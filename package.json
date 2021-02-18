@@ -16,9 +16,11 @@
     "webextension-polyfill-ts": "^0.25.0"
   },
   "devDependencies": {
+    "@snowpack/plugin-build-script": "^2.1.0",
     "@snowpack/plugin-dotenv": "^2.0.5",
     "@snowpack/plugin-optimize": "^0.2.13",
     "@snowpack/plugin-react-refresh": "^2.4.0",
+    "@snowpack/plugin-run-script": "^2.3.0",
     "@snowpack/plugin-typescript": "^1.2.1",
     "@snowpack/web-test-runner-plugin": "^0.2.1",
     "@testing-library/react": "^11.2.5",

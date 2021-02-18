@@ -17,6 +17,14 @@ module.exports = {
         preloadCSSFileName: "/styles.css",
       },
     ],
+    [
+      "@snowpack/plugin-build-script",
+      {
+        input: ["content.ts"], // files to watch
+        output: [".bundle.js"], // files to export
+        cmd: `esbuild $FILE --define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\' --bundle --minify`, // cmd to run
+      },
+    ],
   ],
   routes: [
     /* Enable an SPA Fallback in development: */

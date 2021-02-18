@@ -15,6 +15,7 @@
   "short_name": "Taky Wallet",
 
   "permissions": [
+    "tabs",
     "storage",
     "unlimitedStorage",
     "clipboardWrite",
@@ -45,13 +46,9 @@
   "content_scripts": [
     {
       "matches": ["http://localhost:*/*", "https://*/*"],
-      "js": ["core/content-script.js"],
+      "js": ["core/content.bundle.js"],
       "run_at": "document_start",
       "all_frames": true
     }
-  ],
-  "web_accessible_resources": [
-    "core/content-main.js",
-    "core/meta/pkg/nanoid.js"
   ]
 }
