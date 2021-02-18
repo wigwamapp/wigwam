@@ -2,7 +2,7 @@
 module.exports = {
   mount: {
     public: { url: "/", static: true },
-    src: { url: "/main" },
+    src: { url: "/core" },
   },
   plugins: [
     "@snowpack/plugin-react-refresh",
@@ -11,7 +11,7 @@ module.exports = {
     [
       "@snowpack/plugin-optimize",
       {
-        target: "es2019",
+        target: "es2020",
         preloadModules: true,
         preloadCSS: true,
         preloadCSSFileName: "/styles.css",
@@ -27,7 +27,7 @@ module.exports = {
     // minify: true,
     treeshake: true,
     splitting: true,
-    target: "es2019",
+    target: "es2020",
   },
   packageOptions: {
     /* ... */
@@ -36,6 +36,6 @@ module.exports = {
     open: "none",
   },
   buildOptions: {
-    metaUrlPath: "meta", // chrome issue with __snowpack__ because _ is reserved for system
+    metaUrlPath: "core/meta", // chrome issue with __snowpack__ because _ is reserved for system
   },
 };
