@@ -1,3 +1,3 @@
-import { nanoid } from 'nanoid';
+import { nanoid } from "nanoid";
 
 console.info(nanoid());
