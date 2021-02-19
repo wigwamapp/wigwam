@@ -2,7 +2,7 @@
   "name": "taky",
   "license": "MIT",
   "scripts": {
-    "start": "snowpack build --watch",
+    "start": "cross-env SNOWPACK_PUBLIC_DEBUG=true snowpack build --watch",
     "build": "snowpack build",
     "test": "web-test-runner \"src/**/*.test.tsx\"",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",

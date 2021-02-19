@@ -9,6 +9,10 @@ module.exports = {
     public: { url: "/", static: true },
     src: { url: "/main" },
   },
+  alias: {
+    app: "./src/app",
+    lib: "./src/lib",
+  },
   plugins: [
     "@snowpack/plugin-react-refresh",
     "@snowpack/plugin-dotenv",
