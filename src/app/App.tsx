@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import logo from "./logo.svg";
 import "./App.css";
@@ -7,14 +7,14 @@ interface AppProps {}
 
 function App({}: AppProps) {
   // Create the count state.
-  const [count, setCount] = React.useState(0);
+  const [count, setCount] = useState(0);
   // Create the counter (+1 every second).
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setCount(count + 1), 1000);
     return () => clearTimeout(timer);
   }, [count, setCount]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.info(ethers.Wallet.isSigner(null));
   }, []);
 

@@ -1,19 +1,22 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import App from "app/App";
-import { nanoid } from "nanoid";
-
 import "lib/inter-ui/inter.css";
 import "./index.css";
 
+import React, { StrictMode } from "react";
+import { render } from "react-dom";
+import App from "app/App";
+import { nanoid } from "nanoid";
+import { disableOutlinesForClick } from "lib/outline-on-click";
+
 console.info(nanoid(), import.meta.env.SNOWPACK_PUBLIC_KEK);
 
-ReactDOM.render(
-  <React.StrictMode>
+render(
+  <StrictMode>
     <App />
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById("root")
 );
+
+disableOutlinesForClick();
 
 // Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
 // Learn more: https://snowpack.dev/concepts/hot-module-replacement
