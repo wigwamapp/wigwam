@@ -3,7 +3,9 @@ import * as ReactDOM from "react-dom";
 import App from "./App";
 import { nanoid } from "nanoid";
 
-import "./index.css";
+import "./styles/inter.css";
+import "./styles/tailwind.css";
+import "./styles/base.css";
 
 console.info(nanoid(), import.meta.env.SNOWPACK_PUBLIC_KEK);
 

@@ -2,12 +2,13 @@
 module.exports = {
   mount: {
     public: { url: "/", static: true },
-    src: { url: "/core" },
+    src: { url: "/main" },
   },
   plugins: [
     "@snowpack/plugin-react-refresh",
     "@snowpack/plugin-dotenv",
     "@snowpack/plugin-typescript",
+    "@snowpack/plugin-postcss",
     [
       "@snowpack/plugin-optimize",
       {
@@ -44,6 +45,6 @@ module.exports = {
     open: "none",
   },
   buildOptions: {
-    metaUrlPath: "core/meta", // chrome issue with __snowpack__ because _ is reserved for system
+    metaUrlPath: "meta", // chrome issue with __snowpack__ because _ is reserved for system
   },
 };
