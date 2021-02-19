@@ -1,3 +1,8 @@
+"use strict";
+
+const PROD =
+  process.env.NODE_ENV === "production" && !process.argv.includes("--watch");
+
 /** @type {import("snowpack").SnowpackUserConfig } */
 module.exports = {
   mount: {
@@ -10,36 +15,26 @@ module.exports = {
     "@snowpack/plugin-typescript",
     "@snowpack/plugin-postcss",
     [
-      "@snowpack/plugin-optimize",
-      {
-        target: "es2020",
-        preloadModules: true,
-        preloadCSS: true,
-        preloadCSSFileName: "/styles.css",
-      },
-    ],
-    [
       "@snowpack/plugin-build-script",
       {
         input: ["content.ts"], // files to watch
         output: [".bundle.js"], // files to export
-        cmd: `esbuild $FILE --define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\' --bundle --minify`, // cmd to run
+        cmd: [
+          "esbuild",
+          "$FILE",
+          `--define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\'`,
+          "--bundle",
+          "--minify",
+        ].join(" "), // cmd to run
       },
     ],
   ],
-  routes: [
-    /* Enable an SPA Fallback in development: */
-    // {"match": "routes", "src": ".*", "dest": "/index.html"},
-  ],
   optimize: {
-    // bundle: true,
-    // minify: true,
-    treeshake: true,
-    splitting: true,
+    bundle: PROD,
+    minify: PROD,
+    treeshake: PROD,
+    splitting: PROD,
     target: "es2020",
-  },
-  packageOptions: {
-    /* ... */
   },
   devOptions: {
     open: "none",
