@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { LocationProvider } from "woozie";
 import { QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query-devtools";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { Toaster } from "react-hot-toast";
 import { QUERY_CLIENT, FONTS } from "app/defaults";
 import ErrBond from "app/components/a11y/ErrBond";

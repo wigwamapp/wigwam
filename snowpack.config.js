@@ -13,6 +13,9 @@ module.exports = {
     app: "./src/app",
     core: "./src/core",
     lib: "./src/lib",
+    "react-query/devtools": PROD
+      ? "react-query/devtools"
+      : "react-query/devtools/development",
   },
   plugins: [
     "@snowpack/plugin-react-refresh",
