@@ -29,8 +29,10 @@ module.exports = {
           "$FILE",
           `--define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\'`,
           "--bundle",
-          "--minify",
-        ].join(" "), // cmd to run
+          PROD && "--minify",
+        ]
+          .filter(Boolean)
+          .join(" "),
       },
     ],
     "./remove-hmrurl-plugin.js",
