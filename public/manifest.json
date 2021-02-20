@@ -21,7 +21,7 @@
     "clipboardWrite",
     "activeTab"
   ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'sha256-IuAdsMm/zBYzKQ9PHU8+Gm2xlCjV34Cepcl04ifYzUw=' 'sha256-JKdiWbFYPWshDThcHMRMPiqX4YP+/vmCU367fFNz29s=' 'unsafe-eval'; object-src 'self'",
 
   "author": "",
 
