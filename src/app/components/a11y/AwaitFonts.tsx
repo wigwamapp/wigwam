@@ -25,7 +25,7 @@ const AwaitFonts: React.FC<AwaitFontsProps> = ({ fonts }) => {
 
       await Promise.all(fontFaces.map((ff) => ff.load(undefined, 5_000)));
     } catch (err) {
-      if (process.env.NODE_ENV === "development") {
+      if (import.meta.env.SNOWPACK_PUBLIC_DEBUG === "true") {
         console.error(err);
       }
     } finally {
