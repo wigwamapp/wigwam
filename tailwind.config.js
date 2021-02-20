@@ -20,6 +20,19 @@ module.exports = {
       fontFamily: {
         sans: ["Inter", ...theme.fontFamily.sans],
       },
+      animation: {
+        bootfadein: "bootfadein 0.15s ease-in-out",
+      },
+      keyframes: {
+        bootfadein: {
+          from: {
+            opacity: "0",
+          },
+          to: {
+            opacity: "1",
+          },
+        },
+      },
     },
   },
   variants: {
