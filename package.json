@@ -4,7 +4,7 @@
   "scripts": {
     "start": "cross-env SNOWPACK_PUBLIC_DEBUG=true snowpack build --watch --hmr",
     "build": "cross-env SNOWPACK_PUBLIC_DEBUG=false snowpack build",
-    "test": "web-test-runner \"src/**/*.test.tsx\""
+    "test": "web-test-runner \"src/**/*.test.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
     "clsx": "1.1.1",
