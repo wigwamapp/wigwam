@@ -11,6 +11,7 @@ module.exports = {
   },
   alias: {
     app: "./src/app",
+    core: "./src/core",
     lib: "./src/lib",
   },
   plugins: [
@@ -44,6 +45,7 @@ module.exports = {
     open: "none",
   },
   buildOptions: {
-    metaUrlPath: "meta", // chrome issue with __snowpack__ because _ is reserved for system
+    metaUrlPath: "meta", // chrome issue with __snowpack__ because _ is reserved for system,
+    // sourcemap: !PROD,
   },
 };

@@ -3,11 +3,12 @@ import "./index.css";
 
 import React, { StrictMode } from "react";
 import { render } from "react-dom";
-import App from "app/App";
-import { nanoid } from "nanoid";
+import { enableHashRouting } from "woozie";
 import { disableOutlinesForClick } from "lib/outline-on-click";
+import App from "app/components/App";
 
-console.info(nanoid(), import.meta.env.SNOWPACK_PUBLIC_KEK);
+enableHashRouting();
+disableOutlinesForClick();
 
 render(
   <StrictMode>
@@ -15,8 +16,6 @@ render(
   </StrictMode>,
   document.getElementById("root")
 );
-
-disableOutlinesForClick();
 
 // Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
 // Learn more: https://snowpack.dev/concepts/hot-module-replacement
