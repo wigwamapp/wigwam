@@ -21,6 +21,7 @@ function App({}: AppProps) {
   // Return the App component.
   return (
     <div className="App">
+      <div className="flex items-center justify-center text-xs leading-tight"></div>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
