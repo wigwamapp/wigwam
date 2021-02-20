@@ -44,6 +44,7 @@
     "autoprefixer": "10.2.4",
     "chai": "4.3.0",
     "cross-env": "7.0.3",
+    "glob": "7.1.6",
     "postcss": "8.2.6",
     "postcss-cli": "8.3.1",
     "rollup": "2.39.0",

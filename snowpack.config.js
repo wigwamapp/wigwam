@@ -33,6 +33,7 @@ module.exports = {
         ].join(" "), // cmd to run
       },
     ],
+    "./remove-hmrurl-plugin.js",
   ],
   optimize: {
     bundle: PROD,
