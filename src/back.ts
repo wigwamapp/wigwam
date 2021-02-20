@@ -2,6 +2,15 @@ import { browser } from "webextension-polyfill-ts";
 
 console.info(browser.runtime.id);
 
+browser.browserAction.onClicked.addListener((tab) => {
+  browser.tabs.create({
+    windowId: tab.windowId,
+    index: tab.index + 1,
+    url: browser.runtime.getURL("index.html"),
+    active: true,
+  });
+});
+
 // setTimeout(async () => {
 //   const [currentTab] = await browser.tabs.query({
 //     currentWindow: true,
