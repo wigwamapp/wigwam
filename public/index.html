@@ -13,19 +13,7 @@
         (!("theme" in localStorage) &&
           window.matchMedia("(prefers-color-scheme: dark)").matches)
       ) {
-        document.querySelector("html").classList.add("dark");
-      } else {
-        document.querySelector("html").classList.remove("dark");
-      }
-
-      function toggleDarkMode() {
-        if (document.querySelector("html").classList.contains("dark")) {
-          localStorage.theme = "light";
-          document.querySelector("html").classList.remove("dark");
-        } else {
-          localStorage.theme = "dark";
-          document.querySelector("html").classList.add("dark");
-        }
+        document.documentElement.classList.add("dark");
       }
     </script>
     <script>window.HMR_WEBSOCKET_URL="ws://localhost:12321"</script>

@@ -21,7 +21,7 @@
     "clipboardWrite",
     "activeTab"
   ],
-  "content_security_policy": "script-src 'self' 'sha256-IuAdsMm/zBYzKQ9PHU8+Gm2xlCjV34Cepcl04ifYzUw=' 'sha256-JKdiWbFYPWshDThcHMRMPiqX4YP+/vmCU367fFNz29s=' 'sha256-LDbRcBvep4opMgLNJolM8Zec6OEO8pw2JL590D2n6Bs=' 'unsafe-eval'; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'sha256-IuAdsMm/zBYzKQ9PHU8+Gm2xlCjV34Cepcl04ifYzUw=' 'sha256-JKdiWbFYPWshDThcHMRMPiqX4YP+/vmCU367fFNz29s=' 'sha256-a4v4czp2qnmr595pGYlZ07gEumM6d9R5qGz9t8CjuUE=' 'unsafe-eval'; object-src 'self'",
 
   "author": "",
 
