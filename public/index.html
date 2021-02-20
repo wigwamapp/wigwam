@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="min-h-screen" style="background-color: #282c34;">
+<html class="min-h-screen">
   <head>
     <meta charset="utf-8" />
     <meta
@@ -7,6 +7,27 @@
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
     <title>Taky Wallet</title>
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.querySelector("html").classList.add("dark");
+      } else {
+        document.querySelector("html").classList.remove("dark");
+      }
+
+      function toggleDarkMode() {
+        if (document.querySelector("html").classList.contains("dark")) {
+          localStorage.theme = "light";
+          document.querySelector("html").classList.remove("dark");
+        } else {
+          localStorage.theme = "dark";
+          document.querySelector("html").classList.add("dark");
+        }
+      }
+    </script>
     <script>window.HMR_WEBSOCKET_URL="ws://localhost:12321"</script>
   </head>
   <body class="font-sans antialiased">
