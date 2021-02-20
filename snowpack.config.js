@@ -39,6 +39,7 @@ module.exports = {
       },
     ],
     "./remove-hmrurl-plugin.js",
+    "./optimize-manifest-plugin.js",
   ],
   optimize: {
     bundle: PROD,
