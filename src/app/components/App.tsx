@@ -21,10 +21,7 @@ const App: React.FC = () => (
         </ErrBond>
 
         <Toaster />
-
-        {import.meta.env.SNOWPACK_PUBLIC_DEBUG === "true" && (
-          <ReactQueryDevtools />
-        )}
+        <ReactQueryDevtools />
       </>
     </QueryClientProvider>
   </LocationProvider>

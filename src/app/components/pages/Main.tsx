@@ -6,7 +6,7 @@ import BoxIcon from "app/icons/box.svgr.svg";
 const Main: React.FC = () => (
   <PageLayout>
     <div className="py-8">
-      <h1 className="text-4xl font-semibold text-brand-indigo">Hello!</h1>
+      <h1 className="text-4xl font-semibold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
     </div>
@@ -42,12 +42,12 @@ const MyListbox: React.FC = () => {
         >
           {({ open }) => (
             <>
-              <Listbox.Label className="block text-sm leading-5 font-medium text-gray-700">
+              <Listbox.Label className="block text-sm leading-5 font-medium">
                 Assigned to
               </Listbox.Label>
               <div className="relative">
                 <span className="inline-block w-full rounded-md shadow-sm">
-                  <Listbox.Button className="cursor-default relative w-full rounded-md border border-gray-300 bg-white pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                  <Listbox.Button className="cursor-default relative w-full rounded-md border border-gray-300 pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-brand-primary transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                     <span className="block truncate">{selectedPerson}</span>
                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <svg
@@ -72,7 +72,7 @@ const MyListbox: React.FC = () => {
                   leave="transition ease-in duration-100"
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
-                  className="absolute mt-1 w-full rounded-md bg-white shadow-lg"
+                  className="absolute mt-1 w-full rounded-md bg-white dark:bg-brand-darkover shadow-lg"
                 >
                   <Listbox.Options
                     static
@@ -85,7 +85,7 @@ const MyListbox: React.FC = () => {
                             className={`${
                               active
                                 ? "text-white bg-blue-600"
-                                : "text-gray-900"
+                                : "text-brand-darktext dark:text-white"
                             } cursor-default select-none relative py-2 pl-8 pr-4`}
                           >
                             <span

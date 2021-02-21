@@ -14,7 +14,11 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          indigo: "#74328E",
+          darkbg: "#1F2128",
+          darkover: "#191B20",
+          darktext: "#11142D",
+          lightgray: "#E4E4E4",
+          primary: "#355DFF",
         },
       },
       fontFamily: {

@@ -20,7 +20,9 @@ const PageLayout: React.FC = ({ children }) => {
       onAnimationEnd={bootAnimationDisplayed ? handleAnimationEnd : undefined}
     >
       <ContentContainer>
-        <header className="flex items-center py-8">Header</header>
+        <header className="flex items-center py-8">
+          <h1 className="font-semibold text-xl">Header</h1>
+        </header>
 
         <main>{children}</main>
       </ContentContainer>
