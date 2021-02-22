@@ -1,25 +1,18 @@
-import { browser } from "webextension-polyfill-ts";
+import { Emitter } from "lib/emitter";
 
-const kek = async () => {
-  const [currentTab] = await browser.tabs.query({
-    currentWindow: true,
-    active: true,
-  });
+interface RequestArguments {
+  readonly method: string;
+  readonly params?: readonly unknown[] | object;
+}
 
-  await browser.tabs.create({
-    windowId: currentTab.windowId,
-    index: currentTab.index + 1,
-    url: browser.runtime.getURL("index.html"),
-    active: true,
-    pinned: true,
-    openerTabId: currentTab.id,
-  });
-};
+// interface ProviderRpcError extends Error {
+//   message: string;
+//   code: number;
+//   data?: unknown;
+// }
 
-window.addEventListener("message", (evt) => {
-  if (evt.source !== window) return;
+class Ethereum extends Emitter {
+  async enable() {}
 
-  if (evt.data?.type === "kek") {
-    kek();
-  }
-});
+  async request(_req: RequestArguments) {}
+}
