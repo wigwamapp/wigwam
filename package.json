@@ -11,7 +11,7 @@
     "clsx": "1.1.1",
     "csstype": "2.6.15",
     "dexie": "3.1.0-alpha.8",
-    "dexie-react-hooks": "1.0.5",
+    "dexie-react-hooks": "1.0.6",
     "ethers": "5.0.31",
     "fontfaceobserver": "2.1.0",
     "nanoid": "3.1.20",
@@ -19,7 +19,7 @@
     "react-dom": "17.0.1",
     "react-error-boundary": "3.1.0",
     "react-hot-toast": "1.0.2",
-    "react-query": "3.9.8",
+    "react-query": "3.9.9",
     "webextension-polyfill-ts": "0.25.0",
     "woozie": "1.0.0-beta.8"
   },
