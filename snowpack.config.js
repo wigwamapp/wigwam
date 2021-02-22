@@ -32,6 +32,7 @@ module.exports = {
           "esbuild",
           "$FILE",
           `--define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\'`,
+          `--define:process.env.SNOWPACK_PUBLIC_DEBUG=\'"${process.env.SNOWPACK_PUBLIC_DEBUG}"\'`,
           "--bundle",
           PROD && "--minify",
         ]
@@ -53,7 +54,7 @@ module.exports = {
     open: "none",
   },
   buildOptions: {
-    metaUrlPath: "meta", // chrome issue with __snowpack__ because _ is reserved for system,
-    // sourcemap: !PROD,
+    metaUrlPath: "meta", // chrome ext issue with __snowpack__ because _ is reserved for system,
+    // sourcemap: !PROD, // chrome ext issue with sourcemaps
   },
 };
