@@ -1,5 +1,6 @@
 {
   "name": "taky",
+  "private": true,
   "license": "MIT",
   "scripts": {
     "start": "cross-env SNOWPACK_PUBLIC_DEBUG=true snowpack build --watch --hmr",
