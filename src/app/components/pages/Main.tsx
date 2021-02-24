@@ -9,6 +9,7 @@ const Main: React.FC = () => (
       <h1 className="text-4xl font-semibold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
+      <img src="https://via.placeholder.com/150.png" alt="" />
     </div>
   </PageLayout>
 );
