@@ -6,7 +6,8 @@
     "start": "cross-env SNOWPACK_PUBLIC_DEBUG=true snowpack build --watch --hmr",
     "build": "cross-env SNOWPACK_PUBLIC_DEBUG=false snowpack build",
     "test": "web-test-runner \"src/**/*.test.{js,jsx,ts,tsx}\"",
-    "lint": "eslint {src,types} --ext .js,jsx,.ts,.tsx --color"
+    "lint": "eslint {src,types} --ext .js,jsx,.ts,.tsx --color",
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@headlessui/react": "0.3.1",
