@@ -4,11 +4,12 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
-  "plugins": ["prettier", "@typescript-eslint", "react-hooks"],
+  "plugins": ["prettier", "@typescript-eslint", "react-hooks", "jsx-a11y"],
   "extends": [
     "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:jsx-a11y/recommended"
   ],
   "rules": {
     "@typescript-eslint/no-use-before-define": [
