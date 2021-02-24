@@ -42,10 +42,13 @@ module.exports = {
     ],
     [
       "@snowpack/plugin-run-script",
-      {
-        cmd: "eslint src --ext .js,.mjs,jsx,.ts,.tsx",
-        watch: "esw -w --clear src --ext .js,.mjs,jsx,.ts,.tsx",
-      },
+      (() => {
+        const common = "{src,types} --ext .js,jsx,.ts,.tsx --color";
+        return {
+          cmd: `eslint ${common}`,
+          watch: `esw -w --clear --max-warnings 5 ${common}`,
+        };
+      })(),
     ],
     "./remove-hmrurl-plugin.js",
     "./optimize-manifest-plugin.js",

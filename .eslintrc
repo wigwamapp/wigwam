@@ -1,39 +1,36 @@
 {
-  "extends":[
-    "airbnb-typescript",
-    "airbnb/hooks",
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "plugin:prettier/recommended"
-  ],
-  "plugins":[
-    "react",
-    "@typescript-eslint"
-  ],
-  "env":{
-    "browser":true,
-    "es6":true
-  },
-  "globals":{
-    "Atomics":"readonly",
-    "SharedArrayBuffer":"readonly"
-  },
-  "parser":"@typescript-eslint/parser",
-  "parserOptions":{
-    "ecmaFeatures":{
-      "jsx":true
-    },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
     "ecmaVersion": 2020,
-    "sourceType": "module",
-    "project":"./tsconfig.json"
+    "sourceType": "module"
   },
-  "rules":{
-    "linebreak-style":"off",
-    "prettier/prettier":[
-      "error",
+  "plugins": ["prettier", "@typescript-eslint", "react-hooks"],
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-use-before-define": [
+      "warn",
       {
-        "endOfLine":"auto"
+        "functions": false,
+        "classes": false,
+        "variables": false,
+        "typedefs": false
       }
-    ]
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "detect"
+    }
   }
 }

@@ -6,4 +6,6 @@ export interface TakyMessageBase {
   type: TakyMessageType;
 }
 
-export interface TakyPermissionMessage {}
+export interface TakyPermissionMessage extends TakyMessageBase {
+  type: TakyMessageType.PageMessage;
+}
