@@ -40,6 +40,13 @@ module.exports = {
           .join(" "),
       },
     ],
+    [
+      "@snowpack/plugin-run-script",
+      {
+        cmd: "eslint src --ext .js,.mjs,jsx,.ts,.tsx",
+        watch: "esw -w --clear src --ext .js,.mjs,jsx,.ts,.tsx",
+      },
+    ],
     "./remove-hmrurl-plugin.js",
     "./optimize-manifest-plugin.js",
   ],
