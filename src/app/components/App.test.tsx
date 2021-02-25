@@ -1,12 +1,9 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import { expect } from "chai";
+import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-describe("<App>", () => {
-  it("renders fine", () => {
-    const { getByText } = render(<App />);
-    const hElement = getByText(/Hello!/i);
-    expect(document.body.contains(hElement));
-  });
+test("renders Hello", async () => {
+  render(<App />);
+  const hElement = await screen.findByText(/Hello!/i);
+  expect(hElement).toBeInTheDocument();
 });
