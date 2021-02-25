@@ -5,7 +5,7 @@
   "scripts": {
     "start": "cross-env SNOWPACK_PUBLIC_DEBUG=true snowpack build --watch --hmr",
     "build": "cross-env SNOWPACK_PUBLIC_DEBUG=false snowpack build",
-    "test": "web-test-runner \"src/**/*.test.{js,jsx,ts,tsx}\"",
+    "test": "cross-env NODE_ENV=test SNOWPACK_PUBLIC_DEBUG=true wtr \"src/**/*.test.{js,jsx,ts,tsx}\"",
     "lint": "eslint {src,types} --ext .js,jsx,.ts,.tsx --color",
     "postinstall": "husky install"
   },
@@ -45,6 +45,7 @@
     "@typescript-eslint/eslint-plugin": "4.15.2",
     "@typescript-eslint/parser": "4.15.2",
     "@web/test-runner": "0.12.15",
+    "@web/test-runner-puppeteer": "0.9.3",
     "autoprefixer": "10.2.4",
     "chai": "4.3.0",
     "cross-env": "7.0.3",
@@ -68,11 +69,11 @@
     "typescript": "4.1.5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "{src,types}/**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
       "eslint --color"
     ],
-    "*.{json,html,css,md}": [
+    "*.{js,json,html,css,md}": [
       "prettier --write"
     ]
   }
