@@ -36,7 +36,11 @@ export class Vault {
       await Storage.transact(async () => {
         await Storage.clear();
         await Storage.encryptAndSaveMany(
-          [[seedPhraseStrgKey, seedPhrase]],
+          [
+            [checkStrgKey, null],
+            [migrationLevelStrgKey, MIGRATIONS.length],
+            [seedPhraseStrgKey, seedPhrase],
+          ],
           passwordKey
         );
       });
