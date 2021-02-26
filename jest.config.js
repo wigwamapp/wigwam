@@ -1,7 +1,7 @@
 module.exports = {
   roots: ["<rootDir>/src"],
   collectCoverageFrom: ["src/**/*.{js,jsx,ts,tsx}", "!src/**/*.d.ts"],
-  setupFiles: ["react-app-polyfill/jsdom", "jest-webextension-mock"],
+  setupFiles: ["react-app-polyfill/jsdom", "@serh11p/jest-webextension-mock"],
   setupFilesAfterEnv: ["<rootDir>/.jest/setup.js"],
   testMatch: [
     "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
@@ -25,5 +25,4 @@ module.exports = {
     "\\.svgr.svg$": "<rootDir>/.jest/svgrMock.js",
   },
   moduleFileExtensions: ["js", "ts", "tsx", "json", "jsx", "node"],
-  resetMocks: true,
 };
