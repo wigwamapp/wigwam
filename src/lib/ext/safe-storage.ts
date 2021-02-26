@@ -7,12 +7,12 @@ export const transact = createQueue();
 
 export async function isStored(key: string) {
   const items = await browser.storage.local.get([key]);
-  return key in items;
+  return key in items && items[key] !== undefined;
 }
 
 export async function fetchOne<T = any>(key: string) {
   const items = await browser.storage.local.get([key]);
-  if (key in items) {
+  if (key in items && items[key] !== undefined) {
     return items[key] as T;
   } else {
     throw new Error("Some storage item not found");

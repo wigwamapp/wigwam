@@ -39,6 +39,7 @@
   "devDependencies": {
     "@babel/core": "7.13.1",
     "@babel/preset-react": "7.12.13",
+    "@peculiar/webcrypto": "1.1.6",
     "@serh11p/jest-webextension-mock": "4.0.0",
     "@snowpack/plugin-build-script": "2.1.0",
     "@snowpack/plugin-dotenv": "2.0.5",
