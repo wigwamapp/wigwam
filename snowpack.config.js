@@ -50,8 +50,8 @@ module.exports = {
         };
       })(),
     ],
-    "./remove-hmrurl-plugin.js",
-    "./optimize-manifest-plugin.js",
+    "./.sp/remove-hmrurl-plugin.js",
+    "./.sp/optimize-manifest-plugin.js",
   ],
   optimize: {
     bundle: PROD,
