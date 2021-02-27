@@ -17,4 +17,4 @@ export const QUERY_CLIENT = new QueryClient({
   },
 });
 
-export const FONTS: [string, number[]][] = [["Inter", [300, 400, 500, 600]]];
+export const FONTS: [string, number[]][] = [["Inter", [300, 400, 600, 700]]];
