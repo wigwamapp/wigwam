@@ -17,8 +17,8 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
         .filter(
           (item) =>
             ![
+              "'sha256-Im2HSIcth1+PSO42zNcDBJihVCLxbR3xLNQ5HXL+WOI='",
               "'sha256-IuAdsMm/zBYzKQ9PHU8+Gm2xlCjV34Cepcl04ifYzUw='",
-              "'sha256-JKdiWbFYPWshDThcHMRMPiqX4YP+/vmCU367fFNz29s='",
             ].includes(item)
         )
         .join(" ");

@@ -36,7 +36,10 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
 
 function removeHmrURLScript(content) {
   return content.replace(
-    `<script>window.HMR_WEBSOCKET_URL="ws://localhost:12321"</script>`,
+    `
+    <script>
+      window.HMR_WEBSOCKET_URL = "ws://localhost:12321";
+    </script>`,
     ""
   );
 }
