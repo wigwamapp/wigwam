@@ -6,10 +6,9 @@ import BoxIcon from "app/icons/box.svgr.svg";
 const Main: React.FC = () => (
   <PageLayout>
     <div className="py-8">
-      <h1 className="text-4xl font-semibold text-brand-primary">Hello!</h1>
+      <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
-      <img src="https://via.placeholder.com/150.png" alt="" />
     </div>
   </PageLayout>
 );
