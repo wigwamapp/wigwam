@@ -52,6 +52,7 @@ module.exports = {
     ],
     "./.sp/remove-hmrurl-plugin.js",
     "./.sp/optimize-manifest-plugin.js",
+    "./.sp/remove-useless-stuff.js",
   ],
   optimize: {
     bundle: PROD,
