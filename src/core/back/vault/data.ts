@@ -23,6 +23,10 @@ export const accPubKeyStrgKey = createDynamicStorageKey(
   StorageEntity.AccPubKey
 );
 
+/**
+ * Helpers
+ */
+
 function createStorageKey(id: StorageEntity) {
   return combineStorageKey(STORAGE_KEY_PREFIX, id);
 }

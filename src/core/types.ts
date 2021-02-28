@@ -10,6 +10,13 @@ export interface TakyPermissionMessage extends TakyMessageBase {
   type: TakyMessageType.PageMessage;
 }
 
+export enum WalletStatus {
+  NotInited,
+  Idle,
+  Locked,
+  Ready,
+}
+
 export enum AccountType {
   HD = "HD",
   Imported = "IMPORTED",

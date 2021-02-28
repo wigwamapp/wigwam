@@ -21,6 +21,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "remove",
     "noImplicitReturns": true,
     "noImplicitAny": true
   }

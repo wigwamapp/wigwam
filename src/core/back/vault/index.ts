@@ -20,7 +20,7 @@ import {
 } from "./data";
 
 export class Vault {
-  static async init(password: string) {
+  static async unlock(password: string) {
     const passwordKey = await Vault.toPasswordKey(password);
 
     return withError("Failed to unlock wallet", async () => {
@@ -93,6 +93,18 @@ export class Vault {
       Storage.fetchAndDecryptOne<string>(
         accPrivKeyStrgKey(accAddress),
         passwordKey
+      )
+    );
+  }
+
+  static async deleteAccount(password: string, accAddress: string) {
+    await Vault.toPasswordKey(password);
+    return withError("Failed to delete account", () =>
+      Storage.transact(() =>
+        Storage.remove([
+          accPrivKeyStrgKey(accAddress),
+          accPubKeyStrgKey(accAddress),
+        ])
       )
     );
   }
@@ -227,9 +239,12 @@ export class Vault {
           return address;
         })
         .with({ type: AccountType.Imported }, async (p) => {
-          const { address } = new ethers.Wallet(p.privateKey);
+          const { publicKey, address } = new ethers.Wallet(p.privateKey);
           await Storage.encryptAndSaveMany(
-            [[accPrivKeyStrgKey(address), p.privateKey]],
+            [
+              [accPrivKeyStrgKey(address), p.privateKey],
+              [accPubKeyStrgKey(address), publicKey],
+            ],
             this.passwordKey
           );
           return address;
