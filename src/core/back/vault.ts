@@ -78,6 +78,31 @@ export class Vault {
     return Storage.isStored(seedPhraseStrgKey);
   }
 
+  static async fetchSeedPhrase(password: string) {
+    const passwordKey = await Vault.toPasswordKey(password);
+    return withError("Failed to fetch seed phrase", async () => {
+      const seedPhraseExists = await Vault.hasSeedPhrase();
+      if (!seedPhraseExists) {
+        throw new PublicError("Seed phrase has not yet been established");
+      }
+
+      return Storage.fetchAndDecryptOne<SeedPharse>(
+        seedPhraseStrgKey,
+        passwordKey
+      );
+    });
+  }
+
+  static async fetchPrivateKey(password: string, accAddress: string) {
+    const passwordKey = await Vault.toPasswordKey(password);
+    return withError("Failed to fetch private key", () =>
+      Storage.fetchAndDecryptOne<string>(
+        accPrivKeyStrgKey(accAddress),
+        passwordKey
+      )
+    );
+  }
+
   private static toPasswordKey(password: string) {
     return withError("Invalid password", async (doThrow) => {
       const passwordKey = await Encryptor.generateKey(password);
@@ -144,10 +169,28 @@ export class Vault {
     );
   }
 
+  sign(accAddress: string, digest: string) {
+    return withError("Failed to sign", async () => {
+      const strgKey = accPrivKeyStrgKey(accAddress);
+      const privKeyExists = await Storage.isStored(strgKey);
+      if (!privKeyExists) {
+        throw new PublicError("Cannot sign for this account");
+      }
+
+      const privKey = await Storage.fetchAndDecryptOne<string>(
+        strgKey,
+        this.passwordKey
+      );
+
+      const signingKey = new ethers.utils.SigningKey(privKey);
+      return signingKey.signDigest(digest);
+    });
+  }
+
   private addSeedPhraseForce(seedPhrase: SeedPharse) {
     return withError("Failed to add Seed Phrase", async () => {
-      const seedPhraseExist = await Vault.hasSeedPhrase();
-      if (seedPhraseExist) {
+      const seedPhraseExists = await Vault.hasSeedPhrase();
+      if (seedPhraseExists) {
         throw new PublicError("Seed phrase already exists");
       }
 
@@ -163,8 +206,8 @@ export class Vault {
       match(params)
         .exhaustive()
         .with({ type: AccountType.HD }, async (p) => {
-          const seedPhraseExist = await Vault.hasSeedPhrase();
-          if (!seedPhraseExist) {
+          const seedPhraseExists = await Vault.hasSeedPhrase();
+          if (!seedPhraseExists) {
             throw new PublicError("Seed phrase has not yet been established");
           }
 
@@ -294,7 +337,7 @@ function validateDerivationPath(path: string) {
 
 function validatePrivateKey(privKey: string) {
   try {
-    new ethers.Wallet(privKey);
+    new ethers.utils.SigningKey(privKey);
   } catch {
     throw new PublicError("Invalid private key");
   }
@@ -302,7 +345,7 @@ function validatePrivateKey(privKey: string) {
 
 function validatePublicKey(pubKey: string) {
   try {
-    ethers.utils.computeAddress(ethers.utils.arrayify(pubKey));
+    ethers.utils.computeAddress(pubKey);
   } catch {
     throw new PublicError("Invalid public key");
   }
