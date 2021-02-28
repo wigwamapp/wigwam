@@ -10,25 +10,14 @@ import {
   validateAddAccountParams,
   validateSeedPhrase,
 } from "core/helpers";
-
-type Migration = (passKey: CryptoKey) => Promise<void>;
-
-const STORAGE_KEY_PREFIX = "vault";
-const MIGRATIONS: ReadonlyArray<Migration> = [];
-
-enum StorageEntity {
-  Check = "check",
-  MigrationLevel = "mgrnlvl",
-  SeedPhrase = "seedphrase",
-  AccPrivKey = "accprivkey",
-  AccPubKey = "accpubkey",
-}
-
-const checkStrgKey = createStorageKey(StorageEntity.Check);
-const migrationLevelStrgKey = createStorageKey(StorageEntity.MigrationLevel);
-const seedPhraseStrgKey = createStorageKey(StorageEntity.SeedPhrase);
-const accPrivKeyStrgKey = createDynamicStorageKey(StorageEntity.AccPrivKey);
-const accPubKeyStrgKey = createDynamicStorageKey(StorageEntity.AccPubKey);
+import {
+  MIGRATIONS,
+  checkStrgKey,
+  migrationLevelStrgKey,
+  seedPhraseStrgKey,
+  accPrivKeyStrgKey,
+  accPubKeyStrgKey,
+} from "./data";
 
 export class Vault {
   static async init(password: string) {
@@ -258,18 +247,4 @@ export class Vault {
         .run()
     );
   }
-}
-
-function createStorageKey(id: StorageEntity) {
-  return combineStorageKey(STORAGE_KEY_PREFIX, id);
-}
-
-function createDynamicStorageKey(id: StorageEntity) {
-  const keyBase = combineStorageKey(STORAGE_KEY_PREFIX, id);
-  return (...subKeys: (number | string)[]) =>
-    combineStorageKey(keyBase, ...subKeys);
-}
-
-function combineStorageKey(...parts: (string | number)[]) {
-  return parts.join("_");
 }
