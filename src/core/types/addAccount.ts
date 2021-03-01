@@ -1,33 +1,4 @@
-export enum TakyMessageType {
-  PageMessage = "PAGE_MESSAGE",
-}
-
-export interface TakyMessageBase {
-  type: TakyMessageType;
-}
-
-export interface TakyPermissionMessage extends TakyMessageBase {
-  type: TakyMessageType.PageMessage;
-}
-
-export enum WalletStatus {
-  NotInited,
-  Idle,
-  Locked,
-  Ready,
-}
-
-export enum AccountType {
-  HD = "HD",
-  Imported = "IMPORTED",
-  Hardware = "HARDWARE",
-  Void = "VOID",
-}
-
-export interface SeedPharse {
-  phrase: string;
-  lang: string;
-}
+import { AccountType } from "./base";
 
 export type AddAccountParams =
   | AddHDAccountParams
