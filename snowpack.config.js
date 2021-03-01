@@ -31,6 +31,7 @@ module.exports = {
         cmd: [
           "esbuild",
           "$FILE",
+          `--define:import.meta='{"env":{"SNOWPACK_PUBLIC_DEBUG":"${process.env.SNOWPACK_PUBLIC_DEBUG}"}}'`,
           `--define:process.env.NODE_ENV=\'"${process.env.NODE_ENV}"\'`,
           `--define:process.env.SNOWPACK_PUBLIC_DEBUG=\'"${process.env.SNOWPACK_PUBLIC_DEBUG}"\'`,
           "--bundle",

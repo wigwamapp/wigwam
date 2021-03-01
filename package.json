@@ -84,5 +84,8 @@
     "snowpack-svgr-plugin": "1.0.3",
     "tailwindcss": "2.0.3",
     "typescript": "4.2.2"
+  },
+  "resolutions": {
+    "esbuild": "0.8.54"
   }
 }
