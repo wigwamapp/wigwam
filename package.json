@@ -9,15 +9,6 @@
     "lint": "eslint {src,types} --ext .js,jsx,.ts,.tsx --color",
     "postinstall": "husky install"
   },
-  "lint-staged": {
-    "{src,types}/**/*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --color"
-    ],
-    "*.{js,json,html,css,md}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@ethersproject/wordlists": "5.0.9",
     "@headlessui/react": "0.3.1",
