@@ -11,11 +11,11 @@ type State = {
 };
 
 const store = create<State>((set) => ({
-  status: WalletStatus.NotInited,
+  status: WalletStatus.Idle,
   vault: null,
   init: (vaultExists) =>
     set({
-      status: vaultExists ? WalletStatus.Locked : WalletStatus.Idle,
+      status: vaultExists ? WalletStatus.Locked : WalletStatus.Welcome,
       vault: null,
     }),
   unlock: (vault) => set({ status: WalletStatus.Ready, vault }),
