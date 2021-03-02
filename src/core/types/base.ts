@@ -1,6 +1,6 @@
 export enum WalletStatus {
-  NotInited,
   Idle,
+  Welcome,
   Locked,
   Ready,
 }
