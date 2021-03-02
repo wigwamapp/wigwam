@@ -5,6 +5,13 @@ export enum IntercomMessageType {
   Void = "INTERCOM_VOID",
 }
 
+export type IntercomClientMessage = IntercomRequest | IntercomVoid;
+
+export type IntercomServerMessage =
+  | IntercomResponse
+  | IntercomError
+  | IntercomVoid;
+
 export interface IntercomMessageBase {
   type: IntercomMessageType;
   data: any;

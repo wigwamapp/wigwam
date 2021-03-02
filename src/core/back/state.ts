@@ -3,15 +3,6 @@ import { assert } from "lib/system/assert";
 import { WalletStatus } from "core/types";
 import { Vault } from "./vault";
 
-// export async function unlock(password: string) {
-//   const vault = await Vault.unlock(password);
-//   store.getState().unlock(vault);
-// }
-
-// export async function lock() {
-//   store.getState().lock();
-// }
-
 export async function initIfNeeded() {
   const state = store.getState();
   if (state.status === WalletStatus.Idle) {
@@ -20,9 +11,20 @@ export async function initIfNeeded() {
   }
 }
 
+export function getStatus() {
+  const { status } = store.getState();
+  return status;
+}
+
 export function withUnlocked<T>(factory: (state: UnlockedState) => T) {
   const state = store.getState();
   assertUnlocked(state);
+  return factory(state);
+}
+
+export function withNotReady<T>(factory: (state: NotReadyState) => T) {
+  const state = store.getState();
+  assertNotReady(state);
   return factory(state);
 }
 
@@ -33,9 +35,18 @@ export function assertUnlocked(state: State): asserts state is UnlockedState {
   );
 }
 
+export function assertNotReady(state: State): asserts state is NotReadyState {
+  assert(state.status !== WalletStatus.Ready, "Disallowed for unlocked wallet");
+}
+
 export type UnlockedState = State & {
   status: WalletStatus.Ready;
   vault: Vault;
+};
+
+export type NotReadyState = State & {
+  status: WalletStatus.Idle | WalletStatus.Welcome | WalletStatus.Locked;
+  vault: null;
 };
 
 type State = {

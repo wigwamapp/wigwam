@@ -58,7 +58,7 @@ export interface SetupWalletRequest extends MessageBase {
   type: MessageType.SetupWallet;
   password: string;
   accountParams: AddAccountParams;
-  seedPhrase?: string;
+  seedPhrase?: SeedPharse;
 }
 
 export interface SetupWalletResponse extends MessageBase {
@@ -85,7 +85,7 @@ export interface LockWalletResponse extends MessageBase {
 
 export interface AddSeedPhraseRequest extends MessageBase {
   type: MessageType.AddSeedPhrase;
-  seedPhrase: string;
+  seedPhrase: SeedPharse;
 }
 
 export interface AddSeedPhraseResponse extends MessageBase {

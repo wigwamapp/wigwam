@@ -1,20 +1,48 @@
-// import { browser, Runtime } from "webextension-polyfill-ts";
-// import { Request } from "core/types";
+import { match } from "ts-pattern";
+import { IntercomServer } from "lib/ext/intercom/server";
+import { Request, Response, MessageType } from "core/types";
+import { getStatus, withNotReady, withUnlocked } from "./state";
+import { Vault } from "./vault";
 
-// const ports = new Set<Runtime.Port>();
+const intercom = new IntercomServer<Request, Response>();
 
-// browser.runtime.onConnect.addListener((port) => {
-//   if (port.sender?.id === browser.runtime.id) {
-//     port.onMessage.addListener(handleMessage);
-//     ports.add(port);
-
-//     port.onDisconnect.addListener(() => {
-//       port.onMessage.removeListener(handleMessage);
-//       ports.delete(port);
-//     });
-//   }
-// });
-
-// function handleMessage(_message: any, _port: Runtime.Port) {}
-
-console.info("KEK");
+intercom.onMessage(async (ctx) => {
+  try {
+    await match(ctx.data)
+      .with({ type: MessageType.GetWalletStatus }, async ({ type }) => {
+        const status = getStatus();
+        ctx.reply({ type, status });
+      })
+      .with(
+        { type: MessageType.SetupWallet },
+        ({ type, password, accountParams, seedPhrase }) =>
+          withNotReady(async (state) => {
+            const { vault, accountAddress } = await Vault.setup(
+              password,
+              accountParams,
+              seedPhrase
+            );
+            state.unlock(vault);
+            ctx.reply({ type, accountAddress });
+          })
+      )
+      .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
+        withNotReady(async (state) => {
+          const vault = await Vault.unlock(password);
+          state.unlock(vault);
+          ctx.reply({ type });
+        })
+      )
+      .with({ type: MessageType.LockWallet }, ({ type }) =>
+        withUnlocked(async (state) => {
+          state.lock();
+          ctx.reply({ type });
+        })
+      )
+      .run();
+  } catch (err) {
+    if (ctx.request) {
+      ctx.replyError(err);
+    }
+  }
+});
