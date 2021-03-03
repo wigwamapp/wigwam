@@ -1,6 +1,8 @@
 import { Buffer } from "buffer";
+import * as Storage from "lib/ext/storage";
 import * as Encryptor from "lib/encryptor";
-import * as SafeStorage from "./safe-storage";
+
+export * from "lib/ext/storage";
 
 export interface Encrypted {
   payload: Encryptor.EncryptedPayload;
@@ -11,7 +13,7 @@ export async function fetchAndDecryptOne<T>(
   storageKey: string,
   passKey: CryptoKey
 ) {
-  const encItem = await SafeStorage.fetchOne<Encrypted>(storageKey);
+  const encItem = await Storage.fetchOne<Encrypted>(storageKey);
   return decrypt<T>(encItem, passKey);
 }
 
@@ -26,7 +28,7 @@ export async function encryptAndSaveMany(
     })
   );
 
-  await SafeStorage.putMany(encItems);
+  await Storage.putMany(encItems);
 }
 
 async function encrypt(stuff: any, passKey: CryptoKey): Promise<Encrypted> {

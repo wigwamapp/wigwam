@@ -1,5 +1,5 @@
 import * as Encryptor from "lib/encryptor";
-import * as Storage from "./storage";
+import * as Storage from "./index";
 
 test("Storage works", async () => {
   expect(await Storage.isStored("kek")).toBeFalsy();

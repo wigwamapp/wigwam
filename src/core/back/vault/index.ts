@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
 import * as Encryptor from "lib/encryptor";
-import * as Storage from "lib/ext/storage";
+import * as Storage from "lib/enc-storage";
 import { SeedPharse, AddAccountParams, AccountType } from "core/types";
 import {
   PublicError,
