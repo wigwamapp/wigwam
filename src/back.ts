@@ -1,4 +1,9 @@
 import { browser } from "webextension-polyfill-ts";
+import { startServer } from "core/back/server";
+
+// Start background server
+// It starts Intercom server to communicate with UI & content scripts
+startServer();
 
 // Open new tab with extension page after install
 browser.runtime.onInstalled.addListener(({ reason }) => {

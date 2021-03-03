@@ -78,7 +78,7 @@ export class IntercomServer<Data = any, ReplyData = any> {
   }
 }
 
-class MessageContext<Data, ReplyData> {
+export class MessageContext<Data, ReplyData> {
   public data: Data;
 
   constructor(

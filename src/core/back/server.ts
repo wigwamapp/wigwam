@@ -1,12 +1,15 @@
 import { match } from "ts-pattern";
-import { IntercomServer } from "lib/ext/intercom/server";
+import { IntercomServer, MessageContext } from "lib/ext/intercom/server";
 import { Request, Response, MessageType } from "core/types";
 import { ensureInited, getStatus, withNotReady, withUnlocked } from "./state";
 import { Vault } from "./vault";
 
-const intercom = new IntercomServer<Request, Response>();
+export function startServer() {
+  const intercom = new IntercomServer();
+  intercom.onMessage(handleRequest);
+}
 
-intercom.onMessage(async (ctx) => {
+async function handleRequest(ctx: MessageContext<Request, Response>) {
   if (!ctx.request) return;
 
   try {
@@ -47,4 +50,4 @@ intercom.onMessage(async (ctx) => {
   } catch (err) {
     ctx.replyError(err);
   }
-});
+}

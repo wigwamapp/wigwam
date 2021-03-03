@@ -1,5 +1,4 @@
-import { WalletStatus, SeedPharse } from "./base";
-import { AddAccountParams } from "./addAccount";
+import { WalletStatus, SeedPharse, AddAccountParams } from "./base";
 
 export type Request =
   | GetWalletStatusRequest
