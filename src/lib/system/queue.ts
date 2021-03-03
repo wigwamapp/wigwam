@@ -1,5 +1,7 @@
 export function createQueue() {
   let worker: Promise<any> = Promise.resolve();
   return <T>(factory: () => Promise<T>): Promise<T> =>
-    (worker = worker.then(() => factory()));
+    new Promise((res, rej) => {
+      worker = worker.then(() => factory().then(res).catch(rej));
+    });
 }
