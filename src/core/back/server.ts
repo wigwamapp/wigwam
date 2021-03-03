@@ -1,13 +1,17 @@
 import { match } from "ts-pattern";
 import { IntercomServer } from "lib/ext/intercom/server";
 import { Request, Response, MessageType } from "core/types";
-import { getStatus, withNotReady, withUnlocked } from "./state";
+import { ensureInited, getStatus, withNotReady, withUnlocked } from "./state";
 import { Vault } from "./vault";
 
 const intercom = new IntercomServer<Request, Response>();
 
 intercom.onMessage(async (ctx) => {
+  if (!ctx.request) return;
+
   try {
+    await ensureInited();
+
     await match(ctx.data)
       .with({ type: MessageType.GetWalletStatus }, async ({ type }) => {
         const status = getStatus();
@@ -41,8 +45,6 @@ intercom.onMessage(async (ctx) => {
       )
       .run();
   } catch (err) {
-    if (ctx.request) {
-      ctx.replyError(err);
-    }
+    ctx.replyError(err);
   }
 });

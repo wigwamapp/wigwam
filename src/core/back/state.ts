@@ -3,7 +3,7 @@ import { assert } from "lib/system/assert";
 import { WalletStatus } from "core/types";
 import { Vault } from "./vault";
 
-export async function initIfNeeded() {
+export async function ensureInited() {
   const state = store.getState();
   if (state.status === WalletStatus.Idle) {
     const vaultExists = await Vault.isExist();
