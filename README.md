@@ -23,3 +23,8 @@ Your app is ready to be deployed!
 
 Launches the application test runner.
 Run with the `--watch` flag (`npm test -- --watch`) to run in interactive watch mode.
+
+## Usefull links
+
+- https://github.com/joelshepherd/tabliss
+- https://github.com/fregante/Awesome-WebExtensions
