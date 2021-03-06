@@ -5,9 +5,9 @@ import {
   IntercomClientMessage,
   IntercomRequest,
   IntercomResponse,
-  IntercomError,
+  IntercomErrorResponse,
 } from "./types";
-import { serializeError } from "./helpers";
+import { MESSAGE_TYPES, serializeError } from "./helpers";
 
 export type IntercomServerHandler<ReqData, ResData> = (
   ctx: MessageContext<ReqData, ResData>
@@ -41,7 +41,8 @@ export class IntercomServer<Data = any, ReplyData = any> {
   private handleMessage(msg: any, port: Runtime.Port) {
     if (
       port.sender?.id === browser.runtime.id &&
-      msg?.type in IntercomMessageType
+      port.sender?.frameId === 0 &&
+      MESSAGE_TYPES.includes(msg?.type)
     ) {
       const ctx = new MessageContext<Data, ReplyData>(
         port,
@@ -115,7 +116,7 @@ export class MessageContext<Data, ReplyData> {
     });
   }
 
-  private send(res: IntercomResponse | IntercomError) {
+  private send(res: IntercomResponse | IntercomErrorResponse) {
     if (this.connected) {
       this.port.postMessage(res);
     }

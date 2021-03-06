@@ -1,4 +1,9 @@
+import { IntercomMessageType } from "./types";
+
+export const MESSAGE_TYPES = Object.values(IntercomMessageType);
+
 export const DEFAULT_ERROR_MESSAGE = "Unexpected error occured";
+export const TIMEOUT_ERROR_MESSAGE = "Timeout";
 
 export interface SerializedError {
   message: string;
@@ -14,8 +19,18 @@ export function deserializeError({ message, data }: SerializedError) {
   return new IntercomError(message, data);
 }
 
-export class IntercomError implements Error {
+export class IntercomError extends Error {
   name = "IntercomError";
 
-  constructor(public message: string, public data?: any) {}
+  constructor(message: string, public data?: any) {
+    super(message);
+  }
+}
+
+export class IntercomTimeoutError extends IntercomError {
+  name = "IntercomTimeoutError";
+
+  constructor() {
+    super(TIMEOUT_ERROR_MESSAGE);
+  }
 }

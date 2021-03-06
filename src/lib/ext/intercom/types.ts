@@ -9,7 +9,7 @@ export type IntercomClientMessage = IntercomRequest | IntercomVoid;
 
 export type IntercomServerMessage =
   | IntercomResponse
-  | IntercomError
+  | IntercomErrorResponse
   | IntercomVoid;
 
 export interface IntercomMessageBase {
@@ -33,7 +33,7 @@ export interface IntercomResponse extends IntercomReqResBase {
   type: IntercomMessageType.Res;
 }
 
-export interface IntercomError extends IntercomReqResBase {
+export interface IntercomErrorResponse extends IntercomReqResBase {
   type: IntercomMessageType.Err;
 }
 

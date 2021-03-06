@@ -1,6 +1,8 @@
 import "lib/inter-ui/inter.css";
 import "./index.css";
 
+import "app/playground";
+
 import React, { StrictMode } from "react";
 import { render } from "react-dom";
 import { enableHashRouting } from "woozie";
