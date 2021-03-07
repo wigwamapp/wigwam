@@ -1,8 +1,5 @@
 import { AccountType } from "./base";
 
-// Will fix issue with building
-export enum AddAccountStub {}
-
 export type AddAccountParams =
   | AddHDAccountParams
   | AddImportedAccountParams

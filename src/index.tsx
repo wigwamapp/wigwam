@@ -1,4 +1,4 @@
-import "lib/inter-ui/inter.css";
+// import "lib/inter-ui/inter.css";
 import "./index.css";
 
 import "app/playground";

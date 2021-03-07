@@ -37,4 +37,4 @@ class Ethereum extends Emitter {
   async request(_req: RequestArguments) {}
 }
 
-console.info(import.meta.env.SNOWPACK_PUBLIC_DEBUG);
+// console.info(import.meta.env.SNOWPACK_PUBLIC_DEBUG);

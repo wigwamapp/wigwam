@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import PageLayout from "app/components/layout/PageLayout";
-import BoxIcon from "app/icons/box.svgr.svg";
+// import BoxIcon from "app/icons/box.svgr.svg";
 
 const Main: React.FC = () => (
   <PageLayout>
     <div className="py-8">
       <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
-      <BoxIcon className="stroke-current h-6 w-auto" />
+      {/* <BoxIcon className="stroke-current h-6 w-auto" /> */}
       <MyListbox />
       <div className="my-4">
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
