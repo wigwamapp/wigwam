@@ -14,6 +14,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const LiveReloadPlugin = require("webpack-livereload-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
 const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
@@ -260,6 +261,13 @@ module.exports = {
         // },
       ],
     }),
+
+    NODE_ENV === "development" &&
+      new LiveReloadPlugin({
+        protocol: "http",
+        // hostname: "0.0.0.0",
+        // appendScriptTag: true,
+      }),
 
     new WebpackBar({
       name: "Taky",

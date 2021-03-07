@@ -79,6 +79,7 @@
     "url-loader": "4.1.1",
     "webpack": "5.24.3",
     "webpack-cli": "4.5.0",
+    "webpack-livereload-plugin": "3.0.0",
     "webpack-sources": "2.2.0",
     "webpackbar": "5.0.0-3",
     "zip-webpack-plugin": "4.0.1"
