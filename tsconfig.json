@@ -3,6 +3,7 @@
     "baseUrl": "src",
     "module": "esnext",
     "target": "es2017",
+    "lib": ["dom", "dom.iterable", "ES2019.Object"],
     "moduleResolution": "node",
     "jsx": "preserve",
     "noEmit": true,

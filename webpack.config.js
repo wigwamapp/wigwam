@@ -4,10 +4,14 @@ const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
 const webpack = require("webpack");
+const loaderUtils = require("loader-utils");
 const { ESBuildPlugin, ESBuildMinifyPlugin } = require("esbuild-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
+const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
@@ -28,6 +32,7 @@ const {
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
 } = process.env;
 const VERSION = pkg.version;
+const ES_TARGET = tsConfig.compilerOptions.target;
 const SOURCE_MAP = NODE_ENV !== "production" && SOURCE_MAP_ENV !== "false";
 const IMAGE_INLINE_SIZE_LIMIT = parseInt(IMAGE_INLINE_SIZE_LIMIT_ENV);
 const CWD_PATH = fs.realpathSync(process.cwd());
@@ -38,11 +43,11 @@ const DEST_PATH = path.join(CWD_PATH, "dist");
 const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
 const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
-  OUTPUT_PATH,
+  DEST_PATH,
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
 );
 
-const MANIFEST_PATH = path.join(PUBLIC_PATH, "manifest.json");
+// const MANIFEST_PATH = path.join(PUBLIC_PATH, "manifest.json");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
 const ADDITIONAL_MODULE_PATHS = [
   tsConfig.compilerOptions.baseUrl &&
@@ -67,7 +72,7 @@ module.exports = {
   bail: NODE_ENV === "production",
   devtool: SOURCE_MAP && "inline-cheap-module-source-map",
 
-  target: ["web", "es2017"],
+  target: ["web", ES_TARGET],
 
   entry: {
     back: path.join(SOURCE_PATH, "back.ts"),
@@ -110,15 +115,14 @@ module.exports = {
             },
           },
 
-          // Process application JS with Babel.
-          // The preset includes JSX, Flow, TypeScript, and some ESnext features.
+          // Process application JS with ESBuild.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             include: SOURCE_PATH,
             loader: require.resolve("esbuild-loader"),
             options: {
               loader: "tsx",
-              target: "es2017",
+              target: ES_TARGET,
             },
           },
 
@@ -151,9 +155,9 @@ module.exports = {
             use: getStyleLoaders({
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
-              // modules: {
-              //   getLocalIdent: getCSSModuleLocalIdent,
-              // },
+              modules: {
+                getLocalIdent: getCSSModuleLocalIdent,
+              },
             }),
           },
 
@@ -187,7 +191,24 @@ module.exports = {
       verbose: false,
     }),
 
+    new ForkTsCheckerWebpackPlugin(),
+
+    new ESLintPlugin({
+      extensions: ["js", "mjs", "jsx", "ts", "tsx"],
+      eslintPath: require.resolve("eslint"),
+      failOnError: NODE_ENV === "production",
+      context: SOURCE_PATH,
+      cache: true,
+      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+      // ESLint class options
+      cwd: CWD_PATH,
+      resolvePluginsRelativeTo: __dirname,
+    }),
+
+    new CaseSensitivePathsPlugin(),
+
     new webpack.DefinePlugin({
+      SharedArrayBuffer: "_SharedArrayBuffer",
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
       "process.env.VERSION": JSON.stringify(VERSION),
       "process.env.TARGET_BROWSER": JSON.stringify(TARGET_BROWSER),
@@ -244,7 +265,7 @@ module.exports = {
       name: "Taky",
       color: "#355DFF",
     }),
-  ],
+  ].filter(Boolean),
 
   optimization: {
     splitChunks: {
@@ -257,7 +278,7 @@ module.exports = {
     minimize: NODE_ENV === "production",
     minimizer: [
       new ESBuildMinifyPlugin({
-        target: "es2017", // Syntax to compile to (see options below for possible values)
+        target: ES_TARGET, // Syntax to compile to (see options below for possible values)
       }),
       new CssMinimizerPlugin(),
       new ZipPlugin({
@@ -265,7 +286,7 @@ module.exports = {
         extension: PACKED_EXTENSION,
         filename: TARGET_BROWSER,
       }),
-    ],
+    ].filter(Boolean),
   },
 
   node: false,
@@ -300,4 +321,28 @@ function getStyleLoaders(cssOptions = {}) {
       },
     },
   ].filter(Boolean);
+}
+
+function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
+  // Use the filename or folder name, based on some uses the index.js / index.module.(css|scss|sass) project style
+  const fileNameOrFolder = context.resourcePath.match(
+    /index\.module\.(css|scss|sass)$/
+  )
+    ? "[folder]"
+    : "[name]";
+  // Create a hash based on a the file location and class name. Will be unique across a project, and close to globally unique.
+  const hash = loaderUtils.getHashDigest(
+    path.posix.relative(context.rootContext, context.resourcePath) + localName,
+    "md5",
+    "base64",
+    5
+  );
+  // Use loaderUtils to find the file or folder name
+  const className = loaderUtils.interpolateName(
+    context,
+    fileNameOrFolder + "_" + localName + "__" + hash,
+    options
+  );
+  // Remove the .module that appears in every classname when based on the file and replace all "." with "_".
+  return className.replace(".module_", "_").replace(/\./g, "_");
 }
