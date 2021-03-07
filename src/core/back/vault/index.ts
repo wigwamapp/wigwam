@@ -142,7 +142,7 @@ export class Vault {
           await migrate(passwordKey);
         }
       } catch (err) {
-        if (import.meta.env.SNOWPACK_PUBLIC_DEBUG === "true") {
+        if (process.env.NODE_ENV === "development") {
           console.error(err);
         }
       } finally {

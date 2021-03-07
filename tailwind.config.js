@@ -1,12 +1,8 @@
 const theme = require("tailwindcss/defaultTheme");
 
-const PROD =
-  process.env.NODE_ENV === "production" &&
-  process.env.SNOWPACK_PUBLIC_DEBUG !== "true";
-
 module.exports = {
   purge: {
-    enabled: PROD,
+    enabled: process.env.NODE_ENV === "production",
     content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/**/*.{html,js,mjs}"],
   },
   darkMode: "class",

@@ -28,12 +28,6 @@ browser.browserAction.onClicked.addListener((tab) => {
   });
 });
 
-// Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
-// Learn more: https://snowpack.dev/concepts/hot-module-replacement
-if (import.meta.hot) {
-  import.meta.hot.accept();
-}
-
 // setTimeout(async () => {
 //   const [currentTab] = await browser.tabs.query({
 //     currentWindow: true,
