@@ -10,6 +10,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ZipPlugin = require("zip-webpack-plugin");
 const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
 const tsConfig = require("./tsconfig.json");
@@ -35,6 +36,12 @@ const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
 const DEST_PATH = path.join(CWD_PATH, "dist");
 const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
+const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
+const OUTPUT_PACKED_PATH = path.join(
+  OUTPUT_PATH,
+  `${TARGET_BROWSER}.${PACKED_EXTENSION}`
+);
+
 const MANIFEST_PATH = path.join(PUBLIC_PATH, "manifest.json");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
 const ADDITIONAL_MODULE_PATHS = [
@@ -175,7 +182,7 @@ module.exports = {
 
   plugins: [
     new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: [OUTPUT_PATH /*, OUTPUT_PACKED_PATH*/],
+      cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
       cleanStaleWebpackAssets: false,
       verbose: false,
     }),
@@ -253,6 +260,11 @@ module.exports = {
         target: "es2017", // Syntax to compile to (see options below for possible values)
       }),
       new CssMinimizerPlugin(),
+      new ZipPlugin({
+        path: DEST_PATH,
+        extension: PACKED_EXTENSION,
+        filename: TARGET_BROWSER,
+      }),
     ],
   },
 
