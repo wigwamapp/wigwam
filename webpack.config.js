@@ -2,6 +2,7 @@
 
 const path = require("path");
 const fs = require("fs");
+const dotenv = require("dotenv");
 const webpack = require("webpack");
 const { ESBuildPlugin, ESBuildMinifyPlugin } = require("esbuild-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -13,6 +14,12 @@ const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
 const tsConfig = require("./tsconfig.json");
 
+// Steal ENV vars from .env file
+dotenv.config();
+
+// Grab default and TAKY_* environment variables and prepare them to be
+// injected into the application via DefinePlugin in Webpack configuration.
+const TAKY_ENV_PATTERN = /^TAKY_/i;
 const {
   NODE_ENV = "development",
   TARGET_BROWSER = "chrome",
@@ -38,17 +45,13 @@ const CSS_REGEX = /\.css$/;
 const CSS_MODULE_REGEX = /\.module\.css$/;
 
 const HTML_TEMPLATES = [
-  // {
-  //   path: path.join(PUBLIC_PATH, "popup.html"),
-  //   chunks: ["popup"],
-  // },
-  {
-    path: path.join(PUBLIC_PATH, "index.html"),
-    chunks: ["index"],
-  },
   {
     path: path.join(PUBLIC_PATH, "back.html"),
     chunks: ["back"],
+  },
+  {
+    path: path.join(PUBLIC_PATH, "index.html"),
+    chunks: ["index"],
   },
 ];
 
@@ -181,6 +184,15 @@ module.exports = {
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
       "process.env.VERSION": JSON.stringify(VERSION),
       "process.env.TARGET_BROWSER": JSON.stringify(TARGET_BROWSER),
+      ...(() => {
+        const appEnvs = {};
+        for (const k of Object.keys(process.env)) {
+          if (TAKY_ENV_PATTERN.test(k)) {
+            appEnvs[`process.env.${k}`] = JSON.stringify(process.env[k]);
+          }
+        }
+        return appEnvs;
+      })(),
     }),
 
     new ESBuildPlugin(),
@@ -195,24 +207,9 @@ module.exports = {
         new HtmlWebpackPlugin({
           template: htmlTemplate.path,
           filename: path.basename(htmlTemplate.path),
-          chunks: ["runtime", ...htmlTemplate.chunks],
+          chunks: htmlTemplate.chunks,
           inject: "body",
-          ...(NODE_ENV === "production"
-            ? {
-                minify: {
-                  removeComments: true,
-                  collapseWhitespace: true,
-                  removeRedundantAttributes: true,
-                  useShortDoctype: true,
-                  removeEmptyAttributes: true,
-                  removeStyleLinkTypeAttributes: true,
-                  keepClosingSlash: true,
-                  minifyJS: true,
-                  minifyCSS: true,
-                  minifyURLs: true,
-                },
-              }
-            : {}),
+          minify: false,
         })
     ),
 
@@ -244,9 +241,7 @@ module.exports = {
 
   optimization: {
     splitChunks: {
-      //chunks: "all"
       chunks(chunk) {
-        // exclude `my-excluded-chunk`
         return chunk.name !== "content";
       },
     },

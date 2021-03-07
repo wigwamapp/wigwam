@@ -1,1 +1,0 @@
-__webpack_public_path__ = __webpack_base_uri__ = htmlWebpackPluginPublicPath;
