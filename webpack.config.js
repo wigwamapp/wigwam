@@ -263,7 +263,7 @@ module.exports = {
 
     new WebpackBar({
       name: "Taky",
-      color: "#355DFF",
+      color: "#4F46E5",
     }),
   ].filter(Boolean),
 
