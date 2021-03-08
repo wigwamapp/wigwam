@@ -4,11 +4,10 @@ import { deserializeError, IntercomTimeoutError } from "./helpers";
 
 export class IntercomClient<ReqData = any, ResData = any> {
   public port: Runtime.Port;
-  private reqId: number;
+  private reqId = 0;
 
   constructor(name: string) {
     this.port = browser.runtime.connect(undefined, { name });
-    this.reqId = 0;
   }
 
   get name() {

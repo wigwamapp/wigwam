@@ -3,11 +3,45 @@ import { assert } from "lib/system/assert";
 import { WalletStatus } from "core/types";
 import { Vault } from "./vault";
 
+export type State = {
+  status: WalletStatus;
+  vault: Vault | null;
+  init: (vaultExists: boolean) => void;
+  unlock: (vault: Vault) => void;
+  lock: () => void;
+};
+
+export type UnlockedState = State & {
+  status: WalletStatus.Ready;
+  vault: Vault;
+};
+
+export type NotReadyState = State & {
+  status: WalletStatus.Idle | WalletStatus.Welcome | WalletStatus.Locked;
+  vault: null;
+};
+
+const store = create<State>((set) => ({
+  status: WalletStatus.Idle,
+  vault: null,
+  init: (vaultExists) =>
+    set({
+      status: vaultExists ? WalletStatus.Locked : WalletStatus.Welcome,
+      vault: null,
+    }),
+  unlock: (vault) => set({ status: WalletStatus.Ready, vault }),
+  lock: () =>
+    set((s) => ({
+      status: s.status === WalletStatus.Ready ? WalletStatus.Locked : s.status,
+      vault: null,
+    })),
+}));
+
 export async function ensureInited() {
   const state = store.getState();
   if (state.status === WalletStatus.Idle) {
     const vaultExists = await Vault.isExist();
-    store.getState().init(vaultExists);
+    state.init(vaultExists);
   }
 }
 
@@ -38,37 +72,3 @@ export function assertUnlocked(state: State): asserts state is UnlockedState {
 export function assertNotReady(state: State): asserts state is NotReadyState {
   assert(state.status !== WalletStatus.Ready, "Disallowed for unlocked wallet");
 }
-
-export type UnlockedState = State & {
-  status: WalletStatus.Ready;
-  vault: Vault;
-};
-
-export type NotReadyState = State & {
-  status: WalletStatus.Idle | WalletStatus.Welcome | WalletStatus.Locked;
-  vault: null;
-};
-
-type State = {
-  status: WalletStatus;
-  vault: Vault | null;
-  init: (vaultExists: boolean) => void;
-  unlock: (vault: Vault) => void;
-  lock: () => void;
-};
-
-const store = create<State>((set) => ({
-  status: WalletStatus.Idle,
-  vault: null,
-  init: (vaultExists) =>
-    set({
-      status: vaultExists ? WalletStatus.Locked : WalletStatus.Welcome,
-      vault: null,
-    }),
-  unlock: (vault) => set({ status: WalletStatus.Ready, vault }),
-  lock: () =>
-    set((s) => ({
-      status: s.status === WalletStatus.Ready ? WalletStatus.Locked : s.status,
-      vault: null,
-    })),
-}));
