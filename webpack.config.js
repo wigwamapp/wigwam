@@ -265,6 +265,7 @@ module.exports = {
     NODE_ENV === "development" &&
       new LiveReloadPlugin({
         protocol: "http",
+        // useSourceHash: true,
         // hostname: "0.0.0.0",
         // appendScriptTag: true,
       }),
