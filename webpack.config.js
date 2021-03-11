@@ -14,7 +14,6 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ExtensionReloader = require("@drmikecrowe/webpack-extension-reloaderv5");
 const ZipPlugin = require("zip-webpack-plugin");
 const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
@@ -60,7 +59,9 @@ const CSS_MODULE_REGEX = /\.module\.css$/;
 const HTML_TEMPLATES = [
   {
     path: path.join(PUBLIC_PATH, "back.html"),
-    chunks: ["back"],
+    chunks: ["back", NODE_ENV === "development" && "hot-reload"].filter(
+      Boolean
+    ),
   },
   {
     path: path.join(PUBLIC_PATH, "index.html"),
@@ -79,6 +80,8 @@ module.exports = {
     back: path.join(SOURCE_PATH, "back.ts"),
     content: path.join(SOURCE_PATH, "content.ts"),
     index: path.join(SOURCE_PATH, "index.tsx"),
+    ["hot-reload"]:
+      NODE_ENV === "development" && path.join(SOURCE_PATH, "hot-reload.ts"),
   },
 
   output: {
@@ -186,18 +189,6 @@ module.exports = {
   },
 
   plugins: [
-    NODE_ENV === "development" &&
-      new ExtensionReloader({
-        port: 9090, // Which port use to create the server
-        reloadPage: true, // Force the reload of the page also
-        entries: {
-          // The entries used for the content/background scripts or extension pages
-          contentScript: "content",
-          background: "back",
-          extensionPage: "index",
-        },
-      }),
-
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
       cleanStaleWebpackAssets: false,
@@ -274,10 +265,10 @@ module.exports = {
       ],
     }),
 
-    // new WebpackBar({
-    //   name: "Taky",
-    //   color: "#4F46E5",
-    // }),
+    new WebpackBar({
+      name: "Taky",
+      color: "#4F46E5",
+    }),
   ].filter(Boolean),
 
   optimization: {
