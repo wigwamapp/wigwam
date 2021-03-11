@@ -21,7 +21,7 @@
     "clipboardWrite",
     "activeTab"
   ],
-  "content_security_policy": "script-src 'self' 'sha256-a4v4czp2qnmr595pGYlZ07gEumM6d9R5qGz9t8CjuUE=' http://localhost:35729/livereload.js; object-src 'self'",
+  "content_security_policy": "script-src 'self' 'sha256-a4v4czp2qnmr595pGYlZ07gEumM6d9R5qGz9t8CjuUE='; object-src 'self'",
 
   "author": "",
 

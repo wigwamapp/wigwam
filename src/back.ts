@@ -17,6 +17,8 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
   }
 });
 
+console.info("ASD");
+
 // Open new tab with extension page
 // when user clicked on extension icon in toolbar
 browser.browserAction.onClicked.addListener((tab) => {

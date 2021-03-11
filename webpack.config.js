@@ -14,7 +14,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const LiveReloadPlugin = require("webpack-livereload-plugin");
+const ExtensionReloader = require("@drmikecrowe/webpack-extension-reloaderv5");
 const ZipPlugin = require("zip-webpack-plugin");
 const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
@@ -186,6 +186,18 @@ module.exports = {
   },
 
   plugins: [
+    NODE_ENV === "development" &&
+      new ExtensionReloader({
+        port: 9090, // Which port use to create the server
+        reloadPage: true, // Force the reload of the page also
+        entries: {
+          // The entries used for the content/background scripts or extension pages
+          contentScript: "content",
+          background: "back",
+          extensionPage: "index",
+        },
+      }),
+
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
       cleanStaleWebpackAssets: false,
@@ -262,18 +274,10 @@ module.exports = {
       ],
     }),
 
-    NODE_ENV === "development" &&
-      new LiveReloadPlugin({
-        protocol: "http",
-        // useSourceHash: true,
-        // hostname: "0.0.0.0",
-        // appendScriptTag: true,
-      }),
-
-    new WebpackBar({
-      name: "Taky",
-      color: "#4F46E5",
-    }),
+    // new WebpackBar({
+    //   name: "Taky",
+    //   color: "#4F46E5",
+    // }),
   ].filter(Boolean),
 
   optimization: {

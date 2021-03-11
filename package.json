@@ -34,6 +34,7 @@
   "devDependencies": {
     "@babel/core": "7.13.10",
     "@babel/preset-react": "7.12.13",
+    "@drmikecrowe/webpack-extension-reloaderv5": "1.2.2",
     "@peculiar/webcrypto": "1.1.6",
     "@serh11p/jest-webextension-mock": "4.0.0",
     "@tailwindcss/typography": "0.4.0",
@@ -79,7 +80,6 @@
     "url-loader": "4.1.1",
     "webpack": "5.24.4",
     "webpack-cli": "4.5.0",
-    "webpack-livereload-plugin": "3.0.1",
     "webpack-sources": "2.2.0",
     "webpackbar": "5.0.0-3",
     "zip-webpack-plugin": "4.0.1"
