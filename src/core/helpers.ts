@@ -35,12 +35,12 @@ export function validateAddAccountParams(params: AddAccountParams) {
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
+  assert(lang in wordlists, "Seed phrase language not supported", PublicError);
   assert(
-    ethers.utils.isValidMnemonic(phrase),
+    ethers.utils.isValidMnemonic(phrase, wordlists[lang]),
     "Seed phrase in not valid",
     PublicError
   );
-  assert(lang in wordlists, "Seed phrase language not supported", PublicError);
 }
 
 export function validateDerivationPath(path: string) {
