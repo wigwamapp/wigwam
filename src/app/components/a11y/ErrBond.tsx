@@ -1,14 +1,20 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { PublicError } from "core/helpers";
 
 type ErrBondProps = Pick<React.ComponentProps<typeof ErrorBoundary>, "onReset">;
 
 const ErrBond: React.FC<ErrBondProps> = (props) => (
   <ErrorBoundary
-    fallbackRender={({ resetErrorBoundary }) => (
-      <div>
-        There was an error!
-        <button onClick={() => resetErrorBoundary()}>Try again</button>
+    fallbackRender={({ error, resetErrorBoundary }) => (
+      <div className="w-full h-full flex items-center justify-center">
+        <div>
+          <h3>There was an error!</h3>
+
+          {error instanceof PublicError ? <p>{error.message}</p> : null}
+
+          <button onClick={() => resetErrorBoundary()}>Try again</button>
+        </div>
       </div>
     )}
     {...props}
