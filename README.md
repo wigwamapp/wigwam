@@ -1,4 +1,4 @@
-# VigVam
+# Vigvam
 
 ## Available Scripts
 
