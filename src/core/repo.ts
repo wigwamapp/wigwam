@@ -4,7 +4,7 @@ export enum Table {
   Tokens = "tokens",
 }
 
-export const db = new Dexie("TakyDatabase");
+export const db = new Dexie("VigvamDatabase");
 db.version(1).stores({
   [Table.Tokens]: "++id, decimals, symbol, name",
 });

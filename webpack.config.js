@@ -22,9 +22,9 @@ const tsConfig = require("./tsconfig.json");
 // Steal ENV vars from .env file
 dotenv.config();
 
-// Grab default and TAKY_* environment variables and prepare them to be
+// Grab default and VIGVAM_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
-const TAKY_ENV_PATTERN = /^TAKY_/i;
+const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
   NODE_ENV = "development",
   TARGET_BROWSER = "chrome",
@@ -219,7 +219,7 @@ module.exports = {
       ...(() => {
         const appEnvs = {};
         for (const k of Object.keys(process.env)) {
-          if (TAKY_ENV_PATTERN.test(k)) {
+          if (VIGVAM_ENV_PATTERN.test(k)) {
             appEnvs[`process.env.${k}`] = JSON.stringify(process.env[k]);
           }
         }
@@ -266,7 +266,7 @@ module.exports = {
     }),
 
     new WebpackBar({
-      name: "Taky",
+      name: "",
       color: "#4F46E5",
     }),
   ].filter(Boolean),

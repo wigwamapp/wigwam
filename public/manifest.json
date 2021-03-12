@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "Taky Wallet",
+  "name": "Vigvam",
   "version": "0.1.0",
 
   "icons": {
@@ -11,8 +11,8 @@
   },
 
   "description": "__MSG_appDesc__",
-  "homepage_url": "https://github.com/serh11p/taky",
-  "short_name": "Taky Wallet",
+  "homepage_url": "https://github.com/serh11p/vigvam",
+  "short_name": "Vigvam",
 
   "permissions": [
     "tabs",
@@ -34,7 +34,7 @@
       "38": "misc/icon-38.png",
       "128": "misc/icon-128.png"
     },
-    "default_title": "Taky Wallet"
+    "default_title": "Vigvam Wallet"
   },
 
   "background": {

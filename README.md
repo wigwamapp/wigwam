@@ -1,4 +1,4 @@
-# Taky
+# VigVam
 
 ## Available Scripts
 
