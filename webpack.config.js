@@ -15,6 +15,7 @@ const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const WebpackBar = require("webpackbar");
 const pkg = require("./package.json");
 const tsConfig = require("./tsconfig.json");
@@ -30,6 +31,7 @@ const {
   TARGET_BROWSER = "chrome",
   SOURCE_MAP: SOURCE_MAP_ENV,
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
+  WEBPACK_ANALYZE = "false",
 } = process.env;
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
@@ -80,8 +82,9 @@ module.exports = {
     back: path.join(SOURCE_PATH, "back.ts"),
     content: path.join(SOURCE_PATH, "content.ts"),
     index: path.join(SOURCE_PATH, "index.tsx"),
-    ["hot-reload"]:
-      NODE_ENV === "development" && path.join(SOURCE_PATH, "hot-reload.ts"),
+    ...(NODE_ENV === "development"
+      ? { ["hot-reload"]: path.join(SOURCE_PATH, "hot-reload.ts") }
+      : {}),
   },
 
   output: {
@@ -266,9 +269,11 @@ module.exports = {
     }),
 
     new WebpackBar({
-      name: "",
-      color: "#4F46E5",
+      name: "Vigvam",
+      color: "#ffffff",
     }),
+
+    WEBPACK_ANALYZE === "true" && new BundleAnalyzerPlugin(),
   ].filter(Boolean),
 
   optimization: {
