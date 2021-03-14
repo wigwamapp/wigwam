@@ -250,9 +250,7 @@ export class Vault {
           return address;
         })
         .with({ type: AccountType.Hardware }, async (p) => {
-          const address = ethers.utils.computeAddress(
-            ethers.utils.arrayify(p.publicKey)
-          );
+          const address = ethers.utils.computeAddress(p.publicKey);
           await Storage.encryptAndSaveMany(
             [[accPubKeyStrgKey(address), p.publicKey]],
             this.passwordKey

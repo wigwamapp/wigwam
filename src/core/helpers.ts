@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
 import { assert } from "lib/system/assert";
-import { SeedPharse, AddAccountParams, AccountType } from "core/types";
+import { SeedPharse, AddAccountParams, AccountType } from "./types";
 
 export class PublicError extends Error {
   name = "PublicError";
