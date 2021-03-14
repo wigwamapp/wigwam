@@ -35,6 +35,7 @@
   "devDependencies": {
     "@babel/core": "7.13.10",
     "@babel/preset-react": "7.12.13",
+    "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@peculiar/webcrypto": "1.1.6",
     "@serh11p/jest-webextension-mock": "4.0.0",
     "@tailwindcss/typography": "0.4.0",
