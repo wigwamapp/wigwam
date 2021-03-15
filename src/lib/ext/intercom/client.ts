@@ -37,12 +37,13 @@ export class IntercomClient<ReqData = any, ResData = any> {
             break;
         }
 
+        clearTimeout(timeoutId);
         this.port.onMessage.removeListener(listener);
       };
 
       this.port.onMessage.addListener(listener);
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         this.port.onMessage.removeListener(listener);
         reject(new IntercomTimeoutError());
       }, requestTimeout);
