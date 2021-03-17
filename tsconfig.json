@@ -2,8 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "module": "esnext",
-    "target": "es2017",
-    "lib": ["dom", "dom.iterable", "ES2019.Object"],
+    "target": "es2019",
     "moduleResolution": "node",
     "jsx": "preserve",
     "noEmit": true,
