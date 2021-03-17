@@ -63,7 +63,7 @@ async function watchChanges(
         { url: `chrome-extension://${chrome.runtime.id}/**` },
         (tabs) => {
           for (const tab of tabs) {
-            if (activeTab && tab.id !== activeTab.id) {
+            if (!activeTab || tab.id !== activeTab.id) {
               chrome.tabs.reload(tab.id!);
             }
           }

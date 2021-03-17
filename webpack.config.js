@@ -122,6 +122,20 @@ module.exports = {
             },
           },
 
+          {
+            test: /\.svg$/,
+            use: [
+              "@svgr/webpack",
+              {
+                loader: "url-loader",
+                options: {
+                  limit: IMAGE_INLINE_SIZE_LIMIT,
+                  name: "media/[hash:8].[ext]",
+                },
+              },
+            ],
+          },
+
           // Process application JS with ESBuild.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
