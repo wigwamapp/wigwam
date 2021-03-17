@@ -210,7 +210,6 @@ export class Vault {
   private addAccountForce(params: AddAccountParams) {
     return withError("Failed to add account", () =>
       match(params)
-        .exhaustive()
         .with({ type: AccountType.HD }, async (p) => {
           const seedPhraseExists = await Vault.hasSeedPhrase();
           if (!seedPhraseExists) {
@@ -257,7 +256,7 @@ export class Vault {
           );
           return address;
         })
-        .run()
+        .exhaustive()
     );
   }
 }

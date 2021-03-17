@@ -31,7 +31,8 @@ export function validateAddAccountParams(params: AddAccountParams) {
     })
     .with({ type: AccountType.Hardware }, (p) => {
       validatePublicKey(p.publicKey);
-    });
+    })
+    .run();
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {

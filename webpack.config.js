@@ -5,7 +5,7 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 const webpack = require("webpack");
 const loaderUtils = require("loader-utils");
-const { ESBuildPlugin, ESBuildMinifyPlugin } = require("esbuild-loader");
+const { ESBuildMinifyPlugin } = require("esbuild-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
@@ -229,8 +229,6 @@ module.exports = {
         return appEnvs;
       })(),
     }),
-
-    new ESBuildPlugin(),
 
     new MiniCssExtractPlugin({
       filename: "styles/[name].css",
