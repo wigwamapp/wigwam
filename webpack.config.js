@@ -49,7 +49,7 @@ const OUTPUT_PACKED_PATH = path.join(
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
 );
 
-// const MANIFEST_PATH = path.join(PUBLIC_PATH, "manifest.json");
+const MANIFEST_ENTRY_PATH = path.join(SOURCE_PATH, "manifest.js");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
 const ADDITIONAL_MODULE_PATHS = [
   tsConfig.compilerOptions.baseUrl &&
@@ -270,13 +270,18 @@ module.exports = {
             ignore: ["**/*.html"],
           },
         },
-        // {
-        //   from: MANIFEST_PATH,
-        //   to: path.join(OUTPUT_PATH, "manifest.json"),
-        //   toType: "file",
-        //   // transform: (content) =>
-        //   //   wextManifest[TARGET_BROWSER](JSON.parse(content)).content,
-        // },
+        {
+          from: MANIFEST_ENTRY_PATH,
+          to: path.join(OUTPUT_PATH, "manifest.json"),
+          toType: "file",
+          transform: (_content, absoluteFrom) => {
+            const manifest = require(absoluteFrom)(VERSION, TARGET_BROWSER, [
+              "scripts/runtime.js",
+              "scripts/content.js",
+            ]);
+            return JSON.stringify(manifest, null, 2);
+          },
+        },
       ],
     }),
 

@@ -1,10 +1,11 @@
 {
   "name": "@vigvam/app",
+  "version": "0.1.0",
   "private": true,
   "license": "MIT",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack -w --stats errors-warnings",
-    "build": "cross-env NODE_ENV=production webpack",
+    "build": "cross-env NODE_ENV=production webpack --stats errors-warnings",
     "test": "cross-env NODE_ENV=test jest",
     "analyze": "cross-env WEBPACK_ANALYZE=true yarn build",
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
