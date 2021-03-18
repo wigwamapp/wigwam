@@ -4,6 +4,7 @@ const path = require("path");
 const execa = require("execa");
 const esbuildPath = require.resolve("esbuild");
 const esbuildBin = path.resolve(esbuildPath, "..", "..", "bin", "esbuild");
+const tsConfig = require("../tsconfig.json");
 
 module.exports = {
   process(code, filename) {
@@ -12,7 +13,7 @@ module.exports = {
       [
         `--loader=${path.extname(filename).substr(1)}`,
         "--format=cjs",
-        "--target=es2020",
+        `--target=${tsConfig.compilerOptions.target}`,
       ],
       { input: code }
     );
