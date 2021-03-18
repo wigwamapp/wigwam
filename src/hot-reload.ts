@@ -1,3 +1,6 @@
+// Avoid typescript "isolatedModules" error;
+export {};
+
 type FileEntity = {
   file: File;
   insideBackground: boolean;
