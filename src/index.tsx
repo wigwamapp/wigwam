@@ -1,4 +1,3 @@
-// import "lib/inter-ui/inter.css";
 import "./index.css";
 
 import "app/playground";
@@ -18,7 +17,3 @@ render(
   </StrictMode>,
   document.getElementById("root")
 );
-
-// if (module.hot) {
-//   module.hot.accept();
-// }
