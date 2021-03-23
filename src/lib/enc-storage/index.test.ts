@@ -3,9 +3,9 @@ import * as Storage from "./index";
 
 test("Storage works", async () => {
   expect(await Storage.isStored("kek")).toBeFalsy();
-  await Storage.putOne("kek", "lal");
+  await Storage.put("kek", "lal");
   expect(await Storage.isStored("kek")).toBeTruthy();
-  expect(await Storage.fetchOne("kek")).toBe("lal");
+  expect(await Storage.fetch("kek")).toBe("lal");
 
   const passwordKey = await Encryptor.generateKey("123qweasd");
   await Storage.encryptAndSaveMany([["wow", "WOW"]], passwordKey);

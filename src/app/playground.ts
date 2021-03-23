@@ -1,6 +1,7 @@
 import { IntercomClient } from "lib/ext/intercom/client";
 import { assert } from "lib/system/assert";
 import { MessageType, Request, Response } from "core/types";
+import * as Storage from "lib/ext/storage";
 
 const intercom = new IntercomClient<Request, Response>("UI");
 
@@ -13,3 +14,5 @@ const intercom = new IntercomClient<Request, Response>("UI");
     console.error(err);
   }
 })();
+
+(window as any).Storage = Storage;

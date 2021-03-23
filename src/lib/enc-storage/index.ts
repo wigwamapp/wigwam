@@ -13,7 +13,7 @@ export async function fetchAndDecryptOne<T>(
   storageKey: string,
   passKey: CryptoKey
 ) {
-  const encItem = await Storage.fetchOne<Encrypted>(storageKey);
+  const encItem = await Storage.fetch<Encrypted>(storageKey);
   return decrypt<T>(encItem, passKey);
 }
 
