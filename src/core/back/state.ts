@@ -50,6 +50,14 @@ export function getStatus() {
   return status;
 }
 
+export function onStatusChanged(callback: (newStatus: WalletStatus) => void) {
+  return store.subscribe((state, prevState) => {
+    if (state.status !== prevState.status) {
+      callback(state.status);
+    }
+  });
+}
+
 export function withUnlocked<T>(factory: (state: UnlockedState) => T) {
   const state = store.getState();
   assertUnlocked(state);
