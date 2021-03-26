@@ -9,7 +9,8 @@
     "test": "cross-env NODE_ENV=test jest",
     "analyze": "cross-env WEBPACK_ANALYZE=true yarn build",
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
-    "postinstall": "husky install"
+    "generate-types": "typechain --target=ethers-v5 --outDir src/abi-types src/abi/*.json",
+    "postinstall": "husky install; yarn generate-types"
   },
   "dependencies": {
     "@ethersproject/wordlists": "5.0.10",
@@ -43,6 +44,7 @@
     "@tailwindcss/typography": "0.4.0",
     "@testing-library/jest-dom": "5.11.10",
     "@testing-library/react": "11.2.5",
+    "@typechain/ethers-v5": "6.0.5",
     "@types/chrome": "0.0.133",
     "@types/fontfaceobserver": "0.0.6",
     "@types/jest": "26.0.22",
@@ -80,6 +82,7 @@
     "postcss-loader": "5.2.0",
     "prettier": "2.2.1",
     "tailwindcss": "2.0.4",
+    "typechain": "4.0.3",
     "typescript": "4.2.3",
     "url-loader": "4.1.1",
     "webpack": "5.28.0",
