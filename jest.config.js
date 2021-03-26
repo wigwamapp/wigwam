@@ -22,7 +22,6 @@ module.exports = {
   modulePaths: [],
   moduleNameMapper: {
     "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
-    "\\.svgr.svg$": "<rootDir>/.jest/svgrMock.js",
   },
   moduleFileExtensions: ["js", "ts", "tsx", "json", "jsx", "node"],
 };
