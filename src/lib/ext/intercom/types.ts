@@ -2,15 +2,15 @@ export enum IntercomMessageType {
   Req = "INTERCOM_REQUEST",
   Res = "INTERCOM_RESPONSE",
   Err = "INTERCOM_ERROR",
-  Void = "INTERCOM_VOID",
+  OneWay = "INTERCOM_ONE_WAY",
 }
 
-export type IntercomClientMessage = IntercomRequest | IntercomVoid;
+export type IntercomClientMessage = IntercomRequest | IntercomOneWay;
 
 export type IntercomServerMessage =
   | IntercomResponse
   | IntercomErrorResponse
-  | IntercomVoid;
+  | IntercomOneWay;
 
 export interface IntercomMessageBase {
   type: IntercomMessageType;
@@ -37,6 +37,6 @@ export interface IntercomErrorResponse extends IntercomReqResBase {
   type: IntercomMessageType.Err;
 }
 
-export interface IntercomVoid extends IntercomMessageBase {
-  type: IntercomMessageType.Void;
+export interface IntercomOneWay extends IntercomMessageBase {
+  type: IntercomMessageType.OneWay;
 }

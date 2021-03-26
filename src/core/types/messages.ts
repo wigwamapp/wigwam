@@ -23,6 +23,8 @@ export type Response =
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse;
 
+export type EventMessage = WalletStatusUpdated;
+
 export enum MessageType {
   GetWalletStatus = "GET_WALLET_STATUS",
   WalletStatusUpdated = "WALLET_STATUS_UPDATED",
@@ -49,7 +51,7 @@ export interface GetWalletStatusResponse extends MessageBase {
   status: WalletStatus;
 }
 
-export interface WalletStatusUpdatedMessage extends MessageBase {
+export interface WalletStatusUpdated extends MessageBase {
   type: MessageType.WalletStatusUpdated;
   status: WalletStatus;
 }

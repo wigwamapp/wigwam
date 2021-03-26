@@ -1,15 +1,36 @@
 import { match } from "ts-pattern";
 import { IntercomServer, MessageContext } from "lib/ext/intercom/server";
-import { Request, Response, MessageType } from "core/types";
-import { ensureInited, getStatus, withNotReady, withUnlocked } from "./state";
+import {
+  Request,
+  Response,
+  EventMessage,
+  MessageType,
+  IntercomTarget,
+} from "core/types";
+import {
+  ensureInited,
+  getStatus,
+  withNotReady,
+  withUnlocked,
+  onStatusChanged,
+} from "./state";
 import { Vault } from "./vault";
 
 export function startServer() {
-  const intercom = new IntercomServer();
-  intercom.onMessage(handleRequest);
+  const walletIntercom = new IntercomServer<EventMessage>(
+    IntercomTarget.Wallet
+  );
+  walletIntercom.onMessage<Request, Response>(handleWalletRequest);
+
+  onStatusChanged((status) => {
+    walletIntercom.broadcast({ type: MessageType.WalletStatusUpdated, status });
+  });
+
+  // const dappIntercom = new IntercomServer(IntercomTarget.DApp);
+  // dappIntercom.onMessage(handleDAppRequest);
 }
 
-async function handleRequest(ctx: MessageContext<Request, Response>) {
+async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
   if (!ctx.request) return;
 
   try {

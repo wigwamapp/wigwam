@@ -6,30 +6,35 @@ import {
   IntercomRequest,
   IntercomResponse,
   IntercomErrorResponse,
+  IntercomOneWay,
 } from "./types";
 import { MESSAGE_TYPES, serializeError } from "./helpers";
 
-export type IntercomServerHandler<ReqData, ResData> = (
-  ctx: MessageContext<ReqData, ResData>
+export type IntercomServerHandler<Data = any, ReplyData = any> = (
+  ctx: MessageContext<Data, ReplyData>
 ) => void;
 
-export class IntercomServer<Data = any, ReplyData = any> {
+export class IntercomServer<OneWayData = any> {
   private ports = new Set<Runtime.Port>();
-  private msgHandlers = new Set<IntercomServerHandler<Data, ReplyData>>();
+  private msgHandlers = new Set<IntercomServerHandler>();
 
-  constructor() {
+  constructor(public name: string) {
     browser.runtime.onConnect.addListener((port) => {
-      this.addPort(port);
+      if (port.name === name) {
+        this.addPort(port);
 
-      port.onDisconnect.addListener(() => {
-        this.removePort(port);
-      });
+        port.onDisconnect.addListener(() => {
+          this.removePort(port);
+        });
+      }
     });
 
     this.handleMessage = this.handleMessage.bind(this);
   }
 
-  onMessage(handler: IntercomServerHandler<Data, ReplyData>) {
+  onMessage<Data = unknown, ReplyData = any>(
+    handler: IntercomServerHandler<Data, ReplyData>
+  ) {
     this.addMessageHandler(handler);
     return () => this.removeMessageHandler(handler);
   }
@@ -38,17 +43,26 @@ export class IntercomServer<Data = any, ReplyData = any> {
     return this.ports.has(port);
   }
 
+  broadcast(data: OneWayData) {
+    const msg: IntercomOneWay = { type: IntercomMessageType.OneWay, data };
+    this.ports.forEach((port) => {
+      port.postMessage(msg);
+    });
+  }
+
+  notify(port: Runtime.Port, data: OneWayData) {
+    if (this.isConnected(port)) {
+      port.postMessage({ type: IntercomMessageType.OneWay, data });
+    }
+  }
+
   private handleMessage(msg: any, port: Runtime.Port) {
     if (
       port.sender?.id === browser.runtime.id &&
       port.sender?.frameId === 0 &&
       MESSAGE_TYPES.includes(msg?.type)
     ) {
-      const ctx = new MessageContext<Data, ReplyData>(
-        port,
-        msg as IntercomClientMessage,
-        this
-      );
+      const ctx = new MessageContext(port, msg as IntercomClientMessage, this);
 
       for (const handler of this.msgHandlers) {
         try {
@@ -68,13 +82,11 @@ export class IntercomServer<Data = any, ReplyData = any> {
     this.ports.delete(port);
   }
 
-  private addMessageHandler(handler: IntercomServerHandler<Data, ReplyData>) {
+  private addMessageHandler(handler: IntercomServerHandler) {
     this.msgHandlers.add(handler);
   }
 
-  private removeMessageHandler(
-    handler: IntercomServerHandler<Data, ReplyData>
-  ) {
+  private removeMessageHandler(handler: IntercomServerHandler) {
     this.msgHandlers.delete(handler);
   }
 }

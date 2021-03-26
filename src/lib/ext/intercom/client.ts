@@ -2,7 +2,7 @@ import { Runtime, browser } from "webextension-polyfill-ts";
 import { IntercomMessageType, IntercomClientMessage } from "./types";
 import { deserializeError, IntercomTimeoutError } from "./helpers";
 
-export class IntercomClient<ReqData = any, ResData = any> {
+export class IntercomClient<ReqData = any, ResData = unknown> {
   public port: Runtime.Port;
   private reqId = 0;
 
@@ -53,9 +53,9 @@ export class IntercomClient<ReqData = any, ResData = any> {
   /**
    * Allows to subscribe to notifications channel from background process
    */
-  onMessage<T = any>(callback: (data: T) => void) {
+  onMessage<OneWayData = unknown>(callback: (data: OneWayData) => void) {
     const listener = (msg: any) => {
-      if (msg?.type === IntercomMessageType.Void) {
+      if (msg?.type === IntercomMessageType.OneWay) {
         callback(msg.data);
       }
     };

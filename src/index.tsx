@@ -1,6 +1,6 @@
 import "./index.css";
 
-import "app/playgroundEth";
+import "app/playground";
 
 import React, { StrictMode } from "react";
 import { render } from "react-dom";
