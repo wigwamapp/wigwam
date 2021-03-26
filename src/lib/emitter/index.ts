@@ -14,7 +14,7 @@ export type EventHandlerList = Array<Handler>;
 // A map of event types and their corresponding event handlers.
 export type EventHandlerMap = Map<EventType, EventHandlerList>;
 
-export class Emitter {
+export class Emitter<Event = any> {
   private all: EventHandlerMap = new Map();
 
   /**
@@ -23,7 +23,7 @@ export class Emitter {
    * @param {Function} handler Function to call in response to given event
    * @memberOf Emitter
    */
-  on<T = any>(type: EventType, handler: Handler<T>) {
+  on<T = Event>(type: EventType, handler: Handler<T>) {
     const handlers = this.all.get(type);
     const added = handlers && handlers.push(handler);
     if (!added) {
@@ -37,7 +37,7 @@ export class Emitter {
    * @param {Function} handler Handler function to remove
    * @memberOf Emitter
    */
-  removeListener<T = any>(type: EventType, handler: Handler<T>) {
+  removeListener<T = Event>(type: EventType, handler: Handler<T>) {
     const handlers = this.all.get(type);
     if (handlers) {
       handlers.splice(handlers.indexOf(handler) >>> 0, 1);
@@ -48,10 +48,10 @@ export class Emitter {
    * Invoke all handlers for the given type.
    *
    * @param {string|symbol} type The event type to invoke
-   * @param {Any} [evt] Any value (object is recommended and powerful), passed to each handler
+   * @param {Event} [evt] Any value (object is recommended and powerful), passed to each handler
    * @memberOf Emitter
    */
-  emit<T = any>(type: EventType, evt: T) {
+  emit<T = Event>(type: EventType, evt: T) {
     ((this.all.get(type) || []) as EventHandlerList).slice().map((handler) => {
       try {
         handler(evt);
