@@ -276,7 +276,6 @@ module.exports = {
           toType: "file",
           transform: (_content, absoluteFrom) => {
             const manifest = require(absoluteFrom)(VERSION, TARGET_BROWSER, [
-              "scripts/runtime.js",
               "scripts/content.js",
             ]);
             return JSON.stringify(manifest, null, 2);
@@ -300,7 +299,9 @@ module.exports = {
       },
     },
     mergeDuplicateChunks: true,
-    runtimeChunk: "single",
+    runtimeChunk: {
+      name: (entrypoint) => (entrypoint.name === "content" ? false : "runtime"),
+    },
     minimize: NODE_ENV === "production",
     minimizer: [
       new ESBuildMinifyPlugin({
