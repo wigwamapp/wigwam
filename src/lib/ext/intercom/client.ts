@@ -64,6 +64,11 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
     return () => this.port.onMessage.removeListener(listener);
   }
 
+  onDisconnect(callback: () => void) {
+    this.port.onDisconnect.addListener(callback);
+    return this.port.onDisconnect.removeListener(callback);
+  }
+
   destroy() {
     this.port.disconnect();
   }

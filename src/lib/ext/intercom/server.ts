@@ -10,33 +10,32 @@ import {
 } from "./types";
 import { MESSAGE_TYPES, serializeError } from "./helpers";
 
-export type IntercomServerHandler<Data = any, ReplyData = any> = (
+export type IntercomMessageHandler<Data = any, ReplyData = any> = (
   ctx: MessageContext<Data, ReplyData>
 ) => void;
 
+export type IntercomDisconnectHandler = (port: Runtime.Port) => void;
+
 export class IntercomServer<OneWayData = any> {
   private ports = new Set<Runtime.Port>();
-  private msgHandlers = new Set<IntercomServerHandler>();
+  private msgHandlers = new Set<IntercomMessageHandler>();
+  private discntHandlers = new Set<IntercomDisconnectHandler>();
 
   constructor(public name: string) {
-    browser.runtime.onConnect.addListener((port) => {
-      if (port.name === name) {
-        this.addPort(port);
-
-        port.onDisconnect.addListener(() => {
-          this.removePort(port);
-        });
-      }
-    });
-
+    browser.runtime.onConnect.addListener(this.handleConnect.bind(this));
     this.handleMessage = this.handleMessage.bind(this);
   }
 
   onMessage<Data = unknown, ReplyData = any>(
-    handler: IntercomServerHandler<Data, ReplyData>
+    handler: IntercomMessageHandler<Data, ReplyData>
   ) {
     this.addMessageHandler(handler);
     return () => this.removeMessageHandler(handler);
+  }
+
+  onDisconnect(handler: IntercomDisconnectHandler) {
+    this.discntHandlers.add(handler);
+    return () => this.discntHandlers.delete(handler);
   }
 
   isConnected(port: Runtime.Port) {
@@ -53,6 +52,21 @@ export class IntercomServer<OneWayData = any> {
   notify(port: Runtime.Port, data: OneWayData) {
     if (this.isConnected(port)) {
       port.postMessage({ type: IntercomMessageType.OneWay, data });
+    }
+  }
+
+  private handleConnect(port: Runtime.Port) {
+    if (port.name === this.name) {
+      this.addPort(port);
+
+      port.onDisconnect.addListener(() => {
+        this.removePort(port);
+        this.discntHandlers.forEach((handler) => {
+          try {
+            handler(port);
+          } catch {}
+        });
+      });
     }
   }
 
@@ -82,11 +96,11 @@ export class IntercomServer<OneWayData = any> {
     this.ports.delete(port);
   }
 
-  private addMessageHandler(handler: IntercomServerHandler) {
+  private addMessageHandler(handler: IntercomMessageHandler) {
     this.msgHandlers.add(handler);
   }
 
-  private removeMessageHandler(handler: IntercomServerHandler) {
+  private removeMessageHandler(handler: IntercomMessageHandler) {
     this.msgHandlers.delete(handler);
   }
 }

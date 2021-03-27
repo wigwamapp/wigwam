@@ -14,6 +14,9 @@ const bep20 = Erc20__factory.connect(
 
 (async () => {
   try {
+    // provider.on("message", console.info);
+    // console.info(await provider.send("eth_subscribe", ["newHeads"]));
+
     console.info(
       await Promise.all([bep20.name(), bep20.decimals(), bep20.symbol()])
     );
