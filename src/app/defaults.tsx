@@ -12,7 +12,6 @@ export const QUERY_CLIENT = new QueryClient({
   defaultOptions: {
     queries: {
       suspense: true,
-      refetchOnWindowFocus: false,
     },
   },
 });
