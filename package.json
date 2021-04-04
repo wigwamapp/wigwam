@@ -20,6 +20,7 @@
     "csstype": "2.6.15",
     "dexie": "3.1.0-alpha.8",
     "dexie-react-hooks": "1.0.6",
+    "effector": "21.8.11",
     "ethers": "5.1.0",
     "fontfaceobserver": "2.1.0",
     "inter-ui": "3.18.0",
@@ -31,8 +32,7 @@
     "react-query": "3.13.4",
     "ts-pattern": "3.1.1",
     "webextension-polyfill-ts": "0.25.0",
-    "woozie": "1.0.0-beta.8",
-    "zustand": "3.3.3"
+    "woozie": "1.0.0-beta.8"
   },
   "devDependencies": {
     "@babel/core": "7.13.14",

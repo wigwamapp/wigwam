@@ -87,7 +87,7 @@ export async function isWalletHasSeedPhrase() {
   const type = MessageType.HasSeedPhrase;
   const res = await intercom.request({ type });
   assert(res?.type === type);
-  return res.seedPhraseExist;
+  return res.seedPhraseExists;
 }
 
 export async function addSeedPhrase(seedPhrase: SeedPharse) {

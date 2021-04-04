@@ -6,10 +6,10 @@ export type Request =
   | SetupWalletRequest
   | UnlockWalletRequest
   | LockWalletRequest
+  | HasSeedPhraseRequest
   | AddSeedPhraseRequest
   | AddAccountRequest
   | DeleteAccountRequest
-  | HasSeedPhraseRequest
   | GetSeedPhraseRequest
   | GetPrivateKeyRequest
   | GetPublicKeyRequest;
@@ -19,10 +19,10 @@ export type Response =
   | SetupWalletResponse
   | UnlockWalletResponse
   | LockWalletResponse
+  | HasSeedPhraseResponse
   | AddSeedPhraseResponse
   | AddAccountResponse
   | DeleteAccountResponse
-  | HasSeedPhraseResponse
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse
   | GetPublicKeyResponse;
@@ -35,10 +35,10 @@ export enum MessageType {
   SetupWallet = "SETUP_WALLET",
   UnlockWallet = "UNLOCK_WALLET",
   LockWallet = "LOCK_WALLET",
+  HasSeedPhrase = "HAS_SEED_PHRASE",
   AddSeedPhrase = "ADD_SEED_PHRASE",
   AddAccount = "ADD_ACCOUNT",
   DeleteAccount = "DELETE_ACCOUNT",
-  HasSeedPhrase = "HAS_SEED_PHRASE",
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
@@ -91,6 +91,15 @@ export interface LockWalletResponse extends MessageBase {
   type: MessageType.LockWallet;
 }
 
+export interface HasSeedPhraseRequest extends MessageBase {
+  type: MessageType.HasSeedPhrase;
+}
+
+export interface HasSeedPhraseResponse extends MessageBase {
+  type: MessageType.HasSeedPhrase;
+  seedPhraseExists: boolean;
+}
+
 export interface AddSeedPhraseRequest extends MessageBase {
   type: MessageType.AddSeedPhrase;
   seedPhrase: SeedPharse;
@@ -118,15 +127,6 @@ export interface DeleteAccountRequest extends MessageBase {
 
 export interface DeleteAccountResponse extends MessageBase {
   type: MessageType.DeleteAccount;
-}
-
-export interface HasSeedPhraseRequest extends MessageBase {
-  type: MessageType.HasSeedPhrase;
-}
-
-export interface HasSeedPhraseResponse extends MessageBase {
-  type: MessageType.HasSeedPhrase;
-  seedPhraseExist: boolean;
 }
 
 export interface GetSeedPhraseRequest extends MessageBase {
