@@ -22,6 +22,7 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
 
     this.send({ type: IntercomMessageType.Req, reqId, data });
 
+    let timeoutId: any;
     return new Promise((resolve, reject) => {
       const listener = (msg: any) => {
         switch (true) {
@@ -43,10 +44,12 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
 
       this.port.onMessage.addListener(listener);
 
-      const timeoutId = setTimeout(() => {
-        this.port.onMessage.removeListener(listener);
-        reject(new IntercomTimeoutError());
-      }, requestTimeout);
+      if (requestTimeout !== Infinity) {
+        timeoutId = setTimeout(() => {
+          this.port.onMessage.removeListener(listener);
+          reject(new IntercomTimeoutError());
+        }, requestTimeout);
+      }
     });
   }
 
