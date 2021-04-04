@@ -49,6 +49,8 @@ const OUTPUT_PACKED_PATH = path.join(
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
 );
 
+const MODULES_TO_TRANSPILE = ["effector"];
+
 const MANIFEST_ENTRY_PATH = path.join(SOURCE_PATH, "manifest.js");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
 const ADDITIONAL_MODULE_PATHS = [
@@ -139,7 +141,12 @@ module.exports = {
           // Process application JS with ESBuild.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: SOURCE_PATH,
+            include: [
+              SOURCE_PATH,
+              ...MODULES_TO_TRANSPILE.map((name) =>
+                path.join(NODE_MODULES_PATH, name)
+              ),
+            ],
             loader: require.resolve("esbuild-loader"),
             options: {
               loader: "tsx",
