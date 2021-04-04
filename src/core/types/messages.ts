@@ -9,8 +9,10 @@ export type Request =
   | AddSeedPhraseRequest
   | AddAccountRequest
   | DeleteAccountRequest
+  | HasSeedPhraseRequest
   | GetSeedPhraseRequest
-  | GetPrivateKeyRequest;
+  | GetPrivateKeyRequest
+  | GetPublicKeyRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -20,8 +22,10 @@ export type Response =
   | AddSeedPhraseResponse
   | AddAccountResponse
   | DeleteAccountResponse
+  | HasSeedPhraseResponse
   | GetSeedPhraseResponse
-  | GetPrivateKeyResponse;
+  | GetPrivateKeyResponse
+  | GetPublicKeyResponse;
 
 export type EventMessage = WalletStatusUpdated;
 
@@ -34,8 +38,10 @@ export enum MessageType {
   AddSeedPhrase = "ADD_SEED_PHRASE",
   AddAccount = "ADD_ACCOUNT",
   DeleteAccount = "DELETE_ACCOUNT",
+  HasSeedPhrase = "HAS_SEED_PHRASE",
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
+  GetPublicKey = "GET_PUBLIC_KEY",
 }
 
 export interface MessageBase {
@@ -114,6 +120,15 @@ export interface DeleteAccountResponse extends MessageBase {
   type: MessageType.DeleteAccount;
 }
 
+export interface HasSeedPhraseRequest extends MessageBase {
+  type: MessageType.HasSeedPhrase;
+}
+
+export interface HasSeedPhraseResponse extends MessageBase {
+  type: MessageType.HasSeedPhrase;
+  seedPhraseExist: boolean;
+}
+
 export interface GetSeedPhraseRequest extends MessageBase {
   type: MessageType.GetSeedPhrase;
   password: string;
@@ -133,4 +148,14 @@ export interface GetPrivateKeyRequest extends MessageBase {
 export interface GetPrivateKeyResponse extends MessageBase {
   type: MessageType.GetPrivateKey;
   privateKey: string;
+}
+
+export interface GetPublicKeyRequest extends MessageBase {
+  type: MessageType.GetPublicKey;
+  accountAddress: string;
+}
+
+export interface GetPublicKeyResponse extends MessageBase {
+  type: MessageType.GetPublicKey;
+  publicKey: string;
 }
