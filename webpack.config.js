@@ -49,7 +49,9 @@ const OUTPUT_PACKED_PATH = path.join(
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
 );
 
-const MODULES_TO_TRANSPILE = ["effector"];
+const MODULES_TO_TRANSPILE = [NODE_ENV === "development" && "effector"].filter(
+  Boolean
+);
 
 const MANIFEST_ENTRY_PATH = path.join(SOURCE_PATH, "manifest.js");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
