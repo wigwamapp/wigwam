@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import { useQuery } from "react-query";
+import tw from "lib/tw-classnamed";
 import { walletStateQuery } from "app/queries";
 import PageLayout from "app/components/layout/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
@@ -13,12 +14,20 @@ const Main: FC = () => (
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
       <Kek />
-      <div className="my-4 p-4 text-xl bg-gray-900 dark:hover:bg-opacity-50">
+      <NumberWrapper>
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
-      </div>
+      </NumberWrapper>
     </div>
   </PageLayout>
 );
+
+const NumberWrapper = tw.div`
+  my-4
+  p-[2rem]
+  text-xl
+  bg-gray-900
+  dark:hover:bg-opacity-50
+`;
 
 const Kek: FC = () => {
   const walletState = useQuery(walletStateQuery).data!;
