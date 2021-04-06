@@ -23,6 +23,7 @@
     "effector": "21.8.11",
     "ethers": "5.1.0",
     "fontfaceobserver": "2.1.0",
+    "html-element-attributes": "3.0.0",
     "inter-ui": "3.18.0",
     "nanoid": "3.1.22",
     "react": "17.0.2",

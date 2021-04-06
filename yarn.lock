@@ -4886,6 +4886,11 @@ html-comment-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/html-comment-regex/-/html-comment-regex-1.1.2.tgz#97d4688aeb5c81886a364faa0cad1dda14d433a7"
   integrity sha512-P+M65QY2JQ5Y0G9KKdlDpo0zK+/OHptU5AaBwUfAIDJZk1MYf32Frm84EcOytfJE0t5JvkAnKlmjsXDnWzCJmQ==
 
+html-element-attributes@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/html-element-attributes/-/html-element-attributes-3.0.0.tgz#74c5a7c22f35dbab927ffa51dd32a223b30040d5"
+  integrity sha512-pNpX5J0GU7QPbDQbRsRPOj4896nTBXQ8zmjjM+I7nq3d+PtkBWqNlwrA1ijmPphXv4taconFR8UnLT4D1nH6ig==
+
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/html-encoding-sniffer/-/html-encoding-sniffer-2.0.1.tgz#42a6dc4fd33f00281176e8b23759ca4e4fa185f3"
