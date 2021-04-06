@@ -3421,10 +3421,10 @@ convert-source-map@^1.4.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
   dependencies:
     safe-buffer "~5.1.1"
 
-copy-webpack-plugin@8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-8.1.0.tgz#0b53170db798ed301439536a02f2868ff63291a0"
-  integrity sha512-Soiq8kXI2AZkpw3dSp18u6oU2JonC7UKv3UdXsKOmT1A5QT46ku9+6c0Qy29JDbSavQJNN1/eKGpd3QNw+cZWg==
+copy-webpack-plugin@8.1.1:
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-8.1.1.tgz#3f697e162764925c2f0d235f380676125508fd26"
+  integrity sha512-rYM2uzRxrLRpcyPqGceRBDpxxUV8vcDqIKxAUKfcnFpcrPxT5+XvhTxv7XLjo5AvEJFPdAE3zCogG2JVahqgSQ==
   dependencies:
     fast-glob "^3.2.5"
     glob-parent "^5.1.1"
@@ -5751,11 +5751,6 @@ jest-watcher@^27.0.0-next.3:
     jest-util "^27.0.0-next.3"
     string-length "^4.0.1"
 
-jest-webextension-mock@3.7.8:
-  version "3.7.8"
-  resolved "https://registry.yarnpkg.com/jest-webextension-mock/-/jest-webextension-mock-3.7.8.tgz#1650e678ea5eb44d2538764d82d9de4e8c56b631"
-  integrity sha512-J7zmNS/WVnLuGOdgNjcNNMG89ZMTbJ+arYPD1b3UXbW2bMuHNJaedqVUBiBmhnFeWVvRL9NqMels22wpJlfZxQ==
-
 jest-worker@^26.3.0, jest-worker@^26.6.2:
   version "26.6.2"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-26.6.2.tgz#7f72cbc4d643c365e27b9fd775f9d0eaa9c7a8ed"
@@ -8009,10 +8004,10 @@ table@^6.0.4:
     slice-ansi "^4.0.0"
     string-width "^4.2.0"
 
-tailwindcss@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-2.1.0.tgz#3e9e15931072c45e1c86d76c0619f9f018e96928"
-  integrity sha512-3tsoLMOrFvwrm0VRx2Hr3cRJ158Sd/KH9BwKg5xyS96yiR/0frQBCfUbXvNsa2hxzViGN4nSWJqzBWDQb4jOSA==
+tailwindcss@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-2.1.1.tgz#642f6038c9283a8e1454da34585b8b7c1a1e8877"
+  integrity sha512-zZ6axGqpSZOCBS7wITm/WNHkBzDt5CIZlDlx0eCVldwTxFPELCVGbgh7Xpb3/kZp3cUxOmK7bZUjqhuMrbN6xQ==
   dependencies:
     "@fullhuman/postcss-purgecss" "^3.1.3"
     bytes "^3.0.0"
