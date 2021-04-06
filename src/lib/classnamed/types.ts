@@ -19,7 +19,13 @@ export interface ClassNamedFunction {
 
 export type Tagged<P extends PropsLike> = <PP extends PropsLike>(
   tag: TemplateStringsArray | string,
-  ...tagItems: Array<(props: P & PP) => string | number | false | undefined>
+  ...tagItems: Array<
+    | string
+    | number
+    | false
+    | undefined
+    | ((props: P & PP) => string | number | false | undefined)
+  >
 ) => ClassNamedVNode<P & PP>;
 
 export type ClassNamedVNode<T> = (props: T, ...args: any[]) => any;

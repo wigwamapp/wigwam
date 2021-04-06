@@ -11,7 +11,7 @@ export const classNamed: ClassNamedFunction = (
       {...props}
       className={parseClassNames(
         cleanTemplate(tag, props.className),
-        ...tagItems.map((t) => t(props))
+        ...tagItems.map((t) => (typeof t === "function" ? t(props) : t))
       )}
     />
   ));
