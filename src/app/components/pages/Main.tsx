@@ -2,7 +2,7 @@ import React, { FC, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import { useQuery } from "react-query";
-import tw from "lib/tw-classnamed";
+import classNamed from "lib/classnamed";
 import { walletStateQuery } from "app/queries";
 import PageLayout from "app/components/layout/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
@@ -14,16 +14,20 @@ const Main: FC = () => (
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
       <Kek />
-      <NumberWrapper>
+      <NumberWrapper padding>
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
       </NumberWrapper>
     </div>
   </PageLayout>
 );
 
-const NumberWrapper = tw.div`
+type NumberWrapperProps = {
+  padding: boolean;
+};
+
+const NumberWrapper = classNamed<"div", NumberWrapperProps>("div")`
   my-4
-  p-[2rem]
+  ${(p) => p.padding && "p-[2rem]"}
   text-xl
   bg-gray-900
   dark:hover:bg-opacity-50

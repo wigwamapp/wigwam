@@ -98,14 +98,17 @@ const getAnimationStyle = (
 
 export const ToastBar: React.FC<ToastBarProps> = React.memo(
   ({ toast, position, ...props }) => {
-    const ref = useCallback((el: HTMLElement | null) => {
-      if (el) {
-        setTimeout(() => {
-          const boundingRect = el.getBoundingClientRect();
-          props.onHeight(boundingRect.height);
-        });
-      }
-    }, []);
+    const ref = useCallback(
+      (el: HTMLElement | null) => {
+        if (el) {
+          setTimeout(() => {
+            const boundingRect = el.getBoundingClientRect();
+            props.onHeight(boundingRect.height);
+          });
+        }
+      },
+      [props]
+    );
 
     const positionStyle = getPositionStyle(position, props.offset);
     const animationStyle = toast?.height
