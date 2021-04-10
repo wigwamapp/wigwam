@@ -25,7 +25,7 @@ type NumberWrapperProps = {
   padding: boolean;
 };
 
-const NumberWrapper = classNamed<"div", NumberWrapperProps>("div")`
+const NumberWrapper = classNamed("div")<NumberWrapperProps>`
   my-4
   ${(p) => p.padding && "p-[2rem]"}
   text-xl
