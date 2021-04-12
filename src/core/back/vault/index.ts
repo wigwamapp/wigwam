@@ -112,10 +112,7 @@ export class Vault {
   private static toPasswordKey(password: string) {
     return withError("Invalid password", async (doThrow) => {
       const passwordKey = await Encryptor.generateKey(password);
-      const check = await Storage.fetchAndDecryptOne<any>(
-        checkStrgKey,
-        passwordKey
-      );
+      const check = await Storage.fetchAndDecryptOne(checkStrgKey, passwordKey);
       if (check !== null) {
         doThrow();
       }
