@@ -1,4 +1,4 @@
-export enum IntercomTarget {
+export enum IComСhannel {
   Wallet = "WALLET",
   DApp = "DAPP",
 }

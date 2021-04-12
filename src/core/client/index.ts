@@ -1,7 +1,7 @@
 import { IntercomClient } from "lib/ext/intercom/client";
 import { assert } from "lib/system/assert";
 import {
-  IntercomTarget,
+  IComСhannel,
   Request,
   Response,
   EventMessage,
@@ -11,9 +11,7 @@ import {
   SeedPharse,
 } from "core/types";
 
-export const intercom = new IntercomClient<Request, Response>(
-  IntercomTarget.Wallet
-);
+const intercom = new IntercomClient<Request, Response>(IComСhannel.Wallet);
 
 export async function getWalletStatus() {
   const type = MessageType.GetWalletStatus;

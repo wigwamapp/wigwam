@@ -5,7 +5,7 @@ import {
   Response,
   EventMessage,
   MessageType,
-  IntercomTarget,
+  IComСhannel,
   WalletStatus,
 } from "core/types";
 import {
@@ -19,16 +19,14 @@ import {
 import { Vault } from "./vault";
 
 export function startServer() {
-  const walletIntercom = new IntercomServer<EventMessage>(
-    IntercomTarget.Wallet
-  );
+  const walletIntercom = new IntercomServer<EventMessage>(IComСhannel.Wallet);
   walletIntercom.onMessage<Request, Response>(handleWalletRequest);
 
   $walletStatus.watch((status) => {
     walletIntercom.broadcast({ type: MessageType.WalletStatusUpdated, status });
   });
 
-  // const dappIntercom = new IntercomServer(IntercomTarget.DApp);
+  // const dappIntercom = new IntercomServer(IComСhannel.DApp);
   // dappIntercom.onMessage(handleDAppRequest);
 }
 
