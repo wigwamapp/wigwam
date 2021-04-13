@@ -22,7 +22,6 @@
     "effector": "21.8.11",
     "ethers": "5.1.0",
     "fontfaceobserver": "2.1.0",
-    "html-element-attributes": "3.0.0",
     "inter-ui": "3.18.0",
     "nanoid": "3.1.22",
     "react": "17.0.2",
@@ -36,6 +35,7 @@
   "devDependencies": {
     "@babel/core": "7.13.15",
     "@babel/preset-react": "7.13.13",
+    "@emotion/is-prop-valid": "1.1.0",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@peculiar/webcrypto": "1.1.6",
     "@serh11p/jest-webextension-mock": "4.0.0",

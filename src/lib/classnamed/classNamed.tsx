@@ -1,9 +1,9 @@
 import React, { forwardRef } from "react";
 import classNames from "clsx";
-import { htmlElementAttributes } from "html-element-attributes";
-import { ClassNamedFunction } from "./types";
+import isPropValid from "@emotion/is-prop-valid";
+import { ClassNamedFactory } from "./types";
 
-export const classNamed: ClassNamedFunction = (
+export const classNamed: ClassNamedFactory = (
   Component: React.ElementType
 ): any => (tag: any, ...tagItems: any[]) =>
   forwardRef((props: any, ref) => {
@@ -11,9 +11,7 @@ export const classNamed: ClassNamedFunction = (
       typeof Component === "string"
         ? Object.entries(props).reduce(
             (sum, [key, val]) =>
-              key === "children" || isHTMLAttribute(Component, key)
-                ? { ...sum, [key]: val }
-                : sum,
+              isPropValid(key) ? { ...sum, [key]: val } : sum,
             {}
           )
         : props;
@@ -43,7 +41,10 @@ function parseClassNames(template: string[], ...templateElements: any[]) {
     .replace(/\s{2,}/g, " "); // replace line return by space
 }
 
-function cleanTemplate(template: TemplateStringsArray, inheritedClasses = "") {
+function cleanTemplate(
+  template: string | TemplateStringsArray,
+  inheritedClasses = ""
+) {
   const newClasses: string[] = template
     .toString()
     .trim()
@@ -61,11 +62,4 @@ function cleanTemplate(template: TemplateStringsArray, inheritedClasses = "") {
       .filter((c: string) => c !== " ") // remove empty classes
       .filter((v: string, i: number, arr: string[]) => arr.indexOf(v) === i) // remove duplicate
   ).split(" ");
-}
-
-function isHTMLAttribute(tag: string, name: string) {
-  return (
-    htmlElementAttributes["*"].includes(name) ||
-    Boolean((htmlElementAttributes as any)[tag]?.includes(name))
-  );
 }
