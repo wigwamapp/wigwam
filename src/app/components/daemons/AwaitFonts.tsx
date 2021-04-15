@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useQuery } from "react-query";
 import { awaitFontsQuery, Font } from "app/queries";
 

@@ -2,7 +2,7 @@ import "./index.css";
 
 // import "app/playground";
 
-import React, { StrictMode } from "react";
+import { StrictMode } from "react";
 import { render } from "react-dom";
 import { enableHashRouting } from "woozie";
 import { disableOutlinesForClick } from "lib/outline-on-click";

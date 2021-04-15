@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { LocationProvider } from "woozie";
 import { QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";

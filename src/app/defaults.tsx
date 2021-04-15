@@ -1,4 +1,3 @@
-import React from "react";
 import { Router, Redirect } from "woozie";
 import { QueryClient } from "react-query";
 import Main from "app/components/pages/Main";

@@ -253,6 +253,10 @@ module.exports = {
       })(),
     }),
 
+    new webpack.ProvidePlugin({
+      React: "react",
+    }),
+
     new MiniCssExtractPlugin({
       filename: "styles/[name].css",
       chunkFilename: "styles/[name].chunk.css",

@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import { useQuery } from "react-query";

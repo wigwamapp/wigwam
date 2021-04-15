@@ -1,4 +1,3 @@
-import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { PublicError } from "core/helpers";
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useLayoutEffect } from "react";
+import { useMemo, useLayoutEffect } from "react";
 import { Router, useLocation, HistoryAction } from "woozie";
 import { ROUTE_MAP } from "app/defaults";
 

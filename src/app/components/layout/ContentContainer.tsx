@@ -1,4 +1,3 @@
-import React from "react";
 import classNames from "clsx";
 
 type ContentContainerProps = React.HTMLAttributes<HTMLDivElement>;

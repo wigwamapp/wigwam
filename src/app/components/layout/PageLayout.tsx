@@ -1,13 +1,11 @@
-import React from "react";
+import { useState, useCallback } from "react";
 import classNames from "clsx";
 import ContentContainer from "app/components/layout/ContentContainer";
 
 const PageLayout: React.FC = ({ children }) => {
-  const [bootAnimationDisplayed, setBootAnimationDisplayed] = React.useState(
-    true
-  );
+  const [bootAnimationDisplayed, setBootAnimationDisplayed] = useState(true);
 
-  const handleAnimationEnd = React.useCallback(() => {
+  const handleAnimationEnd = useCallback(() => {
     setBootAnimationDisplayed(false);
   }, [setBootAnimationDisplayed]);
 

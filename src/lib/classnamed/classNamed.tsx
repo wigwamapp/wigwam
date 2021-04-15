@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import classNames from "clsx";
 import isPropValid from "@emotion/is-prop-valid";
 import { ClassNamedFactory } from "./types";
