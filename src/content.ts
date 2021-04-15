@@ -21,7 +21,7 @@
 
 import { Emitter } from "lib/emitter";
 import { IntercomClient } from "lib/ext/intercom/client";
-import { IComСhannel } from "core/types/shared";
+import { IComChannel } from "core/types/shared";
 
 interface RequestArguments {
   readonly method: string;
@@ -70,7 +70,7 @@ class Ethereum extends Emitter<ProviderMessage> {
 let intercom: IntercomClient;
 function getIntercom() {
   if (!intercom) {
-    intercom = new IntercomClient(IComСhannel.DApp);
+    intercom = new IntercomClient(IComChannel.DApp);
   }
   return intercom;
 }

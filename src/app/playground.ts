@@ -5,11 +5,11 @@ import {
   Request,
   Response,
   EventMessage,
-  IComСhannel,
+  IComChannel,
 } from "core/types";
 import * as Storage from "lib/ext/storage";
 
-const intercom = new IntercomClient<Request, Response>(IComСhannel.Wallet);
+const intercom = new IntercomClient<Request, Response>(IComChannel.Wallet);
 
 intercom.onMessage<EventMessage>(console.info);
 
