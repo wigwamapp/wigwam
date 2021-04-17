@@ -6,8 +6,8 @@ export type Items = { [key: string]: unknown } | [string, unknown][];
 export const transact = createQueue();
 
 export async function isStored(key: string) {
-  const items = await browser.storage.local.get([key]);
-  return items[key] !== undefined;
+  const val = await fetchForce(key);
+  return val !== undefined;
 }
 
 export async function fetch<T = any>(key: string) {
