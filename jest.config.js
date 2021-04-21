@@ -1,7 +1,7 @@
 module.exports = {
   roots: ["<rootDir>/src"],
   collectCoverageFrom: ["src/**/*.{js,jsx,ts,tsx}", "!src/**/*.d.ts"],
-  setupFiles: ["@serh11p/jest-webextension-mock"],
+  setupFiles: ["jest-webextension-mock"],
   setupFilesAfterEnv: ["<rootDir>/.jest/setup.js"],
   testMatch: [
     "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",

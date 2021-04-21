@@ -1953,11 +1953,6 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.11.tgz#aeb16f50649a91af79dbe36574b66d0f9e4d9f71"
   integrity sha512-3NsZsJIA/22P3QUyrEDNA2D133H4j224twJrdipXN38dpnIOzAbUDtOwkcJ5pXmn75w7LSQDjA4tO9dm1XlqlA==
 
-"@serh11p/jest-webextension-mock@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@serh11p/jest-webextension-mock/-/jest-webextension-mock-4.0.0.tgz#c3b2a00e8c758e156a4a922718b35183e9023af9"
-  integrity sha512-SQDFFOJGwQpaPopzYkFgzdDdi8tL8US/XM2UjBu4rmLLztTI/wOSecwXj/i3lhOUwOs3bHO2Zz9eRu2rPy5p9A==
-
 "@sinonjs/commons@^1.7.0":
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.2.tgz#858f5c4b48d80778fde4b9d541f27edc0d56488b"
@@ -5805,6 +5800,11 @@ jest-watcher@^27.0.0-next.3:
     chalk "^4.0.0"
     jest-util "^27.0.0-next.3"
     string-length "^4.0.1"
+
+jest-webextension-mock@3.7.9:
+  version "3.7.9"
+  resolved "https://registry.yarnpkg.com/jest-webextension-mock/-/jest-webextension-mock-3.7.9.tgz#5c3215092f25e372c04288430bb9122fb1fbe09e"
+  integrity sha512-vPHhiCz2P/IrO+73U5ZksVwnYoUxG1v86h5FOm5OjCNOzVHwgOAj8W2jewlg07lW+KHuckyQ2dakgYPxlFKQ2A==
 
 jest-worker@^26.3.0, jest-worker@^26.6.2:
   version "26.6.2"
