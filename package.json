@@ -9,7 +9,7 @@
     "test": "cross-env NODE_ENV=test jest",
     "analyze": "cross-env WEBPACK_ANALYZE=true yarn build",
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
-    "generate-types": "typechain --target=ethers-v5 --outDir src/abi-types src/abi/*.json",
+    "generate-types": "typechain --target=ethers-v5 --outDir src/abi-types src/abi/*.json > /dev/null 2>&1",
     "postinstall": "husky install; yarn generate-types"
   },
   "dependencies": {
