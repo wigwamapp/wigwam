@@ -42,6 +42,7 @@ module.exports = (version, _targetBrowser, contentChunks) => ({
       128: "misc/icon-128.png",
     },
     default_title: "Vigvam",
+    default_popup: "popup.html",
   },
 
   background: {

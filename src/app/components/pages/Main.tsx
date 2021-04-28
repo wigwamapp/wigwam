@@ -3,8 +3,8 @@ import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 import { useQuery } from "react-query";
 import classNamed from "lib/classnamed";
-import { walletStateQuery } from "app/queries";
-import PageLayout from "app/components/layout/PageLayout";
+import { walletStatusQuery } from "app/queries";
+import PageLayout from "app/components/layouts/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
 
 const Main: FC = () => (
@@ -34,8 +34,8 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
 `;
 
 const Kek: FC = () => {
-  const walletState = useQuery(walletStateQuery).data!;
-  console.info(walletState);
+  const walletStatus = useQuery(walletStatusQuery).data!;
+  console.info(walletStatus);
 
   return null;
 };

@@ -1,3 +1,3 @@
 export * from "./base";
-export * from "./walletState";
+export * from "./walletStatus";
 export * from "./fonts";

@@ -1,9 +1,14 @@
 import { useMemo, useLayoutEffect } from "react";
 import { Router, useLocation, HistoryAction } from "woozie";
+import { useQuery } from "react-query";
+import { walletStatusQuery } from "app/queries";
 import { ROUTE_MAP } from "app/defaults";
 
 const PageRouter: React.FC = () => {
   const { trigger, pathname } = useLocation();
+  const walletStatus = useQuery(walletStatusQuery).data!;
+
+  const ctx = useMemo(() => ({ walletStatus }), [walletStatus]);
 
   // Scroll to top after new location pushed.
   useLayoutEffect(() => {
@@ -12,7 +17,7 @@ const PageRouter: React.FC = () => {
     }
   }, [trigger, pathname]);
 
-  return useMemo(() => Router.resolve(ROUTE_MAP, pathname, null), [pathname]);
+  return useMemo(() => Router.resolve(ROUTE_MAP, pathname, ctx), [pathname]);
 };
 
 export default PageRouter;
