@@ -1,5 +1,8 @@
 import { browser } from "webextension-polyfill-ts";
+import { enableTrueConsole } from "lib/true-console";
 import { startServer } from "core/back/server";
+
+enableTrueConsole();
 
 // Start background server
 // It starts Intercom server to communicate with UI & content scripts
@@ -20,6 +23,8 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
 // Open new tab with extension page
 // when user clicked on extension icon in toolbar
 browser.browserAction.onClicked.addListener((tab) => {
+  console.info(`Browser action clicked on TAB#${tab.id} [index: ${tab.index}]`);
+
   browser.tabs.create({
     windowId: tab.windowId,
     index: tab.index + 1,

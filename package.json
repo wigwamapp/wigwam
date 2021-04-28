@@ -17,6 +17,7 @@
     "@headlessui/react": "1.1.1",
     "buffer": "6.0.3",
     "clsx": "1.1.1",
+    "consola": "2.15.3",
     "dexie": "3.1.0-alpha.8",
     "dexie-react-hooks": "1.0.6",
     "effector": "21.8.11",
