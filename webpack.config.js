@@ -75,6 +75,11 @@ const HTML_TEMPLATES = [
   },
 ];
 
+const entry = (...files) =>
+  [...files, NODE_ENV === "development" && "true-console.ts"]
+    .filter(Boolean)
+    .map((f) => path.join(SOURCE_PATH, f));
+
 module.exports = {
   mode: NODE_ENV,
   bail: NODE_ENV === "production",
@@ -83,12 +88,9 @@ module.exports = {
   target: ["web", ES_TARGET],
 
   entry: {
-    back: path.join(SOURCE_PATH, "back.ts"),
-    content: path.join(SOURCE_PATH, "content.ts"),
-    index: path.join(SOURCE_PATH, "index.tsx"),
-    ...(NODE_ENV === "development"
-      ? { ["hot-reload"]: path.join(SOURCE_PATH, "hot-reload.ts") }
-      : {}),
+    back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
+    content: entry("content.ts"),
+    index: entry("index.tsx"),
   },
 
   output: {

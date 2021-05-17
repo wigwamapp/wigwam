@@ -1,8 +1,5 @@
 import { browser } from "webextension-polyfill-ts";
-import { enableTrueConsole } from "lib/true-console";
 import { startServer } from "core/back/server";
-
-enableTrueConsole();
 
 // Start background server
 // It starts Porter server to communicate with UI & content scripts
