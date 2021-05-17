@@ -5,7 +5,7 @@ import { startServer } from "core/back/server";
 enableTrueConsole();
 
 // Start background server
-// It starts Intercom server to communicate with UI & content scripts
+// It starts Porter server to communicate with UI & content scripts
 startServer();
 
 // Open new tab with extension page after install

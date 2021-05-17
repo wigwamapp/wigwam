@@ -1,11 +1,11 @@
 import { match } from "ts-pattern";
-import { IntercomServer, MessageContext } from "lib/ext/intercom/server";
+import { PorterServer, MessageContext } from "lib/ext/porter/server";
 import {
   Request,
   Response,
   EventMessage,
   MessageType,
-  IComChannel,
+  PorterChannel,
   WalletStatus,
 } from "core/types";
 import {
@@ -19,15 +19,15 @@ import {
 import { Vault } from "./vault";
 
 export function startServer() {
-  const walletIntercom = new IntercomServer<EventMessage>(IComChannel.Wallet);
-  walletIntercom.onMessage<Request, Response>(handleWalletRequest);
+  const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
+  walletPorter.onMessage<Request, Response>(handleWalletRequest);
 
   $walletStatus.watch((status) => {
-    walletIntercom.broadcast({ type: MessageType.WalletStatusUpdated, status });
+    walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
   });
 
-  // const dappIntercom = new IntercomServer(IComChannel.DApp);
-  // dappIntercom.onMessage(handleDAppRequest);
+  // const dappPorter = new PorterServer(PorterChannel.DApp);
+  // dappPorter.onMessage(handleDAppRequest);
 }
 
 async function handleWalletRequest(ctx: MessageContext<Request, Response>) {

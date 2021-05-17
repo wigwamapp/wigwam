@@ -1,7 +1,7 @@
-import { IntercomClient } from "lib/ext/intercom/client";
+import { PorterClient } from "lib/ext/porter/client";
 import { assert } from "lib/system/assert";
 import {
-  IComChannel,
+  PorterChannel,
   Request,
   Response,
   EventMessage,
@@ -11,11 +11,11 @@ import {
   SeedPharse,
 } from "core/types";
 
-const intercom = new IntercomClient<Request, Response>(IComChannel.Wallet);
+const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
 
 export async function getWalletStatus() {
   const type = MessageType.GetWalletStatus;
-  const res = await intercom.request({ type });
+  const res = await porter.request({ type });
   assert(res?.type === type);
   return res.status;
 }
@@ -23,7 +23,7 @@ export async function getWalletStatus() {
 export function onWalletStatusUpdated(
   callback: (newWalletStatus: WalletStatus) => void
 ) {
-  return intercom.onMessage<EventMessage>((msg) => {
+  return porter.onMessage<EventMessage>((msg) => {
     if (msg.type === MessageType.WalletStatusUpdated) {
       callback(msg.status);
     }
@@ -36,7 +36,7 @@ export async function setupWallet(
   seedPhrase?: SeedPharse
 ) {
   const type = MessageType.SetupWallet;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     password,
     accountParams,
@@ -48,7 +48,7 @@ export async function setupWallet(
 
 export async function unlockWallet(password: string) {
   const type = MessageType.UnlockWallet;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     password,
   });
@@ -57,13 +57,13 @@ export async function unlockWallet(password: string) {
 
 export async function lockWallet() {
   const type = MessageType.LockWallet;
-  const res = await intercom.request({ type });
+  const res = await porter.request({ type });
   assert(res?.type === type);
 }
 
 export async function addAccount(params: AddAccountParams) {
   const type = MessageType.AddAccount;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     params,
   });
@@ -73,7 +73,7 @@ export async function addAccount(params: AddAccountParams) {
 
 export async function deleteAccount(password: string, accountAddress: string) {
   const type = MessageType.DeleteAccount;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     password,
     accountAddress,
@@ -83,14 +83,14 @@ export async function deleteAccount(password: string, accountAddress: string) {
 
 export async function isWalletHasSeedPhrase() {
   const type = MessageType.HasSeedPhrase;
-  const res = await intercom.request({ type });
+  const res = await porter.request({ type });
   assert(res?.type === type);
   return res.seedPhraseExists;
 }
 
 export async function addSeedPhrase(seedPhrase: SeedPharse) {
   const type = MessageType.AddSeedPhrase;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     seedPhrase,
   });
@@ -99,7 +99,7 @@ export async function addSeedPhrase(seedPhrase: SeedPharse) {
 
 export async function getSeedPhrase(password: string) {
   const type = MessageType.GetSeedPhrase;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     password,
   });
@@ -109,7 +109,7 @@ export async function getSeedPhrase(password: string) {
 
 export async function getPrivateKey(password: string, accountAddress: string) {
   const type = MessageType.GetPrivateKey;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     password,
     accountAddress,
@@ -120,7 +120,7 @@ export async function getPrivateKey(password: string, accountAddress: string) {
 
 export async function getPublicKey(accountAddress: string) {
   const type = MessageType.GetPublicKey;
-  const res = await intercom.request({
+  const res = await porter.request({
     type,
     accountAddress,
   });

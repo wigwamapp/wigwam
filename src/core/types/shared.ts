@@ -1,4 +1,4 @@
-export enum IComChannel {
+export enum PorterChannel {
   Wallet = "WALLET",
   DApp = "DAPP",
 }

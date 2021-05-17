@@ -1,6 +1,6 @@
-import { IntercomMessageType } from "./types";
+import { PorterMessageType } from "./types";
 
-export const MESSAGE_TYPES = Object.values(IntercomMessageType);
+export const MESSAGE_TYPES = Object.values(PorterMessageType);
 
 export const DEFAULT_ERROR_MESSAGE = "Unexpected error occured";
 export const TIMEOUT_ERROR_MESSAGE = "Timeout";
@@ -16,19 +16,19 @@ export function serializeError(err: any): SerializedError {
 }
 
 export function deserializeError({ message, data }: SerializedError) {
-  return new IntercomError(message, data);
+  return new PorterError(message, data);
 }
 
-export class IntercomError extends Error {
-  name = "IntercomError";
+export class PorterError extends Error {
+  name = "PorterError";
 
   constructor(message: string, public data?: any) {
     super(message);
   }
 }
 
-export class IntercomTimeoutError extends IntercomError {
-  name = "IntercomTimeoutError";
+export class PorterTimeoutError extends PorterError {
+  name = "PorterTimeoutError";
 
   constructor() {
     super(TIMEOUT_ERROR_MESSAGE);

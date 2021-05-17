@@ -1,25 +1,25 @@
 import { browser, Runtime } from "webextension-polyfill-ts";
 import { assert } from "lib/system/assert";
 import {
-  IntercomMessageType,
-  IntercomClientMessage,
-  IntercomRequest,
-  IntercomResponse,
-  IntercomErrorResponse,
-  IntercomOneWay,
+  PorterMessageType,
+  PorterClientMessage,
+  PorterRequest,
+  PorterResponse,
+  PorterErrorResponse,
+  PorterOneWay,
 } from "./types";
 import { MESSAGE_TYPES, serializeError } from "./helpers";
 
-export type IntercomMessageHandler<Data = any, ReplyData = any> = (
+export type PorterMessageHandler<Data = any, ReplyData = any> = (
   ctx: MessageContext<Data, ReplyData>
 ) => void;
 
-export type IntercomDisconnectHandler = (port: Runtime.Port) => void;
+export type PorterDisconnectHandler = (port: Runtime.Port) => void;
 
-export class IntercomServer<OneWayData = any> {
+export class PorterServer<OneWayData = any> {
   private ports = new Set<Runtime.Port>();
-  private msgHandlers = new Set<IntercomMessageHandler>();
-  private discntHandlers = new Set<IntercomDisconnectHandler>();
+  private msgHandlers = new Set<PorterMessageHandler>();
+  private discntHandlers = new Set<PorterDisconnectHandler>();
 
   constructor(public name: string) {
     browser.runtime.onConnect.addListener(this.handleConnect.bind(this));
@@ -27,13 +27,13 @@ export class IntercomServer<OneWayData = any> {
   }
 
   onMessage<Data = unknown, ReplyData = any>(
-    handler: IntercomMessageHandler<Data, ReplyData>
+    handler: PorterMessageHandler<Data, ReplyData>
   ) {
     this.addMessageHandler(handler);
     return () => this.removeMessageHandler(handler);
   }
 
-  onDisconnect(handler: IntercomDisconnectHandler) {
+  onDisconnect(handler: PorterDisconnectHandler) {
     this.discntHandlers.add(handler);
     return () => this.discntHandlers.delete(handler);
   }
@@ -43,7 +43,7 @@ export class IntercomServer<OneWayData = any> {
   }
 
   broadcast(data: OneWayData) {
-    const msg: IntercomOneWay = { type: IntercomMessageType.OneWay, data };
+    const msg: PorterOneWay = { type: PorterMessageType.OneWay, data };
     this.ports.forEach((port) => {
       port.postMessage(msg);
     });
@@ -51,7 +51,7 @@ export class IntercomServer<OneWayData = any> {
 
   notify(port: Runtime.Port, data: OneWayData) {
     if (this.isConnected(port)) {
-      port.postMessage({ type: IntercomMessageType.OneWay, data });
+      port.postMessage({ type: PorterMessageType.OneWay, data });
     }
   }
 
@@ -76,7 +76,7 @@ export class IntercomServer<OneWayData = any> {
       port.sender?.frameId === 0 &&
       MESSAGE_TYPES.includes(msg?.type)
     ) {
-      const ctx = new MessageContext(port, msg as IntercomClientMessage, this);
+      const ctx = new MessageContext(port, msg as PorterClientMessage, this);
 
       for (const handler of this.msgHandlers) {
         try {
@@ -96,11 +96,11 @@ export class IntercomServer<OneWayData = any> {
     this.ports.delete(port);
   }
 
-  private addMessageHandler(handler: IntercomMessageHandler) {
+  private addMessageHandler(handler: PorterMessageHandler) {
     this.msgHandlers.add(handler);
   }
 
-  private removeMessageHandler(handler: IntercomMessageHandler) {
+  private removeMessageHandler(handler: PorterMessageHandler) {
     this.msgHandlers.delete(handler);
   }
 }
@@ -110,8 +110,8 @@ export class MessageContext<Data, ReplyData> {
 
   constructor(
     public port: Runtime.Port,
-    private msg: IntercomClientMessage,
-    private server: IntercomServer
+    private msg: PorterClientMessage,
+    private server: PorterServer
   ) {
     this.data = msg.data;
   }
@@ -121,13 +121,13 @@ export class MessageContext<Data, ReplyData> {
   }
 
   get request() {
-    return this.msg.type === IntercomMessageType.Req;
+    return this.msg.type === PorterMessageType.Req;
   }
 
   reply(data: ReplyData) {
     assertRequest(this.msg);
     this.port.postMessage({
-      type: IntercomMessageType.Res,
+      type: PorterMessageType.Res,
       reqId: this.msg.reqId,
       data,
     });
@@ -136,24 +136,22 @@ export class MessageContext<Data, ReplyData> {
   replyError(err: any) {
     assertRequest(this.msg);
     this.send({
-      type: IntercomMessageType.Err,
+      type: PorterMessageType.Err,
       reqId: this.msg.reqId,
       data: serializeError(err),
     });
   }
 
-  private send(res: IntercomResponse | IntercomErrorResponse) {
+  private send(res: PorterResponse | PorterErrorResponse) {
     if (this.connected) {
       this.port.postMessage(res);
     }
   }
 }
 
-function assertRequest(
-  msg: IntercomClientMessage
-): asserts msg is IntercomRequest {
+function assertRequest(msg: PorterClientMessage): asserts msg is PorterRequest {
   assert(
-    msg.type === IntercomMessageType.Req,
+    msg.type === PorterMessageType.Req,
     "Not allowed for non-request messages"
   );
 }

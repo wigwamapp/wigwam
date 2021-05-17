@@ -1,8 +1,8 @@
 import { Runtime, browser } from "webextension-polyfill-ts";
-import { IntercomMessageType, IntercomClientMessage } from "./types";
-import { deserializeError, IntercomTimeoutError } from "./helpers";
+import { PorterMessageType, PorterClientMessage } from "./types";
+import { deserializeError, PorterTimeoutError } from "./helpers";
 
-export class IntercomClient<ReqData = any, ResData = unknown> {
+export class PorterClient<ReqData = any, ResData = unknown> {
   public port: Runtime.Port;
   private reqId = 0;
 
@@ -20,7 +20,7 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
   async request(data: ReqData, requestTimeout = 60_000): Promise<ResData> {
     const reqId = this.reqId++;
 
-    this.send({ type: IntercomMessageType.Req, reqId, data });
+    this.send({ type: PorterMessageType.Req, reqId, data });
 
     let timeoutId: any;
     return new Promise((resolve, reject) => {
@@ -29,11 +29,11 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
           case msg?.reqId !== reqId:
             return;
 
-          case msg?.type === IntercomMessageType.Res:
+          case msg?.type === PorterMessageType.Res:
             resolve(msg.data);
             break;
 
-          case msg?.type === IntercomMessageType.Err:
+          case msg?.type === PorterMessageType.Err:
             reject(deserializeError(msg.data));
             break;
         }
@@ -47,7 +47,7 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
       if (requestTimeout !== Infinity) {
         timeoutId = setTimeout(() => {
           this.port.onMessage.removeListener(listener);
-          reject(new IntercomTimeoutError());
+          reject(new PorterTimeoutError());
         }, requestTimeout);
       }
     });
@@ -58,7 +58,7 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
    */
   onMessage<OneWayData = unknown>(callback: (data: OneWayData) => void) {
     const listener = (msg: any) => {
-      if (msg?.type === IntercomMessageType.OneWay) {
+      if (msg?.type === PorterMessageType.OneWay) {
         callback(msg.data);
       }
     };
@@ -76,7 +76,7 @@ export class IntercomClient<ReqData = any, ResData = unknown> {
     this.port.disconnect();
   }
 
-  private send(msg: IntercomClientMessage) {
+  private send(msg: PorterClientMessage) {
     this.port.postMessage(msg);
   }
 }

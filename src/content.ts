@@ -1,14 +1,14 @@
 /* eslint-disable */
 
-// import { IntercomClient } from "lib/ext/intercom/client";
+// import { PorterClient } from "lib/ext/porter/client";
 // import { assert } from "lib/system/assert";
 // import { MessageType, Request, Response } from "core/types";
 
-// const intercom = new IntercomClient<Request, Response>("CONTENT_SCRIPT");
+// const porter = new PorterClient<Request, Response>("CONTENT_SCRIPT");
 
 // (async () => {
 //   try {
-//     const res = await intercom.request(
+//     const res = await porter.request(
 //       { type: MessageType.GetWalletStatus },
 //       5_000
 //     );
@@ -20,8 +20,8 @@
 // })();
 
 import { Emitter } from "lib/emitter";
-import { IntercomClient } from "lib/ext/intercom/client";
-import { IComChannel } from "core/types/shared";
+import { PorterClient } from "lib/ext/porter/client";
+import { PorterChannel } from "core/types/shared";
 
 interface RequestArguments {
   readonly method: string;
@@ -67,10 +67,10 @@ class Ethereum extends Emitter<ProviderMessage> {
   async request(_req: RequestArguments) {}
 }
 
-let intercom: IntercomClient;
-function getIntercom() {
-  if (!intercom) {
-    intercom = new IntercomClient(IComChannel.DApp);
+let porter: PorterClient;
+function getPorter() {
+  if (!porter) {
+    porter = new PorterClient(PorterChannel.DApp);
   }
-  return intercom;
+  return porter;
 }
