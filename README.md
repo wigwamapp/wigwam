@@ -8,6 +8,13 @@
 
 ### yarn test
 
+## Audit
+
+```sh
+  yarn global add sync
+  yarn npm-audit
+```
+
 ## Usefull links
 
 - https://github.com/joelshepherd/tabliss
