@@ -5,9 +5,9 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 const webpack = require("webpack");
 const loaderUtils = require("loader-utils");
-const { ESBuildMinifyPlugin } = require("esbuild-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
@@ -47,10 +47,6 @@ const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
   DEST_PATH,
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
-);
-
-const MODULES_TO_TRANSPILE = [NODE_ENV === "development" && "effector"].filter(
-  Boolean
 );
 
 const MANIFEST_ENTRY_PATH = path.join(SOURCE_PATH, "manifest.js");
@@ -103,6 +99,9 @@ module.exports = {
   resolve: {
     modules: [NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
     extensions: MODULE_FILE_EXTENSIONS,
+    alias: {
+      effector: require.resolve("./.patch/effector.mjs"),
+    },
   },
 
   module: {
@@ -142,19 +141,13 @@ module.exports = {
             ],
           },
 
-          // Process application JS with ESBuild.
+          // Process application JS with Sucrase.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: [
-              SOURCE_PATH,
-              ...MODULES_TO_TRANSPILE.map((name) =>
-                path.join(NODE_MODULES_PATH, name)
-              ),
-            ],
-            loader: require.resolve("esbuild-loader"),
+            include: [SOURCE_PATH],
+            loader: "@sucrase/webpack-loader",
             options: {
-              loader: "tsx",
-              target: ES_TARGET,
+              transforms: ["jsx", "typescript"],
             },
           },
 
@@ -319,8 +312,44 @@ module.exports = {
     },
     minimize: NODE_ENV === "production",
     minimizer: [
-      new ESBuildMinifyPlugin({
-        target: ES_TARGET, // Syntax to compile to (see options below for possible values)
+      // This is only used in production mode
+      new TerserPlugin({
+        terserOptions: {
+          parse: {
+            // We want terser to parse ecma 8 code. However, we don't want it
+            // to apply any minification steps that turns valid ecma 5 code
+            // into invalid ecma 5 code. This is why the 'compress' and 'output'
+            // sections only apply transformations that are ecma 5 safe
+            // https://github.com/facebook/create-react-app/pull/4234
+            ecma: 8,
+          },
+          compress: {
+            ecma: 5,
+            warnings: false,
+            // Disabled because of an issue with Uglify breaking seemingly valid code:
+            // https://github.com/facebook/create-react-app/issues/2376
+            // Pending further investigation:
+            // https://github.com/mishoo/UglifyJS2/issues/2011
+            comparisons: false,
+            // Disabled because of an issue with Terser breaking valid code:
+            // https://github.com/facebook/create-react-app/issues/5250
+            // Pending further investigation:
+            // https://github.com/terser-js/terser/issues/120
+            inline: 2,
+            // Drop console for prod
+            drop_console: NODE_ENV === "production",
+          },
+          mangle: {
+            safari10: true,
+          },
+          output: {
+            ecma: 5,
+            comments: false,
+            // Turned on because emoji and regex is not minified properly using default
+            // https://github.com/facebook/create-react-app/issues/2488
+            ascii_only: true,
+          },
+        },
       }),
       new CssMinimizerPlugin(),
       new ZipPlugin({
@@ -328,7 +357,7 @@ module.exports = {
         extension: PACKED_EXTENSION,
         filename: TARGET_BROWSER,
       }),
-    ].filter(Boolean),
+    ],
   },
 
   node: false,
