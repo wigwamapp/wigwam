@@ -1,10 +1,14 @@
-import { walletStatusQuery } from "app/queries";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
+import { match } from "ts-pattern";
+import { browser } from "webextension-polyfill-ts";
+
+import { WalletStatus } from "core/types";
+import { walletStatusQuery } from "app/queries";
+
 import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
 import Popup from "./pages/Popup";
-import { WalletStatus } from "core/types";
-import { match } from "ts-pattern";
 
 const PopupApp: React.FC = () => (
   <BaseProvider>
@@ -20,5 +24,17 @@ const PopupRouter: React.FC = () => {
   return match(walletStatus)
     .with(WalletStatus.Ready, () => <Popup />)
     .with(WalletStatus.Locked, () => <Unlock />)
-    .otherwise(() => null);
+    .otherwise(() => <OpenInTab />);
+};
+
+const OpenInTab: React.FC = () => {
+  useEffect(() => {
+    browser.tabs.create({
+      url: browser.runtime.getURL("index.html"),
+      active: true,
+    });
+    window.close();
+  }, []);
+
+  return null;
 };

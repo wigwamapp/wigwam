@@ -31,6 +31,8 @@ export function startServer() {
 }
 
 async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
+  console.debug("New wallet request", ctx);
+
   if (!ctx.request) return;
 
   try {

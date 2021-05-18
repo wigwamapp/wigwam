@@ -3,7 +3,7 @@ import { useQueryClient, useQuery } from "react-query";
 import { onWalletStatusUpdated } from "core/client";
 import { walletStatusQuery } from "app/queries";
 
-const UpdateWalletState: FC = () => {
+const UpdateWalletStatus: FC = () => {
   const queryClient = useQueryClient();
 
   useQuery(walletStatusQuery);
@@ -17,4 +17,4 @@ const UpdateWalletState: FC = () => {
   return null;
 };
 
-export default UpdateWalletState;
+export default UpdateWalletStatus;

@@ -61,13 +61,15 @@ const CSS_MODULE_REGEX = /\.module\.css$/;
 const HTML_TEMPLATES = [
   {
     path: path.join(PUBLIC_PATH, "back.html"),
-    chunks: ["back", NODE_ENV === "development" && "hot-reload"].filter(
-      Boolean
-    ),
+    chunks: ["back"],
   },
   {
     path: path.join(PUBLIC_PATH, "index.html"),
     chunks: ["index"],
+  },
+  {
+    path: path.join(PUBLIC_PATH, "popup.html"),
+    chunks: ["popup"],
   },
 ];
 
@@ -87,6 +89,7 @@ module.exports = {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
     content: entry("content.ts"),
     index: entry("index.tsx"),
+    popup: entry("popup.tsx"),
   },
 
   output: {

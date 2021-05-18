@@ -17,19 +17,6 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
   }
 });
 
-// Open new tab with extension page
-// when user clicked on extension icon in toolbar
-browser.browserAction.onClicked.addListener((tab) => {
-  console.info(`Browser action clicked on TAB#${tab.id} [index: ${tab.index}]`);
-
-  browser.tabs.create({
-    windowId: tab.windowId,
-    index: tab.index + 1,
-    url: browser.runtime.getURL("index.html"),
-    active: true,
-  });
-});
-
 // setTimeout(async () => {
 //   const [currentTab] = await browser.tabs.query({
 //     currentWindow: true,

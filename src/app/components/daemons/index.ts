@@ -1,2 +1,2 @@
 export { default as AwaitFonts } from "./AwaitFonts";
-export { default as UpdateWalletState } from "./UpdateWalletState";
+export { default as UpdateWalletStatus } from "./UpdateWalletStatus";

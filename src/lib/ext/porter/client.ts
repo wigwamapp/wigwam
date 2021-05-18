@@ -22,8 +22,9 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
     this.send({ type: PorterMessageType.Req, reqId, data });
 
-    let timeoutId: any;
     return new Promise((resolve, reject) => {
+      let timeoutId: any;
+
       const listener = (msg: any) => {
         switch (true) {
           case msg?.reqId !== reqId:
