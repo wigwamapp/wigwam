@@ -74,7 +74,7 @@ const HTML_TEMPLATES = [
 ];
 
 const entry = (...files) =>
-  [...files, NODE_ENV === "development" && "true-console.ts"]
+  [NODE_ENV === "development" && "true-console.ts", ...files]
     .filter(Boolean)
     .map((f) => path.join(SOURCE_PATH, f));
 
