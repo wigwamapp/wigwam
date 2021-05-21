@@ -23,7 +23,6 @@
     "clsx": "1.1.1",
     "consola": "2.15.3",
     "dexie": "3.1.0-alpha.8",
-    "dexie-react-hooks": "1.0.6",
     "effector": "21.8.11",
     "ethers": "5.2.0",
     "fontfaceobserver": "2.1.0",
