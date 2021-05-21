@@ -4,7 +4,5 @@
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
 import { Crypto } from "@peculiar/webcrypto";
-import React from "react";
 
 global.crypto = new Crypto();
-global.React = React;
