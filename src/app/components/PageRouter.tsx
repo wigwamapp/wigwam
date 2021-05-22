@@ -17,10 +17,10 @@ const PageRouter: React.FC = () => {
     }
   }, [trigger, pathname]);
 
-  return useMemo(() => Router.resolve(ROUTE_MAP, pathname, ctx), [
-    pathname,
-    ctx,
-  ]);
+  return useMemo(
+    () => Router.resolve(ROUTE_MAP, pathname, ctx),
+    [pathname, ctx]
+  );
 };
 
 export default PageRouter;

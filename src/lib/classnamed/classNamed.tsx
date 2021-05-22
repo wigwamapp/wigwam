@@ -3,30 +3,30 @@ import classNames from "clsx";
 import isPropValid from "@emotion/is-prop-valid";
 import { ClassNamedFactory } from "./types";
 
-export const classNamed: ClassNamedFactory = (
-  Component: React.ElementType
-): any => (tag: any, ...tagItems: any[]) =>
-  forwardRef((props: any, ref) => {
-    const propsToPass =
-      typeof Component === "string"
-        ? Object.entries(props).reduce(
-            (sum, [key, val]) =>
-              isPropValid(key) ? { ...sum, [key]: val } : sum,
-            {}
-          )
-        : props;
+export const classNamed: ClassNamedFactory =
+  (Component: React.ElementType): any =>
+  (tag: any, ...tagItems: any[]) =>
+    forwardRef((props: any, ref) => {
+      const propsToPass =
+        typeof Component === "string"
+          ? Object.entries(props).reduce(
+              (sum, [key, val]) =>
+                isPropValid(key) ? { ...sum, [key]: val } : sum,
+              {}
+            )
+          : props;
 
-    return (
-      <Component
-        ref={ref}
-        {...propsToPass}
-        className={parseClassNames(
-          cleanTemplate(tag, props.className),
-          ...tagItems.map((t) => (typeof t === "function" ? t(props) : t))
-        )}
-      />
-    );
-  });
+      return (
+        <Component
+          ref={ref}
+          {...propsToPass}
+          className={parseClassNames(
+            cleanTemplate(tag, props.className),
+            ...tagItems.map((t) => (typeof t === "function" ? t(props) : t))
+          )}
+        />
+      );
+    });
 
 function parseClassNames(template: string[], ...templateElements: any[]) {
   return template
