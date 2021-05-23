@@ -1,11 +1,13 @@
 import { FC, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
-import { useQuery } from "react-query";
+import { useQueries } from "react-query";
 import classNamed from "lib/classnamed";
+import { WalletStatus } from "core/types";
 import { walletStatusQuery } from "app/queries";
 import PageLayout from "app/components/layouts/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
+import { useStorageQuery } from "app/queries/storage";
 
 const Main: FC = () => (
   <PageLayout>
@@ -34,10 +36,18 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
 `;
 
 const Kek: FC = () => {
-  const walletStatus = useQuery(walletStatusQuery).data!;
-  console.info(walletStatus);
+  const kekQuery = useStorageQuery<string>("kek");
 
-  return null;
+  const [{ data: kekData }, { data: walletStatusData }] = useQueries([
+    kekQuery,
+    walletStatusQuery,
+  ]);
+  const kek = kekData as string | undefined;
+  const walletStatus = walletStatusData as WalletStatus;
+
+  return (
+    <div className="p-2">{JSON.stringify({ kek, walletStatus }, null, 2)}</div>
+  );
 };
 
 export default Main;

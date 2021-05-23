@@ -8,11 +8,13 @@ const UpdateWalletStatus: FC = () => {
 
   useQuery(walletStatusQuery);
 
-  useEffect(() => {
-    return onWalletStatusUpdated((newWalletStatus) => {
-      queryClient.setQueryData(walletStatusQuery.queryKey, newWalletStatus);
-    });
-  }, [queryClient]);
+  useEffect(
+    () =>
+      onWalletStatusUpdated((newWalletStatus) => {
+        queryClient.setQueryData(walletStatusQuery.queryKey, newWalletStatus);
+      }),
+    [queryClient]
+  );
 
   return null;
 };
