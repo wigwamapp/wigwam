@@ -1,17 +1,20 @@
 import { useEffect, useMemo } from "react";
 import { useQueryClient } from "react-query";
 import * as Storage from "lib/ext/storage";
+import { query } from "./base";
 
 export function useStorageQuery<T = any>(key: string) {
   const queryClient = useQueryClient();
 
   const storageQuery = useMemo(
-    () => ({
-      queryKey: ["storage", key],
-      queryFn: () => Storage.fetchForce<T>(key),
-      refetchOnReconnect: false,
-      staleTime: Infinity,
-    }),
+    () =>
+      query({
+        queryKey: ["storage", key],
+        queryFn: () => Storage.fetchForce<T>(key),
+        refetchOnReconnect: false,
+        staleTime: Infinity,
+        refetchOnMount: true,
+      }),
     [key]
   );
 

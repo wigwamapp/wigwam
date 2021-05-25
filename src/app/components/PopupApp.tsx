@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { match } from "ts-pattern";
-import { browser } from "webextension-polyfill-ts";
 
 import { WalletStatus } from "core/types";
 import { walletStatusQuery } from "app/queries";
+import { openInTab } from "app/helpers";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
@@ -29,11 +29,7 @@ const PopupRouter: React.FC = () => {
 
 const OpenInTab: React.FC = () => {
   useEffect(() => {
-    browser.tabs.create({
-      url: browser.runtime.getURL("index.html"),
-      active: true,
-    });
-    window.close();
+    openInTab();
   }, []);
 
   return null;

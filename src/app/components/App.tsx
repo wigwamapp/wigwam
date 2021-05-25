@@ -1,7 +1,8 @@
+import { FC } from "react";
 import BaseProvider from "./BaseProvider";
 import PageRouter from "./PageRouter";
 
-const App: React.FC = () => (
+const App: FC = () => (
   <BaseProvider>
     <PageRouter />
   </BaseProvider>

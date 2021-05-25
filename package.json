@@ -19,6 +19,7 @@
     "@ethersproject/providers": "5.2.0",
     "@ethersproject/wordlists": "5.2.0",
     "@headlessui/react": "1.2.0",
+    "@heroicons/react": "1.0.1",
     "buffer": "6.0.3",
     "clsx": "1.1.1",
     "consola": "2.15.3",

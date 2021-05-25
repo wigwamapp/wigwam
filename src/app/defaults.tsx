@@ -1,24 +1,44 @@
 import { Router, Redirect } from "woozie";
 import { QueryClient } from "react-query";
-// import { match } from "ts-pattern";
+import { match } from "ts-pattern";
+
 import { WalletStatus } from "core/types";
-// import Welcome from "app/components/pages/Welcome";
-import Main from "app/components/pages/Main";
+
+import Unlock from "./components/pages/Unlock";
+import Welcome from "./components/pages/Welcome";
+import Main from "./components/pages/Main";
+import AddAccount from "./components/pages/AddAccount";
 
 export interface RouterContext {
   walletStatus: WalletStatus;
 }
 
 export const ROUTE_MAP = Router.createMap<RouterContext>([
-  // [
-  //   "*",
-  //   (_p, ctx) =>
-  //     match(ctx.walletStatus)
-  //       .with(WalletStatus.Locked, () => <Main />)
-  //       .with(WalletStatus.Welcome, () => <Welcome />)
-  //       .otherwise(() => Router.SKIP),
-  // ],
-  ["/", () => <Main />],
+  // Unlcok when wallet locked
+  [
+    "*",
+    (_p, ctx) =>
+      match(ctx.walletStatus)
+        .with(WalletStatus.Locked, () => <Unlock />)
+        .with(WalletStatus.Idle, () => null)
+        .otherwise(() => Router.SKIP),
+  ],
+  [
+    "/",
+    (_p, ctx) =>
+      ctx.walletStatus === WalletStatus.Welcome ? <Welcome /> : <Main />,
+  ],
+  ["/add-account", () => <AddAccount />],
+  [
+    "*",
+    (_p, ctx) =>
+      ctx.walletStatus === WalletStatus.Ready ? (
+        Router.SKIP
+      ) : (
+        <Redirect to="/" />
+      ),
+  ],
+  // Only ready below
   ["*", () => <Redirect to="/" />],
 ]);
 
