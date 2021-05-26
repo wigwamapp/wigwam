@@ -73,7 +73,7 @@ export function validateDerivationPath(path: string) {
 
 export function validatePrivateKey(privKey: string) {
   try {
-    new ethers.utils.SigningKey(privKey);
+    new ethers.Wallet(privKey);
   } catch {
     throw new PublicError("Invalid private key");
   }
