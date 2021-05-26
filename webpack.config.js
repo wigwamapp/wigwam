@@ -139,9 +139,9 @@ module.exports = {
           {
             test: /\.svg$/,
             use: [
-              "@svgr/webpack",
+              require.resolve("@svgr/webpack"),
               {
-                loader: "url-loader",
+                loader: require.resolve("url-loader"),
                 options: {
                   limit: IMAGE_INLINE_SIZE_LIMIT,
                   name: "media/[hash:8].[ext]",
@@ -154,9 +154,10 @@ module.exports = {
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             include: [SOURCE_PATH],
-            loader: "@sucrase/webpack-loader",
+            loader: require.resolve("@sucrase/webpack-loader"),
             options: {
               transforms: ["jsx", "typescript"],
+              production: NODE_ENV === "production",
             },
           },
 
