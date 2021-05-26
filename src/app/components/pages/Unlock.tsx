@@ -1,7 +1,11 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
+
+import { isPopup } from "lib/ext/view";
 
 const Unlock: FC = () => {
-  return null;
+  const popup = useMemo(() => isPopup(), []);
+
+  return <>{popup ? "Popup unlock" : "Unlock"}</>;
 };
 
 export default Unlock;
