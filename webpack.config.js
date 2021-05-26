@@ -33,6 +33,12 @@ const {
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
 } = process.env;
+const ENV_SLUG =
+  NODE_ENV === "development"
+    ? "dev"
+    : NODE_ENV === "production"
+    ? "prod"
+    : NODE_ENV;
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
 const SOURCE_MAP = NODE_ENV !== "production" && SOURCE_MAP_ENV !== "false";
@@ -41,7 +47,7 @@ const CWD_PATH = fs.realpathSync(process.cwd());
 const NODE_MODULES_PATH = path.join(CWD_PATH, "node_modules");
 const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
-const DEST_PATH = path.join(CWD_PATH, "dist");
+const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SLUG);
 const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
 const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
