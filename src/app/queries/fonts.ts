@@ -21,13 +21,7 @@ export const awaitFontsQuery = (fonts: Font[]) =>
         }
 
         await Promise.all(fontFaces.map((ff) => ff.load(undefined, 5_000)));
-      } catch (err) {
-        if (process.env.NODE_ENV === "development") {
-          console.error(err);
-        }
-      } finally {
-        return null;
-      }
+      } catch {}
     },
     retry: false,
     staleTime: Infinity,

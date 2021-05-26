@@ -80,9 +80,7 @@ const HTML_TEMPLATES = [
 ];
 
 const entry = (...files) =>
-  [NODE_ENV === "development" && "true-console.ts", ...files]
-    .filter(Boolean)
-    .map((f) => path.join(SOURCE_PATH, f));
+  files.filter(Boolean).map((f) => path.join(SOURCE_PATH, f));
 
 module.exports = {
   mode: NODE_ENV,

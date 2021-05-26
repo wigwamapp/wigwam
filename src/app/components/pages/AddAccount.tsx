@@ -38,18 +38,20 @@ const AddAccount: FC = () => {
   }, [hasSeedPhrase]);
 
   return (
-    <div className="flex flex-col prose">
-      {ADD_ACCOUNT_SECTIONS.map((section) => (
-        <div key={section.key}>
-          <h2>{section.title}</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="prose-xl dark:prose-dark text-center">
+        {ADD_ACCOUNT_SECTIONS.map((section) => (
+          <div key={section.key}>
+            <h2>{section.title}</h2>
 
-          <div className={classNames("flex items-stretch")}>
-            {section.tiles.map(({ key, title }) => (
-              <button key={key}>{title}</button>
-            ))}
+            <div className={classNames("flex items-stretch")}>
+              {section.tiles.map(({ key, title }) => (
+                <button key={key}>{title}</button>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
