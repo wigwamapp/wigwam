@@ -42,7 +42,6 @@
     "@emotion/is-prop-valid": "1.1.0",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@peculiar/webcrypto": "1.1.7",
-    "@sucrase/jest-plugin": "2.1.0",
     "@sucrase/webpack-loader": "2.0.0",
     "@svgr/webpack": "5.5.0",
     "@tailwindcss/typography": "0.4.1",

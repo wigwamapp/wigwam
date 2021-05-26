@@ -9,7 +9,7 @@ module.exports = {
   ],
   testEnvironment: "jsdom",
   transform: {
-    "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "@sucrase/jest-plugin",
+    "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/.jest/jsTransform.js",
     "^.+\\.css$": "<rootDir>/.jest/cssTransform.js",
     "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)":
       "<rootDir>/.jest/fileTransform.js",
