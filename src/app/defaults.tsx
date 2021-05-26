@@ -1,6 +1,5 @@
 import { Router, Redirect } from "woozie";
 import { QueryClient } from "react-query";
-import { match } from "ts-pattern";
 
 import { WalletStatus } from "core/types";
 
@@ -17,11 +16,18 @@ export const ROUTE_MAP = Router.createMap<RouterContext>([
   // Unlcok when wallet locked
   [
     "*",
-    (_p, ctx) =>
-      match(ctx.walletStatus)
-        .with(WalletStatus.Locked, () => <Unlock />)
-        .with(WalletStatus.Idle, () => null)
-        .otherwise(() => Router.SKIP),
+    (_p, ctx) => {
+      switch (ctx.walletStatus) {
+        case WalletStatus.Idle:
+          return null;
+
+        case WalletStatus.Locked:
+          return <Unlock />;
+
+        default:
+          return Router.SKIP;
+      }
+    },
   ],
   [
     "/",
