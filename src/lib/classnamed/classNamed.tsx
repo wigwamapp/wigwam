@@ -1,10 +1,10 @@
-import { forwardRef } from "react";
+import { ElementType, forwardRef } from "react";
 import classNames from "clsx";
 import isPropValid from "@emotion/is-prop-valid";
 import { ClassNamedFactory } from "./types";
 
 export const classNamed: ClassNamedFactory =
-  (Component: React.ElementType): any =>
+  (Component: ElementType): any =>
   (tag: any, ...tagItems: any[]) =>
     forwardRef((props: any, ref) => {
       const propsToPass =

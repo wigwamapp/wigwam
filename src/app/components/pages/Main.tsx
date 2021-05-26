@@ -65,7 +65,7 @@ const people = [
   "Emil Schaefer",
 ];
 
-const MyListbox: React.FC = () => {
+const MyListbox: FC = () => {
   const [selectedPerson, setSelectedPerson] = useState(people[0]);
 
   return (

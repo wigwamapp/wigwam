@@ -1,4 +1,6 @@
-const AddSeedPhrase: React.FC = () => {
+import { FC } from "react";
+
+const AddSeedPhrase: FC = () => {
   return null;
 };
 

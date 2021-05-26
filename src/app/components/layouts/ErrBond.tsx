@@ -1,9 +1,10 @@
+import { FC, ComponentProps } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { PublicError } from "core/helpers";
 
-type ErrBondProps = Pick<React.ComponentProps<typeof ErrorBoundary>, "onReset">;
+type ErrBondProps = Pick<ComponentProps<typeof ErrorBoundary>, "onReset">;
 
-const ErrBond: React.FC<ErrBondProps> = (props) => (
+const ErrBond: FC<ErrBondProps> = (props) => (
   <ErrorBoundary
     fallbackRender={({ error, resetErrorBoundary }) => (
       <div className="w-full h-full flex items-center justify-center">

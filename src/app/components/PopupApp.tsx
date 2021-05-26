@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import { useQuery } from "react-query";
 import { match } from "ts-pattern";
 
@@ -10,7 +10,7 @@ import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
 import Popup from "./pages/Popup";
 
-const PopupApp: React.FC = () => (
+const PopupApp: FC = () => (
   <BaseProvider>
     <PopupRouter />
   </BaseProvider>
@@ -18,7 +18,7 @@ const PopupApp: React.FC = () => (
 
 export default PopupApp;
 
-const PopupRouter: React.FC = () => {
+const PopupRouter: FC = () => {
   const walletStatus = useQuery(walletStatusQuery).data!;
 
   return match(walletStatus)
@@ -27,7 +27,7 @@ const PopupRouter: React.FC = () => {
     .otherwise(() => <OpenInTab />);
 };
 
-const OpenInTab: React.FC = () => {
+const OpenInTab: FC = () => {
   useEffect(() => {
     openInTab();
   }, []);

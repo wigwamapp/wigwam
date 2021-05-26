@@ -1,8 +1,9 @@
+import { FC, HTMLAttributes } from "react";
 import classNames from "clsx";
 
-type ButtonProps = React.HTMLAttributes<HTMLButtonElement>;
+type ButtonProps = HTMLAttributes<HTMLButtonElement>;
 
-const Button: React.FC<ButtonProps> = ({ className, ...rest }) => (
+const Button: FC<ButtonProps> = ({ className, ...rest }) => (
   <button
     className={classNames(
       "bg-blue-500 hover:bg-blue-700",

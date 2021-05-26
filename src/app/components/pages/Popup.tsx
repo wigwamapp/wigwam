@@ -1,4 +1,6 @@
-const Popup: React.FC = () => {
+import { FC } from "react";
+
+const Popup: FC = () => {
   return null;
 };
 

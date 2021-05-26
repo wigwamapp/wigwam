@@ -1,18 +1,10 @@
-import classNames from "clsx";
+import classNamed from "lib/classnamed";
 
-type ContentContainerProps = React.HTMLAttributes<HTMLDivElement>;
-
-const ContentContainer: React.FC<ContentContainerProps> = ({
-  className,
-  children,
-  ...rest
-}) => (
-  <div
-    className={classNames("w-full max-w-6xl mx-auto px-4", className)}
-    {...rest}
-  >
-    {children}
-  </div>
-);
+const ContentContainer = classNamed("div")`
+  w-full
+  max-w-6xl
+  mx-auto
+  px-4
+`;
 
 export default ContentContainer;

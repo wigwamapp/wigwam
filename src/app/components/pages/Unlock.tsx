@@ -1,4 +1,6 @@
-const Unlock: React.FC = () => {
+import { FC } from "react";
+
+const Unlock: FC = () => {
   return null;
 };
 
