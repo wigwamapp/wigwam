@@ -1,5 +1,13 @@
 {
   "appDesc": {
     "message": "🛶 Awesome Wallet"
+  },
+  "welcomeTo": {
+    "message": "Welcome to $target$",
+    "placeholders": {
+      "target": {
+        "content": "$1"
+      }
+    }
   }
 }

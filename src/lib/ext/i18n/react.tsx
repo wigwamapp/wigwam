@@ -1,13 +1,57 @@
-import { memo } from "react";
+import { memo, Fragment, ReactNode, useMemo } from "react";
+
+import { t } from "./core";
+import { toList } from "./helpers";
+
+export * from "./index";
+
+export type ReactSubstitutions = ReactNode | ReactNode[];
 
 export type TProps = {
-  id?: string;
+  id: string;
+  subs?: ReactSubstitutions;
 };
 
-export const T = memo<TProps>(({ children }) => {
-  return <>{children}</>;
+export const T = memo<TProps>(({ id, subs, children }) => {
+  const message = useMemo(() => tReact(id, subs), [id, subs]);
+  return message || (children ?? null);
 });
 
-export const t = (msg: string) => msg;
+const TMP_SEPARATOR = "$_$";
+const BOLD_PATTERN = /<b>(.*?)<\/b>/g;
 
-// TODO: Implement well i18n
+function tReact(messageName: string, substitutions?: ReactSubstitutions) {
+  const subList = toList(substitutions);
+  const tmp = t(
+    messageName,
+    subList.map(() => TMP_SEPARATOR)
+  );
+
+  return (
+    <>
+      {tmp.split(TMP_SEPARATOR).map((partI, i) => (
+        <Fragment key={`i_${i}`}>
+          {partI.split("\n").map((partJ, j) => (
+            <Fragment key={`j_${j}`}>
+              {j > 0 && <br />}
+              {partJ.includes("<b>")
+                ? partJ
+                    .split(BOLD_PATTERN)
+                    .map((partK, k) => (
+                      <Fragment key={`k_${k}`}>
+                        {k % 2 === 0 ? (
+                          partK
+                        ) : (
+                          <span className="font-semibold">{partK}</span>
+                        )}
+                      </Fragment>
+                    ))
+                : partJ}
+            </Fragment>
+          ))}
+          {subList[i]}
+        </Fragment>
+      ))}
+    </>
+  );
+}
