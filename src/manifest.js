@@ -2,9 +2,15 @@
  * @param {string} version
  * @param {string} targetBrowser
  * @param {string[]} contentChunks
+ * @param {string[]} webAccessibleResources
  * @returns {import("webextension-polyfill-ts").Manifest}
  */
-module.exports = (version, _targetBrowser, contentChunks) => ({
+module.exports = (
+  version,
+  _targetBrowser,
+  contentChunks = [],
+  webAccessibleResources = []
+) => ({
   manifest_version: 2,
   name: "Vigvam",
   version,
@@ -52,10 +58,12 @@ module.exports = (version, _targetBrowser, contentChunks) => ({
 
   content_scripts: [
     {
-      matches: ["http://localhost:*/*", "https://*/*"],
+      matches: ["file://*/*", "http://*/*", "https://*/*"],
       js: contentChunks,
       run_at: "document_start",
       all_frames: true,
     },
   ],
+
+  web_accessible_resources: webAccessibleResources,
 });

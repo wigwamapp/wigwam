@@ -128,17 +128,18 @@ function getBackgroundScripts() {
 
 function getContentScripts() {
   const manifest = chrome.runtime.getManifest();
-  const paths = [];
+  const scripts = manifest.web_accessible_resources ?? [];
   if (manifest.content_scripts) {
     for (const contentScript of manifest.content_scripts) {
       if (contentScript.js) {
-        for (const path of contentScript.js) {
-          paths.push(path);
+        for (const s of contentScript.js) {
+          scripts.push(s);
         }
       }
     }
   }
-  return paths;
+
+  return scripts;
 }
 
 function getActiveTab() {

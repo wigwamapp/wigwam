@@ -78,6 +78,7 @@ const HTML_TEMPLATES = [
     chunks: ["popup"],
   },
 ];
+const SOLO_ENTRIES = ["content", "inpage"];
 
 const entry = (...files) =>
   files.filter(Boolean).map((f) => path.join(SOURCE_PATH, f));
@@ -92,6 +93,7 @@ module.exports = {
   entry: {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
     content: entry("content.ts"),
+    inpage: entry("inpage.ts"),
     index: entry("index.tsx"),
     popup: entry("popup.tsx"),
   },
@@ -300,9 +302,12 @@ module.exports = {
           to: path.join(OUTPUT_PATH, "manifest.json"),
           toType: "file",
           transform: (_content, absoluteFrom) => {
-            const manifest = require(absoluteFrom)(VERSION, TARGET_BROWSER, [
-              "scripts/content.js",
-            ]);
+            const manifest = require(absoluteFrom)(
+              VERSION,
+              TARGET_BROWSER,
+              ["scripts/content.js"],
+              ["scripts/inpage.js"]
+            );
             return JSON.stringify(manifest, null, 2);
           },
         },
@@ -320,12 +325,13 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks(chunk) {
-        return chunk.name !== "content";
+        return !SOLO_ENTRIES.includes(chunk.name);
       },
     },
     mergeDuplicateChunks: true,
     runtimeChunk: {
-      name: (entrypoint) => (entrypoint.name === "content" ? false : "runtime"),
+      name: (entrypoint) =>
+        SOLO_ENTRIES.includes(entrypoint.name) ? false : "runtime",
     },
     minimize: NODE_ENV === "production",
     minimizer: [

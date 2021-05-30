@@ -19,6 +19,8 @@
 //   }
 // })();
 
+import { browser } from "webextension-polyfill-ts";
+
 import { Emitter } from "lib/emitter";
 import { PorterClient } from "lib/ext/porter/client";
 import { PorterChannel } from "core/types/shared";
@@ -73,4 +75,19 @@ function getPorter() {
     porter = new PorterClient(PorterChannel.DApp);
   }
   return porter;
+}
+
+injectScript(browser.runtime.getURL("scripts/inpage.js"));
+
+function injectScript(src: string) {
+  try {
+    const container = document.head || document.documentElement;
+    const script = document.createElement("script");
+    script.setAttribute("async", "false");
+    script.src = src;
+    container.insertBefore(script, container.children[0]);
+    container.removeChild(script);
+  } catch (err) {
+    console.error("Vigvam: Provider injection failed.", err);
+  }
 }
