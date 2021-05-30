@@ -92,7 +92,7 @@
     "webpack": "5.38.1",
     "webpack-bundle-analyzer": "4.4.2",
     "webpack-cli": "4.7.0",
-    "webpack-sources": "2.2.0",
+    "webpack-sources": "2.3.0",
     "webpackbar": "5.0.0-3",
     "zip-webpack-plugin": "4.0.1"
   }
