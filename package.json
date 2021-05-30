@@ -87,7 +87,7 @@
     "tailwindcss": "2.1.2",
     "terser-webpack-plugin": "5.1.2",
     "typechain": "5.0.0",
-    "typescript": "4.2.4",
+    "typescript": "4.3.2",
     "url-loader": "4.1.1",
     "webpack": "5.38.1",
     "webpack-bundle-analyzer": "4.4.2",
