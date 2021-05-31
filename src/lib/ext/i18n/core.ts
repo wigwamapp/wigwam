@@ -69,7 +69,7 @@ export function t(messageName: string, substitutions?: Substitutions) {
   }
 }
 
-export function getCurrentLocale() {
+export function getLocale() {
   return getSavedLocale() || getNativeLocale();
 }
 

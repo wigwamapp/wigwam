@@ -1,4 +1,4 @@
-import { memo, Fragment, ReactNode, useMemo } from "react";
+import { memo, Fragment, ReactNode } from "react";
 
 import { t } from "./core";
 import { toList } from "./helpers";
@@ -12,10 +12,10 @@ export type TProps = {
   values?: ReactSubstitutions;
 };
 
-export const T = memo<TProps>(({ i18nKey, values, children }) => {
-  const message = useMemo(() => tReact(i18nKey, values), [i18nKey, values]);
-  return message || (children ?? null);
-});
+export const T = memo<TProps>(
+  ({ i18nKey, values, children }) =>
+    tReact(i18nKey, values) || (children ?? null)
+);
 
 const TMP_SEPARATOR = "$_$";
 const BOLD_PATTERN = /<b>(.*?)<\/b>/g;

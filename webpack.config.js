@@ -93,7 +93,7 @@ module.exports = {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
-    index: entry("index.tsx"),
+    index: entry("index.tsx", NODE_ENV === "development" && "dev-tools.ts"),
     popup: entry("popup.tsx"),
   },
 
