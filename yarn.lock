@@ -8058,10 +8058,10 @@ ts-interface-checker@^0.1.9:
   resolved "https://registry.yarnpkg.com/ts-interface-checker/-/ts-interface-checker-0.1.13.tgz#784fd3d679722bc103b1b4b8030bcddb5db2a699"
   integrity sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==
 
-ts-pattern@3.1.6:
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/ts-pattern/-/ts-pattern-3.1.6.tgz#04a955743ce9c81615f53ee3bb2b14a8333486ae"
-  integrity sha512-7vEPubZHZXCcVP947hiHV1rOZrRlMaN+oRb4jVhHUwbOYfxeDRGuZ78DBZ22f80bUiDLceMLN7ltbvx74hWIbQ==
+ts-pattern@3.1.7:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/ts-pattern/-/ts-pattern-3.1.7.tgz#c4aa242235337a82c37707fa3518293fb659ecdb"
+  integrity sha512-HGItgT+nbmBqnj5Rp82QT2CaHzSfowwkX0P6tHZsy++VsdziWqQDJ8lCEqd00GlgxJA0tDwYKOD19pSwD7jRMA==
 
 tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
