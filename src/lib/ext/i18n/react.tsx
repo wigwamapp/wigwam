@@ -8,12 +8,12 @@ export * from "./index";
 export type ReactSubstitutions = ReactNode | ReactNode[];
 
 export type TProps = {
-  id: string;
-  subs?: ReactSubstitutions;
+  i18nKey: string;
+  values?: ReactSubstitutions;
 };
 
-export const T = memo<TProps>(({ id, subs, children }) => {
-  const message = useMemo(() => tReact(id, subs), [id, subs]);
+export const T = memo<TProps>(({ i18nKey, values, children }) => {
+  const message = useMemo(() => tReact(i18nKey, values), [i18nKey, values]);
   return message || (children ?? null);
 });
 

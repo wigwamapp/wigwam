@@ -11,7 +11,7 @@ const Welcome: FC = () => (
   >
     <article className="prose-xl dark:prose-dark text-center">
       <h1>
-        <T id="welcomeTo" subs={"Vigvam"} />
+        <T i18nKey="welcomeTo" values={"Vigvam"} />
       </h1>
 
       <p>Bla bla bla</p>

@@ -6,5 +6,5 @@
   ],
   "i18n-ally.localesPaths": ["public/_locales"],
   "i18n-ally.keystyle": "nested",
-  "i18n-ally.regex.key": ".message$"
+  "i18n-ally.enabledFrameworks": ["general", "chrome-ext", "react"]
 }
