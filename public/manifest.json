@@ -1,0 +1,68 @@
+{
+  "manifest_version": 2,
+  "name": "Vigvam ⍋ web3︵wallet",
+  "version": "{{pkg.version}}",
+
+  "icons": {
+    "16": "misc/icon-16.png",
+    "19": "misc/icon-19.png",
+    "38": "misc/icon-38.png",
+    "128": "misc/icon-128.png"
+  },
+
+  "description": "__MSG_appDesc__",
+  "homepage_url": "https://github.com/vigvamapp/vigvam",
+  "short_name": "Vigvam",
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "clipboardWrite",
+    "activeTab"
+  ],
+  "content_security_policy": "script-src 'self' 'sha256-a4v4czp2qnmr595pGYlZ07gEumM6d9R5qGz9t8CjuUE='; object-src 'self'",
+
+  "__chrome|firefox__author": "https://vigvam.app",
+  "__opera__developer": {
+    "name": "https://vigvam.app"
+  },
+
+  "__firefox__applications": {
+    "gecko": { "id": "{}" }
+  },
+
+  "__chrome__minimum_chrome_version": "73",
+  "__opera__minimum_opera_version": "60",
+
+  "default_locale": "en",
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Vigvam",
+    "default_icon": {
+      "16": "misc/icon-16.png",
+      "19": "misc/icon-19.png",
+      "38": "misc/icon-38.png",
+      "128": "misc/icon-128.png"
+    },
+    "__chrome|opera__chrome_style": false,
+    "__firefox__browser_style": false
+  },
+
+  "background": {
+    "page": "back.html",
+    "persistent": true
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "js": ["scripts/content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+
+  "web_accessible_resources": ["scripts/inpage.js"]
+}

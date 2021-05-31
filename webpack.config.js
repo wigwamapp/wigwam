@@ -55,7 +55,6 @@ const OUTPUT_PACKED_PATH = path.join(
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
 );
 
-const MANIFEST_ENTRY_PATH = path.join(SOURCE_PATH, "manifest.js");
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
 const ADDITIONAL_MODULE_PATHS = [
   tsConfig.compilerOptions.baseUrl &&
@@ -294,20 +293,21 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: ["**/*.html", "**/locales"],
+            ignore: ["**/*.html", "**/manifest.json", "**/locales"],
           },
         },
         {
-          from: MANIFEST_ENTRY_PATH,
+          from: path.join(PUBLIC_PATH, "manifest.json"),
           to: path.join(OUTPUT_PATH, "manifest.json"),
           toType: "file",
-          transform: (_content, absoluteFrom) => {
-            const manifest = require(absoluteFrom)(
-              VERSION,
-              TARGET_BROWSER,
-              ["scripts/content.js"],
-              ["scripts/inpage.js"]
+          transform: (content) => {
+            const json = JSON.parse(
+              processTemplate(content.toString("utf8"), {
+                pkg,
+                env: ENV_SLUG,
+              })
             );
+            const manifest = transformManifestKeys(json, TARGET_BROWSER);
             return JSON.stringify(manifest, null, 2);
           },
         },
@@ -465,4 +465,53 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
   );
   // Remove the .module that appears in every classname when based on the file and replace all "." with "_".
   return className.replace(".module_", "_").replace(/\./g, "_");
+}
+
+/**
+ *  Fork of `wext-manifest`
+ */
+const browserVendors = ["chrome", "firefox", "opera", "edge", "safari"];
+const vendorRegExp = new RegExp(
+  `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`
+);
+
+const transformManifestKeys = (manifest, vendor) => {
+  if (Array.isArray(manifest)) {
+    return manifest.map((newManifest) => {
+      return transformManifestKeys(newManifest, vendor);
+    });
+  }
+
+  if (typeof manifest === "object") {
+    return Object.entries(manifest).reduce((newManifest, [key, value]) => {
+      const match = key.match(vendorRegExp);
+
+      if (match) {
+        const vendors = match[1].split("|");
+
+        // Swap key with non prefixed name
+        if (vendors.indexOf(vendor) > -1) {
+          newManifest[match[2]] = value;
+        }
+      } else {
+        newManifest[key] = transformManifestKeys(value, vendor);
+      }
+
+      return newManifest;
+    }, {});
+  }
+
+  return manifest;
+};
+
+function processTemplate(str, mix) {
+  return str.replace(/\{{(.*?)\}}/g, (x, key, y) => {
+    x = 0;
+    y = mix;
+    key = key.trim().split(".");
+    while (y && x < key.length) {
+      y = y[key[x++]];
+    }
+    return y != null ? y : "";
+  });
 }
