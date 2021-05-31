@@ -1,7 +1,10 @@
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
+
 import { assert } from "lib/system/assert";
+import * as Repo from "core/repo";
+
 import { SeedPharse, AddAccountParams, AccountType } from "./types";
 
 export class PublicError extends Error {
@@ -21,6 +24,13 @@ export async function withError<T>(
   }
 }
 
+export async function validateAccountExistence(address: string) {
+  const acc = await Repo.accounts.get(address);
+  if (acc) {
+    throw new PublicError("Account already exists");
+  }
+}
+
 export function validateAddAccountParams(params: AddAccountParams) {
   match(params)
     .with({ type: AccountType.HD }, (p) => {
@@ -29,7 +39,7 @@ export function validateAddAccountParams(params: AddAccountParams) {
     .with({ type: AccountType.Imported }, (p) => {
       validatePrivateKey(p.privateKey);
     })
-    .with({ type: AccountType.Hardware }, (p) => {
+    .with({ type: AccountType.External }, (p) => {
       validatePublicKey(p.publicKey);
     })
     .run();

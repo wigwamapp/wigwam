@@ -1,3 +1,5 @@
+import { match } from "ts-pattern";
+
 import { PorterClient } from "lib/ext/porter/client";
 import { assert } from "lib/system/assert";
 import {
@@ -9,9 +11,35 @@ import {
   WalletStatus,
   AddAccountParams,
   SeedPharse,
+  AccountType,
 } from "core/types";
+import * as Repo from "core/repo";
 
 const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
+
+export async function createAccount(addParams: AddAccountParams) {
+  const address = await addAccount(addParams);
+
+  let name = addParams.name;
+  if (!name) {
+    const count = await Repo.accounts.count();
+    name = `Wallet ${count + 1}`;
+  }
+
+  const params: any = match(addParams)
+    .with({ type: AccountType.HD }, (p) => ({
+      derivationPath: p.derivationPath,
+    }))
+    .otherwise(() => ({}));
+
+  await Repo.accounts.add({
+    type: addParams.type,
+    address,
+    name,
+    params,
+    usdValues: {},
+  });
+}
 
 export async function getWalletStatus() {
   const type = MessageType.GetWalletStatus;

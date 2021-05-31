@@ -7,6 +7,7 @@ import { SeedPharse, AddAccountParams, AccountType } from "core/types";
 import {
   PublicError,
   withError,
+  validateAccountExistence,
   validateAddAccountParams,
   validateSeedPhrase,
 } from "core/helpers";
@@ -217,13 +218,13 @@ export class Vault {
             seedPhraseStrgKey,
             this.passwordKey
           );
-
           const { address, privateKey, publicKey } = ethers.Wallet.fromMnemonic(
             phrase,
             p.derivationPath,
             wordlists[lang]
           );
 
+          await validateAccountExistence(address);
           await Storage.encryptAndSaveMany(
             [
               [accPrivKeyStrgKey(address), privateKey],
@@ -236,6 +237,8 @@ export class Vault {
         })
         .with({ type: AccountType.Imported }, async (p) => {
           const { publicKey, address } = new ethers.Wallet(p.privateKey);
+
+          await validateAccountExistence(address);
           await Storage.encryptAndSaveMany(
             [
               [accPrivKeyStrgKey(address), p.privateKey],
@@ -243,14 +246,22 @@ export class Vault {
             ],
             this.passwordKey
           );
+
           return address;
         })
-        .with({ type: AccountType.Hardware }, async (p) => {
+        .with({ type: AccountType.External }, async (p) => {
           const address = ethers.utils.computeAddress(p.publicKey);
+
+          await validateAccountExistence(address);
           await Storage.encryptAndSaveMany(
             [[accPubKeyStrgKey(address), p.publicKey]],
             this.passwordKey
           );
+
+          return address;
+        })
+        .with({ type: AccountType.Void }, async ({ address }) => {
+          await validateAccountExistence(address);
           return address;
         })
         .exhaustive()

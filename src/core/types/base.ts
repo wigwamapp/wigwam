@@ -8,7 +8,7 @@ export enum WalletStatus {
 export enum AccountType {
   HD = "HD",
   Imported = "IMPORTED",
-  Hardware = "HARDWARE",
+  External = "EXTERNAL",
   Void = "VOID",
 }
 

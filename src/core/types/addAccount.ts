@@ -3,10 +3,12 @@ import { AccountType } from "./base";
 export type AddAccountParams =
   | AddHDAccountParams
   | AddImportedAccountParams
-  | AddHardwareAccountParams;
+  | AddExternalAccountParams
+  | AddVoidAccountParams;
 
 export interface AddAccountParamsBase {
   type: AccountType;
+  name?: string;
 }
 
 export interface AddHDAccountParams extends AddAccountParamsBase {
@@ -19,7 +21,12 @@ export interface AddImportedAccountParams extends AddAccountParamsBase {
   privateKey: string;
 }
 
-export interface AddHardwareAccountParams extends AddAccountParamsBase {
-  type: AccountType.Hardware;
+export interface AddExternalAccountParams extends AddAccountParamsBase {
+  type: AccountType.External;
   publicKey: string;
+}
+
+export interface AddVoidAccountParams extends AddAccountParamsBase {
+  type: AccountType.Void;
+  address: string;
 }
