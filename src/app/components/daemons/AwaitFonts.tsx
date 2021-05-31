@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react";
 import { useQuery } from "react-query";
+
 import { awaitFontsQuery, Font } from "app/queries";
 
 type AwaitFontsProps = {

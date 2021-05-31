@@ -5,7 +5,11 @@ import { ReactQueryDevtools } from "react-query/devtools";
 
 import { QUERY_CLIENT, FONTS } from "app/defaults";
 import ErrBond from "app/components/layouts/ErrBond";
-import { AwaitFonts, UpdateWalletStatus } from "app/components/daemons";
+import {
+  AwaitFonts,
+  AwaitI18N,
+  UpdateWalletStatus,
+} from "app/components/daemons";
 
 const BaseProvider: FC = ({ children }) => (
   <LocationProvider>
@@ -14,6 +18,7 @@ const BaseProvider: FC = ({ children }) => (
         <ErrBond>
           <Suspense fallback={null}>
             <AwaitFonts fonts={FONTS} />
+            <AwaitI18N />
             <UpdateWalletStatus />
 
             {children}
