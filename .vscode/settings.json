@@ -4,7 +4,7 @@
     "classNamed\\.\\w+`([^`]*)", // classNamed.xxx`...`
     "classNamed\\(.*?\\)`([^`]*)" // classNamed(Component)`...`
   ],
-  "i18n-ally.localesPaths": ["public/_locales"],
-  "i18n-ally.keystyle": "nested",
-  "i18n-ally.enabledFrameworks": ["general", "chrome-ext", "react"]
+  "i18n-ally.localesPaths": ["public/locales"],
+  "i18n-ally.keystyle": "flat",
+  "i18n-ally.enabledFrameworks": ["general", "react"]
 }

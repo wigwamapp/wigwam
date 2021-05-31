@@ -294,7 +294,7 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: ["**/*.html"],
+            ignore: ["**/*.html", "**/locales"],
           },
         },
         {
@@ -309,6 +309,32 @@ module.exports = {
               ["scripts/inpage.js"]
             );
             return JSON.stringify(manifest, null, 2);
+          },
+        },
+        {
+          from: path.join(PUBLIC_PATH, "locales/*.json"),
+          to: path.join(OUTPUT_PATH, "_locales/[name]/messages.json"),
+          transform: (content) => {
+            const json = JSON.parse(content);
+            const extJson = Object.fromEntries(
+              Object.entries(json).map(([name, val]) => {
+                const keys = [];
+                const message = val.replace(/\{(.*?)\}/g, (_, key) => {
+                  keys.push(key);
+                  return `$${key}$`;
+                });
+
+                const extVal = { message };
+                if (keys.length > 0) {
+                  extVal.placeholders = Object.fromEntries(
+                    keys.map((key, i) => [key, { content: `$${i + 1}` }])
+                  );
+                }
+
+                return [name, extVal];
+              })
+            );
+            return JSON.stringify(extJson, null, 2);
           },
         },
       ],
