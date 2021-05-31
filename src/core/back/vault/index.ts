@@ -1,8 +1,10 @@
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
+
 import * as Encryptor from "lib/encryptor";
 import * as Storage from "lib/enc-storage";
+import { t } from "lib/ext/i18n";
 import { SeedPharse, AddAccountParams, AccountType } from "core/types";
 import {
   PublicError,
@@ -11,6 +13,7 @@ import {
   validateAddAccountParams,
   validateSeedPhrase,
 } from "core/helpers";
+
 import {
   MIGRATIONS,
   checkStrgKey,
@@ -24,7 +27,7 @@ export class Vault {
   static async unlock(password: string) {
     const passwordKey = await Vault.toPasswordKey(password);
 
-    return withError("Failed to unlock wallet", async () => {
+    return withError(t("failedToUnlockWallet"), async () => {
       await Vault.runMigrations(passwordKey);
       return new Vault(passwordKey);
     });
@@ -35,7 +38,7 @@ export class Vault {
     accParams: AddAccountParams,
     seedPhrase?: SeedPharse
   ) {
-    return withError("Failed to create wallet", async () => {
+    return withError(t("failedToCreateWallet"), async () => {
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
@@ -75,10 +78,10 @@ export class Vault {
 
   static async fetchSeedPhrase(password: string) {
     const passwordKey = await Vault.toPasswordKey(password);
-    return withError("Failed to fetch seed phrase", async () => {
+    return withError(t("failedToFetchSeedPhrase"), async () => {
       const seedPhraseExists = await Vault.hasSeedPhrase();
       if (!seedPhraseExists) {
-        throw new PublicError("Seed phrase has not yet been established");
+        throw new PublicError(t("seedPhraseNotEstablished"));
       }
 
       return Storage.fetchAndDecryptOne<SeedPharse>(
@@ -90,7 +93,7 @@ export class Vault {
 
   static async fetchPrivateKey(password: string, accAddress: string) {
     const passwordKey = await Vault.toPasswordKey(password);
-    return withError("Failed to fetch private key", () =>
+    return withError(t("failedToFetchPrivateKey"), () =>
       Storage.fetchAndDecryptOne<string>(
         accPrivKeyStrgKey(accAddress),
         passwordKey
@@ -100,7 +103,7 @@ export class Vault {
 
   static async deleteAccount(password: string, accAddress: string) {
     await Vault.toPasswordKey(password);
-    return withError("Failed to delete account", () =>
+    return withError(t("failedToDeleteAccount"), () =>
       Storage.transact(() =>
         Storage.remove([
           accPrivKeyStrgKey(accAddress),
@@ -111,7 +114,7 @@ export class Vault {
   }
 
   private static toPasswordKey(password: string) {
-    return withError("Invalid password", async (doThrow) => {
+    return withError(t("invalidPassword"), async (doThrow) => {
       const passwordKey = await Encryptor.generateKey(password);
       const check = await Storage.fetchAndDecryptOne(checkStrgKey, passwordKey);
       if (check !== null) {
@@ -165,7 +168,7 @@ export class Vault {
   }
 
   fetchPublicKey(accAddress: string) {
-    return withError("Failed to fetch public key", () =>
+    return withError(t("failedToFetchPublicKey"), () =>
       Storage.fetchAndDecryptOne<string>(
         accPubKeyStrgKey(accAddress),
         this.passwordKey
@@ -174,11 +177,11 @@ export class Vault {
   }
 
   sign(accAddress: string, digest: string) {
-    return withError("Failed to sign", async () => {
+    return withError(t("failedToSign"), async () => {
       const strgKey = accPrivKeyStrgKey(accAddress);
       const privKeyExists = await Storage.isStored(strgKey);
       if (!privKeyExists) {
-        throw new PublicError("Cannot sign for this account");
+        throw new PublicError(t("cannotSignForAccount"));
       }
 
       const privKey = await Storage.fetchAndDecryptOne<string>(
@@ -192,10 +195,10 @@ export class Vault {
   }
 
   private addSeedPhraseForce(seedPhrase: SeedPharse) {
-    return withError("Failed to add Seed Phrase", async () => {
+    return withError(t("failedToAddSeedPhrase"), async () => {
       const seedPhraseExists = await Vault.hasSeedPhrase();
       if (seedPhraseExists) {
-        throw new PublicError("Seed phrase already exists");
+        throw new PublicError(t("seedPhraseAlreadyExists"));
       }
 
       await Storage.encryptAndSaveMany(
@@ -206,12 +209,12 @@ export class Vault {
   }
 
   private addAccountForce(params: AddAccountParams) {
-    return withError("Failed to add account", () =>
+    return withError(t("failedToAddAccount"), () =>
       match(params)
         .with({ type: AccountType.HD }, async (p) => {
           const seedPhraseExists = await Vault.hasSeedPhrase();
           if (!seedPhraseExists) {
-            throw new PublicError("Seed phrase has not yet been established");
+            throw new PublicError(t("seedPhraseNotEstablished"));
           }
 
           const { phrase, lang } = await Storage.fetchAndDecryptOne<SeedPharse>(

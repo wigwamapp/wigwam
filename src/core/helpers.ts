@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
 
+import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
 import * as Repo from "core/repo";
 
@@ -27,7 +28,7 @@ export async function withError<T>(
 export async function validateAccountExistence(address: string) {
   const acc = await Repo.accounts.get(address);
   if (acc) {
-    throw new PublicError("Account already exists");
+    throw new PublicError(t("accountAlreadyExists"));
   }
 }
 
@@ -46,10 +47,10 @@ export function validateAddAccountParams(params: AddAccountParams) {
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
-  assert(lang in wordlists, "Seed phrase language not supported", PublicError);
+  assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
   assert(
     ethers.utils.isValidMnemonic(phrase, wordlists[lang]),
-    "Seed phrase in not valid",
+    t("seedPhraseIsNotValid"),
     PublicError
   );
 }
@@ -77,7 +78,7 @@ export function validateDerivationPath(path: string) {
   })();
 
   if (!valid) {
-    throw new PublicError("Derivation path is invalid");
+    throw new PublicError(t("derivationPathIsInvalid"));
   }
 }
 
@@ -85,7 +86,7 @@ export function validatePrivateKey(privKey: string) {
   try {
     new ethers.Wallet(privKey);
   } catch {
-    throw new PublicError("Invalid private key");
+    throw new PublicError(t("invalidPrivateKey"));
   }
 }
 
@@ -93,6 +94,6 @@ export function validatePublicKey(pubKey: string) {
   try {
     ethers.utils.computeAddress(pubKey);
   } catch {
-    throw new PublicError("Invalid public key");
+    throw new PublicError(t("invalidPublicKey"));
   }
 }

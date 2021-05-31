@@ -1,4 +1,25 @@
 {
-  "appDesc": "イーサリアムとバイナンススマートチェーンの仮想通貨ウォレット。 \nDeFiを探索する",
-  "welcomeTo": "{target} へようこそ"
+  "appDesc": "イーサリアムとバイナンススマートチェーンの仮想通貨ウォレット。 \nDeFiとNFTを調べてください。",
+  "welcomeTo": "{target} へようこそ",
+  "accountAlreadyExists": "アカウントはすでに存在しています",
+  "cannotSignForAccount": "このアカウントにはサインできません",
+  "derivationPathIsInvalid": "派生パスが無効です",
+  "failedToAddAccount": "アカウントの追加に失敗しました",
+  "failedToAddSeedPhrase": "シードフレーズの追加に失敗しました",
+  "failedToCreateWallet": "ウォレットの作成に失敗しました",
+  "failedToDeleteAccount": "アカウントを削除できませんでした",
+  "failedToFetchPrivateKey": "秘密鍵のフェッチに失敗しました",
+  "failedToFetchPublicKey": "公開鍵の取得に失敗しました",
+  "failedToFetchSeedPhrase": "シード フレーズを取得できませんでした",
+  "failedToSign": "署名に失敗しました",
+  "failedToUnlockWallet": "ウォレットのロック解除に失敗しました",
+  "invalidPassword": "無効なパスワード",
+  "invalidPrivateKey": "無効な秘密鍵",
+  "invalidPublicKey": "無効な公開鍵",
+  "notAllowed": "禁止されている",
+  "seedPhraseAlreadyExists": "シード フレーズは既に存在します",
+  "seedPhraseIsNotValid": "シード フレーズが無効です",
+  "seedPhraseLanguageNotSupported": "シード フレーズ言語はサポートされていません",
+  "seedPhraseNotEstablished": "シードフレーズはまだ確立されていない",
+  "walletLocked": "ウォレットがロックされています"
 }

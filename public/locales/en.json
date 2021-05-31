@@ -1,4 +1,25 @@
 {
-  "appDesc": "A crypto wallet for Ethereum and Binance Smart Chain. Explore DeFi & NFTs.",
-  "welcomeTo": "Welcome to {target}"
+  "appDesc": "A crypto wallet for Ethereum and Binance Smart Chain. Explore DeFi and NFTs.",
+  "welcomeTo": "Welcome to {target}",
+  "notAllowed": "Not allowed",
+  "walletLocked": "Wallet locked",
+  "invalidPassword": "Invalid password",
+  "failedToUnlockWallet": "Failed to unlock wallet",
+  "failedToCreateWallet": "Failed to create wallet",
+  "failedToAddSeedPhrase": "Failed to add Seed Phrase",
+  "failedToFetchSeedPhrase": "Failed to fetch seed phrase",
+  "failedToFetchPrivateKey": "Failed to fetch private key",
+  "failedToFetchPublicKey": "Failed to fetch public key",
+  "failedToAddAccount": "Failed to add account",
+  "failedToSign": "Failed to sign",
+  "cannotSignForAccount": "Cannot sign for this account",
+  "failedToDeleteAccount": "Failed to delete account",
+  "seedPhraseNotEstablished": "Seed phrase has not yet been established",
+  "seedPhraseAlreadyExists": "Seed phrase already exists",
+  "accountAlreadyExists": "Account already exists",
+  "seedPhraseLanguageNotSupported": "Seed phrase language not supported",
+  "seedPhraseIsNotValid": "Seed phrase in not valid",
+  "derivationPathIsInvalid": "Derivation path is invalid",
+  "invalidPrivateKey": "Invalid private key",
+  "invalidPublicKey": "Invalid public key"
 }
