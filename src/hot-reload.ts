@@ -50,34 +50,39 @@ async function watchChanges(
   };
 
   if (lastChecksum && checksum.common !== lastChecksum.common) {
-    if (checksum.content !== lastChecksum.content) {
-      localStorage.setItem(RELOAD_TAB_FLAG, "true");
-      chrome.runtime.reload();
-    } else {
-      let activeTab: chrome.tabs.Tab | undefined;
+    try {
+      if (checksum.content !== lastChecksum.content) {
+        localStorage.setItem(RELOAD_TAB_FLAG, "true");
+        chrome.runtime.reload();
+      } else {
+        let activeTab: chrome.tabs.Tab | undefined;
 
-      if (checksum.background !== lastChecksum.background) {
-        // Reload background script
-        location.reload();
-        activeTab = await getActiveTab();
-      }
+        if (checksum.background !== lastChecksum.background) {
+          // Reload background script
+          location.reload();
+          activeTab = await getActiveTab();
+        }
 
-      chrome.tabs.query(
-        { url: `chrome-extension://${chrome.runtime.id}/**` },
-        (tabs) => {
-          for (const tab of tabs) {
-            if (!activeTab || tab.id !== activeTab.id) {
-              chrome.tabs.reload(tab.id!);
+        chrome.tabs.query(
+          { url: `chrome-extension://${chrome.runtime.id}/**` },
+          (tabs) => {
+            if (tabs) {
+              for (const tab of tabs) {
+                if (!activeTab || tab.id !== activeTab.id) {
+                  chrome.tabs.reload(tab.id!);
+                }
+              }
+            }
+
+            if (activeTab) {
+              chrome.tabs.reload(activeTab.id!);
             }
           }
-          if (activeTab) {
-            chrome.tabs.reload(activeTab.id!);
-          }
-        }
-      );
+        );
+      }
+    } finally {
+      lastChangedAt = Date.now();
     }
-
-    lastChangedAt = Date.now();
   }
 
   const retryAfter =
