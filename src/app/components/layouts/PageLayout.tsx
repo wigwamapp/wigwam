@@ -3,7 +3,7 @@ import classNames from "clsx";
 import ContentContainer from "app/components/layouts/ContentContainer";
 
 let bootAnimationDisplayed = true;
-const handleAnimationEnd = () => {
+const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
@@ -13,7 +13,7 @@ const PageLayout: FC = ({ children }) => (
       bootAnimationDisplayed && "animate-bootfadein",
       "min-h-screen flex flex-col"
     )}
-    onAnimationEnd={bootAnimationDisplayed ? handleAnimationEnd : undefined}
+    onAnimationEnd={bootAnimationDisplayed ? handleBootAnimationEnd : undefined}
   >
     <ContentContainer>{children}</ContentContainer>
   </div>
