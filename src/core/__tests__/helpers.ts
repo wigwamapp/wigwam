@@ -4,7 +4,7 @@ describe("validatePrivateKey()", () => {
   it("validate", () => {
     expect(() => {
       validatePrivateKey("qwe");
-    }).toThrowError("Invalid private key");
+    }).toThrowError("Translated<invalidPrivateKey>");
 
     expect(() => {
       validatePrivateKey(
@@ -18,7 +18,7 @@ describe("validatePublicKey()", () => {
   it("validate", () => {
     expect(() => {
       validatePublicKey("qwe");
-    }).toThrowError("Invalid public key");
+    }).toThrowError("Translated<invalidPublicKey>");
 
     expect(() => {
       validatePublicKey(
