@@ -6,6 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack -w --stats errors-warnings",
     "build": "cross-env NODE_ENV=production webpack --stats errors-warnings",
+    "build:chrome": "cross-env TARGET_BROWSER=chrome yarn build",
+    "build:firefox": "cross-env TARGET_BROWSER=firefox yarn build",
     "test": "cross-env NODE_ENV=test jest",
     "analyze": "cross-env WEBPACK_ANALYZE=true yarn build",
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
