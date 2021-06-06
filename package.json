@@ -14,12 +14,15 @@
     "npm-audit": "synp --source-file yarn.lock && npm audit --production; rm package-lock.json"
   },
   "dependencies": {
+    "@emotion/is-prop-valid": "1.1.0",
     "@ethersproject/abi": "5.3.0",
     "@ethersproject/bytes": "5.3.0",
     "@ethersproject/providers": "5.3.0",
     "@ethersproject/wordlists": "5.3.0",
     "@headlessui/react": "1.2.0",
     "@heroicons/react": "1.0.1",
+    "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
+    "@ledgerhq/hw-transport-webhid": "5.51.1",
     "buffer": "6.0.3",
     "clsx": "1.1.1",
     "dexie": "3.1.0-alpha.8",
@@ -40,8 +43,6 @@
   },
   "devDependencies": {
     "@babel/core": "7.14.3",
-    "@emotion/is-prop-valid": "1.1.0",
-    "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@peculiar/webcrypto": "1.1.7",
     "@sucrase/webpack-loader": "2.0.0",
     "@svgr/webpack": "5.5.0",
