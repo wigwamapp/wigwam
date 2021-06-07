@@ -6,7 +6,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     readonly NODE_ENV: "development" | "production" | "test";
     readonly VERSION: string;
-    readonly TARGET_BROWSER: "chrome" | "firefox" | "safari";
+    readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
   }
 }
 
