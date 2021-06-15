@@ -2,6 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
+import { openTabIfProfileChanged } from "core/profile";
 
 // Setup fixtures
 setupFixtures();
@@ -9,6 +10,9 @@ setupFixtures();
 // Start background server
 // It starts Porter server to communicate with UI & content scripts
 startServer();
+
+// Open new tab when profile changed (after reset)
+openTabIfProfileChanged();
 
 // Open new tab with extension page after install
 browser.runtime.onInstalled.addListener(({ reason }) => {

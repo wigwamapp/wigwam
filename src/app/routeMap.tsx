@@ -2,6 +2,7 @@ import { Router, Redirect } from "woozie";
 
 import { WalletStatus } from "core/types";
 
+import Profiles from "./components/pages/Profiles";
 import Unlock from "./components/pages/Unlock";
 import Welcome from "./components/pages/Welcome";
 import Main from "./components/pages/Main";
@@ -12,6 +13,7 @@ export interface RouterContext {
 }
 
 export const ROUTE_MAP = Router.createMap<RouterContext>([
+  ["/profiles", () => <Profiles />],
   // Unlcok when wallet locked
   [
     "*",
