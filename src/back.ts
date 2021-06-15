@@ -1,5 +1,10 @@
 import { browser } from "webextension-polyfill-ts";
+
+import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
+
+// Setup fixtures
+setupFixtures();
 
 // Start background server
 // It starts Porter server to communicate with UI & content scripts

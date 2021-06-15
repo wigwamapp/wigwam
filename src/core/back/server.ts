@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 import {
   Request,
@@ -8,6 +9,7 @@ import {
   PorterChannel,
   WalletStatus,
 } from "core/types";
+
 import {
   $walletStatus,
   ensureInited,
