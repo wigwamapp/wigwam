@@ -1,8 +1,8 @@
 import { browser } from "webextension-polyfill-ts";
 
+import { openTabIfProfileChanged } from "lib/ext/profile";
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
-import { openTabIfProfileChanged } from "core/profile";
 
 // Setup fixtures
 setupFixtures();

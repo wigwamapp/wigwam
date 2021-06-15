@@ -1,5 +1,8 @@
 import { browser, Storage } from "webextension-polyfill-ts";
+
 import { createQueue } from "lib/system/queue";
+
+import { underProfile } from "./profile";
 
 export type Items = { [key: string]: unknown } | [string, unknown][];
 
@@ -20,6 +23,7 @@ export async function fetch<T = any>(key: string) {
 }
 
 export async function fetchForce<T = any>(key: string): Promise<T | undefined> {
+  key = underProfile(key);
   const items = await browser.storage.local.get([key]);
   return items[key];
 }
@@ -29,13 +33,15 @@ export function put<T>(key: string, value: T) {
 }
 
 export function putMany(items: Items) {
-  if (Array.isArray(items)) {
-    items = Object.fromEntries(items);
+  if (!Array.isArray(items)) {
+    items = Object.entries(items);
   }
+  items = Object.fromEntries(items.map(([k, v]) => [underProfile(k), v]));
   return browser.storage.local.set(items);
 }
 
 export function remove(keys: string | string[]) {
+  keys = Array.isArray(keys) ? keys.map(underProfile) : underProfile(keys);
   return browser.storage.local.remove(keys);
 }
 
@@ -47,6 +53,7 @@ export function subscribe<T = any>(
   key: string,
   callback: (change: { newValue?: T; oldValue?: T }) => void
 ) {
+  key = underProfile(key);
   const listener = (
     changes: { [s: string]: Storage.StorageChange },
     areaName: string

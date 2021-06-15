@@ -38,7 +38,12 @@ export class Vault {
     accParams: AddAccountParams,
     seedPhrase?: SeedPharse
   ) {
-    return withError(t("failedToCreateWallet"), async () => {
+    return withError(t("failedToCreateWallet"), async (doThrow) => {
+      try {
+        await Vault.toPasswordKey(password);
+        doThrow();
+      } catch {}
+
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
@@ -47,7 +52,6 @@ export class Vault {
       const passwordKey = await Encryptor.generateKey(password);
 
       return Storage.transact(async () => {
-        await Storage.clear();
         await Storage.encryptAndSaveMany(
           [
             [checkStrgKey, null],

@@ -14,6 +14,12 @@ export const DEFAULT_PROFILE: Profile = {
   name: "Default",
 };
 
+const currentProfileId = getProfileId();
+
+export function underProfile(key: string) {
+  return `${currentProfileId}_${key}`;
+}
+
 export function getProfileId() {
   try {
     const value = localStorage.getItem(PROFILE_LSKEY);

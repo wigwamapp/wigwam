@@ -1,9 +1,11 @@
-export const STORAGE_KEY = "locale";
+import * as Global from "../global";
+
+export const LOCALE_GKEY = "locale";
 
 export function getSavedLocale() {
-  return localStorage.getItem(STORAGE_KEY);
+  return Global.get(LOCALE_GKEY);
 }
 
 export function saveLocale(locale: string) {
-  return localStorage.setItem(STORAGE_KEY, locale);
+  return Global.put(LOCALE_GKEY, locale);
 }
