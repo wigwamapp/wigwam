@@ -1,11 +1,13 @@
 import Dexie from "dexie";
 
+import { underProfile } from "lib/ext/profile";
+
 export enum Table {
   Networks = "networks",
   Accounts = "accounts",
 }
 
-export const db = new Dexie("VigvamMain");
+export const db = new Dexie(underProfile("main"));
 
 /**
  * 1
