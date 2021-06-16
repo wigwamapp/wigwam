@@ -5,6 +5,7 @@ import ArrowNarrowRightIcon from "@heroicons/react/solid/ArrowNarrowRightIcon";
 
 import { T } from "lib/ext/react";
 import PageLayout from "app/components/layouts/PageLayout";
+import AutoIcon from "app/components/atoms/AutoIcon";
 
 const Welcome: FC = () => (
   <PageLayout>
@@ -17,6 +18,8 @@ const Welcome: FC = () => (
         </h1>
 
         <p>Bla bla bla</p>
+        <AutoIcon type="avataaars" seed="ASD" className="w-24 h-24 mb-8" />
+        <br />
 
         <Link to="/add-account" className="inline-flex items-center">
           Continue
