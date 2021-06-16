@@ -7,13 +7,15 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const PageLayout: FC = ({ children }) => (
+const PageLayout: FC<{ animate?: boolean }> = ({ children, animate }) => (
   <div
     className={classNames(
-      bootAnimationDisplayed && "animate-bootfadein",
+      (bootAnimationDisplayed || animate) && "animate-bootfadein",
       "min-h-screen flex flex-col"
     )}
-    onAnimationEnd={bootAnimationDisplayed ? handleBootAnimationEnd : undefined}
+    onAnimationEnd={
+      bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
+    }
   >
     <ContentContainer>{children}</ContentContainer>
   </div>

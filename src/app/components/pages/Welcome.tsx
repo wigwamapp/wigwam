@@ -8,7 +8,7 @@ import PageLayout from "app/components/layouts/PageLayout";
 import AutoIcon from "app/components/atoms/AutoIcon";
 
 const Welcome: FC = () => (
-  <PageLayout>
+  <PageLayout animate>
     <div
       className={classNames("min-h-screen", "flex items-center justify-center")}
     >
