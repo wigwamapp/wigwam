@@ -1,5 +1,7 @@
 import { browser } from "webextension-polyfill-ts";
 
+import { assert } from "lib/system/assert";
+
 export interface Profile {
   id: number;
   name: string;
@@ -32,6 +34,8 @@ export function getProfileId() {
 }
 
 export function setProfileId(id: number) {
+  assert(getAllProfiles().some((p) => p.id === id));
+
   localStorage.setItem(PROFILE_LSKEY, JSON.stringify(id));
   localStorage.setItem(OPEN_TAB_LSKEY, "true");
   browser.runtime.reload();
