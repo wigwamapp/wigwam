@@ -18,8 +18,17 @@ const Welcome: FC = () => (
         </h1>
 
         <p>Bla bla bla</p>
-        <AutoIcon type="avataaars" seed="ASD" className="w-24 h-24 mb-8" />
-        <br />
+        <div className="flex items-center justify-center mb-8">
+          <AutoIcon
+            seed="ASD"
+            className="w-24 h-24 mr-8"
+            source="boring"
+            variant="bauhaus"
+            square
+          />
+
+          <AutoIcon seed="ASD" className="w-24 h-24 mr-8" type="avataaars" />
+        </div>
 
         <Link to="/add-account" className="inline-flex items-center">
           Continue

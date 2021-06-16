@@ -1,19 +1,43 @@
 import { FC, HTMLAttributes, memo } from "react";
 import classNames from "clsx";
 import memoize from "mem";
+import Avatar from "boring-avatars";
 import { createAvatar } from "@dicebear/avatars";
 import * as jdenticonStyle from "@dicebear/avatars-jdenticon-sprites";
 import * as avataaarsStyle from "@dicebear/avatars-avataaars-sprites";
 
-type StyleType = "jdenticon" | "avataaars";
+type Source = "dicebear" | "boring";
+type DicebearStyleType = "jdenticon" | "avataaars";
+type BoringVariant =
+  | "marble"
+  | "beam"
+  | "pixel"
+  | "sunset"
+  | "ring"
+  | "bauhaus";
 
 type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
-  type?: StyleType;
   seed: string;
+  source?: Source;
+  // only for Dicebear
+  type?: DicebearStyleType;
+  // only for Boring
+  variant?: BoringVariant;
+  colors?: string[];
+  square?: boolean;
 };
 
 const AutoIcon: FC<AutoIconProps> = memo(
-  ({ type = "jdenticon", seed, className, ...rest }) => (
+  ({
+    seed,
+    className,
+    source = "dicebear",
+    type = "jdenticon",
+    variant,
+    colors,
+    square,
+    ...rest
+  }) => (
     <div
       className={classNames(
         "inline-flex items-center justify-center",
@@ -21,9 +45,23 @@ const AutoIcon: FC<AutoIconProps> = memo(
         className
       )}
       {...rest}
-      dangerouslySetInnerHTML={{
-        __html: loadIconDataUri(type, seed),
-      }}
+      {...(source === "boring"
+        ? {
+            children: (
+              <Avatar
+                name={seed}
+                variant={variant}
+                colors={colors}
+                square={square}
+                size="100%"
+              />
+            ),
+          }
+        : {
+            dangerouslySetInnerHTML: {
+              __html: loadIconDataUri(type, seed),
+            },
+          })}
     />
   )
 );
@@ -34,7 +72,7 @@ const loadIconDataUri = memoize(generateIconDataUri, {
   cacheKey: ([t, s]) => `${t}_${s}`,
 });
 
-function generateIconDataUri(type: StyleType, seed: string) {
+function generateIconDataUri(type: DicebearStyleType, seed: string) {
   switch (type) {
     case "jdenticon":
       return createAvatar(jdenticonStyle, { seed });
