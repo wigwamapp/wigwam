@@ -39,10 +39,10 @@ export class Vault {
     seedPhrase?: SeedPharse
   ) {
     return withError(t("failedToCreateWallet"), async (doThrow) => {
-      try {
-        await Vault.toPasswordKey(password);
+      // Drop if wallet already exists
+      if (await Vault.isExist()) {
         doThrow();
-      } catch {}
+      }
 
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
