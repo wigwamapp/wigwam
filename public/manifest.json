@@ -11,7 +11,7 @@
   },
 
   "description": "__MSG_appDesc__",
-  "homepage_url": "https://github.com/vigvamapp/vigvam",
+  "homepage_url": "https://vigvam.app",
   "short_name": "Vigvam",
 
   "permissions": [
