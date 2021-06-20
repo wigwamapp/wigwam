@@ -97,3 +97,7 @@ export function validatePublicKey(pubKey: string) {
     throw new PublicError(t("invalidPublicKey"));
   }
 }
+
+export function toWordlistLang(localeCode: string) {
+  return localeCode.replace(/-/g, "_").toLowerCase();
+}
