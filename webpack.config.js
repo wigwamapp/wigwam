@@ -318,7 +318,10 @@ module.exports = {
         },
         {
           from: path.join(PUBLIC_PATH, "locales/*.json"),
-          to: path.join(OUTPUT_PATH, "_locales/[name]/messages.json"),
+          to: ({ absoluteFilename }) => {
+            const name = path.parse(absoluteFilename).name.replace(/-/g, "_");
+            return path.join(OUTPUT_PATH, `_locales/${name}/messages.json`);
+          },
           transform: (content) => {
             const json = JSON.parse(content);
             const extJson = Object.fromEntries(
