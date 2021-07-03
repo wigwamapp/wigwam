@@ -1,10 +1,7 @@
 import { DEFAULT_NETWORKS } from "fixtures/networks";
+import { formatURL } from "core/helpers";
 
-import { INetwork, IAccount } from "./types";
-import { db, Table } from "./schema";
-
-export const networks = db.table<INetwork, number>(Table.Networks);
-export const accounts = db.table<IAccount, string>(Table.Accounts);
+import { db, networks } from "./schema";
 
 export async function setupFixtures() {
   try {
@@ -13,7 +10,10 @@ export async function setupFixtures() {
         const existing = await networks.get(net.chainId);
         if (existing) {
           await networks.where({ chainId: net.chainId }).modify((extNet) => {
-            extNet.rpcURLs = net.rpcURLs;
+            const rpcURLSet = new Set(
+              [...net.rpcURLs, ...extNet.rpcURLs].map(formatURL)
+            );
+            extNet.rpcURLs = Array.from(rpcURLSet);
           });
         } else {
           await networks.add(net);
@@ -23,8 +23,4 @@ export async function setupFixtures() {
   } catch (err) {
     console.error(err);
   }
-}
-
-export function isPathsEquals(a: string, b: string) {
-  return a.split("/").join("") === b.split("/").join("");
 }

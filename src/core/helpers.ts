@@ -101,3 +101,7 @@ export function validatePublicKey(pubKey: string) {
 export function toWordlistLang(localeCode: string) {
   return localeCode.replace(/-/g, "_").toLowerCase();
 }
+
+export function formatURL(url: string) {
+  return url.endsWith("/") ? url : `${url}/`;
+}
