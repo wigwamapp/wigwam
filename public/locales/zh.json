@@ -1,7 +1,5 @@
 {
   "accountAlreadyExists": "账户已存在",
-  "walletLocked": "钱包锁定",
-  "welcomeTo": "欢迎来到{目标}",
   "appDesc": "以太坊和币安智能链的加密钱包。\n探索 DeFi 和 NFT。",
   "cannotSignForAccount": "无法登录此帐户",
   "derivationPathIsInvalid": "派生路径无效",
@@ -14,6 +12,7 @@
   "failedToFetchSeedPhrase": "无法获取种子短语",
   "failedToSign": "未能签署",
   "failedToUnlockWallet": "钱包解锁失败",
+  "initial": "最初的",
   "invalidPassword": "无效的密码",
   "invalidPrivateKey": "私钥无效",
   "invalidPublicKey": "无效的公钥",
@@ -21,5 +20,7 @@
   "seedPhraseAlreadyExists": "种子短语已存在",
   "seedPhraseIsNotValid": "种子短语无效",
   "seedPhraseLanguageNotSupported": "不支持种子短语语言",
-  "seedPhraseNotEstablished": "种子短语尚未建立"
+  "seedPhraseNotEstablished": "种子短语尚未建立",
+  "walletLocked": "钱包锁定",
+  "welcomeTo": "欢迎来到{目标}"
 }

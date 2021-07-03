@@ -12,6 +12,7 @@
   "failedToFetchSeedPhrase": "Не удалось получить исходную фразу",
   "failedToSign": "Не удалось подписать",
   "failedToUnlockWallet": "Не удалось разблокировать кошелек",
+  "initial": "Исходный",
   "invalidPassword": "Неправильный пароль",
   "invalidPrivateKey": "Неверный закрытый ключ",
   "invalidPublicKey": "Недействительный открытый ключ",

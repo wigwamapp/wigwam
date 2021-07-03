@@ -12,6 +12,7 @@
   "failedToFetchSeedPhrase": "无法获取种子短语",
   "failedToSign": "未能签署",
   "failedToUnlockWallet": "钱包解锁失败",
+  "initial": "最初的",
   "invalidPassword": "无效的密码",
   "invalidPrivateKey": "私钥无效",
   "invalidPublicKey": "无效的公钥",

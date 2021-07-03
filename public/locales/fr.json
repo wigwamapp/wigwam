@@ -12,6 +12,7 @@
   "failedToFetchSeedPhrase": "Échec de la récupération de la phrase de départ",
   "failedToSign": "Échec de la signature",
   "failedToUnlockWallet": "Échec du déverrouillage du portefeuille",
+  "initial": "Initiale",
   "invalidPassword": "Mot de passe incorrect",
   "invalidPrivateKey": "Clé privée invalide",
   "invalidPublicKey": "Clé publique invalide",

@@ -21,5 +21,6 @@
   "seedPhraseIsNotValid": "Seed phrase in not valid",
   "derivationPathIsInvalid": "Derivation path is invalid",
   "invalidPrivateKey": "Invalid private key",
-  "invalidPublicKey": "Invalid public key"
+  "invalidPublicKey": "Invalid public key",
+  "initial": "Initial"
 }

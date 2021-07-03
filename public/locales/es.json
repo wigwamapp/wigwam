@@ -12,6 +12,7 @@
   "failedToFetchSeedPhrase": "No se pudo recuperar la frase inicial",
   "failedToSign": "No se pudo firmar",
   "failedToUnlockWallet": "No se pudo desbloquear la billetera",
+  "initial": "Inicial",
   "invalidPassword": "Contraseña invalida",
   "invalidPrivateKey": "Clave privada inválida",
   "invalidPublicKey": "Clave pública no válida",

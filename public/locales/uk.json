@@ -12,6 +12,7 @@
   "failedToFetchSeedPhrase": "Не вдалося отримати насіннєву фразу",
   "failedToSign": "Не вдалося підписати",
   "failedToUnlockWallet": "Не вдалося розблокувати гаманець",
+  "initial": "Початковий",
   "invalidPassword": "Недійсний пароль",
   "invalidPrivateKey": "Недійсний приватний ключ",
   "invalidPublicKey": "Недійсний відкритий ключ",
