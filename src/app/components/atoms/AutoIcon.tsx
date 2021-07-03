@@ -59,7 +59,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
           }
         : {
             dangerouslySetInnerHTML: {
-              __html: loadIconDataUri(type, seed),
+              __html: loadDicebearIconSvg(type, seed),
             },
           })}
     />
@@ -68,11 +68,11 @@ const AutoIcon: FC<AutoIconProps> = memo(
 
 export default AutoIcon;
 
-const loadIconDataUri = memoize(generateIconDataUri, {
+const loadDicebearIconSvg = memoize(generateDicebearIconSvg, {
   cacheKey: ([t, s]) => `${t}_${s}`,
 });
 
-function generateIconDataUri(type: DicebearStyleType, seed: string) {
+function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
   switch (type) {
     case "jdenticon":
       return createAvatar(jdenticonStyle, { seed });
