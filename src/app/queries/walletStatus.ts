@@ -1,8 +1,10 @@
 import { getWalletStatus } from "core/client";
 
-export const walletStatusQuery = {
+import { query } from "./base";
+
+export const walletStatusQuery = query({
   queryKey: "wallet-status",
   queryFn: getWalletStatus,
   refetchOnReconnect: false,
   staleTime: Infinity,
-};
+});
