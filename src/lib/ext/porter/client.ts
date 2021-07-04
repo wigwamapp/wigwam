@@ -7,7 +7,7 @@ export class PorterClient<ReqData = any, ResData = unknown> {
   private reqId = 0;
 
   constructor(name: string) {
-    this.port = browser.runtime.connect({ name } as any);
+    this.port = browser.runtime.connect({ name });
   }
 
   get name() {

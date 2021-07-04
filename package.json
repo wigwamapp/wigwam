@@ -45,7 +45,7 @@
     "ts-pattern": "3.2.1",
     "use-debounce": "7.0.0",
     "use-force-update": "1.0.7",
-    "webextension-polyfill-ts": "0.25.0",
+    "webextension-polyfill-ts": "0.26.0",
     "woozie": "1.0.0-beta.8"
   },
   "devDependencies": {
