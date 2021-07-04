@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "種子短語無效",
   "seedPhraseLanguageNotSupported": "不支持種子短語語言",
   "seedPhraseNotEstablished": "種子短語尚未建立",
+  "wallet": "錢包",
   "walletLocked": "錢包鎖定",
   "welcomeTo": "歡迎來到{目標}"
 }

@@ -239,20 +239,6 @@ module.exports = {
       verbose: false,
     }),
 
-    new ForkTsCheckerWebpackPlugin(),
-
-    new ESLintPlugin({
-      extensions: ["js", "mjs", "jsx", "ts", "tsx"],
-      eslintPath: require.resolve("eslint"),
-      failOnError: NODE_ENV === "production",
-      context: SOURCE_PATH,
-      cache: true,
-      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
-      // ESLint class options
-      cwd: CWD_PATH,
-      resolvePluginsRelativeTo: __dirname,
-    }),
-
     new CaseSensitivePathsPlugin(),
 
     new webpack.DefinePlugin({
@@ -326,16 +312,19 @@ module.exports = {
             const json = JSON.parse(content);
             const extJson = Object.fromEntries(
               Object.entries(json).map(([name, val]) => {
-                const keys = [];
+                const keySet = new Set();
                 const message = val.replace(/\{(.*?)\}/g, (_, key) => {
-                  keys.push(key);
+                  keySet.add(key);
                   return `$${key}$`;
                 });
 
                 const extVal = { message };
-                if (keys.length > 0) {
+                if (keySet.size > 0) {
                   extVal.placeholders = Object.fromEntries(
-                    keys.map((key, i) => [key, { content: `$${i + 1}` }])
+                    Array.from(keySet).map((key, i) => [
+                      key,
+                      { content: `$${i + 1}` },
+                    ])
                   );
                 }
 
@@ -346,6 +335,20 @@ module.exports = {
           },
         },
       ],
+    }),
+
+    new ForkTsCheckerWebpackPlugin(),
+
+    new ESLintPlugin({
+      extensions: ["js", "mjs", "jsx", "ts", "tsx"],
+      eslintPath: require.resolve("eslint"),
+      failOnError: NODE_ENV === "production",
+      context: SOURCE_PATH,
+      cache: true,
+      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+      // ESLint class options
+      cwd: CWD_PATH,
+      resolvePluginsRelativeTo: __dirname,
     }),
 
     new WebpackBar({

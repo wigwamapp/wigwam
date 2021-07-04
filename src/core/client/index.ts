@@ -23,7 +23,7 @@ export async function createAccount(addParams: AddAccountParams) {
   let name = addParams.name;
   if (!name) {
     const count = await Repo.accounts.count();
-    name = `Wallet ${count + 1}`;
+    name = `{{wallet}} ${count + 1}`;
   }
 
   const params: any = match(addParams)

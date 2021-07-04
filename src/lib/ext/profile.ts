@@ -2,8 +2,6 @@ import { browser } from "webextension-polyfill-ts";
 
 import { assert } from "lib/system/assert";
 
-import { t } from "./i18n";
-
 export interface Profile {
   id: number;
   name: string;
@@ -15,7 +13,7 @@ export const OPEN_TAB_LSKEY = "opentab";
 
 export const DEFAULT_PROFILE: Profile = {
   id: 0,
-  name: t("initial"),
+  name: "{{initial}}",
 };
 
 const currentProfileId = getProfileId();
@@ -77,16 +75,12 @@ export function updateProfileName(id: number, name: string) {
 }
 
 export function getAllProfiles() {
-  const allProfiles = (() => {
-    try {
-      const value = localStorage.getItem(ALL_PROFILES_LSKEY);
-      if (value) {
-        return JSON.parse(value) as Profile[];
-      }
-    } catch {}
+  try {
+    const value = localStorage.getItem(ALL_PROFILES_LSKEY);
+    if (value) {
+      return JSON.parse(value) as Profile[];
+    }
+  } catch {}
 
-    return null;
-  })();
-
-  return allProfiles ?? [DEFAULT_PROFILE];
+  return [DEFAULT_PROFILE];
 }

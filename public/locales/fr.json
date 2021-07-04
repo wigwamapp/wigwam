@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "La phrase de départ n'est pas valide",
   "seedPhraseLanguageNotSupported": "Langue de la phrase de départ non prise en charge",
   "seedPhraseNotEstablished": "La phrase de départ n'a pas encore été établie",
+  "wallet": "Portefeuille",
   "walletLocked": "Portefeuille verrouillé",
   "welcomeTo": "Bienvenue sur {cible}"
 }

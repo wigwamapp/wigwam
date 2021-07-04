@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "Frase seme non valida",
   "seedPhraseLanguageNotSupported": "Lingua della frase seme non supportata",
   "seedPhraseNotEstablished": "La frase seme non è stata ancora stabilita",
+  "wallet": "Portafoglio",
   "walletLocked": "Portafoglio bloccato",
   "welcomeTo": "Benvenuto in {target}"
 }

@@ -1,5 +1,10 @@
 import { AccountType } from "core/types";
 
+export enum RepoTable {
+  Networks = "networks",
+  Accounts = "accounts",
+}
+
 export interface INetwork {
   chainId: number;
   rpcURLs: string[];

@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "Исходная фраза в недействительной",
   "seedPhraseLanguageNotSupported": "Язык исходной фразы не поддерживается",
   "seedPhraseNotEstablished": "Исходная фраза еще не установлена",
+  "wallet": "Кошелек",
   "walletLocked": "Кошелек заблокирован",
   "welcomeTo": "Добро пожаловать в {target}"
 }

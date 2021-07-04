@@ -22,5 +22,6 @@
   "derivationPathIsInvalid": "Derivation path is invalid",
   "invalidPrivateKey": "Invalid private key",
   "invalidPublicKey": "Invalid public key",
-  "initial": "Initial"
+  "initial": "Initial",
+  "wallet": "Wallet"
 }

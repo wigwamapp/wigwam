@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "Фраза насіння недійсна",
   "seedPhraseLanguageNotSupported": "Мова насіннєвих фраз не підтримується",
   "seedPhraseNotEstablished": "Насіннєва фраза ще не встановлена",
+  "wallet": "Гаманець",
   "walletLocked": "Гаманець заблоковано",
   "welcomeTo": "Ласкаво просимо до {target}"
 }

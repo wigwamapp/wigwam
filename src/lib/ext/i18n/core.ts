@@ -77,6 +77,10 @@ export function t(messageName: string, substitutions?: Substitutions) {
   }
 }
 
+export function replaceT(str: string) {
+  return str.replace(/{{(.*?)}}/g, (substr, key) => t(key) ?? substr);
+}
+
 export function getLocale() {
   return getSavedLocale() || getNativeLocale();
 }

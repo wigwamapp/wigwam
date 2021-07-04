@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "种子短语无效",
   "seedPhraseLanguageNotSupported": "不支持种子短语语言",
   "seedPhraseNotEstablished": "种子短语尚未建立",
+  "wallet": "钱包",
   "walletLocked": "钱包锁定",
   "welcomeTo": "欢迎来到{目标}"
 }

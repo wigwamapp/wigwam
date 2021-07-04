@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "유효하지 않은 시드 문구",
   "seedPhraseLanguageNotSupported": "시드 문구 언어가 지원되지 않습니다.",
   "seedPhraseNotEstablished": "시드 문구가 아직 설정되지 않았습니다.",
+  "wallet": "지갑",
   "walletLocked": "지갑 잠김",
   "welcomeTo": "{target}에 오신 것을 환영합니다"
 }

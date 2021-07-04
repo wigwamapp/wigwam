@@ -1,7 +1,8 @@
 import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { formatURL } from "core/helpers";
 
-import { db, networks } from "./schema";
+import { db } from "./schema";
+import { networks } from "./helpers";
 
 export async function setupFixtures() {
   try {

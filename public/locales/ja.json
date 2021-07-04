@@ -21,6 +21,7 @@
   "seedPhraseIsNotValid": "シード フレーズが無効です",
   "seedPhraseLanguageNotSupported": "シード フレーズ言語はサポートされていません",
   "seedPhraseNotEstablished": "シードフレーズはまだ確立されていない",
+  "wallet": "財布",
   "walletLocked": "ウォレットがロックされています",
   "welcomeTo": "{target} へようこそ"
 }
