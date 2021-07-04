@@ -1,6 +1,9 @@
 import { useEffect, useMemo } from "react";
 import { useQueryClient } from "react-query";
+import { dequal } from "dequal/lite";
+
 import * as Storage from "lib/ext/storage";
+
 import { query } from "./base";
 
 export function useStorageQuery<T = any>(key: string) {
@@ -21,7 +24,11 @@ export function useStorageQuery<T = any>(key: string) {
   useEffect(
     () =>
       Storage.subscribe<T>(key, ({ newValue }) => {
-        queryClient.setQueryData(storageQuery.queryKey, newValue);
+        // Avoid re-updates
+        const currentValue = queryClient.getQueryData(storageQuery.queryKey);
+        if (!dequal(newValue, currentValue)) {
+          queryClient.setQueryData(storageQuery.queryKey, newValue);
+        }
       }),
     [queryClient, key, storageQuery.queryKey]
   );

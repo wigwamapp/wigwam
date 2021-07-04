@@ -31,6 +31,7 @@
     "boring-avatars": "1.5.8",
     "buffer": "6.0.3",
     "clsx": "1.1.1",
+    "dequal": "2.0.2",
     "dexie": "3.1.0-alpha.8",
     "effector": "21.8.12",
     "ethers": "5.4.1",

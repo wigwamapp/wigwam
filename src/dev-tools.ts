@@ -1,3 +1,5 @@
+import { browser } from "webextension-polyfill-ts";
+
 import * as profile from "lib/ext/profile";
 import * as storage from "lib/ext/storage";
 import * as i18n from "lib/ext/i18n";
@@ -9,6 +11,7 @@ import * as repo from "core/repo";
 import * as client from "core/client";
 
 Object.assign(window, {
+  browser,
   profile,
   storage,
   i18n,
