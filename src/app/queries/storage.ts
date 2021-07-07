@@ -16,7 +16,6 @@ export function useStorageQuery<T = any>(key: string) {
         queryFn: () => Storage.fetchForce<T>(key),
         refetchOnReconnect: false,
         staleTime: Infinity,
-        refetchOnMount: true,
       }),
     [key]
   );
