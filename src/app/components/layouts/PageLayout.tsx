@@ -7,7 +7,10 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const PageLayout: FC<{ animate?: boolean }> = ({ children, animate }) => (
+const PageLayout: FC<{ animate?: boolean }> = ({
+  children,
+  animate = true,
+}) => (
   <div
     className={classNames(
       (bootAnimationDisplayed || animate) && "animate-bootfadein",

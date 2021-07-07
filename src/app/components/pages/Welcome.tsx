@@ -10,7 +10,7 @@ import PageLayout from "app/components/layouts/PageLayout";
 import AutoIcon from "app/components/atoms/AutoIcon";
 
 const Welcome: FC = () => (
-  <PageLayout animate>
+  <PageLayout>
     <div
       className={classNames("min-h-screen", "flex items-center justify-center")}
     >
@@ -34,7 +34,7 @@ const Welcome: FC = () => (
 
         <Keks />
 
-        <Link to="/add-account" className="inline-flex items-center">
+        <Link to="/profiles" className="inline-flex items-center">
           Continue
           <ArrowNarrowRightIcon className="h-4 w-auto ml-2" />
         </Link>

@@ -54,16 +54,12 @@ export function openTabIfProfileChanged() {
 
 export function addProfile(name: string) {
   const allProfiles = getAllProfiles();
+  const id = allProfiles.length;
   localStorage.setItem(
     ALL_PROFILES_LSKEY,
-    JSON.stringify([
-      ...allProfiles,
-      {
-        id: allProfiles.length,
-        name,
-      },
-    ])
+    JSON.stringify([...allProfiles, { id, name }])
   );
+  return id;
 }
 
 export function updateProfileName(id: number, name: string) {

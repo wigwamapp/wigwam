@@ -1,7 +1,7 @@
 import { memo, Fragment, ReactNode, useMemo, useEffect } from "react";
 import useForceUpdate from "use-force-update";
 
-import { t, getInitializing } from "./core";
+import { t, getInitializing, replaceT } from "./core";
 import { onInited } from "./loading";
 import { toList } from "./helpers";
 
@@ -25,6 +25,12 @@ export const T = memo<TProps>(({ i18nKey, values, children }) => {
 
   return tReact(i18nKey, values) || (children ?? null);
 });
+
+export type TReplaceProps = {
+  msg: string;
+};
+
+export const TReplace = memo<TReplaceProps>(({ msg }) => <>{replaceT(msg)}</>);
 
 const TMP_SEPARATOR = "$_$";
 const BOLD_PATTERN = /<b>(.*?)<\/b>/g;

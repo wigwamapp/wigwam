@@ -13,7 +13,11 @@ export interface RouterContext {
 }
 
 export const ROUTE_MAP = Router.createMap<RouterContext>([
-  ["/profiles", () => <Profiles />],
+  [
+    "/profiles",
+    (_p, ctx) =>
+      ctx.walletStatus === WalletStatus.Locked ? <Profiles /> : Router.SKIP,
+  ],
   // Unlcok when wallet locked
   [
     "*",

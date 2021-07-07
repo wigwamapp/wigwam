@@ -40,7 +40,7 @@ const AddAccount: FC = () => {
   }, [hasSeedPhrase]);
 
   return (
-    <PageLayout animate>
+    <PageLayout>
       <div className="min-h-screen flex items-center justify-center">
         <div className="prose-xl dark:prose-dark text-center">
           {ADD_ACCOUNT_SECTIONS.map((section) => (
