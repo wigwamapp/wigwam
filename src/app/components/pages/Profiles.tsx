@@ -17,8 +17,7 @@ import {
   setProfileId,
 } from "lib/ext/profile";
 import { TReplace } from "lib/ext/i18n/react";
-import PageLayout from "app/components/layouts/PageLayout";
-import Heading from "app/components/atoms/Heading";
+import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import AutoIcon from "app/components/atoms/AutoIcon";
 
 const Profiles: FC = () => {
@@ -41,9 +40,7 @@ const Profiles: FC = () => {
   }, []);
 
   return (
-    <PageLayout>
-      <Heading className="mt-16">Profiles</Heading>
-
+    <BoardingPageLayout title="Profiles">
       <div className="-mx-4 flex flex-wrap items-stretch">
         {allProfiles.map((p) => {
           const active = p.id === currentProfileId;
@@ -65,7 +62,7 @@ const Profiles: FC = () => {
                   seed={p.name}
                   className="w-36 h-36 mb-4"
                   source="boring"
-                  variant="bauhaus"
+                  variant="beam"
                   square
                 />
 
@@ -98,7 +95,7 @@ const Profiles: FC = () => {
         onClose={handleCancelAdding}
         onAdd={handleAdd}
       />
-    </PageLayout>
+    </BoardingPageLayout>
   );
 };
 

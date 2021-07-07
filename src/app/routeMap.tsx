@@ -16,7 +16,11 @@ export const ROUTE_MAP = Router.createMap<RouterContext>([
   [
     "/profiles",
     (_p, ctx) =>
-      ctx.walletStatus === WalletStatus.Locked ? <Profiles /> : Router.SKIP,
+      [WalletStatus.Welcome, WalletStatus.Locked].includes(ctx.walletStatus) ? (
+        <Profiles />
+      ) : (
+        Router.SKIP
+      ),
   ],
   // Unlcok when wallet locked
   [
