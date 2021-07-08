@@ -13,7 +13,7 @@ export const OPEN_TAB_LSKEY = "opentab";
 
 export const DEFAULT_PROFILE: Profile = {
   id: 0,
-  name: "{{initial}}",
+  name: "{{profile}} 1",
 };
 
 const currentProfileId = getProfileId();

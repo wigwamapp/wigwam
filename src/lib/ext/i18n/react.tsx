@@ -15,14 +15,7 @@ export type TProps = {
 };
 
 export const T = memo<TProps>(({ i18nKey, values, children }) => {
-  const forceUpdate = useForceUpdate();
-  const initializing = useMemo(() => getInitializing(), []);
-  useEffect(() => {
-    if (initializing) {
-      onInited(forceUpdate);
-    }
-  }, [initializing, forceUpdate]);
-
+  useI18NUpdate();
   return tReact(i18nKey, values) || (children ?? null);
 });
 
@@ -30,7 +23,20 @@ export type TReplaceProps = {
   msg: string;
 };
 
-export const TReplace = memo<TReplaceProps>(({ msg }) => <>{replaceT(msg)}</>);
+export const TReplace = memo<TReplaceProps>(({ msg }) => {
+  useI18NUpdate();
+  return <>{replaceT(msg)}</>;
+});
+
+export function useI18NUpdate() {
+  const forceUpdate = useForceUpdate();
+  const initializing = useMemo(() => getInitializing(), []);
+  useEffect(() => {
+    if (initializing) {
+      onInited(forceUpdate);
+    }
+  }, [initializing, forceUpdate]);
+}
 
 const TMP_SEPARATOR = "$_$";
 const BOLD_PATTERN = /<b>(.*?)<\/b>/g;

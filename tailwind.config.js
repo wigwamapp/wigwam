@@ -34,59 +34,6 @@ module.exports = {
           },
         },
       },
-      typography: (theme) => ({
-        default: {},
-        dark: {
-          css: {
-            color: theme("colors.gray.300"),
-            blockquote: {
-              color: theme("colors.gray.300"),
-            },
-            a: {
-              color: "#A78BFA",
-              "&:hover": {
-                color: "#A78BFA",
-              },
-            },
-            code: {
-              backgroundColor: theme("colors.blue.700"),
-              paddingLeft: "5px",
-              paddingRight: "5px",
-              borderRadius: "4px",
-            },
-            svg: {
-              color: theme("colors.currentColor"),
-            },
-            h1: {
-              color: theme("colors.gray.300"),
-            },
-            h2: {
-              color: theme("colors.gray.300"),
-            },
-            h3: {
-              color: theme("colors.gray.300"),
-            },
-            h4: {
-              color: theme("colors.gray.300"),
-            },
-            h5: {
-              color: theme("colors.gray.300"),
-            },
-            h6: {
-              color: theme("colors.gray.300"),
-            },
-            strong: {
-              color: theme("colors.gray.300"),
-            },
-            code: {
-              color: theme("colors.gray.300"),
-            },
-            figcaption: {
-              color: theme("colors.gray.500"),
-            },
-          },
-        },
-      }),
     },
   },
   plugins: [require("@tailwindcss/typography")],

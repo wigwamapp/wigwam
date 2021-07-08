@@ -23,5 +23,11 @@
   "invalidPrivateKey": "Invalid private key",
   "invalidPublicKey": "Invalid public key",
   "initial": "Initial",
-  "wallet": "Wallet"
+  "wallet": "Wallet",
+  "profile": "Profile",
+  "profiles": "Profiles",
+  "add": "Add",
+  "cancel": "Cancel",
+  "Back": "back",
+  "Continue": "continue"
 }

@@ -1,14 +1,5 @@
-import {
-  FC,
-  Fragment,
-  memo,
-  useCallback,
-  useMemo,
-  useState,
-  useRef,
-} from "react";
+import { FC, memo, useCallback, useMemo, useState, useRef } from "react";
 import classNames from "clsx";
-import { Dialog, Transition } from "@headlessui/react";
 
 import {
   getProfileId,
@@ -16,9 +7,10 @@ import {
   addProfile,
   setProfileId,
 } from "lib/ext/profile";
-import { TReplace } from "lib/ext/i18n/react";
+import { T, TReplace, useI18NUpdate, replaceT } from "lib/ext/i18n/react";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
-import AutoIcon from "app/components/atoms/AutoIcon";
+import DialogWrapper from "app/components/layouts/DialogWrapper";
+import AutoIcon from "app/components/elements/AutoIcon";
 
 const Profiles: FC = () => {
   const currentProfileId = useMemo(() => getProfileId(), []);
@@ -92,6 +84,7 @@ const Profiles: FC = () => {
 
       <AddProfileDialog
         adding={adding}
+        profilesLength={allProfiles.length}
         onClose={handleCancelAdding}
         onAdd={handleAdd}
       />
@@ -103,111 +96,77 @@ export default Profiles;
 
 type AddProfileDialogProps = {
   adding: boolean;
+  profilesLength: number;
   onClose: () => void;
   onAdd: (name: string) => void;
 };
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
-  ({ adding, onClose, onAdd }) => {
+  ({ adding, profilesLength, onClose, onAdd }) => {
+    useI18NUpdate();
+
     const nameFieldRef = useRef<HTMLInputElement>(null);
+    const defaultNameSource = useMemo(
+      () => `{{profile}} ${profilesLength + 1}`,
+      [profilesLength]
+    );
+    const defaultNameValue = replaceT(defaultNameSource);
 
     const handleAdd = useCallback(() => {
-      if (nameFieldRef.current) {
-        onAdd(nameFieldRef.current.value);
+      const value = nameFieldRef.current?.value;
+      if (value) {
+        onAdd(value === defaultNameValue ? defaultNameSource : value);
       }
-    }, [onAdd]);
+    }, [onAdd, defaultNameValue, defaultNameSource]);
 
     return (
-      <Transition appear show={adding} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 z-10 overflow-y-auto"
-          onClose={onClose}
-        >
-          <div className="min-h-screen px-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
+      <DialogWrapper
+        displayed={adding}
+        title={<T i18nKey="profiles" />}
+        description="Lorem ipsum dolor sit amet..."
+        onClose={onClose}
+      >
+        <form className="mt-4">
+          <input
+            ref={nameFieldRef}
+            type="text"
+            defaultValue={defaultNameValue}
+            spellCheck={false}
+            className={classNames(
+              "w-full bg-transparent p-4",
+              "border border-white",
+              "focus:outline-none focus:border-red-500",
+              "text-lg text-white",
+              "transition ease-in-out duration-300"
+            )}
+          />
+
+          <div className="mt-8 w-full flex items-stretch">
+            <button
+              type="button"
+              className={classNames(
+                "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
+                "transition ease-in-out duration-200"
+              )}
+              onClick={onClose}
             >
-              <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 backdrop-filter backdrop-blur" />
-            </Transition.Child>
+              <T i18nKey="cancel" />
+            </button>
 
-            {/* This element is to trick the browser into centering the modal contents. */}
-            <span
-              className="inline-block h-screen align-middle"
-              aria-hidden="true"
+            <div className="flex-1" />
+
+            <button
+              className={classNames(
+                "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
+                "transition ease-in-out duration-200"
+              )}
+              onClick={handleAdd}
             >
-              &#8203;
-            </span>
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <div
-                className={classNames(
-                  "inline-block w-full max-w-md",
-                  "p-6 my-8 overflow-hidden",
-                  "text-left align-middle",
-                  "transition-all transform"
-                )}
-              >
-                <Dialog.Title
-                  as="h3"
-                  className="mb-4 text-3xl font-medium leading-6 text-gray-100"
-                >
-                  Add new profile
-                </Dialog.Title>
-                <div className="mt-2 mb-12">
-                  <p className="text-sm text-gray-300">Lorem ipsum dolor...</p>
-                </div>
-
-                <form className="mt-4">
-                  <input
-                    ref={nameFieldRef}
-                    type="text"
-                    spellCheck={false}
-                    className={classNames(
-                      "w-full bg-transparent p-4",
-                      "border border-white",
-                      "focus:outline-none focus:border-red-500",
-                      "text-lg text-white"
-                    )}
-                  />
-
-                  <div className="mt-8 w-full flex items-stretch">
-                    <button
-                      type="button"
-                      className="inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl"
-                      onClick={onClose}
-                    >
-                      Cancel
-                    </button>
-
-                    <div className="flex-1" />
-
-                    <button
-                      className="inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl"
-                      onClick={handleAdd}
-                    >
-                      Add
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </Transition.Child>
+              <T i18nKey="add" />
+            </button>
           </div>
-        </Dialog>
-      </Transition>
+        </form>
+      </DialogWrapper>
     );
   }
 );

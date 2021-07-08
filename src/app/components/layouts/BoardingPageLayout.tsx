@@ -11,7 +11,7 @@ import { HistoryAction, useLocation, goBack, navigate } from "woozie";
 import ArrowNarrowLeftIcon from "@heroicons/react/solid/ArrowNarrowLeftIcon";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
-import Heading from "app/components/atoms/Heading";
+import Heading from "app/components/elements/Heading";
 
 type BoardingPageLayoutProps = {
   title: ReactNode;
