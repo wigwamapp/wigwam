@@ -10,11 +10,15 @@ import classNames from "clsx";
 import { HistoryAction, useLocation, goBack, navigate } from "woozie";
 import ArrowNarrowLeftIcon from "@heroicons/react/solid/ArrowNarrowLeftIcon";
 
+import { T } from "lib/ext/i18n/react";
 import ContentContainer from "app/components/layouts/ContentContainer";
+import ProfileNav from "app/components/blocks/ProfileNav";
 import Heading from "app/components/elements/Heading";
 
 type BoardingPageLayoutProps = {
-  title: ReactNode;
+  title?: ReactNode;
+  header?: boolean;
+  profileNav?: boolean;
   animate?: boolean;
 };
 
@@ -25,6 +29,8 @@ const handleBootAnimationEnd = () => {
 
 const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
   title,
+  header = true,
+  profileNav = true,
   animate = true,
   children,
 }) => (
@@ -37,15 +43,22 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer>
-      <header className="mt-16 mb-8">
-        <div>
-          <BackButton className="mb-8" />
-          <Heading className="mt-16">{title}</Heading>
-        </div>
-      </header>
+    <ContentContainer narrow>
+      {header && (
+        <header className="mt-16 mb-8 flex items-stretch">
+          <BackButton />
+          <div className="flex-1" />
+          {title && (
+            <>
+              <Heading className="mt-16">{title}</Heading>
+              <div className="flex-1" />
+            </>
+          )}
+          {profileNav && <ProfileNav />}
+        </header>
+      )}
 
-      <main>{children}</main>
+      {children}
     </ContentContainer>
   </div>
 );
@@ -93,7 +106,7 @@ const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
       {...rest}
     >
       <ArrowNarrowLeftIcon className="mr-2 h-6 w-auto stroke-current stroke-1" />
-      Back
+      <T i18nKey="back" />
     </button>
   ) : null;
 });

@@ -16,3 +16,5 @@ export const DEFAULT_LOCALES: LocaleMeta[] = [
   { code: "zh-CN", name: "Chinese Simplified", nativeName: "中文(简体)" },
   { code: "zh-TW", name: "Chinese Traditional", nativeName: "中文(繁體)" },
 ];
+
+export const FALLBACK_LOCALE = DEFAULT_LOCALES[0];

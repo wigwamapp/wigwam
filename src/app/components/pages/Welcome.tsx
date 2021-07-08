@@ -1,25 +1,33 @@
 import { FC } from "react";
+import classNames from "clsx";
 import { Link } from "woozie";
-import ArrowNarrowRightIcon from "@heroicons/react/solid/ArrowNarrowRightIcon";
+import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
 
 import { T } from "lib/ext/react";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
-import ProfileNav from "app/components/blocks/ProfileNav";
 
 const Welcome: FC = () => (
-  <>
-    <div className="flex items-center my-8">
-      <div className="flex-1" />
-      <ProfileNav />
-    </div>
+  <BoardingPageLayout header={false}>
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <h1 className="mb-24 text-6xl text-white text-center">
+        <T i18nKey="welcomeTo" values={"Vigvam"} />
+      </h1>
 
-    <BoardingPageLayout title={<T i18nKey="welcomeTo" values={"Vigvam"} />}>
-      <Link to="/add-account" className="inline-flex items-center">
-        Continue
-        <ArrowNarrowRightIcon className="h-4 w-auto ml-2" />
+      <Link
+        to="/setup"
+        className={classNames(
+          "inline-flex items-center",
+          "text-3xl",
+          "text-gray-100",
+          "transition ease-in-out duration-300",
+          "animate-pulse hover:animate-none focus:animate-none"
+        )}
+      >
+        <T i18nKey="continue" />
+        <ArrowCircleRightIcon className="h-8 w-auto ml-4" />
       </Link>
-    </BoardingPageLayout>
-  </>
+    </div>
+  </BoardingPageLayout>
 );
 
 export default Welcome;

@@ -11,6 +11,7 @@ import { T, TReplace, useI18NUpdate, replaceT } from "lib/ext/i18n/react";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import DialogWrapper from "app/components/layouts/DialogWrapper";
 import AutoIcon from "app/components/elements/AutoIcon";
+import TextField from "app/components/elements/TextField";
 
 const Profiles: FC = () => {
   const currentProfileId = useMemo(() => getProfileId(), []);
@@ -127,19 +128,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
         onClose={onClose}
       >
         <form className="mt-4">
-          <input
-            ref={nameFieldRef}
-            type="text"
-            defaultValue={defaultNameValue}
-            spellCheck={false}
-            className={classNames(
-              "w-full bg-transparent p-4",
-              "border border-white",
-              "focus:outline-none focus:border-red-500",
-              "text-lg text-white",
-              "transition ease-in-out duration-300"
-            )}
-          />
+          <TextField ref={nameFieldRef} defaultValue={defaultNameValue} />
 
           <div className="mt-8 w-full flex items-stretch">
             <button

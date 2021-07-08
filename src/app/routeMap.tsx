@@ -6,7 +6,7 @@ import Profiles from "./components/pages/Profiles";
 import Unlock from "./components/pages/Unlock";
 import Welcome from "./components/pages/Welcome";
 import Main from "./components/pages/Main";
-import AddAccount from "./components/pages/AddAccount";
+import Setup from "./components/pages/Setup";
 
 export interface RouterContext {
   walletStatus: WalletStatus;
@@ -43,7 +43,7 @@ export const ROUTE_MAP = Router.createMap<RouterContext>([
     (_p, ctx) =>
       ctx.walletStatus === WalletStatus.Welcome ? <Welcome /> : <Main />,
   ],
-  ["/add-account", () => <AddAccount />],
+  ["/setup", () => <Setup />],
   [
     "*",
     (_p, ctx) =>
