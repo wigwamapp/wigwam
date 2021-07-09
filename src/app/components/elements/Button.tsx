@@ -6,11 +6,8 @@ type ButtonProps = HTMLAttributes<HTMLButtonElement>;
 const Button: FC<ButtonProps> = ({ className, ...rest }) => (
   <button
     className={classNames(
-      "bg-blue-500 hover:bg-blue-700",
-      "border border-blue-700",
-      "rounded",
-      "py-2 px-4",
-      "text-white font-bold",
+      "inline-flex p-4 text-gray-300 hover:text-gray-100 text-2xl",
+      "transition ease-in-out duration-200",
       className
     )}
     {...rest}
