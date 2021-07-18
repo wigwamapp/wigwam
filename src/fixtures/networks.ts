@@ -70,3 +70,5 @@ export const DEFAULT_NETWORKS: INetwork[] = [
     blockExplorerURL: "https://scan-testnet.hecochain.com",
   },
 ];
+
+export const INITIAL_NETWORK = DEFAULT_NETWORKS[0]; // Ethereum

@@ -6,18 +6,24 @@ import * as Storage from "lib/ext/storage";
 
 import { query } from "./base";
 
-export function useStorageQuery<T = any>(key: string) {
+export function useStorageQuery<T = any>(
+  key: string,
+  fallback?: T | (() => Promise<T>)
+) {
   const queryClient = useQueryClient();
 
   const storageQuery = useMemo(
     () =>
       query({
         queryKey: ["storage", key],
-        queryFn: () => Storage.fetchForce<T>(key),
+        queryFn: () =>
+          Storage.fetchForce<T>(key).then((val) =>
+            val !== undefined ? val : (fallback as T)
+          ),
         refetchOnReconnect: false,
         staleTime: Infinity,
       }),
-    [key]
+    [key, fallback]
   );
 
   useEffect(
