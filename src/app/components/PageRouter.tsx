@@ -1,13 +1,12 @@
 import { FC, useMemo, useLayoutEffect } from "react";
 import { Router, useLocation, HistoryAction } from "woozie";
-import { useQuery } from "react-query";
 
-import { walletStatusQuery } from "app/queries";
+import { useQueriesSuspense, walletStatusQuery } from "app/queries";
 import { ROUTE_MAP, RouterContext } from "app/routeMap";
 
 const PageRouter: FC = () => {
   const { trigger, pathname } = useLocation();
-  const walletStatus = useQuery(walletStatusQuery).data!;
+  const [walletStatus] = useQueriesSuspense([walletStatusQuery]);
 
   const ctx = useMemo<RouterContext>(() => ({ walletStatus }), [walletStatus]);
 

@@ -1,7 +1,6 @@
 import { FC, useMemo } from "react";
-import { useQuery } from "react-query";
 
-import { awaitFontsQuery, Font } from "app/queries";
+import { useQueriesSuspense, awaitFontsQuery, Font } from "app/queries";
 
 type AwaitFontsProps = {
   fonts: Font[];
@@ -9,7 +8,7 @@ type AwaitFontsProps = {
 
 const AwaitFonts: FC<AwaitFontsProps> = ({ fonts }) => {
   const query = useMemo(() => awaitFontsQuery(fonts), [fonts]);
-  useQuery(query);
+  useQueriesSuspense([query]);
   return null;
 };
 

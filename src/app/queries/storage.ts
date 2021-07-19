@@ -21,7 +21,6 @@ export function useStorageQuery<T = any>(
             val !== undefined ? val : (fallback as T)
           ),
         refetchOnReconnect: false,
-        staleTime: Infinity,
       }),
     [key, fallback]
   );

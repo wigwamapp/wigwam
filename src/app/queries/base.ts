@@ -46,6 +46,10 @@ export function useQueriesSuspense<TQueries extends readonly UseQueryOptions[]>(
       >;
 } {
   return useQueries(
-    queries as UseQueryOptions<unknown, unknown, unknown>[]
+    queries.map((query) => ({ ...query, suspense: true })) as UseQueryOptions<
+      unknown,
+      unknown,
+      unknown
+    >[]
   ).map(({ data }) => data) as any;
 }

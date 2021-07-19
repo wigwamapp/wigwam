@@ -1,19 +1,18 @@
 import { memo, ReactNode, useEffect, useMemo } from "react";
 import classNames from "clsx";
-import { useQuery } from "react-query";
 
 // import { T } from "lib/ext/i18n/react";
-import { hasSeedPhraseQuery } from "app/queries";
+import { useQueriesSuspense, hasSeedPhraseQuery } from "app/queries";
 import { useSearchParams } from "app/hooks/useSearchParams";
 
 import AddSeedPhrase from "./AddSeedPhrase";
 
 const AddAccount = memo(() => {
+  const [hasSeedPhrase] = useQueriesSuspense([hasSeedPhraseQuery]);
+
   const [tiles, setTiles] = useSearchParams<string>("tile");
   const tile = 0 in tiles ? tiles[0] : null;
   const tileNode = useMemo(() => tile && TILE_NODES[tile](), [tile]);
-
-  const hasSeedPhrase = useQuery(hasSeedPhraseQuery).data!;
 
   useEffect(() => {
     console.info(hasSeedPhrase);

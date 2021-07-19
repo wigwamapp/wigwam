@@ -15,21 +15,18 @@ export function useAccountAddressQuery() {
 export const allAccountsQuery = query({
   queryKey: "all-accounts",
   queryFn: () => Repo.accounts.toArray(),
-  staleTime: Infinity,
 });
 
 export const networkQuery = (chainId: number) =>
   query({
     queryKey: ["network", chainId],
     queryFn: () => Repo.networks.get(chainId),
-    staleTime: Infinity,
   });
 
 export const accountQuery = (address: string) =>
   query({
     queryKey: ["account", address],
     queryFn: () => Repo.accounts.get(address),
-    staleTime: Infinity,
   });
 
 async function fetchDefaultAccountAddress() {

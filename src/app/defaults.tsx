@@ -1,9 +1,11 @@
 import { QueryClient } from "react-query";
+import { dequal } from "dequal/lite";
 
 export const QUERY_CLIENT = new QueryClient({
   defaultOptions: {
     queries: {
-      suspense: true,
+      isDataEqual: dequal,
+      staleTime: Infinity,
     },
   },
 });

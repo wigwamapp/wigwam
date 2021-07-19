@@ -1,12 +1,12 @@
 import { FC, useEffect } from "react";
-import { useQueryClient, useQuery } from "react-query";
+import { useQueryClient } from "react-query";
 import { onWalletStatusUpdated } from "core/client";
-import { walletStatusQuery } from "app/queries";
+import { useQueriesSuspense, walletStatusQuery } from "app/queries";
 
 const UpdateWalletStatus: FC = () => {
   const queryClient = useQueryClient();
 
-  useQuery(walletStatusQuery);
+  useQueriesSuspense([walletStatusQuery]);
 
   useEffect(
     () =>

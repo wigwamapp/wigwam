@@ -1,10 +1,9 @@
 import { FC } from "react";
-import { useQuery } from "react-query";
 
-import { awaitI18NQuery } from "app/queries";
+import { useQueriesSuspense, awaitI18NQuery } from "app/queries";
 
 const AwaitI18N: FC = () => {
-  useQuery(awaitI18NQuery);
+  useQueriesSuspense([awaitI18NQuery]);
   return null;
 };
 

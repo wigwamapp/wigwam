@@ -23,6 +23,5 @@ export const awaitFontsQuery = (fonts: Font[]) =>
         await Promise.all(fontFaces.map((ff) => ff.load(undefined, 5_000)));
       } catch {}
     },
-    retry: false,
-    staleTime: Infinity,
+    refetchOnReconnect: false,
   });
