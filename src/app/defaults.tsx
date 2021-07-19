@@ -18,3 +18,12 @@ export const BSC_RPC_URLS = [
   "https://bsc-dataseed1.defibit.io/",
   "https://bsc-dataseed1.ninicoin.io/",
 ];
+
+export enum SetupStep {
+  Language = "language",
+  ChooseAddAccountWay = "choose-add-account-way",
+  CreateSeedPhrase = "create-seed-phrase",
+  ImportSeedPhrase = "import-seed-phrase",
+  VerifySeedPhrase = "verify-seed-phrase",
+  AddHDAccount = "add-hd-account",
+}

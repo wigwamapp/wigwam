@@ -1,5 +1,4 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-// import classNames from "clsx";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 
@@ -18,9 +17,10 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 
 type AddSeedPhraseProps = {
   importExisting?: boolean;
+  onAdd: (seedPhrase: SeedPharse) => void;
 };
 
-const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting }) => {
+const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting, onAdd }) => {
   const defaultLocale = useMemo(() => {
     const currentCode = getLocale();
     return (
@@ -60,11 +60,11 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting }) => {
     };
     try {
       validateSeedPhrase(seedPhrase);
-      alert("Done");
+      onAdd(seedPhrase);
     } catch (err) {
       alert(err.message);
     }
-  }, [wordlistLocale, seedPhraseText]);
+  }, [wordlistLocale, seedPhraseText, onAdd]);
 
   return (
     <div className="my-16">

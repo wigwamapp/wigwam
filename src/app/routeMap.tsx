@@ -43,10 +43,7 @@ export const ROUTE_MAP = Router.createMap<RouterContext>([
     (_p, ctx) =>
       ctx.walletStatus === WalletStatus.Welcome ? <Welcome /> : <Main />,
   ],
-  [
-    "/setup/:stepSlug?",
-    ({ stepSlug }) => <Setup key={stepSlug} stepSlug={stepSlug} />,
-  ],
+  ["/setup", () => <Setup />],
   [
     "*",
     (_p, ctx) =>

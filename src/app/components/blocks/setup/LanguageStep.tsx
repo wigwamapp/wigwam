@@ -1,10 +1,16 @@
 import { FC, useMemo } from "react";
 
-import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
+import { useSteps } from "lib/react-steps";
 import { getLocale, setLocale } from "lib/ext/react";
+
+import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 
-const SelectGlobalLanguage: FC = () => {
+import ContinueButton from "./ContinueButton";
+
+const LanguageStep: FC = () => {
+  const { navigateToStep } = useSteps();
+
   const locale = useMemo(() => {
     const currentCode = getLocale();
     return (
@@ -21,8 +27,10 @@ const SelectGlobalLanguage: FC = () => {
         onSelect={({ code }) => setLocale(code)}
         className="mt-24"
       />
+
+      <ContinueButton onClick={() => navigateToStep("add-account")} />
     </div>
   );
 };
 
-export default SelectGlobalLanguage;
+export default LanguageStep;

@@ -1,4 +1,4 @@
-import { memo, ReactNode, useEffect, useMemo } from "react";
+import { memo, ReactNode, useMemo } from "react";
 import classNames from "clsx";
 
 // import { T } from "lib/ext/i18n/react";
@@ -10,19 +10,17 @@ import AddSeedPhrase from "./AddSeedPhrase";
 const AddAccount = memo(() => {
   const [hasSeedPhrase] = useQueriesSuspense([hasSeedPhraseQuery]);
 
+  const sections = useMemo(() => getSections(hasSeedPhrase), [hasSeedPhrase]);
+
   const [tiles, setTiles] = useSearchParams<string>("tile");
   const tile = 0 in tiles ? tiles[0] : null;
   const tileNode = useMemo(() => tile && TILE_NODES[tile](), [tile]);
-
-  useEffect(() => {
-    console.info(hasSeedPhrase);
-  }, [hasSeedPhrase]);
 
   return tileNode ? (
     <div className="mb-8">{tileNode}</div>
   ) : (
     <div className="mb-8 w-full mx-auto max-w-md flex flex-col">
-      {SECTIONS.map((section) => (
+      {sections.map((section) => (
         <div key={section.type} className="py-8">
           <h2
             className={classNames(section.points ? "mb-2" : "mb-6", "text-2xl")}
@@ -72,7 +70,7 @@ const TILE_NODES: Record<string, () => ReactNode> = {
   "seed-phrase-import": () => <AddSeedPhrase importExisting />,
 };
 
-const SECTIONS = [
+const getSections = (hasSeedPhrase: boolean) => [
   {
     type: "seed_phrase",
     title: "From Seed Phrase",
@@ -80,13 +78,20 @@ const SECTIONS = [
       security: 0.8,
       adoption: 0.7,
     },
-    tiles: [
-      {
-        key: "seed-phrase-new",
-        title: "Create new",
-      },
-      { key: "seed-phrase-import", title: "Import existing" },
-    ],
+    tiles: hasSeedPhrase
+      ? [
+          {
+            key: "add-from-seed-phrase",
+            title: "Add wallet",
+          },
+        ]
+      : [
+          {
+            key: "seed-phrase-new",
+            title: "Create new",
+          },
+          { key: "seed-phrase-import", title: "Import existing" },
+        ],
   },
   {
     type: "device",
