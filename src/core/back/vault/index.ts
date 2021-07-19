@@ -14,14 +14,7 @@ import {
   validateSeedPhrase,
 } from "core/helpers";
 
-import {
-  MIGRATIONS,
-  checkStrgKey,
-  migrationLevelStrgKey,
-  seedPhraseStrgKey,
-  accPrivKeyStrgKey,
-  accPubKeyStrgKey,
-} from "./data";
+import { MIGRATIONS, Data } from "./data";
 
 export class Vault {
   static async unlock(password: string) {
@@ -53,10 +46,7 @@ export class Vault {
 
       return Storage.transact(async () => {
         await Storage.encryptAndSaveMany(
-          [
-            [checkStrgKey, null],
-            [migrationLevelStrgKey, MIGRATIONS.length],
-          ],
+          [Data.check(null), Data.migrationLevel(MIGRATIONS.length)],
           passwordKey
         );
 
@@ -73,11 +63,11 @@ export class Vault {
   }
 
   static isExist() {
-    return Storage.isStored(checkStrgKey);
+    return Storage.isStored(Data.check());
   }
 
   static hasSeedPhrase() {
-    return Storage.isStored(seedPhraseStrgKey);
+    return Storage.isStored(Data.seedPhrase());
   }
 
   static async fetchSeedPhrase(password: string) {
@@ -89,7 +79,7 @@ export class Vault {
       }
 
       return Storage.fetchAndDecryptOne<SeedPharse>(
-        seedPhraseStrgKey,
+        Data.seedPhrase(),
         passwordKey
       );
     });
@@ -99,7 +89,7 @@ export class Vault {
     const passwordKey = await Vault.toPasswordKey(password);
     return withError(t("failedToFetchPrivateKey"), () =>
       Storage.fetchAndDecryptOne<string>(
-        accPrivKeyStrgKey(accAddress),
+        Data.privateKey(accAddress)(),
         passwordKey
       )
     );
@@ -112,8 +102,8 @@ export class Vault {
         Storage.remove(
           accountAddresses
             .map((address) => [
-              accPrivKeyStrgKey(address),
-              accPubKeyStrgKey(address),
+              Data.privateKey(address)(),
+              Data.publicKey(address)(),
             ])
             .flat()
         )
@@ -124,7 +114,7 @@ export class Vault {
   private static toPasswordKey(password: string) {
     return withError(t("invalidPassword"), async (doThrow) => {
       const passwordKey = await Encryptor.generateKey(password);
-      const check = await Storage.fetchAndDecryptOne(checkStrgKey, passwordKey);
+      const check = await Storage.fetchAndDecryptOne(Data.check(), passwordKey);
       if (check !== null) {
         doThrow();
       }
@@ -136,11 +126,11 @@ export class Vault {
     return Storage.transact(async () => {
       try {
         const migrationLevelStored = await Storage.isStored(
-          migrationLevelStrgKey
+          Data.migrationLevel()
         );
         const migrationLevel = migrationLevelStored
           ? await Storage.fetchAndDecryptOne<number>(
-              migrationLevelStrgKey,
+              Data.migrationLevel(),
               passwordKey
             )
           : 0;
@@ -156,7 +146,7 @@ export class Vault {
         }
       } finally {
         await Storage.encryptAndSaveMany(
-          [[migrationLevelStrgKey, MIGRATIONS.length]],
+          [Data.migrationLevel(MIGRATIONS.length)],
           passwordKey
         );
       }
@@ -178,7 +168,7 @@ export class Vault {
   fetchPublicKey(accAddress: string) {
     return withError(t("failedToFetchPublicKey"), () =>
       Storage.fetchAndDecryptOne<string>(
-        accPubKeyStrgKey(accAddress),
+        Data.publicKey(accAddress)(),
         this.passwordKey
       )
     );
@@ -186,14 +176,14 @@ export class Vault {
 
   sign(accAddress: string, digest: string) {
     return withError(t("failedToSign"), async () => {
-      const strgKey = accPrivKeyStrgKey(accAddress);
-      const privKeyExists = await Storage.isStored(strgKey);
+      const dataKey = Data.privateKey(accAddress)();
+      const privKeyExists = await Storage.isStored(dataKey);
       if (!privKeyExists) {
         throw new PublicError(t("cannotSignForAccount"));
       }
 
       const privKey = await Storage.fetchAndDecryptOne<string>(
-        strgKey,
+        dataKey,
         this.passwordKey
       );
 
@@ -210,7 +200,7 @@ export class Vault {
       }
 
       await Storage.encryptAndSaveMany(
-        [[seedPhraseStrgKey, seedPhrase]],
+        [Data.seedPhrase(seedPhrase)],
         this.passwordKey
       );
     });
@@ -226,7 +216,7 @@ export class Vault {
           }
 
           const { phrase, lang } = await Storage.fetchAndDecryptOne<SeedPharse>(
-            seedPhraseStrgKey,
+            Data.seedPhrase(),
             this.passwordKey
           );
 
@@ -241,13 +231,10 @@ export class Vault {
 
           await Storage.encryptAndSaveMany(
             toAdd
-              .map(
-                ({ address, privateKey, publicKey }) =>
-                  [
-                    [accPrivKeyStrgKey(address), privateKey],
-                    [accPubKeyStrgKey(address), publicKey],
-                  ] as [string, string][]
-              )
+              .map(({ address, privateKey, publicKey }) => [
+                Data.privateKey(address)(privateKey),
+                Data.publicKey(address)(publicKey),
+              ])
               .flat(),
             this.passwordKey
           );
@@ -265,13 +252,10 @@ export class Vault {
 
           await Storage.encryptAndSaveMany(
             toAdd
-              .map(
-                ({ address, privateKey, publicKey }) =>
-                  [
-                    [accPrivKeyStrgKey(address), privateKey],
-                    [accPubKeyStrgKey(address), publicKey],
-                  ] as [string, string][]
-              )
+              .map(({ address, privateKey, publicKey }) => [
+                Data.privateKey(address)(privateKey),
+                Data.publicKey(address)(publicKey),
+              ])
               .flat(),
             this.passwordKey
           );
@@ -288,12 +272,9 @@ export class Vault {
           );
 
           await Storage.encryptAndSaveMany(
-            toAdd
-              .map(
-                ({ address, publicKey }) =>
-                  [[accPubKeyStrgKey(address), publicKey]] as [string, string][]
-              )
-              .flat(),
+            toAdd.map(({ address, publicKey }) =>
+              Data.publicKey(address)(publicKey)
+            ),
             this.passwordKey
           );
 
