@@ -47,15 +47,15 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       })
       .with(
         { type: MessageType.SetupWallet },
-        ({ type, password, accountParams, seedPhrase }) =>
+        ({ type, password, accountsParams, seedPhrase }) =>
           withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
-            const { vault, accountAddress } = await Vault.setup(
+            const { vault, accountAddresses } = await Vault.setup(
               password,
-              accountParams,
+              accountsParams,
               seedPhrase
             );
             unlocked(vault);
-            ctx.reply({ type, accountAddress });
+            ctx.reply({ type, accountAddresses });
           })
       )
       .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
@@ -79,17 +79,17 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           ctx.reply({ type });
         })
       )
-      .with({ type: MessageType.AddAccount }, ({ type, params }) =>
+      .with({ type: MessageType.AddAccounts }, ({ type, params }) =>
         withVault(async (vault) => {
-          const accountAddress = await vault.addAccount(params);
-          ctx.reply({ type, accountAddress });
+          const accountAddresses = await vault.addAccounts(params);
+          ctx.reply({ type, accountAddresses });
         })
       )
       .with(
-        { type: MessageType.DeleteAccount },
-        ({ type, password, accountAddress }) =>
+        { type: MessageType.DeleteAccounts },
+        ({ type, password, accountAddresses }) =>
           withStatus(WalletStatus.Ready, async () => {
-            await Vault.deleteAccount(password, accountAddress);
+            await Vault.deleteAccounts(password, accountAddresses);
             ctx.reply({ type });
           })
       )

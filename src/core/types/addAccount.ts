@@ -1,32 +1,32 @@
 import { AccountType } from "./base";
 
-export type AddAccountParams =
-  | AddHDAccountParams
-  | AddImportedAccountParams
-  | AddExternalAccountParams
-  | AddVoidAccountParams;
+export type AddAccountsParams =
+  | AddHDAccountsParams
+  | AddImportedAccountsParams
+  | AddExternalAccountsParams
+  | AddVoidAccountsParams;
 
-export interface AddAccountParamsBase {
+export interface AddAccountsParamsBase {
   type: AccountType;
-  name?: string;
+  names?: string[];
 }
 
-export interface AddHDAccountParams extends AddAccountParamsBase {
+export interface AddHDAccountsParams extends AddAccountsParamsBase {
   type: AccountType.HD;
-  derivationPath: string;
+  derivationPaths: string[];
 }
 
-export interface AddImportedAccountParams extends AddAccountParamsBase {
+export interface AddImportedAccountsParams extends AddAccountsParamsBase {
   type: AccountType.Imported;
-  privateKey: string;
+  privateKeys: string[];
 }
 
-export interface AddExternalAccountParams extends AddAccountParamsBase {
+export interface AddExternalAccountsParams extends AddAccountsParamsBase {
   type: AccountType.External;
-  publicKey: string;
+  publicKeys: string[];
 }
 
-export interface AddVoidAccountParams extends AddAccountParamsBase {
+export interface AddVoidAccountsParams extends AddAccountsParamsBase {
   type: AccountType.Void;
-  address: string;
+  addresses: string[];
 }

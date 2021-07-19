@@ -1,5 +1,3 @@
-import { match } from "ts-pattern";
-
 import { PorterClient } from "lib/ext/porter/client";
 import { assert } from "lib/system/assert";
 import {
@@ -9,36 +7,42 @@ import {
   EventMessage,
   MessageType,
   WalletStatus,
-  AddAccountParams,
+  AddAccountsParams,
   SeedPharse,
-  AccountType,
 } from "core/types";
 import * as Repo from "core/repo";
 
 const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
 
-export async function createAccount(addParams: AddAccountParams) {
-  const address = await addAccount(addParams);
+export async function createAccounts(addParams: AddAccountsParams) {
+  const addresses = await addAccounts(addParams);
 
-  let name = addParams.name;
-  if (!name) {
+  let names: string[];
+  if (addParams.names) {
+    names = addParams.names;
+  } else {
+    names = [];
     const count = await Repo.accounts.count();
-    name = `{{wallet}} ${count + 1}`;
+    for (let i = 0; i < addresses.length; i++) {
+      names.push(`{{wallet}} ${count + 1 + i}`);
+    }
   }
 
-  const params: any = match(addParams)
-    .with({ type: AccountType.HD }, (p) => ({
-      derivationPath: p.derivationPath,
-    }))
-    .otherwise(() => ({}));
+  // const params: any = match(addParams)
+  //   .with({ type: AccountType.HD }, (p) => ({
+  //     derivationPath: p.derivationPath,
+  //   }))
+  //   .otherwise(() => ({}));
 
-  await Repo.accounts.add({
-    type: addParams.type,
-    address,
-    name,
-    params,
-    usdValues: {},
-  });
+  await Repo.accounts.bulkAdd(
+    addresses.map((address, i) => ({
+      type: addParams.type,
+      address,
+      name: names[i],
+      params: {},
+      usdValues: {},
+    }))
+  );
 }
 
 export async function getWalletStatus() {
@@ -60,18 +64,18 @@ export function onWalletStatusUpdated(
 
 export async function setupWallet(
   password: string,
-  accountParams: AddAccountParams,
+  accountsParams: AddAccountsParams,
   seedPhrase?: SeedPharse
 ) {
   const type = MessageType.SetupWallet;
   const res = await porter.request({
     type,
     password,
-    accountParams,
+    accountsParams,
     seedPhrase,
   });
   assert(res?.type === type);
-  return res.accountAddress;
+  return res.accountAddresses;
 }
 
 export async function unlockWallet(password: string) {
@@ -89,22 +93,25 @@ export async function lockWallet() {
   assert(res?.type === type);
 }
 
-export async function addAccount(params: AddAccountParams) {
-  const type = MessageType.AddAccount;
+export async function addAccounts(params: AddAccountsParams) {
+  const type = MessageType.AddAccounts;
   const res = await porter.request({
     type,
     params,
   });
   assert(res?.type === type);
-  return res.accountAddress;
+  return res.accountAddresses;
 }
 
-export async function deleteAccount(password: string, accountAddress: string) {
-  const type = MessageType.DeleteAccount;
+export async function deleteAccount(
+  password: string,
+  accountAddresses: string[]
+) {
+  const type = MessageType.DeleteAccounts;
   const res = await porter.request({
     type,
     password,
-    accountAddress,
+    accountAddresses,
   });
   assert(res?.type === type);
 }

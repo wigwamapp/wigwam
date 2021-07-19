@@ -31,9 +31,9 @@ export interface IAccountBase {
 
 export interface IHDAccount extends IAccountBase {
   type: AccountType.HD;
-  params: {
-    derivationPath: string;
-  };
+  // params: {
+  //   derivationPath: string;
+  // };
 }
 
 export interface IImportedAccount extends IAccountBase {

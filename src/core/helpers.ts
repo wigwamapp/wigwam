@@ -6,7 +6,7 @@ import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
 import * as Repo from "core/repo";
 
-import { SeedPharse, AddAccountParams, AccountType } from "./types";
+import { SeedPharse, AddAccountsParams, AccountType } from "./types";
 
 export class PublicError extends Error {
   name = "PublicError";
@@ -32,16 +32,16 @@ export async function validateAccountExistence(address: string) {
   }
 }
 
-export function validateAddAccountParams(params: AddAccountParams) {
+export function validateAddAccountsParams(params: AddAccountsParams) {
   match(params)
     .with({ type: AccountType.HD }, (p) => {
-      validateDerivationPath(p.derivationPath);
+      p.derivationPaths.forEach(validateDerivationPath);
     })
     .with({ type: AccountType.Imported }, (p) => {
-      validatePrivateKey(p.privateKey);
+      p.privateKeys.forEach(validatePrivateKey);
     })
     .with({ type: AccountType.External }, (p) => {
-      validatePublicKey(p.publicKey);
+      p.publicKeys.forEach(validatePublicKey);
     })
     .run();
 }

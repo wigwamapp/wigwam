@@ -1,5 +1,5 @@
 import { WalletStatus, SeedPharse } from "./base";
-import { AddAccountParams } from "./addAccount";
+import { AddAccountsParams } from "./addAccount";
 
 export type Request =
   | GetWalletStatusRequest
@@ -8,8 +8,8 @@ export type Request =
   | LockWalletRequest
   | HasSeedPhraseRequest
   | AddSeedPhraseRequest
-  | AddAccountRequest
-  | DeleteAccountRequest
+  | AddAccountsRequest
+  | DeleteAccountsRequest
   | GetSeedPhraseRequest
   | GetPrivateKeyRequest
   | GetPublicKeyRequest;
@@ -21,8 +21,8 @@ export type Response =
   | LockWalletResponse
   | HasSeedPhraseResponse
   | AddSeedPhraseResponse
-  | AddAccountResponse
-  | DeleteAccountResponse
+  | AddAccountsResponse
+  | DeleteAccountsResponse
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse
   | GetPublicKeyResponse;
@@ -37,8 +37,8 @@ export enum MessageType {
   LockWallet = "LOCK_WALLET",
   HasSeedPhrase = "HAS_SEED_PHRASE",
   AddSeedPhrase = "ADD_SEED_PHRASE",
-  AddAccount = "ADD_ACCOUNT",
-  DeleteAccount = "DELETE_ACCOUNT",
+  AddAccounts = "ADD_ACCOUNTS",
+  DeleteAccounts = "DELETE_ACCOUNTS",
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
@@ -65,13 +65,13 @@ export interface WalletStatusUpdated extends MessageBase {
 export interface SetupWalletRequest extends MessageBase {
   type: MessageType.SetupWallet;
   password: string;
-  accountParams: AddAccountParams;
+  accountsParams: AddAccountsParams;
   seedPhrase?: SeedPharse;
 }
 
 export interface SetupWalletResponse extends MessageBase {
   type: MessageType.SetupWallet;
-  accountAddress: string;
+  accountAddresses: string[];
 }
 
 export interface UnlockWalletRequest extends MessageBase {
@@ -109,24 +109,24 @@ export interface AddSeedPhraseResponse extends MessageBase {
   type: MessageType.AddSeedPhrase;
 }
 
-export interface AddAccountRequest extends MessageBase {
-  type: MessageType.AddAccount;
-  params: AddAccountParams;
+export interface AddAccountsRequest extends MessageBase {
+  type: MessageType.AddAccounts;
+  params: AddAccountsParams;
 }
 
-export interface AddAccountResponse extends MessageBase {
-  type: MessageType.AddAccount;
-  accountAddress: string;
+export interface AddAccountsResponse extends MessageBase {
+  type: MessageType.AddAccounts;
+  accountAddresses: string[];
 }
 
-export interface DeleteAccountRequest extends MessageBase {
-  type: MessageType.DeleteAccount;
+export interface DeleteAccountsRequest extends MessageBase {
+  type: MessageType.DeleteAccounts;
   password: string;
-  accountAddress: string;
+  accountAddresses: string[];
 }
 
-export interface DeleteAccountResponse extends MessageBase {
-  type: MessageType.DeleteAccount;
+export interface DeleteAccountsResponse extends MessageBase {
+  type: MessageType.DeleteAccounts;
 }
 
 export interface GetSeedPhraseRequest extends MessageBase {
