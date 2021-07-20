@@ -66,8 +66,8 @@ const AddAccount = memo(() => {
 export default AddAccount;
 
 const TILE_NODES: Record<string, () => ReactNode> = {
-  "seed-phrase-new": () => <AddSeedPhrase />,
-  "seed-phrase-import": () => <AddSeedPhrase importExisting />,
+  // "seed-phrase-new": () => <AddSeedPhrase />,
+  // "seed-phrase-import": () => <AddSeedPhrase importExisting />,
 };
 
 const getSections = (hasSeedPhrase: boolean) => [
