@@ -1,24 +1,17 @@
-import { memo, ReactNode, useMemo } from "react";
+import { memo, useMemo } from "react";
 import classNames from "clsx";
 
-// import { T } from "lib/ext/i18n/react";
+import { useSteps } from "lib/react-steps";
 import { useQueriesSuspense, hasSeedPhraseQuery } from "app/queries";
-import { useSearchParams } from "app/hooks/useSearchParams";
+import { WalletStep } from "app/defaults";
 
-import AddSeedPhrase from "./AddSeedPhrase";
+const ChooseAddAccountWay = memo(() => {
+  const { navigateToStep } = useSteps();
 
-const AddAccount = memo(() => {
   const [hasSeedPhrase] = useQueriesSuspense([hasSeedPhraseQuery]);
-
   const sections = useMemo(() => getSections(hasSeedPhrase), [hasSeedPhrase]);
 
-  const [tiles, setTiles] = useSearchParams<string>("tile");
-  const tile = 0 in tiles ? tiles[0] : null;
-  const tileNode = useMemo(() => tile && TILE_NODES[tile](), [tile]);
-
-  return tileNode ? (
-    <div className="mb-8">{tileNode}</div>
-  ) : (
+  return (
     <div className="mb-8 w-full mx-auto max-w-md flex flex-col">
       {sections.map((section) => (
         <div key={section.type} className="py-8">
@@ -40,8 +33,8 @@ const AddAccount = memo(() => {
           )}
 
           <div className={classNames("-mx-4", "flex flex-wrap items-stretch")}>
-            {section.tiles.map(({ key, title }) => (
-              <div key={key} className="p-4">
+            {section.tiles.map(({ toStep, title }) => (
+              <div key={toStep} className="p-4">
                 <button
                   className={classNames(
                     "p-4",
@@ -50,7 +43,7 @@ const AddAccount = memo(() => {
                     "border-white hover:bg-white hover:bg-opacity-5",
                     "text-lg font-semibold"
                   )}
-                  onClick={() => setTiles([key])}
+                  onClick={() => navigateToStep(toStep)}
                 >
                   {title}
                 </button>
@@ -63,12 +56,7 @@ const AddAccount = memo(() => {
   );
 });
 
-export default AddAccount;
-
-const TILE_NODES: Record<string, () => ReactNode> = {
-  // "seed-phrase-new": () => <AddSeedPhrase />,
-  // "seed-phrase-import": () => <AddSeedPhrase importExisting />,
-};
+export default ChooseAddAccountWay;
 
 const getSections = (hasSeedPhrase: boolean) => [
   {
@@ -81,16 +69,16 @@ const getSections = (hasSeedPhrase: boolean) => [
     tiles: hasSeedPhrase
       ? [
           {
-            key: "add-from-seed-phrase",
+            toStep: WalletStep.AddHDAccount,
             title: "Add wallet",
           },
         ]
       : [
           {
-            key: "seed-phrase-new",
+            toStep: WalletStep.CreateSeedPhrase,
             title: "Create new",
           },
-          { key: "seed-phrase-import", title: "Import existing" },
+          { toStep: WalletStep.ImportSeedPhrase, title: "Import existing" },
         ],
   },
   {
@@ -102,7 +90,7 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        key: "ledger",
+        toStep: WalletStep.AddLedgerAccount,
         title: "Ledger",
       },
     ],
@@ -116,17 +104,17 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        key: "social-twitter",
+        toStep: WalletStep.AddTorusAccount,
         title: "Twitter",
       },
-      {
-        key: "social-google",
-        title: "Google",
-      },
-      {
-        key: "social-facebook",
-        title: "Facebook",
-      },
+      // {
+      //   toStep: WalletStep.AddTorusAccount,
+      //   title: "Google",
+      // },
+      // {
+      //   toStep: WalletStep.AddTorusAccount,
+      //   title: "Facebook",
+      // },
     ],
   },
   {
@@ -134,7 +122,7 @@ const getSections = (hasSeedPhrase: boolean) => [
     title: "Advanced",
     tiles: [
       {
-        key: "private-key",
+        toStep: WalletStep.AddByPrivateKeyAccount,
         title: "By Private key",
       },
     ],

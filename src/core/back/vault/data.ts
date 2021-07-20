@@ -1,3 +1,5 @@
+const ROOT_PREFIX = "v";
+
 /**
  * Schema
  */
@@ -37,8 +39,6 @@ type DataItem = {
   (): string;
   <T>(val: T): [string, T];
 };
-
-const ROOT_PREFIX = "v";
 
 function createStatic(prefix: Prefix, subPart?: Part): DataItem {
   const key = combine(ROOT_PREFIX, prefix, subPart);

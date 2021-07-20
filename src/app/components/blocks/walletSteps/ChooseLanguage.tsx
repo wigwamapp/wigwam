@@ -5,10 +5,11 @@ import { getLocale, setLocale } from "lib/ext/react";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
+import { WalletStep } from "app/defaults";
 
-import ContinueButton from "./ContinueButton";
+import ContinueButton from "../ContinueButton";
 
-const LanguageStep: FC = () => {
+const ChooseLanguage: FC = () => {
   const { navigateToStep } = useSteps();
 
   const locale = useMemo(() => {
@@ -28,9 +29,11 @@ const LanguageStep: FC = () => {
         className="mt-24"
       />
 
-      <ContinueButton onClick={() => navigateToStep("add-account")} />
+      <ContinueButton
+        onClick={() => navigateToStep(WalletStep.ChooseAddAccountWay)}
+      />
     </div>
   );
 };
 
-export default LanguageStep;
+export default ChooseLanguage;

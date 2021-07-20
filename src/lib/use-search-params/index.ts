@@ -19,8 +19,9 @@ export function useSearchParams<T = any>(
       navigate((lctn) => {
         const usp = new URLSearchParams(lctn.search);
         if (typeof values === "function") {
-          values = values(toValues<T>(usp.getAll("key")));
+          values = values(toValues<T>(usp.getAll(key)));
         }
+        usp.delete(key);
         for (const value of values) {
           usp.append(key, JSON.stringify(value));
         }

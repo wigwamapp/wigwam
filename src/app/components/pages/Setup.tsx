@@ -1,26 +1,38 @@
 import { FC, Suspense } from "react";
 
 import { AllSteps, StepsProvider } from "lib/react-steps";
-import { SetupStep } from "app/defaults";
+import { WalletStep } from "app/defaults";
 
 import BoardingPageLayout from "../layouts/BoardingPageLayout";
-import LanguageStep from "../blocks/setup/LanguageStep";
-import ChooseAddAccountWay from "../blocks/setup/ChooseAddAccountWay";
-import AddSeedPhraseStep from "../blocks/setup/AddSeedPhraseStep";
-import AddHDAccountStep from "../blocks/setup/AddHDAccountStep";
-import VerifySeedPhraseStep from "../blocks/setup/VerifySeedPhraseStep";
+import LanguageStep from "../blocks/walletSteps/ChooseLanguage";
+import ChooseAddAccountWay from "../blocks/walletSteps/ChooseAddAccountWay";
+import AddSeedPhrase from "../blocks/walletSteps/AddSeedPhrase";
+import VerifySeedPhrase from "../blocks/walletSteps/VerifySeedPhrase";
+import AddHDAccount from "../blocks/walletSteps/AddHDAccount";
+import AddByPrivateKeyAccount from "../blocks/walletSteps/AddByPrivateKeyAccount";
+import AddLedgerAccount from "../blocks/walletSteps/AddLedgerAccount";
+import AddTorusAccount from "../blocks/walletSteps/AddTorusAccount";
+import SetupPassword from "../blocks/walletSteps/SetupPassword";
 
-const STEPS: AllSteps<SetupStep> = [
-  [SetupStep.Language, () => <LanguageStep />],
-  [SetupStep.ChooseAddAccountWay, () => <ChooseAddAccountWay />],
-  [SetupStep.CreateSeedPhrase, () => <AddSeedPhraseStep />],
-  [SetupStep.ImportSeedPhrase, () => <AddSeedPhraseStep importExisting />],
-  [SetupStep.VerifySeedPhrase, () => <VerifySeedPhraseStep />],
-  [SetupStep.AddHDAccount, () => <AddHDAccountStep />],
+const STEPS: AllSteps<WalletStep> = [
+  [WalletStep.ChooseLanguage, () => <LanguageStep />],
+  [WalletStep.ChooseAddAccountWay, () => <ChooseAddAccountWay />],
+  [WalletStep.CreateSeedPhrase, () => <AddSeedPhrase />],
+  [WalletStep.ImportSeedPhrase, () => <AddSeedPhrase importExisting />],
+  [WalletStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
+  [WalletStep.AddHDAccount, () => <AddHDAccount />],
+  [WalletStep.AddByPrivateKeyAccount, () => <AddByPrivateKeyAccount />],
+  [WalletStep.AddLedgerAccount, () => <AddLedgerAccount />],
+  [WalletStep.AddTorusAccount, () => <AddTorusAccount />],
+  [WalletStep.SetupPassword, () => <SetupPassword />],
 ];
 
 const Setup: FC = () => (
-  <StepsProvider namespace="setup" steps={STEPS} fallback="language">
+  <StepsProvider
+    namespace="setup"
+    steps={STEPS}
+    fallback={WalletStep.ChooseLanguage}
+  >
     {({ stepId, children }) => (
       <BoardingPageLayout key={stepId} title={null}>
         <div className="mb-24">

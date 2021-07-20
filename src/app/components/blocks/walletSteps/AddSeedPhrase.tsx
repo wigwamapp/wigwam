@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 
+import { useSteps } from "lib/react-steps";
 import { getLocale } from "lib/ext/i18n/react";
 import { getRandomBytes } from "lib/encryptor";
 import { SeedPharse } from "core/types";
@@ -10,6 +11,7 @@ import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
+import { WalletStep } from "app/defaults";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -17,10 +19,11 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 
 type AddSeedPhraseProps = {
   importExisting?: boolean;
-  onAdd: (seedPhrase: SeedPharse) => void;
 };
 
-const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting, onAdd }) => {
+const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting }) => {
+  const { stateRef, navigateToStep } = useSteps();
+
   const defaultLocale = useMemo(() => {
     const currentCode = getLocale();
     return (
@@ -53,18 +56,28 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting, onAdd }) => {
     }
   }, [importExisting, setSeedPhraseText, wordlistLocale]);
 
-  const navigateToSelectAccount = useCallback(() => {
+  const handleContinue = useCallback(() => {
     const seedPhrase: SeedPharse = {
       phrase: seedPhraseText,
       lang: wordlistLocale,
     };
     try {
       validateSeedPhrase(seedPhrase);
-      onAdd(seedPhrase);
+
+      stateRef.current.seedPhrase = seedPhrase;
+      navigateToStep(
+        importExisting ? WalletStep.AddHDAccount : WalletStep.VerifySeedPhrase
+      );
     } catch (err) {
       alert(err.message);
     }
-  }, [wordlistLocale, seedPhraseText, onAdd]);
+  }, [
+    wordlistLocale,
+    seedPhraseText,
+    stateRef,
+    navigateToStep,
+    importExisting,
+  ]);
 
   return (
     <div className="my-16">
@@ -90,9 +103,7 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting, onAdd }) => {
                   onChange={(evt) => setSeedPhraseText(evt.target.value)}
                 />
               </div>
-              <Button onClick={() => navigateToSelectAccount()}>
-                Continue
-              </Button>
+              <Button onClick={handleContinue}>Continue</Button>
             </>
           ) : (
             <Button onClick={() => generateNew()}>Create</Button>
