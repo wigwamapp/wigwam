@@ -1,17 +1,17 @@
 {
   "back": "Back",
   "continue": "Continue",
-  "accountAlreadyExists": "Account already exists",
+  "accountAlreadyExists": "Wallet with the same address already exists",
   "add": "Add",
-  "addAccount": "Add Account",
+  "addAccount": "Add Wallet",
   "appDesc": "A crypto wallet for Ethereum and Binance Smart Chain. Explore DeFi and NFTs.",
   "cancel": "Cancel",
   "cannotSignForAccount": "Cannot sign for this account",
   "derivationPathIsInvalid": "Derivation path is invalid",
-  "failedToAddAccount": "Failed to add account",
+  "failedToAddAccounts": "Failed to add new wallets",
   "failedToAddSeedPhrase": "Failed to add Seed Phrase",
-  "failedToCreateWallet": "Failed to create wallet",
-  "failedToDeleteAccount": "Failed to delete account",
+  "failedToSetupWallet": "Failed to setup wallet",
+  "failedToDeleteAccounts": "Failed to delete wallet",
   "failedToFetchPrivateKey": "Failed to fetch private key",
   "failedToFetchPublicKey": "Failed to fetch public key",
   "failedToFetchSeedPhrase": "Failed to fetch seed phrase",
@@ -31,5 +31,5 @@
   "seedPhraseNotEstablished": "Seed phrase has not yet been established",
   "wallet": "Wallet",
   "walletLocked": "Wallet locked",
-  "welcomeTo": "Welcome to {target}"
+  "welcomeTo": "Welcome to {{target}}"
 }

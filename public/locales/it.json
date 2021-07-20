@@ -1,20 +1,20 @@
 {
-  "accountAlreadyExists": "L'account esiste già",
+  "accountAlreadyExists": "Esiste già un portafoglio con lo stesso indirizzo",
   "add": "Inserisci",
-  "addAccount": "Aggiungi account",
+  "addAccount": "Aggiungi portafoglio",
   "appDesc": "Un portafoglio crittografico per Ethereum e Binance Smart Chain. \nEsplora DeFi e NFT.",
   "back": "Indietro",
   "cancel": "Annulla",
   "cannotSignForAccount": "Impossibile firmare per questo account",
   "continue": "Continua",
   "derivationPathIsInvalid": "Il percorso di derivazione non è valido",
-  "failedToAddAccount": "Impossibile aggiungere l'account",
+  "failedToAddAccounts": "Impossibile aggiungere nuovi portafogli",
   "failedToAddSeedPhrase": "Impossibile aggiungere la frase seme",
-  "failedToCreateWallet": "Impossibile creare il portafoglio",
-  "failedToDeleteAccount": "Impossibile eliminare l'account",
+  "failedToDeleteAccounts": "Impossibile eliminare il portafoglio",
   "failedToFetchPrivateKey": "Impossibile recuperare la chiave privata",
   "failedToFetchPublicKey": "Impossibile recuperare la chiave pubblica",
   "failedToFetchSeedPhrase": "Impossibile recuperare la frase seme",
+  "failedToSetupWallet": "Impossibile configurare il portafoglio",
   "failedToSign": "Impossibile firmare",
   "failedToUnlockWallet": "Impossibile sbloccare il portafoglio",
   "initial": "Iniziale",
@@ -31,5 +31,5 @@
   "seedPhraseNotEstablished": "La frase seme non è stata ancora stabilita",
   "wallet": "Portafoglio",
   "walletLocked": "Portafoglio bloccato",
-  "welcomeTo": "Benvenuto in {target}"
+  "welcomeTo": "Benvenuto in {{target}}"
 }

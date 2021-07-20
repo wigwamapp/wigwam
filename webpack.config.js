@@ -313,7 +313,7 @@ module.exports = {
             const extJson = Object.fromEntries(
               Object.entries(json).map(([name, val]) => {
                 const keySet = new Set();
-                const message = val.replace(/\{(.*?)\}/g, (_, key) => {
+                const message = val.replace(/{{(.*?)}}/g, (_, key) => {
                   keySet.add(key);
                   return `$${key}$`;
                 });

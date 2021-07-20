@@ -97,7 +97,7 @@ export class Vault {
 
   static async deleteAccounts(password: string, accountAddresses: string[]) {
     await Vault.toPasswordKey(password);
-    return withError(t("failedToDeleteAccount"), () =>
+    return withError(t("failedToDeleteAccounts"), () =>
       Storage.transact(() =>
         Storage.remove(
           accountAddresses
@@ -207,7 +207,7 @@ export class Vault {
   }
 
   private addAccountsForce(accounts: AddAccountParams[]) {
-    return withError(t("failedToAddAccount"), async () => {
+    return withError(t("failedToAddAccounts"), async () => {
       // Generate rest crypto keys if needed
       type AccountStorageData = {
         address: string;
