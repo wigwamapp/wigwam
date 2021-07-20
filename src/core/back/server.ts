@@ -47,11 +47,11 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       })
       .with(
         { type: MessageType.SetupWallet },
-        ({ type, password, accountsParams, seedPhrase }) =>
+        ({ type, password, accounts, seedPhrase }) =>
           withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
             const { vault, accountAddresses } = await Vault.setup(
               password,
-              accountsParams,
+              accounts,
               seedPhrase
             );
             unlocked(vault);
@@ -79,9 +79,9 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           ctx.reply({ type });
         })
       )
-      .with({ type: MessageType.AddAccounts }, ({ type, params }) =>
+      .with({ type: MessageType.AddAccounts }, ({ type, accounts }) =>
         withVault(async (vault) => {
-          const accountAddresses = await vault.addAccounts(params);
+          const accountAddresses = await vault.addAccounts(accounts);
           ctx.reply({ type, accountAddresses });
         })
       )

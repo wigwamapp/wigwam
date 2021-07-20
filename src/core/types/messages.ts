@@ -1,5 +1,5 @@
 import { WalletStatus, SeedPharse } from "./base";
-import { AddAccountsParams } from "./addAccount";
+import { AddAccountParams } from "./addAccount";
 
 export type Request =
   | GetWalletStatusRequest
@@ -65,7 +65,7 @@ export interface WalletStatusUpdated extends MessageBase {
 export interface SetupWalletRequest extends MessageBase {
   type: MessageType.SetupWallet;
   password: string;
-  accountsParams: AddAccountsParams;
+  accounts: AddAccountParams[];
   seedPhrase?: SeedPharse;
 }
 
@@ -111,7 +111,7 @@ export interface AddSeedPhraseResponse extends MessageBase {
 
 export interface AddAccountsRequest extends MessageBase {
   type: MessageType.AddAccounts;
-  params: AddAccountsParams;
+  accounts: AddAccountParams[];
 }
 
 export interface AddAccountsResponse extends MessageBase {

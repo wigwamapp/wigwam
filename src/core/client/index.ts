@@ -7,39 +7,23 @@ import {
   EventMessage,
   MessageType,
   WalletStatus,
-  AddAccountsParams,
+  AddAccountParams,
   SeedPharse,
 } from "core/types";
 import * as Repo from "core/repo";
 
+import { toPlainAccountParams } from "./helpers";
+
 const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
 
-export async function createAccounts(addParams: AddAccountsParams) {
-  const addresses = await addAccounts(addParams);
-
-  let names: string[];
-  if (addParams.names) {
-    names = addParams.names;
-  } else {
-    names = [];
-    const count = await Repo.accounts.count();
-    for (let i = 0; i < addresses.length; i++) {
-      names.push(`{{wallet}} ${count + 1 + i}`);
-    }
-  }
-
-  // const params: any = match(addParams)
-  //   .with({ type: AccountType.HD }, (p) => ({
-  //     derivationPath: p.derivationPath,
-  //   }))
-  //   .otherwise(() => ({}));
+export async function createAccounts(accounts: AddAccountParams[]) {
+  const addresses = await addAccounts(accounts);
 
   await Repo.accounts.bulkAdd(
-    addresses.map((address, i) => ({
-      type: addParams.type,
-      address,
-      name: names[i],
-      params: {},
+    accounts.map((addParams, i) => ({
+      ...toPlainAccountParams(addParams),
+      address: addresses[i],
+      name: addParams.name,
       usdValues: {},
     }))
   );
@@ -64,14 +48,14 @@ export function onWalletStatusUpdated(
 
 export async function setupWallet(
   password: string,
-  accountsParams: AddAccountsParams,
+  accounts: AddAccountParams[],
   seedPhrase?: SeedPharse
 ) {
   const type = MessageType.SetupWallet;
   const res = await porter.request({
     type,
     password,
-    accountsParams,
+    accounts,
     seedPhrase,
   });
   assert(res?.type === type);
@@ -93,11 +77,11 @@ export async function lockWallet() {
   assert(res?.type === type);
 }
 
-export async function addAccounts(params: AddAccountsParams) {
+export async function addAccounts(accounts: AddAccountParams[]) {
   const type = MessageType.AddAccounts;
   const res = await porter.request({
     type,
-    params,
+    accounts,
   });
   assert(res?.type === type);
   return res.accountAddresses;

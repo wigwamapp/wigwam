@@ -5,12 +5,12 @@ import { match } from "ts-pattern";
 import * as Encryptor from "lib/encryptor";
 import * as Storage from "lib/enc-storage";
 import { t } from "lib/ext/i18n";
-import { SeedPharse, AddAccountsParams, AccountType } from "core/types";
+import { SeedPharse, AddAccountParams, AccountType } from "core/types";
 import {
   PublicError,
   withError,
   validateAccountExistence,
-  validateAddAccountsParams,
+  validateAddAccountParams,
   validateSeedPhrase,
 } from "core/helpers";
 
@@ -28,7 +28,7 @@ export class Vault {
 
   static async setup(
     password: string,
-    accountsParams: AddAccountsParams,
+    accounts: AddAccountParams[],
     seedPhrase?: SeedPharse
   ) {
     return withError(t("failedToCreateWallet"), async (doThrow) => {
@@ -40,7 +40,7 @@ export class Vault {
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
-      validateAddAccountsParams(accountsParams);
+      accounts.forEach(validateAddAccountParams);
 
       const passwordKey = await Encryptor.generateKey(password);
 
@@ -55,7 +55,7 @@ export class Vault {
           await vault.addSeedPhraseForce(seedPhrase);
         }
 
-        const accountAddresses = await vault.addAccountsForce(accountsParams);
+        const accountAddresses = await vault.addAccountsForce(accounts);
 
         return { vault, accountAddresses };
       });
@@ -160,9 +160,9 @@ export class Vault {
     return Storage.transact(() => this.addSeedPhraseForce(seedPhrase));
   }
 
-  addAccounts(params: AddAccountsParams) {
-    validateAddAccountsParams(params);
-    return Storage.transact(() => this.addAccountsForce(params));
+  addAccounts(accounts: AddAccountParams[]) {
+    accounts.forEach(validateAddAccountParams);
+    return Storage.transact(() => this.addAccountsForce(accounts));
   }
 
   fetchPublicKey(accAddress: string) {
@@ -206,85 +206,79 @@ export class Vault {
     });
   }
 
-  private addAccountsForce(params: AddAccountsParams) {
-    return withError(t("failedToAddAccount"), () =>
-      match(params)
-        .with({ type: AccountType.HD }, async (p) => {
-          const seedPhraseExists = await Vault.hasSeedPhrase();
-          if (!seedPhraseExists) {
-            throw new PublicError(t("seedPhraseNotEstablished"));
-          }
+  private addAccountsForce(accounts: AddAccountParams[]) {
+    return withError(t("failedToAddAccount"), async () => {
+      // Generate rest crypto keys if needed
+      type AccountStorageData = {
+        address: string;
+        publicKey?: string;
+        privateKey?: string;
+      };
 
-          const { phrase, lang } = await Storage.fetchAndDecryptOne<SeedPharse>(
-            Data.seedPhrase(),
-            this.passwordKey
-          );
+      const accountsData: AccountStorageData[] = await Promise.all(
+        accounts.map((params) =>
+          match(params)
+            .with({ type: AccountType.HD }, async (p) => {
+              const seedPhraseExists = await Vault.hasSeedPhrase();
+              if (!seedPhraseExists) {
+                throw new PublicError(t("seedPhraseNotEstablished"));
+              }
 
-          const toAdd = await Promise.all(
-            p.derivationPaths.map(async (path) => {
+              const { phrase, lang } =
+                await Storage.fetchAndDecryptOne<SeedPharse>(
+                  Data.seedPhrase(),
+                  this.passwordKey
+                );
+
               const { address, privateKey, publicKey } =
-                ethers.Wallet.fromMnemonic(phrase, path, wordlists[lang]);
-              await validateAccountExistence(address);
+                ethers.Wallet.fromMnemonic(
+                  phrase,
+                  p.derivationPath,
+                  wordlists[lang]
+                );
+
               return { address, privateKey, publicKey };
             })
-          );
-
-          await Storage.encryptAndSaveMany(
-            toAdd
-              .map(({ address, privateKey, publicKey }) => [
-                Data.privateKey(address)(privateKey),
-                Data.publicKey(address)(publicKey),
-              ])
-              .flat(),
-            this.passwordKey
-          );
-
-          return toAdd.map(({ address }) => address);
-        })
-        .with({ type: AccountType.Imported }, async (p) => {
-          const toAdd = await Promise.all(
-            p.privateKeys.map(async (privateKey) => {
+            .with({ type: AccountType.Imported }, async ({ privateKey }) => {
               const { publicKey, address } = new ethers.Wallet(privateKey);
-              await validateAccountExistence(address);
+
               return { address, privateKey, publicKey };
             })
-          );
-
-          await Storage.encryptAndSaveMany(
-            toAdd
-              .map(({ address, privateKey, publicKey }) => [
-                Data.privateKey(address)(privateKey),
-                Data.publicKey(address)(publicKey),
-              ])
-              .flat(),
-            this.passwordKey
-          );
-
-          return toAdd.map(({ address }) => address);
-        })
-        .with({ type: AccountType.External }, async (p) => {
-          const toAdd = await Promise.all(
-            p.publicKeys.map(async (publicKey) => {
+            .with({ type: AccountType.External }, async ({ publicKey }) => {
               const address = ethers.utils.computeAddress(publicKey);
-              await validateAccountExistence(address);
+
               return { address, publicKey };
             })
-          );
+            .with({ type: AccountType.Void }, async ({ address }) => {
+              return { address };
+            })
+            .exhaustive()
+        )
+      );
 
-          await Storage.encryptAndSaveMany(
-            toAdd.map(({ address, publicKey }) =>
-              Data.publicKey(address)(publicKey)
-            ),
-            this.passwordKey
-          );
+      // Validate accounts existence
+      await Promise.all(
+        accountsData.map(({ address }) => validateAccountExistence(address))
+      );
 
-          return toAdd.map(({ address }) => address);
-        })
-        .with({ type: AccountType.Void }, async ({ addresses }) => {
-          await Promise.all(addresses.map(validateAccountExistence));
-          return addresses;
-        })
-        .exhaustive()
-    );
+      // Save them
+      const toSave: [string, unknown][] = [];
+
+      for (const { address, publicKey, privateKey } of accountsData) {
+        if (publicKey) {
+          toSave.push(Data.publicKey(address)(publicKey));
+        }
+        if (privateKey) {
+          toSave.push(Data.privateKey(address)(privateKey));
+        }
+      }
+
+      if (toSave.length > 0) {
+        await Storage.encryptAndSaveMany(toSave, this.passwordKey);
+      }
+
+      // Return account addresses
+      return accountsData.map(({ address }) => address);
+    });
   }
 }
