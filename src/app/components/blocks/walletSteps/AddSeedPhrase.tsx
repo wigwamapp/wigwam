@@ -12,6 +12,7 @@ import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
+import { addSeedPhrase } from "core/client";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -19,99 +20,108 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 
 type AddSeedPhraseProps = {
   importExisting?: boolean;
+  initialSetup?: boolean;
 };
 
-const AddSeedPhrase = memo<AddSeedPhraseProps>(({ importExisting }) => {
-  const { stateRef, navigateToStep } = useSteps();
+const AddSeedPhrase = memo<AddSeedPhraseProps>(
+  ({ importExisting, initialSetup }) => {
+    const { stateRef, navigateToStep } = useSteps();
 
-  const defaultLocale = useMemo(() => {
-    const currentCode = getLocale();
-    return (
-      SUPPORTED_LOCALES.find(({ code }) => currentCode === code) ??
-      FALLBACK_LOCALE
-    );
-  }, []);
-
-  const [locale, setLocale] = useState(defaultLocale);
-
-  const wordlistLocale = useMemo(
-    () => toWordlistLang(locale.code),
-    [locale.code]
-  );
-
-  const [seedPhraseText, setSeedPhraseText] = useState<string>("");
-
-  const generateNew = useCallback(() => {
-    const extraEntropy = getRandomBytes();
-    const wallet = ethers.Wallet.createRandom({
-      locale: wordlistLocale,
-      extraEntropy,
-    });
-    setSeedPhraseText(wallet.mnemonic.phrase);
-  }, [wordlistLocale, setSeedPhraseText]);
-
-  useEffect(() => {
-    if (!importExisting) {
-      setSeedPhraseText("");
-    }
-  }, [importExisting, setSeedPhraseText, wordlistLocale]);
-
-  const handleContinue = useCallback(() => {
-    const seedPhrase: SeedPharse = {
-      phrase: seedPhraseText,
-      lang: wordlistLocale,
-    };
-    try {
-      validateSeedPhrase(seedPhrase);
-
-      stateRef.current.seedPhrase = seedPhrase;
-      navigateToStep(
-        importExisting ? WalletStep.AddHDAccount : WalletStep.VerifySeedPhrase
+    const defaultLocale = useMemo(() => {
+      const currentCode = getLocale();
+      return (
+        SUPPORTED_LOCALES.find(({ code }) => currentCode === code) ??
+        FALLBACK_LOCALE
       );
-    } catch (err) {
-      alert(err.message);
-    }
-  }, [
-    wordlistLocale,
-    seedPhraseText,
-    stateRef,
-    navigateToStep,
-    importExisting,
-  ]);
+    }, []);
 
-  return (
-    <div className="my-16">
-      <h1 className="mb-16 text-3xl text-white text-center">
-        {importExisting ? "Import Seed Phrase" : "Add new Seed Phrase"}
-      </h1>
+    const [locale, setLocale] = useState(defaultLocale);
 
-      <div className="flex flex-col items-center justify-center">
-        <SelectLanguage
-          selected={locale}
-          items={SUPPORTED_LOCALES}
-          onSelect={setLocale}
-        />
+    const wordlistLocale = useMemo(
+      () => toWordlistLang(locale.code),
+      [locale.code]
+    );
 
-        <div className="my-16 flex flex-col items-center justify-center">
-          {importExisting || seedPhraseText ? (
-            <>
-              <div>
-                <div className="text-white mb-2 text-lg">Seed Phrase</div>
-                <LongTextField
-                  value={seedPhraseText}
-                  className="mb-16 w-96 h-36 resize-none"
-                  onChange={(evt) => setSeedPhraseText(evt.target.value)}
-                />
-              </div>
-              <Button onClick={handleContinue}>Continue</Button>
-            </>
-          ) : (
-            <Button onClick={() => generateNew()}>Create</Button>
-          )}
+    const [seedPhraseText, setSeedPhraseText] = useState<string>("");
+
+    const generateNew = useCallback(() => {
+      const extraEntropy = getRandomBytes();
+      const wallet = ethers.Wallet.createRandom({
+        locale: wordlistLocale,
+        extraEntropy,
+      });
+      setSeedPhraseText(wallet.mnemonic.phrase);
+    }, [wordlistLocale, setSeedPhraseText]);
+
+    useEffect(() => {
+      if (!importExisting) {
+        setSeedPhraseText("");
+      }
+    }, [importExisting, setSeedPhraseText, wordlistLocale]);
+
+    const handleContinue = useCallback(async () => {
+      const seedPhrase: SeedPharse = {
+        phrase: seedPhraseText,
+        lang: wordlistLocale,
+      };
+      try {
+        validateSeedPhrase(seedPhrase);
+
+        if (!initialSetup && importExisting) {
+          await addSeedPhrase(seedPhrase);
+        } else {
+          stateRef.current.seedPhrase = seedPhrase;
+        }
+
+        navigateToStep(
+          importExisting ? WalletStep.AddHDAccount : WalletStep.VerifySeedPhrase
+        );
+      } catch (err) {
+        alert(err.message);
+      }
+    }, [
+      wordlistLocale,
+      seedPhraseText,
+      initialSetup,
+      importExisting,
+      stateRef,
+      navigateToStep,
+    ]);
+
+    return (
+      <div className="my-16">
+        <h1 className="mb-16 text-3xl text-white text-center">
+          {importExisting ? "Import Seed Phrase" : "Add new Seed Phrase"}
+        </h1>
+
+        <div className="flex flex-col items-center justify-center">
+          <SelectLanguage
+            selected={locale}
+            items={SUPPORTED_LOCALES}
+            onSelect={setLocale}
+          />
+
+          <div className="my-16 flex flex-col items-center justify-center">
+            {importExisting || seedPhraseText ? (
+              <>
+                <div>
+                  <div className="text-white mb-2 text-lg">Seed Phrase</div>
+                  <LongTextField
+                    value={seedPhraseText}
+                    className="mb-16 w-96 h-36 resize-none"
+                    onChange={(evt) => setSeedPhraseText(evt.target.value)}
+                  />
+                </div>
+                <Button onClick={handleContinue}>Continue</Button>
+              </>
+            ) : (
+              <Button onClick={() => generateNew()}>Create</Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 export default AddSeedPhrase;

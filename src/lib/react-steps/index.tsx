@@ -12,6 +12,7 @@ import { useSearchParams } from "lib/use-search-params";
 export type AllSteps<T = string> = [T, () => ReactNode][];
 
 export type StepsContext = {
+  fallbackStep: string;
   stateRef: React.MutableRefObject<Record<string, any>>;
   navigateToStep: (stepId: string) => void;
 };
@@ -51,10 +52,11 @@ export const StepsProvider: FC<StepsProviderProps> = ({
 
   const value = useMemo(
     () => ({
+      fallbackStep: fallback,
       stateRef,
       navigateToStep,
     }),
-    [navigateToStep]
+    [fallback, navigateToStep]
   );
 
   return (

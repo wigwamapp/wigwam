@@ -17,9 +17,12 @@ import SetupPassword from "../blocks/walletSteps/SetupPassword";
 const STEPS: AllSteps<WalletStep> = [
   [WalletStep.ChooseLanguage, () => <LanguageStep />],
   [WalletStep.ChooseAddAccountWay, () => <ChooseAddAccountWay />],
-  [WalletStep.CreateSeedPhrase, () => <AddSeedPhrase />],
-  [WalletStep.ImportSeedPhrase, () => <AddSeedPhrase importExisting />],
-  [WalletStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
+  [WalletStep.CreateSeedPhrase, () => <AddSeedPhrase initialSetup />],
+  [
+    WalletStep.ImportSeedPhrase,
+    () => <AddSeedPhrase initialSetup importExisting />,
+  ],
+  [WalletStep.VerifySeedPhrase, () => <VerifySeedPhrase initialSetup />],
   [WalletStep.AddHDAccount, () => <AddHDAccount />],
   [WalletStep.AddByPrivateKeyAccount, () => <AddByPrivateKeyAccount />],
   [WalletStep.AddLedgerAccount, () => <AddLedgerAccount />],

@@ -43,7 +43,11 @@ export const ROUTE_MAP = Router.createMap<RouterContext>([
     (_p, ctx) =>
       ctx.walletStatus === WalletStatus.Welcome ? <Welcome /> : <Main />,
   ],
-  ["/setup", () => <Setup />],
+  [
+    "/setup",
+    (_p, ctx) =>
+      ctx.walletStatus === WalletStatus.Welcome ? <Setup /> : Router.SKIP,
+  ],
   [
     "*",
     (_p, ctx) =>

@@ -16,10 +16,11 @@ import { toPlainAccountParams } from "./helpers";
 
 const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
 
-export async function createAccounts(accounts: AddAccountParams[]) {
-  const addresses = await addAccounts(accounts);
-
-  await Repo.accounts.bulkAdd(
+export function saveAccounts(
+  accounts: AddAccountParams[],
+  addresses: string[]
+) {
+  return Repo.accounts.bulkAdd(
     accounts.map((addParams, i) => ({
       ...toPlainAccountParams(addParams),
       address: addresses[i],
