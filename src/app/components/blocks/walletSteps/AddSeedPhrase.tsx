@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 
@@ -13,6 +13,7 @@ import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
 import { addSeedPhrase } from "core/client";
+import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -88,6 +89,9 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
       navigateToStep,
     ]);
 
+    const fieldRef = useRef<HTMLTextAreaElement>(null);
+    const { copy, copied } = useCopyToClipboard(fieldRef);
+
     return (
       <div className="my-16">
         <h1 className="mb-16 text-3xl text-white text-center">
@@ -105,8 +109,13 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
             {importExisting || seedPhraseText ? (
               <>
                 <div>
-                  <div className="text-white mb-2 text-lg">Seed Phrase</div>
+                  <div className="flex items-center text-white mb-2 text-lg">
+                    <span>Seed Phrase</span>
+                    <div className="flex-1" />
+                    <button onClick={copy}>{copied ? "Copied" : "Copy"}</button>
+                  </div>
                   <LongTextField
+                    ref={fieldRef}
                     value={seedPhraseText}
                     className="mb-16 w-96 h-36 resize-none"
                     onChange={(evt) => setSeedPhraseText(evt.target.value)}

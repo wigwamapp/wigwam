@@ -74,6 +74,12 @@ async function watchChanges(
               }
             }
 
+            chrome.extension
+              .getViews({ type: "popup" })
+              .forEach((popupWindow) => {
+                popupWindow.location.reload();
+              });
+
             if (activeTab) {
               chrome.tabs.reload(activeTab.id!);
             }

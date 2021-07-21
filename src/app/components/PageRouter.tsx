@@ -5,8 +5,8 @@ import { useQueriesSuspense, walletStatusQuery } from "app/queries";
 import { ROUTE_MAP, RouterContext } from "app/routeMap";
 
 const PageRouter: FC = () => {
-  const { trigger, pathname } = useLocation();
   const [walletStatus] = useQueriesSuspense([walletStatusQuery]);
+  const { trigger, pathname } = useLocation();
 
   const ctx = useMemo<RouterContext>(() => ({ walletStatus }), [walletStatus]);
 
