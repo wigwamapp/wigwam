@@ -1,15 +1,3 @@
-import { QueryClient } from "react-query";
-import { dequal } from "dequal/lite";
-
-export const QUERY_CLIENT = new QueryClient({
-  defaultOptions: {
-    queries: {
-      isDataEqual: dequal,
-      staleTime: Infinity,
-    },
-  },
-});
-
 export const FONTS: [string, number[]][] = [["Inter", [300, 400, 600, 700]]];
 
 export const BSC_CHAIN_ID = 56;

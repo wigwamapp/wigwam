@@ -3,10 +3,8 @@ import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 
 import classNamed from "lib/classnamed";
-import { useQueriesSuspense, walletStatusQuery } from "app/queries";
 import PageLayout from "app/components/layouts/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
-import { useStorageQuery } from "app/queries/storage";
 
 const Main: FC = () => (
   <PageLayout>
@@ -14,7 +12,7 @@ const Main: FC = () => (
       <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
       <MyListbox />
-      <Kek />
+      {/* <Kek /> */}
       <NumberWrapper padding>
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
       </NumberWrapper>
@@ -34,15 +32,15 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
   dark:hover:bg-opacity-50
 `;
 
-const Kek: FC = () => {
-  const kekQuery = useStorageQuery<string>("kek");
+// const Kek: FC = () => {
+//   const kekQuery = useStorageQuery<string>("kek");
 
-  const [kek, walletStatus] = useQueriesSuspense([kekQuery, walletStatusQuery]);
+//   const [kek, walletStatus] = useQueriesSuspense([kekQuery, walletStatusQuery]);
 
-  return (
-    <div className="p-2">{JSON.stringify({ kek, walletStatus }, null, 2)}</div>
-  );
-};
+//   return (
+//     <div className="p-2">{JSON.stringify({ kek, walletStatus }, null, 2)}</div>
+//   );
+// };
 
 export default Main;
 

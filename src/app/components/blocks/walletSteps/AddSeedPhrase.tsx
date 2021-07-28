@@ -1,19 +1,20 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
-
+import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
 import { useSteps } from "lib/react-steps";
 import { getLocale } from "lib/ext/i18n/react";
 import { getRandomBytes } from "lib/encryptor";
+
 import { SeedPharse } from "core/types";
-import { toWordlistLang, validateSeedPhrase } from "core/helpers";
+import { toWordlistLang, validateSeedPhrase } from "core/common";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
+
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
-import { addSeedPhrase } from "core/client";
-import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
+import * as Actions from "app/actions";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -69,7 +70,7 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
         validateSeedPhrase(seedPhrase);
 
         if (!initialSetup && importExisting) {
-          await addSeedPhrase(seedPhrase);
+          await Actions.addSeedPhrase(seedPhrase);
         } else {
           stateRef.current.seedPhrase = seedPhrase;
         }

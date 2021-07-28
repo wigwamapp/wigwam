@@ -10,25 +10,8 @@ import {
   AddAccountParams,
   SeedPharse,
 } from "core/types";
-import * as Repo from "core/repo";
-
-import { toPlainAccountParams } from "./helpers";
 
 const porter = new PorterClient<Request, Response>(PorterChannel.Wallet);
-
-export function saveAccounts(
-  accounts: AddAccountParams[],
-  addresses: string[]
-) {
-  return Repo.accounts.bulkAdd(
-    accounts.map((addParams, i) => ({
-      ...toPlainAccountParams(addParams),
-      address: addresses[i],
-      name: addParams.name,
-      usdValues: {},
-    }))
-  );
-}
 
 export async function getWalletStatus() {
   const type = MessageType.GetWalletStatus;

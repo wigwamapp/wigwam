@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
-
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
+
 import {
   Request,
   Response,
@@ -9,6 +9,7 @@ import {
   PorterChannel,
   WalletStatus,
 } from "core/types";
+import { saveAccounts } from "core/common";
 
 import {
   $walletStatus,
@@ -54,6 +55,7 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
               accounts,
               seedPhrase
             );
+            await saveAccounts(accounts, accountAddresses);
             unlocked(vault);
             ctx.reply({ type, accountAddresses });
           })

@@ -1,14 +1,15 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
+import { useResource } from "lib/resax";
 
 import { useSteps } from "lib/react-steps";
-import { useQueriesSuspense, hasSeedPhraseQuery } from "app/queries";
+import { hasSeedPhraseRes } from "app/resources";
 import { WalletStep } from "app/defaults";
 
 const ChooseAddAccountWay = memo(() => {
-  const { navigateToStep } = useSteps();
+  const hasSeedPhrase = useResource(hasSeedPhraseRes);
 
-  const [hasSeedPhrase] = useQueriesSuspense([hasSeedPhraseQuery]);
+  const { navigateToStep } = useSteps();
   const sections = useMemo(() => getSections(hasSeedPhrase), [hasSeedPhrase]);
 
   return (

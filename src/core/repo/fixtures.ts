@@ -1,5 +1,5 @@
 import { DEFAULT_NETWORKS } from "fixtures/networks";
-import { formatURL } from "core/helpers";
+import { formatURL } from "core/common";
 
 import { db } from "./schema";
 import { networks } from "./helpers";

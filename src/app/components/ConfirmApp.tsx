@@ -1,8 +1,9 @@
 import { FC, useEffect } from "react";
 import { match } from "ts-pattern";
+import { useResource } from "lib/resax";
 
 import { WalletStatus } from "core/types";
-import { useQueriesSuspense, walletStatusQuery } from "app/queries";
+import { walletStatusRes } from "app/resources";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
@@ -17,7 +18,7 @@ const ConfirmApp: FC = () => (
 export default ConfirmApp;
 
 const ConfirmRouter: FC = () => {
-  const [walletStatus] = useQueriesSuspense([walletStatusQuery]);
+  const walletStatus = useResource(walletStatusRes);
 
   return match(walletStatus)
     .with(WalletStatus.Ready, () => <Confirm />)

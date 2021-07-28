@@ -1,7 +1,6 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/react-steps";
 
-import { addSeedPhrase } from "core/client";
 import {
   AddHDAccountParams,
   AccountSourceType,
@@ -12,6 +11,7 @@ import {
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
+import * as Actions from "app/actions";
 
 type VerifySeedPhraseProps = {
   initialSetup?: boolean;
@@ -38,7 +38,7 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
       }
 
       if (!initialSetup) {
-        await addSeedPhrase(seedPhrase);
+        await Actions.addSeedPhrase(seedPhrase);
         navigateToStep(WalletStep.AddHDAccount);
       } else {
         const addAccountParams: AddHDAccountParams = {

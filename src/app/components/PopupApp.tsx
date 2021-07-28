@@ -1,8 +1,9 @@
 import { FC, useEffect } from "react";
 import { match } from "ts-pattern";
+import { useResource } from "lib/resax";
 
 import { WalletStatus } from "core/types";
-import { useQueriesSuspense, walletStatusQuery } from "app/queries";
+import { walletStatusRes } from "app/resources";
 import { openInTab } from "app/helpers";
 
 import BaseProvider from "./BaseProvider";
@@ -18,7 +19,7 @@ const PopupApp: FC = () => (
 export default PopupApp;
 
 const PopupRouter: FC = () => {
-  const [walletStatus] = useQueriesSuspense([walletStatusQuery]);
+  const walletStatus = useResource(walletStatusRes);
 
   return match(walletStatus)
     .with(WalletStatus.Ready, () => <Popup />)

@@ -12,7 +12,7 @@ import {
   validateAccountExistence,
   validateAddAccountParams,
   validateSeedPhrase,
-} from "core/helpers";
+} from "core/common";
 
 import { MIGRATIONS, Data } from "./data";
 
