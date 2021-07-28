@@ -1,4 +1,4 @@
-import { validatePrivateKey, validatePublicKey } from "../helpers";
+import { validatePrivateKey, validatePublicKey } from "../common";
 
 describe("validatePrivateKey()", () => {
   it("validate", () => {

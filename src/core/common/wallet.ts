@@ -1,50 +1,11 @@
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
-import { match } from "ts-pattern";
-
 import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
-import * as Repo from "core/repo";
 
-import { SeedPharse, AddAccountParams, AccountType } from "./types";
+import { SeedPharse } from "core/types";
 
-export class PublicError extends Error {
-  name = "PublicError";
-}
-
-export async function withError<T>(
-  errMessage: string,
-  factory: (doThrow: () => void) => Promise<T>
-) {
-  try {
-    return await factory(() => {
-      throw new Error("<stub>");
-    });
-  } catch (err) {
-    throw err instanceof PublicError ? err : new PublicError(errMessage);
-  }
-}
-
-export async function validateAccountExistence(address: string) {
-  const acc = await Repo.accounts.get(address);
-  if (acc) {
-    throw new PublicError(t("accountAlreadyExists"));
-  }
-}
-
-export function validateAddAccountParams(params: AddAccountParams) {
-  match(params)
-    .with({ type: AccountType.HD }, (p) => {
-      validateDerivationPath(p.derivationPath);
-    })
-    .with({ type: AccountType.Imported }, (p) => {
-      validatePrivateKey(p.privateKey);
-    })
-    .with({ type: AccountType.External }, (p) => {
-      validatePublicKey(p.publicKey);
-    })
-    .run();
-}
+import { PublicError } from "./base";
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
   assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
@@ -96,12 +57,4 @@ export function validatePublicKey(pubKey: string) {
   } catch {
     throw new PublicError(t("invalidPublicKey"));
   }
-}
-
-export function toWordlistLang(localeCode: string) {
-  return localeCode.replace(/-/g, "_").toLowerCase();
-}
-
-export function formatURL(url: string) {
-  return url.endsWith("/") ? url : `${url}/`;
 }

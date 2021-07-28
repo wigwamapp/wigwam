@@ -2,8 +2,8 @@ import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/react-steps";
 
 import { AddAccountParams, SeedPharse } from "core/types";
-import { setupWallet, saveAccounts } from "core/client";
 
+import * as Actions from "app/actions";
 import TextField from "app/components/elements/TextField";
 import Button from "app/components/elements/Button";
 
@@ -29,8 +29,7 @@ const SetupPassword = memo(() => {
       if (!addAccountParams || !password) return;
 
       const accounts = [addAccountParams];
-      const addresses = await setupWallet(password, accounts, seedPhrase);
-      await saveAccounts(accounts, addresses);
+      await Actions.setupWallet(password, accounts, seedPhrase);
     } catch (err) {
       alert(err.message);
     }

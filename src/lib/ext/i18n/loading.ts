@@ -5,7 +5,7 @@ import { saveLocale } from "./saving";
 
 export const REFRESH_MSGTYPE = "I18N_REFRESH";
 
-const initPromise = init();
+export const initPromise = init();
 
 browser.runtime.onMessage.addListener((msg) => {
   if (msg?.type === REFRESH_MSGTYPE) {

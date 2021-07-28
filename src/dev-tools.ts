@@ -6,7 +6,7 @@ import * as i18n from "lib/ext/i18n";
 import * as enc from "lib/encryptor";
 import * as encStorage from "lib/enc-storage";
 
-import * as helpers from "core/helpers";
+import * as common from "core/common";
 import * as repo from "core/repo";
 import * as client from "core/client";
 
@@ -17,7 +17,7 @@ Object.assign(window, {
   i18n,
   enc,
   encStorage,
-  helpers,
+  common,
   repo,
   client,
 });

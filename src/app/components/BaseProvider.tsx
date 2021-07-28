@@ -1,39 +1,42 @@
-import { FC, Suspense } from "react";
+import { FC, Suspense, useEffect } from "react";
 import { LocationProvider } from "woozie";
-import { QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
+import { useResource } from "lib/resax";
 
-import { QUERY_CLIENT, FONTS } from "app/defaults";
+import { FONTS } from "app/defaults";
+import { fontsRes, i18nRes } from "app/resources";
 import ErrBond from "app/components/layouts/ErrBond";
-import {
-  SetImageBg,
-  AwaitFonts,
-  AwaitI18N,
-  UpdateWalletStatus,
-} from "app/components/daemons";
 
 const BaseProvider: FC = ({ children }) => (
   <>
     <SetImageBg />
 
     <LocationProvider>
-      <QueryClientProvider client={QUERY_CLIENT}>
-        <>
-          <ErrBond>
-            <Suspense fallback={null}>
-              <AwaitFonts fonts={FONTS} />
-              <AwaitI18N />
-              <UpdateWalletStatus />
+      <ErrBond>
+        <Suspense fallback={null}>
+          <BootResources />
 
-              {children}
-            </Suspense>
-          </ErrBond>
-
-          <ReactQueryDevtools />
-        </>
-      </QueryClientProvider>
+          {children}
+        </Suspense>
+      </ErrBond>
     </LocationProvider>
   </>
 );
 
 export default BaseProvider;
+
+const BootResources: FC = () => {
+  useResource(fontsRes(FONTS), i18nRes);
+
+  return null;
+};
+
+const SetImageBg: FC = () => {
+  useEffect(() => {
+    const t = setTimeout(() => {
+      document.documentElement.style.backgroundImage = "url(images/bg.jpeg)";
+    }, 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  return null;
+};
