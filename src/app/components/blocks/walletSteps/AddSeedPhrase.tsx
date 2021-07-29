@@ -76,7 +76,9 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
         }
 
         navigateToStep(
-          importExisting ? WalletStep.AddHDAccount : WalletStep.VerifySeedPhrase
+          importExisting
+            ? WalletStep.AddHDAccounts
+            : WalletStep.VerifySeedPhrase
         );
       } catch (err) {
         alert(err.message);

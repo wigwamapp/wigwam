@@ -18,6 +18,10 @@ export const setupWallet = withEffect(Client.setupWallet, () =>
   ])
 );
 
+export const addAccounts = withEffect(Client.addAccounts, () =>
+  Promise.all([allAccountsRes.refresh(), accountAddressRes.refresh()])
+);
+
 function withEffect<Args extends any[], Result>(
   factory: (...args: Args) => Promise<Result>,
   effect: (result: Result) => Promise<any> | void

@@ -1,4 +1,5 @@
 import { browser } from "webextension-polyfill-ts";
+import { ethers } from "ethers";
 
 import * as profile from "lib/ext/profile";
 import * as storage from "lib/ext/storage";
@@ -12,6 +13,7 @@ import * as client from "core/client";
 
 Object.assign(window, {
   browser,
+  ethers,
   profile,
   storage,
   i18n,

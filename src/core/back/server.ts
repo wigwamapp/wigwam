@@ -118,6 +118,16 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           ctx.reply({ type, publicKey });
         })
       )
+      .with(
+        { type: MessageType.GetNeuterExtendedKey },
+        ({ type, derivationPath }) =>
+          withVault(async (vault) => {
+            const extendedKey = await vault.fetchNeuterExtendedKey(
+              derivationPath
+            );
+            ctx.reply({ type, extendedKey });
+          })
+      )
       .run();
   } catch (err) {
     ctx.replyError(err);

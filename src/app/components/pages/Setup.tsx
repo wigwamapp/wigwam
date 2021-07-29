@@ -8,9 +8,9 @@ import LanguageStep from "../blocks/walletSteps/ChooseLanguage";
 import ChooseAddAccountWay from "../blocks/walletSteps/ChooseAddAccountWay";
 import AddSeedPhrase from "../blocks/walletSteps/AddSeedPhrase";
 import VerifySeedPhrase from "../blocks/walletSteps/VerifySeedPhrase";
-import AddHDAccount from "../blocks/walletSteps/AddHDAccount";
+import AddHDAccounts from "../blocks/walletSteps/AddHDAccounts";
 import AddByPrivateKeyAccount from "../blocks/walletSteps/AddByPrivateKeyAccount";
-import AddLedgerAccount from "../blocks/walletSteps/AddLedgerAccount";
+import AddLedgerAccounts from "../blocks/walletSteps/AddLedgerAccounts";
 import AddTorusAccount from "../blocks/walletSteps/AddTorusAccount";
 import SetupPassword from "../blocks/walletSteps/SetupPassword";
 
@@ -23,9 +23,9 @@ const STEPS: AllSteps<WalletStep> = [
     () => <AddSeedPhrase initialSetup importExisting />,
   ],
   [WalletStep.VerifySeedPhrase, () => <VerifySeedPhrase initialSetup />],
-  [WalletStep.AddHDAccount, () => <AddHDAccount />],
+  [WalletStep.AddHDAccounts, () => <AddHDAccounts initialSetup />],
   [WalletStep.AddByPrivateKeyAccount, () => <AddByPrivateKeyAccount />],
-  [WalletStep.AddLedgerAccount, () => <AddLedgerAccount />],
+  [WalletStep.AddLedgerAccounts, () => <AddLedgerAccounts />],
   [WalletStep.AddTorusAccount, () => <AddTorusAccount />],
   [WalletStep.SetupPassword, () => <SetupPassword />],
 ];

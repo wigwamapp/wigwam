@@ -12,6 +12,7 @@ import {
   validateAccountExistence,
   validateAddAccountParams,
   validateSeedPhrase,
+  toNeuterExtendedKey,
 } from "core/common";
 
 import { MIGRATIONS, Data } from "./data";
@@ -172,6 +173,22 @@ export class Vault {
         this.passwordKey
       )
     );
+  }
+
+  fetchNeuterExtendedKey(derivationPath: string) {
+    return withError(t("failedToFetchPublicKey"), async () => {
+      const seedPhraseExists = await Vault.hasSeedPhrase();
+      if (!seedPhraseExists) {
+        throw new PublicError(t("seedPhraseNotEstablished"));
+      }
+
+      const seedPhrase = await Storage.fetchAndDecryptOne<SeedPharse>(
+        Data.seedPhrase(),
+        this.passwordKey
+      );
+
+      return toNeuterExtendedKey(seedPhrase, derivationPath);
+    });
   }
 
   sign(accAddress: string, digest: string) {

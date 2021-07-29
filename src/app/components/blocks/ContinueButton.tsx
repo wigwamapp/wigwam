@@ -12,9 +12,9 @@ const ContinueButton = memo<ButtonHTMLAttributes<HTMLButtonElement>>(
           "inline-flex items-center",
           "text-3xl",
           "text-gray-100",
-          disabled && "opacity-75",
+          disabled && "opacity-50",
           "transition ease-in-out duration-300",
-          "animate-pulse hover:animate-none focus:animate-none",
+          !disabled && "animate-pulse hover:animate-none focus:animate-none",
           className
         )}
         {...rest}

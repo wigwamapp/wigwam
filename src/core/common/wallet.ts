@@ -7,6 +7,34 @@ import { SeedPharse } from "core/types";
 
 import { PublicError } from "./base";
 
+export function generatePreviewAddresses(
+  extendedKey: string,
+  offset = 0,
+  limit = 9
+) {
+  const root = ethers.utils.HDNode.fromExtendedKey(extendedKey);
+
+  const addresses: string[] = [];
+  for (let i = offset; i < offset + limit; i++) {
+    addresses.push(root.derivePath(i.toString()).address);
+  }
+
+  return addresses;
+}
+
+export function toNeuterExtendedKey(
+  seedPhrase: SeedPharse,
+  derivationPath: string
+) {
+  return ethers.utils.HDNode.fromMnemonic(
+    seedPhrase.phrase,
+    undefined,
+    wordlists[seedPhrase.lang]
+  )
+    .derivePath(derivationPath)
+    .neuter().extendedKey;
+}
+
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
   assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
   assert(

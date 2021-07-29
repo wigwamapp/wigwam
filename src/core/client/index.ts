@@ -130,3 +130,13 @@ export async function getPublicKey(accountAddress: string) {
   assert(res?.type === type);
   return res.publicKey;
 }
+
+export async function getNeuterExtendedKey(derivationPath: string) {
+  const type = MessageType.GetNeuterExtendedKey;
+  const res = await porter.request({
+    type,
+    derivationPath,
+  });
+  assert(res?.type === type);
+  return res.extendedKey;
+}

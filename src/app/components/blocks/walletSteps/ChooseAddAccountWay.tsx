@@ -34,8 +34,8 @@ const ChooseAddAccountWay = memo(() => {
           )}
 
           <div className={classNames("-mx-4", "flex flex-wrap items-stretch")}>
-            {section.tiles.map(({ toStep, title }) => (
-              <div key={toStep} className="p-4">
+            {section.tiles.map(({ toStep, title }, i) => (
+              <div key={`${toStep}_${i}`} className="p-4">
                 <button
                   className={classNames(
                     "p-4",
@@ -70,7 +70,7 @@ const getSections = (hasSeedPhrase: boolean) => [
     tiles: hasSeedPhrase
       ? [
           {
-            toStep: WalletStep.AddHDAccount,
+            toStep: WalletStep.AddHDAccounts,
             title: "Add wallet",
           },
         ]
@@ -91,7 +91,7 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        toStep: WalletStep.AddLedgerAccount,
+        toStep: WalletStep.AddLedgerAccounts,
         title: "Ledger",
       },
     ],
@@ -106,16 +106,25 @@ const getSections = (hasSeedPhrase: boolean) => [
     tiles: [
       {
         toStep: WalletStep.AddTorusAccount,
+        stepsState: {
+          socialProvider: "twitter",
+        },
         title: "Twitter",
       },
-      // {
-      //   toStep: WalletStep.AddTorusAccount,
-      //   title: "Google",
-      // },
-      // {
-      //   toStep: WalletStep.AddTorusAccount,
-      //   title: "Facebook",
-      // },
+      {
+        toStep: WalletStep.AddTorusAccount,
+        stepsState: {
+          socialProvider: "google",
+        },
+        title: "Google",
+      },
+      {
+        toStep: WalletStep.AddTorusAccount,
+        stepsState: {
+          socialProvider: "facebook",
+        },
+        title: "Facebook",
+      },
     ],
   },
   {

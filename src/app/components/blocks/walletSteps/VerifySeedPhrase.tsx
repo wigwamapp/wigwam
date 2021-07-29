@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/react-steps";
+import { ethers } from "ethers";
 
 import {
   AddHDAccountParams,
@@ -39,16 +40,18 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
 
       if (!initialSetup) {
         await Actions.addSeedPhrase(seedPhrase);
-        navigateToStep(WalletStep.AddHDAccount);
+        navigateToStep(WalletStep.AddHDAccounts);
       } else {
-        const addAccountParams: AddHDAccountParams = {
-          type: AccountType.HD,
-          sourceType: AccountSourceType.SeedPhrase,
-          name: "{{wallet}} 1",
-          derivationPath: "m/44'/60'/0'/0",
-        };
+        const addAccountsParams: AddHDAccountParams[] = [
+          {
+            type: AccountType.HD,
+            sourceType: AccountSourceType.SeedPhrase,
+            name: "{{wallet}} 1",
+            derivationPath: ethers.utils.defaultPath,
+          },
+        ];
 
-        Object.assign(stateRef.current, { addAccountParams });
+        Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(WalletStep.SetupPassword);
       }
     } catch (err) {

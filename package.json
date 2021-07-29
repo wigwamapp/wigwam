@@ -17,6 +17,7 @@
     "npm-audit": "npx synp --source-file yarn.lock && npm audit --production; rm package-lock.json"
   },
   "dependencies": {
+    "@0xsequence/multicall": "0.25.1",
     "@dicebear/avatars": "4.6.9",
     "@dicebear/avatars-avataaars-sprites": "4.6.9",
     "@dicebear/avatars-jdenticon-sprites": "4.6.9",

@@ -1,9 +1,10 @@
-import { resource } from "lib/resax";
+import { resource, resourceFactory } from "lib/resax";
 
 import {
   getWalletStatus,
   isWalletHasSeedPhrase,
   onWalletStatusUpdated,
+  getNeuterExtendedKey,
 } from "core/client";
 
 export const walletStatusRes = resource(getWalletStatus, {
@@ -13,3 +14,5 @@ export const walletStatusRes = resource(getWalletStatus, {
 });
 
 export const hasSeedPhraseRes = resource(isWalletHasSeedPhrase);
+
+export const neuterExtendedKeyRes = resourceFactory(getNeuterExtendedKey);

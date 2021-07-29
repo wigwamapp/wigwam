@@ -13,9 +13,9 @@ export enum WalletStep {
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
-  AddHDAccount = "add-hd-account",
+  AddHDAccounts = "add-hd-accounts",
   AddByPrivateKeyAccount = "add-by-private-key-account",
-  AddLedgerAccount = "add-ledger-account",
+  AddLedgerAccounts = "add-ledger-accounts",
   AddTorusAccount = "add-torus-account",
   SetupPassword = "setup-password",
 }

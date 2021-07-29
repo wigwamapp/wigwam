@@ -12,7 +12,8 @@ export type Request =
   | DeleteAccountsRequest
   | GetSeedPhraseRequest
   | GetPrivateKeyRequest
-  | GetPublicKeyRequest;
+  | GetPublicKeyRequest
+  | GetNeuterExtendedKeyRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -25,7 +26,8 @@ export type Response =
   | DeleteAccountsResponse
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse
-  | GetPublicKeyResponse;
+  | GetPublicKeyResponse
+  | GetNeuterExtendedKeyResponse;
 
 export type EventMessage = WalletStatusUpdated;
 
@@ -42,6 +44,7 @@ export enum MessageType {
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
+  GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
 }
 
 export interface MessageBase {
@@ -158,4 +161,14 @@ export interface GetPublicKeyRequest extends MessageBase {
 export interface GetPublicKeyResponse extends MessageBase {
   type: MessageType.GetPublicKey;
   publicKey: string;
+}
+
+export interface GetNeuterExtendedKeyRequest extends MessageBase {
+  type: MessageType.GetNeuterExtendedKey;
+  derivationPath: string;
+}
+
+export interface GetNeuterExtendedKeyResponse extends MessageBase {
+  type: MessageType.GetNeuterExtendedKey;
+  extendedKey: string;
 }

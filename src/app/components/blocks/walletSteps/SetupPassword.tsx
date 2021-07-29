@@ -10,15 +10,15 @@ import Button from "app/components/elements/Button";
 const SetupPassword = memo(() => {
   const { stateRef, fallbackStep, navigateToStep } = useSteps();
 
-  const addAccountParams: AddAccountParams | undefined =
-    stateRef.current.addAccountParams;
+  const addAccountsParams: AddAccountParams[] | undefined =
+    stateRef.current.addAccountsParams;
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
 
   useEffect(() => {
-    if (!addAccountParams) {
+    if (!addAccountsParams) {
       navigateToStep(fallbackStep);
     }
-  }, [addAccountParams, navigateToStep, fallbackStep]);
+  }, [addAccountsParams, navigateToStep, fallbackStep]);
 
   const passwordFieldRef = useRef<HTMLInputElement>(null);
 
@@ -26,16 +26,15 @@ const SetupPassword = memo(() => {
     try {
       const password = passwordFieldRef.current?.value;
 
-      if (!addAccountParams || !password) return;
+      if (!addAccountsParams || !password) return;
 
-      const accounts = [addAccountParams];
-      await Actions.setupWallet(password, accounts, seedPhrase);
+      await Actions.setupWallet(password, addAccountsParams, seedPhrase);
     } catch (err) {
       alert(err.message);
     }
-  }, [addAccountParams, seedPhrase]);
+  }, [addAccountsParams, seedPhrase]);
 
-  if (!addAccountParams) {
+  if (!addAccountsParams) {
     return null;
   }
 
