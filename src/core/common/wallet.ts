@@ -7,19 +7,19 @@ import { SeedPharse } from "core/types";
 
 import { PublicError } from "./base";
 
-export function generatePreviewAddresses(
+export function generatePreviewHDNodes(
   extendedKey: string,
   offset = 0,
   limit = 9
 ) {
   const root = ethers.utils.HDNode.fromExtendedKey(extendedKey);
 
-  const addresses: string[] = [];
+  const nodes: ethers.utils.HDNode[] = [];
   for (let i = offset; i < offset + limit; i++) {
-    addresses.push(root.derivePath(i.toString()).address);
+    nodes.push(root.derivePath(i.toString()));
   }
 
-  return addresses;
+  return nodes;
 }
 
 export function toNeuterExtendedKey(

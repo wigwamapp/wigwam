@@ -21,7 +21,7 @@ import {
   AccountType,
   AccountSourceType,
 } from "core/types";
-import { toNeuterExtendedKey, generatePreviewAddresses } from "core/common";
+import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
 import { INetwork } from "core/repo";
 
 import { hasSeedPhraseRes, neuterExtendedKeyRes } from "app/resources";
@@ -74,7 +74,11 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
 
   const addresses = useMemo(
     () =>
-      neuterExtendedKey ? generatePreviewAddresses(neuterExtendedKey) : null,
+      neuterExtendedKey
+        ? generatePreviewHDNodes(neuterExtendedKey).map(
+            ({ address }) => address
+          )
+        : null,
     [neuterExtendedKey]
   );
 
@@ -102,13 +106,13 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
     try {
       const addressesToAdd = Array.from(addressesToAddRef.current);
       const addAccountsParams: AddHDAccountParams[] = addressesToAdd.map(
-        (address) => {
-          const index = addresses!.findIndex((a) => a === address);
+        (address, i) => {
+          const hdIndex = addresses!.findIndex((a) => a === address);
           return {
             type: AccountType.HD,
             sourceType: AccountSourceType.SeedPhrase,
-            name: `{{wallet}} ${index + 1}`,
-            derivationPath: `${rootDerivationPath}/${index}`,
+            name: `{{wallet}} ${i + 1}`,
+            derivationPath: `${rootDerivationPath}/${hdIndex}`,
           };
         }
       );

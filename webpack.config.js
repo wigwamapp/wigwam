@@ -259,6 +259,7 @@ module.exports = {
 
     new webpack.ProvidePlugin({
       React: "react",
+      Buffer: ["buffer", "Buffer"],
     }),
 
     new MiniCssExtractPlugin({

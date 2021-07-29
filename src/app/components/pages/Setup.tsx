@@ -25,7 +25,7 @@ const STEPS: AllSteps<WalletStep> = [
   [WalletStep.VerifySeedPhrase, () => <VerifySeedPhrase initialSetup />],
   [WalletStep.AddHDAccounts, () => <AddHDAccounts initialSetup />],
   [WalletStep.AddByPrivateKeyAccount, () => <AddByPrivateKeyAccount />],
-  [WalletStep.AddLedgerAccounts, () => <AddLedgerAccounts />],
+  [WalletStep.AddLedgerAccounts, () => <AddLedgerAccounts initialSetup />],
   [WalletStep.AddTorusAccount, () => <AddTorusAccount />],
   [WalletStep.SetupPassword, () => <SetupPassword />],
 ];
