@@ -22,4 +22,11 @@ Object.assign(window, {
   common,
   repo,
   client,
+  reset,
 });
+
+async function reset() {
+  await browser.storage.local.clear();
+  await repo.clear();
+  browser.runtime.reload();
+}
