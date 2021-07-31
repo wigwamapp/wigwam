@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
 import { useResource } from "lib/resax";
 
@@ -28,7 +28,7 @@ const PopupRouter: FC = () => {
 };
 
 const OpenInTab: FC = () => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     openInTab();
   }, []);
 

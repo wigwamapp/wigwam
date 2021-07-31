@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
 import { useResource } from "lib/resax";
 
@@ -27,9 +27,6 @@ const ConfirmRouter: FC = () => {
 };
 
 const Close: FC = () => {
-  useEffect(() => {
-    window.close();
-  }, []);
-
+  useLayoutEffect(() => window.close(), []);
   return null;
 };
