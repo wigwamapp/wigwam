@@ -1,13 +1,13 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
-import { useResource } from "lib/resax";
-
+import { useAtomValue } from "jotai/utils";
 import { useSteps } from "lib/react-steps";
-import { hasSeedPhraseRes } from "app/resources";
+
+import { hasSeedPhraseAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";
 
 const ChooseAddAccountWay = memo(() => {
-  const hasSeedPhrase = useResource(hasSeedPhraseRes);
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
 
   const { navigateToStep } = useSteps();
   const sections = useMemo(() => getSections(hasSeedPhrase), [hasSeedPhrase]);

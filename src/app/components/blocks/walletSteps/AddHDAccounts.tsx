@@ -8,11 +8,10 @@ import {
   useRef,
 } from "react";
 import classNames from "clsx";
-import { useResource } from "lib/resax";
-import { useSteps } from "lib/react-steps";
 import useForceUpdate from "use-force-update";
 import { providers } from "@0xsequence/multicall";
 import { ethers, providers as ethersProviders } from "ethers";
+import { useSteps } from "lib/react-steps";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import {
@@ -24,9 +23,13 @@ import {
 import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
 import { INetwork } from "core/repo";
 
-import { hasSeedPhraseRes, neuterExtendedKeyRes } from "app/resources";
-import * as Actions from "app/actions";
+import {
+  hasSeedPhraseAtom,
+  neuterExtendedKeyAtomFamily,
+  useMaybeAtomValue,
+} from "app/atoms";
 import { WalletStep } from "app/defaults";
+import { useAddAccounts } from "app/hooks/wallet";
 import AccountPreview from "app/components/elements/AccountPreview";
 
 import ContinueButton from "../ContinueButton";
@@ -36,12 +39,13 @@ type AddHDAccountsProps = {
 };
 
 const rootDerivationPath = "m/44'/60'/0'/0";
-const rootNeuterExtendedKeyRes = neuterExtendedKeyRes(rootDerivationPath);
+const rootNeuterExtendedKeyAtom =
+  neuterExtendedKeyAtomFamily(rootDerivationPath);
 
 const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
-  const hasSeedPhrase = useResource(!initialSetup && hasSeedPhraseRes);
-  const existingNeuterExtendedKey = useResource(
-    hasSeedPhrase && rootNeuterExtendedKeyRes
+  const hasSeedPhrase = useMaybeAtomValue(!initialSetup && hasSeedPhraseAtom);
+  const existingNeuterExtendedKey = useMaybeAtomValue(
+    hasSeedPhrase && rootNeuterExtendedKeyAtom
   );
 
   const { stateRef, fallbackStep, navigateToStep } = useSteps();
@@ -61,8 +65,6 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
       navigateToStep(fallbackStep);
     }
   }, [neuterExtendedKey, navigateToStep, fallbackStep]);
-
-  useEffect(() => () => neuterExtendedKeyRes.clear(), []);
 
   const [network] = useState(INITIAL_NETWORK);
   const provider = useMemo(() => {
@@ -100,6 +102,8 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
 
   const canContinue = addressesToAddRef.current.size > 0;
 
+  const addAccounts = useAddAccounts();
+
   const handleContinue = useCallback(async () => {
     if (!canContinue) return;
 
@@ -121,12 +125,19 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
         Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(WalletStep.SetupPassword);
       } else {
-        await Actions.addAccounts(addAccountsParams);
+        await addAccounts(addAccountsParams);
       }
     } catch (err) {
       console.error(err);
     }
-  }, [canContinue, addresses, initialSetup, navigateToStep, stateRef]);
+  }, [
+    canContinue,
+    addresses,
+    initialSetup,
+    navigateToStep,
+    stateRef,
+    addAccounts,
+  ]);
 
   if (!addresses) {
     return null;

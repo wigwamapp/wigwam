@@ -1,12 +1,15 @@
+import { atom } from "jotai";
+import { atomFamily } from "jotai/utils";
+import { dequal } from "dequal/lite";
 import FontFaceObserver from "fontfaceobserver";
-import { resource, resourceFactory } from "lib/resax";
 import { initPromise } from "lib/ext/i18n";
 
-export const fontsRes = resourceFactory(awaitFonts, {
-  preload: true,
-});
+export const fontsAtomFamily = atomFamily(
+  (fonts: Font[]) => atom(() => awaitFonts(fonts)),
+  dequal
+);
 
-export const i18nRes = resource(() => initPromise);
+export const i18nAtom = atom(() => initPromise);
 
 type Font = string | [string, number[]];
 

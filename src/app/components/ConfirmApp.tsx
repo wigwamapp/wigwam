@@ -1,9 +1,9 @@
 import { FC, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
-import { useResource } from "lib/resax";
+import { useAtomValue } from "jotai/utils";
 
 import { WalletStatus } from "core/types";
-import { walletStatusRes } from "app/resources";
+import { walletStatusAtom } from "app/atoms";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
@@ -18,7 +18,7 @@ const ConfirmApp: FC = () => (
 export default ConfirmApp;
 
 const ConfirmRouter: FC = () => {
-  const walletStatus = useResource(walletStatusRes);
+  const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
     .with(WalletStatus.Ready, () => <Confirm />)

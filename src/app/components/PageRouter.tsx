@@ -1,12 +1,12 @@
 import { FC, useMemo, useLayoutEffect } from "react";
 import { Router, useLocation, HistoryAction } from "woozie";
-import { useResource } from "lib/resax";
+import { useAtomValue } from "jotai/utils";
 
-import { walletStatusRes } from "app/resources";
+import { walletStatusAtom } from "app/atoms";
 import { ROUTE_MAP, RouterContext } from "app/routeMap";
 
 const PageRouter: FC = () => {
-  const walletStatus = useResource(walletStatusRes);
+  const walletStatus = useAtomValue(walletStatusAtom);
   const { trigger, pathname } = useLocation();
 
   const ctx = useMemo<RouterContext>(() => ({ walletStatus }), [walletStatus]);

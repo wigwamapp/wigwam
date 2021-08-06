@@ -26,8 +26,8 @@ import {
 import { generatePreviewHDNodes } from "core/common";
 import { INetwork } from "core/repo";
 
-import * as Actions from "app/actions";
 import { WalletStep } from "app/defaults";
+import { useAddAccounts } from "app/hooks/wallet";
 import AccountPreview from "app/components/elements/AccountPreview";
 
 import ContinueButton from "../ContinueButton";
@@ -107,6 +107,8 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
 
   const canContinue = addressesToAddRef.current.size > 0;
 
+  const addAccounts = useAddAccounts();
+
   const handleContinue = useCallback(async () => {
     if (!canContinue) return;
 
@@ -129,12 +131,19 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
         Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(WalletStep.SetupPassword);
       } else {
-        await Actions.addAccounts(addAccountsParams);
+        await addAccounts(addAccountsParams);
       }
     } catch (err) {
       console.error(err);
     }
-  }, [canContinue, accounts, initialSetup, navigateToStep, stateRef]);
+  }, [
+    canContinue,
+    accounts,
+    initialSetup,
+    navigateToStep,
+    stateRef,
+    addAccounts,
+  ]);
 
   return (
     <div className="flex flex-col items-center justify-center">

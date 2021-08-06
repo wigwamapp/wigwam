@@ -1,9 +1,10 @@
 import { FC, Suspense, useEffect } from "react";
 import { LocationProvider } from "woozie";
-import { useResource } from "lib/resax";
+import { Provider as JotaiProvider, atom } from "jotai";
+import { useAtomValue, waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
-import { fontsRes, i18nRes } from "app/resources";
+import { fontsAtomFamily, i18nAtom } from "app/atoms";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
@@ -12,11 +13,13 @@ const BaseProvider: FC = ({ children }) => (
 
     <LocationProvider>
       <ErrBond>
-        <Suspense fallback={null}>
-          <BootResources />
+        <JotaiProvider>
+          <Suspense fallback={null}>
+            <Boot />
 
-          {children}
-        </Suspense>
+            {children}
+          </Suspense>
+        </JotaiProvider>
       </ErrBond>
     </LocationProvider>
   </>
@@ -24,9 +27,10 @@ const BaseProvider: FC = ({ children }) => (
 
 export default BaseProvider;
 
-const BootResources: FC = () => {
-  useResource(fontsRes(FONTS), i18nRes);
+const bootAtom = atom(() => waitForAll([fontsAtomFamily(FONTS), i18nAtom]));
 
+const Boot: FC = () => {
+  useAtomValue(bootAtom);
   return null;
 };
 

@@ -1,9 +1,9 @@
 import { FC, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
-import { useResource } from "lib/resax";
+import { useAtomValue } from "jotai/utils";
 
 import { WalletStatus } from "core/types";
-import { walletStatusRes } from "app/resources";
+import { walletStatusAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
 
 import BaseProvider from "./BaseProvider";
@@ -19,7 +19,7 @@ const PopupApp: FC = () => (
 export default PopupApp;
 
 const PopupRouter: FC = () => {
-  const walletStatus = useResource(walletStatusRes);
+  const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
     .with(WalletStatus.Ready, () => <Popup />)

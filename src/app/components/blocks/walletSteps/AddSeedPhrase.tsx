@@ -8,13 +8,13 @@ import { getRandomBytes } from "lib/encryptor";
 
 import { SeedPharse } from "core/types";
 import { toWordlistLang, validateSeedPhrase } from "core/common";
+import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
-import * as Actions from "app/actions";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -70,7 +70,7 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
         validateSeedPhrase(seedPhrase);
 
         if (!initialSetup && importExisting) {
-          await Actions.addSeedPhrase(seedPhrase);
+          await addSeedPhrase(seedPhrase);
         } else {
           stateRef.current.seedPhrase = seedPhrase;
         }

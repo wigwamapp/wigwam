@@ -8,11 +8,11 @@ import {
   AccountType,
   SeedPharse,
 } from "core/types";
+import { addSeedPhrase } from "core/client";
 
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { WalletStep } from "app/defaults";
-import * as Actions from "app/actions";
 
 type VerifySeedPhraseProps = {
   initialSetup?: boolean;
@@ -39,7 +39,7 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
       }
 
       if (!initialSetup) {
-        await Actions.addSeedPhrase(seedPhrase);
+        await addSeedPhrase(seedPhrase);
         navigateToStep(WalletStep.AddHDAccounts);
       } else {
         const addAccountsParams: AddHDAccountParams[] = [
