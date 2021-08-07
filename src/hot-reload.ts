@@ -155,18 +155,29 @@ function getBackgroundScripts() {
 
 function getContentScripts() {
   const manifest = chrome.runtime.getManifest();
-  const scripts = manifest.web_accessible_resources ?? [];
+  const scriptSet = new Set<string>();
+
+  if (manifest.web_accessible_resources) {
+    for (const resource of manifest.web_accessible_resources) {
+      if (typeof resource === "string") {
+        scriptSet.add(resource);
+      } else {
+        resource.resources.forEach((r) => scriptSet.add(r));
+      }
+    }
+  }
+
   if (manifest.content_scripts) {
     for (const contentScript of manifest.content_scripts) {
       if (contentScript.js) {
         for (const s of contentScript.js) {
-          scripts.push(s);
+          scriptSet.add(s);
         }
       }
     }
   }
 
-  return scripts;
+  return Array.from(scriptSet);
 }
 
 async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
