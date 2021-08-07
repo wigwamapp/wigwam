@@ -292,15 +292,18 @@ module.exports = {
           from: path.join(PUBLIC_PATH, "manifest.json"),
           to: path.join(OUTPUT_PATH, "manifest.json"),
           toType: "file",
-          transform: (content) => {
-            const json = JSON.parse(
-              processTemplate(content.toString("utf8"), {
-                pkg,
-                env: ENV_SLUG,
-              })
-            );
-            const manifest = transformManifestKeys(json, TARGET_BROWSER);
-            return JSON.stringify(manifest, null, 2);
+          transform: {
+            cache: true,
+            transformer: (content) => {
+              const json = JSON.parse(
+                processTemplate(content.toString("utf8"), {
+                  pkg,
+                  env: ENV_SLUG,
+                })
+              );
+              const manifest = transformManifestKeys(json, TARGET_BROWSER);
+              return JSON.stringify(manifest, null, 2);
+            },
           },
         },
         {
@@ -309,30 +312,33 @@ module.exports = {
             const name = path.parse(absoluteFilename).name.replace(/-/g, "_");
             return path.join(OUTPUT_PATH, `_locales/${name}/messages.json`);
           },
-          transform: (content) => {
-            const json = JSON.parse(content);
-            const extJson = Object.fromEntries(
-              Object.entries(json).map(([name, val]) => {
-                const keySet = new Set();
-                const message = val.replace(/{{(.*?)}}/g, (_, key) => {
-                  keySet.add(key);
-                  return `$${key}$`;
-                });
+          transform: {
+            cache: true,
+            transformer: (content) => {
+              const json = JSON.parse(content);
+              const extJson = Object.fromEntries(
+                Object.entries(json).map(([name, val]) => {
+                  const keySet = new Set();
+                  const message = val.replace(/{{(.*?)}}/g, (_, key) => {
+                    keySet.add(key);
+                    return `$${key}$`;
+                  });
 
-                const extVal = { message };
-                if (keySet.size > 0) {
-                  extVal.placeholders = Object.fromEntries(
-                    Array.from(keySet).map((key, i) => [
-                      key,
-                      { content: `$${i + 1}` },
-                    ])
-                  );
-                }
+                  const extVal = { message };
+                  if (keySet.size > 0) {
+                    extVal.placeholders = Object.fromEntries(
+                      Array.from(keySet).map((key, i) => [
+                        key,
+                        { content: `$${i + 1}` },
+                      ])
+                    );
+                  }
 
-                return [name, extVal];
-              })
-            );
-            return JSON.stringify(extJson, null, 2);
+                  return [name, extVal];
+                })
+              );
+              return JSON.stringify(extJson, null, 2);
+            },
           },
         },
       ],

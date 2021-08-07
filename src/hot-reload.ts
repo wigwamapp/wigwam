@@ -5,16 +5,19 @@ type FileEntity = {
   file: File;
   insideBackground: boolean;
   insideContent: boolean;
+  locale: boolean;
 };
 
 type ChecksumSnapshot = {
   common: string;
   background: string;
   content: string;
+  locales: string;
+  manifest: string;
 };
 
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
-const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
+const SLOW_DOWN_AFTER = 10 * 60_000; // 10 min
 
 const backgroundScripts = getBackgroundScripts();
 const contentScripts = getContentScripts();
@@ -24,12 +27,15 @@ chrome.management.getSelf((self) => {
     chrome.runtime.getPackageDirectoryEntry(watchChanges);
 
     // NB: see https://github.com/xpl/crx-hotreload/issues/5
-    if (localStorage.getItem(RELOAD_TAB_FLAG)) {
+    const reloadTabURL = localStorage.getItem(RELOAD_TAB_FLAG);
+    if (reloadTabURL) {
       localStorage.removeItem(RELOAD_TAB_FLAG);
 
-      getActiveTab().then((tab) => {
-        if (tab) {
-          chrome.tabs.reload(tab.id!);
+      queryTabs({ url: reloadTabURL }).then((tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.reload(tabs[0].id!);
+        } else {
+          chrome.tabs.create({ url: reloadTabURL, active: true });
         }
       });
     }
@@ -47,52 +53,61 @@ async function watchChanges(
     common: toChecksum(entities),
     background: toChecksum(entities.filter((e) => e.insideBackground)),
     content: toChecksum(entities.filter((e) => e.insideContent)),
+    locales: toChecksum(entities.filter((e) => e.locale)),
+    manifest: toChecksum(
+      entities.filter((e) => e.file.name === "manifest.json")
+    ),
   };
 
   if (lastChecksum && checksum.common !== lastChecksum.common) {
     try {
-      if (checksum.content !== lastChecksum.content) {
-        localStorage.setItem(RELOAD_TAB_FLAG, "true");
+      if (
+        checksum.content !== lastChecksum.content ||
+        checksum.locales !== lastChecksum.locales ||
+        checksum.manifest !== lastChecksum.manifest
+      ) {
+        const activeTab = await getActiveTab();
+        if (activeTab?.url)
+          localStorage.setItem(RELOAD_TAB_FLAG, activeTab.url);
+
         chrome.runtime.reload();
       } else {
+        let reloadSelf = false;
         let activeTab: chrome.tabs.Tab | undefined;
 
         if (checksum.background !== lastChecksum.background) {
-          // Reload background script
-          location.reload();
+          reloadSelf = true;
           activeTab = await getActiveTab();
         }
 
-        chrome.tabs.query(
-          { url: `chrome-extension://${chrome.runtime.id}/**` },
-          (tabs) => {
-            if (tabs) {
-              for (const tab of tabs) {
-                if (!activeTab || tab.id !== activeTab.id) {
-                  chrome.tabs.reload(tab.id!);
-                }
-              }
-            }
+        const tabs = await queryTabs({
+          url: `chrome-extension://${chrome.runtime.id}/**`,
+        });
 
-            chrome.extension
-              .getViews({ type: "popup" })
-              .forEach((popupWindow) => {
-                popupWindow.location.reload();
-              });
-
-            if (activeTab) {
-              chrome.tabs.reload(activeTab.id!);
-            }
+        // Reload background script
+        if (reloadSelf) location.reload();
+        // Reload active tab
+        if (activeTab) chrome.tabs.reload(activeTab.id!);
+        // Reload other extension tab
+        for (const tab of tabs) {
+          if (!activeTab || tab.id !== activeTab.id) {
+            chrome.tabs.reload(tab.id!);
           }
-        );
+        }
+        // Reload popup
+        chrome.extension.getViews({ type: "popup" }).forEach((popupWindow) => {
+          popupWindow.location.reload();
+        });
       }
+    } catch (err) {
+      console.error(err);
     } finally {
       lastChangedAt = Date.now();
     }
   }
 
   const retryAfter =
-    Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 10_000 : 1_000;
+    Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 5_000 : 1_000;
   setTimeout(() => watchChanges(dir, checksum, lastChangedAt), retryAfter);
 }
 
@@ -112,7 +127,8 @@ function findFiles(dir: DirectoryEntry) {
                       backgroundScripts
                     );
                     const insideContent = isEntryInside(entry, contentScripts);
-                    res({ file, insideBackground, insideContent });
+                    const locale = /.*\_locales.*\.json/.test(entry.fullPath);
+                    res({ file, insideBackground, insideContent, locale });
                   })
                 )
           )
@@ -153,10 +169,16 @@ function getContentScripts() {
   return scripts;
 }
 
-function getActiveTab() {
-  return new Promise<chrome.tabs.Tab | undefined>((res) => {
-    chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-      res(tabs[0]);
-    });
+async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
+  const tabs = await queryTabs({
+    active: true,
+    lastFocusedWindow: true,
   });
+  return tabs[0];
+}
+
+function queryTabs(params: chrome.tabs.QueryInfo) {
+  return new Promise<chrome.tabs.Tab[]>((res) =>
+    chrome.tabs.query(params, res)
+  );
 }
