@@ -21,15 +21,15 @@ import {
   AccountSourceType,
 } from "core/types";
 import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
+import { addAccounts } from "core/client";
 import { INetwork } from "core/repo";
 
 import {
   hasSeedPhraseAtom,
-  neuterExtendedKeyAtomFamily,
+  getNeuterExtendedKeyAtom,
   useMaybeAtomValue,
 } from "app/atoms";
 import { WalletStep } from "app/defaults";
-import { useAddAccounts } from "app/hooks/wallet";
 import AccountPreview from "app/components/elements/AccountPreview";
 
 import ContinueButton from "../ContinueButton";
@@ -39,8 +39,7 @@ type AddHDAccountsProps = {
 };
 
 const rootDerivationPath = "m/44'/60'/0'/0";
-const rootNeuterExtendedKeyAtom =
-  neuterExtendedKeyAtomFamily(rootDerivationPath);
+const rootNeuterExtendedKeyAtom = getNeuterExtendedKeyAtom(rootDerivationPath);
 
 const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
   const hasSeedPhrase = useMaybeAtomValue(!initialSetup && hasSeedPhraseAtom);
@@ -102,8 +101,6 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
 
   const canContinue = addressesToAddRef.current.size > 0;
 
-  const addAccounts = useAddAccounts();
-
   const handleContinue = useCallback(async () => {
     if (!canContinue) return;
 
@@ -130,14 +127,7 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
     } catch (err) {
       console.error(err);
     }
-  }, [
-    canContinue,
-    addresses,
-    initialSetup,
-    navigateToStep,
-    stateRef,
-    addAccounts,
-  ]);
+  }, [canContinue, addresses, initialSetup, navigateToStep, stateRef]);
 
   if (!addresses) {
     return null;
@@ -188,10 +178,16 @@ const Account = memo<AccountProps>(({ address, provider, network }) => {
   const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+
     provider
       .getBalance(address)
-      .then((b) => setBalance(b))
+      .then((b) => mounted && setBalance(b))
       .catch(console.error);
+
+    return () => {
+      mounted = false;
+    };
   }, [provider, address, setBalance]);
 
   const baseAsset = useMemo(

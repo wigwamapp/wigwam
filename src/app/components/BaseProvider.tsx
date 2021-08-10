@@ -4,7 +4,7 @@ import { Provider as JotaiProvider, atom } from "jotai";
 import { useAtomValue, waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
-import { fontsAtomFamily, i18nAtom } from "app/atoms";
+import { fontsAtom, i18nAtom } from "app/atoms";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
@@ -27,7 +27,7 @@ const BaseProvider: FC = ({ children }) => (
 
 export default BaseProvider;
 
-const bootAtom = atom(() => waitForAll([fontsAtomFamily(FONTS), i18nAtom]));
+const bootAtom = atom(() => waitForAll([fontsAtom(FONTS), i18nAtom]));
 
 const Boot: FC = () => {
   useAtomValue(bootAtom);

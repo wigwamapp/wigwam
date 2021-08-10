@@ -1,49 +1,43 @@
+import { atom } from "jotai";
 import { atomFamily } from "jotai/utils";
 import { assert } from "lib/system/assert";
 
 import * as Repo from "core/repo";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
-import {
-  atomWithGetStorage,
-  atomWithSetStorage,
-  atomWithAutoReset,
-} from "./utils";
+import { atomWithStorage, atomWithRepoQuery } from "./utils";
 
-export const getChainIdAtom = atomWithGetStorage<number>(
+export const chainIdAtom = atomWithStorage<number>(
   "chain_id",
   INITIAL_NETWORK.chainId
 );
 
-export const setChainIdAtom = atomWithSetStorage<number>("chain_id");
-
-export const getAccountAddressAtom = atomWithGetStorage<string>(
+export const accountAddressAtom = atomWithStorage<string>(
   "account_address",
   fetchDefaultAccountAddress
 );
 
-export const setAcountAddressAtom =
-  atomWithSetStorage<string>("account_address");
-
-export const allAccountsAtom = atomWithAutoReset(() => Repo.accounts.toArray());
+export const getAllAccountsAtom = atomWithRepoQuery(() =>
+  Repo.accounts.toArray()
+);
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
-  atomWithAutoReset(() => Repo.networks.get(chainId))
+  atomWithRepoQuery(() => Repo.networks.get(chainId))
 );
 
 export const getAccountAtom = atomFamily((address: string) =>
-  atomWithAutoReset(() => Repo.accounts.get(address))
+  atomWithRepoQuery(() => Repo.accounts.get(address))
 );
 
-export const getCurrentNetworkAtom = atomWithAutoReset((get) => {
-  const chainId = get(getChainIdAtom);
+export const getCurrentNetworkAtom = atom((get) => {
+  const chainId = get(chainIdAtom);
   const network = get(getNetworkAtom(chainId));
   assert(network);
   return network;
 });
 
-export const getCurrentAccountAtom = atomWithAutoReset<Repo.IAccount>((get) => {
-  const address = get(getAccountAddressAtom);
+export const getCurrentAccountAtom = atom<Repo.IAccount>((get) => {
+  const address = get(accountAddressAtom);
   const account = get(getAccountAtom(address));
   assert(account);
   return account;

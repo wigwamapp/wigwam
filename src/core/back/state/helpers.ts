@@ -19,7 +19,6 @@ export async function withStatus<T>(
   factory: () => T
 ) {
   const state = $walletStatus.getState();
-  console.info(state, status);
   assert(
     Array.isArray(status) ? status.includes(state) : state === status,
     t("notAllowed")

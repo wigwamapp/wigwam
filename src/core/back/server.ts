@@ -55,6 +55,7 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
               accounts,
               seedPhrase
             );
+
             await saveAccounts(accounts, accountAddresses);
             unlocked(vault);
             ctx.reply({ type, accountAddresses });

@@ -4,7 +4,7 @@ import { dequal } from "dequal/lite";
 import FontFaceObserver from "fontfaceobserver";
 import { initPromise } from "lib/ext/i18n";
 
-export const fontsAtomFamily = atomFamily(
+export const fontsAtom = atomFamily(
   (fonts: Font[]) => atom(() => awaitFonts(fonts)),
   dequal
 );

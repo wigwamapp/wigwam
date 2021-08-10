@@ -32,16 +32,6 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
   dark:hover:bg-opacity-50
 `;
 
-// const Kek: FC = () => {
-//   const kekQuery = useStorageQuery<string>("kek");
-
-//   const [kek, walletStatus] = useQueriesSuspense([kekQuery, walletStatusQuery]);
-
-//   return (
-//     <div className="p-2">{JSON.stringify({ kek, walletStatus }, null, 2)}</div>
-//   );
-// };
-
 export default Main;
 
 const people = [

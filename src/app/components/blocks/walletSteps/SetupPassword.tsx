@@ -2,8 +2,8 @@ import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/react-steps";
 
 import { AddAccountParams, SeedPharse } from "core/types";
+import { setupWallet } from "core/client";
 
-import { useSetupWallet } from "app/hooks/wallet";
 import TextField from "app/components/elements/TextField";
 import Button from "app/components/elements/Button";
 
@@ -22,8 +22,6 @@ const SetupPassword = memo(() => {
 
   const passwordFieldRef = useRef<HTMLInputElement>(null);
 
-  const setupWallet = useSetupWallet();
-
   const handleFinish = useCallback(async () => {
     try {
       const password = passwordFieldRef.current?.value;
@@ -34,7 +32,7 @@ const SetupPassword = memo(() => {
     } catch (err) {
       alert(err.message);
     }
-  }, [addAccountsParams, seedPhrase, setupWallet]);
+  }, [addAccountsParams, seedPhrase]);
 
   if (!addAccountsParams) {
     return null;

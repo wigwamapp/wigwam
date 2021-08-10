@@ -1,51 +1,60 @@
 import { atom, SetStateAction } from "jotai";
-import { atomWithDefault, RESET } from "jotai/utils";
 import * as Storage from "lib/ext/storage";
 
-export function atomWithGetStorage<T = any>(
+export function atomWithStorage<T = any>(
   key: string,
   fallback: T | (() => T) | (() => Promise<T>)
 ) {
-  const anAtom = atomWithDefault(async (): Promise<T> => {
+  const fetchData = async (): Promise<T> => {
     try {
       return await Storage.fetch<T>(key);
     } catch {
       return typeof fallback === "function" ? (fallback as any)() : fallback;
     }
-  });
-
-  anAtom.onMount = (setAtom) => {
-    const unsub = Storage.subscribe<T>(key, ({ newValue }) => {
-      if (typeof newValue === "undefined") {
-        if (typeof fallback === "function") {
-          const val = (fallback as any)();
-          val instanceof Promise ? val.then(setAtom) : setAtom(val);
-        } else {
-          setAtom(fallback);
-        }
-      } else {
-        setAtom(newValue);
-      }
-    });
-
-    return () => {
-      unsub();
-      setAtom((v) => v);
-      setAtom(RESET);
-    };
   };
 
-  return anAtom;
-}
+  const storageResutAtom = atom(() => {
+    const initialPromise = fetchData();
+    const dataAtom = atom<T | Promise<T>>(initialPromise);
 
-export function atomWithSetStorage<T>(key: string) {
-  return atom(null, (_get, _set, update: SetStateAction<T>) => {
-    (async () => {
+    let alreadyMounted = false;
+
+    dataAtom.onMount = (setAtom) => {
+      if (alreadyMounted) {
+        fetchData()
+          .then(setAtom)
+          .catch((err) => setAtom(Promise.reject(err)));
+      }
+
+      alreadyMounted = true;
+
+      return Storage.subscribe<T>(key, ({ newValue }) => {
+        if (typeof newValue === "undefined") {
+          if (typeof fallback === "function") {
+            const val = (fallback as any)();
+            val instanceof Promise ? val.then(setAtom) : setAtom(val);
+          } else {
+            setAtom(fallback);
+          }
+        } else {
+          setAtom(newValue);
+        }
+      });
+    };
+
+    return dataAtom;
+  });
+
+  const storageAtom = atom(
+    (get) => get(get(storageResutAtom)),
+    (get, _set, update: SetStateAction<T>) => {
       const newValue =
         typeof update === "function"
-          ? (update as (prev?: T) => T)(await Storage.fetchForce<T>(key))
+          ? (update as (prev: T) => T)(get(storageAtom))
           : update;
       Storage.put(key, newValue);
-    })();
-  });
+    }
+  );
+
+  return storageAtom;
 }
