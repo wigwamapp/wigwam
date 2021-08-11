@@ -1,27 +1,32 @@
 import { FC, useMemo, useLayoutEffect } from "react";
-import { Router, useLocation, HistoryAction } from "woozie";
 import { useAtomValue } from "jotai/utils";
+import {
+  getLastAction,
+  HistoryAction,
+  resetHistoryPosition,
+} from "lib/history";
 
-import { walletStatusAtom } from "app/atoms";
-import { ROUTE_MAP, RouterContext } from "app/routeMap";
+import { walletStatusAtom, pageAtom } from "app/atoms";
+import { matchPage } from "app/pageRoutes";
+import { Page } from "app/defaults";
 
 const PageRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
-  const { trigger, pathname } = useLocation();
-
-  const ctx = useMemo<RouterContext>(() => ({ walletStatus }), [walletStatus]);
+  const page = useAtomValue(pageAtom);
 
   // Scroll to top after new location pushed.
+  const lastHistoryAction = getLastAction();
   useLayoutEffect(() => {
-    if (trigger === HistoryAction.Push) {
+    if (lastHistoryAction === HistoryAction.Push) {
       window.scrollTo(0, 0);
     }
-  }, [trigger, pathname]);
 
-  return useMemo(
-    () => Router.resolve(ROUTE_MAP, pathname, ctx),
-    [pathname, ctx]
-  );
+    if (page === Page.Default) {
+      resetHistoryPosition();
+    }
+  }, [page, lastHistoryAction]);
+
+  return useMemo(() => matchPage(page, walletStatus), [page, walletStatus]);
 };
 
 export default PageRouter;

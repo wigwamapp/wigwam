@@ -7,10 +7,13 @@ import {
   useCallback,
 } from "react";
 import classNames from "clsx";
-import { HistoryAction, useLocation, goBack, navigate } from "woozie";
+import { useAtom } from "jotai";
+import { goBack, getHistoryPosition } from "lib/history";
 import ArrowNarrowLeftIcon from "@heroicons/react/solid/ArrowNarrowLeftIcon";
-
 import { T } from "lib/ext/i18n/react";
+
+import { pageAtom } from "app/atoms";
+import { Page } from "app/defaults";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import ProfileNav from "app/components/blocks/ProfileNav";
 import Heading from "app/components/elements/Heading";
@@ -68,9 +71,10 @@ export default BoardingPageLayout;
 type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
-  const { historyPosition, pathname } = useLocation();
+  const [page, setPage] = useAtom(pageAtom);
+  const historyPosition = getHistoryPosition();
 
-  const inHome = pathname === "/";
+  const inHome = page === Page.Default;
   const canBack = historyPosition > 0 || !inHome;
 
   const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
@@ -88,11 +92,11 @@ const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
           break;
 
         case !inHome:
-          navigate("/", HistoryAction.Replace);
+          setPage([Page.Default, "replace"]);
           break;
       }
     },
-    [onClick, historyPosition, inHome]
+    [onClick, historyPosition, inHome, setPage]
   );
 
   return canBack ? (

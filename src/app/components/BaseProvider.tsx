@@ -1,5 +1,4 @@
 import { FC, Suspense, useEffect } from "react";
-import { LocationProvider } from "woozie";
 import { Provider as JotaiProvider, atom } from "jotai";
 import { useAtomValue, waitForAll } from "jotai/utils";
 
@@ -11,17 +10,15 @@ const BaseProvider: FC = ({ children }) => (
   <>
     <SetImageBg />
 
-    <LocationProvider>
-      <ErrBond>
-        <JotaiProvider>
-          <Suspense fallback={null}>
-            <Boot />
+    <ErrBond>
+      <JotaiProvider>
+        <Suspense fallback={null}>
+          <Boot />
 
-            {children}
-          </Suspense>
-        </JotaiProvider>
-      </ErrBond>
-    </LocationProvider>
+          {children}
+        </Suspense>
+      </JotaiProvider>
+    </ErrBond>
   </>
 );
 

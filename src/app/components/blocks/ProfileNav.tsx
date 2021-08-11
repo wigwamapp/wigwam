@@ -1,9 +1,10 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
-import { Link } from "woozie";
-
+import { Link } from "lib/navigation";
 import { TReplace } from "lib/ext/i18n/react";
 import { getProfileId, getAllProfiles } from "lib/ext/profile";
+
+import { Page } from "app/defaults";
 
 const ProfileNav = memo(() => {
   const currentProfileId = useMemo(() => getProfileId(), []);
@@ -16,7 +17,7 @@ const ProfileNav = memo(() => {
 
   return profilesLength > 1 ? (
     <Link
-      to="/profiles"
+      to={{ page: Page.Profiles }}
       className={classNames("inline-flex items-center justify-center p-6")}
     >
       <span className="text-xl text-white">

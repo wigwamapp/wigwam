@@ -1,9 +1,10 @@
 import { FC } from "react";
 import classNames from "clsx";
-import { Link } from "woozie";
 import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
-
+import { Link } from "lib/navigation";
 import { T } from "lib/ext/react";
+
+import { Page } from "app/defaults";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 
 const Welcome: FC = () => (
@@ -14,7 +15,7 @@ const Welcome: FC = () => (
       </h1>
 
       <Link
-        to="/setup"
+        to={{ page: Page.Setup }}
         className={classNames(
           "inline-flex items-center",
           "text-3xl",

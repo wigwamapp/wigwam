@@ -1,5 +1,12 @@
 export const FONTS: [string, number[]][] = [["Inter", [300, 400, 600, 700]]];
 
+export enum Page {
+  Default = "default",
+  Setup = "setup",
+  Profiles = "profiles",
+  Unlock = "unlock",
+}
+
 export enum WalletStep {
   ChooseLanguage = "choose-language",
   ChooseAddAccountWay = "choose-add-account-way",

@@ -52,8 +52,7 @@
     "ts-pattern": "3.2.4",
     "use-debounce": "7.0.0",
     "use-force-update": "1.0.7",
-    "webextension-polyfill-ts": "0.26.0",
-    "woozie": "1.0.0-beta.8"
+    "webextension-polyfill-ts": "0.26.0"
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
