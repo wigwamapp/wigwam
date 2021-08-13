@@ -7,9 +7,9 @@ export const $walletStatus = createStore(WalletStatus.Idle)
   .on(inited, (_s, vaultExists) =>
     vaultExists ? WalletStatus.Locked : WalletStatus.Welcome
   )
-  .on(unlocked, () => WalletStatus.Ready)
+  .on(unlocked, () => WalletStatus.Unlocked)
   .on(locked, (state) =>
-    state === WalletStatus.Ready ? WalletStatus.Locked : state
+    state === WalletStatus.Unlocked ? WalletStatus.Locked : state
   );
 
 export const $vault = createStore<Vault | null>(null)

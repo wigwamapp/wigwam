@@ -91,13 +91,13 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       .with(
         { type: MessageType.DeleteAccounts },
         ({ type, password, accountAddresses }) =>
-          withStatus(WalletStatus.Ready, async () => {
+          withStatus(WalletStatus.Unlocked, async () => {
             await Vault.deleteAccounts(password, accountAddresses);
             ctx.reply({ type });
           })
       )
       .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
-        withStatus(WalletStatus.Ready, async () => {
+        withStatus(WalletStatus.Unlocked, async () => {
           const seedPhrase = await Vault.fetchSeedPhrase(password);
           ctx.reply({ type, seedPhrase });
         })
@@ -105,7 +105,7 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       .with(
         { type: MessageType.GetPrivateKey },
         ({ type, password, accountAddress }) =>
-          withStatus(WalletStatus.Ready, async () => {
+          withStatus(WalletStatus.Unlocked, async () => {
             const privateKey = await Vault.fetchPrivateKey(
               password,
               accountAddress

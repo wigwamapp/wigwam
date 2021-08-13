@@ -22,7 +22,7 @@ const PopupRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
-    .with(WalletStatus.Ready, () => <Popup />)
+    .with(WalletStatus.Unlocked, () => <Popup />)
     .with(WalletStatus.Locked, () => <Unlock />)
     .otherwise(() => <OpenInTab />);
 };

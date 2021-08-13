@@ -33,7 +33,7 @@ export function matchPage(page: Page, walletStatus: WalletStatus) {
         <Setup />
       ))
       // Only ready below
-      .with({ walletStatus: not(WalletStatus.Ready) }, () => (
+      .with({ walletStatus: not(WalletStatus.Unlocked) }, () => (
         <Redirect to={{ page: Page.Default }} />
       ))
       .with({ page: Page.Default }, () => <Main />)

@@ -21,7 +21,7 @@ const ConfirmRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
-    .with(WalletStatus.Ready, () => <Confirm />)
+    .with(WalletStatus.Unlocked, () => <Confirm />)
     .with(WalletStatus.Locked, () => <Unlock />)
     .otherwise(() => <Close />);
 };

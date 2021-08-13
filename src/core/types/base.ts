@@ -2,7 +2,7 @@ export enum WalletStatus {
   Idle,
   Welcome,
   Locked,
-  Ready,
+  Unlocked,
 }
 
 export enum AccountType {
