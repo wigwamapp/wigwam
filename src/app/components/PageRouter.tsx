@@ -14,7 +14,7 @@ const PageRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const page = useAtomValue(pageAtom);
 
-  // Scroll to top after new location pushed.
+  // Scroll to top after new page pushed.
   const lastHistoryAction = getLastAction();
   useLayoutEffect(() => {
     if (lastHistoryAction === HistoryAction.Push) {

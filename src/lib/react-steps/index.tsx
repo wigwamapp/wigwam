@@ -6,9 +6,11 @@ import {
   useRef,
   useCallback,
   ReactNode,
+  useLayoutEffect,
 } from "react";
 import { useAtom } from "jotai";
 import { atomWithURLHash } from "lib/navigation";
+import { getLastAction, HistoryAction } from "lib/history";
 
 export type AllSteps<T = string> = [T, () => ReactNode][];
 
@@ -24,6 +26,7 @@ export type StepsProviderProps = {
   namespace: string;
   steps: AllSteps;
   fallback: string;
+  rootElement?: HTMLElement;
   children?: (props: { children: ReactNode; step: string }) => ReactNode;
 };
 
@@ -31,6 +34,7 @@ export const StepsProvider: FC<StepsProviderProps> = ({
   namespace,
   steps,
   fallback,
+  rootElement = window,
   children,
 }) => {
   const stepsAtom = useMemo(
@@ -39,6 +43,14 @@ export const StepsProvider: FC<StepsProviderProps> = ({
   );
 
   const [step, setStep] = useAtom(stepsAtom);
+
+  // Scroll to top after new step pushed.
+  const lastHistoryAction = getLastAction();
+  useLayoutEffect(() => {
+    if (lastHistoryAction === HistoryAction.Push) {
+      rootElement.scrollTo(0, 0);
+    }
+  }, [rootElement, step, lastHistoryAction]);
 
   const stepsObj = useMemo(() => Object.fromEntries(steps), [steps]);
   const stepNode = useMemo(() => {
