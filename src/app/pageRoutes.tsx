@@ -11,9 +11,15 @@ import Welcome from "./components/pages/Welcome";
 import Main from "./components/pages/Main";
 import Setup from "./components/pages/Setup";
 
-export function matchPage(page: Page, walletStatus: WalletStatus) {
+export type MatchPageParams = {
+  page: Page;
+  walletStatus: WalletStatus;
+  profileCount: number;
+};
+
+export function matchPage(params: MatchPageParams) {
   return (
-    match({ page, walletStatus })
+    match(params)
       .with({ walletStatus: WalletStatus.Idle }, () => null)
       .with(
         {
@@ -26,12 +32,21 @@ export function matchPage(page: Page, walletStatus: WalletStatus) {
       )
       // Unlcok when wallet locked
       .with({ walletStatus: WalletStatus.Locked }, () => <Unlock />)
-      .with({ page: Page.Default, walletStatus: WalletStatus.Welcome }, () => (
-        <Welcome />
-      ))
-      .with({ page: Page.Setup, walletStatus: WalletStatus.Welcome }, () => (
-        <Setup />
-      ))
+      .with(
+        {
+          page: Page.Default,
+          walletStatus: WalletStatus.Welcome,
+          profileCount: 1,
+        },
+        () => <Welcome />
+      )
+      .with(
+        {
+          page: when((p) => [Page.Default, Page.Setup].includes(p)),
+          walletStatus: WalletStatus.Welcome,
+        },
+        () => <Setup />
+      )
       // Only ready below
       .with({ walletStatus: not(WalletStatus.Unlocked) }, () => (
         <Redirect to={{ page: Page.Default }} />

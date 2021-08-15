@@ -1,17 +1,20 @@
-import { FC, useState } from "react";
+import { FC, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 
 import classNamed from "lib/classnamed";
+import { TReplace } from "lib/ext/react";
 import PageLayout from "app/components/layouts/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
+import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
+import { accountAddressAtom, getAllAccountsAtom } from "app/atoms";
 
 const Main: FC = () => (
   <PageLayout>
     <div className="py-8">
       <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
-      <MyListbox />
+      <AccountsSelect />
       {/* <Kek /> */}
       <NumberWrapper padding>
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
@@ -34,21 +37,24 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
 
 export default Main;
 
-const people = [
-  "Wade Cooper",
-  "Arlene Mccoy",
-  "Devon Webb",
-  "Tom Cook",
-  "Tanya Fox",
-  "Hellen Schmidt",
-  "Caroline Schultz",
-  "Mason Heaney",
-  "Claudie Smitham",
-  "Emil Schaefer",
-];
+const AccountsSelect: FC = () => {
+  const { allAccounts, accountAddress } = useAtomValue(
+    useMemo(
+      () =>
+        waitForAll({
+          allAccounts: getAllAccountsAtom,
+          accountAddress: accountAddressAtom,
+        }),
+      []
+    )
+  );
 
-const MyListbox: FC = () => {
-  const [selectedPerson, setSelectedPerson] = useState(people[0]);
+  const setAccountAddress = useUpdateAtom(accountAddressAtom);
+
+  const currentAccount = useMemo(
+    () => allAccounts.find((a) => a.address === accountAddress)!,
+    [allAccounts, accountAddress]
+  );
 
   return (
     <div className="py-12">
@@ -56,8 +62,8 @@ const MyListbox: FC = () => {
         <Listbox
           as="div"
           className="space-y-1"
-          value={selectedPerson}
-          onChange={setSelectedPerson}
+          value={currentAccount}
+          onChange={(acc) => setAccountAddress(acc.address)}
         >
           {({ open }) => (
             <>
@@ -67,7 +73,9 @@ const MyListbox: FC = () => {
               <div className="relative">
                 <span className="inline-block w-full rounded-md shadow-sm">
                   <Listbox.Button className="cursor-default relative w-full rounded-md border border-gray-300 pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-brand-primary transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                    <span className="block truncate">{selectedPerson}</span>
+                    <span className="block truncate">
+                      <TReplace msg={currentAccount.name} />
+                    </span>
                     <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <svg
                         className="h-5 w-5 text-gray-400"
@@ -97,8 +105,8 @@ const MyListbox: FC = () => {
                     static
                     className="max-h-60 rounded-md py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none sm:text-sm sm:leading-5"
                   >
-                    {people.map((person) => (
-                      <Listbox.Option key={person} value={person}>
+                    {allAccounts.map((acc) => (
+                      <Listbox.Option key={acc.address} value={acc}>
                         {({ selected, active }) => (
                           <div
                             className={`${
@@ -112,7 +120,7 @@ const MyListbox: FC = () => {
                                 selected ? "font-semibold" : "font-normal"
                               } block truncate`}
                             >
-                              {person}
+                              <TReplace msg={acc.name} />
                             </span>
                             {selected && (
                               <span

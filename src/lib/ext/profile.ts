@@ -1,37 +1,33 @@
 import { browser } from "webextension-polyfill-ts";
+import { nanoid } from "nanoid";
+import memoize from "mem";
 
 import { assert } from "lib/system/assert";
 
 export interface Profile {
   id: number;
   name: string;
+  avatarSeed: string;
 }
 
-export const ALL_PROFILES_LSKEY = "allprofiles";
+export const ALL_PROFILES_LSKEY = "all_profiles";
 export const PROFILE_LSKEY = "profile";
-export const OPEN_TAB_LSKEY = "opentab";
+export const OPEN_TAB_LSKEY = "__open_tab";
+export const DEFAULT_AVATAR_SEED = "__default_avatar_seed";
 
 export const DEFAULT_PROFILE: Profile = {
   id: 0,
   name: "{{profile}} 1",
+  avatarSeed: getDefaultAvatarSeed(),
 };
 
-const currentProfileId = getProfileId();
-
 export function underProfile(key: string) {
-  return `${currentProfileId}_${key}`;
+  return `${getProfileId()}_${key}`;
 }
 
-export function getProfileId() {
-  try {
-    const value = localStorage.getItem(PROFILE_LSKEY);
-    if (value) {
-      return JSON.parse(value) as number;
-    }
-  } catch {}
-
-  return DEFAULT_PROFILE.id;
-}
+export const getProfileId = memoize(
+  () => getItemSafe<number>(PROFILE_LSKEY) ?? DEFAULT_PROFILE.id
+);
 
 export function setProfileId(id: number) {
   assert(getAllProfiles().some((p) => p.id === id));
@@ -54,12 +50,18 @@ export function openTabIfProfileChanged() {
 
 export function addProfile(name: string) {
   const allProfiles = getAllProfiles();
-  const id = allProfiles.length;
+
+  const profile: Profile = {
+    name,
+    id: allProfiles.length,
+    avatarSeed: nanoid(),
+  };
   localStorage.setItem(
     ALL_PROFILES_LSKEY,
-    JSON.stringify([...allProfiles, { id, name }])
+    JSON.stringify([...allProfiles, profile])
   );
-  return id;
+
+  return profile;
 }
 
 export function updateProfileName(id: number, name: string) {
@@ -71,12 +73,31 @@ export function updateProfileName(id: number, name: string) {
 }
 
 export function getAllProfiles() {
+  return getItemSafe<Profile[]>(ALL_PROFILES_LSKEY) ?? [DEFAULT_PROFILE];
+}
+
+export function getCurrentProfile() {
+  const allProfiles = getAllProfiles();
+  const profileId = getProfileId();
+  return allProfiles.find((p) => p.id === profileId)!;
+}
+
+function getDefaultAvatarSeed() {
+  const existing = getItemSafe<string>(DEFAULT_AVATAR_SEED, false);
+  if (existing) return existing;
+
+  const seed = nanoid();
+  localStorage.setItem(DEFAULT_AVATAR_SEED, seed);
+  return seed;
+}
+
+function getItemSafe<T = any>(key: string, parse = true) {
   try {
-    const value = localStorage.getItem(ALL_PROFILES_LSKEY);
+    const value = localStorage.getItem(key);
     if (value) {
-      return JSON.parse(value) as Profile[];
+      return (parse ? JSON.parse(value) : value) as T;
     }
   } catch {}
 
-  return [DEFAULT_PROFILE];
+  return null;
 }

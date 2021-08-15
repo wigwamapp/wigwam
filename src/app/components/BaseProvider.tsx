@@ -1,5 +1,5 @@
-import { FC, Suspense, useEffect } from "react";
-import { Provider as JotaiProvider, atom } from "jotai";
+import { FC, Suspense } from "react";
+import { Provider as JotaiProvider } from "jotai";
 import { useAtomValue, waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
@@ -8,8 +8,6 @@ import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
   <>
-    <SetImageBg />
-
     <ErrBond>
       <JotaiProvider>
         <Suspense fallback={null}>
@@ -24,20 +22,10 @@ const BaseProvider: FC = ({ children }) => (
 
 export default BaseProvider;
 
-const bootAtom = atom(() => waitForAll([fontsAtom(FONTS), i18nAtom]));
+const bootAtom = waitForAll([fontsAtom(FONTS), i18nAtom]);
 
 const Boot: FC = () => {
   useAtomValue(bootAtom);
-  return null;
-};
-
-const SetImageBg: FC = () => {
-  useEffect(() => {
-    const t = setTimeout(() => {
-      document.documentElement.style.backgroundImage = "url(images/bg.jpeg)";
-    }, 100);
-    return () => clearTimeout(t);
-  }, []);
 
   return null;
 };

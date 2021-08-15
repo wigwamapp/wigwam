@@ -17,6 +17,8 @@ const Profiles: FC = () => {
   const currentProfileId = useMemo(() => getProfileId(), []);
   const allProfiles = useMemo(() => getAllProfiles(), []);
 
+  console.info(allProfiles);
+
   const [adding, setAdding] = useState(false);
 
   const handleCancelAdding = useCallback(() => {
@@ -24,7 +26,7 @@ const Profiles: FC = () => {
   }, [setAdding]);
 
   const handleAdd = useCallback((name: string) => {
-    const id = addProfile(name);
+    const { id } = addProfile(name);
     setProfileId(id);
   }, []);
 
@@ -33,7 +35,7 @@ const Profiles: FC = () => {
   }, []);
 
   return (
-    <BoardingPageLayout title="Profiles">
+    <BoardingPageLayout title="Profiles" profileNav={false}>
       <div className="-mx-4 flex flex-wrap items-stretch">
         {allProfiles.map((p) => {
           const active = p.id === currentProfileId;
@@ -52,10 +54,10 @@ const Profiles: FC = () => {
                 onClick={active ? undefined : () => handleSelect(p)}
               >
                 <AutoIcon
-                  seed={p.name}
+                  seed={p.avatarSeed}
                   className="w-36 h-36 mb-4"
                   source="boring"
-                  variant="beam"
+                  variant="pixel"
                   square
                 />
 

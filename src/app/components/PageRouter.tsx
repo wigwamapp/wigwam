@@ -5,6 +5,7 @@ import {
   HistoryAction,
   resetHistoryPosition,
 } from "lib/history";
+import { getAllProfiles } from "lib/ext/profile";
 
 import { walletStatusAtom, pageAtom } from "app/atoms";
 import { matchPage } from "app/pageRoutes";
@@ -13,6 +14,7 @@ import { Page } from "app/defaults";
 const PageRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const page = useAtomValue(pageAtom);
+  const profileCount = useMemo(() => getAllProfiles().length, []);
 
   // Scroll to top after new page pushed.
   const lastHistoryAction = getLastAction();
@@ -26,7 +28,10 @@ const PageRouter: FC = () => {
     }
   }, [page, lastHistoryAction]);
 
-  return useMemo(() => matchPage(page, walletStatus), [page, walletStatus]);
+  return useMemo(
+    () => matchPage({ page, walletStatus, profileCount }),
+    [page, walletStatus, profileCount]
+  );
 };
 
 export default PageRouter;

@@ -8,42 +8,30 @@ import {
 } from "react";
 import classNames from "clsx";
 import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
-
 import { isPopup } from "lib/ext/view";
+import { getCurrentProfile } from "lib/ext/profile";
 
 import { unlockWallet } from "core/client";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
+import PopupLayout from "app/components/layouts/PopupLayout";
 import TextField from "app/components/elements/TextField";
-import { openInTab } from "app/helpers";
+import ProfilePreview from "app/components/blocks/ProfilePreview";
 
 const Unlock: FC = () => {
-  const popup = useMemo(() => isPopup(), []);
+  const currentProfile = useMemo(getCurrentProfile, []);
 
-  return (
+  const content = (
     <>
-      {popup ? (
-        <div
-          className={classNames(
-            "min-h-screen w-full",
-            "flex flex-col items-center justify-center",
-            "p-8"
-          )}
-        >
-          <button
-            className="mb-8 text-lg text-white"
-            onClick={() => openInTab()}
-          >
-            Open in Tab
-          </button>
-          <UnlockForm />
-        </div>
-      ) : (
-        <BoardingPageLayout>
-          <UnlockForm />
-        </BoardingPageLayout>
-      )}
+      <ProfilePreview profile={currentProfile} />
+      <UnlockForm />
     </>
+  );
+
+  return isPopup() ? (
+    <PopupLayout>{content}</PopupLayout>
+  ) : (
+    <BoardingPageLayout profileNav={false}>{content}</BoardingPageLayout>
   );
 };
 
@@ -69,7 +57,10 @@ const UnlockForm = memo(() => {
   );
 
   return (
-    <form className="w-full flex flex-col items-center" onSubmit={handleSubmit}>
+    <form
+      className="w-full flex flex-col items-center p-8"
+      onSubmit={handleSubmit}
+    >
       <TextField
         ref={passwordFieldRef}
         type="password"
