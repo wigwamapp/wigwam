@@ -17,7 +17,7 @@
     "npm-audit": "npx synp --source-file yarn.lock && npm audit --production; rm package-lock.json"
   },
   "dependencies": {
-    "@0xsequence/multicall": "0.25.1",
+    "@0xsequence/multicall": "0.27.0",
     "@dicebear/avatars": "4.7.2",
     "@dicebear/avatars-avataaars-sprites": "4.7.2",
     "@dicebear/avatars-jdenticon-sprites": "4.7.2",
@@ -69,7 +69,7 @@
     "@types/chrome": "0.0.154",
     "@types/fontfaceobserver": "2.1.0",
     "@types/jest": "27.0.1",
-    "@types/react": "17.0.17",
+    "@types/react": "17.0.18",
     "@types/react-dom": "17.0.9",
     "@types/webpack-env": "1.16.2",
     "@typescript-eslint/eslint-plugin": "4.29.1",

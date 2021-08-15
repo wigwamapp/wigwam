@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import classNames from "clsx";
-import { useSteps } from "lib/react-steps";
+import { useSteps } from "lib/use-steps";
 import useForceUpdate from "use-force-update";
 import { providers } from "@0xsequence/multicall";
 import { ethers, providers as ethersProviders } from "ethers";

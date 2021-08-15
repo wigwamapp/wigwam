@@ -11,7 +11,8 @@ import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { providers } from "@0xsequence/multicall";
 import { ethers, providers as ethersProviders } from "ethers";
-import { useSteps } from "lib/react-steps";
+import { useSteps } from "lib/use-steps";
+import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import {
@@ -24,11 +25,7 @@ import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
 import { addAccounts } from "core/client";
 import { INetwork } from "core/repo";
 
-import {
-  hasSeedPhraseAtom,
-  getNeuterExtendedKeyAtom,
-  useMaybeAtomValue,
-} from "app/atoms";
+import { hasSeedPhraseAtom, getNeuterExtendedKeyAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 

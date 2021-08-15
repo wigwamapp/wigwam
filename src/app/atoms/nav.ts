@@ -1,4 +1,4 @@
-import { atomWithURLHash } from "lib/navigation";
+import { atomWithURLHash } from "lib/atom-utils";
 
 import { Page } from "app/defaults";
 

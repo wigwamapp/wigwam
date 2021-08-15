@@ -1,4 +1,5 @@
 import { atomFamily, atomWithDefault } from "jotai/utils";
+import { atomWithAutoReset } from "lib/atom-utils";
 
 import {
   getWalletStatus,
@@ -6,8 +7,6 @@ import {
   onWalletStatusUpdated,
   getNeuterExtendedKey,
 } from "core/client";
-
-import { atomWithAutoReset } from "./utils";
 
 export const walletStatusAtom = atomWithDefault(getWalletStatus);
 walletStatusAtom.onMount = (setAtom) => onWalletStatusUpdated(setAtom);

@@ -1,8 +1,12 @@
 import { atom, SetStateAction } from "jotai";
 import { atomWithDefault, RESET } from "jotai/utils";
 import { listen, changeState } from "lib/history";
-
-import { serialize, deserialize, getHashSearchParams, toURL } from "./utils";
+import {
+  serialize,
+  deserialize,
+  getHashSearchParams,
+  toURL,
+} from "lib/navigation";
 
 export function atomWithURLHash<T>(key: string, initialValue: T) {
   const getValue = (params: URLSearchParams) => {

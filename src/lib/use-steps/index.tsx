@@ -9,8 +9,8 @@ import {
   useLayoutEffect,
 } from "react";
 import { useAtom } from "jotai";
-import { atomWithURLHash } from "lib/navigation";
 import { getLastAction, HistoryAction } from "lib/history";
+import { atomWithURLHash } from "lib/atom-utils";
 
 export type AllSteps<T = string> = [T, () => ReactNode][];
 

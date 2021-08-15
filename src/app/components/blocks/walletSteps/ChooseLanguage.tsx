@@ -1,6 +1,6 @@
 import { FC, useMemo } from "react";
 
-import { useSteps } from "lib/react-steps";
+import { useSteps } from "lib/use-steps";
 import { getLocale, setLocale } from "lib/ext/react";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";

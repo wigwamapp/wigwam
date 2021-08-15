@@ -1,11 +1,10 @@
 import { atom } from "jotai";
 import { atomFamily } from "jotai/utils";
 import { assert } from "lib/system/assert";
+import { atomWithStorage, atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
 import { INITIAL_NETWORK } from "fixtures/networks";
-
-import { atomWithStorage, atomWithRepoQuery } from "./utils";
 
 export const chainIdAtom = atomWithStorage<number>(
   "chain_id",

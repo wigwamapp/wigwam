@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
-import { useSteps } from "lib/react-steps";
+import { useSteps } from "lib/use-steps";
 import { getLocale } from "lib/ext/i18n/react";
 import { getRandomBytes } from "lib/encryptor";
 
