@@ -10,7 +10,6 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const ESLintPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -349,18 +348,16 @@ module.exports = {
       ],
     }),
 
-    new ForkTsCheckerWebpackPlugin(),
-
-    new ESLintPlugin({
-      extensions: ["js", "mjs", "jsx", "ts", "tsx"],
-      eslintPath: require.resolve("eslint"),
-      failOnError: NODE_ENV === "production",
-      context: SOURCE_PATH,
-      cache: true,
-      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
-      // ESLint class options
-      cwd: CWD_PATH,
-      resolvePluginsRelativeTo: __dirname,
+    new ForkTsCheckerWebpackPlugin({
+      eslint: {
+        files: "src/**/*.{js,mjs,jsx,ts,tsx}",
+        options: {
+          cache: true,
+          cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+          cwd: CWD_PATH,
+          resolvePluginsRelativeTo: __dirname,
+        },
+      },
     }),
 
     new WebpackBar({
