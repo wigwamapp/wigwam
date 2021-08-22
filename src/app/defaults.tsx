@@ -1,4 +1,6 @@
-export const FONTS: [string, number[]][] = [["Inter", [300, 400, 600, 700]]];
+import { Font } from "lib/ext/fonts";
+
+export const FONTS: Font[] = [["Inter", 300, 400, 600, 700]];
 
 export enum Page {
   Default = "default",
