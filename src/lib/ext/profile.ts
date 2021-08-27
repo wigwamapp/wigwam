@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts";
 import { nanoid } from "nanoid";
-import memoize from "mem";
+import memoizeOne from "memoize-one";
 
 import { assert } from "lib/system/assert";
 
@@ -25,7 +25,7 @@ export function underProfile(key: string) {
   return `${getProfileId()}_${key}`;
 }
 
-export const getProfileId = memoize(
+export const getProfileId = memoizeOne(
   () => getItemSafe<number>(PROFILE_LSKEY) ?? DEFAULT_PROFILE.id
 );
 

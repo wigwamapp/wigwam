@@ -1,7 +1,7 @@
 import { browser } from "webextension-polyfill-ts";
-import memoize from "mem";
+import memoizeOne from "memoize-one";
 
-export const isPopup = memoize(() => {
+export const isPopup = memoizeOne(() => {
   const popups = browser.extension.getViews({ type: "popup" });
   return popups.includes(window);
 });
