@@ -19,7 +19,7 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
   switch (reason) {
     case "install":
       browser.tabs.create({
-        url: browser.runtime.getURL("index.html"),
+        url: browser.runtime.getURL("main.html"),
         active: true,
       });
       break;
@@ -35,7 +35,7 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
 //   const tab = await browser.tabs.create({
 //     windowId: currentTab.windowId,
 //     index: currentTab.index + 1,
-//     url: browser.runtime.getURL("index.html"),
+//     url: browser.runtime.getURL("main.html"),
 //     active: true,
 //     openerTabId: currentTab.id,
 //   });

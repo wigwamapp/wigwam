@@ -28,7 +28,7 @@ const AddOpenLoginAccount: FC = () => {
       //   const { privKey } = await openlogin.login({
       //     fastLogin: true,
       //     loginProvider: "google",
-      //     // redirectUrl: "https://vigvam.app", // browser.runtime.getURL("index.html"),
+      //     // redirectUrl: browser.runtime.getURL("main.html"),
       //   });
       //   console.info(privKey);
       // }

@@ -3,10 +3,10 @@ import { FC } from "react";
 import BaseProvider from "./BaseProvider";
 import PageRouter from "./PageRouter";
 
-const App: FC = () => (
+const MainApp: FC = () => (
   <BaseProvider>
     <PageRouter />
   </BaseProvider>
 );
 
-export default App;
+export default MainApp;

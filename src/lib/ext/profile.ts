@@ -44,7 +44,7 @@ export function openTabIfProfileChanged() {
   if (openTab) {
     localStorage.removeItem(OPEN_TAB_LSKEY);
     browser.tabs.create({
-      url: browser.runtime.getURL("index.html"),
+      url: browser.runtime.getURL("main.html"),
       active: true,
     });
   }

@@ -1,4 +1,4 @@
-@import "app/fonts/inter.css";
+@import "./fonts/inter.css";
 
 body {
   font-variant-ligatures: none;

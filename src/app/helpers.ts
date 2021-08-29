@@ -12,7 +12,7 @@ export async function openInTab(to?: Destination) {
 
   try {
     const url = browser.runtime.getURL(
-      `index.html${to ? `#${toHash(to)}` : ""}`
+      `main.html${to ? `#${toHash(to)}` : ""}`
     );
     const params = { url, active: true };
 

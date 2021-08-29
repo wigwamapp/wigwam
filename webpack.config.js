@@ -68,8 +68,8 @@ const HTML_TEMPLATES = [
     chunks: ["back"],
   },
   {
-    path: path.join(PUBLIC_PATH, "index.html"),
-    chunks: ["index"],
+    path: path.join(PUBLIC_PATH, "main.html"),
+    chunks: ["main"],
   },
   {
     path: path.join(PUBLIC_PATH, "popup.html"),
@@ -94,7 +94,7 @@ module.exports = {
 
   entry: {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
-    index: entry("index.tsx", NODE_ENV === "development" && "dev-tools.ts"),
+    main: entry("main.tsx", NODE_ENV === "development" && "dev-tools.ts"),
     popup: entry("popup.tsx"),
     confirm: entry("confirm.tsx"),
     content: entry("content.ts"),
