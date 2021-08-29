@@ -106,8 +106,7 @@ async function watchChanges(
     }
   }
 
-  const retryAfter =
-    Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 5_000 : 1_000;
+  const retryAfter = Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 5_000 : 500;
   setTimeout(() => watchChanges(dir, checksum, lastChangedAt), retryAfter);
 }
 
