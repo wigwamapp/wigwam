@@ -8,7 +8,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtom } from "jotai";
-import { goBack, getHistoryPosition } from "lib/history";
+import { goBack, getPosition } from "lib/history";
 import ArrowNarrowLeftIcon from "@heroicons/react/solid/ArrowNarrowLeftIcon";
 import { T } from "lib/ext/i18n/react";
 
@@ -72,7 +72,7 @@ type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
   const [page, setPage] = useAtom(pageAtom);
-  const historyPosition = getHistoryPosition();
+  const historyPosition = getPosition();
 
   const inHome = page === Page.Default;
   const canBack = historyPosition > 0 || !inHome;

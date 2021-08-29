@@ -19,9 +19,10 @@ export function listen(listener: (action: HistoryAction) => void) {
     () => listener(action),
   ]);
 
-  refs.forEach(([action, cb]) => window.addEventListener(action, cb));
-  return () =>
-    refs.forEach(([action, cb]) => window.removeEventListener(action, cb));
+  for (const [action, cb] of refs) window.addEventListener(action, cb);
+  return () => {
+    for (const [action, cb] of refs) window.removeEventListener(action, cb);
+  };
 }
 
 export function changeState(url: string, replace = false, state: any = null) {
@@ -46,11 +47,11 @@ export function getLastAction() {
   return patchedHistory.lastAction;
 }
 
-export function getHistoryPosition() {
+export function getPosition() {
   return patchedHistory.position ?? 0;
 }
 
-export function resetHistoryPosition() {
+export function resetPosition() {
   patchedHistory.position = 0;
 }
 
@@ -60,9 +61,15 @@ patchMethod("replaceState", HistoryAction.Replace);
 listen(patchHistory);
 
 function patchHistory(action: HistoryAction) {
-  const position =
-    getHistoryPosition() +
-    (action === HistoryAction.Push ? 1 : action === HistoryAction.Pop ? -1 : 0);
+  const position = Math.max(
+    0,
+    getPosition() +
+      (action === HistoryAction.Push
+        ? 1
+        : action === HistoryAction.Pop
+        ? -1
+        : 0)
+  );
 
   Object.assign(patchedHistory, {
     lastAction: action,
