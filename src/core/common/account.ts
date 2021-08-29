@@ -6,7 +6,7 @@ import {
   AccountType,
   AccountParams,
   AddAccountParams,
-  AccountSourceType,
+  AccountSource,
 } from "core/types";
 
 import { PublicError } from "./base";
@@ -34,28 +34,28 @@ export function toPlainAccountParams(
   addParams: AddAccountParams
 ): AccountParams {
   return match(addParams)
-    .with({ sourceType: AccountSourceType.SeedPhrase }, (p) => ({
+    .with({ source: AccountSource.SeedPhrase }, (p) => ({
       type: p.type,
-      sourceType: p.sourceType,
+      source: p.source,
       derivationPath: p.derivationPath,
     }))
-    .with({ sourceType: AccountSourceType.PrivateKey }, (p) => ({
+    .with({ source: AccountSource.PrivateKey }, (p) => ({
       type: p.type,
-      sourceType: p.sourceType,
+      source: p.source,
     }))
-    .with({ sourceType: AccountSourceType.Ledger }, (p) => ({
+    .with({ source: AccountSource.Ledger }, (p) => ({
       type: p.type,
-      sourceType: p.sourceType,
+      source: p.source,
       derivationPath: p.derivationPath,
     }))
-    .with({ sourceType: AccountSourceType.Torus }, (p) => ({
+    .with({ source: AccountSource.OpenLogin }, (p) => ({
       type: p.type,
-      sourceType: p.sourceType,
+      source: p.source,
       social: p.social,
     }))
-    .with({ sourceType: AccountSourceType.Address }, (p) => ({
+    .with({ source: AccountSource.Address }, (p) => ({
       type: p.type,
-      sourceType: p.sourceType,
+      source: p.source,
     }))
     .exhaustive();
 }

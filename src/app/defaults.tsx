@@ -18,6 +18,6 @@ export enum WalletStep {
   AddHDAccounts = "add-hd-accounts",
   AddByPrivateKeyAccount = "add-by-private-key-account",
   AddLedgerAccounts = "add-ledger-accounts",
-  AddTorusAccount = "add-torus-account",
+  AddOpenLoginAccount = "add-open-login-account",
   SetupPassword = "setup-password",
 }

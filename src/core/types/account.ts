@@ -1,41 +1,41 @@
-import { AccountSourceType, AccountType } from "./base";
+import { AccountSource, AccountType } from "./base";
 
 export type AccountParams =
   | HDAccountParams
   | ByPrivateKeyAccountParams
   | LedgerAccountParams
-  | TorusAccountParams
+  | OpenLoginAccountParams
   | WatchOnlyAccountParams;
 
 export interface AccountParamsBase {
   type: AccountType;
-  sourceType: AccountSourceType;
+  source: AccountSource;
 }
 
 export interface HDAccountParams extends AccountParamsBase {
   type: AccountType.HD;
-  sourceType: AccountSourceType.SeedPhrase;
+  source: AccountSource.SeedPhrase;
   derivationPath: string;
 }
 
 export interface ByPrivateKeyAccountParams extends AccountParamsBase {
   type: AccountType.Imported;
-  sourceType: AccountSourceType.PrivateKey;
+  source: AccountSource.PrivateKey;
 }
 
 export interface LedgerAccountParams extends AccountParamsBase {
   type: AccountType.External;
-  sourceType: AccountSourceType.Ledger;
+  source: AccountSource.Ledger;
   derivationPath: string;
 }
 
-export interface TorusAccountParams extends AccountParamsBase {
+export interface OpenLoginAccountParams extends AccountParamsBase {
   type: AccountType.Imported;
-  sourceType: AccountSourceType.Torus;
+  source: AccountSource.OpenLogin;
   social: string;
 }
 
 export interface WatchOnlyAccountParams extends AccountParamsBase {
   type: AccountType.Void;
-  sourceType: AccountSourceType.Address;
+  source: AccountSource.Address;
 }

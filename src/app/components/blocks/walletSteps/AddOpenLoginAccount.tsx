@@ -1,7 +1,7 @@
 import { FC, useCallback } from "react";
 import { ethers } from "ethers";
 
-const AddTorusAccount: FC = () => {
+const AddOpenLoginAccount: FC = () => {
   const handleConnect = useCallback(async () => {
     try {
       const { default: OpenLogin, UX_MODE } = await import(
@@ -39,9 +39,9 @@ const AddTorusAccount: FC = () => {
 
   return (
     <div className="p-8">
-      <button onClick={handleConnect}>Connect TORUS</button>
+      <button onClick={handleConnect}>Connect Open Login</button>
     </div>
   );
 };
 
-export default AddTorusAccount;
+export default AddOpenLoginAccount;

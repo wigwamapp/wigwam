@@ -105,21 +105,21 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        toStep: WalletStep.AddTorusAccount,
+        toStep: WalletStep.AddOpenLoginAccount,
         stepsState: {
           socialProvider: "twitter",
         },
         title: "Twitter",
       },
       {
-        toStep: WalletStep.AddTorusAccount,
+        toStep: WalletStep.AddOpenLoginAccount,
         stepsState: {
           socialProvider: "google",
         },
         title: "Google",
       },
       {
-        toStep: WalletStep.AddTorusAccount,
+        toStep: WalletStep.AddOpenLoginAccount,
         stepsState: {
           socialProvider: "facebook",
         },

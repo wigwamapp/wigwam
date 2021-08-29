@@ -3,7 +3,7 @@ import {
   HDAccountParams,
   ByPrivateKeyAccountParams,
   LedgerAccountParams,
-  TorusAccountParams,
+  OpenLoginAccountParams,
   WatchOnlyAccountParams,
 } from "./account";
 
@@ -11,7 +11,7 @@ export type AddAccountParams =
   | AddHDAccountParams
   | AddByPrivateKeyAccountParams
   | AddLedgerAccountParams
-  | AddTorusAccountParams
+  | AddOpenLoginAccountParams
   | AddWatchOnlyAccountParams;
 
 export interface AddAccountParamsBase {
@@ -20,7 +20,7 @@ export interface AddAccountParamsBase {
 }
 
 /**
- * By `AccountSourceType`
+ * By `AccountSource`
  */
 
 export interface AddHDAccountParams
@@ -37,8 +37,8 @@ export interface AddLedgerAccountParams
   extends LedgerAccountParams,
     AddExternalAccountParams {}
 
-export interface AddTorusAccountParams
-  extends TorusAccountParams,
+export interface AddOpenLoginAccountParams
+  extends OpenLoginAccountParams,
     AddImportedAccountParams {}
 
 export interface AddWatchOnlyAccountParams

@@ -18,11 +18,7 @@ import { LedgerTransport, getExtendedKey } from "lib/ledger";
 import retry from "async-retry";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import {
-  AccountType,
-  AccountSourceType,
-  AddLedgerAccountParams,
-} from "core/types";
+import { AccountType, AccountSource, AddLedgerAccountParams } from "core/types";
 import { generatePreviewHDNodes } from "core/common";
 import { addAccounts } from "core/client";
 import { INetwork } from "core/repo";
@@ -117,7 +113,7 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
           const hdIndex = accounts!.findIndex((n) => n.address === address);
           return {
             type: AccountType.External,
-            sourceType: AccountSourceType.Ledger,
+            source: AccountSource.Ledger,
             name: `{{wallet}} ${i + 1}`,
             derivationPath: `${rootDerivationPath}/${hdIndex}`,
             publicKey: accounts![hdIndex].publicKey,

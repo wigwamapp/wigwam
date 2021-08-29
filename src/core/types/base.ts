@@ -12,10 +12,10 @@ export enum AccountType {
   Void = "VOID",
 }
 
-export enum AccountSourceType {
+export enum AccountSource {
   SeedPhrase = "SEED_PHRASE",
   PrivateKey = "PRIVATE_KEY",
-  Torus = "TORUS",
+  OpenLogin = "OPEN_LOGIN",
   Ledger = "LEDGER",
   Address = "ADDRESS",
 }

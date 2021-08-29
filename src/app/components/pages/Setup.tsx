@@ -11,7 +11,7 @@ import VerifySeedPhrase from "../blocks/walletSteps/VerifySeedPhrase";
 import AddHDAccounts from "../blocks/walletSteps/AddHDAccounts";
 import AddByPrivateKeyAccount from "../blocks/walletSteps/AddByPrivateKeyAccount";
 import AddLedgerAccounts from "../blocks/walletSteps/AddLedgerAccounts";
-import AddTorusAccount from "../blocks/walletSteps/AddTorusAccount";
+import AddOpenLoginAccount from "../blocks/walletSteps/AddOpenLoginAccount";
 import SetupPassword from "../blocks/walletSteps/SetupPassword";
 
 const STEPS: AllSteps<WalletStep> = [
@@ -26,7 +26,7 @@ const STEPS: AllSteps<WalletStep> = [
   [WalletStep.AddHDAccounts, () => <AddHDAccounts initialSetup />],
   [WalletStep.AddByPrivateKeyAccount, () => <AddByPrivateKeyAccount />],
   [WalletStep.AddLedgerAccounts, () => <AddLedgerAccounts initialSetup />],
-  [WalletStep.AddTorusAccount, () => <AddTorusAccount />],
+  [WalletStep.AddOpenLoginAccount, () => <AddOpenLoginAccount />],
   [WalletStep.SetupPassword, () => <SetupPassword />],
 ];
 

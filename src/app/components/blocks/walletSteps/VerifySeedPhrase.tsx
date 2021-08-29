@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 import {
   AddHDAccountParams,
-  AccountSourceType,
+  AccountSource,
   AccountType,
   SeedPharse,
 } from "core/types";
@@ -45,7 +45,7 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
         const addAccountsParams: AddHDAccountParams[] = [
           {
             type: AccountType.HD,
-            sourceType: AccountSourceType.SeedPhrase,
+            source: AccountSource.SeedPhrase,
             name: "{{wallet}} 1",
             derivationPath: ethers.utils.defaultPath,
           },

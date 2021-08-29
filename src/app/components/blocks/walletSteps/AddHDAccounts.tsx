@@ -19,7 +19,7 @@ import {
   AddHDAccountParams,
   SeedPharse,
   AccountType,
-  AccountSourceType,
+  AccountSource,
 } from "core/types";
 import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
 import { addAccounts } from "core/client";
@@ -108,7 +108,7 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
           const hdIndex = addresses!.findIndex((a) => a === address);
           return {
             type: AccountType.HD,
-            sourceType: AccountSourceType.SeedPhrase,
+            source: AccountSource.SeedPhrase,
             name: `{{wallet}} ${i + 1}`,
             derivationPath: `${rootDerivationPath}/${hdIndex}`,
           };
