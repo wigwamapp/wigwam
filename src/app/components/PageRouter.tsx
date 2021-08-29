@@ -1,10 +1,6 @@
 import { FC, useMemo, useLayoutEffect } from "react";
 import { useAtomValue } from "jotai/utils";
-import {
-  getLastAction,
-  HistoryAction,
-  resetHistoryPosition,
-} from "lib/history";
+import { getLastAction, HistoryAction, resetPosition } from "lib/history";
 import { getAllProfiles } from "lib/ext/profile";
 
 import { walletStatusAtom, pageAtom } from "app/atoms";
@@ -24,7 +20,7 @@ const PageRouter: FC = () => {
     }
 
     if (page === Page.Default) {
-      resetHistoryPosition();
+      resetPosition();
     }
   }, [page, lastHistoryAction]);
 
