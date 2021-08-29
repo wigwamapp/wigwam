@@ -1,8 +1,8 @@
 import { memo, Fragment, ReactNode, useMemo, useEffect } from "react";
 import useForceUpdate from "use-force-update";
 
-import { t, getInitializing, replaceT } from "./core";
-import { onInited } from "./loading";
+import { t, replaceT } from "./core";
+import { onInited, isInited } from "./loading";
 import { toList } from "./helpers";
 
 export * from "./index";
@@ -30,12 +30,11 @@ export const TReplace = memo<TReplaceProps>(({ msg }) => {
 
 export function useI18NUpdate() {
   const forceUpdate = useForceUpdate();
-  const initializing = useMemo(() => getInitializing(), []);
+  const inited = useMemo(isInited, []);
+
   useEffect(() => {
-    if (initializing) {
-      onInited(forceUpdate);
-    }
-  }, [initializing, forceUpdate]);
+    if (!inited) onInited(forceUpdate);
+  }, [inited, forceUpdate]);
 }
 
 const TMP_SEPARATOR = "$_$";

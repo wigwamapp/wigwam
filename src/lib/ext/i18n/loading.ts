@@ -1,30 +1,23 @@
 import { browser } from "webextension-polyfill-ts";
 
 import { init } from "./core";
-import { saveLocale } from "./saving";
-
-export const REFRESH_MSGTYPE = "I18N_REFRESH";
+import { onUpdated } from "./persisting";
 
 export const initPromise = init();
 
-browser.runtime.onMessage.addListener((msg) => {
-  if (msg?.type === REFRESH_MSGTYPE) {
-    refresh();
-  }
+let initialized = false;
+onInited(() => {
+  initialized = true;
 });
+
+onUpdated(refresh);
 
 export function onInited(callback: () => void) {
   initPromise.then(callback);
 }
 
-export function setLocale(locale: string) {
-  saveLocale(locale);
-  notifyOthers();
-  refresh();
-}
-
-function notifyOthers() {
-  browser.runtime.sendMessage({ type: REFRESH_MSGTYPE });
+export function isInited() {
+  return initialized;
 }
 
 async function refresh() {

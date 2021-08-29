@@ -2,21 +2,14 @@ import { browser } from "webextension-polyfill-ts";
 
 import { FetchedLocaleMessages, LocaleMessages, Substitutions } from "./types";
 import { areLocalesEqual, processTemplate, toList } from "./helpers";
-import { getSavedLocale } from "./saving";
+import { getSavedLocale, saveLocale } from "./persisting";
 
-let initializing = false;
 let fetchedLocaleMessages: FetchedLocaleMessages = {
   target: null,
   fallback: null,
 };
 
-export function getInitializing() {
-  return initializing;
-}
-
 export async function init() {
-  initializing = true;
-
   const refetched: FetchedLocaleMessages = {
     target: null,
     fallback: null,
@@ -45,7 +38,6 @@ export async function init() {
   }
 
   fetchedLocaleMessages = refetched;
-  initializing = false;
 }
 
 export function t(messageName: string, substitutions?: Substitutions) {
@@ -83,6 +75,10 @@ export function replaceT(str: string) {
 
 export function getLocale() {
   return getSavedLocale() || getNativeLocale();
+}
+
+export function setLocale(locale: string) {
+  saveLocale(locale);
 }
 
 export function getNativeLocale() {

@@ -4,6 +4,8 @@ import memoizeOne from "memoize-one";
 
 import { assert } from "lib/system/assert";
 
+import { getItemSafe } from "./utils";
+
 export interface Profile {
   id: number;
   name: string;
@@ -13,7 +15,7 @@ export interface Profile {
 export const ALL_PROFILES_LSKEY = "all_profiles";
 export const PROFILE_LSKEY = "profile";
 export const OPEN_TAB_LSKEY = "__open_tab";
-export const DEFAULT_AVATAR_SEED = "__default_avatar_seed";
+export const DEFAULT_AVATAR_SEED_LSKEY = "__default_avatar_seed";
 
 export const DEFAULT_PROFILE: Profile = {
   id: 0,
@@ -83,21 +85,12 @@ export function getCurrentProfile() {
 }
 
 function getDefaultAvatarSeed() {
-  const existing = getItemSafe<string>(DEFAULT_AVATAR_SEED, false);
+  const existing = getItemSafe<string>(DEFAULT_AVATAR_SEED_LSKEY, {
+    serealize: false,
+  });
   if (existing) return existing;
 
   const seed = nanoid();
-  localStorage.setItem(DEFAULT_AVATAR_SEED, seed);
+  localStorage.setItem(DEFAULT_AVATAR_SEED_LSKEY, seed);
   return seed;
-}
-
-function getItemSafe<T = any>(key: string, parse = true) {
-  try {
-    const value = localStorage.getItem(key);
-    if (value) {
-      return (parse ? JSON.parse(value) : value) as T;
-    }
-  } catch {}
-
-  return null;
 }
