@@ -6,5 +6,17 @@ import { disableOutlinesForClick } from "lib/outline-on-click";
 
 export function mount(app: ReactNode) {
   disableOutlinesForClick();
-  render(<StrictMode>{app}</StrictMode>, document.getElementById("root"));
+
+  render(
+    <StrictMode>
+      {process.env.NODE_ENV === "production"
+        ? app
+        : (() => {
+            // eslint-disable-next-line
+            const { default: Inspect } = require("inspx");
+            return <Inspect>{app}</Inspect>;
+          })()}
+    </StrictMode>,
+    document.getElementById("root")
+  );
 }
