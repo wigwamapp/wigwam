@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 
 import * as profile from "lib/ext/profile";
 import * as storage from "lib/ext/storage";
+import * as global from "lib/ext/global";
 import * as i18n from "lib/ext/i18n";
 import * as enc from "lib/encryptor";
 import * as encStorage from "lib/enc-storage";
@@ -16,6 +17,7 @@ Object.assign(window, {
   ethers,
   profile,
   storage,
+  global,
   i18n,
   enc,
   encStorage,

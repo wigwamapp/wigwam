@@ -1,19 +1,19 @@
 import { atom } from "jotai";
 import { atomFamily } from "jotai/utils";
 import { assert } from "lib/system/assert";
-import { atomWithStorage, atomWithRepoQuery } from "lib/atom-utils";
+import { atomWithGlobal, atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
-export const chainIdAtom = atomWithStorage<number>(
+export const chainIdAtom = atomWithGlobal<number>(
   "chain_id",
   INITIAL_NETWORK.chainId
 );
 
-export const accountAddressAtom = atomWithStorage<string>(
+export const accountAddressAtom = atomWithGlobal<string | null>(
   "account_address",
-  fetchDefaultAccountAddress
+  null
 );
 
 export const getAllAccountsAtom = atomWithRepoQuery(() =>
@@ -36,16 +36,15 @@ export const getCurrentNetworkAtom = atom((get) => {
 });
 
 export const getCurrentAccountAtom = atom<Repo.IAccount>((get) => {
-  const address = get(accountAddressAtom);
-  const account = get(getAccountAtom(address));
-  assert(account);
-  return account;
-});
-
-async function fetchDefaultAccountAddress() {
-  const allAccounts = await Repo.accounts.toArray();
+  const allAccounts = get(getAllAccountsAtom);
   if (allAccounts.length === 0) {
     throw new Error("There are no accounts");
   }
-  return allAccounts[0].address;
-}
+
+  const address = get(accountAddressAtom);
+  const index = address
+    ? allAccounts.findIndex((acc) => acc.address === address)
+    : 0;
+
+  return allAccounts[index === -1 ? 0 : index];
+});

@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 
@@ -7,14 +7,18 @@ import { TReplace } from "lib/ext/react";
 import PageLayout from "app/components/layouts/PageLayout";
 import { ReactComponent as BoxIcon } from "app/icons/box.svg";
 import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
-import { accountAddressAtom, getAllAccountsAtom } from "app/atoms";
+import {
+  accountAddressAtom,
+  getCurrentAccountAtom,
+  getAllAccountsAtom,
+} from "app/atoms";
 
 const Main: FC = () => (
   <PageLayout>
     <div className="py-8">
       <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
       <BoxIcon className="stroke-current h-6 w-auto" />
-      <AccountsSelect />
+      <ConditionalAccountsSelect />
       {/* <Kek /> */}
       <NumberWrapper padding>
         {ethers.utils.formatUnits(ethers.BigNumber.from("10000000"))}
@@ -37,24 +41,32 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
 
 export default Main;
 
+const ConditionalAccountsSelect: FC = () => {
+  const [opened, setOpened] = useState(true);
+
+  return (
+    <div>
+      <button className="py-4 text-xl" onClick={() => setOpened((o) => !o)}>
+        Toggle
+      </button>
+      {opened && <AccountsSelect />}
+    </div>
+  );
+};
+
 const AccountsSelect: FC = () => {
-  const { allAccounts, accountAddress } = useAtomValue(
+  const { allAccounts, currentAccount } = useAtomValue(
     useMemo(
       () =>
         waitForAll({
           allAccounts: getAllAccountsAtom,
-          accountAddress: accountAddressAtom,
+          currentAccount: getCurrentAccountAtom,
         }),
       []
     )
   );
 
   const setAccountAddress = useUpdateAtom(accountAddressAtom);
-
-  const currentAccount = useMemo(
-    () => allAccounts.find((a) => a.address === accountAddress)!,
-    [allAccounts, accountAddress]
-  );
 
   return (
     <div className="py-12">
