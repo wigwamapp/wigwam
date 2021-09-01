@@ -22,7 +22,7 @@ An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br
 
 - ⚡️ Lightweight.
 
-## Build
+## Build from source
 
 > Requires: [`Node.js ^14`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
 
