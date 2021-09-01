@@ -155,18 +155,6 @@ module.exports = {
             ],
           },
 
-          // Fix non ascii character for `effector`
-          {
-            test: /\.(js|mjs)$/,
-            include: [path.join(NODE_MODULES_PATH, "effector")],
-            loader: "string-replace-loader",
-            options: {
-              search: "ɔ",
-              replace: "cc",
-              flags: "g",
-            },
-          },
-
           // Process application JS with Sucrase.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
