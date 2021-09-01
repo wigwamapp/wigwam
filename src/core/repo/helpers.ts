@@ -5,5 +5,5 @@ export const networks = db.table<INetwork, number>(RepoTable.Networks);
 export const accounts = db.table<IAccount, string>(RepoTable.Accounts);
 
 export function clear() {
-  return Promise.all([networks.clear(), accounts.clear()]);
+  return db.delete();
 }
