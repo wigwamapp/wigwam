@@ -28,6 +28,7 @@ Object.assign(window, {
 });
 
 async function reset() {
+  global.clear();
   await browser.storage.local.clear();
   await repo.clear();
   browser.runtime.reload();
