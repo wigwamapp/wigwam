@@ -2,7 +2,7 @@
   "accountAlreadyExists": "Ya existe una billetera con la misma dirección",
   "add": "Agregar",
   "addAccount": "Agregar billetera",
-  "appDesc": "Una billetera criptográfica para Ethereum y Binance Smart Chain. \nExplore DeFi y NFT.",
+  "appDesc": "Una aplicación que administra sus billeteras y claves criptográficas. Explore DeFi y NFT. Ethereum, BSC, Polygon, Optimism y otros.",
   "back": "atrás",
   "cancel": "Cancelar",
   "cannotSignForAccount": "No se puede iniciar sesión para esta cuenta",

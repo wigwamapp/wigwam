@@ -2,7 +2,7 @@
   "accountAlreadyExists": "同じアドレスのウォレットはすでに存在します",
   "add": "追加",
   "addAccount": "ウォレットを追加",
-  "appDesc": "イーサリアムとバイナンススマートチェーン用の暗号ウォレット。 \nDeFiとNFTを調べてください。",
+  "appDesc": "ウォレットと暗号鍵を管理するアプリ。 DeFiとNFTを調べてください。イーサリアム、BSC、ポリゴン、楽観主義など。",
   "back": "バック",
   "cancel": "キャンセル",
   "cannotSignForAccount": "このアカウントに署名できません",

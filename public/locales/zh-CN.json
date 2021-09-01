@@ -2,7 +2,7 @@
   "accountAlreadyExists": "相同地址的钱包已存在",
   "add": "添加",
   "addAccount": "添加钱包",
-  "appDesc": "以太坊和币安智能链的加密钱包。\n探索 DeFi 和 NFT。",
+  "appDesc": "管理您的钱包和加密密钥的应用程序。探索 DeFi 和 NFT。以太坊、BSC、多边形、乐观主义等。",
   "back": "后退",
   "cancel": "取消",
   "cannotSignForAccount": "无法登录此帐户",

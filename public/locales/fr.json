@@ -2,7 +2,7 @@
   "accountAlreadyExists": "Le portefeuille avec la même adresse existe déjà",
   "add": "Ajouter",
   "addAccount": "Ajouter un portefeuille",
-  "appDesc": "Un portefeuille crypto pour Ethereum et Binance Smart Chain. \nExplorez DeFi et NFT.",
+  "appDesc": "Une application qui gère vos portefeuilles et vos clés cryptographiques. Explorez DeFi et NFT. Ethereum, BSC, Polygon, Optimism et autres.",
   "back": "Dos",
   "cancel": "Annuler",
   "cannotSignForAccount": "Impossible de signer pour ce compte",

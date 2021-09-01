@@ -2,7 +2,7 @@
   "accountAlreadyExists": "동일한 주소의 지갑이 이미 있습니다.",
   "add": "더하다",
   "addAccount": "지갑 추가",
-  "appDesc": "이더리움과 바이낸스 스마트체인을 위한 암호화폐 지갑. \nDeFi와 NFT를 살펴보세요.",
+  "appDesc": "지갑과 암호화 키를 관리하는 앱입니다. DeFi와 NFT를 살펴보세요. 이더리움, BSC, 폴리곤, 낙관론 등.",
   "back": "뒤",
   "cancel": "취소",
   "cannotSignForAccount": "이 계정에 서명할 수 없습니다.",
