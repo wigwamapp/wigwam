@@ -26,6 +26,10 @@ browser.runtime.onInstalled.addListener(({ reason }) => {
   }
 });
 
+// for (const _i of [1, 2, 3, 4, 5, 6, 7, 8]) {
+//   new Worker(new URL("./worker", import.meta.url));
+// }
+
 // setTimeout(async () => {
 //   const [currentTab] = await browser.tabs.query({
 //     currentWindow: true,
