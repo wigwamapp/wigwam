@@ -122,8 +122,6 @@ module.exports = {
     strictExportPresence: true,
 
     rules: [
-      { parser: { requireEnsure: false } },
-
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
