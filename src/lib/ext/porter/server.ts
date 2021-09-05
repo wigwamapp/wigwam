@@ -44,9 +44,9 @@ export class PorterServer<OneWayData = any> {
 
   broadcast(data: OneWayData) {
     const msg: PorterOneWay = { type: PorterMessageType.OneWay, data };
-    this.ports.forEach((port) => {
+    for (const port of this.ports) {
       port.postMessage(msg);
-    });
+    }
   }
 
   notify(port: Runtime.Port, data: OneWayData) {
