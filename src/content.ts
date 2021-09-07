@@ -19,7 +19,7 @@
 //   }
 // })();
 
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 import { Emitter } from "lib/emitter";
 import { PorterClient } from "lib/ext/porter/client";

@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 import { getExtensionTabs } from "lib/ext/tab";
 import { isPopup } from "lib/ext/view";

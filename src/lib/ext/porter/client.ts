@@ -1,4 +1,4 @@
-import { Runtime, browser } from "webextension-polyfill-ts";
+import browser, { Runtime } from "webextension-polyfill";
 import { PorterMessageType, PorterClientMessage } from "./types";
 import { deserializeError, PorterTimeoutError } from "./helpers";
 

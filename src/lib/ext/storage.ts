@@ -1,4 +1,4 @@
-import { browser, Storage } from "webextension-polyfill-ts";
+import browser, { Storage } from "webextension-polyfill";
 
 import { createQueue } from "lib/system/queue";
 

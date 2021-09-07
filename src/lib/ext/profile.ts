@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 import { nanoid } from "nanoid";
 import memoizeOne from "memoize-one";
 

@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 import memoizeOne from "memoize-one";
 
 export const isPopup = memoizeOne(() => {

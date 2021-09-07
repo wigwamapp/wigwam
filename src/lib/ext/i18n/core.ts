@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 import { FetchedLocaleMessages, LocaleMessages, Substitutions } from "./types";
 import { areLocalesEqual, processTemplate, toList } from "./helpers";

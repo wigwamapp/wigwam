@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 import { openTabIfProfileChanged } from "lib/ext/profile";
 import { setupFixtures } from "core/repo";

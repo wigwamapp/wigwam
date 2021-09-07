@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 import { ethers } from "ethers";
 
 import * as profile from "lib/ext/profile";
