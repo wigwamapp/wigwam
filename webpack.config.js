@@ -160,7 +160,7 @@ module.exports = {
             loader: "string-replace-loader",
             options: {
               search: "require",
-              replace: "_require",
+              replace: "_r",
               flags: "g",
             },
           },

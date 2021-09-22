@@ -48,8 +48,8 @@ const UnlockForm = memo(() => {
       if (password) {
         try {
           await unlockWallet(password);
-        } catch (err) {
-          alert(err.message);
+        } catch (err: any) {
+          alert(err?.message);
         }
       }
     },

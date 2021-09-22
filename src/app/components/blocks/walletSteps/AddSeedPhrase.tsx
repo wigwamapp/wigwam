@@ -80,8 +80,8 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
             ? WalletStep.AddHDAccounts
             : WalletStep.VerifySeedPhrase
         );
-      } catch (err) {
-        alert(err.message);
+      } catch (err: any) {
+        alert(err?.message);
       }
     }, [
       wordlistLocale,

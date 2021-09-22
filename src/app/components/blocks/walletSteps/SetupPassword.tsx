@@ -29,8 +29,8 @@ const SetupPassword = memo(() => {
       if (!addAccountsParams || !password) return;
 
       await setupWallet(password, addAccountsParams, seedPhrase);
-    } catch (err) {
-      alert(err.message);
+    } catch (err: any) {
+      alert(err?.message);
     }
   }, [addAccountsParams, seedPhrase]);
 

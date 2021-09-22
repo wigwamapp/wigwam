@@ -54,8 +54,8 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
         Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(WalletStep.SetupPassword);
       }
-    } catch (err) {
-      alert(err.message);
+    } catch (err: any) {
+      alert(err?.message);
     }
   }, [seedPhrase, initialSetup, stateRef, navigateToStep]);
 
