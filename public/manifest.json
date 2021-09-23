@@ -30,7 +30,7 @@
   },
 
   "__firefox__applications": {
-    "gecko": { "id": "{}" }
+    "gecko": { "id": "{daf44bf7-a45e-4450-979c-91cf07434c3d}" }
   },
 
   "__chrome__minimum_chrome_version": "73",
@@ -63,8 +63,12 @@
       "js": ["scripts/content.js"],
       "run_at": "document_start",
       "all_frames": true
+    },
+    {
+      "matches": ["{{website}}/*"],
+      "js": ["scripts/version.js"]
     }
   ],
 
-  "web_accessible_resources": ["scripts/inpage.js", "scripts/version.js"]
+  "web_accessible_resources": ["scripts/inpage.js"]
 }

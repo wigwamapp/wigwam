@@ -16,13 +16,21 @@ openTabIfProfileChanged();
 
 // Open new tab with extension page after install
 browser.runtime.onInstalled.addListener(({ reason }) => {
-  switch (reason) {
-    case "install":
-      browser.tabs.create({
-        url: browser.runtime.getURL("main.html"),
-        active: true,
-      });
-      break;
+  if (reason === "install") {
+    browser.tabs.create({
+      url: browser.runtime.getURL("main.html"),
+      active: true,
+    });
+  }
+
+  if (reason === "install" || reason === "update") {
+    browser.tabs
+      .query({ url: `${process.env.VIGVAM_WEBSITE_ORIGIN}/**` })
+      .then((tabs) => {
+        const tabId = tabs[0]?.id;
+        tabId && browser.tabs.reload(tabId);
+      })
+      .catch(() => undefined);
   }
 });
 

@@ -1,10 +1,9 @@
 // Avoid typescript "isolatedModules" error;
 export {};
 
-const vigvamApps =
-  (window as any)._vigvamApps ?? ((window as any)._vigvamApps = []);
+declare const browser: any;
 
-const extId = document.currentScript?.dataset.extid ?? "";
-const version = process.env.VERSION;
-
-vigvamApps.push({ extId, version });
+const extId = (chrome ?? browser)?.runtime?.id;
+if (extId) {
+  document.cookie = `_vigvam_${extId}=${process.env.VERSION}; SameSite=Lax`;
+}

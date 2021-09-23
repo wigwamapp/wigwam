@@ -79,24 +79,12 @@ function getPorter() {
 
 injectScript(browser.runtime.getURL("scripts/inpage.js"));
 
-if (origin === process.env.VIGVAM_WEBSITE_ORIGIN) {
-  injectScript(browser.runtime.getURL("scripts/version.js"), {
-    extid: browser.runtime.id,
-  });
-}
-
-function injectScript(src: string, attrs?: Record<string, string>) {
+function injectScript(src: string) {
   try {
     const container = document.head || document.documentElement;
     const script = document.createElement("script");
     script.setAttribute("async", "false");
     script.src = src;
-    if (attrs) {
-      for (const [key, value] of Object.entries(attrs)) {
-        script.dataset[key] = value;
-      }
-    }
-
     container.insertBefore(script, container.children[0]);
     container.removeChild(script);
   } catch (err) {
