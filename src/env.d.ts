@@ -5,8 +5,10 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     readonly NODE_ENV: "development" | "production" | "test";
-    readonly VERSION: string;
     readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
+    readonly VERSION: string;
+    // Vigvam specific
+    readonly VIGVAM_WEBSITE_ORIGIN: string;
   }
 }
 

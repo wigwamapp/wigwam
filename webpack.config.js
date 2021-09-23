@@ -28,6 +28,7 @@ const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
   NODE_ENV = "development",
   TARGET_BROWSER = "chrome",
+  VIGVAM_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
@@ -80,7 +81,7 @@ const HTML_TEMPLATES = [
     chunks: ["confirm"],
   },
 ];
-const SOLO_ENTRIES = ["content", "inpage"];
+const SOLO_ENTRIES = ["content", "inpage", "version"];
 
 const entry = (...files) =>
   files.filter(Boolean).map((f) => path.join(SOURCE_PATH, f));
@@ -99,6 +100,7 @@ module.exports = {
     confirm: entry("confirm.tsx"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
+    version: entry("version.ts"),
   },
 
   output: {
@@ -301,6 +303,7 @@ module.exports = {
                 processTemplate(content.toString("utf8"), {
                   pkg,
                   env: ENV_SLUG,
+                  website: VIGVAM_WEBSITE_ORIGIN,
                 })
               );
               const manifest = transformManifestKeys(json, TARGET_BROWSER);

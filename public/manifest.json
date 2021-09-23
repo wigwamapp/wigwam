@@ -12,7 +12,7 @@
   },
 
   "description": "__MSG_appDesc__",
-  "homepage_url": "https://vigvam.app",
+  "homepage_url": "{{website}}",
   "short_name": "Vigvam",
 
   "permissions": [
@@ -24,9 +24,9 @@
   ],
   "content_security_policy": "script-src 'self' 'sha256-a4v4czp2qnmr595pGYlZ07gEumM6d9R5qGz9t8CjuUE='; object-src 'self'",
 
-  "__chrome|firefox__author": "https://vigvam.app",
+  "__chrome|firefox__author": "{{website}}",
   "__opera__developer": {
-    "name": "https://vigvam.app"
+    "name": "{{website}}"
   },
 
   "__firefox__applications": {
@@ -66,5 +66,5 @@
     }
   ],
 
-  "web_accessible_resources": ["scripts/inpage.js"]
+  "web_accessible_resources": ["scripts/inpage.js", "scripts/version.js"]
 }
