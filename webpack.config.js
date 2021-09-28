@@ -155,18 +155,6 @@ module.exports = {
             ],
           },
 
-          // Fix incomprehensible 'require' check for `jotai`
-          {
-            test: /\.(js|mjs)$/,
-            include: [path.join(NODE_MODULES_PATH, "jotai")],
-            loader: "string-replace-loader",
-            options: {
-              search: "require",
-              replace: "_r",
-              flags: "g",
-            },
-          },
-
           // Process application JS with Sucrase.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
