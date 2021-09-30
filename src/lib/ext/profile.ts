@@ -4,7 +4,7 @@ import memoizeOne from "memoize-one";
 
 import { assert } from "lib/system/assert";
 
-import { getItemSafe } from "./utils";
+import { getItemSafe, getMainURL } from "./utils";
 
 export interface Profile {
   id: number;
@@ -44,7 +44,7 @@ export function openTabIfProfileChanged() {
   if (openTab) {
     localStorage.removeItem(OPEN_TAB_LSKEY);
     browser.tabs.create({
-      url: browser.runtime.getURL("main.html"),
+      url: getMainURL(),
       active: true,
     });
   }

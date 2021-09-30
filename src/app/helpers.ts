@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 
-import { getExtensionTabs } from "lib/ext/tab";
 import { isPopup } from "lib/ext/view";
+import { getMainURL } from "lib/ext/utils";
 import { Destination, toHash, navigate } from "lib/navigation";
 
 export async function openInTab(to?: Destination) {
@@ -11,16 +11,21 @@ export async function openInTab(to?: Destination) {
   }
 
   try {
-    const url = browser.runtime.getURL(
-      `main.html${to ? `#${toHash(to)}` : ""}`
-    );
-    const params = { url, active: true };
+    const hash = to && toHash(to);
 
-    const extTabs = await getExtensionTabs();
-    if (extTabs.length > 0) {
-      browser.tabs.update(extTabs[0].id, params);
+    let mainTabs = await browser.tabs.query({
+      currentWindow: true,
+      url: getMainURL("**"),
+    });
+    if (hash) {
+      mainTabs = mainTabs.filter((t) => t.url?.includes(hash));
+    }
+
+    if (mainTabs.length > 0) {
+      browser.tabs.update(mainTabs[0].id, { active: true });
     } else {
-      browser.tabs.create(params);
+      const url = getMainURL(hash && `#${hash}`);
+      browser.tabs.create({ url, active: true });
     }
   } catch (err) {
     console.error(err);

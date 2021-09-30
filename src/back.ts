@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 
 import { openTabIfProfileChanged } from "lib/ext/profile";
+import { getMainURL } from "lib/ext/utils";
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
@@ -18,7 +19,7 @@ openTabIfProfileChanged();
 browser.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === "install") {
     browser.tabs.create({
-      url: browser.runtime.getURL("main.html"),
+      url: getMainURL(),
       active: true,
     });
   }
