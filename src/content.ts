@@ -22,7 +22,6 @@
 import browser from "webextension-polyfill";
 
 import { Emitter } from "lib/emitter";
-import { PorterClient } from "lib/ext/porter/client";
 import { PorterChannel } from "core/types/shared";
 
 interface RequestArguments {
@@ -67,14 +66,6 @@ class Ethereum extends Emitter<ProviderMessage> {
   async enable() {}
 
   async request(_req: RequestArguments) {}
-}
-
-let porter: PorterClient;
-function getPorter() {
-  if (!porter) {
-    porter = new PorterClient(PorterChannel.DApp);
-  }
-  return porter;
 }
 
 injectScript(browser.runtime.getURL("scripts/inpage.js"));

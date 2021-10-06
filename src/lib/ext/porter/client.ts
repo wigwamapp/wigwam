@@ -3,15 +3,27 @@ import { PorterMessageType, PorterClientMessage } from "./types";
 import { deserializeError, PorterTimeoutError } from "./helpers";
 
 export class PorterClient<ReqData = any, ResData = unknown> {
-  public port: Runtime.Port;
+  private _port?: Runtime.Port;
   private reqId = 0;
 
-  constructor(name: string) {
-    this.port = browser.runtime.connect({ name });
+  get port() {
+    if (this._port) return this._port;
+
+    throw new Error(
+      "Not connected. Add `porter.connect()` at the top of your entry file"
+    );
+  }
+
+  get connected() {
+    return Boolean(this._port);
   }
 
   get name() {
     return this.port.name;
+  }
+
+  connect(name: string) {
+    this._port = browser.runtime.connect({ name });
   }
 
   /**
