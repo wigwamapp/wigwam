@@ -27,18 +27,25 @@ dotenv.config();
 const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
   NODE_ENV = "development",
+  STAGING_ENV = "false",
   TARGET_BROWSER = "chrome",
   VIGVAM_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
 } = process.env;
-const ENV_SLUG =
+const ENV_SHORT =
   NODE_ENV === "development"
     ? "dev"
     : NODE_ENV === "production"
     ? "prod"
     : NODE_ENV;
+const ENV_BADGE = [
+  ENV_SHORT === "prod" ? null : ENV_SHORT,
+  STAGING_ENV === "true" ? "staging" : null,
+]
+  .filter(Boolean)
+  .join(".");
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
 const SOURCE_MAP = NODE_ENV !== "production" && SOURCE_MAP_ENV !== "false";
@@ -47,7 +54,7 @@ const CWD_PATH = fs.realpathSync(process.cwd());
 const NODE_MODULES_PATH = path.join(CWD_PATH, "node_modules");
 const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
-const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SLUG);
+const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SHORT);
 const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
 const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
@@ -236,6 +243,7 @@ module.exports = {
     new webpack.DefinePlugin({
       SharedArrayBuffer: "_SharedArrayBuffer",
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
+      "process.env.STAGING_ENV": JSON.stringify(STAGING_ENV),
       "process.env.VERSION": JSON.stringify(VERSION),
       "process.env.TARGET_BROWSER": JSON.stringify(TARGET_BROWSER),
       ...(() => {
@@ -290,7 +298,8 @@ module.exports = {
               const json = JSON.parse(
                 processTemplate(content.toString("utf8"), {
                   pkg,
-                  env: ENV_SLUG,
+                  env: ENV_SHORT,
+                  envBadge: ENV_BADGE ? `[${ENV_BADGE.toUpperCase()}] ` : "",
                   website: VIGVAM_WEBSITE_ORIGIN,
                 })
               );
