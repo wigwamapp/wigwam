@@ -1,4 +1,5 @@
 import { assert } from "lib/system/assert";
+import { getPasswordHash } from "lib/crypto-utils/hash";
 import {
   EventMessage,
   MessageType,
@@ -32,9 +33,10 @@ export async function setupWallet(
   seedPhrase?: SeedPharse
 ) {
   const type = MessageType.SetupWallet;
+  const passwordHash = await getPasswordHash(password);
   const res = await porter.request({
     type,
-    password,
+    passwordHash,
     accounts,
     seedPhrase,
   });
@@ -44,9 +46,10 @@ export async function setupWallet(
 
 export async function unlockWallet(password: string) {
   const type = MessageType.UnlockWallet;
+  const passwordHash = await getPasswordHash(password);
   const res = await porter.request({
     type,
-    password,
+    passwordHash,
   });
   assert(res?.type === type);
 }
@@ -67,14 +70,15 @@ export async function addAccounts(accounts: AddAccountParams[]) {
   return res.accountAddresses;
 }
 
-export async function deleteAccount(
+export async function deleteAccounts(
   password: string,
   accountAddresses: string[]
 ) {
   const type = MessageType.DeleteAccounts;
+  const passwordHash = await getPasswordHash(password);
   const res = await porter.request({
     type,
-    password,
+    passwordHash,
     accountAddresses,
   });
   assert(res?.type === type);
@@ -98,9 +102,10 @@ export async function addSeedPhrase(seedPhrase: SeedPharse) {
 
 export async function getSeedPhrase(password: string) {
   const type = MessageType.GetSeedPhrase;
+  const passwordHash = await getPasswordHash(password);
   const res = await porter.request({
     type,
-    password,
+    passwordHash,
   });
   assert(res?.type === type);
   return res.seedPhrase;
@@ -108,9 +113,10 @@ export async function getSeedPhrase(password: string) {
 
 export async function getPrivateKey(password: string, accountAddress: string) {
   const type = MessageType.GetPrivateKey;
+  const passwordHash = await getPasswordHash(password);
   const res = await porter.request({
     type,
-    password,
+    passwordHash,
     accountAddress,
   });
   assert(res?.type === type);

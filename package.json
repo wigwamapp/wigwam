@@ -11,7 +11,7 @@
     "test": "cross-env NODE_ENV=test jest",
     "analyze": "cross-env WEBPACK_ANALYZE=true yarn build",
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
-    "ts-check": "tsc --pretty",
+    "ts": "tsc --pretty",
     "generate-types": "typechain --target=ethers-v5 --out-dir src/abi-types src/abi/*.json > /dev/null 2>&1",
     "postinstall": "husky install; yarn generate-types",
     "npm-audit": "npx synp --source-file yarn.lock && npm audit --production; rm package-lock.json"
@@ -44,6 +44,7 @@
     "eth-phishing-detect": "1.1.15",
     "ethers": "5.4.7",
     "fontfaceobserver": "2.1.0",
+    "hashids": "2.2.8",
     "inspx": "0.0.1-alpha.6",
     "inter-ui": "3.19.3",
     "jotai": "1.3.8",

@@ -4,7 +4,7 @@ import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
 import { useSteps } from "lib/use-steps";
 import { getLocale } from "lib/ext/i18n/react";
-import { getRandomBytes } from "lib/encryptor";
+import { getRandomBytes } from "lib/crypto-utils/random";
 
 import { SeedPharse } from "core/types";
 import { toWordlistLang, validateSeedPhrase } from "core/common";

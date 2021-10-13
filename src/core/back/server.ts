@@ -9,7 +9,7 @@ import {
   PorterChannel,
   WalletStatus,
 } from "core/types";
-import { saveAccounts } from "core/common";
+import { cleanAccounts, saveAccounts } from "core/common";
 
 import {
   $walletStatus,
@@ -48,10 +48,10 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       })
       .with(
         { type: MessageType.SetupWallet },
-        ({ type, password, accounts, seedPhrase }) =>
+        ({ type, passwordHash, accounts, seedPhrase }) =>
           withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
             const { vault, accountAddresses } = await Vault.setup(
-              password,
+              passwordHash,
               accounts,
               seedPhrase
             );
@@ -61,9 +61,9 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
             ctx.reply({ type, accountAddresses });
           })
       )
-      .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
+      .with({ type: MessageType.UnlockWallet }, ({ type, passwordHash }) =>
         withStatus(WalletStatus.Locked, async () => {
-          const vault = await Vault.unlock(password);
+          const vault = await Vault.unlock(passwordHash);
           unlocked(vault);
           ctx.reply({ type });
         })
@@ -85,29 +85,31 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       .with({ type: MessageType.AddAccounts }, ({ type, accounts }) =>
         withVault(async (vault) => {
           const accountAddresses = await vault.addAccounts(accounts);
+          await saveAccounts(accounts, accountAddresses);
           ctx.reply({ type, accountAddresses });
         })
       )
       .with(
         { type: MessageType.DeleteAccounts },
-        ({ type, password, accountAddresses }) =>
+        ({ type, passwordHash, accountAddresses }) =>
           withStatus(WalletStatus.Unlocked, async () => {
-            await Vault.deleteAccounts(password, accountAddresses);
+            await Vault.deleteAccounts(passwordHash, accountAddresses);
+            await cleanAccounts(accountAddresses);
             ctx.reply({ type });
           })
       )
-      .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
+      .with({ type: MessageType.GetSeedPhrase }, ({ type, passwordHash }) =>
         withStatus(WalletStatus.Unlocked, async () => {
-          const seedPhrase = await Vault.fetchSeedPhrase(password);
+          const seedPhrase = await Vault.fetchSeedPhrase(passwordHash);
           ctx.reply({ type, seedPhrase });
         })
       )
       .with(
         { type: MessageType.GetPrivateKey },
-        ({ type, password, accountAddress }) =>
+        ({ type, passwordHash, accountAddress }) =>
           withStatus(WalletStatus.Unlocked, async () => {
             const privateKey = await Vault.fetchPrivateKey(
-              password,
+              passwordHash,
               accountAddress
             );
             ctx.reply({ type, privateKey });

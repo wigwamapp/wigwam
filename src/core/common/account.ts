@@ -30,6 +30,10 @@ export function saveAccounts(
   );
 }
 
+export function cleanAccounts(addresses: string[]) {
+  return Repo.accounts.bulkDelete(addresses);
+}
+
 export function toPlainAccountParams(
   addParams: AddAccountParams
 ): AccountParams {

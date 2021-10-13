@@ -23,7 +23,7 @@ export const Data = {
 /**
  * Migrations
  */
-export type Migration = (passwordKey: CryptoKey) => Promise<void>;
+export type Migration = (key: CryptoKey) => Promise<void>;
 
 export const MIGRATIONS: ReadonlyArray<Migration> = [];
 

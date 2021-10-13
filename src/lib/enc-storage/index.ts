@@ -1,29 +1,24 @@
 import { Buffer } from "buffer";
 import * as Storage from "lib/ext/storage";
-import * as Encryptor from "lib/encryptor";
+import { getRandomBytes, deriveKey, decrypt, encrypt } from "lib/crypto-utils";
 
 export * from "lib/ext/storage";
 
-export interface Encrypted {
-  payload: Encryptor.EncryptedPayload;
-  salt: string;
-}
-
 export async function fetchAndDecryptOne<T>(
   storageKey: string,
-  passKey: CryptoKey
+  cryptoKey: CryptoKey
 ) {
-  const encItem = await Storage.fetch<Encrypted>(storageKey);
-  return decrypt<T>(encItem, passKey);
+  const encItem = await Storage.fetch<string>(storageKey);
+  return decryptStorageItem<T>(encItem, cryptoKey);
 }
 
 export async function encryptAndSaveMany(
   items: [string, unknown][],
-  passKey: CryptoKey
+  cryptoKey: CryptoKey
 ) {
   const encItems = await Promise.all(
-    items.map(async ([storageKey, stuff]) => {
-      const encItem = await encrypt(stuff, passKey);
+    items.map(async ([storageKey, data]) => {
+      const encItem = await encryptStorageItem(data, cryptoKey);
       return [storageKey, encItem] as [typeof storageKey, typeof encItem];
     })
   );
@@ -31,20 +26,28 @@ export async function encryptAndSaveMany(
   await Storage.putMany(encItems);
 }
 
-async function encrypt(stuff: any, passKey: CryptoKey): Promise<Encrypted> {
-  const salt = Encryptor.getRandomBytes();
-  const derivedPassKey = await Encryptor.deriveKey(passKey, salt);
-  const payload = await Encryptor.encrypt(stuff, derivedPassKey);
+async function encryptStorageItem(
+  data: any,
+  cryptoKey: CryptoKey
+): Promise<string> {
+  const salt = getRandomBytes();
+  const derivedPassKey = await deriveKey(cryptoKey, salt);
+  const { iv, cipher } = await encrypt(data, derivedPassKey);
 
-  return {
-    payload,
-    salt: Buffer.from(salt).toString("hex"),
-  };
+  return Buffer.concat([salt, iv, cipher]).toString("hex");
 }
 
-async function decrypt<T>(encItem: Encrypted, passKey: CryptoKey) {
-  const { salt: saltHex, payload } = encItem;
-  const salt = Buffer.from(saltHex, "hex");
-  const derivedPassKey = await Encryptor.deriveKey(passKey, salt);
-  return Encryptor.decrypt<T>(payload, derivedPassKey);
+async function decryptStorageItem<T>(item: string, cryptoKey: CryptoKey) {
+  const itemBuf = Buffer.from(item, "hex");
+
+  let index = 0;
+  const pick = (length?: number) =>
+    itemBuf.slice(index, length && (index += length));
+
+  const salt = pick(32);
+  const iv = pick(16);
+  const cipher = pick();
+
+  const derivedPassKey = await deriveKey(cryptoKey, salt);
+  return decrypt<T>({ iv, cipher }, derivedPassKey);
 }

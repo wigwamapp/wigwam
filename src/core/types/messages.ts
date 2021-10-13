@@ -67,7 +67,7 @@ export interface WalletStatusUpdated extends MessageBase {
 
 export interface SetupWalletRequest extends MessageBase {
   type: MessageType.SetupWallet;
-  password: string;
+  passwordHash: string;
   accounts: AddAccountParams[];
   seedPhrase?: SeedPharse;
 }
@@ -79,7 +79,7 @@ export interface SetupWalletResponse extends MessageBase {
 
 export interface UnlockWalletRequest extends MessageBase {
   type: MessageType.UnlockWallet;
-  password: string;
+  passwordHash: string;
 }
 
 export interface UnlockWalletResponse extends MessageBase {
@@ -124,7 +124,7 @@ export interface AddAccountsResponse extends MessageBase {
 
 export interface DeleteAccountsRequest extends MessageBase {
   type: MessageType.DeleteAccounts;
-  password: string;
+  passwordHash: string;
   accountAddresses: string[];
 }
 
@@ -134,7 +134,7 @@ export interface DeleteAccountsResponse extends MessageBase {
 
 export interface GetSeedPhraseRequest extends MessageBase {
   type: MessageType.GetSeedPhrase;
-  password: string;
+  passwordHash: string;
 }
 
 export interface GetSeedPhraseResponse extends MessageBase {
@@ -144,7 +144,7 @@ export interface GetSeedPhraseResponse extends MessageBase {
 
 export interface GetPrivateKeyRequest extends MessageBase {
   type: MessageType.GetPrivateKey;
-  password: string;
+  passwordHash: string;
   accountAddress: string;
 }
 
