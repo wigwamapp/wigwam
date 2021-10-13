@@ -7,6 +7,8 @@ import { SeedPharse } from "core/types";
 
 import { PublicError } from "./base";
 
+export const derivationPathRegex = new RegExp("^m(\\/[0-9]+')+$");
+
 export function generatePreviewHDNodes(
   extendedKey: string,
   offset = 0,
@@ -45,28 +47,7 @@ export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
 }
 
 export function validateDerivationPath(path: string) {
-  const valid = (() => {
-    if (!path.startsWith("m")) {
-      return false;
-    }
-    if (path.length > 1 && path[1] !== "/") {
-      return false;
-    }
-
-    const parts = path.replace("m", "").split("/").filter(Boolean);
-    if (
-      !parts.every((path) => {
-        const pNum = +(path.includes("'") ? path.replace("'", "") : path);
-        return Number.isSafeInteger(pNum) && pNum >= 0;
-      })
-    ) {
-      return false;
-    }
-
-    return true;
-  })();
-
-  if (!valid) {
+  if (!derivationPathRegex.test(path)) {
     throw new PublicError(t("derivationPathIsInvalid"));
   }
 }
