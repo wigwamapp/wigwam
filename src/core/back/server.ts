@@ -131,7 +131,9 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
             ctx.reply({ type, extendedKey });
           })
       )
-      .run();
+      .otherwise(() => {
+        throw new Error("Not Found");
+      });
   } catch (err) {
     ctx.replyError(err);
   }

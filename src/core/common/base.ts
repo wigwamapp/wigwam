@@ -12,10 +12,12 @@ export async function withError<T>(
 ) {
   try {
     return await factory(() => {
-      throw new Error();
+      throw new PublicError(errMessage);
     });
   } catch (err) {
-    throw err instanceof PublicError ? err : new PublicError(errMessage);
+    const isPublic = err instanceof PublicError;
+    if (!isPublic) console.error(err);
+    throw isPublic ? err : new PublicError(errMessage);
   }
 }
 
