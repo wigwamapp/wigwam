@@ -37,7 +37,7 @@ export class Vault {
     accounts: AddAccountParams[],
     seedPhrase?: SeedPharse
   ) {
-    return withError(t("failedToCreateWallet"), async (doThrow) => {
+    return withError(t("failedToSetupWallet"), async (doThrow) => {
       // Drop if wallet already exists
       if (await Vault.isExist()) {
         doThrow();
