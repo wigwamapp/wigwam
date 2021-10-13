@@ -83,10 +83,6 @@ const HTML_TEMPLATES = [
     path: path.join(PUBLIC_PATH, "popup.html"),
     chunks: ["popup"],
   },
-  {
-    path: path.join(PUBLIC_PATH, "confirm.html"),
-    chunks: ["confirm"],
-  },
 ];
 const SOLO_ENTRIES = ["content", "inpage", "version"];
 
@@ -104,7 +100,6 @@ module.exports = {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
     main: entry("main.tsx", NODE_ENV === "development" && "dev-tools.ts"),
     popup: entry("popup.tsx"),
-    confirm: entry("confirm.tsx"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
     version: entry("version.ts"),
