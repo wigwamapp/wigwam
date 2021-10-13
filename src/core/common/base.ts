@@ -12,7 +12,7 @@ export async function withError<T>(
 ) {
   try {
     return await factory(() => {
-      throw new Error("<stub>");
+      throw new Error();
     });
   } catch (err) {
     throw err instanceof PublicError ? err : new PublicError(errMessage);

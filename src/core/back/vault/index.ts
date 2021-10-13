@@ -148,9 +148,7 @@ export class Vault {
           await migrate(cryptoKey);
         }
       } catch (err) {
-        if (process.env.NODE_ENV === "development") {
-          console.error(err);
-        }
+        console.error(err);
       } finally {
         await Storage.encryptAndSaveMany(
           [Data.migrationLevel(MIGRATIONS.length)],

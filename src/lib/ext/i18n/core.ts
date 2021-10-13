@@ -61,9 +61,7 @@ export function t(messageName: string, substitutions?: Substitutions) {
 
     return val.message;
   } catch (err) {
-    if (process.env.NODE_ENV === "development") {
-      console.error(err);
-    }
+    console.error(err);
 
     return "";
   }
