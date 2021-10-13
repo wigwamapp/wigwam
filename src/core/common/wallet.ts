@@ -7,7 +7,7 @@ import { SeedPharse } from "core/types";
 
 import { PublicError } from "./base";
 
-export const derivationPathRegex = new RegExp("^m(\\/[0-9]+')+$");
+export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+$");
 
 export function generatePreviewHDNodes(
   extendedKey: string,

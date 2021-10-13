@@ -13,18 +13,20 @@ export async function openInTab(to?: Destination) {
   try {
     const hash = to && toHash(to);
 
-    let mainTabs = await browser.tabs.query({
+    const mainTabs = await browser.tabs.query({
       currentWindow: true,
       url: getMainURL("**"),
     });
-    if (hash) {
-      mainTabs = mainTabs.filter((t) => t.url?.includes(hash));
-    }
+
+    const url = getMainURL(`#${hash ?? ""}`);
 
     if (mainTabs.length > 0) {
-      browser.tabs.update(mainTabs[0].id, { active: true });
+      const tab = mainTabs[0];
+      browser.tabs.update(
+        tab.id,
+        tab.url === url ? { active: true } : { url, active: true }
+      );
     } else {
-      const url = getMainURL(hash && `#${hash}`);
       browser.tabs.create({ url, active: true });
     }
   } catch (err) {
