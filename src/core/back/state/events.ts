@@ -6,3 +6,5 @@ export const inited = createEvent<boolean>();
 export const unlocked = createEvent<Vault>();
 
 export const locked = createEvent();
+
+export const pinged = createEvent();

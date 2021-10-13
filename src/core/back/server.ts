@@ -18,6 +18,7 @@ import {
   withVault,
   locked,
   unlocked,
+  pinged,
 } from "./state";
 import { Vault } from "./vault";
 
@@ -37,6 +38,8 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
   console.debug("New wallet request", ctx);
 
   if (!ctx.request) return;
+
+  pinged();
 
   try {
     await ensureInited();
