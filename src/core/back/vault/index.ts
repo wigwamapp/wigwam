@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
 
+import { getRandomInt } from "lib/system/randomInt";
 import { getCryptoKey, getRandomBytes } from "lib/crypto-utils";
 import * as Storage from "lib/enc-storage";
 import { t } from "lib/ext/i18n";
@@ -17,7 +18,11 @@ import {
 
 import { MIGRATIONS, Data } from "./data";
 
+const MAX_DECRYPT_ATTEMPTS = 10;
+
 export class Vault {
+  static decryptAttempts = 0;
+
   static async unlock(passwordHash: string) {
     const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
 
@@ -123,9 +128,20 @@ export class Vault {
 
   private static getCryptoKeyCheck(passwordHash: string) {
     return withError(t("invalidPassword"), async () => {
-      const cryptoKey = await getCryptoKey(passwordHash);
-      await Storage.fetchAndDecryptOne(Data.check(), cryptoKey);
-      return cryptoKey;
+      try {
+        const cryptoKey = await getCryptoKey(passwordHash);
+        await Storage.fetchAndDecryptOne(Data.check(), cryptoKey);
+
+        Vault.decryptAttempts = 0;
+
+        return cryptoKey;
+      } catch (err) {
+        if (++Vault.decryptAttempts > MAX_DECRYPT_ATTEMPTS) {
+          await new Promise((r) => setTimeout(r, getRandomInt(3_000, 5_000)));
+        }
+
+        throw err;
+      }
     });
   }
 
