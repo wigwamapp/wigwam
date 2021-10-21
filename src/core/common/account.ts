@@ -67,7 +67,7 @@ export function toPlainAccountParams(
 export async function validateAccountExistence(address: string) {
   const acc = await Repo.accounts.get(address);
   if (acc) {
-    throw new PublicError(t("accountAlreadyExists"));
+    throw new PublicError(t("walletAlreadyExists"));
   }
 }
 

@@ -112,7 +112,7 @@ export class Vault {
   ) {
     await Vault.getCryptoKeyCheck(passwordHash);
 
-    return withError(t("failedToDeleteAccounts"), () =>
+    return withError(t("failedToDeleteWallets"), () =>
       Storage.transact(() =>
         Storage.remove(
           accountAddresses
@@ -216,7 +216,7 @@ export class Vault {
       const dataKey = Data.privateKey(accAddress)();
       const privKeyExists = await Storage.isStored(dataKey);
       if (!privKeyExists) {
-        throw new PublicError(t("cannotSignForAccount"));
+        throw new PublicError(t("cannotSignForWallet"));
       }
 
       const privKey = await Storage.fetchAndDecryptOne<string>(
@@ -244,7 +244,7 @@ export class Vault {
   }
 
   private addAccountsForce(accounts: AddAccountParams[]) {
-    return withError(t("failedToAddAccounts"), async () => {
+    return withError(t("failedToAddWallets"), async () => {
       // Generate rest crypto keys if needed
       type AccountStorageData = {
         address: string;
