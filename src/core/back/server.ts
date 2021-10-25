@@ -21,6 +21,7 @@ import {
   pinged,
 } from "./state";
 import { Vault } from "./vault";
+import { performRpc } from "./network";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -133,6 +134,13 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
             );
             ctx.reply({ type, extendedKey });
           })
+      )
+      .with(
+        { type: MessageType.PerformRpc },
+        async ({ type, chainId, method, params }) => {
+          const result = await performRpc(chainId, method, params);
+          ctx.reply({ type, result });
+        }
       )
       .otherwise(() => {
         throw new Error("Not Found");

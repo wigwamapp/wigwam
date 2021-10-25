@@ -9,8 +9,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
-import { providers } from "@0xsequence/multicall";
-import { ethers, providers as ethersProviders } from "ethers";
+import { ethers } from "ethers";
 import { useSteps } from "lib/use-steps";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
@@ -22,7 +21,7 @@ import {
   AccountSource,
 } from "core/types";
 import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
-import { addAccounts } from "core/client";
+import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
 import { hasSeedPhraseAtom, getNeuterExtendedKeyAtom } from "app/atoms";
@@ -63,12 +62,10 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
   }, [neuterExtendedKey, navigateToStep, fallbackStep]);
 
   const [network] = useState(INITIAL_NETWORK);
-  const provider = useMemo(() => {
-    const rpc = network.rpcURLs[0];
-    return new providers.MulticallProvider(
-      new ethersProviders.JsonRpcProvider(rpc)
-    );
-  }, [network]);
+  const provider = useMemo(
+    () => new ClientProvider(network.chainId),
+    [network]
+  );
 
   const addresses = useMemo(
     () =>

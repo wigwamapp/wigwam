@@ -13,7 +13,8 @@ export type Request =
   | GetSeedPhraseRequest
   | GetPrivateKeyRequest
   | GetPublicKeyRequest
-  | GetNeuterExtendedKeyRequest;
+  | GetNeuterExtendedKeyRequest
+  | PerformRpcRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -27,7 +28,8 @@ export type Response =
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
-  | GetNeuterExtendedKeyResponse;
+  | GetNeuterExtendedKeyResponse
+  | PerformRpcResponse;
 
 export type EventMessage = WalletStatusUpdated;
 
@@ -45,6 +47,7 @@ export enum MessageType {
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
+  PerformRpc = "PERFORM_RPC",
 }
 
 export interface MessageBase {
@@ -171,4 +174,16 @@ export interface GetNeuterExtendedKeyRequest extends MessageBase {
 export interface GetNeuterExtendedKeyResponse extends MessageBase {
   type: MessageType.GetNeuterExtendedKey;
   extendedKey: string;
+}
+
+export interface PerformRpcRequest extends MessageBase {
+  type: MessageType.PerformRpc;
+  chainId: number;
+  method: string;
+  params: any;
+}
+
+export interface PerformRpcResponse extends MessageBase {
+  type: MessageType.PerformRpc;
+  result: any;
 }

@@ -10,8 +10,7 @@ import {
 import classNames from "clsx";
 import { useSteps } from "lib/use-steps";
 import useForceUpdate from "use-force-update";
-import { providers } from "@0xsequence/multicall";
-import { ethers, providers as ethersProviders } from "ethers";
+import { ethers } from "ethers";
 import Transport from "@ledgerhq/hw-transport";
 import LedgerEth from "@ledgerhq/hw-app-eth";
 import { LedgerTransport, getExtendedKey } from "lib/ledger";
@@ -20,7 +19,7 @@ import retry from "async-retry";
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { AccountType, AccountSource, AddLedgerAccountParams } from "core/types";
 import { generatePreviewHDNodes } from "core/common";
-import { addAccounts } from "core/client";
+import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
 import { WalletStep } from "app/defaults";
@@ -73,12 +72,10 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
   );
 
   const [network] = useState(INITIAL_NETWORK);
-  const provider = useMemo(() => {
-    const rpc = network.rpcURLs[0];
-    return new providers.MulticallProvider(
-      new ethersProviders.JsonRpcProvider(rpc)
-    );
-  }, [network]);
+  const provider = useMemo(
+    () => new ClientProvider(network.chainId),
+    [network]
+  );
 
   const accounts = useMemo(
     () => (extendedKey ? generatePreviewHDNodes(extendedKey) : null),
