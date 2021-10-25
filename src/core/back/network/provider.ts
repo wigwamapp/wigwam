@@ -1,12 +1,16 @@
 import { providers as multicallProviders } from "@0xsequence/multicall";
 import { providers } from "ethers";
-import memoizeOne from "memoize-one";
-import { assert } from "lib/system/assert";
+import mem from "mem";
 
-import * as Repo from "core/repo";
+export async function performRpc(
+  chainId: number,
+  url: string,
+  method: string,
+  params: any
+) {
+  console.info("Perform RPC request", { chainId, url, method, params });
 
-export async function performRpc(chainId: number, method: string, params: any) {
-  const { plainProvider, multicallProvider } = await getProvider(chainId);
+  const { plainProvider, multicallProvider } = await getProvider(url, chainId);
 
   switch (method) {
     case "getBalance":
@@ -23,11 +27,8 @@ export async function performRpc(chainId: number, method: string, params: any) {
   }
 }
 
-const getProvider = memoizeOne(async (chainId: number) => {
-  const network = await Repo.networks.get(chainId);
-  assert(network);
-
-  const plainProvider = new NetworkProvider(network);
+const getProvider = mem(async (url: string, chainId: number) => {
+  const plainProvider = new RpcProvider(url, chainId);
   const multicallProvider = new multicallProviders.MulticallProvider(
     plainProvider
   );
@@ -35,11 +36,7 @@ const getProvider = memoizeOne(async (chainId: number) => {
   return { plainProvider, multicallProvider };
 });
 
-class NetworkProvider extends providers.JsonRpcProvider {
-  constructor({ chainId, name, rpcURLs }: Repo.INetwork) {
-    super(rpcURLs[0], { chainId, name });
-  }
-
+class RpcProvider extends providers.JsonRpcProvider {
   async detectNetwork() {
     return this.network;
   }

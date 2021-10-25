@@ -119,6 +119,7 @@ module.exports = {
       "@toruslabs/openlogin": require.resolve(
         "@toruslabs/openlogin/dist/openlogin.umd.min.js"
       ),
+      "@ethersproject/random": "lib/ethers-random",
     },
   },
 
