@@ -1,6 +1,7 @@
 import { ModuleThread, spawn, Thread } from "threads";
 import memoizeOne from "memoize-one";
 import { assert } from "lib/system/assert";
+import { notifyWorkerSpawned } from "lib/ext/worker";
 
 import * as Repo from "core/repo";
 
@@ -38,9 +39,11 @@ const getWorker = async () => {
   return worker;
 };
 
-const spawnWorkerMemo = memoizeOne(() =>
-  spawn<typeof Provider>(new Worker(new URL("./worker", import.meta.url)))
-);
+const spawnWorkerMemo = memoizeOne(() => {
+  const worker = new Worker(new URL("./worker", import.meta.url));
+  notifyWorkerSpawned(worker);
+  return spawn<typeof Provider>(worker);
+});
 
 const terminate = (thread: ModuleThread) => {
   spawnWorkerMemo.clear();

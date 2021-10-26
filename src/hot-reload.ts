@@ -22,6 +22,13 @@ const SLOW_DOWN_AFTER = 10 * 60_000; // 10 min
 const backgroundScripts = getBackgroundScripts();
 const contentScripts = getContentScripts();
 
+// A little hack for dev experience :)
+// Listen custom event "worker_spawned", and add it to script list.
+window.addEventListener<any>("worker_spawned", (evt: CustomEvent<string>) => {
+  const workerScript = evt.detail;
+  backgroundScripts.push(workerScript);
+});
+
 chrome.management.getSelf((self) => {
   if (self.installType === "development") {
     chrome.runtime.getPackageDirectoryEntry(watchChanges);

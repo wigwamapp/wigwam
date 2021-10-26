@@ -1,6 +1,8 @@
 import { providers as multicallProviders } from "@0xsequence/multicall";
 import { providers } from "ethers";
 import mem from "mem";
+// import memoizeOne from "memoize-one";
+// import { dequal } from "dequal/lite";
 
 export async function performRpc(
   chainId: number,
@@ -40,4 +42,19 @@ class RpcProvider extends providers.JsonRpcProvider {
   async detectNetwork() {
     return this.network;
   }
+
+  // async perform(method: string, params: any) {
+  //   switch (method) {
+  //     case "getBlock":
+  //       return this.getBlockMemo(params);
+
+  //     default:
+  //       return super.perform(method, params);
+  //   }
+  // }
+
+  // private getBlockMemo = memoizeOne(
+  //   (params: any) => super.perform("getBlock", params),
+  //   dequal
+  // );
 }
