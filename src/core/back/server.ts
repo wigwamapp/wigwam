@@ -21,7 +21,7 @@ import {
   pinged,
 } from "./state";
 import { Vault } from "./vault";
-import { performRpc } from "./network";
+import { sendRpc } from "./network";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -136,10 +136,10 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           })
       )
       .with(
-        { type: MessageType.PerformRpc },
+        { type: MessageType.SendRpc },
         async ({ type, chainId, method, params }) => {
-          const result = await performRpc(chainId, method, params);
-          ctx.reply({ type, result });
+          const response = await sendRpc(chainId, method, params);
+          ctx.reply({ type, response });
         }
       )
       .otherwise(() => {

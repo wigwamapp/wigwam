@@ -1,5 +1,6 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams } from "./addAccount";
+import { RpcResponse } from "./network";
 
 export type Request =
   | GetWalletStatusRequest
@@ -14,7 +15,7 @@ export type Request =
   | GetPrivateKeyRequest
   | GetPublicKeyRequest
   | GetNeuterExtendedKeyRequest
-  | PerformRpcRequest;
+  | SendRpcRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -29,7 +30,7 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
-  | PerformRpcResponse;
+  | SendRpcResponse;
 
 export type EventMessage = WalletStatusUpdated;
 
@@ -47,7 +48,7 @@ export enum MessageType {
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
-  PerformRpc = "PERFORM_RPC",
+  SendRpc = "PERFORM_RPC",
 }
 
 export interface MessageBase {
@@ -176,14 +177,14 @@ export interface GetNeuterExtendedKeyResponse extends MessageBase {
   extendedKey: string;
 }
 
-export interface PerformRpcRequest extends MessageBase {
-  type: MessageType.PerformRpc;
+export interface SendRpcRequest extends MessageBase {
+  type: MessageType.SendRpc;
   chainId: number;
   method: string;
   params: any;
 }
 
-export interface PerformRpcResponse extends MessageBase {
-  type: MessageType.PerformRpc;
-  result: any;
+export interface SendRpcResponse extends MessageBase {
+  type: MessageType.SendRpc;
+  response: RpcResponse;
 }

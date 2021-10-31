@@ -237,7 +237,9 @@ module.exports = {
     new CaseSensitivePathsPlugin(),
 
     new webpack.DefinePlugin({
+      // for web extensions
       SharedArrayBuffer: "_SharedArrayBuffer",
+      // for env vars
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
       "process.env.STAGING_ENV": JSON.stringify(STAGING_ENV),
       "process.env.VERSION": JSON.stringify(VERSION),
