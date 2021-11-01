@@ -1,4 +1,5 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
+import memoizeOne from "memoize-one";
 import { PorterClient } from "lib/ext/porter/client";
 import { assert } from "lib/system/assert";
 
@@ -11,9 +12,7 @@ export class ClientProvider extends JsonRpcProvider {
     super("", chainId);
   }
 
-  async detectNetwork() {
-    return this.network;
-  }
+  getNetwork = memoizeOne(super.getNetwork.bind(this));
 
   async send(method: string, params: Array<any>): Promise<any> {
     const type = MessageType.SendRpc;

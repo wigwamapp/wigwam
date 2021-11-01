@@ -1,6 +1,7 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { providers as multicallProviders } from "@0xsequence/multicall";
-import mem from "mem";
+import memoizeOne from "memoize-one";
+import memoize from "mem";
 
 import { RpcResponse } from "core/types";
 
@@ -16,14 +17,23 @@ export async function sendRpc(
 
   const getResult = async () => {
     switch (method) {
-      // Cached
+      /**
+       * Cached
+       */
       case "eth_chainId":
-        return chainId;
+      case "net_version":
+        return plainProvider.getChainId();
 
       case "eth_blockNumber":
-        return plainProvider.getCachedBlockNumber();
+        return plainProvider._getFastBlockNumber();
 
-      // Multicall
+      case "eth_getBlockByHash":
+      case "eth_getBlockByNumber":
+        return plainProvider._getBlock(params[0], params[1]);
+
+      /**
+       * Multicall
+       */
       case "eth_getBalance":
         return multicallProvider.getBalance(params[0], params[1]);
 
@@ -33,6 +43,9 @@ export async function sendRpc(
       case "eth_call":
         return multicallProvider.call(params[0], params[1]);
 
+      /**
+       * Rest
+       */
       default:
         return plainProvider.send(method, params);
     }
@@ -51,7 +64,7 @@ export async function sendRpc(
   }
 }
 
-const getProvider = mem(async (url: string, chainId: number) => {
+const getProvider = memoize(async (url: string, chainId: number) => {
   const plainProvider = new RpcProvider(url, chainId);
   const multicallProvider = new multicallProviders.MulticallProvider(
     plainProvider
@@ -61,21 +74,7 @@ const getProvider = mem(async (url: string, chainId: number) => {
 });
 
 class RpcProvider extends JsonRpcProvider {
-  private _cachedBlockNumber?: number;
+  getNetwork = memoizeOne(super.getNetwork.bind(this));
 
-  constructor(url: string, chainId: number) {
-    super(url, chainId);
-
-    this.on("block", (blockNumber) => {
-      this._cachedBlockNumber = blockNumber;
-    });
-  }
-
-  async detectNetwork() {
-    return this.network;
-  }
-
-  async getCachedBlockNumber() {
-    return this._cachedBlockNumber ?? this.getBlockNumber();
-  }
+  getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
 }
