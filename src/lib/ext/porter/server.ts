@@ -126,7 +126,7 @@ export class MessageContext<Data, ReplyData> {
 
   reply(data: ReplyData) {
     assertRequest(this.msg);
-    this.port.postMessage({
+    this.send({
       type: PorterMessageType.Res,
       reqId: this.msg.reqId,
       data,

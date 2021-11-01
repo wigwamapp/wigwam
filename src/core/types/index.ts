@@ -3,4 +3,5 @@ export * from "./account";
 export * from "./addAccount";
 export * from "./messages";
 export * from "./shared";
-export * from "./network";
+export * from "./rpc";
+export * from "./activity";

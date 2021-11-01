@@ -2,10 +2,10 @@ import { createStore } from "effector";
 
 import * as Global from "lib/ext/global";
 import { Setting } from "core/common";
-import { WalletStatus } from "core/types";
+import { WalletStatus, ForApproval } from "core/types";
 
 import { Vault } from "../vault";
-import { inited, unlocked, locked, pinged } from "./events";
+import { inited, unlocked, locked, pinged, approvalItemAdded } from "./events";
 
 export const $walletStatus = createStore(WalletStatus.Idle)
   .on(inited, (_s, vaultExists) =>
@@ -33,3 +33,8 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   });
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;
+
+export const $awaitingApproval = createStore<ForApproval[]>([]).on(
+  approvalItemAdded,
+  (current, item) => [...current, item]
+);

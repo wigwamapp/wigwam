@@ -13,6 +13,7 @@ import { cleanAccounts, saveAccounts } from "core/common";
 
 import {
   $walletStatus,
+  $awaitingApproval,
   ensureInited,
   withStatus,
   withVault,
@@ -21,7 +22,7 @@ import {
   pinged,
 } from "./state";
 import { Vault } from "./vault";
-import { sendRpc } from "./network";
+import { handleRpc } from "./rpc";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -29,6 +30,13 @@ export function startServer() {
 
   $walletStatus.watch((status) => {
     walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
+  });
+
+  $awaitingApproval.watch((awaitingApproval) => {
+    walletPorter.broadcast({
+      type: MessageType.AwaitingApprovalUpdated,
+      awaitingApproval,
+    });
   });
 
   // const dappPorter = new PorterServer(PorterChannel.DApp);
@@ -137,9 +145,10 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       )
       .with(
         { type: MessageType.SendRpc },
-        async ({ type, chainId, method, params }) => {
-          const response = await sendRpc(chainId, method, params);
-          ctx.reply({ type, response });
+        ({ type, chainId, method, params }) => {
+          handleRpc(chainId, method, params, (response) =>
+            ctx.reply({ type, response })
+          );
         }
       )
       .otherwise(() => {

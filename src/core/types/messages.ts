@@ -1,6 +1,7 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams } from "./addAccount";
-import { RpcResponse } from "./network";
+import { RpcResponse } from "./rpc";
+import { ForApproval } from "./activity";
 
 export type Request =
   | GetWalletStatusRequest
@@ -32,7 +33,7 @@ export type Response =
   | GetNeuterExtendedKeyResponse
   | SendRpcResponse;
 
-export type EventMessage = WalletStatusUpdated;
+export type EventMessage = WalletStatusUpdated | AwaitingApprovalUpdated;
 
 export enum MessageType {
   GetWalletStatus = "GET_WALLET_STATUS",
@@ -48,7 +49,8 @@ export enum MessageType {
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
-  SendRpc = "PERFORM_RPC",
+  SendRpc = "SEND_RPC",
+  AwaitingApprovalUpdated = "AWAITING_APPROVAL_UPDATED",
 }
 
 export interface MessageBase {
@@ -181,10 +183,15 @@ export interface SendRpcRequest extends MessageBase {
   type: MessageType.SendRpc;
   chainId: number;
   method: string;
-  params: any;
+  params: any[];
 }
 
 export interface SendRpcResponse extends MessageBase {
   type: MessageType.SendRpc;
   response: RpcResponse;
+}
+
+export interface AwaitingApprovalUpdated extends MessageBase {
+  type: MessageType.AwaitingApprovalUpdated;
+  awaitingApproval: ForApproval[];
 }

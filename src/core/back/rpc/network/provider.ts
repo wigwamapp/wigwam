@@ -9,7 +9,7 @@ export async function sendRpc(
   chainId: number,
   url: string,
   method: string,
-  params: any
+  params: any[]
 ): Promise<RpcResponse> {
   console.info("Perform RPC request", { chainId, url, method, params });
 
