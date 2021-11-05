@@ -272,7 +272,7 @@ module.exports = {
           filename: path.basename(htmlTemplate.path),
           chunks: htmlTemplate.chunks,
           inject: "body",
-          minify: false,
+          minify: NODE_ENV === "production",
         })
     ),
 
