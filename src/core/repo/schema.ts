@@ -11,6 +11,6 @@ export const db = new Dexie(underProfile("main"));
  */
 
 db.version(1).stores({
-  [RepoTable.Networks]: "&chainId,*rpcURLs,name,mainAssetSymbol,mainAssetName",
-  [RepoTable.Accounts]: "&address,type,name",
+  [RepoTable.Networks]: "&chainId,*rpcUrls,name,mainnet",
+  [RepoTable.Accounts]: "&address,name,type,source",
 });

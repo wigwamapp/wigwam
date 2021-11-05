@@ -7,12 +7,16 @@ export enum RepoTable {
 
 export interface INetwork {
   chainId: number;
-  rpcURLs: string[];
-  main: boolean;
+  rpcUrls: string[];
   name: string;
-  mainAssetSymbol?: string;
-  mainAssetName?: string;
-  blockExplorerURL?: string;
+  mainnet: boolean;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  blockExplorerUrls?: string[];
+  iconUrls?: string[];
 }
 
 export type IAccount = AccountParams & {

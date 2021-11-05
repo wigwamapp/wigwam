@@ -194,8 +194,8 @@ const Account = memo<AccountProps>(({ address, provider, network }) => {
     () =>
       balance
         ? {
-            symbol: network.mainAssetSymbol!,
-            name: network.mainAssetName!,
+            symbol: network.nativeCurrency.symbol,
+            name: network.nativeCurrency.name,
             balance,
           }
         : undefined,

@@ -11,10 +11,10 @@ export async function setupFixtures() {
         const existing = await networks.get(net.chainId);
         if (existing) {
           await networks.where({ chainId: net.chainId }).modify((extNet) => {
-            const rpcURLSet = new Set(
-              [...net.rpcURLs, ...extNet.rpcURLs].map(formatURL)
+            const rpcUrlSet = new Set(
+              [...net.rpcUrls, ...extNet.rpcUrls].map(formatURL)
             );
-            extNet.rpcURLs = Array.from(rpcURLSet);
+            extNet.rpcUrls = Array.from(rpcUrlSet);
           });
         } else {
           await networks.add(net);

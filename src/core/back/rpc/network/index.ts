@@ -13,7 +13,7 @@ export async function sendRpc(chainId: number, method: string, params: any[]) {
   const worker = await getWorker();
   const network = await getNetwork(chainId);
 
-  const url = network.rpcURLs[0];
+  const url = network.rpcUrls[0];
   const result = await worker.sendRpc(chainId, url, method, params);
 
   return result;
