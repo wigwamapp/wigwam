@@ -1,13 +1,18 @@
 import { INetwork } from "core/repo";
 
-export const DEFAULT_NETWORKS: INetwork[] = [
+// Currently taken from
+// https://github.com/TP-Lab/networklist-org/blob/main/chains.json
+
+export const DEFAULT_NETWORKS = [
   // Ethereum
   {
     chainId: 1,
     rpcUrls: [
-      "https://cloudflare-eth.com/",
-      "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161/",
+      "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "https://api.mycryptoapi.com/eth",
+      "https://cloudflare-eth.com",
     ],
+    chain: "ETH",
     mainnet: true,
     name: "Ethereum Mainnet",
     nativeCurrency: {
@@ -15,31 +20,43 @@ export const DEFAULT_NETWORKS: INetwork[] = [
       name: "Ethereum",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://etherscan.io"],
+    explorerUrls: ["https://etherscan.io"],
+    faucetUrls: [],
+    infoUrl: "https://ethereum.org",
   },
   {
     chainId: 3,
-    rpcUrls: ["https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161/"],
+    rpcUrls: ["https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"],
     mainnet: false,
-    name: "Ropsten Test Network",
+    name: "Ethereum Testnet Ropsten",
     nativeCurrency: {
-      symbol: "ETH",
-      name: "Ethereum",
+      symbol: "ROP",
+      name: "Ropsten Ether",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://ropsten.etherscan.io"],
+    explorerUrls: ["https://ropsten.etherscan.io"],
+    faucetUrls: ["https://faucet.ropsten.be"],
+    infoUrl: "https://github.com/ethereum/ropsten",
   },
   {
     chainId: 42,
-    rpcUrls: ["https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161/"],
+    rpcUrls: [
+      "https://kovan.poa.network",
+      "http://kovan.poa.network:8545",
+      "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+    ],
     mainnet: false,
-    name: "Kovan Test Network",
+    name: "Ethereum Testnet Kovan",
     nativeCurrency: {
-      symbol: "ETH",
-      name: "Ethereum",
+      symbol: "KOV",
+      name: "Kovan Ether",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://kovan.etherscan.io"],
+    explorerUrls: ["https://kovan.etherscan.io"],
+    faucetUrls: [
+      "https://faucet.kovan.network",
+      "https://gitter.im/kovan-testnet/faucet",
+    ],
   },
 
   // Binance Smart Chain
@@ -53,7 +70,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
       name: "Binance Coin",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://bscscan.com"],
+    explorerUrls: ["https://bscscan.com"],
   },
   {
     chainId: 97,
@@ -65,7 +82,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
       name: "Binance Coin",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://testnet.bscscan.com"],
+    explorerUrls: ["https://testnet.bscscan.com"],
   },
 
   // Huobi Eco Chain
@@ -79,7 +96,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
       name: "Binance Coin",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://scan.hecochain.com"],
+    explorerUrls: ["https://scan.hecochain.com"],
   },
   {
     chainId: 256,
@@ -91,7 +108,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
       name: "Huobi Token",
       decimals: 18,
     },
-    blockExplorerUrls: ["https://scan-testnet.hecochain.com"],
+    explorerUrls: ["https://scan-testnet.hecochain.com"],
   },
 ];
 

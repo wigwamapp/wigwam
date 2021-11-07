@@ -8,6 +8,7 @@ export enum RepoTable {
 export interface INetwork {
   chainId: number;
   rpcUrls: string[];
+  chain: string;
   name: string;
   mainnet: boolean;
   nativeCurrency: {
@@ -15,8 +16,11 @@ export interface INetwork {
     symbol: string; // 2-6 characters long
     decimals: 18;
   };
-  blockExplorerUrls?: string[];
+  explorerUrls?: string[];
+  ensRegistry?: string;
   iconUrls?: string[];
+  faucetUrls?: string[];
+  infoUrl?: string;
 }
 
 export type IAccount = AccountParams & {
