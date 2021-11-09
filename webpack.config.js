@@ -27,7 +27,7 @@ dotenv.config();
 const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
   NODE_ENV = "development",
-  STAGING_ENV = "false",
+  STAGING_ENV = JSON.stringify(NODE_ENV !== "production"),
   TARGET_BROWSER = "chrome",
   VIGVAM_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
@@ -43,9 +43,7 @@ const ENV_SHORT =
 const ENV_BADGE = [
   ENV_SHORT === "prod" ? null : ENV_SHORT,
   STAGING_ENV === "true" ? "staging" : null,
-]
-  .filter(Boolean)
-  .join(".");
+].find(Boolean);
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
 const SOURCE_MAP = NODE_ENV !== "production" && SOURCE_MAP_ENV !== "false";
