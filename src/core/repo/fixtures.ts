@@ -3,25 +3,59 @@ import { formatURL } from "core/common";
 
 import { db } from "./schema";
 import { networks } from "./helpers";
+import { INetwork } from "./types";
 
 export async function setupFixtures() {
   try {
     await db.transaction("rw", networks, async () => {
-      for (const net of DEFAULT_NETWORKS) {
-        const existing = await networks.get(net.chainId);
-        if (existing) {
-          await networks.where({ chainId: net.chainId }).modify((extNet) => {
-            const rpcUrlSet = new Set(
-              [...net.rpcUrls, ...extNet.rpcUrls].map(formatURL)
-            );
-            extNet.rpcUrls = Array.from(rpcUrlSet);
-          });
-        } else {
-          await networks.add(net);
-        }
-      }
+      const existingNetworks = await networks.bulkGet(
+        DEFAULT_NETWORKS.map((net) => net.chainId)
+      );
+
+      const toPut = DEFAULT_NETWORKS.map((net, i) => {
+        const existing = existingNetworks[i];
+        if (!existing) return net;
+
+        return mergeNetwork(existing, net);
+      });
+
+      await networks.bulkPut(toPut);
     });
   } catch (err) {
     console.error(err);
   }
+}
+
+function mergeNetwork(saved: INetwork, toMerge: INetwork): INetwork {
+  const {
+    chainTag,
+    infoUrl,
+    nativeCurrency,
+    rpcUrls,
+    faucetUrls,
+    explorerUrls,
+  } = toMerge;
+
+  return {
+    ...saved,
+    // Override
+    chainTag,
+    infoUrl,
+    nativeCurrency: {
+      ...saved.nativeCurrency,
+      name: nativeCurrency.name,
+    },
+    // Merge
+    rpcUrls: mergeUrls(saved.rpcUrls, rpcUrls)!,
+    faucetUrls: mergeUrls(saved.faucetUrls, faucetUrls),
+    explorerUrls: mergeUrls(saved.explorerUrls, explorerUrls),
+  };
+}
+
+function mergeUrls(base?: string[], toMerge?: string[]) {
+  if (base && toMerge) {
+    return Array.from(new Set([...base, ...toMerge].map(formatURL)));
+  }
+
+  return base ?? toMerge;
 }
