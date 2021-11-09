@@ -1,30 +1,23 @@
 import { ModuleThread, spawn, Thread } from "threads";
 import memoizeOne from "memoize-one";
-import { assert } from "lib/system/assert";
 import { notifyWorkerSpawned } from "lib/ext/worker";
 
-import * as Repo from "core/repo";
+import { getRpcUrl } from "core/common/network";
 
 import type * as Provider from "./provider";
 
 const RPC_WORKER_TERMINATE_TIMEOUT = 5 * 60 * 60_000; // 5 min
 
 export async function sendRpc(chainId: number, method: string, params: any[]) {
-  const worker = await getWorker();
-  const network = await getNetwork(chainId);
+  const [worker, url] = await Promise.all([getWorker(), getRpcUrl(chainId)]);
 
-  const url = network.rpcUrls[0];
-  const result = await worker.sendRpc(chainId, url, method, params);
-
-  return result;
+  try {
+    return await worker.sendRpc(chainId, url, method, params);
+  } catch (err) {
+    // @TODO: Handle non rpc errors, and wrap them to rpc format
+    throw err;
+  }
 }
-
-const getNetwork = memoizeOne(async (chainId: number) => {
-  const network = await Repo.networks.get(chainId);
-  assert(network);
-
-  return network;
-});
 
 let terminateTimeout: number;
 const getWorker = async () => {

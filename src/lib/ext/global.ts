@@ -23,16 +23,20 @@ export function clear() {
   notifySelf(null);
 }
 
-export function subscribe(key: string, callback: () => void) {
+export function subscribe(
+  key: string,
+  callback: () => void,
+  opts?: AddEventListenerOptions
+) {
   const handleChange = (evt: StorageEvent | CustomEvent<string | null>) => {
     const evtKey = evt instanceof StorageEvent ? evt.key : evt.detail;
     if (evtKey === key || evtKey === null) callback();
   };
 
   // this only works for other documents, not the current one
-  window.addEventListener("storage", handleChange);
+  window.addEventListener("storage", handleChange, opts);
   // this is a custom event, triggered in writeValueToLocalStorage
-  window.addEventListener<any>("local-storage", handleChange);
+  window.addEventListener<any>("local-storage", handleChange, opts);
 
   return () => {
     window.removeEventListener("storage", handleChange);
