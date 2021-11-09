@@ -4346,10 +4346,10 @@ detective@^5.2.0:
     defined "^1.0.0"
     minimist "^1.1.1"
 
-dexie@3.1.0-alpha.8:
-  version "3.1.0-alpha.8"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.1.0-alpha.8.tgz#154cf0bba8d0c0d9e7e2e3128a60ebb0597da8b6"
-  integrity sha512-7LGEXCJPfsMkgRrLMNqeCxt32CnZrrFyRU5kt6v5+bVXW43d7C2hU4WHORKYaP3BWumBg4A+YIaBYKV9EhX9CQ==
+dexie@3.2.0-rc.3:
+  version "3.2.0-rc.3"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.2.0-rc.3.tgz#e79c531fde444f063c3c841e5886b5da36e88aba"
+  integrity sha512-4DdArnU3AWfCWRFz+7lkgZMjTvhPgYvQ5vGA4nHdTWvi+Gh5hLIeF/vGa7MjgeXLae82uquWixihXqyuheQSTA==
 
 didyoumean@^1.2.2:
   version "1.2.2"
