@@ -7,17 +7,17 @@ export enum RepoTable {
 
 export interface INetwork {
   chainId: number;
+  type: INetworkType;
   rpcUrls: string[];
-  chain: string;
+  chainTag: string;
   name: string;
-  mainnet: boolean;
   nativeCurrency: {
     name: string;
     symbol: string; // 2-6 characters long
     decimals: 18;
   };
-  explorerUrls?: string[];
   ensRegistry?: string;
+  explorerUrls?: string[];
   iconUrls?: string[];
   faucetUrls?: string[];
   infoUrl?: string;
@@ -28,3 +28,5 @@ export type IAccount = AccountParams & {
   name: string;
   usdValues: Record<number, string>;
 };
+
+export type INetworkType = "mainnet" | "testnet" | "manually-added";

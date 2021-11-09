@@ -1,7 +1,9 @@
 import browser from "webextension-polyfill";
 
+export const getPublicURL = browser.runtime.getURL;
+
 export function getMainURL(path = "") {
-  return browser.runtime.getURL(`main.html${path ?? ""}`);
+  return getPublicURL(`main.html${path}`);
 }
 
 export function getItemSafe<T = any>(key: string, opts = { serealize: true }) {
