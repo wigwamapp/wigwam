@@ -27,7 +27,7 @@ dotenv.config();
 const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
   NODE_ENV = "development",
-  STAGING_ENV = JSON.stringify(NODE_ENV !== "production"),
+  RELEASE_ENV = "false",
   TARGET_BROWSER = "chrome",
   VIGVAM_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
@@ -42,7 +42,7 @@ const ENV_SHORT =
     : NODE_ENV;
 const ENV_BADGE = [
   ENV_SHORT === "prod" ? null : ENV_SHORT,
-  STAGING_ENV === "true" ? "staging" : null,
+  RELEASE_ENV !== "true" ? "staging" : null,
 ].find(Boolean);
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
@@ -239,7 +239,7 @@ module.exports = {
       SharedArrayBuffer: "_SharedArrayBuffer",
       // for env vars
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
-      "process.env.STAGING_ENV": JSON.stringify(STAGING_ENV),
+      "process.env.RELEASE_ENV": JSON.stringify(RELEASE_ENV),
       "process.env.VERSION": JSON.stringify(VERSION),
       "process.env.TARGET_BROWSER": JSON.stringify(TARGET_BROWSER),
       ...(() => {

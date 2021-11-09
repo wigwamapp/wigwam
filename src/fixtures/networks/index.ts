@@ -29,7 +29,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
   CELO,
 ].flat();
 
-if (process.env.STAGING_ENV === "true") {
+if (process.env.RELEASE_ENV === "false") {
   assert(
     new Set(DEFAULT_NETWORKS.map((n) => n.chainId)).size ===
       DEFAULT_NETWORKS.length,
