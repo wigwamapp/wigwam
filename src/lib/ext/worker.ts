@@ -9,18 +9,17 @@ export function notifyWorkerSpawned(worker?: Worker) {
       postMessage({ type, scriptPathname: location.pathname });
     } else {
       // Inside parent script
-      const handleMessage = (evt: MessageEvent<any>) => {
-        if (evt.data?.type === "worker_spawned") {
-          window.dispatchEvent(
-            new CustomEvent<string>(evt.data.type, {
-              detail: evt.data.scriptPathname,
-            })
-          );
-          worker!.removeEventListener("message", handleMessage);
-        }
-      };
-
-      worker!.addEventListener("message", handleMessage);
+      worker!.addEventListener(
+        "message",
+        (evt) => {
+          if (evt.data?.type === type) {
+            window.dispatchEvent(
+              new CustomEvent<string>(type, { detail: evt.data.scriptPathname })
+            );
+          }
+        },
+        { once: true }
+      );
     }
   }
 }
