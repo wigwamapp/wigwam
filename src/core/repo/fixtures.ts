@@ -14,9 +14,7 @@ export async function setupFixtures() {
 
       const toPut = DEFAULT_NETWORKS.map((net, i) => {
         const existing = existingNetworks[i];
-        if (!existing) return net;
-
-        return mergeNetwork(existing, net);
+        return existing ? mergeNetwork(existing, net) : net;
       });
 
       await networks.bulkPut(toPut);
