@@ -45,6 +45,10 @@ export const getNetworkMemo = memoize(async (chainId: number) => {
   return net;
 });
 
+export function formatRpcUrl(url: string) {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
 export class NetworkNotFoundError implements Error {
   name = "NetworkNotFoundError";
   message = "Network Not Found";

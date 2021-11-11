@@ -1,5 +1,5 @@
 import { DEFAULT_NETWORKS } from "fixtures/networks";
-import { formatURL } from "core/common";
+import { formatRpcUrl } from "core/common";
 
 import { db } from "./schema";
 import { networks } from "./helpers";
@@ -52,7 +52,7 @@ function mergeNetwork(saved: INetwork, toMerge: INetwork): INetwork {
 
 function mergeUrls(base?: string[], toMerge?: string[]) {
   if (base && toMerge) {
-    return Array.from(new Set([...base, ...toMerge].map(formatURL)));
+    return Array.from(new Set([...base, ...toMerge].map(formatRpcUrl)));
   }
 
   return base ?? toMerge;

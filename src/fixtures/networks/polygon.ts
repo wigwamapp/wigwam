@@ -6,7 +6,7 @@ export const POLYGON: INetwork[] = [
     chainId: 137,
     type: "mainnet",
     rpcUrls: [
-      "https://polygon-rpc.com/",
+      "https://polygon-rpc.com",
       "https://rpc-mainnet.matic.network",
       "https://matic-mainnet.chainstacklabs.com",
       "https://rpc-mainnet.maticvigil.com",

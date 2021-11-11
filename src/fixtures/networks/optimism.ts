@@ -5,7 +5,7 @@ export const OPTIMISM: INetwork[] = [
   {
     chainId: 10,
     type: "mainnet",
-    rpcUrls: ["https://mainnet.optimism.io/"],
+    rpcUrls: ["https://mainnet.optimism.io"],
     chainTag: "optimism",
     name: "Optimism",
     nativeCurrency: {
@@ -23,7 +23,7 @@ export const OPTIMISM: INetwork[] = [
   {
     chainId: 69,
     type: "testnet",
-    rpcUrls: ["https://kovan.optimism.io/"],
+    rpcUrls: ["https://kovan.optimism.io"],
     chainTag: "optimism",
     name: "Optimism Testnet Kovan",
     nativeCurrency: {
@@ -37,7 +37,7 @@ export const OPTIMISM: INetwork[] = [
   {
     chainId: 420,
     type: "testnet",
-    rpcUrls: ["https://goerli.optimism.io/"],
+    rpcUrls: ["https://goerli.optimism.io"],
     chainTag: "optimism",
     name: "Optimism Testnet Goerli",
     nativeCurrency: {
