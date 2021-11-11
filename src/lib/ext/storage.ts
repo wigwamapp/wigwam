@@ -30,6 +30,10 @@ export async function fetchForce<T = any>(key: string): Promise<T | undefined> {
   return items[key];
 }
 
+export async function fetchMany(keys: string[]) {
+  return browser.storage.local.get(keys.map(wrapKey));
+}
+
 export function put<T>(key: string, value: T) {
   return putMany([[key, value]]);
 }
