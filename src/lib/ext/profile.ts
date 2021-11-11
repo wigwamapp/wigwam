@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill";
-import { nanoid } from "nanoid";
+import { nanoid, customAlphabet } from "nanoid";
 import memoizeOne from "memoize-one";
 
 import { assert } from "lib/system/assert";
@@ -7,34 +7,39 @@ import { assert } from "lib/system/assert";
 import { getItemSafe, getMainURL } from "./utils";
 
 export interface Profile {
-  id: number;
+  id: string;
   name: string;
   avatarSeed: string;
 }
 
+export const DEFAULT_PROFILE_NAME = "{{profile}} 1";
+
 export const ALL_PROFILES_LSKEY = "all_profiles";
 export const PROFILE_LSKEY = "profile";
 export const OPEN_TAB_LSKEY = "__open_tab";
-export const DEFAULT_AVATAR_SEED_LSKEY = "__default_avatar_seed";
 
-export const DEFAULT_PROFILE: Profile = {
-  id: 0,
-  name: "{{profile}} 1",
-  avatarSeed: getDefaultAvatarSeed(),
-};
+const getDefaultProfile = memoizeOne(() => {
+  if (ALL_PROFILES_LSKEY in localStorage) {
+    return getItemSafe<Profile[]>(ALL_PROFILES_LSKEY)![0];
+  }
+
+  const defaultProfile = generateProfile(DEFAULT_PROFILE_NAME);
+  localStorage.setItem(ALL_PROFILES_LSKEY, JSON.stringify([defaultProfile]));
+  return defaultProfile;
+});
 
 export function underProfile(key: string) {
   return `${getProfileId()}_${key}`;
 }
 
 export const getProfileId = memoizeOne(
-  () => getItemSafe<number>(PROFILE_LSKEY) ?? DEFAULT_PROFILE.id
+  () => localStorage.getItem(PROFILE_LSKEY) ?? getDefaultProfile().id
 );
 
-export function setProfileId(id: number) {
+export function setProfileId(id: string) {
   assert(getAllProfiles().some((p) => p.id === id));
 
-  localStorage.setItem(PROFILE_LSKEY, JSON.stringify(id));
+  localStorage.setItem(PROFILE_LSKEY, id);
   localStorage.setItem(OPEN_TAB_LSKEY, "true");
   browser.runtime.reload();
 }
@@ -52,12 +57,8 @@ export function openTabIfProfileChanged() {
 
 export function addProfile(name: string) {
   const allProfiles = getAllProfiles();
+  const profile = generateProfile(name);
 
-  const profile: Profile = {
-    name,
-    id: allProfiles.length,
-    avatarSeed: nanoid(),
-  };
   localStorage.setItem(
     ALL_PROFILES_LSKEY,
     JSON.stringify([...allProfiles, profile])
@@ -66,31 +67,38 @@ export function addProfile(name: string) {
   return profile;
 }
 
-export function updateProfileName(id: number, name: string) {
+export function updateProfile(
+  id: string,
+  { name, avatarSeed }: Omit<Profile, "id">
+) {
   const allProfiles = getAllProfiles();
   localStorage.setItem(
     ALL_PROFILES_LSKEY,
-    JSON.stringify(allProfiles.map((p) => (p.id === id ? { ...p, name } : p)))
+    JSON.stringify(
+      allProfiles.map((p) => (p.id === id ? { ...p, name, avatarSeed } : p))
+    )
   );
 }
 
 export function getAllProfiles() {
-  return getItemSafe<Profile[]>(ALL_PROFILES_LSKEY) ?? [DEFAULT_PROFILE];
+  return getItemSafe<Profile[]>(ALL_PROFILES_LSKEY) ?? [getDefaultProfile()];
 }
 
 export function getCurrentProfile() {
   const allProfiles = getAllProfiles();
   const profileId = getProfileId();
+
   return allProfiles.find((p) => p.id === profileId)!;
 }
 
-function getDefaultAvatarSeed() {
-  const existing = getItemSafe<string>(DEFAULT_AVATAR_SEED_LSKEY, {
-    serealize: false,
-  });
-  if (existing) return existing;
+function generateProfile(name: string): Profile {
+  const id = generateProfileId();
+  const avatarSeed = nanoid();
 
-  const seed = nanoid();
-  localStorage.setItem(DEFAULT_AVATAR_SEED_LSKEY, seed);
-  return seed;
+  return { id, name, avatarSeed };
 }
+
+const generateProfileId = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  11
+);

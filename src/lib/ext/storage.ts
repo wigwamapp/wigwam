@@ -1,6 +1,4 @@
 import browser, { Storage } from "webextension-polyfill";
-import { utils } from "ethers";
-import { Buffer } from "buffer";
 
 import { createQueue } from "lib/system/queue";
 
@@ -25,13 +23,13 @@ export async function fetch<T = any>(key: string) {
 }
 
 export async function fetchForce<T = any>(key: string): Promise<T | undefined> {
-  key = wrapKey(key);
+  key = underProfile(key);
   const items = await browser.storage.local.get([key]);
   return items[key];
 }
 
-export async function fetchMany(keys: string[]) {
-  return browser.storage.local.get(keys.map(wrapKey));
+export function fetchMany(keys: string[]) {
+  return browser.storage.local.get(keys.map(underProfile));
 }
 
 export function put<T>(key: string, value: T) {
@@ -42,12 +40,12 @@ export function putMany(items: Items) {
   if (!Array.isArray(items)) {
     items = Object.entries(items);
   }
-  items = Object.fromEntries(items.map(([k, v]) => [wrapKey(k), v]));
+  items = Object.fromEntries(items.map(([k, v]) => [underProfile(k), v]));
   return browser.storage.local.set(items);
 }
 
 export function remove(keys: string | string[]) {
-  keys = Array.isArray(keys) ? keys.map(wrapKey) : wrapKey(keys);
+  keys = Array.isArray(keys) ? keys.map(underProfile) : underProfile(keys);
   return browser.storage.local.remove(keys);
 }
 
@@ -59,7 +57,7 @@ export function subscribe<T = any>(
   key: string,
   callback: (change: { newValue?: T; oldValue?: T }) => void
 ) {
-  key = wrapKey(key);
+  key = underProfile(key);
   const listener = (
     changes: { [s: string]: Storage.StorageChange },
     areaName: string
@@ -71,9 +69,4 @@ export function subscribe<T = any>(
 
   browser.storage.onChanged.addListener(listener);
   return () => browser.storage.onChanged.removeListener(listener);
-}
-
-function wrapKey(key: string) {
-  key = underProfile(key);
-  return utils.sha256(Buffer.from(key, "utf8")).slice(2);
 }
