@@ -42,11 +42,11 @@ const ENV_SHORT =
     : NODE_ENV;
 const ENV_BADGE = [
   ENV_SHORT === "prod" ? null : ENV_SHORT,
-  RELEASE_ENV !== "true" ? "staging" : null,
+  RELEASE_ENV === "true" ? null : "staging",
 ].find(Boolean);
 const VERSION = pkg.version;
 const ES_TARGET = tsConfig.compilerOptions.target;
-const SOURCE_MAP = NODE_ENV !== "production" && SOURCE_MAP_ENV !== "false";
+const SOURCE_MAP = RELEASE_ENV === "false" && SOURCE_MAP_ENV !== "false";
 const IMAGE_INLINE_SIZE_LIMIT = parseInt(IMAGE_INLINE_SIZE_LIMIT_ENV);
 const CWD_PATH = fs.realpathSync(process.cwd());
 const NODE_MODULES_PATH = path.join(CWD_PATH, "node_modules");
@@ -96,7 +96,7 @@ module.exports = {
 
   entry: {
     back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
-    main: entry("main.tsx", NODE_ENV === "development" && "dev-tools.ts"),
+    main: entry("main.tsx", RELEASE_ENV === "false" && "dev-tools.ts"),
     popup: entry("popup.tsx"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
@@ -399,8 +399,8 @@ module.exports = {
             // Pending further investigation:
             // https://github.com/terser-js/terser/issues/120
             inline: 2,
-            // Drop console for prod
-            drop_console: NODE_ENV === "production",
+            // Drop console for release
+            drop_console: RELEASE_ENV === "true",
           },
           output: {
             ecma: 8,
