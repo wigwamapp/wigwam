@@ -1,3 +1,6 @@
+import { Buffer } from "buffer";
+import { utils } from "ethers";
+
 const ROOT_PREFIX = "v";
 
 /**
@@ -41,7 +44,7 @@ type DataItem = {
 };
 
 function createStatic(prefix: Prefix, subPart?: Part): DataItem {
-  const key = combine(ROOT_PREFIX, prefix, subPart);
+  const key = wrapKey(combine(ROOT_PREFIX, prefix, subPart));
   return (val?: any) =>
     typeof val === "undefined" ? key : ([key, val] as any);
 }
@@ -52,4 +55,8 @@ function createDynamic(prefix: Prefix) {
 
 function combine(...parts: (Part | undefined)[]) {
   return parts.filter((p) => typeof p !== "undefined").join("_");
+}
+
+function wrapKey(key: string) {
+  return utils.sha256(Buffer.from(key, "utf8")).slice(2);
 }

@@ -1,5 +1,4 @@
 import { Buffer } from "buffer";
-import { utils } from "ethers";
 import * as Storage from "lib/ext/storage";
 import { getRandomBytes, deriveKey, decrypt, encrypt } from "lib/crypto-utils";
 
@@ -9,7 +8,7 @@ export async function fetchAndDecryptOne<T>(
   storageKey: string,
   cryptoKey: CryptoKey
 ) {
-  const encItem = await Storage.fetch<string>(wrapStorageKey(storageKey));
+  const encItem = await Storage.fetch<string>(storageKey);
   return decryptStorageItem<T>(encItem, cryptoKey);
 }
 
@@ -20,7 +19,7 @@ export async function encryptAndSaveMany(
   const encItems = await Promise.all(
     items.map(async ([storageKey, data]) => {
       const encItem = await encryptStorageItem(data, cryptoKey);
-      return [wrapStorageKey(storageKey), encItem] as [string, string];
+      return [storageKey, encItem] as [string, string];
     })
   );
 
@@ -51,8 +50,4 @@ async function decryptStorageItem<T>(item: string, cryptoKey: CryptoKey) {
 
   const derivedPassKey = await deriveKey(cryptoKey, salt);
   return decrypt<T>({ iv, cipher }, derivedPassKey);
-}
-
-function wrapStorageKey(key: string) {
-  return utils.sha256(Buffer.from(key, "utf8")).slice(2);
 }

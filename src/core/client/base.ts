@@ -1,4 +1,3 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { PorterClient } from "lib/ext/porter/client";
 
 import { Request, Response } from "core/types";

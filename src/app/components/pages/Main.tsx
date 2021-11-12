@@ -5,7 +5,6 @@ import { ethers } from "ethers";
 import classNamed from "lib/classnamed";
 import { TReplace } from "lib/ext/react";
 import PageLayout from "app/components/layouts/PageLayout";
-import { ReactComponent as BoxIcon } from "app/icons/box.svg";
 import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import {
   accountAddressAtom,
@@ -17,7 +16,6 @@ const Main: FC = () => (
   <PageLayout>
     <div className="py-8">
       <h1 className="text-4xl font-bold text-brand-primary">Hello!</h1>
-      <BoxIcon className="stroke-current h-6 w-auto" />
       <ConditionalAccountsSelect />
       {/* <Kek /> */}
       <NumberWrapper padding>

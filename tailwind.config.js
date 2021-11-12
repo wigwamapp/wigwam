@@ -16,6 +16,8 @@ module.exports = {
           darktext: "#11142D",
           lightgray: "#E4E4E4",
           primary: "#355DFF",
+          redone: "#FF002D",
+          redtwo: "#FF7F44",
         },
       },
       fontFamily: {

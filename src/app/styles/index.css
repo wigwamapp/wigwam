@@ -11,3 +11,21 @@ body {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .glass-icon {
+    --color-1: theme("colors.white");
+    --color-2: theme("colors.white");
+  }
+
+  svg.glass-icon * {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  @variants focus, hover, group-hover, group-focus {
+    .glass-icon--active {
+      --color-1: theme("colors.brand.redone");
+      --color-2: theme("colors.brand.redtwo");
+    }
+  }
+}

@@ -29,7 +29,7 @@ const getDefaultProfile = memoizeOne(() => {
 });
 
 export function underProfile(key: string) {
-  return `${getProfileId()}_${key}`;
+  return `${getProfileId()}${key}`;
 }
 
 export const getProfileId = memoizeOne(

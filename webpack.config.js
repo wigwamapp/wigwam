@@ -145,7 +145,17 @@ module.exports = {
           {
             test: /\.svg$/,
             use: [
-              require.resolve("@svgr/webpack"),
+              {
+                loader: require.resolve("@svgr/webpack"),
+                options: {
+                  prettier: false,
+                  svgo: true,
+                  svgoConfig: {
+                    plugins: [{ removeViewBox: false }],
+                  },
+                  titleProp: true,
+                },
+              },
               {
                 loader: require.resolve("url-loader"),
                 options: {
