@@ -1,7 +1,6 @@
-export async function getPasswordHash(password: string) {
-  const hash = await crypto.subtle.digest(
-    "SHA-256",
-    Buffer.from(password, "utf8")
-  );
-  return Buffer.from(hash).toString("hex");
+import { Buffer } from "buffer";
+import { utils } from "ethers";
+
+export function getPasswordHash(password: string) {
+  return utils.ripemd160(utils.sha256(Buffer.from(password, "utf8"))).slice(2);
 }

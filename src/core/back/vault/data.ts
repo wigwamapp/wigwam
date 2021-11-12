@@ -58,5 +58,5 @@ function combine(...parts: (Part | undefined)[]) {
 }
 
 function wrapKey(key: string) {
-  return utils.sha256(Buffer.from(key, "utf8")).slice(2);
+  return utils.ripemd160(Buffer.from(key, "utf8")).slice(2);
 }
