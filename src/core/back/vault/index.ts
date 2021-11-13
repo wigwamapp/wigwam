@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import { wordlists } from "@ethersproject/wordlists";
 import { match } from "ts-pattern";
+import memoizeOne from "memoize-one";
 
 import { getRandomInt } from "lib/system/randomInt";
 import { getCryptoKey, getRandomBytes } from "lib/crypto-utils";
@@ -13,7 +13,8 @@ import {
   validateAccountExistence,
   validateAddAccountParams,
   validateSeedPhrase,
-  toNeuterExtendedKey,
+  toDerivedNeuterExtendedKey,
+  getSeedPhraseHDNode,
 } from "core/common";
 
 import { MIGRATIONS, Data } from "./data";
@@ -21,7 +22,7 @@ import { MIGRATIONS, Data } from "./data";
 const MAX_DECRYPT_ATTEMPTS = 10;
 
 export class Vault {
-  static decryptAttempts = 0;
+  static decryptAttempts = parseInt(sessionStorage.decryptAttempts ?? 0);
 
   static async unlock(passwordHash: string) {
     const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
@@ -82,17 +83,9 @@ export class Vault {
   static async fetchSeedPhrase(passwordHash: string) {
     const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
 
-    return withError(t("failedToFetchSeedPhrase"), async () => {
-      const seedPhraseExists = await Vault.hasSeedPhrase();
-      if (!seedPhraseExists) {
-        throw new PublicError(t("seedPhraseNotEstablished"));
-      }
-
-      return Storage.fetchAndDecryptOne<SeedPharse>(
-        Data.seedPhrase(),
-        cryptoKey
-      );
-    });
+    return withError(t("failedToFetchSeedPhrase"), () =>
+      Vault.getSeedPhraseCheck(cryptoKey)
+    );
   }
 
   static async fetchPrivateKey(passwordHash: string, accAddress: string) {
@@ -141,6 +134,8 @@ export class Vault {
         }
 
         throw err;
+      } finally {
+        sessionStorage.decryptAttempts = Vault.decryptAttempts;
       }
     });
   }
@@ -174,6 +169,15 @@ export class Vault {
     });
   }
 
+  private static async getSeedPhraseCheck(cryptoKey: CryptoKey) {
+    const seedPhraseExists = await Vault.hasSeedPhrase();
+    if (!seedPhraseExists) {
+      throw new PublicError(t("seedPhraseNotEstablished"));
+    }
+
+    return Storage.fetchAndDecryptOne<SeedPharse>(Data.seedPhrase(), cryptoKey);
+  }
+
   constructor(private cryptoKey: CryptoKey) {}
 
   addSeedPhrase(seedPhrase: SeedPharse) {
@@ -197,17 +201,8 @@ export class Vault {
 
   fetchNeuterExtendedKey(derivationPath: string) {
     return withError(t("failedToFetchPublicKey"), async () => {
-      const seedPhraseExists = await Vault.hasSeedPhrase();
-      if (!seedPhraseExists) {
-        throw new PublicError(t("seedPhraseNotEstablished"));
-      }
-
-      const seedPhrase = await Storage.fetchAndDecryptOne<SeedPharse>(
-        Data.seedPhrase(),
-        this.cryptoKey
-      );
-
-      return toNeuterExtendedKey(seedPhrase, derivationPath);
+      const seedPhrase = await Vault.getSeedPhraseCheck(this.cryptoKey);
+      return toDerivedNeuterExtendedKey(seedPhrase, derivationPath);
     });
   }
 
@@ -252,32 +247,25 @@ export class Vault {
         privateKey?: string;
       };
 
+      const getRootHDNode = memoizeOne(async () => {
+        const seedPhrase = await Vault.getSeedPhraseCheck(this.cryptoKey);
+        return getSeedPhraseHDNode(seedPhrase);
+      });
+
       const accountsData: AccountStorageData[] = await Promise.all(
         accounts.map((params) =>
           match(params)
             .with({ type: AccountType.HD }, async (p) => {
-              const seedPhraseExists = await Vault.hasSeedPhrase();
-              if (!seedPhraseExists) {
-                throw new PublicError(t("seedPhraseNotEstablished"));
-              }
-
-              const { phrase, lang } =
-                await Storage.fetchAndDecryptOne<SeedPharse>(
-                  Data.seedPhrase(),
-                  this.cryptoKey
-                );
-
-              const { address, privateKey, publicKey } =
-                ethers.Wallet.fromMnemonic(
-                  phrase,
-                  p.derivationPath,
-                  wordlists[lang]
-                );
+              const rootHDNode = await getRootHDNode();
+              const { address, privateKey, publicKey } = rootHDNode.derivePath(
+                p.derivationPath
+              );
 
               return { address, privateKey, publicKey };
             })
             .with({ type: AccountType.Imported }, async ({ privateKey }) => {
-              const { publicKey, address } = new ethers.Wallet(privateKey);
+              const publicKey = ethers.utils.computePublicKey(privateKey);
+              const address = ethers.utils.computeAddress(publicKey);
 
               return { address, privateKey, publicKey };
             })
@@ -287,6 +275,8 @@ export class Vault {
               return { address, publicKey };
             })
             .with({ type: AccountType.Void }, async ({ address }) => {
+              address = ethers.utils.getAddress(address);
+
               return { address };
             })
             .exhaustive()

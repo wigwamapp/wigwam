@@ -20,7 +20,10 @@ import {
   AccountType,
   AccountSource,
 } from "core/types";
-import { toNeuterExtendedKey, generatePreviewHDNodes } from "core/common";
+import {
+  toDerivedNeuterExtendedKey,
+  generatePreviewHDNodes,
+} from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
@@ -50,7 +53,7 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
     () =>
       existingNeuterExtendedKey ??
       (initialSetup && seedPhrase
-        ? toNeuterExtendedKey(seedPhrase, rootDerivationPath)
+        ? toDerivedNeuterExtendedKey(seedPhrase, rootDerivationPath)
         : null),
     [existingNeuterExtendedKey, initialSetup, seedPhrase]
   );

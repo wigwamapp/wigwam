@@ -24,17 +24,16 @@ export function generatePreviewHDNodes(
   return nodes;
 }
 
-export function toNeuterExtendedKey(
+export function toDerivedNeuterExtendedKey(
   seedPhrase: SeedPharse,
   derivationPath: string
 ) {
-  return ethers.utils.HDNode.fromMnemonic(
-    seedPhrase.phrase,
-    undefined,
-    wordlists[seedPhrase.lang]
-  )
-    .derivePath(derivationPath)
-    .neuter().extendedKey;
+  return getSeedPhraseHDNode(seedPhrase).derivePath(derivationPath).neuter()
+    .extendedKey;
+}
+
+export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
+  return ethers.utils.HDNode.fromMnemonic(phrase, undefined, wordlists[lang]);
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
