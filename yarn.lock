@@ -2085,10 +2085,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@ledgerhq/cryptoassets@^6.14.0":
-  version "6.14.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/cryptoassets/-/cryptoassets-6.14.0.tgz#736b795e0abf84bce3e3e9c90c1b864e55634cc0"
-  integrity sha512-B6yTpi9oahyEHwOB2CtTDhQSfwPTFBYPTvV2EXmC0rK4WkQ/mItYTAizoRtDd3WGo/2+8jmWKXnHAS0MMflyaQ==
+"@ledgerhq/cryptoassets@^6.15.1":
+  version "6.15.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/cryptoassets/-/cryptoassets-6.15.1.tgz#824bcf6019191dcf78bac4aafa346ca646573f31"
+  integrity sha512-YOPTAdOtxBke03ApisBgQxKShLmvzV8YU/uF9i6TpDA5hDCyjNbC2MVQkeTA4oOto+foKff9uwcBbminW8d6pA==
   dependencies:
     invariant "2"
 
@@ -2122,12 +2122,12 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-6.10.0.tgz#dda9127b65f653fbb2f74a55e8f0e550d69de6e4"
   integrity sha512-fQFnl2VIXh9Yd41lGjReCeK+Q2hwxQJvLZfqHnKqWapTz68NHOv5QcI0OHuZVNEbv0xhgdLhi5b65kgYeQSUVg==
 
-"@ledgerhq/hw-app-eth@6.15.0":
-  version "6.15.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-6.15.0.tgz#4378d66b4b5a50cfe3addd57d5b6021209d66836"
-  integrity sha512-wzqJjKD7IK+xO18P5L9yRVnuEp/EJ+745tkkRCcJEkceozTbGFr/ILk5ypjBtm/KRnFOQfq6lrU0X9fCX95O+Q==
+"@ledgerhq/hw-app-eth@6.15.1":
+  version "6.15.1"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-6.15.1.tgz#85aabe6680f6eecb7af77d388ca6f0676b73be2c"
+  integrity sha512-7D+L4vO5T5bjzR6JgdaLZ9HGrS4Qd+sEO4y8x/8IOaIU3dBxDCkLasmlsccPDIF/8C5j7mQ2QeQzYGK6vNrCZA==
   dependencies:
-    "@ledgerhq/cryptoassets" "^6.14.0"
+    "@ledgerhq/cryptoassets" "^6.15.1"
     "@ledgerhq/errors" "^6.10.0"
     "@ledgerhq/hw-transport" "^6.11.2"
     "@ledgerhq/logs" "^6.10.0"
@@ -2429,10 +2429,10 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.1.1.tgz#3348564048e7a2d7398c935d466c0414ebb6a669"
   integrity sha512-Z6DoceYb/1xSg5+e+ZlPZ9v0N16ZvZ+wYMraFue4HYrE4ttONKtsvruIRf6t9TBR0YvSOfi1hUU0fJfBLCDYow==
 
-"@typechain/ethers-v5@8.0.2":
-  version "8.0.2"
-  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-8.0.2.tgz#0f2cc0db1513cb02e3e78929139216b153c9d2c0"
-  integrity sha512-oRMA3X5UWrsUiNb/lFTusa8xBpw6CckOHAk7sZBHeDQh4tAp+ZU24wdwdURcOtPnagzdCv5Dvl1qlD038brf1A==
+"@typechain/ethers-v5@8.0.3":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@typechain/ethers-v5/-/ethers-v5-8.0.3.tgz#c9a41615648597568751bcc67200f6987a295379"
+  integrity sha512-p85DhWgbE4prFkHcIQzQuAK1+TrgJLjkMSWdATKg6nO1FfWl7hX7mICsbgGgqmRh0+iPE29d/etqmbSAQlffPw==
   dependencies:
     lodash "^4.17.15"
     ts-essentials "^7.0.1"
@@ -8982,10 +8982,10 @@ type-fest@^0.20.2:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
 
-typechain@6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/typechain/-/typechain-6.0.2.tgz#0a1d6328aa934dfd66c8941cd94c1d3491cc34f0"
-  integrity sha512-fphYQ2+r5z38eq02qr4KjgU9/Xdda8Cj+eV2QHSRXhDPyhEVv+ln9123iGjjDLEhGyROb3DQkbvjm3Dl0GtUeQ==
+typechain@6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/typechain/-/typechain-6.0.3.tgz#c0663f024ed11c2c5ad730309334283078d0289d"
+  integrity sha512-NPyCl4bvUtcd2g5Xlqznv6w6i9N5nQLG/UOkazkkyMkjKmo7smpub5UIJ8DLUc/nrZSiV75jEmOjvC2W7d+qvg==
   dependencies:
     "@types/prettier" "^2.1.1"
     command-line-args "^4.0.7"
@@ -9005,10 +9005,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.4.4:
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.4.tgz#2cd01a1a1f160704d3101fd5a58ff0f9fcb8030c"
-  integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
+typescript@4.5.2:
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.2.tgz#8ac1fba9f52256fdb06fb89e4122fa6a346c2998"
+  integrity sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==
 
 typical@^2.6.0, typical@^2.6.1:
   version "2.6.1"
