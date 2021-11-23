@@ -1,3 +1,3 @@
 module.exports = {
-  reject: ["css-loader", "lint-staged", "mini-css-extract-plugin"],
+  reject: ["css-loader", "mini-css-extract-plugin"],
 };
