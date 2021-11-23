@@ -102,7 +102,7 @@
     "jest": "27.3.1",
     "jest-webextension-mock": "3.7.19",
     "lint-staged": "12.1.2",
-    "mini-css-extract-plugin": "2.3.0",
+    "mini-css-extract-plugin": "2.4.5",
     "postcss": "8.3.11",
     "postcss-loader": "6.2.0",
     "prettier": "2.4.1",
