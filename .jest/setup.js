@@ -7,3 +7,5 @@ import "@testing-library/jest-dom";
 import { webcrypto } from "crypto";
 
 global.crypto = webcrypto;
+
+jest.mock("mem", () => (fn) => fn);

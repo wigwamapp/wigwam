@@ -64,7 +64,7 @@ export async function sendRpc(
   }
 }
 
-const getProvider = memoize(async (url: string, chainId: number) => {
+const getProvider = memoize((url: string, chainId: number) => {
   const plainProvider = new RpcProvider(url, chainId);
   const multicallProvider = new multicallProviders.MulticallProvider(
     plainProvider
