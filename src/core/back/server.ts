@@ -19,13 +19,18 @@ import {
   withVault,
   locked,
   unlocked,
-  pinged,
+  walletPortsCountUpdated,
 } from "./state";
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
+
+  walletPorter.onConnection(() => {
+    walletPortsCountUpdated(walletPorter.portsCount);
+  });
+
   walletPorter.onMessage<Request, Response>(handleWalletRequest);
 
   $walletStatus.watch((status) => {
@@ -47,8 +52,6 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
   console.debug("New wallet request", ctx);
 
   if (!ctx.request) return;
-
-  pinged();
 
   try {
     await ensureInited();

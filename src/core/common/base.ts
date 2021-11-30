@@ -7,13 +7,18 @@ export async function withError<T>(
   factory: (doThrow: () => void) => Promise<T>
 ) {
   try {
-    return await factory(() => {
+    const doThrow = () => {
       throw new PublicError(errMessage);
-    });
+    };
+
+    return await factory(doThrow);
   } catch (err) {
-    const isPublic = err instanceof PublicError;
-    if (!isPublic) console.error(err);
-    throw isPublic ? err : new PublicError(errMessage);
+    if (err instanceof PublicError) {
+      throw err;
+    } else {
+      console.warn(errMessage, err);
+      throw new PublicError(errMessage);
+    }
   }
 }
 

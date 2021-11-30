@@ -1,5 +1,6 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { assert } from "lib/system/assert";
+import { forEachSafe } from "lib/system/forEachSafe";
 import {
   PorterMessageType,
   PorterClientMessage,
@@ -14,12 +15,19 @@ export type PorterMessageHandler<Data = any, ReplyData = any> = (
   ctx: MessageContext<Data, ReplyData>
 ) => void;
 
-export type PorterDisconnectHandler = (port: Runtime.Port) => void;
+export type PorterConnectionHandler = (
+  action: "connect" | "disconnect",
+  port: Runtime.Port
+) => void;
 
 export class PorterServer<OneWayData = any> {
   private ports = new Set<Runtime.Port>();
-  private msgHandlers = new Set<PorterMessageHandler>();
-  private discntHandlers = new Set<PorterDisconnectHandler>();
+  private messageHandlers = new Set<PorterMessageHandler>();
+  private connectionHandlers = new Set<PorterConnectionHandler>();
+
+  get portsCount() {
+    return this.ports.size;
+  }
 
   constructor(public name: string) {
     browser.runtime.onConnect.addListener(this.handleConnect.bind(this));
@@ -33,9 +41,9 @@ export class PorterServer<OneWayData = any> {
     return () => this.removeMessageHandler(handler);
   }
 
-  onDisconnect(handler: PorterDisconnectHandler) {
-    this.discntHandlers.add(handler);
-    return () => this.discntHandlers.delete(handler);
+  onConnection(handler: PorterConnectionHandler) {
+    this.connectionHandlers.add(handler);
+    return () => this.connectionHandlers.delete(handler);
   }
 
   isConnected(port: Runtime.Port) {
@@ -59,13 +67,14 @@ export class PorterServer<OneWayData = any> {
     if (port.name === this.name) {
       this.addPort(port);
 
+      forEachSafe(this.connectionHandlers, (handle) => handle("connect", port));
+
       port.onDisconnect.addListener(() => {
         this.removePort(port);
-        this.discntHandlers.forEach((handler) => {
-          try {
-            handler(port);
-          } catch {}
-        });
+
+        forEachSafe(this.connectionHandlers, (handle) =>
+          handle("disconnect", port)
+        );
       });
     }
   }
@@ -78,11 +87,7 @@ export class PorterServer<OneWayData = any> {
     ) {
       const ctx = new MessageContext(port, msg as PorterClientMessage, this);
 
-      for (const handler of this.msgHandlers) {
-        try {
-          handler(ctx);
-        } catch {}
-      }
+      forEachSafe(this.messageHandlers, (handle) => handle(ctx));
     }
   }
 
@@ -97,11 +102,11 @@ export class PorterServer<OneWayData = any> {
   }
 
   private addMessageHandler(handler: PorterMessageHandler) {
-    this.msgHandlers.add(handler);
+    this.messageHandlers.add(handler);
   }
 
   private removeMessageHandler(handler: PorterMessageHandler) {
-    this.msgHandlers.delete(handler);
+    this.messageHandlers.delete(handler);
   }
 }
 

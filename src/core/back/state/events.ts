@@ -1,5 +1,4 @@
 import { createEvent } from "effector";
-import { Runtime } from "webextension-polyfill";
 
 import { ForApproval } from "core/types";
 
@@ -11,8 +10,6 @@ export const unlocked = createEvent<Vault>();
 
 export const locked = createEvent();
 
-export const pinged = createEvent();
-
-export const portDisconnected = createEvent<Runtime.Port>();
+export const walletPortsCountUpdated = createEvent<number>();
 
 export const approvalItemAdded = createEvent<ForApproval>();

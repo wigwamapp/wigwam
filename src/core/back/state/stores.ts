@@ -5,7 +5,13 @@ import { Setting } from "core/common";
 import { WalletStatus, ForApproval } from "core/types";
 
 import { Vault } from "../vault";
-import { inited, unlocked, locked, pinged, approvalItemAdded } from "./events";
+import {
+  inited,
+  unlocked,
+  locked,
+  walletPortsCountUpdated,
+  approvalItemAdded,
+} from "./events";
 
 export const $walletStatus = createStore(WalletStatus.Idle)
   .on(inited, (_s, vaultExists) =>
@@ -21,15 +27,15 @@ export const $vault = createStore<Vault | null>(null)
   .on(locked, () => null);
 
 export const $autoLockTimeout = createStore<MaybeTimeout>(null)
-  .on(pinged, (t) => {
-    if (t !== null) clearTimeout(t);
-
-    const timeout = Global.get<number>(Setting.AutoLockTimeout);
-    return timeout ? setTimeout(() => locked(), timeout) : null;
-  })
   .on(locked, (t) => {
     if (t !== null) clearTimeout(t);
     return null;
+  })
+  .on(walletPortsCountUpdated, (t, count) => {
+    if (t !== null) clearTimeout(t);
+
+    const timeout = count === 0 && Global.get<number>(Setting.AutoLockTimeout);
+    return timeout ? setTimeout(() => locked(), timeout) : null;
   });
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;
