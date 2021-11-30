@@ -1,4 +1,3 @@
-import memoize from "mem";
 import * as Global from "lib/ext/global";
 import { assert } from "lib/system/assert";
 
@@ -16,7 +15,7 @@ export async function getRpcUrl(chainId: number) {
   url = Global.get<string>(savedKey);
 
   if (!url) {
-    const network = await getNetworkMemo(chainId);
+    const network = await getNetwork(chainId);
     url = network.rpcUrls[0];
   }
 
@@ -39,11 +38,11 @@ export function setRpcUrl(chainId: number, url: string) {
   Global.put(getRpcUrlKey(chainId), url);
 }
 
-export const getNetworkMemo = memoize(async (chainId: number) => {
+export async function getNetwork(chainId: number) {
   const net = await Repo.networks.get(chainId);
   assert(net, undefined, NetworkNotFoundError);
   return net;
-});
+}
 
 export function formatRpcUrl(url: string) {
   return url.endsWith("/") ? url.slice(0, -1) : url;
