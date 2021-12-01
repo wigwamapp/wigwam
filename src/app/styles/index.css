@@ -7,14 +7,14 @@ body {
 html,
 body {
   background: radial-gradient(
-      26.01% 80.59% at -6.35% 75.55%,
-      rgba(4, 73, 88, 0.1) 0%,
-      rgba(4, 73, 88, 0) 100%
+      30.26% 62.3% at 93.12% 25.55%,
+      rgba(90, 4, 20, 0.056) 0%,
+      rgba(13, 14, 29, 0) 100%
     ),
     radial-gradient(
-      26.71% 58.64% at 94.69% 18.15%,
-      rgba(90, 4, 20, 0.056) 0%,
-      rgba(0, 0, 0, 0) 100%
+      43.61% 135.15% at 0% 77.51%,
+      rgba(4, 73, 88, 0.1) 0%,
+      rgba(13, 14, 29, 0) 100%
     ),
     #0d0e1d;
   /* TODO: Change when design will be ready */
@@ -30,8 +30,9 @@ body {
 
 @layer utilities {
   .glass-icon {
-    --color-1: theme("colors.white");
-    --color-2: theme("colors.white");
+    --opacity: 0.8;
+    --color-1: theme("colors.brand.main");
+    --color-2: theme("colors.brand.main");
   }
 
   svg.glass-icon * {
@@ -39,9 +40,14 @@ body {
   }
 
   @variants focus, hover, group-hover, group-focus {
-    .glass-icon--active {
-      --color-1: theme("colors.brand.redone");
-      --color-2: theme("colors.brand.redtwo");
+    .glass-icon--hover {
+      --opacity: 1;
     }
+  }
+
+  .glass-icon--active {
+    --opacity: 1;
+    --color-1: theme("colors.brand.redone");
+    --color-2: theme("colors.brand.redtwo");
   }
 }
