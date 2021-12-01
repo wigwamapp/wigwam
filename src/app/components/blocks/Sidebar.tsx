@@ -61,6 +61,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => (
           "flex items-center",
           "transition-colors",
           "hover:text-brand-light",
+          "focus:text-brand-light",
           "first:bg-brand-main/5 first:text-brand-light",
           "last:mb-0"
         )}
