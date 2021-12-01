@@ -61,3 +61,19 @@
   font-display: swap;
   src: url("~inter-ui/Inter (web)/Inter-BoldItalic.woff2") format("woff2");
 }
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("~inter-ui/Inter (web)/Inter-Black.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url("~inter-ui/Inter (web)/Inter-BlackItalic.woff2") format("woff2");
+}

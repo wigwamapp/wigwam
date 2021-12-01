@@ -4,6 +4,22 @@ body {
   font-variant-ligatures: none;
 }
 
+html,
+body {
+  background: radial-gradient(
+      26.01% 80.59% at -6.35% 75.55%,
+      rgba(4, 73, 88, 0.1) 0%,
+      rgba(4, 73, 88, 0) 100%
+    ),
+    radial-gradient(
+      26.71% 58.64% at 94.69% 18.15%,
+      rgba(90, 4, 20, 0.056) 0%,
+      rgba(0, 0, 0, 0) 100%
+    ),
+    #0d0e1d;
+  /* TODO: Change when design will be ready */
+}
+
 /**
  * TailwindCSS
  */

@@ -18,6 +18,8 @@ module.exports = {
           primary: "#355DFF",
           redone: "#FF002D",
           redtwo: "#FF7F44",
+          light: "#F8F9FD",
+          main: "#CCD6FF",
         },
       },
       fontFamily: {
