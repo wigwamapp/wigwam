@@ -16,6 +16,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ZipPlugin = require("zip-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const WebpackBar = require("webpackbar");
+const hash = require("string-hash");
 const pkg = require("./package.json");
 const tsConfig = require("./tsconfig.json");
 
@@ -144,7 +145,7 @@ module.exports = {
 
           {
             test: /\.svg$/,
-            use: [
+            use: ({ resource }) => [
               {
                 loader: require.resolve("@svgr/webpack"),
                 options: {
@@ -156,6 +157,9 @@ module.exports = {
                         params: {
                           overrides: {
                             removeViewBox: false,
+                            cleanupIDs: {
+                              prefix: `svg-${hash(resource)}`,
+                            },
                           },
                         },
                       },

@@ -106,6 +106,7 @@
     "postcss": "8.4.4",
     "postcss-loader": "6.2.1",
     "prettier": "2.5.0",
+    "string-hash": "1.1.3",
     "sucrase": "3.20.3",
     "tailwindcss": "2.2.19",
     "terser-webpack-plugin": "5.2.5",
