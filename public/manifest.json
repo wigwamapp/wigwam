@@ -22,7 +22,7 @@
     "clipboardWrite",
     "activeTab"
   ],
-  "content_security_policy": "script-src 'self' 'sha256-Qbi4ZCIPJiXnbCH8L9umFl590l/l0Sr7e5vp8I1zZg4='; object-src 'self'",
+  "content_security_policy": "script-src 'self'; object-src 'self'",
 
   "__chrome|firefox__author": "{{website}}",
   "__opera__developer": {
