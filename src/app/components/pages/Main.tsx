@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { ethers } from "ethers";
 
@@ -10,7 +10,10 @@ import {
   accountAddressAtom,
   getCurrentAccountAtom,
   getAllAccountsAtom,
+  getAllMainNetworksAtom,
+  chainIdAtom,
 } from "app/atoms";
+import { useAtom } from "jotai";
 
 const Main: FC = () => (
   <PageLayout>
@@ -40,6 +43,13 @@ const NumberWrapper = classNamed("div")<NumberWrapperProps>`
 export default Main;
 
 const ConditionalAccountsSelect: FC = () => {
+  const [chainId, setChainId] = useAtom(chainIdAtom);
+  const networks = useAtomValue(getAllMainNetworksAtom);
+
+  useEffect(() => {
+    console.log({ networks, chainId, setChainId });
+  }, [networks, chainId, setChainId]);
+
   const [opened, setOpened] = useState(true);
 
   return (

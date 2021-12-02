@@ -24,6 +24,12 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery(() => Repo.networks.get(chainId))
 );
 
+export const getAllMainNetworksAtom = atomWithRepoQuery(() =>
+  Repo.networks
+    .filter((n) => ["mainnet", "manually-added"].includes(n.type))
+    .toArray()
+);
+
 export const getAccountAtom = atomFamily((address: string) =>
   atomWithRepoQuery(() => Repo.accounts.get(address))
 );
