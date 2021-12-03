@@ -40,8 +40,10 @@ if (process.env.RELEASE_ENV === "false") {
 export const INITIAL_NETWORK = ETHEREUM[0]; // Ethereum Mainnet
 
 export const NETWORK_ICON_MAP = new Map<number, string>(
-  DEFAULT_NETWORKS.filter((n) => n.type === "mainnet").map((n) => [
+  DEFAULT_NETWORKS.map((n) => [
     n.chainId,
-    getPublicURL(`icons/network/${n.chainTag}.png`),
+    getPublicURL(
+      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-test"}.svg`
+    ),
   ])
 );
