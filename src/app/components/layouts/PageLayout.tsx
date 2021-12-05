@@ -1,6 +1,7 @@
 import { FC } from "react";
 import classNames from "clsx";
 import ContentContainer from "app/components/layouts/ContentContainer";
+import Sidebar from "../blocks/Sidebar";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -20,7 +21,10 @@ const PageLayout: FC<{ animate?: boolean }> = ({
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer>{children}</ContentContainer>
+    <ContentContainer className="flex flex-grow">
+      <Sidebar />
+      {children}
+    </ContentContainer>
   </div>
 );
 

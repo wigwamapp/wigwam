@@ -7,6 +7,14 @@ export enum Page {
   Setup = "setup",
   Profiles = "profiles",
   Unlock = "unlock",
+  Overview = "overview",
+  Receive = "receive",
+  Send = "send",
+  Swap = "swap",
+  Apps = "apps",
+  Contacts = "contacts",
+  Wallets = "wallets",
+  Settings = "settings",
 }
 
 export enum WalletStep {
