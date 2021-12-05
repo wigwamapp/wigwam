@@ -249,7 +249,6 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
-      cleanStaleWebpackAssets: false,
       verbose: false,
     }),
 
