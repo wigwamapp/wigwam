@@ -1,16 +1,21 @@
 import { FC, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
+import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 
 import classNamed from "lib/classnamed";
 import { TReplace } from "lib/ext/react";
-import PageLayout from "app/components/layouts/PageLayout";
-import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import {
   accountAddressAtom,
   getCurrentAccountAtom,
   getAllAccountsAtom,
 } from "app/atoms";
+import PageLayout from "app/components/layouts/PageLayout";
+import Select from "app/components/elements/Select";
+import NetworkSelect from "app/components/elements/NetworkSelect";
+import NewButton from "app/components/elements/NewButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import { SelectTempData } from "app/temp-data/select";
 
 const Main: FC = () => (
   <PageLayout>
@@ -42,12 +47,35 @@ export default Main;
 const ConditionalAccountsSelect: FC = () => {
   const [opened, setOpened] = useState(true);
 
+  const [select, setSelect] = useState(SelectTempData[0]);
+
   return (
     <div>
       <button className="py-4 text-xl" onClick={() => setOpened((o) => !o)}>
         Toggle
       </button>
       {opened && <AccountsSelect />}
+      <Select
+        items={SelectTempData}
+        currentItem={select}
+        setItem={(item) => setSelect(item)}
+        className="mb-5"
+      />
+      <NetworkSelect className="mb-5" />
+      <NewButton className="mr-5">Primary</NewButton>
+      <NewButton theme="secondary" className="mr-5">
+        Secondary
+      </NewButton>
+      <NewButton theme="tertiary" className="mr-5">
+        Tertiary
+      </NewButton>
+      <ScrollAreaContainer className="h-[200px] mt-5 w-40" type="always">
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((el) => (
+          <div key={el} className="p-4 w-80">
+            {el}
+          </div>
+        ))}
+      </ScrollAreaContainer>
     </div>
   );
 };
