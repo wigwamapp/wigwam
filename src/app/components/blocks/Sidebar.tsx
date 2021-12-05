@@ -25,7 +25,7 @@ const Sidebar: FC = () => (
       )}
     >
       <VigvamIcon className={classNames("h-10 w-auto", "mr-5")} />
-      VigVam
+      Vigvam
     </Link>
     <SidebarBlock links={NavLinksPrimary} />
     <SidebarBlock

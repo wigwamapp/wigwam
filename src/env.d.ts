@@ -10,6 +10,9 @@ declare namespace NodeJS {
     readonly VERSION: string;
     // Vigvam specific
     readonly VIGVAM_WEBSITE_ORIGIN: string;
+    // Dev
+    readonly VIGVAM_DEV_UNLOCK_PASSWORD: string;
+    readonly VIGVAM_DEV_ACTIVE_TAB_RELOAD: string;
   }
 }
 

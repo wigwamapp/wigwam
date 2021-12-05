@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useLayoutEffect } from "react";
 import { changeState } from "lib/history";
 
 import { Destination } from "./types";
@@ -11,7 +11,7 @@ type RedirectProps = {
 };
 
 const Redirect: FC<RedirectProps> = ({ to, push = false, fallback = null }) => {
-  useEffect(() => changeState(toURL(toHash(to)), !push), [to, push]);
+  useLayoutEffect(() => changeState(toURL(toHash(to)), !push), [to, push]);
 
   return fallback;
 };
