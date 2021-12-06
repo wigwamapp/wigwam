@@ -4,8 +4,12 @@ body {
   font-variant-ligatures: none;
 }
 
-html,
-body {
+/**
+ * Custom utilities
+ */
+
+.brandbg-main,
+.brandbg-popup {
   background: radial-gradient(
       30.26% 62.3% at 93.12% 25.55%,
       rgba(90, 4, 20, 0.056) 0%,
@@ -18,6 +22,11 @@ body {
     ),
     #0d0e1d;
   /* TODO: Change when design will be ready */
+}
+
+.brandbg-main-fallback,
+.brandbg-popup-fallback {
+  background-color: #0c0f1e;
 }
 
 /**

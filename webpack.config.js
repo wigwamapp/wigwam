@@ -20,14 +20,42 @@ const hash = require("string-hash");
 const pkg = require("./package.json");
 const tsConfig = require("./tsconfig.json");
 
-// Steal ENV vars from .env file
-dotenv.config();
+// Steal ENV vars from .env files
+const DOTENV_PATH = path.resolve(__dirname, ".env");
+const { NODE_ENV = "development" } = process.env;
+const ENV_SHORT =
+  NODE_ENV === "development"
+    ? "dev"
+    : NODE_ENV === "production"
+    ? "prod"
+    : NODE_ENV;
+
+// https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
+const dotenvFiles = [
+  `${DOTENV_PATH}.${ENV_SHORT}.local`,
+  // Don't include `.env.local` for `test` environment
+  // since normally you expect tests to produce the same
+  // results for everyone
+  NODE_ENV !== "test" && `${DOTENV_PATH}.local`,
+  `${DOTENV_PATH}.${ENV_SHORT}`,
+  DOTENV_PATH,
+].filter(Boolean);
+
+// Load environment variables from .env* files. Suppress warnings using silent
+// if this file is missing. dotenv will never modify any environment variables
+// that have already been set.  Variable expansion is supported in .env files.
+// https://github.com/motdotla/dotenv
+// https://github.com/motdotla/dotenv-expand
+for (const path of dotenvFiles) {
+  if (fs.existsSync(path)) {
+    dotenv.config({ path });
+  }
+}
 
 // Grab default and VIGVAM_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
 const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
 const {
-  NODE_ENV = "development",
   RELEASE_ENV = "false",
   TARGET_BROWSER = "chrome",
   VIGVAM_WEBSITE_ORIGIN = "",
@@ -35,12 +63,6 @@ const {
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
 } = process.env;
-const ENV_SHORT =
-  NODE_ENV === "development"
-    ? "dev"
-    : NODE_ENV === "production"
-    ? "prod"
-    : NODE_ENV;
 const ENV_BADGE = [
   ENV_SHORT === "prod" ? null : ENV_SHORT,
   RELEASE_ENV === "true" ? null : "staging",
@@ -249,6 +271,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
+      cleanStaleWebpackAssets: false,
       verbose: false,
     }),
 

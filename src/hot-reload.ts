@@ -16,8 +16,9 @@ type ChecksumSnapshot = {
   manifest: string;
 };
 
+const ACTIVE_TAB_RELOAD = process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true";
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
-const SLOW_DOWN_AFTER = 10 * 60_000; // 10 min
+const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
 const backgroundScripts = getBackgroundScripts();
 const contentScripts = getContentScripts();
@@ -88,7 +89,7 @@ async function watchChanges(
         }
 
         const tabs = await queryTabs({
-          url: `chrome-extension://${chrome.runtime.id}/**`,
+          url: getExtensionUrlPattern(),
         });
 
         // Reload background script
@@ -113,7 +114,8 @@ async function watchChanges(
     }
   }
 
-  const retryAfter = Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 5_000 : 500;
+  const retryAfter =
+    Date.now() - lastChangedAt > SLOW_DOWN_AFTER ? 5_000 : 1_000;
   setTimeout(() => watchChanges(dir, checksum, lastChangedAt), retryAfter);
 }
 
@@ -190,6 +192,7 @@ async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
   const tabs = await queryTabs({
     active: true,
     lastFocusedWindow: true,
+    url: ACTIVE_TAB_RELOAD ? undefined : getExtensionUrlPattern(),
   });
   return tabs[0];
 }
@@ -198,4 +201,8 @@ function queryTabs(params: chrome.tabs.QueryInfo) {
   return new Promise<chrome.tabs.Tab[]>((res) =>
     chrome.tabs.query(params, res)
   );
+}
+
+function getExtensionUrlPattern() {
+  return `chrome-extension://${chrome.runtime.id}/**`;
 }
