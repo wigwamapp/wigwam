@@ -1,5 +1,6 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
+import { useAtom } from "jotai";
 import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 
@@ -7,14 +8,17 @@ import classNamed from "lib/classnamed";
 import { TReplace } from "lib/ext/react";
 import {
   accountAddressAtom,
-  getCurrentAccountAtom,
+  chainIdAtom,
   getAllAccountsAtom,
+  getCurrentAccountAtom,
+  getProviderAtom,
 } from "app/atoms";
 import PageLayout from "app/components/layouts/PageLayout";
 import Select from "app/components/elements/Select";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import NewButton from "app/components/elements/NewButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import WalletCard from "app/components/elements/WalletCard";
 import { SelectTempData } from "app/temp-data/select";
 
 const Main: FC = () => (
@@ -49,6 +53,16 @@ const ConditionalAccountsSelect: FC = () => {
 
   const [select, setSelect] = useState(SelectTempData[0]);
 
+  const { currentAccount } = useAtomValue(
+    useMemo(
+      () =>
+        waitForAll({
+          currentAccount: getCurrentAccountAtom,
+        }),
+      []
+    )
+  );
+
   return (
     <div>
       <button className="py-4 text-xl" onClick={() => setOpened((o) => !o)}>
@@ -69,18 +83,22 @@ const ConditionalAccountsSelect: FC = () => {
       <NewButton theme="tertiary" className="mr-5">
         Tertiary
       </NewButton>
-      <ScrollAreaContainer className="h-[200px] mt-5 w-40" type="always">
+      <ScrollAreaContainer className="h-[200px] my-5 w-40" type="always">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((el) => (
           <div key={el} className="p-4 w-80">
             {el}
           </div>
         ))}
       </ScrollAreaContainer>
+      <WalletCard account={currentAccount} />
     </div>
   );
 };
 
 const AccountsSelect: FC = () => {
+  const [chainId] = useAtom(chainIdAtom);
+  const provider = useAtomValue(getProviderAtom);
+
   const { allAccounts, currentAccount } = useAtomValue(
     useMemo(
       () =>
@@ -93,6 +111,22 @@ const AccountsSelect: FC = () => {
   );
 
   const setAccountAddress = useUpdateAtom(accountAddressAtom);
+
+  useEffect(() => {
+    console.log("allAccounts", allAccounts);
+    console.log("currentAccount", currentAccount);
+    console.log("chainId", chainId);
+    console.log("provider", provider);
+
+    const getCurrentBalance = async (address: string) => {
+      const bal = await provider.getBalance(address);
+      console.log("bal", +bal);
+      return bal;
+    };
+
+    const balance = getCurrentBalance(currentAccount.address);
+    console.log("balance", balance);
+  }, [allAccounts, chainId, currentAccount, provider]);
 
   return (
     <div className="py-12">
