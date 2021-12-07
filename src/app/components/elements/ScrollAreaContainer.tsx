@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, forwardRef } from "react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import classNames from "clsx";
 
@@ -8,29 +8,38 @@ type ScrollAreaContainerProps = {
   scrollBarClassName?: string;
 } & ScrollArea.ScrollAreaProps;
 
-const ScrollAreaContainer: FC<ScrollAreaContainerProps> = ({
-  className,
-  viewPortClassName,
-  scrollBarClassName,
-  children,
-  type = "scroll",
-  ...rest
-}) => (
-  <ScrollArea.Root
-    className={classNames("overflow-hidden", className)}
-    type={type}
-    {...rest}
-  >
-    <ScrollArea.Viewport
-      className={classNames("w-full h-full", viewPortClassName)}
-      // TODO: Add paddings for different states
+const ScrollAreaContainer = forwardRef<
+  HTMLDivElement,
+  ScrollAreaContainerProps
+>(
+  (
+    {
+      className,
+      viewPortClassName,
+      scrollBarClassName,
+      children,
+      type = "scroll",
+      ...rest
+    },
+    ref
+  ) => (
+    <ScrollArea.Root
+      ref={ref}
+      className={classNames("overflow-hidden", className)}
+      type={type}
+      {...rest}
     >
-      {children}
-    </ScrollArea.Viewport>
-    <Scrollbar orientation="vertical" className={scrollBarClassName} />
-    <Scrollbar orientation="horizontal" className={scrollBarClassName} />
-    <ScrollArea.Corner />
-  </ScrollArea.Root>
+      <ScrollArea.Viewport
+        className={classNames("w-full h-full", viewPortClassName)}
+        // TODO: Add paddings for different states
+      >
+        {children}
+      </ScrollArea.Viewport>
+      <Scrollbar orientation="vertical" className={scrollBarClassName} />
+      <Scrollbar orientation="horizontal" className={scrollBarClassName} />
+      <ScrollArea.Corner />
+    </ScrollArea.Root>
+  )
 );
 
 export default ScrollAreaContainer;
