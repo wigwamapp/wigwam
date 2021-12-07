@@ -93,7 +93,7 @@ const Select: FC<SelectProps> = ({
             scrollBarClassName="py-3"
           >
             {items
-              .filter((item) => item !== currentItem)
+              .filter((item) => item.key !== currentItem.key)
               .map((item) => (
                 <Listbox.Option
                   key={item.key}

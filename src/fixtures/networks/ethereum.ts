@@ -86,10 +86,10 @@ export const ETHEREUM: INetwork[] = [
       "https://goerli.prylabs.net",
     ],
     chainTag: "ethereum",
-    name: "Ethereum Testnet Görli",
+    name: "Ethereum Testnet Goerli",
     nativeCurrency: {
       symbol: "GOR",
-      name: "Görli Ether",
+      name: "Goerli Ether",
       decimals: 18,
     },
     ensRegistry: "0x112234455c3a32fd11230c42e7bccd4a84e02010",

@@ -42,7 +42,7 @@ export const OPTIMISM: INetwork[] = [
     name: "Optimism Testnet Goerli",
     nativeCurrency: {
       symbol: "GOR",
-      name: "Görli Ether",
+      name: "Goerli Ether",
       decimals: 18,
     },
     faucetUrls: [],
