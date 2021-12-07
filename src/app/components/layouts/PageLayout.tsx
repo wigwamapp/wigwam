@@ -14,7 +14,7 @@ const PageLayout: FC<{ animate?: boolean }> = ({
 }) => (
   <div
     className={classNames(
-      (bootAnimationDisplayed || animate) && "animate-bootfadein",
+      // (bootAnimationDisplayed || animate) && "animate-bootfadein",
       "min-h-screen flex flex-col"
     )}
     onAnimationEnd={
@@ -23,7 +23,8 @@ const PageLayout: FC<{ animate?: boolean }> = ({
   >
     <ContentContainer className="flex flex-grow">
       <Sidebar />
-      <div className="pl-6">{children}</div>
+
+      <main className="py-4 px-8">{children}</main>
     </ContentContainer>
   </div>
 );

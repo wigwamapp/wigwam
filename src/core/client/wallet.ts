@@ -46,7 +46,7 @@ export async function setupWallet(
 
 export async function unlockWallet(password: string) {
   const type = MessageType.UnlockWallet;
-  const passwordHash = await getPasswordHash(password);
+  const passwordHash = getPasswordHash(password);
   const res = await porter.request({
     type,
     passwordHash,
