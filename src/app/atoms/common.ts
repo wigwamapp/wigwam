@@ -27,7 +27,7 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
 
 export const getAllMainNetworksAtom = atomWithRepoQuery(() =>
   Repo.networks
-    .filter((n) => ["mainnet", "manually-added"].includes(n.type))
+    .filter((n) => ["mainnet", "testnet", "manually-added"].includes(n.type))
     .toArray()
 );
 
