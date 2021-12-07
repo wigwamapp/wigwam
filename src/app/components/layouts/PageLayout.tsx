@@ -24,7 +24,7 @@ const PageLayout: FC<{ animate?: boolean }> = ({
     <ContentContainer className="flex flex-grow">
       <Sidebar />
 
-      <main className="py-4 px-8">{children}</main>
+      <main className="py-4 pl-6 flex-grow">{children}</main>
     </ContentContainer>
   </div>
 );
