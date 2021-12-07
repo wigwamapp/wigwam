@@ -129,7 +129,10 @@ export class Vault {
 
         return cryptoKey;
       } catch (err) {
-        if (++Vault.decryptAttempts > MAX_DECRYPT_ATTEMPTS) {
+        if (
+          process.env.NODE_ENV !== "development" &&
+          ++Vault.decryptAttempts > MAX_DECRYPT_ATTEMPTS
+        ) {
           await new Promise((r) => setTimeout(r, getRandomInt(3_000, 5_000)));
         }
 

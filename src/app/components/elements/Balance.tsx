@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, Suspense, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai/utils";
 
@@ -11,13 +11,13 @@ type BalanceProps = {
 };
 
 const Balance: FC<BalanceProps> = ({ address, chainId, className }) => {
-  const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
-
   const currentChainId = useAtomValue(chainIdAtom);
   const finalChainId = chainId ?? currentChainId;
 
   const network = useAtomValue(getNetworkAtom(finalChainId));
   const provider = useAtomValue(getProviderAtom);
+
+  const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -43,4 +43,10 @@ const Balance: FC<BalanceProps> = ({ address, chainId, className }) => {
   );
 };
 
-export default Balance;
+const SafeBalance: typeof Balance = (props) => (
+  <Suspense fallback={null}>
+    <Balance {...props} />
+  </Suspense>
+);
+
+export default SafeBalance;

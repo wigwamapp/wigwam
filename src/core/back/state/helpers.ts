@@ -11,16 +11,19 @@ import { inited, unlocked } from "./events";
 
 export async function ensureInited() {
   const state = $walletStatus.getState();
+
   if (state === WalletStatus.Idle) {
     const vaultExists = await Vault.isExist();
     inited(vaultExists);
-  }
 
-  // Auto Unlock
-  const PASSWORD = process.env.VIGVAM_DEV_UNLOCK_PASSWORD;
+    // Auto Unlock
+    const PASSWORD = process.env.VIGVAM_DEV_UNLOCK_PASSWORD;
 
-  if (process.env.NODE_ENV === "development" && PASSWORD) {
-    await autoUnlock(PASSWORD).catch(console.error);
+    if (process.env.NODE_ENV === "development" && PASSWORD) {
+      try {
+        await autoUnlock(PASSWORD);
+      } catch {}
+    }
   }
 }
 
