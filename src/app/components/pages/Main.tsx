@@ -1,6 +1,5 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { useAtom } from "jotai";
 import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 
@@ -96,13 +95,15 @@ const ConditionalAccountsSelect: FC = () => {
 };
 
 const AccountsSelect: FC = () => {
-  const [chainId] = useAtom(chainIdAtom);
-  const provider = useAtomValue(getProviderAtom);
+  // const [] = useAtom(chainIdAtom);
+  // const provider = useAtomValue(getProviderAtom);
 
-  const { allAccounts, currentAccount } = useAtomValue(
+  const { chainId, provider, allAccounts, currentAccount } = useAtomValue(
     useMemo(
       () =>
         waitForAll({
+          chainId: chainIdAtom,
+          provider: getProviderAtom,
           allAccounts: getAllAccountsAtom,
           currentAccount: getCurrentAccountAtom,
         }),

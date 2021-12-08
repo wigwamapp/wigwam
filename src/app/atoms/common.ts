@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { atomFamily } from "jotai/utils";
+import { atomFamily, loadable } from "jotai/utils";
 import { assert } from "lib/system/assert";
 import { atomWithGlobal, atomWithRepoQuery } from "lib/atom-utils";
 
@@ -23,6 +23,10 @@ export const getAllAccountsAtom = atomWithRepoQuery(() =>
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery(() => Repo.networks.get(chainId))
+);
+
+export const lazyNetworkAtom = atomFamily((chainId: number) =>
+  loadable(atom((get) => get(getNetworkAtom(chainId))))
 );
 
 export const getAllMainNetworksAtom = atomWithRepoQuery(() =>
