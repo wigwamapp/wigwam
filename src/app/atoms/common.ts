@@ -26,7 +26,7 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
 );
 
 export const lazyNetworkAtom = atomFamily((chainId: number) =>
-  loadable(atom((get) => get(getNetworkAtom(chainId))))
+  loadable(getNetworkAtom(chainId))
 );
 
 export const getAllMainNetworksAtom = atomWithRepoQuery(() =>
