@@ -1,26 +1,23 @@
-import { FC, Suspense, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { useAtomValue } from "jotai/utils";
 
-import { chainIdAtom, getNetworkAtom, getProviderAtom } from "app/atoms";
+import { useNativeCurrency, useProvider } from "app/hooks";
 
 type BalanceProps = {
   address: string;
-  chainId?: number;
   className?: string;
 };
 
-const Balance: FC<BalanceProps> = ({ address, chainId, className }) => {
-  const currentChainId = useAtomValue(chainIdAtom);
-  const finalChainId = chainId ?? currentChainId;
-
-  const network = useAtomValue(getNetworkAtom(finalChainId));
-  const provider = useAtomValue(getProviderAtom);
+const Balance: FC<BalanceProps> = ({ address, className }) => {
+  const provider = useProvider();
+  const nativeCurrency = useNativeCurrency();
 
   const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
 
   useEffect(() => {
     let mounted = true;
+
+    setBalance(null);
 
     provider
       .getBalance(address)
@@ -32,21 +29,15 @@ const Balance: FC<BalanceProps> = ({ address, chainId, className }) => {
     };
   }, [address, provider]);
 
-  if (!balance || !network) {
+  if (!balance || !nativeCurrency) {
     return <></>;
   }
 
   return (
     <span className={className}>
-      {ethers.utils.formatEther(balance)} {network.nativeCurrency.symbol}
+      {ethers.utils.formatEther(balance)} {nativeCurrency.symbol}
     </span>
   );
 };
 
-const SafeBalance: typeof Balance = (props) => (
-  <Suspense fallback={null}>
-    <Balance {...props} />
-  </Suspense>
-);
-
-export default SafeBalance;
+export default Balance;
