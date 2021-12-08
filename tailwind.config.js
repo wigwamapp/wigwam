@@ -22,6 +22,8 @@ module.exports = {
           darklight: "#2A2C3F",
           light: "#F8F9FD",
           main: "#CCD6FF",
+          inactivelight: "#B7BCD0",
+          inactivedark: "#767C9D",
         },
       },
       fontFamily: {

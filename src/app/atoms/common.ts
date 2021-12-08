@@ -1,9 +1,10 @@
 import { atom } from "jotai";
-import { atomFamily } from "jotai/utils";
+import { atomFamily, loadable } from "jotai/utils";
 import { assert } from "lib/system/assert";
 import { atomWithGlobal, atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
+import { getClientProvider } from "core/client";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
 export const chainIdAtom = atomWithGlobal<number>(
@@ -22,6 +23,10 @@ export const getAllAccountsAtom = atomWithRepoQuery(() =>
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery(() => Repo.networks.get(chainId))
+);
+
+export const lazyNetworkAtom = atomFamily((chainId: number) =>
+  loadable(getNetworkAtom(chainId))
 );
 
 export const getAllMainNetworksAtom = atomWithRepoQuery(() =>
@@ -53,4 +58,9 @@ export const getCurrentAccountAtom = atom<Repo.IAccount>((get) => {
     : 0;
 
   return allAccounts[index === -1 ? 0 : index];
+});
+
+export const getProviderAtom = atom((get) => {
+  const chainId = get(chainIdAtom);
+  return getClientProvider(chainId);
 });

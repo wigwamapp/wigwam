@@ -120,7 +120,7 @@ const Select: FC<SelectProps> = ({
                         <img
                           src={item.icon}
                           alt={item.value}
-                          className={"w-6 mr-3"}
+                          className={"w-6 h-6 mr-3"}
                         />
                       )}
                       {item.value}

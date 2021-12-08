@@ -5,9 +5,10 @@ import Avatar from "boring-avatars";
 import { createAvatar } from "@dicebear/avatars";
 import * as jdenticonStyle from "@dicebear/avatars-jdenticon-sprites";
 import * as avataaarsStyle from "@dicebear/avatars-avataaars-sprites";
+import * as personasStyle from "@dicebear/personas";
 
 type Source = "dicebear" | "boring";
-type DicebearStyleType = "jdenticon" | "avataaars";
+type DicebearStyleType = "jdenticon" | "avataaars" | "personas";
 type BoringVariant =
   | "marble"
   | "beam"
@@ -92,6 +93,11 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
           "tongue",
           "twinkle",
         ],
+      });
+
+    case "personas":
+      return createAvatar(personasStyle, {
+        seed,
       });
   }
 }
