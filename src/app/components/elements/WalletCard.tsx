@@ -9,23 +9,21 @@ import Balance from "./Balance";
 
 type WalletCardProps = {
   account: Repo.IAccount;
-  type?: "tiny" | "detailed";
   className?: string;
   onClick?: () => void;
 };
 
 const WalletCard: FC<WalletCardProps> = ({
   account: { name, address },
-  type = "tiny",
   className,
   onClick,
 }) => {
   const classNamesList = classNames(
-    "flex",
-    "bg-brand-main/5",
     "p-3",
-    type === "tiny" ? "max-w-[16.5rem]" : "max-w-[23.25rem]",
-    "rounded-[.625rem]"
+    `max-w-[16.5rem]`,
+    "bg-brand-main/5",
+    "rounded-[.625rem]",
+    "flex"
   );
 
   const content = (

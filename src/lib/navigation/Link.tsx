@@ -4,7 +4,7 @@ import { changeState } from "lib/history";
 import { Destination } from "./types";
 import { isModifiedEvent, toHash, toURL } from "./utils";
 
-type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   to: Destination;
   replace?: boolean;
 };
