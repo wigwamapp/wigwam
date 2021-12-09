@@ -18,17 +18,13 @@
   "permissions": ["tabs", "storage", "clipboardWrite", "activeTab"],
   "content_security_policy": "script-src 'self'; object-src 'self'",
 
-  "__chrome|firefox__author": "{{website}}",
-  "__opera__developer": {
-    "name": "{{website}}"
-  },
+  "author": "{{website}}",
 
   "__firefox__applications": {
     "gecko": { "id": "{daf44bf7-a45e-4450-979c-91cf07434c3d}" }
   },
 
   "__chrome__minimum_chrome_version": "73",
-  "__opera__minimum_opera_version": "60",
 
   "default_locale": "en",
 
@@ -42,7 +38,7 @@
       "48": "icons/48.png",
       "128": "icons/128.png"
     },
-    "__chrome|opera__chrome_style": false,
+    "__chrome__chrome_style": false,
     "__firefox__browser_style": false
   },
 
