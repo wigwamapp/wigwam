@@ -1,16 +1,14 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
-
 import classNamed from "lib/classnamed";
 import { TReplace } from "lib/ext/react";
+
 import {
   accountAddressAtom,
-  chainIdAtom,
   getAllAccountsAtom,
   getCurrentAccountAtom,
-  getProviderAtom,
 } from "app/atoms";
 import PageLayout from "app/components/layouts/PageLayout";
 import Select from "app/components/elements/Select";
@@ -18,6 +16,9 @@ import NetworkSelect from "app/components/elements/NetworkSelect";
 import NewButton from "app/components/elements/NewButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletCard from "app/components/elements/WalletCard";
+import IconedButton from "app/components/elements/IconedButton";
+import { ReactComponent as SettingsIcon } from "app/icons/settings-small.svg";
+import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import { SelectTempData } from "app/temp-data/select";
 
 const Main: FC = () => (
@@ -76,12 +77,24 @@ const ConditionalAccountsSelect: FC = () => {
       />
       <NetworkSelect className="mb-5" />
       <NewButton className="mr-5">Primary</NewButton>
-      <NewButton theme="secondary" className="mr-5">
+      <NewButton
+        href="https://www.google.com/"
+        theme="secondary"
+        className="mr-5"
+      >
         Secondary
       </NewButton>
       <NewButton theme="tertiary" className="mr-5">
         Tertiary
       </NewButton>
+      <div className="flex mt-5">
+        <IconedButton
+          className="mr-3"
+          Icon={ExternalLinkIcon}
+          href="https://www.google.com"
+        />
+        <IconedButton theme="secondary" Icon={SettingsIcon} />
+      </div>
       <ScrollAreaContainer className="h-[200px] my-5 w-40" type="always">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((el) => (
           <div key={el} className="p-4 w-80">
@@ -95,15 +108,10 @@ const ConditionalAccountsSelect: FC = () => {
 };
 
 const AccountsSelect: FC = () => {
-  // const [] = useAtom(chainIdAtom);
-  // const provider = useAtomValue(getProviderAtom);
-
-  const { chainId, provider, allAccounts, currentAccount } = useAtomValue(
+  const { allAccounts, currentAccount } = useAtomValue(
     useMemo(
       () =>
         waitForAll({
-          chainId: chainIdAtom,
-          provider: getProviderAtom,
           allAccounts: getAllAccountsAtom,
           currentAccount: getCurrentAccountAtom,
         }),
@@ -112,22 +120,6 @@ const AccountsSelect: FC = () => {
   );
 
   const setAccountAddress = useUpdateAtom(accountAddressAtom);
-
-  useEffect(() => {
-    console.log("allAccounts", allAccounts);
-    console.log("currentAccount", currentAccount);
-    console.log("chainId", chainId);
-    console.log("provider", provider);
-
-    const getCurrentBalance = async (address: string) => {
-      const bal = await provider.getBalance(address);
-      console.log("bal", +bal);
-      return bal;
-    };
-
-    const balance = getCurrentBalance(currentAccount.address);
-    console.log("balance", balance);
-  }, [allAccounts, chainId, currentAccount, provider]);
 
   return (
     <div className="py-12">

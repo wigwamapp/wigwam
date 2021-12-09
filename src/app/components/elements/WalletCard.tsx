@@ -7,30 +7,23 @@ import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 
-const cardSizes = {
-  detailed: 23.25,
-  tiny: 16.5,
-};
-
 type WalletCardProps = {
   account: Repo.IAccount;
-  type?: keyof typeof cardSizes;
   className?: string;
   onClick?: () => void;
 };
 
 const WalletCard: FC<WalletCardProps> = ({
   account: { name, address },
-  type = "tiny",
   className,
   onClick,
 }) => {
   const classNamesList = classNames(
-    "flex",
-    "bg-brand-main/5",
     "p-3",
-    `max-w-[${cardSizes[type]}rem]`,
-    "rounded-[.625rem]"
+    `max-w-[16.5rem]`,
+    "bg-brand-main/5",
+    "rounded-[.625rem]",
+    "flex"
   );
 
   const content = (
