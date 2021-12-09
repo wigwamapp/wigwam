@@ -14,9 +14,9 @@ An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br
 
 - 📖 Open source.
 
-- 🏦 Uses the best Security approaches.
+- 🔐 Uses the best Security approaches.
 
-- 🔐 Support for [Ledger](https://www.ledger.com/) devices.
+- 🔌 Support for [Ledger](https://www.ledger.com/) devices.
 
 - 👥 Support for Social Auth with [Open Login](https://openlogin.com/).
 
