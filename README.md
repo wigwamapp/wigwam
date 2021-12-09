@@ -50,7 +50,10 @@ yarn build:firefox
 
 ### Add an application to the browser locally
 
-@TODO
+1. Open chrome://extensions/ in your browser
+2. Enable "Developer mode"
+3. Tap on "Load unpacked"
+4. Select "<your_local_vigvam_repository_dir>/dist/prod/chrome_unpacked"
 
 ## Misc scripts
 
