@@ -18,6 +18,7 @@ const NewButton: FC<NewButtonProps> = ({
     theme === "primary" && "bg-buttonaccent bg-opacity-90",
     theme === "secondary" && "bg-brand-main bg-opacity-10",
     "rounded-[.375rem]",
+    "inline-flex justify-center",
     "transition",
     theme === "primary" && [
       "hover:bg-opacity-100 hover:shadow-buttonaccent",
