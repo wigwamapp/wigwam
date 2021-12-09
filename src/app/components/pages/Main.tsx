@@ -17,8 +17,11 @@ import NewButton from "app/components/elements/NewButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletCard from "app/components/elements/WalletCard";
 import IconedButton from "app/components/elements/IconedButton";
+import Input from "app/components/elements/Input";
 import { ReactComponent as SettingsIcon } from "app/icons/settings-small.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
+import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy-input.svg";
 import { SelectTempData } from "app/temp-data/select";
 
 const Main: FC = () => (
@@ -94,6 +97,26 @@ const ConditionalAccountsSelect: FC = () => {
           href="https://www.google.com"
         />
         <IconedButton theme="secondary" Icon={SettingsIcon} />
+      </div>
+      <div className="grid gap-4 mt-5">
+        <Input placeholder="Type something..." />
+        <Input
+          placeholder="Type name or address to search..."
+          StartAdornment={SearchIcon}
+        />
+        <Input
+          placeholder="Type name or address to search..."
+          StartAdornment={SearchIcon}
+          disabled
+        />
+        <Input
+          label="Label"
+          placeholder="Type name or address to search..."
+          EndAdornment={CopyIcon}
+          defaultValue="contract address"
+          readOnly
+          id="input-2"
+        />
       </div>
       <ScrollAreaContainer className="h-[200px] my-5 w-40" type="always">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((el) => (

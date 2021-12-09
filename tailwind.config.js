@@ -24,6 +24,10 @@ module.exports = {
           main: "#CCD6FF",
           inactivelight: "#B7BCD0",
           inactivedark: "#767C9D",
+          gray: "#AAABB1",
+          placeholder: "#66697C",
+          disabledbackground: "#343434",
+          disabledcolor: "#535364",
         },
       },
       fontFamily: {
