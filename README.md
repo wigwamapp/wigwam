@@ -14,9 +14,9 @@ An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br
 
 - 📖 Open source.
 
-- 🏦 Uses the best Security approaches.
+- 🔐 Uses the best Security approaches.
 
-- 🔐 Support for [Ledger](https://www.ledger.com/) devices.
+- 🔌 Support for [Ledger](https://www.ledger.com/) devices.
 
 - 👥 Support for Social Auth with [Open Login](https://openlogin.com/).
 
@@ -50,7 +50,10 @@ yarn build:firefox
 
 ### Add an application to the browser locally
 
-@TODO
+1. Open `chrome://extensions/` in your browser
+2. Enable "Developer mode"
+3. Tap on "Load unpacked"
+4. Select `<your_local_vigvam_repository_dir>/dist/prod/chrome_unpacked`
 
 ## Misc scripts
 
