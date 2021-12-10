@@ -141,6 +141,7 @@ module.exports = {
         "@toruslabs/openlogin/dist/openlogin.umd.min.js"
       ),
       "@ethersproject/random": "lib/ethers-random",
+      // "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
     },
   },
 
