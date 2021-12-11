@@ -48,10 +48,8 @@ body {
     @apply transition-all duration-300 ease-in-out;
   }
 
-  @variants focus, hover, group-hover, group-focus {
-    .glass-icon--hover {
-      --opacity: 1;
-    }
+  .glass-icon--hover {
+    --opacity: 1;
   }
 
   .glass-icon--active {

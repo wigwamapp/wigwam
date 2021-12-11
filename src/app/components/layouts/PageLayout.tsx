@@ -21,10 +21,10 @@ const PageLayout: FC<{ animate?: boolean }> = ({
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer className="flex flex-grow">
+    <ContentContainer className="flex grow">
       <Sidebar />
 
-      <main className="py-4 pl-6 flex-grow">{children}</main>
+      <main className="py-4 pl-6 grow">{children}</main>
     </ContentContainer>
   </div>
 );
