@@ -1,51 +1,14 @@
 import { FC, useMemo, useState } from "react";
-import { useAtom } from "jotai";
-import { useAtomValue, waitForAll } from "jotai/utils";
+import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import Fuse from "fuse.js";
 
 import { INetwork } from "core/repo";
-import {
-  chainIdAtom,
-  getAllMainNetworksAtom,
-  getCurrentNetworkAtom,
-} from "app/atoms";
+import { chainIdAtom, getAllMainNetworksAtom } from "app/atoms";
+import { useLazyNetwork } from "app/hooks";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "./Select";
-
-const searchOptions = {
-  includeScore: true,
-  keys: [
-    {
-      name: "name",
-      weight: 1,
-    },
-    {
-      name: "chainTag",
-      weight: 2,
-    },
-    {
-      name: "chainId",
-      weight: 2,
-    },
-    {
-      name: "nativeCurrency.name",
-      weight: 3,
-    },
-    {
-      name: "nativeCurrency.symbol",
-      weight: 3,
-    },
-    {
-      name: "rpcUrls.value",
-      weight: 4,
-    },
-    {
-      name: "type",
-      weight: 4,
-    },
-  ],
-};
 
 const prepareNetwork = (network: INetwork) => ({
   key: network.chainId,
@@ -58,20 +21,16 @@ type NetworkSelectProps = {
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
-  const [, setChainId] = useAtom(chainIdAtom);
-  const { networks, currentNetwork } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          networks: getAllMainNetworksAtom,
-          currentNetwork: getCurrentNetworkAtom,
-        }),
-      []
-    )
-  );
+  const networks = useAtomValue(getAllMainNetworksAtom);
+  const currentNetwork = useLazyNetwork(networks[0]);
+
+  const setChainId = useUpdateAtom(chainIdAtom);
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
-  const fuse = useMemo(() => new Fuse(networks, searchOptions), [networks]);
+  const fuse = useMemo(
+    () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
+    [networks]
+  );
 
   const preparedNetworks = useMemo(() => {
     if (searchValue) {
