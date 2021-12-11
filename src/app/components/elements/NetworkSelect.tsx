@@ -1,40 +1,58 @@
-import { FC, useMemo } from "react";
-import { useAtom } from "jotai";
-import { useAtomValue } from "jotai/utils";
+import { FC, useMemo, useState } from "react";
+import { useAtomValue, useUpdateAtom } from "jotai/utils";
+import Fuse from "fuse.js";
 
+import { INetwork } from "core/repo";
 import { chainIdAtom, getAllMainNetworksAtom } from "app/atoms";
+import { useLazyNetwork } from "app/hooks";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "./Select";
+
+const prepareNetwork = (network: INetwork) => ({
+  key: network.chainId,
+  value: network.name,
+  icon: NETWORK_ICON_MAP.get(network.chainId),
+});
 
 type NetworkSelectProps = {
   className?: string;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
-  const [chainId, setChainId] = useAtom(chainIdAtom);
   const networks = useAtomValue(getAllMainNetworksAtom);
+  const currentNetwork = useLazyNetwork(networks[0]);
 
-  const preparedNetworks = useMemo(
-    () =>
-      networks.map((network) => ({
-        key: network.chainId,
-        value: network.name,
-        icon: NETWORK_ICON_MAP.get(network.chainId),
-      })),
+  const setChainId = useUpdateAtom(chainIdAtom);
+
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+  const fuse = useMemo(
+    () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
     [networks]
   );
 
-  const currentNetwork = useMemo(
-    () => preparedNetworks.find(({ key }) => key === chainId)!,
-    [chainId, preparedNetworks]
+  const preparedNetworks = useMemo(() => {
+    if (searchValue) {
+      return fuse
+        .search(searchValue)
+        .map(({ item: network }) => prepareNetwork(network));
+    } else {
+      return networks.map((network) => prepareNetwork(network));
+    }
+  }, [fuse, networks, searchValue]);
+
+  const preparedCurrentNetwork = useMemo(
+    () => prepareNetwork(currentNetwork),
+    [currentNetwork]
   );
 
   return (
     <Select
       items={preparedNetworks}
-      currentItem={currentNetwork}
+      currentItem={preparedCurrentNetwork}
       setItem={(network) => setChainId(network.key)}
+      onSearch={(value) => setSearchValue(value === "" ? null : value)}
       className={className}
     />
   );

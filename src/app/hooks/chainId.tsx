@@ -3,13 +3,13 @@ import { useAtomValue } from "jotai/utils";
 
 import { chainIdAtom } from "app/atoms";
 
-const ScopedChainIdContext = createContext(-1);
+const ScopedChainIdContext = createContext<number | null>(null);
 
 export function useChainId() {
   const globalChainId = useAtomValue(chainIdAtom);
   const scopedChainId = useContext(ScopedChainIdContext);
 
-  return scopedChainId === -1 ? globalChainId : scopedChainId;
+  return scopedChainId === null ? globalChainId : scopedChainId;
 }
 
 export const ChainIdProvider: FC<{ chainId: number }> = ({

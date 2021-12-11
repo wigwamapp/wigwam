@@ -48,6 +48,7 @@
     "eth-phishing-detect": "1.1.15",
     "ethers": "5.5.2",
     "fontfaceobserver": "2.1.0",
+    "fuse.js": "6.4.6",
     "hashids": "2.2.10",
     "inter-ui": "3.19.3",
     "jotai": "1.4.7",
