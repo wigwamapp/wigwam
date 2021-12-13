@@ -8,7 +8,7 @@ An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br
 
 - 🧩 A classic browser extension.
 
-- 🌐 Fast and simple interaction with Web3 world.
+- 🌐 Fast and simple interaction with Web 3.0 world.
 
 - 🤲 Non-custodial. We don't have a server or a central hub. The keys belong to the user and are stored on his device in encrypted form.
 
