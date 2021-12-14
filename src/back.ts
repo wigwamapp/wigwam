@@ -1,14 +1,14 @@
 import browser from "webextension-polyfill";
-import { openTabIfProfileChanged } from "lib/ext/profile";
+import { initProfiles } from "lib/ext/profile";
 import { getMainURL } from "lib/ext/utils";
 
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
-browser.tabs.create({
-  url: getMainURL(),
-  active: true,
-});
+// Init profiles
+// - Create default profile if it doesn't exist
+// - Open new tab when profile changed (after refresh)
+initProfiles();
 
 // Setup fixtures
 setupFixtures();
@@ -16,9 +16,6 @@ setupFixtures();
 // Start background server
 // It starts Porter server to communicate with UI & content scripts
 startServer();
-
-// Open new tab when profile changed (after reset)
-openTabIfProfileChanged();
 
 // Open new tab with extension page after install
 browser.runtime.onInstalled.addListener(({ reason }) => {

@@ -1,14 +1,15 @@
 import { getCryptoKey } from "lib/crypto-utils";
+import { storage } from "lib/ext/storage";
 
-import * as Storage from "./index";
+import { encryptAndSaveMany, fetchAndDecryptOne } from "./index";
 
 test("Storage works", async () => {
-  expect(await Storage.isStored("kek")).toBeFalsy();
-  await Storage.put("kek", "lal");
-  expect(await Storage.isStored("kek")).toBeTruthy();
-  expect(await Storage.fetch("kek")).toBe("lal");
+  expect(await storage.isStored("kek")).toBeFalsy();
+  await storage.put("kek", "lal");
+  expect(await storage.isStored("kek")).toBeTruthy();
+  expect(await storage.fetch("kek")).toBe("lal");
 
   const cryptoKey = await getCryptoKey("123qweasd");
-  await Storage.encryptAndSaveMany([["wow", "WOW"]], cryptoKey);
-  expect(await Storage.fetchAndDecryptOne("wow", cryptoKey)).toBe("WOW");
+  await encryptAndSaveMany([["wow", "WOW"]], cryptoKey);
+  expect(await fetchAndDecryptOne("wow", cryptoKey)).toBe("WOW");
 });

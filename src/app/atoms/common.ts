@@ -1,16 +1,16 @@
 import { atom } from "jotai";
 import { atomFamily, loadable } from "jotai/utils";
-import { atomWithGlobal, atomWithRepoQuery } from "lib/atom-utils";
+import { atomWithStorage, atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
-export const chainIdAtom = atomWithGlobal<number>(
+export const chainIdAtom = atomWithStorage<number>(
   "chain_id",
   INITIAL_NETWORK.chainId
 );
 
-export const accountAddressAtom = atomWithGlobal<string | null>(
+export const accountAddressAtom = atomWithStorage<string | null>(
   "account_address",
   null
 );

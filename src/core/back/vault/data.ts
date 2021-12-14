@@ -1,6 +1,3 @@
-import { Buffer } from "buffer";
-import { utils } from "ethers";
-
 const ROOT_PREFIX = "v";
 
 /**
@@ -43,20 +40,12 @@ type DataItem = {
   <T>(val: T): [string, T];
 };
 
-function createStatic(prefix: Prefix, subPart?: Part): DataItem {
-  const key = wrapKey(combine(ROOT_PREFIX, prefix, subPart));
+function createStatic(prefix: Prefix, subPart: Part = ""): DataItem {
+  const key = [ROOT_PREFIX, prefix, subPart].join("_");
   return (val?: any) =>
     typeof val === "undefined" ? key : ([key, val] as any);
 }
 
 function createDynamic(prefix: Prefix) {
   return (part: Part) => createStatic(prefix, part);
-}
-
-function combine(...parts: (Part | undefined)[]) {
-  return parts.filter((p) => typeof p !== "undefined").join("_");
-}
-
-function wrapKey(key: string) {
-  return utils.ripemd160(Buffer.from(key, "utf8")).slice(2);
 }

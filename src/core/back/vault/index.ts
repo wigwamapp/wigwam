@@ -4,7 +4,8 @@ import memoizeOne from "memoize-one";
 
 import { getRandomInt } from "lib/system/randomInt";
 import { getCryptoKey, getRandomBytes } from "lib/crypto-utils";
-import * as Storage from "lib/enc-storage";
+import { encryptAndSaveMany, fetchAndDecryptOne } from "lib/enc-storage";
+import { storage } from "lib/ext/storage";
 import { t } from "lib/ext/i18n";
 import { SeedPharse, AddAccountParams, AccountType } from "core/types";
 import {
@@ -51,8 +52,8 @@ export class Vault {
 
       const cryptoKey = await getCryptoKey(passwordHash);
 
-      return Storage.transact(async () => {
-        await Storage.encryptAndSaveMany(
+      return storage.transact(async () => {
+        await encryptAndSaveMany(
           [
             Data.check(getRandomBytes(64)),
             Data.migrationLevel(MIGRATIONS.length),
@@ -73,11 +74,11 @@ export class Vault {
   }
 
   static isExist() {
-    return Storage.isStored(Data.check());
+    return storage.isStored(Data.check());
   }
 
   static hasSeedPhrase() {
-    return Storage.isStored(Data.seedPhrase());
+    return storage.isStored(Data.seedPhrase());
   }
 
   static async fetchSeedPhrase(passwordHash: string) {
@@ -92,10 +93,7 @@ export class Vault {
     const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
 
     return withError(t("failedToFetchPrivateKey"), () =>
-      Storage.fetchAndDecryptOne<string>(
-        Data.privateKey(accAddress)(),
-        cryptoKey
-      )
+      fetchAndDecryptOne<string>(Data.privateKey(accAddress)(), cryptoKey)
     );
   }
 
@@ -106,8 +104,8 @@ export class Vault {
     await Vault.getCryptoKeyCheck(passwordHash);
 
     return withError(t("failedToDeleteWallets"), () =>
-      Storage.transact(() =>
-        Storage.remove(
+      storage.transact(() =>
+        storage.remove(
           accountAddresses
             .map((address) => [
               Data.privateKey(address)(),
@@ -123,7 +121,7 @@ export class Vault {
     return withError(t("invalidPassword"), async () => {
       try {
         const cryptoKey = await getCryptoKey(passwordHash);
-        await Storage.fetchAndDecryptOne(Data.check(), cryptoKey);
+        await fetchAndDecryptOne(Data.check(), cryptoKey);
 
         Vault.decryptAttempts = 0;
 
@@ -144,16 +142,13 @@ export class Vault {
   }
 
   private static async runMigrations(cryptoKey: CryptoKey) {
-    return Storage.transact(async () => {
+    return storage.transact(async () => {
       try {
-        const migrationLevelStored = await Storage.isStored(
+        const migrationLevelStored = await storage.isStored(
           Data.migrationLevel()
         );
         const migrationLevel = migrationLevelStored
-          ? await Storage.fetchAndDecryptOne<number>(
-              Data.migrationLevel(),
-              cryptoKey
-            )
+          ? await fetchAndDecryptOne<number>(Data.migrationLevel(), cryptoKey)
           : 0;
         const migrationsToRun = MIGRATIONS.filter(
           (_m, i) => i >= migrationLevel
@@ -164,7 +159,7 @@ export class Vault {
       } catch (err) {
         console.error(err);
       } finally {
-        await Storage.encryptAndSaveMany(
+        await encryptAndSaveMany(
           [Data.migrationLevel(MIGRATIONS.length)],
           cryptoKey
         );
@@ -178,27 +173,24 @@ export class Vault {
       throw new PublicError(t("seedPhraseNotEstablished"));
     }
 
-    return Storage.fetchAndDecryptOne<SeedPharse>(Data.seedPhrase(), cryptoKey);
+    return fetchAndDecryptOne<SeedPharse>(Data.seedPhrase(), cryptoKey);
   }
 
   constructor(private cryptoKey: CryptoKey) {}
 
   addSeedPhrase(seedPhrase: SeedPharse) {
     validateSeedPhrase(seedPhrase);
-    return Storage.transact(() => this.addSeedPhraseForce(seedPhrase));
+    return storage.transact(() => this.addSeedPhraseForce(seedPhrase));
   }
 
   addAccounts(accounts: AddAccountParams[]) {
     accounts.forEach(validateAddAccountParams);
-    return Storage.transact(() => this.addAccountsForce(accounts));
+    return storage.transact(() => this.addAccountsForce(accounts));
   }
 
   fetchPublicKey(accAddress: string) {
     return withError(t("failedToFetchPublicKey"), () =>
-      Storage.fetchAndDecryptOne<string>(
-        Data.publicKey(accAddress)(),
-        this.cryptoKey
-      )
+      fetchAndDecryptOne<string>(Data.publicKey(accAddress)(), this.cryptoKey)
     );
   }
 
@@ -212,15 +204,12 @@ export class Vault {
   sign(accAddress: string, digest: string) {
     return withError(t("failedToSign"), async () => {
       const dataKey = Data.privateKey(accAddress)();
-      const privKeyExists = await Storage.isStored(dataKey);
+      const privKeyExists = await storage.isStored(dataKey);
       if (!privKeyExists) {
         throw new PublicError(t("cannotSignForWallet"));
       }
 
-      const privKey = await Storage.fetchAndDecryptOne<string>(
-        dataKey,
-        this.cryptoKey
-      );
+      const privKey = await fetchAndDecryptOne<string>(dataKey, this.cryptoKey);
 
       const signingKey = new ethers.utils.SigningKey(privKey);
       return signingKey.signDigest(digest);
@@ -234,10 +223,7 @@ export class Vault {
         throw new PublicError(t("seedPhraseAlreadyExists"));
       }
 
-      await Storage.encryptAndSaveMany(
-        [Data.seedPhrase(seedPhrase)],
-        this.cryptoKey
-      );
+      await encryptAndSaveMany([Data.seedPhrase(seedPhrase)], this.cryptoKey);
     });
   }
 
@@ -304,7 +290,7 @@ export class Vault {
       }
 
       if (toSave.length > 0) {
-        await Storage.encryptAndSaveMany(toSave, this.cryptoKey);
+        await encryptAndSaveMany(toSave, this.cryptoKey);
       }
 
       // Return account addresses

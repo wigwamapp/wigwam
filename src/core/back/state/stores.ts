@@ -34,8 +34,8 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   .on(walletPortsCountUpdated, (t, count) => {
     if (t !== null) clearTimeout(t);
 
-    const timeout = count === 0 && Global.get<number>(Setting.AutoLockTimeout);
-    return timeout ? setTimeout(() => locked(), timeout) : null;
+    const timeout = count === 0 && Global.get(Setting.AutoLockTimeout);
+    return timeout ? setTimeout(() => locked(), +timeout) : null;
   });
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;

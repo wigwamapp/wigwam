@@ -1,5 +1,5 @@
 import { atom, SetStateAction } from "jotai";
-import * as Storage from "lib/ext/storage";
+import { storage } from "lib/ext/storage";
 
 export function atomWithStorage<T = any>(
   key: string,
@@ -7,7 +7,7 @@ export function atomWithStorage<T = any>(
 ) {
   const fetchData = async (): Promise<T> => {
     try {
-      return await Storage.fetch<T>(key);
+      return await storage.fetch<T>(key);
     } catch {
       return typeof fallback === "function" ? (fallback as any)() : fallback;
     }
@@ -28,7 +28,7 @@ export function atomWithStorage<T = any>(
 
       alreadyMounted = true;
 
-      return Storage.subscribe<T>(key, ({ newValue }) => {
+      return storage.subscribe<T>(key, ({ newValue }) => {
         if (typeof newValue === "undefined") {
           if (typeof fallback === "function") {
             const val = (fallback as any)();
@@ -52,7 +52,7 @@ export function atomWithStorage<T = any>(
         typeof update === "function"
           ? (update as (prev: T) => T)(get(storageAtom))
           : update;
-      Storage.put(key, newValue);
+      storage.put(key, newValue);
     }
   );
 

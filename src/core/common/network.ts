@@ -12,7 +12,7 @@ export async function getRpcUrl(chainId: number) {
   if (url) return url;
 
   const savedKey = getRpcUrlKey(chainId);
-  url = Global.get<string>(savedKey);
+  url = Global.get(savedKey);
 
   if (!url) {
     const network = await getNetwork(chainId);

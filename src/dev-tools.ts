@@ -3,9 +3,9 @@ import { ethers } from "ethers";
 import { Buffer } from "buffer";
 
 import * as profile from "lib/ext/profile";
-import * as storage from "lib/ext/storage";
 import * as global from "lib/ext/global";
 import * as i18n from "lib/ext/i18n";
+import { storage } from "lib/ext/storage";
 import * as cryptoUtils from "lib/crypto-utils";
 import * as encStorage from "lib/enc-storage";
 

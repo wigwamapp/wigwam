@@ -1,14 +1,12 @@
 import { Buffer } from "buffer";
-import * as Storage from "lib/ext/storage";
+import { storage } from "lib/ext/storage";
 import { getRandomBytes, deriveKey, decrypt, encrypt } from "lib/crypto-utils";
-
-export * from "lib/ext/storage";
 
 export async function fetchAndDecryptOne<T>(
   storageKey: string,
   cryptoKey: CryptoKey
 ) {
-  const encItem = await Storage.fetch<string>(storageKey);
+  const encItem = await storage.fetch<string>(storageKey);
   return decryptStorageItem<T>(encItem, cryptoKey);
 }
 
@@ -23,7 +21,7 @@ export async function encryptAndSaveMany(
     })
   );
 
-  await Storage.putMany(encItems);
+  await storage.putMany(encItems);
 }
 
 async function encryptStorageItem(
