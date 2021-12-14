@@ -5,6 +5,11 @@ import { getMainURL } from "lib/ext/utils";
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
+browser.tabs.create({
+  url: getMainURL(),
+  active: true,
+});
+
 // Setup fixtures
 setupFixtures();
 
