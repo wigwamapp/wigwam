@@ -7,8 +7,8 @@ import { TReplace } from "lib/ext/react";
 
 import {
   accountAddressAtom,
-  getAllAccountsAtom,
-  getCurrentAccountAtom,
+  allAccountsAtom,
+  currentAccountAtom,
 } from "app/atoms";
 import PageLayout from "app/components/layouts/PageLayout";
 import Select from "app/components/elements/Select";
@@ -60,7 +60,7 @@ const ConditionalAccountsSelect: FC = () => {
     useMemo(
       () =>
         waitForAll({
-          currentAccount: getCurrentAccountAtom,
+          currentAccount: currentAccountAtom,
         }),
       []
     )
@@ -135,8 +135,8 @@ const AccountsSelect: FC = () => {
     useMemo(
       () =>
         waitForAll({
-          allAccounts: getAllAccountsAtom,
-          currentAccount: getCurrentAccountAtom,
+          allAccounts: allAccountsAtom,
+          currentAccount: currentAccountAtom,
         }),
       []
     )

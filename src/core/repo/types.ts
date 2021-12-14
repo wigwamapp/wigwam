@@ -29,4 +29,4 @@ export type IAccount = AccountParams & {
   usdValues: Record<number, string>;
 };
 
-export type INetworkType = "mainnet" | "testnet" | "manually-added";
+export type INetworkType = "mainnet" | "testnet" | "unknown";

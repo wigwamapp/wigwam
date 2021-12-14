@@ -3,7 +3,7 @@ import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import Fuse from "fuse.js";
 
 import { INetwork } from "core/repo";
-import { chainIdAtom, getAllMainNetworksAtom } from "app/atoms";
+import { chainIdAtom, allNetworksAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
@@ -21,7 +21,7 @@ type NetworkSelectProps = {
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
-  const networks = useAtomValue(getAllMainNetworksAtom);
+  const networks = useAtomValue(allNetworksAtom);
   const currentNetwork = useLazyNetwork(networks[0]);
 
   const setChainId = useUpdateAtom(chainIdAtom);
