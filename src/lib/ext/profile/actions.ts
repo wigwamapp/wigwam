@@ -50,15 +50,12 @@ export async function addProfile(name: string) {
   return profile;
 }
 
-export async function updateProfile(
-  id: string,
-  { name, avatarSeed }: Omit<Profile, "id">
-) {
+export async function updateProfile(id: string, toUpdate: Omit<Profile, "id">) {
   const state = await loadState();
 
   await setState({
     ...state,
-    all: state.all.map((p) => (p.id === id ? { ...p, name, avatarSeed } : p)),
+    all: state.all.map((p) => (p.id === id ? { ...p, ...toUpdate } : p)),
   });
 
   loadState.clear();

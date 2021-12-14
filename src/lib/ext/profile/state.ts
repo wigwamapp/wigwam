@@ -7,7 +7,6 @@ import { ProfileState } from "./types";
 const stateKey = "state";
 const profileStorage = new StorageArea("local", {
   keyMapper: (k) => `profile_${k}`,
-  obfuscate: true,
 });
 
 export const loadState = memoizeOne(async () => {

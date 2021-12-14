@@ -111,10 +111,11 @@ export class StorageArea {
   private async wrapOneKey(key: string) {
     // Wrap with provided key mapper
     key = this.opts.keyMapper ? await this.opts.keyMapper(key) : key;
-    // Obfuscate to hash
-    key = this.opts.obfuscate
-      ? utils.ripemd160(Buffer.from(key, "utf8")).slice(2)
-      : key;
+    // Obfuscate with hashing
+    key =
+      this.opts.obfuscate !== false
+        ? utils.ripemd160(Buffer.from(key, "utf8")).slice(2)
+        : key;
 
     return key;
   }
