@@ -20,8 +20,13 @@ const Profiles: FC = () => {
   }, [setAdding]);
 
   const handleAdd = useCallback(async (name: string) => {
-    const { id } = await addProfile(name);
-    changeProfile(id);
+    try {
+      await addProfile(name);
+
+      setAdding(false);
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
 
   const handleSelect = useCallback((profile) => {
@@ -51,7 +56,7 @@ const Profiles: FC = () => {
                   seed={p.avatarSeed}
                   className="w-36 h-36 mb-4"
                   source="boring"
-                  variant="pixel"
+                  variant="beam"
                   square
                 />
 
@@ -141,6 +146,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
             <div className="flex-1" />
 
             <button
+              type="button"
               className={classNames(
                 "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
                 "transition ease-in-out duration-200"
