@@ -59,7 +59,7 @@ const ComingSoon: FC = () => {
             <NewButton
               theme="secondary"
               href="https://vigvam.app/"
-              className="ml-6 rounded-[6.25rem] flex align-center py-[.875rem] px-8 text-xl"
+              className="ml-6 rounded-[6.25rem] flex align-center py-[.875rem] px-8 !text-xl"
             >
               vigvam.app
               <ExternalLinkIcon className="ml-4" />
