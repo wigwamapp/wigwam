@@ -22,7 +22,7 @@ const SocialLinks = [
   },
   {
     Icon: TwitterIcon,
-    href: "https://twitter.com/VigVamApp",
+    href: "https://twitter.com/vigvamapp",
   },
 ];
 
@@ -52,14 +52,15 @@ const ComingSoon: FC = () => {
                 theme="secondary"
                 Icon={Icon}
                 href={href}
-                className="w-12 h-12 rounded-[.75rem] mr-2"
-                iconClassName="w-10 h-10"
+                className="!w-14 !h-14 !rounded-[.75rem] mr-2"
+                iconClassName="!w-12 h-auto"
               />
             ))}
+
             <NewButton
               theme="secondary"
               href="https://vigvam.app/"
-              className="ml-6 rounded-[6.25rem] flex align-center py-[.875rem] px-8 !text-xl"
+              className="ml-6 !rounded-full items-center py-[.875rem] !px-7 !text-xl"
             >
               vigvam.app
               <ExternalLinkIcon className="ml-4" />
