@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 import { Font } from "lib/ext/fonts";
 
-import { INetwork } from "core/repo";
+import type { INetwork } from "core/repo";
 
 export enum Page {
   Default = "default",
