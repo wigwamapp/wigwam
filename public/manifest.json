@@ -21,7 +21,10 @@
   "author": "{{website}}",
 
   "__firefox__applications": {
-    "gecko": { "id": "{daf44bf7-a45e-4450-979c-91cf07434c3d}" }
+    "gecko": {
+      "id": "webextension@vigvam.app",
+      "strict_min_version": "68.0"
+    }
   },
 
   "__chrome__minimum_chrome_version": "73",
