@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "同じアドレスのウォレットはすでに存在します",
   "add": "追加",
   "addWallet": "ウォレットを追加",
-  "appDesc": "ウォレットと暗号鍵を管理するアプリ。 DeFiとNFTを調べてください。イーサリアム、BSC、ポリゴン、楽観主義など。",
+  "appDesc": "ウォレットと暗号鍵を管理するアプリ。 DeFiとNFTを探索します。イーサリアム、BSC、ポリゴン、楽観主義、雪崩など。",
   "back": "バック",
   "cancel": "キャンセル",
   "cannotSignForWallet": "このアカウントに署名できません",
   "continue": "継続する",
   "derivationPathIsInvalid": "派生パスが無効です",
-  "failedToAddWallets": "新しいウォレットの追加に失敗しました",
   "failedToAddSeedPhrase": "シードフレーズの追加に失敗しました",
+  "failedToAddWallets": "新しいウォレットの追加に失敗しました",
   "failedToDeleteWallets": "ウォレットの削除に失敗しました",
   "failedToFetchPrivateKey": "秘密鍵のフェッチに失敗しました",
   "failedToFetchPublicKey": "公開鍵の取得に失敗しました",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "シードフレーズ言語はサポートされていません",
   "seedPhraseNotEstablished": "シードフレーズはまだ確立されていません",
   "wallet": "財布",
+  "walletAlreadyExists": "同じアドレスのウォレットはすでに存在します",
   "walletLocked": "ウォレットがロックされています",
   "welcomeTo": "{{target}}へようこそ"
 }

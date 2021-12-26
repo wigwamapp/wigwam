@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "Le portefeuille avec la même adresse existe déjà",
   "add": "Ajouter",
   "addWallet": "Ajouter un portefeuille",
-  "appDesc": "Une application qui gère vos portefeuilles et vos clés cryptographiques. Explorez DeFi et NFT. Ethereum, BSC, Polygon, Optimism et autres.",
+  "appDesc": "Une application qui gère vos portefeuilles et vos clés cryptographiques. Explorez DeFi et NFT. Ethereum, BSC, Polygone, Optimisme, Avalanche et autres.",
   "back": "Dos",
   "cancel": "Annuler",
   "cannotSignForWallet": "Impossible de signer pour ce compte",
   "continue": "Continuer",
   "derivationPathIsInvalid": "Le chemin de dérivation n'est pas valide",
-  "failedToAddWallets": "Échec de l'ajout de nouveaux portefeuilles",
   "failedToAddSeedPhrase": "Échec de l'ajout de la phrase de départ",
+  "failedToAddWallets": "Échec de l'ajout de nouveaux portefeuilles",
   "failedToDeleteWallets": "Échec de la suppression du portefeuille",
   "failedToFetchPrivateKey": "Échec de la récupération de la clé privée",
   "failedToFetchPublicKey": "Échec de la récupération de la clé publique",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "Langue de la phrase de départ non prise en charge",
   "seedPhraseNotEstablished": "La phrase de départ n'a pas encore été établie",
   "wallet": "Portefeuille",
+  "walletAlreadyExists": "Le portefeuille avec la même adresse existe déjà",
   "walletLocked": "Portefeuille verrouillé",
   "welcomeTo": "Bienvenue sur {{target}}"
 }

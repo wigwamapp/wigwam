@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "동일한 주소의 지갑이 이미 있습니다.",
   "add": "더하다",
   "addWallet": "지갑 추가",
-  "appDesc": "지갑과 암호화 키를 관리하는 앱입니다. DeFi와 NFT를 살펴보세요. 이더리움, BSC, 폴리곤, 낙관론 등.",
+  "appDesc": "지갑과 암호화 키를 관리하는 앱. DeFi와 NFT를 살펴보세요. Ethereum, BSC, Polygon, Optimism, Avalanche 등.",
   "back": "뒤",
   "cancel": "취소",
   "cannotSignForWallet": "이 계정에 서명할 수 없습니다.",
   "continue": "계속하다",
   "derivationPathIsInvalid": "파생 경로가 잘못되었습니다.",
-  "failedToAddWallets": "새 지갑을 추가하지 못했습니다.",
   "failedToAddSeedPhrase": "시드 구문을 추가하지 못했습니다.",
+  "failedToAddWallets": "새 지갑을 추가하지 못했습니다.",
   "failedToDeleteWallets": "지갑 삭제 실패",
   "failedToFetchPrivateKey": "개인 키를 가져오지 못했습니다.",
   "failedToFetchPublicKey": "공개 키를 가져오지 못했습니다.",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "지원되지 않는 시드 구문 언어",
   "seedPhraseNotEstablished": "시드 구문이 아직 설정되지 않았습니다.",
   "wallet": "지갑",
+  "walletAlreadyExists": "동일한 주소의 지갑이 이미 있습니다.",
   "walletLocked": "지갑 잠김",
   "welcomeTo": "{{target}}에 오신 것을 환영합니다."
 }
