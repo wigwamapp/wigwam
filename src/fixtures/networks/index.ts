@@ -8,7 +8,7 @@ import { OPTIMISM } from "./optimism";
 import { POLYGON } from "./polygon";
 import { BSC } from "./bsc";
 import { ARBITRUM } from "./arbitrum";
-import { AVALANCE } from "./avalanche";
+import { AVALANCHE } from "./avalanche";
 import { HARMONY } from "./harmony";
 import { FANTOM } from "./fantom";
 import { CELO } from "./celo";
@@ -23,7 +23,7 @@ export const DEFAULT_NETWORKS: INetwork[] = [
   POLYGON,
   BSC,
   ARBITRUM,
-  AVALANCE,
+  AVALANCHE,
   HARMONY,
   FANTOM,
   CELO,

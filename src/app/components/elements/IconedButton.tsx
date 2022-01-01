@@ -5,12 +5,14 @@ import Link, { LinkProps } from "lib/navigation/Link";
 type NewButtonProps = {
   Icon: FC<{ className?: string }>;
   theme?: "primary" | "secondary";
+  iconClassName?: string;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const NewButton: FC<NewButtonProps> = ({
   theme = "primary",
   className,
   Icon,
+  iconClassName,
   ...rest
 }) => {
   const classNamesList = classNames(
@@ -30,10 +32,12 @@ const NewButton: FC<NewButtonProps> = ({
   const content = (
     <Icon
       className={classNames(
-        theme === "primary" && "w-4 h-4",
-        theme === "secondary" && "w-6 h-6",
+        theme === "primary" && "w-4",
+        theme === "secondary" && "w-6",
+        "h-auto",
         "transition-opacity",
-        "group-active:opacity-60"
+        "group-active:opacity-60",
+        iconClassName
       )}
     />
   );

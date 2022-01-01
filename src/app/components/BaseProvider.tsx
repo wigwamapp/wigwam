@@ -3,7 +3,7 @@ import { Provider as JotaiProvider } from "jotai";
 import { useAtomValue, waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
-import { fontsAtom, i18nAtom } from "app/atoms";
+import { fontsAtom, i18nAtom } from "app/atoms/boot";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (

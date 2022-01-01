@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "相同地址的钱包已存在",
   "add": "添加",
   "addWallet": "添加钱包",
-  "appDesc": "管理您的钱包和加密密钥的应用程序。探索 DeFi 和 NFT。以太坊、BSC、多边形、乐观主义等。",
+  "appDesc": "管理您的钱包和加密密钥的应用程序。探索 DeFi 和 NFT。以太坊、BSC、多边形、乐观主义、雪崩等。",
   "back": "后退",
   "cancel": "取消",
   "cannotSignForWallet": "无法登录此帐户",
   "continue": "继续",
   "derivationPathIsInvalid": "派生路径无效",
-  "failedToAddWallets": "添加新钱包失败",
   "failedToAddSeedPhrase": "添加种子短语失败",
+  "failedToAddWallets": "添加新钱包失败",
   "failedToDeleteWallets": "删除钱包失败",
   "failedToFetchPrivateKey": "获取私钥失败",
   "failedToFetchPublicKey": "获取公钥失败",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "不支持种子短语语言",
   "seedPhraseNotEstablished": "种子短语尚未建立",
   "wallet": "钱包",
+  "walletAlreadyExists": "相同地址的钱包已存在",
   "walletLocked": "钱包锁定",
   "welcomeTo": "欢迎来到{{target}}"
 }

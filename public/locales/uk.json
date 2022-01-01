@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "Гаманець з тією ж адресою вже існує",
   "add": "Додати",
   "addWallet": "Додати гаманець",
-  "appDesc": "Додаток, що управляє вашими гаманцями та крипто-ключами. Досліджуйте DeFi та NFT. Ethereum, BSC, Polygon, Optimism та інші.",
+  "appDesc": "Додаток, який керує вашими гаманцями та криптоключами. Досліджуйте DeFi та NFT. Ethereum, BSC, Polygon, Optimism, Avalanche та інші.",
   "back": "Назад",
   "cancel": "Скасувати",
   "cannotSignForWallet": "Не вдається підписати для цього облікового запису",
   "continue": "Продовжуйте",
   "derivationPathIsInvalid": "Шлях деривації недійсний",
-  "failedToAddWallets": "Не вдалося додати нові гаманці",
   "failedToAddSeedPhrase": "Не вдалося додати насіннєву фразу",
+  "failedToAddWallets": "Не вдалося додати нові гаманці",
   "failedToDeleteWallets": "Не вдалося видалити гаманець",
   "failedToFetchPrivateKey": "Не вдалося отримати приватний ключ",
   "failedToFetchPublicKey": "Не вдалося отримати відкритий ключ",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "Мова насіннєвих фраз не підтримується",
   "seedPhraseNotEstablished": "Насіннєва фраза ще не встановлена",
   "wallet": "Гаманець",
+  "walletAlreadyExists": "Гаманець з тією ж адресою вже існує",
   "walletLocked": "Гаманець заблоковано",
   "welcomeTo": "Ласкаво просимо до {{target}}"
 }
