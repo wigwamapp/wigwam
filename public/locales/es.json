@@ -1,15 +1,14 @@
 {
-  "walletAlreadyExists": "Ya existe una billetera con la misma dirección",
   "add": "Agregar",
   "addWallet": "Agregar billetera",
-  "appDesc": "Una aplicación que administra sus billeteras y claves criptográficas. Explore DeFi y NFT. Ethereum, BSC, Polygon, Optimism y otros.",
+  "appDesc": "Una aplicación que administra sus billeteras y claves criptográficas. Explore DeFi y NFT. Ethereum, BSC, Polygon, Optimism, Avalanche y otros.",
   "back": "atrás",
   "cancel": "Cancelar",
   "cannotSignForWallet": "No se puede iniciar sesión para esta cuenta",
   "continue": "Continuar",
   "derivationPathIsInvalid": "La ruta de derivación no es válida",
-  "failedToAddWallets": "No se pudieron agregar nuevas billeteras",
   "failedToAddSeedPhrase": "No se pudo agregar la frase inicial",
+  "failedToAddWallets": "No se pudieron agregar nuevas billeteras",
   "failedToDeleteWallets": "No se pudo borrar la billetera",
   "failedToFetchPrivateKey": "No se pudo recuperar la clave privada",
   "failedToFetchPublicKey": "No se pudo recuperar la clave pública",
@@ -30,6 +29,7 @@
   "seedPhraseLanguageNotSupported": "El idioma de la frase inicial no es compatible",
   "seedPhraseNotEstablished": "La frase semilla aún no se ha establecido",
   "wallet": "Cartera",
+  "walletAlreadyExists": "Ya existe una billetera con la misma dirección",
   "walletLocked": "Billetera bloqueada",
   "welcomeTo": "Bienvenido a {{target}}"
 }
