@@ -4,11 +4,13 @@
 
 An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br />Ethereum, BSC, Polygon, Optimism and others.
 
+[![Vigvam](https://user-images.githubusercontent.com/11996139/146784241-7082320b-50f8-46c9-b4e4-b6dfad004824.png)](https://vigvam.app/)
+
 ## Features
 
 - 🧩 A classic browser extension.
 
-- 🌐 Fast and simple interaction with Web3 world.
+- 🌐 Fast and simple interaction with Web 3.0 world.
 
 - 🤲 Non-custodial. We don't have a server or a central hub. The keys belong to the user and are stored on his device in encrypted form.
 
