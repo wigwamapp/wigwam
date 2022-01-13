@@ -1,4 +1,4 @@
-import memoizeOne from "memoize-one";
+import { livePromise } from "lib/system/livePromise";
 
 import { StorageArea } from "../storageArea";
 
@@ -9,19 +9,13 @@ const profileStorage = new StorageArea("local", {
   keyMapper: (k) => `profile_${k}`,
 });
 
-export const loadState = memoizeOne(async () => {
-  const state = await fetchState();
-  if (state) return state;
-
-  return new Promise<ProfileState>((res) => {
-    const unsub = subscribeState((newState) => {
-      res(newState);
-      unsub();
-    });
-  });
-});
+export const loadState = livePromise(fetchStateForce, subscribeState);
 
 export function fetchState() {
+  return profileStorage.fetch<ProfileState>(stateKey);
+}
+
+export function fetchStateForce() {
   return profileStorage.fetchForce<ProfileState>(stateKey);
 }
 

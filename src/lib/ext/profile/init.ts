@@ -2,12 +2,12 @@ import browser from "webextension-polyfill";
 
 import { getMainURL } from "../utils";
 
-import { fetchState, setState } from "./state";
+import { fetchStateForce, setState } from "./state";
 import { generateProfile } from "./helpers";
 import { DEFAULT_NAME } from "./defaults";
 
 export async function initProfiles() {
-  const state = await fetchState();
+  const state = await fetchStateForce();
   if (!state) {
     const current = generateProfile(DEFAULT_NAME);
     const all = [current];

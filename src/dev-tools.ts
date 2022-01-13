@@ -29,6 +29,7 @@ Object.assign(window, {
   repo,
   client,
   reset,
+  getAllStorage,
 });
 
 async function reset() {
@@ -36,4 +37,8 @@ async function reset() {
   await storage.clear();
   await repo.clear();
   browser.runtime.reload();
+}
+
+function getAllStorage() {
+  return browser.storage.local.get();
 }

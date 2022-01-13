@@ -1,7 +1,5 @@
 import { createStore } from "effector";
 
-import * as Global from "lib/ext/global";
-import { Setting } from "core/common";
 import { WalletStatus, ForApproval } from "core/types";
 
 import { Vault } from "../vault";
@@ -34,7 +32,7 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   .on(walletPortsCountUpdated, (t, count) => {
     if (t !== null) clearTimeout(t);
 
-    const timeout = count === 0 && Global.get(Setting.AutoLockTimeout);
+    const timeout = count === 0 && 0; /*Global.get(Setting.AutoLockTimeout)*/
     return timeout ? setTimeout(() => locked(), +timeout) : null;
   });
 

@@ -52,7 +52,8 @@ export function atomWithStorage<T = any>(
         typeof update === "function"
           ? (update as (prev: T) => T)(get(storageAtom))
           : update;
-      storage.put(key, newValue);
+
+      storage.put(key, newValue).catch(console.error);
     }
   );
 

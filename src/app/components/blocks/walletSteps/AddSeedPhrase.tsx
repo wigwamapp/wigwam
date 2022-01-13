@@ -1,9 +1,9 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAtomValue } from "jotai/utils";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
 import { useSteps } from "lib/use-steps";
-import { getLocale } from "lib/ext/i18n/react";
 import { getRandomBytes } from "lib/crypto-utils/random";
 
 import { SeedPharse } from "core/types";
@@ -14,6 +14,7 @@ import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
+import { currentLocaleAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
@@ -27,15 +28,16 @@ type AddSeedPhraseProps = {
 
 const AddSeedPhrase = memo<AddSeedPhraseProps>(
   ({ importExisting, initialSetup }) => {
+    const currentLocale = useAtomValue(currentLocaleAtom);
+
     const { stateRef, navigateToStep } = useSteps();
 
-    const defaultLocale = useMemo(() => {
-      const currentCode = getLocale();
-      return (
-        SUPPORTED_LOCALES.find(({ code }) => currentCode === code) ??
-        FALLBACK_LOCALE
-      );
-    }, []);
+    const defaultLocale = useMemo(
+      () =>
+        SUPPORTED_LOCALES.find(({ code }) => currentLocale === code) ??
+        FALLBACK_LOCALE,
+      [currentLocale]
+    );
 
     const [locale, setLocale] = useState(defaultLocale);
 

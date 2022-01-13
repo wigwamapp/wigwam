@@ -4,6 +4,8 @@ import { FetchedLocaleMessages, LocaleMessages, Substitutions } from "./types";
 import { areLocalesEqual, processTemplate, toList } from "./helpers";
 import { getSavedLocale, saveLocale } from "./persisting";
 
+const nativeSupported = "getMessage" in browser.i18n;
+
 let fetchedLocaleMessages: FetchedLocaleMessages = {
   target: null,
   fallback: null,
@@ -15,26 +17,29 @@ export async function init() {
     fallback: null,
   };
 
-  const saved = getSavedLocale();
+  const saved = await getSavedLocale();
+  const native = getNativeLocale();
+  const fallback = getDefaultLocale();
+  const target = saved || native || fallback;
 
-  if (saved) {
-    const native = getNativeLocale();
+  if (!nativeSupported || (saved && !areLocalesEqual(saved, native!))) {
+    const promises: Promise<void>[] = [];
 
-    await Promise.all([
-      // Fetch target locale messages if needed
-      (async () => {
-        if (!areLocalesEqual(saved, native)) {
-          refetched.target = await fetchLocaleMessages(saved);
-        }
-      })(),
-      // Fetch fallback locale messages if needed
-      (async () => {
-        const deflt = getDefaultLocale();
-        if (!areLocalesEqual(deflt, native) && !areLocalesEqual(deflt, saved)) {
-          refetched.fallback = await fetchLocaleMessages(deflt);
-        }
-      })(),
-    ]);
+    promises.push(
+      fetchLocaleMessages(target).then((messages) => {
+        refetched.target = messages;
+      })
+    );
+
+    if (target !== fallback) {
+      promises.push(
+        fetchLocaleMessages(fallback).then((messages) => {
+          refetched.fallback = messages;
+        })
+      );
+    }
+
+    await Promise.all(promises);
   }
 
   fetchedLocaleMessages = refetched;
@@ -46,7 +51,10 @@ export function t(messageName: string, substitutions?: Substitutions) {
     fetchedLocaleMessages.fallback?.[messageName];
 
   if (!val) {
-    return browser.i18n.getMessage(messageName, substitutions);
+    return (
+      browser.i18n.getMessage?.(messageName, substitutions) ||
+      `Translated<${messageName}>`
+    );
   }
 
   try {
@@ -63,7 +71,7 @@ export function t(messageName: string, substitutions?: Substitutions) {
   } catch (err) {
     console.error(err);
 
-    return "";
+    return `Translated<${messageName}>`;
   }
 }
 
@@ -71,21 +79,22 @@ export function replaceT(str: string) {
   return str.replace(/{{(.*?)}}/g, (substr, key) => t(key) ?? substr);
 }
 
-export function getLocale() {
-  return getSavedLocale() || getNativeLocale();
+export async function getLocale() {
+  const saved = await getSavedLocale();
+  return saved || getNativeLocale() || getDefaultLocale();
 }
 
 export function setLocale(locale: string) {
-  saveLocale(locale);
+  return saveLocale(locale);
 }
 
-export function getNativeLocale() {
-  return browser.i18n.getUILanguage();
+export function getNativeLocale(): string | undefined {
+  return browser.i18n.getUILanguage?.();
 }
 
 export function getDefaultLocale(): string {
   const manifest = browser.runtime.getManifest();
-  return (manifest as any).default_locale || "en";
+  return manifest.default_locale || "en";
 }
 
 export async function fetchLocaleMessages(locale: string) {

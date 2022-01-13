@@ -2,7 +2,7 @@ import browser from "webextension-polyfill";
 import { assert } from "lib/system/assert";
 
 import { Profile } from "./types";
-import { loadState, setState } from "./state";
+import { loadState, fetchState, setState } from "./state";
 import { generateProfile } from "./helpers";
 
 /**
@@ -19,7 +19,7 @@ export async function getProfileId() {
 }
 
 export async function changeProfile(id: string) {
-  const state = await loadState();
+  const state = await fetchState();
 
   assert(
     state.all.some((p) => p.id === id),
@@ -36,7 +36,7 @@ export async function changeProfile(id: string) {
 }
 
 export async function addProfile(name: string) {
-  const state = await loadState();
+  const state = await fetchState();
 
   const profile = generateProfile(name);
 
@@ -45,18 +45,14 @@ export async function addProfile(name: string) {
     all: [...state.all, profile],
   });
 
-  loadState.clear();
-
   return profile;
 }
 
 export async function updateProfile(id: string, toUpdate: Omit<Profile, "id">) {
-  const state = await loadState();
+  const state = await fetchState();
 
   await setState({
     ...state,
     all: state.all.map((p) => (p.id === id ? { ...p, ...toUpdate } : p)),
   });
-
-  loadState.clear();
 }
