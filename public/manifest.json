@@ -16,7 +16,9 @@
   "short_name": "Vigvam",
 
   "permissions": ["tabs", "storage", "clipboardWrite", "activeTab"],
-  "content_security_policy": "script-src 'self'; object-src 'self'",
+
+  "__chrome__content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
+  "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",
 
   "author": "{{website}}",
 

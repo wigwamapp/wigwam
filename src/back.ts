@@ -5,6 +5,10 @@ import { getMainURL } from "lib/ext/utils";
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
+import * as Argon from "lib/argon2";
+
+Object.assign(globalThis, { Argon });
+
 // Init profiles
 // - Create default profile if it doesn't exist
 // - Open new tab when profile changed (after refresh)

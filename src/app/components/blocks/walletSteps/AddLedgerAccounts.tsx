@@ -11,9 +11,7 @@ import classNames from "clsx";
 import { useSteps } from "lib/use-steps";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
-import Transport from "@ledgerhq/hw-transport";
-import LedgerEth from "@ledgerhq/hw-app-eth";
-import { LedgerTransport, getExtendedKey } from "lib/ledger";
+import type Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
@@ -42,6 +40,12 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
 
   const handleConnect = useCallback(async () => {
     try {
+      const [{ default: LedgerEth }, { LedgerTransport, getExtendedKey }] =
+        await Promise.all([
+          import("@ledgerhq/hw-app-eth"),
+          import("lib/ledger"),
+        ]);
+
       await retry(
         async () => {
           await transportRef.current?.close();
