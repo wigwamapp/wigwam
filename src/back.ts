@@ -6,8 +6,9 @@ import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
 import * as Argon from "lib/argon2";
+import * as Kdbx from "lib/kdbx";
 
-Object.assign(globalThis, { Argon });
+Object.assign(globalThis, { Argon, Kdbx });
 
 // Init profiles
 // - Create default profile if it doesn't exist
