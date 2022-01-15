@@ -1,5 +1,5 @@
 import Fuse from "fuse.js";
-import { Font } from "lib/ext/fonts";
+import { Font } from "lib/web-fonts";
 
 import type { INetwork } from "core/repo";
 
