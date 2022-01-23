@@ -2,12 +2,7 @@ import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/use-steps";
 import { ethers } from "ethers";
 
-import {
-  AddHDAccountParams,
-  AccountSource,
-  AccountType,
-  SeedPharse,
-} from "core/types";
+import { AddHDAccountParams, AccountSource, SeedPharse } from "core/types";
 import { addSeedPhrase } from "core/client";
 
 import LongTextField from "app/components/elements/LongTextField";
@@ -44,7 +39,6 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
       } else {
         const addAccountsParams: AddHDAccountParams[] = [
           {
-            type: AccountType.HD,
             source: AccountSource.SeedPhrase,
             name: "{{wallet}} 1",
             derivationPath: ethers.utils.defaultPath,

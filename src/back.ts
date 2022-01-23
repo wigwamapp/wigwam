@@ -1,14 +1,12 @@
 import browser from "webextension-polyfill";
 import { initProfiles } from "lib/ext/profile";
 import { getMainURL } from "lib/ext/utils";
+import { setupArgon2Impl } from "lib/kdbx";
 
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
 
-import * as Argon from "lib/argon2";
-import * as Kdbx from "lib/kdbx";
-
-Object.assign(globalThis, { Argon, Kdbx });
+setupArgon2Impl();
 
 // Init profiles
 // - Create default profile if it doesn't exist

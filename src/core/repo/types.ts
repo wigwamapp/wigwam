@@ -1,8 +1,5 @@
-import { AccountParams } from "core/types";
-
 export enum RepoTable {
   Networks = "networks",
-  Accounts = "accounts",
 }
 
 export interface INetwork {
@@ -22,11 +19,5 @@ export interface INetwork {
   faucetUrls?: string[];
   infoUrl?: string;
 }
-
-export type IAccount = AccountParams & {
-  address: string;
-  name: string;
-  usdValues: Record<number, string>;
-};
 
 export type INetworkType = "mainnet" | "testnet" | "unknown";

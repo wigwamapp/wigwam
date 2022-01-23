@@ -14,12 +14,7 @@ import { useSteps } from "lib/use-steps";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import {
-  AddHDAccountParams,
-  SeedPharse,
-  AccountType,
-  AccountSource,
-} from "core/types";
+import { AddHDAccountParams, SeedPharse, AccountSource } from "core/types";
 import {
   toDerivedNeuterExtendedKey,
   generatePreviewHDNodes,
@@ -107,7 +102,6 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
         (address, i) => {
           const hdIndex = addresses!.findIndex((a) => a === address);
           return {
-            type: AccountType.HD,
             source: AccountSource.SeedPhrase,
             name: `{{wallet}} ${i + 1}`,
             derivationPath: `${rootDerivationPath}/${hdIndex}`,

@@ -1,13 +1,6 @@
-import { match } from "ts-pattern";
 import { t } from "lib/ext/i18n";
 
-import * as Repo from "core/repo";
-import {
-  AccountType,
-  AccountParams,
-  AddAccountParams,
-  AccountSource,
-} from "core/types";
+import { Account, AddAccountParams, AccountSource } from "core/types";
 
 import { PublicError } from "./base";
 import {
@@ -16,71 +9,32 @@ import {
   validatePublicKey,
 } from "./wallet";
 
-export function saveAccounts(
-  accounts: AddAccountParams[],
-  addresses: string[]
-) {
-  return Repo.accounts.bulkAdd(
-    accounts.map((addParams, i) => ({
-      ...toPlainAccountParams(addParams),
-      address: addresses[i],
-      name: addParams.name,
-      usdValues: {}, // Record<chainId, usdVolumeSnapshot>
-    }))
-  );
-}
+export function validateAddAccountParams(params: AddAccountParams) {
+  switch (params.source) {
+    case AccountSource.SeedPhrase:
+      validateDerivationPath(params.derivationPath);
+      break;
 
-export function cleanAccounts(addresses: string[]) {
-  return Repo.accounts.bulkDelete(addresses);
-}
+    case AccountSource.Ledger:
+      validateDerivationPath(params.derivationPath);
+      validatePublicKey(params.publicKey);
+      break;
 
-export function toPlainAccountParams(
-  addParams: AddAccountParams
-): AccountParams {
-  return match(addParams)
-    .with({ source: AccountSource.SeedPhrase }, (p) => ({
-      type: p.type,
-      source: p.source,
-      derivationPath: p.derivationPath,
-    }))
-    .with({ source: AccountSource.PrivateKey }, (p) => ({
-      type: p.type,
-      source: p.source,
-    }))
-    .with({ source: AccountSource.Ledger }, (p) => ({
-      type: p.type,
-      source: p.source,
-      derivationPath: p.derivationPath,
-    }))
-    .with({ source: AccountSource.OpenLogin }, (p) => ({
-      type: p.type,
-      source: p.source,
-      social: p.social,
-    }))
-    .with({ source: AccountSource.Address }, (p) => ({
-      type: p.type,
-      source: p.source,
-    }))
-    .exhaustive();
-}
-
-export async function validateAccountExistence(address: string) {
-  const acc = await Repo.accounts.get(address);
-  if (acc) {
-    throw new PublicError(t("walletAlreadyExists"));
+    case AccountSource.PrivateKey:
+    case AccountSource.OpenLogin:
+      validatePrivateKey(params.privateKey);
+      break;
   }
 }
 
-export function validateAddAccountParams(params: AddAccountParams) {
-  match(params)
-    .with({ type: AccountType.HD }, (p) => {
-      validateDerivationPath(p.derivationPath);
-    })
-    .with({ type: AccountType.Imported }, (p) => {
-      validatePrivateKey(p.privateKey);
-    })
-    .with({ type: AccountType.External }, (p) => {
-      validatePublicKey(p.publicKey);
-    })
-    .run();
+export function validateNoAccountDuplicates(accounts: Account[]) {
+  const uniques = new Set<string>();
+
+  for (const { address } of accounts) {
+    if (!uniques.has(address)) {
+      uniques.add(address);
+    } else {
+      throw new PublicError(t("walletAlreadyExists"));
+    }
+  }
 }

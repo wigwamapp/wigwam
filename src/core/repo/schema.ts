@@ -11,5 +11,4 @@ export const db = new AsyncDexie(underProfile("main"));
 
 db.version(1).stores({
   [RepoTable.Networks]: "&chainId,type,chainTag",
-  [RepoTable.Accounts]: "&address,type,source",
 });

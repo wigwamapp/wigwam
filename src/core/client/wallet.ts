@@ -6,6 +6,7 @@ import {
   WalletStatus,
   AddAccountParams,
   SeedPharse,
+  Account,
 } from "core/types";
 
 import { porter } from "./base";
@@ -27,26 +28,35 @@ export function onWalletStatusUpdated(
   });
 }
 
+export function onAccountsUpdated(callback: (newAccounts: Account[]) => void) {
+  return porter.onMessage<EventMessage>((msg) => {
+    if (msg.type === MessageType.AccountsUpdated) {
+      callback(msg.accounts);
+    }
+  });
+}
+
 export async function setupWallet(
   password: string,
-  accounts: AddAccountParams[],
+  accountsParams: AddAccountParams[],
   seedPhrase?: SeedPharse
 ) {
   const type = MessageType.SetupWallet;
-  const passwordHash = await getPasswordHash(password);
+  const passwordHash = getPasswordHash(password);
+
   const res = await porter.request({
     type,
     passwordHash,
-    accounts,
+    accountsParams,
     seedPhrase,
   });
   assert(res?.type === type);
-  return res.accountAddresses;
 }
 
 export async function unlockWallet(password: string) {
   const type = MessageType.UnlockWallet;
   const passwordHash = getPasswordHash(password);
+
   const res = await porter.request({
     type,
     passwordHash,
@@ -56,43 +66,54 @@ export async function unlockWallet(password: string) {
 
 export async function lockWallet() {
   const type = MessageType.LockWallet;
+
   const res = await porter.request({ type });
   assert(res?.type === type);
 }
 
-export async function addAccounts(accounts: AddAccountParams[]) {
-  const type = MessageType.AddAccounts;
-  const res = await porter.request({
-    type,
-    accounts,
-  });
+export async function getAccounts() {
+  const type = MessageType.GetAccounts;
+
+  const res = await porter.request({ type });
   assert(res?.type === type);
-  return res.accountAddresses;
+
+  return res.accounts;
 }
 
-export async function deleteAccounts(
-  password: string,
-  accountAddresses: string[]
-) {
+export async function addAccounts(accountsParams: AddAccountParams[]) {
+  const type = MessageType.AddAccounts;
+
+  const res = await porter.request({
+    type,
+    accountsParams,
+  });
+  assert(res?.type === type);
+}
+
+export async function deleteAccounts(password: string, accountUuids: string[]) {
   const type = MessageType.DeleteAccounts;
-  const passwordHash = await getPasswordHash(password);
+  const passwordHash = getPasswordHash(password);
+
   const res = await porter.request({
     type,
     passwordHash,
-    accountAddresses,
+    accountUuids,
   });
   assert(res?.type === type);
 }
 
 export async function isWalletHasSeedPhrase() {
   const type = MessageType.HasSeedPhrase;
+
   const res = await porter.request({ type });
   assert(res?.type === type);
+
   return res.seedPhraseExists;
 }
 
 export async function addSeedPhrase(seedPhrase: SeedPharse) {
   const type = MessageType.AddSeedPhrase;
+
   const res = await porter.request({
     type,
     seedPhrase,
@@ -102,43 +123,51 @@ export async function addSeedPhrase(seedPhrase: SeedPharse) {
 
 export async function getSeedPhrase(password: string) {
   const type = MessageType.GetSeedPhrase;
-  const passwordHash = await getPasswordHash(password);
+  const passwordHash = getPasswordHash(password);
+
   const res = await porter.request({
     type,
     passwordHash,
   });
   assert(res?.type === type);
+
   return res.seedPhrase;
 }
 
-export async function getPrivateKey(password: string, accountAddress: string) {
+export async function getPrivateKey(password: string, accountUuid: string) {
   const type = MessageType.GetPrivateKey;
-  const passwordHash = await getPasswordHash(password);
+  const passwordHash = getPasswordHash(password);
+
   const res = await porter.request({
     type,
     passwordHash,
-    accountAddress,
+    accountUuid,
   });
   assert(res?.type === type);
+
   return res.privateKey;
 }
 
-export async function getPublicKey(accountAddress: string) {
+export async function getPublicKey(accountUuid: string) {
   const type = MessageType.GetPublicKey;
+
   const res = await porter.request({
     type,
-    accountAddress,
+    accountUuid,
   });
   assert(res?.type === type);
+
   return res.publicKey;
 }
 
 export async function getNeuterExtendedKey(derivationPath: string) {
   const type = MessageType.GetNeuterExtendedKey;
+
   const res = await porter.request({
     type,
     derivationPath,
   });
   assert(res?.type === type);
+
   return res.extendedKey;
 }

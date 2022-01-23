@@ -40,10 +40,11 @@ export class StorageArea {
     return items[key];
   }
 
-  async fetchMany(keys: string[]) {
+  async fetchMany<T = any>(keys: string[]) {
     keys = await this.wrapKeys(keys);
 
-    return this.area.get(keys);
+    const items = await this.area.get(keys);
+    return keys.map((k) => items[k] as T | undefined);
   }
 
   async put<T>(key: string, value: T) {

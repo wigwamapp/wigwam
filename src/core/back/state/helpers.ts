@@ -48,5 +48,6 @@ export async function withVault<T>(factory: (vault: Vault) => T) {
 async function autoUnlock(password: string) {
   const passwordHash = getPasswordHash(password);
   const vault = await Vault.unlock(passwordHash);
-  unlocked(vault);
+  const accounts = vault.getAccounts();
+  unlocked({ vault, accounts });
 }

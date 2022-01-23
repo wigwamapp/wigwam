@@ -9,10 +9,10 @@ import {
   PorterChannel,
   WalletStatus,
 } from "core/types";
-import { cleanAccounts, saveAccounts } from "core/common";
 
 import {
   $walletStatus,
+  $accounts,
   $awaitingApproval,
   ensureInited,
   withStatus,
@@ -20,6 +20,7 @@ import {
   locked,
   unlocked,
   walletPortsCountUpdated,
+  accountsUpdated,
 } from "./state";
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
@@ -35,6 +36,10 @@ export function startServer() {
 
   $walletStatus.watch((status) => {
     walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
+  });
+
+  $accounts.watch((accounts) => {
+    walletPorter.broadcast({ type: MessageType.AccountsUpdated, accounts });
   });
 
   $awaitingApproval.watch((awaitingApproval) => {
@@ -59,80 +64,102 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
     await match(ctx.data)
       .with({ type: MessageType.GetWalletStatus }, async ({ type }) => {
         const status = $walletStatus.getState();
+
         ctx.reply({ type, status });
       })
       .with(
         { type: MessageType.SetupWallet },
-        ({ type, passwordHash, accounts, seedPhrase }) =>
+        ({ type, passwordHash, accountsParams, seedPhrase }) =>
           withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
-            const { vault, accountAddresses } = await Vault.setup(
+            const vault = await Vault.setup(
               passwordHash,
-              accounts,
+              accountsParams,
               seedPhrase
             );
 
-            await saveAccounts(accounts, accountAddresses);
-            unlocked(vault);
-            ctx.reply({ type, accountAddresses });
+            const accounts = vault.getAccounts();
+            unlocked({ vault, accounts });
+
+            ctx.reply({ type });
           })
       )
       .with({ type: MessageType.UnlockWallet }, ({ type, passwordHash }) =>
         withStatus(WalletStatus.Locked, async () => {
           const vault = await Vault.unlock(passwordHash);
-          unlocked(vault);
+
+          const accounts = vault.getAccounts();
+          unlocked({ vault, accounts });
+
           ctx.reply({ type });
         })
       )
       .with({ type: MessageType.LockWallet }, ({ type }) => {
         locked();
+
         ctx.reply({ type });
       })
-      .with({ type: MessageType.HasSeedPhrase }, async ({ type }) => {
-        const seedPhraseExists = await Vault.hasSeedPhrase();
-        ctx.reply({ type, seedPhraseExists });
-      })
+      .with({ type: MessageType.HasSeedPhrase }, async ({ type }) =>
+        withVault(async (vault) => {
+          const seedPhraseExists = vault.isSeedPhraseExists();
+
+          ctx.reply({ type, seedPhraseExists });
+        })
+      )
       .with({ type: MessageType.AddSeedPhrase }, ({ type, seedPhrase }) =>
         withVault(async (vault) => {
           await vault.addSeedPhrase(seedPhrase);
+
           ctx.reply({ type });
         })
       )
-      .with({ type: MessageType.AddAccounts }, ({ type, accounts }) =>
+      .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
-          const accountAddresses = await vault.addAccounts(accounts);
-          await saveAccounts(accounts, accountAddresses);
-          ctx.reply({ type, accountAddresses });
+          const accounts = vault.getAccounts();
+
+          ctx.reply({ type, accounts });
+        })
+      )
+      .with({ type: MessageType.AddAccounts }, ({ type, accountsParams }) =>
+        withVault(async (vault) => {
+          await vault.addAccounts(accountsParams);
+
+          const accounts = vault.getAccounts();
+          accountsUpdated(accounts);
+
+          ctx.reply({ type });
         })
       )
       .with(
         { type: MessageType.DeleteAccounts },
-        ({ type, passwordHash, accountAddresses }) =>
-          withStatus(WalletStatus.Unlocked, async () => {
-            await Vault.deleteAccounts(passwordHash, accountAddresses);
-            await cleanAccounts(accountAddresses);
+        ({ type, passwordHash, accountUuids }) =>
+          withVault(async (vault) => {
+            await vault.deleteAccounts(passwordHash, accountUuids);
+
+            const accounts = vault.getAccounts();
+            accountsUpdated(accounts);
+
             ctx.reply({ type });
           })
       )
       .with({ type: MessageType.GetSeedPhrase }, ({ type, passwordHash }) =>
-        withStatus(WalletStatus.Unlocked, async () => {
-          const seedPhrase = await Vault.fetchSeedPhrase(passwordHash);
+        withVault(async (vault) => {
+          const seedPhrase = vault.getSeedPhrase(passwordHash);
+
           ctx.reply({ type, seedPhrase });
         })
       )
       .with(
         { type: MessageType.GetPrivateKey },
-        ({ type, passwordHash, accountAddress }) =>
-          withStatus(WalletStatus.Unlocked, async () => {
-            const privateKey = await Vault.fetchPrivateKey(
-              passwordHash,
-              accountAddress
-            );
+        ({ type, passwordHash, accountUuid }) =>
+          withVault(async (vault) => {
+            const privateKey = vault.getPrivateKey(passwordHash, accountUuid);
+
             ctx.reply({ type, privateKey });
           })
       )
-      .with({ type: MessageType.GetPublicKey }, ({ type, accountAddress }) =>
+      .with({ type: MessageType.GetPublicKey }, ({ type, accountUuid }) =>
         withVault(async (vault) => {
-          const publicKey = await vault.fetchPublicKey(accountAddress);
+          const publicKey = vault.getPublicKey(accountUuid);
           ctx.reply({ type, publicKey });
         })
       )
@@ -140,9 +167,7 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
         { type: MessageType.GetNeuterExtendedKey },
         ({ type, derivationPath }) =>
           withVault(async (vault) => {
-            const extendedKey = await vault.fetchNeuterExtendedKey(
-              derivationPath
-            );
+            const extendedKey = vault.getNeuterExtendedKey(derivationPath);
             ctx.reply({ type, extendedKey });
           })
       )

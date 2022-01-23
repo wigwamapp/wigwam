@@ -2,13 +2,14 @@ import { FC } from "react";
 import classNames from "clsx";
 import { TReplace } from "lib/ext/i18n/react";
 
-import * as Repo from "core/repo";
+import { Account } from "core/types";
+
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 
 type WalletCardProps = {
-  account: Repo.IAccount;
+  account: Account;
   className?: string;
   onClick?: () => void;
 };
