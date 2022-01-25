@@ -12,9 +12,11 @@ import {
   KdbxEntry,
   ProtectedValue,
   KdbxEntryField,
+  ByteUtils,
 } from "kdbxweb";
 import * as Argon2 from "lib/argon2";
-import { assert } from "lib/system/assert";
+
+const { base64ToBytes, bytesToBase64, zeroBuffer } = ByteUtils;
 
 export type KdfParams =
   | {
@@ -106,13 +108,6 @@ export function createGroup(parentGroup: KdbxGroup, uuid = KdbxUuid.random()) {
   return group;
 }
 
-export function getFieldText(entry: KdbxEntry, fieldName: string) {
-  const field = entry.fields.get(fieldName);
-  assert(field, "Field not found");
-
-  return field instanceof ProtectedValue ? field.getText() : field;
-}
-
 export function setFields(
   entry: KdbxEntry,
   toSet: Record<string, KdbxEntryField>
@@ -122,11 +117,16 @@ export function setFields(
   }
 }
 
-export function getFields<T extends { [k: string]: KdbxEntryField }>(
+export function exportFields<T extends { [k: string]: KdbxEntryField }>(
   entry: KdbxEntry,
   opts: { uuid?: boolean } = {}
 ) {
-  const base = Object.fromEntries(entry.fields.entries());
+  const base: Record<string, string> = {};
+
+  for (const [key, value] of entry.fields.entries()) {
+    base[key] =
+      value instanceof ProtectedValue ? exportProtected(value) : value;
+  }
 
   if (opts.uuid) {
     base.uuid = entry.uuid.toString();
@@ -135,12 +135,41 @@ export function getFields<T extends { [k: string]: KdbxEntryField }>(
   return base as T;
 }
 
+export function importProtected(str: string): ProtectedValue {
+  const combined = base64ToBytes(str);
+
+  const valueByteLength = combined.byteLength / 2;
+  const value = combined.slice(0, valueByteLength);
+  const prevSalt = combined.slice(valueByteLength, combined.byteLength);
+
+  zeroBuffer(combined);
+
+  const instance = new ProtectedValue(value, prevSalt);
+
+  zeroBuffer(value);
+  zeroBuffer(prevSalt);
+
+  const nextSalt = CryptoEngine.random(valueByteLength);
+  instance.setSalt(nextSalt);
+
+  zeroBuffer(nextSalt);
+
+  return instance;
+}
+
+export function exportProtected(instance: ProtectedValue): string {
+  const combined = new Uint8Array([...instance.value, ...instance.salt]);
+  const str = bytesToBase64(combined);
+
+  zeroBuffer(combined);
+
+  // Refresh origin salt after export
+  const nextSalt = CryptoEngine.random(instance.byteLength);
+  instance.setSalt(nextSalt);
+
+  return str;
+}
+
 export function toUuid(uuid: string | KdbxUuid) {
   return uuid instanceof KdbxUuid ? uuid : new KdbxUuid(uuid);
 }
-
-// export class PV extends ProtectedValue {
-//   toProtectedString() {
-//     return this.
-//   }
-// }

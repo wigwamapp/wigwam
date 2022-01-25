@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 import { useSteps } from "lib/use-steps";
 import { ethers } from "ethers";
+import { fromProtectedString } from "lib/crypto-utils";
 
 import { AddHDAccountParams, AccountSource, SeedPharse } from "core/types";
 import { addSeedPhrase } from "core/client";
@@ -29,7 +30,7 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
     try {
       if (!seedPhrase) return;
 
-      if (fieldRef.current?.value !== seedPhrase.phrase) {
+      if (fieldRef.current?.value !== fromProtectedString(seedPhrase.phrase)) {
         throw new Error("Invalid");
       }
 

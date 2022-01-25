@@ -6,6 +6,8 @@ export enum WalletStatus {
 }
 
 export interface SeedPharse {
+  [key: string]: string;
+
   phrase: string;
   lang: string;
 }

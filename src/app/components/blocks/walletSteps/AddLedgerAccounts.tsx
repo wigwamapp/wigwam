@@ -13,6 +13,7 @@ import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
 import type Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
+import { toProtectedString } from "lib/crypto-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { AccountSource, AddLedgerAccountParams } from "core/types";
@@ -116,7 +117,7 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
             source: AccountSource.Ledger,
             name: `{{wallet}} ${i + 1}`,
             derivationPath: `${rootDerivationPath}/${hdIndex}`,
-            publicKey: accounts![hdIndex].publicKey,
+            publicKey: toProtectedString(accounts![hdIndex].publicKey),
           };
         }
       );

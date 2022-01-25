@@ -1,6 +1,7 @@
 import { t } from "lib/ext/i18n";
 
 import { Account, AddAccountParams, AccountSource } from "core/types";
+import { fromProtectedString } from "lib/crypto-utils";
 
 import { PublicError } from "./base";
 import {
@@ -17,12 +18,12 @@ export function validateAddAccountParams(params: AddAccountParams) {
 
     case AccountSource.Ledger:
       validateDerivationPath(params.derivationPath);
-      validatePublicKey(params.publicKey);
+      validatePublicKey(fromProtectedString(params.publicKey));
       break;
 
     case AccountSource.PrivateKey:
     case AccountSource.OpenLogin:
-      validatePrivateKey(params.privateKey);
+      validatePrivateKey(fromProtectedString(params.privateKey));
       break;
   }
 }

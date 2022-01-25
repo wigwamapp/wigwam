@@ -12,10 +12,11 @@ import memoizeOne from "memoize-one";
 import {
   createKdbx,
   createGroup,
-  getFieldText,
   setFields,
   toUuid,
-  getFields,
+  importProtected,
+  exportFields,
+  exportProtected,
 } from "lib/kdbx";
 import { storage } from "lib/ext/storage";
 import { t } from "lib/ext/i18n";
@@ -44,7 +45,13 @@ import {
   validateNoAccountDuplicates,
 } from "core/common";
 
-const { bytesToBase64, base64ToBytes, zeroBuffer, arrayToBuffer } = ByteUtils;
+const {
+  bytesToBase64,
+  base64ToBytes,
+  zeroBuffer,
+  arrayToBuffer,
+  arrayBufferEquals,
+} = ByteUtils;
 
 // Storage entities
 enum St {
@@ -65,7 +72,7 @@ export class Vault {
   }
 
   static async setup(
-    passwordHash: string,
+    password: string,
     accountsParams: AddAccountParams[],
     seedPhrase?: SeedPharse
   ) {
@@ -75,6 +82,8 @@ export class Vault {
         throw getError();
       }
 
+      console.info(seedPhrase);
+
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
@@ -82,8 +91,7 @@ export class Vault {
       accountsParams.forEach(validateAddAccountParams);
 
       const keyFile = await Credentials.createRandomKeyFile();
-      const credentials = new Credentials(null, keyFile);
-      credentials.passwordHash = ProtectedValue.fromString(passwordHash);
+      const credentials = new Credentials(importProtected(password), keyFile);
 
       const kdbx = createKdbx(credentials, "Vault", KDF_PARAMS);
 
@@ -118,7 +126,7 @@ export class Vault {
     });
   }
 
-  static async unlock(passwordHash: string) {
+  static async unlock(password: string) {
     return withError(t("failedToUnlockWallet"), async (getError) => {
       const [keyFileB64, dataB64] = await storage.fetchMany<string>([
         St.KeyFile,
@@ -132,8 +140,7 @@ export class Vault {
       const keyFile = base64ToBytes(keyFileB64);
       const data = arrayToBuffer(base64ToBytes(dataB64));
 
-      const credentials = new Credentials(null, keyFile);
-      credentials.passwordHash = ProtectedValue.fromString(passwordHash);
+      const credentials = new Credentials(importProtected(password), keyFile);
 
       const kdbx = await withError(t("invalidPassword"), () =>
         Kdbx.load(data, credentials).finally(() => zeroBuffer(keyFile))
@@ -154,8 +161,8 @@ export class Vault {
     return spGroup.entries[0] instanceof KdbxEntry;
   }
 
-  getSeedPhrase(passwordHash: string) {
-    this.verify(passwordHash);
+  async getSeedPhrase(password: string) {
+    await this.verify(password);
 
     return withError(t("failedToFetchSeedPhrase"), () =>
       this.getSeedPhraseForce()
@@ -186,7 +193,7 @@ export class Vault {
     const accGroup = this.getGroup(Gr.Accounts);
 
     return accGroup.entries.map((entry) =>
-      getFields<Account>(entry, { uuid: true })
+      exportFields<Account>(entry, { uuid: true })
     );
   }
 
@@ -199,11 +206,15 @@ export class Vault {
     });
   }
 
-  async deleteAccounts(passwordHash: string, accUuids: string[]) {
-    this.verify(passwordHash);
+  async deleteAccounts(password: string, accUuids: string[]) {
+    await this.verify(password);
 
     return withError(t("failedToDeleteWallets"), async () => {
       const accountsGroup = this.getGroup(Gr.Accounts);
+
+      if (accUuids.length >= accountsGroup.entries.length) {
+        throw new Error("Cannot delete all accounts");
+      }
 
       for (const accUuid of accUuids) {
         const accEntry = this.getEntry(accountsGroup, accUuid);
@@ -223,24 +234,24 @@ export class Vault {
 
   getPublicKey(accUuid: string) {
     return withError(t("failedToFetchPublicKey"), () =>
-      this.getKeyForce(accUuid, "publicKey")
+      exportProtected(this.getKeyForce(accUuid, "publicKey"))
     );
   }
 
   sign(accUuid: string, digest: string) {
     return withError(t("failedToSign"), () => {
       const privKey = this.getKeyForce(accUuid, "privateKey");
-      const signingKey = new ethers.utils.SigningKey(privKey);
+      const signingKey = new ethers.utils.SigningKey(privKey.getText());
 
       return signingKey.signDigest(digest);
     });
   }
 
-  getPrivateKey(passwordHash: string, accUuid: string) {
-    this.verify(passwordHash);
+  async getPrivateKey(password: string, accUuid: string) {
+    await this.verify(password);
 
     return withError(t("failedToFetchPrivateKey"), () =>
-      this.getKeyForce(accUuid, "privateKey")
+      exportProtected(this.getKeyForce(accUuid, "privateKey"))
     );
   }
 
@@ -291,9 +302,11 @@ export class Vault {
           }
 
           case AccountSource.PrivateKey: {
-            const { privateKey } = params;
+            const privateKey = importProtected(params.privateKey);
 
-            const publicKey = ethers.utils.computePublicKey(privateKey);
+            const publicKey = ethers.utils.computePublicKey(
+              privateKey.getText()
+            );
             const address = ethers.utils.computeAddress(publicKey);
 
             const account: PrivateKeyAccount = {
@@ -303,7 +316,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey: ProtectedValue.fromString(privateKey),
+              privateKey,
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -311,9 +324,12 @@ export class Vault {
           }
 
           case AccountSource.OpenLogin: {
-            const { privateKey, social } = params;
+            const social = params.social;
+            const privateKey = importProtected(params.privateKey);
 
-            const publicKey = ethers.utils.computePublicKey(privateKey);
+            const publicKey = ethers.utils.computePublicKey(
+              privateKey.getText()
+            );
             const address = ethers.utils.computeAddress(publicKey);
 
             const account: SocialAccount = {
@@ -324,7 +340,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey: ProtectedValue.fromString(privateKey),
+              privateKey,
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -332,9 +348,10 @@ export class Vault {
           }
 
           case AccountSource.Ledger: {
-            const { derivationPath, publicKey } = params;
+            const derivationPath = params.derivationPath;
+            const publicKey = importProtected(params.publicKey);
 
-            const address = ethers.utils.computeAddress(publicKey);
+            const address = ethers.utils.computeAddress(publicKey.getText());
 
             const account: LedgerAccount = {
               ...base,
@@ -344,7 +361,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              publicKey: ProtectedValue.fromString(publicKey),
+              publicKey,
             };
 
             return { account, keys };
@@ -396,15 +413,20 @@ export class Vault {
 
     const entry = this.createEntry(Gr.SeedPhrases);
 
-    entry.fields.set("phrase", ProtectedValue.fromString(seedPhrase.phrase));
-    entry.fields.set("lang", seedPhrase.lang);
+    setFields(entry, {
+      phrase: importProtected(seedPhrase.phrase),
+      lang: seedPhrase.lang,
+    });
   }
 
   private getKeyForce(accUuid: string, fieldName: string) {
     const entry = this.getEntry(Gr.AccountKeys, accUuid);
     assert(entry, "Account not found");
 
-    return getFieldText(entry, fieldName);
+    const value = entry.fields.get(fieldName);
+    assert(value instanceof ProtectedValue, "Field not found");
+
+    return value;
   }
 
   private getSeedPhraseForce() {
@@ -414,19 +436,26 @@ export class Vault {
     }
 
     const entry = this.getGroup(Gr.SeedPhrases).entries[0];
-
-    const seedPhrase: SeedPharse = {
-      phrase: getFieldText(entry, "phrase"),
-      lang: getFieldText(entry, "lang"),
-    };
+    const seedPhrase = exportFields<SeedPharse>(entry);
 
     return seedPhrase;
   }
 
-  private verify(passwordHash: string) {
-    withError(t("invalidPassword"), (getError) => {
-      if (this.kdbx.credentials.passwordHash?.getText() !== passwordHash) {
-        throw getError();
+  private async verify(password: string) {
+    return withError(t("invalidPassword"), async (getError) => {
+      const hashToCheck = await importProtected(password).getHash();
+
+      const localHash = arrayToBuffer(
+        this.kdbx.credentials.passwordHash!.getBinary()
+      );
+
+      try {
+        if (!arrayBufferEquals(hashToCheck, localHash)) {
+          throw getError();
+        }
+      } finally {
+        zeroBuffer(hashToCheck);
+        zeroBuffer(localHash);
       }
     });
   }

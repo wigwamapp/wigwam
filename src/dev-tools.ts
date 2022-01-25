@@ -7,7 +7,6 @@ import * as global from "lib/ext/global";
 import * as i18n from "lib/ext/i18n";
 import { storage } from "lib/ext/storage";
 import * as cryptoUtils from "lib/crypto-utils";
-import * as encStorage from "lib/enc-storage";
 
 import * as types from "core/types";
 import * as common from "core/common";
@@ -15,6 +14,7 @@ import * as repo from "core/repo";
 import * as client from "core/client";
 
 Object.assign(window, {
+  ...cryptoUtils,
   browser,
   ethers,
   Buffer,
@@ -22,8 +22,6 @@ Object.assign(window, {
   storage,
   global,
   i18n,
-  cryptoUtils,
-  encStorage,
   types,
   common,
   repo,

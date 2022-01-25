@@ -1,5 +1,5 @@
 import { assert } from "lib/system/assert";
-import { getPasswordHash } from "lib/crypto-utils/hash";
+import { toProtectedString } from "lib/crypto-utils";
 import {
   EventMessage,
   MessageType,
@@ -41,12 +41,13 @@ export async function setupWallet(
   accountsParams: AddAccountParams[],
   seedPhrase?: SeedPharse
 ) {
+  password = toProtectedString(password);
+
   const type = MessageType.SetupWallet;
-  const passwordHash = getPasswordHash(password);
 
   const res = await porter.request({
     type,
-    passwordHash,
+    password,
     accountsParams,
     seedPhrase,
   });
@@ -54,12 +55,13 @@ export async function setupWallet(
 }
 
 export async function unlockWallet(password: string) {
+  password = toProtectedString(password);
+
   const type = MessageType.UnlockWallet;
-  const passwordHash = getPasswordHash(password);
 
   const res = await porter.request({
     type,
-    passwordHash,
+    password,
   });
   assert(res?.type === type);
 }
@@ -91,12 +93,13 @@ export async function addAccounts(accountsParams: AddAccountParams[]) {
 }
 
 export async function deleteAccounts(password: string, accountUuids: string[]) {
+  password = toProtectedString(password);
+
   const type = MessageType.DeleteAccounts;
-  const passwordHash = getPasswordHash(password);
 
   const res = await porter.request({
     type,
-    passwordHash,
+    password,
     accountUuids,
   });
   assert(res?.type === type);
@@ -122,12 +125,13 @@ export async function addSeedPhrase(seedPhrase: SeedPharse) {
 }
 
 export async function getSeedPhrase(password: string) {
+  password = toProtectedString(password);
+
   const type = MessageType.GetSeedPhrase;
-  const passwordHash = getPasswordHash(password);
 
   const res = await porter.request({
     type,
-    passwordHash,
+    password,
   });
   assert(res?.type === type);
 
@@ -135,12 +139,13 @@ export async function getSeedPhrase(password: string) {
 }
 
 export async function getPrivateKey(password: string, accountUuid: string) {
+  password = toProtectedString(password);
+
   const type = MessageType.GetPrivateKey;
-  const passwordHash = getPasswordHash(password);
 
   const res = await porter.request({
     type,
-    passwordHash,
+    password,
     accountUuid,
   });
   assert(res?.type === type);

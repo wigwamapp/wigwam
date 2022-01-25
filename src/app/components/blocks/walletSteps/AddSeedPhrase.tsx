@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
 import { useSteps } from "lib/use-steps";
-import { getRandomBytes } from "lib/crypto-utils/random";
+import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
 import { toWordlistLang, validateSeedPhrase } from "core/common";
@@ -65,9 +65,10 @@ const AddSeedPhrase = memo<AddSeedPhraseProps>(
 
     const handleContinue = useCallback(async () => {
       const seedPhrase: SeedPharse = {
-        phrase: seedPhraseText,
+        phrase: toProtectedString(seedPhraseText),
         lang: wordlistLocale,
       };
+
       try {
         validateSeedPhrase(seedPhrase);
 

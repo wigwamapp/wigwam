@@ -68,10 +68,10 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       })
       .with(
         { type: MessageType.SetupWallet },
-        ({ type, passwordHash, accountsParams, seedPhrase }) =>
+        ({ type, password, accountsParams, seedPhrase }) =>
           withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
             const vault = await Vault.setup(
-              passwordHash,
+              password,
               accountsParams,
               seedPhrase
             );
@@ -82,9 +82,9 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
             ctx.reply({ type });
           })
       )
-      .with({ type: MessageType.UnlockWallet }, ({ type, passwordHash }) =>
+      .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
         withStatus(WalletStatus.Locked, async () => {
-          const vault = await Vault.unlock(passwordHash);
+          const vault = await Vault.unlock(password);
 
           const accounts = vault.getAccounts();
           unlocked({ vault, accounts });
@@ -130,9 +130,9 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       )
       .with(
         { type: MessageType.DeleteAccounts },
-        ({ type, passwordHash, accountUuids }) =>
+        ({ type, password, accountUuids }) =>
           withVault(async (vault) => {
-            await vault.deleteAccounts(passwordHash, accountUuids);
+            await vault.deleteAccounts(password, accountUuids);
 
             const accounts = vault.getAccounts();
             accountsUpdated(accounts);
@@ -140,18 +140,18 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
             ctx.reply({ type });
           })
       )
-      .with({ type: MessageType.GetSeedPhrase }, ({ type, passwordHash }) =>
+      .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
         withVault(async (vault) => {
-          const seedPhrase = vault.getSeedPhrase(passwordHash);
+          const seedPhrase = await vault.getSeedPhrase(password);
 
           ctx.reply({ type, seedPhrase });
         })
       )
       .with(
         { type: MessageType.GetPrivateKey },
-        ({ type, passwordHash, accountUuid }) =>
+        ({ type, password, accountUuid }) =>
           withVault(async (vault) => {
-            const privateKey = vault.getPrivateKey(passwordHash, accountUuid);
+            const privateKey = await vault.getPrivateKey(password, accountUuid);
 
             ctx.reply({ type, privateKey });
           })

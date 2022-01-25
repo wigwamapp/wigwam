@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
+import { fromProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
 
@@ -33,13 +34,17 @@ export function toDerivedNeuterExtendedKey(
 }
 
 export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
-  return ethers.utils.HDNode.fromMnemonic(phrase, undefined, wordlists[lang]);
+  return ethers.utils.HDNode.fromMnemonic(
+    fromProtectedString(phrase),
+    undefined,
+    wordlists[lang]
+  );
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
   assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
   assert(
-    ethers.utils.isValidMnemonic(phrase, wordlists[lang]),
+    ethers.utils.isValidMnemonic(fromProtectedString(phrase), wordlists[lang]),
     t("seedPhraseIsNotValid"),
     PublicError
   );
