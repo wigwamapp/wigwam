@@ -12,7 +12,6 @@ import {
 
 import {
   $walletStatus,
-  $accounts,
   $awaitingApproval,
   ensureInited,
   withStatus,
@@ -38,7 +37,7 @@ export function startServer() {
     walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
   });
 
-  $accounts.watch((accounts) => {
+  accountsUpdated.watch((accounts) => {
     walletPorter.broadcast({ type: MessageType.AccountsUpdated, accounts });
   });
 

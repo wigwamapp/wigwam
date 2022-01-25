@@ -20,6 +20,7 @@ import {
 import { storage } from "lib/ext/storage";
 import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
+import { typedArrayToBuffer } from "lib/system/typedArrayToBuffer";
 
 import { KDF_PARAMS } from "fixtures/kdbx";
 
@@ -129,13 +130,14 @@ export class Vault {
         throw getError();
       }
 
-      const [keyFile, data] = [keyFileB64, dataB64].map(base64ToBytes);
+      const keyFile = base64ToBytes(keyFileB64);
+      const data = typedArrayToBuffer(base64ToBytes(dataB64));
 
       const credentials = new Credentials(null, keyFile);
       credentials.passwordHash = ProtectedValue.fromString(passwordHash);
 
       const kdbx = await withError(t("invalidPassword"), () =>
-        Kdbx.load(data, credentials)
+        Kdbx.load(data, credentials).finally(() => zeroBuffer(keyFile))
       );
 
       return new Vault(kdbx);
