@@ -20,7 +20,6 @@ import {
 import { storage } from "lib/ext/storage";
 import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
-import { typedArrayToBuffer } from "lib/system/typedArrayToBuffer";
 
 import { KDF_PARAMS } from "fixtures/kdbx";
 
@@ -45,7 +44,7 @@ import {
   validateNoAccountDuplicates,
 } from "core/common";
 
-const { bytesToBase64, base64ToBytes, zeroBuffer } = ByteUtils;
+const { bytesToBase64, base64ToBytes, zeroBuffer, arrayToBuffer } = ByteUtils;
 
 // Storage entities
 enum St {
@@ -131,7 +130,7 @@ export class Vault {
       }
 
       const keyFile = base64ToBytes(keyFileB64);
-      const data = typedArrayToBuffer(base64ToBytes(dataB64));
+      const data = arrayToBuffer(base64ToBytes(dataB64));
 
       const credentials = new Credentials(null, keyFile);
       credentials.passwordHash = ProtectedValue.fromString(passwordHash);
