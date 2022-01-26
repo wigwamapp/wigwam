@@ -36,8 +36,8 @@ const Setup: FC = () => (
     steps={STEPS}
     fallback={WalletStep.ChooseLanguage}
   >
-    {({ step, children }) => (
-      <BoardingPageLayout key={step} title={null}>
+    {({ children }) => (
+      <BoardingPageLayout title={null}>
         <div className="mb-24">
           <Suspense fallback={null}>
             <div className="mt-12">{children}</div>

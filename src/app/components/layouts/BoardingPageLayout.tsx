@@ -34,7 +34,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
   title,
   header = true,
   profileNav = true,
-  animate = true,
+  animate = false,
   children,
 }) => (
   <div
