@@ -11,13 +11,12 @@ import classNames from "clsx";
 import { useSteps } from "lib/use-steps";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
-import Transport from "@ledgerhq/hw-transport";
-import LedgerEth from "@ledgerhq/hw-app-eth";
-import { LedgerTransport, getExtendedKey } from "lib/ledger";
+import type Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
+import { toProtectedString } from "lib/crypto-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AccountType, AccountSource, AddLedgerAccountParams } from "core/types";
+import { AccountSource, AddLedgerAccountParams } from "core/types";
 import { generatePreviewHDNodes } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
@@ -42,6 +41,12 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
 
   const handleConnect = useCallback(async () => {
     try {
+      const [{ default: LedgerEth }, { LedgerTransport, getExtendedKey }] =
+        await Promise.all([
+          import("@ledgerhq/hw-app-eth"),
+          import("lib/ledger"),
+        ]);
+
       await retry(
         async () => {
           await transportRef.current?.close();
@@ -109,11 +114,10 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
         (address, i) => {
           const hdIndex = accounts!.findIndex((n) => n.address === address);
           return {
-            type: AccountType.External,
             source: AccountSource.Ledger,
             name: `{{wallet}} ${i + 1}`,
             derivationPath: `${rootDerivationPath}/${hdIndex}`,
-            publicKey: accounts![hdIndex].publicKey,
+            publicKey: toProtectedString(accounts![hdIndex].publicKey),
           };
         }
       );

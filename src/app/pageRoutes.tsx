@@ -14,7 +14,6 @@ import Setup from "./components/pages/Setup";
 export type MatchPageParams = {
   page: Page;
   walletStatus: WalletStatus;
-  profileCount: number;
 };
 
 export function matchPage(params: MatchPageParams) {
@@ -36,13 +35,12 @@ export function matchPage(params: MatchPageParams) {
         {
           page: Page.Default,
           walletStatus: WalletStatus.Welcome,
-          profileCount: 1,
         },
         () => <Welcome />
       )
       .with(
         {
-          page: when((p) => [Page.Default, Page.Setup].includes(p)),
+          page: Page.Setup,
           walletStatus: WalletStatus.Welcome,
         },
         () => <Setup />

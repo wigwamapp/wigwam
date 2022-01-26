@@ -142,6 +142,13 @@ module.exports = {
       ),
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
+      "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
+    },
+    fallback: {
+      process: false,
+      path: false,
+      fs: false,
+      crypto: false,
     },
   },
 
@@ -299,7 +306,6 @@ module.exports = {
 
     new webpack.ProvidePlugin({
       React: "react",
-      Buffer: ["buffer", "Buffer"],
     }),
 
     new MiniCssExtractPlugin({

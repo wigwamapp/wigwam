@@ -20,6 +20,7 @@ export async function handleRpc(
         reply(await sendRpc(chainId, method, params));
     }
   } catch (err: any) {
+    // @TODO: Handle non rpc errors, and wrap them to rpc format
     reply({ error: { message: err.message } });
   }
 }

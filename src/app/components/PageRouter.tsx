@@ -1,16 +1,22 @@
 import { FC, useMemo, useLayoutEffect } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue, waitForAll } from "jotai/utils";
 import { getLastAction, HistoryAction, resetPosition } from "lib/history";
-import { getAllProfiles } from "lib/ext/profile";
 
 import { walletStatusAtom, pageAtom } from "app/atoms";
 import { matchPage } from "app/pageRoutes";
 import { Page } from "app/defaults";
 
 const PageRouter: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
-  const page = useAtomValue(pageAtom);
-  const profileCount = useMemo(() => getAllProfiles().length, []);
+  const { page, walletStatus } = useAtomValue(
+    useMemo(
+      () =>
+        waitForAll({
+          page: pageAtom,
+          walletStatus: walletStatusAtom,
+        }),
+      []
+    )
+  );
 
   // Scroll to top after new page pushed.
   const lastHistoryAction = getLastAction();
@@ -24,10 +30,7 @@ const PageRouter: FC = () => {
     }
   }, [page, lastHistoryAction]);
 
-  return useMemo(
-    () => matchPage({ page, walletStatus, profileCount }),
-    [page, walletStatus, profileCount]
-  );
+  return useMemo(() => matchPage({ page, walletStatus }), [page, walletStatus]);
 };
 
 export default PageRouter;

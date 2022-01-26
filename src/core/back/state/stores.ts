@@ -1,14 +1,13 @@
 import { createStore } from "effector";
 
-import * as Global from "lib/ext/global";
-import { Setting } from "core/common";
-import { WalletStatus, ForApproval } from "core/types";
+import { WalletStatus, ForApproval, Account } from "core/types";
 
 import { Vault } from "../vault";
 import {
   inited,
   unlocked,
   locked,
+  accountsUpdated,
   walletPortsCountUpdated,
   approvalItemAdded,
 } from "./events";
@@ -22,8 +21,13 @@ export const $walletStatus = createStore(WalletStatus.Idle)
     state === WalletStatus.Unlocked ? WalletStatus.Locked : state
   );
 
+export const $accounts = createStore<Account[]>([])
+  .on(unlocked, (_s, { accounts }) => accounts)
+  .on(accountsUpdated, (_s, accounts) => accounts)
+  .on(locked, () => []);
+
 export const $vault = createStore<Vault | null>(null)
-  .on(unlocked, (_s, vault) => vault)
+  .on(unlocked, (_s, { vault }) => vault)
   .on(locked, () => null);
 
 export const $autoLockTimeout = createStore<MaybeTimeout>(null)
@@ -34,8 +38,8 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   .on(walletPortsCountUpdated, (t, count) => {
     if (t !== null) clearTimeout(t);
 
-    const timeout = count === 0 && Global.get<number>(Setting.AutoLockTimeout);
-    return timeout ? setTimeout(() => locked(), timeout) : null;
+    const timeout = count === 0 && 0; /*Global.get(Setting.AutoLockTimeout)*/
+    return timeout ? setTimeout(() => locked(), +timeout) : null;
   });
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;

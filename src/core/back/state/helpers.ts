@@ -1,13 +1,12 @@
-import { getPasswordHash } from "lib/crypto-utils/hash";
-
 import { t } from "lib/ext/i18n";
+import { toProtectedString } from "lib/crypto-utils";
 import { assert } from "lib/system/assert";
-import { WalletStatus } from "core/types";
 
-import { Vault } from "../vault";
+import { WalletStatus } from "core/types";
 
 import { $walletStatus, $vault } from "./stores";
 import { inited, unlocked } from "./events";
+import { Vault } from "../vault";
 
 export async function ensureInited() {
   const state = $walletStatus.getState();
@@ -46,7 +45,7 @@ export async function withVault<T>(factory: (vault: Vault) => T) {
 }
 
 async function autoUnlock(password: string) {
-  const passwordHash = getPasswordHash(password);
-  const vault = await Vault.unlock(passwordHash);
-  unlocked(vault);
+  const vault = await Vault.unlock(toProtectedString(password));
+  const accounts = vault.getAccounts();
+  unlocked({ vault, accounts });
 }

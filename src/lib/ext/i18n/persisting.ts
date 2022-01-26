@@ -1,15 +1,15 @@
-import * as Global from "../global";
+import { storage } from "../storage";
 
-export const LOCALE_GKEY = "locale";
+export const LOCALE_KEY = "locale";
 
 export function getSavedLocale() {
-  return Global.get(LOCALE_GKEY);
+  return storage.fetchForce<string>(LOCALE_KEY);
 }
 
 export function saveLocale(locale: string) {
-  return Global.put(LOCALE_GKEY, locale);
+  return storage.put(LOCALE_KEY, locale);
 }
 
 export function onUpdated(callback: () => void) {
-  return Global.subscribe(LOCALE_GKEY, callback);
+  return storage.subscribe<string>(LOCALE_KEY, callback);
 }

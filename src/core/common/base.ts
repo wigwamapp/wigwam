@@ -2,23 +2,29 @@ export function toWordlistLang(localeCode: string) {
   return localeCode.replace(/-/g, "_").toLowerCase();
 }
 
-export async function withError<T>(
+export function withError<T>(
   errMessage: string,
-  factory: (doThrow: () => void) => Promise<T>
-) {
-  try {
-    const doThrow = () => {
-      throw new PublicError(errMessage);
-    };
-
-    return await factory(doThrow);
-  } catch (err) {
+  factory: (getError: () => void) => T
+): T {
+  const getError = (err?: unknown) => {
     if (err instanceof PublicError) {
-      throw err;
+      return err;
     } else {
-      console.warn(errMessage, err);
-      throw new PublicError(errMessage);
+      err && console.warn(errMessage, err);
+      return new PublicError(errMessage);
     }
+  };
+
+  try {
+    const result = factory(getError);
+
+    return result instanceof Promise
+      ? (result as any).catch((err: unknown) => {
+          throw getError(err);
+        })
+      : result;
+  } catch (err) {
+    throw getError(err);
   }
 }
 

@@ -1,5 +1,5 @@
 import { WalletStatus, SeedPharse } from "./base";
-import { AddAccountParams } from "./addAccount";
+import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
 import { ForApproval } from "./activity";
 
@@ -10,6 +10,7 @@ export type Request =
   | LockWalletRequest
   | HasSeedPhraseRequest
   | AddSeedPhraseRequest
+  | GetAccountsRequest
   | AddAccountsRequest
   | DeleteAccountsRequest
   | GetSeedPhraseRequest
@@ -25,6 +26,7 @@ export type Response =
   | LockWalletResponse
   | HasSeedPhraseResponse
   | AddSeedPhraseResponse
+  | GetAccountsResponse
   | AddAccountsResponse
   | DeleteAccountsResponse
   | GetSeedPhraseResponse
@@ -33,7 +35,10 @@ export type Response =
   | GetNeuterExtendedKeyResponse
   | SendRpcResponse;
 
-export type EventMessage = WalletStatusUpdated | AwaitingApprovalUpdated;
+export type EventMessage =
+  | WalletStatusUpdated
+  | AccountsUpdated
+  | AwaitingApprovalUpdated;
 
 export enum MessageType {
   GetWalletStatus = "GET_WALLET_STATUS",
@@ -43,8 +48,10 @@ export enum MessageType {
   LockWallet = "LOCK_WALLET",
   HasSeedPhrase = "HAS_SEED_PHRASE",
   AddSeedPhrase = "ADD_SEED_PHRASE",
+  GetAccounts = "GET_ACCOUNTS",
   AddAccounts = "ADD_ACCOUNTS",
   DeleteAccounts = "DELETE_ACCOUNTS",
+  AccountsUpdated = "ACCOUNTS_UPDATED",
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
@@ -73,19 +80,18 @@ export interface WalletStatusUpdated extends MessageBase {
 
 export interface SetupWalletRequest extends MessageBase {
   type: MessageType.SetupWallet;
-  passwordHash: string;
-  accounts: AddAccountParams[];
+  password: string;
+  accountsParams: AddAccountParams[];
   seedPhrase?: SeedPharse;
 }
 
 export interface SetupWalletResponse extends MessageBase {
   type: MessageType.SetupWallet;
-  accountAddresses: string[];
 }
 
 export interface UnlockWalletRequest extends MessageBase {
   type: MessageType.UnlockWallet;
-  passwordHash: string;
+  password: string;
 }
 
 export interface UnlockWalletResponse extends MessageBase {
@@ -118,29 +124,42 @@ export interface AddSeedPhraseResponse extends MessageBase {
   type: MessageType.AddSeedPhrase;
 }
 
+export interface GetAccountsRequest extends MessageBase {
+  type: MessageType.GetAccounts;
+}
+
+export interface GetAccountsResponse extends MessageBase {
+  type: MessageType.GetAccounts;
+  accounts: Account[];
+}
+
 export interface AddAccountsRequest extends MessageBase {
   type: MessageType.AddAccounts;
-  accounts: AddAccountParams[];
+  accountsParams: AddAccountParams[];
 }
 
 export interface AddAccountsResponse extends MessageBase {
   type: MessageType.AddAccounts;
-  accountAddresses: string[];
 }
 
 export interface DeleteAccountsRequest extends MessageBase {
   type: MessageType.DeleteAccounts;
-  passwordHash: string;
-  accountAddresses: string[];
+  password: string;
+  accountUuids: string[];
 }
 
 export interface DeleteAccountsResponse extends MessageBase {
   type: MessageType.DeleteAccounts;
 }
 
+export interface AccountsUpdated extends MessageBase {
+  type: MessageType.AccountsUpdated;
+  accounts: Account[];
+}
+
 export interface GetSeedPhraseRequest extends MessageBase {
   type: MessageType.GetSeedPhrase;
-  passwordHash: string;
+  password: string;
 }
 
 export interface GetSeedPhraseResponse extends MessageBase {
@@ -150,8 +169,8 @@ export interface GetSeedPhraseResponse extends MessageBase {
 
 export interface GetPrivateKeyRequest extends MessageBase {
   type: MessageType.GetPrivateKey;
-  passwordHash: string;
-  accountAddress: string;
+  password: string;
+  accountUuid: string;
 }
 
 export interface GetPrivateKeyResponse extends MessageBase {
@@ -161,7 +180,7 @@ export interface GetPrivateKeyResponse extends MessageBase {
 
 export interface GetPublicKeyRequest extends MessageBase {
   type: MessageType.GetPublicKey;
-  accountAddress: string;
+  accountUuid: string;
 }
 
 export interface GetPublicKeyResponse extends MessageBase {

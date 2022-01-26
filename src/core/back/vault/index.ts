@@ -1,314 +1,514 @@
+import {
+  Kdbx,
+  ProtectedValue,
+  Credentials,
+  ByteUtils,
+  KdbxUuid,
+  KdbxEntry,
+  KdbxGroup,
+} from "kdbxweb";
 import { ethers } from "ethers";
-import { match } from "ts-pattern";
 import memoizeOne from "memoize-one";
-
-import { getRandomInt } from "lib/system/randomInt";
-import { getCryptoKey, getRandomBytes } from "lib/crypto-utils";
-import * as Storage from "lib/enc-storage";
+import {
+  createKdbx,
+  createGroup,
+  setFields,
+  toUuid,
+  importProtected,
+  exportFields,
+  exportProtected,
+} from "lib/kdbx";
+import { storage } from "lib/ext/storage";
 import { t } from "lib/ext/i18n";
-import { SeedPharse, AddAccountParams, AccountType } from "core/types";
+import { assert } from "lib/system/assert";
+
+import { KDF_PARAMS } from "fixtures/kdbx";
+
+import {
+  SeedPharse,
+  AddAccountParams,
+  AccountSource,
+  HDAccount,
+  PrivateKeyAccount,
+  SocialAccount,
+  LedgerAccount,
+  WatchOnlyAccount,
+  Account,
+} from "core/types";
 import {
   PublicError,
   withError,
-  validateAccountExistence,
   validateAddAccountParams,
   validateSeedPhrase,
   toDerivedNeuterExtendedKey,
   getSeedPhraseHDNode,
+  validateNoAccountDuplicates,
 } from "core/common";
 
-import { MIGRATIONS, Data } from "./data";
+const {
+  bytesToBase64,
+  base64ToBytes,
+  zeroBuffer,
+  arrayToBuffer,
+  arrayBufferEquals,
+} = ByteUtils;
 
-const MAX_DECRYPT_ATTEMPTS = 10;
+// Storage entities
+enum St {
+  KeyFile = "vault_keyfile",
+  Data = "vault_data",
+}
+
+// Kdbx groups, UUID
+enum Gr {
+  Accounts = "LC1q3/r/GuXIIBFvZVIdjA==",
+  SeedPhrases = "JCwiJUMhmarO4ZvNS99/WA==",
+  AccountKeys = "aaovObw95bFaxfkNRBpM6w==",
+}
 
 export class Vault {
-  static decryptAttempts = parseInt(sessionStorage.decryptAttempts ?? 0);
-
-  static async unlock(passwordHash: string) {
-    const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
-
-    return withError(t("failedToUnlockWallet"), async () => {
-      await Vault.runMigrations(cryptoKey);
-      return new Vault(cryptoKey);
-    });
+  static isExist() {
+    return storage.isStored(St.KeyFile);
   }
 
   static async setup(
-    passwordHash: string,
-    accounts: AddAccountParams[],
+    password: string,
+    accountsParams: AddAccountParams[],
     seedPhrase?: SeedPharse
   ) {
-    return withError(t("failedToSetupWallet"), async (doThrow) => {
-      // Drop if wallet already exists
+    return withError(t("failedToSetupWallet"), async (getError) => {
+      // Drop if vault already exists
       if (await Vault.isExist()) {
-        doThrow();
+        throw getError();
       }
+
+      console.info(seedPhrase);
 
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
-      accounts.forEach(validateAddAccountParams);
 
-      const cryptoKey = await getCryptoKey(passwordHash);
+      accountsParams.forEach(validateAddAccountParams);
 
-      return Storage.transact(async () => {
-        await Storage.encryptAndSaveMany(
-          [
-            Data.check(getRandomBytes(64)),
-            Data.migrationLevel(MIGRATIONS.length),
-          ],
-          cryptoKey
-        );
+      const keyFile = await Credentials.createRandomKeyFile();
+      const credentials = new Credentials(importProtected(password), keyFile);
 
-        const vault = new Vault(cryptoKey);
-        if (seedPhrase) {
-          await vault.addSeedPhraseForce(seedPhrase);
-        }
+      const kdbx = createKdbx(credentials, "Vault", KDF_PARAMS);
 
-        const accountAddresses = await vault.addAccountsForce(accounts);
+      const rootGroup = kdbx.getDefaultGroup();
 
-        return { vault, accountAddresses };
-      });
+      for (const groupUuid of Object.values(Gr)) {
+        createGroup(rootGroup, new KdbxUuid(groupUuid));
+      }
+
+      const vault = new Vault(kdbx);
+
+      if (seedPhrase) {
+        vault.addSeedPhraseForce(seedPhrase);
+      }
+
+      vault.addAccountsForce(accountsParams);
+
+      const data = await kdbx.save();
+
+      const keyFileB64 = bytesToBase64(keyFile);
+      zeroBuffer(keyFile);
+
+      const dataB64 = bytesToBase64(data);
+      zeroBuffer(data);
+
+      await storage.putMany([
+        [St.KeyFile, keyFileB64],
+        [St.Data, dataB64],
+      ]);
+
+      return vault;
     });
   }
 
-  static isExist() {
-    return Storage.isStored(Data.check());
+  static async unlock(password: string) {
+    return withError(t("failedToUnlockWallet"), async (getError) => {
+      const [keyFileB64, dataB64] = await storage.fetchMany<string>([
+        St.KeyFile,
+        St.Data,
+      ]);
+
+      if (!(keyFileB64 && dataB64)) {
+        throw getError();
+      }
+
+      const keyFile = base64ToBytes(keyFileB64);
+      const data = arrayToBuffer(base64ToBytes(dataB64));
+
+      const credentials = new Credentials(importProtected(password), keyFile);
+
+      const kdbx = await withError(t("invalidPassword"), () =>
+        Kdbx.load(data, credentials).finally(() => zeroBuffer(keyFile))
+      );
+
+      return new Vault(kdbx);
+    });
   }
 
-  static hasSeedPhrase() {
-    return Storage.isStored(Data.seedPhrase());
+  constructor(private kdbx: Kdbx) {}
+
+  // =============//
+  // Seed Phrase //
+  // ============//
+
+  isSeedPhraseExists() {
+    const spGroup = this.getGroup(Gr.SeedPhrases);
+    return spGroup.entries[0] instanceof KdbxEntry;
   }
 
-  static async fetchSeedPhrase(passwordHash: string) {
-    const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
+  async getSeedPhrase(password: string) {
+    await this.verify(password);
 
     return withError(t("failedToFetchSeedPhrase"), () =>
-      Vault.getSeedPhraseCheck(cryptoKey)
+      this.getSeedPhraseForce()
     );
   }
 
-  static async fetchPrivateKey(passwordHash: string, accAddress: string) {
-    const cryptoKey = await Vault.getCryptoKeyCheck(passwordHash);
+  async addSeedPhrase(seedPhrase: SeedPharse) {
+    return withError(t("failedToAddSeedPhrase"), async () => {
+      validateSeedPhrase(seedPhrase);
+      this.addSeedPhraseForce(seedPhrase);
 
-    return withError(t("failedToFetchPrivateKey"), () =>
-      Storage.fetchAndDecryptOne<string>(
-        Data.privateKey(accAddress)(),
-        cryptoKey
-      )
-    );
-  }
-
-  static async deleteAccounts(
-    passwordHash: string,
-    accountAddresses: string[]
-  ) {
-    await Vault.getCryptoKeyCheck(passwordHash);
-
-    return withError(t("failedToDeleteWallets"), () =>
-      Storage.transact(() =>
-        Storage.remove(
-          accountAddresses
-            .map((address) => [
-              Data.privateKey(address)(),
-              Data.publicKey(address)(),
-            ])
-            .flat()
-        )
-      )
-    );
-  }
-
-  private static getCryptoKeyCheck(passwordHash: string) {
-    return withError(t("invalidPassword"), async () => {
-      try {
-        const cryptoKey = await getCryptoKey(passwordHash);
-        await Storage.fetchAndDecryptOne(Data.check(), cryptoKey);
-
-        Vault.decryptAttempts = 0;
-
-        return cryptoKey;
-      } catch (err) {
-        if (
-          process.env.NODE_ENV !== "development" &&
-          ++Vault.decryptAttempts > MAX_DECRYPT_ATTEMPTS
-        ) {
-          await new Promise((r) => setTimeout(r, getRandomInt(3_000, 5_000)));
-        }
-
-        throw err;
-      } finally {
-        sessionStorage.decryptAttempts = Vault.decryptAttempts;
-      }
+      await this.saveData();
     });
   }
 
-  private static async runMigrations(cryptoKey: CryptoKey) {
-    return Storage.transact(async () => {
-      try {
-        const migrationLevelStored = await Storage.isStored(
-          Data.migrationLevel()
-        );
-        const migrationLevel = migrationLevelStored
-          ? await Storage.fetchAndDecryptOne<number>(
-              Data.migrationLevel(),
-              cryptoKey
-            )
-          : 0;
-        const migrationsToRun = MIGRATIONS.filter(
-          (_m, i) => i >= migrationLevel
-        );
-        for (const migrate of migrationsToRun) {
-          await migrate(cryptoKey);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        await Storage.encryptAndSaveMany(
-          [Data.migrationLevel(MIGRATIONS.length)],
-          cryptoKey
-        );
-      }
-    });
-  }
-
-  private static async getSeedPhraseCheck(cryptoKey: CryptoKey) {
-    const seedPhraseExists = await Vault.hasSeedPhrase();
-    if (!seedPhraseExists) {
-      throw new PublicError(t("seedPhraseNotEstablished"));
-    }
-
-    return Storage.fetchAndDecryptOne<SeedPharse>(Data.seedPhrase(), cryptoKey);
-  }
-
-  constructor(private cryptoKey: CryptoKey) {}
-
-  addSeedPhrase(seedPhrase: SeedPharse) {
-    validateSeedPhrase(seedPhrase);
-    return Storage.transact(() => this.addSeedPhraseForce(seedPhrase));
-  }
-
-  addAccounts(accounts: AddAccountParams[]) {
-    accounts.forEach(validateAddAccountParams);
-    return Storage.transact(() => this.addAccountsForce(accounts));
-  }
-
-  fetchPublicKey(accAddress: string) {
-    return withError(t("failedToFetchPublicKey"), () =>
-      Storage.fetchAndDecryptOne<string>(
-        Data.publicKey(accAddress)(),
-        this.cryptoKey
-      )
-    );
-  }
-
-  fetchNeuterExtendedKey(derivationPath: string) {
-    return withError(t("failedToFetchPublicKey"), async () => {
-      const seedPhrase = await Vault.getSeedPhraseCheck(this.cryptoKey);
+  getNeuterExtendedKey(derivationPath: string) {
+    return withError(t("failedToFetchPublicKey"), () => {
+      const seedPhrase = this.getSeedPhraseForce();
       return toDerivedNeuterExtendedKey(seedPhrase, derivationPath);
     });
   }
 
-  sign(accAddress: string, digest: string) {
-    return withError(t("failedToSign"), async () => {
-      const dataKey = Data.privateKey(accAddress)();
-      const privKeyExists = await Storage.isStored(dataKey);
-      if (!privKeyExists) {
-        throw new PublicError(t("cannotSignForWallet"));
+  // =========//
+  // Accounts //
+  // =========//
+
+  getAccounts() {
+    const accGroup = this.getGroup(Gr.Accounts);
+
+    return accGroup.entries.map((entry) =>
+      exportFields<Account>(entry, { uuid: true })
+    );
+  }
+
+  async addAccounts(accountParams: AddAccountParams[]) {
+    return withError(t("failedToAddWallets"), async () => {
+      accountParams.forEach(validateAddAccountParams);
+      this.addAccountsForce(accountParams);
+
+      await this.saveData();
+    });
+  }
+
+  async deleteAccounts(password: string, accUuids: string[]) {
+    await this.verify(password);
+
+    return withError(t("failedToDeleteWallets"), async () => {
+      const accountsGroup = this.getGroup(Gr.Accounts);
+
+      if (accUuids.length >= accountsGroup.entries.length) {
+        throw new Error("Cannot delete all accounts");
       }
 
-      const privKey = await Storage.fetchAndDecryptOne<string>(
-        dataKey,
-        this.cryptoKey
-      );
+      for (const accUuid of accUuids) {
+        const accEntry = this.getEntry(accountsGroup, accUuid);
 
-      const signingKey = new ethers.utils.SigningKey(privKey);
+        if (accEntry) {
+          this.kdbx.remove(accEntry);
+        }
+      }
+
+      await this.saveData();
+    });
+  }
+
+  // =============//
+  // Account keys //
+  // =============//
+
+  getPublicKey(accUuid: string) {
+    return withError(t("failedToFetchPublicKey"), () =>
+      exportProtected(this.getKeyForce(accUuid, "publicKey"))
+    );
+  }
+
+  sign(accUuid: string, digest: string) {
+    return withError(t("failedToSign"), () => {
+      const privKey = this.getKeyForce(accUuid, "privateKey");
+      const signingKey = new ethers.utils.SigningKey(privKey.getText());
+
       return signingKey.signDigest(digest);
     });
   }
 
-  private addSeedPhraseForce(seedPhrase: SeedPharse) {
-    return withError(t("failedToAddSeedPhrase"), async () => {
-      const seedPhraseExists = await Vault.hasSeedPhrase();
-      if (seedPhraseExists) {
-        throw new PublicError(t("seedPhraseAlreadyExists"));
-      }
+  async getPrivateKey(password: string, accUuid: string) {
+    await this.verify(password);
 
-      await Storage.encryptAndSaveMany(
-        [Data.seedPhrase(seedPhrase)],
-        this.cryptoKey
-      );
+    return withError(t("failedToFetchPrivateKey"), () =>
+      exportProtected(this.getKeyForce(accUuid, "privateKey"))
+    );
+  }
+
+  // ========//
+  // Private //
+  // ========//
+
+  private addAccountsForce(accountsParams: AddAccountParams[]) {
+    const getRootHDNode = memoizeOne(() => {
+      const seedPhrase = this.getSeedPhraseForce();
+      return getSeedPhraseHDNode(seedPhrase);
+    });
+
+    type AccountKeys = {
+      privateKey?: ProtectedValue;
+      publicKey?: ProtectedValue;
+    };
+
+    const toSave: { account: Account; keys: AccountKeys }[] =
+      accountsParams.map((params) => {
+        const { source, name } = params;
+        const base = {
+          uuid: KdbxUuid.random().toString(),
+          name,
+        };
+
+        switch (source) {
+          case AccountSource.SeedPhrase: {
+            const { derivationPath } = params;
+
+            const rootHDNode = getRootHDNode();
+            const { address, privateKey, publicKey } =
+              rootHDNode.derivePath(derivationPath);
+
+            const account: HDAccount = {
+              ...base,
+              source,
+              address,
+              derivationPath,
+            };
+
+            const keys: AccountKeys = {
+              privateKey: ProtectedValue.fromString(privateKey),
+              publicKey: ProtectedValue.fromString(publicKey),
+            };
+
+            return { account, keys };
+          }
+
+          case AccountSource.PrivateKey: {
+            const privateKey = importProtected(params.privateKey);
+
+            const publicKey = ethers.utils.computePublicKey(
+              privateKey.getText()
+            );
+            const address = ethers.utils.computeAddress(publicKey);
+
+            const account: PrivateKeyAccount = {
+              ...base,
+              source,
+              address,
+            };
+
+            const keys: AccountKeys = {
+              privateKey,
+              publicKey: ProtectedValue.fromString(publicKey),
+            };
+
+            return { account, keys };
+          }
+
+          case AccountSource.OpenLogin: {
+            const social = params.social;
+            const privateKey = importProtected(params.privateKey);
+
+            const publicKey = ethers.utils.computePublicKey(
+              privateKey.getText()
+            );
+            const address = ethers.utils.computeAddress(publicKey);
+
+            const account: SocialAccount = {
+              ...base,
+              source,
+              address,
+              social,
+            };
+
+            const keys: AccountKeys = {
+              privateKey,
+              publicKey: ProtectedValue.fromString(publicKey),
+            };
+
+            return { account, keys };
+          }
+
+          case AccountSource.Ledger: {
+            const derivationPath = params.derivationPath;
+            const publicKey = importProtected(params.publicKey);
+
+            const address = ethers.utils.computeAddress(publicKey.getText());
+
+            const account: LedgerAccount = {
+              ...base,
+              source,
+              address,
+              derivationPath,
+            };
+
+            const keys: AccountKeys = {
+              publicKey,
+            };
+
+            return { account, keys };
+          }
+
+          case AccountSource.Address: {
+            let { address } = params;
+
+            address = ethers.utils.getAddress(address);
+
+            const account: WatchOnlyAccount = {
+              ...base,
+              source,
+              address,
+            };
+
+            const keys: AccountKeys = {};
+
+            return { account, keys };
+          }
+        }
+      });
+
+    getRootHDNode.clear();
+
+    const prevAccounts = this.getAccounts();
+    const nextAccounts = [
+      prevAccounts,
+      toSave.map(({ account }) => account),
+    ].flat();
+
+    validateNoAccountDuplicates(nextAccounts);
+
+    for (const { account, keys } of toSave) {
+      const { uuid, ...accFields } = account;
+
+      const accEntry = this.createEntry(Gr.Accounts, uuid);
+      setFields(accEntry, accFields);
+
+      const keysEntry = this.createEntry(Gr.AccountKeys, uuid);
+      setFields(keysEntry, keys);
+    }
+  }
+
+  private addSeedPhraseForce(seedPhrase: SeedPharse) {
+    if (this.isSeedPhraseExists()) {
+      throw new PublicError(t("seedPhraseAlreadyExists"));
+    }
+
+    const entry = this.createEntry(Gr.SeedPhrases);
+
+    setFields(entry, {
+      phrase: importProtected(seedPhrase.phrase),
+      lang: seedPhrase.lang,
     });
   }
 
-  private addAccountsForce(accounts: AddAccountParams[]) {
-    return withError(t("failedToAddWallets"), async () => {
-      // Generate rest crypto keys if needed
-      type AccountStorageData = {
-        address: string;
-        publicKey?: string;
-        privateKey?: string;
-      };
+  private getKeyForce(accUuid: string, fieldName: string) {
+    const entry = this.getEntry(Gr.AccountKeys, accUuid);
+    assert(entry, "Account not found");
 
-      const getRootHDNode = memoizeOne(async () => {
-        const seedPhrase = await Vault.getSeedPhraseCheck(this.cryptoKey);
-        return getSeedPhraseHDNode(seedPhrase);
-      });
+    const value = entry.fields.get(fieldName);
+    assert(value instanceof ProtectedValue, "Field not found");
 
-      const accountsData: AccountStorageData[] = await Promise.all(
-        accounts.map((params) =>
-          match(params)
-            .with({ type: AccountType.HD }, async (p) => {
-              const rootHDNode = await getRootHDNode();
-              const { address, privateKey, publicKey } = rootHDNode.derivePath(
-                p.derivationPath
-              );
+    return value;
+  }
 
-              return { address, privateKey, publicKey };
-            })
-            .with({ type: AccountType.Imported }, async ({ privateKey }) => {
-              const publicKey = ethers.utils.computePublicKey(privateKey);
-              const address = ethers.utils.computeAddress(publicKey);
+  private getSeedPhraseForce() {
+    const seedPhraseExists = this.isSeedPhraseExists();
+    if (!seedPhraseExists) {
+      throw new PublicError(t("seedPhraseNotEstablished"));
+    }
 
-              return { address, privateKey, publicKey };
-            })
-            .with({ type: AccountType.External }, async ({ publicKey }) => {
-              const address = ethers.utils.computeAddress(publicKey);
+    const entry = this.getGroup(Gr.SeedPhrases).entries[0];
+    const seedPhrase = exportFields<SeedPharse>(entry);
 
-              return { address, publicKey };
-            })
-            .with({ type: AccountType.Void }, async ({ address }) => {
-              address = ethers.utils.getAddress(address);
+    return seedPhrase;
+  }
 
-              return { address };
-            })
-            .exhaustive()
-        )
+  private async verify(password: string) {
+    return withError(t("invalidPassword"), async (getError) => {
+      const hashToCheck = await importProtected(password).getHash();
+
+      const localHash = arrayToBuffer(
+        this.kdbx.credentials.passwordHash!.getBinary()
       );
 
-      // Validate accounts existence
-      await Promise.all(
-        accountsData.map(({ address }) => validateAccountExistence(address))
-      );
-
-      // Save them
-      const toSave: [string, unknown][] = [];
-
-      for (const { address, publicKey, privateKey } of accountsData) {
-        if (publicKey) {
-          toSave.push(Data.publicKey(address)(publicKey));
+      try {
+        if (!arrayBufferEquals(hashToCheck, localHash)) {
+          throw getError();
         }
-        if (privateKey) {
-          toSave.push(Data.privateKey(address)(privateKey));
-        }
+      } finally {
+        zeroBuffer(hashToCheck);
+        zeroBuffer(localHash);
       }
-
-      if (toSave.length > 0) {
-        await Storage.encryptAndSaveMany(toSave, this.cryptoKey);
-      }
-
-      // Return account addresses
-      return accountsData.map(({ address }) => address);
     });
+  }
+
+  private async saveData() {
+    const data = await this.kdbx.save();
+
+    const dataB64 = bytesToBase64(data);
+    zeroBuffer(data);
+
+    await storage.put(St.Data, dataB64);
+  }
+
+  private createEntry(
+    groupUuid: Gr,
+    uuid: KdbxUuid | string = KdbxUuid.random()
+  ) {
+    const parentGroup = this.getGroup(groupUuid);
+
+    const entry = new KdbxEntry();
+    entry.uuid = toUuid(uuid);
+    entry.parentGroup = parentGroup;
+    entry.autoType.enabled = false;
+
+    parentGroup.entries.push(entry);
+
+    return entry;
+  }
+
+  private getEntry(groupOrUuid: KdbxGroup | Gr, entryUuid: KdbxUuid | string) {
+    const group =
+      groupOrUuid instanceof KdbxGroup
+        ? groupOrUuid
+        : this.getGroup(groupOrUuid);
+
+    for (const entry of group.entries) {
+      if (entry.uuid.equals(entryUuid)) {
+        return entry;
+      }
+    }
+
+    return null;
+  }
+
+  private getGroup(uuid: Gr) {
+    const root = this.kdbx.getDefaultGroup();
+
+    for (const group of root.groups) {
+      if (group.uuid.equals(uuid)) {
+        return group;
+      }
+    }
+
+    throw new Error("Group not found");
   }
 }

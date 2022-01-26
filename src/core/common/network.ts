@@ -1,4 +1,4 @@
-import * as Global from "lib/ext/global";
+import { storage } from "lib/ext/storage";
 import { assert } from "lib/system/assert";
 
 import * as Repo from "core/repo";
@@ -6,13 +6,13 @@ import * as Repo from "core/repo";
 const rpcUrlsCache = new Map<number, string>();
 
 export async function getRpcUrl(chainId: number) {
-  let url: string | null | undefined;
+  let url: string | undefined;
 
   url = rpcUrlsCache.get(chainId);
   if (url) return url;
 
   const savedKey = getRpcUrlKey(chainId);
-  url = Global.get<string>(savedKey);
+  url = await storage.fetchForce(savedKey);
 
   if (!url) {
     const network = await getNetwork(chainId);
@@ -22,20 +22,22 @@ export async function getRpcUrl(chainId: number) {
   // Avoid double subscription on first load (rare case)
   if (!rpcUrlsCache.has(chainId)) {
     rpcUrlsCache.set(chainId, url);
-    Global.subscribe(
-      savedKey,
-      () => {
+
+    const unsub = storage.subscribe(savedKey, ({ newValue }) => {
+      if (newValue) {
+        rpcUrlsCache.set(chainId, newValue);
+      } else {
         rpcUrlsCache.delete(chainId);
-      },
-      { once: true }
-    );
+        unsub();
+      }
+    });
   }
 
   return url;
 }
 
-export function setRpcUrl(chainId: number, url: string) {
-  Global.put(getRpcUrlKey(chainId), url);
+export async function setRpcUrl(chainId: number, url: string) {
+  await storage.put(getRpcUrlKey(chainId), url);
 }
 
 export async function getNetwork(chainId: number) {

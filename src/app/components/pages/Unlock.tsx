@@ -1,25 +1,19 @@
-import {
-  FC,
-  useMemo,
-  memo,
-  useRef,
-  useCallback,
-  FormEventHandler,
-} from "react";
+import { FC, memo, useRef, useCallback, FormEventHandler } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai/utils";
 import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
 import { isPopup } from "lib/ext/view";
-import { getCurrentProfile } from "lib/ext/profile";
 
 import { unlockWallet } from "core/client";
 
+import { currentProfileAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import PopupLayout from "app/components/layouts/PopupLayout";
 import TextField from "app/components/elements/TextField";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 
 const Unlock: FC = () => {
-  const currentProfile = useMemo(getCurrentProfile, []);
+  const currentProfile = useAtomValue(currentProfileAtom);
 
   const content = (
     <>

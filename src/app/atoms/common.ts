@@ -1,21 +1,32 @@
 import { atom } from "jotai";
-import { atomFamily, loadable } from "jotai/utils";
-import { atomWithGlobal, atomWithRepoQuery } from "lib/atom-utils";
+import { atomFamily, atomWithDefault, loadable, RESET } from "jotai/utils";
+import { atomWithStorage, atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
+import { getAccounts, onAccountsUpdated } from "core/client";
 import { INITIAL_NETWORK } from "fixtures/networks";
+import { Account } from "core/types";
 
-export const chainIdAtom = atomWithGlobal<number>(
+export const chainIdAtom = atomWithStorage<number>(
   "chain_id",
   INITIAL_NETWORK.chainId
 );
 
-export const accountAddressAtom = atomWithGlobal<string | null>(
+export const accountAddressAtom = atomWithStorage<string | null>(
   "account_address",
   null
 );
 
-export const allAccountsAtom = atomWithRepoQuery(() => Repo.accounts.toArray());
+export const allAccountsAtom = atomWithDefault(getAccounts);
+allAccountsAtom.onMount = (setAtom) => {
+  const unsub = onAccountsUpdated(setAtom);
+
+  return () => {
+    unsub();
+    setAtom((v) => v);
+    setAtom(RESET);
+  };
+};
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery(() => Repo.networks.get(chainId))
@@ -31,11 +42,7 @@ export const allNetworksAtom = atomWithRepoQuery(() =>
     .toArray()
 );
 
-export const getAccountAtom = atomFamily((address: string) =>
-  atomWithRepoQuery(() => Repo.accounts.get(address))
-);
-
-export const currentAccountAtom = atom<Repo.IAccount>((get) => {
+export const currentAccountAtom = atom<Account>((get) => {
   const allAccounts = get(allAccountsAtom);
   if (allAccounts.length === 0) {
     throw new Error("There are no accounts");

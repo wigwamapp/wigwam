@@ -1,23 +1,17 @@
 import { FC, memo, useCallback, useMemo, useState, useRef } from "react";
 import classNames from "clsx";
 
-import {
-  getProfileId,
-  getAllProfiles,
-  addProfile,
-  setProfileId,
-} from "lib/ext/profile";
+import { changeProfile, addProfile } from "lib/ext/profile";
 import { T, TReplace, useI18NUpdate, replaceT } from "lib/ext/i18n/react";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import DialogWrapper from "app/components/layouts/DialogWrapper";
 import AutoIcon from "app/components/elements/AutoIcon";
 import TextField from "app/components/elements/TextField";
+import { useAtomValue } from "jotai/utils";
+import { profileStateAtom } from "app/atoms";
 
 const Profiles: FC = () => {
-  const currentProfileId = useMemo(() => getProfileId(), []);
-  const allProfiles = useMemo(() => getAllProfiles(), []);
-
-  console.info(allProfiles);
+  const { all, currentId } = useAtomValue(profileStateAtom);
 
   const [adding, setAdding] = useState(false);
 
@@ -25,20 +19,25 @@ const Profiles: FC = () => {
     setAdding(false);
   }, [setAdding]);
 
-  const handleAdd = useCallback((name: string) => {
-    const { id } = addProfile(name);
-    setProfileId(id);
+  const handleAdd = useCallback(async (name: string) => {
+    try {
+      await addProfile(name);
+
+      setAdding(false);
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
 
   const handleSelect = useCallback((profile) => {
-    setProfileId(profile.id);
+    changeProfile(profile.id);
   }, []);
 
   return (
     <BoardingPageLayout title="Profiles" profileNav={false}>
       <div className="-mx-4 flex flex-wrap items-stretch">
-        {allProfiles.map((p) => {
-          const active = p.id === currentProfileId;
+        {all.map((p) => {
+          const active = p.id === currentId;
 
           return (
             <div key={p.id} className="p-4">
@@ -57,7 +56,7 @@ const Profiles: FC = () => {
                   seed={p.avatarSeed}
                   className="w-36 h-36 mb-4"
                   source="boring"
-                  variant="pixel"
+                  variant="beam"
                   square
                 />
 
@@ -87,7 +86,7 @@ const Profiles: FC = () => {
 
       <AddProfileDialog
         adding={adding}
-        profilesLength={allProfiles.length}
+        profilesLength={all.length}
         onClose={handleCancelAdding}
         onAdd={handleAdd}
       />
@@ -147,6 +146,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
             <div className="flex-1" />
 
             <button
+              type="button"
               className={classNames(
                 "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
                 "transition ease-in-out duration-200"

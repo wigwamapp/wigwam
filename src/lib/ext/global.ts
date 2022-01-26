@@ -1,21 +1,18 @@
-import { getItemSafe } from "./utils";
-import { underProfile } from "./profile";
-
 export interface LocalStorageEventInit {
   key?: string;
 }
 
-export function get<T = any>(key: string) {
-  return getItemSafe<T>(underProfile(key));
+export function get(key: string) {
+  return localStorage.getItem(key);
 }
 
-export function put(key: string, value: any) {
-  localStorage.setItem(underProfile(key), JSON.stringify(value));
+export function put(key: string, value: string) {
+  localStorage.setItem(key, value);
   notifySelf(key);
 }
 
 export function remove(key: string) {
-  localStorage.removeItem(underProfile(key));
+  localStorage.removeItem(key);
 }
 
 export function clear() {

@@ -2,9 +2,9 @@ import { atom, SetStateAction } from "jotai";
 import { atomWithDefault, RESET } from "jotai/utils";
 import * as Global from "lib/ext/global";
 
-export function atomWithGlobal<T = any>(key: string, fallback: T | (() => T)) {
-  const getData = (): T =>
-    Global.get<T>(key) ??
+export function atomWithGlobal(key: string, fallback: string | (() => string)) {
+  const getData = (): string =>
+    Global.get(key) ??
     (typeof fallback === "function" ? (fallback as any)() : fallback);
 
   const baseAtom = atomWithDefault(getData);
@@ -20,10 +20,10 @@ export function atomWithGlobal<T = any>(key: string, fallback: T | (() => T)) {
 
   const anAtom = atom(
     (get) => get(baseAtom),
-    (get, _set, update: SetStateAction<T>) => {
+    (get, _set, update: SetStateAction<string>) => {
       const newValue =
         typeof update === "function"
-          ? (update as (prev: T) => T)(get(baseAtom))
+          ? (update as (prev: string) => string)(get(baseAtom))
           : update;
       Global.put(key, newValue);
     }
