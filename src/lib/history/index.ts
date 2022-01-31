@@ -4,13 +4,6 @@ export enum HistoryAction {
   Replace = "replacestate",
 }
 
-export interface PatchedHistory extends History {
-  lastAction: HistoryAction;
-  position: number;
-}
-
-const patchedHistory = window.history as PatchedHistory;
-
 const ACTIONS = Object.values(HistoryAction);
 
 export function listen(listener: (action: HistoryAction) => void) {
@@ -43,16 +36,16 @@ export function goForward() {
   go(1);
 }
 
-export function getLastAction() {
-  return patchedHistory.lastAction;
+export function getLastAction(): HistoryAction | undefined {
+  return sessionStorage.lastAction;
 }
 
 export function getPosition() {
-  return patchedHistory.position ?? 0;
+  return +sessionStorage.historyPosition || 0;
 }
 
 export function resetPosition() {
-  patchedHistory.position = 0;
+  sessionStorage.historyPosition = "0";
 }
 
 patchMethod("pushState", HistoryAction.Push);
@@ -71,9 +64,9 @@ function patchHistory(action: HistoryAction) {
         : 0)
   );
 
-  Object.assign(patchedHistory, {
+  Object.assign(sessionStorage, {
     lastAction: action,
-    position,
+    historyPosition: position,
   });
 }
 
