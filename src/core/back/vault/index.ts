@@ -82,8 +82,6 @@ export class Vault {
         throw getError();
       }
 
-      console.info(seedPhrase);
-
       if (seedPhrase) {
         validateSeedPhrase(seedPhrase);
       }
