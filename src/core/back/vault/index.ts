@@ -150,7 +150,35 @@ export class Vault {
 
   constructor(private kdbx: Kdbx) {}
 
-  // =============//
+  // ============//
+  // Credentials //
+  // ============//
+
+  async changePassword(current: string, next: string) {
+    await this.verify(current);
+
+    return withError(t("failedToFetchPublicKey"), async () => {
+      await this.kdbx.credentials.setPassword(importProtected(next));
+
+      const keyFile = await Credentials.createRandomKeyFile();
+      await this.kdbx.credentials.setKeyFile(keyFile);
+
+      const keyFileB64 = bytesToBase64(keyFile);
+      zeroBuffer(keyFile);
+
+      const data = await this.kdbx.save();
+
+      const dataB64 = bytesToBase64(data);
+      zeroBuffer(data);
+
+      await storage.putMany([
+        [St.KeyFile, keyFileB64],
+        [St.Data, dataB64],
+      ]);
+    });
+  }
+
+  // ============//
   // Seed Phrase //
   // ============//
 
