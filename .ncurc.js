@@ -1,3 +1,3 @@
 module.exports = {
-  reject: ["css-loader"],
+  reject: ["css-loader", "fork-ts-checker-webpack-plugin"],
 };
