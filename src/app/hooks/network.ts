@@ -9,6 +9,7 @@ import { INetwork } from "core/repo";
 export function useNetwork() {
   const chainId = useChainId();
   const network = useAtomValue(lazyNetworkAtom(chainId));
+
   return network.state === "hasData" ? network.data : undefined;
 }
 
