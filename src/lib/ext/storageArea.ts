@@ -1,6 +1,6 @@
 import browser, { Storage } from "webextension-polyfill";
-import { Buffer } from "buffer";
 import { utils } from "ethers";
+import { utf8ToBytes } from "lib/crypto-utils/bytes";
 import { createQueue } from "lib/system/queue";
 
 export type StorageItems = { [key: string]: unknown } | [string, unknown][];
@@ -115,7 +115,7 @@ export class StorageArea {
     // Obfuscate with hashing
     key =
       this.opts.obfuscate !== false
-        ? utils.ripemd160(Buffer.from(key, "utf8")).slice(2)
+        ? utils.ripemd160(utf8ToBytes(key)).slice(2)
         : key;
 
     return key;

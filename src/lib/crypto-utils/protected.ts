@@ -1,10 +1,14 @@
 import { getRandomBytes } from "./random";
-
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+import {
+  zeroBuffer,
+  utf8ToBytes,
+  bytesToUtf8,
+  base64ToBytes,
+  bytesToBase64,
+} from "./bytes";
 
 export function toProtectedString(str: string) {
-  const bytes = textEncoder.encode(str);
+  const bytes = utf8ToBytes(str);
   const salt = getRandomBytes(bytes.length);
 
   for (let i = 0, len = bytes.length; i < len; i++) {
@@ -38,29 +42,5 @@ export function fromProtectedString(str: string) {
   zeroBuffer(value);
   zeroBuffer(salt);
 
-  return textDecoder.decode(bytes);
-}
-
-function bytesToBase64(arr: Uint8Array): string {
-  let str = "";
-  for (let i = 0; i < arr.length; i++) {
-    str += String.fromCharCode(arr[i]);
-  }
-
-  return btoa(str);
-}
-
-function base64ToBytes(str: string): Uint8Array {
-  const byteStr = atob(str);
-
-  const arr = new Uint8Array(byteStr.length);
-  for (let i = 0; i < byteStr.length; i++) {
-    arr[i] = byteStr.charCodeAt(i);
-  }
-
-  return arr;
-}
-
-function zeroBuffer(arr: Uint8Array) {
-  arr.fill(0);
+  return bytesToUtf8(bytes);
 }
