@@ -148,7 +148,7 @@ export class Vault {
     });
   }
 
-  constructor(private kdbx: Kdbx) {}
+  constructor(private readonly kdbx: Kdbx) {}
 
   // ============//
   // Credentials //

@@ -73,6 +73,19 @@ export async function lockWallet() {
   assert(res?.type === type);
 }
 
+export async function changePassword(
+  currentPassword: string,
+  nextPassword: string
+) {
+  currentPassword = toProtectedString(currentPassword);
+  nextPassword = toProtectedString(nextPassword);
+
+  const type = MessageType.ChangePassword;
+
+  const res = await porter.request({ type, currentPassword, nextPassword });
+  assert(res?.type === type);
+}
+
 export async function getAccounts() {
   const type = MessageType.GetAccounts;
 

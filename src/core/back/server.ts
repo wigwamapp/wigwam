@@ -97,6 +97,15 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
 
         ctx.reply({ type });
       })
+      .with(
+        { type: MessageType.ChangePassword },
+        ({ type, currentPassword, nextPassword }) =>
+          withVault(async (vault) => {
+            await vault.changePassword(currentPassword, nextPassword);
+
+            ctx.reply({ type });
+          })
+      )
       .with({ type: MessageType.HasSeedPhrase }, async ({ type }) =>
         withVault(async (vault) => {
           const seedPhraseExists = vault.isSeedPhraseExists();

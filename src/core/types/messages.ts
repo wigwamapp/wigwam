@@ -8,6 +8,7 @@ export type Request =
   | SetupWalletRequest
   | UnlockWalletRequest
   | LockWalletRequest
+  | ChangePasswordRequest
   | HasSeedPhraseRequest
   | AddSeedPhraseRequest
   | GetAccountsRequest
@@ -24,6 +25,7 @@ export type Response =
   | SetupWalletResponse
   | UnlockWalletResponse
   | LockWalletResponse
+  | ChangePasswordResponse
   | HasSeedPhraseResponse
   | AddSeedPhraseResponse
   | GetAccountsResponse
@@ -46,6 +48,7 @@ export enum MessageType {
   SetupWallet = "SETUP_WALLET",
   UnlockWallet = "UNLOCK_WALLET",
   LockWallet = "LOCK_WALLET",
+  ChangePassword = "CHANGE_PASSWORD",
   HasSeedPhrase = "HAS_SEED_PHRASE",
   AddSeedPhrase = "ADD_SEED_PHRASE",
   GetAccounts = "GET_ACCOUNTS",
@@ -104,6 +107,16 @@ export interface LockWalletRequest extends MessageBase {
 
 export interface LockWalletResponse extends MessageBase {
   type: MessageType.LockWallet;
+}
+
+export interface ChangePasswordRequest extends MessageBase {
+  type: MessageType.ChangePassword;
+  currentPassword: string;
+  nextPassword: string;
+}
+
+export interface ChangePasswordResponse extends MessageBase {
+  type: MessageType.ChangePassword;
 }
 
 export interface HasSeedPhraseRequest extends MessageBase {
