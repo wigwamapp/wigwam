@@ -168,16 +168,16 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
       .with({ type: MessageType.GetPublicKey }, ({ type, accountUuid }) =>
         withVault(async (vault) => {
           const publicKey = vault.getPublicKey(accountUuid);
+
           ctx.reply({ type, publicKey });
         })
       )
-      .with(
-        { type: MessageType.GetNeuterExtendedKey },
-        ({ type, derivationPath }) =>
-          withVault(async (vault) => {
-            const extendedKey = vault.getNeuterExtendedKey(derivationPath);
-            ctx.reply({ type, extendedKey });
-          })
+      .with({ type: MessageType.GetNeuterExtendedKey }, ({ type }) =>
+        withVault(async (vault) => {
+          const extendedKey = vault.getNeuterExtendedKey();
+
+          ctx.reply({ type, extendedKey });
+        })
       )
       .with(
         { type: MessageType.SendRpc },

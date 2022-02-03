@@ -28,7 +28,11 @@ export const $accounts = createStore<Account[]>([])
 
 export const $vault = createStore<Vault | null>(null)
   .on(unlocked, (_s, { vault }) => vault)
-  .on(locked, () => null);
+  .on(locked, (prevVault) => {
+    prevVault?.cleanup();
+
+    return null;
+  });
 
 export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   .on(locked, (t) => {

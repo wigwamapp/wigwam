@@ -16,13 +16,14 @@ import { useMaybeAtomValue } from "lib/atom-utils";
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { AddHDAccountParams, SeedPharse, AccountSource } from "core/types";
 import {
-  toDerivedNeuterExtendedKey,
+  toNeuterExtendedKey,
   generatePreviewHDNodes,
+  getSeedPhraseHDNode,
 } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
-import { hasSeedPhraseAtom, getNeuterExtendedKeyAtom } from "app/atoms";
+import { hasSeedPhraseAtom, neuterExtendedKeyAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 
@@ -33,25 +34,31 @@ type AddHDAccountsProps = {
 };
 
 const rootDerivationPath = "m/44'/60'/0'/0";
-const rootNeuterExtendedKeyAtom = getNeuterExtendedKeyAtom(rootDerivationPath);
 
 const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
   const hasSeedPhrase = useMaybeAtomValue(!initialSetup && hasSeedPhraseAtom);
-  const existingNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && rootNeuterExtendedKeyAtom
+  const rootNeuterExtendedKey = useMaybeAtomValue(
+    hasSeedPhrase && neuterExtendedKeyAtom
   );
 
   const { stateRef, fallbackStep, navigateToStep } = useSteps();
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
 
-  const neuterExtendedKey = useMemo(
-    () =>
-      existingNeuterExtendedKey ??
-      (initialSetup && seedPhrase
-        ? toDerivedNeuterExtendedKey(seedPhrase, rootDerivationPath)
-        : null),
-    [existingNeuterExtendedKey, initialSetup, seedPhrase]
-  );
+  const neuterExtendedKey = useMemo(() => {
+    if (rootNeuterExtendedKey) {
+      return toNeuterExtendedKey(
+        ethers.utils.HDNode.fromExtendedKey(rootNeuterExtendedKey),
+        rootDerivationPath
+      );
+    } else {
+      return seedPhrase
+        ? toNeuterExtendedKey(
+            getSeedPhraseHDNode(seedPhrase),
+            rootDerivationPath
+          )
+        : null;
+    }
+  }, [rootNeuterExtendedKey, seedPhrase]);
 
   useEffect(() => {
     if (!neuterExtendedKey) {

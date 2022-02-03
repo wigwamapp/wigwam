@@ -1,4 +1,4 @@
-import { atomFamily, atomWithDefault } from "jotai/utils";
+import { atomWithDefault } from "jotai/utils";
 import { atomWithAutoReset } from "lib/atom-utils";
 
 import {
@@ -15,6 +15,4 @@ export const hasSeedPhraseAtom = atomWithAutoReset(() =>
   isWalletHasSeedPhrase().catch(() => false)
 );
 
-export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
-  atomWithAutoReset(() => getNeuterExtendedKey(derivationPath))
-);
+export const neuterExtendedKeyAtom = atomWithAutoReset(getNeuterExtendedKey);

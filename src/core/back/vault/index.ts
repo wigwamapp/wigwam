@@ -40,7 +40,7 @@ import {
   withError,
   validateAddAccountParams,
   validateSeedPhrase,
-  toDerivedNeuterExtendedKey,
+  toNeuterExtendedKey,
   getSeedPhraseHDNode,
   validateNoAccountDuplicates,
 } from "core/common";
@@ -150,6 +150,14 @@ export class Vault {
 
   constructor(private readonly kdbx: Kdbx) {}
 
+  cleanup() {
+    this.kdbx.cleanup({
+      historyRules: true,
+      customIcons: true,
+      binaries: true,
+    });
+  }
+
   // ============//
   // Credentials //
   // ============//
@@ -204,10 +212,14 @@ export class Vault {
     });
   }
 
-  getNeuterExtendedKey(derivationPath: string) {
+  getNeuterExtendedKey() {
     return withError(t("failedToFetchPublicKey"), () => {
-      const seedPhrase = this.getSeedPhraseForce();
-      return toDerivedNeuterExtendedKey(seedPhrase, derivationPath);
+      const { fields } = this.getSeedPhraseEntry();
+      const neuterExtendedKey = fields.get(
+        "neuterExtendedKey"
+      ) as ProtectedValue;
+
+      return exportProtected(neuterExtendedKey);
     });
   }
 
@@ -437,11 +449,14 @@ export class Vault {
       throw new PublicError(t("seedPhraseAlreadyExists"));
     }
 
+    const extendedKey = toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase));
+
     const entry = this.createEntry(Gr.SeedPhrases);
 
     setFields(entry, {
       phrase: importProtected(seedPhrase.phrase),
       lang: seedPhrase.lang,
+      neuterExtendedKey: ProtectedValue.fromString(extendedKey),
     });
   }
 
@@ -456,15 +471,19 @@ export class Vault {
   }
 
   private getSeedPhraseForce() {
-    const seedPhraseExists = this.isSeedPhraseExists();
-    if (!seedPhraseExists) {
-      throw new PublicError(t("seedPhraseNotEstablished"));
-    }
-
-    const entry = this.getGroup(Gr.SeedPhrases).entries[0];
+    const entry = this.getSeedPhraseEntry();
     const seedPhrase = exportFields<SeedPharse>(entry);
 
     return seedPhrase;
+  }
+
+  private getSeedPhraseEntry() {
+    const seedPhraseExists = this.isSeedPhraseExists();
+    if (seedPhraseExists) {
+      return this.getGroup(Gr.SeedPhrases).entries[0];
+    }
+
+    throw new PublicError(t("seedPhraseNotEstablished"));
   }
 
   private async verify(password: string) {

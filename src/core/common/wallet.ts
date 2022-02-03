@@ -25,12 +25,15 @@ export function generatePreviewHDNodes(
   return nodes;
 }
 
-export function toDerivedNeuterExtendedKey(
-  seedPhrase: SeedPharse,
-  derivationPath: string
+export function toNeuterExtendedKey(
+  hdNode: ethers.utils.HDNode,
+  derivationPath?: string
 ) {
-  return getSeedPhraseHDNode(seedPhrase).derivePath(derivationPath).neuter()
-    .extendedKey;
+  if (derivationPath) {
+    hdNode = hdNode.derivePath(derivationPath);
+  }
+
+  return hdNode.neuter().extendedKey;
 }
 
 export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
