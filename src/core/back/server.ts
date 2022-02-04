@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
+import { getRandomInt } from "lib/system/randomInt";
 
 import {
   Request,
@@ -47,6 +48,26 @@ export function startServer() {
       awaitingApproval,
     });
   });
+
+  let attempts = +sessionStorage.passwordUsageAttempts || 0;
+
+  Vault.onPasswordUsage = async (success) => {
+    if (success) {
+      attempts = 0;
+    } else {
+      attempts++;
+
+      if (attempts > 5) {
+        await new Promise((r) => setTimeout(r, getRandomInt(3_000, 5_000)));
+      }
+
+      if (attempts > 3) {
+        locked();
+      }
+    }
+
+    sessionStorage.passwordUsageAttempts = attempts;
+  };
 
   // const dappPorter = new PorterServer(PorterChannel.DApp);
   // dappPorter.onMessage(handleDAppRequest);

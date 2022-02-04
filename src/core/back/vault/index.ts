@@ -67,6 +67,8 @@ enum Gr {
 }
 
 export class Vault {
+  static onPasswordUsage?: (success: boolean) => void | Promise<void>;
+
   static isExist() {
     return storage.isStored(St.KeyFile);
   }
@@ -140,9 +142,20 @@ export class Vault {
 
       const credentials = new Credentials(importProtected(password), keyFile);
 
-      const kdbx = await withError(t("invalidPassword"), () =>
-        Kdbx.load(data, credentials).finally(() => zeroBuffer(keyFile))
-      );
+      const kdbx = await withError(t("invalidPassword"), async () => {
+        let success = true;
+
+        try {
+          return await Kdbx.load(data, credentials);
+        } catch (err) {
+          success = false;
+
+          throw err;
+        } finally {
+          zeroBuffer(keyFile);
+          await Vault.onPasswordUsage?.(success);
+        }
+      });
 
       return new Vault(kdbx);
     });
@@ -495,7 +508,11 @@ export class Vault {
       );
 
       try {
-        if (!arrayBufferEquals(hashToCheck, localHash)) {
+        const matched = arrayBufferEquals(hashToCheck, localHash);
+
+        await Vault.onPasswordUsage?.(matched);
+
+        if (!matched) {
           throw getError();
         }
       } finally {
