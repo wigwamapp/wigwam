@@ -98,9 +98,12 @@ export function applyKdfParams(kdbx: Kdbx, params: KdfParams) {
   }
 }
 
-export function createGroup(parentGroup: KdbxGroup, uuid = KdbxUuid.random()) {
+export function createGroup(
+  parentGroup: KdbxGroup,
+  uuid: string | KdbxUuid = KdbxUuid.random()
+) {
   const group = new KdbxGroup();
-  group.uuid = uuid;
+  group.uuid = toUuid(uuid);
   group.parentGroup = parentGroup;
 
   parentGroup.groups.push(group);

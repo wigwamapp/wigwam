@@ -96,9 +96,8 @@ export class Vault {
       const kdbx = createKdbx(credentials, "Vault", KDF_PARAMS);
 
       const rootGroup = kdbx.getDefaultGroup();
-
       for (const groupUuid of Object.values(Gr)) {
-        createGroup(rootGroup, new KdbxUuid(groupUuid));
+        createGroup(rootGroup, groupUuid);
       }
 
       const vault = new Vault(kdbx);
@@ -140,12 +139,15 @@ export class Vault {
       const keyFile = base64ToBytes(keyFileB64);
       const data = arrayToBuffer(base64ToBytes(dataB64));
 
-      const credentials = new Credentials(importProtected(password), keyFile);
-
       const kdbx = await withError(t("invalidPassword"), async () => {
         let success = true;
 
         try {
+          const credentials = new Credentials(
+            importProtected(password),
+            keyFile
+          );
+
           return await Kdbx.load(data, credentials);
         } catch (err) {
           success = false;
