@@ -160,15 +160,17 @@ export function importProtected(str: string): ProtectedValue {
   return instance;
 }
 
-export function exportProtected(instance: ProtectedValue): string {
-  const combined = new Uint8Array([...instance.value, ...instance.salt]);
+export function exportProtected(origin: ProtectedValue): string {
+  const cloned = origin.clone();
+
+  // Refresh salt for export
+  const nextSalt = CryptoEngine.random(cloned.byteLength);
+  cloned.setSalt(nextSalt);
+
+  const combined = new Uint8Array([...cloned.value, ...cloned.salt]);
   const str = bytesToBase64(combined);
 
   zeroBuffer(combined);
-
-  // Refresh origin salt after export
-  const nextSalt = CryptoEngine.random(instance.byteLength);
-  instance.setSalt(nextSalt);
 
   return str;
 }
