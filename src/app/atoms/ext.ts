@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomWithDefault } from "jotai/utils";
 import { atomWithAutoReset } from "lib/atom-utils";
-import { fetchState, subscribeState } from "lib/ext/profile";
+import { loadState, subscribeState } from "lib/ext/profile";
 import { getActiveTab } from "lib/ext/tab";
 import { getLocale } from "lib/ext/i18n";
 
@@ -9,7 +9,7 @@ export const currentLocaleAtom = atomWithDefault(getLocale);
 
 export const activeTabAtom = atomWithDefault(getActiveTab);
 
-export const profileStateAtom = atomWithAutoReset(fetchState, {
+export const profileStateAtom = atomWithAutoReset(loadState, {
   onMount: subscribeState,
 });
 

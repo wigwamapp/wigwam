@@ -1,10 +1,13 @@
+type Unsubscribe = (() => void) | void;
+
 export function livePromise<T>(
   pick: () => Promise<T | undefined>,
-  subscribe: (callback: (newValue: T) => void) => any
+  subscribe: (callback: (newValue: T) => void) => Unsubscribe
 ) {
   let promise: Promise<T> | undefined;
+  let unsub: Unsubscribe;
 
-  return () => {
+  const factory = () => {
     if (!promise) {
       promise = new Promise<T>((res) => {
         let resolved = false;
@@ -18,7 +21,7 @@ export function livePromise<T>(
           })
           .catch(console.error);
 
-        subscribe((value) => {
+        unsub = subscribe((value) => {
           promise = Promise.resolve(value);
 
           if (!resolved) {
@@ -31,4 +34,10 @@ export function livePromise<T>(
 
     return promise;
   };
+
+  factory.clear = () => {
+    unsub?.();
+  };
+
+  return factory;
 }
