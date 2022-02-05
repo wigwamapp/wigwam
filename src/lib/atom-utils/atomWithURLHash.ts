@@ -1,5 +1,4 @@
 import { atom, SetStateAction } from "jotai";
-import { atomWithDefault, RESET } from "jotai/utils";
 import { listen, changeState } from "lib/history";
 import {
   serialize,
@@ -8,26 +7,21 @@ import {
   toURL,
 } from "lib/navigation";
 
+import { atomWithAutoReset } from "./atomWithAutoReset";
+
 export function atomWithURLHash<T>(key: string, initialValue: T) {
   const getValue = (params: URLSearchParams) => {
     const value = params.get(key);
     return value !== null ? deserialize<T>(value) : initialValue;
   };
 
-  const baseAtom = atomWithDefault(() => getValue(getHashSearchParams()));
+  const readAtom = atomWithAutoReset(() => getValue(getHashSearchParams()), {
+    onMount: (setAtom) =>
+      listen(() => setAtom(getValue(getHashSearchParams()))),
+  });
 
-  baseAtom.onMount = (setAtom) => {
-    const unsub = listen(() => setAtom(getValue(getHashSearchParams())));
-
-    return () => {
-      setAtom((v) => v);
-      setAtom(RESET);
-      unsub();
-    };
-  };
-
-  const anAtom = atom(
-    (get) => get(baseAtom),
+  const urlHashAtom = atom(
+    (get) => get(readAtom),
     (
       _get,
       _set,
@@ -46,5 +40,5 @@ export function atomWithURLHash<T>(key: string, initialValue: T) {
     }
   );
 
-  return anAtom;
+  return urlHashAtom;
 }
