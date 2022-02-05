@@ -1,6 +1,10 @@
 import { atom } from "jotai";
-import { atomFamily, atomWithDefault, loadable, RESET } from "jotai/utils";
-import { atomWithStorage, atomWithRepoQuery } from "lib/atom-utils";
+import { atomFamily, loadable } from "jotai/utils";
+import {
+  atomWithStorage,
+  atomWithRepoQuery,
+  atomWithAutoReset,
+} from "lib/atom-utils";
 
 import * as Repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
@@ -17,16 +21,10 @@ export const accountAddressAtom = atomWithStorage<string | null>(
   null
 );
 
-export const allAccountsAtom = atomWithDefault(getAccounts);
-allAccountsAtom.onMount = (setAtom) => {
-  const unsub = onAccountsUpdated(setAtom);
-
-  return () => {
-    unsub();
-    setAtom((v) => v);
-    setAtom(RESET);
-  };
-};
+export const allAccountsAtom = atomWithAutoReset(getAccounts, {
+  onMount: onAccountsUpdated,
+  resetDelay: 5_000,
+});
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery(() => Repo.networks.get(chainId))

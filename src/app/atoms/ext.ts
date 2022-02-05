@@ -5,15 +5,16 @@ import { fetchState, subscribeState } from "lib/ext/profile";
 import { getActiveTab } from "lib/ext/tab";
 import { getLocale } from "lib/ext/i18n";
 
-export const activeTabAtom = atomWithAutoReset(getActiveTab);
+export const currentLocaleAtom = atomWithDefault(getLocale);
 
-export const profileStateAtom = atomWithDefault(fetchState);
-profileStateAtom.onMount = (setAtom) => subscribeState(setAtom);
+export const activeTabAtom = atomWithDefault(getActiveTab);
+
+export const profileStateAtom = atomWithAutoReset(fetchState, {
+  onMount: subscribeState,
+});
 
 export const currentProfileAtom = atom((get) => {
   const { all, currentId } = get(profileStateAtom);
   const index = all.findIndex((p) => p.id === currentId);
   return all[index === -1 ? 0 : index];
 });
-
-export const currentLocaleAtom = atomWithDefault(getLocale);
