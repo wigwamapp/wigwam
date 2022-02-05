@@ -10,7 +10,6 @@ import {
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
-import { useSteps } from "lib/react-hooks/useSteps";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
@@ -24,6 +23,7 @@ import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
 import { hasSeedPhraseAtom, neuterExtendedKeyAtom } from "app/atoms";
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 
@@ -41,7 +41,7 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
     hasSeedPhrase && neuterExtendedKeyAtom
   );
 
-  const { stateRef, fallbackStep, navigateToStep } = useSteps();
+  const { stateRef, reset, navigateToStep } = useSteps();
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
 
   const neuterExtendedKey = useMemo(() => {
@@ -62,9 +62,9 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
 
   useEffect(() => {
     if (!neuterExtendedKey) {
-      navigateToStep(fallbackStep);
+      reset();
     }
-  }, [neuterExtendedKey, navigateToStep, fallbackStep]);
+  }, [neuterExtendedKey, reset]);
 
   const [network] = useState(INITIAL_NETWORK);
   const provider = useMemo(

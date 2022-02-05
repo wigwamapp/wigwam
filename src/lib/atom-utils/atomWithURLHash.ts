@@ -1,4 +1,5 @@
 import { atom, SetStateAction } from "jotai";
+import { RESET } from "jotai/utils";
 import { listen, changeState } from "lib/history";
 import {
   serialize,
@@ -20,23 +21,24 @@ export function atomWithURLHash<T>(key: string, initialValue: T) {
       listen(() => setAtom(getValue(getHashSearchParams()))),
   });
 
+  type Update<T> = typeof RESET | SetStateAction<T>;
+
   const urlHashAtom = atom(
     (get) => get(readAtom),
-    (
-      _get,
-      _set,
-      [update, action]: [SetStateAction<T>] | [SetStateAction<T>, "replace"]
-    ) => {
+    (_get, _set, [update, action]: [Update<T>] | [Update<T>, "replace"]) => {
       const searchParams = getHashSearchParams();
       const newValue =
         typeof update === "function"
           ? (update as (prev: T) => T)(getValue(searchParams))
           : update;
 
-      searchParams.set(key, serialize(newValue));
-      const hash = searchParams.toString();
+      if (newValue === RESET) {
+        searchParams.delete(key);
+      } else {
+        searchParams.set(key, serialize(newValue));
+      }
 
-      changeState(toURL(hash), action === "replace");
+      changeState(toURL(searchParams.toString()), action === "replace");
     }
   );
 

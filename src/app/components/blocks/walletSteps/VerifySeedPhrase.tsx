@@ -1,5 +1,4 @@
 import { memo, useCallback, useEffect, useRef } from "react";
-import { useSteps } from "lib/react-hooks/useSteps";
 import { ethers } from "ethers";
 import { fromProtectedString } from "lib/crypto-utils";
 
@@ -8,6 +7,7 @@ import { addSeedPhrase } from "core/client";
 
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 
 type VerifySeedPhraseProps = {
@@ -15,14 +15,14 @@ type VerifySeedPhraseProps = {
 };
 
 const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
-  const { stateRef, fallbackStep, navigateToStep } = useSteps();
+  const { stateRef, reset, navigateToStep } = useSteps();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   useEffect(() => {
     if (!seedPhrase) {
-      navigateToStep(fallbackStep);
+      reset();
     }
-  }, [seedPhrase, navigateToStep, fallbackStep]);
+  }, [seedPhrase, reset]);
 
   const fieldRef = useRef<HTMLTextAreaElement>(null);
 

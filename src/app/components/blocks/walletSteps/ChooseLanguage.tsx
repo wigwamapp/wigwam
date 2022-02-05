@@ -1,11 +1,11 @@
 import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai/utils";
 
-import { useSteps } from "lib/react-hooks/useSteps";
 import { setLocale } from "lib/ext/react";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 import { currentLocaleAtom } from "app/atoms";
 

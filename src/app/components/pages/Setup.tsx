@@ -1,6 +1,6 @@
 import { FC, Suspense } from "react";
 
-import { AllSteps, StepsProvider } from "lib/react-hooks/useSteps";
+import { AllSteps, StepsProvider } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 
 import BoardingPageLayout from "../layouts/BoardingPageLayout";

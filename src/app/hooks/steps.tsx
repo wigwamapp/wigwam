@@ -9,8 +9,10 @@ import {
   useLayoutEffect,
 } from "react";
 import { useAtom } from "jotai";
+import { RESET } from "jotai/utils";
 import { getLastAction, HistoryAction } from "lib/history";
-import { atomWithURLHash } from "lib/atom-utils";
+
+import { getStepsAtom } from "app/atoms";
 
 export type AllSteps<T = string> = [T, () => ReactNode][];
 
@@ -18,6 +20,7 @@ export type StepsContext = {
   fallbackStep: string;
   stateRef: React.MutableRefObject<Record<string, any>>;
   navigateToStep: (stepId: string) => void;
+  reset: () => void;
 };
 
 export const stepsContext = createContext<StepsContext | null>(null);
@@ -37,12 +40,7 @@ export const StepsProvider: FC<StepsProviderProps> = ({
   rootElement = window,
   children,
 }) => {
-  const stepsAtom = useMemo(
-    () => atomWithURLHash(`${namespace}_step`, fallback),
-    [namespace, fallback]
-  );
-
-  const [step, setStep] = useAtom(stepsAtom);
+  const [step, setStep] = useAtom(getStepsAtom([namespace, fallback]));
 
   // Scroll to top after new step pushed.
   const lastHistoryAction = getLastAction();
@@ -67,13 +65,19 @@ export const StepsProvider: FC<StepsProviderProps> = ({
     [setStep]
   );
 
+  const reset = useCallback(() => {
+    stateRef.current = {};
+    setStep([RESET, "replace"]);
+  }, [setStep]);
+
   const value = useMemo(
     () => ({
       fallbackStep: fallback,
       stateRef,
       navigateToStep,
+      reset,
     }),
-    [fallback, navigateToStep]
+    [fallback, navigateToStep, reset]
   );
 
   return (

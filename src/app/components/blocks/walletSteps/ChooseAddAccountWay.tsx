@@ -1,9 +1,9 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai/utils";
-import { useSteps } from "lib/react-hooks/useSteps";
 
 import { hasSeedPhraseAtom } from "app/atoms";
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 
 const ChooseAddAccountWay = memo(() => {

@@ -8,7 +8,6 @@ import {
   useEffect,
 } from "react";
 import classNames from "clsx";
-import { useSteps } from "lib/react-hooks/useSteps";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
 import type Transport from "@ledgerhq/hw-transport";
@@ -21,6 +20,7 @@ import { generatePreviewHDNodes } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 

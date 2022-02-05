@@ -1,14 +1,14 @@
 import { memo, useCallback, useEffect, useRef } from "react";
-import { useSteps } from "lib/react-hooks/useSteps";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
+import { useSteps } from "app/hooks/steps";
 import TextField from "app/components/elements/TextField";
 import Button from "app/components/elements/Button";
 
 const SetupPassword = memo(() => {
-  const { stateRef, fallbackStep, navigateToStep } = useSteps();
+  const { stateRef, reset } = useSteps();
 
   const addAccountsParams: AddAccountParams[] | undefined =
     stateRef.current.addAccountsParams;
@@ -16,9 +16,9 @@ const SetupPassword = memo(() => {
 
   useEffect(() => {
     if (!addAccountsParams) {
-      navigateToStep(fallbackStep);
+      reset();
     }
-  }, [addAccountsParams, navigateToStep, fallbackStep]);
+  }, [addAccountsParams, reset]);
 
   const passwordFieldRef = useRef<HTMLInputElement>(null);
 
@@ -29,10 +29,12 @@ const SetupPassword = memo(() => {
       if (!addAccountsParams || !password) return;
 
       await setupWallet(password, addAccountsParams, seedPhrase);
+
+      reset();
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [addAccountsParams, seedPhrase]);
+  }, [addAccountsParams, seedPhrase, reset]);
 
   if (!addAccountsParams) {
     return null;

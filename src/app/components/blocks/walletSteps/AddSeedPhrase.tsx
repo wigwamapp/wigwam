@@ -3,7 +3,6 @@ import { useAtomValue } from "jotai/utils";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-import { useSteps } from "lib/react-hooks/useSteps";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
@@ -15,6 +14,7 @@ import SelectLanguage from "app/components/blocks/SelectLanguage";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { currentLocaleAtom } from "app/atoms";
+import { useSteps } from "app/hooks/steps";
 import { WalletStep } from "app/defaults";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
