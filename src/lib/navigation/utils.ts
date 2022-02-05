@@ -32,9 +32,13 @@ export function isModifiedEvent(event: MouseEvent) {
 }
 
 export function serialize<T>(val: T) {
-  return JSON.stringify(val);
+  return typeof val === "string" ? val : JSON.stringify(val);
 }
 
 export function deserialize<T = any>(str: string): T {
-  return JSON.parse(str);
+  try {
+    return JSON.parse(str);
+  } catch {
+    return str as any;
+  }
 }
