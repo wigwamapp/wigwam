@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { useAtomValue } from "jotai/utils";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { lazyNetworkAtom } from "app/atoms";
 
@@ -17,15 +17,9 @@ export function useLazyNetwork(): INetwork | undefined;
 export function useLazyNetwork(fallback: INetwork): INetwork;
 export function useLazyNetwork(fallback?: INetwork) {
   const network = useNetwork();
-  const prevNetworkRef = useRef(network);
+  const prevNetwork = usePrevious(network);
 
-  useEffect(() => {
-    if (network) {
-      prevNetworkRef.current = network;
-    }
-  }, [network]);
-
-  return network ?? prevNetworkRef.current ?? fallback;
+  return network ?? prevNetwork ?? fallback;
 }
 
 export function useNativeCurrency() {

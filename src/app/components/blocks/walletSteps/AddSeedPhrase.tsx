@@ -2,8 +2,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai/utils";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
-import { useCopyToClipboard } from "lib/use-copy-to-clipboard";
-import { useSteps } from "lib/use-steps";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useSteps } from "lib/react-hooks/useSteps";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";

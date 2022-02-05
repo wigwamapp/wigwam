@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai/utils";
 
-import { useSteps } from "lib/use-steps";
+import { useSteps } from "lib/react-hooks/useSteps";
 import { setLocale } from "lib/ext/react";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";

@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai/utils";
-import { useSteps } from "lib/use-steps";
+import { useSteps } from "lib/react-hooks/useSteps";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";

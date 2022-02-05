@@ -10,7 +10,7 @@ import {
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
-import { useSteps } from "lib/use-steps";
+import { useSteps } from "lib/react-hooks/useSteps";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";

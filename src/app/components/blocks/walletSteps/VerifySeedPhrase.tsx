@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef } from "react";
-import { useSteps } from "lib/use-steps";
+import { useSteps } from "lib/react-hooks/useSteps";
 import { ethers } from "ethers";
 import { fromProtectedString } from "lib/crypto-utils";
 

@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import classNames from "clsx";
-import { useSteps } from "lib/use-steps";
+import { useSteps } from "lib/react-hooks/useSteps";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
 import type Transport from "@ledgerhq/hw-transport";
