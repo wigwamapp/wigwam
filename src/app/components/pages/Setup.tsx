@@ -1,6 +1,7 @@
 import { FC, Suspense } from "react";
 
 import { AllSteps, StepsProvider } from "app/hooks/steps";
+import { welcomeStepAtom } from "app/atoms";
 import { WalletStep } from "app/defaults";
 
 import BoardingPageLayout from "../layouts/BoardingPageLayout";
@@ -31,11 +32,7 @@ const STEPS: AllSteps<WalletStep> = [
 ];
 
 const Setup: FC = () => (
-  <StepsProvider
-    namespace="setup"
-    steps={STEPS}
-    fallback={WalletStep.ChooseLanguage}
-  >
+  <StepsProvider atom={welcomeStepAtom} steps={STEPS}>
     {({ children }) => (
       <BoardingPageLayout title={null}>
         <div className="mb-24">

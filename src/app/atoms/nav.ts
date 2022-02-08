@@ -1,13 +1,15 @@
-import { atomFamily } from "jotai/utils";
-import { dequal } from "dequal";
 import { atomWithURLHash } from "lib/atom-utils";
 
-import { Page } from "app/defaults";
+import { Page, WalletStep } from "app/defaults";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
 
-export const getStepsAtom = atomFamily(
-  ([namespace, fallback]: string[]) =>
-    atomWithURLHash(`${namespace}_step`, fallback),
-  dequal
+export const welcomeStepAtom = atomWithURLHash(
+  "welcome_step",
+  WalletStep.ChooseLanguage
+);
+
+export const addAccountStepAtom = atomWithURLHash(
+  "addacc_step",
+  WalletStep.ChooseLanguage
 );

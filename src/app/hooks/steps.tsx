@@ -1,5 +1,4 @@
 import {
-  FC,
   createContext,
   useMemo,
   useContext,
@@ -7,17 +6,16 @@ import {
   useCallback,
   ReactNode,
   useLayoutEffect,
+  useEffect,
 } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { getLastAction, HistoryAction } from "lib/history";
+import { URLHashAtom } from "lib/atom-utils";
 
-import { getStepsAtom } from "app/atoms";
-
-export type AllSteps<T = string> = [T, () => ReactNode][];
+export type AllSteps<T> = [T, () => ReactNode][];
 
 export type StepsContext = {
-  fallbackStep: string;
   stateRef: React.MutableRefObject<Record<string, any>>;
   navigateToStep: (stepId: string) => void;
   reset: () => void;
@@ -25,22 +23,22 @@ export type StepsContext = {
 
 export const stepsContext = createContext<StepsContext | null>(null);
 
-export type StepsProviderProps = {
-  namespace: string;
-  steps: AllSteps;
-  fallback: string;
-  rootElement?: HTMLElement;
-  children?: (props: { children: ReactNode; step: string }) => ReactNode;
+export type StepsProviderProps<T> = {
+  atom: URLHashAtom<T>;
+  steps: AllSteps<T>;
+  resetOnExit?: boolean;
+  rootElement?: HTMLElement | Window;
+  children?: (props: { children: ReactNode; step: T }) => ReactNode;
 };
 
-export const StepsProvider: FC<StepsProviderProps> = ({
-  namespace,
+export const StepsProvider = <T,>({
+  atom,
   steps,
-  fallback,
+  resetOnExit = true,
   rootElement = window,
   children,
-}) => {
-  const [step, setStep] = useAtom(getStepsAtom([namespace, fallback]));
+}: StepsProviderProps<T>) => {
+  const [step, setStep] = useAtom(atom);
 
   // Scroll to top after new step pushed.
   const lastHistoryAction = getLastAction();
@@ -51,33 +49,34 @@ export const StepsProvider: FC<StepsProviderProps> = ({
   }, [rootElement, step, lastHistoryAction]);
 
   const stepsObj = useMemo(() => Object.fromEntries(steps), [steps]);
-  const stepNode = useMemo(() => {
+  const stepNode = useMemo<ReactNode>(() => {
     const node = stepsObj[step]();
-    return children ? children({ children: node, step }) : node;
+    return children ? children({ children: node, step: step as any }) : node;
   }, [stepsObj, step, children]);
 
   const stateRef = useRef<Record<string, any>>({});
 
   const navigateToStep = useCallback(
     (toSet: string, replace = false) => {
-      setStep([toSet, replace && "replace"]);
+      setStep([toSet as any, replace && "replace"]);
     },
     [setStep]
   );
 
   const reset = useCallback(() => {
     stateRef.current = {};
-    setStep([RESET, "replace"]);
+    setTimeout(() => setStep([RESET, "replace"]));
   }, [setStep]);
 
-  const value = useMemo(
+  useEffect(() => (resetOnExit ? reset : undefined), [resetOnExit, reset]);
+
+  const value = useMemo<StepsContext>(
     () => ({
-      fallbackStep: fallback,
       stateRef,
       navigateToStep,
       reset,
     }),
-    [fallback, navigateToStep, reset]
+    [navigateToStep, reset]
   );
 
   return (

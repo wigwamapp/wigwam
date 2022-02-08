@@ -4,19 +4,7 @@ export enum HistoryAction {
   Replace = "replacestate",
 }
 
-const ACTIONS = Object.values(HistoryAction);
-
-export function listen(listener: (action: HistoryAction) => void) {
-  const refs: [HistoryAction, () => void][] = ACTIONS.map((action) => [
-    action,
-    () => listener(action),
-  ]);
-
-  for (const [action, cb] of refs) window.addEventListener(action, cb);
-  return () => {
-    for (const [action, cb] of refs) window.removeEventListener(action, cb);
-  };
-}
+export const listen = init();
 
 export function changeState(url: string, replace = false, state: any = null) {
   const title = ""; // Deprecated stuff
@@ -48,12 +36,39 @@ export function resetPosition() {
   sessionStorage.historyPosition = "0";
 }
 
-patchMethod("pushState", HistoryAction.Push);
-patchMethod("replaceState", HistoryAction.Replace);
+function init() {
+  // Patch default history methods to listen
+  patchMethod("pushState", HistoryAction.Push);
+  patchMethod("replaceState", HistoryAction.Replace);
 
-listen(patchHistory);
+  // Listen history changes
+  type Listener = (action: HistoryAction) => void;
+  const listeners = new Set<Listener>();
 
-function patchHistory(action: HistoryAction) {
+  for (const action of Object.values(HistoryAction)) {
+    window.addEventListener(action, () => {
+      for (const callback of listeners) {
+        try {
+          callback(action);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    });
+  }
+
+  const listen = (callback: Listener) => {
+    listeners.add(callback);
+    return () => listeners.delete(callback);
+  };
+
+  // Persist last action & position
+  listen(persist);
+
+  return listen;
+}
+
+function persist(action: HistoryAction) {
   const position = Math.max(
     0,
     getPosition() +
