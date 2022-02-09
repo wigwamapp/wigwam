@@ -1,5 +1,12 @@
-import { FC, AnchorHTMLAttributes, useMemo, useCallback } from "react";
-import { changeState } from "lib/history";
+import {
+  FC,
+  AnchorHTMLAttributes,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
+import useForceUpdate from "use-force-update";
+import { changeState, listen } from "lib/history";
 
 import { Destination } from "./types";
 import { isModifiedEvent, toHash, toURL } from "./utils";
@@ -7,18 +14,37 @@ import { isModifiedEvent, toHash, toURL } from "./utils";
 export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   to: Destination;
   replace?: boolean;
+  merge?: boolean;
 };
 
 const Link: FC<LinkProps> = ({
   to,
-  replace = false,
+  replace,
+  merge,
   children,
   onClick,
   target,
   ...rest
 }) => {
-  const url = useMemo(() => toURL(toHash(to)), [to]);
+  const forceUpdate = useForceUpdate();
 
+  const urlRef = useRef<string | undefined>();
+  const generateUrl = useCallback(() => toURL(toHash(to, merge)), [to, merge]);
+
+  if (!urlRef.current) {
+    urlRef.current = generateUrl();
+  }
+
+  useEffect(
+    () =>
+      listen(() => {
+        urlRef.current = generateUrl();
+        forceUpdate();
+      }),
+    [forceUpdate, generateUrl]
+  );
+
+  const url = urlRef.current;
   const navigate = useCallback(() => changeState(url, replace), [url, replace]);
 
   const handleClick = useCallback(

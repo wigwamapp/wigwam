@@ -31,5 +31,6 @@
   "seedPhraseNotEstablished": "Seed phrase has not yet been established",
   "wallet": "Wallet",
   "walletLocked": "Wallet locked",
-  "welcomeTo": "Welcome to {{target}}"
+  "welcomeTo": "Welcome to {{target}}",
+  "letsBegin": "Let's begin"
 }

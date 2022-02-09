@@ -6,8 +6,12 @@ import { setupWallet } from "core/client";
 import { useSteps } from "app/hooks/steps";
 import TextField from "app/components/elements/TextField";
 import Button from "app/components/elements/Button";
+import { useUpdateAtom } from "jotai/utils";
+import { addAccountModalAtom } from "app/atoms";
 
 const SetupPassword = memo(() => {
+  const setAccModalOpened = useUpdateAtom(addAccountModalAtom);
+
   const { stateRef, reset } = useSteps();
 
   const addAccountsParams: AddAccountParams[] | undefined =
@@ -30,11 +34,11 @@ const SetupPassword = memo(() => {
 
       await setupWallet(password, addAccountsParams, seedPhrase);
 
-      reset();
+      setAccModalOpened([false]);
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [addAccountsParams, seedPhrase, reset]);
+  }, [addAccountsParams, seedPhrase, setAccModalOpened]);
 
   if (!addAccountsParams) {
     return null;

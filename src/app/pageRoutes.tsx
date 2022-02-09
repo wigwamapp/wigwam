@@ -9,7 +9,6 @@ import Profiles from "./components/pages/Profiles";
 import Unlock from "./components/pages/Unlock";
 import Welcome from "./components/pages/Welcome";
 import Main from "./components/pages/Main";
-import Setup from "./components/pages/Setup";
 
 export type MatchPageParams = {
   page: Page;
@@ -37,13 +36,6 @@ export function matchPage(params: MatchPageParams) {
           walletStatus: WalletStatus.Welcome,
         },
         () => <Welcome />
-      )
-      .with(
-        {
-          page: Page.Setup,
-          walletStatus: WalletStatus.Welcome,
-        },
-        () => <Setup />
       )
       // Only ready below
       .with({ walletStatus: not(WalletStatus.Unlocked) }, () => (

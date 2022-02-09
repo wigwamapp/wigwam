@@ -1,6 +1,6 @@
 import { Destination } from "./types";
 
-export function toHash(dest: Destination) {
+export function toHash(dest: Destination, merge?: boolean) {
   dest =
     typeof dest === "function"
       ? dest(
@@ -13,9 +13,13 @@ export function toHash(dest: Destination) {
         )
       : dest;
 
-  return new URLSearchParams(
-    Object.entries(dest).map(([key, value]) => [key, serialize(value)])
-  ).toString();
+  const usp = merge ? getHashSearchParams() : new URLSearchParams();
+
+  for (const [key, value] of Object.entries(dest)) {
+    usp.set(key, serialize(value));
+  }
+
+  return usp.toString();
 }
 
 export function toURL(hash: string) {

@@ -3,14 +3,17 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai/utils";
 
 import { hasSeedPhraseAtom } from "app/atoms";
-import { useSteps } from "app/hooks/steps";
-import { WalletStep } from "app/defaults";
+import { useSteps, StepsContext } from "app/hooks/steps";
+import { AddAccountStep } from "app/defaults";
 
 const ChooseAddAccountWay = memo(() => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
 
-  const { navigateToStep } = useSteps();
-  const sections = useMemo(() => getSections(hasSeedPhrase), [hasSeedPhrase]);
+  const stepsCtx = useSteps();
+  const sections = useMemo(
+    () => getWays(hasSeedPhrase, stepsCtx),
+    [hasSeedPhrase, stepsCtx]
+  );
 
   return (
     <div className="mb-8 w-full mx-auto max-w-md flex flex-col">
@@ -34,8 +37,8 @@ const ChooseAddAccountWay = memo(() => {
           )}
 
           <div className={classNames("-mx-4", "flex flex-wrap items-stretch")}>
-            {section.tiles.map(({ toStep, title }, i) => (
-              <div key={`${toStep}_${i}`} className="p-4">
+            {section.tiles.map(({ title, action }, i) => (
+              <div key={i} className="p-4">
                 <button
                   className={classNames(
                     "p-4",
@@ -44,7 +47,7 @@ const ChooseAddAccountWay = memo(() => {
                     "border-white hover:bg-white hover:bg-opacity-5",
                     "text-lg font-semibold"
                   )}
-                  onClick={() => navigateToStep(toStep)}
+                  onClick={() => action()}
                 >
                   {title}
                 </button>
@@ -59,7 +62,10 @@ const ChooseAddAccountWay = memo(() => {
 
 export default ChooseAddAccountWay;
 
-const getSections = (hasSeedPhrase: boolean) => [
+const getWays = (
+  hasSeedPhrase: boolean,
+  { stateRef, navigateToStep }: StepsContext
+) => [
   {
     type: "seed_phrase",
     title: "From Seed Phrase",
@@ -70,16 +76,27 @@ const getSections = (hasSeedPhrase: boolean) => [
     tiles: hasSeedPhrase
       ? [
           {
-            toStep: WalletStep.AddHDAccounts,
             title: "Add wallet",
+            action: () => {
+              alert("Not implemented");
+            },
           },
         ]
       : [
           {
-            toStep: WalletStep.CreateSeedPhrase,
             title: "Create new",
+            action: () => {
+              stateRef.current.addSeedPhraseType = "create";
+              navigateToStep(AddAccountStep.AddSeedPhrase);
+            },
           },
-          { toStep: WalletStep.ImportSeedPhrase, title: "Import existing" },
+          {
+            title: "Import existing",
+            action: () => {
+              stateRef.current.addSeedPhraseType = "import";
+              navigateToStep(AddAccountStep.AddSeedPhrase);
+            },
+          },
         ],
   },
   {
@@ -91,8 +108,10 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        toStep: WalletStep.AddLedgerAccounts,
         title: "Ledger",
+        action: () => {
+          alert("Not implemented");
+        },
       },
     ],
   },
@@ -105,25 +124,22 @@ const getSections = (hasSeedPhrase: boolean) => [
     },
     tiles: [
       {
-        toStep: WalletStep.AddOpenLoginAccount,
-        stepsState: {
-          socialProvider: "twitter",
-        },
         title: "Twitter",
+        action: () => {
+          alert("Not implemented");
+        },
       },
       {
-        toStep: WalletStep.AddOpenLoginAccount,
-        stepsState: {
-          socialProvider: "google",
-        },
         title: "Google",
+        action: () => {
+          alert("Not implemented");
+        },
       },
       {
-        toStep: WalletStep.AddOpenLoginAccount,
-        stepsState: {
-          socialProvider: "facebook",
-        },
         title: "Facebook",
+        action: () => {
+          alert("Not implemented");
+        },
       },
     ],
   },
@@ -132,8 +148,8 @@ const getSections = (hasSeedPhrase: boolean) => [
     title: "Advanced",
     tiles: [
       {
-        toStep: WalletStep.AddByPrivateKeyAccount,
-        title: "By Private key",
+        title: "Import Private key",
+        action: () => navigateToStep(AddAccountStep.AddPrivateKey),
       },
     ],
   },

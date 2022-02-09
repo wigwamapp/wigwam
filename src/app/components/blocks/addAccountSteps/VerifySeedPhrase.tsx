@@ -1,20 +1,27 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 import { ethers } from "ethers";
+import { useAtomValue } from "jotai/utils";
 import { fromProtectedString } from "lib/crypto-utils";
 
-import { AddHDAccountParams, AccountSource, SeedPharse } from "core/types";
+import {
+  AddHDAccountParams,
+  AccountSource,
+  SeedPharse,
+  WalletStatus,
+} from "core/types";
 import { addSeedPhrase } from "core/client";
 
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
 import { useSteps } from "app/hooks/steps";
-import { WalletStep } from "app/defaults";
+import { AddAccountStep } from "app/defaults";
+import { walletStatusAtom } from "app/atoms";
 
-type VerifySeedPhraseProps = {
-  initialSetup?: boolean;
-};
+const VerifySeedPhrase = memo(() => {
+  const walletStatus = useAtomValue(walletStatusAtom);
 
-const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
+  const initialSetup = walletStatus === WalletStatus.Welcome;
+
   const { stateRef, reset, navigateToStep } = useSteps();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
@@ -34,20 +41,21 @@ const VerifySeedPhrase = memo<VerifySeedPhraseProps>(({ initialSetup }) => {
         throw new Error("Invalid");
       }
 
-      if (!initialSetup) {
-        await addSeedPhrase(seedPhrase);
-        navigateToStep(WalletStep.AddHDAccounts);
-      } else {
-        const addAccountsParams: AddHDAccountParams[] = [
-          {
-            source: AccountSource.SeedPhrase,
-            name: "{{wallet}} 1",
-            derivationPath: ethers.utils.defaultPath,
-          },
-        ];
+      const addAccountsParams: AddHDAccountParams[] = [
+        {
+          source: AccountSource.SeedPhrase,
+          name: "{{wallet}} 1",
+          derivationPath: ethers.utils.defaultPath,
+        },
+      ];
 
-        Object.assign(stateRef.current, { addAccountsParams });
-        navigateToStep(WalletStep.SetupPassword);
+      Object.assign(stateRef.current, { addAccountsParams });
+
+      if (initialSetup) {
+        navigateToStep(AddAccountStep.SetupPassword);
+      } else {
+        await addSeedPhrase(seedPhrase);
+        navigateToStep(AddAccountStep.VerifyToAdd);
       }
     } catch (err: any) {
       alert(err?.message);

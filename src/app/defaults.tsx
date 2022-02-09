@@ -18,16 +18,19 @@ export enum Page {
   Settings = "settings",
 }
 
-export enum WalletStep {
+export enum WelcomeStep {
+  Hello = "hello",
   ChooseLanguage = "choose-language",
-  ChooseAddAccountWay = "choose-add-account-way",
-  CreateSeedPhrase = "create-seed-phrase",
-  ImportSeedPhrase = "import-seed-phrase",
+  LetsBegin = "lets-begin",
+}
+
+export enum AddAccountStep {
+  ChooseWay = "choose-way",
+  AddSeedPhrase = "add-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
-  AddHDAccounts = "add-hd-accounts",
-  AddByPrivateKeyAccount = "add-by-private-key-account",
-  AddLedgerAccounts = "add-ledger-accounts",
-  AddOpenLoginAccount = "add-open-login-account",
+  SelectDerivation = "select-derivation",
+  AddPrivateKey = "add-private-key",
+  VerifyToAdd = "verify-to-add",
   SetupPassword = "setup-password",
 }
 

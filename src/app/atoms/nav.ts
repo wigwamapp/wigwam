@@ -1,15 +1,17 @@
 import { atomWithURLHash } from "lib/atom-utils";
 
-import { Page, WalletStep } from "app/defaults";
+import { Page, WelcomeStep, AddAccountStep } from "app/defaults";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
 
 export const welcomeStepAtom = atomWithURLHash(
-  "welcome_step",
-  WalletStep.ChooseLanguage
+  "welcomeStep",
+  WelcomeStep.Hello
 );
 
+export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
+
 export const addAccountStepAtom = atomWithURLHash(
-  "addacc_step",
-  WalletStep.ChooseLanguage
+  "addAccStep",
+  AddAccountStep.ChooseWay
 );

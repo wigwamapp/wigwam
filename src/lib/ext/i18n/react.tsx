@@ -51,9 +51,12 @@ function tReact(messageName: string, substitutions?: ReactSubstitutions) {
     <>
       {tmp.split(TMP_SEPARATOR).map((partI, i) => (
         <Fragment key={`i_${i}`}>
+          {i > 0 && subList[i]}
+
           {partI.split("\n").map((partJ, j) => (
             <Fragment key={`j_${j}`}>
               {j > 0 && <br />}
+
               {partJ.includes("<b>")
                 ? partJ
                     .split(BOLD_PATTERN)
@@ -65,7 +68,6 @@ function tReact(messageName: string, substitutions?: ReactSubstitutions) {
                 : partJ}
             </Fragment>
           ))}
-          {subList[i]}
         </Fragment>
       ))}
     </>

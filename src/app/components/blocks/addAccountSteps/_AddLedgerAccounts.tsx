@@ -21,7 +21,7 @@ import { addAccounts, ClientProvider } from "core/client";
 import { INetwork } from "core/repo";
 
 import { useSteps } from "app/hooks/steps";
-import { WalletStep } from "app/defaults";
+import { AddAccountStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 
 import ContinueButton from "../ContinueButton";
@@ -124,7 +124,7 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
 
       if (initialSetup) {
         Object.assign(stateRef.current, { addAccountsParams });
-        navigateToStep(WalletStep.SetupPassword);
+        navigateToStep(AddAccountStep.SetupPassword);
       } else {
         await addAccounts(addAccountsParams);
       }

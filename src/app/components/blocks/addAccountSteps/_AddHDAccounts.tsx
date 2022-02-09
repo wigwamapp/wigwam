@@ -24,7 +24,7 @@ import { INetwork } from "core/repo";
 
 import { hasSeedPhraseAtom, neuterExtendedKeyAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
-import { WalletStep } from "app/defaults";
+import { AddAccountStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
 
 import ContinueButton from "../ContinueButton";
@@ -118,7 +118,7 @@ const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
 
       if (initialSetup) {
         Object.assign(stateRef.current, { addAccountsParams });
-        navigateToStep(WalletStep.SetupPassword);
+        navigateToStep(AddAccountStep.SetupPassword);
       } else {
         await addAccounts(addAccountsParams);
       }

@@ -57,7 +57,7 @@ function init() {
     });
   }
 
-  const listen = (callback: Listener) => {
+  const listen = (callback: Listener): (() => void) => {
     listeners.add(callback);
     return () => listeners.delete(callback);
   };
