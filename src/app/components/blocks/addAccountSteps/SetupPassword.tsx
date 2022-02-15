@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useRef } from "react";
+import { useSetAtom } from "jotai";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
@@ -6,11 +7,10 @@ import { setupWallet } from "core/client";
 import { useSteps } from "app/hooks/steps";
 import TextField from "app/components/elements/TextField";
 import Button from "app/components/elements/Button";
-import { useUpdateAtom } from "jotai/utils";
 import { addAccountModalAtom } from "app/atoms";
 
 const SetupPassword = memo(() => {
-  const setAccModalOpened = useUpdateAtom(addAccountModalAtom);
+  const setAccModalOpened = useSetAtom(addAccountModalAtom);
 
   const { stateRef, reset } = useSteps();
 

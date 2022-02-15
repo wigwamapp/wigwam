@@ -1,6 +1,6 @@
 import { FC, Suspense } from "react";
-import { Provider as JotaiProvider } from "jotai";
-import { useAtomValue, waitForAll } from "jotai/utils";
+import { Provider as JotaiProvider, useAtomValue } from "jotai";
+import { waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
 import { fontsAtom, i18nAtom } from "app/atoms/boot";

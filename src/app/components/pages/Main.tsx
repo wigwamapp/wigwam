@@ -1,6 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { useAtomValue, useUpdateAtom, waitForAll } from "jotai/utils";
+import { useAtomValue, useSetAtom } from "jotai";
+import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 import classNamed from "lib/classnamed";
 import { TReplace } from "lib/ext/react";
@@ -142,7 +143,7 @@ const AccountsSelect: FC = () => {
     )
   );
 
-  const setAccountAddress = useUpdateAtom(accountAddressAtom);
+  const setAccountAddress = useSetAtom(accountAddressAtom);
 
   return (
     <div className="py-12">

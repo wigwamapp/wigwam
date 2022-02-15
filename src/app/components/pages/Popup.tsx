@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 
 import { lockWallet } from "core/client";
 

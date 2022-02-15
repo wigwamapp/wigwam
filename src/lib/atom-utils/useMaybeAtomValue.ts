@@ -1,5 +1,4 @@
-import { atom, Atom } from "jotai";
-import { useAtomValue } from "jotai/utils";
+import { atom, useAtomValue, Atom } from "jotai";
 
 const nilAtom = atom(null);
 

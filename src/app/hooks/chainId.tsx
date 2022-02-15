@@ -1,5 +1,5 @@
 import { FC, createContext, useContext } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 
 import { chainIdAtom } from "app/atoms";
 

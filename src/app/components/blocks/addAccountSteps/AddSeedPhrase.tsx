@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";

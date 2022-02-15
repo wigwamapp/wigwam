@@ -1,10 +1,10 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Page } from "app/defaults";
-import { useAtomValue } from "jotai/utils";
 import { profileStateAtom } from "app/atoms";
 
 const ProfileNav = memo(() => {

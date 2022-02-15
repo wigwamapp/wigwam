@@ -1,6 +1,6 @@
 import { FC, memo, useRef, useCallback, FormEventHandler } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
 import { isPopup } from "lib/ext/view";
 

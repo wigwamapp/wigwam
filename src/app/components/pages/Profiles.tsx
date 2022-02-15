@@ -1,5 +1,6 @@
 import { FC, memo, useCallback, useMemo, useState, useRef } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
 
 import { changeProfile, addProfile } from "lib/ext/profile";
 import { T, TReplace, useI18NUpdate, replaceT } from "lib/ext/i18n/react";
@@ -7,7 +8,6 @@ import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import DialogWrapper from "app/components/layouts/DialogWrapper";
 import AutoIcon from "app/components/elements/AutoIcon";
 import TextField from "app/components/elements/TextField";
-import { useAtomValue } from "jotai/utils";
 import { profileStateAtom } from "app/atoms";
 
 const Profiles: FC = () => {
