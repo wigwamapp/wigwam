@@ -10,16 +10,21 @@ import { toWordlistLang, validateSeedPhrase } from "core/common";
 import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
-import SelectLanguage from "app/components/blocks/SelectLanguage";
-import LongTextField from "app/components/elements/LongTextField";
-import Button from "app/components/elements/Button";
+import { AddAccountStep } from "app/defaults";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
-import { AddAccountStep } from "app/defaults";
+import LongTextField from "app/components/elements/LongTextField";
+import Button from "app/components/elements/Button";
+import Select from "app/components/elements/Select";
+import NewSelectLanguage from "app/components/blocks/NewSelectLanguage";
+import AddAccountHeader from "app/components/blocks/AddAccountHeader";
+import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
 );
+
+const WORDS_COUNT = [12, 15, 18, 21, 24];
 
 const AddSeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
@@ -43,6 +48,16 @@ const AddSeedPhrase = memo(() => {
     () => toWordlistLang(locale.code),
     [locale.code]
   );
+
+  const wordsCountList = useMemo(
+    () =>
+      WORDS_COUNT.map((count) => ({
+        key: count,
+        value: count.toString(),
+      })),
+    []
+  );
+  const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
 
   const [seedPhraseText, setSeedPhraseText] = useState<string>("");
 
@@ -97,42 +112,58 @@ const AddSeedPhrase = memo(() => {
   const { copy, copied } = useCopyToClipboard(fieldRef);
 
   return (
-    <div className="my-16">
-      <h1 className="mb-16 text-3xl text-white text-center">
-        {importExisting ? "Import Seed Phrase" : "Add new Seed Phrase"}
-      </h1>
+    <>
+      <div className="my-16">
+        <AddAccountHeader className="mb-8">
+          {importExisting
+            ? "Import existing Secret Phrase"
+            : "Create new Secret Phrase"}
+        </AddAccountHeader>
 
-      <div className="flex flex-col items-center justify-center">
-        <SelectLanguage
-          selected={locale}
-          items={SUPPORTED_LOCALES}
-          onSelect={setLocale}
-        />
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex">
+            <NewSelectLanguage
+              selected={locale}
+              items={SUPPORTED_LOCALES}
+              onSelect={setLocale}
+              className="mr-6"
+            />
+            <Select
+              items={wordsCountList}
+              currentItem={wordsCount}
+              setItem={setWordsCount}
+              label="Words"
+              showSelected
+              className="!min-w-[8.375rem]"
+            />
+          </div>
 
-        <div className="my-16 flex flex-col items-center justify-center">
-          {importExisting || seedPhraseText ? (
-            <>
-              <div>
-                <div className="flex items-center text-white mb-2 text-lg">
-                  <span>Seed Phrase</span>
-                  <div className="flex-1" />
-                  <button onClick={copy}>{copied ? "Copied" : "Copy"}</button>
+          <div className="my-16 flex flex-col items-center justify-center">
+            {importExisting || seedPhraseText ? (
+              <>
+                <div>
+                  <div className="flex items-center text-white mb-2 text-lg">
+                    <span>Seed Phrase</span>
+                    <div className="flex-1" />
+                    <button onClick={copy}>{copied ? "Copied" : "Copy"}</button>
+                  </div>
+                  <LongTextField
+                    ref={fieldRef}
+                    value={seedPhraseText}
+                    className="mb-16 w-96 h-36 resize-none"
+                    onChange={(evt) => setSeedPhraseText(evt.target.value)}
+                  />
                 </div>
-                <LongTextField
-                  ref={fieldRef}
-                  value={seedPhraseText}
-                  className="mb-16 w-96 h-36 resize-none"
-                  onChange={(evt) => setSeedPhraseText(evt.target.value)}
-                />
-              </div>
-              <Button onClick={handleContinue}>Continue</Button>
-            </>
-          ) : (
-            <Button onClick={() => generateNew()}>Create</Button>
-          )}
+                <Button onClick={handleContinue}>Continue</Button>
+              </>
+            ) : (
+              <Button onClick={() => generateNew()}>Create</Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <AddAccountContinueButton onContinue={handleContinue} />
+    </>
   );
 });
 

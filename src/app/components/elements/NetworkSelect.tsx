@@ -54,6 +54,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
       setItem={(network) => setChainId(network.key)}
       onSearch={(value) => setSearchValue(value === "" ? null : value)}
       className={className}
+      scrollAreaClassName="h-64"
     />
   );
 };

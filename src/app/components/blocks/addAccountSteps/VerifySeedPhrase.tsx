@@ -11,11 +11,11 @@ import {
 } from "core/types";
 import { addSeedPhrase } from "core/client";
 
-import LongTextField from "app/components/elements/LongTextField";
-import Button from "app/components/elements/Button";
-import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
 import { walletStatusAtom } from "app/atoms";
+import { useSteps } from "app/hooks/steps";
+import LongTextField from "app/components/elements/LongTextField";
+import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
@@ -67,26 +67,28 @@ const VerifySeedPhrase = memo(() => {
   }
 
   return (
-    <div className="my-16">
-      <h1 className="mb-16 text-3xl text-white text-center">
-        {"Verify Seed Phrase"}
-      </h1>
+    <>
+      <div className="my-16">
+        <h1 className="mb-16 text-3xl text-white text-center">
+          {"Verify Seed Phrase"}
+        </h1>
 
-      <div className="flex flex-col items-center justify-center">
-        <div className="mb-16 flex flex-col items-center justify-center">
-          <>
-            <div>
-              <div className="text-white mb-2 text-lg">Seed Phrase</div>
-              <LongTextField
-                ref={fieldRef}
-                className="mb-16 w-96 h-36 resize-none"
-              />
-            </div>
-            <Button onClick={handleContinue}>Continue</Button>
-          </>
+        <div className="flex flex-col items-center justify-center">
+          <div className="mb-16 flex flex-col items-center justify-center">
+            <>
+              <div>
+                <div className="text-white mb-2 text-lg">Seed Phrase</div>
+                <LongTextField
+                  ref={fieldRef}
+                  className="mb-16 w-96 h-36 resize-none"
+                />
+              </div>
+            </>
+          </div>
         </div>
       </div>
-    </div>
+      <AddAccountContinueButton onContinue={handleContinue} />
+    </>
   );
 });
 

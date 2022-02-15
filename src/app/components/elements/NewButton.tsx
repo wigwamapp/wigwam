@@ -3,7 +3,7 @@ import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
-  theme?: "primary" | "secondary" | "tertiary";
+  theme?: "primary" | "secondary" | "tertiary" | "clean";
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const NewButton: FC<NewButtonProps> = ({
@@ -13,7 +13,8 @@ const NewButton: FC<NewButtonProps> = ({
   ...rest
 }) => {
   const classNamesList = classNames(
-    "py-3 px-4 min-w-[10rem]",
+    "py-3 px-4",
+    theme !== "clean" && "min-w-[10rem]",
     "text-brand-light text-base font-bold",
     theme === "primary" && "bg-buttonaccent bg-opacity-90",
     theme === "secondary" && "bg-brand-main bg-opacity-10",
@@ -30,6 +31,7 @@ const NewButton: FC<NewButtonProps> = ({
       "focus:bg-brand-darklight focus:bg-opacity-100 focus:shadow-buttonsecondary",
       "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
     ],
+    theme === "clean" && "font-medium hover:opacity-70 focus:opacity-70",
     className
   );
 

@@ -1,16 +1,16 @@
 import { memo, Suspense } from "react";
 
-import { AllSteps, StepsProvider } from "app/hooks/steps";
-import { addAccountStepAtom } from "app/atoms";
 import { AddAccountStep } from "app/defaults";
+import { addAccountStepAtom } from "app/atoms";
+import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "../blocks/addAccountSteps/ChooseAddAccountWay";
-import AddSeedPhrase from "../blocks/addAccountSteps/AddSeedPhrase";
-import VerifySeedPhrase from "../blocks/addAccountSteps/VerifySeedPhrase";
-import SelectAccountDerivation from "../blocks/addAccountSteps/SelectAccountDerivation";
-import AddPrivateKey from "../blocks/addAccountSteps/AddPrivateKey";
-import VerifyAccountToAdd from "../blocks/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "../blocks/addAccountSteps/SetupPassword";
+import ChooseAddAccountWay from "app/components/blocks/addAccountSteps/ChooseAddAccountWay";
+import AddSeedPhrase from "app/components/blocks/addAccountSteps/AddSeedPhrase";
+import VerifySeedPhrase from "app/components/blocks/addAccountSteps/VerifySeedPhrase";
+import SelectAccountDerivation from "app/components/blocks/addAccountSteps/SelectAccountDerivation";
+import AddPrivateKey from "app/components/blocks/addAccountSteps/AddPrivateKey";
+import VerifyAccountToAdd from "app/components/blocks/addAccountSteps/VerifyAccountToAdd";
+import SetupPassword from "app/components/blocks/addAccountSteps/SetupPassword";
 
 const STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
@@ -26,8 +26,8 @@ const AddAccountSteps = memo(() => (
   <StepsProvider atom={addAccountStepAtom} steps={STEPS}>
     {({ children }) => (
       <div className="mb-24">
-        <Suspense fallback={null}>
-          <div className="mt-12">{children}</div>
+        <Suspense fallback={<>Loading...</>}>
+          <div className="mt-24">{children}</div>
         </Suspense>
       </div>
     )}
