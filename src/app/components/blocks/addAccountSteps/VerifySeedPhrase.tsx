@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { fromProtectedString } from "lib/crypto-utils";
@@ -14,8 +14,9 @@ import { addSeedPhrase } from "core/client";
 import { AddAccountStep } from "app/defaults";
 import { walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
-import LongTextField from "app/components/elements/LongTextField";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
+import AddAccountHeader from "app/components/blocks/AddAccountHeader";
+import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
@@ -24,6 +25,8 @@ const VerifySeedPhrase = memo(() => {
 
   const { stateRef, reset, navigateToStep } = useSteps();
 
+  const [inputSeedPhrase, setInputSeedPhrase] = useState("");
+
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   useEffect(() => {
     if (!seedPhrase) {
@@ -31,13 +34,11 @@ const VerifySeedPhrase = memo(() => {
     }
   }, [seedPhrase, reset]);
 
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
-
   const handleContinue = useCallback(async () => {
     try {
       if (!seedPhrase) return;
 
-      if (fieldRef.current?.value !== fromProtectedString(seedPhrase.phrase)) {
+      if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) {
         throw new Error("Invalid");
       }
 
@@ -60,7 +61,7 @@ const VerifySeedPhrase = memo(() => {
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [seedPhrase, initialSetup, stateRef, navigateToStep]);
+  }, [seedPhrase, inputSeedPhrase, stateRef, initialSetup, navigateToStep]);
 
   if (!seedPhrase) {
     return null;
@@ -68,25 +69,22 @@ const VerifySeedPhrase = memo(() => {
 
   return (
     <>
-      <div className="my-16">
-        <h1 className="mb-16 text-3xl text-white text-center">
-          {"Verify Seed Phrase"}
-        </h1>
+      <AddAccountHeader
+        className="mb-8"
+        description="Fill in the blanks and enter your secret phrase"
+      >
+        Verify Secret Phrase
+      </AddAccountHeader>
 
-        <div className="flex flex-col items-center justify-center">
-          <div className="mb-16 flex flex-col items-center justify-center">
-            <>
-              <div>
-                <div className="text-white mb-2 text-lg">Seed Phrase</div>
-                <LongTextField
-                  ref={fieldRef}
-                  className="mb-16 w-96 h-36 resize-none"
-                />
-              </div>
-            </>
-          </div>
-        </div>
+      <div className="flex flex-col max-w-[27.5rem] mx-auto">
+        <SeedPhraseField
+          value={inputSeedPhrase}
+          onChange={(evt) => setInputSeedPhrase(evt.target.value)}
+          placeholder="Paste there your secret phrase"
+          mode={"import"}
+        />
       </div>
+
       <AddAccountContinueButton onContinue={handleContinue} />
     </>
   );

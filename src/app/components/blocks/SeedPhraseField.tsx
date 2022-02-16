@@ -10,14 +10,17 @@ import NewButton from "app/components/elements/NewButton";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as DownloadIcon } from "app/icons/download.svg";
+import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 
 type SeedPhraseFieldProps = LongTextFieldProps & {
+  mode?: "create" | "import";
   onRegenerate?: () => void;
 };
 
 const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
+  mode = "create",
   onRegenerate,
   className,
   ...rest
@@ -36,7 +39,7 @@ const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
         </label>
         <div className="flex items-center">
           <IconedButton theme="secondary" Icon={EyeIcon} className="mr-2" />
-          {!!onRegenerate && (
+          {mode === "create" && !!onRegenerate && (
             <IconedButton
               theme="secondary"
               Icon={RegenerateIcon}
@@ -44,29 +47,39 @@ const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
               className="mr-2"
             />
           )}
-          <IconedButton theme="secondary" Icon={DownloadIcon} />
+          <IconedButton
+            theme="secondary"
+            Icon={mode === "create" ? DownloadIcon : UploadIcon}
+          />
         </div>
       </div>
-      <LongTextField ref={fieldRef} className="resize-none" {...rest} />
-      <NewButton
-        theme="tertiary"
-        onClick={copy}
-        className={classNames(
-          "absolute bottom-[1.125rem] right-3",
-          "text-sm text-brand-light",
-          "!p-0 !pr-1 !min-w-0",
-          "!font-normal",
-          "cursor-copy",
-          "items-center"
-        )}
-      >
-        {copied ? (
-          <SuccessIcon className="mr-1" />
-        ) : (
-          <CopyIcon className="mr-1" />
-        )}
-        {copied ? "Copied" : "Copy"}
-      </NewButton>
+      <LongTextField
+        ref={fieldRef}
+        className="resize-none"
+        id="seedPhrase"
+        {...rest}
+      />
+      {mode === "create" && (
+        <NewButton
+          theme="tertiary"
+          onClick={copy}
+          className={classNames(
+            "absolute bottom-[1.125rem] right-3",
+            "text-sm text-brand-light",
+            "!p-0 !pr-1 !min-w-0",
+            "!font-normal",
+            "cursor-copy",
+            "items-center"
+          )}
+        >
+          {copied ? (
+            <SuccessIcon className="mr-1" />
+          ) : (
+            <CopyIcon className="mr-1" />
+          )}
+          {copied ? "Copied" : "Copy"}
+        </NewButton>
+      )}
     </div>
   );
 };

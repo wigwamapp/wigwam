@@ -114,7 +114,7 @@ const AddSeedPhrase = memo(() => {
           : "Create new Secret Phrase"}
       </AddAccountHeader>
 
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col max-w-[27.5rem] mx-auto">
         <div className="flex">
           <NewSelectLanguage
             selected={locale}
@@ -122,21 +122,29 @@ const AddSeedPhrase = memo(() => {
             onSelect={setLocale}
             className="mr-6"
           />
-          <Select
-            items={wordsCountList}
-            currentItem={wordsCount}
-            setItem={setWordsCount}
-            label="Words"
-            showSelected
-            className="!min-w-[8.375rem]"
-          />
+          {!importExisting && (
+            <Select
+              items={wordsCountList}
+              currentItem={wordsCount}
+              setItem={setWordsCount}
+              label="Words"
+              showSelected
+              className="!min-w-[8.375rem]"
+            />
+          )}
         </div>
 
         <SeedPhraseField
           value={seedPhraseText}
           onRegenerate={() => generateNew()}
           onChange={(evt) => setSeedPhraseText(evt.target.value)}
+          placeholder={
+            importExisting
+              ? "Paste there your secret phrase"
+              : "Type there a secret phrase or generate new"
+          }
           className="mt-8"
+          mode={importExisting ? "import" : "create"}
         />
       </div>
       <AddAccountContinueButton onContinue={handleContinue} />
