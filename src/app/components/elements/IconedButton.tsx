@@ -4,7 +4,7 @@ import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
   Icon: FC<{ className?: string }>;
-  theme?: "primary" | "secondary";
+  theme?: "primary" | "secondary" | "tertiary";
   iconClassName?: string;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
@@ -17,9 +17,10 @@ const NewButton: FC<NewButtonProps> = ({
 }) => {
   const classNamesList = classNames(
     "group",
-    theme === "primary" && "w-5 h-5",
-    theme === "secondary" && "w-6 h-6",
+    (theme === "primary" || theme === "secondary") && "w-5 h-5",
+    theme === "tertiary" && "w-6 h-6",
     theme === "primary" && "bg-brand-main/20",
+    theme === "secondary" && "bg-brand-main/[.05]",
     "rounded",
     "flex justify-center items-center",
     "transition",
@@ -32,8 +33,8 @@ const NewButton: FC<NewButtonProps> = ({
   const content = (
     <Icon
       className={classNames(
-        theme === "primary" && "w-4",
-        theme === "secondary" && "w-6",
+        (theme === "primary" || theme === "secondary") && "w-4",
+        theme === "tertiary" && "w-6",
         "h-auto",
         "transition-opacity",
         "group-active:opacity-60",

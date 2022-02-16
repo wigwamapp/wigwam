@@ -150,7 +150,10 @@ const Select: FC<SelectProps> = ({
                         <div
                           className={classNames(
                             "flex items-center",
-                            "py-2 px-3",
+                            "px-3",
+                            showSelected && item.key === currentItem.key
+                              ? "py-1.5"
+                              : "py-2",
                             "rounded-[.625rem]",
                             "cursor-pointer",
                             "text-sm font-bold",

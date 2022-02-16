@@ -96,7 +96,7 @@ const ConditionalAccountsSelect: FC = () => {
           Icon={ExternalLinkIcon}
           href="https://www.google.com"
         />
-        <IconedButton theme="secondary" Icon={SettingsIcon} />
+        <IconedButton theme="tertiary" Icon={SettingsIcon} />
       </div>
       <div className="grid gap-4 mt-5">
         <Input placeholder="Type something..." />
