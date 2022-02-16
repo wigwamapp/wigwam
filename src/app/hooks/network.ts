@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { lazyNetworkAtom } from "app/atoms";

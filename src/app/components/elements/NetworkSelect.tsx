@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from "react";
-import { useAtomValue, useUpdateAtom } from "jotai/utils";
+import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
 
 import { INetwork } from "core/repo";
@@ -24,7 +24,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
   const networks = useAtomValue(allNetworksAtom);
   const currentNetwork = useLazyNetwork(networks[0]);
 
-  const setChainId = useUpdateAtom(chainIdAtom);
+  const setChainId = useSetAtom(chainIdAtom);
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(

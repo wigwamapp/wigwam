@@ -1,6 +1,6 @@
 import { FC, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 import { walletStatusAtom } from "app/atoms";

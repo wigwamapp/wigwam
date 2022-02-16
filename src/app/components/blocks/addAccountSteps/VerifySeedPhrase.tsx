@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useRef } from "react";
 import { ethers } from "ethers";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { fromProtectedString } from "lib/crypto-utils";
 
 import {

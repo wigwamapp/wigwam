@@ -1,5 +1,6 @@
 import { FC, useMemo, useLayoutEffect } from "react";
-import { useAtomValue, waitForAll } from "jotai/utils";
+import { useAtomValue } from "jotai";
+import { waitForAll } from "jotai/utils";
 import { getLastAction, HistoryAction, resetPosition } from "lib/history";
 
 import { walletStatusAtom, pageAtom } from "app/atoms";

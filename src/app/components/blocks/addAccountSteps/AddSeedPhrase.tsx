@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";

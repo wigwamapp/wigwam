@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";

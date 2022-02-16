@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 
 import { setLocale } from "lib/ext/react";
 
