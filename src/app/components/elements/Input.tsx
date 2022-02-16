@@ -54,7 +54,6 @@ const Input: FC<InputProps> = ({
             "border border-brand-main/10",
             "rounded-[.625rem]",
             "outline-none",
-            "cursor-pointer",
             "transition-colors",
             "placeholder-brand-placeholder",
             !disabled && [
