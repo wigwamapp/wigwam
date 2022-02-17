@@ -21,15 +21,15 @@ const ProfilePreview = memo<ProfilePreviewProps>(
       >
         <AutoIcon
           seed={profile.avatarSeed}
-          initial={profile.name.slice(2, 3)}
+          source="boring"
+          variant="marble"
+          initials={profile.name.slice(2, 3)}
           className={classNames(
             "w-24 h-24",
             "text-4xl",
             theme === "large" && "mb-5",
             theme === "small" && "mb-4"
           )}
-          source="boring"
-          variant="marble"
         />
 
         <h3

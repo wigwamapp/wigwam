@@ -19,8 +19,8 @@ type BoringVariant =
 
 type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   seed: string;
-  initial?: string;
   source?: Source;
+  initials?: string;
   // only for Dicebear
   type?: DicebearStyleType;
   // only for Boring
@@ -32,7 +32,7 @@ type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
 const AutoIcon: FC<AutoIconProps> = memo(
   ({
     seed,
-    initial,
+    initials,
     className,
     source = "dicebear",
     type = "jdenticon",
@@ -52,9 +52,15 @@ const AutoIcon: FC<AutoIconProps> = memo(
         ? {
             children: (
               <>
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase font-bold drop-shadow-profileinitial">
-                  {initial}
-                </span>
+                {initials && (
+                  <span
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase font-bold drop-shadow-profileinitial"
+                    style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.1)" }}
+                  >
+                    {initials}
+                  </span>
+                )}
+
                 <Avatar
                   name={seed}
                   variant={variant}
