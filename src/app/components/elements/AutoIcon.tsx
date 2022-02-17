@@ -2,10 +2,12 @@ import { FC, HTMLAttributes, memo } from "react";
 import classNames from "clsx";
 import memoize from "mem";
 import Avatar from "boring-avatars";
-import { createAvatar } from "@dicebear/avatars";
+import { createAvatar, utils } from "@dicebear/avatars";
 import * as jdenticonStyle from "@dicebear/avatars-jdenticon-sprites";
 import * as avataaarsStyle from "@dicebear/avatars-avataaars-sprites";
 import * as personasStyle from "@dicebear/personas";
+
+import niceColorPalettes from "fixtures/niceColorPalettes/200.json";
 
 type Source = "dicebear" | "boring";
 type DicebearStyleType = "jdenticon" | "avataaars" | "personas";
@@ -26,6 +28,7 @@ type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   // only for Boring
   variant?: BoringVariant;
   colors?: string[];
+  autoColors?: boolean;
   square?: boolean;
 };
 
@@ -38,6 +41,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
     type = "jdenticon",
     variant,
     colors,
+    autoColors,
     square,
     ...rest
   }) => (
@@ -64,7 +68,9 @@ const AutoIcon: FC<AutoIconProps> = memo(
                 <Avatar
                   name={seed}
                   variant={variant}
-                  colors={colors}
+                  colors={
+                    colors ?? (autoColors ? seedToColors(seed) : undefined)
+                  }
                   square={square}
                   size="100%"
                 />
@@ -114,3 +120,9 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
       });
   }
 }
+
+const seedToColors = memoize((seed: string) => {
+  const prng = utils.prng.create(seed);
+
+  return prng.pick(niceColorPalettes);
+});

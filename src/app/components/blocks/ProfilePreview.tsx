@@ -23,6 +23,7 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           seed={profile.avatarSeed}
           source="boring"
           variant="marble"
+          autoColors
           initials={profile.name.slice(2, 3)}
           className={classNames(
             "w-24 h-24",
