@@ -13,6 +13,7 @@ declare namespace NodeJS {
     // Dev
     readonly VIGVAM_DEV_UNLOCK_PASSWORD: string;
     readonly VIGVAM_DEV_ACTIVE_TAB_RELOAD: string;
+    readonly VIGVAM_DEV_ELEMENTS_SPACING: string;
   }
 }
 
