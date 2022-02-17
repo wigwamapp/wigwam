@@ -65,7 +65,7 @@ const NewButton: FC<NewButtonProps> = ({
   }
 
   return (
-    <button className={classNamesList} {...rest}>
+    <button type="button" className={classNamesList} {...rest}>
       {content}
     </button>
   );

@@ -19,6 +19,7 @@ type BoringVariant =
 
 type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   seed: string;
+  initial?: string;
   source?: Source;
   // only for Dicebear
   type?: DicebearStyleType;
@@ -31,6 +32,7 @@ type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
 const AutoIcon: FC<AutoIconProps> = memo(
   ({
     seed,
+    initial,
     className,
     source = "dicebear",
     type = "jdenticon",
@@ -41,7 +43,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
   }) => (
     <div
       className={classNames(
-        "inline-flex items-center justify-center",
+        "inline-flex items-center justify-center relative",
         "overflow-hidden",
         className
       )}
@@ -49,13 +51,18 @@ const AutoIcon: FC<AutoIconProps> = memo(
       {...(source === "boring"
         ? {
             children: (
-              <Avatar
-                name={seed}
-                variant={variant}
-                colors={colors}
-                square={square}
-                size="100%"
-              />
+              <>
+                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase font-bold drop-shadow-profileinitial">
+                  {initial}
+                </span>
+                <Avatar
+                  name={seed}
+                  variant={variant}
+                  colors={colors}
+                  square={square}
+                  size="100%"
+                />
+              </>
             ),
           }
         : {
