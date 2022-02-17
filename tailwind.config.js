@@ -23,6 +23,7 @@ module.exports = {
           placeholder: "#66697C",
           disabledbackground: "#343434",
           disabledcolor: "#535364",
+          inactivedark2: "#7D8398",
         },
       },
       fontFamily: {
