@@ -26,7 +26,7 @@ const AddAccountSteps = memo(() => (
   <StepsProvider atom={addAccountStepAtom} steps={STEPS}>
     {({ children }) => (
       <div className="mb-24">
-        <Suspense fallback={<>Loading...</>}>
+        <Suspense fallback={null}>
           <div className="mt-24">{children}</div>
         </Suspense>
       </div>

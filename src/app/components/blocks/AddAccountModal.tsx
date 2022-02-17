@@ -77,6 +77,7 @@ const AddAccountModal = memo(() => {
               Back
             </NewButton>
           )}
+
           <Dialog.Close className="fixed top-4 right-4" asChild>
             <NewButton theme="clean">Cancel</NewButton>
           </Dialog.Close>
