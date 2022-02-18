@@ -5,8 +5,8 @@
 
   "icons": {
     "16": "icons/16.png",
-    "48": "icons/48.png",
-    "128": "icons/128.png"
+    "48": "icons/128.png",
+    "128": "icons/512.png"
   },
 
   "description": "__MSG_appDesc__",
@@ -36,10 +36,8 @@
     "default_title": "Vigvam",
     "default_icon": {
       "16": "icons/16.png",
-      "24": "icons/24.png",
-      "32": "icons/32.png",
-      "48": "icons/48.png",
-      "128": "icons/128.png"
+      "48": "icons/128.png",
+      "128": "icons/512.png"
     },
     "__chrome__chrome_style": false,
     "__firefox__browser_style": false
