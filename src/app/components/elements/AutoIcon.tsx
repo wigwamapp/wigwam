@@ -2,10 +2,12 @@ import { FC, HTMLAttributes, memo } from "react";
 import classNames from "clsx";
 import memoize from "mem";
 import Avatar from "boring-avatars";
-import { createAvatar } from "@dicebear/avatars";
+import { createAvatar, utils } from "@dicebear/avatars";
 import * as jdenticonStyle from "@dicebear/avatars-jdenticon-sprites";
 import * as avataaarsStyle from "@dicebear/avatars-avataaars-sprites";
 import * as personasStyle from "@dicebear/personas";
+
+import niceColorPalettes from "fixtures/niceColorPalettes/200.json";
 
 type Source = "dicebear" | "boring";
 type DicebearStyleType = "jdenticon" | "avataaars" | "personas";
@@ -20,28 +22,32 @@ type BoringVariant =
 type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   seed: string;
   source?: Source;
+  initials?: string;
   // only for Dicebear
   type?: DicebearStyleType;
   // only for Boring
   variant?: BoringVariant;
   colors?: string[];
+  autoColors?: boolean;
   square?: boolean;
 };
 
 const AutoIcon: FC<AutoIconProps> = memo(
   ({
     seed,
+    initials,
     className,
     source = "dicebear",
     type = "jdenticon",
     variant,
     colors,
+    autoColors,
     square,
     ...rest
   }) => (
     <div
       className={classNames(
-        "inline-flex items-center justify-center",
+        "inline-flex items-center justify-center relative",
         "overflow-hidden",
         className
       )}
@@ -49,13 +55,26 @@ const AutoIcon: FC<AutoIconProps> = memo(
       {...(source === "boring"
         ? {
             children: (
-              <Avatar
-                name={seed}
-                variant={variant}
-                colors={colors}
-                square={square}
-                size="100%"
-              />
+              <>
+                {initials && (
+                  <span
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase font-bold drop-shadow-profileinitial"
+                    style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.1)" }}
+                  >
+                    {initials}
+                  </span>
+                )}
+
+                <Avatar
+                  name={seed}
+                  variant={variant}
+                  colors={
+                    colors ?? (autoColors ? seedToColors(seed) : undefined)
+                  }
+                  square={square}
+                  size="100%"
+                />
+              </>
             ),
           }
         : {
@@ -101,3 +120,9 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
       });
   }
 }
+
+const seedToColors = memoize((seed: string) => {
+  const prng = utils.prng.create(seed);
+
+  return prng.pick(niceColorPalettes);
+});

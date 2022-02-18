@@ -48,6 +48,9 @@ module.exports = {
         addaccountmodal:
           "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(114, 114, 114, 0.15)",
       },
+      dropShadow: {
+        profileinitial: "0px 2px 5px rgba(112, 113, 129, 0.37)",
+      },
       backgroundImage: {
         buttonaccent:
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",

@@ -1,23 +1,41 @@
-import { FC, memo, useRef, useCallback, FormEventHandler } from "react";
+import {
+  FC,
+  memo,
+  useRef,
+  useCallback,
+  FormEventHandler,
+  useState,
+} from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
 import { isPopup } from "lib/ext/view";
 
 import { unlockWallet } from "core/client";
 
+import { Page } from "app/defaults";
 import { currentProfileAtom } from "app/atoms";
+import { openInTab } from "app/helpers";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import PopupLayout from "app/components/layouts/PopupLayout";
-import TextField from "app/components/elements/TextField";
+import Input from "app/components/elements/Input";
+import NewButton from "app/components/elements/NewButton";
+import IconedButton from "app/components/elements/IconedButton";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
+import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
 
   const content = (
     <>
-      <ProfilePreview profile={currentProfile} />
+      <div className="flex justify-center">
+        <div className="relative">
+          <ChangeProfileButton className="absolute top-1/2 -translate-y-1/2 right-[calc(100%+4.5rem)]" />
+          <ProfilePreview profile={currentProfile} />
+        </div>
+      </div>
       <UnlockForm />
     </>
   );
@@ -33,6 +51,7 @@ export default Unlock;
 
 const UnlockForm = memo(() => {
   const passwordFieldRef = useRef<HTMLInputElement>(null);
+  const [inputShowContent, setInputShowContent] = useState(false);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (evt) => {
@@ -52,28 +71,66 @@ const UnlockForm = memo(() => {
 
   return (
     <form
-      className="w-full flex flex-col items-center p-8"
+      className="w-full flex flex-col items-center mt-12"
       onSubmit={handleSubmit}
     >
-      <TextField
-        ref={passwordFieldRef}
-        type="password"
-        placeholder="******"
-        className="mb-8 w-full max-w-sm"
-      />
+      <div className="max-w-[19rem] w-full relative">
+        <Input
+          ref={passwordFieldRef}
+          type={inputShowContent ? "text" : "password"}
+          placeholder="Type password"
+          label="New password"
+          className="w-full"
+        />
+        <IconedButton
+          Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
+          theme="tertiary"
+          className="absolute bottom-2.5 right-3"
+          onClick={() => setInputShowContent(!inputShowContent)}
+        />
+      </div>
 
-      <button
-        className={classNames(
-          "inline-flex items-center",
-          "text-3xl",
-          "text-gray-100",
-          "transition ease-in-out duration-300",
-          "animate-pulse hover:animate-none focus:animate-none"
-        )}
-      >
-        Unlock
-        <ArrowCircleRightIcon className="h-8 w-auto ml-4" />
-      </button>
+      <div className="max-w-[13.75rem] w-full mt-6 center">
+        <NewButton type="submit" className="w-full">
+          Unlock
+        </NewButton>
+        <button className="w-full mt-4 text-sm text-brand-inactivelight">
+          <u>Forgot the password?</u>
+          <br />
+          Want to <u>sign into another profile?</u>
+        </button>
+      </div>
     </form>
+  );
+});
+
+type ChangeProfileButtonProps = {
+  className?: string;
+};
+
+const ChangeProfileButton = memo<ChangeProfileButtonProps>(({ className }) => {
+  const handleClick = useCallback(() => {
+    openInTab({ page: Page.Profiles });
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={classNames(
+        "flex flex-col items-center",
+        "box-border w-40 px-3 py-11",
+        "rounded-[.625rem]",
+        "transition-colors",
+        "hover:bg-brand-main/10 focus:bg-brand-main/10",
+        "active:bg-brand-main/[.05]",
+        className
+      )}
+    >
+      <span className="rounded-full flex items-center justify-center bg-brand-main/10 w-16 h-16 mb-3">
+        <ChangeProfileIcon className="w-6 h-6" />
+      </span>
+      <span className="text-lg font-bold text-brand-light">Change profile</span>
+    </button>
   );
 });
