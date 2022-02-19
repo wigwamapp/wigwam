@@ -22,7 +22,7 @@ type BoringVariant =
 type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   seed: string;
   source?: Source;
-  initials?: string;
+  initialsSource?: string;
   // only for Dicebear
   type?: DicebearStyleType;
   // only for Boring
@@ -35,7 +35,7 @@ type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
 const AutoIcon: FC<AutoIconProps> = memo(
   ({
     seed,
-    initials,
+    initialsSource,
     className,
     source = "dicebear",
     type = "jdenticon",
@@ -56,12 +56,16 @@ const AutoIcon: FC<AutoIconProps> = memo(
         ? {
             children: (
               <>
-                {initials && (
+                {initialsSource && (
                   <span
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase font-bold drop-shadow-profileinitial"
-                    style={{ textShadow: "0 1px 0 rgba(0, 0, 0, 0.1)" }}
+                    className={classNames(
+                      "absolute top-1/2 left-1/2",
+                      "-translate-x-1/2 -translate-y-1/2",
+                      "uppercase font-bold drop-shadow-profileinitial",
+                      "text-[300%]"
+                    )}
                   >
-                    {initials}
+                    {getInitials(initialsSource)}
                   </span>
                 )}
 
@@ -126,3 +130,15 @@ const seedToColors = memoize((seed: string) => {
 
   return prng.pick(niceColorPalettes);
 });
+
+function getInitials(source: string) {
+  const parts = source.split(" ");
+
+  let initials = "";
+  for (const i of [0, 1]) {
+    const char = parts[i]?.charAt(0);
+    if (char) initials += char;
+  }
+
+  return initials;
+}
