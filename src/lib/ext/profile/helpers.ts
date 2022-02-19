@@ -2,9 +2,9 @@ import { nanoid, customAlphabet } from "nanoid";
 
 import { Profile } from "./types";
 
-export function generateProfile(name: string): Profile {
+export function generateProfile(name: string, profileSeed?: string): Profile {
   const id = generateProfileId();
-  const avatarSeed = nanoid();
+  const avatarSeed = profileSeed ?? nanoid();
 
   return { id, name, avatarSeed };
 }

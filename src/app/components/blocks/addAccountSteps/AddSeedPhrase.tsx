@@ -91,7 +91,7 @@ const AddSeedPhrase = memo(() => {
 
       navigateToStep(
         importExisting
-          ? AddAccountStep.VerifyToAdd
+          ? AddAccountStep.SelectAccountsToAddMethod
           : AddAccountStep.VerifySeedPhrase
       );
     } catch (err: any) {
@@ -145,6 +145,7 @@ const AddSeedPhrase = memo(() => {
           }
           className="mt-8"
           mode={importExisting ? "import" : "create"}
+          autoFocus={importExisting}
         />
       </div>
       <AddAccountContinueButton onContinue={handleContinue} />

@@ -35,10 +35,10 @@ export async function changeProfile(id: string) {
   browser.runtime.reload();
 }
 
-export async function addProfile(name: string) {
+export async function addProfile(name: string, profileSeed?: string) {
   const state = await fetchState();
 
-  const profile = generateProfile(name);
+  const profile = generateProfile(name, profileSeed);
 
   await setState({
     ...state,
