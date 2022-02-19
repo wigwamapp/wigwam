@@ -18,10 +18,26 @@ export async function openInTab(to?: Destination) {
       url: getMainURL("**"),
     });
 
+    const currentTabs = await browser.tabs.query({
+      currentWindow: true,
+      active: true,
+    });
+
     const url = getMainURL(`#${hash ?? ""}`);
 
     if (mainTabs.length > 0) {
       const tab = mainTabs[0];
+      browser.tabs.update(
+        tab.id,
+        tab.url === url ? { active: true } : { url, active: true }
+      );
+    } else if (
+      currentTabs.length > 0 &&
+      currentTabs[0].url &&
+      (currentTabs[0].url.includes("://newtab") ||
+        currentTabs[0].url.includes("://startpageshared"))
+    ) {
+      const tab = currentTabs[0];
       browser.tabs.update(
         tab.id,
         tab.url === url ? { active: true } : { url, active: true }
