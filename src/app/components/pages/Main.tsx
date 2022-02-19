@@ -9,11 +9,14 @@ import { TReplace } from "lib/ext/react";
 import {
   accountAddressAtom,
   allAccountsAtom,
+  allNetworksAtom,
+  chainIdAtom,
   currentAccountAtom,
 } from "app/atoms";
+import { useLazyNetwork } from "app/hooks";
 import PageLayout from "app/components/layouts/PageLayout";
 import Select from "app/components/elements/Select";
-import NetworkSelect from "app/components/elements/NetworkSelect";
+import NetworkSelectPrimitive from "app/components/elements/NetworkSelect";
 import NewButton from "app/components/elements/NewButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletCard from "app/components/elements/WalletCard";
@@ -243,5 +246,25 @@ const AccountsSelect: FC = () => {
         </Listbox>
       </div>
     </div>
+  );
+};
+
+type NetworkSelectProps = {
+  className?: string;
+};
+
+const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
+  const networks = useAtomValue(allNetworksAtom);
+  const currentNetwork = useLazyNetwork(networks[0]);
+
+  const setChainId = useSetAtom(chainIdAtom);
+
+  return (
+    <NetworkSelectPrimitive
+      networks={networks}
+      currentNetwork={currentNetwork}
+      onNetworkChange={setChainId}
+      className={className}
+    />
   );
 };
