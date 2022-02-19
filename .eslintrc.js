@@ -6,10 +6,11 @@ module.exports = {
   },
   plugins: ["prettier", "@typescript-eslint", "react-hooks", "jsx-a11y"],
   extends: [
-    "plugin:prettier/recommended",
+    // "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
+    "prettier",
   ],
   rules: {
     "@typescript-eslint/no-use-before-define": [
