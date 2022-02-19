@@ -6,12 +6,24 @@ type InputProps = {
   label?: string;
   StartAdornment?: FC<{ className?: string }>;
   EndAdornment?: FC<{ className?: string }>;
+  theme?: "primary" | "clean";
+  inputClassName?: string;
 } & HTMLProps<HTMLInputElement>;
 
 const Input = memo(
   forwardRef<HTMLInputElement, InputProps>(
     (
-      { className, label, id, StartAdornment, EndAdornment, disabled, ...rest },
+      {
+        className,
+        label,
+        id,
+        StartAdornment,
+        EndAdornment,
+        disabled,
+        theme = "primary",
+        inputClassName,
+        ...rest
+      },
       ref
     ) => {
       const [focused, setFocused] = useState<boolean>(false);
@@ -51,8 +63,9 @@ const Input = memo(
                 !!EndAdornment && "pr-10",
                 "box-border",
                 "text-brand-light leading-none",
-                "bg-black/20",
-                "border border-brand-main/10",
+                "border",
+                theme === "primary" && "bg-black/20 border-brand-main/10",
+                theme === "clean" && "bg-transparent border-transparent",
                 "rounded-[.625rem]",
                 "outline-none",
                 "transition-colors",
@@ -61,12 +74,13 @@ const Input = memo(
                   "group-hover:bg-brand-main/5",
                   "group-hover:border-brand-main/5",
                 ],
-                focused && "border-brand-main/[.15]",
+                focused && "!bg-brand-main/5 !border-brand-main/[.15]",
                 disabled && [
                   "bg-brand-disabledbackground/20",
                   "border-brand-main/5",
                   "text-brand-disabledcolor placeholder-brand-disabledcolor",
-                ]
+                ],
+                inputClassName
               )}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}

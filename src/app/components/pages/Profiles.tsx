@@ -2,14 +2,20 @@ import { FC, memo, useCallback, useMemo, useState, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
-import { T, useI18NUpdate, replaceT } from "lib/ext/i18n/react";
+import { nanoid } from "nanoid";
 
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
-import DialogWrapper from "app/components/layouts/DialogWrapper";
-import TextField from "app/components/elements/TextField";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "app/components/elements/SecondaryModal";
+import Input from "app/components/elements/Input";
+import NewButton from "app/components/elements/NewButton";
+import AutoIcon from "app/components/elements/AutoIcon";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as AddNewIcon } from "app/icons/add-new.svg";
+import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
+import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
 
 const Profiles: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
@@ -20,9 +26,9 @@ const Profiles: FC = () => {
     setAdding(false);
   }, [setAdding]);
 
-  const handleAdd = useCallback(async (name: string) => {
+  const handleAdd = useCallback(async (name: string, profileSeed: string) => {
     try {
-      await addProfile(name);
+      await addProfile(name, profileSeed);
 
       setAdding(false);
     } catch (err) {
@@ -92,9 +98,10 @@ const Profiles: FC = () => {
       </div>
 
       <AddProfileDialog
-        adding={adding}
+        key={String(adding)}
+        open={adding}
         profilesLength={all.length}
-        onClose={handleCancelAdding}
+        onOpenChange={handleCancelAdding}
         onAdd={handleAdd}
       />
     </BoardingPageLayout>
@@ -103,68 +110,87 @@ const Profiles: FC = () => {
 
 export default Profiles;
 
-type AddProfileDialogProps = {
-  adding: boolean;
+type AddProfileDialogProps = SecondaryModalProps & {
   profilesLength: number;
-  onClose: () => void;
-  onAdd: (name: string) => void;
+  onAdd: (name: string, profileSeed: string) => void;
 };
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
-  ({ adding, profilesLength, onClose, onAdd }) => {
-    useI18NUpdate();
+  ({ open, onOpenChange, profilesLength, onAdd }) => {
+    const [profileSeed, setProfileSeed] = useState(nanoid);
 
     const nameFieldRef = useRef<HTMLInputElement>(null);
-    const defaultNameSource = useMemo(
-      () => `{{profile}} ${profilesLength + 1}`,
+
+    const defaultNameValue = useMemo(
+      () => `Profile ${profilesLength + 1}`,
       [profilesLength]
     );
-    const defaultNameValue = replaceT(defaultNameSource);
+
+    const [nameValue, setNameValue] = useState(defaultNameValue);
+
+    const handleNameFieldChange = useCallback(
+      (evt) => {
+        setNameValue(evt.target.value);
+      },
+      [setNameValue]
+    );
+
+    const regenerateProfileSeed = useCallback(() => {
+      setProfileSeed(nanoid());
+    }, []);
 
     const handleAdd = useCallback(() => {
       const value = nameFieldRef.current?.value;
       if (value) {
-        onAdd(value === defaultNameValue ? defaultNameSource : value);
+        onAdd(value, profileSeed);
       }
-    }, [onAdd, defaultNameValue, defaultNameSource]);
+    }, [onAdd, profileSeed]);
 
     return (
-      <DialogWrapper
-        displayed={adding}
-        title={<T i18nKey="profiles" />}
-        description="Lorem ipsum dolor sit amet..."
-        onClose={onClose}
-      >
-        <form className="mt-4">
-          <TextField ref={nameFieldRef} defaultValue={defaultNameValue} />
-
-          <div className="mt-8 w-full flex items-stretch">
-            <button
-              type="button"
-              className={classNames(
-                "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
-                "transition ease-in-out duration-200"
-              )}
-              onClick={onClose}
+      <SecondaryModal open={open} onOpenChange={onOpenChange}>
+        <h2 className="mb-[3.25rem] text-[2rem] font-bold">
+          Add a New Profile
+        </h2>
+        <div className="flex justify-center items-center w-full">
+          <div className="mr-16 flex flex-col items-center">
+            <AutoIcon
+              seed={profileSeed}
+              source="boring"
+              variant="marble"
+              autoColors
+              initialsSource={nameValue}
+              className={"w-[7.75rem] h-[7.75rem] text-5xl"}
+            />
+            <NewButton
+              theme="tertiary"
+              className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
+              onClick={regenerateProfileSeed}
             >
-              <T i18nKey="cancel" />
-            </button>
+              <RegenerateIcon className="mr-2" />
+              Regenerate
+            </NewButton>
+          </div>
+          <form className="w-full max-w-[18rem]">
+            <Input
+              ref={nameFieldRef}
+              label="Name"
+              placeholder="Enter your name"
+              value={nameValue}
+              onChange={handleNameFieldChange}
+              required
+            />
 
-            <div className="flex-1" />
-
-            <button
-              type="button"
-              className={classNames(
-                "inline-flex p-4 text-gray-300 hover:text-gray-100 text-xl",
-                "transition ease-in-out duration-200"
-              )}
+            <NewButton
+              type="submit"
+              className="mt-6 w-full flex items-center"
               onClick={handleAdd}
             >
-              <T i18nKey="add" />
-            </button>
-          </div>
-        </form>
-      </DialogWrapper>
+              Add
+              <PlusIcon className="ml-1" />
+            </NewButton>
+          </form>
+        </div>
+      </SecondaryModal>
     );
   }
 );

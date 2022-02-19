@@ -30,6 +30,7 @@ module.exports = {
     "react/prop-types": "off",
     "react/display-name": "off",
     "react/react-in-jsx-scope": "off",
+    "jsx-a11y/no-autofocus": "off",
   },
   settings: {
     react: {

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import classNames from "clsx";
 import { Profile } from "lib/ext/profile";
-import { TReplace } from "lib/ext/react";
+import { replaceT, TReplace } from "lib/ext/react";
 
 import AutoIcon from "app/components/elements/AutoIcon";
 
@@ -25,7 +25,7 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           source="boring"
           variant="marble"
           autoColors
-          initials={profile.name.slice(2, 3)}
+          initialsSource={replaceT(profile.name)}
           className={classNames(
             "w-24 h-24",
             theme === "extrasmall" && "w-20 h-20",

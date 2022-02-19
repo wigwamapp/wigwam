@@ -1,10 +1,7 @@
 import { FC, useMemo, useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
 
 import { INetwork } from "core/repo";
-import { chainIdAtom, allNetworksAtom } from "app/atoms";
-import { useLazyNetwork } from "app/hooks";
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
@@ -17,15 +14,18 @@ const prepareNetwork = (network: INetwork) => ({
 });
 
 type NetworkSelectProps = {
+  networks: INetwork[];
+  currentNetwork: INetwork;
+  onNetworkChange: (chainId: number) => void;
   className?: string;
 };
 
-const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
-  const networks = useAtomValue(allNetworksAtom);
-  const currentNetwork = useLazyNetwork(networks[0]);
-
-  const setChainId = useSetAtom(chainIdAtom);
-
+const NetworkSelect: FC<NetworkSelectProps> = ({
+  networks,
+  currentNetwork,
+  onNetworkChange,
+  className,
+}) => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
@@ -51,7 +51,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
     <Select
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
-      setItem={(network) => setChainId(network.key)}
+      setItem={(network) => onNetworkChange(network.key)}
       onSearch={(value) => setSearchValue(value === "" ? null : value)}
       className={className}
       scrollAreaClassName="h-64"

@@ -124,6 +124,7 @@ const Select: FC<SelectProps> = ({
                       e.preventDefault();
                       onSearch(e.currentTarget.value);
                     }}
+                    autoFocus
                   />
                 </div>
               )}
