@@ -24,10 +24,9 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           source="boring"
           variant="marble"
           autoColors
-          initials={replaceT(profile.name).charAt(0)}
+          initialsSource={replaceT(profile.name)}
           className={classNames(
             "w-24 h-24",
-            "text-4xl",
             theme === "large" && "mb-5",
             theme === "small" && "mb-4"
           )}

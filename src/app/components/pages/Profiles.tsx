@@ -98,6 +98,7 @@ const Profiles: FC = () => {
       </div>
 
       <AddProfileDialog
+        key={String(adding)}
         open={adding}
         profilesLength={all.length}
         onOpenChange={handleCancelAdding}
@@ -116,13 +117,22 @@ type AddProfileDialogProps = SecondaryModalProps & {
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
   ({ open, onOpenChange, profilesLength, onAdd }) => {
-    const [profileSeed, setProfileSeed] = useState(nanoid());
+    const [profileSeed, setProfileSeed] = useState(nanoid);
 
     const nameFieldRef = useRef<HTMLInputElement>(null);
 
     const defaultNameValue = useMemo(
       () => `Profile ${profilesLength + 1}`,
       [profilesLength]
+    );
+
+    const [nameValue, setNameValue] = useState(defaultNameValue);
+
+    const handleNameFieldChange = useCallback(
+      (evt) => {
+        setNameValue(evt.target.value);
+      },
+      [setNameValue]
     );
 
     const regenerateProfileSeed = useCallback(() => {
@@ -141,14 +151,15 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
         <h2 className="mb-[3.25rem] text-[2rem] font-bold">
           Add a New Profile
         </h2>
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center items-center w-full">
           <div className="mr-16 flex flex-col items-center">
             <AutoIcon
               seed={profileSeed}
               source="boring"
               variant="marble"
               autoColors
-              className={"w-[7.75rem] h-[7.75rem]"}
+              initialsSource={nameValue}
+              className={"w-[7.75rem] h-[7.75rem] text-lg"}
             />
             <NewButton
               theme="tertiary"
@@ -164,12 +175,14 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
               ref={nameFieldRef}
               label="Name"
               placeholder="Enter your name"
-              defaultValue={defaultNameValue}
+              value={nameValue}
+              onChange={handleNameFieldChange}
               required
             />
+
             <NewButton
               type="submit"
-              className="mt-5 w-full flex items-center"
+              className="mt-6 w-full flex items-center"
               onClick={handleAdd}
             >
               Add
