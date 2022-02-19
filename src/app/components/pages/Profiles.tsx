@@ -159,7 +159,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
               variant="marble"
               autoColors
               initialsSource={nameValue}
-              className={"w-[7.75rem] h-[7.75rem] text-lg"}
+              className={"w-[7.75rem] h-[7.75rem] text-5xl"}
             />
             <NewButton
               theme="tertiary"

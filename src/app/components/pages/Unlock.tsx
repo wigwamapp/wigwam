@@ -8,7 +8,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { isPopup } from "lib/ext/view";
+import { isPopup as isPopupPrimitive } from "lib/ext/view";
 
 import { unlockWallet } from "core/client";
 
@@ -24,24 +24,51 @@ import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
+import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
 
+  const isPopup = isPopupPrimitive();
+
   const content = (
     <>
-      <div className="flex justify-center">
+      <div className={classNames("flex justify-center", isPopup && "mt-16")}>
         <div className="relative">
-          <ChangeProfileButton className="absolute top-1/2 -translate-y-1/2 right-[calc(100%+4.5rem)]" />
-          <ProfilePreview profile={currentProfile} />
+          <ChangeProfileButton
+            theme={isPopup ? "small" : "large"}
+            className={classNames(
+              "absolute top-1/2 -translate-y-1/2",
+              isPopup ? "right-[calc(100%+1rem)]" : "right-[calc(100%+4.5rem)]"
+            )}
+          />
+          <ProfilePreview
+            theme={isPopup ? "extrasmall" : "large"}
+            profile={currentProfile}
+          />
         </div>
       </div>
-      <UnlockForm />
+      <UnlockForm
+        theme={isPopup ? "small" : "large"}
+        className={isPopup ? "mt-11" : "mt-12"}
+      />
     </>
   );
 
-  return isPopup() ? (
-    <PopupLayout>{content}</PopupLayout>
+  return isPopup ? (
+    <PopupLayout>
+      {content}
+      <div
+        className={classNames(
+          "absolute bottom-6 left-1/2 -translate-x-1/2",
+          "text-xl font-black",
+          "flex items-center"
+        )}
+      >
+        <VigvamIcon className="h-[1.375rem] w-auto mr-3" />
+        Vigvam
+      </div>
+    </PopupLayout>
   ) : (
     <BoardingPageLayout profileNav={false}>{content}</BoardingPageLayout>
   );
@@ -49,7 +76,12 @@ const Unlock: FC = () => {
 
 export default Unlock;
 
-const UnlockForm = memo(() => {
+type UnlockFormProps = {
+  theme?: "large" | "small";
+  className?: string;
+};
+
+const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
   const passwordFieldRef = useRef<HTMLInputElement>(null);
   const [inputShowContent, setInputShowContent] = useState(false);
 
@@ -71,7 +103,7 @@ const UnlockForm = memo(() => {
 
   return (
     <form
-      className="w-full flex flex-col items-center mt-12"
+      className={classNames("w-full flex flex-col items-center", className)}
       onSubmit={handleSubmit}
     >
       <div className="max-w-[19rem] w-full relative">
@@ -79,7 +111,7 @@ const UnlockForm = memo(() => {
           ref={passwordFieldRef}
           type={inputShowContent ? "text" : "password"}
           placeholder="Type password"
-          label="New password"
+          label="Password"
           className="w-full"
         />
         <IconedButton
@@ -90,11 +122,23 @@ const UnlockForm = memo(() => {
         />
       </div>
 
-      <div className="max-w-[13.75rem] w-full mt-6 center">
+      <div
+        className={classNames(
+          "max-w-[13.75rem] w-full center",
+          theme === "large" && "mt-6",
+          theme === "small" && "mt-4"
+        )}
+      >
         <NewButton type="submit" className="w-full">
           Unlock
         </NewButton>
-        <button className="w-full mt-4 text-sm text-brand-inactivelight">
+        <button
+          className={classNames(
+            "w-full text-brand-inactivelight",
+            theme === "large" && "text-sm mt-4",
+            theme === "small" && "text-xs mt-3"
+          )}
+        >
           <u>Forgot the password?</u>
           <br />
           Want to <u>sign into another profile?</u>
@@ -105,32 +149,58 @@ const UnlockForm = memo(() => {
 });
 
 type ChangeProfileButtonProps = {
+  theme?: "large" | "small";
   className?: string;
 };
 
-const ChangeProfileButton = memo<ChangeProfileButtonProps>(({ className }) => {
-  const handleClick = useCallback(() => {
-    openInTab({ page: Page.Profiles });
-  }, []);
+const ChangeProfileButton = memo<ChangeProfileButtonProps>(
+  ({ theme = "large", className }) => {
+    const handleClick = useCallback(() => {
+      openInTab({ page: Page.Profiles });
+    }, []);
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={classNames(
-        "flex flex-col items-center",
-        "box-border w-40 px-3 py-11",
-        "rounded-[.625rem]",
-        "transition-colors",
-        "hover:bg-brand-main/10 focus:bg-brand-main/10",
-        "active:bg-brand-main/[.05]",
-        className
-      )}
-    >
-      <span className="rounded-full flex items-center justify-center bg-brand-main/10 w-16 h-16 mb-3">
-        <ChangeProfileIcon className="w-6 h-6" />
-      </span>
-      <span className="text-lg font-bold text-brand-light">Change profile</span>
-    </button>
-  );
-});
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        className={classNames(
+          "flex flex-col items-center",
+          "box-border",
+          theme === "large" && "w-40 px-3 py-11",
+          theme === "small" && "w-[6.5rem] px-2 py-5",
+          "rounded-[.625rem]",
+          "transition-colors",
+          "hover:bg-brand-main/10 focus:bg-brand-main/10",
+          "active:bg-brand-main/[.05]",
+          className
+        )}
+      >
+        <span
+          className={classNames(
+            "rounded-full",
+            "flex items-center justify-center",
+            "bg-brand-main/10",
+            theme === "large" && "w-16 h-16 mb-3",
+            theme === "small" && "w-12 h-12 mb-1"
+          )}
+        >
+          <ChangeProfileIcon
+            className={classNames(
+              theme === "large" && "w-6 h-6",
+              theme === "small" && "w-[1.125rem] h-[1.125rem]"
+            )}
+          />
+        </span>
+        <span
+          className={classNames(
+            theme === "large" && "text-lg",
+            theme === "small" && "text-xs",
+            "font-bold text-brand-light"
+          )}
+        >
+          Change profile
+        </span>
+      </button>
+    );
+  }
+);

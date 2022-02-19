@@ -61,8 +61,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
                     className={classNames(
                       "absolute top-1/2 left-1/2",
                       "-translate-x-1/2 -translate-y-1/2",
-                      "uppercase font-bold drop-shadow-profileinitial",
-                      "text-[300%]"
+                      "uppercase font-bold drop-shadow-profileinitial"
                     )}
                   >
                     {getInitials(initialsSource)}
