@@ -13,15 +13,21 @@ export async function openInTab(to?: Destination) {
   try {
     const hash = to && toHash(to);
 
-    const mainTabs = await browser.tabs.query({
-      currentWindow: true,
-      url: getMainURL("**"),
-    });
-
-    const currentTabs = await browser.tabs.query({
-      currentWindow: true,
-      active: true,
-    });
+    const [mainTabs, currentTabs] = await Promise.all(
+      [
+        {
+          url: getMainURL("**"),
+        },
+        {
+          active: true,
+        },
+      ].map((params) =>
+        browser.tabs.query({
+          currentWindow: true,
+          ...params,
+        })
+      )
+    );
 
     const url = getMainURL(`#${hash ?? ""}`);
 
