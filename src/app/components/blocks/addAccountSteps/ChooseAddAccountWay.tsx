@@ -22,6 +22,7 @@ const ChooseAddAccountWay = memo(() => {
   return (
     <div className="mb-8 w-full max-w-[59rem] mx-auto flex flex-wrap">
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
+
       {sections
         .filter(({ type }) => type !== "advanced")
         .map((section, index) => (
@@ -55,10 +56,6 @@ const ChooseAddAccountWay = memo(() => {
                 </Tooltip>
               )}
             </div>
-            <Points
-              security={section.points?.security ?? 0.7}
-              adoption={section.points?.adoption ?? 0.88}
-            />
 
             {/*{section.points && (*/}
             {/*  <div className="mb-4 flex items-center text-sm text-gray-300">*/}
@@ -74,7 +71,7 @@ const ChooseAddAccountWay = memo(() => {
             <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
               {section.tiles.map(({ title, Icon, action, soon }, i) => (
                 <button
-                  key={title}
+                  key={i}
                   className={classNames(
                     "relative",
                     "flex flex-col items-center",

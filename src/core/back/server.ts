@@ -58,7 +58,7 @@ export function startServer() {
       attempts++;
 
       if (attempts > 5) {
-        await new Promise((r) => setTimeout(r, getRandomInt(3_000, 5_000)));
+        await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
       }
 
       if (attempts > 3) {

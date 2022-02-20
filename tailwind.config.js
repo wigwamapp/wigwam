@@ -14,6 +14,7 @@ module.exports = {
           redone: "#FF002D",
           redtwo: "#FF7F44",
           dark: "#0D0E1D",
+          darkblue: "#07081B",
           darklight: "#2A2C3F",
           light: "#F8F9FD",
           main: "#CCD6FF",
@@ -23,6 +24,7 @@ module.exports = {
           placeholder: "#66697C",
           disabledbackground: "#343434",
           disabledcolor: "#535364",
+          inactivedark2: "#7D8398",
         },
       },
       fontFamily: {
@@ -47,9 +49,13 @@ module.exports = {
         addaccountmodal:
           "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(114, 114, 114, 0.15)",
       },
+      dropShadow: {
+        profileinitial: "0px 2px 5px rgba(112, 113, 129, 0.37)",
+      },
       backgroundImage: {
         buttonaccent:
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",
+        radio: "linear-gradient(275.43deg, #FF002D 13.81%, #FF7F44 111.89%)",
       },
     },
   },

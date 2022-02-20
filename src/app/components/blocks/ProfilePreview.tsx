@@ -1,40 +1,52 @@
-import { memo, useCallback } from "react";
+import { memo } from "react";
 import classNames from "clsx";
 import { Profile } from "lib/ext/profile";
-import { TReplace } from "lib/ext/react";
+import { replaceT, TReplace } from "lib/ext/react";
 
 import AutoIcon from "app/components/elements/AutoIcon";
-import { openInTab } from "app/helpers";
-import { Page } from "app/defaults";
 
 type ProfilePreviewProps = {
+  theme?: "large" | "small" | "extrasmall";
   profile: Profile;
 };
 
-const ProfilePreview = memo<ProfilePreviewProps>(({ profile }) => {
-  const handleClick = useCallback(() => {
-    openInTab({ page: Page.Profiles });
-  }, []);
-
-  return (
-    <div className="w-full flex justify-center">
-      <button
-        className={classNames("flex flex-col items-center", "p-4")}
-        onClick={handleClick}
+const ProfilePreview = memo<ProfilePreviewProps>(
+  ({ theme = "large", profile }) => {
+    return (
+      <div
+        className={classNames(
+          "flex flex-col items-center",
+          theme === "small" && "max-w-24",
+          theme === "extrasmall" && "max-w-20"
+        )}
       >
         <AutoIcon
           seed={profile.avatarSeed}
-          className="w-24 h-24 mb-4"
           source="boring"
-          variant="pixel"
+          variant="marble"
+          autoColors
+          initialsSource={replaceT(profile.name)}
+          className={classNames(
+            "w-24 h-24",
+            theme === "extrasmall" && "w-20 h-20",
+            theme === "extrasmall" ? "text-3xl" : "text-4xl",
+            theme === "large" && "mb-5",
+            theme === "small" && "mb-4",
+            theme === "extrasmall" && "mb-3"
+          )}
         />
 
-        <h3 className="text-lg font-medium">
+        <h3
+          className={classNames(
+            "font-bold",
+            theme === "large" ? "text-[2rem]" : "text-lg"
+          )}
+        >
           <TReplace msg={profile.name} />
         </h3>
-      </button>
-    </div>
-  );
-});
+      </div>
+    );
+  }
+);
 
 export default ProfilePreview;
