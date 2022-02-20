@@ -86,12 +86,10 @@ const withTooltip = (
 ) => {
   return forwardRef(
     (props: IconedButtonProps, ref: ForwardedRef<HTMLElement>) => {
-      if (!!props["aria-label"]) {
+      const ariaLabel = props["aria-label"];
+      if (ariaLabel) {
         return (
-          <Tooltip
-            theme="secondary"
-            ariaLabel={props["aria-label"] ?? "Prop aria label 404"}
-          >
+          <Tooltip theme="secondary" ariaLabel={ariaLabel}>
             <WrappedComponent {...props} ref={ref} />
           </Tooltip>
         );
@@ -101,4 +99,5 @@ const withTooltip = (
     }
   );
 };
+
 export default withTooltip(IconedButton);

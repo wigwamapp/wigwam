@@ -40,7 +40,7 @@ const ChooseAddAccountWay = memo(() => {
               >
                 {section.title}
               </h2>
-              {!!section.tooltip && (
+              {section.tooltip && (
                 <Tooltip
                   TooltipIcon={TooltipIcon}
                   theme="primary"
@@ -134,13 +134,6 @@ interface PointsProps {
   security: number;
   adoption: number;
 }
-const absToZero = (n: number) => (n < 0 ? 0 : Math.abs(n));
-const calcWidth = (n: number, idx: number) =>
-  absToZero(n - idx * 0.2) > 0.2
-    ? 100
-    : absToZero(n - idx * 0.2) > 0
-    ? (n - idx * 0.2) * 500
-    : 0;
 const Points: React.FC<PointsProps> = ({ security, adoption }) => (
   <div className="mt-4">
     <div
@@ -182,5 +175,13 @@ const Points: React.FC<PointsProps> = ({ security, adoption }) => (
     </div>
   </div>
 );
+
+const absToZero = (n: number) => (n < 0 ? 0 : Math.abs(n));
+const calcWidth = (n: number, idx: number) =>
+  absToZero(n - idx * 0.2) > 0.2
+    ? 100
+    : absToZero(n - idx * 0.2) > 0
+    ? (n - idx * 0.2) * 500
+    : 0;
 
 export default ChooseAddAccountWay;
