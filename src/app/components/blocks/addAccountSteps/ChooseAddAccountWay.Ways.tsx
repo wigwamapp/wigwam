@@ -11,7 +11,7 @@ import { ReactComponent as RedditIcon } from "app/icons/AddWalletReddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/AddWalletLedger.svg";
 import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 
-type WaysReturn = {
+export interface WaysReturn {
   type: string;
   title: string;
   points?: {
@@ -24,12 +24,13 @@ type WaysReturn = {
     action: () => void;
     soon?: boolean;
   }[];
-}[];
+}
+[];
 
 export const getWays = (
   hasSeedPhrase: boolean,
   { stateRef, navigateToStep }: StepsContext
-): WaysReturn => [
+): WaysReturn[] => [
   {
     type: "seed_phrase",
     title: "Seed Phrase",
@@ -135,6 +136,12 @@ export const getWays = (
     tiles: [
       {
         title: "Import Private key",
+        Icon: ImportIcon,
+        action: () => navigateToStep(AddAccountStep.AddPrivateKey),
+      },
+      {
+        title: "Create Private key",
+        Icon: ImportIcon,
         action: () => navigateToStep(AddAccountStep.AddPrivateKey),
       },
     ],
