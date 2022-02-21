@@ -2526,10 +2526,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@ledgerhq/cryptoassets@^6.24.1":
-  version "6.24.1"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/cryptoassets/-/cryptoassets-6.24.1.tgz#edac116eaa2d5da5e7c0cda3bc039aa6aedfd7d5"
-  integrity sha512-RCl2T5Qeu4fch5O+6pgT9s9AWs0ATWdBDwN2MSUuLxj7BfwdXig5+hcSObM3OIJPryNeDCtIYNK3z0blgxfTiA==
+"@ledgerhq/cryptoassets@^6.25.0":
+  version "6.25.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/cryptoassets/-/cryptoassets-6.25.0.tgz#9e9307c69c436c938fafd27d5351526c21a2a114"
+  integrity sha512-WjE94BGv9bh70UrgAKH3mAflnAYUGnln/GNEP3UWJKtCkE64RCvRYFI9J4OpnSLEIs9Yf9h48Mjbu6Q2CYao+Q==
   dependencies:
     invariant "2"
 
@@ -2563,14 +2563,14 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-6.10.0.tgz#dda9127b65f653fbb2f74a55e8f0e550d69de6e4"
   integrity sha512-fQFnl2VIXh9Yd41lGjReCeK+Q2hwxQJvLZfqHnKqWapTz68NHOv5QcI0OHuZVNEbv0xhgdLhi5b65kgYeQSUVg==
 
-"@ledgerhq/hw-app-eth@6.24.1":
-  version "6.24.1"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-6.24.1.tgz#13e0f1ebb5ab298d9280bb14e29e04ed6e5f4754"
-  integrity sha512-IyEY+th08RRZaJ014JmKmyS+vtrZzmFwXGgJ0aO7Z+pAzpqgZWyoFsntxf27YE/qPxR/FtHdyFma9RGYI97IEg==
+"@ledgerhq/hw-app-eth@6.25.0":
+  version "6.25.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-app-eth/-/hw-app-eth-6.25.0.tgz#afdf9c45ce24a725dda98805785492262d83b16f"
+  integrity sha512-7oFRWSWLKE0uZosWaCsBC83avCfHZKoqPw36iAj6UhylbICqszOOL9RNa4b1TUnEMI0K2/W0hGPlGGYY2/5g9Q==
   dependencies:
     "@ethersproject/abi" "^5.5.0"
     "@ethersproject/rlp" "^5.5.0"
-    "@ledgerhq/cryptoassets" "^6.24.1"
+    "@ledgerhq/cryptoassets" "^6.25.0"
     "@ledgerhq/errors" "^6.10.0"
     "@ledgerhq/hw-transport" "^6.24.1"
     "@ledgerhq/logs" "^6.10.0"
@@ -4199,10 +4199,10 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-boring-avatars@1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/boring-avatars/-/boring-avatars-1.6.1.tgz#9b2800bc501c20529fd1e725ab650641f1ed4af3"
-  integrity sha512-P7BZRz1DEdx61iW7q8EoB10rDLGGH4ec8uwQsMKOCag8TznC5A/efd5OBuL9Su3HjMEDHN3X8/JRRQNsVZMl4Q==
+boring-avatars@1.6.3:
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/boring-avatars/-/boring-avatars-1.6.3.tgz#5f391502ae15393a156ebe7a7140d2a6a832c1b2"
+  integrity sha512-0gtu0dfk7uXp0xEYJ5RLAQO9HhYOVQOg7EArBy4Uqphzn5Oz15a/LztInowhvAU7W1NHYxUheLHKGN7rw/XEDA==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
