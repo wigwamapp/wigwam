@@ -42,7 +42,7 @@ const ChooseAddAccountWay = memo(() => {
               </h2>
               {section.tooltip && (
                 <Tooltip
-                  TooltipIcon={TooltipIcon}
+                  TooltipIcon={<TooltipIcon />}
                   theme="primary"
                   ariaLabel="lorem ipsum"
                 >

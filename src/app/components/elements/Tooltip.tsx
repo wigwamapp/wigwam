@@ -1,11 +1,12 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import classNames from "clsx";
 
 type TooltipProps = {
-  TooltipIcon?: FC;
+  TooltipIcon?: ReactNode;
   ariaLabel: string;
   theme?: "primary" | "secondary";
+  withTrigger?: boolean;
 };
 
 const config = {
@@ -27,17 +28,22 @@ const config = {
 const Tooltip: FC<TooltipProps> = ({
   ariaLabel,
   TooltipIcon,
+  withTrigger = false,
   theme = "primary",
   children,
 }) => {
   return (
     <TooltipPrimitive.Root delayDuration={300}>
-      <TooltipPrimitive.TooltipTrigger
-        aria-label={ariaLabel}
-        className={classNames("ml-2 mt-1.5 flex")}
-      >
-        {!!TooltipIcon ? <TooltipIcon /> : children}
-      </TooltipPrimitive.TooltipTrigger>
+      {withTrigger ? (
+        TooltipIcon
+      ) : (
+        <TooltipPrimitive.TooltipTrigger
+          aria-label={ariaLabel}
+          className={classNames("ml-2 mt-1.5 flex")}
+        >
+          {TooltipIcon}
+        </TooltipPrimitive.TooltipTrigger>
+      )}
       <TooltipPrimitive.Content
         side={config[theme].side}
         portalled
@@ -55,7 +61,7 @@ const Tooltip: FC<TooltipProps> = ({
           "z-10"
         )}
       >
-        {!!TooltipIcon ? children : ariaLabel}
+        {children ? children : ariaLabel}
         <TooltipPrimitive.Arrow
           offset={13}
           width={15}

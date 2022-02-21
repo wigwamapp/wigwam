@@ -1,6 +1,7 @@
 import React, { FC, forwardRef, HTMLAttributes, ForwardedRef } from "react";
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import Tooltip from "app/components/elements/Tooltip";
 
@@ -67,14 +68,14 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
     }
 
     return (
-      <button
+      <TooltipPrimitive.TooltipTrigger
         ref={ref as ForwardedRef<HTMLButtonElement>}
         type="button"
         className={classNamesList}
         {...rest}
       >
         {content}
-      </button>
+      </TooltipPrimitive.TooltipTrigger>
     );
   }
 );
@@ -89,9 +90,12 @@ const withTooltip = (
       const ariaLabel = props["aria-label"];
       if (ariaLabel) {
         return (
-          <Tooltip theme="secondary" ariaLabel={ariaLabel}>
-            <WrappedComponent {...props} ref={ref} />
-          </Tooltip>
+          <Tooltip
+            theme="secondary"
+            withTrigger
+            TooltipIcon={<WrappedComponent {...props} ref={ref} />}
+            ariaLabel={ariaLabel}
+          />
         );
       } else {
         return <WrappedComponent {...props} ref={ref} />;
