@@ -1,7 +1,6 @@
 import React, { FC, forwardRef, HTMLAttributes, ForwardedRef } from "react";
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import Tooltip from "app/components/elements/Tooltip";
 
@@ -68,14 +67,14 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
     }
 
     return (
-      <TooltipPrimitive.TooltipTrigger
+      <button
         ref={ref as ForwardedRef<HTMLButtonElement>}
         type="button"
         className={classNamesList}
         {...rest}
       >
         {content}
-      </TooltipPrimitive.TooltipTrigger>
+      </button>
     );
   }
 );
