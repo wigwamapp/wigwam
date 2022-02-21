@@ -25,6 +25,9 @@ import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "../elements/SecondaryModal";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
@@ -84,6 +87,7 @@ type UnlockFormProps = {
 const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
   const passwordFieldRef = useRef<HTMLInputElement>(null);
   const [inputShowContent, setInputShowContent] = useState(false);
+  const [attention, setAttention] = useState(false);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (evt) => {
@@ -116,6 +120,7 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
         />
         <IconedButton
           Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
+          aria-label={inputShowContent ? "Show password" : "Hide password"}
           theme="tertiary"
           className="absolute bottom-2.5 right-3"
           onClick={() => setInputShowContent(!inputShowContent)}
@@ -138,12 +143,14 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
             theme === "large" && "text-sm mt-4",
             theme === "small" && "text-xs mt-3"
           )}
+          onClick={() => setAttention(true)}
         >
           <u>Forgot the password?</u>
           <br />
           Want to <u>sign into another profile?</u>
         </button>
       </div>
+      <AttentionModal open={attention} onOpenChange={setAttention} />
     </form>
   );
 });
@@ -204,3 +211,34 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
     );
   }
 );
+
+const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
+  const nameFieldRef = useRef<HTMLInputElement>(null);
+  const [nameValue, setNameValue] = useState("");
+
+  const handleNameFieldChange = useCallback(
+    (evt) => {
+      setNameValue(evt.target.value);
+    },
+    [setNameValue]
+  );
+
+  return (
+    <SecondaryModal open={open} onOpenChange={onOpenChange}>
+      <h2 className="mb-[3.25rem] text-[2rem] font-bold">Add a New Profile</h2>
+      <div className="flex justify-center items-center w-full">
+        <div className="mr-16 flex flex-col items-center">asdasdad</div>
+        <form className="w-full max-w-[18rem]">
+          <Input
+            ref={nameFieldRef}
+            label="Name"
+            placeholder="Enter your name"
+            value={nameValue}
+            onChange={handleNameFieldChange}
+            required
+          />
+        </form>
+      </div>
+    </SecondaryModal>
+  );
+});

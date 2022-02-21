@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 import { StepsContext } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
@@ -14,6 +14,9 @@ import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 type WaysReturn = {
   type: string;
   title: string;
+  tooltip?: {
+    content: ReactNode;
+  };
   points?: {
     security: number;
     adoption: number;
@@ -33,9 +36,26 @@ export const getWays = (
   {
     type: "seed_phrase",
     title: "Seed Phrase",
+    tooltip: {
+      content: (
+        <>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus dolor purus non enim praesent elementum facilisis
+            leo
+          </p>
+          <p className="mt-5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus
+          </p>
+        </>
+      ),
+    },
     points: {
       security: 0.8,
-      adoption: 0.7,
+      adoption: 0.68,
     },
     tiles: hasSeedPhrase
       ? [
@@ -69,6 +89,23 @@ export const getWays = (
   {
     type: "social",
     title: "Social",
+    tooltip: {
+      content: (
+        <>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus dolor purus non enim praesent elementum facilisis
+            leo
+          </p>
+          <p className="mt-5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus
+          </p>
+        </>
+      ),
+    },
     points: {
       security: 0.3,
       adoption: 0.9,
@@ -107,6 +144,23 @@ export const getWays = (
   {
     type: "device",
     title: "Hard device",
+    tooltip: {
+      content: (
+        <>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus dolor purus non enim praesent elementum facilisis
+            leo
+          </p>
+          <p className="mt-5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus
+          </p>
+        </>
+      ),
+    },
     points: {
       security: 0.9,
       adoption: 0.5,

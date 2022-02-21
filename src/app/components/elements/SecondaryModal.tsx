@@ -34,7 +34,11 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
           )}
         >
           <Dialog.Close asChild className="fixed top-4 right-4">
-            <IconedButton Icon={CloseIcon} theme="tertiary" />
+            <IconedButton
+              Icon={CloseIcon}
+              aria-label="close"
+              theme="tertiary"
+            />
           </Dialog.Close>
           {children}
         </Dialog.Content>

@@ -97,10 +97,15 @@ const ConditionalAccountsSelect: FC = () => {
       <div className="flex mt-5">
         <IconedButton
           className="mr-3"
+          aria-label="google"
           Icon={ExternalLinkIcon}
           href="https://www.google.com"
         />
-        <IconedButton theme="tertiary" Icon={SettingsIcon} />
+        <IconedButton
+          theme="tertiary"
+          aria-label="Settings"
+          Icon={SettingsIcon}
+        />
       </div>
       <div className="grid gap-4 mt-5">
         <Input placeholder="Type something..." />

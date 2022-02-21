@@ -77,7 +77,6 @@ const DialogWrapper = memo<DialogWrapperProps>(
                     {description}
                   </Dialog.Description>
                 )}
-
                 {children}
               </div>
             </Transition.Child>

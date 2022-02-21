@@ -15,14 +15,17 @@ const SocialLinks = [
   {
     Icon: TelegramIcon,
     href: "https://t.me/vigvamapp",
+    ariaLabel: "telegram",
   },
   {
     Icon: GithubIcon,
     href: "https://github.com/vigvamapp",
+    ariaLabel: "github",
   },
   {
     Icon: TwitterIcon,
     href: "https://twitter.com/vigvamapp",
+    ariaLabel: "twitter",
   },
 ];
 
@@ -46,10 +49,11 @@ const ComingSoon: FC = () => {
             <strong>Follow</strong> to stay updated about our public Beta:
           </p>
           <div className="flex">
-            {SocialLinks.map(({ Icon, href }) => (
+            {SocialLinks.map(({ Icon, href, ariaLabel }) => (
               <IconedButton
                 key={href}
                 theme="secondary"
+                aria-label={ariaLabel}
                 Icon={Icon}
                 href={href}
                 className="!w-14 !h-14 !rounded-[.75rem] mr-2"
