@@ -68,14 +68,14 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
     }
 
     return (
-      <TooltipPrimitive.TooltipTrigger
+      <button
         ref={ref as ForwardedRef<HTMLButtonElement>}
         type="button"
         className={classNamesList}
         {...rest}
       >
         {content}
-      </TooltipPrimitive.TooltipTrigger>
+      </button>
     );
   }
 );
@@ -90,12 +90,9 @@ const withTooltip = (
       const ariaLabel = props["aria-label"];
       if (ariaLabel) {
         return (
-          <Tooltip
-            theme="secondary"
-            withTrigger
-            TooltipIcon={<WrappedComponent {...props} ref={ref} />}
-            ariaLabel={ariaLabel}
-          />
+          <Tooltip theme="secondary" asChild content={ariaLabel}>
+            <WrappedComponent {...props} ref={ref} />
+          </Tooltip>
         );
       } else {
         return <WrappedComponent {...props} ref={ref} />;

@@ -42,17 +42,21 @@ const ChooseAddAccountWay = memo(() => {
               </h2>
               {section.tooltip && (
                 <Tooltip
-                  TooltipIcon={<TooltipIcon />}
+                  content={
+                    <>
+                      {section.tooltip.content}
+                      {section.points && (
+                        <Points
+                          adoption={section.points.adoption}
+                          security={section.points.security}
+                        />
+                      )}
+                    </>
+                  }
                   theme="primary"
-                  ariaLabel="lorem ipsum"
+                  className="ml-2 mt-1.5 flex"
                 >
-                  {section.tooltip.content}
-                  {section.points && (
-                    <Points
-                      security={section.points.security}
-                      adoption={section.points.adoption}
-                    />
-                  )}
+                  <TooltipIcon className="ml-3" />
                 </Tooltip>
               )}
             </div>
