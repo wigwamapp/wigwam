@@ -14,12 +14,14 @@ const config = {
     sideOffset: 5,
     align: "start" as const,
     alignOffset: -10,
+    paddings: "py-5 px-5",
   },
   secondary: {
     side: "bottom" as const,
     sideOffset: 2,
     align: "center" as const,
     alignOffset: 0,
+    paddings: "py-3 px-8",
   },
 };
 const Tooltip: FC<TooltipProps> = ({
@@ -48,7 +50,7 @@ const Tooltip: FC<TooltipProps> = ({
           theme === "primary" &&
             "w-[18rem] bg-brand-darklight/30 backdrop-filter backdrop-blur-lg",
           "border border-brand-light/5",
-          "py-5 px-5",
+          config[theme].paddings,
           "text-white",
           "z-10"
         )}

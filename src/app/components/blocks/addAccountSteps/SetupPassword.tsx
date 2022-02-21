@@ -73,7 +73,7 @@ const SetupPassword = memo(() => {
           <IconedButton
             Icon={inputShowStates.first ? EyeIcon : OpenedEyeIcon}
             theme="tertiary"
-            aria-label={"Hide / show secret phrase"}
+            aria-label={"Hide phrase"}
             className="absolute bottom-2.5 right-3"
             onClick={() =>
               setInputShowStates((prevState) => ({
