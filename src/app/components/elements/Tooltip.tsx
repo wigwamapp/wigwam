@@ -6,7 +6,7 @@ type TooltipProps = {
   TooltipIcon?: ReactNode;
   ariaLabel: string;
   theme?: "primary" | "secondary";
-  withTrigger?: boolean;
+  asChild?: boolean;
 };
 
 const config = {
@@ -28,22 +28,19 @@ const config = {
 const Tooltip: FC<TooltipProps> = ({
   ariaLabel,
   TooltipIcon,
-  withTrigger = false,
+  asChild = false,
   theme = "primary",
   children,
 }) => {
   return (
     <TooltipPrimitive.Root delayDuration={300}>
-      {withTrigger ? (
-        TooltipIcon
-      ) : (
-        <TooltipPrimitive.TooltipTrigger
-          aria-label={ariaLabel}
-          className={classNames("ml-2 mt-1.5 flex")}
-        >
-          {TooltipIcon}
-        </TooltipPrimitive.TooltipTrigger>
-      )}
+      <TooltipPrimitive.TooltipTrigger
+        aria-label={ariaLabel}
+        className={classNames("ml-2 mt-1.5 flex")}
+        asChild={asChild}
+      >
+        {TooltipIcon}
+      </TooltipPrimitive.TooltipTrigger>
       <TooltipPrimitive.Content
         side={config[theme].side}
         portalled

@@ -92,8 +92,8 @@ const withTooltip = (
         return (
           <Tooltip
             theme="secondary"
-            withTrigger
             TooltipIcon={<WrappedComponent {...props} ref={ref} />}
+            asChild
             ariaLabel={ariaLabel}
           />
         );
