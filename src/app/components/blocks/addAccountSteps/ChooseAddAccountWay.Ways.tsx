@@ -60,7 +60,7 @@ export const getWays = (
     tiles: hasSeedPhrase
       ? [
           {
-            title: "Add wallet asdasda",
+            title: "Add wallet",
             Icon: ImportIcon,
             action: () => {
               alert("Not implemented");
