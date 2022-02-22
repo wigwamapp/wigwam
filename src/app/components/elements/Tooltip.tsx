@@ -37,7 +37,7 @@ const Tooltip: FC<TooltipProps> = ({
   ...rest
 }) => {
   return (
-    <TooltipPrimitive.Root delayDuration={delayDuration} open {...rest}>
+    <TooltipPrimitive.Root delayDuration={delayDuration} {...rest}>
       <TooltipPrimitive.TooltipTrigger asChild={asChild} className={className}>
         {children}
       </TooltipPrimitive.TooltipTrigger>
