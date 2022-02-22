@@ -20,14 +20,14 @@ import PopupLayout from "app/components/layouts/PopupLayout";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "../elements/SecondaryModal";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
-import SecondaryModal, {
-  SecondaryModalProps,
-} from "../elements/SecondaryModal";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
@@ -143,14 +143,19 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
             theme === "large" && "text-sm mt-4",
             theme === "small" && "text-xs mt-3"
           )}
-          onClick={() => setAttention(true)}
+          onClick={() => {
+            setAttention(true);
+          }}
         >
           <u>Forgot the password?</u>
           <br />
           Want to <u>sign into another profile?</u>
         </button>
       </div>
-      <AttentionModal open={attention} onOpenChange={setAttention} />
+      <AttentionModal
+        open={attention}
+        onOpenChange={() => setAttention(false)}
+      />
     </form>
   );
 });
@@ -213,31 +218,30 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
 );
 
 const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
-  const nameFieldRef = useRef<HTMLInputElement>(null);
-  const [nameValue, setNameValue] = useState("");
-
-  const handleNameFieldChange = useCallback(
-    (evt) => {
-      setNameValue(evt.target.value);
-    },
-    [setNameValue]
-  );
-
   return (
     <SecondaryModal open={open} onOpenChange={onOpenChange}>
-      <h2 className="mb-[3.25rem] text-[2rem] font-bold">Add a New Profile</h2>
       <div className="flex justify-center items-center w-full">
-        <div className="mr-16 flex flex-col items-center">asdasdad</div>
-        <form className="w-full max-w-[18rem]">
-          <Input
-            ref={nameFieldRef}
-            label="Name"
-            placeholder="Enter your name"
-            value={nameValue}
-            onChange={handleNameFieldChange}
-            required
-          />
-        </form>
+        <div className="mr-16 flex flex-col items-center">
+          <ul>
+            <li className="relative my-5">
+              <span className="absolute left-[-22px] top-2 w-2.5 h-2.5 bg-radio rounded-full" />
+              <h4 className="text-xl">You cannot reset Application.</h4>
+            </li>
+            <li className="relative my-5">
+              <span className="absolute left-[-22px] top-2 w-2.5 h-2.5 bg-radio rounded-full" />
+              <h4 className="text-xl">
+                To restore with Seed Phrase, or if you want to start from
+                scratch, go to Profiles and Add a New Profile!
+              </h4>
+            </li>
+          </ul>
+          <p className="text-base text-brand-inactivelight">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+            purus sit amet luctus venenatis, lectus magna fringilla urna,
+            porttitor rhoncus dolor purus non enim praesent elementum facilisis
+            leo
+          </p>
+        </div>
       </div>
     </SecondaryModal>
   );

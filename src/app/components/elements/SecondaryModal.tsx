@@ -32,6 +32,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             "overflow-hidden",
             "flex flex-col justify-center items-center"
           )}
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <Dialog.Close asChild className="fixed top-4 right-4">
             <IconedButton
