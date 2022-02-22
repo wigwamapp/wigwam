@@ -16,7 +16,7 @@ const config = {
     align: "start" as const,
     alignOffset: -10,
     paddings: "py-5 px-5",
-    fill: "rgb(42 44 63 / 0.3)",
+    fill: "#1e2132",
   },
   secondary: {
     side: "bottom" as const,
@@ -37,7 +37,7 @@ const Tooltip: FC<TooltipProps> = ({
   ...rest
 }) => {
   return (
-    <TooltipPrimitive.Root delayDuration={delayDuration} {...rest}>
+    <TooltipPrimitive.Root delayDuration={delayDuration} open {...rest}>
       <TooltipPrimitive.TooltipTrigger asChild={asChild} className={className}>
         {children}
       </TooltipPrimitive.TooltipTrigger>
@@ -63,7 +63,7 @@ const Tooltip: FC<TooltipProps> = ({
           offset={13}
           width={15}
           height={8}
-          style={{ stroke: "rgb(42 44 63 / 0.3)", fill: config[theme].fill }}
+          className={`stroke-[#323453] fill-[${config[theme].fill}]`}
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Root>
