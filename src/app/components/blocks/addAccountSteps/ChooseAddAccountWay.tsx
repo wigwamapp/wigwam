@@ -143,14 +143,14 @@ const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
   </button>
 );
 
-interface PointProps {
+type PointProps = {
   filled: number;
   style: "gray" | "green";
-}
+};
 
-const Point: React.FC<PointProps> = ({ filled, style }) => (
+const Point: FC<PointProps> = ({ filled, style }) => (
   <div className="relative w-2 h-2 overflow-hidden rounded-[50%]">
-    <div className="absolute t-0 w-2 h-2 border-solid border border-[#83819a] rounded-[50%]"></div>
+    <div className="absolute t-0 w-2 h-2 border-solid border border-[#83819a] rounded-[50%]" />
     <div
       className={classNames(
         "absolute t-0",
@@ -158,16 +158,16 @@ const Point: React.FC<PointProps> = ({ filled, style }) => (
         "h-2"
       )}
       style={{ width: `${filled}%` }}
-    ></div>
+    />
   </div>
 );
 
-interface PointsProps {
+type PointsProps = {
   security: number;
   adoption: number;
-}
+};
 
-const Points: React.FC<PointsProps> = ({ security, adoption }) => (
+const Points: FC<PointsProps> = ({ security, adoption }) => (
   <div className="mt-4">
     <div
       className={classNames("w-[125px]", "flex items-center justify-between")}
