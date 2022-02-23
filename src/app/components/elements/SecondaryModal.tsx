@@ -14,6 +14,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
   open,
   onOpenChange,
   children,
+  className,
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -30,8 +31,10 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             "backdrop-blur-[40px]",
             "rounded-[1.875rem]",
             "overflow-hidden",
-            "flex flex-col justify-center items-center"
+            "flex flex-col justify-center items-center",
+            className
           )}
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <Dialog.Close asChild className="fixed top-4 right-4">
             <IconedButton
