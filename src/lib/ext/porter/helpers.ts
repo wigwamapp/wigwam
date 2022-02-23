@@ -4,6 +4,7 @@ export const MESSAGE_TYPES = Object.values(PorterMessageType);
 
 export const DEFAULT_ERROR_MESSAGE = "Unexpected error occured";
 export const TIMEOUT_ERROR_MESSAGE = "Timeout";
+export const DISCONNECTED_ERROR_MESSAGE = "Disconnected";
 
 export interface SerializedError {
   message: string;
@@ -32,5 +33,13 @@ export class PorterTimeoutError extends PorterError {
 
   constructor() {
     super(TIMEOUT_ERROR_MESSAGE);
+  }
+}
+
+export class PorterDisconnectedError extends PorterError {
+  name = "PorterDisconnectedError";
+
+  constructor() {
+    super(DISCONNECTED_ERROR_MESSAGE);
   }
 }

@@ -21,16 +21,16 @@ export async function getWalletStatus() {
 export function onWalletStatusUpdated(
   callback: (newWalletStatus: WalletStatus) => void
 ) {
-  return porter.onMessage<EventMessage>((msg) => {
-    if (msg.type === MessageType.WalletStatusUpdated) {
+  return porter.onOneWayMessage<EventMessage>((msg) => {
+    if (msg?.type === MessageType.WalletStatusUpdated) {
       callback(msg.status);
     }
   });
 }
 
 export function onAccountsUpdated(callback: (newAccounts: Account[]) => void) {
-  return porter.onMessage<EventMessage>((msg) => {
-    if (msg.type === MessageType.AccountsUpdated) {
+  return porter.onOneWayMessage<EventMessage>((msg) => {
+    if (msg?.type === MessageType.AccountsUpdated) {
       callback(msg.accounts);
     }
   });
