@@ -11,26 +11,27 @@ import { ReactComponent as RedditIcon } from "app/icons/AddWalletReddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/AddWalletLedger.svg";
 import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 
-export interface WaysReturn {
+export type WaysReturnTile = {
+  title: string;
+  Icon?: FC<{ className?: string }>;
+  action: () => void;
+  soon?: boolean;
+};
+
+type WaysReturn = {
   type: string;
   title: string;
   points?: {
     security: number;
     adoption: number;
   };
-  tiles: {
-    title: string;
-    Icon?: FC<{ className?: string }>;
-    action: () => void;
-    soon?: boolean;
-  }[];
-}
-[];
+  tiles: WaysReturnTile[];
+}[];
 
 export const getWays = (
   hasSeedPhrase: boolean,
   { stateRef, navigateToStep }: StepsContext
-): WaysReturn[] => [
+): WaysReturn => [
   {
     type: "seed_phrase",
     title: "Seed Phrase",
@@ -137,12 +138,18 @@ export const getWays = (
       {
         title: "Import Private key",
         Icon: ImportIcon,
-        action: () => navigateToStep(AddAccountStep.AddPrivateKey),
+        soon: true,
+        action: () => {
+          alert("Not implemented");
+        },
       },
       {
         title: "Create Private key",
         Icon: ImportIcon,
-        action: () => navigateToStep(AddAccountStep.AddPrivateKey),
+        soon: true,
+        action: () => {
+          alert("Not implemented");
+        },
       },
     ],
   },
