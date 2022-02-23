@@ -1,43 +1,60 @@
 import browser, { Runtime } from "webextension-polyfill";
-import { PorterMessageType, PorterClientMessage } from "./types";
-import { deserializeError, PorterTimeoutError } from "./helpers";
+import { forEachSafe } from "lib/system/forEachSafe";
+
+import { PorterMessageType } from "./types";
+import {
+  deserializeError,
+  PorterTimeoutError,
+  PorterDisconnectedError,
+} from "./helpers";
 
 export class PorterClient<ReqData = any, ResData = unknown> {
-  private _port?: Runtime.Port;
+  private port?: Runtime.Port;
   private reqId = 0;
+  private messageHandlers = new Set<(msg: any) => void>();
 
-  get port() {
-    if (this._port) return this._port;
-
-    throw new Error(
-      "Not connected. Add `porter.connect()` at the top of your entry file"
-    );
-  }
-
-  get connected() {
-    return Boolean(this._port);
-  }
-
-  get name() {
-    return this.port.name;
-  }
+  private connectedAt?: number;
 
   connect(name: string) {
-    this._port = browser.runtime.connect({ name });
+    this.port?.disconnect();
+
+    const port = browser.runtime.connect({ name });
+
+    port.onMessage.addListener((msg) => {
+      forEachSafe(this.messageHandlers, (handle) => handle(msg));
+    });
+
+    port.onDisconnect.addListener((p) => {
+      delete this.port;
+
+      if (Date.now() - this.connectedAt! > 1_000) {
+        this.connect(name);
+      } else {
+        setTimeout(() => this.connect(name), 1_000);
+      }
+
+      const err = p.error ?? browser.runtime.lastError;
+      if (err) console.error(new Error(err.message));
+    });
+
+    this.port = port;
+    this.connectedAt = Date.now();
   }
 
   /**
    * Makes a request to background process and returns a response promise
    */
-  async request(data: ReqData, requestTimeout = 60_000): Promise<ResData> {
+  async request(
+    data: ReqData,
+    opts: { timeout?: number; signal?: AbortSignal } = {}
+  ): Promise<ResData> {
+    const port = this.getCurrentPort();
     const reqId = this.reqId++;
 
-    this.send({ type: PorterMessageType.Req, reqId, data });
+    port.postMessage({ type: PorterMessageType.Req, reqId, data });
 
     return new Promise((resolve, reject) => {
-      let timeoutId: any;
-
-      const listener = (msg: any) => {
+      const handleMessage = (msg: any) => {
         switch (true) {
           case msg?.reqId !== reqId:
             return;
@@ -51,17 +68,38 @@ export class PorterClient<ReqData = any, ResData = unknown> {
             break;
         }
 
-        clearTimeout(timeoutId);
-        this.port.onMessage.removeListener(listener);
+        cleanup();
       };
 
-      this.port.onMessage.addListener(listener);
+      const handleDisconnect = () => {
+        cleanup();
+        reject(new PorterDisconnectedError());
+      };
 
-      if (requestTimeout !== Infinity) {
-        timeoutId = setTimeout(() => {
-          this.port.onMessage.removeListener(listener);
-          reject(new PorterTimeoutError());
-        }, requestTimeout);
+      const handleAbort = () => {
+        cleanup();
+        reject(new Error("Request cancelled"));
+      };
+
+      const handleTimeout = () => {
+        cleanup();
+        reject(new PorterTimeoutError());
+      };
+
+      let timeoutId: ReturnType<typeof setTimeout>;
+
+      const cleanup = () => {
+        clearTimeout(timeoutId);
+        opts.signal?.removeEventListener("abort", handleAbort);
+        port.onDisconnect.removeListener(handleDisconnect);
+        this.messageHandlers.delete(handleMessage);
+      };
+
+      this.messageHandlers.add(handleMessage);
+      port.onDisconnect.addListener(handleDisconnect);
+      opts.signal?.addEventListener("abort", handleAbort);
+      if (opts.timeout !== 0) {
+        timeoutId = setTimeout(handleTimeout, opts.timeout ?? 60_000);
       }
     });
   }
@@ -69,27 +107,20 @@ export class PorterClient<ReqData = any, ResData = unknown> {
   /**
    * Allows to subscribe to notifications channel from background process
    */
-  onMessage<OneWayData = unknown>(callback: (data: OneWayData) => void) {
+  onOneWayMessage<OneWayData = unknown>(callback: (data: OneWayData) => void) {
     const listener = (msg: any) => {
       if (msg?.type === PorterMessageType.OneWay) {
         callback(msg.data);
       }
     };
 
-    this.port.onMessage.addListener(listener);
-    return () => this.port.onMessage.removeListener(listener);
+    this.messageHandlers.add(listener);
+    return () => this.messageHandlers.delete(listener);
   }
 
-  onDisconnect(callback: () => void) {
-    this.port.onDisconnect.addListener(callback);
-    return this.port.onDisconnect.removeListener(callback);
-  }
+  private getCurrentPort() {
+    if (this.port) return this.port;
 
-  destroy() {
-    this.port.disconnect();
-  }
-
-  private send(msg: PorterClientMessage) {
-    this.port.postMessage(msg);
+    throw new PorterDisconnectedError();
   }
 }
