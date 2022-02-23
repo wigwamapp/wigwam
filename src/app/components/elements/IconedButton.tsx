@@ -1,4 +1,11 @@
-import React, { FC, forwardRef, HTMLAttributes, ForwardedRef } from "react";
+import React, {
+  FC,
+  forwardRef,
+  HTMLAttributes,
+  ForwardedRef,
+  ForwardRefExoticComponent,
+  RefAttributes,
+} from "react";
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
 
@@ -80,8 +87,8 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
 );
 
 const withTooltip = (
-  WrappedComponent: React.ForwardRefExoticComponent<
-    IconedButtonProps & React.RefAttributes<HTMLElement>
+  WrappedComponent: ForwardRefExoticComponent<
+    IconedButtonProps & RefAttributes<HTMLElement>
   >
 ) => {
   return forwardRef(

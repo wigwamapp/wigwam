@@ -97,7 +97,7 @@ const ConditionalAccountsSelect: FC = () => {
       <div className="flex mt-5">
         <IconedButton
           className="mr-3"
-          aria-label="google"
+          aria-label="Google"
           Icon={ExternalLinkIcon}
           href="https://www.google.com"
         />

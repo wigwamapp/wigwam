@@ -47,7 +47,7 @@ export const getWays = (
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
             leo
           </p>
-          <p className="mt-5">
+          <p className="mt-2">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus
@@ -100,7 +100,7 @@ export const getWays = (
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
             leo
           </p>
-          <p className="mt-5">
+          <p className="mt-2">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus
@@ -155,7 +155,7 @@ export const getWays = (
             porttitor rhoncus dolor purus non enim praesent elementum facilisis
             leo
           </p>
-          <p className="mt-5">
+          <p className="mt-2">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
             purus sit amet luctus venenatis, lectus magna fringilla urna,
             porttitor rhoncus

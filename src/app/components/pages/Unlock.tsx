@@ -120,7 +120,7 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
         />
         <IconedButton
           Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
-          aria-label={inputShowContent ? "Show password" : "Hide password"}
+          aria-label={`${inputShowContent ? "Hide" : "Show"} password`}
           theme="tertiary"
           className="absolute bottom-2.5 right-3"
           onClick={() => setInputShowContent(!inputShowContent)}

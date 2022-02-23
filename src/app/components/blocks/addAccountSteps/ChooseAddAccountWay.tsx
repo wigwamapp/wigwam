@@ -35,10 +35,8 @@ const ChooseAddAccountWay = memo(() => {
               index % 3 !== 2 && "border-r border-brand-light/[.03]"
             )}
           >
-            <div className="flex">
-              <h2
-                className={classNames("text-2xl font-bold capitalize", "mb-5")}
-              >
+            <div className="flex items-center mb-5">
+              <h2 className={classNames("text-2xl font-bold capitalize")}>
                 {section.title}
               </h2>
               {section.tooltip && (
@@ -54,9 +52,9 @@ const ChooseAddAccountWay = memo(() => {
                       )}
                     </>
                   }
-                  className="ml-2 mt-1.5 flex"
+                  className="ml-2"
                 >
-                  <TooltipIcon className="ml-3" />
+                  <TooltipIcon />
                 </HoverCard>
               )}
             </div>

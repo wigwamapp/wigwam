@@ -7,6 +7,7 @@ import {
   ReactNode,
   useLayoutEffect,
   useEffect,
+  MutableRefObject,
 } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -16,7 +17,7 @@ import { URLHashAtom } from "lib/atom-utils";
 export type AllSteps<T> = [T, () => ReactNode][];
 
 export type StepsContext = {
-  stateRef: React.MutableRefObject<Record<string, any>>;
+  stateRef: MutableRefObject<Record<string, any>>;
   navigateToStep: (stepId: string) => void;
   reset: () => void;
 };

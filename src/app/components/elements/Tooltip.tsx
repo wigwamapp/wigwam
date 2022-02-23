@@ -28,9 +28,9 @@ const Tooltip: FC<TooltipProps> = ({
         align="center"
         alignOffset={0}
         className={classNames(
-          "rounded-[.625rem]",
-          "bg-[#33364b]",
-          "py-3 px-8",
+          "rounded-md",
+          "bg-brand-main/20 backdrop-blur-[6px]",
+          "py-1.5 px-3",
           "text-white",
           "z-10"
         )}
@@ -40,7 +40,7 @@ const Tooltip: FC<TooltipProps> = ({
           offset={13}
           width={15}
           height={8}
-          className="fill-[#33364b]"
+          className="fill-brand-main/20"
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Root>
