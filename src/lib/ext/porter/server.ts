@@ -1,6 +1,7 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { assert } from "lib/system/assert";
 import { forEachSafe } from "lib/system/forEachSafe";
+
 import {
   PorterMessageType,
   PorterClientMessage,
