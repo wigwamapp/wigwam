@@ -5,6 +5,8 @@ import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
 
 import { AddAccountStep } from "app/defaults";
 import { useSteps } from "app/hooks/steps";
+import Collapse from "app/components/elements/Collapse";
+import Input from "app/components/elements/Input";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 
@@ -24,7 +26,7 @@ const SelectAccountsToAddMethod: FC = () => {
   return (
     <>
       <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
-      <div className="flex flex-col max-w-[55rem] mx-auto">
+      <div className="flex flex-col max-w-[55rem] mx-auto mb-32">
         <RadioGroupPrimitive.Root
           className="flex"
           defaultValue="auto"
@@ -44,6 +46,14 @@ const SelectAccountsToAddMethod: FC = () => {
             description="Choose which of the wallets belonging to the Secret Phrase you wish to add."
           />
         </RadioGroupPrimitive.Root>
+        <Collapse label="Customize Derivationa path" className="mt-12">
+          <div className="max-w-[17.5rem]">
+            <p className="mb-3 text-sm">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam
+            </p>
+            <Input defaultValue="m/44'/60'/0'/0/{index}" />
+          </div>
+        </Collapse>
       </div>
       <AddAccountContinueButton onContinue={handleContinue} />
     </>
