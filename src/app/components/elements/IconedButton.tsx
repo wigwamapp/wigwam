@@ -89,7 +89,7 @@ const withTooltip = (
       const ariaLabel = props["aria-label"];
       if (ariaLabel) {
         return (
-          <Tooltip theme="secondary" asChild content={ariaLabel}>
+          <Tooltip asChild content={ariaLabel}>
             <WrappedComponent {...props} ref={ref} />
           </Tooltip>
         );

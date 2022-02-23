@@ -4,8 +4,8 @@ import { useAtomValue } from "jotai";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
+import HoverCard from "app/components/elements/HoverCard";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
-import Tooltip from "app/components/elements/Tooltip";
 import { ReactComponent as TooltipIcon } from "app/icons/tooltip.svg";
 
 import { getWays } from "./ChooseAddAccountWay.Ways";
@@ -41,7 +41,7 @@ const ChooseAddAccountWay = memo(() => {
                 {section.title}
               </h2>
               {section.tooltip && (
-                <Tooltip
+                <HoverCard
                   content={
                     <>
                       {section.tooltip.content}
@@ -53,11 +53,10 @@ const ChooseAddAccountWay = memo(() => {
                       )}
                     </>
                   }
-                  theme="primary"
                   className="ml-2 mt-1.5 flex"
                 >
                   <TooltipIcon className="ml-3" />
-                </Tooltip>
+                </HoverCard>
               )}
             </div>
 
