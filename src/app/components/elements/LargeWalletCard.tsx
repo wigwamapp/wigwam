@@ -66,7 +66,14 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
           )}
         >
           <input ref={fieldRef} defaultValue={address} className="sr-only" />
-          <Tooltip content="Copy wallet address to clipboard" asChild>
+          <Tooltip
+            content={
+              copied
+                ? "Wallet address copied to clipboard"
+                : "Copy wallet address to clipboard"
+            }
+            asChild
+          >
             <button
               onClick={copy}
               className={classNames(

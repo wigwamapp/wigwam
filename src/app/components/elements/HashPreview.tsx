@@ -1,5 +1,6 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import classNames from "clsx";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import HoverCard from "app/components/elements/HoverCard";
 
@@ -19,6 +20,9 @@ type HashPreviewProps = {
 
 export const HashPreview = memo<HashPreviewProps>(
   ({ hash, startLength = 6, endLength = 4, withTooltip = true, className }) => {
+    const fieldRef = useRef<HTMLInputElement>(null);
+    const { copy, copied } = useCopyToClipboard(fieldRef);
+
     if (hash.length > startLength + endLength) {
       const content = (
         <span className={classNames("inline-flex", className)}>
@@ -28,8 +32,14 @@ export const HashPreview = memo<HashPreviewProps>(
 
       if (withTooltip) {
         return (
-          <HoverCard content={hash} size="small" side="bottom" align="center">
-            {content}
+          <HoverCard
+            content={`${hash}${copied ? " copied" : ""}`}
+            size="small"
+            side="bottom"
+            align="center"
+          >
+            <input ref={fieldRef} defaultValue={hash} className="sr-only" />
+            <button onClick={copy}>{content}</button>
           </HoverCard>
         );
       }

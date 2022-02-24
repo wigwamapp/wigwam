@@ -20,6 +20,7 @@ const WalletCard: FC<WalletCardProps> = ({
   onClick,
 }) => {
   const classNamesList = classNames(
+    "relative",
     "p-3",
     "max-w-[16.5rem]",
     "bg-brand-main/5",

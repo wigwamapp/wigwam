@@ -35,10 +35,10 @@ const HoverCard: FC<HoverCardProps> = ({
   content,
   openDelay = 200,
   className,
-  asChild,
   side = "right",
   align = "start",
   size = "large",
+  asChild,
   children,
   ...rest
 }) => (
