@@ -20,6 +20,9 @@ import PopupLayout from "app/components/layouts/PopupLayout";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "app/components/elements/SecondaryModal";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
@@ -84,6 +87,7 @@ type UnlockFormProps = {
 const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
   const passwordFieldRef = useRef<HTMLInputElement>(null);
   const [inputShowContent, setInputShowContent] = useState(false);
+  const [attention, setAttention] = useState(false);
 
   const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
     async (evt) => {
@@ -116,6 +120,7 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
         />
         <IconedButton
           Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
+          aria-label={`${inputShowContent ? "Hide" : "Show"} password`}
           theme="tertiary"
           className="absolute bottom-2.5 right-3"
           onClick={() => setInputShowContent(!inputShowContent)}
@@ -138,12 +143,19 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
             theme === "large" && "text-sm mt-4",
             theme === "small" && "text-xs mt-3"
           )}
+          onClick={() => {
+            setAttention(true);
+          }}
         >
           <u>Forgot the password?</u>
           <br />
           Want to <u>sign into another profile?</u>
         </button>
       </div>
+      <AttentionModal
+        open={attention}
+        onOpenChange={() => setAttention(false)}
+      />
     </form>
   );
 });
@@ -203,4 +215,38 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
       </button>
     );
   }
+);
+
+const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
+  return (
+    <SecondaryModal
+      open={open}
+      onOpenChange={onOpenChange}
+      className="px-[5.25rem]"
+    >
+      <ul>
+        <ListBlock className="mb-5">You cannot reset Application.</ListBlock>
+        <ListBlock>
+          To restore with Seed Phrase, or if you want to start from scratch, go
+          to Profiles and Add a New Profile!
+        </ListBlock>
+      </ul>
+      <p className="text-base text-brand-inactivelight mt-5">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
+        purus sit amet luctus venenatis, lectus magna fringilla urna, porttitor
+        rhoncus dolor purus non enim praesent elementum facilisis leo
+      </p>
+    </SecondaryModal>
+  );
+});
+
+type ListBlockProps = {
+  className?: string;
+};
+
+const ListBlock: FC<ListBlockProps> = ({ children, className }) => (
+  <li className={classNames("relative pl-[1.375rem]", className)}>
+    <span className="absolute left-0 top-2 w-2.5 h-2.5 bg-radio rounded-full" />
+    <span className="text-xl font-bold">{children}</span>
+  </li>
 );

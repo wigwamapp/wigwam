@@ -1,6 +1,15 @@
-import { FC, forwardRef, HTMLAttributes, ForwardedRef } from "react";
+import React, {
+  FC,
+  forwardRef,
+  HTMLAttributes,
+  ForwardedRef,
+  ForwardRefExoticComponent,
+  RefAttributes,
+} from "react";
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
+
+import Tooltip from "app/components/elements/Tooltip";
 
 type IconedButtonProps = {
   Icon: FC<{ className?: string }>;
@@ -77,4 +86,25 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
   }
 );
 
-export default IconedButton;
+const withTooltip = (
+  WrappedComponent: ForwardRefExoticComponent<
+    IconedButtonProps & RefAttributes<HTMLElement>
+  >
+) => {
+  return forwardRef(
+    (props: IconedButtonProps, ref: ForwardedRef<HTMLElement>) => {
+      const ariaLabel = props["aria-label"];
+      if (ariaLabel) {
+        return (
+          <Tooltip asChild content={ariaLabel}>
+            <WrappedComponent {...props} ref={ref} />
+          </Tooltip>
+        );
+      } else {
+        return <WrappedComponent {...props} ref={ref} />;
+      }
+    }
+  );
+};
+
+export default withTooltip(IconedButton);

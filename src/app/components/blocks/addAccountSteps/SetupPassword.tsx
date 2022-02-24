@@ -73,6 +73,7 @@ const SetupPassword = memo(() => {
           <IconedButton
             Icon={inputShowStates.first ? EyeIcon : OpenedEyeIcon}
             theme="tertiary"
+            aria-label={`${inputShowStates.first ? "Hide" : "Show"} password`}
             className="absolute bottom-2.5 right-3"
             onClick={() =>
               setInputShowStates((prevState) => ({
@@ -92,6 +93,7 @@ const SetupPassword = memo(() => {
           <IconedButton
             Icon={inputShowStates.second ? EyeIcon : OpenedEyeIcon}
             theme="tertiary"
+            aria-label={`${inputShowStates.second ? "Hide" : "Show"} password`}
             className="absolute bottom-2.5 right-3"
             onClick={() =>
               setInputShowStates((prevState) => ({

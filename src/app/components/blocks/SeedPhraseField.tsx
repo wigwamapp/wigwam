@@ -38,10 +38,16 @@ const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
           Secret Phrase
         </label>
         <div className="flex items-center">
-          <IconedButton theme="secondary" Icon={EyeIcon} className="mr-2" />
+          <IconedButton
+            theme="secondary"
+            aria-label="Show / hide"
+            Icon={EyeIcon}
+            className="mr-2"
+          />
           {mode === "create" && !!onRegenerate && (
             <IconedButton
               theme="secondary"
+              aria-label="Regenerate secret phrase"
               Icon={RegenerateIcon}
               onClick={onRegenerate}
               className="mr-2"
@@ -49,6 +55,11 @@ const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
           )}
           <IconedButton
             theme="secondary"
+            aria-label={
+              mode === "create"
+                ? "Download secret phrase"
+                : "Upload secret phrase"
+            }
             Icon={mode === "create" ? DownloadIcon : UploadIcon}
           />
         </div>

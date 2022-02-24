@@ -58,3 +58,7 @@ body {
     --color-2: theme("colors.brand.redtwo");
   }
 }
+
+div[data-radix-popper-content-wrapper] {
+  will-change: auto !important;
+}
