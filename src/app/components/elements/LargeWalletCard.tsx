@@ -65,11 +65,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             "w-full min-w-[0]"
           )}
         >
-          <input
-            ref={fieldRef}
-            defaultValue={address}
-            className="absolute top-0 right-0 opacity-0 pointer-events-none"
-          />
+          <input ref={fieldRef} defaultValue={address} className="sr-only" />
           <Tooltip content="Copy wallet address to clipboard" asChild>
             <button
               onClick={copy}
