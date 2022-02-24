@@ -22,6 +22,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletCard from "app/components/elements/WalletCard";
 import IconedButton from "app/components/elements/IconedButton";
 import Input from "app/components/elements/Input";
+import LargeWalletCard from "app/components/elements/LargeWalletCard";
 import { ReactComponent as SettingsIcon } from "app/icons/settings-small.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
@@ -134,6 +135,7 @@ const ConditionalAccountsSelect: FC = () => {
           </div>
         ))}
       </ScrollAreaContainer>
+      <LargeWalletCard account={currentAccount} />
       <WalletCard account={currentAccount} />
     </div>
   );

@@ -31,8 +31,7 @@ const Tooltip: FC<TooltipProps> = ({
           "rounded-md",
           "bg-brand-main/20 backdrop-blur-[6px]",
           "py-1.5 px-3",
-          "text-white",
-          "z-10"
+          "text-white"
         )}
       >
         {content}
