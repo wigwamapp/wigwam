@@ -37,6 +37,7 @@
     "@ledgerhq/hw-transport-webhid": "6.24.1",
     "@radix-ui/react-alert-dialog": "0.1.5",
     "@radix-ui/react-checkbox": "0.1.4",
+    "@radix-ui/react-collapsible": "0.1.5",
     "@radix-ui/react-dialog": "0.1.5",
     "@radix-ui/react-radio-group": "0.1.4",
     "@radix-ui/react-scroll-area": "0.1.3",
