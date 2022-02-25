@@ -6,8 +6,8 @@ import { hasSeedPhraseAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import Collapse from "app/components/elements/Collapse";
 import HoverCard from "app/components/elements/HoverCard";
+import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
-import { ReactComponent as TooltipIcon } from "app/icons/tooltip.svg";
 
 import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
 

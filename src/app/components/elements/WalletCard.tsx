@@ -22,10 +22,11 @@ const WalletCard: FC<WalletCardProps> = ({
   const classNamesList = classNames(
     "relative",
     "p-3",
-    "max-w-[16.5rem]",
+    "w-[16.5rem] min-w-[16.5rem]",
     "bg-brand-main/5",
     "rounded-[.625rem]",
-    "flex"
+    "flex items-stretch",
+    "text-left"
   );
 
   const content = (
@@ -57,6 +58,7 @@ const WalletCard: FC<WalletCardProps> = ({
         <HashPreview
           hash={address}
           className="text-sm text-brand-inactivedark mt-0.5 font-normal leading-none"
+          withTooltip={false}
         />
         <Balance address={address} className="mt-auto" />
       </span>
