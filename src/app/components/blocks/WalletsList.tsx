@@ -140,7 +140,6 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
             onChange={(e) => {
               setSearchValue(e.currentTarget.value);
             }}
-            autoFocus
             inputClassName="!max-h-[2.5rem]"
           />
           {searchValue && (
