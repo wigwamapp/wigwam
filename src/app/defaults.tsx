@@ -2,6 +2,7 @@ import Fuse from "fuse.js";
 import { Font } from "lib/web-fonts";
 
 import type { INetwork } from "core/repo";
+import { Account } from "core/types";
 
 export enum Page {
   Default = "default",
@@ -65,6 +66,24 @@ export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<INetwork> = {
     {
       name: "type",
       weight: 4,
+    },
+  ],
+};
+
+export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
+  includeScore: true,
+  keys: [
+    {
+      name: "address",
+      weight: 1,
+    },
+    {
+      name: "name",
+      weight: 1,
+    },
+    {
+      name: "source",
+      weight: 2,
     },
   ],
 };

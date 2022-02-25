@@ -38,10 +38,9 @@ import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
 import HoverCard from "app/components/elements/HoverCard";
+import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
-
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
-import { ReactComponent as TooltipIcon } from "app/icons/tooltip.svg";
 
 type VerifyAccountToAddProps = {
   initialSetup?: boolean;

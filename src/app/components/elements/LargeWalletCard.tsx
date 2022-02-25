@@ -14,11 +14,11 @@ import Balance from "app/components/elements/Balance";
 import IconedButton from "app/components/elements/IconedButton";
 import Tooltip from "app/components/elements/Tooltip";
 import HoverCard from "app/components/elements/HoverCard";
+import TooltipIcon from "app/components/elements/TooltipIcon";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as TooltipIcon } from "app/icons/tooltip.svg";
 
 type LargeWalletCardProps = {
   account: Account;
@@ -39,7 +39,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
     <div
       className={classNames(
         "px-4 pt-4 pb-3",
-        "max-w-[23.25rem]",
+        "w-[23.25rem] min-w-[23.25rem]",
         "bg-brand-main/10",
         "rounded-[.625rem]",
         "flex flex-col",
@@ -160,7 +160,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
         align="end"
         className="absolute right-4 bottom-3"
       >
-        <TooltipIcon />
+        <TooltipIcon theme="dark" />
       </HoverCard>
     </div>
   );
