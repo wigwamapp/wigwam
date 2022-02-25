@@ -4,21 +4,28 @@ import classNames from "clsx";
 
 type TooltipProps = {
   content: ReactNode;
-  className?: string;
   asChild?: boolean;
+  hideOnClick?: boolean;
+  className?: string;
 } & TooltipPrimitive.TooltipProps;
 
 const Tooltip: FC<TooltipProps> = ({
   content,
   delayDuration = 200,
-  className,
   asChild,
+  hideOnClick = false,
   children,
+  className,
   ...rest
 }) => {
   return (
     <TooltipPrimitive.Root delayDuration={delayDuration} {...rest}>
-      <TooltipPrimitive.TooltipTrigger asChild={asChild} className={className}>
+      <TooltipPrimitive.TooltipTrigger
+        asChild={asChild}
+        className={className}
+        onClick={(evt) => !hideOnClick && evt.preventDefault()}
+        onMouseDown={(evt) => !hideOnClick && evt.preventDefault()}
+      >
         {children}
       </TooltipPrimitive.TooltipTrigger>
       <TooltipPrimitive.Content
@@ -31,8 +38,7 @@ const Tooltip: FC<TooltipProps> = ({
           "rounded-md",
           "bg-brand-main/20 backdrop-blur-[6px]",
           "py-1.5 px-3",
-          "text-white",
-          "z-10"
+          "text-white"
         )}
       >
         {content}

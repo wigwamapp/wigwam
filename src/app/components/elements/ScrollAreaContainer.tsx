@@ -6,6 +6,7 @@ type ScrollAreaContainerProps = {
   className?: string;
   viewPortClassName?: string;
   scrollBarClassName?: string;
+  viewportAsChild?: boolean;
 } & ScrollArea.ScrollAreaProps;
 
 const ScrollAreaContainer = forwardRef<
@@ -17,8 +18,9 @@ const ScrollAreaContainer = forwardRef<
       className,
       viewPortClassName,
       scrollBarClassName,
-      children,
+      viewportAsChild = false,
       type = "scroll",
+      children,
       ...rest
     },
     ref
@@ -31,7 +33,7 @@ const ScrollAreaContainer = forwardRef<
     >
       <ScrollArea.Viewport
         className={classNames("w-full h-full", viewPortClassName)}
-        // TODO: Add paddings for different states
+        asChild={viewportAsChild}
       >
         {children}
       </ScrollArea.Viewport>
