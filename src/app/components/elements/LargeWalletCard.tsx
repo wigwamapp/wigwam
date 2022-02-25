@@ -62,7 +62,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
           className={classNames(
             "flex flex-col items-start",
             "text-base text-brand-light leading-none",
-            "w-full min-w-[0]"
+            "w-full min-w-0"
           )}
         >
           <input ref={fieldRef} defaultValue={address} className="sr-only" />
@@ -88,7 +88,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               <span
                 className={classNames(
                   "block",
-                  "pb-0.5 block min-w-[0]",
+                  "pb-0.5 block min-w-0",
                   "font-bold",
                   "overflow-ellipsis overflow-hidden whitespace-nowrap"
                 )}

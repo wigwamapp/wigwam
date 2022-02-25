@@ -17,8 +17,8 @@ const Menu: FC = () => {
     <div className="flex items-center py-4 border-b border-brand-main/[.07]">
       <NetworkSelect />
       <div className="ml-auto flex items-center">
-        <NewButton theme="tertiary">
-          <ControlIcon className="mr-2" />
+        <NewButton theme="tertiary" className="!min-w-0 w-[8.5rem]">
+          <ControlIcon className="-ml-0.5 mr-2" />
           Control
         </NewButton>
         <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
@@ -50,11 +50,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({ className }) => {
   );
 };
 
-type LockProfileButtonProps = {
-  className?: string;
-};
-
-const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
+const LockProfileButton: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
 
   const handleLock = useCallback(async () => {
@@ -69,10 +65,9 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
     <NewButton
       theme="secondary"
       className={classNames(
-        "h-full !py-2 !px-4",
+        "h-full !py-2 !px-4 !min-w-0 w-[8.5rem]",
         "!rounded-[.625rem]",
-        "!justify-start items-center",
-        className
+        "!justify-start items-center"
       )}
       onClick={handleLock}
     >

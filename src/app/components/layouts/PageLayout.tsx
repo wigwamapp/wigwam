@@ -26,7 +26,7 @@ const PageLayout: FC<{ animate?: boolean }> = ({
     <ContentContainer className="flex grow">
       <Sidebar />
 
-      <main className="pl-6 grow w-full min-w-[0]">
+      <main className="pl-6 grow w-full min-w-0">
         <Menu />
         {children}
       </main>

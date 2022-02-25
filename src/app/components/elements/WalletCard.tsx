@@ -46,7 +46,7 @@ const WalletCard: FC<WalletCardProps> = ({
         className={classNames(
           "flex flex-col",
           "text-base font-bold text-brand-inactivelight leading-none",
-          "min-w-[0]",
+          "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
           "group-focus:text-brand-light"

@@ -130,7 +130,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
   }, [accounts, fuse, searchValue]);
 
   return (
-    <div className="flex flex-col w-full min-w-[0]">
+    <div className="flex flex-col w-full min-w-0">
       <div className="flex items-center mb-3">
         <div className="relative w-full">
           <Input
