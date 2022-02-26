@@ -323,8 +323,8 @@ const PriceChange: FC<PriceChangeProps> = ({
         "rounded-md",
         isPositive && isPercent && "bg-[#4F9A5E]",
         !isPositive && isPercent && "bg-[#B82D41]",
-        isPositive && !isPercent && "text-[#EA556A]",
-        !isPositive && !isPercent && "text-[#6BB77A]"
+        isPositive && !isPercent && "text-[#6BB77A]",
+        !isPositive && !isPercent && "text-[#EA556A]"
       )}
     >
       {isPositive ? "+" : "-"}
