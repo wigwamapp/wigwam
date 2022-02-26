@@ -32,7 +32,10 @@ const ScrollAreaContainer = forwardRef<
       {...rest}
     >
       <ScrollArea.Viewport
-        className={classNames("w-full h-full", viewPortClassName)}
+        className={classNames(
+          "w-full h-full overscroll-contain",
+          viewPortClassName
+        )}
         asChild={viewportAsChild}
       >
         {children}
