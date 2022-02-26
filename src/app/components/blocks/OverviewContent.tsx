@@ -29,16 +29,7 @@ const OverviewContent: FC = () => {
         activeAssetName={selectedAsset.name}
         onAssetSelect={setSelectedAsset}
       />
-      <AssetInfo
-        icon={selectedAsset.icon}
-        name={selectedAsset.name}
-        symbol={selectedAsset.symbol}
-        type={selectedAsset.type}
-        price={selectedAsset.price}
-        priceChange={selectedAsset.priceChange}
-        balance={selectedAsset.balance}
-        dollars={selectedAsset.dollars}
-      />
+      <AssetInfo asset={selectedAsset} />
     </div>
   );
 };
@@ -120,11 +111,7 @@ const AssetsList: FC<AssetsListProps> = ({
         {filteredAssets.map((asset, i) => (
           <AssetCard
             key={asset.name}
-            icon={asset.icon}
-            name={asset.name}
-            symbol={asset.symbol}
-            balance={asset.balance}
-            dollars={asset.dollars}
+            asset={asset}
             isActive={activeAssetName === asset.name}
             onAssetSelect={() => {
               onAssetSelect(asset);
@@ -138,22 +125,21 @@ const AssetsList: FC<AssetsListProps> = ({
   );
 };
 
-type AssetCardProps = Omit<AssetTempType, "type" | "price" | "priceChange"> & {
+type AssetCardProps = {
+  asset: Omit<AssetTempType, "type" | "price" | "priceChange">;
   isActive?: boolean;
   onAssetSelect: () => void;
   className?: string;
 };
 
 const AssetCard: FC<AssetCardProps> = ({
-  icon,
-  name,
-  symbol,
-  balance,
-  dollars,
+  asset,
   isActive = false,
   onAssetSelect,
   className,
 }) => {
+  const { icon, name, symbol, balance, dollars } = asset;
+
   return (
     <button
       type="button"
@@ -204,83 +190,87 @@ const AssetCard: FC<AssetCardProps> = ({
   );
 };
 
-const AssetInfo: FC<AssetTempType> = ({
-  icon,
-  name,
-  symbol,
-  type,
-  price,
-  priceChange,
-  balance,
-  dollars,
-}) => (
-  <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
-    <div className="flex mb-4">
-      <div
-        className={classNames(
-          "w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5",
-          "bg-white",
-          "rounded-full overflow-hidden"
-        )}
-      >
-        <img src={icon} alt={name} className="w-full h-full object-cover" />
-      </div>
-      <div className="flex flex-col justify-between grow">
-        <div className="flex items-center">
-          <h2 className="text-2xl font-bold mr-3">{name}</h2>
-          {type && <Tag type={type} />}
-          <IconedButton
-            aria-label="View wallet transactions in explorer"
-            Icon={WalletExplorerIcon}
-            className="!w-6 !h-6 ml-auto"
-            iconClassName="!w-[1.125rem]"
-          />
-          <IconedButton
-            aria-label="View wallet transactions in explorer"
-            Icon={ClockIcon}
-            className="!w-6 !h-6 ml-2"
-            iconClassName="!w-[1.125rem]"
-          />
+type AssetInfoProps = {
+  asset: AssetTempType;
+};
+
+const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
+  const { icon, name, symbol, type, price, priceChange, balance, dollars } =
+    asset;
+
+  return (
+    <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
+      <div className="flex mb-4">
+        <div
+          className={classNames(
+            "w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5",
+            "bg-white",
+            "rounded-full overflow-hidden"
+          )}
+        >
+          <img src={icon} alt={name} className="w-full h-full object-cover" />
         </div>
-        <div className="flex flex-col">
-          <span className="text-base text-brand-gray leading-none mb-0.5">
-            Price
-          </span>
-          <span className="flex items-center">
-            <span className="text-lg font-bold leading-5 mr-3">$ {price}</span>
-            <PriceChange priceChange={priceChange} isPercent />
-          </span>
+        <div className="flex flex-col justify-between grow">
+          <div className="flex items-center">
+            <h2 className="text-2xl font-bold mr-3">{name}</h2>
+            {type && <Tag type={type} />}
+            <IconedButton
+              aria-label="View wallet transactions in explorer"
+              Icon={WalletExplorerIcon}
+              className="!w-6 !h-6 ml-auto"
+              iconClassName="!w-[1.125rem]"
+            />
+            <IconedButton
+              aria-label="View wallet transactions in explorer"
+              Icon={ClockIcon}
+              className="!w-6 !h-6 ml-2"
+              iconClassName="!w-[1.125rem]"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base text-brand-gray leading-none mb-0.5">
+              Price
+            </span>
+            <span className="flex items-center">
+              <span className="text-lg font-bold leading-5 mr-3">
+                $ {price}
+              </span>
+              <PriceChange priceChange={priceChange} isPercent />
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-    <div>
-      <div className="text-base text-brand-gray leading-none mb-3">Balance</div>
       <div>
-        <span className="text-[1.75rem] font-bold leading-none">
-          {balance} {symbol}
-        </span>
-        <span className="text-base text-brand-inactivedark ml-8 mr-4">
-          $ {dollars}
-        </span>
-        <PriceChange priceChange={"-2.8"} />
+        <div className="text-base text-brand-gray leading-none mb-3">
+          Balance
+        </div>
+        <div>
+          <span className="text-[1.75rem] font-bold leading-none">
+            {balance} {symbol}
+          </span>
+          <span className="text-base text-brand-inactivedark ml-8 mr-4">
+            $ {dollars}
+          </span>
+          <PriceChange priceChange={"-2.8"} />
+        </div>
+      </div>
+      <div className="mt-6 grid grid-cols-3 gap-2">
+        <NewButton theme="secondary" className="grow !py-2">
+          <SendIcon className="mr-2" />
+          Send
+        </NewButton>
+        <NewButton theme="secondary" className="grow !py-2">
+          <SwapIcon className="mr-2" />
+          Swap
+        </NewButton>
+        <NewButton theme="secondary" className="grow !py-2">
+          <ActivityIcon className="mr-2" />
+          Activity
+        </NewButton>
       </div>
     </div>
-    <div className="mt-6 grid grid-cols-3 gap-2">
-      <NewButton theme="secondary" className="grow !py-2">
-        <SendIcon className="mr-2" />
-        Send
-      </NewButton>
-      <NewButton theme="secondary" className="grow !py-2">
-        <SwapIcon className="mr-2" />
-        Swap
-      </NewButton>
-      <NewButton theme="secondary" className="grow !py-2">
-        <ActivityIcon className="mr-2" />
-        Activity
-      </NewButton>
-    </div>
-  </div>
-);
+  );
+};
 
 type TagProps = Pick<AssetTempType, "type">;
 
