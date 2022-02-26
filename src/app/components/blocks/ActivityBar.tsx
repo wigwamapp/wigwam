@@ -1,4 +1,5 @@
 import { FC, ReactElement, useState } from "react";
+import { match } from "ts-pattern";
 import classNames from "clsx";
 
 import Tooltip from "app/components/elements/Tooltip";
@@ -166,37 +167,23 @@ const StatItem: FC<StatItemProps> = ({
   const { Icon, color } = getStatConfig(status);
 
   return (
-    <Tooltip content={ariaLabel}>
-      <span
-        className={classNames(
-          "flex items-center",
-          "text-base font-bold",
-          color,
-          className
-        )}
-      >
-        <Icon className="mr-2" />
-        {count}
-      </span>
+    <Tooltip
+      content={ariaLabel}
+      className={classNames(
+        "flex items-center",
+        "text-base font-bold",
+        color,
+        className
+      )}
+    >
+      <Icon className="mr-2" />
+      {count}
     </Tooltip>
   );
 };
 
-const getStatConfig = (status: StatusType) => {
-  if (status === "pending") {
-    return {
-      Icon: PendingIcon,
-      color: "text-[#D99E2E]",
-    };
-  }
-  if (status === "failed") {
-    return {
-      Icon: FailedIcon,
-      color: "text-[#EA556A]",
-    };
-  }
-  return {
-    Icon: SuccessIcon,
-    color: "text-[#6BB77A]",
-  };
-};
+const getStatConfig = (status: StatusType) =>
+  match(status)
+    .with("pending", () => ({ Icon: PendingIcon, color: "text-[#D99E2E]" }))
+    .with("failed", () => ({ Icon: FailedIcon, color: "text-[#EA556A]" }))
+    .otherwise(() => ({ Icon: SuccessIcon, color: "text-[#6BB77A]" }));
