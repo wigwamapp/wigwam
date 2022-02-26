@@ -8,7 +8,7 @@ import { ReactComponent as SwapIcon } from "app/icons/Send.svg";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/activity-successfull.svg";
 import { ReactComponent as PendingIcon } from "app/icons/activity-pending.svg";
-import { ReactComponent as WarningIcon } from "app/icons/activity-warning.svg";
+import { ReactComponent as FailedIcon } from "app/icons/activity-warning.svg";
 
 const ActivityBar: FC = () => {
   const [activityHovered, setActivityHovered] = useState(false);
@@ -77,9 +77,18 @@ const ActivityBar: FC = () => {
         </span>
       </div>
       <div className="flex items-center">
-        <StatItem count={2} className="mr-6" />
-        <StatItem count={4} status="pending" className="mr-6" />
-        <StatItem count={1} status="warning" />
+        <StatItem
+          count={2}
+          ariaLabel="2 successful transactions"
+          className="mr-6"
+        />
+        <StatItem
+          count={4}
+          status="pending"
+          ariaLabel="4 pending transactions"
+          className="mr-6"
+        />
+        <StatItem count={1} status="failed" ariaLabel="1 failed transactions" />
       </div>
     </div>
   );
@@ -135,17 +144,19 @@ const ActivityIcon: FC<ActivityIconProps> = ({
   return <Icon />;
 };
 
-type StatusType = "successful" | "pending" | "warning";
+type StatusType = "successful" | "pending" | "failed";
 
 type StatItemProps = {
   status?: StatusType;
   count?: number;
+  ariaLabel: string;
   className?: string;
 };
 
 const StatItem: FC<StatItemProps> = ({
   status = "successful",
   count,
+  ariaLabel,
   className,
 }) => {
   if (!count || count === 0) {
@@ -155,17 +166,19 @@ const StatItem: FC<StatItemProps> = ({
   const { Icon, color } = getStatConfig(status);
 
   return (
-    <span
-      className={classNames(
-        "flex items-center",
-        "text-base font-bold",
-        color,
-        className
-      )}
-    >
-      <Icon className="mr-2" />
-      {count}
-    </span>
+    <Tooltip content={ariaLabel}>
+      <span
+        className={classNames(
+          "flex items-center",
+          "text-base font-bold",
+          color,
+          className
+        )}
+      >
+        <Icon className="mr-2" />
+        {count}
+      </span>
+    </Tooltip>
   );
 };
 
@@ -176,9 +189,9 @@ const getStatConfig = (status: StatusType) => {
       color: "text-[#D99E2E]",
     };
   }
-  if (status === "warning") {
+  if (status === "failed") {
     return {
-      Icon: WarningIcon,
+      Icon: FailedIcon,
       color: "text-[#EA556A]",
     };
   }
