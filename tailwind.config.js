@@ -56,6 +56,7 @@ module.exports = {
         buttonaccent:
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",
         radio: "linear-gradient(275.43deg, #FF002D 13.81%, #FF7F44 111.89%)",
+        activity: "linear-gradient(220deg, #FF002D 0.11%, #FF7F44 90.88%)",
       },
     },
   },

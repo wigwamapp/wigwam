@@ -140,7 +140,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
             onChange={(e) => {
               setSearchValue(e.currentTarget.value);
             }}
-            inputClassName="!max-h-[2.5rem]"
+            inputClassName="!max-h-[2.5rem] pr-11"
           />
           {searchValue && (
             <IconedButton
