@@ -4,6 +4,7 @@ import classNames from "clsx";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Sidebar from "app/components/blocks/Sidebar";
 import Menu from "app/components/blocks/Menu";
+import ActivityBar from "app/components/blocks/ActivityBar";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -38,6 +39,7 @@ const PageLayout: FC<{ animate?: boolean; className?: string }> = ({
         {children}
       </main>
     </ContentContainer>
+    <ActivityBar />
   </div>
 );
 

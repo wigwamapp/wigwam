@@ -5,7 +5,11 @@ import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
 import { AddAccountStep } from "app/defaults";
-import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
+import {
+  addAccountModalAtom,
+  addAccountStepAtom,
+  hasSeedPhraseAtom,
+} from "app/atoms";
 
 import NewButton from "app/components/elements/NewButton";
 import BackButton from "app/components/elements/BackButton";
@@ -15,6 +19,8 @@ import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  console.log("hasSeedPhrase", hasSeedPhrase); // Q: Doesn't work without this line
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -26,6 +32,12 @@ const AddAccountModal = memo(() => {
   return (
     <Dialog.Root open={accModalOpened} onOpenChange={handleOpenChange} modal>
       <Dialog.Portal>
+        <Dialog.Overlay
+          className={classNames(
+            "fixed inset-0 z-20",
+            hasSeedPhrase && "bg-brand-darkblue/50"
+          )}
+        />
         <div
           className={classNames(
             "flex items-center justify-center",
@@ -44,6 +56,7 @@ const AddAccountModal = memo(() => {
           <VigvamIcon className="w-16 mt-2" />
         </div>
         <Dialog.Content
+          onOpenAutoFocus={(e) => e.preventDefault()}
           className={classNames(
             "fixed z-20",
             "h-3/4 w-full max-w-6xl min-w-[40rem]",
