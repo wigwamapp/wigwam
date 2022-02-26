@@ -232,7 +232,7 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
               Price
             </span>
             <span className="flex items-center">
-              <span className="text-lg font-bold leading-5 mr-3">
+              <span className="text-lg font-bold leading-6 mr-3">
                 $ {price}
               </span>
               <PriceChange priceChange={priceChange} isPercent />
