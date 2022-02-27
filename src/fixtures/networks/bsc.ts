@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const BSC: INetwork[] = [
+export const BSC: Network[] = [
   // Mainnet
   {
     chainId: 56,

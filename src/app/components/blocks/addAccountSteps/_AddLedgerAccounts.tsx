@@ -15,10 +15,9 @@ import retry from "async-retry";
 import { toProtectedString } from "lib/crypto-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AccountSource, AddLedgerAccountParams } from "core/types";
+import { AccountSource, AddLedgerAccountParams, Network } from "core/types";
 import { generatePreviewHDNodes } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
-import { INetwork } from "core/repo";
 
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
@@ -181,7 +180,7 @@ export default AddLedgerAccounts;
 type AccountProps = {
   address: string;
   provider: ethers.providers.Provider;
-  network: INetwork;
+  network: Network;
 };
 
 const Account = memo<AccountProps>(({ address, provider, network }) => {

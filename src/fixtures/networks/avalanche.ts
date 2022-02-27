@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const AVALANCHE: INetwork[] = [
+export const AVALANCHE: Network[] = [
   // Mainnet
   {
     chainId: 43114,

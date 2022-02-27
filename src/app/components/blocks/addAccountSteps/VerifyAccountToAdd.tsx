@@ -16,14 +16,18 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AddHDAccountParams, SeedPharse, AccountSource } from "core/types";
+import {
+  AddHDAccountParams,
+  SeedPharse,
+  AccountSource,
+  Network,
+} from "core/types";
 import {
   toNeuterExtendedKey,
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
 } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
-import { INetwork } from "core/repo";
 
 import {
   allNetworksAtom,
@@ -287,7 +291,7 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
-  network: INetwork;
+  network: Network;
   isAdded: boolean;
   onToggleAdd: () => void;
   onChangeWalletName: (name: string) => void;

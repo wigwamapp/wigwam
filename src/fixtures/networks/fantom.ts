@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const FANTOM: INetwork[] = [
+export const FANTOM: Network[] = [
   // Mainnet
   {
     chainId: 250,
