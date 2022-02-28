@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const POLYGON: INetwork[] = [
+export const POLYGON: Network[] = [
   // Mainnet
   {
     chainId: 137,

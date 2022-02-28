@@ -6,6 +6,7 @@ type ScrollAreaContainerProps = {
   className?: string;
   viewPortClassName?: string;
   scrollBarClassName?: string;
+  viewportAsChild?: boolean;
 } & ScrollArea.ScrollAreaProps;
 
 const ScrollAreaContainer = forwardRef<
@@ -17,8 +18,9 @@ const ScrollAreaContainer = forwardRef<
       className,
       viewPortClassName,
       scrollBarClassName,
-      children,
+      viewportAsChild = false,
       type = "scroll",
+      children,
       ...rest
     },
     ref
@@ -30,8 +32,11 @@ const ScrollAreaContainer = forwardRef<
       {...rest}
     >
       <ScrollArea.Viewport
-        className={classNames("w-full h-full", viewPortClassName)}
-        // TODO: Add paddings for different states
+        className={classNames(
+          "w-full h-full overscroll-contain",
+          viewPortClassName
+        )}
+        asChild={viewportAsChild}
       >
         {children}
       </ScrollArea.Viewport>

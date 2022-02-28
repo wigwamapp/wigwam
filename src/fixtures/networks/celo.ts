@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const CELO: INetwork[] = [
+export const CELO: Network[] = [
   // Mainnet
   {
     chainId: 42220,

@@ -1,0 +1,200 @@
+import { FC, useMemo, useState } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { waitForAll } from "jotai/utils";
+import classNames from "clsx";
+import Fuse from "fuse.js";
+import Link from "lib/navigation/Link";
+
+import { Account } from "core/types";
+
+import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
+import {
+  accountAddressAtom,
+  allAccountsAtom,
+  currentAccountAtom,
+} from "app/atoms";
+import LargeWalletCard from "app/components/elements/LargeWalletCard";
+import Input from "app/components/elements/Input";
+import NewButton from "app/components/elements/NewButton";
+import WalletCard from "app/components/elements/WalletCard";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import IconedButton from "app/components/elements/IconedButton";
+import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as ClearIcon } from "app/icons/close.svg";
+
+const WalletsList: FC = () => {
+  const { currentAccount, allAccounts } = useAtomValue(
+    useMemo(
+      () =>
+        waitForAll({
+          currentAccount: currentAccountAtom,
+          allAccounts: allAccountsAtom,
+        }),
+      []
+    )
+  );
+
+  const accountsWithoutCurrent = useMemo(
+    () =>
+      allAccounts.filter(({ address }) => address !== currentAccount.address),
+    [allAccounts, currentAccount.address]
+  );
+
+  return (
+    <div className="flex py-4 border-b border-brand-main/[.07]">
+      <LargeWalletCard account={currentAccount} className="mr-6" />
+      {accountsWithoutCurrent.length > 0 ? (
+        <SearchableAccountsScrollArea accounts={accountsWithoutCurrent} />
+      ) : (
+        <EmptyWalletCard />
+      )}
+    </div>
+  );
+};
+
+export default WalletsList;
+
+const emptyClassBg = classNames(
+  "h-3",
+  "rounded bg-brand-main/10",
+  "transition-colors",
+  "group-hover:bg-brand-main/20 group-focus:bg-brand-main/20"
+);
+
+const EmptyWalletCard: FC = () => (
+  <div className="flex items-center">
+    <Link to={{ addAccOpened: true }} className={"flex group cursor-pointer"}>
+      <div
+        className={classNames(
+          "w-[14.5rem] min-w-[14.5rem]",
+          "flex items-stretch",
+          "bg-brand-main/5",
+          "rounded-l-[.625rem]",
+          "p-3",
+          "transition-colors",
+          "group-hover:bg-brand-main/10 group-focus:bg-brand-main/10"
+        )}
+      >
+        <div
+          className={classNames(
+            "!h-14 w-14 min-w-[3.5rem] mr-3",
+            "!rounded-[.625rem]",
+            emptyClassBg
+          )}
+        />
+        <span className="flex flex-col">
+          <span className={classNames("w-24", emptyClassBg)} />
+          <span className={classNames("mt-2 w-20", emptyClassBg)} />
+          <span className={classNames("mt-auto w-32", emptyClassBg)} />
+        </span>
+      </div>
+      <div
+        className={classNames(
+          "flex justify-center items-center",
+          "px-3.5",
+          "bg-brand-main/10",
+          "rounded-r-[.625rem]",
+          "transition-colors",
+          "group-hover:bg-brand-main/20 group-focus:bg-brand-main/20"
+        )}
+      >
+        <AddWalletIcon />
+      </div>
+    </Link>
+  </div>
+);
+
+type SearchableAccountsScrollAreaProps = {
+  accounts: Account[];
+};
+
+const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
+  accounts,
+}) => {
+  const setAccountAddress = useSetAtom(accountAddressAtom);
+
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
+  const fuse = useMemo(
+    () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
+    [accounts]
+  );
+
+  const filteredAccounts = useMemo(() => {
+    if (searchValue) {
+      return fuse.search(searchValue).map(({ item: account }) => account);
+    }
+    return accounts;
+  }, [accounts, fuse, searchValue]);
+
+  return (
+    <div className="flex flex-col w-full min-w-0">
+      <div className="flex items-center mb-3">
+        <div className="relative w-full">
+          <Input
+            placeholder="Type name or address to search..."
+            StartAdornment={SearchIcon}
+            value={searchValue ?? ""}
+            onChange={(e) => {
+              setSearchValue(e.currentTarget.value);
+            }}
+            inputClassName="!max-h-[2.5rem] pr-11"
+          />
+          {searchValue && (
+            <IconedButton
+              theme="tertiary"
+              Icon={ClearIcon}
+              aria-label="Clear"
+              onClick={() => setSearchValue(null)}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+            />
+          )}
+        </div>
+        <NewButton
+          to={{ addAccOpened: true }}
+          theme="tertiary"
+          className="ml-5 !py-2"
+        >
+          <AddWalletIcon className="mr-2" />
+          Add Wallet
+        </NewButton>
+      </div>
+      {filteredAccounts.length > 0 ? (
+        <ScrollAreaContainer
+          className="pb-4 -mb-4"
+          viewPortClassName="!flex rounded-[.625rem]"
+          scrollBarClassName="w-full px-0"
+          viewportAsChild
+          type="hover"
+        >
+          {filteredAccounts.map((account, i) => (
+            <WalletCard
+              key={account.address}
+              account={account}
+              onClick={() => {
+                setAccountAddress(account.address);
+                setSearchValue(null);
+              }}
+              className={classNames(i !== accounts.length - 1 && "mr-4")}
+            />
+          ))}
+        </ScrollAreaContainer>
+      ) : (
+        <div
+          className={classNames(
+            "flex justify-center items-center",
+            "h-full mr-[11.25rem]",
+            "border border-brand-light/[.05]",
+            "rounded-[.625rem]",
+            "text-sm text-brand-placeholder"
+          )}
+        >
+          <NoResultsFoundIcon className="mr-5" />
+          No results found
+        </div>
+      )}
+    </div>
+  );
+};

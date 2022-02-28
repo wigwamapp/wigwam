@@ -1,21 +1,21 @@
 import { FC, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "./Select";
 
-const prepareNetwork = (network: INetwork) => ({
+const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
   icon: NETWORK_ICON_MAP.get(network.chainId),
 });
 
 type NetworkSelectProps = {
-  networks: INetwork[];
-  currentNetwork: INetwork;
+  networks: Network[];
+  currentNetwork: Network;
   onNetworkChange: (chainId: number) => void;
   className?: string;
 };

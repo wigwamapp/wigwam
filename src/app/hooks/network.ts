@@ -1,10 +1,11 @@
 import { useAtomValue } from "jotai";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
+import { Network } from "core/types";
+
 import { lazyNetworkAtom } from "app/atoms";
 
 import { useChainId } from "./chainId";
-import { INetwork } from "core/repo";
 
 export function useNetwork() {
   const chainId = useChainId();
@@ -13,9 +14,9 @@ export function useNetwork() {
   return network.state === "hasData" ? network.data : undefined;
 }
 
-export function useLazyNetwork(): INetwork | undefined;
-export function useLazyNetwork(fallback: INetwork): INetwork;
-export function useLazyNetwork(fallback?: INetwork) {
+export function useLazyNetwork(): Network | undefined;
+export function useLazyNetwork(fallback: Network): Network;
+export function useLazyNetwork(fallback?: Network) {
   const network = useNetwork();
   const prevNetwork = usePrevious(network);
 

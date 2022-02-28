@@ -15,17 +15,17 @@ const SocialLinks = [
   {
     Icon: TelegramIcon,
     href: "https://t.me/vigvamapp",
-    ariaLabel: "telegram",
+    ariaLabel: "Telegram",
   },
   {
     Icon: GithubIcon,
     href: "https://github.com/vigvamapp",
-    ariaLabel: "github",
+    ariaLabel: "Github",
   },
   {
     Icon: TwitterIcon,
     href: "https://twitter.com/vigvamapp",
-    ariaLabel: "twitter",
+    ariaLabel: "Twitter",
   },
 ];
 

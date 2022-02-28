@@ -16,14 +16,18 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { useMaybeAtomValue } from "lib/atom-utils";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AddHDAccountParams, SeedPharse, AccountSource } from "core/types";
+import {
+  AddHDAccountParams,
+  SeedPharse,
+  AccountSource,
+  Network,
+} from "core/types";
 import {
   toNeuterExtendedKey,
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
 } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
-import { INetwork } from "core/repo";
 
 import {
   allNetworksAtom,
@@ -37,8 +41,9 @@ import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
+import HoverCard from "app/components/elements/HoverCard";
+import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
-
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
 type VerifyAccountToAddProps = {
@@ -199,11 +204,34 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
       <div className="flex flex-col max-w-[45.25rem] mx-auto">
         <div className="flex mb-9">
           <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
-          <NetworkSelect
-            networks={preparedNetworks}
-            currentNetwork={network}
-            onNetworkChange={onNetworkChange}
-          />
+          <div className="flex items-center ml-auto">
+            <HoverCard
+              content={
+                <>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                    aliquam, purus sit amet luctus venenatis, lectus magna
+                    fringilla urna, porttitor rhoncus dolor purus non enim
+                    praesent elementum facilisis leo
+                  </p>
+                  <p className="mt-2">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                    aliquam, purus sit amet luctus venenatis, lectus magna
+                    fringilla urna, porttitor rhoncus
+                  </p>
+                </>
+              }
+              className="mr-3"
+              side="left"
+            >
+              <TooltipIcon />
+            </HoverCard>
+            <NetworkSelect
+              networks={preparedNetworks}
+              currentNetwork={network}
+              onNetworkChange={onNetworkChange}
+            />
+          </div>
         </div>
         <table className="text-brand-light">
           <thead>
@@ -263,7 +291,7 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
-  network: INetwork;
+  network: Network;
   isAdded: boolean;
   onToggleAdd: () => void;
   onChangeWalletName: (name: string) => void;

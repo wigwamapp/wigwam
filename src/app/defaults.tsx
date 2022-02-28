@@ -1,7 +1,8 @@
 import Fuse from "fuse.js";
 import { Font } from "lib/web-fonts";
 
-import type { INetwork } from "core/repo";
+import { Account, Network } from "core/types";
+import { AssetTempType } from "app/temp-data/assets";
 
 export enum Page {
   Default = "default",
@@ -35,37 +36,65 @@ export enum AddAccountStep {
   SetupPassword = "setup-password",
 }
 
-export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<INetwork> = {
+export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   includeScore: true,
   keys: [
     {
       name: "name",
-      weight: 1,
+      weight: 4,
     },
     {
       name: "chainTag",
-      weight: 2,
+      weight: 3,
     },
     {
       name: "chainId",
-      weight: 2,
+      weight: 3,
     },
     {
       name: "nativeCurrency.name",
-      weight: 3,
+      weight: 2,
     },
     {
       name: "nativeCurrency.symbol",
+      weight: 2,
+    },
+    "rpcUrls.value",
+    "type",
+  ],
+};
+
+export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
+  includeScore: true,
+  shouldSort: false,
+  keys: [
+    {
+      name: "name",
+      weight: 3,
+    },
+    "address",
+    // "source", TODO: More flexible source as GMAIL, TWITTER, etc.
+  ],
+};
+
+export const ASSETS_SEARCH_OPTIONS: Fuse.IFuseOptions<AssetTempType> = {
+  includeScore: true,
+  shouldSort: false,
+  keys: [
+    {
+      name: "name",
       weight: 3,
     },
     {
-      name: "rpcUrls.value",
-      weight: 4,
+      name: "symbol",
+      weight: 3,
     },
     {
-      name: "type",
-      weight: 4,
+      name: "address",
+      weight: 2,
     },
+    "balance",
+    "dollars",
   ],
 };
 

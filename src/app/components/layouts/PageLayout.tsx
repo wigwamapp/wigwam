@@ -1,31 +1,45 @@
 import { FC } from "react";
 import classNames from "clsx";
+
 import ContentContainer from "app/components/layouts/ContentContainer";
-import Sidebar from "../blocks/Sidebar";
+import Sidebar from "app/components/blocks/Sidebar";
+import Menu from "app/components/blocks/Menu";
+import ActivityBar from "app/components/blocks/ActivityBar";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const PageLayout: FC<{ animate?: boolean }> = ({
+const PageLayout: FC<{ animate?: boolean; className?: string }> = ({
   children,
   animate = true,
+  className,
 }) => (
   <div
     className={classNames(
       // (bootAnimationDisplayed || animate) && "animate-bootfadein",
-      "min-h-screen flex flex-col"
+      "h-screen flex flex-col"
     )}
     onAnimationEnd={
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer className="flex grow">
+    <ContentContainer className="flex grow max-h-screen">
       <Sidebar />
 
-      <main className="py-4 pl-6 grow">{children}</main>
+      <main
+        className={classNames(
+          "w-full min-w-0 pl-6",
+          "grow overflow-hidden",
+          className
+        )}
+      >
+        <Menu />
+        {children}
+      </main>
     </ContentContainer>
+    <ActivityBar />
   </div>
 );
 

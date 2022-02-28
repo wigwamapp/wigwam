@@ -4,9 +4,9 @@ import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
-import AutoIcon from "./AutoIcon";
-import HashPreview from "./HashPreview";
-import Balance from "./Balance";
+import AutoIcon from "app/components/elements/AutoIcon";
+import HashPreview from "app/components/elements/HashPreview";
+import Balance from "app/components/elements/Balance";
 
 type WalletCardProps = {
   account: Account;
@@ -20,11 +20,13 @@ const WalletCard: FC<WalletCardProps> = ({
   onClick,
 }) => {
   const classNamesList = classNames(
+    "relative",
     "p-3",
-    `max-w-[16.5rem]`,
+    "w-[16.5rem] min-w-[16.5rem]",
     "bg-brand-main/5",
     "rounded-[.625rem]",
-    "flex"
+    "flex items-stretch",
+    "text-left"
   );
 
   const content = (
@@ -44,7 +46,7 @@ const WalletCard: FC<WalletCardProps> = ({
         className={classNames(
           "flex flex-col",
           "text-base font-bold text-brand-inactivelight leading-none",
-          "min-w-[0]",
+          "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
           "group-focus:text-brand-light"
@@ -55,7 +57,8 @@ const WalletCard: FC<WalletCardProps> = ({
         </h3>
         <HashPreview
           hash={address}
-          className="text-sm text-brand-inactivedark mt-1 font-normal leading-none"
+          className="text-sm text-brand-inactivedark mt-0.5 font-normal leading-none"
+          withTooltip={false}
         />
         <Balance address={address} className="mt-auto" />
       </span>

@@ -1,7 +1,8 @@
-import { db } from "./schema";
-import { RepoTable, INetwork } from "./types";
+import { Network } from "core/types";
 
-export const networks = db.table<INetwork, number>(RepoTable.Networks);
+import { db, RepoTable } from "./schema";
+
+export const networks = db.table<Network, number>(RepoTable.Networks);
 
 export async function clear() {
   try {

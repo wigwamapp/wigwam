@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const OPTIMISM: INetwork[] = [
+export const OPTIMISM: Network[] = [
   // Mainnet
   {
     chainId: 10,
