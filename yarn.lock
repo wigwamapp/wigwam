@@ -2836,7 +2836,7 @@
     "@radix-ui/react-id" "0.1.5"
     "@radix-ui/react-primitive" "0.1.4"
 
-"@radix-ui/react-popover@^0.1.5":
+"@radix-ui/react-popover@0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-popover/-/react-popover-0.1.5.tgz#5657d7496dad75ccb2cd02945aac4f5530458a3b"
   integrity sha512-G3SWbagICqrYsmVrW5ISujHtI9SSwGT/1tHFnRS4EwmYow4J/YKrdmJ19wX/vnMGeGgRHiobNhlxSPNThek3Mw==
