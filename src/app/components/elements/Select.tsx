@@ -120,7 +120,10 @@ function Select<T extends string | ReactElement, U extends string | number>({
               <Listbox.Options
                 static
                 as={"div"}
-                className={classNames("shadow-xs", "focus:outline-none")}
+                className={classNames(
+                  "shadow-xs",
+                  "focus-visible:outline-none"
+                )}
               >
                 {!!onSearch && (
                   <div
@@ -175,7 +178,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               {
                                 "bg-brand-main/20": active,
                               },
-                              "focus:bg-brand-main/20",
+                              "focus-visible:bg-brand-main/20",
                               "transition-colors"
                             )}
                           >

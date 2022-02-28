@@ -31,7 +31,7 @@ const ListboxWrapper = memo<ListboxWrapperProps>(
             >
               <Listbox.Options
                 static
-                className="max-h-60 py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none"
+                className="max-h-60 py-1 text-base leading-6 shadow-xs overflow-auto focus-visible:outline-none"
               >
                 {children}
               </Listbox.Options>

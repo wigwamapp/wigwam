@@ -19,15 +19,16 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
       "transition",
       theme === "primary" && [
         "hover:bg-opacity-100 hover:shadow-buttonaccent",
-        "focus:bg-opacity-100 focus:shadow-buttonaccent",
+        "focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent",
         "active:bg-opacity-70 active:shadow-none",
       ],
       (theme === "secondary" || theme === "tertiary") && [
         "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
-        "focus:bg-brand-darklight focus:bg-opacity-100 focus:shadow-buttonsecondary",
+        "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
         "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
       ],
-      theme === "clean" && "font-medium hover:opacity-70 focus:opacity-70",
+      theme === "clean" &&
+        "font-medium hover:opacity-70 focus-visible:opacity-70",
       className
     );
 

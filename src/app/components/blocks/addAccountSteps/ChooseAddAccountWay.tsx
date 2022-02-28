@@ -112,7 +112,7 @@ const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
       "text-xs font-bold",
       "max-w-[4.5rem]",
       "transition-transform",
-      !soon && "hover:scale-110 focus:scale-110",
+      !soon && "hover:scale-110 focus-visible:scale-110",
       !soon && "active:scale-95",
       soon && "cursor-not-allowed",
       className

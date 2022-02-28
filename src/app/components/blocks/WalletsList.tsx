@@ -57,7 +57,7 @@ const emptyClassBg = classNames(
   "h-3",
   "rounded bg-brand-main/10",
   "transition-colors",
-  "group-hover:bg-brand-main/20 group-focus:bg-brand-main/20"
+  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
 );
 
 const EmptyWalletCard: FC = () => (
@@ -71,7 +71,7 @@ const EmptyWalletCard: FC = () => (
           "rounded-l-[.625rem]",
           "p-3",
           "transition-colors",
-          "group-hover:bg-brand-main/10 group-focus:bg-brand-main/10"
+          "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
         )}
       >
         <div
@@ -94,7 +94,7 @@ const EmptyWalletCard: FC = () => (
           "bg-brand-main/10",
           "rounded-r-[.625rem]",
           "transition-colors",
-          "group-hover:bg-brand-main/20 group-focus:bg-brand-main/20"
+          "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
         )}
       >
         <AddWalletIcon />
