@@ -32,7 +32,7 @@ import {
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
-import NetworkSelect from "app/components/elements/NetworkSelect";
+import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";

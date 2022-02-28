@@ -14,15 +14,12 @@ import {
   currentAccountAtom,
 } from "app/atoms";
 import LargeWalletCard from "app/components/elements/LargeWalletCard";
-import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import WalletCard from "app/components/elements/WalletCard";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import IconedButton from "app/components/elements/IconedButton";
-import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
+import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
-import { ReactComponent as ClearIcon } from "app/icons/close.svg";
 
 const WalletsList: FC = () => {
   const { currentAccount, allAccounts } = useAtomValue(
@@ -132,26 +129,10 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
   return (
     <div className="flex flex-col w-full min-w-0">
       <div className="flex items-center mb-3">
-        <div className="relative w-full">
-          <Input
-            placeholder="Type name or address to search..."
-            StartAdornment={SearchIcon}
-            value={searchValue ?? ""}
-            onChange={(e) => {
-              setSearchValue(e.currentTarget.value);
-            }}
-            inputClassName="!max-h-[2.5rem] pr-11"
-          />
-          {searchValue && (
-            <IconedButton
-              theme="tertiary"
-              Icon={ClearIcon}
-              aria-label="Clear"
-              onClick={() => setSearchValue(null)}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
-            />
-          )}
-        </div>
+        <SearchInput
+          searchValue={searchValue}
+          toggleSearchValue={setSearchValue}
+        />
         <NewButton
           to={{ addAccOpened: true }}
           theme="tertiary"
@@ -167,7 +148,6 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
           viewPortClassName="!flex rounded-[.625rem]"
           scrollBarClassName="w-full px-0"
           viewportAsChild
-          type="hover"
         >
           {filteredAccounts.map((account, i) => (
             <WalletCard
