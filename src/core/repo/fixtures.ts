@@ -1,9 +1,10 @@
-import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { formatRpcUrl } from "core/common";
+import { Network } from "core/types";
+
+import { DEFAULT_NETWORKS } from "fixtures/networks";
 
 import { db } from "./schema";
 import { networks } from "./helpers";
-import { INetwork } from "./types";
 
 export async function setupFixtures() {
   try {
@@ -24,7 +25,7 @@ export async function setupFixtures() {
   }
 }
 
-function mergeNetwork(saved: INetwork, toMerge: INetwork): INetwork {
+function mergeNetwork(saved: Network, toMerge: Network): Network {
   const {
     chainTag,
     infoUrl,

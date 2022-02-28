@@ -162,7 +162,8 @@ const AssetCard: FC<AssetCardProps> = ({
               "group-hover:text-brand-light"
             )}
           >
-            $ {dollars}
+            <span className="opacity-75">$</span>
+            {dollars}
           </span>
         </span>
       </span>
@@ -213,7 +214,8 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
             </span>
             <span className="flex items-center">
               <span className="text-lg font-bold leading-6 mr-3">
-                $ {price}
+                <span className="opacity-75">$</span>
+                {price}
               </span>
               <PriceChange priceChange={priceChange} isPercent />
             </span>
@@ -229,7 +231,8 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
             {balance} {symbol}
           </span>
           <span className="text-base text-brand-inactivedark ml-8 mr-4">
-            $ {dollars}
+            <span className="opacity-75">$</span>
+            {dollars}
           </span>
           <PriceChange priceChange={"-2.8"} />
         </div>

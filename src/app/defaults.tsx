@@ -1,8 +1,7 @@
 import Fuse from "fuse.js";
 import { Font } from "lib/web-fonts";
 
-import type { INetwork } from "core/repo";
-import { Account } from "core/types";
+import { Account, Network } from "core/types";
 import { AssetTempType } from "app/temp-data/assets";
 
 export enum Page {
@@ -37,7 +36,7 @@ export enum AddAccountStep {
   SetupPassword = "setup-password",
 }
 
-export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<INetwork> = {
+export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   includeScore: true,
   keys: [
     {

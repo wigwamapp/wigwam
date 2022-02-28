@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const ETHEREUM: INetwork[] = [
+export const ETHEREUM: Network[] = [
   // Mainnet
   {
     chainId: 1,

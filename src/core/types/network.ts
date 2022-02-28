@@ -1,10 +1,6 @@
-export enum RepoTable {
-  Networks = "networks",
-}
-
-export interface INetwork {
+export interface Network {
   chainId: number;
-  type: INetworkType;
+  type: NetworkType;
   rpcUrls: string[];
   chainTag: string;
   name: string;
@@ -20,4 +16,4 @@ export interface INetwork {
   infoUrl?: string;
 }
 
-export type INetworkType = "mainnet" | "testnet" | "unknown";
+export type NetworkType = "mainnet" | "testnet" | "unknown";

@@ -137,7 +137,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
           )}
         </div>
         <span className="text-sm leading-none text-brand-inactivedark">
-          $ 46,909.13
+          <span className="opacity-75">$</span>46,909.13
         </span>
       </div>
       <HoverCard

@@ -1,7 +1,10 @@
 import { underProfile } from "lib/ext/profile";
 
-import { RepoTable } from "./types";
 import { AsyncDexie } from "./asyncDexie";
+
+export enum RepoTable {
+  Networks = "networks",
+}
 
 export const db = new AsyncDexie(underProfile("main"));
 

@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const ARBITRUM: INetwork[] = [
+export const ARBITRUM: Network[] = [
   // Mainnet
   {
     chainId: 42161,

@@ -1,6 +1,6 @@
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
-export const HARMONY: INetwork[] = [
+export const HARMONY: Network[] = [
   // Mainnet
   {
     chainId: 1666600000,

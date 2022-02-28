@@ -1,7 +1,7 @@
 import { assert } from "lib/system/assert";
 import { getPublicURL } from "lib/ext/utils";
 
-import { INetwork } from "core/repo";
+import { Network } from "core/types";
 
 import { ETHEREUM } from "./ethereum";
 import { OPTIMISM } from "./optimism";
@@ -17,7 +17,7 @@ import { CELO } from "./celo";
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
 // https://chainid.network/chains.json
 
-export const DEFAULT_NETWORKS: INetwork[] = [
+export const DEFAULT_NETWORKS: Network[] = [
   ETHEREUM,
   OPTIMISM,
   POLYGON,
