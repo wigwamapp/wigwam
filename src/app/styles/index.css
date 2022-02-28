@@ -38,6 +38,12 @@ body {
 @tailwind utilities;
 
 @layer utilities {
+  .glass-icon-stable {
+    --opacity: 1;
+    --color-1: theme("colors.brand.main");
+    --color-2: theme("colors.brand.main");
+  }
+
   .glass-icon {
     --opacity: 0.8;
     --color-1: theme("colors.brand.main");

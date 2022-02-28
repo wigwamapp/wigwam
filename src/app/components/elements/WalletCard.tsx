@@ -49,7 +49,7 @@ const WalletCard: FC<WalletCardProps> = ({
           "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
-          "group-focus:text-brand-light"
+          "group-focus-visible:text-brand-light"
         )}
       >
         <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap">
@@ -74,7 +74,7 @@ const WalletCard: FC<WalletCardProps> = ({
           "group",
           "cursor-pointer",
           "transition-colors",
-          "hover:bg-brand-main/10 focus:bg-brand-main/10",
+          "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           className
         )}
         onClick={onClick}

@@ -4,18 +4,16 @@ import Fuse from "fuse.js";
 
 import { ASSETS_SEARCH_OPTIONS } from "app/defaults";
 import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
-import Input from "app/components/elements/Input";
 import IconedButton from "app/components/elements/IconedButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import NewButton from "app/components/elements/NewButton";
+import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
-import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
-import { ReactComponent as ClearIcon } from "app/icons/close.svg";
 import { AssetsTempData, AssetTempType } from "app/temp-data/assets";
 
 const OverviewContent: FC = () => {
@@ -74,27 +72,10 @@ const AssetsList: FC<AssetsListProps> = ({
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
-        <div className="relative w-full">
-          <Input
-            placeholder="Type name or address to search..."
-            StartAdornment={SearchIcon}
-            value={searchValue ?? ""}
-            onChange={(e) => {
-              setSearchValue(e.currentTarget.value);
-            }}
-            className="w-full"
-            inputClassName="max-h-10 text-sm pr-11"
-          />
-          {searchValue && (
-            <IconedButton
-              theme="tertiary"
-              Icon={ClearIcon}
-              aria-label="Clear"
-              onClick={() => setSearchValue(null)}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
-            />
-          )}
-        </div>
+        <SearchInput
+          searchValue={searchValue}
+          toggleSearchValue={setSearchValue}
+        />
         <IconedButton
           Icon={ConfigIcon}
           theme="tertiary"
@@ -106,7 +87,6 @@ const AssetsList: FC<AssetsListProps> = ({
         className="pr-5 -mr-5 mt-4"
         viewPortClassName="pb-20 rounded-t-[.625rem]"
         scrollBarClassName="py-0 pb-20"
-        type="hover"
       >
         {filteredAssets.map((asset, i) => (
           <AssetCard
