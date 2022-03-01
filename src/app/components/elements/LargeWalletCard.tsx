@@ -30,7 +30,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   className,
 }) => {
   const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
+  const { copy, copied } = useCopyToClipboard(fieldRef); // Don't change when input's value changes
 
   const networks = useAtomValue(allNetworksAtom);
   const currentNetwork = useLazyNetwork(networks[0]);
@@ -65,7 +65,12 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             "w-full min-w-0"
           )}
         >
-          <input ref={fieldRef} defaultValue={address} className="sr-only" />
+          <input
+            ref={fieldRef}
+            value={address}
+            onChange={() => undefined}
+            className="sr-only"
+          />
           <Tooltip
             content={
               copied
@@ -99,12 +104,12 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                 <HashPreview
                   hash={address}
                   withTooltip={false}
-                  className="text-sm font-normal leading-none"
+                  className="text-sm font-normal leading-none mr-1"
                 />
                 {copied ? (
-                  <SuccessIcon className="w-[1.3125rem] ml-1" />
+                  <SuccessIcon className="w-[1.3125rem] h-auto" />
                 ) : (
-                  <CopyIcon className="w-[1.3125rem] ml-1" />
+                  <CopyIcon className="w-[1.3125rem] h-auto" />
                 )}
               </span>
             </button>

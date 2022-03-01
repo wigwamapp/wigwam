@@ -122,8 +122,9 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
           Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
           aria-label={`${inputShowContent ? "Hide" : "Show"} password`}
           theme="tertiary"
-          className="absolute bottom-2.5 right-3"
           onClick={() => setInputShowContent(!inputShowContent)}
+          tabIndex={-1}
+          className="absolute bottom-2.5 right-3"
         />
       </div>
 
