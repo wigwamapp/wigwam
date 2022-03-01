@@ -10,16 +10,18 @@ export enum TokenStandard {
   ERC1155 = "ERC1155",
 }
 
-export type AccountAsset = AccountToken & AssetMetadata;
-export type AccountNFT = AccountToken & NFTMetadata;
+export type AccountToken = AccountAsset | AccountNFT;
 
-export type TokenMetadata = AssetMetadata | NFTMetadata;
+export type AccountAsset = Asset & TokenBalanceFields;
+export type AccountNFT = NFT & TokenBalanceFields;
 
-export interface AccountToken extends TokenBase {
-  tokenSlug: string;
-  balance?: string;
-  balanceUSD?: string;
-}
+export type Token = Asset | NFT;
+
+export type TokenBalanceFields = {
+  accountAddress: string;
+  rawBalance?: string;
+  balanceUSD?: number;
+};
 
 export interface TokenBase {
   chainId: number;
@@ -27,18 +29,19 @@ export interface TokenBase {
   tokenType: TokenType;
 }
 
-export interface AssetMetadata extends TokenBase {
+export interface Asset extends TokenBase {
   tokenType: TokenType.Asset;
   decimals: 6;
   name: string;
   symbol: string;
   logoUrl?: string;
+  priceUSD?: string;
   displaySymbol?: string;
   optimizedSymbol?: string;
   protocolId?: string;
 }
 
-export interface NFTMetadata extends TokenBase {
+export interface NFT extends TokenBase {
   tokenType: TokenType.NFT;
   // @TODO
 }

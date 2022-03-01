@@ -1,41 +1,48 @@
-import { atom } from "jotai";
-import { atomFamily, loadable } from "jotai/utils";
+import { atomFamily } from "jotai/utils";
 import { dequal } from "dequal";
-import {
-  atomWithStorage,
-  atomWithRepoQuery,
-  atomWithAutoReset,
-} from "lib/atom-utils";
+import { atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
-import { getAccounts, onAccountsUpdated } from "core/client";
-import { INITIAL_NETWORK } from "fixtures/networks";
-import { Account, TokenType } from "core/types";
-import { accountAddressAtom } from "./common";
+import { TokenType } from "core/types";
+
+export type GetAccountTokensAtomParams = {
+  chainId: number;
+  tokenType: TokenType;
+  accountAddress: string;
+  withDisabled?: boolean;
+  search?: string;
+};
 
 export const getAccountTokensAtom = atomFamily(
-  ({ chainId, tokenType }: { chainId: number; tokenType: TokenType }) =>
-    atomWithRepoQuery((query, get) => {
-      const accountAddress = get(accountAddressAtom);
-
-      // Repo.accountTokens.where("").between([], []).and(() => true).offset(3).toArray();
-
-      return query(() =>
-        Repo.accountTokens
-          .where("[chainId+accountAddress+tokenType+balanceUSD]")
+  ({
+    chainId,
+    tokenType,
+    accountAddress,
+    withDisabled,
+    search,
+  }: GetAccountTokensAtomParams) =>
+    atomWithRepoQuery((query) =>
+      query(() => {
+        let coll = Repo.accountTokens
+          .where("[chainId+tokenType+accountAddress+balanceUSD]")
           .between(
-            [chainId, accountAddress, tokenType, ""],
-            [chainId, accountAddress, tokenType, "\uffff"]
+            [chainId, tokenType, accountAddress, withDisabled ? -1 : 0],
+            [chainId, tokenType, accountAddress, Infinity]
           )
-          .reverse()
-          .toArray()
-      );
-    }),
+          .reverse();
+
+        if (search) {
+          coll = coll.filter(
+            (token) =>
+              token.tokenType === TokenType.Asset
+                ? token.name.includes(search)
+                : true
+            // @TODO: Implement valid searching
+          );
+        }
+
+        return coll.toArray();
+      })
+    ),
   dequal
 );
-
-// export const getAccountAssetsAtom = atomFamily((chainId: number) =>
-// atomWithRepoQuery((query, get) => {
-//   const accountTokens = get(getAccountTokensAtom({ chainId:  }))
-// })
-// )
