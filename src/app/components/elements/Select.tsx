@@ -74,7 +74,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "text-sm font-bold",
                 "bg-brand-main/5",
                 "rounded-[.625rem]",
-                "hover:bg-brand-main/10",
+                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
                 {
                   "bg-brand-main/10": open,
                 },
