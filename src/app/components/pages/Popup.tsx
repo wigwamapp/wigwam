@@ -67,7 +67,8 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
   }
 
   return (
-    <div
+    <button
+      type="button"
       className={classNames(
         "flex items-center",
         "w-full",
@@ -117,7 +118,7 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
           {state === "connectible" ? "Connect" : "Disconnect"}
         </span>
       )}
-    </div>
+    </button>
   );
 };
 
@@ -242,6 +243,7 @@ const AssetCard: FC<AssetCardProps> = ({ asset, className }) => {
               Icon={PopoverIcon}
               theme="tertiary"
               className="ml-2"
+              tabIndex={-1}
             />
           </PopoverPrimitive.Anchor>
           {/*<Popover*/}
