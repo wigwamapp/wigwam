@@ -13,17 +13,22 @@ export enum TokenStandard {
 export type AccountAsset = AccountToken & AssetMetadata;
 export type AccountNFT = AccountToken & NFTMetadata;
 
-export interface AccountToken {
-  chainId: number;
-  accountAddress: string;
+export type TokenMetadata = AssetMetadata | NFTMetadata;
+
+export interface AccountToken extends TokenBase {
   tokenSlug: string;
   balance?: string;
   balanceUSD?: string;
 }
 
-export interface AssetMetadata {
+export interface TokenBase {
   chainId: number;
   tokenSlug: string;
+  tokenType: TokenType;
+}
+
+export interface AssetMetadata extends TokenBase {
+  tokenType: TokenType.Asset;
   decimals: 6;
   name: string;
   symbol: string;
@@ -33,8 +38,7 @@ export interface AssetMetadata {
   protocolId?: string;
 }
 
-export interface NFTMetadata {
-  chainId: number;
-  tokenSlug: string;
+export interface NFTMetadata extends TokenBase {
+  tokenType: TokenType.NFT;
   // @TODO
 }
