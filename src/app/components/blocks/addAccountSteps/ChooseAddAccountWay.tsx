@@ -10,6 +10,7 @@ import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 
 import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
+import NewTooltip from "../../elements/NewTooltip";
 
 const ChooseAddAccountWay = memo(() => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
@@ -40,7 +41,7 @@ const ChooseAddAccountWay = memo(() => {
                 {section.title}
               </h2>
               {section.tooltip && (
-                <HoverCard
+                <NewTooltip
                   content={
                     <>
                       {section.tooltip.content}
@@ -53,9 +54,11 @@ const ChooseAddAccountWay = memo(() => {
                     </>
                   }
                   className="ml-2"
+                  appendTo={document.querySelector("#addAccountModalRoot")!}
+                  interactive
                 >
                   <TooltipIcon />
-                </HoverCard>
+                </NewTooltip>
               )}
             </div>
             <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
