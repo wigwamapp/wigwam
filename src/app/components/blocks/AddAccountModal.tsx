@@ -52,28 +52,37 @@ const AddAccountModal = memo(() => {
             "fixed z-20",
             "h-3/4 w-full max-w-6xl min-w-[40rem]",
             "m-auto inset-x-0 inset-y-0",
-            "bg-brand-dark/10",
-            "backdrop-blur-[30px]",
-            "border border-brand-light/5",
             "rounded-[2.5rem]",
-            "overflow-hidden",
-            "after:absolute after:inset-0",
-            "after:shadow-addaccountmodal",
-            "after:rounded-[2.5rem]",
-            "after:pointer-events-none",
-            "after:z-30"
+            "overflow-hidden"
           )}
+          id="addAccountModalRoot"
         >
-          {accountStep !== AddAccountStep.ChooseWay && (
-            <BackButton className="fixed top-4 left-4 " />
-          )}
+          <div
+            className={classNames(
+              "w-full h-full",
+              "bg-brand-dark/10",
+              "backdrop-blur-[30px]",
+              "border border-brand-light/5",
+              "rounded-[2.5rem]",
+              "overflow-hidden",
+              "after:absolute after:inset-0",
+              "after:shadow-addaccountmodal",
+              "after:rounded-[2.5rem]",
+              "after:pointer-events-none",
+              "after:z-30"
+            )}
+          >
+            {accountStep !== AddAccountStep.ChooseWay && (
+              <BackButton className="fixed top-4 left-4 " />
+            )}
 
-          <Dialog.Close className="fixed top-4 right-4" asChild>
-            <NewButton theme="clean">Cancel</NewButton>
-          </Dialog.Close>
+            <Dialog.Close className="fixed top-4 right-4" asChild>
+              <NewButton theme="clean">Cancel</NewButton>
+            </Dialog.Close>
 
-          <div className="overflow-y-scroll h-full">
-            {accModalOpened && <AddAccountSteps />}
+            <div className="overflow-y-scroll h-full">
+              {accModalOpened && <AddAccountSteps />}
+            </div>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

@@ -55,7 +55,6 @@ const ChooseAddAccountWay = memo(() => {
                   }
                   className="ml-2"
                   appendTo={document.querySelector("#addAccountModalRoot")!}
-                  interactive
                 >
                   <TooltipIcon />
                 </NewTooltip>

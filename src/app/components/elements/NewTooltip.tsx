@@ -20,6 +20,7 @@ const NewTooltip: FC<NewTooltipProps> = ({
   size = "large",
   className,
   children,
+  ...rest
 }) => {
   const [arrow, setArrow] = useState(null);
 
@@ -30,7 +31,7 @@ const NewTooltip: FC<NewTooltipProps> = ({
           <div className={classNames("text-white", getSizeClasses(size))}>
             {content}
           </div>
-          <span
+          <div
             className={classNames(
               "tooltip-arrow-wrapper",
               "block",
@@ -51,7 +52,7 @@ const NewTooltip: FC<NewTooltipProps> = ({
                 "bg-brand-main/10 backdrop-blur-[60px]"
               )}
             />
-          </span>
+          </div>
         </>
       }
       interactive={interactive ?? size === "large"}
@@ -66,11 +67,20 @@ const NewTooltip: FC<NewTooltipProps> = ({
             name: "arrow",
             options: {
               element: arrow,
+              padding: 10,
+            },
+          },
+          {
+            name: "offset",
+            options: {
+              offset: ({ placement }: any) => {
+                return placement.endsWith("start") ? [-10, 16] : [10, 16];
+              },
             },
           },
         ],
       }}
-      visible
+      {...rest}
     >
       <button className={className}>{children}</button>
     </Tippy>
