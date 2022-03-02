@@ -11,6 +11,9 @@ import { currentLocaleAtom } from "app/atoms";
 import BoardingPageLayout from "../../layouts/BoardingPageLayout";
 import SelectLanguage from "../SelectLanguage";
 import ContinueButton from "../ContinueButton";
+import TooltipIcon from "../../elements/TooltipIcon";
+import HoverCard from "../../elements/HoverCard";
+import NewTooltip from "../../elements/NewTooltip";
 
 const ChooseLanguage: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
@@ -33,6 +36,26 @@ const ChooseLanguage: FC = () => {
           onSelect={({ code }) => setLocale(code)}
           className="mt-24"
         />
+        <NewTooltip
+          content={
+            <>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                aliquam, purus sit amet luctus venenatis, lectus magna fringilla
+                urna, porttitor rhoncus dolor purus non enim praesent elementum
+                facilisis leo
+              </p>
+              <p className="mt-2">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                aliquam, purus sit amet luctus venenatis, lectus magna fringilla
+                urna, porttitor rhoncus
+              </p>
+            </>
+          }
+          className="mr-3"
+        >
+          <TooltipIcon />
+        </NewTooltip>
 
         <ContinueButton onClick={() => navigateToStep(WelcomeStep.LetsBegin)} />
       </div>

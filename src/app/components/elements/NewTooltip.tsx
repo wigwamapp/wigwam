@@ -3,12 +3,12 @@ import {
   useFloating,
   shift,
   offset,
-  autoUpdate,
   autoPlacement,
   hide,
+  arrow,
 } from "@floating-ui/react-dom";
 import classNames from "clsx";
-import { createPortal } from "react-dom";
+import * as Portal from "@radix-ui/react-portal";
 
 type sizeType = "large" | "small";
 
@@ -25,30 +25,31 @@ const NewTooltip: FC<NewTooltip> = ({
   children,
 }) => {
   const [open, setOpen] = useState(false);
+  const arrowRef = useRef(null);
   const openTimerRef = useRef(0);
   const closeTimerRef = useRef(0);
 
-  const { x, y, reference, floating, strategy, update, refs } = useFloating({
+  const {
+    x,
+    y,
+    reference,
+    floating,
+    strategy,
+    update,
+    middlewareData: { arrow: { x: arrowX, y: arrowY } = {} },
+  } = useFloating({
+    // placement: "left-start",
     middleware: [
       shift(),
       offset(10),
       autoPlacement({
-        // 'right' and 'left' won't be chosen
         allowedPlacements:
           size === "large" ? ["right", "left"] : ["top", "bottom"],
       }),
       hide(),
+      arrow({ element: arrowRef }),
     ],
   });
-
-  useEffect(() => {
-    if (!refs.reference.current || !refs.floating.current) {
-      return;
-    }
-
-    // Only call this when the floating element is rendered
-    return autoUpdate(refs.reference.current, refs.floating.current, update);
-  }, [refs.reference, refs.floating, update]);
 
   const handleOpen = useCallback(() => {
     clearTimeout(closeTimerRef.current);
@@ -79,7 +80,7 @@ const NewTooltip: FC<NewTooltip> = ({
       <button
         type="button"
         ref={reference}
-        onMouseOver={handleOpen}
+        onMouseEnter={handleOpen}
         onFocus={handleOpen}
         onMouseLeave={handleClose}
         onBlur={handleClose}
@@ -87,7 +88,7 @@ const NewTooltip: FC<NewTooltip> = ({
       >
         {children}
       </button>
-      <Portal>
+      <Portal.Root className="w-full pointer-events-auto">
         <div
           ref={floating}
           style={{
@@ -100,14 +101,22 @@ const NewTooltip: FC<NewTooltip> = ({
             getSizeClasses(size),
             "text-white"
           )}
-          onMouseOver={handleCardHover}
+          onMouseEnter={handleCardHover}
           onFocus={handleCardHover}
           onMouseLeave={handleClose}
           onBlur={handleClose}
         >
           {content}
+          <div
+            ref={arrowRef}
+            className="absolute w-2 h-2 bg-white rotate-45"
+            style={{
+              top: arrowY ?? "",
+              left: arrowX ?? "",
+            }}
+          />
         </div>
-      </Portal>
+      </Portal.Root>
     </>
   );
 };
@@ -118,7 +127,7 @@ const getSizeClasses = (size: sizeType) => {
   if (size === "large") {
     return classNames(
       "rounded-[.625rem]",
-      "max-w-[18rem]",
+      "w-max-content max-w-[18rem]",
       "bg-brand-main/10 backdrop-blur-[60px]",
       "py-5 px-5"
     );
@@ -129,26 +138,4 @@ const getSizeClasses = (size: sizeType) => {
     "bg-brand-main/20 backdrop-blur-[6px]",
     "py-1.5 px-3"
   );
-};
-
-type PortalProps = {
-  className?: string;
-};
-
-const Portal: FC<PortalProps> = ({ children }) => {
-  const [container] = useState(() => {
-    // This will be executed only on the initial render
-    // https://reactjs.org/docs/hooks-reference.html#lazy-initial-state
-    return document.createElement("div");
-  });
-
-  useEffect(() => {
-    container.classList.add("relative", "z-[10000]");
-    document.body.appendChild(container);
-    return () => {
-      document.body.removeChild(container);
-    };
-  }, [container]);
-
-  return createPortal(children, container);
 };
