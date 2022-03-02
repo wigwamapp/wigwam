@@ -1,8 +1,10 @@
 import { FC, Suspense } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 
-import { allNetworksAtom, chainIdAtom } from "app/atoms";
-import { useLazyNetwork } from "app/hooks";
+import { INITIAL_NETWORK } from "fixtures/networks";
+
+import { chainIdAtom } from "app/atoms";
+import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
 import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
 type NetworkSelectProps = {
@@ -16,14 +18,14 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   currentItemClassName,
   currentItemIconClassName,
 }) => {
-  const networks = useAtomValue(allNetworksAtom);
-  const currentNetwork = useLazyNetwork(networks[0]);
+  const currentNetwork = useLazyNetwork() ?? INITIAL_NETWORK;
+  const allNetworks = useLazyAllNetworks() ?? [];
 
   const setChainId = useSetAtom(chainIdAtom);
 
   return (
     <NetworkSelectPrimitive
-      networks={networks}
+      networks={allNetworks}
       currentNetwork={currentNetwork}
       onNetworkChange={setChainId}
       className={className}

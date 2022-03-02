@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { atomFamily, loadable } from "jotai/utils";
+import { atomFamily } from "jotai/utils";
 import {
   atomWithStorage,
   atomWithRepoQuery,
@@ -32,10 +32,6 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
     return query(() => Repo.networks.get(chainId));
   })
-);
-
-export const lazyNetworkAtom = atomFamily((chainId: number) =>
-  loadable(getNetworkAtom(chainId))
 );
 
 export const allNetworksAtom = atomWithRepoQuery((query, get) => {
