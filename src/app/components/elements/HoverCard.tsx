@@ -42,7 +42,7 @@ const HoverCard: FC<HoverCardProps> = ({
   children,
   ...rest
 }) => (
-  <HoverCardPrimitive.Root openDelay={openDelay} {...rest}>
+  <HoverCardPrimitive.Root open={true} openDelay={openDelay} {...rest}>
     <HoverCardPrimitive.Trigger
       asChild={asChild}
       className={classNames("cursor-pointer", className)}

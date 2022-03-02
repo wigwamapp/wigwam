@@ -5,8 +5,8 @@ import { useAtomValue } from "jotai";
 import { hasSeedPhraseAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import Collapse from "app/components/elements/Collapse";
-import HoverCard from "app/components/elements/HoverCard";
 import TooltipIcon from "app/components/elements/TooltipIcon";
+import NewTooltip from "app/components/elements/NewTooltip";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 
 import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
@@ -40,7 +40,7 @@ const ChooseAddAccountWay = memo(() => {
                 {section.title}
               </h2>
               {section.tooltip && (
-                <HoverCard
+                <NewTooltip
                   content={
                     <>
                       {section.tooltip.content}
@@ -55,7 +55,7 @@ const ChooseAddAccountWay = memo(() => {
                   className="ml-2"
                 >
                   <TooltipIcon />
-                </HoverCard>
+                </NewTooltip>
               )}
             </div>
             <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
