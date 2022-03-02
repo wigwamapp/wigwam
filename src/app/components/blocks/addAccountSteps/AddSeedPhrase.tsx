@@ -71,7 +71,7 @@ const AddSeedPhrase = memo(() => {
 
   useEffect(() => {
     if (!importExisting) {
-      generateNew();
+      setTimeout(generateNew, 0);
     }
   }, [generateNew, importExisting, wordlistLocale, wordsCount]);
 
