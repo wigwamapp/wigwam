@@ -6,6 +6,7 @@ import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "app/components/elements/Select";
+import NewSelect from "./NewSelect";
 
 const prepareNetwork = (network: Network) => ({
   key: network.chainId,
@@ -52,7 +53,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   );
 
   return (
-    <Select
+    <NewSelect
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
@@ -62,6 +63,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
+      modal={true}
     />
   );
 };

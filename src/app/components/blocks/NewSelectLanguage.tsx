@@ -3,6 +3,7 @@ import { memo, useCallback, useMemo } from "react";
 import { FALLBACK_LOCALE, LocaleMeta } from "fixtures/locales";
 
 import Select from "app/components/elements/Select";
+import NewSelect from "../elements/NewSelect";
 
 const prepareLanguage = (language: LocaleMeta) => ({
   key: language.code,
@@ -38,7 +39,7 @@ const NewSelectLanguage = memo<NewSelectLanguageProps>(
     );
 
     return (
-      <Select
+      <NewSelect
         items={preparedLanguages}
         currentItem={preparedCurrentLanguage}
         setItem={selectLanguage}

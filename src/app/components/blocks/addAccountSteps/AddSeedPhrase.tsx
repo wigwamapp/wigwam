@@ -17,6 +17,7 @@ import NewSelectLanguage from "app/components/blocks/NewSelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import NewSelect from "../../elements/NewSelect";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -123,13 +124,14 @@ const AddSeedPhrase = memo(() => {
             className="mr-6"
           />
           {!importExisting && (
-            <Select
+            <NewSelect
               items={wordsCountList}
               currentItem={wordsCount}
               setItem={setWordsCount}
               label="Words"
               showSelected
               className="!min-w-[8.375rem]"
+              contentClassName="!min-w-[8.375rem]"
             />
           )}
         </div>
