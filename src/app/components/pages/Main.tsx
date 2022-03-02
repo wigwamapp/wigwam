@@ -1,4 +1,4 @@
-import { FC, Suspense, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 import PageLayout from "app/components/layouts/PageLayout";
 import WalletsList from "app/components/blocks/WalletsList";
@@ -14,9 +14,7 @@ const Main: FC = () => {
       <WalletsList />
       <OverviewContent />
 
-      <Suspense fallback={<KekFallback />}>
-        <Kek />
-      </Suspense>
+      <Kek />
     </PageLayout>
   );
 };
@@ -25,22 +23,25 @@ export default Main;
 
 const Kek: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
-  const accountAssets = useAccountTokens(
+
+  const [search, setSearch] = useState("");
+
+  const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
-    currentAccount.address
+    currentAccount.address,
+    { search, limit: 10 }
   );
 
   useEffect(() => {
-    console.info(accountAssets);
-  }, [accountAssets]);
+    Object.assign(window, {
+      kek: {
+        setSearch,
+        loadMore,
+      },
+    });
 
-  return null;
-};
-
-const KekFallback: FC = () => {
-  useEffect(() => {
-    console.info("Suspense");
-  }, []);
+    console.info({ tokens, hasMore, search });
+  }, [tokens, loadMore, hasMore, search, setSearch]);
 
   return null;
 };
