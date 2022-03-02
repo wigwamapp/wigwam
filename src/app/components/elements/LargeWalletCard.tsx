@@ -1,12 +1,10 @@
 import { FC, useRef } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
 import { TReplace } from "lib/ext/i18n/react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Account } from "core/types";
 
-import { allNetworksAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -32,8 +30,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   const fieldRef = useRef<HTMLInputElement>(null);
   const { copy, copied } = useCopyToClipboard(fieldRef); // Don't change when input's value changes
 
-  const networks = useAtomValue(allNetworksAtom);
-  const currentNetwork = useLazyNetwork(networks[0]);
+  const currentNetwork = useLazyNetwork();
 
   return (
     <div
@@ -122,7 +119,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
       </div>
       <div className="flex mt-2">
         <div className="flex justify-center w-18 min-w-[4.5rem] mr-4">
-          {currentNetwork.explorerUrls && (
+          {currentNetwork?.explorerUrls && (
             <IconedButton
               href={`${currentNetwork.explorerUrls}/address/${address}`}
               aria-label="View wallet transactions in explorer"
@@ -131,7 +128,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               iconClassName="!w-[1.125rem]"
             />
           )}
-          {currentNetwork.explorerUrls && (
+          {currentNetwork?.explorerUrls && (
             <IconedButton
               href={`${currentNetwork.explorerUrls}/address/${address}`}
               aria-label="View wallet transactions in explorer"

@@ -11,6 +11,8 @@ import { getAccounts, onAccountsUpdated } from "core/client";
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { Account } from "core/types";
 
+import { testNetworksAtom } from "./settings";
+
 export const chainIdAtom = atomWithStorage<number>(
   "chain_id",
   INITIAL_NETWORK.chainId
@@ -27,18 +29,26 @@ export const allAccountsAtom = atomWithAutoReset(getAccounts, {
 });
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
-  atomWithRepoQuery(() => Repo.networks.get(chainId))
+  atomWithRepoQuery((query) => {
+    return query(() => Repo.networks.get(chainId));
+  })
 );
 
 export const lazyNetworkAtom = atomFamily((chainId: number) =>
   loadable(getNetworkAtom(chainId))
 );
 
-export const allNetworksAtom = atomWithRepoQuery(() =>
-  Repo.networks
-    .filter((n) => ["mainnet", "testnet", "unknown"].includes(n.type))
-    .toArray()
-);
+export const allNetworksAtom = atomWithRepoQuery((query, get) => {
+  const testnetEnabled = get(testNetworksAtom);
+
+  const netTypes = [
+    "mainnet",
+    "unknown",
+    ...(testnetEnabled ? ["testnet"] : []),
+  ];
+
+  return query(() => Repo.networks.where("type").anyOf(netTypes).toArray());
+});
 
 export const currentAccountAtom = atom<Account>((get) => {
   const allAccounts = get(allAccountsAtom);

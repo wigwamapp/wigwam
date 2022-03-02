@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { allNetworksAtom, chainIdAtom } from "app/atoms";
@@ -33,4 +33,10 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   );
 };
 
-export default NetworkSelect;
+const WrappedNetworkSelect: FC<NetworkSelectProps> = (props) => (
+  <Suspense fallback={null}>
+    <NetworkSelect {...props} />
+  </Suspense>
+);
+
+export default WrappedNetworkSelect;
