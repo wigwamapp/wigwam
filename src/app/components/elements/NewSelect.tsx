@@ -1,6 +1,7 @@
 import { ReactElement, useState } from "react";
 import classNames from "clsx";
 import { Listbox } from "@headlessui/react";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -133,14 +134,14 @@ function NewSelect<T extends string | ReactElement, U extends string | number>({
               />
             </div>
           )}
-          <ScrollAreaContainer
+          <OverlayScrollbarsComponent
             className={classNames(
               "max-h-64 pl-3 pr-4",
               "flex flex-col",
               scrollAreaClassName
             )}
-            viewPortClassName="py-3"
-            scrollBarClassName="py-3"
+            // viewPortClassName="py-3"
+            // scrollBarClassName="py-3"
           >
             {items
               .filter((item) =>
@@ -170,6 +171,7 @@ function NewSelect<T extends string | ReactElement, U extends string | number>({
                       onSearch(null);
                     }
                   }}
+                  textValue=""
                   asChild
                 >
                   <button>
@@ -189,7 +191,7 @@ function NewSelect<T extends string | ReactElement, U extends string | number>({
                   </button>
                 </DropdownMenu.Item>
               ))}
-          </ScrollAreaContainer>
+          </OverlayScrollbarsComponent>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
     </div>
