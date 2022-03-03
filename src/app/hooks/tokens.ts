@@ -12,12 +12,13 @@ export type UseAccountTokensOptions = {
   withDisabled?: boolean;
   search?: string;
   limit?: number;
+  onReset?: () => void;
 };
 
 export function useAccountTokens(
   tokenType: TokenType,
   accountAddress: string,
-  { withDisabled, search, limit = 25 }: UseAccountTokensOptions = {}
+  { withDisabled, search, limit = 25, onReset }: UseAccountTokensOptions = {}
 ) {
   const forceUpdate = useForceUpdate();
   const chainId = useChainId();
@@ -38,6 +39,7 @@ export function useAccountTokens(
 
   if (baseParams !== prevBaseParams) {
     offsetRef.current = 0;
+    onReset?.();
   }
 
   const offset = offsetRef.current;
