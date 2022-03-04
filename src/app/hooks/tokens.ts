@@ -7,6 +7,8 @@ import { TokenType } from "core/types";
 import { useChainId } from "./chainId";
 import { getAccountTokensAtom } from "app/atoms/tokens";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useAtomValue } from "jotai";
+import { currentAccountAtom, getTokenAtom } from "app/atoms";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -79,4 +81,16 @@ export function useAccountTokens(
     hasMore,
     loadMore,
   };
+}
+
+export function useToken(tokenSlug: string) {
+  const chainId = useChainId();
+  const { address: accountAddress } = useAtomValue(currentAccountAtom);
+
+  const params = useMemo(
+    () => ({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  return useLazyAtomValue(getTokenAtom(params));
 }

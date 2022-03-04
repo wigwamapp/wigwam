@@ -9,3 +9,13 @@ export const getAccountTokensAtom = atomFamily(
     atomWithRepoQuery((query) => query(() => Repo.queryAccountTokens(params))),
   dequal
 );
+
+export const getTokenAtom = atomFamily(
+  ({ chainId, accountAddress, tokenSlug }) =>
+    atomWithRepoQuery((query) =>
+      query(() =>
+        Repo.accountTokens.get([chainId, accountAddress, tokenSlug].join("_"))
+      )
+    ),
+  dequal
+);
