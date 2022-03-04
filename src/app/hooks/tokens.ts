@@ -102,7 +102,7 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
     if (prevTokenSlug === tokenSlug) {
       onReset?.();
     }
-  }, [params, tokenSlug]);
+  }, [onReset, params, prevTokenSlug, tokenSlug]);
 
   return useLazyAtomValue(getTokenAtom(params));
 }
