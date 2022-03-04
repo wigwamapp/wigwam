@@ -1,7 +1,7 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
-import { ForApproval } from "./activity";
+import { Approval } from "./activity";
 
 export type Request =
   | GetWalletStatusRequest
@@ -18,7 +18,9 @@ export type Request =
   | GetPrivateKeyRequest
   | GetPublicKeyRequest
   | GetNeuterExtendedKeyRequest
-  | SendRpcRequest;
+  | SendRpcRequest
+  | GetApprovalsRequest
+  | ApproveRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -35,12 +37,14 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
-  | SendRpcResponse;
+  | SendRpcResponse
+  | GetApprovalsResponse
+  | ApproveResponse;
 
 export type EventMessage =
   | WalletStatusUpdated
   | AccountsUpdated
-  | AwaitingApprovalUpdated;
+  | ApprovalsUpdated;
 
 export enum MessageType {
   GetWalletStatus = "GET_WALLET_STATUS",
@@ -60,7 +64,9 @@ export enum MessageType {
   GetPublicKey = "GET_PUBLIC_KEY",
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
   SendRpc = "SEND_RPC",
-  AwaitingApprovalUpdated = "AWAITING_APPROVAL_UPDATED",
+  GetApprovals = "GET_APPROVALS",
+  ApprovalsUpdated = "APPROVALS_UPDATED",
+  Approve = "APPROVE",
 }
 
 export interface MessageBase {
@@ -222,7 +228,26 @@ export interface SendRpcResponse extends MessageBase {
   response: RpcResponse;
 }
 
-export interface AwaitingApprovalUpdated extends MessageBase {
-  type: MessageType.AwaitingApprovalUpdated;
-  awaitingApproval: ForApproval[];
+export interface GetApprovalsRequest extends MessageBase {
+  type: MessageType.GetApprovals;
+}
+
+export interface GetApprovalsResponse extends MessageBase {
+  type: MessageType.GetApprovals;
+  approvals: Approval[];
+}
+
+export interface ApprovalsUpdated extends MessageBase {
+  type: MessageType.ApprovalsUpdated;
+  approvals: Approval[];
+}
+
+export interface ApproveRequest extends MessageBase {
+  type: MessageType.Approve;
+  approvalId: string;
+  approve: boolean;
+}
+
+export interface ApproveResponse extends MessageBase {
+  type: MessageType.Approve;
 }

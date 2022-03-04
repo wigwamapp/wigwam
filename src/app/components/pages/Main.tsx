@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 import PageLayout from "app/components/layouts/PageLayout";
 import WalletsList from "app/components/blocks/WalletsList";
@@ -7,6 +7,8 @@ import { useAccountTokens } from "app/hooks/tokens";
 import { useAtomValue } from "jotai";
 import { currentAccountAtom } from "app/atoms";
 import { TokenType } from "core/types";
+import { useProvider } from "app/hooks";
+import { ethers } from "ethers";
 
 const Main: FC = () => {
   return (
@@ -15,6 +17,7 @@ const Main: FC = () => {
       <OverviewContent />
 
       <Kek />
+      <Lal />
     </PageLayout>
   );
 };
@@ -42,6 +45,40 @@ const Kek: FC = () => {
 
     console.info({ tokens, hasMore, search });
   }, [tokens, loadMore, hasMore, search, setSearch]);
+
+  return null;
+};
+
+const Lal: FC = () => {
+  const currentAccount = useAtomValue(currentAccountAtom);
+
+  const provider = useProvider();
+
+  const sendEther = useCallback(
+    async (to: string, amount: string) => {
+      const from = currentAccount.address;
+      const signer = provider.getSigner(from);
+
+      const readyTx = await signer.populateTransaction({
+        from,
+        to,
+        value: ethers.utils.parseEther(amount),
+      });
+
+      const res = await signer.sendTransaction(readyTx);
+
+      return res;
+    },
+    [provider, currentAccount.address]
+  );
+
+  useEffect(() => {
+    Object.assign(window, {
+      lal: {
+        sendEther,
+      },
+    });
+  }, [sendEther]);
 
   return null;
 };
