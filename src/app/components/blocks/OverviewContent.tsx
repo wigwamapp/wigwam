@@ -73,11 +73,11 @@ const AssetsList: FC = () => {
   );
 
   useEffect(() => {
-    if (tokens && tokens[0] && (isFirstLoad.current || !tokenSlug)) {
+    if (tokens && tokens[0] && isFirstLoad.current && !tokenSlug) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
       isFirstLoad.current = false;
     }
-    setTokenSlug([RESET]);
+    // setTokenSlug([RESET]);
   }, [setTokenSlug, tokenSlug, tokens]);
 
   return (
