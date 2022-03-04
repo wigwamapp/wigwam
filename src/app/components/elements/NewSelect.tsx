@@ -37,7 +37,7 @@ function NewSelect<T extends string | ReactElement, U extends string | number>({
   searchValue,
   onSearch,
   showSelected = false,
-  modal = false,
+  modal = true,
   className,
   contentClassName,
   scrollAreaClassName,
