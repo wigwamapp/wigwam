@@ -1,62 +1,44 @@
-import { FC, useMemo, useState } from "react";
-import Fuse from "fuse.js";
+import { FC, Suspense } from "react";
+import { useSetAtom } from "jotai";
 
-import { Network } from "core/types";
-import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { INITIAL_NETWORK } from "fixtures/networks";
 
-import Select from "./Select";
-
-const prepareNetwork = (network: Network) => ({
-  key: network.chainId,
-  value: network.name,
-  icon: NETWORK_ICON_MAP.get(network.chainId),
-});
+import { chainIdAtom } from "app/atoms";
+import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
+import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
 type NetworkSelectProps = {
-  networks: Network[];
-  currentNetwork: Network;
-  onNetworkChange: (chainId: number) => void;
   className?: string;
+  currentItemClassName?: string;
+  currentItemIconClassName?: string;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
-  networks,
-  currentNetwork,
-  onNetworkChange,
   className,
+  currentItemClassName,
+  currentItemIconClassName,
 }) => {
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-  const fuse = useMemo(
-    () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
-    [networks]
-  );
+  const currentNetwork = useLazyNetwork() ?? INITIAL_NETWORK;
+  const allNetworks = useLazyAllNetworks() ?? [];
 
-  const preparedNetworks = useMemo(() => {
-    if (searchValue) {
-      return fuse
-        .search(searchValue)
-        .map(({ item: network }) => prepareNetwork(network));
-    } else {
-      return networks.map((network) => prepareNetwork(network));
-    }
-  }, [fuse, networks, searchValue]);
-
-  const preparedCurrentNetwork = useMemo(
-    () => prepareNetwork(currentNetwork),
-    [currentNetwork]
-  );
+  const setChainId = useSetAtom(chainIdAtom);
 
   return (
-    <Select
-      items={preparedNetworks}
-      currentItem={preparedCurrentNetwork}
-      setItem={(network) => onNetworkChange(network.key)}
-      onSearch={(value) => setSearchValue(value === "" ? null : value)}
+    <NetworkSelectPrimitive
+      networks={allNetworks}
+      currentNetwork={currentNetwork}
+      onNetworkChange={setChainId}
       className={className}
-      scrollAreaClassName="h-64"
+      currentItemClassName={currentItemClassName}
+      currentItemIconClassName={currentItemIconClassName}
     />
   );
 };
 
-export default NetworkSelect;
+const WrappedNetworkSelect: FC<NetworkSelectProps> = (props) => (
+  <Suspense fallback={null}>
+    <NetworkSelect {...props} />
+  </Suspense>
+);
+
+export default WrappedNetworkSelect;

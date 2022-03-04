@@ -61,7 +61,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => (
           "flex items-center",
           "transition-colors",
           "hover:text-brand-light",
-          "focus:text-brand-light",
+          "focus-visible:text-brand-light",
           "first:bg-brand-main/5 first:text-brand-light",
           "last:mb-0"
         )}
@@ -74,7 +74,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => (
             "glass-icon",
             "group-first:glass-icon--active",
             "group-hover:glass-icon--hover",
-            "group-focus:glass-icon--hover"
+            "group-focus-visible:glass-icon--hover"
           )}
         />
         {label}

@@ -122,8 +122,9 @@ const UnlockForm = memo<UnlockFormProps>(({ theme = "large", className }) => {
           Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
           aria-label={`${inputShowContent ? "Hide" : "Show"} password`}
           theme="tertiary"
-          className="absolute bottom-2.5 right-3"
           onClick={() => setInputShowContent(!inputShowContent)}
+          tabIndex={-1}
+          className="absolute bottom-2.5 right-3"
         />
       </div>
 
@@ -182,7 +183,7 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
           theme === "small" && "w-[6.5rem] px-2 py-5",
           "rounded-[.625rem]",
           "transition-colors",
-          "hover:bg-brand-main/10 focus:bg-brand-main/10",
+          "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           "active:bg-brand-main/[.05]",
           className
         )}

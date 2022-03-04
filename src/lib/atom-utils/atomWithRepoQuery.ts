@@ -1,18 +1,18 @@
 import { atom, Atom, Getter } from "jotai";
-import { liveQuery, PromiseExtended } from "dexie";
+import { liveQuery, Observable } from "dexie";
 
 type Subscription = {
   unsubscribe: () => void;
 };
 
 export function atomWithRepoQuery<TData>(
-  createQuery: (get: Getter) => PromiseExtended<TData>
+  factory: (query: typeof liveQuery, get: Getter) => Observable<TData>
 ): Atom<TData> {
   const observableResultAtom = atom((get) => {
     let settlePromise: ((data: TData | null, err?: unknown) => void) | null =
       null;
 
-    const observable = liveQuery(() => createQuery(get));
+    const observable = factory(liveQuery, get);
 
     const dataAtom = atom<TData | Promise<TData>>(
       new Promise<TData>((resolve, reject) => {

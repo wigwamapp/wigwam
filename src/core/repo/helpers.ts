@@ -1,8 +1,9 @@
-import { Network } from "core/types";
+import { Network, AccountToken } from "core/types";
 
 import { db, RepoTable } from "./schema";
 
 export const networks = db.table<Network, number>(RepoTable.Networks);
+export const accountTokens = db.table<AccountToken>(RepoTable.AccountTokens);
 
 export async function clear() {
   try {
