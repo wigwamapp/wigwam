@@ -8,6 +8,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
+import { RESET } from "jotai/utils";
 
 import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -42,8 +43,6 @@ const AssetsList: FC = () => {
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
-  const isFirstLoad = useRef(true);
-
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
@@ -72,11 +71,9 @@ const AssetsList: FC = () => {
   );
 
   useEffect(() => {
-    if (tokens && tokens[0] && isFirstLoad.current && !tokenSlug) {
+    if (tokens && tokens[0] && !tokenSlug) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
-      isFirstLoad.current = false;
     }
-    // setTokenSlug([RESET]);
   }, [setTokenSlug, tokenSlug, tokens]);
 
   return (
@@ -202,14 +199,16 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 );
 
 const AssetInfo: FC = () => {
-  const tokenSlug = useAtomValue(tokenSlugAtom)!;
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
   // const currentAccount = useAtomValue(currentAccountAtom);
   // const { tokens } = useAccountTokens(TokenType.Asset, currentAccount.address, {
   //   limit: 1,
   // });
 
-  const tokenInfo = useToken(tokenSlug) as AccountAsset;
-  const parsedTokenSlug = parseTokenSlug(tokenSlug);
+  const tokenInfo = useToken(tokenSlug, () =>
+    setTokenSlug([RESET])
+  ) as AccountAsset;
+  const parsedTokenSlug = parseTokenSlug(tokenSlug ?? undefined);
 
   // if (!tokenInfo && tokens[0]) {
   //   setTokenSlug([tokens[0].tokenSlug, "replace"]);
