@@ -26,6 +26,7 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { RESET } from "jotai/utils";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -76,6 +77,7 @@ const AssetsList: FC = () => {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
       isFirstLoad.current = false;
     }
+    setTokenSlug([RESET]);
   }, [setTokenSlug, tokenSlug, tokens]);
 
   return (
@@ -248,13 +250,13 @@ const AssetInfo: FC = () => {
             <IconedButton
               aria-label="View wallet transactions in explorer"
               Icon={WalletExplorerIcon}
-              className="!w-6 !h-6 ml-auto"
+              className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
               iconClassName="!w-[1.125rem]"
             />
             <IconedButton
               aria-label="View wallet transactions in explorer"
               Icon={ClockIcon}
-              className="!w-6 !h-6 ml-2"
+              className="!w-6 !h-6 min-w-[1.5rem] ml-2"
               iconClassName="!w-[1.125rem]"
             />
           </div>

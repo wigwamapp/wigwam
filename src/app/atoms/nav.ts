@@ -16,4 +16,4 @@ export const addAccountStepAtom = atomWithURLHash(
   AddAccountStep.ChooseWay
 );
 
-export const tokenSlugAtom = atomWithURLHash("token", undefined);
+export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
