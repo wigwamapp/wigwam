@@ -43,7 +43,7 @@ const Tooltip: FC<TooltipProps> = ({
       >
         {content}
         <TooltipPrimitive.Arrow
-          offset={13}
+          offset={6}
           width={15}
           height={8}
           className="fill-brand-main/20"

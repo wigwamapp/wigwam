@@ -1,28 +1,20 @@
-import { useAtomValue } from "jotai";
-import { usePrevious } from "lib/react-hooks/usePrevious";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { Network } from "core/types";
-
-import { lazyNetworkAtom } from "app/atoms";
+import { allNetworksAtom, getNetworkAtom } from "app/atoms";
 
 import { useChainId } from "./chainId";
 
-export function useNetwork() {
-  const chainId = useChainId();
-  const network = useAtomValue(lazyNetworkAtom(chainId));
-
-  return network.state === "hasData" ? network.data : undefined;
+export function useLazyAllNetworks() {
+  return useLazyAtomValue(allNetworksAtom);
 }
 
-export function useLazyNetwork(): Network | undefined;
-export function useLazyNetwork(fallback: Network): Network;
-export function useLazyNetwork(fallback?: Network) {
-  const network = useNetwork();
-  const prevNetwork = usePrevious(network);
+export function useLazyNetwork(previous = true) {
+  const chainId = useChainId();
+  const networkAtom = getNetworkAtom(chainId);
 
-  return network ?? prevNetwork ?? fallback;
+  return useLazyAtomValue(networkAtom, previous);
 }
 
 export function useNativeCurrency() {
-  return useNetwork()?.nativeCurrency;
+  return useLazyNetwork(false)?.nativeCurrency;
 }

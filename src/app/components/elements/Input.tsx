@@ -1,13 +1,14 @@
 import { FC, forwardRef, HTMLProps, memo, useState } from "react";
 import classNames from "clsx";
 
-type InputProps = {
+export type InputProps = {
   className?: string;
   label?: string;
   StartAdornment?: FC<{ className?: string }>;
   EndAdornment?: FC<{ className?: string }>;
   theme?: "primary" | "clean";
   inputClassName?: string;
+  adornmentClassName?: string;
 } & HTMLProps<HTMLInputElement>;
 
 const Input = memo(
@@ -22,6 +23,7 @@ const Input = memo(
         disabled,
         theme = "primary",
         inputClassName,
+        adornmentClassName,
         ...rest
       },
       ref
@@ -34,7 +36,8 @@ const Input = memo(
         "pointer-events-none",
         "transition-colors",
         focused && "fill-current text-brand-light",
-        disabled && "fill-current text-brand-disabledcolor"
+        disabled && "fill-current text-brand-disabledcolor",
+        adornmentClassName
       );
 
       return (

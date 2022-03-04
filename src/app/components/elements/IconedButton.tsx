@@ -29,7 +29,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       "flex justify-center items-center",
       "transition",
       "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-      "focus:bg-brand-main/30 focus:shadow-buttonsecondary",
+      "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
       "active:bg-brand-main/20 active:shadow-none",
       className
     );

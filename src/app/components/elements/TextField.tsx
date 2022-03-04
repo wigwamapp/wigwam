@@ -14,7 +14,7 @@ const TextField = memo(
           className={classNames(
             "w-full bg-transparent p-4",
             "border border-white",
-            "focus:outline-none focus:border-red-500",
+            "focus-visible:outline-none focus-visible:border-red-500",
             "text-lg text-white",
             "transition ease-in-out duration-300",
             className

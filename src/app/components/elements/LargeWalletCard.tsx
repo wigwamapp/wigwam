@@ -1,12 +1,10 @@
 import { FC, useRef } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
 import { TReplace } from "lib/ext/i18n/react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Account } from "core/types";
 
-import { allNetworksAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -30,10 +28,9 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   className,
 }) => {
   const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
+  const { copy, copied } = useCopyToClipboard(fieldRef); // Don't change when input's value changes
 
-  const networks = useAtomValue(allNetworksAtom);
-  const currentNetwork = useLazyNetwork(networks[0]);
+  const currentNetwork = useLazyNetwork();
 
   return (
     <div
@@ -65,7 +62,12 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             "w-full min-w-0"
           )}
         >
-          <input ref={fieldRef} defaultValue={address} className="sr-only" />
+          <input
+            ref={fieldRef}
+            value={address}
+            onChange={() => undefined}
+            className="sr-only"
+          />
           <Tooltip
             content={
               copied
@@ -99,12 +101,12 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                 <HashPreview
                   hash={address}
                   withTooltip={false}
-                  className="text-sm font-normal leading-none"
+                  className="text-sm font-normal leading-none mr-1"
                 />
                 {copied ? (
-                  <SuccessIcon className="w-[1.3125rem] ml-1" />
+                  <SuccessIcon className="w-[1.3125rem] h-auto" />
                 ) : (
-                  <CopyIcon className="w-[1.3125rem] ml-1" />
+                  <CopyIcon className="w-[1.3125rem] h-auto" />
                 )}
               </span>
             </button>
@@ -117,7 +119,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
       </div>
       <div className="flex mt-2">
         <div className="flex justify-center w-18 min-w-[4.5rem] mr-4">
-          {currentNetwork.explorerUrls && (
+          {currentNetwork?.explorerUrls && (
             <IconedButton
               href={`${currentNetwork.explorerUrls}/address/${address}`}
               aria-label="View wallet transactions in explorer"
@@ -126,7 +128,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               iconClassName="!w-[1.125rem]"
             />
           )}
-          {currentNetwork.explorerUrls && (
+          {currentNetwork?.explorerUrls && (
             <IconedButton
               href={`${currentNetwork.explorerUrls}/address/${address}`}
               aria-label="View wallet transactions in explorer"

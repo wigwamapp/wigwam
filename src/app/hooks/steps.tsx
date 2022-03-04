@@ -8,6 +8,7 @@ import {
   useLayoutEffect,
   useEffect,
   MutableRefObject,
+  RefObject,
 } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -28,7 +29,7 @@ export type StepsProviderProps<T> = {
   atom: URLHashAtom<T>;
   steps: AllSteps<T>;
   resetOnExit?: boolean;
-  rootElement?: HTMLElement | Window;
+  rootRef?: RefObject<HTMLElement>;
   children?: (props: { children: ReactNode; step: T }) => ReactNode;
 };
 
@@ -36,7 +37,7 @@ export const StepsProvider = <T,>({
   atom,
   steps,
   resetOnExit = true,
-  rootElement = window,
+  rootRef,
   children,
 }: StepsProviderProps<T>) => {
   const [step, setStep] = useAtom(atom);
@@ -45,9 +46,10 @@ export const StepsProvider = <T,>({
   const lastHistoryAction = getLastAction();
   useLayoutEffect(() => {
     if (lastHistoryAction === HistoryAction.Push) {
-      rootElement.scrollTo(0, 0);
+      const element = rootRef ? rootRef.current : window;
+      element?.scrollTo(0, 0);
     }
-  }, [rootElement, step, lastHistoryAction]);
+  }, [rootRef, step, lastHistoryAction]);
 
   const stepsObj = useMemo(() => Object.fromEntries(steps), [steps]);
   const stepNode = useMemo<ReactNode>(() => {

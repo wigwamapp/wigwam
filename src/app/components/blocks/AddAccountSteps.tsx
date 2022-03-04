@@ -1,4 +1,4 @@
-import { memo, Suspense } from "react";
+import { memo, Suspense, useRef } from "react";
 
 import { AddAccountStep } from "app/defaults";
 import { addAccountStepAtom } from "app/atoms";
@@ -27,16 +27,22 @@ const STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.SetupPassword, () => <SetupPassword />],
 ];
 
-const AddAccountSteps = memo(() => (
-  <StepsProvider atom={addAccountStepAtom} steps={STEPS}>
-    {({ children }) => (
-      <div className="mb-24">
-        <Suspense fallback={null}>
-          <div className="mt-24">{children}</div>
-        </Suspense>
-      </div>
-    )}
-  </StepsProvider>
-));
+const AddAccountSteps = memo(() => {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={rootRef} className="overflow-y-scroll h-full">
+      <StepsProvider rootRef={rootRef} atom={addAccountStepAtom} steps={STEPS}>
+        {({ children }) => (
+          <div className="mb-24">
+            <Suspense fallback={null}>
+              <div className="mt-24">{children}</div>
+            </Suspense>
+          </div>
+        )}
+      </StepsProvider>
+    </div>
+  );
+});
 
 export default AddAccountSteps;

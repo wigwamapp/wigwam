@@ -74,7 +74,7 @@ const Profiles: FC = () => {
               "w-[9.625rem] py-6 px-7 max-h-[11.75rem] mb-2",
               "rounded-[.625rem]",
               "transition-colors",
-              "hover:bg-brand-main/10 focus:bg-brand-main/10",
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
               "active:bg-brand-main/[.05]"
             )}
           >

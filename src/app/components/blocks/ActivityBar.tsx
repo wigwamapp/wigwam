@@ -11,21 +11,27 @@ import { ReactComponent as SuccessIcon } from "app/icons/activity-successfull.sv
 import { ReactComponent as PendingIcon } from "app/icons/activity-pending.svg";
 import { ReactComponent as FailedIcon } from "app/icons/activity-warning.svg";
 
-const ActivityBar: FC = () => {
+type WithThemeProps = {
+  theme?: "small" | "large";
+};
+
+const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const [activityHovered, setActivityHovered] = useState(false);
 
   return (
     <div
       className={classNames(
         "fixed bottom-3 left-1/2 -translate-x-1/2",
-        "w-[75rem] px-8 py-4",
+        "w-[calc(100%-1.5rem)] max-w-[75rem]",
         "bg-brand-darkblue/20",
         "backdrop-blur-[10px]",
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
         "flex justify-between",
         "rounded-[.625rem]",
-        "cursor-pointer"
+        "cursor-pointer",
+        theme === "large" && "px-8 py-4",
+        theme === "small" && "px-3 py-2"
       )}
       onMouseOver={() => setActivityHovered(true)}
       onFocus={() => setActivityHovered(true)}
@@ -36,30 +42,48 @@ const ActivityBar: FC = () => {
         <ActivityIcon
           Icon={SendIcon}
           ariaLabel="Send transaction"
+          theme={theme}
           className="mr-2"
         />
         <ActivityIcon
           Icon={SwapIcon}
           ariaLabel="Swap transaction"
+          theme={theme}
           className="mr-2"
         />
         <ActivityIcon
           Icon="https://s2.coinmarketcap.com/static/img/coins/200x200/7278.png"
           ariaLabel="Approve interaction with aave.com"
+          theme={theme}
         />
-        <span className="flex items-center text-base font-bold ml-3">
-          +3 waiting for approval
-          <ArrowIcon className="ml-1" />
+        <span
+          className={classNames(
+            "flex items-center",
+            "font-bold",
+            "ml-2",
+            theme === "small" && "text-xs",
+            theme === "large" && "text-base"
+          )}
+        >
+          +3
+          {theme === "large" && (
+            <>
+              {" "}
+              waiting for approval
+              <ArrowIcon className="ml-1" />
+            </>
+          )}
         </span>
       </div>
       <div className={centeredClassNames}>
         <span
           className={classNames(
-            "w-52 h-2",
             "bg-activity",
             "rounded-xl",
             "transition-all",
-            activityHovered && "h-0",
+            theme === "small" && "w-20 h-1.5",
+            theme === "large" && "w-52 h-2",
+            activityHovered && "!h-0",
             centeredClassNames
           )}
         />
@@ -68,28 +92,49 @@ const ActivityBar: FC = () => {
             "transition-opacity",
             "whitespace-nowrap",
             "flex items-center",
-            "text-base font-bold",
+            "font-bold",
+            theme === "small" && "text-xs",
+            theme === "large" && "text-base",
             !activityHovered && "opacity-0",
             centeredClassNames
           )}
         >
           Coming soon
-          <ActivityHoverIcon className="w-5 h-5 ml-1" />
+          <ActivityHoverIcon
+            className={classNames(
+              "ml-1",
+              theme === "small" && "w-[1.125rem] h-[1.125rem]",
+              theme === "large" && "w-5 h-5"
+            )}
+          />
         </span>
       </div>
       <div className="flex items-center">
         <StatItem
           count={2}
           ariaLabel="2 successful transactions"
-          className="mr-6"
+          theme={theme}
+          className={classNames(
+            theme === "small" && "mr-2",
+            theme === "large" && "mr-6"
+          )}
         />
         <StatItem
           count={4}
           status="pending"
           ariaLabel="4 pending transactions"
-          className="mr-6"
+          theme={theme}
+          className={classNames(
+            theme === "small" && "mr-2",
+            theme === "large" && "mr-6"
+          )}
         />
-        <StatItem count={1} status="failed" ariaLabel="1 failed transactions" />
+        <StatItem
+          count={1}
+          status="failed"
+          ariaLabel="1 failed transactions"
+          theme={theme}
+        />
       </div>
     </div>
   );
@@ -103,13 +148,14 @@ const centeredClassNames = classNames(
   "-translate-x-1/2 -translate-y-1/2"
 );
 
-type ActivityIconProps = {
+type ActivityIconProps = WithThemeProps & {
   Icon: FC<{ className?: string }> | string;
   ariaLabel?: string;
   className?: string;
 };
 
 const ActivityIcon: FC<ActivityIconProps> = ({
+  theme,
   Icon,
   ariaLabel,
   className,
@@ -121,9 +167,10 @@ const ActivityIcon: FC<ActivityIconProps> = ({
       <span
         className={classNames(
           "block",
-          "w-6 h-6",
           "bg-white",
           "rounded-full overflow-hidden",
+          theme === "small" && "w-[1.125rem] h-[1.125rem]",
+          theme === "large" && "w-6 h-6",
           className
         )}
       >
@@ -135,7 +182,16 @@ const ActivityIcon: FC<ActivityIconProps> = ({
       </span>
     );
   } else {
-    content = <Icon className={classNames("w-6 h-6", className)} />;
+    content = (
+      <Icon
+        className={classNames(
+          "glass-icon-stable",
+          theme === "small" && "w-[1.125rem] h-[1.125rem]",
+          theme === "large" && "w-6 h-6",
+          className
+        )}
+      />
+    );
   }
 
   if (ariaLabel) {
@@ -147,7 +203,7 @@ const ActivityIcon: FC<ActivityIconProps> = ({
 
 type StatusType = "successful" | "pending" | "failed";
 
-type StatItemProps = {
+type StatItemProps = WithThemeProps & {
   status?: StatusType;
   count?: number;
   ariaLabel: string;
@@ -158,6 +214,7 @@ const StatItem: FC<StatItemProps> = ({
   status = "successful",
   count,
   ariaLabel,
+  theme,
   className,
 }) => {
   if (!count || count === 0) {
@@ -171,12 +228,19 @@ const StatItem: FC<StatItemProps> = ({
       content={ariaLabel}
       className={classNames(
         "flex items-center",
-        "text-base font-bold",
+        "font-bold",
+        theme === "small" && "text-xs",
+        theme === "large" && "text-base",
         color,
         className
       )}
     >
-      <Icon className="mr-2" />
+      <Icon
+        className={classNames(
+          theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
+          theme === "large" && "mr-2"
+        )}
+      />
       {count}
     </Tooltip>
   );

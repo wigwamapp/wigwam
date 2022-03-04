@@ -7,6 +7,7 @@ type ScrollAreaContainerProps = {
   viewPortClassName?: string;
   scrollBarClassName?: string;
   viewportAsChild?: boolean;
+  hiddenScrollbar?: "vertical" | "horizontal";
 } & ScrollArea.ScrollAreaProps;
 
 const ScrollAreaContainer = forwardRef<
@@ -19,7 +20,8 @@ const ScrollAreaContainer = forwardRef<
       viewPortClassName,
       scrollBarClassName,
       viewportAsChild = false,
-      type = "scroll",
+      hiddenScrollbar,
+      type = "hover",
       children,
       ...rest
     },
@@ -40,8 +42,12 @@ const ScrollAreaContainer = forwardRef<
       >
         {children}
       </ScrollArea.Viewport>
-      <Scrollbar orientation="vertical" className={scrollBarClassName} />
-      <Scrollbar orientation="horizontal" className={scrollBarClassName} />
+      {hiddenScrollbar !== "vertical" && (
+        <Scrollbar orientation="vertical" className={scrollBarClassName} />
+      )}
+      {hiddenScrollbar !== "horizontal" && (
+        <Scrollbar orientation="horizontal" className={scrollBarClassName} />
+      )}
       <ScrollArea.Corner />
     </ScrollArea.Root>
   )
