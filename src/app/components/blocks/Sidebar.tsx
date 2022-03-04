@@ -1,8 +1,10 @@
 import { FC } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
 import { Page } from "app/defaults";
+import { pageAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 import { NavLinksPrimary, NavLinksSecondary } from "./Sidebar.Links";
@@ -47,40 +49,44 @@ type SidebarBlockProps = {
   className?: string;
 };
 
-const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => (
-  <div className={classNames("flex flex-col", className)}>
-    {links.map(({ route, label, Icon }) => (
-      <Link
-        key={route}
-        to={{ page: route }}
-        className={classNames(
-          "group",
-          "text-base font-bold text-brand-light/80",
-          "w-52 py-2 px-3 mb-2",
-          "rounded-[.625rem]",
-          "flex items-center",
-          "transition-colors",
-          "hover:text-brand-light",
-          "focus:text-brand-light",
-          "first:bg-brand-main/5 first:text-brand-light",
-          "last:mb-0"
-        )}
-      >
-        <Icon
+const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
+  const page = useAtomValue(pageAtom);
+
+  return (
+    <div className={classNames("flex flex-col", className)}>
+      {links.map(({ route, label, Icon }) => (
+        <Link
+          key={route}
+          to={{ page: route }}
           className={classNames(
-            "w-7 h-7",
-            "min-w-7",
-            "mr-5",
-            "glass-icon",
-            "group-first:glass-icon--active",
-            "group-hover:glass-icon--hover",
-            "group-focus:glass-icon--hover"
+            "group",
+            "text-base font-bold text-brand-light/80",
+            "w-52 py-2 px-3 mb-2",
+            "rounded-[.625rem]",
+            "flex items-center",
+            "transition-colors",
+            "hover:text-brand-light",
+            "focus:text-brand-light",
+            page === label.toLowerCase() && "bg-brand-main/5 text-brand-light",
+            "last:mb-0"
           )}
-        />
-        {label}
-      </Link>
-    ))}
-  </div>
-);
+        >
+          <Icon
+            className={classNames(
+              "w-7 h-7",
+              "min-w-7",
+              "mr-5",
+              "glass-icon",
+              page === label.toLowerCase() && "glass-icon--active",
+              "group-hover:glass-icon--hover",
+              "group-focus:glass-icon--hover"
+            )}
+          />
+          {label}
+        </Link>
+      ))}
+    </div>
+  );
+};
 
 export default Sidebar;
