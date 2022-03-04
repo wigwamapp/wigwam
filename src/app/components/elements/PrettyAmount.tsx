@@ -41,6 +41,10 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     isShownDecTooltip = true;
   }
 
+  const isWithDots = convertedAmount
+    .decimalPlaces(decSplit, BigNumber.ROUND_DOWN)
+    .gt(0);
+
   const isShownIntTooltip =
     integerPart.toString().length > (isMinified ? 3 : 6);
 
@@ -89,7 +93,7 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
             ),
             dec: isMinified ? 3 : undefined,
             locale: currentLocale,
-            withTooltip: true,
+            withTooltip: isWithDots,
           })}
           currency={currency}
         />
@@ -158,7 +162,6 @@ export const getPrettyAmount = ({
   locale?: string;
   withTooltip?: boolean;
 }) => {
-  console.log("value", +value);
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
     let finalValue = new Intl.NumberFormat(locale, {
       maximumFractionDigits: dec > 4 ? 3 : 2,

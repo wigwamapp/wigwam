@@ -26,7 +26,6 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
-import { RESET } from "jotai/utils";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">

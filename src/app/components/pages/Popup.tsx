@@ -3,19 +3,18 @@ import {
   forwardRef,
   HTMLAttributes,
   useCallback,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AccountAsset, TokenType } from "core/types";
 
 import { Page } from "app/defaults";
 import { openInTab } from "app/helpers";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { currentAccountAtom } from "app/atoms";
 import { useAccountTokens } from "app/hooks/tokens";
 import PopupLayout from "app/components/layouts/PopupLayout";
 import NetworkSelect from "app/components/elements/NetworkSelect";
@@ -125,12 +124,9 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
 };
 
 const AssetsList: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
   const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
-
-  const isFirstLoad = useRef(true);
 
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
@@ -213,16 +209,14 @@ type AssetCardProps = {
 
 const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
   ({ asset, className }, ref) => {
-    const setTokenSlug = useSetAtom(tokenSlugAtom);
     const [popoverOpened, setPopoverOpened] = useState(false);
     const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
     const openLink = useCallback(
       (page: Page) => {
-        setTokenSlug([asset.tokenSlug]);
-        openInTab({ page: page });
+        openInTab({ page: page, token: asset.tokenSlug });
       },
-      [asset.tokenSlug, setTokenSlug]
+      [asset.tokenSlug]
     );
 
     return (
