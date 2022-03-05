@@ -38,7 +38,12 @@ export const HashPreview = memo<HashPreviewProps>(
             side="bottom"
             align="center"
           >
-            <input ref={fieldRef} defaultValue={hash} className="sr-only" />
+            <input
+              ref={fieldRef}
+              defaultValue={hash}
+              tabIndex={-1}
+              className="sr-only"
+            />
             <button onClick={copy}>{content}</button>
           </HoverCard>
         );

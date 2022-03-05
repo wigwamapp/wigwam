@@ -10,6 +10,7 @@ import {
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
+import { TReplace } from "lib/ext/i18n/react";
 
 import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -172,7 +173,9 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           />
         </span>
         <span className="flex flex-col w-full">
-          <span className="text-sm font-bold leading-4">{name}</span>
+          <span className="text-sm font-bold leading-4">
+            <TReplace msg={name} />
+          </span>
           <span className="mt-auto flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}

@@ -13,7 +13,7 @@ import { AddAccountStep } from "app/defaults";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import Select from "app/components/elements/Select";
-import NewSelectLanguage from "app/components/blocks/NewSelectLanguage";
+import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
@@ -70,7 +70,7 @@ const AddSeedPhrase = memo(() => {
 
   useEffect(() => {
     if (!importExisting) {
-      generateNew();
+      setTimeout(generateNew, 0);
     }
   }, [generateNew, importExisting, wordlistLocale, wordsCount]);
 
@@ -116,7 +116,7 @@ const AddSeedPhrase = memo(() => {
 
       <div className="flex flex-col max-w-[27.5rem] mx-auto">
         <div className="flex">
-          <NewSelectLanguage
+          <SelectLanguage
             selected={locale}
             items={SUPPORTED_LOCALES}
             onSelect={setLocale}
@@ -130,6 +130,7 @@ const AddSeedPhrase = memo(() => {
               label="Words"
               showSelected
               className="!min-w-[8.375rem]"
+              contentClassName="!min-w-[8.375rem]"
             />
           )}
         </div>

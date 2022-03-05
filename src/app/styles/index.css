@@ -66,5 +66,5 @@ body {
 }
 
 div[data-radix-popper-content-wrapper] {
-  will-change: auto !important;
+  will-change: scroll-position !important;
 }

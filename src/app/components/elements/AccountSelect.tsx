@@ -4,6 +4,7 @@ import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
@@ -67,6 +68,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       searchValue={searchValue}
       onSearch={setSearchValue}
       currentItemClassName={classNames("!px-3", className)}
+      contentClassName="!min-w-[22.25rem]"
     />
   );
 };
@@ -98,6 +100,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         ref={fieldRef}
         value={account.address}
         onChange={() => undefined}
+        tabIndex={-1}
         className="sr-only"
       />
       <Tooltip
@@ -110,21 +113,25 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       >
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <span
-          onClick={(e) => {
-            e.stopPropagation();
-            copy();
+          onPointerDown={(e) => {
+            e.preventDefault();
           }}
+          onClick={copy}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
           className={classNames(
-            "px-1 pb-0.5 -mb-0.5 -mt-1",
+            "px-1 -my-1",
             "text-left",
             "rounded",
             "max-w-full",
-            "flex flex-col",
+            "inline-flex flex-col",
             "transition-colors",
             "hover:bg-brand-main/40 focus-visible:bg-brand-main/40"
           )}
         >
-          <span className="font-bold">{account.name}</span>
+          <span className="font-bold">
+            <TReplace msg={account.name} />
+          </span>
           <span className="flex items-center mt-auto">
             <HashPreview
               hash={account.address}
@@ -164,7 +171,7 @@ const AccountSelectItem: FC<AccountSelectItemProps> = ({ account }) => (
         "rounded-[.625rem]"
       )}
     />
-    <span>{account.name}</span>
+    <TReplace msg={account.name} />
     <span className="flex flex-col items-end ml-auto">
       <HashPreview
         hash={account.address}
