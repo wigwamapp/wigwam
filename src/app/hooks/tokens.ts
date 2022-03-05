@@ -1,23 +1,30 @@
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useAtomValue } from "jotai";
 import useForceUpdate from "use-force-update";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { TokenType } from "core/types";
 
+import {
+  currentAccountAtom,
+  getTokenAtom,
+  getAccountTokensAtom,
+} from "app/atoms";
+
 import { useChainId } from "./chainId";
-import { getAccountTokensAtom } from "app/atoms/tokens";
-import { useCallback, useEffect, useMemo, useRef } from "react";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
   search?: string;
   limit?: number;
+  onReset?: () => void;
 };
 
 export function useAccountTokens(
   tokenType: TokenType,
   accountAddress: string,
-  { withDisabled, search, limit = 25 }: UseAccountTokensOptions = {}
+  { withDisabled, search, limit = 25, onReset }: UseAccountTokensOptions = {}
 ) {
   const forceUpdate = useForceUpdate();
   const chainId = useChainId();
@@ -38,6 +45,7 @@ export function useAccountTokens(
 
   if (baseParams !== prevBaseParams) {
     offsetRef.current = 0;
+    onReset?.();
   }
 
   const offset = offsetRef.current;
@@ -77,4 +85,24 @@ export function useAccountTokens(
     hasMore,
     loadMore,
   };
+}
+
+export function useToken(tokenSlug: string | null, onReset?: () => void) {
+  const chainId = useChainId();
+  const { address: accountAddress } = useAtomValue(currentAccountAtom);
+
+  const prevTokenSlug = usePrevious(tokenSlug);
+
+  const params = useMemo(
+    () => ({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  useEffect(() => {
+    if (prevTokenSlug === tokenSlug) {
+      onReset?.();
+    }
+  }, [onReset, params, prevTokenSlug, tokenSlug]);
+
+  return useLazyAtomValue(getTokenAtom(params));
 }
