@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
   useEffect,
+  useMemo,
 } from "react";
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
@@ -211,7 +212,10 @@ const AssetInfo: FC = () => {
   );
 
   const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
-  const parsedTokenSlug = parseTokenSlug(tokenSlug ?? undefined);
+  const parsedTokenSlug = useMemo(
+    () => tokenSlug && parseTokenSlug(tokenSlug),
+    [tokenSlug]
+  );
 
   // if (!tokenInfo && tokens[0]) {
   //   setTokenSlug([tokens[0].tokenSlug, "replace"]);
