@@ -66,6 +66,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             ref={fieldRef}
             value={address}
             onChange={() => undefined}
+            tabIndex={-1}
             className="sr-only"
           />
           <Tooltip
