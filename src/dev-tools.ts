@@ -91,6 +91,7 @@ async function fakeAccountTokens(accountAddress: string) {
       logoUrl: token.logo_url,
       rawBalance,
       balanceUSD,
+      priceUSD: token.price,
     });
 
     dbKeys.push([chainId, accountAddress, tokenSlug].join("_"));
