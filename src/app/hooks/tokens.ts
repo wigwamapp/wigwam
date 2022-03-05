@@ -91,18 +91,20 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
   const chainId = useChainId();
   const { address: accountAddress } = useAtomValue(currentAccountAtom);
 
-  const prevTokenSlug = usePrevious(tokenSlug);
-
   const params = useMemo(
     () => ({ chainId, accountAddress, tokenSlug }),
     [chainId, accountAddress, tokenSlug]
   );
 
+  const prevTokenSlugRef = useRef<typeof tokenSlug>();
+
   useEffect(() => {
-    if (prevTokenSlug === tokenSlug) {
+    if (prevTokenSlugRef.current === tokenSlug) {
       onReset?.();
     }
-  }, [onReset, params, prevTokenSlug, tokenSlug]);
+
+    prevTokenSlugRef.current = tokenSlug;
+  }, [onReset, params, tokenSlug]);
 
   return useLazyAtomValue(getTokenAtom(params));
 }
