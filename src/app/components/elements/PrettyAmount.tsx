@@ -166,7 +166,7 @@ export const getPrettyAmount = ({
     let finalValue = new Intl.NumberFormat(locale, {
       maximumFractionDigits: dec > 4 ? 3 : 2,
       notation: "compact",
-    }).format(+value);
+    } as any).format(+value);
     const finalSplitLetter = finalValue.slice(-1);
     if (checkIfObjectsKey(finalSplitLetter)) {
       finalValue = `${new BigNumber(value)

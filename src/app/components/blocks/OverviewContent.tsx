@@ -205,9 +205,12 @@ const AssetInfo: FC = () => {
   //   limit: 1,
   // });
 
-  const tokenInfo = useToken(tokenSlug, () =>
-    setTokenSlug([RESET])
-  ) as AccountAsset;
+  const handleTokenReset = useCallback(
+    () => setTokenSlug([RESET]),
+    [setTokenSlug]
+  );
+
+  const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
   const parsedTokenSlug = parseTokenSlug(tokenSlug ?? undefined);
 
   // if (!tokenInfo && tokens[0]) {
