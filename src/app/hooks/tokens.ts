@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import useForceUpdate from "use-force-update";
-import { useLazyAtomValue } from "lib/atom-utils";
+import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { TokenType } from "core/types";
@@ -43,7 +43,7 @@ export function useAccountTokens(
 
   const offsetRef = useRef(0);
 
-  if (baseParams !== prevBaseParams) {
+  if (prevBaseParams && baseParams !== prevBaseParams) {
     offsetRef.current = 0;
     onReset?.();
   }
@@ -106,5 +106,5 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
     prevTokenSlugRef.current = tokenSlug;
   }, [onReset, params, tokenSlug]);
 
-  return useLazyAtomValue(getTokenAtom(params));
+  return useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
 }
