@@ -67,6 +67,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       searchValue={searchValue}
       onSearch={setSearchValue}
       currentItemClassName={classNames("!px-3", className)}
+      contentClassName="!min-w-[22.25rem]"
     />
   );
 };
@@ -115,7 +116,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
             copy();
           }}
           className={classNames(
-            "px-1 pb-0.5 -mb-0.5 -mt-1",
+            "px-1 -my-1",
             "text-left",
             "rounded",
             "max-w-full",

@@ -11,12 +11,14 @@ type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
+  contentClassName?: string;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
   currentItemIconClassName,
+  contentClassName,
 }) => {
   const currentNetwork = useLazyNetwork() ?? INITIAL_NETWORK;
   const allNetworks = useLazyAllNetworks() ?? [];
@@ -31,6 +33,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       className={className}
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
+      contentClassName={contentClassName}
     />
   );
 };

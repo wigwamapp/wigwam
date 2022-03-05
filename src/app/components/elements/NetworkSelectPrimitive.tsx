@@ -6,7 +6,6 @@ import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "app/components/elements/Select";
-import NewSelect from "./NewSelect";
 
 const prepareNetwork = (network: Network) => ({
   key: network.chainId,
@@ -21,6 +20,7 @@ type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
+  contentClassName?: string;
 };
 
 const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
@@ -30,6 +30,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
   currentItemIconClassName,
+  contentClassName,
 }) => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -53,7 +54,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   );
 
   return (
-    <NewSelect
+    <Select
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
@@ -63,6 +64,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
+      contentClassName={contentClassName}
       modal={true}
     />
   );
