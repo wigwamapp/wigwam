@@ -11,7 +11,7 @@ import Welcome from "./components/pages/Welcome";
 import Main from "./components/pages/Main";
 import Overview from "./components/pages/Overview";
 import Receive from "./components/pages/Receive";
-import Send from "./components/pages/Send";
+import Transfer from "./components/pages/Transfer";
 import Swap from "./components/pages/Swap";
 import Apps from "./components/pages/Apps";
 import Contacts from "./components/pages/Contacts";
@@ -52,7 +52,7 @@ export function matchPage(params: MatchPageParams) {
       .with({ page: Page.Default }, () => <Main />)
       .with({ page: Page.Overview }, () => <Overview />)
       .with({ page: Page.Receive }, () => <Receive />)
-      .with({ page: Page.Send }, () => <Send />)
+      .with({ page: Page.Transfer }, () => <Transfer />)
       .with({ page: Page.Swap }, () => <Swap />)
       .with({ page: Page.Apps }, () => <Apps />)
       .with({ page: Page.Contacts }, () => <Contacts />)

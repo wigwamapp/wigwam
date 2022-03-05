@@ -20,8 +20,8 @@ export const NavLinksPrimary = [
     Icon: ReceiveIcon,
   },
   {
-    route: Page.Send,
-    label: "Send",
+    route: Page.Transfer,
+    label: "Transfer",
     Icon: SendIcon,
   },
   {

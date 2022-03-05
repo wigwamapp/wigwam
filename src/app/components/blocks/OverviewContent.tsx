@@ -10,7 +10,7 @@ import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
-import { ReactComponent as SwapIcon } from "app/icons/Swap.svg";
+import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
@@ -240,7 +240,7 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
       <div className="mt-6 grid grid-cols-3 gap-2">
         <NewButton theme="secondary" className="grow !py-2">
           <SendIcon className="mr-2" />
-          Send
+          Transfer
         </NewButton>
         <NewButton theme="secondary" className="grow !py-2">
           <SwapIcon className="mr-2" />

@@ -264,7 +264,7 @@ const AssetCard: FC<AssetCardProps> = ({ asset, className }) => {
           "px-1 py-2"
         )}
       >
-        <PopoverButton Icon={SendIcon}>Send</PopoverButton>
+        <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
         <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
         <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
       </PopoverPrimitive.Content>

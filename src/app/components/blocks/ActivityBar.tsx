@@ -41,7 +41,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
       <div className="flex items-center">
         <ActivityIcon
           Icon={SendIcon}
-          ariaLabel="Send transaction"
+          ariaLabel="Transfer transaction"
           theme={theme}
           className="mr-2"
         />
