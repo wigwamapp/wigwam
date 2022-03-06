@@ -11,7 +11,7 @@ export enum Page {
   Unlock = "unlock",
   Overview = "overview",
   Receive = "receive",
-  Send = "send",
+  Transfer = "transfer",
   Swap = "swap",
   Apps = "apps",
   Contacts = "contacts",

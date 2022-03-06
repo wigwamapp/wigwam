@@ -2,16 +2,14 @@ import { FC } from "react";
 
 import PageLayout from "app/components/layouts/PageLayout";
 import WalletsList from "app/components/blocks/WalletsList";
-import OverviewContent from "app/components/blocks/OverviewContent";
 
-const Main: FC = () => {
+const Contacts: FC = () => {
   return (
     <PageLayout className="flex flex-col">
       <WalletsList />
-
-      <OverviewContent />
+      <h2>Contacts</h2>
     </PageLayout>
   );
 };
 
-export default Main;
+export default Contacts;

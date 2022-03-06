@@ -80,9 +80,7 @@ const AddAccountModal = memo(() => {
               <NewButton theme="clean">Cancel</NewButton>
             </Dialog.Close>
 
-            <div className="overflow-y-scroll h-full">
-              {accModalOpened && <AddAccountSteps />}
-            </div>
+            {accModalOpened && <AddAccountSteps />}
           </div>
         </Dialog.Content>
       </Dialog.Portal>
