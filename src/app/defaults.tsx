@@ -25,6 +25,15 @@ export enum WelcomeStep {
   LetsBegin = "lets-begin",
 }
 
+export enum SettingTabs {
+  General = "General",
+  Profile = "Profile",
+  Security = "Security & Privacy",
+  Web3 = "Web 3",
+  Networks = "Networks",
+  About = "About",
+}
+
 export enum AddAccountStep {
   ChooseWay = "choose-way",
   AddSeedPhrase = "add-seed-phrase",

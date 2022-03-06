@@ -28,6 +28,11 @@ export const allAccountsAtom = atomWithAutoReset(getAccounts, {
   resetDelay: 5_000,
 });
 
+export const tokensWithoutBalanceAtom = atomWithStorage<boolean>(
+  "without_balance",
+  true
+);
+
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
     return query(() => Repo.networks.get(chainId));
