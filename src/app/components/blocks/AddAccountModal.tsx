@@ -6,7 +6,7 @@ import { useAtomValue } from "jotai/utils";
 
 import { AddAccountStep } from "app/defaults";
 import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
-
+import { OverflowProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
 import BackButton from "app/components/elements/BackButton";
 import AddAccountSteps from "app/components/blocks/AddAccountSteps";
@@ -46,43 +46,47 @@ const AddAccountModal = memo(() => {
         >
           <VigvamIcon className="w-16 mt-2" />
         </div>
-        <Dialog.Content
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          className={classNames(
-            "fixed z-20",
-            "h-3/4 w-full max-w-6xl min-w-[40rem]",
-            "m-auto inset-x-0 inset-y-0",
-            "rounded-[2.5rem]",
-            "overflow-hidden"
+        <OverflowProvider>
+          {(ref) => (
+            <Dialog.Content
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              className={classNames(
+                "fixed z-20",
+                "h-3/4 w-full max-w-6xl min-w-[40rem]",
+                "m-auto inset-x-0 inset-y-0",
+                "rounded-[2.5rem]",
+                "overflow-hidden"
+              )}
+              ref={ref}
+            >
+              <div
+                className={classNames(
+                  "w-full h-full",
+                  "bg-brand-dark/10",
+                  "backdrop-blur-[30px]",
+                  "border border-brand-light/5",
+                  "rounded-[2.5rem]",
+                  "overflow-hidden",
+                  "after:absolute after:inset-0",
+                  "after:shadow-addaccountmodal",
+                  "after:rounded-[2.5rem]",
+                  "after:pointer-events-none",
+                  "after:z-30"
+                )}
+              >
+                {accountStep !== AddAccountStep.ChooseWay && (
+                  <BackButton className="fixed top-4 left-4 " />
+                )}
+
+                <Dialog.Close className="fixed top-4 right-4" asChild>
+                  <NewButton theme="clean">Cancel</NewButton>
+                </Dialog.Close>
+
+                {accModalOpened && <AddAccountSteps />}
+              </div>
+            </Dialog.Content>
           )}
-          id="addAccountModalRoot"
-        >
-          <div
-            className={classNames(
-              "w-full h-full",
-              "bg-brand-dark/10",
-              "backdrop-blur-[30px]",
-              "border border-brand-light/5",
-              "rounded-[2.5rem]",
-              "overflow-hidden",
-              "after:absolute after:inset-0",
-              "after:shadow-addaccountmodal",
-              "after:rounded-[2.5rem]",
-              "after:pointer-events-none",
-              "after:z-30"
-            )}
-          >
-            {accountStep !== AddAccountStep.ChooseWay && (
-              <BackButton className="fixed top-4 left-4 " />
-            )}
-
-            <Dialog.Close className="fixed top-4 right-4" asChild>
-              <NewButton theme="clean">Cancel</NewButton>
-            </Dialog.Close>
-
-            {accModalOpened && <AddAccountSteps />}
-          </div>
-        </Dialog.Content>
+        </OverflowProvider>
       </Dialog.Portal>
     </Dialog.Root>
   );

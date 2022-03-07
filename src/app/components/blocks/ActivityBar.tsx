@@ -195,7 +195,11 @@ const ActivityIcon: FC<ActivityIconProps> = ({
   }
 
   if (ariaLabel) {
-    return <Tooltip content={ariaLabel}>{content}</Tooltip>;
+    return (
+      <Tooltip content={ariaLabel} size="small" duration={[100, 0]}>
+        {content}
+      </Tooltip>
+    );
   }
 
   return <Icon />;
@@ -226,6 +230,8 @@ const StatItem: FC<StatItemProps> = ({
   return (
     <Tooltip
       content={ariaLabel}
+      size="small"
+      duration={[100, 0]}
       className={classNames(
         "flex items-center",
         "font-bold",
@@ -235,13 +241,15 @@ const StatItem: FC<StatItemProps> = ({
         className
       )}
     >
-      <Icon
-        className={classNames(
-          theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
-          theme === "large" && "mr-2"
-        )}
-      />
-      {count}
+      <>
+        <Icon
+          className={classNames(
+            theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
+            theme === "large" && "mr-2"
+          )}
+        />
+        {count}
+      </>
     </Tooltip>
   );
 };

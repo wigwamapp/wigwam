@@ -2,7 +2,7 @@ import { memo, useRef } from "react";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import HoverCard from "app/components/elements/HoverCard";
+import Tooltip from "app/components/elements/Tooltip";
 
 export const getHashPreview = (hash: string, startLength = 6, endLength = 4) =>
   `${hash.slice(0, startLength)}...${hash.slice(
@@ -32,20 +32,17 @@ export const HashPreview = memo<HashPreviewProps>(
 
       if (withTooltip) {
         return (
-          <HoverCard
-            content={`${hash}${copied ? " copied" : ""}`}
-            size="small"
-            side="bottom"
-            align="center"
-          >
-            <input
-              ref={fieldRef}
-              defaultValue={hash}
-              tabIndex={-1}
-              className="sr-only"
-            />
-            <button onClick={copy}>{content}</button>
-          </HoverCard>
+          <Tooltip content={`${hash}${copied ? " copied" : ""}`} size="small">
+            <>
+              <input
+                ref={fieldRef}
+                defaultValue={hash}
+                tabIndex={-1}
+                className="sr-only"
+              />
+              <button onClick={copy}>{content}</button>
+            </>
+          </Tooltip>
         );
       }
 

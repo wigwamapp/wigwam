@@ -11,7 +11,6 @@ import HashPreview from "app/components/elements/HashPreview";
 import Balance from "app/components/elements/Balance";
 import IconedButton from "app/components/elements/IconedButton";
 import Tooltip from "app/components/elements/Tooltip";
-import HoverCard from "app/components/elements/HoverCard";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
@@ -76,6 +75,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                 : "Copy wallet address to clipboard"
             }
             asChild
+            size="small"
           >
             <button
               onClick={copy}
@@ -127,6 +127,11 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               Icon={WalletExplorerIcon}
               className="!w-6 !h-6"
               iconClassName="!w-[1.125rem]"
+              tooltipProps={
+                currentNetwork?.explorerUrls
+                  ? { duration: [100, 0] }
+                  : undefined
+              }
             />
           )}
           {currentNetwork?.explorerUrls && (
@@ -136,6 +141,11 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               Icon={ClockIcon}
               className="!w-6 !h-6 ml-2"
               iconClassName="!w-[1.125rem]"
+              tooltipProps={
+                currentNetwork?.explorerUrls
+                  ? { duration: [100, 0] }
+                  : undefined
+              }
             />
           )}
         </div>
@@ -143,7 +153,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
           <span className="opacity-75">$</span>46,909.13
         </span>
       </div>
-      <HoverCard
+      <Tooltip
         content={
           <>
             <p>
@@ -159,12 +169,11 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             </p>
           </>
         }
-        side="right"
-        align="end"
+        placement="right"
         className="absolute right-4 bottom-3"
       >
         <TooltipIcon theme="dark" />
-      </HoverCard>
+      </Tooltip>
     </div>
   );
 };

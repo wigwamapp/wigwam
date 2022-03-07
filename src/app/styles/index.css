@@ -69,24 +69,25 @@ div[data-radix-popper-content-wrapper] {
   will-change: scroll-position !important;
 }
 
+/* Tooltip arrow */
 div[data-placement^="top"] .tooltip-arrow-icon {
-  transform: translateY(-7.5px) rotate(45deg);
+  transform: translateY(-75%) rotate(45deg);
 }
 div[data-placement^="bottom"] .tooltip-arrow-wrapper {
   bottom: 100%;
 }
 div[data-placement^="bottom"] .tooltip-arrow-icon {
-  transform: translateY(7.5px) rotate(45deg);
+  transform: translateY(75%) rotate(45deg);
 }
 div[data-placement^="right"] .tooltip-arrow-wrapper {
-  left: -15px;
+  right: 100%;
 }
 div[data-placement^="right"] .tooltip-arrow-icon {
-  transform: translateX(7.5px) rotate(45deg);
+  transform: translateX(75%) rotate(45deg);
 }
 div[data-placement^="left"] .tooltip-arrow-wrapper {
   left: 100%;
 }
 div[data-placement^="left"] .tooltip-arrow-icon {
-  transform: translateX(-7.5px) rotate(45deg);
+  transform: translateX(-75%) rotate(45deg);
 }

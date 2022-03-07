@@ -41,7 +41,7 @@ import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
-import HoverCard from "app/components/elements/HoverCard";
+import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
@@ -205,7 +205,7 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
         <div className="flex mb-9">
           <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
           <div className="flex items-center ml-auto">
-            <HoverCard
+            <Tooltip
               content={
                 <>
                   <p>
@@ -222,10 +222,10 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
                 </>
               }
               className="mr-3"
-              side="left"
+              placement="left-start"
             >
               <TooltipIcon />
-            </HoverCard>
+            </Tooltip>
             <NetworkSelect
               networks={preparedNetworks}
               currentNetwork={network}
