@@ -38,12 +38,19 @@ export const HashPreview = memo<HashPreviewProps>(
               size="small"
               asChild
             >
-              <button onClick={copy}>{content}</button>
+              <button
+                onPointerDown={(e) => e.preventDefault()}
+                tabIndex={0}
+                onClick={copy}
+              >
+                {content}
+              </button>
             </Tooltip>
 
             <input
               ref={fieldRef}
-              defaultValue={hash}
+              value={hash}
+              onChange={() => undefined}
               tabIndex={-1}
               className="sr-only"
             />

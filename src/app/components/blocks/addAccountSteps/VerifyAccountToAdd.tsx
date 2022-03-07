@@ -35,6 +35,7 @@ import {
   neuterExtendedKeyAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
+import { TippySingletonProvider } from "app/hooks";
 import { AddAccountStep } from "app/defaults";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
@@ -257,26 +258,28 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
             </tr>
           </thead>
           <tbody>
-            {addresses.map((address, i) => {
-              const isAdded = addressesToAddRef.current.has(address);
-              const addressName = addressesNamesRef.current.get(address);
+            <TippySingletonProvider>
+              {addresses.map((address, i) => {
+                const isAdded = addressesToAddRef.current.has(address);
+                const addressName = addressesNamesRef.current.get(address);
 
-              return (
-                <Account
-                  key={address}
-                  name={addressName ?? `Wallet ${i + 1}`}
-                  address={address}
-                  provider={provider}
-                  network={network}
-                  isAdded={isAdded}
-                  onToggleAdd={() => toggleAddress(address)}
-                  onChangeWalletName={(newName: string) =>
-                    changeWalletName(address, newName)
-                  }
-                  className={i === addresses.length - 1 ? "!border-none" : ""}
-                />
-              );
-            })}
+                return (
+                  <Account
+                    key={address}
+                    name={addressName ?? `Wallet ${i + 1}`}
+                    address={address}
+                    provider={provider}
+                    network={network}
+                    isAdded={isAdded}
+                    onToggleAdd={() => toggleAddress(address)}
+                    onChangeWalletName={(newName: string) =>
+                      changeWalletName(address, newName)
+                    }
+                    className={i === addresses.length - 1 ? "!border-none" : ""}
+                  />
+                );
+              })}
+            </TippySingletonProvider>
           </tbody>
         </table>
       </div>

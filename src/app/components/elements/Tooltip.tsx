@@ -1,8 +1,9 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import classNames from "clsx";
 import { match } from "ts-pattern";
 import Tippy, { TippyProps } from "@tippyjs/react";
-import { useOverflowRef } from "app/hooks";
+
+import { useOverflowRef, useTippySingletonTarget } from "app/hooks";
 
 type sizeType = "large" | "small";
 
@@ -24,9 +25,8 @@ const Tooltip: FC<TooltipProps> = ({
   children,
   ...rest
 }) => {
-  const [arrow, setArrow] = useState(null);
-
   const overflowElementRef = useOverflowRef();
+  const singletonTarget = useTippySingletonTarget();
 
   return (
     <Tippy
@@ -34,29 +34,6 @@ const Tooltip: FC<TooltipProps> = ({
         <>
           <div className={classNames("text-white", getSizeClasses(size))}>
             {content}
-          </div>
-          <div
-            className={classNames(
-              "tooltip-arrow-wrapper",
-              "block",
-              "w-[16px] h-[16px]",
-              "overflow-hidden",
-              "flex items-center justify-center"
-            )}
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            ref={setArrow}
-          >
-            <span
-              className={classNames(
-                "tooltip-arrow-icon",
-                "block",
-                "w-2.5 h-2.5",
-                "rotate-45",
-                size === "large" && "bg-brand-main/10 backdrop-blur-[60px]",
-                size === "small" && "bg-brand-main/20 backdrop-blur-[6px]"
-              )}
-            />
           </div>
         </>
       }
@@ -66,25 +43,7 @@ const Tooltip: FC<TooltipProps> = ({
       placement={placement ?? (size === "large" ? "right-start" : "bottom")}
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
-      popperOptions={{
-        modifiers: [
-          {
-            name: "arrow",
-            options: {
-              element: arrow,
-              padding: 10,
-            },
-          },
-          {
-            name: "offset",
-            options: {
-              offset: ({ placement }: any) => {
-                return placement.endsWith("start") ? [-10, 16] : [10, 16];
-              },
-            },
-          },
-        ],
-      }}
+      singleton={singletonTarget}
       {...rest}
     >
       {asChild ? children : <button className={className}>{children}</button>}

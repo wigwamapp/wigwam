@@ -167,6 +167,7 @@ export const getPrettyAmount = ({
       maximumFractionDigits: dec > 4 ? 3 : 2,
       notation: "compact",
     } as any).format(+value);
+
     const finalSplitLetter = finalValue.slice(-1);
     if (checkIfObjectsKey(finalSplitLetter)) {
       finalValue = `${new BigNumber(value)
@@ -174,7 +175,7 @@ export const getPrettyAmount = ({
         .decimalPlaces(dec > 4 ? 3 : 2, BigNumber.ROUND_DOWN)
         .toString()}${finalSplitLetter}`;
     }
-    console.log("finalValue", finalValue);
+
     return finalValue;
   }
 
