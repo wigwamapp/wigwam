@@ -16,21 +16,20 @@ import { Page } from "app/defaults";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { useAccountTokens } from "app/hooks/tokens";
+import PopupLayout from "app/components/layouts/PopupLayout";
+import PreloadUnlocked from "app/components/layouts/PreloadUnlocked";
+import NetworkSelect from "app/components/elements/NetworkSelect";
+import AccountSelect from "app/components/elements/AccountSelect";
+import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
+import SearchInput from "app/components/elements/SearchInput";
+import IconedButton from "app/components/elements/IconedButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
-
-import PopupLayout from "../layouts/PopupLayout";
-import PreloadUnlocked from "../layouts/PreloadUnlocked";
-import NetworkSelect from "../elements/NetworkSelect";
-import AccountSelect from "../elements/AccountSelect";
-import AssetsSwitcher from "../elements/AssetsSwitcher";
-import SearchInput from "../elements/SearchInput";
-import IconedButton from "../elements/IconedButton";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import PrettyAmount from "../elements/PrettyAmount";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -39,6 +38,7 @@ const Popup: FC = () => (
         className="max-w-auto"
         currentItemClassName="!px-3 !py-1.5"
         currentItemIconClassName="w-8 h-8 !mr-3"
+        contentClassName="!min-w-[22.25rem]"
       />
       <AccountSelect className="mt-2" />
       <InteractionWithDapp

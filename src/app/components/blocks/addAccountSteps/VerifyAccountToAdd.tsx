@@ -35,13 +35,14 @@ import {
   neuterExtendedKeyAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
+import { TippySingletonProvider } from "app/hooks";
 import { AddAccountStep } from "app/defaults";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
-import HoverCard from "app/components/elements/HoverCard";
+import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
@@ -205,7 +206,7 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
         <div className="flex mb-9">
           <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
           <div className="flex items-center ml-auto">
-            <HoverCard
+            <Tooltip
               content={
                 <>
                   <p>
@@ -222,10 +223,10 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
                 </>
               }
               className="mr-3"
-              side="left"
+              placement="left-start"
             >
               <TooltipIcon />
-            </HoverCard>
+            </Tooltip>
             <NetworkSelect
               networks={preparedNetworks}
               currentNetwork={network}
@@ -257,26 +258,28 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
             </tr>
           </thead>
           <tbody>
-            {addresses.map((address, i) => {
-              const isAdded = addressesToAddRef.current.has(address);
-              const addressName = addressesNamesRef.current.get(address);
+            <TippySingletonProvider>
+              {addresses.map((address, i) => {
+                const isAdded = addressesToAddRef.current.has(address);
+                const addressName = addressesNamesRef.current.get(address);
 
-              return (
-                <Account
-                  key={address}
-                  name={addressName ?? `Wallet ${i + 1}`}
-                  address={address}
-                  provider={provider}
-                  network={network}
-                  isAdded={isAdded}
-                  onToggleAdd={() => toggleAddress(address)}
-                  onChangeWalletName={(newName: string) =>
-                    changeWalletName(address, newName)
-                  }
-                  className={i === addresses.length - 1 ? "!border-none" : ""}
-                />
-              );
-            })}
+                return (
+                  <Account
+                    key={address}
+                    name={addressName ?? `Wallet ${i + 1}`}
+                    address={address}
+                    provider={provider}
+                    network={network}
+                    isAdded={isAdded}
+                    onToggleAdd={() => toggleAddress(address)}
+                    onChangeWalletName={(newName: string) =>
+                      changeWalletName(address, newName)
+                    }
+                    className={i === addresses.length - 1 ? "!border-none" : ""}
+                  />
+                );
+              })}
+            </TippySingletonProvider>
           </tbody>
         </table>
       </div>

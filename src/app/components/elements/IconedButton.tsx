@@ -9,7 +9,7 @@ import React, {
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
 
-import Tooltip from "app/components/elements/Tooltip";
+import Tooltip, { TooltipProps } from "app/components/elements/Tooltip";
 
 type IconedButtonProps = {
   Icon: FC<{ className?: string }>;
@@ -86,22 +86,26 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
   }
 );
 
+type ForwardRefProps = IconedButtonProps & {
+  tooltipProps?: TooltipProps;
+};
+
 const withTooltip = (
   WrappedComponent: ForwardRefExoticComponent<
-    IconedButtonProps & RefAttributes<HTMLElement>
+    ForwardRefProps & RefAttributes<HTMLElement>
   >
 ) => {
-  return forwardRef(
-    (props: IconedButtonProps, ref: ForwardedRef<HTMLElement>) => {
-      const ariaLabel = props["aria-label"];
+  return forwardRef<HTMLElement, ForwardRefProps>(
+    ({ tooltipProps, ...rest }, ref) => {
+      const ariaLabel = rest["aria-label"];
       if (ariaLabel) {
         return (
-          <Tooltip asChild content={ariaLabel}>
-            <WrappedComponent {...props} ref={ref} />
+          <Tooltip asChild content={ariaLabel} size="small" {...tooltipProps}>
+            <WrappedComponent {...rest} ref={ref} />
           </Tooltip>
         );
       } else {
-        return <WrappedComponent {...props} ref={ref} />;
+        return <WrappedComponent {...rest} ref={ref} />;
       }
     }
   );
