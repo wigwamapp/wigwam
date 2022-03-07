@@ -8,9 +8,9 @@ import { useSteps } from "app/hooks/steps";
 import { WelcomeStep } from "app/defaults";
 import { currentLocaleAtom } from "app/atoms";
 
-import BoardingPageLayout from "../../layouts/BoardingPageLayout";
-import SelectLanguage from "../SelectLanguage";
-import ContinueButton from "../ContinueButton";
+import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
+import SelectLanguage from "app/components/blocks/SelectLanguage";
+import ContinueButton from "app/components/blocks/ContinueButton";
 
 const ChooseLanguage: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);

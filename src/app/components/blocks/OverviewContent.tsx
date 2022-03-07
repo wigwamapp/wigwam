@@ -1,62 +1,82 @@
-import { FC, useMemo, useState } from "react";
+import {
+  FC,
+  forwardRef,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
 import classNames from "clsx";
-import Fuse from "fuse.js";
+import { useAtom, useAtomValue } from "jotai";
+import { RESET } from "jotai/utils";
+import { TReplace } from "lib/ext/i18n/react";
 
-import { ASSETS_SEARCH_OPTIONS } from "app/defaults";
+import { AccountAsset, TokenStandard, TokenType } from "core/types";
+import { parseTokenSlug } from "core/common/tokens";
+
+import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { useAccountTokens, useToken } from "app/hooks/tokens";
 import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
 import IconedButton from "app/components/elements/IconedButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
-import { AssetsTempData, AssetTempType } from "app/temp-data/assets";
 
-const OverviewContent: FC = () => {
-  const [selectedAsset, setSelectedAsset] = useState<AssetTempType>(
-    AssetsTempData[0]
-  );
-
-  return (
-    <div className="flex mt-6 min-h-0 grow">
-      <AssetsList
-        activeAssetName={selectedAsset.name}
-        onAssetSelect={setSelectedAsset}
-      />
-      <AssetInfo asset={selectedAsset} />
-    </div>
-  );
-};
+const OverviewContent: FC = () => (
+  <div className="flex mt-6 min-h-0 grow">
+    <AssetsList />
+    <AssetInfo />
+  </div>
+);
 
 export default OverviewContent;
 
-type AssetsListProps = {
-  activeAssetName: string;
-  onAssetSelect: (asset: AssetTempType) => void;
-};
-
-const AssetsList: FC<AssetsListProps> = ({
-  activeAssetName,
-  onAssetSelect,
-}) => {
+const AssetsList: FC = () => {
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+  const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
-  const fuse = useMemo(
-    () => new Fuse(AssetsTempData, ASSETS_SEARCH_OPTIONS),
-    []
+  const { tokens, loadMore, hasMore } = useAccountTokens(
+    TokenType.Asset,
+    currentAccount.address,
+    { search: searchValue ?? undefined, limit: 10 }
   );
 
-  const filteredAssets = useMemo(() => {
-    if (searchValue) {
-      return fuse.search(searchValue).map(({ item: asset }) => asset);
+  const observer = useRef<IntersectionObserver>();
+  const lastAssetRef = useCallback(
+    (node) => {
+      if (!tokens) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [hasMore, loadMore, tokens]
+  );
+
+  useEffect(() => {
+    if (tokens && tokens[0] && !tokenSlug) {
+      setTokenSlug([tokens[0].tokenSlug, "replace"]);
     }
-    return AssetsTempData;
-  }, [fuse, searchValue]);
+  }, [setTokenSlug, tokenSlug, tokens]);
 
   return (
     <div
@@ -88,96 +108,128 @@ const AssetsList: FC<AssetsListProps> = ({
         viewPortClassName="pb-20 rounded-t-[.625rem]"
         scrollBarClassName="py-0 pb-20"
       >
-        {filteredAssets.map((asset, i) => (
-          <AssetCard
-            key={asset.name}
-            asset={asset}
-            isActive={activeAssetName === asset.name}
-            onAssetSelect={() => {
-              onAssetSelect(asset);
-              setSearchValue(null);
-            }}
-            className={classNames(i !== AssetsTempData.length - 1 && "mb-2")}
-          />
-        ))}
+        {tokens.map((asset, i) => {
+          const isLastOne = i === tokens.length - 1;
+
+          return (
+            <AssetCard
+              key={asset.tokenSlug}
+              ref={isLastOne ? lastAssetRef : null}
+              asset={asset as AccountAsset}
+              isActive={tokenSlug === asset.tokenSlug}
+              onAssetSelect={() => {
+                setTokenSlug([asset.tokenSlug, "replace"]);
+                setSearchValue(null);
+              }}
+              className={classNames(!isLastOne && "mb-2")}
+            />
+          );
+        })}
       </ScrollAreaContainer>
     </div>
   );
 };
 
 type AssetCardProps = {
-  asset: Omit<AssetTempType, "type" | "price" | "priceChange">;
+  asset: AccountAsset;
   isActive?: boolean;
   onAssetSelect: () => void;
   className?: string;
 };
 
-const AssetCard: FC<AssetCardProps> = ({
-  asset,
-  isActive = false,
-  onAssetSelect,
-  className,
-}) => {
-  const { icon, name, symbol, balance, dollars } = asset;
+const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
+  ({ asset, isActive = false, onAssetSelect, className }, ref) => {
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
-  return (
-    <button
-      type="button"
-      onClick={onAssetSelect}
-      className={classNames(
-        "flex items-stretch",
-        "w-full p-3",
-        "text-left",
-        "rounded-[.625rem]",
-        "group",
-        "transition-colors",
-        !isActive && "hover:bg-brand-main/10",
-        isActive && "bg-brand-main/20",
-        className
-      )}
-    >
-      <span
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={onAssetSelect}
         className={classNames(
-          "block",
-          "w-11 h-11 min-w-[2.75rem] mr-3",
-          "bg-white",
-          "rounded-full overflow-hidden"
+          "flex items-stretch",
+          "w-full p-3",
+          "text-left",
+          "rounded-[.625rem]",
+          "group",
+          "transition-colors",
+          !isActive && "hover:bg-brand-main/10",
+          isActive && "bg-brand-main/20",
+          className
         )}
       >
-        <img src={icon} alt={name} className="w-full h-full object-cover" />
-      </span>
-      <span className="flex flex-col w-full">
-        <span className="text-sm font-bold leading-4">{name}</span>
-        <span className="mt-auto flex justify-between items-end">
-          <span className="text-base font-bold leading-4">
-            {balance} {symbol}
+        <span
+          className={classNames(
+            "block",
+            "w-11 h-11 min-w-[2.75rem] mr-3",
+            "bg-white",
+            "rounded-full overflow-hidden"
+          )}
+        >
+          <img
+            src={logoUrl}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+        </span>
+        <span className="flex flex-col w-full">
+          <span className="text-sm font-bold leading-4">
+            <TReplace msg={name} />
           </span>
-          <span
-            className={classNames(
-              "ml-2",
-              "text-sm leading-4",
-              !isActive && "text-brand-inactivedark",
-              isActive && "text-brand-light",
-              "transition-colors",
-              "group-hover:text-brand-light"
-            )}
-          >
-            <span className="opacity-75">$</span>
-            {dollars}
+          <span className="mt-auto flex justify-between items-end">
+            <PrettyAmount
+              amount={rawBalance ?? 0}
+              decimals={decimals}
+              currency={symbol}
+              className="text-base font-bold leading-4"
+            />
+            <PrettyAmount
+              amount={balanceUSD ?? 0}
+              currency="$"
+              className={classNames(
+                "ml-2",
+                "text-sm leading-4",
+                !isActive && "text-brand-inactivedark",
+                isActive && "text-brand-light",
+                "transition-colors",
+                "group-hover:text-brand-light"
+              )}
+            />
           </span>
         </span>
-      </span>
-    </button>
+      </button>
+    );
+  }
+);
+
+const AssetInfo: FC = () => {
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
+  // const currentAccount = useAtomValue(currentAccountAtom);
+  // const { tokens } = useAccountTokens(TokenType.Asset, currentAccount.address, {
+  //   limit: 1,
+  // });
+
+  const handleTokenReset = useCallback(
+    () => setTokenSlug([RESET]),
+    [setTokenSlug]
   );
-};
 
-type AssetInfoProps = {
-  asset: AssetTempType;
-};
+  const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
+  const parsedTokenSlug = useMemo(
+    () => tokenSlug && parseTokenSlug(tokenSlug),
+    [tokenSlug]
+  );
 
-const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
-  const { icon, name, symbol, type, price, priceChange, balance, dollars } =
-    asset;
+  // if (!tokenInfo && tokens[0]) {
+  //   setTokenSlug([tokens[0].tokenSlug, "replace"]);
+  // }
+  if (!tokenInfo || !parsedTokenSlug) {
+    return <></>;
+  }
+
+  const { logoUrl, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
+    tokenInfo;
+  const { standard } = parsedTokenSlug;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
@@ -189,22 +241,30 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
             "rounded-full overflow-hidden"
           )}
         >
-          <img src={icon} alt={name} className="w-full h-full object-cover" />
+          <img
+            src={logoUrl}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
         </div>
-        <div className="flex flex-col justify-between grow">
+        <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
-            <h2 className="text-2xl font-bold mr-3">{name}</h2>
-            {type && <Tag type={type} />}
+            <h2
+              className={classNames("text-2xl font-bold", "mr-3", "truncate")}
+            >
+              {name}
+            </h2>
+            {standard && <Tag standard={standard} />}
             <IconedButton
               aria-label="View wallet transactions in explorer"
               Icon={WalletExplorerIcon}
-              className="!w-6 !h-6 ml-auto"
+              className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
               iconClassName="!w-[1.125rem]"
             />
             <IconedButton
               aria-label="View wallet transactions in explorer"
               Icon={ClockIcon}
-              className="!w-6 !h-6 ml-2"
+              className="!w-6 !h-6 min-w-[1.5rem] ml-2"
               iconClassName="!w-[1.125rem]"
             />
           </div>
@@ -213,11 +273,12 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
               Price
             </span>
             <span className="flex items-center">
-              <span className="text-lg font-bold leading-6 mr-3">
-                <span className="opacity-75">$</span>
-                {price}
-              </span>
-              <PriceChange priceChange={priceChange} isPercent />
+              <PrettyAmount
+                amount={priceUSD ?? 0}
+                currency="$"
+                className="text-lg font-bold leading-6 mr-3"
+              />
+              <PriceChange priceChange="2.8" isPercent />
             </span>
           </div>
         </div>
@@ -227,20 +288,26 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
           Balance
         </div>
         <div>
-          <span className="text-[1.75rem] font-bold leading-none">
-            {balance} {symbol}
-          </span>
-          <span className="text-base text-brand-inactivedark ml-8 mr-4">
-            <span className="opacity-75">$</span>
-            {dollars}
-          </span>
+          <PrettyAmount
+            amount={rawBalance ?? 0}
+            decimals={decimals}
+            currency={symbol}
+            className="text-[1.75rem] font-bold leading-none"
+          />
+
+          <PrettyAmount
+            amount={balanceUSD ?? 0}
+            currency="$"
+            className="text-base text-brand-inactivedark ml-8 mr-4"
+          />
+
           <PriceChange priceChange={"-2.8"} />
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
         <NewButton theme="secondary" className="grow !py-2">
           <SendIcon className="mr-2" />
-          Send
+          Transfer
         </NewButton>
         <NewButton theme="secondary" className="grow !py-2">
           <SwapIcon className="mr-2" />
@@ -255,22 +322,31 @@ const AssetInfo: FC<AssetInfoProps> = ({ asset }) => {
   );
 };
 
-type TagProps = Pick<AssetTempType, "type">;
+enum TokenStandardValue {
+  ERC20 = "ERC-20",
+  ERC721 = "ERC-721",
+  ERC777 = "ERC-777",
+  ERC1155 = "ERC-1155",
+}
 
-const Tag: FC<TagProps> = ({ type }) => (
+type TagProps = { standard: TokenStandard };
+
+const Tag: FC<TagProps> = ({ standard }) => (
   <span
     className={classNames(
-      "py-2 px-4",
+      "py-2 px-4 mr-4",
       "text-base font-bold leading-none",
       "border border-brand-main/20",
-      "rounded-[.625rem]"
+      "rounded-[.625rem]",
+      "whitespace-nowrap"
     )}
   >
-    {type === "erc-20" && "ERC-20"}
+    {TokenStandardValue[standard]}
   </span>
 );
 
-type PriceChangeProps = Pick<AssetTempType, "priceChange"> & {
+type PriceChangeProps = {
+  priceChange: string;
   isPercent?: boolean;
 };
 

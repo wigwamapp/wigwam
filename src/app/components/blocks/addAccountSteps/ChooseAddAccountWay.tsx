@@ -4,8 +4,9 @@ import { useAtomValue } from "jotai";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
+import { TippySingletonProvider } from "app/hooks";
 import Collapse from "app/components/elements/Collapse";
-import HoverCard from "app/components/elements/HoverCard";
+import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 
@@ -24,54 +25,56 @@ const ChooseAddAccountWay = memo(() => {
     <div className="mb-8 w-full max-w-[59rem] mx-auto flex flex-wrap">
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
 
-      {sections
-        .filter(({ type }) => type !== "advanced")
-        .map((section, index) => (
-          <div
-            key={section.type}
-            className={classNames(
-              "w-1/3",
-              "px-[1.75rem]",
-              index % 3 !== 2 && "border-r border-brand-light/[.03]"
-            )}
-          >
-            <div className="flex items-center mb-5">
-              <h2 className={classNames("text-2xl font-bold capitalize")}>
-                {section.title}
-              </h2>
-              {section.tooltip && (
-                <HoverCard
-                  content={
-                    <>
-                      {section.tooltip.content}
-                      {section.points && (
-                        <Points
-                          adoption={section.points.adoption}
-                          security={section.points.security}
-                        />
-                      )}
-                    </>
-                  }
-                  className="ml-2"
-                >
-                  <TooltipIcon />
-                </HoverCard>
+      <TippySingletonProvider>
+        {sections
+          .filter(({ type }) => type !== "advanced")
+          .map((section, index) => (
+            <div
+              key={section.type}
+              className={classNames(
+                "w-1/3",
+                "px-[1.75rem]",
+                index % 3 !== 2 && "border-r border-brand-light/[.03]"
               )}
+            >
+              <div className="flex items-center mb-5">
+                <h2 className={classNames("text-2xl font-bold capitalize")}>
+                  {section.title}
+                </h2>
+                {section.tooltip && (
+                  <Tooltip
+                    content={
+                      <>
+                        {section.tooltip.content}
+                        {section.points && (
+                          <Points
+                            adoption={section.points.adoption}
+                            security={section.points.security}
+                          />
+                        )}
+                      </>
+                    }
+                    className="ml-2"
+                  >
+                    <TooltipIcon />
+                  </Tooltip>
+                )}
+              </div>
+              <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
+                {section.tiles.map(({ title, Icon, action, soon }, i) => (
+                  <Tile
+                    key={i}
+                    title={title}
+                    Icon={Icon}
+                    action={action}
+                    soon={soon}
+                    className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                  />
+                ))}
+              </div>
             </div>
-            <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
-              {section.tiles.map(({ title, Icon, action, soon }, i) => (
-                <Tile
-                  key={i}
-                  title={title}
-                  Icon={Icon}
-                  action={action}
-                  soon={soon}
-                  className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+      </TippySingletonProvider>
 
       {sections
         .filter(({ type }) => type === "advanced")
