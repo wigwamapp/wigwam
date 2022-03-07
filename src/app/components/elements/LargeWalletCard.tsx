@@ -68,6 +68,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             tabIndex={-1}
             className="sr-only"
           />
+
           <Tooltip
             content={
               copied
@@ -78,7 +79,11 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             size="small"
           >
             <button
+              onPointerDown={(e) => {
+                e.preventDefault();
+              }}
               onClick={copy}
+              tabIndex={0}
               className={classNames(
                 "px-1 pt-1 -mx-1 -mt-1",
                 "text-left",
