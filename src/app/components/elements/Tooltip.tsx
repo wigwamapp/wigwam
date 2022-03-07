@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import classNames from "clsx";
 import { match } from "ts-pattern";
 import Tippy, { TippyProps } from "@tippyjs/react";
-import { useOverflowRef } from "app/hooks";
+import { useOverflowRef, useTippySingletonTarget } from "app/hooks";
 
 type sizeType = "large" | "small";
 
@@ -27,6 +27,7 @@ const Tooltip: FC<TooltipProps> = ({
   const [arrow, setArrow] = useState(null);
 
   const overflowElementRef = useOverflowRef();
+  const singletonTarget = useTippySingletonTarget();
 
   return (
     <Tippy
@@ -85,6 +86,7 @@ const Tooltip: FC<TooltipProps> = ({
           },
         ],
       }}
+      singleton={singletonTarget}
       {...rest}
     >
       {asChild ? children : <button className={className}>{children}</button>}

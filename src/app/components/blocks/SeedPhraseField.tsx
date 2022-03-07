@@ -13,6 +13,7 @@ import { ReactComponent as DownloadIcon } from "app/icons/download.svg";
 import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { TippySingletonProvider } from "app/hooks";
 
 type SeedPhraseFieldProps = LongTextFieldProps & {
   mode?: "create" | "import";
@@ -38,39 +39,32 @@ const SeedPhraseField: FC<SeedPhraseFieldProps> = ({
           Secret Phrase
         </label>
         <div className="flex items-center">
-          <IconedButton
-            aria-label="Show / hide"
-            Icon={EyeIcon}
-            className="mr-2"
-            theme="secondary"
-            tooltipProps={{
-              duration: [100, 0],
-            }}
-          />
-          {mode === "create" && !!onRegenerate && (
+          <TippySingletonProvider>
             <IconedButton
-              aria-label="Regenerate secret phrase"
-              Icon={RegenerateIcon}
-              onClick={onRegenerate}
+              aria-label="Show / hide"
+              Icon={EyeIcon}
               className="mr-2"
               theme="secondary"
-              tooltipProps={{
-                duration: [100, 0],
-              }}
             />
-          )}
-          <IconedButton
-            aria-label={
-              mode === "create"
-                ? "Download secret phrase"
-                : "Upload secret phrase"
-            }
-            Icon={mode === "create" ? DownloadIcon : UploadIcon}
-            theme="secondary"
-            tooltipProps={{
-              duration: [100, 0],
-            }}
-          />
+            {mode === "create" && !!onRegenerate && (
+              <IconedButton
+                aria-label="Regenerate secret phrase"
+                Icon={RegenerateIcon}
+                onClick={onRegenerate}
+                className="mr-2"
+                theme="secondary"
+              />
+            )}
+            <IconedButton
+              aria-label={
+                mode === "create"
+                  ? "Download secret phrase"
+                  : "Upload secret phrase"
+              }
+              Icon={mode === "create" ? DownloadIcon : UploadIcon}
+              theme="secondary"
+            />
+          </TippySingletonProvider>
         </div>
       </div>
       <LongTextField
