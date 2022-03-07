@@ -49,7 +49,8 @@ export const HashPreview = memo<HashPreviewProps>(
 
             <input
               ref={fieldRef}
-              defaultValue={hash}
+              value={hash}
+              onChange={() => undefined}
               tabIndex={-1}
               className="sr-only"
             />
