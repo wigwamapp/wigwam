@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC } from "react";
 import { useSetAtom } from "jotai";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
@@ -38,10 +38,4 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   );
 };
 
-const WrappedNetworkSelect: FC<NetworkSelectProps> = (props) => (
-  <Suspense fallback={null}>
-    <NetworkSelect {...props} />
-  </Suspense>
-);
-
-export default WrappedNetworkSelect;
+export default NetworkSelect;
