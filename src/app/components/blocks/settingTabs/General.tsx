@@ -7,8 +7,8 @@ import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { currentLocaleAtom, tokensWithoutBalanceAtom } from "app/atoms";
 import { toWordlistLang } from "core/common";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
-import NewSelectLanguage from "../NewSelectLanguage";
 import Select from "app/components/elements/Select";
+import SelectLanguage from "app/components/blocks/SelectLanguage";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -36,7 +36,7 @@ const General: FC = () => {
 
   return (
     <div className={classNames("flex flex-col", "px-4")}>
-      <NewSelectLanguage
+      <SelectLanguage
         selected={locale}
         items={SUPPORTED_LOCALES}
         onSelect={setLocale}
