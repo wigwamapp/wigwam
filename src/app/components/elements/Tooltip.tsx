@@ -32,7 +32,13 @@ const Tooltip: FC<TooltipProps> = ({
     <Tippy
       content={
         <>
-          <div className={classNames("text-white", getSizeClasses(size))}>
+          <div
+            className={classNames(
+              "text-white",
+              "border border-[#323453]",
+              getSizeClasses(size)
+            )}
+          >
             {content}
           </div>
         </>
