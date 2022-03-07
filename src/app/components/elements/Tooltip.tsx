@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import classNames from "clsx";
 import { match } from "ts-pattern";
 import Tippy, { TippyProps } from "@tippyjs/react";
@@ -25,6 +25,7 @@ const Tooltip: FC<TooltipProps> = ({
   children,
   ...rest
 }) => {
+  const [arrow, setArrow] = useState(null);
   const overflowElementRef = useOverflowRef();
   const singletonTarget = useTippySingletonTarget();
 
@@ -40,6 +41,29 @@ const Tooltip: FC<TooltipProps> = ({
             )}
           >
             {content}
+            <div
+              className={classNames(
+                "tooltip-arrow-wrapper",
+                "block",
+                "w-3.5 h-3.5",
+                "overflow-hidden",
+                "flex items-center justify-center"
+              )}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              ref={setArrow}
+            >
+              <span
+                className={classNames(
+                  "tooltip-arrow-icon",
+                  "block",
+                  "w-2 h-2",
+                  "rotate-45",
+                  "bg-[#323453]",
+                  "rounded-bl-[1px]"
+                )}
+              />
+            </div>
           </div>
         </>
       }
@@ -52,6 +76,13 @@ const Tooltip: FC<TooltipProps> = ({
       singleton={singletonTarget}
       popperOptions={{
         modifiers: [
+          {
+            name: "arrow",
+            options: {
+              element: arrow,
+              padding: 10,
+            },
+          },
           {
             name: "offset",
             options: {
