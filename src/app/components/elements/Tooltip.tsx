@@ -62,8 +62,8 @@ const Tooltip: FC<TooltipProps> = ({
       }
       interactive={interactive ?? size === "large"}
       appendTo={overflowElementRef?.current ?? document.body}
-      maxWidth={maxWidth ?? size === "large" ? "18rem" : "none"}
-      placement={placement ?? size === "large" ? "right-start" : "bottom"}
+      maxWidth={maxWidth ?? (size === "large" ? "18rem" : "none")}
+      placement={placement ?? (size === "large" ? "right-start" : "bottom")}
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
       popperOptions={{
