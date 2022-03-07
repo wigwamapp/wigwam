@@ -32,17 +32,22 @@ export const HashPreview = memo<HashPreviewProps>(
 
       if (withTooltip) {
         return (
-          <Tooltip content={`${hash}${copied ? " copied" : ""}`} size="small">
-            <>
-              <input
-                ref={fieldRef}
-                defaultValue={hash}
-                tabIndex={-1}
-                className="sr-only"
-              />
+          <>
+            <Tooltip
+              content={`${hash}${copied ? " copied" : ""}`}
+              size="small"
+              asChild
+            >
               <button onClick={copy}>{content}</button>
-            </>
-          </Tooltip>
+            </Tooltip>
+
+            <input
+              ref={fieldRef}
+              defaultValue={hash}
+              tabIndex={-1}
+              className="sr-only"
+            />
+          </>
         );
       }
 
