@@ -50,6 +50,24 @@ const Tooltip: FC<TooltipProps> = ({
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
       singleton={singletonTarget}
+      popperOptions={{
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: ({ placement }: any) => {
+                if (placement.endsWith("start")) {
+                  return [-10, 10];
+                }
+                if (placement.endsWith("end")) {
+                  return [10, 10];
+                }
+                return [0, 10];
+              },
+            },
+          },
+        ],
+      }}
       {...rest}
     >
       {asChild ? children : <button className={className}>{children}</button>}
