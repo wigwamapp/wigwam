@@ -1,14 +1,25 @@
 import { FC, createContext, useContext } from "react";
-import Tippy, { useSingleton } from "@tippyjs/react";
+import Tippy, { useSingleton, UseSingletonProps } from "@tippyjs/react";
 
 type SingletonTarget = ReturnType<typeof useSingleton>["1"];
 
 const TippySingletonTargetContext = createContext<SingletonTarget | null>(null);
 
+const singletonParams: UseSingletonProps = {
+  overrides: [
+    "placement",
+    "trigger",
+    "popperOptions",
+    "appendTo",
+    "hideOnClick",
+    "offset",
+    "maxWidth",
+    "interactive",
+  ],
+};
+
 export const TippySingletonProvider: FC = ({ children }) => {
-  const [source, target] = useSingleton({
-    overrides: ["placement", "trigger", "popperOptions"],
-  });
+  const [source, target] = useSingleton(singletonParams);
 
   return (
     <>
