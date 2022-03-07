@@ -1,15 +1,16 @@
-import { FC, useCallback, useLayoutEffect, useMemo } from "react";
+import { FC, useCallback, useLayoutEffect, useMemo, useState } from "react";
 import classNames from "clsx";
 import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
-import { walletStatusAtom } from "app/atoms";
 import { approveItem } from "core/client";
+
+import { walletStatusAtom, approvalsAtom } from "app/atoms";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./pages/Unlock";
-import { approvalsAtom } from "app/atoms/approve";
+import LongTextField from "./elements/LongTextField";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
@@ -44,23 +45,36 @@ const Approve: FC = () => {
     [approvals]
   );
 
+  const [lastError, setLastError] = useState<any>(null);
+
   const handleApprove = useCallback(
     async (approve: boolean) => {
       try {
         await approveItem(currentApproval.id, approve);
       } catch (err) {
         console.error(err);
-        alert("Error! Check dev tools.");
+        setLastError(err);
       }
     },
-    [currentApproval]
+    [currentApproval, setLastError]
   );
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-8 text-white text-xl font-semibold">
+    <div className="h-screen flex flex-col">
+      <div className="mb-8 pt-4 px-4 text-white text-xl font-semibold">
         TYPE: {currentApproval.type}
       </div>
+
+      {lastError && (
+        <div className="mb-8 px-4">
+          <h2 className="mb-2 text-white text-xl font-semibold">Error</h2>
+
+          <LongTextField
+            readOnly
+            value={lastError?.message || "Unknown error."}
+          />
+        </div>
+      )}
 
       <div className="flex-1" />
 

@@ -4,9 +4,9 @@ import { assert } from "lib/system/assert";
 import { ActivityType } from "core/types";
 
 import { Vault } from "../vault";
-import { $approvals, approvalResolved } from "../state";
-import { sendRpc } from "../rpc";
-import { ethers, UnsignedTransaction } from "ethers";
+import { $accounts, $approvals, approvalResolved } from "../state";
+import { getRpcProvider, sendRpc } from "../rpc";
+import { ethers } from "ethers";
 
 const { serializeTransaction, keccak256 } = ethers.utils;
 
@@ -23,12 +23,28 @@ export async function processApprove(
       .with(
         { type: ActivityType.Transaction },
         async ({ chainId, accountAddress, txParams, rpcReply }) => {
-          console.info({ txParams });
+          accountAddress = ethers.utils.getAddress(accountAddress);
 
-          const tx = txParams as UnsignedTransaction;
+          // console.info("txParams", txParams);
+          // console.info("accountAddress", accountAddress);
+
+          if ("gas" in txParams) {
+            const { gas, ...rest } = txParams;
+            txParams = { ...rest, gasLimit: gas };
+          }
+
+          const account = $accounts
+            .getState()
+            .find((a) => a.address === accountAddress);
+          assert(account, "Account not found");
+
+          const provider = getRpcProvider(chainId).getSigner(account.address);
+
+          const tx: any = await provider.populateTransaction(txParams);
+          // console.info({ tx });
 
           const rawTx = serializeTransaction(tx);
-          const signature = vault.sign(accountAddress, keccak256(rawTx));
+          const signature = vault.sign(account.uuid, keccak256(rawTx));
 
           const signedRawTx = serializeTransaction(tx, signature);
 
@@ -36,13 +52,14 @@ export async function processApprove(
             signedRawTx,
           ]);
 
-          console.info({ rpcRes });
+          // console.info({ rpcRes });
 
           if ("result" in rpcRes) {
-            const [txHash] = rpcRes.result;
+            const txHash = rpcRes.result;
 
             rpcReply({ result: txHash });
           } else {
+            console.info(rpcRes.error);
             const { message, ...data } = rpcRes.error;
 
             const err = new Error(message);

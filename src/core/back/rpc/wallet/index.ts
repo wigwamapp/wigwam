@@ -26,6 +26,11 @@ export async function sendTransaction(
 
 let currentWinId: number | null = null;
 
+if ("currentWinId" in sessionStorage) {
+  browser.windows.remove(+sessionStorage.currentWinId).catch(console.error);
+  sessionStorage.removeItem("currentWinId");
+}
+
 approvalAdded.watch(async () => {
   if (currentWinId !== null) {
     browser.windows.update(currentWinId, { focused: true });
@@ -43,6 +48,7 @@ $approvals.watch((approvals) => {
 browser.windows.onRemoved.addListener((removedWinId) => {
   if (removedWinId === currentWinId) {
     currentWinId = null;
+    sessionStorage.removeItem("currentWinId");
   }
 });
 
@@ -83,4 +89,5 @@ async function createApproveWindow() {
   }
 
   currentWinId = win.id!;
+  sessionStorage.currentWinId = currentWinId;
 }
