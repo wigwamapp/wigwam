@@ -35,7 +35,7 @@ const Tooltip: FC<TooltipProps> = ({
           <div
             className={classNames(
               "text-white",
-              "border border-[#323453]",
+              "border border-white/5",
               getSizeClasses(size)
             )}
           >
