@@ -59,10 +59,22 @@ const Approve: FC = () => {
     [currentApproval, setLastError]
   );
 
+  const restLength = approvals.length - 1;
+
   return (
     <div className="h-screen flex flex-col">
-      <div className="mb-8 pt-4 px-4 text-white text-xl font-semibold">
-        TYPE: {currentApproval.type}
+      <div className="mb-8 pt-4 flex items-center">
+        <div className="px-4 text-white text-xl font-semibold">
+          Type: {currentApproval.type.toLowerCase()}
+        </div>
+
+        <div className="flex-1" />
+
+        {restLength > 0 && (
+          <div className="font-medium text-lg text-white px-4">
+            +{restLength}
+          </div>
+        )}
       </div>
 
       {lastError && (
@@ -99,7 +111,7 @@ const Approve: FC = () => {
                 "w-full h-full",
                 "rounded-lg bg-slate-600",
                 "text-white text-2xl",
-                "flex items-center"
+                "flex items-center justify-center"
               )}
             >
               {content}

@@ -26,7 +26,6 @@ export async function processApprove(
           accountAddress = ethers.utils.getAddress(accountAddress);
 
           // console.info("txParams", txParams);
-          // console.info("accountAddress", accountAddress);
 
           if ("gas" in txParams) {
             const { gas, ...rest } = txParams;
@@ -41,7 +40,10 @@ export async function processApprove(
           const provider = getRpcProvider(chainId).getSigner(account.address);
 
           const tx: any = await provider.populateTransaction(txParams);
-          // console.info({ tx });
+
+          if (tx.type === ethers.utils.TransactionTypes.legacy) {
+            delete tx.from;
+          }
 
           const rawTx = serializeTransaction(tx);
           const signature = vault.sign(account.uuid, keccak256(rawTx));
@@ -51,8 +53,6 @@ export async function processApprove(
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
             signedRawTx,
           ]);
-
-          // console.info({ rpcRes });
 
           if ("result" in rpcRes) {
             const txHash = rpcRes.result;
