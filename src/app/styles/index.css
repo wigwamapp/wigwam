@@ -68,7 +68,3 @@ body {
 div[data-radix-popper-content-wrapper] {
   will-change: auto !important;
 }
-
-[data-state="checked"] span {
-  transform: translateX(16px);
-}

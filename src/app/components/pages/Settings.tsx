@@ -42,37 +42,44 @@ const Settings: FC = () => {
   );
 };
 
-const tabsContent: Array<{ title: SettingTabs; desc: string }> = [
-  {
-    title: SettingTabs.General,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-  {
-    title: SettingTabs.Profile,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-  {
-    title: SettingTabs.Security,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-  {
-    title: SettingTabs.Web3,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-  {
-    title: SettingTabs.Networks,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-  {
-    title: SettingTabs.About,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-];
+const tabsContent: Array<{ route: SettingTabs; title: string; desc: string }> =
+  [
+    {
+      route: SettingTabs.General,
+      title: "General",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+    {
+      route: SettingTabs.Profile,
+      title: "Profile",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+    {
+      route: SettingTabs.Security,
+      title: "Security & Privacy",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+    {
+      route: SettingTabs.Web3,
+      title: "Web 3",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+    {
+      route: SettingTabs.Networks,
+      title: "Networks",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+    {
+      route: SettingTabs.About,
+      title: "About",
+      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    },
+  ];
 const Tabs: FC = () => (
   <div
     className={classNames(
       "flex flex-col",
-      "w-[333px] px-6",
+      "w-[333px] pr-6",
       "border-r border-brand-main/[.07]"
     )}
   >

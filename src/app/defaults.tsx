@@ -26,12 +26,12 @@ export enum WelcomeStep {
 }
 
 export enum SettingTabs {
-  General = "General",
-  Profile = "Profile",
-  Security = "Security & Privacy",
-  Web3 = "Web 3",
-  Networks = "Networks",
-  About = "About",
+  General = "general",
+  Profile = "profile",
+  Security = "security-&-privacy",
+  Web3 = "web-3",
+  Networks = "networks",
+  About = "about",
 }
 
 export enum AddAccountStep {

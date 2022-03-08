@@ -42,7 +42,7 @@ const General: FC = () => {
         onSelect={setLocale}
         className="mb-3"
       />
-      <Select {...currencySelectProps} className="mb-2" />
+      <Select {...currencySelectProps} className="mb-3" />
       <label
         className={classNames(
           "ml-4 mb-2",
@@ -72,6 +72,7 @@ const Switcher: FC<SwitcherProps> = ({
 }) => {
   return (
     <div
+      role="button"
       className={classNames(
         "flex items-center justify-between",
         "py-[9px] px-5",
@@ -79,16 +80,17 @@ const Switcher: FC<SwitcherProps> = ({
         "rounded-[.625rem]",
         className
       )}
+      tabIndex={0}
+      onKeyPress={() => 0}
+      onClick={() => setToggle(!toggle)}
     >
-      <label className="text-sm" htmlFor="show">
-        {label}
-      </label>
+      <h6 className="text-sm font-bold">{label}</h6>
       <SwitchPrimitive.Switch
         id="show"
         className={classNames(
           "relative",
           "w-[43px] h-[26px]",
-          "bg-brand-main/10",
+          "bg-brand-main/20",
           "rounded-full",
           "[-webkit-tap-highlight-color: transparent]",
           "border border-brand-light",
@@ -100,12 +102,13 @@ const Switcher: FC<SwitcherProps> = ({
         <SwitchPrimitive.SwitchThumb
           className={classNames(
             "block",
-            "w-[21px] h-[21px]",
+            "w-[18px] h-[18px]",
             "bg-brand-white",
             "rounded-full",
             "bg-brand-light",
             "[box-shadow: 0 2px 2px #222222]",
-            "duration-100 translate-x-[4px]"
+            "duration-100 translate-x-[4px]",
+            toggle && "translate-x-[20px]"
           )}
         />
       </SwitchPrimitive.Switch>
