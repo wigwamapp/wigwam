@@ -20,6 +20,7 @@ type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
+  contentClassName?: string;
 };
 
 const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
@@ -29,6 +30,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
   currentItemIconClassName,
+  contentClassName,
 }) => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -62,6 +64,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
+      contentClassName={contentClassName}
+      modal={true}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC } from "react";
 import { useSetAtom } from "jotai";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
@@ -11,12 +11,14 @@ type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
+  contentClassName?: string;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
   currentItemIconClassName,
+  contentClassName,
 }) => {
   const currentNetwork = useLazyNetwork() ?? INITIAL_NETWORK;
   const allNetworks = useLazyAllNetworks() ?? [];
@@ -31,14 +33,9 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       className={className}
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
+      contentClassName={contentClassName}
     />
   );
 };
 
-const WrappedNetworkSelect: FC<NetworkSelectProps> = (props) => (
-  <Suspense fallback={null}>
-    <NetworkSelect {...props} />
-  </Suspense>
-);
-
-export default WrappedNetworkSelect;
+export default NetworkSelect;

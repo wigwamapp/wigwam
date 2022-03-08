@@ -1,56 +1,71 @@
-import { FC, ReactNode } from "react";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { FC } from "react";
 import classNames from "clsx";
+import { match } from "ts-pattern";
+import Tippy, { TippyProps } from "@tippyjs/react";
 
-type TooltipProps = {
-  content: ReactNode;
+import { useOverflowRef, useTippySingletonTarget } from "app/hooks";
+
+type sizeType = "large" | "small";
+
+export type TooltipProps = {
+  size?: sizeType;
   asChild?: boolean;
-  hideOnClick?: boolean;
   className?: string;
-} & TooltipPrimitive.TooltipProps;
+} & Omit<TippyProps, "appendTo">;
 
 const Tooltip: FC<TooltipProps> = ({
+  interactive,
   content,
-  delayDuration = 200,
-  asChild,
+  maxWidth,
+  placement,
   hideOnClick = false,
-  children,
+  size = "large",
+  asChild = false,
   className,
+  children,
   ...rest
 }) => {
+  const overflowElementRef = useOverflowRef();
+  const singletonTarget = useTippySingletonTarget();
+
   return (
-    <TooltipPrimitive.Root delayDuration={delayDuration} {...rest}>
-      <TooltipPrimitive.TooltipTrigger
-        asChild={asChild}
-        className={className}
-        onClick={(evt) => !hideOnClick && evt.preventDefault()}
-        onMouseDown={(evt) => !hideOnClick && evt.preventDefault()}
-      >
-        {children}
-      </TooltipPrimitive.TooltipTrigger>
-      <TooltipPrimitive.Content
-        portalled
-        side="bottom"
-        sideOffset={2}
-        align="center"
-        alignOffset={0}
-        className={classNames(
-          "rounded-md",
-          "bg-brand-main/20 backdrop-blur-[6px]",
-          "py-1.5 px-3",
-          "text-white"
-        )}
-      >
-        {content}
-        <TooltipPrimitive.Arrow
-          offset={6}
-          width={15}
-          height={8}
-          className="fill-brand-main/20"
-        />
-      </TooltipPrimitive.Content>
-    </TooltipPrimitive.Root>
+    <Tippy
+      content={
+        <>
+          <div className={classNames("text-white", getSizeClasses(size))}>
+            {content}
+          </div>
+        </>
+      }
+      interactive={interactive ?? size === "large"}
+      appendTo={overflowElementRef?.current ?? document.body}
+      maxWidth={maxWidth ?? (size === "large" ? "18rem" : "none")}
+      placement={placement ?? (size === "large" ? "right-start" : "bottom")}
+      hideOnClick={hideOnClick}
+      className="pointer-events-auto"
+      singleton={singletonTarget}
+      {...rest}
+    >
+      {asChild ? children : <button className={className}>{children}</button>}
+    </Tippy>
   );
 };
 
 export default Tooltip;
+
+const getSizeClasses = (size: sizeType) =>
+  match(size)
+    .with("large", () =>
+      classNames(
+        "rounded-[.625rem]",
+        "bg-brand-main/10 backdrop-blur-[60px]",
+        "py-5 px-5"
+      )
+    )
+    .otherwise(() =>
+      classNames(
+        "rounded-md",
+        "bg-brand-main/20 backdrop-blur-[6px]",
+        "py-1.5 px-3"
+      )
+    );
