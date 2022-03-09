@@ -34,7 +34,7 @@ const Settings: FC = () => {
 
   return (
     <PageLayout className="flex flex-col">
-      <div className="flex mt-5">
+      <div className="flex mt-5 h-full">
         <Tabs />
         {useMemo(() => settingsRoutes(settingTab), [settingTab])}
       </div>
