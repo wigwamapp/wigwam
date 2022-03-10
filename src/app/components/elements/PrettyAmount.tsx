@@ -108,7 +108,7 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
         asChild
         duration={[100, 50]}
       >
-        {contentNode}
+        <AmountWithCurrency amount={content} currency={currency} />
       </CopiableTooltip>
     );
   }

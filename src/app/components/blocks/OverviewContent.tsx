@@ -16,6 +16,7 @@ import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
 import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
 import IconedButton from "app/components/elements/IconedButton";
@@ -204,10 +205,6 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 
 const AssetInfo: FC = () => {
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
-  // const currentAccount = useAtomValue(currentAccountAtom);
-  // const { tokens } = useAccountTokens(TokenType.Asset, currentAccount.address, {
-  //   limit: 1,
-  // });
 
   const handleTokenReset = useCallback(
     () => setTokenSlug([RESET]),
@@ -220,9 +217,6 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
-  // if (!tokenInfo && tokens[0]) {
-  //   setTokenSlug([tokens[0].tokenSlug, "replace"]);
-  // }
   if (!tokenInfo || !parsedTokenSlug) {
     return <></>;
   }
@@ -255,18 +249,20 @@ const AssetInfo: FC = () => {
               {name}
             </h2>
             {standard && <Tag standard={standard} />}
-            <IconedButton
-              aria-label="View wallet transactions in explorer"
-              Icon={WalletExplorerIcon}
-              className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
-              iconClassName="!w-[1.125rem]"
-            />
-            <IconedButton
-              aria-label="View wallet transactions in explorer"
-              Icon={ClockIcon}
-              className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-              iconClassName="!w-[1.125rem]"
-            />
+            <TippySingletonProvider>
+              <IconedButton
+                aria-label="View wallet transactions in explorer"
+                Icon={WalletExplorerIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
+                iconClassName="!w-[1.125rem]"
+              />
+              <IconedButton
+                aria-label="View wallet transactions in explorer"
+                Icon={ClockIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] ml-2"
+                iconClassName="!w-[1.125rem]"
+              />
+            </TippySingletonProvider>
           </div>
           <div className="flex flex-col">
             <span className="text-base text-brand-gray leading-none mb-0.5">

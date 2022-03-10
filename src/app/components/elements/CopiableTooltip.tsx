@@ -1,4 +1,4 @@
-import { FC, ComponentProps, useCallback, useRef } from "react";
+import { FC, ComponentProps, useCallback, useRef, useEffect } from "react";
 import classNames from "clsx";
 import * as Tippy from "tippy.js";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -7,12 +7,16 @@ import Tooltip from "./Tooltip";
 
 type CopiableTooltipProps = ComponentProps<typeof Tooltip> & {
   textToCopy: string;
+  copiedText?: string;
+  onCopiedToggle?: (state: boolean) => void;
 };
 
 const CopiableTooltip: FC<CopiableTooltipProps> = ({
   textToCopy,
   content,
   onHidden,
+  copiedText = "Copied",
+  onCopiedToggle,
   children,
   className,
   ...rest
@@ -28,11 +32,15 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
     [onHidden, setCopied]
   );
 
+  useEffect(() => {
+    onCopiedToggle?.(copied);
+  }, [copied, onCopiedToggle]);
+
   return (
     <>
       <Tooltip
         {...rest}
-        content={copied ? "Copied" : content}
+        content={copied ? copiedText : content}
         onHidden={handleTooltipHidden}
         asChild
       >

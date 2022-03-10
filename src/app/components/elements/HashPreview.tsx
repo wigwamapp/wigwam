@@ -1,8 +1,7 @@
-import { memo, useRef } from "react";
+import { memo } from "react";
 import classNames from "clsx";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import Tooltip from "app/components/elements/Tooltip";
+import CopiableTooltip from "app/components/elements/CopiableTooltip";
 
 export const getHashPreview = (hash: string, startLength = 6, endLength = 4) =>
   `${hash.slice(0, startLength)}...${hash.slice(
@@ -20,9 +19,6 @@ type HashPreviewProps = {
 
 export const HashPreview = memo<HashPreviewProps>(
   ({ hash, startLength = 6, endLength = 4, withTooltip = true, className }) => {
-    const fieldRef = useRef<HTMLInputElement>(null);
-    const { copy, copied } = useCopyToClipboard(fieldRef);
-
     if (hash.length > startLength + endLength) {
       const content = (
         <span className={classNames("inline-flex", className)}>
@@ -32,25 +28,9 @@ export const HashPreview = memo<HashPreviewProps>(
 
       if (withTooltip) {
         return (
-          <>
-            <Tooltip content={`${hash}${copied ? " copied" : ""}`} asChild>
-              <button
-                onPointerDown={(e) => e.preventDefault()}
-                tabIndex={0}
-                onClick={copy}
-              >
-                {content}
-              </button>
-            </Tooltip>
-
-            <input
-              ref={fieldRef}
-              value={hash}
-              onChange={() => undefined}
-              tabIndex={-1}
-              className="sr-only"
-            />
-          </>
+          <CopiableTooltip content={hash} textToCopy={hash}>
+            {content}
+          </CopiableTooltip>
         );
       }
 

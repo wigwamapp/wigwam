@@ -44,6 +44,7 @@ import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
@@ -249,10 +250,12 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
               </Th>
               <Th />
               <Th className="!pl-7 !text-brand-light align-middle">
-                <span className="flex align-center">
-                  Name
-                  <EditIcon className="ml-0.5" />
-                </span>
+                <Tooltip content="You can edit wallet's name">
+                  <span className="flex align-center font-semibold">
+                    Name
+                    <EditIcon className="ml-0.5" />
+                  </span>
+                </Tooltip>
               </Th>
               <Th>Address</Th>
               <Th>Balance</Th>
@@ -374,11 +377,14 @@ const Account = memo<AccountProps>(
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
-          {baseAsset
-            ? `${ethers.utils.formatEther(baseAsset.balance)} ${
-                baseAsset.symbol
-              }`
-            : `0 ${network.nativeCurrency.symbol}`}
+          <PrettyAmount
+            amount={baseAsset ? ethers.utils.formatEther(baseAsset.balance) : 0}
+            currency={
+              baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol
+            }
+            copiable={true}
+            className="font-bold"
+          />
         </Td>
       </tr>
     );

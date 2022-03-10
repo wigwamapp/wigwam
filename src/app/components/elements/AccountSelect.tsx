@@ -1,9 +1,8 @@
-import { FC, useMemo, useRef, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
@@ -18,7 +17,7 @@ import Select from "app/components/elements/Select";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
 import Balance from "app/components/elements/Balance";
-import Tooltip from "app/components/elements/Tooltip";
+import CopiableTooltip from "app/components/elements/CopiableTooltip";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
@@ -80,8 +79,7 @@ type AccountSelectItemProps = {
 };
 
 const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
-  const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
+  const [copied, setCopied] = useState(false);
 
   return (
     <span className="flex items-center text-left w-full pr-3">
@@ -96,39 +94,22 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           "rounded-[.625rem]"
         )}
       />
-      <input
-        ref={fieldRef}
-        value={account.address}
-        onChange={() => undefined}
-        tabIndex={-1}
-        className="sr-only"
-      />
-      <Tooltip
-        content={
-          copied
-            ? "Wallet address copied to clipboard"
-            : "Copy wallet address to clipboard"
-        }
-        asChild
+      <CopiableTooltip
+        content="Copy wallet address to clipboard"
+        textToCopy={account.address}
+        copiedText="Wallet address copied to clipboard"
+        onCopiedToggle={setCopied}
+        className={classNames(
+          "px-1 -my-1",
+          "text-left",
+          "rounded",
+          "max-w-full",
+          "inline-flex flex-col",
+          "transition-colors",
+          "hover:bg-brand-main/40 focus-visible:bg-brand-main/40"
+        )}
       >
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <span
-          onPointerDown={(e) => {
-            e.preventDefault();
-          }}
-          onClick={copy}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex={0}
-          className={classNames(
-            "px-1 -my-1",
-            "text-left",
-            "rounded",
-            "max-w-full",
-            "inline-flex flex-col",
-            "transition-colors",
-            "hover:bg-brand-main/40 focus-visible:bg-brand-main/40"
-          )}
-        >
+        <>
           <span className="font-bold">
             <TReplace msg={account.name} />
           </span>
@@ -144,11 +125,11 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
               <CopyIcon className="w-[1.125rem] h-auto" />
             )}
           </span>
-        </span>
-      </Tooltip>
+        </>
+      </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <Balance address={account.address} copiable />
+          <Balance address={account.address} copiable className="font-bold" />
         </span>
         <span className="text-xs leading-4 text-brand-inactivedark font-normal mt-auto">
           $ 22,478.34
