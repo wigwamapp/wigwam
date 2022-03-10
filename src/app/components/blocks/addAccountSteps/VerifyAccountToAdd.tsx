@@ -222,8 +222,9 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
                   </p>
                 </>
               }
-              className="mr-3"
               placement="left-start"
+              size="large"
+              className="mr-3"
             >
               <TooltipIcon />
             </Tooltip>

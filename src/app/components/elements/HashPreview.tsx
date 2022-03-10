@@ -33,11 +33,7 @@ export const HashPreview = memo<HashPreviewProps>(
       if (withTooltip) {
         return (
           <>
-            <Tooltip
-              content={`${hash}${copied ? " copied" : ""}`}
-              size="small"
-              asChild
-            >
+            <Tooltip content={`${hash}${copied ? " copied" : ""}`} asChild>
               <button
                 onPointerDown={(e) => e.preventDefault()}
                 tabIndex={0}

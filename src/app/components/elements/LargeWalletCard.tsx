@@ -77,7 +77,6 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                   : "Copy wallet address to clipboard"
               }
               asChild
-              size="small"
             >
               <button
                 onPointerDown={(e) => {
@@ -120,6 +119,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             </Tooltip>
             <Balance
               address={address}
+              copiable
               className="mt-auto text-xl font-bold leading-none"
             />
           </div>
@@ -166,6 +166,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             </>
           }
           placement="right"
+          size="large"
           className="absolute right-4 bottom-3"
         >
           <TooltipIcon theme="dark" />

@@ -54,6 +54,7 @@ const ChooseAddAccountWay = memo(() => {
                         )}
                       </>
                     }
+                    size="large"
                     className="ml-2"
                   >
                     <TooltipIcon />

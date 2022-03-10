@@ -19,7 +19,7 @@ const Tooltip: FC<TooltipProps> = ({
   maxWidth,
   placement,
   hideOnClick = false,
-  size = "large",
+  size = "small",
   asChild = false,
   className,
   children,

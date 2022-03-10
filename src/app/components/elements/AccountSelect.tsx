@@ -109,7 +109,6 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
             ? "Wallet address copied to clipboard"
             : "Copy wallet address to clipboard"
         }
-        size="small"
         asChild
       >
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
@@ -149,7 +148,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </Tooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <Balance address={account.address} />
+          <Balance address={account.address} copiable />
         </span>
         <span className="text-xs leading-4 text-brand-inactivedark font-normal mt-auto">
           $ 22,478.34

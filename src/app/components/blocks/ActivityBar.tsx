@@ -2,6 +2,7 @@ import { FC, ReactElement, useState } from "react";
 import { match } from "ts-pattern";
 import classNames from "clsx";
 
+import { TippySingletonProvider } from "app/hooks";
 import Tooltip from "app/components/elements/Tooltip";
 import { ReactComponent as ActivityHoverIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -38,104 +39,106 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
       onMouseLeave={() => setActivityHovered(false)}
       onBlur={() => setActivityHovered(true)}
     >
-      <div className="flex items-center">
-        <ActivityIcon
-          Icon={SendIcon}
-          ariaLabel="Transfer transaction"
-          theme={theme}
-          className="mr-2"
-        />
-        <ActivityIcon
-          Icon={SwapIcon}
-          ariaLabel="Swap transaction"
-          theme={theme}
-          className="mr-2"
-        />
-        <ActivityIcon
-          Icon="https://s2.coinmarketcap.com/static/img/coins/200x200/7278.png"
-          ariaLabel="Approve interaction with aave.com"
-          theme={theme}
-        />
-        <span
-          className={classNames(
-            "flex items-center",
-            "font-bold",
-            "ml-2",
-            theme === "small" && "text-xs",
-            theme === "large" && "text-base"
-          )}
-        >
-          +3
-          {theme === "large" && (
-            <>
-              {" "}
-              waiting for approval
-              <ArrowIcon className="ml-1" />
-            </>
-          )}
-        </span>
-      </div>
-      <div className={centeredClassNames}>
-        <span
-          className={classNames(
-            "bg-activity",
-            "rounded-xl",
-            "transition-all",
-            theme === "small" && "w-20 h-1.5",
-            theme === "large" && "w-52 h-2",
-            activityHovered && "!h-0",
-            centeredClassNames
-          )}
-        />
-        <span
-          className={classNames(
-            "transition-opacity",
-            "whitespace-nowrap",
-            "flex items-center",
-            "font-bold",
-            theme === "small" && "text-xs",
-            theme === "large" && "text-base",
-            !activityHovered && "opacity-0",
-            centeredClassNames
-          )}
-        >
-          Coming soon
-          <ActivityHoverIcon
+      <TippySingletonProvider>
+        <div className="flex items-center">
+          <ActivityIcon
+            Icon={SendIcon}
+            ariaLabel="Transfer transaction"
+            theme={theme}
+            className="mr-2"
+          />
+          <ActivityIcon
+            Icon={SwapIcon}
+            ariaLabel="Swap transaction"
+            theme={theme}
+            className="mr-2"
+          />
+          <ActivityIcon
+            Icon="https://s2.coinmarketcap.com/static/img/coins/200x200/7278.png"
+            ariaLabel="Approve interaction with aave.com"
+            theme={theme}
+          />
+          <span
             className={classNames(
-              "ml-1",
-              theme === "small" && "w-[1.125rem] h-[1.125rem]",
-              theme === "large" && "w-5 h-5"
+              "flex items-center",
+              "font-bold",
+              "ml-2",
+              theme === "small" && "text-xs",
+              theme === "large" && "text-base"
+            )}
+          >
+            +3
+            {theme === "large" && (
+              <>
+                {" "}
+                waiting for approval
+                <ArrowIcon className="ml-1" />
+              </>
+            )}
+          </span>
+        </div>
+        <div className={centeredClassNames}>
+          <span
+            className={classNames(
+              "bg-activity",
+              "rounded-xl",
+              "transition-all",
+              theme === "small" && "w-20 h-1.5",
+              theme === "large" && "w-52 h-2",
+              activityHovered && "!h-0",
+              centeredClassNames
             )}
           />
-        </span>
-      </div>
-      <div className="flex items-center">
-        <StatItem
-          count={2}
-          ariaLabel="2 successful transactions"
-          theme={theme}
-          className={classNames(
-            theme === "small" && "mr-2",
-            theme === "large" && "mr-6"
-          )}
-        />
-        <StatItem
-          count={4}
-          status="pending"
-          ariaLabel="4 pending transactions"
-          theme={theme}
-          className={classNames(
-            theme === "small" && "mr-2",
-            theme === "large" && "mr-6"
-          )}
-        />
-        <StatItem
-          count={1}
-          status="failed"
-          ariaLabel="1 failed transactions"
-          theme={theme}
-        />
-      </div>
+          <span
+            className={classNames(
+              "transition-opacity",
+              "whitespace-nowrap",
+              "flex items-center",
+              "font-bold",
+              theme === "small" && "text-xs",
+              theme === "large" && "text-base",
+              !activityHovered && "opacity-0",
+              centeredClassNames
+            )}
+          >
+            Coming soon
+            <ActivityHoverIcon
+              className={classNames(
+                "ml-1",
+                theme === "small" && "w-[1.125rem] h-[1.125rem]",
+                theme === "large" && "w-5 h-5"
+              )}
+            />
+          </span>
+        </div>
+        <div className="flex items-center">
+          <StatItem
+            count={2}
+            ariaLabel="2 successful transactions"
+            theme={theme}
+            className={classNames(
+              theme === "small" && "mr-2",
+              theme === "large" && "mr-6"
+            )}
+          />
+          <StatItem
+            count={4}
+            status="pending"
+            ariaLabel="4 pending transactions"
+            theme={theme}
+            className={classNames(
+              theme === "small" && "mr-2",
+              theme === "large" && "mr-6"
+            )}
+          />
+          <StatItem
+            count={1}
+            status="failed"
+            ariaLabel="1 failed transactions"
+            theme={theme}
+          />
+        </div>
+      </TippySingletonProvider>
     </div>
   );
 };
@@ -195,11 +198,7 @@ const ActivityIcon: FC<ActivityIconProps> = ({
   }
 
   if (ariaLabel) {
-    return (
-      <Tooltip content={ariaLabel} size="small" duration={[100, 0]}>
-        {content}
-      </Tooltip>
-    );
+    return <Tooltip content={ariaLabel}>{content}</Tooltip>;
   }
 
   return <Icon />;
@@ -230,8 +229,6 @@ const StatItem: FC<StatItemProps> = ({
   return (
     <Tooltip
       content={ariaLabel}
-      size="small"
-      duration={[100, 0]}
       className={classNames(
         "flex items-center",
         "font-bold",

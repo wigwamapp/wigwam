@@ -276,6 +276,7 @@ const AssetInfo: FC = () => {
               <PrettyAmount
                 amount={priceUSD ?? 0}
                 currency="$"
+                copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
               <PriceChange priceChange="2.8" isPercent />
@@ -292,12 +293,14 @@ const AssetInfo: FC = () => {
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
+            copiable
             className="text-[1.75rem] font-bold leading-none"
           />
 
           <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
+            copiable
             className="text-base text-brand-inactivedark ml-8 mr-4"
           />
 
