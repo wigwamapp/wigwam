@@ -7,6 +7,7 @@ export type InputProps = {
   StartAdornment?: FC<{ className?: string }>;
   EndAdornment?: FC<{ className?: string }>;
   theme?: "primary" | "clean";
+  optional?: boolean;
   inputClassName?: string;
   adornmentClassName?: string;
 } & HTMLProps<HTMLInputElement>;
@@ -24,6 +25,7 @@ const Input = memo(
         theme = "primary",
         inputClassName,
         adornmentClassName,
+        optional,
         ...rest
       },
       ref
@@ -45,9 +47,14 @@ const Input = memo(
           {label && (
             <label
               htmlFor={id}
-              className="mx-4 mb-2 cursor-pointer text-brand-gray"
+              className="flex justify-between mx-4 mb-2 cursor-pointer text-brand-gray"
             >
               {label}
+              {optional && (
+                <span className="text-xs text-brand-inactivedark2 self-end">
+                  optional
+                </span>
+              )}
             </label>
           )}
           <div className="relative">

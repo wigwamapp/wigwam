@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
-import { Page, SettingTabs } from "app/defaults";
+import { Page } from "app/defaults";
 import { pageAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
@@ -58,17 +58,10 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
         const isPageActive =
           route === (page === Page.Default ? Page.Overview : page);
 
-        const link =
-          route === Page.Settings
-            ? {
-                page: route,
-                setting: SettingTabs.General,
-              }
-            : { page: route };
         return (
           <Link
             key={route}
-            to={link}
+            to={{ page: route }}
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
