@@ -1,12 +1,11 @@
-import { FC, useRef } from "react";
+import { FC } from "react";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { followCursor } from "tippy.js";
-import classNames from "clsx";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { currentLocaleAtom } from "app/atoms";
-import Tooltip from "app/components/elements/Tooltip";
+
+import CopiableTooltip from "./CopiableTooltip";
 
 type PrettyAmountProps = {
   amount: string | number | BigNumber;
@@ -26,9 +25,6 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   className,
 }) => {
   const currentLocale = useAtomValue(currentLocaleAtom);
-
-  const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
 
   const bigNumberAmount = new BigNumber(amount);
   if (!bigNumberAmount) {
@@ -97,37 +93,23 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     });
   }
 
+  const contentNode = (
+    <AmountWithCurrency amount={tooltipContent} currency={currency} />
+  );
+
   if (copiable) {
     return (
-      <Tooltip
-        content={
-          copied ? (
-            "Copied"
-          ) : (
-            <AmountWithCurrency amount={tooltipContent} currency={currency} />
-          )
-        }
+      <CopiableTooltip
+        content={contentNode}
+        textToCopy={tooltipContent}
+        className={className}
         followCursor
         plugins={[followCursor]}
         asChild
         duration={[100, 50]}
       >
-        <button
-          type="button"
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={copy}
-          className={classNames("cursor-pointer", className)}
-        >
-          <input
-            ref={fieldRef}
-            value={tooltipContent}
-            onChange={() => undefined}
-            tabIndex={-1}
-            className="sr-only"
-          />
-          <AmountWithCurrency amount={content} currency={currency} />
-        </button>
-      </Tooltip>
+        {contentNode}
+      </CopiableTooltip>
     );
   }
 
