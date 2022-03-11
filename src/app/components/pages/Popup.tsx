@@ -233,7 +233,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     );
 
     return (
-      <DropdownMenu.Root open={popoverOpened} onOpenChange={setPopoverOpened}>
+      <DropdownMenu.Root
+        open={popoverOpened}
+        onOpenChange={setPopoverOpened}
+        modal
+      >
         <button
           ref={ref}
           type="button"
