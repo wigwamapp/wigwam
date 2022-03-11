@@ -34,12 +34,12 @@ const Settings: FC = () => {
 
   return (
     <PageLayout className="flex flex-col">
-      <Suspense fallback={null}>
-        <div className="flex mt-5 h-full">
-          <Tabs />
+      <div className="flex mt-5 h-full">
+        <Tabs />
+        <Suspense fallback={null}>
           {useMemo(() => settingsRoutes(settingTab), [settingTab])}
-        </div>
-      </Suspense>
+        </Suspense>
+      </div>
     </PageLayout>
   );
 };
