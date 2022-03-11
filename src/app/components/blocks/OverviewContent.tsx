@@ -11,6 +11,8 @@ import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { TReplace } from "lib/ext/i18n/react";
+import * as repo from "core/repo";
+import * as Checkbox from "@radix-ui/react-checkbox";
 
 import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -30,6 +32,9 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+
+const LOAD_MORE_ON_ASSET_FROM_END = 3;
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -45,15 +50,20 @@ const AssetsList: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
-    { search: searchValue ?? undefined, limit: 10 }
+    {
+      withDisabled: manageModeEnabled,
+      search: searchValue ?? undefined,
+      limit: 10,
+    }
   );
 
   const observer = useRef<IntersectionObserver>();
-  const lastAssetRef = useCallback(
+  const loadMoreTriggerAssetRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -79,6 +89,31 @@ const AssetsList: FC = () => {
     }
   }, [setTokenSlug, tokenSlug, tokens]);
 
+  const handleAssetClick = useCallback(
+    async (asset: AccountAsset) => {
+      if (manageModeEnabled) {
+        try {
+          await repo.accountTokens.put(
+            {
+              ...asset,
+              balanceUSD:
+                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
+                  ? -1
+                  : 0,
+            },
+            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setTokenSlug([asset.tokenSlug, "replace"]);
+        setSearchValue(null);
+      }
+    },
+    [currentAccount.address, manageModeEnabled, setTokenSlug]
+  );
+
   return (
     <div
       className={classNames(
@@ -102,6 +137,7 @@ const AssetsList: FC = () => {
           theme="tertiary"
           className="ml-2"
           aria-label="Manage assets list"
+          onClick={() => setManageModeEnabled(!manageModeEnabled)}
         />
       </div>
       <ScrollAreaContainer
@@ -109,23 +145,21 @@ const AssetsList: FC = () => {
         viewPortClassName="pb-20 rounded-t-[.625rem]"
         scrollBarClassName="py-0 pb-20"
       >
-        {tokens.map((asset, i) => {
-          const isLastOne = i === tokens.length - 1;
-
-          return (
-            <AssetCard
-              key={asset.tokenSlug}
-              ref={isLastOne ? lastAssetRef : null}
-              asset={asset as AccountAsset}
-              isActive={tokenSlug === asset.tokenSlug}
-              onAssetSelect={() => {
-                setTokenSlug([asset.tokenSlug, "replace"]);
-                setSearchValue(null);
-              }}
-              className={classNames(!isLastOne && "mb-2")}
-            />
-          );
-        })}
+        {tokens.map((asset, i) => (
+          <AssetCard
+            key={asset.tokenSlug}
+            ref={
+              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                ? loadMoreTriggerAssetRef
+                : null
+            }
+            asset={asset as AccountAsset}
+            isActive={tokenSlug === asset.tokenSlug}
+            onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
+            isManageMode={manageModeEnabled}
+            className={classNames(i !== tokens.length - 1 && "mb-2")}
+          />
+        ))}
       </ScrollAreaContainer>
     </div>
   );
@@ -135,11 +169,15 @@ type AssetCardProps = {
   asset: AccountAsset;
   isActive?: boolean;
   onAssetSelect: () => void;
+  isManageMode: boolean;
   className?: string;
 };
 
 const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  ({ asset, isActive = false, onAssetSelect, className }, ref) => {
+  (
+    { asset, isActive = false, onAssetSelect, isManageMode, className },
+    ref
+  ) => {
     const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
     return (
@@ -148,6 +186,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         type="button"
         onClick={onAssetSelect}
         className={classNames(
+          "relative",
           "flex items-stretch",
           "w-full p-3",
           "text-left",
@@ -184,18 +223,45 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               currency={symbol}
               className="text-base font-bold leading-4"
             />
-            <PrettyAmount
-              amount={balanceUSD ?? 0}
-              currency="$"
-              className={classNames(
-                "ml-2",
-                "text-sm leading-4",
-                !isActive && "text-brand-inactivedark",
-                isActive && "text-brand-light",
-                "transition-colors",
-                "group-hover:text-brand-light"
-              )}
-            />
+            {!isManageMode && (
+              <PrettyAmount
+                amount={balanceUSD ?? 0}
+                currency="$"
+                className={classNames(
+                  "ml-2",
+                  "text-sm leading-4",
+                  !isActive && "text-brand-inactivedark",
+                  isActive && "text-brand-light",
+                  "transition-colors",
+                  "group-hover:text-brand-light"
+                )}
+              />
+            )}
+            {isManageMode && (
+              <Checkbox.Root
+                className={classNames(
+                  "absolute top-1/2 right-5 -translate-y-1/2",
+                  "w-5 h-5 min-w-[1.25rem]",
+                  "bg-brand-main/20",
+                  "rounded",
+                  "flex items-center justify-center",
+                  balanceUSD !== undefined &&
+                    balanceUSD >= 0 &&
+                    "border border-brand-main"
+                )}
+                checked={balanceUSD !== undefined && balanceUSD >= 0}
+                // onCheckedChange={onCheckedChange}
+                asChild
+              >
+                <span>
+                  <Checkbox.Indicator>
+                    {balanceUSD !== undefined && balanceUSD >= 0 && (
+                      <CheckIcon />
+                    )}
+                  </Checkbox.Indicator>
+                </span>
+              </Checkbox.Root>
+            )}
           </span>
         </span>
       </button>

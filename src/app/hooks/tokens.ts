@@ -106,5 +106,11 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
     prevTokenSlugRef.current = tokenSlug;
   }, [onReset, params, tokenSlug]);
 
-  return useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
+  const asset = useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
+
+  if (asset?.balanceUSD === undefined || asset.balanceUSD < 0) {
+    return null;
+  }
+
+  return asset;
 }
