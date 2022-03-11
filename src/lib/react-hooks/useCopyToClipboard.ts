@@ -17,6 +17,7 @@ export function useCopyToClipboard<
 
       return () => clearTimeout(timeout);
     }
+
     return;
   }, [ref, copied, setCopied, copyDelay]);
 

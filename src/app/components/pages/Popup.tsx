@@ -25,6 +25,7 @@ import SearchInput from "app/components/elements/SearchInput";
 import IconedButton from "app/components/elements/IconedButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import PrettyAmount from "app/components/elements/PrettyAmount";
+import Tooltip from "app/components/elements/Tooltip";
 import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -163,11 +164,18 @@ const AssetsList: FC = () => {
   return (
     <>
       <div className="flex items-center mt-5">
-        <AssetsSwitcher
-          theme="small"
-          checked={isNftsSelected}
-          onCheckedChange={setIsNftsSelected}
-        />
+        <Tooltip
+          content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+          asChild
+        >
+          <span>
+            <AssetsSwitcher
+              theme="small"
+              checked={isNftsSelected}
+              onCheckedChange={setIsNftsSelected}
+            />
+          </span>
+        </Tooltip>
         <SearchInput
           searchValue={searchValue}
           toggleSearchValue={setSearchValue}
