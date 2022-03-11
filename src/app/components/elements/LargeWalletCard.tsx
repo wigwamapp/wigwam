@@ -1,7 +1,6 @@
-import { FC, useRef } from "react";
+import { FC, useState } from "react";
 import classNames from "clsx";
 import { TReplace } from "lib/ext/i18n/react";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Account } from "core/types";
 
@@ -11,6 +10,7 @@ import HashPreview from "app/components/elements/HashPreview";
 import Balance from "app/components/elements/Balance";
 import IconedButton from "app/components/elements/IconedButton";
 import Tooltip from "app/components/elements/Tooltip";
+import CopiableTooltip from "app/components/elements/CopiableTooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
@@ -26,8 +26,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   account: { name, address },
   className,
 }) => {
-  const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef); // Don't change when input's value changes
+  const [copied, setCopied] = useState(false);
 
   const currentNetwork = useLazyNetwork();
 
@@ -62,38 +61,21 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               "w-full min-w-0"
             )}
           >
-            <input
-              ref={fieldRef}
-              value={address}
-              onChange={() => undefined}
-              tabIndex={-1}
-              className="sr-only"
-            />
-
-            <Tooltip
-              content={
-                copied
-                  ? "Wallet address copied to clipboard"
-                  : "Copy wallet address to clipboard"
-              }
-              asChild
-              size="small"
+            <CopiableTooltip
+              content="Copy wallet address to clipboard"
+              textToCopy={address}
+              copiedText="Wallet address copied to clipboard"
+              onCopiedToggle={setCopied}
+              className={classNames(
+                "px-1 pt-1 -mx-1 -mt-1",
+                "text-left",
+                "rounded",
+                "max-w-full",
+                "transition-colors",
+                "hover:bg-brand-main/40"
+              )}
             >
-              <button
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                }}
-                onClick={copy}
-                tabIndex={0}
-                className={classNames(
-                  "px-1 pt-1 -mx-1 -mt-1",
-                  "text-left",
-                  "rounded",
-                  "max-w-full",
-                  "transition-colors",
-                  "hover:bg-brand-main/40"
-                )}
-              >
+              <>
                 <span
                   className={classNames(
                     "block",
@@ -104,7 +86,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                 >
                   <TReplace msg={name} />
                 </span>
-                <span className="flex items-center">
+                <span className="inline-flex items-center">
                   <HashPreview
                     hash={address}
                     withTooltip={false}
@@ -116,10 +98,11 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                     <CopyIcon className="w-[1.3125rem] h-auto" />
                   )}
                 </span>
-              </button>
-            </Tooltip>
+              </>
+            </CopiableTooltip>
             <Balance
               address={address}
+              copiable
               className="mt-auto text-xl font-bold leading-none"
             />
           </div>
@@ -166,6 +149,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             </>
           }
           placement="right"
+          size="large"
           className="absolute right-4 bottom-3"
         >
           <TooltipIcon theme="dark" />
