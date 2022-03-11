@@ -19,7 +19,7 @@ const Tooltip: FC<TooltipProps> = ({
   maxWidth,
   placement,
   hideOnClick = false,
-  size = "large",
+  size = "small",
   asChild = false,
   className,
   children,
@@ -32,7 +32,13 @@ const Tooltip: FC<TooltipProps> = ({
     <Tippy
       content={
         <>
-          <div className={classNames("text-white", getSizeClasses(size))}>
+          <div
+            className={classNames(
+              "text-white",
+              "border border-white/5",
+              getSizeClasses(size)
+            )}
+          >
             {content}
           </div>
         </>
@@ -44,6 +50,24 @@ const Tooltip: FC<TooltipProps> = ({
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
       singleton={singletonTarget}
+      popperOptions={{
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: ({ placement }: any) => {
+                if (placement.endsWith("start")) {
+                  return [-10, 6];
+                }
+                if (placement.endsWith("end")) {
+                  return [10, 6];
+                }
+                return [0, 6];
+              },
+            },
+          },
+        ],
+      }}
       {...rest}
     >
       {asChild ? children : <button className={className}>{children}</button>}
@@ -66,6 +90,6 @@ const getSizeClasses = (size: sizeType) =>
       classNames(
         "rounded-md",
         "bg-brand-main/20 backdrop-blur-[6px]",
-        "py-1.5 px-3"
+        "py-1 px-3"
       )
     );
