@@ -47,7 +47,11 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
         <button
           type="button"
           onPointerDown={(e) => e.preventDefault()}
-          onClick={copy}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            copy();
+          }}
           className={classNames("cursor-pointer", className)}
         >
           {children}
