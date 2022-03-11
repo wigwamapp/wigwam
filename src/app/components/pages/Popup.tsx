@@ -236,6 +236,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
       <PopoverPrimitive.Root
         open={popoverOpened}
         onOpenChange={setPopoverOpened}
+        modal
       >
         <PopoverPrimitive.Trigger asChild className={className}>
           <button
