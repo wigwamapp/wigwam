@@ -29,6 +29,7 @@ const General: FC = () => {
     setItem: (itemKey: any) => {
       currencySelectProps.currentItem = itemKey;
     },
+    showSelected: true,
     label: "Primary fiat currency",
   };
 

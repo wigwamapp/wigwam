@@ -1,21 +1,42 @@
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import classNames from "clsx";
+import Fuse from "fuse.js";
 
 import { useLazyAllNetworks } from "app/hooks";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import SearchInput from "app/components/elements/SearchInput";
-import Button from "app/components/elements/Button";
 import EditNetwork from "app/components/blocks/EditNetwork";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 
 type NetworkTab = number | null;
 const Networks: FC = () => {
-  const allNetworks = useLazyAllNetworks() ?? [];
+  const allNetworks = useLazyAllNetworks();
 
   const [tab, setTab] = useState<NetworkTab>(null);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
+  const fuse = useMemo(
+    () => new Fuse(allNetworks ?? [], NETWORK_SEARCH_OPTIONS),
+    [allNetworks]
+  );
+  const preparedNetworks = useMemo(() => {
+    if (!allNetworks) {
+      return;
+    }
+    if (searchValue) {
+      return fuse.search(searchValue).map(({ item: network }) => network);
+    } else {
+      return allNetworks;
+    }
+  }, [fuse, allNetworks, searchValue]);
+
+  const cancelEditing = () => setTab(null);
+  const currentNetwork = useMemo(
+    () => allNetworks?.find((n) => n.chainId === tab),
+    [tab, allNetworks]
+  );
   return (
     <div className="flex">
       <div
@@ -37,21 +58,27 @@ const Networks: FC = () => {
               tab={tab}
               onClick={() => setTab(0)}
             />
-            {allNetworks.map((network) => (
-              <NetworkBtn
-                key={network.chainId}
-                id={network.chainId}
-                name={network.name}
-                icon={NETWORK_ICON_MAP.get(network.chainId)}
-                tab={tab}
-                onClick={() => setTab(network.chainId)}
-              />
-            ))}
+            {preparedNetworks &&
+              preparedNetworks.map((network) => (
+                <NetworkBtn
+                  key={network.chainId}
+                  id={network.chainId}
+                  name={network.name}
+                  icon={NETWORK_ICON_MAP.get(network.chainId)}
+                  tab={tab}
+                  onClick={() => setTab(network.chainId)}
+                />
+              ))}
           </nav>
         </div>
       </div>
-      {tab !== null && (
-        <EditNetwork className="px-6 w-[28.125rem]" isNew={tab === 0} />
+      {(currentNetwork || tab === 0) && (
+        <EditNetwork
+          className="px-6 w-[24.875rem]"
+          isNew={tab === 0}
+          network={currentNetwork}
+          onCancelHandler={cancelEditing}
+        />
       )}
     </div>
   );
@@ -66,15 +93,17 @@ interface NetworkBtnProps {
 }
 const NetworkBtn: FC<NetworkBtnProps> = ({ id, icon, tab, name, onClick }) => {
   return (
-    <Button
+    <button
+      type="button"
       className={classNames(
         "relative group",
-        "mt-2",
+        "inline-flex justify-start",
+        "mt-2 px-3",
         "first:mt-5",
         "w-[270px] py-3",
         "text-base font-bold",
         tab !== id && "hover:bg-brand-main/[.1]",
-        tab === id && "bg-brand-main/[.05]",
+        (tab === id || id === 0) && "bg-brand-main/[.05]",
         "rounded-[10px]"
       )}
       onClick={onClick}
@@ -96,7 +125,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({ id, icon, tab, name, onClick }) => {
       >
         <ChevronDownIcon />
       </div>
-    </Button>
+    </button>
   );
 };
 
