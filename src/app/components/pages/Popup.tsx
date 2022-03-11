@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
@@ -233,76 +233,77 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     );
 
     return (
-      <PopoverPrimitive.Root
-        open={popoverOpened}
-        onOpenChange={setPopoverOpened}
-      >
-        <PopoverPrimitive.Trigger asChild className={className}>
-          <button
-            ref={ref}
-            type="button"
-            onClick={() => !popoverOpened && setPopoverOpened(true)}
+      <DropdownMenu.Root open={popoverOpened} onOpenChange={setPopoverOpened}>
+        <button
+          ref={ref}
+          type="button"
+          onClick={() => !popoverOpened && setPopoverOpened(true)}
+          className={classNames(
+            "relative",
+            "flex items-stretch",
+            "w-full p-2",
+            "text-left",
+            "rounded-[.625rem]",
+            "cursor-default",
+            "group",
+            "transition-colors",
+            // !popoverOpened &&
+            //   "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            // popoverOpened && "bg-brand-main/20",
+            className
+          )}
+        >
+          <span
             className={classNames(
-              "flex items-stretch",
-              "w-full p-2",
-              "text-left",
-              "rounded-[.625rem]",
-              "cursor-pointer",
-              "group",
-              "transition-colors",
-              !popoverOpened &&
-                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-              popoverOpened && "bg-brand-main/20",
-              className
+              "block",
+              "w-11 h-11 min-w-[2.75rem] mr-3",
+              "bg-white",
+              "rounded-full overflow-hidden"
             )}
           >
-            <span
+            <img
+              src={logoUrl}
+              alt={name}
+              className="w-full h-full object-cover"
+            />
+          </span>
+          <span className="flex flex-col w-full">
+            <span className="text-sm font-bold leading-5">{name}</span>
+            <span className="mt-auto flex justify-between items-end">
+              <PrettyAmount
+                amount={rawBalance ?? 0}
+                decimals={decimals}
+                currency={symbol}
+                className="text-sm font-bold leading-5"
+                copiable
+              />
+              <PrettyAmount
+                amount={balanceUSD ?? 0}
+                currency="$"
+                className={classNames(
+                  "ml-2",
+                  "text-xs leading-4",
+                  "text-brand-inactivedark",
+                  "transition-colors"
+                  // "group-hover:text-brand-light group-focus-visible:text-brand-light"
+                )}
+                copiable
+              />
+            </span>
+          </span>
+          <DropdownMenu.Trigger asChild>
+            <IconedButton
+              Icon={PopoverIcon}
+              theme="tertiary"
               className={classNames(
-                "block",
-                "w-11 h-11 min-w-[2.75rem] mr-3",
-                "bg-white",
-                "rounded-full overflow-hidden"
+                "ml-2",
+                popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
               )}
-            >
-              <img
-                src={logoUrl}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
-            </span>
-            <span className="flex flex-col w-full">
-              <span className="text-sm font-bold leading-5">{name}</span>
-              <span className="mt-auto flex justify-between items-end">
-                <PrettyAmount
-                  amount={rawBalance ?? 0}
-                  decimals={decimals}
-                  currency={symbol}
-                  className="text-sm font-bold leading-5"
-                />
-                <PrettyAmount
-                  amount={balanceUSD ?? 0}
-                  currency="$"
-                  className={classNames(
-                    "ml-2",
-                    "text-xs leading-4",
-                    "text-brand-inactivedark",
-                    "transition-colors",
-                    "group-hover:text-brand-light group-focus-visible:text-brand-light"
-                  )}
-                />
-              </span>
-            </span>
-            <PopoverPrimitive.Anchor asChild>
-              <IconedButton
-                Icon={PopoverIcon}
-                theme="tertiary"
-                className="ml-2"
-                tabIndex={-1}
-              />
-            </PopoverPrimitive.Anchor>
-          </button>
-        </PopoverPrimitive.Trigger>
-        <PopoverPrimitive.Content
+              tabIndex={-1}
+            />
+          </DropdownMenu.Trigger>
+        </button>
+        <DropdownMenu.Content
           side="left"
           align="start"
           className={classNames(
@@ -319,8 +320,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
           <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
           <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
-        </PopoverPrimitive.Content>
-      </PopoverPrimitive.Root>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
     );
   }
 );
