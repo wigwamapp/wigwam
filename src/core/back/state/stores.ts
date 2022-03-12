@@ -1,6 +1,6 @@
 import { createStore } from "effector";
 
-import { WalletStatus, ForApproval, Account } from "core/types";
+import { WalletStatus, Approval, Account } from "core/types";
 
 import { Vault } from "../vault";
 import {
@@ -9,7 +9,8 @@ import {
   locked,
   accountsUpdated,
   walletPortsCountUpdated,
-  approvalItemAdded,
+  approvalAdded,
+  approvalResolved,
 } from "./events";
 
 export const $walletStatus = createStore(WalletStatus.Idle)
@@ -48,7 +49,9 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;
 
-export const $awaitingApproval = createStore<ForApproval[]>([]).on(
-  approvalItemAdded,
-  (current, item) => [...current, item]
-);
+export const $approvals = createStore<Approval[]>([])
+  .on(approvalAdded, (current, item) => [...current, item])
+  .on(approvalResolved, (current, approvalId) =>
+    current.filter((a) => a.id !== approvalId)
+  )
+  .on(locked, () => []);

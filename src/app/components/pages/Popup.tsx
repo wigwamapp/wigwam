@@ -7,12 +7,14 @@ import {
   useState,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AccountAsset, TokenType } from "core/types";
+import * as repo from "core/repo";
 
-import { Page } from "app/defaults";
+import { LOAD_MORE_ON_ASSET_FROM_END, Page } from "app/defaults";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { useAccountTokens } from "app/hooks/tokens";
@@ -26,11 +28,12 @@ import IconedButton from "app/components/elements/IconedButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import Tooltip from "app/components/elements/Tooltip";
-import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
+import ControlIcon from "app/components/elements/ControlIcon";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
+import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -133,15 +136,20 @@ const AssetsList: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
-    { search: searchValue ?? undefined, limit: 10 }
+    {
+      withDisabled: manageModeEnabled,
+      search: searchValue ?? undefined,
+      limit: 10,
+    }
   );
 
   const observer = useRef<IntersectionObserver>();
-  const lastAssetRef = useCallback(
+  const loadMoreTriggerAssetRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -186,10 +194,21 @@ const AssetsList: FC = () => {
           clearButtonClassName="!right-3"
         />
         <IconedButton
-          Icon={ConfigIcon}
+          Icon={ControlIcon}
+          iconProps={{
+            isActive: manageModeEnabled,
+          }}
           theme="tertiary"
-          className="ml-2"
-          aria-label="Manage assets list"
+          className={classNames(
+            "ml-2",
+            manageModeEnabled && "bg-brand-main/30"
+          )}
+          aria-label={
+            manageModeEnabled
+              ? "Finish managing assets list"
+              : "Manage assets list"
+          }
+          onClick={() => setManageModeEnabled(!manageModeEnabled)}
         />
       </div>
       <ScrollAreaContainer
@@ -198,18 +217,19 @@ const AssetsList: FC = () => {
         scrollBarClassName="py-0 pb-16"
         hiddenScrollbar="horizontal"
       >
-        {tokens.map((asset, i) => {
-          const isLastOne = i === tokens.length - 1;
-
-          return (
-            <AssetCard
-              key={asset.tokenSlug}
-              ref={isLastOne ? lastAssetRef : null}
-              asset={asset as AccountAsset}
-              className={classNames(!isLastOne && "mb-1")}
-            />
-          );
-        })}
+        {tokens.map((asset, i) => (
+          <AssetCard
+            key={asset.tokenSlug}
+            ref={
+              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                ? loadMoreTriggerAssetRef
+                : null
+            }
+            asset={asset as AccountAsset}
+            isManageMode={manageModeEnabled}
+            className={classNames(i !== tokens.length - 1 && "mb-1")}
+          />
+        ))}
       </ScrollAreaContainer>
     </>
   );
@@ -217,11 +237,14 @@ const AssetsList: FC = () => {
 
 type AssetCardProps = {
   asset: AccountAsset;
+  isManageMode?: boolean;
   className?: string;
 };
 
 const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  ({ asset, className }, ref) => {
+  ({ asset, isManageMode = false, className }, ref) => {
+    const currentAccount = useAtomValue(currentAccountAtom);
+
     const [popoverOpened, setPopoverOpened] = useState(false);
     const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
@@ -232,55 +255,77 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
       [asset.tokenSlug]
     );
 
-    return (
-      <DropdownMenu.Root
-        open={popoverOpened}
-        onOpenChange={setPopoverOpened}
-        modal
+    const handleAssetClick = useCallback(async () => {
+      if (isManageMode) {
+        try {
+          await repo.accountTokens.put(
+            {
+              ...asset,
+              balanceUSD:
+                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
+                  ? -1
+                  : 0,
+            },
+            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        if (!popoverOpened) {
+          setPopoverOpened(true);
+        }
+      }
+    }, [asset, currentAccount.address, isManageMode, popoverOpened]);
+
+    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
+
+    const content = (
+      <button
+        ref={ref}
+        type="button"
+        onClick={handleAssetClick}
+        className={classNames(
+          "relative",
+          "flex items-stretch",
+          "w-full p-2",
+          "text-left",
+          "rounded-[.625rem]",
+          "cursor-default",
+          "group",
+          "transition",
+          isManageMode &&
+            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
+          !isEnabled && "opacity-60",
+          "hover:opacity-100",
+          className
+        )}
       >
-        <button
-          ref={ref}
-          type="button"
-          onClick={() => !popoverOpened && setPopoverOpened(true)}
+        <span
           className={classNames(
-            "relative",
-            "flex items-stretch",
-            "w-full p-2",
-            "text-left",
-            "rounded-[.625rem]",
-            "cursor-default",
-            "group",
-            "transition-colors",
-            // !popoverOpened &&
-            //   "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-            // popoverOpened && "bg-brand-main/20",
-            className
+            "block",
+            "w-11 h-11 min-w-[2.75rem] mr-3",
+            "bg-white",
+            "rounded-full overflow-hidden"
           )}
         >
-          <span
-            className={classNames(
-              "block",
-              "w-11 h-11 min-w-[2.75rem] mr-3",
-              "bg-white",
-              "rounded-full overflow-hidden"
-            )}
-          >
-            <img
-              src={logoUrl}
-              alt={name}
-              className="w-full h-full object-cover"
+          <img
+            src={logoUrl}
+            alt={name}
+            className="w-full h-full object-cover"
+          />
+        </span>
+        <span className="flex flex-col w-full">
+          <span className="text-sm font-bold leading-5">{name}</span>
+          <span className="mt-auto flex justify-between items-end">
+            <PrettyAmount
+              amount={rawBalance ?? 0}
+              decimals={decimals}
+              currency={symbol}
+              className="text-sm font-bold leading-5"
+              copiable={!isManageMode}
             />
-          </span>
-          <span className="flex flex-col w-full">
-            <span className="text-sm font-bold leading-5">{name}</span>
-            <span className="mt-auto flex justify-between items-end">
-              <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                currency={symbol}
-                className="text-sm font-bold leading-5"
-                copiable
-              />
+            {!isManageMode && (
               <PrettyAmount
                 amount={balanceUSD ?? 0}
                 currency="$"
@@ -293,8 +338,10 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                 )}
                 copiable
               />
-            </span>
+            )}
           </span>
+        </span>
+        {!isManageMode ? (
           <DropdownMenu.Trigger asChild>
             <IconedButton
               Icon={PopoverIcon}
@@ -306,27 +353,62 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               tabIndex={-1}
             />
           </DropdownMenu.Trigger>
-        </button>
-        <DropdownMenu.Content
-          side="left"
-          align="start"
-          className={classNames(
-            "bg-brand-dark/10",
-            "backdrop-blur-[30px]",
-            "border border-brand-light/5",
-            "rounded-[.625rem]",
-            "px-1 py-2"
-          )}
-        >
-          <PopoverButton Icon={SendIcon} onClick={() => openLink(Page.Default)}>
-            Info
-          </PopoverButton>
-          <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
-          <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
-          <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+        ) : (
+          <Checkbox.Root
+            className={classNames(
+              "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
+              "bg-brand-main/20",
+              "rounded",
+              "flex items-center justify-center",
+              isEnabled && "border border-brand-main"
+            )}
+            checked={isEnabled}
+            asChild
+          >
+            <span>
+              <Checkbox.Indicator>
+                {isEnabled && <CheckIcon />}
+              </Checkbox.Indicator>
+            </span>
+          </Checkbox.Root>
+        )}
+      </button>
     );
+
+    if (!isManageMode) {
+      return (
+        <DropdownMenu.Root
+          open={popoverOpened}
+          onOpenChange={setPopoverOpened}
+          modal
+        >
+          {content}
+          <DropdownMenu.Content
+            side="left"
+            align="start"
+            className={classNames(
+              "bg-brand-dark/10",
+              "backdrop-blur-[30px]",
+              "border border-brand-light/5",
+              "rounded-[.625rem]",
+              "px-1 py-2"
+            )}
+          >
+            <PopoverButton
+              Icon={SendIcon}
+              onClick={() => openLink(Page.Default)}
+            >
+              Info
+            </PopoverButton>
+            <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
+            <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
+            <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      );
+    }
+
+    return content;
   }
 );
 

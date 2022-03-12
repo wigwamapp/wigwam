@@ -11,10 +11,13 @@ import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { TReplace } from "lib/ext/i18n/react";
+import * as repo from "core/repo";
+import * as Checkbox from "@radix-ui/react-checkbox";
 
 import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
+import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
@@ -24,12 +27,13 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
+import ControlIcon from "app/components/elements/ControlIcon";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -45,15 +49,31 @@ const AssetsList: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [manageModeEnabled, setManageModeEnabled] = useState(false);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const setDefaultTokenRef = useRef(!tokenSlug);
+
+  const handleAccountTokensReset = useCallback(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
+
+    setDefaultTokenRef.current = true;
+  }, []);
 
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
-    { search: searchValue ?? undefined, limit: 10 }
+    {
+      withDisabled: manageModeEnabled,
+      search: searchValue ?? undefined,
+      limit: 10,
+      onReset: handleAccountTokensReset,
+    }
   );
 
   const observer = useRef<IntersectionObserver>();
-  const lastAssetRef = useCallback(
+  const loadMoreTriggerAssetRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -74,10 +94,44 @@ const AssetsList: FC = () => {
   );
 
   useEffect(() => {
-    if (tokens && tokens[0] && !tokenSlug) {
+    if (setDefaultTokenRef.current && tokens.length > 0 && !manageModeEnabled) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      setDefaultTokenRef.current = false;
     }
-  }, [setTokenSlug, tokenSlug, tokens]);
+  }, [manageModeEnabled, setTokenSlug, tokens]);
+
+  const handleAssetClick = useCallback(
+    async (asset: AccountAsset) => {
+      if (manageModeEnabled) {
+        try {
+          await repo.accountTokens.put(
+            {
+              ...asset,
+              balanceUSD:
+                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
+                  ? -1
+                  : 0,
+            },
+            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setTokenSlug([asset.tokenSlug, "replace"]);
+        setSearchValue(null);
+      }
+    },
+    [currentAccount.address, manageModeEnabled, setTokenSlug]
+  );
+
+  const toggleManageMode = useCallback(() => {
+    if (!manageModeEnabled) {
+      setTokenSlug([RESET]);
+    }
+
+    setManageModeEnabled((mode) => !mode);
+  }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
 
   return (
     <div
@@ -98,34 +152,44 @@ const AssetsList: FC = () => {
           toggleSearchValue={setSearchValue}
         />
         <IconedButton
-          Icon={ConfigIcon}
+          Icon={ControlIcon}
+          iconProps={{
+            isActive: manageModeEnabled,
+          }}
           theme="tertiary"
-          className="ml-2"
-          aria-label="Manage assets list"
+          className={classNames(
+            "ml-2",
+            manageModeEnabled && "bg-brand-main/30"
+          )}
+          aria-label={
+            manageModeEnabled
+              ? "Finish managing assets list"
+              : "Manage assets list"
+          }
+          onClick={toggleManageMode}
         />
       </div>
       <ScrollAreaContainer
+        ref={scrollAreaRef}
         className="pr-5 -mr-5 mt-4"
         viewPortClassName="pb-20 rounded-t-[.625rem]"
         scrollBarClassName="py-0 pb-20"
       >
-        {tokens.map((asset, i) => {
-          const isLastOne = i === tokens.length - 1;
-
-          return (
-            <AssetCard
-              key={asset.tokenSlug}
-              ref={isLastOne ? lastAssetRef : null}
-              asset={asset as AccountAsset}
-              isActive={tokenSlug === asset.tokenSlug}
-              onAssetSelect={() => {
-                setTokenSlug([asset.tokenSlug, "replace"]);
-                setSearchValue(null);
-              }}
-              className={classNames(!isLastOne && "mb-2")}
-            />
-          );
-        })}
+        {tokens.map((asset, i) => (
+          <AssetCard
+            key={asset.tokenSlug}
+            ref={
+              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                ? loadMoreTriggerAssetRef
+                : null
+            }
+            asset={asset as AccountAsset}
+            isActive={tokenSlug === asset.tokenSlug}
+            onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
+            isManageMode={manageModeEnabled}
+            className={classNames(i !== tokens.length - 1 && "mb-2")}
+          />
+        ))}
       </ScrollAreaContainer>
     </div>
   );
@@ -135,12 +199,18 @@ type AssetCardProps = {
   asset: AccountAsset;
   isActive?: boolean;
   onAssetSelect: () => void;
+  isManageMode: boolean;
   className?: string;
 };
 
 const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  ({ asset, isActive = false, onAssetSelect, className }, ref) => {
+  (
+    { asset, isActive = false, onAssetSelect, isManageMode, className },
+    ref
+  ) => {
     const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+
+    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
 
     return (
       <button
@@ -148,14 +218,17 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         type="button"
         onClick={onAssetSelect}
         className={classNames(
+          "relative",
           "flex items-stretch",
           "w-full p-3",
           "text-left",
           "rounded-[.625rem]",
           "group",
-          "transition-colors",
+          "transition",
           !isActive && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
+          !isEnabled && "opacity-60",
+          "hover:opacity-100",
           className
         )}
       >
@@ -174,7 +247,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           />
         </span>
         <span className="flex flex-col w-full">
-          <span className="text-sm font-bold leading-4">
+          <span className={"text-sm font-bold leading-4"}>
             <TReplace msg={name} />
           </span>
           <span className="mt-auto flex justify-between items-end">
@@ -182,20 +255,41 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               amount={rawBalance ?? 0}
               decimals={decimals}
               currency={symbol}
-              className="text-base font-bold leading-4"
+              className={"text-base font-bold leading-4"}
             />
-            <PrettyAmount
-              amount={balanceUSD ?? 0}
-              currency="$"
-              className={classNames(
-                "ml-2",
-                "text-sm leading-4",
-                !isActive && "text-brand-inactivedark",
-                isActive && "text-brand-light",
-                "transition-colors",
-                "group-hover:text-brand-light"
-              )}
-            />
+            {!isManageMode && (
+              <PrettyAmount
+                amount={balanceUSD ?? 0}
+                currency="$"
+                className={classNames(
+                  "ml-2",
+                  "text-sm leading-4",
+                  !isActive && "text-brand-inactivedark",
+                  isActive && "text-brand-light",
+                  "group-hover:text-brand-light"
+                )}
+              />
+            )}
+            {isManageMode && (
+              <Checkbox.Root
+                className={classNames(
+                  "absolute top-1/2 right-5 -translate-y-1/2",
+                  "w-5 h-5 min-w-[1.25rem]",
+                  "bg-brand-main/20",
+                  "rounded",
+                  "flex items-center justify-center",
+                  isEnabled && "border border-brand-main"
+                )}
+                checked={isEnabled}
+                asChild
+              >
+                <span>
+                  <Checkbox.Indicator>
+                    {isEnabled && <CheckIcon />}
+                  </Checkbox.Indicator>
+                </span>
+              </Checkbox.Root>
+            )}
           </span>
         </span>
       </button>
@@ -204,14 +298,9 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 );
 
 const AssetInfo: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
+  const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
-  const handleTokenReset = useCallback(
-    () => setTokenSlug([RESET]),
-    [setTokenSlug]
-  );
-
-  const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
+  const tokenInfo = useToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
