@@ -51,6 +51,16 @@ const AssetsList: FC = () => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const setDefaultTokenRef = useRef(!tokenSlug);
+
+  const handleAccountTokensReset = useCallback(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
+
+    setDefaultTokenRef.current = true;
+  }, []);
+
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
@@ -58,6 +68,7 @@ const AssetsList: FC = () => {
       withDisabled: manageModeEnabled,
       search: searchValue ?? undefined,
       limit: 10,
+      onReset: handleAccountTokensReset,
     }
   );
 
@@ -83,10 +94,11 @@ const AssetsList: FC = () => {
   );
 
   useEffect(() => {
-    if (tokens && tokens[0] && !tokenSlug && !manageModeEnabled) {
+    if (setDefaultTokenRef.current && tokens.length > 0 && !manageModeEnabled) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      setDefaultTokenRef.current = false;
     }
-  }, [manageModeEnabled, setTokenSlug, tokenSlug, tokens]);
+  }, [manageModeEnabled, setTokenSlug, tokens]);
 
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
@@ -113,20 +125,13 @@ const AssetsList: FC = () => {
     [currentAccount.address, manageModeEnabled, setTokenSlug]
   );
 
-  const toggleManageMode = useCallback(
-    (mode: boolean) => {
-      if (!mode) {
-        setTokenSlug([null, "replace"]);
-      } else {
-        if (tokens && tokens[0] && !tokenSlug) {
-          setTokenSlug([tokens[0].tokenSlug, "replace"]);
-        }
-      }
+  const toggleManageMode = useCallback(() => {
+    if (!manageModeEnabled) {
+      setTokenSlug([RESET]);
+    }
 
-      setManageModeEnabled(!mode);
-    },
-    [setTokenSlug, tokenSlug, tokens]
-  );
+    setManageModeEnabled((mode) => !mode);
+  }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
 
   return (
     <div
@@ -161,10 +166,11 @@ const AssetsList: FC = () => {
               ? "Finish managing assets list"
               : "Manage assets list"
           }
-          onClick={() => toggleManageMode(manageModeEnabled)}
+          onClick={toggleManageMode}
         />
       </div>
       <ScrollAreaContainer
+        ref={scrollAreaRef}
         className="pr-5 -mr-5 mt-4"
         viewPortClassName="pb-20 rounded-t-[.625rem]"
         scrollBarClassName="py-0 pb-20"
@@ -292,14 +298,9 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 );
 
 const AssetInfo: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
+  const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
-  const handleTokenReset = useCallback(
-    () => setTokenSlug([RESET]),
-    [setTokenSlug]
-  );
-
-  const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
+  const tokenInfo = useToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
