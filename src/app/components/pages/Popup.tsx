@@ -323,7 +323,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               decimals={decimals}
               currency={symbol}
               className="text-sm font-bold leading-5"
-              copiable
+              copiable={!isManageMode}
             />
             {!isManageMode && (
               <PrettyAmount
