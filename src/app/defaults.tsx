@@ -99,3 +99,5 @@ export const ASSETS_SEARCH_OPTIONS: Fuse.IFuseOptions<AssetTempType> = {
 };
 
 export const FONTS: Font[] = [["Inter", 300, 400, 600, 700, 900]];
+
+export const LOAD_MORE_ON_ASSET_FROM_END = 3;
