@@ -83,10 +83,10 @@ const AssetsList: FC = () => {
   );
 
   useEffect(() => {
-    if (tokens && tokens[0] && !tokenSlug) {
+    if (tokens && tokens[0] && !tokenSlug && !manageModeEnabled) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
     }
-  }, [setTokenSlug, tokenSlug, tokens]);
+  }, [manageModeEnabled, setTokenSlug, tokenSlug, tokens]);
 
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
@@ -111,6 +111,21 @@ const AssetsList: FC = () => {
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
+  );
+
+  const toggleManageMode = useCallback(
+    (mode: boolean) => {
+      if (!mode) {
+        setTokenSlug([null, "replace"]);
+      } else {
+        if (tokens && tokens[0] && !tokenSlug) {
+          setTokenSlug([tokens[0].tokenSlug, "replace"]);
+        }
+      }
+
+      setManageModeEnabled(!mode);
+    },
+    [setTokenSlug, tokenSlug, tokens]
   );
 
   return (
@@ -146,7 +161,7 @@ const AssetsList: FC = () => {
               ? "Finish managing assets list"
               : "Manage assets list"
           }
-          onClick={() => setManageModeEnabled(!manageModeEnabled)}
+          onClick={() => toggleManageMode(manageModeEnabled)}
         />
       </div>
       <ScrollAreaContainer
@@ -189,6 +204,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
   ) => {
     const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
+    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
+
     return (
       <button
         ref={ref}
@@ -201,9 +218,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "text-left",
           "rounded-[.625rem]",
           "group",
-          "transition-colors",
+          "transition",
           !isActive && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
+          !isEnabled && "opacity-60",
+          "hover:opacity-100",
           className
         )}
       >
@@ -222,7 +241,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           />
         </span>
         <span className="flex flex-col w-full">
-          <span className="text-sm font-bold leading-4">
+          <span className={"text-sm font-bold leading-4"}>
             <TReplace msg={name} />
           </span>
           <span className="mt-auto flex justify-between items-end">
@@ -230,7 +249,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               amount={rawBalance ?? 0}
               decimals={decimals}
               currency={symbol}
-              className="text-base font-bold leading-4"
+              className={"text-base font-bold leading-4"}
             />
             {!isManageMode && (
               <PrettyAmount
@@ -241,7 +260,6 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                   "text-sm leading-4",
                   !isActive && "text-brand-inactivedark",
                   isActive && "text-brand-light",
-                  "transition-colors",
                   "group-hover:text-brand-light"
                 )}
               />
@@ -254,18 +272,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                   "bg-brand-main/20",
                   "rounded",
                   "flex items-center justify-center",
-                  balanceUSD !== undefined &&
-                    balanceUSD >= 0 &&
-                    "border border-brand-main"
+                  isEnabled && "border border-brand-main"
                 )}
-                checked={balanceUSD !== undefined && balanceUSD >= 0}
+                checked={isEnabled}
                 asChild
               >
                 <span>
                   <Checkbox.Indicator>
-                    {balanceUSD !== undefined && balanceUSD >= 0 && (
-                      <CheckIcon />
-                    )}
+                    {isEnabled && <CheckIcon />}
                   </Checkbox.Indicator>
                 </span>
               </Checkbox.Root>

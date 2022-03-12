@@ -278,6 +278,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
       }
     }, [asset, currentAccount.address, isManageMode, popoverOpened]);
 
+    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
+
     const content = (
       <button
         ref={ref}
@@ -291,9 +293,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "rounded-[.625rem]",
           "cursor-default",
           "group",
-          "transition-colors",
+          "transition",
           isManageMode &&
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
+          !isEnabled && "opacity-60",
+          "hover:opacity-100",
           className
         )}
       >
@@ -356,16 +360,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               "bg-brand-main/20",
               "rounded",
               "flex items-center justify-center",
-              balanceUSD !== undefined &&
-                balanceUSD >= 0 &&
-                "border border-brand-main"
+              isEnabled && "border border-brand-main"
             )}
-            checked={balanceUSD !== undefined && balanceUSD >= 0}
+            checked={isEnabled}
             asChild
           >
             <span>
               <Checkbox.Indicator>
-                {balanceUSD !== undefined && balanceUSD >= 0 && <CheckIcon />}
+                {isEnabled && <CheckIcon />}
               </Checkbox.Indicator>
             </span>
           </Checkbox.Root>
