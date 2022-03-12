@@ -18,6 +18,7 @@ db.version(1).stores({
   [RepoTable.AccountTokens]: [
     "",
     "[chainId+tokenSlug]",
-    "[chainId+tokenType+accountAddress+balanceUSD]",
+    "[chainId+tokenType+accountAddress]",
+    "[chainId+tokenType+accountAddress+disabled+balanceUSD]",
   ].join(),
 });
