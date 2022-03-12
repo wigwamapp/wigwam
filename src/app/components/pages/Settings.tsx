@@ -4,16 +4,16 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Redirect } from "lib/navigation";
 
-import PageLayout from "app/components/layouts/PageLayout";
-import SettingsTab from "app/components/elements/SettingTab";
 import { SettingTab } from "app/defaults";
 import { settingTabAtom } from "app/atoms";
-import General from "../blocks/settingTabs/General";
-import Security from "../blocks/settingTabs/Security";
-import Web3 from "../blocks/settingTabs/Web3";
-import Networks from "../blocks/settingTabs/Networks";
-import Profile from "../blocks/settingTabs/Profile";
-import About from "../blocks/settingTabs/About";
+import PageLayout from "app/components/layouts/PageLayout";
+import SettingsTab from "app/components/elements/SettingsTab";
+import General from "app/components/blocks/settingTabs/General";
+import Security from "app/components/blocks/settingTabs/Security";
+import Web3 from "app/components/blocks/settingTabs/Web3";
+import Networks from "app/components/blocks/settingTabs/Networks";
+import Profile from "app/components/blocks/settingTabs/Profile";
+import About from "app/components/blocks/settingTabs/About";
 
 const settingsRoutes = (settingTab: SettingTab) => {
   return (
@@ -80,12 +80,18 @@ const Tabs: FC = () => (
   <div
     className={classNames(
       "flex flex-col",
-      "w-[333px] pr-6",
+      "w-[calc(19.25rem+1px)] pr-6",
       "border-r border-brand-main/[.07]"
     )}
   >
-    {tabsContent.map((tab) => (
-      <SettingsTab key={tab.title} {...tab} />
+    {tabsContent.map(({ title, route, desc }, i) => (
+      <SettingsTab
+        key={title}
+        title={title}
+        route={route}
+        desc={desc}
+        className={classNames(i !== tabsContent.length - 1 && "mb-2")}
+      />
     ))}
   </div>
 );
