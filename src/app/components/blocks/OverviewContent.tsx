@@ -17,6 +17,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { AccountAsset, TokenStandard, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
+import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
@@ -26,15 +27,13 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
+import ControlIcon from "app/components/elements/ControlIcon";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
-
-const LOAD_MORE_ON_ASSET_FROM_END = 3;
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -133,10 +132,20 @@ const AssetsList: FC = () => {
           toggleSearchValue={setSearchValue}
         />
         <IconedButton
-          Icon={ConfigIcon}
+          Icon={ControlIcon}
+          iconProps={{
+            isActive: manageModeEnabled,
+          }}
           theme="tertiary"
-          className="ml-2"
-          aria-label="Manage assets list"
+          className={classNames(
+            "ml-2",
+            manageModeEnabled && "bg-brand-main/30"
+          )}
+          aria-label={
+            manageModeEnabled
+              ? "Finish managing assets list"
+              : "Manage assets list"
+          }
           onClick={() => setManageModeEnabled(!manageModeEnabled)}
         />
       </div>
@@ -250,7 +259,6 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                     "border border-brand-main"
                 )}
                 checked={balanceUSD !== undefined && balanceUSD >= 0}
-                // onCheckedChange={onCheckedChange}
                 asChild
               >
                 <span>
