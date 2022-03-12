@@ -45,8 +45,13 @@ export function useAccountTokens(
 
   if (prevBaseParams && baseParams !== prevBaseParams) {
     offsetRef.current = 0;
-    onReset?.();
   }
+
+  useEffect(() => {
+    if (prevBaseParams && baseParams !== prevBaseParams) {
+      onReset?.();
+    }
+  }, [prevBaseParams, baseParams, onReset]);
 
   const offset = offsetRef.current;
   const queryParams = useMemo(
