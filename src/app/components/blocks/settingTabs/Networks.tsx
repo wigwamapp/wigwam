@@ -1,26 +1,28 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
-import { useLazyAllNetworks } from "app/hooks";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
+
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import { useLazyAllNetworks } from "app/hooks";
 import SearchInput from "app/components/elements/SearchInput";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
-import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
+import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
-type NetworkTab = number | null;
 const Networks: FC = () => {
   const allNetworks = useLazyAllNetworks();
 
-  const [tab, setTab] = useState<NetworkTab>(null);
+  const [tab, setTab] = useState<"new" | number | null>(null);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const fuse = useMemo(
     () => new Fuse(allNetworks ?? [], NETWORK_SEARCH_OPTIONS),
     [allNetworks]
   );
+
   const preparedNetworks = useMemo(() => {
     if (!allNetworks) {
       return;
@@ -32,79 +34,89 @@ const Networks: FC = () => {
     }
   }, [fuse, allNetworks, searchValue]);
 
-  const cancelEditing = () => setTab(null);
-  const currentNetwork = useMemo(
+  const selectedNetwork = useMemo(
     () => allNetworks?.find((n) => n.chainId === tab),
     [tab, allNetworks]
   );
+
+  const cancelEditing = useCallback(() => setTab(null), []);
+
   return (
-    <div className="flex">
+    <>
       <div
         className={classNames(
-          "w-[318px] px-5",
+          "flex flex-col",
+          "w-[calc(19.875rem+1px)] px-6",
           "border-r border-brand-main/[.07]"
         )}
       >
-        <div className={classNames("relative", "px-1")}>
-          <SearchInput
-            placeholder="Type name to search..."
-            searchValue={searchValue}
-            toggleSearchValue={(value: string | null) => setSearchValue(value)}
+        <SearchInput
+          placeholder="Type name to search..."
+          searchValue={searchValue}
+          toggleSearchValue={(value: string | null) => setSearchValue(value)}
+        />
+        <ScrollAreaContainer
+          className={classNames("flex flex-col", "pr-5 -mr-5 mt-5")}
+          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-20"
+        >
+          <NetworkBtn
+            name="Add new network"
+            isActive={tab === "new"}
+            onClick={() => setTab("new")}
+            className="bg-brand-main/[.05]"
           />
-          <nav>
+          {preparedNetworks?.map(({ chainId, name }) => (
             <NetworkBtn
-              id={0}
-              name="Add new network"
-              tab={tab}
-              onClick={() => setTab(0)}
+              key={chainId}
+              icon={NETWORK_ICON_MAP.get(chainId)}
+              name={name}
+              onClick={() => setTab(chainId)}
+              isActive={tab === chainId}
+              className="mt-2"
             />
-            {preparedNetworks &&
-              preparedNetworks.map((network) => (
-                <NetworkBtn
-                  key={network.chainId}
-                  id={network.chainId}
-                  name={network.name}
-                  icon={NETWORK_ICON_MAP.get(network.chainId)}
-                  tab={tab}
-                  onClick={() => setTab(network.chainId)}
-                />
-              ))}
-          </nav>
-        </div>
+          ))}
+        </ScrollAreaContainer>
       </div>
-      {(currentNetwork || tab === 0) && (
+      {(selectedNetwork || tab === "new") && (
         <EditNetwork
-          className="px-6 w-[24.875rem]"
-          isNew={tab === 0}
-          network={currentNetwork}
+          isNew={tab === "new"}
+          network={selectedNetwork}
           onCancelHandler={cancelEditing}
         />
       )}
-    </div>
+    </>
   );
 };
 
-interface NetworkBtnProps {
-  id: number;
+type NetworkBtnProps = {
   icon?: string;
   name: string;
-  tab: NetworkTab;
   onClick: () => void;
-}
-const NetworkBtn: FC<NetworkBtnProps> = ({ id, icon, tab, name, onClick }) => {
+  isActive?: boolean;
+  className?: string;
+};
+
+const NetworkBtn: FC<NetworkBtnProps> = ({
+  icon,
+  name,
+  onClick,
+  isActive = false,
+  className,
+}) => {
   return (
     <button
       type="button"
       className={classNames(
         "relative group",
-        "inline-flex justify-start",
-        "mt-2 px-3",
-        "first:mt-5",
-        "w-[270px] py-3",
-        "text-base font-bold",
-        tab !== id && "hover:bg-brand-main/[.1]",
-        (tab === id || id === 0) && "bg-brand-main/[.05]",
-        "rounded-[10px]"
+        "inline-flex justify-start items-center",
+        "w-full py-2 px-3 min-h-[2.75rem]",
+        "text-base font-bold whitespace-nowrap",
+        "rounded-[.625rem]",
+        "transition-colors",
+        !isActive && "hover:bg-brand-main/[.05]",
+        isActive && "bg-brand-main/10",
+        className
       )}
       onClick={onClick}
     >
@@ -114,17 +126,15 @@ const NetworkBtn: FC<NetworkBtnProps> = ({ id, icon, tab, name, onClick }) => {
         <PlusCircleIcon className="mr-3" />
       )}
       {name}
-      <div
+      <ChevronRightIcon
         className={classNames(
-          tab === id && "translate-x-0 opacticy-100",
-          tab !== id && "translate-x-[-4px] opacity-0",
-          "absolute right-6 inset-y-1/2",
-          "transition-transform rotate-[270deg]",
-          "group-hover:translate-x-0 group-hover:opacity-100"
+          "absolute right-2 top-1/2 -translate-y-1/2",
+          "transition",
+          "group-hover:translate-x-0 group-hover:opacity-100",
+          isActive && "translate-x-0 opacity-100",
+          !isActive && "-translate-x-1.5 opacity-0"
         )}
-      >
-        <ChevronDownIcon />
-      </div>
+      />
     </button>
   );
 };

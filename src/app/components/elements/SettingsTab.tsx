@@ -30,7 +30,7 @@ const SettingsTab: FC<SettingsTabProps> = ({
         "relative group",
         "flex flex-col",
         "py-3 px-4 pr-[2.625rem]",
-        "rounded-[10px]",
+        "rounded-[.625rem]",
         "cursor-pointer",
         isOpen && "bg-brand-main/10",
         !isOpen && "hover:bg-brand-main/5",
