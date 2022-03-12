@@ -28,6 +28,7 @@ import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import ControlIcon from "app/components/elements/ControlIcon";
+import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
@@ -232,20 +233,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           className
         )}
       >
-        <span
-          className={classNames(
-            "block",
-            "w-11 h-11 min-w-[2.75rem] mr-3",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </span>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-11 h-11 min-w-[2.75rem] mr-3"
+        />
         <span className="flex flex-col w-full">
           <span className={"text-sm font-bold leading-4"}>
             <TReplace msg={name} />
@@ -317,19 +309,11 @@ const AssetInfo: FC = () => {
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <div
-          className={classNames(
-            "w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
+        />
         <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
             <h2
