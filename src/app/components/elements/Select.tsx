@@ -49,15 +49,17 @@ function Select<T extends string | ReactElement, U extends string | number>({
   return (
     <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
       {!!label && (
-        <div
+        <button
+          type="button"
           className={classNames(
             "ml-4 mb-2",
-            "text-base font-normal",
+            "text-base font-normal text-left",
             "text-brand-gray"
           )}
+          onClick={() => setOpened(!opened)}
         >
           {label}
-        </div>
+        </button>
       )}
       <DropdownMenu.Root
         open={opened}
@@ -69,7 +71,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "flex items-center",
             "w-full",
-            "py-[10px] px-5",
+            "py-2.5 px-5",
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",

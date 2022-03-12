@@ -1,27 +1,27 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import classNames from "clsx";
-import { useAtom } from "jotai";
-import { wordlists } from "@ethersproject/wordlists";
+import { useAtom, useAtomValue } from "jotai";
+import { setLocale } from "lib/ext/i18n";
+
+import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { currentLocaleAtom, tokensWithoutBalanceAtom } from "app/atoms";
-import { toWordlistLang } from "core/common";
-import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import Select from "app/components/elements/Select";
-import SelectLanguage from "app/components/blocks/SelectLanguage";
 import Switcher from "app/components/elements/Switcher";
+import SelectLanguage from "app/components/blocks/SelectLanguage";
 
-const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists
-);
 const General: FC = () => {
-  const [currentLocale] = useAtom(currentLocaleAtom);
-  const defaultLocale = useMemo(
+  const currentLocale = useAtomValue(currentLocaleAtom);
+  const [showTokensWithoutBalance, toggleTokensWithoutBalance] = useAtom(
+    tokensWithoutBalanceAtom
+  );
+
+  const locale = useMemo(
     () =>
-      SUPPORTED_LOCALES.find(({ code }) => currentLocale === code) ??
+      DEFAULT_LOCALES.find(({ code }) => currentLocale === code) ??
       FALLBACK_LOCALE,
     [currentLocale]
   );
-  const [locale, setLocale] = useState(defaultLocale);
 
   const currencySelectProps = {
     items: [{ key: "usd", value: "USD ($)" }],
@@ -33,28 +33,21 @@ const General: FC = () => {
     label: "Primary fiat currency",
   };
 
-  const [show, updateShow] = useAtom(tokensWithoutBalanceAtom);
-
   return (
     <div className={classNames("flex flex-col", "px-4")}>
       <SelectLanguage
         selected={locale}
-        items={SUPPORTED_LOCALES}
-        onSelect={setLocale}
+        items={DEFAULT_LOCALES}
+        onSelect={({ code }) => setLocale(code)}
         className="mb-3"
       />
       <Select {...currencySelectProps} className="mb-3" />
-      <label
-        className={classNames(
-          "ml-4 mb-2",
-          "text-base font-normal",
-          "text-brand-gray"
-        )}
-        htmlFor="show"
-      >
-        Tokens without balance
-      </label>
-      <Switcher label="Show" toggle={show} setToggle={updateShow} />
+      <Switcher
+        label="Tokens without balance"
+        text={showTokensWithoutBalance ? "Hide" : "Show"}
+        checked={showTokensWithoutBalance}
+        onCheckedChange={toggleTokensWithoutBalance}
+      />
     </div>
   );
 };
