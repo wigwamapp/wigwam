@@ -1,31 +1,31 @@
-import { FC, useMemo } from "react";
+import { FC, Suspense, useMemo } from "react";
 import { match } from "ts-pattern";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Redirect } from "lib/navigation";
 
 import PageLayout from "app/components/layouts/PageLayout";
-import SettingTab from "app/components/elements/SettingTab";
-import { SettingTabs } from "app/defaults";
+import SettingsTab from "app/components/elements/SettingTab";
+import { SettingTab } from "app/defaults";
 import { settingTabAtom } from "app/atoms";
 import General from "../blocks/settingTabs/General";
-import Network from "../blocks/settingTabs/Network";
 import Security from "../blocks/settingTabs/Security";
 import Web3 from "../blocks/settingTabs/Web3";
-import About from "../blocks/settingTabs/About";
+import Networks from "../blocks/settingTabs/Networks";
 import Profile from "../blocks/settingTabs/Profile";
+import About from "../blocks/settingTabs/About";
 
-const settingsRoutes = (settingTab: SettingTabs) => {
+const settingsRoutes = (settingTab: SettingTab) => {
   return (
-    match({ settingTab })
-      .with({ settingTab: SettingTabs.General }, () => <General />)
-      .with({ settingTab: SettingTabs.Profile }, () => <Profile />)
-      .with({ settingTab: SettingTabs.Security }, () => <Security />)
-      .with({ settingTab: SettingTabs.Web3 }, () => <Web3 />)
-      .with({ settingTab: SettingTabs.Networks }, () => <Network />)
-      .with({ settingTab: SettingTabs.About }, () => <About />)
+    match(settingTab)
+      .with(SettingTab.General, () => <General />)
+      .with(SettingTab.Profile, () => <Profile />)
+      .with(SettingTab.Security, () => <Security />)
+      .with(SettingTab.Web3, () => <Web3 />)
+      .with(SettingTab.Networks, () => <Networks />)
+      .with(SettingTab.About, () => <About />)
       // Redirect to default
-      .otherwise(() => <Redirect to={{ settingTab: SettingTabs.General }} />)
+      .otherwise(() => <Redirect to={{ settingTab: SettingTab.General }} />)
   );
 };
 
@@ -36,45 +36,46 @@ const Settings: FC = () => {
     <PageLayout className="flex flex-col">
       <div className="flex mt-5 h-full">
         <Tabs />
-        {useMemo(() => settingsRoutes(settingTab), [settingTab])}
+        <Suspense fallback={null}>
+          {useMemo(() => settingsRoutes(settingTab), [settingTab])}
+        </Suspense>
       </div>
     </PageLayout>
   );
 };
 
-const tabsContent: Array<{ route: SettingTabs; title: string; desc: string }> =
-  [
-    {
-      route: SettingTabs.General,
-      title: "General",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-    {
-      route: SettingTabs.Profile,
-      title: "Profile",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-    {
-      route: SettingTabs.Security,
-      title: "Security & Privacy",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-    {
-      route: SettingTabs.Web3,
-      title: "Web 3",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-    {
-      route: SettingTabs.Networks,
-      title: "Networks",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-    {
-      route: SettingTabs.About,
-      title: "About",
-      desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-    },
-  ];
+const tabsContent: Array<{ route: SettingTab; title: string; desc: string }> = [
+  {
+    route: SettingTab.General,
+    title: "General",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+  {
+    route: SettingTab.Profile,
+    title: "Profile",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+  {
+    route: SettingTab.Security,
+    title: "Security & Privacy",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+  {
+    route: SettingTab.Web3,
+    title: "Web 3",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+  {
+    route: SettingTab.Networks,
+    title: "Networks",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+  {
+    route: SettingTab.About,
+    title: "About",
+    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+  },
+];
 const Tabs: FC = () => (
   <div
     className={classNames(
@@ -84,7 +85,7 @@ const Tabs: FC = () => (
     )}
   >
     {tabsContent.map((tab) => (
-      <SettingTab key={tab.title} {...tab} />
+      <SettingsTab key={tab.title} {...tab} />
     ))}
   </div>
 );

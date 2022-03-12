@@ -28,12 +28,12 @@ const ScrollAreaContainer = forwardRef<
     ref
   ) => (
     <ScrollArea.Root
-      ref={ref}
       className={classNames("overflow-hidden", className)}
       type={type}
       {...rest}
     >
       <ScrollArea.Viewport
+        ref={ref}
         className={classNames(
           "w-full h-full overscroll-contain",
           viewPortClassName

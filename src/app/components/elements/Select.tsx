@@ -69,7 +69,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "flex items-center",
             "w-full",
-            "py-2 px-5",
+            "py-[10px] px-5",
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",

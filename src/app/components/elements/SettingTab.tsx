@@ -5,14 +5,14 @@ import { Link } from "lib/navigation";
 
 import { settingTabAtom } from "app/atoms";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
-import { SettingTabs } from "app/defaults";
+import { SettingTab } from "app/defaults";
 
 interface SettingTabProps {
   title: string;
-  route: SettingTabs;
+  route: SettingTab;
   desc: string;
 }
-const SettingTab: FC<SettingTabProps> = ({ title, route, desc }) => {
+const SettingsTab: FC<SettingTabProps> = ({ title, route, desc }) => {
   const [active] = useAtom(settingTabAtom);
   const isOpen = active === route;
   return (
@@ -47,4 +47,4 @@ const SettingTab: FC<SettingTabProps> = ({ title, route, desc }) => {
   );
 };
 
-export default SettingTab;
+export default SettingsTab;

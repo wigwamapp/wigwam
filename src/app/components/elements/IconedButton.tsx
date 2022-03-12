@@ -13,12 +13,16 @@ import Tooltip, { TooltipProps } from "app/components/elements/Tooltip";
 
 type IconedButtonProps = {
   Icon: FC<{ className?: string }>;
+  iconProps?: any;
   theme?: "primary" | "secondary" | "tertiary";
   iconClassName?: string;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
-  ({ theme = "primary", className, Icon, iconClassName, ...rest }, ref) => {
+  (
+    { theme = "primary", className, Icon, iconProps, iconClassName, ...rest },
+    ref
+  ) => {
     const classNamesList = classNames(
       "group",
       (theme === "primary" || theme === "secondary") && "w-5 h-5",
@@ -44,6 +48,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
           "group-active:opacity-60",
           iconClassName
         )}
+        {...iconProps}
       />
     );
 

@@ -1,6 +1,6 @@
 import { createEvent } from "effector";
 
-import { ForApproval, Account } from "core/types";
+import { Approval, Account } from "core/types";
 
 import { Vault } from "../vault";
 
@@ -14,4 +14,6 @@ export const accountsUpdated = createEvent<Account[]>();
 
 export const walletPortsCountUpdated = createEvent<number>();
 
-export const approvalItemAdded = createEvent<ForApproval>();
+export const approvalAdded = createEvent<Approval>();
+
+export const approvalResolved = createEvent<string>();
