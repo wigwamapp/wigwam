@@ -25,7 +25,7 @@ export enum WelcomeStep {
   LetsBegin = "lets-begin",
 }
 
-export enum SettingTabs {
+export enum SettingTab {
   General = "general",
   Profile = "profile",
   Security = "security-&-privacy",
