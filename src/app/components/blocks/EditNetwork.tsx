@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { FormEventHandler, memo, useState } from "react";
 import classNames from "clsx";
 
 import * as Repo from "core/repo";
@@ -10,6 +10,14 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
+const emptyState = {
+  nName: "",
+  rpcUrl: "",
+  chainId: "",
+  currencySymbol: "",
+  blockExplorer: "",
+};
+
 type EditNetworkProps = {
   isNew: boolean;
   network?: Network;
@@ -19,26 +27,21 @@ type EditNetworkProps = {
 
 const EditNetwork = memo<EditNetworkProps>(
   ({ isNew, network, onCancelHandler }) => {
-    const [state, setState] = useState({
-      nName: network?.name ?? "",
-      rpcUrl: network?.rpcUrls[0] ?? "",
-      chainId: network?.chainId ?? "",
-      currencySymbol: network?.nativeCurrency?.symbol ?? "",
-      blockExplorer: network?.explorerUrls?.[0] ?? "",
-    });
+    const [state, setState] = useState(
+      network
+        ? {
+            nName: network.name,
+            rpcUrl: network.rpcUrls[0],
+            chainId: network.chainId,
+            currencySymbol: network.nativeCurrency?.symbol,
+            blockExplorer: network.explorerUrls?.[0] ?? "",
+          }
+        : emptyState
+    );
 
-    // Clear the state on "Add new network" open
-    useEffect(() => {
-      setState({
-        nName: network?.name ?? "",
-        rpcUrl: network?.rpcUrls[0] ?? "",
-        chainId: network?.chainId ?? "",
-        currencySymbol: network?.nativeCurrency?.symbol ?? "",
-        blockExplorer: network?.explorerUrls?.[0] ?? "",
-      });
-    }, [isNew, network]);
+    const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+      e.preventDefault();
 
-    const handleSubmit = async () => {
       try {
         const repoMethod = isNew ? "add" : "put";
         await Repo.networks[repoMethod]({
@@ -63,13 +66,7 @@ const EditNetwork = memo<EditNetworkProps>(
     };
 
     const handleClear = () => {
-      setState({
-        nName: "",
-        rpcUrl: "",
-        chainId: "",
-        currencySymbol: "",
-        blockExplorer: "",
-      });
+      setState(emptyState);
       onCancelHandler();
     };
 
@@ -99,12 +96,14 @@ const EditNetwork = memo<EditNetworkProps>(
         >
           <form onSubmit={handleSubmit}>
             <Input
+              id="network"
               value={state.nName}
               onChange={onChangeInput("nName")}
               label="Network Name"
               readOnly={isNative}
             />
             <Input
+              id="rpc"
               className="mt-4"
               value={state.rpcUrl}
               onChange={onChangeInput("rpcUrl")}
@@ -112,6 +111,7 @@ const EditNetwork = memo<EditNetworkProps>(
               readOnly={isNative}
             />
             <Input
+              id="chainId"
               className="mt-4"
               value={state.chainId}
               onChange={onChangeInput("chainId")}
@@ -119,6 +119,7 @@ const EditNetwork = memo<EditNetworkProps>(
               readOnly={isNative}
             />
             <Input
+              id="currencySymbol"
               className="mt-4"
               value={state.currencySymbol}
               onChange={onChangeInput("currencySymbol")}
@@ -127,6 +128,7 @@ const EditNetwork = memo<EditNetworkProps>(
               readOnly={isNative}
             />
             <Input
+              id="blockExplorer"
               className="mt-4"
               value={state.blockExplorer}
               onChange={onChangeInput("blockExplorer")}
@@ -145,7 +147,6 @@ const EditNetwork = memo<EditNetworkProps>(
 
               <NewButton
                 type="submit"
-                onClick={handleClear}
                 className="!py-2 ml-4 w-full"
                 disabled={isNative}
               >
