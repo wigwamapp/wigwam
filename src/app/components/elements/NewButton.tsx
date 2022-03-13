@@ -1,17 +1,16 @@
-import { HTMLAttributes, ForwardedRef, forwardRef } from "react";
+import { HTMLAttributes, ForwardedRef, forwardRef, ReactNode } from "react";
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
   theme?: "primary" | "secondary" | "tertiary" | "clean";
   disabled?: boolean;
+  children: ReactNode;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const NewButton = forwardRef<HTMLElement, NewButtonProps>(
-  (
-    { theme = "primary", disabled = false, className, children, ...rest },
-    ref
-  ) => {
+  ({ theme = "primary", className, ...rest }, ref) => {
+    const { disabled = false } = rest;
     const classNamesList = classNames(
       "py-3 px-4",
       theme !== "clean" && "min-w-[10rem]",
@@ -47,9 +46,7 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
           rel="nofollow noreferrer"
           className={classNamesList}
           {...rest}
-        >
-          {children}
-        </a>
+        />
       );
     }
 
@@ -59,9 +56,7 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
           ref={ref as ForwardedRef<HTMLAnchorElement>}
           className={classNamesList}
           {...rest}
-        >
-          {children}
-        </Link>
+        />
       );
     }
 
@@ -70,9 +65,7 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
         ref={ref as ForwardedRef<HTMLButtonElement>}
         className={classNamesList}
         {...rest}
-      >
-        {children}
-      </button>
+      />
     );
   }
 );
