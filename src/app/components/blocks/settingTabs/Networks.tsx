@@ -80,6 +80,7 @@ const Networks: FC = () => {
       </div>
       {(selectedNetwork || tab === "new") && (
         <EditNetwork
+          key={selectedNetwork ? selectedNetwork.chainId : "new"}
           isNew={tab === "new"}
           network={selectedNetwork}
           onCancelHandler={cancelEditing}
