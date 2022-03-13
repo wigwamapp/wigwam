@@ -246,7 +246,15 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     const currentAccount = useAtomValue(currentAccountAtom);
 
     const [popoverOpened, setPopoverOpened] = useState(false);
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+    const {
+      logoUrl,
+      name,
+      symbol,
+      rawBalance,
+      decimals,
+      balanceUSD,
+      disabled,
+    } = asset;
 
     const openLink = useCallback(
       (page: Page) => {
@@ -261,10 +269,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           await repo.accountTokens.put(
             {
               ...asset,
-              balanceUSD:
-                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
-                  ? -1
-                  : 0,
+              disabled: 1 - asset.disabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -277,8 +282,6 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         }
       }
     }, [asset, currentAccount.address, isManageMode, popoverOpened]);
-
-    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
 
     const content = (
       <button
@@ -296,7 +299,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "transition",
           isManageMode &&
             "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
-          !isEnabled && "opacity-60",
+          disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
@@ -351,14 +354,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               "bg-brand-main/20",
               "rounded",
               "flex items-center justify-center",
-              isEnabled && "border border-brand-main"
+              !disabled && "border border-brand-main"
             )}
-            checked={isEnabled}
+            checked={!disabled}
             asChild
           >
             <span>
               <Checkbox.Indicator>
-                {isEnabled && <CheckIcon />}
+                {!disabled && <CheckIcon />}
               </Checkbox.Indicator>
             </span>
           </Checkbox.Root>

@@ -12,13 +12,14 @@ export enum TokenStandard {
 
 export type AccountToken = AccountAsset | AccountNFT;
 
-export type AccountAsset = Asset & TokenBalanceFields;
-export type AccountNFT = NFT & TokenBalanceFields;
+export type AccountAsset = Asset & AccountTokenFields;
+export type AccountNFT = NFT & AccountTokenFields;
 
 export type Token = Asset | NFT;
 
-export type TokenBalanceFields = {
+type AccountTokenFields = {
   accountAddress: string;
+  disabled: number;
   rawBalance?: string;
   balanceUSD?: number;
 };

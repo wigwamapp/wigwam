@@ -94,12 +94,22 @@ const AssetsList: FC = () => {
     [hasMore, loadMore, tokens]
   );
 
+  // A little hack to avoid using `manageModeEnabled` dependency
+  const manageModeEnabledRef = useRef<boolean>();
+  if (manageModeEnabledRef.current !== manageModeEnabled) {
+    manageModeEnabledRef.current = manageModeEnabled;
+  }
+
   useEffect(() => {
-    if (setDefaultTokenRef.current && tokens.length > 0 && !manageModeEnabled) {
+    if (
+      setDefaultTokenRef.current &&
+      tokens.length > 0 &&
+      !manageModeEnabledRef.current
+    ) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
       setDefaultTokenRef.current = false;
     }
-  }, [manageModeEnabled, setTokenSlug, tokens]);
+  }, [setTokenSlug, tokens]);
 
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
@@ -108,10 +118,7 @@ const AssetsList: FC = () => {
           await repo.accountTokens.put(
             {
               ...asset,
-              balanceUSD:
-                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
-                  ? -1
-                  : 0,
+              disabled: 1 - asset.disabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -120,7 +127,7 @@ const AssetsList: FC = () => {
         }
       } else {
         setTokenSlug([asset.tokenSlug, "replace"]);
-        setSearchValue(null);
+        // setSearchValue(null);
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
@@ -185,7 +192,7 @@ const AssetsList: FC = () => {
                 : null
             }
             asset={asset as AccountAsset}
-            isActive={tokenSlug === asset.tokenSlug}
+            isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
             onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
             isManageMode={manageModeEnabled}
             className={classNames(i !== tokens.length - 1 && "mb-2")}
@@ -209,9 +216,15 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
-
-    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
+    const {
+      logoUrl,
+      name,
+      symbol,
+      rawBalance,
+      decimals,
+      balanceUSD,
+      disabled,
+    } = asset;
 
     return (
       <button
@@ -228,7 +241,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "transition",
           !isActive && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
-          !isEnabled && "opacity-60",
+          disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
@@ -270,14 +283,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                   "bg-brand-main/20",
                   "rounded",
                   "flex items-center justify-center",
-                  isEnabled && "border border-brand-main"
+                  !disabled && "border border-brand-main"
                 )}
-                checked={isEnabled}
+                checked={!disabled}
                 asChild
               >
                 <span>
                   <Checkbox.Indicator>
-                    {isEnabled && <CheckIcon />}
+                    {!disabled && <CheckIcon />}
                   </Checkbox.Indicator>
                 </span>
               </Checkbox.Root>
