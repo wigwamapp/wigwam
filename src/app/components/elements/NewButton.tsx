@@ -4,10 +4,14 @@ import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
   theme?: "primary" | "secondary" | "tertiary" | "clean";
+  disabled?: boolean;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const NewButton = forwardRef<HTMLElement, NewButtonProps>(
-  ({ theme = "primary", className, children, ...rest }, ref) => {
+  (
+    { theme = "primary", disabled = false, className, children, ...rest },
+    ref
+  ) => {
     const classNamesList = classNames(
       "py-3 px-4",
       theme !== "clean" && "min-w-[10rem]",
@@ -17,18 +21,21 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
       "rounded-[.375rem]",
       "inline-flex justify-center",
       "transition",
-      theme === "primary" && [
-        "hover:bg-opacity-100 hover:shadow-buttonaccent",
-        "focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent",
-        "active:bg-opacity-70 active:shadow-none",
-      ],
-      (theme === "secondary" || theme === "tertiary") && [
-        "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
-        "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
-        "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
-      ],
+      theme === "primary" &&
+        !disabled && [
+          "hover:bg-opacity-100 hover:shadow-buttonaccent",
+          "focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent",
+          "active:bg-opacity-70 active:shadow-none",
+        ],
+      (theme === "secondary" || theme === "tertiary") &&
+        !disabled && [
+          "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
+          "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
+          "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
+        ],
       theme === "clean" &&
         "font-medium hover:opacity-70 focus-visible:opacity-70",
+      disabled && "opacity-40 cursor-not-allowed",
       className
     );
 

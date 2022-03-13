@@ -7,7 +7,7 @@ import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import Select from "app/components/elements/Select";
 
-const prepareNetwork = (network: Network) => ({
+export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
   icon: NETWORK_ICON_MAP.get(network.chainId),
