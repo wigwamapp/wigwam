@@ -11,7 +11,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { AccountAsset, TokenType } from "core/types";
+import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
 
 import { LOAD_MORE_ON_ASSET_FROM_END, Page } from "app/defaults";
@@ -35,6 +35,7 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import { createAccountTokenKey } from "core/common/tokens";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -219,7 +220,7 @@ const AssetsList: FC = () => {
       >
         {tokens.map((asset, i) => (
           <AssetCard
-            key={asset.tokenSlug}
+            key={createAccountTokenKey(asset)}
             ref={
               i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
                 ? loadMoreTriggerAssetRef
@@ -246,15 +247,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     const currentAccount = useAtomValue(currentAccountAtom);
 
     const [popoverOpened, setPopoverOpened] = useState(false);
-    const {
-      logoUrl,
-      name,
-      symbol,
-      rawBalance,
-      decimals,
-      balanceUSD,
-      disabled,
-    } = asset;
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
+      asset;
+
+    const nativeAsset = status === TokenStatus.Native;
+    const disabled = status === TokenStatus.Disabled;
 
     const openLink = useCallback(
       (page: Page) => {
@@ -265,11 +262,16 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 
     const handleAssetClick = useCallback(async () => {
       if (isManageMode) {
+        if (asset.status === TokenStatus.Native) return;
+
         try {
           await repo.accountTokens.put(
             {
               ...asset,
-              disabled: 1 - asset.disabled,
+              status:
+                asset.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -303,6 +305,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "hover:opacity-100",
           className
         )}
+        disabled={isManageMode && nativeAsset}
       >
         <Avatar
           src={logoUrl}
@@ -347,7 +350,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               tabIndex={-1}
             />
           </DropdownMenu.Trigger>
-        ) : (
+        ) : !nativeAsset ? (
           <Checkbox.Root
             className={classNames(
               "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
@@ -365,7 +368,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               </Checkbox.Indicator>
             </span>
           </Checkbox.Root>
-        )}
+        ) : null}
       </button>
     );
 

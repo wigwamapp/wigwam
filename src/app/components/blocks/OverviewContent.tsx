@@ -14,8 +14,13 @@ import { TReplace } from "lib/ext/i18n/react";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
-import { AccountAsset, TokenStandard, TokenType } from "core/types";
-import { parseTokenSlug } from "core/common/tokens";
+import {
+  AccountAsset,
+  TokenStandard,
+  TokenStatus,
+  TokenType,
+} from "core/types";
+import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
@@ -114,11 +119,16 @@ const AssetsList: FC = () => {
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
       if (manageModeEnabled) {
+        if (asset.status === TokenStatus.Native) return;
+
         try {
           await repo.accountTokens.put(
             {
               ...asset,
-              disabled: 1 - asset.disabled,
+              status:
+                asset.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -127,7 +137,6 @@ const AssetsList: FC = () => {
         }
       } else {
         setTokenSlug([asset.tokenSlug, "replace"]);
-        // setSearchValue(null);
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
@@ -185,7 +194,7 @@ const AssetsList: FC = () => {
       >
         {tokens.map((asset, i) => (
           <AssetCard
-            key={asset.tokenSlug}
+            key={createAccountTokenKey(asset)}
             ref={
               i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
                 ? loadMoreTriggerAssetRef
@@ -216,15 +225,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const {
-      logoUrl,
-      name,
-      symbol,
-      rawBalance,
-      decimals,
-      balanceUSD,
-      disabled,
-    } = asset;
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
+      asset;
+    const nativeAsset = status === TokenStatus.Native;
+    const disabled = status === TokenStatus.Disabled;
+    const hoverable = isManageMode ? !nativeAsset : !isActive;
 
     return (
       <button
@@ -239,12 +244,13 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "rounded-[.625rem]",
           "group",
           "transition",
-          !isActive && "hover:bg-brand-main/10",
+          hoverable && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
           disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
+        disabled={isManageMode && nativeAsset}
       >
         <Avatar
           src={logoUrl}
@@ -275,7 +281,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                 )}
               />
             )}
-            {isManageMode && (
+            {isManageMode && !nativeAsset && (
               <Checkbox.Root
                 className={classNames(
                   "absolute top-1/2 right-5 -translate-y-1/2",
@@ -416,19 +422,20 @@ enum TokenStandardValue {
 
 type TagProps = { standard: TokenStandard };
 
-const Tag: FC<TagProps> = ({ standard }) => (
-  <span
-    className={classNames(
-      "py-2 px-4 mr-4",
-      "text-base font-bold leading-none",
-      "border border-brand-main/20",
-      "rounded-[.625rem]",
-      "whitespace-nowrap"
-    )}
-  >
-    {TokenStandardValue[standard]}
-  </span>
-);
+const Tag: FC<TagProps> = ({ standard }) =>
+  standard !== TokenStandard.Native ? (
+    <span
+      className={classNames(
+        "py-2 px-4 mr-4",
+        "text-base font-bold leading-none",
+        "border border-brand-main/20",
+        "rounded-[.625rem]",
+        "whitespace-nowrap"
+      )}
+    >
+      {TokenStandardValue[standard]}
+    </span>
+  ) : null;
 
 type PriceChangeProps = {
   priceChange: string;

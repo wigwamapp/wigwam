@@ -2,6 +2,7 @@ import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
 import { Approval } from "./activity";
+import { SyncStatus } from "./sync";
 
 export type Request =
   | GetWalletStatusRequest
@@ -20,7 +21,8 @@ export type Request =
   | GetNeuterExtendedKeyRequest
   | SendRpcRequest
   | GetApprovalsRequest
-  | ApproveRequest;
+  | ApproveRequest
+  | GetSyncStatusRequest;
 
 export type Response =
   | GetWalletStatusResponse
@@ -37,6 +39,7 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
+  | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
   | ApproveResponse;
@@ -44,7 +47,9 @@ export type Response =
 export type EventMessage =
   | WalletStatusUpdated
   | AccountsUpdated
-  | ApprovalsUpdated;
+  | ApprovalsUpdated
+  | Sync
+  | SyncStatusUpdated;
 
 export enum MessageType {
   GetWalletStatus = "GET_WALLET_STATUS",
@@ -63,6 +68,9 @@ export enum MessageType {
   GetPrivateKey = "GET_PRIVATE_KEY",
   GetPublicKey = "GET_PUBLIC_KEY",
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
+  Sync = "SYNC",
+  GetSyncStatus = "GET_SYNC_STATUS",
+  SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
   GetApprovals = "GET_APPROVALS",
   ApprovalsUpdated = "APPROVALS_UPDATED",
@@ -214,6 +222,26 @@ export interface GetNeuterExtendedKeyRequest extends MessageBase {
 export interface GetNeuterExtendedKeyResponse extends MessageBase {
   type: MessageType.GetNeuterExtendedKey;
   extendedKey: string;
+}
+
+export interface Sync extends MessageBase {
+  type: MessageType.Sync;
+  chainId: number;
+  accountUuid: string;
+}
+
+export interface GetSyncStatusRequest extends MessageBase {
+  type: MessageType.GetSyncStatus;
+}
+
+export interface GetSyncStatusResponse extends MessageBase {
+  type: MessageType.GetSyncStatus;
+  status: SyncStatus;
+}
+
+export interface SyncStatusUpdated extends MessageBase {
+  type: MessageType.SyncStatusUpdated;
+  status: SyncStatus;
 }
 
 export interface SendRpcRequest extends MessageBase {

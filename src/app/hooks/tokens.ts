@@ -5,6 +5,7 @@ import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { TokenType } from "core/types";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
   currentAccountAtom,
@@ -57,6 +58,7 @@ export function useAccountTokens(
   const queryParams = useMemo(
     () => ({
       ...baseParams,
+      withNative: false,
       limit: offset + limit,
     }),
     [baseParams, offset, limit]
@@ -74,7 +76,13 @@ export function useAccountTokens(
     prevQueryParamsRef.current = queryParams;
   }, [queryParams]);
 
-  const tokens = useLazyAtomValue(accountTokensAtom) ?? [];
+  const nativeToken = useToken(NATIVE_TOKEN_SLUG);
+  const restTokens = useLazyAtomValue(accountTokensAtom);
+
+  const tokens = useMemo(
+    () => (nativeToken && restTokens ? [nativeToken, ...restTokens] : []),
+    [nativeToken, restTokens]
+  );
 
   const hasMore = offsetRef.current <= tokens.length;
 
@@ -112,10 +120,6 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
   }, [onReset, params, tokenSlug]);
 
   const asset = useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
-
-  if (asset?.balanceUSD === undefined || asset.balanceUSD < 0) {
-    return null;
-  }
 
   return asset;
 }

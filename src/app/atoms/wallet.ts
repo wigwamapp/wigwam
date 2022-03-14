@@ -5,6 +5,8 @@ import {
   isWalletHasSeedPhrase,
   onWalletStatusUpdated,
   getNeuterExtendedKey,
+  getSyncStatus,
+  onSyncStatusUpdated,
 } from "core/client";
 
 export const walletStatusAtom = atomWithAutoReset(getWalletStatus, {
@@ -16,3 +18,7 @@ export const hasSeedPhraseAtom = atomWithAutoReset(() =>
 );
 
 export const neuterExtendedKeyAtom = atomWithAutoReset(getNeuterExtendedKey);
+
+export const syncStatusAtom = atomWithAutoReset(getSyncStatus, {
+  onMount: onSyncStatusUpdated,
+});

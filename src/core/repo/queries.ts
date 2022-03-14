@@ -1,4 +1,5 @@
-import { TokenType } from "core/types";
+import { parseTokenSlug } from "core/common/tokens";
+import { TokenStatus, TokenType } from "core/types";
 
 import { accountTokens } from "./helpers";
 
@@ -6,6 +7,7 @@ export type QueryAccountTokensParams = {
   chainId: number;
   tokenType: TokenType;
   accountAddress: string;
+  withNative?: boolean;
   withDisabled?: boolean;
   search?: string;
   offset?: number;
@@ -16,6 +18,7 @@ export function queryAccountTokens({
   chainId,
   tokenType,
   accountAddress,
+  withNative = true,
   withDisabled,
   search,
   offset,
@@ -31,21 +34,28 @@ export function queryAccountTokens({
       .equals(baseArgs);
   } else {
     coll = accountTokens
-      .where("[chainId+tokenType+accountAddress+disabled]")
-      .equals([...baseArgs, 0]);
+      .where("[chainId+tokenType+accountAddress+status+balanceUSD]")
+      .between(
+        [...baseArgs, TokenStatus.Enabled, 0],
+        [...baseArgs, TokenStatus.Native, Infinity]
+      );
   }
 
   coll = coll.reverse();
 
+  if (!withNative) {
+    coll = coll.filter((token) => token.status !== TokenStatus.Native);
+  }
+
   if (search) {
     const match = createSearchMatcher(search);
 
-    coll = coll.filter(
-      (token) =>
-        token.tokenType === TokenType.Asset
-          ? match(token.name) || match(token.symbol)
-          : true
-      // @TODO: Implement valid searching
+    coll = coll.filter((token) =>
+      token.tokenType === TokenType.Asset
+        ? match(parseTokenSlug(token.tokenSlug).address) ||
+          match(token.name) ||
+          match(token.symbol)
+        : true
     );
   }
 
@@ -63,5 +73,11 @@ export function queryAccountTokens({
 function createSearchMatcher(search: string) {
   const loweredSearch = search.toLowerCase();
 
-  return (item: string) => item.toLowerCase().includes(loweredSearch);
+  return (item: string, strict?: "strict") => {
+    const loweredItem = item.toLowerCase();
+
+    return strict
+      ? loweredItem === loweredSearch
+      : loweredItem.includes(loweredSearch);
+  };
 }
