@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";

@@ -25,7 +25,7 @@ export type UseAccountTokensOptions = {
 export function useAccountTokens(
   tokenType: TokenType,
   accountAddress: string,
-  { withDisabled, search, limit = 25, onReset }: UseAccountTokensOptions = {}
+  { withDisabled, search, limit = 20, onReset }: UseAccountTokensOptions = {}
 ) {
   const forceUpdate = useForceUpdate();
   const chainId = useChainId();

@@ -73,7 +73,6 @@ const AssetsList: FC = () => {
     {
       withDisabled: manageModeEnabled,
       search: searchValue ?? undefined,
-      limit: 10,
       onReset: handleAccountTokensReset,
     }
   );
