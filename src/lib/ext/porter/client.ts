@@ -104,6 +104,11 @@ export class PorterClient<ReqData = any, ResData = unknown> {
     });
   }
 
+  sendOneWayMessage<T>(data: T) {
+    const port = this.getCurrentPort();
+    port.postMessage({ type: PorterMessageType.OneWay, data });
+  }
+
   /**
    * Allows to subscribe to notifications channel from background process
    */

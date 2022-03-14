@@ -21,10 +21,12 @@ import {
   unlocked,
   walletPortsCountUpdated,
   accountsUpdated,
+  $syncStatus,
 } from "./state";
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
 import { processApprove } from "./approve";
+import { addSyncRequest } from "./sync";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -47,6 +49,13 @@ export function startServer() {
     walletPorter.broadcast({
       type: MessageType.ApprovalsUpdated,
       approvals,
+    });
+  });
+
+  $syncStatus.watch((status) => {
+    walletPorter.broadcast({
+      type: MessageType.SyncStatusUpdated,
+      status,
     });
   });
 
@@ -74,10 +83,10 @@ export function startServer() {
   // dappPorter.onMessage(handleDAppRequest);
 }
 
-async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
+async function handleWalletRequest(
+  ctx: MessageContext<Request | EventMessage, Response>
+) {
   console.debug("New wallet request", ctx);
-
-  if (!ctx.request) return;
 
   try {
     await ensureInited();
@@ -213,6 +222,18 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           await processApprove(approvalId, approve, vault);
 
           ctx.reply({ type });
+        })
+      )
+      .with({ type: MessageType.Sync }, ({ chainId, accountUuid }) =>
+        withStatus(WalletStatus.Unlocked, () => {
+          addSyncRequest({ chainId, accountUuid });
+        })
+      )
+      .with({ type: MessageType.GetSyncStatus }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, () => {
+          const status = $syncStatus.getState();
+
+          ctx.reply({ type, status });
         })
       )
       .with(

@@ -11,6 +11,8 @@ import {
   walletPortsCountUpdated,
   approvalAdded,
   approvalResolved,
+  syncStarted,
+  synced,
 } from "./events";
 
 export const $walletStatus = createStore(WalletStatus.Idle)
@@ -48,6 +50,23 @@ export const $autoLockTimeout = createStore<MaybeTimeout>(null)
   });
 
 type MaybeTimeout = ReturnType<typeof setTimeout> | null;
+
+export const $syncPool = createStore<number[]>([])
+  .on(syncStarted, (pool, chainId) => [...pool, chainId])
+  .on(synced, (pool, chainId) => {
+    const i = pool.indexOf(chainId);
+
+    if (i > -1) {
+      // Remove one element by index
+      const copied = Array.from(pool);
+      copied.splice(i, 1);
+      return copied;
+    }
+
+    return pool;
+  });
+
+export const $syncStatus = $syncPool.map((pool) => Array.from(new Set(pool)));
 
 export const $approvals = createStore<Approval[]>([])
   .on(approvalAdded, (current, item) => [...current, item])
