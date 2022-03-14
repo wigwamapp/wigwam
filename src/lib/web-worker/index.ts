@@ -19,7 +19,7 @@ export function createWorker<T extends ModuleMethods>(
   const terminateAfterIdle = opts.terminateAfterIdle !== false;
   const idleDelay = opts.idleDelay ?? 60_000; // 1 min
 
-  let terminateTimeout: number;
+  let terminateTimeout: ReturnType<typeof setTimeout>;
   let queue = 0;
 
   const perform = async (
