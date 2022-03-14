@@ -14,6 +14,7 @@ import {
 } from "app/atoms";
 
 import { useChainId } from "./chainId";
+import { matchNativeToken } from "core/repo";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -79,10 +80,17 @@ export function useAccountTokens(
   const nativeToken = useToken(NATIVE_TOKEN_SLUG);
   const restTokens = useLazyAtomValue(accountTokensAtom);
 
-  const tokens = useMemo(
-    () => (nativeToken && restTokens ? [nativeToken, ...restTokens] : []),
-    [nativeToken, restTokens]
-  );
+  const tokens = useMemo(() => {
+    if (nativeToken && restTokens) {
+      if (search && !matchNativeToken(nativeToken, search)) {
+        return restTokens;
+      }
+
+      return [nativeToken, ...restTokens];
+    }
+
+    return [];
+  }, [nativeToken, restTokens, search]);
 
   const hasMore = offsetRef.current <= tokens.length;
 

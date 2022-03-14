@@ -1,5 +1,5 @@
 import { parseTokenSlug } from "core/common/tokens";
-import { TokenStatus, TokenType } from "core/types";
+import { AccountToken, TokenStatus, TokenType } from "core/types";
 
 import { accountTokens } from "./helpers";
 
@@ -52,7 +52,7 @@ export function queryAccountTokens({
 
     coll = coll.filter((token) =>
       token.tokenType === TokenType.Asset
-        ? match(parseTokenSlug(token.tokenSlug).address) ||
+        ? match(parseTokenSlug(token.tokenSlug).address, "strict") ||
           match(token.name) ||
           match(token.symbol)
         : true
@@ -68,6 +68,14 @@ export function queryAccountTokens({
   }
 
   return coll.toArray();
+}
+
+export function matchNativeToken(token: AccountToken, search: string) {
+  const match = createSearchMatcher(search);
+
+  return token.tokenType === TokenType.Asset
+    ? match(token.name) || match(token.symbol)
+    : false;
 }
 
 function createSearchMatcher(search: string) {
