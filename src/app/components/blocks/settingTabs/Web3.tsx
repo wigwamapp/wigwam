@@ -1,11 +1,24 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import classNames from "clsx";
 
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import Switcher from "app/components/elements/Switcher";
+
 const Web3: FC = () => {
+  const [metamaskMode, setMetamaskMode] = useState(false);
   return (
-    <div className={classNames("flex flex-col", "py-3 px-4 mb-2")}>
-      <h3>Web3</h3>
-    </div>
+    <ScrollAreaContainer
+      className={classNames("flex flex-col py-3 px-4")}
+      viewPortClassName="pb-20 rounded-t-[.625rem]"
+      scrollBarClassName="py-0 pb-20"
+    >
+      <Switcher
+        label="Use Metamask Compatible Mode"
+        text={metamaskMode ? "Using" : "Turned off"}
+        checked={metamaskMode}
+        onCheckedChange={() => setMetamaskMode(!metamaskMode)}
+      />
+    </ScrollAreaContainer>
   );
 };
 

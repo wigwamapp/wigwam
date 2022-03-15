@@ -44,7 +44,7 @@ const General: FC = () => {
       <Select {...currencySelectProps} className="mb-3" />
       <Switcher
         label="Tokens without balance"
-        text={showTokensWithoutBalance ? "Hide" : "Show"}
+        text={showTokensWithoutBalance ? "Visible" : "Hidden"}
         checked={showTokensWithoutBalance}
         onCheckedChange={toggleTokensWithoutBalance}
       />
