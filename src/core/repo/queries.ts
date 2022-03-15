@@ -21,13 +21,21 @@ export function queryAccountTokens({
   offset,
   limit,
 }: QueryAccountTokensParams) {
-  let coll = accountTokens
-    .where("[chainId+tokenType+accountAddress+balanceUSD]")
-    .between(
-      [chainId, tokenType, accountAddress, withDisabled ? -1 : 0],
-      [chainId, tokenType, accountAddress, Infinity]
-    )
-    .reverse();
+  let coll;
+
+  const baseArgs: any[] = [chainId, tokenType, accountAddress];
+
+  if (withDisabled) {
+    coll = accountTokens
+      .where("[chainId+tokenType+accountAddress]")
+      .equals(baseArgs);
+  } else {
+    coll = accountTokens
+      .where("[chainId+tokenType+accountAddress+disabled]")
+      .equals([...baseArgs, 0]);
+  }
+
+  coll = coll.reverse();
 
   if (search) {
     const match = createSearchMatcher(search);

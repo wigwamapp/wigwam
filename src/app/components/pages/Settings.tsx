@@ -4,16 +4,17 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Redirect } from "lib/navigation";
 
-import PageLayout from "app/components/layouts/PageLayout";
-import SettingsTab from "app/components/elements/SettingTab";
 import { SettingTab } from "app/defaults";
 import { settingTabAtom } from "app/atoms";
-import General from "../blocks/settingTabs/General";
-import Security from "../blocks/settingTabs/Security";
-import Web3 from "../blocks/settingTabs/Web3";
-import Networks from "../blocks/settingTabs/Networks";
-import Profile from "../blocks/settingTabs/Profile";
-import About from "../blocks/settingTabs/About";
+import PageLayout from "app/components/layouts/PageLayout";
+import SettingsTab from "app/components/elements/SettingsTab";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import General from "app/components/blocks/settingTabs/General";
+import Security from "app/components/blocks/settingTabs/Security";
+import Web3 from "app/components/blocks/settingTabs/Web3";
+import Networks from "app/components/blocks/settingTabs/Networks";
+import Profile from "app/components/blocks/settingTabs/Profile";
+import About from "app/components/blocks/settingTabs/About";
 
 const settingsRoutes = (settingTab: SettingTab) => {
   return (
@@ -34,7 +35,7 @@ const Settings: FC = () => {
 
   return (
     <PageLayout className="flex flex-col">
-      <div className="flex mt-5 h-full">
+      <div className="flex mt-5 min-h-0 grow">
         <Tabs />
         <Suspense fallback={null}>
           {useMemo(() => settingsRoutes(settingTab), [settingTab])}
@@ -76,18 +77,27 @@ const tabsContent: Array<{ route: SettingTab; title: string; desc: string }> = [
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
 ];
+
 const Tabs: FC = () => (
-  <div
+  <ScrollAreaContainer
     className={classNames(
       "flex flex-col",
-      "w-[333px] pr-6",
+      "w-[calc(19.25rem+1px)] pr-6",
       "border-r border-brand-main/[.07]"
     )}
+    viewPortClassName="pb-20 rounded-t-[.625rem]"
+    scrollBarClassName="py-0 pb-20 !right-1"
   >
-    {tabsContent.map((tab) => (
-      <SettingsTab key={tab.title} {...tab} />
+    {tabsContent.map(({ title, route, desc }, i) => (
+      <SettingsTab
+        key={title}
+        title={title}
+        route={route}
+        desc={desc}
+        className={classNames(i !== tabsContent.length - 1 && "mb-2")}
+      />
     ))}
-  </div>
+  </ScrollAreaContainer>
 );
 
 export default Settings;

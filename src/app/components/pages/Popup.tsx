@@ -29,6 +29,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import Tooltip from "app/components/elements/Tooltip";
 import ControlIcon from "app/components/elements/ControlIcon";
+import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -48,8 +49,8 @@ const Popup: FC = () => (
       <InteractionWithDapp
         className="mt-2"
         state="connected"
-        icon="https://s2.coinmarketcap.com/static/img/coins/200x200/7278.png"
-        name="app.uniswap.com"
+        icon="data:image/png;base64,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"
+        name="compound.finance"
       />
 
       <AssetsList />
@@ -97,18 +98,17 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
           "w-5 h-5 mr-1.5",
           "rounded-full overflow-hidden",
           "border",
-          !icon && "bg-brand-main/10",
-          icon && state === "connected" && "bg-white",
           state !== "connected" && "border-[#BCC2DB]",
           state === "connected" && "border-[#4F9A5E]"
         )}
       >
         {icon && (
-          <img
+          <Avatar
             src={icon}
             alt={name ?? "Dapp"}
             className={classNames(
               "w-full h-full object-cover",
+              "!border-none",
               state === "connectible" && "opacity-50"
             )}
           />
@@ -246,7 +246,15 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     const currentAccount = useAtomValue(currentAccountAtom);
 
     const [popoverOpened, setPopoverOpened] = useState(false);
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+    const {
+      logoUrl,
+      name,
+      symbol,
+      rawBalance,
+      decimals,
+      balanceUSD,
+      disabled,
+    } = asset;
 
     const openLink = useCallback(
       (page: Page) => {
@@ -261,10 +269,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           await repo.accountTokens.put(
             {
               ...asset,
-              balanceUSD:
-                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
-                  ? -1
-                  : 0,
+              disabled: 1 - asset.disabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -277,8 +282,6 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         }
       }
     }, [asset, currentAccount.address, isManageMode, popoverOpened]);
-
-    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
 
     const content = (
       <button
@@ -296,25 +299,16 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "transition",
           isManageMode &&
             "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
-          !isEnabled && "opacity-60",
+          disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
       >
-        <span
-          className={classNames(
-            "block",
-            "w-11 h-11 min-w-[2.75rem] mr-3",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </span>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-11 h-11 min-w-[2.75rem] mr-3"
+        />
         <span className="flex flex-col w-full">
           <span className="text-sm font-bold leading-5">{name}</span>
           <span className="mt-auto flex justify-between items-end">
@@ -360,14 +354,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               "bg-brand-main/20",
               "rounded",
               "flex items-center justify-center",
-              isEnabled && "border border-brand-main"
+              !disabled && "border border-brand-main"
             )}
-            checked={isEnabled}
+            checked={!disabled}
             asChild
           >
             <span>
               <Checkbox.Indicator>
-                {isEnabled && <CheckIcon />}
+                {!disabled && <CheckIcon />}
               </Checkbox.Indicator>
             </span>
           </Checkbox.Root>

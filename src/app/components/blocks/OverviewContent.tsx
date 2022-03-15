@@ -28,6 +28,7 @@ import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import ControlIcon from "app/components/elements/ControlIcon";
+import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
@@ -93,12 +94,22 @@ const AssetsList: FC = () => {
     [hasMore, loadMore, tokens]
   );
 
+  // A little hack to avoid using `manageModeEnabled` dependency
+  const manageModeEnabledRef = useRef<boolean>();
+  if (manageModeEnabledRef.current !== manageModeEnabled) {
+    manageModeEnabledRef.current = manageModeEnabled;
+  }
+
   useEffect(() => {
-    if (setDefaultTokenRef.current && tokens.length > 0 && !manageModeEnabled) {
+    if (
+      setDefaultTokenRef.current &&
+      tokens.length > 0 &&
+      !manageModeEnabledRef.current
+    ) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
       setDefaultTokenRef.current = false;
     }
-  }, [manageModeEnabled, setTokenSlug, tokens]);
+  }, [setTokenSlug, tokens]);
 
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
@@ -107,10 +118,7 @@ const AssetsList: FC = () => {
           await repo.accountTokens.put(
             {
               ...asset,
-              balanceUSD:
-                asset.balanceUSD !== undefined && asset.balanceUSD >= 0
-                  ? -1
-                  : 0,
+              disabled: 1 - asset.disabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -119,7 +127,7 @@ const AssetsList: FC = () => {
         }
       } else {
         setTokenSlug([asset.tokenSlug, "replace"]);
-        setSearchValue(null);
+        // setSearchValue(null);
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
@@ -184,7 +192,7 @@ const AssetsList: FC = () => {
                 : null
             }
             asset={asset as AccountAsset}
-            isActive={tokenSlug === asset.tokenSlug}
+            isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
             onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
             isManageMode={manageModeEnabled}
             className={classNames(i !== tokens.length - 1 && "mb-2")}
@@ -208,9 +216,15 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
-
-    const isEnabled = balanceUSD !== undefined && balanceUSD >= 0;
+    const {
+      logoUrl,
+      name,
+      symbol,
+      rawBalance,
+      decimals,
+      balanceUSD,
+      disabled,
+    } = asset;
 
     return (
       <button
@@ -227,25 +241,16 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "transition",
           !isActive && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
-          !isEnabled && "opacity-60",
+          disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
       >
-        <span
-          className={classNames(
-            "block",
-            "w-11 h-11 min-w-[2.75rem] mr-3",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </span>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-11 h-11 min-w-[2.75rem] mr-3"
+        />
         <span className="flex flex-col w-full">
           <span className={"text-sm font-bold leading-4"}>
             <TReplace msg={name} />
@@ -278,14 +283,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                   "bg-brand-main/20",
                   "rounded",
                   "flex items-center justify-center",
-                  isEnabled && "border border-brand-main"
+                  !disabled && "border border-brand-main"
                 )}
-                checked={isEnabled}
+                checked={!disabled}
                 asChild
               >
                 <span>
                   <Checkbox.Indicator>
-                    {isEnabled && <CheckIcon />}
+                    {!disabled && <CheckIcon />}
                   </Checkbox.Indicator>
                 </span>
               </Checkbox.Root>
@@ -317,19 +322,11 @@ const AssetInfo: FC = () => {
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <div
-          className={classNames(
-            "w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
+        />
         <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
             <h2

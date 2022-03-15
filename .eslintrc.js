@@ -31,6 +31,7 @@ module.exports = {
     "react/display-name": "off",
     "react/react-in-jsx-scope": "off",
     "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/anchor-has-content": "off",
   },
   settings: {
     react: {

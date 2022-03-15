@@ -71,14 +71,15 @@ async function fakeAccountTokens(accountAddress: string) {
       token.raw_amount_hex_str
     ).toString();
 
+    const disabled = rawBalance === "0" ? 1 : 0;
+
     const balanceUSD =
-      rawBalance !== "0"
-        ? token.price &&
-          +new BigNumber(rawBalance)
+      !disabled && token.price
+        ? +new BigNumber(rawBalance)
             .div(10 ** token.decimals)
             .times(token.price)
             .toFormat(2, BigNumber.ROUND_DOWN)
-        : -1;
+        : 0;
 
     accTokens.push({
       chainId,
@@ -92,6 +93,7 @@ async function fakeAccountTokens(accountAddress: string) {
       rawBalance,
       balanceUSD,
       priceUSD: token.price,
+      disabled,
     });
 
     dbKeys.push([chainId, accountAddress, tokenSlug].join("_"));

@@ -55,42 +55,20 @@ const Security: FC = () => {
         <RevealIcon className="pr-3" />
         Reveal
       </button>
-      <div className="mt-3">
-        <label
-          className={classNames(
-            "ml-4 mb-2",
-            "text-base font-normal",
-            "text-brand-gray"
-          )}
-          htmlFor="Sync"
-        >
-          Sync data using third-party explorers
-        </label>
-        <Switcher
-          label="Sync"
-          toggle={syncData}
-          setToggle={onSyncToggle}
-          className={classNames("mt-3 px-3")}
-        ></Switcher>
-      </div>
-      <div className="mt-3 ">
-        <label
-          className={classNames(
-            "ml-4 mb-2",
-            "text-base font-normal",
-            "text-brand-gray"
-          )}
-          htmlFor="Use"
-        >
-          Use Phishing Detection
-        </label>
-        <Switcher
-          label="Use"
-          toggle={phishing}
-          setToggle={onPhishingToggle}
-          className={classNames("mt-3 px-3")}
-        ></Switcher>
-      </div>
+      <Switcher
+        text={syncData ? "Synced" : "Not synced"}
+        label="Sync data using third-party explorers"
+        checked={syncData}
+        onCheckedChange={onSyncToggle}
+        className={classNames("mt-3")}
+      ></Switcher>
+      <Switcher
+        text={phishing ? "Enabled" : "Disabled"}
+        checked={phishing}
+        label="Use Phishing Detection"
+        onCheckedChange={onPhishingToggle}
+        className={classNames("mt-3")}
+      ></Switcher>
       <SeedPhraseModal
         open={passwordConfirm}
         showPhrase={showPhrase}
