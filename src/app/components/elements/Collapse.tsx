@@ -2,7 +2,7 @@ import { FC, ReactNode, useState } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import classNames from "clsx";
 
-import { ReactComponent as CollapseIcon } from "app/icons/Collapse.svg";
+import { ReactComponent as CollapseIcon } from "app/icons/collapse.svg";
 
 type CollapseProps = Collapsible.CollapsibleProps & {
   label: ReactNode | string;
@@ -32,10 +32,7 @@ const Collapse: FC<CollapseProps> = ({
         )}
       >
         <CollapseIcon
-          className={classNames(
-            "transform duration-300 transition ease-in-out",
-            open && "rotate-[-180deg]"
-          )}
+          className={classNames("transition-transform", open && "rotate-90")}
         />
         <span className={"text-2xl font-bold capitalize ml-3"}>{label}</span>
       </Collapsible.Trigger>
