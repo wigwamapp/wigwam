@@ -1,4 +1,6 @@
 import { memo, Suspense, useRef } from "react";
+import { useAtomValue } from "jotai/utils";
+import classNames from "clsx";
 
 import { AddAccountStep } from "app/defaults";
 import { addAccountStepAtom } from "app/atoms";
@@ -28,13 +30,18 @@ const STEPS: AllSteps<AddAccountStep> = [
 ];
 
 const AddAccountSteps = memo(() => {
+  const accountStep = useAtomValue(addAccountStepAtom);
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={rootRef} className="overflow-y-scroll h-full">
       <StepsProvider rootRef={rootRef} atom={addAccountStepAtom} steps={STEPS}>
         {({ children }) => (
-          <div className="mb-24">
+          <div
+            className={classNames(
+              accountStep === AddAccountStep.ChooseWay ? "mb-16" : "mb-24"
+            )}
+          >
             <Suspense fallback={null}>
               <div className="mt-24">{children}</div>
             </Suspense>
