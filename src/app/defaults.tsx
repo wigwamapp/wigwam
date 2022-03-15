@@ -2,7 +2,6 @@ import Fuse from "fuse.js";
 import { Font } from "lib/web-fonts";
 
 import { Account, Network } from "core/types";
-import { AssetTempType } from "app/temp-data/assets";
 
 export enum Page {
   Default = "default",
