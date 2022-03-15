@@ -114,9 +114,9 @@ const syncAccountTokens = mem(
       await repo.accountTokens.bulkPut(accTokens, dbKeys);
     } catch (err) {
       console.error(err);
+    } finally {
+      synced(chainId);
     }
-
-    synced(chainId);
   },
   {
     cacheKey: (args) => args.join("_"),
