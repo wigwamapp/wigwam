@@ -158,6 +158,7 @@ function getMyRandomAddress(accountAddress: string) {
     "0xdb9d281c3d29baa9587f5dac99dd982156913913",
     "0x108a8b7200d044bbbe95bef6f671baec5473e05f",
     "0x0b5a91adc9a867501fd814cea2caba28f9770b63",
+    "0xab5801a7d398351b8be11c439e05c5b3259aec9b",
   ];
   const randomIndex = Math.floor(Math.random() * addresses.length);
   const randomAddress = addresses[randomIndex];
