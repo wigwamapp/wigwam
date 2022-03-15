@@ -47,6 +47,7 @@ export enum AddAccountStep {
 
 export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   includeScore: true,
+  threshold: 0.4,
   keys: [
     {
       name: "name",
@@ -75,7 +76,8 @@ export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
 
 export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
   includeScore: true,
-  shouldSort: false,
+  shouldSort: true,
+  threshold: 0.45,
   keys: [
     {
       name: "name",
@@ -83,27 +85,6 @@ export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
     },
     "address",
     // "source", TODO: More flexible source as GMAIL, TWITTER, etc.
-  ],
-};
-
-export const ASSETS_SEARCH_OPTIONS: Fuse.IFuseOptions<AssetTempType> = {
-  includeScore: true,
-  shouldSort: false,
-  keys: [
-    {
-      name: "name",
-      weight: 3,
-    },
-    {
-      name: "symbol",
-      weight: 3,
-    },
-    {
-      name: "address",
-      weight: 2,
-    },
-    "balance",
-    "dollars",
   ],
 };
 
