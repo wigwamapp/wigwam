@@ -46,7 +46,7 @@ export enum AddAccountStep {
 
 export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   includeScore: true,
-  threshold: 0.4,
+  threshold: 0.3,
   keys: [
     {
       name: "name",
@@ -57,10 +57,6 @@ export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
       weight: 3,
     },
     {
-      name: "chainId",
-      weight: 3,
-    },
-    {
       name: "nativeCurrency.name",
       weight: 2,
     },
@@ -68,8 +64,6 @@ export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
       name: "nativeCurrency.symbol",
       weight: 2,
     },
-    "rpcUrls.value",
-    "type",
   ],
 };
 
