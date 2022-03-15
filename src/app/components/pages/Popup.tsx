@@ -42,8 +42,8 @@ const Popup: FC = () => (
     <PreloadUnlocked>
       <NetworkSelect
         className="max-w-auto"
-        currentItemClassName="!px-3 !py-1.5"
-        currentItemIconClassName="w-8 h-8 !mr-3"
+        currentItemClassName="pr-3 pl-3.5 !py-1.5"
+        currentItemIconClassName="w-8 h-8 !mr-3.5"
         contentClassName="!min-w-[22.25rem]"
       />
       <AccountSelect className="mt-2" />
@@ -79,17 +79,14 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
   }
 
   return (
-    <button
-      type="button"
+    <div
       className={classNames(
         "flex items-center",
         "w-full",
-        "min-h-8 py-2 px-3 pr-4",
+        "min-h-8 py-1 px-3 pr-2",
         "text-xs leading-none",
-        "bg-brand-main/5",
+        "border border-brand-main/[.07]",
         "rounded-[.625rem]",
-        state !== "default" &&
-          "cursor-pointer hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
         className
       )}
     >
@@ -125,11 +122,14 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
         </span>
       )}
       {state !== "default" && (
-        <span className="ml-auto">
+        <button
+          type="button"
+          className="leading-[.875rem] px-2 py-1 ml-auto transition-opacity hover:opacity-70"
+        >
           {state === "connectible" ? "Connect" : "Disconnect"}
-        </span>
+        </button>
       )}
-    </button>
+    </div>
   );
 };
 
@@ -200,7 +200,7 @@ const AssetsList: FC = () => {
           }}
           theme="tertiary"
           className={classNames(
-            "ml-2",
+            "ml-2 mr-2",
             manageModeEnabled && "bg-brand-main/30"
           )}
           aria-label={
