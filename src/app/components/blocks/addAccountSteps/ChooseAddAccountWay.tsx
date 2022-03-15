@@ -22,7 +22,7 @@ const ChooseAddAccountWay = memo(() => {
   );
 
   return (
-    <div className="mb-8 w-full max-w-[59rem] mx-auto flex flex-wrap">
+    <div className="w-full max-w-[59rem] mx-auto flex flex-wrap">
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
 
       <TippySingletonProvider>
