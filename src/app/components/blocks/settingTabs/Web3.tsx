@@ -13,8 +13,8 @@ const Web3: FC = () => {
       scrollBarClassName="py-0 pb-20"
     >
       <Switcher
-        label="Use Metamask Compatible Mode"
-        text={metamaskMode ? "Using" : "Turned off"}
+        label="Metamask Compatible Mode"
+        text={metamaskMode ? "Enabled" : "Disabled"}
         checked={metamaskMode}
         onCheckedChange={() => setMetamaskMode(!metamaskMode)}
       />
