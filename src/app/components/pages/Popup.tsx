@@ -3,6 +3,7 @@ import {
   forwardRef,
   HTMLAttributes,
   useCallback,
+  memo,
   useRef,
   useState,
 } from "react";
@@ -10,6 +11,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import { dequal } from "dequal/lite";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
@@ -268,137 +270,144 @@ type AssetCardProps = {
   className?: string;
 };
 
-const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  ({ asset, isManageMode = false, className }, ref) => {
-    const currentAccount = useAtomValue(currentAccountAtom);
+const AssetCard = memo(
+  forwardRef<HTMLButtonElement, AssetCardProps>(
+    ({ asset, isManageMode = false, className }, ref) => {
+      const currentAccount = useAtomValue(currentAccountAtom);
 
-    const [popoverOpened, setPopoverOpened] = useState(false);
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
-      asset;
+      const [popoverOpened, setPopoverOpened] = useState(false);
+      const {
+        logoUrl,
+        name,
+        symbol,
+        rawBalance,
+        decimals,
+        balanceUSD,
+        status,
+      } = asset;
 
-    const nativeAsset = status === TokenStatus.Native;
-    const disabled = status === TokenStatus.Disabled;
+      const nativeAsset = status === TokenStatus.Native;
+      const disabled = status === TokenStatus.Disabled;
 
-    const openLink = useCallback(
-      (page: Page) => {
-        openInTab({ page: page, token: asset.tokenSlug });
-      },
-      [asset.tokenSlug]
-    );
+      const openLink = useCallback(
+        (page: Page) => {
+          openInTab({ page: page, token: asset.tokenSlug });
+        },
+        [asset.tokenSlug]
+      );
 
-    const handleAssetClick = useCallback(async () => {
-      if (isManageMode) {
-        if (asset.status === TokenStatus.Native) return;
+      const handleAssetClick = useCallback(async () => {
+        if (isManageMode) {
+          if (asset.status === TokenStatus.Native) return;
 
-        try {
-          await repo.accountTokens.put(
-            {
-              ...asset,
-              status:
-                asset.status === TokenStatus.Enabled
-                  ? TokenStatus.Disabled
-                  : TokenStatus.Enabled,
-            },
-            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
-          );
-        } catch (e) {
-          console.error(e);
+          try {
+            await repo.accountTokens.put(
+              {
+                ...asset,
+                status:
+                  asset.status === TokenStatus.Enabled
+                    ? TokenStatus.Disabled
+                    : TokenStatus.Enabled,
+              },
+              [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+            );
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          if (!popoverOpened) {
+            setPopoverOpened(true);
+          }
         }
-      } else {
-        if (!popoverOpened) {
-          setPopoverOpened(true);
-        }
-      }
-    }, [asset, currentAccount.address, isManageMode, popoverOpened]);
+      }, [asset, currentAccount.address, isManageMode, popoverOpened]);
 
-    const content = (
-      <button
-        ref={ref}
-        type="button"
-        onClick={handleAssetClick}
-        className={classNames(
-          "relative",
-          "flex items-stretch",
-          "w-full p-2",
-          "text-left",
-          "rounded-[.625rem]",
-          "cursor-default",
-          "group",
-          "transition",
-          isManageMode &&
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
-          disabled && "opacity-60",
-          "hover:opacity-100",
-          className
-        )}
-        disabled={isManageMode && nativeAsset}
-      >
-        <Avatar
-          src={logoUrl}
-          alt={name}
-          className="w-11 h-11 min-w-[2.75rem] mr-3"
-        />
-        <span className="flex flex-col w-full">
-          <span className="text-sm font-bold leading-5">{name}</span>
-          <span className="mt-auto flex justify-between items-end">
-            <PrettyAmount
-              amount={rawBalance ?? 0}
-              decimals={decimals}
-              currency={symbol}
-              className="text-sm font-bold leading-5"
-              copiable={!isManageMode}
-            />
-            {!isManageMode && (
+      const content = (
+        <button
+          ref={ref}
+          type="button"
+          onClick={handleAssetClick}
+          className={classNames(
+            "relative",
+            "flex items-stretch",
+            "w-full p-2",
+            "text-left",
+            "rounded-[.625rem]",
+            "cursor-default",
+            "group",
+            "transition",
+            isManageMode &&
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
+            disabled && "opacity-60",
+            "hover:opacity-100",
+            className
+          )}
+          disabled={isManageMode && nativeAsset}
+        >
+          <Avatar
+            src={logoUrl}
+            alt={name}
+            className="w-11 h-11 min-w-[2.75rem] mr-3"
+          />
+          <span className="flex flex-col w-full">
+            <span className="text-sm font-bold leading-5">{name}</span>
+            <span className="mt-auto flex justify-between items-end">
               <PrettyAmount
-                amount={balanceUSD ?? 0}
-                currency="$"
+                amount={rawBalance ?? 0}
+                decimals={decimals}
+                currency={symbol}
+                className="text-sm font-bold leading-5"
+                copiable={!isManageMode}
+              />
+              {!isManageMode && (
+                <PrettyAmount
+                  amount={balanceUSD ?? 0}
+                  currency="$"
+                  className={classNames(
+                    "ml-2",
+                    "text-xs leading-4",
+                    "text-brand-inactivedark",
+                    "transition-colors"
+                    // "group-hover:text-brand-light group-focus-visible:text-brand-light"
+                  )}
+                  copiable
+                />
+              )}
+            </span>
+          </span>
+          {!isManageMode ? (
+            <DropdownMenu.Trigger asChild>
+              <IconedButton
+                Icon={PopoverIcon}
+                theme="tertiary"
                 className={classNames(
                   "ml-2",
-                  "text-xs leading-4",
-                  "text-brand-inactivedark",
-                  "transition-colors"
-                  // "group-hover:text-brand-light group-focus-visible:text-brand-light"
+                  popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
                 )}
-                copiable
+                tabIndex={-1}
               />
-            )}
-          </span>
-        </span>
-        {!isManageMode ? (
-          <DropdownMenu.Trigger asChild>
-            <IconedButton
-              Icon={PopoverIcon}
-              theme="tertiary"
+            </DropdownMenu.Trigger>
+          ) : !nativeAsset ? (
+            <Checkbox.Root
               className={classNames(
-                "ml-2",
-                popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
+                "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
+                "bg-brand-main/20",
+                "rounded",
+                "flex items-center justify-center",
+                !disabled && "border border-brand-main"
               )}
-              tabIndex={-1}
-            />
-          </DropdownMenu.Trigger>
-        ) : !nativeAsset ? (
-          <Checkbox.Root
-            className={classNames(
-              "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
-              "bg-brand-main/20",
-              "rounded",
-              "flex items-center justify-center",
-              !disabled && "border border-brand-main"
-            )}
-            checked={!disabled}
-            asChild
-          >
-            <span>
-              <Checkbox.Indicator>
-                {!disabled && <CheckIcon />}
-              </Checkbox.Indicator>
-            </span>
-          </Checkbox.Root>
-        ) : null}
-      </button>
-    );
+              checked={!disabled}
+              asChild
+            >
+              <span>
+                <Checkbox.Indicator>
+                  {!disabled && <CheckIcon />}
+                </Checkbox.Indicator>
+              </span>
+            </Checkbox.Root>
+          ) : null}
+        </button>
+      );
 
-    if (!isManageMode) {
       return (
         <DropdownMenu.Root
           open={popoverOpened}
@@ -406,33 +415,35 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           modal
         >
           {content}
-          <DropdownMenu.Content
-            side="left"
-            align="start"
-            className={classNames(
-              "bg-brand-dark/10",
-              "backdrop-blur-[30px]",
-              "border border-brand-light/5",
-              "rounded-[.625rem]",
-              "px-1 py-2"
-            )}
-          >
-            <PopoverButton
-              Icon={SendIcon}
-              onClick={() => openLink(Page.Default)}
+
+          {!isManageMode && (
+            <DropdownMenu.Content
+              side="left"
+              align="start"
+              className={classNames(
+                "bg-brand-dark/10",
+                "backdrop-blur-[30px]",
+                "border border-brand-light/5",
+                "rounded-[.625rem]",
+                "px-1 py-2"
+              )}
             >
-              Info
-            </PopoverButton>
-            <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
-            <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
-            <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
-          </DropdownMenu.Content>
+              <PopoverButton
+                Icon={SendIcon}
+                onClick={() => openLink(Page.Default)}
+              >
+                Info
+              </PopoverButton>
+              <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
+              <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
+              <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
+            </DropdownMenu.Content>
+          )}
         </DropdownMenu.Root>
       );
     }
-
-    return content;
-  }
+  ),
+  dequal
 );
 
 type PopoverButton = HTMLAttributes<HTMLButtonElement> & {
