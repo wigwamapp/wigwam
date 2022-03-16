@@ -7,6 +7,8 @@ import { currentLocaleAtom } from "app/atoms";
 
 import CopiableTooltip from "./CopiableTooltip";
 
+BigNumber.set({ EXPONENTIAL_AT: 38 });
+
 type PrettyAmountProps = {
   amount: string | number | BigNumber;
   decimals?: number;
@@ -47,10 +49,6 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     isShownDecTooltip = true;
   }
 
-  const isWithDots = convertedAmount
-    .decimalPlaces(decSplit, BigNumber.ROUND_DOWN)
-    .gt(0);
-
   const isShownIntTooltip =
     integerPart.toString().length > (isMinified ? 3 : 6);
 
@@ -74,17 +72,17 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
 
     tooltipContent = getPrettyAmount({
       value: convertedAmount,
-      dec: 1e38,
+      dec: 38,
       locale: currentLocale,
     });
   }
 
-  if (isShownDecTooltip) {
+  if (isShownDecTooltip && !isShownIntTooltip) {
     content = getPrettyAmount({
       value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
-      withTooltip: isWithDots,
+      withTooltip: true,
     });
 
     tooltipContent = getPrettyAmount({

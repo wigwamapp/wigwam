@@ -50,7 +50,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
     return (
       <RoundedButton
         onClick={handleLock}
-        className={classNames("px-3", className)}
+        className={classNames("pl-3 pr-4", className)}
       >
         {content}
       </RoundedButton>

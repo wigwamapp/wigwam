@@ -14,8 +14,13 @@ import { TReplace } from "lib/ext/i18n/react";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
-import { AccountAsset, TokenStandard, TokenType } from "core/types";
-import { parseTokenSlug } from "core/common/tokens";
+import {
+  AccountAsset,
+  TokenStandard,
+  TokenStatus,
+  TokenType,
+} from "core/types";
+import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
@@ -35,6 +40,7 @@ import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -68,7 +74,6 @@ const AssetsList: FC = () => {
     {
       withDisabled: manageModeEnabled,
       search: searchValue ?? undefined,
-      limit: 10,
       onReset: handleAccountTokensReset,
     }
   );
@@ -114,11 +119,16 @@ const AssetsList: FC = () => {
   const handleAssetClick = useCallback(
     async (asset: AccountAsset) => {
       if (manageModeEnabled) {
+        if (asset.status === TokenStatus.Native) return;
+
         try {
           await repo.accountTokens.put(
             {
               ...asset,
-              disabled: 1 - asset.disabled,
+              status:
+                asset.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -127,7 +137,6 @@ const AssetsList: FC = () => {
         }
       } else {
         setTokenSlug([asset.tokenSlug, "replace"]);
-        // setSearchValue(null);
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
@@ -140,6 +149,14 @@ const AssetsList: FC = () => {
 
     setManageModeEnabled((mode) => !mode);
   }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.select();
+    }
+  }, []);
 
   return (
     <div
@@ -156,6 +173,7 @@ const AssetsList: FC = () => {
       />
       <div className="flex items-center">
         <SearchInput
+          ref={searchInputRef}
           searchValue={searchValue}
           toggleSearchValue={setSearchValue}
         />
@@ -177,28 +195,45 @@ const AssetsList: FC = () => {
           onClick={toggleManageMode}
         />
       </div>
-      <ScrollAreaContainer
-        ref={scrollAreaRef}
-        className="pr-5 -mr-5 mt-4"
-        viewPortClassName="pb-20 rounded-t-[.625rem]"
-        scrollBarClassName="py-0 pb-20"
-      >
-        {tokens.map((asset, i) => (
-          <AssetCard
-            key={asset.tokenSlug}
-            ref={
-              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                ? loadMoreTriggerAssetRef
-                : null
-            }
-            asset={asset as AccountAsset}
-            isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
-            onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
-            isManageMode={manageModeEnabled}
-            className={classNames(i !== tokens.length - 1 && "mb-2")}
-          />
-        ))}
-      </ScrollAreaContainer>
+      {tokens.length <= 0 && searchValue ? (
+        <button
+          type="button"
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
+          )}
+          onClick={focusSearchInput}
+        >
+          <NoResultsFoundIcon className="mb-4" />
+          Can&apos;t find a token?
+          <br />
+          Put an address into the search line to find it.
+        </button>
+      ) : (
+        <ScrollAreaContainer
+          ref={scrollAreaRef}
+          className="pr-5 -mr-5 mt-4"
+          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-20"
+        >
+          {tokens.map((asset, i) => (
+            <AssetCard
+              key={createAccountTokenKey(asset)}
+              ref={
+                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
+              asset={asset as AccountAsset}
+              isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
+              onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
+              isManageMode={manageModeEnabled}
+              className={classNames(i !== tokens.length - 1 && "mb-2")}
+            />
+          ))}
+        </ScrollAreaContainer>
+      )}
     </div>
   );
 };
@@ -216,15 +251,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const {
-      logoUrl,
-      name,
-      symbol,
-      rawBalance,
-      decimals,
-      balanceUSD,
-      disabled,
-    } = asset;
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
+      asset;
+    const nativeAsset = status === TokenStatus.Native;
+    const disabled = status === TokenStatus.Disabled;
+    const hoverable = isManageMode ? !nativeAsset : !isActive;
 
     return (
       <button
@@ -239,12 +270,13 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "rounded-[.625rem]",
           "group",
           "transition",
-          !isActive && "hover:bg-brand-main/10",
+          hoverable && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
           disabled && "opacity-60",
           "hover:opacity-100",
           className
         )}
+        disabled={isManageMode && nativeAsset}
       >
         <Avatar
           src={logoUrl}
@@ -275,7 +307,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
                 )}
               />
             )}
-            {isManageMode && (
+            {isManageMode && !nativeAsset && (
               <Checkbox.Root
                 className={classNames(
                   "absolute top-1/2 right-5 -translate-y-1/2",
@@ -416,19 +448,20 @@ enum TokenStandardValue {
 
 type TagProps = { standard: TokenStandard };
 
-const Tag: FC<TagProps> = ({ standard }) => (
-  <span
-    className={classNames(
-      "py-2 px-4 mr-4",
-      "text-base font-bold leading-none",
-      "border border-brand-main/20",
-      "rounded-[.625rem]",
-      "whitespace-nowrap"
-    )}
-  >
-    {TokenStandardValue[standard]}
-  </span>
-);
+const Tag: FC<TagProps> = ({ standard }) =>
+  standard !== TokenStandard.Native ? (
+    <span
+      className={classNames(
+        "py-2 px-4 mr-4",
+        "text-base font-bold leading-none",
+        "border border-brand-main/20",
+        "rounded-[.625rem]",
+        "whitespace-nowrap"
+      )}
+    >
+      {TokenStandardValue[standard]}
+    </span>
+  ) : null;
 
 type PriceChangeProps = {
   priceChange: string;
