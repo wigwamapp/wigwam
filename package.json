@@ -14,7 +14,7 @@
     "ts": "tsc --pretty",
     "generate-types": "typechain --target=ethers-v5 --out-dir src/abi-types src/abi/*.json > /dev/null 2>&1",
     "postinstall": "husky install; yarn generate-types",
-    "npm-audit": "npx synp --source-file yarn.lock && npm audit --production; rm package-lock.json",
+    "npm-audit": "npx synp --source-file yarn.lock && npm audit; rm package-lock.json",
     "check-updates": "npx npm-check-updates"
   },
   "dependencies": {

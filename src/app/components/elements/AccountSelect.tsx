@@ -66,7 +66,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       setItem={(account) => setAccountAddress(account.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
-      currentItemClassName={classNames("!px-3", className)}
+      currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
       contentClassName="!min-w-[22.25rem]"
     />
   );
@@ -88,8 +88,8 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         source="dicebear"
         type="personas"
         className={classNames(
-          "h-8 w-8 min-w-[2rem]",
-          "mr-3",
+          "h-10 w-10 min-w-[2.5rem]",
+          "mr-1",
           "bg-black/20",
           "rounded-[.625rem]"
         )}

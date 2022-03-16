@@ -7,6 +7,8 @@ import {
   AddAccountParams,
   SeedPharse,
   Account,
+  Sync,
+  SyncStatus,
 } from "core/types";
 
 import { porter } from "./base";
@@ -185,4 +187,27 @@ export async function getNeuterExtendedKey() {
   assert(res?.type === type);
 
   return res.extendedKey;
+}
+
+export async function getSyncStatus() {
+  const type = MessageType.GetSyncStatus;
+
+  const res = await porter.request({ type });
+  assert(res?.type === type);
+
+  return res.status;
+}
+
+export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
+  return porter.onOneWayMessage<EventMessage>((msg) => {
+    if (msg?.type === MessageType.SyncStatusUpdated) {
+      callback(msg.status);
+    }
+  });
+}
+
+export function sync(chainId: number, accountUuid: string) {
+  const msg: Sync = { type: MessageType.Sync, chainId, accountUuid };
+
+  porter.sendOneWayMessage(msg);
 }

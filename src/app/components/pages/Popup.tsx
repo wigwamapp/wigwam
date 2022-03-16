@@ -11,7 +11,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { AccountAsset, TokenType } from "core/types";
+import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
 
 import { LOAD_MORE_ON_ASSET_FROM_END, Page } from "app/defaults";
@@ -35,14 +35,16 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import { createAccountTokenKey } from "core/common/tokens";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const Popup: FC = () => (
   <PopupLayout>
     <PreloadUnlocked>
       <NetworkSelect
         className="max-w-auto"
-        currentItemClassName="!px-3 !py-1.5"
-        currentItemIconClassName="w-8 h-8 !mr-3"
+        currentItemClassName="pr-3 pl-3.5 !py-1.5"
+        currentItemIconClassName="w-8 h-8 !mr-3.5"
         contentClassName="!min-w-[22.25rem]"
       />
       <AccountSelect className="mt-2" />
@@ -78,17 +80,14 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
   }
 
   return (
-    <button
-      type="button"
+    <div
       className={classNames(
         "flex items-center",
         "w-full",
-        "min-h-8 py-2 px-3 pr-4",
+        "min-h-8 py-1 px-3 pr-2",
         "text-xs leading-none",
-        "bg-brand-main/5",
+        "border border-brand-main/[.07]",
         "rounded-[.625rem]",
-        state !== "default" &&
-          "cursor-pointer hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
         className
       )}
     >
@@ -124,11 +123,14 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
         </span>
       )}
       {state !== "default" && (
-        <span className="ml-auto">
+        <button
+          type="button"
+          className="leading-[.875rem] px-2 py-1 ml-auto transition-opacity hover:opacity-70"
+        >
           {state === "connectible" ? "Connect" : "Disconnect"}
-        </span>
+        </button>
       )}
-    </button>
+    </div>
   );
 };
 
@@ -144,7 +146,6 @@ const AssetsList: FC = () => {
     {
       withDisabled: manageModeEnabled,
       search: searchValue ?? undefined,
-      limit: 10,
     }
   );
 
@@ -169,6 +170,14 @@ const AssetsList: FC = () => {
     [hasMore, loadMore, tokens]
   );
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.select();
+    }
+  }, []);
+
   return (
     <>
       <div className="flex items-center mt-5">
@@ -185,6 +194,7 @@ const AssetsList: FC = () => {
           </span>
         </Tooltip>
         <SearchInput
+          ref={searchInputRef}
           searchValue={searchValue}
           toggleSearchValue={setSearchValue}
           className="ml-2"
@@ -200,7 +210,7 @@ const AssetsList: FC = () => {
           }}
           theme="tertiary"
           className={classNames(
-            "ml-2",
+            "ml-2 mr-2",
             manageModeEnabled && "bg-brand-main/30"
           )}
           aria-label={
@@ -211,26 +221,43 @@ const AssetsList: FC = () => {
           onClick={() => setManageModeEnabled(!manageModeEnabled)}
         />
       </div>
-      <ScrollAreaContainer
-        className="pr-3.5 -mr-3.5 mt-2"
-        viewPortClassName="pb-16 rounded-t-[.625rem]"
-        scrollBarClassName="py-0 pb-16"
-        hiddenScrollbar="horizontal"
-      >
-        {tokens.map((asset, i) => (
-          <AssetCard
-            key={asset.tokenSlug}
-            ref={
-              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                ? loadMoreTriggerAssetRef
-                : null
-            }
-            asset={asset as AccountAsset}
-            isManageMode={manageModeEnabled}
-            className={classNames(i !== tokens.length - 1 && "mb-1")}
-          />
-        ))}
-      </ScrollAreaContainer>
+      {tokens.length <= 0 && searchValue ? (
+        <button
+          type="button"
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
+          )}
+          onClick={focusSearchInput}
+        >
+          <NoResultsFoundIcon className="mb-4" />
+          Can&apos;t find a token?
+          <br />
+          Put an address into the search line to find it.
+        </button>
+      ) : (
+        <ScrollAreaContainer
+          className="pr-3.5 -mr-3.5 mt-2"
+          viewPortClassName="pb-16 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-16"
+          hiddenScrollbar="horizontal"
+        >
+          {tokens.map((asset, i) => (
+            <AssetCard
+              key={createAccountTokenKey(asset)}
+              ref={
+                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
+              asset={asset as AccountAsset}
+              isManageMode={manageModeEnabled}
+              className={classNames(i !== tokens.length - 1 && "mb-1")}
+            />
+          ))}
+        </ScrollAreaContainer>
+      )}
     </>
   );
 };
@@ -246,15 +273,11 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     const currentAccount = useAtomValue(currentAccountAtom);
 
     const [popoverOpened, setPopoverOpened] = useState(false);
-    const {
-      logoUrl,
-      name,
-      symbol,
-      rawBalance,
-      decimals,
-      balanceUSD,
-      disabled,
-    } = asset;
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
+      asset;
+
+    const nativeAsset = status === TokenStatus.Native;
+    const disabled = status === TokenStatus.Disabled;
 
     const openLink = useCallback(
       (page: Page) => {
@@ -265,11 +288,16 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 
     const handleAssetClick = useCallback(async () => {
       if (isManageMode) {
+        if (asset.status === TokenStatus.Native) return;
+
         try {
           await repo.accountTokens.put(
             {
               ...asset,
-              disabled: 1 - asset.disabled,
+              status:
+                asset.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
             },
             [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
           );
@@ -303,6 +331,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           "hover:opacity-100",
           className
         )}
+        disabled={isManageMode && nativeAsset}
       >
         <Avatar
           src={logoUrl}
@@ -347,7 +376,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               tabIndex={-1}
             />
           </DropdownMenu.Trigger>
-        ) : (
+        ) : !nativeAsset ? (
           <Checkbox.Root
             className={classNames(
               "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
@@ -365,7 +394,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               </Checkbox.Indicator>
             </span>
           </Checkbox.Root>
-        )}
+        ) : null}
       </button>
     );
 

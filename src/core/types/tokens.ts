@@ -4,10 +4,17 @@ export enum TokenType {
 }
 
 export enum TokenStandard {
+  Native = "NATIVE",
   ERC20 = "ERC20",
   ERC721 = "ERC721",
   ERC777 = "ERC777",
   ERC1155 = "ERC1155",
+}
+
+export enum TokenStatus {
+  Disabled,
+  Enabled,
+  Native,
 }
 
 export type AccountToken = AccountAsset | AccountNFT;
@@ -19,7 +26,7 @@ export type Token = Asset | NFT;
 
 type AccountTokenFields = {
   accountAddress: string;
-  disabled: number;
+  status: TokenStatus;
   rawBalance?: string;
   balanceUSD?: number;
 };

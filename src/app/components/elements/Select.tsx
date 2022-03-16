@@ -96,9 +96,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
           )}
           {currentItem.value}
           <ChevronDownIcon
-            className={classNames("ml-auto", "transition-transform", {
-              "rotate-180": opened,
-            })}
+            className={classNames(
+              "min-w-[1.5rem]",
+              "ml-auto",
+              "transition-transform",
+              {
+                "rotate-180": opened,
+              }
+            )}
           />
         </DropdownMenu.Trigger>
         <DropdownMenu.Content

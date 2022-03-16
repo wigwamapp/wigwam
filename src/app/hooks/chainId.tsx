@@ -1,7 +1,8 @@
 import { FC, createContext, useContext } from "react";
 import { useAtomValue } from "jotai";
 
-import { chainIdAtom } from "app/atoms";
+import { chainIdAtom, syncStatusAtom } from "app/atoms";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -20,3 +21,10 @@ export const ChainIdProvider: FC<{ chainId: number }> = ({
     {children}
   </ScopedChainIdContext.Provider>
 );
+
+export function useIsSyncing() {
+  const chainId = useChainId();
+  const status = useLazyAtomValue(syncStatusAtom) ?? [];
+
+  return status.includes(chainId);
+}
