@@ -108,7 +108,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
           </div>
         </div>
         <div className="flex mt-2">
-          <div className="flex justify-center w-18 min-w-[4.5rem] mr-4">
+          <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
             {currentNetwork?.explorerUrls && (
               <IconedButton
                 href={`${currentNetwork.explorerUrls}/address/${address}`}
