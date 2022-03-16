@@ -35,14 +35,10 @@ const Balance: FC<BalanceProps> = ({
     };
   }, [address, provider]);
 
-  if (!balance || !nativeCurrency) {
-    return <></>;
-  }
-
   return (
     <PrettyAmount
-      amount={ethers.utils.formatEther(balance)}
-      currency={nativeCurrency.symbol}
+      amount={balance && ethers.utils.formatEther(balance)}
+      currency={nativeCurrency?.symbol}
       copiable={copiable}
       className={className}
     />

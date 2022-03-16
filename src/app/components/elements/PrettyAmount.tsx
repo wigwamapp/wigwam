@@ -1,4 +1,5 @@
 import { FC } from "react";
+import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { followCursor } from "tippy.js";
@@ -10,7 +11,7 @@ import CopiableTooltip from "./CopiableTooltip";
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
 type PrettyAmountProps = {
-  amount: string | number | BigNumber;
+  amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;
   isMinified?: boolean;
@@ -28,10 +29,8 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
 }) => {
   const currentLocale = useAtomValue(currentLocaleAtom);
 
-  const bigNumberAmount = new BigNumber(amount);
-  if (!bigNumberAmount) {
-    return <></>;
-  }
+  const amountExist = amount !== null;
+  const bigNumberAmount = new BigNumber(amount ?? 0);
 
   const convertedAmount = bigNumberAmount.div(10 ** decimals);
   const integerPart = convertedAmount.decimalPlaces(0);
@@ -91,31 +90,31 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     });
   }
 
-  const contentNode = (
-    <AmountWithCurrency amount={tooltipContent} currency={currency} />
-  );
+  if (!amountExist) {
+    className = classNames(className, "invisible pointer-events-none");
+  }
+
+  const children = <AmountWithCurrency amount={content} currency={currency} />;
 
   if (copiable) {
     return (
       <CopiableTooltip
-        content={contentNode}
+        content={
+          <AmountWithCurrency amount={tooltipContent} currency={currency} />
+        }
         textToCopy={tooltipContent}
-        className={className}
         followCursor
         plugins={[followCursor]}
         asChild
+        className={className}
         duration={[100, 50]}
       >
-        <AmountWithCurrency amount={content} currency={currency} />
+        {children}
       </CopiableTooltip>
     );
   }
 
-  return (
-    <span className={className}>
-      <AmountWithCurrency amount={content} currency={currency} />
-    </span>
-  );
+  return <span className={className}>{children}</span>;
 };
 
 export default PrettyAmount;
