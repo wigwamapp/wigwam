@@ -1,165 +1,146 @@
-import { FC, memo, useRef, useState } from "react";
+import {
+  FC,
+  FormEventHandler,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
+import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 
 import { getSeedPhrase } from "core/client";
+
 import Switcher from "app/components/elements/Switcher";
-import SecondaryModal from "app/components/elements/SecondaryModal";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "app/components/elements/SecondaryModal";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 import Input from "app/components/elements/Input";
+import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 
 const Security: FC = () => {
-  const [passwordConfirm, setPasswordConfirm] = useState(false);
+  const [revealModalOpened, setRevealModalOpened] = useState(false);
   const [syncData, setSyncData] = useState(false);
   const [phishing, setPhishing] = useState(false);
-  const [showPhrase, setShowPhrase] = useState("");
 
-  const onRevealClickHandler = () => {
-    setPasswordConfirm(true);
-  };
-  const onPwdConfirm = async (password: string) => {
-    try {
-      const seed = await getSeedPhrase(password);
-      setShowPhrase(seed.phrase);
-    } catch (err) {
-      console.log(`error`, err);
-    }
-  };
-  const onSyncToggle = () => {
-    setSyncData(!syncData);
-  };
-  const onPhishingToggle = () => {
-    setPhishing(!phishing);
-  };
   return (
-    <div className={classNames("flex flex-col", "px-4")}>
-      <h3 className="font-bold text-lg">Reveal Seed Phrase</h3>
-      <button
+    <div className="flex flex-col items-start grow pl-4">
+      <h3 className="font-bold text-2xl leading-none mb-6">
+        Reveal Seed Phrase
+      </h3>
+      <NewButton
+        theme="secondary"
         className={classNames(
-          "mt-3",
-          "pl-3 py-[7px] w-[157px]",
-          "rounded-[.375rem]",
-          "inline-flex items-center",
-          "transition",
-          "text-brand-light text-lg font-bold",
-          "bg-brand-main bg-opacity-20",
-          "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
-          "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
-          "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none"
+          "flex !justify-start items-center",
+          "text-left",
+          "!px-3 !py-2 mr-auto"
         )}
-        onClick={onRevealClickHandler}
+        onClick={() => setRevealModalOpened(true)}
       >
-        <RevealIcon className="pr-3" />
+        <RevealIcon className="w-[1.625rem] h-auto mr-3" />
         Reveal
-      </button>
+      </NewButton>
+      <hr className="w-full my-8 border-brand-main/[.07]" />
+      <h3 className="font-bold text-2xl leading-none mb-6">Security</h3>
       <Switcher
-        text={syncData ? "Synced" : "Not synced"}
+        text={syncData ? "Syncing" : "Not syncing"}
         label="Sync data using third-party explorers"
         checked={syncData}
-        onCheckedChange={onSyncToggle}
-        className={classNames("mt-3")}
-      ></Switcher>
+        onCheckedChange={() => setSyncData(!syncData)}
+        className="min-w-[20rem]"
+      />
       <Switcher
         text={phishing ? "Enabled" : "Disabled"}
         checked={phishing}
         label="Use Phishing Detection"
-        onCheckedChange={onPhishingToggle}
-        className={classNames("mt-3")}
-      ></Switcher>
-      <SeedPhraseModal
-        open={passwordConfirm}
-        showPhrase={showPhrase}
-        onPwdConfirm={onPwdConfirm}
-        onOpenChange={() => {
-          setShowPhrase("");
-          setPasswordConfirm(false);
-        }}
+        onCheckedChange={() => setPhishing(!phishing)}
+        className="mt-3 min-w-[20rem]"
       />
+      {revealModalOpened && (
+        <SeedPhraseModal
+          open={true}
+          onOpenChange={() => setRevealModalOpened(false)}
+        />
+      )}
     </div>
   );
 };
 
-interface PasswordConfirmModalProps {
-  open: boolean;
-  showPhrase: string;
-  onPwdConfirm: (password: string) => void;
-  onOpenChange: () => void;
-}
-
-const SeedPhraseModal = memo<PasswordConfirmModalProps>(
-  ({ open, showPhrase, onPwdConfirm, onOpenChange }) => {
-    const [inputShowState, setInputShowState] = useState(false);
-    const passwordFieldRef = useRef<HTMLInputElement>(null);
-
-    const handler = () => {
-      if (passwordFieldRef.current) {
-        onPwdConfirm(passwordFieldRef.current.value);
-      }
-    };
-    const onEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.code === "Enter") {
-        handler();
-      }
-    };
-
-    // TODO: Show if password invalid
-    return (
-      <SecondaryModal
-        open={open}
-        onOpenChange={onOpenChange}
-        className="px-[5.25rem]"
-      >
-        {showPhrase !== "" ? (
-          <SeedPhraseField
-            readOnly
-            value="power of a scalable software localization platform to enter new markets"
-          />
-        ) : (
-          <>
-            <div className="w-full relative mb-3">
-              <Input
-                ref={passwordFieldRef}
-                type={inputShowState ? "text" : "password"}
-                placeholder="Type password"
-                label="Confirm your password"
-                onKeyPress={onEnter}
-                className="w-full"
-              />
-              <IconedButton
-                Icon={inputShowState ? EyeIcon : OpenedEyeIcon}
-                theme="tertiary"
-                aria-label={`${inputShowState ? "Hide" : "Show"} password`}
-                onClick={() => setInputShowState(!inputShowState)}
-                tabIndex={-1}
-                className="absolute bottom-2.5 right-3"
-              />
-            </div>
-            <button
-              className={classNames(
-                "mt-3",
-                "pl-3 py-[7px] w-[157px]",
-                "rounded-[.375rem]",
-                "inline-flex items-center",
-                "transition",
-                "text-brand-light text-lg font-bold",
-                "bg-brand-main bg-opacity-20",
-                "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
-                "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
-                "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none"
-              )}
-              onClick={handler}
-            >
-              <RevealIcon className="pr-3" />
-              Reveal
-            </button>
-          </>
-        )}
-      </SecondaryModal>
-    );
-  }
-);
-
 export default Security;
+
+const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
+  const passwordFieldRef = useRef<HTMLInputElement>(null);
+  const [inputShowState, setInputShowState] = useState(false);
+  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+  const windowFocused = useWindowFocus();
+
+  useEffect(() => {
+    if (!windowFocused && seedPhrase) {
+      onOpenChange?.(false);
+    }
+  }, [onOpenChange, seedPhrase, windowFocused]);
+
+  const handleConfirmPassword = useCallback<FormEventHandler<HTMLFormElement>>(
+    async (evt) => {
+      evt.preventDefault();
+
+      const password = passwordFieldRef.current?.value;
+      if (password) {
+        try {
+          const seed = await getSeedPhrase(password);
+          setSeedPhrase(seed.phrase);
+        } catch (err: any) {
+          alert(err?.message);
+        }
+      }
+    },
+    []
+  );
+
+  return (
+    <SecondaryModal
+      open={open}
+      onOpenChange={onOpenChange}
+      className="px-[5.25rem]"
+    >
+      <h2 className="mb-8 text-2xl font-bold">Reveal secret phrase</h2>
+      {seedPhrase ? (
+        <SeedPhraseField
+          readOnly
+          value="power of a scalable software localization platform to enter new markets"
+        />
+      ) : (
+        <form
+          className="flex flex-col items-center"
+          onSubmit={handleConfirmPassword}
+        >
+          <div className="w-[20rem] relative mb-3">
+            <Input
+              ref={passwordFieldRef}
+              type={inputShowState ? "text" : "password"}
+              placeholder="Type password"
+              label="Confirm your password"
+              className="w-full"
+            />
+            <IconedButton
+              Icon={inputShowState ? EyeIcon : OpenedEyeIcon}
+              theme="tertiary"
+              aria-label={`${inputShowState ? "Hide" : "Show"} password`}
+              onClick={() => setInputShowState(!inputShowState)}
+              className="absolute bottom-2.5 right-3"
+            />
+          </div>
+          <NewButton type="submit" className="!py-2 !min-w-[14rem]">
+            Reveal
+          </NewButton>
+        </form>
+      )}
+    </SecondaryModal>
+  );
+});
