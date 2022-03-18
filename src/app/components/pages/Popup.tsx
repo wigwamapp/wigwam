@@ -36,6 +36,7 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { createAccountTokenKey } from "core/common/tokens";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -169,6 +170,14 @@ const AssetsList: FC = () => {
     [hasMore, loadMore, tokens]
   );
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.select();
+    }
+  }, []);
+
   return (
     <>
       <div className="flex items-center mt-5">
@@ -185,6 +194,7 @@ const AssetsList: FC = () => {
           </span>
         </Tooltip>
         <SearchInput
+          ref={searchInputRef}
           searchValue={searchValue}
           toggleSearchValue={setSearchValue}
           className="ml-2"
@@ -211,26 +221,43 @@ const AssetsList: FC = () => {
           onClick={() => setManageModeEnabled(!manageModeEnabled)}
         />
       </div>
-      <ScrollAreaContainer
-        className="pr-3.5 -mr-3.5 mt-2"
-        viewPortClassName="pb-16 rounded-t-[.625rem]"
-        scrollBarClassName="py-0 pb-16"
-        hiddenScrollbar="horizontal"
-      >
-        {tokens.map((asset, i) => (
-          <AssetCard
-            key={createAccountTokenKey(asset)}
-            ref={
-              i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                ? loadMoreTriggerAssetRef
-                : null
-            }
-            asset={asset as AccountAsset}
-            isManageMode={manageModeEnabled}
-            className={classNames(i !== tokens.length - 1 && "mb-1")}
-          />
-        ))}
-      </ScrollAreaContainer>
+      {tokens.length <= 0 && searchValue ? (
+        <button
+          type="button"
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
+          )}
+          onClick={focusSearchInput}
+        >
+          <NoResultsFoundIcon className="mb-4" />
+          Can&apos;t find a token?
+          <br />
+          Put an address into the search line to find it.
+        </button>
+      ) : (
+        <ScrollAreaContainer
+          className="pr-3.5 -mr-3.5 mt-2"
+          viewPortClassName="pb-16 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-16"
+          hiddenScrollbar="horizontal"
+        >
+          {tokens.map((asset, i) => (
+            <AssetCard
+              key={createAccountTokenKey(asset)}
+              ref={
+                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
+              asset={asset as AccountAsset}
+              isManageMode={manageModeEnabled}
+              className={classNames(i !== tokens.length - 1 && "mb-1")}
+            />
+          ))}
+        </ScrollAreaContainer>
+      )}
     </>
   );
 };

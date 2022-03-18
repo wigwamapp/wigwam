@@ -10,7 +10,6 @@ interface SwitcherProps {
   onCheckedChange: (checked: boolean) => void;
   className?: string;
 }
-
 const Switcher: FC<SwitcherProps> = ({
   id = "switcher",
   label,
@@ -23,7 +22,7 @@ const Switcher: FC<SwitcherProps> = ({
     {label && (
       <label
         className={classNames(
-          "ml-4 mb-2",
+          "mx-4 mb-2",
           "text-base font-normal",
           "text-brand-gray",
           "cursor-pointer"
