@@ -15,6 +15,7 @@ import Web3 from "app/components/blocks/settingTabs/Web3";
 import Networks from "app/components/blocks/settingTabs/Networks";
 import Profile from "app/components/blocks/settingTabs/Profile";
 import About from "app/components/blocks/settingTabs/About";
+import Advanced from "app/components/blocks/settingTabs/Advanced";
 
 const settingsRoutes = (settingTab: SettingTab) => {
   return (
@@ -25,6 +26,7 @@ const settingsRoutes = (settingTab: SettingTab) => {
       .with(SettingTab.Web3, () => <Web3 />)
       .with(SettingTab.Networks, () => <Networks />)
       .with(SettingTab.About, () => <About />)
+      .with(SettingTab.Advanced, () => <Advanced />)
       // Redirect to default
       .otherwise(() => <Redirect to={{ settingTab: SettingTab.General }} />)
   );
@@ -72,9 +74,14 @@ const tabsContent: Array<{ route: SettingTab; title: string; desc: string }> = [
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
+    route: SettingTab.Advanced,
+    title: "Advanced",
+    desc: "Additional features management",
+  },
+  {
     route: SettingTab.About,
     title: "About",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "",
   },
 ];
 

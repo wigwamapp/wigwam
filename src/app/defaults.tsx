@@ -31,6 +31,7 @@ export enum SettingTab {
   Web3 = "web-3",
   Networks = "networks",
   About = "about",
+  Advanced = "advanced",
 }
 
 export enum AddAccountStep {
