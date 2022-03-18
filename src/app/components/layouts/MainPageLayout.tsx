@@ -8,26 +8,9 @@ import ActivityBar from "app/components/blocks/ActivityBar";
 
 import PreloadUnlocked from "./PreloadUnlocked";
 
-let bootAnimationDisplayed = true;
-const handleBootAnimationEnd = () => {
-  bootAnimationDisplayed = false;
-};
-
-const PageLayout: FC<{ animate?: boolean; className?: string }> = ({
-  children,
-  animate = true,
-  className,
-}) => (
+const MainPageLayout: FC = ({ children }) => (
   <PreloadUnlocked>
-    <div
-      className={classNames(
-        // (bootAnimationDisplayed || animate) && "animate-bootfadein",
-        "h-screen flex flex-col"
-      )}
-      onAnimationEnd={
-        bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
-      }
-    >
+    <div className="h-screen flex flex-col">
       <ContentContainer className="flex grow max-h-screen">
         <Sidebar />
 
@@ -35,10 +18,11 @@ const PageLayout: FC<{ animate?: boolean; className?: string }> = ({
           className={classNames(
             "w-full min-w-0 pl-6",
             "grow overflow-hidden",
-            className
+            "flex flex-col"
           )}
         >
           <Menu />
+
           {children}
         </main>
       </ContentContainer>
@@ -47,4 +31,4 @@ const PageLayout: FC<{ animate?: boolean; className?: string }> = ({
   </PreloadUnlocked>
 );
 
-export default PageLayout;
+export default MainPageLayout;

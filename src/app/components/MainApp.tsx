@@ -1,12 +1,12 @@
 import { FC } from "react";
 
 import BaseProvider from "./BaseProvider";
-import PageRouter from "./PageRouter";
+import FullScreenRouter from "./FullScreenRouter";
 import AddAccountModal from "./blocks/AddAccountModal";
 
 const MainApp: FC = () => (
   <BaseProvider>
-    <PageRouter />
+    <FullScreenRouter />
 
     <Modals />
   </BaseProvider>

@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { pageAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 

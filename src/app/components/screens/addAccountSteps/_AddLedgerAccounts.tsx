@@ -20,7 +20,7 @@ import { generatePreviewHDNodes } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 
 import { useSteps } from "app/hooks/steps";
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import AccountPreview from "app/components/elements/AccountPreview";
 import ContinueButton from "app/components/blocks/ContinueButton";
 

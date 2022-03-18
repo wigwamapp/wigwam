@@ -4,7 +4,7 @@ import ArrowCircleRightIcon from "@heroicons/react/solid/ArrowCircleRightIcon";
 import { Link } from "lib/navigation";
 import { T } from "lib/ext/react";
 
-import { WelcomeStep } from "app/defaults";
+import { WelcomeStep } from "app/nav";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 
 const Hello: FC = () => (

@@ -1,6 +1,6 @@
 import { atomWithURLHash } from "lib/atom-utils";
 
-import { Page, WelcomeStep, AddAccountStep, SettingTab } from "app/defaults";
+import { Page, WelcomeStep, AddAccountStep, SettingTab } from "app/nav";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
 

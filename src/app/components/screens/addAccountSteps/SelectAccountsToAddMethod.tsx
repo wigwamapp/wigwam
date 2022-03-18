@@ -3,7 +3,7 @@ import classNames from "clsx";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
 import Collapse from "app/components/elements/Collapse";
 import Input from "app/components/elements/Input";

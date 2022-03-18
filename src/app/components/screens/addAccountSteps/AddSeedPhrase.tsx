@@ -9,7 +9,7 @@ import { toWordlistLang, validateSeedPhrase } from "core/common";
 import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import Select from "app/components/elements/Select";

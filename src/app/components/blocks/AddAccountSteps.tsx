@@ -2,7 +2,7 @@ import { memo, Suspense, useRef } from "react";
 import { useAtomValue } from "jotai/utils";
 import classNames from "clsx";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
@@ -15,7 +15,7 @@ import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccounts
 import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
 import SetupPassword from "../screens/addAccountSteps/SetupPassword";
 
-const STEPS: AllSteps<AddAccountStep> = [
+const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
   [AddAccountStep.AddSeedPhrase, () => <AddSeedPhrase />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
@@ -35,7 +35,11 @@ const AddAccountSteps = memo(() => {
 
   return (
     <div ref={rootRef} className="overflow-y-scroll h-full">
-      <StepsProvider rootRef={rootRef} atom={addAccountStepAtom} steps={STEPS}>
+      <StepsProvider
+        rootRef={rootRef}
+        atom={addAccountStepAtom}
+        steps={ADD_ACCOUNT_STEPS}
+      >
         {({ children }) => (
           <div
             className={classNames(

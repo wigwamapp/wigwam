@@ -5,7 +5,7 @@ import { setLocale } from "lib/ext/react";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import { useSteps } from "app/hooks/steps";
-import { WelcomeStep } from "app/defaults";
+import { WelcomeStep } from "app/nav";
 import { currentLocaleAtom } from "app/atoms";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
