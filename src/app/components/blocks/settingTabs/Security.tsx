@@ -51,14 +51,14 @@ const Security: FC = () => {
         text={syncData ? "Syncing" : "Not syncing"}
         label="Sync data using third-party explorers"
         checked={syncData}
-        onCheckedChange={() => setSyncData(!syncData)}
+        onCheckedChange={setSyncData}
         className="min-w-[20rem]"
       />
       <Switcher
         text={phishing ? "Enabled" : "Disabled"}
         checked={phishing}
         label="Use Phishing Detection"
-        onCheckedChange={() => setPhishing(!phishing)}
+        onCheckedChange={setPhishing}
         className="mt-3 min-w-[20rem]"
       />
       {revealModalOpened && (

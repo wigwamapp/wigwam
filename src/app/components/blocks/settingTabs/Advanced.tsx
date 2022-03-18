@@ -7,10 +7,8 @@ import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 
 const Advanced: FC = () => {
-  const [show, updateAtom] = useAtom(testNetworksAtom);
-  const toggleTestNetworks = () => {
-    updateAtom(!show);
-  };
+  const [testnetsVisibility, toggleTestnetsVisibility] =
+    useAtom(testNetworksAtom);
 
   return (
     <ScrollAreaContainer
@@ -21,9 +19,9 @@ const Advanced: FC = () => {
       <SettingsHeader>Advanced</SettingsHeader>
       <Switcher
         label="Show/hide test networks"
-        text={show ? "Visible" : "Hidden"}
-        checked={show}
-        onCheckedChange={toggleTestNetworks}
+        text={testnetsVisibility ? "Visible" : "Hidden"}
+        checked={testnetsVisibility}
+        onCheckedChange={toggleTestnetsVisibility}
         className="min-w-[17.75rem]"
       />
     </ScrollAreaContainer>
