@@ -5,6 +5,7 @@ import classNames from "clsx";
 import Input from "app/components/elements/Input";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
+import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { Network } from "core/types";
 
 interface EditNetworkProps {
@@ -78,15 +79,18 @@ const EditNetwork = memo<EditNetworkProps>(
 
     return (
       <section className={className}>
-        <header className="flex items-center">
-          {isNew ? (
-            <PlusCircleIcon width={20} className="mr-4" />
-          ) : (
-            <EditIcon className="mr-4" />
-          )}
-          <h3 className="text-brand-light text-2xl font-bold">
-            {isNew ? "Add new network" : "Edit network"}
-          </h3>
+        <header className="flex items-center justify-between">
+          <div className="flex items-center">
+            {isNew ? (
+              <PlusCircleIcon width={24} height={24} className="mr-4" />
+            ) : (
+              <EditIcon className="mr-3" />
+            )}
+            <h3 className="text-brand-light text-2xl font-bold">
+              {isNew ? "Add new network" : "Edit network"}
+            </h3>
+          </div>
+          <DeleteIcon />
         </header>
         <form className="mt-7" onSubmit={handleSubmit}>
           <Input
