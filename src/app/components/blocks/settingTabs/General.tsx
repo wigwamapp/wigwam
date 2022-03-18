@@ -8,6 +8,7 @@ import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import { currentLocaleAtom, tokensWithoutBalanceAtom } from "app/atoms";
 import Select from "app/components/elements/Select";
 import Switcher from "app/components/elements/Switcher";
+import SettingsHeader from "app/components/elements/SettingsHeader";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 
 const General: FC = () => {
@@ -35,6 +36,7 @@ const General: FC = () => {
 
   return (
     <div className={classNames("flex flex-col", "px-4")}>
+      <SettingsHeader>General</SettingsHeader>
       <SelectLanguage
         selected={locale}
         items={DEFAULT_LOCALES}

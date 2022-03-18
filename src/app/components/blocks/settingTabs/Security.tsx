@@ -20,6 +20,7 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
+import SettingsHeader from "app/components/elements/SettingsHeader";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
@@ -31,9 +32,7 @@ const Security: FC = () => {
 
   return (
     <div className="flex flex-col items-start grow pl-4">
-      <h3 className="font-bold text-2xl leading-none mb-6">
-        Reveal Seed Phrase
-      </h3>
+      <SettingsHeader>Reveal Seed Phrase</SettingsHeader>
       <NewButton
         theme="secondary"
         className={classNames(
@@ -47,7 +46,7 @@ const Security: FC = () => {
         Reveal
       </NewButton>
       <hr className="w-full my-8 border-brand-main/[.07]" />
-      <h3 className="font-bold text-2xl leading-none mb-6">Security</h3>
+      <SettingsHeader>Security</SettingsHeader>
       <Switcher
         text={syncData ? "Syncing" : "Not syncing"}
         label="Sync data using third-party explorers"

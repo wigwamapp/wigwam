@@ -1,10 +1,10 @@
 import { FC } from "react";
-import classNames from "clsx";
 import { useAtom } from "jotai";
 
 import { testNetworksAtom } from "app/atoms";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Switcher from "app/components/elements/Switcher";
+import SettingsHeader from "app/components/elements/SettingsHeader";
 
 const Advanced: FC = () => {
   const [show, updateAtom] = useAtom(testNetworksAtom);
@@ -14,15 +14,17 @@ const Advanced: FC = () => {
 
   return (
     <ScrollAreaContainer
-      className={classNames("flex flex-col py-3 px-4")}
-      viewPortClassName="pb-20 rounded-t-[.625rem]"
+      className="flex flex-col px-4"
+      viewPortClassName="pb-20"
       scrollBarClassName="py-0 pb-20"
     >
+      <SettingsHeader>Advanced</SettingsHeader>
       <Switcher
         label="Show/hide test networks"
         text={show ? "Visible" : "Hidden"}
         checked={show}
         onCheckedChange={toggleTestNetworks}
+        className="min-w-[17.75rem]"
       />
     </ScrollAreaContainer>
   );
