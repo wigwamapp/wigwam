@@ -8,13 +8,15 @@ import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
-import { AttentionModal } from "../pages/Unlock";
+
+import { AttentionModal } from "../screens/Unlock";
 
 interface PasswordFormProps {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
   className?: string;
 }
+
 const PasswordForm = memo<PasswordFormProps>(
   ({ theme = "large", unlockCallback, className }) => {
     const passwordFieldRef = useRef<HTMLInputElement>(null);

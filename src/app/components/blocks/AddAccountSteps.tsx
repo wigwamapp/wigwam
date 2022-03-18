@@ -6,14 +6,14 @@ import { AddAccountStep } from "app/defaults";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "app/components/blocks/addAccountSteps/ChooseAddAccountWay";
-import AddSeedPhrase from "app/components/blocks/addAccountSteps/AddSeedPhrase";
-import VerifySeedPhrase from "app/components/blocks/addAccountSteps/VerifySeedPhrase";
-import SelectAccountDerivation from "app/components/blocks/addAccountSteps/SelectAccountDerivation";
-import AddPrivateKey from "app/components/blocks/addAccountSteps/AddPrivateKey";
-import SelectAccountsToAddMethod from "app/components/blocks/addAccountSteps/SelectAccountsToAddMethod";
-import VerifyAccountToAdd from "app/components/blocks/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "app/components/blocks/addAccountSteps/SetupPassword";
+import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
+import AddSeedPhrase from "../screens/addAccountSteps/AddSeedPhrase";
+import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
+import SelectAccountDerivation from "../screens/addAccountSteps/SelectAccountDerivation";
+import AddPrivateKey from "../screens/addAccountSteps/AddPrivateKey";
+import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
+import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
+import SetupPassword from "../screens/addAccountSteps/SetupPassword";
 
 const STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],

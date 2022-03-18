@@ -6,16 +6,16 @@ import { Redirect } from "lib/navigation";
 
 import { SettingTab } from "app/defaults";
 import { settingTabAtom } from "app/atoms";
-import PageLayout from "app/components/layouts/PageLayout";
 import SettingsTab from "app/components/elements/SettingsTab";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import General from "app/components/blocks/settingTabs/General";
-import Security from "app/components/blocks/settingTabs/Security";
-import Web3 from "app/components/blocks/settingTabs/Web3";
-import Networks from "app/components/blocks/settingTabs/Networks";
-import Profile from "app/components/blocks/settingTabs/Profile";
-import About from "app/components/blocks/settingTabs/About";
-import Advanced from "app/components/blocks/settingTabs/Advanced";
+
+import General from "../settingTabs/General";
+import Security from "../settingTabs/Security";
+import Web3 from "../settingTabs/Web3";
+import Networks from "../settingTabs/Networks";
+import Profile from "../settingTabs/Profile";
+import About from "../settingTabs/About";
+import Advanced from "../settingTabs/Advanced";
 
 const settingsRoutes = (settingTab: SettingTab) => {
   return (
@@ -36,14 +36,14 @@ const Settings: FC = () => {
   const settingTab = useAtomValue(settingTabAtom);
 
   return (
-    <PageLayout className="flex flex-col">
+    <>
       <div className="flex mt-5 min-h-0 grow">
         <Tabs />
         <Suspense fallback={null}>
           {useMemo(() => settingsRoutes(settingTab), [settingTab])}
         </Suspense>
       </div>
-    </PageLayout>
+    </>
   );
 };
 

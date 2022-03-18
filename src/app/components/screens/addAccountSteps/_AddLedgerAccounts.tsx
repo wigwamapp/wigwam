@@ -22,8 +22,7 @@ import { addAccounts, ClientProvider } from "core/client";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
-
-import ContinueButton from "../ContinueButton";
+import ContinueButton from "app/components/blocks/ContinueButton";
 
 const rootDerivationPath = "m/44'/60'/0'/0";
 

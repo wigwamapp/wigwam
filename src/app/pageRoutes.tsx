@@ -1,22 +1,14 @@
-import { match, when, not } from "ts-pattern";
+import { match, when, not, __ } from "ts-pattern";
 import { Redirect } from "lib/navigation";
 
 import { WalletStatus } from "core/types";
 
 import { Page } from "app/defaults";
 
-import Profiles from "./components/pages/Profiles";
-import Unlock from "./components/pages/Unlock";
-import Welcome from "./components/pages/Welcome";
-import Main from "./components/pages/Main";
-import Overview from "./components/pages/Overview";
-import Receive from "./components/pages/Receive";
-import Transfer from "./components/pages/Transfer";
-import Swap from "./components/pages/Swap";
-import Apps from "./components/pages/Apps";
-import Contacts from "./components/pages/Contacts";
-import Wallets from "./components/pages/Wallets";
-import Settings from "./components/pages/Settings";
+import Profiles from "./components/screens/Profiles";
+import Unlock from "./components/screens/Unlock";
+import Welcome from "./components/screens/Welcome";
+import Main from "./components/screens/Main";
 
 export type MatchPageParams = {
   page: Page;
@@ -49,15 +41,7 @@ export function matchPage(params: MatchPageParams) {
       .with({ walletStatus: not(WalletStatus.Unlocked) }, () => (
         <Redirect to={{ page: Page.Default }} />
       ))
-      .with({ page: Page.Default }, () => <Main />)
-      .with({ page: Page.Overview }, () => <Overview />)
-      .with({ page: Page.Receive }, () => <Receive />)
-      .with({ page: Page.Transfer }, () => <Transfer />)
-      .with({ page: Page.Swap }, () => <Swap />)
-      .with({ page: Page.Apps }, () => <Apps />)
-      .with({ page: Page.Contacts }, () => <Contacts />)
-      .with({ page: Page.Wallets }, () => <Wallets />)
-      .with({ page: Page.Settings }, () => <Settings />)
+      .with(__, () => <Main />)
       // Redirect to default
       .otherwise(() => <Redirect to={{ page: Page.Default }} />)
   );

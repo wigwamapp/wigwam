@@ -8,7 +8,6 @@ export enum Page {
   Setup = "setup",
   Profiles = "profiles",
   Unlock = "unlock",
-  Overview = "overview",
   Receive = "receive",
   Transfer = "transfer",
   Swap = "swap",

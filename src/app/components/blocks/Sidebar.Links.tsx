@@ -10,7 +10,7 @@ import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 
 export const NavLinksPrimary = [
   {
-    route: Page.Overview,
+    route: Page.Default,
     label: "Overview",
     Icon: OverviewIcon,
   },

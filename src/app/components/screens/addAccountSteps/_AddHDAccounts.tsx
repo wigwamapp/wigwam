@@ -30,8 +30,7 @@ import { hasSeedPhraseAtom, neuterExtendedKeyAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/defaults";
 import AccountPreview from "app/components/elements/AccountPreview";
-
-import ContinueButton from "../ContinueButton";
+import ContinueButton from "app/components/blocks/ContinueButton";
 
 type AddHDAccountsProps = {
   initialSetup?: boolean;

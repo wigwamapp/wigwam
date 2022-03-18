@@ -4,9 +4,9 @@ import { AllSteps, StepsProvider } from "app/hooks/steps";
 import { welcomeStepAtom } from "app/atoms";
 import { WelcomeStep } from "app/defaults";
 
-import LetsBegin from "../blocks/welcomeSteps/LetsBegin";
-import ChooseLanguage from "../blocks/welcomeSteps/ChooseLanguage";
-import Hello from "../blocks/welcomeSteps/Hello";
+import LetsBegin from "./welcomeSteps/LetsBegin";
+import ChooseLanguage from "./welcomeSteps/ChooseLanguage";
+import Hello from "./welcomeSteps/Hello";
 
 const STEPS: AllSteps<WelcomeStep> = [
   [WelcomeStep.Hello, () => <Hello />],
