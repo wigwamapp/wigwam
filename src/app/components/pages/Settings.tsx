@@ -15,7 +15,7 @@ import Web3 from "app/components/blocks/settingTabs/Web3";
 import Networks from "app/components/blocks/settingTabs/Networks";
 import Profile from "app/components/blocks/settingTabs/Profile";
 import About from "app/components/blocks/settingTabs/About";
-import Advanced from "../blocks/settingTabs/Advanced";
+import Advanced from "app/components/blocks/settingTabs/Advanced";
 
 const settingsRoutes = (settingTab: SettingTab) => {
   return (
