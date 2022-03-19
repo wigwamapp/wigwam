@@ -33,6 +33,7 @@ import Tooltip from "app/components/elements/Tooltip";
 import ControlIcon from "app/components/elements/ControlIcon";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
+import { ReactComponent as InfoIcon } from "app/icons/info-round.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
@@ -429,7 +430,7 @@ const AssetCard = memo(
               )}
             >
               <PopoverButton
-                Icon={SendIcon}
+                Icon={InfoIcon}
                 onClick={() => openLink(Page.Default)}
               >
                 Info
