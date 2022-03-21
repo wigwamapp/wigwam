@@ -6,6 +6,7 @@ import { Form, Field } from "react-final-form";
 import { updateProfile } from "lib/ext/profile";
 import { changePassword } from "core/client";
 import { profileStateAtom } from "app/atoms";
+import { replaceT, useI18NUpdate } from "lib/ext/react";
 
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
@@ -17,11 +18,14 @@ import IconedButton from "app/components/elements/IconedButton";
 
 const Profile: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
+  useI18NUpdate();
 
-  const currentProfile = useMemo(
-    () => all.find((profile) => profile.id === currentId)!,
-    [all, currentId]
-  );
+  const currentProfile = useMemo(() => {
+    const profile = all.find((profile) => profile.id === currentId)!;
+
+    profile.name = replaceT(profile.name);
+    return profile;
+  }, [all, currentId]);
   const currentName = currentProfile.name;
   const currentSeed = currentProfile.avatarSeed;
 
