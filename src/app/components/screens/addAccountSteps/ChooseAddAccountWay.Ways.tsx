@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react";
 
 import { StepsContext } from "app/hooks/steps";
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { ReactComponent as ImportIcon } from "app/icons/AddWalletImport.svg";
 import { ReactComponent as CreateIcon } from "app/icons/AddWalletCreate.svg";
 import { ReactComponent as GoogleIcon } from "app/icons/AddWalletGoogle.svg";

@@ -16,7 +16,8 @@ import { dequal } from "dequal/lite";
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
 
-import { LOAD_MORE_ON_ASSET_FROM_END, Page } from "app/defaults";
+import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { useAccountTokens } from "app/hooks/tokens";

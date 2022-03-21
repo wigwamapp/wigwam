@@ -9,7 +9,8 @@ import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
 import { ReactComponent as GithubIcon } from "app/icons/github.svg";
 import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external.svg";
-import BaseProvider from "./BaseProvider";
+
+import BaseProvider from "../BaseProvider";
 
 const SocialLinks = [
   {

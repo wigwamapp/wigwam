@@ -4,7 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";

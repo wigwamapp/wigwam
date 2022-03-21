@@ -3,18 +3,18 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 
-import { SettingTab } from "app/defaults";
+import { SettingTab } from "app/nav";
 import { settingTabAtom } from "app/atoms";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
-type SettingsTabProps = {
+type SettingsItemProps = {
   title: string;
   route: SettingTab;
   desc: string;
   className?: string;
 };
 
-const SettingsTab: FC<SettingsTabProps> = ({
+const SettingsItem: FC<SettingsItemProps> = ({
   title,
   route,
   desc,
@@ -52,4 +52,4 @@ const SettingsTab: FC<SettingsTabProps> = ({
   );
 };
 
-export default SettingsTab;
+export default SettingsItem;

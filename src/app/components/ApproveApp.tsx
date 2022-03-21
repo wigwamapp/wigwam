@@ -9,7 +9,7 @@ import { approveItem } from "core/client";
 import { walletStatusAtom, approvalsAtom } from "app/atoms";
 
 import BaseProvider from "./BaseProvider";
-import Unlock from "./pages/Unlock";
+import Unlock from "./screens/Unlock";
 import LongTextField from "./elements/LongTextField";
 
 const ApproveApp: FC = () => (

@@ -36,7 +36,7 @@ import {
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { TippySingletonProvider } from "app/hooks";
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";

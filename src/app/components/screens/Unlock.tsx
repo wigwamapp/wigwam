@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { currentProfileAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";

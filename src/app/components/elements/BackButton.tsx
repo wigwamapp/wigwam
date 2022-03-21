@@ -8,7 +8,7 @@ import classNames from "clsx";
 import { useAtom } from "jotai";
 import { getPosition, goBack } from "lib/history";
 
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { pageAtom } from "app/atoms";
 import NewButton from "app/components/elements/NewButton";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";

@@ -11,7 +11,7 @@ import {
 } from "core/types";
 import { addSeedPhrase } from "core/client";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
