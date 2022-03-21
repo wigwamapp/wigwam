@@ -8,6 +8,8 @@ export type InputProps = {
   EndAdornment?: FC<{ className?: string }>;
   theme?: "primary" | "clean";
   optional?: boolean;
+  error?: boolean;
+  errorMessage?: string;
   inputClassName?: string;
   adornmentClassName?: string;
 } & HTMLProps<HTMLInputElement>;
@@ -23,6 +25,8 @@ const Input = memo(
         EndAdornment,
         disabled,
         theme = "primary",
+        error,
+        errorMessage,
         inputClassName,
         adornmentClassName,
         optional,
@@ -101,6 +105,19 @@ const Input = memo(
               <EndAdornment
                 className={classNames(adornmentClassNames, "right-4")}
               />
+            )}
+          </div>
+          <div
+            className={classNames(
+              "max-h-0 overflow-hidden",
+              error && "max-h-6",
+              "transition-[max-height] duration-200"
+            )}
+          >
+            {error && (
+              <span className="text-brand-redone pt-2 pl-4 text-sm">
+                {errorMessage}
+              </span>
             )}
           </div>
         </div>

@@ -12,6 +12,7 @@ type ProfileGenProps = {
   profilesLength: number;
   label: string;
   editMode?: boolean;
+  seed?: string;
   profileName?: string;
   onAdd: (value: string, profileSeed: string) => void;
   className?: string;
@@ -22,6 +23,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
   label,
   profileName,
   editMode,
+  seed,
   onAdd,
   className,
 }) => {
@@ -37,10 +39,11 @@ const ProfileGen: FC<ProfileGenProps> = ({
   const [nameValue, setNameValue] = useState(defaultNameValue);
 
   useEffect(() => {
-    if (profileName && nameValue === defaultNameValue) {
+    if (profileName && nameValue === defaultNameValue && seed) {
       setNameValue(profileName);
+      setProfileSeed(seed);
     }
-  }, [profileName, nameValue, defaultNameValue]);
+  }, [profileName, nameValue, defaultNameValue, seed]);
 
   const handleNameFieldChange = useCallback(
     (evt) => {

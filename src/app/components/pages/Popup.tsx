@@ -430,10 +430,11 @@ const AssetCard = memo(
               )}
             >
               <PopoverButton
+                className="ml-0.5"
                 Icon={InfoIcon}
                 onClick={() => openLink(Page.Default)}
               >
-                Info
+                <span className="ml-1">Info</span>
               </PopoverButton>
               <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
               <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
@@ -449,9 +450,15 @@ const AssetCard = memo(
 
 type PopoverButton = HTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;
+  className?: string;
 };
 
-const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
+const PopoverButton: FC<PopoverButton> = ({
+  Icon,
+  children,
+  className = "",
+  ...rest
+}) => (
   <button
     type="button"
     className={classNames(
@@ -460,7 +467,8 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
       "rounded-[.625rem]",
       "text-sm font-bold",
       "transition-colors",
-      "hover:bg-brand-main/20 focus:bg-brand-main/20"
+      "hover:bg-brand-main/20 focus:bg-brand-main/20",
+      className
     )}
     {...rest}
   >
