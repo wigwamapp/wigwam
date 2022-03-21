@@ -38,3 +38,9 @@ export enum SettingTab {
   About = "about",
   Advanced = "advanced",
 }
+
+export enum TransferTab {
+  Asset = "asset",
+  Nft = "nft",
+  Bridge = "bridge",
+}

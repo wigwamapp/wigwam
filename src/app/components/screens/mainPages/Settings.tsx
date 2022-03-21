@@ -1,79 +1,66 @@
-import { FC, Suspense } from "react";
-import classNames from "clsx";
+import { FC, Suspense, useMemo } from "react";
+import { useAtomValue } from "jotai";
 
+import { settingTabAtom } from "app/atoms";
 import { SettingTab } from "app/nav";
-import SettingsItem from "app/components/elements/SettingsItem";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 
 import SettingsTab from "./Settings.Tab";
 
-const Settings: FC = () => (
-  <div className="flex mt-5 min-h-0 grow">
-    <Tabs />
+const Settings: FC = () => {
+  const activeTabRoute = useAtomValue(settingTabAtom);
+  const activeRoute = useMemo(
+    () =>
+      tabsContent.find(({ route }) => route.setting === activeTabRoute)?.route,
+    [activeTabRoute]
+  );
 
-    <Suspense fallback={null}>
-      <SettingsTab />
-    </Suspense>
-  </div>
-);
+  return (
+    <div className="flex mt-5 min-h-0 grow">
+      <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
+
+      <Suspense fallback={null}>
+        <SettingsTab />
+      </Suspense>
+    </div>
+  );
+};
 
 export default Settings;
 
-const Tabs: FC = () => (
-  <ScrollAreaContainer
-    className={classNames(
-      "flex flex-col",
-      "w-[calc(19.25rem+1px)] pr-6",
-      "border-r border-brand-main/[.07]"
-    )}
-    viewPortClassName="pb-20 rounded-t-[.625rem]"
-    scrollBarClassName="py-0 pb-20 !right-1"
-  >
-    {tabsContent.map(({ title, route, desc }, i) => (
-      <SettingsItem
-        key={title}
-        title={title}
-        route={route}
-        desc={desc}
-        className={classNames(i !== tabsContent.length - 1 && "mb-2")}
-      />
-    ))}
-  </ScrollAreaContainer>
-);
-
-const tabsContent: Array<{ route: SettingTab; title: string; desc: string }> = [
+const tabsContent = [
   {
-    route: SettingTab.General,
+    route: { page: "settings", setting: SettingTab.General },
     title: "General",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: SettingTab.Profile,
+    route: { page: "settings", setting: SettingTab.Profile },
     title: "Profile",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: SettingTab.Security,
+    route: { page: "settings", setting: SettingTab.Security },
     title: "Security & Privacy",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: SettingTab.Web3,
+    route: { page: "settings", setting: SettingTab.Web3 },
     title: "Web 3",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: SettingTab.Networks,
+    route: { page: "settings", setting: SettingTab.Networks },
     title: "Networks",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: SettingTab.Advanced,
+    route: { page: "settings", setting: SettingTab.Advanced },
     title: "Advanced",
     desc: "Additional features management",
   },
   {
-    route: SettingTab.About,
+    route: { page: "settings", setting: SettingTab.About },
     title: "About",
     desc: "",
   },
