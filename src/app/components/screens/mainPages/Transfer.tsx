@@ -21,9 +21,11 @@ const Transfer: FC = () => {
 
       <div className="flex mt-5 min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
-        <Suspense fallback={null}>
-          <TransferTab />
-        </Suspense>
+        <div className="ml-6 w-full max-w-[23.25rem]">
+          <Suspense fallback={null}>
+            <TransferTab />
+          </Suspense>
+        </div>
       </div>
     </>
   );

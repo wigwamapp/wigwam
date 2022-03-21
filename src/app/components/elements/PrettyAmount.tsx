@@ -90,6 +90,8 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     });
   }
 
+  className = classNames(className, "whitespace-nowrap");
+
   if (!amountExist) {
     className = classNames(className, "invisible pointer-events-none");
   }
@@ -165,9 +167,13 @@ export const getPrettyAmount = ({
   withTooltip?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
+    const isLargerThenTrillion = new BigNumber(value).gt(1e18);
+    const minFract = isLargerThenTrillion ? 0 : 2;
+    const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
+
     let finalValue = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: dec > 4 ? 3 : 2,
+      minimumFractionDigits: minFract,
+      maximumFractionDigits: maxFract,
       notation: "compact",
     } as any).format(+value);
 
@@ -175,7 +181,7 @@ export const getPrettyAmount = ({
     if (checkIfObjectsKey(finalSplitLetter)) {
       finalValue = `${new BigNumber(value)
         .div(currenciesCompacts[finalSplitLetter])
-        .decimalPlaces(dec > 4 ? 3 : 2, BigNumber.ROUND_DOWN)
+        .decimalPlaces(maxFract, BigNumber.ROUND_DOWN)
         .toString()}${finalSplitLetter}`;
     }
 

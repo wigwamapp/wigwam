@@ -1,7 +1,11 @@
 import { FC } from "react";
 
+import TokenSelect from "app/components/elements/TokenSelect";
+
 const Asset: FC = () => (
-  <h3 className="font-bold text-2xl leading-none mb-6">Transfer - Asset</h3>
+  <div className="flex flex-col">
+    <TokenSelect />
+  </div>
 );
 
 export default Asset;
