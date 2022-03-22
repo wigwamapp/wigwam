@@ -1,4 +1,4 @@
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -10,7 +10,7 @@ import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 
 export const NavLinksPrimary = [
   {
-    route: Page.Overview,
+    route: Page.Default,
     label: "Overview",
     Icon: OverviewIcon,
   },

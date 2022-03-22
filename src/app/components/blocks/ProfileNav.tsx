@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 import { TReplace } from "lib/ext/i18n/react";
 
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { profileStateAtom } from "app/atoms";
 
 const ProfileNav = memo(() => {

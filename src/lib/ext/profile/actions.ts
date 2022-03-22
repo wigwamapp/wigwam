@@ -56,3 +56,21 @@ export async function updateProfile(id: string, toUpdate: Omit<Profile, "id">) {
     all: state.all.map((p) => (p.id === id ? { ...p, ...toUpdate } : p)),
   });
 }
+
+export async function appendProfile(profile: Profile) {
+  const state = await fetchState();
+
+  await setState({
+    ...state,
+    all: [...state.all, profile],
+  });
+}
+
+export async function assertProfileNotExist(id: string) {
+  const state = await fetchState();
+
+  assert(
+    state.all.every((p) => p.id !== id),
+    "Profile already exists"
+  );
+}

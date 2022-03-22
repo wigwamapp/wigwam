@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
-import { Page } from "app/defaults";
+import { Page } from "app/nav";
 import { pageAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
@@ -18,7 +18,7 @@ const Sidebar: FC = () => (
     )}
   >
     <Link
-      to={{ page: Page.Overview }}
+      to={{ page: Page.Default }}
       className={classNames(
         "mb-5 py-5",
         "border-b border-brand-main/[.07]",
@@ -55,8 +55,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
   return (
     <div className={classNames("flex flex-col", className)}>
       {links.map(({ route, label, Icon }) => {
-        const isPageActive =
-          route === (page === Page.Default ? Page.Overview : page);
+        const isPageActive = route === page;
 
         return (
           <Link
