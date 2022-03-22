@@ -42,6 +42,7 @@ const LongTextField = memo(
               "outline-none",
               "transition-colors",
               "placeholder-brand-placeholder",
+              "resize-none",
               !disabled && [
                 "group-hover:bg-brand-main/5",
                 "group-hover:border-brand-main/5",
