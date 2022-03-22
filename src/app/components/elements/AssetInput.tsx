@@ -5,9 +5,9 @@ import classNames from "clsx";
 import Input, { InputProps } from "./Input";
 
 type AssetInputProps = Omit<InputProps, "onChange" | "ref"> & {
-  value?: number | string;
-  min?: number;
-  max?: number;
+  value?: BigNumber.Value;
+  min?: BigNumber.Value;
+  max?: BigNumber.Value;
   assetDecimals?: number;
   onChange?: (v?: string) => void;
   withMaxButton?: boolean;
@@ -19,7 +19,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
       value,
       min = 0,
       max = Number.MAX_SAFE_INTEGER,
-      assetDecimals = 6,
+      assetDecimals = 2,
       onChange,
       onFocus,
       onBlur,
@@ -69,12 +69,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
     const handleFocus = useCallback(
       (evt) => {
         setFocused(true);
-        if (onFocus) {
-          onFocus(evt);
-          if (evt.defaultPrevented) {
-            return;
-          }
-        }
+        onFocus?.(evt);
       },
       [setFocused, onFocus]
     );
@@ -82,22 +77,17 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
     const handleBlur = useCallback(
       (evt) => {
         setFocused(false);
-        if (onBlur) {
-          onBlur(evt);
-          if (evt.defaultPrevented) {
-            return;
-          }
-        }
+        onBlur?.(evt);
       },
       [setFocused, onBlur]
     );
 
     const handleMaxButtonClick = useCallback(() => {
       if (max) {
-        setLocalValue(new BigNumber(max).toString());
-        if (onChange) {
-          onChange(max.toString());
-        }
+        const maxStr = new BigNumber(max).toString();
+
+        setLocalValue(maxStr);
+        onChange?.(maxStr);
       }
     }, [max, onChange]);
 
