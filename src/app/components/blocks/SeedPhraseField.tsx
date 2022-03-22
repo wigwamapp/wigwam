@@ -61,7 +61,6 @@ const SeedPhraseField = forwardRef<HTMLTextAreaElement, SeedPhraseFieldProps>(
       <div className={classNames("w-full max-w-[27.5rem] relative", className)}>
         <LongTextField
           ref={mergeRefs([ref, fieldRef])}
-          className="resize-none"
           id="seedPhrase"
           label="Secret Phrase"
           actions={
