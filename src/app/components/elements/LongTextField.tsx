@@ -4,7 +4,7 @@ import classNames from "clsx";
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
   actions?: ReactNode;
-  textAreaClassName?: string;
+  textareaClassName?: string;
 };
 
 const LongTextField = memo(
@@ -17,7 +17,7 @@ const LongTextField = memo(
         spellCheck = false,
         className,
         disabled,
-        textAreaClassName,
+        textareaClassName,
         ...rest
       },
       ref
@@ -63,7 +63,7 @@ const LongTextField = memo(
                 "border-brand-main/5",
                 "text-brand-disabledcolor placeholder-brand-disabledcolor",
               ],
-              textAreaClassName
+              textareaClassName
             )}
             {...rest}
           />
