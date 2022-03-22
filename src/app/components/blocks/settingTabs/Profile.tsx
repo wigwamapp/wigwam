@@ -4,7 +4,13 @@ import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 
 import { updateProfile } from "lib/ext/profile";
-import { changePassword } from "core/client";
+import {
+  changePassword,
+  composeValidators,
+  differentPasswords,
+  minLength,
+  required,
+} from "core/client";
 import { profileStateAtom } from "app/atoms";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 
@@ -56,24 +62,6 @@ const Profile: FC = () => {
     }
   };
 
-  const validate = (values: Values) => {
-    const errors: Partial<Values> = {};
-    if (!values.oldPwd) {
-      errors.oldPwd = "Required";
-    }
-    if (!values.newPwd) {
-      errors.newPwd = "Required";
-    }
-    if (!values.confirmNewPwd) {
-      errors.confirmNewPwd = "Required";
-    }
-    if (values.confirmNewPwd !== values.newPwd) {
-      errors.confirmNewPwd = "Passwords doesn't match";
-    }
-
-    return errors;
-  };
-
   return (
     <div className={classNames("flex flex-col grow", "px-6")}>
       <SettingsHeader>Edit Profile</SettingsHeader>
@@ -89,11 +77,13 @@ const Profile: FC = () => {
 
       <Form
         onSubmit={onSubmit}
-        validate={validate}
-        render={({ handleSubmit, submitting }) => (
+        render={({ handleSubmit, submitting }: any) => (
           <form className="mt-6 max-w-[18rem]" onSubmit={handleSubmit}>
             <SettingsHeader>Change password</SettingsHeader>
-            <PasswordField name="oldPwd"></PasswordField>
+            <PasswordField
+              name="oldPwd"
+              validate={(composeValidators(required), minLength(8))}
+            />
             <div
               className={classNames(
                 "max-h-0 overflow-hidden",
@@ -107,8 +97,18 @@ const Profile: FC = () => {
                 </span>
               )}
             </div>
-            <PasswordField name="newPwd"></PasswordField>
-            <PasswordField name="confirmNewPwd"></PasswordField>
+            <PasswordField
+              name="newPwd"
+              validate={composeValidators(required, minLength(8))}
+            />
+            <PasswordField
+              validate={composeValidators(
+                required,
+                minLength(8),
+                differentPasswords("newPwd")
+              )}
+              name="confirmNewPwd"
+            />
             <NewButton
               type="submit"
               className="!py-2 ml-4 mt-8"
@@ -125,14 +125,15 @@ const Profile: FC = () => {
 
 type PasswordFieldProps = {
   name: string;
+  validate: (val: string) => string | undefined;
 };
 
-const PasswordField: React.FC<PasswordFieldProps> = ({ name }) => {
+const PasswordField: React.FC<PasswordFieldProps> = ({ name, validate }) => {
   const [show, setShow] = useState(false);
 
   return (
-    <Field name={name}>
-      {({ input, meta }) => (
+    <Field name={name} validate={validate}>
+      {({ input, meta }: any) => (
         <div className="max-w-[19rem] w-full relative">
           <Input
             className="mt-4"
