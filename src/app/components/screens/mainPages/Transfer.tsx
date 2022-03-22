@@ -24,13 +24,15 @@ const Transfer: FC = () => {
       <div className="flex mt-5 min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
         <ScrollAreaContainer
-          className="box-content w-full max-w-[23.25rem] px-6 -mr-6"
+          className="box-content w-full px-6"
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
         >
-          <Suspense fallback={null}>
-            <TransferTab />
-          </Suspense>
+          <div className="max-w-[23.25rem]">
+            <Suspense fallback={null}>
+              <TransferTab />
+            </Suspense>
+          </div>
         </ScrollAreaContainer>
       </div>
     </>

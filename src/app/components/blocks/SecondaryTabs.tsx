@@ -19,7 +19,7 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
   <ScrollAreaContainer
     className={classNames(
       "flex flex-col",
-      "w-[calc(19.25rem+1px)] pr-6",
+      "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
       "border-r border-brand-main/[.07]",
       className
     )}

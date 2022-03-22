@@ -1,18 +1,22 @@
-import { FC, useRef } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
+import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 import { usePasteToClipboard } from "lib/react-hooks/usePasteToClipboard";
 
 import { AccountAsset } from "core/types";
 
 import { tokenSlugAtom } from "app/atoms";
+import { TippySingletonProvider, useNativeCurrency } from "app/hooks";
 import { useToken } from "app/hooks/tokens";
 import TokenSelect from "app/components/elements/TokenSelect";
 import LongTextField from "app/components/elements/LongTextField";
 import NewButton from "app/components/elements/NewButton";
-import Input from "app/components/elements/Input";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
+import AssetInput from "app/components/elements/AssetInput";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -20,9 +24,20 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 const Asset: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const currentToken = useToken(tokenSlug) as AccountAsset;
+  const nativeCurrency = useNativeCurrency();
 
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const { paste, pasted } = usePasteToClipboard(fieldRef);
+
+  const [amount, setAmount] = useState<string | undefined>(undefined);
+
+  const prevToken = usePrevious(currentToken);
+
+  useEffect(() => {
+    if (currentToken !== prevToken) {
+      setAmount(undefined);
+    }
+  }, [currentToken, prevToken]);
 
   return (
     <div className="flex flex-col">
@@ -55,26 +70,21 @@ const Asset: FC = () => {
         </NewButton>
       </div>
       <div className="relative mt-5">
-        <Input
+        <AssetInput
           label="Amount"
           placeholder="0.00"
-          actions={
-            <button
-              type="button"
-              className={classNames(
-                "py-1 px-3",
-                "bg-brand-main/10",
-                "rounded-md",
-                "text-xs font-bold",
-                "transition-colors",
-                "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-                "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
-                "active:bg-brand-main/20 active:shadow-none"
-              )}
-            >
-              MAX
-            </button>
+          value={amount}
+          onChange={setAmount}
+          max={
+            currentToken?.rawBalance
+              ? new BigNumber(currentToken.rawBalance)
+                  .div(new BigNumber(10).pow(currentToken.decimals))
+                  .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN)
+                  .toNumber()
+              : 0
           }
+          assetDecimals={currentToken?.decimals}
+          withMaxButton
           inputClassName="pr-20"
         />
         {currentToken && (
@@ -112,17 +122,69 @@ const Asset: FC = () => {
           <TooltipIcon />
         </Tooltip>
         <div className="flex flex-col">
-          <SummaryRow
-            header="Amount: 311.5 USDT"
-            value="$312.55"
-            className="mb-1"
-          />
-          <SummaryRow
-            header="Average Fee: 0.13 ETH"
-            value="$9.55"
-            className="mb-1"
-          />
-          <SummaryRow header="Total: $9.55" />
+          <TippySingletonProvider>
+            <SummaryRow
+              header={
+                <>
+                  Amount:{" "}
+                  <PrettyAmount
+                    amount={amount ?? 0}
+                    currency={currentToken?.symbol ?? undefined}
+                    copiable
+                    className="font-bold"
+                  />
+                </>
+              }
+              value={
+                <PrettyAmount
+                  amount={
+                    amount && currentToken
+                      ? new BigNumber(amount).multipliedBy(
+                          currentToken.priceUSD ?? 0
+                        )
+                      : 0
+                  }
+                  currency="$"
+                  copiable
+                />
+              }
+              className="mb-1"
+            />
+            <SummaryRow
+              header={
+                <>
+                  Average Fee:{" "}
+                  <PrettyAmount
+                    amount={0.13}
+                    currency={nativeCurrency?.symbol ?? undefined}
+                    copiable
+                    className="font-bold"
+                  />
+                </>
+              }
+              value={<PrettyAmount amount={9.55} currency="$" copiable />}
+              className="mb-1"
+            />
+            <SummaryRow
+              header={
+                <>
+                  Total:{" "}
+                  <PrettyAmount
+                    amount={
+                      amount && currentToken
+                        ? new BigNumber(amount)
+                            .multipliedBy(currentToken.priceUSD ?? 0)
+                            .plus(9.55)
+                        : 9.55
+                    }
+                    currency="$"
+                    copiable
+                    className="font-bold"
+                  />
+                </>
+              }
+            />
+          </TippySingletonProvider>
         </div>
       </div>
       <NewButton className="flex items-center min-w-[13.75rem] mt-8 mx-auto">
@@ -136,8 +198,8 @@ const Asset: FC = () => {
 export default Asset;
 
 type SummaryRowProps = {
-  header: string;
-  value?: string;
+  header: string | ReactNode;
+  value?: string | ReactNode;
   className?: string;
 };
 
