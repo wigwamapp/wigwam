@@ -8,7 +8,6 @@ import {
   changePassword,
   composeValidators,
   differentPasswords,
-  minLength,
   required,
 } from "core/client";
 import { profileStateAtom } from "app/atoms";
@@ -88,7 +87,7 @@ const Profile: FC = () => {
             <SettingsHeader>Change password</SettingsHeader>
             <PasswordField
               name="oldPwd"
-              validate={(composeValidators(required), minLength(8))}
+              validate={composeValidators(required)}
             />
             <div
               className={classNames(
@@ -105,13 +104,12 @@ const Profile: FC = () => {
             </div>
             <PasswordField
               name="newPwd"
-              validate={composeValidators(required, minLength(8))}
+              validate={composeValidators(required)}
             />
             <PasswordField
               name="confirmNewPwd"
               validate={composeValidators(
                 required,
-                minLength(8),
                 differentPasswords("newPwd")
               )}
             />
