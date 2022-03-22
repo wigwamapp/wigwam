@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { fromProtectedString } from "lib/crypto-utils";
@@ -20,12 +20,11 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
   const { stateRef, reset, navigateToStep } = useSteps();
-
-  const [inputSeedPhrase, setInputSeedPhrase] = useState("");
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   useEffect(() => {
@@ -37,6 +36,8 @@ const VerifySeedPhrase = memo(() => {
   const handleContinue = useCallback(async () => {
     try {
       if (!seedPhrase) return;
+
+      const inputSeedPhrase = seedPhraseInputRef.current?.value;
 
       if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) {
         throw new Error("Invalid");
@@ -61,7 +62,7 @@ const VerifySeedPhrase = memo(() => {
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [seedPhrase, inputSeedPhrase, stateRef, initialSetup, navigateToStep]);
+  }, [seedPhrase, stateRef, initialSetup, navigateToStep]);
 
   if (!seedPhrase) {
     return null;
@@ -78,8 +79,7 @@ const VerifySeedPhrase = memo(() => {
 
       <div className="flex flex-col max-w-[27.5rem] mx-auto">
         <SeedPhraseField
-          value={inputSeedPhrase}
-          onChange={(evt) => setInputSeedPhrase(evt.target.value)}
+          ref={seedPhraseInputRef}
           placeholder="Paste there your secret phrase"
           mode={"import"}
         />
