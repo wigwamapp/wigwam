@@ -3,8 +3,10 @@ import { useAtomValue } from "jotai";
 
 import { transferTabAtom } from "app/atoms";
 import { TransferTab as TransferTabEnum } from "app/nav";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
+
 import TransferTab from "./Transfer.Tab";
 
 const Transfer: FC = () => {
@@ -21,11 +23,15 @@ const Transfer: FC = () => {
 
       <div className="flex mt-5 min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
-        <div className="ml-6 w-full max-w-[23.25rem]">
+        <ScrollAreaContainer
+          className="box-content w-full max-w-[23.25rem] px-6 -mr-6"
+          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-20"
+        >
           <Suspense fallback={null}>
             <TransferTab />
           </Suspense>
-        </div>
+        </ScrollAreaContainer>
       </div>
     </>
   );
