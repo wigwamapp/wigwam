@@ -2,6 +2,7 @@ import { FC, useCallback, useMemo, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
+import type { FormApi } from "final-form";
 
 import { updateProfile } from "lib/ext/profile";
 import {
@@ -21,17 +22,21 @@ import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
 
+interface Values {
+  oldPwd: string;
+  newPwd: string;
+  confirmNewPwd: string;
+}
+
 const Profile: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
   useI18NUpdate();
 
-  const currentProfile = useMemo(() => {
-    const profile = all.find((profile) => profile.id === currentId)!;
-
-    profile.name = replaceT(profile.name);
-    return profile;
-  }, [all, currentId]);
-  const currentName = currentProfile.name;
+  const currentProfile = useMemo(
+    () => all.find((profile) => profile.id === currentId)!,
+    [all, currentId]
+  );
+  const currentName = replaceT(currentProfile.name);
   const currentSeed = currentProfile.avatarSeed;
 
   const handleAdd = useCallback(
@@ -46,12 +51,8 @@ const Profile: FC = () => {
   );
 
   const [invalidPwd, setInvalidPwd] = useState("");
-  interface Values {
-    oldPwd: string;
-    newPwd: string;
-    confirmNewPwd: string;
-  }
-  const onSubmit = async (values: Values, form: any) => {
+
+  const onSubmit = async (values: Values, form: FormApi<Values>) => {
     try {
       await changePassword(values.oldPwd, values.newPwd);
       setInvalidPwd("");
@@ -82,7 +83,7 @@ const Profile: FC = () => {
           valid,
           pristine,
           modifiedSinceLastSubmit,
-        }: any) => (
+        }) => (
           <form className="mt-6 max-w-[18rem]" onSubmit={handleSubmit}>
             <SettingsHeader>Change password</SettingsHeader>
             <PasswordField

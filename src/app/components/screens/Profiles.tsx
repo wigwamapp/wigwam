@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useState } from "react";
+import { FC, memo, useCallback, useState, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
@@ -21,7 +21,12 @@ const Profiles: FC = () => {
     setAdding(false);
   }, [setAdding]);
 
+  const processingRef = useRef(false);
+
   const handleAdd = useCallback(async (name: string, profileSeed: string) => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+
     try {
       await addProfile(name, profileSeed);
 
@@ -29,6 +34,8 @@ const Profiles: FC = () => {
     } catch (err) {
       console.error(err);
     }
+
+    processingRef.current = false;
   }, []);
 
   const handleSelect = useCallback((profile) => {
@@ -118,7 +125,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
           Add a New Profile
         </h2>
         <ProfileGen
-          className="justify-center "
+          className="justify-center"
           profilesLength={profilesLength}
           onAdd={onAdd}
           label="Name"
