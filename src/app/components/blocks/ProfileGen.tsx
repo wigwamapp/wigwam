@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
 
@@ -87,29 +87,28 @@ const ProfileGen: FC<ProfileGenProps> = ({
           valid,
           pristine,
           modifiedSinceLastSubmit,
-        }: any) => (
+        }) => (
           <form className="w-full max-w-[18rem]" onSubmit={handleSubmit}>
-            <Field name="profileName" validate={required}>
-              {({ input, meta }: any) => {
-                const props = {
-                  ...input,
-                  onChange: (e: React.FormEvent<HTMLInputElement>) => {
-                    setNameValue(e.currentTarget.value);
-                    input.onChange(e);
-                  },
-                };
-                return (
-                  <Input
-                    label={label}
-                    className="min-h-[7rem]"
-                    inputClassName={editMode ? "max-h-11" : ""}
-                    placeholder="Enter your name"
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    {...props}
-                  />
-                );
-              }}
+            <Field
+              name="profileName"
+              validate={required}
+              defaultValue={profileName}
+            >
+              {({ input, meta }) => (
+                <Input
+                  label={label}
+                  className="min-h-[7rem]"
+                  inputClassName={editMode ? "max-h-11" : ""}
+                  placeholder="Enter your name"
+                  error={meta.error && meta.touched}
+                  errorMessage={meta.error}
+                  {...input}
+                  onChange={(evt) => {
+                    setNameValue(evt.currentTarget.value);
+                    input.onChange(evt);
+                  }}
+                />
+              )}
             </Field>
 
             <NewButton
