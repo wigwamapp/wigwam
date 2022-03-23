@@ -45,7 +45,7 @@ const LongTextField = memo(
               "w-full h-28",
               "py-3 px-4",
               "box-border",
-              "text-sm text-brand-light font-medium",
+              "text-base leading-5 text-brand-light font-medium",
               "bg-black/20",
               "border border-brand-main/10",
               "rounded-[.625rem]",

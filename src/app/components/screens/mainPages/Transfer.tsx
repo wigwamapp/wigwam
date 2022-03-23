@@ -24,9 +24,9 @@ const Transfer: FC = () => {
       <div className="flex mt-5 min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
         <ScrollAreaContainer
-          className="box-content w-full px-6"
-          viewPortClassName="pb-20 rounded-t-[.625rem]"
-          scrollBarClassName="py-0 pb-20"
+          className="box-content w-full px-6 -mt-5"
+          viewPortClassName="pb-20 pt-5"
+          scrollBarClassName="py-0 pt-5 pb-20"
         >
           <div className="max-w-[23.25rem]">
             <Suspense fallback={null}>

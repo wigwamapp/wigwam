@@ -1,14 +1,29 @@
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  FC,
+  FormEventHandler,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
+import { ethers } from "ethers";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 import { usePasteToClipboard } from "lib/react-hooks/usePasteToClipboard";
+import { Erc20__factory } from "abi-types";
 
 import { AccountAsset } from "core/types";
+import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 
-import { tokenSlugAtom } from "app/atoms";
-import { TippySingletonProvider, useNativeCurrency } from "app/hooks";
+import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import {
+  TippySingletonProvider,
+  useNativeCurrency,
+  useProvider,
+} from "app/hooks";
 import { useToken } from "app/hooks/tokens";
 import TokenSelect from "app/components/elements/TokenSelect";
 import LongTextField from "app/components/elements/LongTextField";
@@ -22,12 +37,13 @@ import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 const Asset: FC = () => {
+  const currentAccount = useAtomValue(currentAccountAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const currentToken = useToken(tokenSlug) as AccountAsset;
   const nativeCurrency = useNativeCurrency();
 
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
-  const { paste, pasted } = usePasteToClipboard(fieldRef);
+  const recipientAddressRef = useRef<HTMLTextAreaElement>(null);
+  const { paste, pasted } = usePasteToClipboard(recipientAddressRef);
 
   const [amount, setAmount] = useState<string | undefined>(undefined);
 
@@ -39,15 +55,83 @@ const Asset: FC = () => {
     }
   }, [currentToken, prevToken]);
 
+  const handleMaxButtonClick = useCallback(() => {
+    setAmount(
+      currentToken?.rawBalance
+        ? new BigNumber(currentToken.rawBalance)
+            .div(new BigNumber(10).pow(currentToken.decimals))
+            .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN)
+            .toString()
+        : "0"
+    );
+  }, [currentToken]);
+
+  const provider = useProvider();
+
+  const sendEther = useCallback(
+    async (to: string, amount: string) => {
+      return await provider.getSigner(currentAccount.address).sendTransaction({
+        to,
+        value: ethers.utils.parseEther(amount),
+      });
+    },
+    [currentAccount.address, provider]
+  );
+
+  const sendToken = useCallback(
+    async (
+      to: string,
+      tokenContract: string,
+      amount: string,
+      decimals: number
+    ) => {
+      const signer = provider.getSigner(currentAccount.address);
+      const contract = Erc20__factory.connect(tokenContract, signer);
+
+      const convertedAmount = ethers.utils.parseUnits(amount, decimals);
+
+      return await contract.transfer(to, convertedAmount);
+    },
+    [currentAccount.address, provider]
+  );
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
+    async (evt) => {
+      evt.preventDefault();
+      const recipientAddress = recipientAddressRef.current;
+      if (!recipientAddress || !amount || !tokenSlug) {
+        return;
+      }
+      try {
+        if (tokenSlug === NATIVE_TOKEN_SLUG) {
+          await sendEther(recipientAddress.value, amount);
+        } else {
+          const tokenContract = parseTokenSlug(tokenSlug).address;
+
+          await sendToken(
+            recipientAddress.value,
+            tokenContract,
+            amount,
+            currentToken.decimals
+          );
+        }
+      } catch (err) {
+        console.error("error", err);
+      }
+    },
+    [amount, currentToken, sendEther, sendToken, tokenSlug]
+  );
+
   return (
-    <div className="flex flex-col">
+    <form onSubmit={handleSubmit} className="flex flex-col">
       <TokenSelect />
       <div className="relative mt-5">
         <LongTextField
-          ref={fieldRef}
+          ref={recipientAddressRef}
           label="Recipient"
           placeholder="0x0000000000000000000000000000000000000000"
           textareaClassName="!h-20"
+          maxLength={42}
         />
         <NewButton
           theme="tertiary"
@@ -75,14 +159,7 @@ const Asset: FC = () => {
           placeholder="0.00"
           value={amount}
           onChange={setAmount}
-          max={
-            currentToken?.rawBalance
-              ? new BigNumber(currentToken.rawBalance)
-                  .div(new BigNumber(10).pow(currentToken.decimals))
-                  .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN)
-                  .toNumber()
-              : 0
-          }
+          handleMaxButtonClick={handleMaxButtonClick}
           assetDecimals={currentToken?.decimals}
           withMaxButton
           inputClassName="pr-20"
@@ -187,11 +264,14 @@ const Asset: FC = () => {
           </TippySingletonProvider>
         </div>
       </div>
-      <NewButton className="flex items-center min-w-[13.75rem] mt-8 mx-auto">
+      <NewButton
+        type="submit"
+        className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
+      >
         <SendIcon className="mr-2" />
         Transfer
       </NewButton>
-    </div>
+    </form>
   );
 };
 

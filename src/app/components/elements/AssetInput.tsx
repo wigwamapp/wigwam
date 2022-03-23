@@ -11,6 +11,7 @@ type AssetInputProps = Omit<InputProps, "onChange" | "ref"> & {
   assetDecimals?: number;
   onChange?: (v?: string) => void;
   withMaxButton?: boolean;
+  handleMaxButtonClick?: () => void;
 };
 
 const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
@@ -24,6 +25,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
       onFocus,
       onBlur,
       withMaxButton = false,
+      handleMaxButtonClick,
       ...rest
     },
     ref
@@ -81,15 +83,6 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
       },
       [setFocused, onBlur]
     );
-
-    const handleMaxButtonClick = useCallback(() => {
-      if (max) {
-        const maxStr = new BigNumber(max).toString();
-
-        setLocalValue(maxStr);
-        onChange?.(maxStr);
-      }
-    }, [max, onChange]);
 
     return (
       <Input
