@@ -11,7 +11,7 @@ type TooltipIconProps = {
 const TooltipIcon: FC<TooltipIconProps> = ({ theme = "light", className }) => (
   <span
     className={classNames(
-      "block w-5 h-5 rounded-full",
+      "flex items-center w-5 h-5 rounded-full",
       theme === "light" && "bg-brand-main/[.15]",
       theme === "dark" && "bg-black/25",
       className
