@@ -90,6 +90,8 @@ const Networks: FC = () => {
   );
 };
 
+export default Networks;
+
 type NetworkBtnProps = {
   icon?: string;
   name: string;
@@ -139,5 +141,3 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
     </button>
   );
 };
-
-export default Networks;

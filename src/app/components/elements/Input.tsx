@@ -1,4 +1,4 @@
-import { FC, forwardRef, HTMLProps, memo, useState } from "react";
+import { FC, forwardRef, HTMLProps, memo, ReactNode, useState } from "react";
 import classNames from "clsx";
 
 export type InputProps = {
@@ -10,6 +10,7 @@ export type InputProps = {
   optional?: boolean;
   inputClassName?: string;
   adornmentClassName?: string;
+  actions?: ReactNode;
 } & HTMLProps<HTMLInputElement>;
 
 const Input = memo(
@@ -26,6 +27,7 @@ const Input = memo(
         inputClassName,
         adornmentClassName,
         optional,
+        actions,
         ...rest
       },
       ref
@@ -43,21 +45,21 @@ const Input = memo(
       );
 
       return (
-        <div className={classNames("group flex flex-col text-base", className)}>
-          {label && (
-            <label
-              htmlFor={id}
-              className="flex justify-between mx-4 mb-2 cursor-pointer text-brand-gray"
-            >
-              {label}
-              {optional && (
-                <span className="text-xs text-brand-inactivedark2 self-end">
-                  optional
-                </span>
-              )}
-            </label>
-          )}
-          <div className="relative">
+        <div className={classNames("flex flex-col text-base", className)}>
+          <div className="flex justify-between items-center mx-4 mb-2">
+            {label && (
+              <label htmlFor={id} className="cursor-pointer text-brand-gray">
+                {label}
+              </label>
+            )}
+            {actions}
+            {optional && !actions && (
+              <span className="text-xs text-brand-inactivedark2 self-end">
+                optional
+              </span>
+            )}
+          </div>
+          <div className="group relative">
             {!!StartAdornment && (
               <StartAdornment
                 className={classNames(adornmentClassNames, "left-4")}
