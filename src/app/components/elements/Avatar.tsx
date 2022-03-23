@@ -17,6 +17,7 @@ const Avatar = memo<AvatarProps>(
     return (
       <AvatarPrimitive.Root
         className={classNames(
+          "block",
           "rounded-full overflow-hidden",
           "bg-brand-main/10",
           loadingState === "error" && "border border-brand-main/20",
