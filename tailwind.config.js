@@ -19,6 +19,7 @@ module.exports = {
           light: "#F8F9FD",
           main: "#CCD6FF",
           inactivelight: "#B7BCD0",
+          font: "#BCC2DB",
           inactivedark: "#767C9D",
           gray: "#AAABB1",
           placeholder: "#66697C",
