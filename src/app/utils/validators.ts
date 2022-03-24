@@ -1,6 +1,7 @@
 type ValidationType = (value: string) => string | undefined;
 
-export const required = (value: string) => (value ? undefined : "Required");
+export const required = (value: string) =>
+  value ? undefined : "Required field";
 
 export const minLength = (min: number) => (value: string) =>
   value && value.length >= min ? undefined : `Minimal length is ${min}`;

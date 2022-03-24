@@ -3,24 +3,21 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 import type { FormApi } from "final-form";
-
 import { updateProfile } from "lib/ext/profile";
-import {
-  changePassword,
-  composeValidators,
-  differentPasswords,
-  required,
-} from "core/client";
-import { profileStateAtom } from "app/atoms";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 
-import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
-import SettingsHeader from "app/components/elements/SettingsHeader";
-import ProfileGen from "app/components/blocks/ProfileGen";
-import Input from "app/components/elements/Input";
+import { changePassword } from "core/client";
+
+import { composeValidators, differentPasswords, required } from "app/utils";
+import { profileStateAtom } from "app/atoms";
+
+import Input, { InputProps } from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
+import SettingsHeader from "app/components/elements/SettingsHeader";
+import ProfileGen from "app/components/blocks/ProfileGen";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 
 interface Values {
   oldPwd: string;
@@ -89,6 +86,8 @@ const Profile: FC = () => {
             <PasswordField
               name="oldPwd"
               validate={composeValidators(required)}
+              label="Confirm old password"
+              placeholder="Type old password"
             />
             <div
               className={classNames(
@@ -106,6 +105,8 @@ const Profile: FC = () => {
             <PasswordField
               name="newPwd"
               validate={composeValidators(required)}
+              label="New password"
+              placeholder="Type new password"
             />
             <PasswordField
               name="confirmNewPwd"
@@ -113,6 +114,8 @@ const Profile: FC = () => {
                 required,
                 differentPasswords("newPwd")
               )}
+              label="Confirm new password"
+              placeholder="Confirm new password"
             />
             <NewButton
               type="submit"
@@ -130,26 +133,29 @@ const Profile: FC = () => {
   );
 };
 
+export default Profile;
+
 type PasswordFieldProps = {
   name: string;
   validate: (val: string) => string | undefined;
-};
+} & Omit<InputProps, "name" | "ref">;
 
-const PasswordField: React.FC<PasswordFieldProps> = ({ name, validate }) => {
+const PasswordField: FC<PasswordFieldProps> = ({ name, validate, ...rest }) => {
   const [show, setShow] = useState(false);
 
   return (
     <Field name={name} validate={validate}>
-      {({ input, meta }: any) => (
+      {({ input, meta }) => (
         <div className="max-w-[19rem] w-full relative">
           <Input
-            className="mt-4"
+            id={name}
             type={show ? "text" : "password"}
             error={meta.error && meta.touched}
             errorMessage={meta.error}
+            className="mt-4"
             inputClassName="max-h-11"
+            {...rest}
             {...input}
-            label="Confirm new password"
           />
           <IconedButton
             Icon={show ? EyeIcon : OpenedEyeIcon}
@@ -157,12 +163,10 @@ const PasswordField: React.FC<PasswordFieldProps> = ({ name, validate }) => {
             theme="tertiary"
             onClick={() => setShow(!show)}
             tabIndex={-1}
-            className="absolute top-11 right-3"
+            className="absolute top-[2.625rem] right-3"
           />
         </div>
       )}
     </Field>
   );
 };
-
-export default Profile;

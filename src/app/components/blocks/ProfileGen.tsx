@@ -1,14 +1,14 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
+import { Field, Form } from "react-final-form";
 
+import { required } from "app/utils";
 import AutoIcon from "app/components/elements/AutoIcon";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
 import Input from "app/components/elements/Input";
-import NewButton from "../elements/NewButton";
-import { Field, Form } from "react-final-form";
-import { required } from "core/client";
+import NewButton from "app/components/elements/NewButton";
 
 type ProfileGenProps = {
   profilesLength: number;
