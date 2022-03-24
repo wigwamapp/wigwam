@@ -1,4 +1,12 @@
-import { FC, forwardRef, HTMLProps, memo, ReactNode, useState } from "react";
+import {
+  FC,
+  forwardRef,
+  HTMLProps,
+  memo,
+  ReactNode,
+  useCallback,
+  useState,
+} from "react";
 import classNames from "clsx";
 
 export type InputProps = {
@@ -8,6 +16,8 @@ export type InputProps = {
   EndAdornment?: FC<{ className?: string }>;
   theme?: "primary" | "clean";
   optional?: boolean;
+  error?: boolean;
+  errorMessage?: string;
   inputClassName?: string;
   adornmentClassName?: string;
   actions?: ReactNode;
@@ -24,10 +34,14 @@ const Input = memo(
         EndAdornment,
         disabled,
         theme = "primary",
+        error,
+        errorMessage,
         inputClassName,
         adornmentClassName,
         optional,
         actions,
+        onFocus,
+        onBlur,
         ...rest
       },
       ref
@@ -42,6 +56,22 @@ const Input = memo(
         focused && "fill-current text-brand-light",
         disabled && "fill-current text-brand-disabledcolor",
         adornmentClassName
+      );
+
+      const handleFocus = useCallback(
+        (evt) => {
+          setFocused(true);
+          onFocus?.(evt);
+        },
+        [onFocus]
+      );
+
+      const handleBlur = useCallback(
+        (evt) => {
+          setFocused(false);
+          onBlur?.(evt);
+        },
+        [onBlur]
       );
 
       return (
@@ -86,16 +116,17 @@ const Input = memo(
                   "group-hover:bg-brand-main/5",
                   "group-hover:border-brand-main/5",
                 ],
-                focused && "!bg-brand-main/5 !border-brand-main/[.15]",
+                focused && "!bg-brand-main/[.05] !border-brand-main/[.15]",
                 disabled && [
                   "bg-brand-disabledbackground/20",
                   "border-brand-main/5",
                   "text-brand-disabledcolor placeholder-brand-disabledcolor",
                 ],
+                error && "!border-brand-redobject",
                 inputClassName
               )}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
               disabled={disabled}
               {...rest}
             />
@@ -104,6 +135,17 @@ const Input = memo(
                 className={classNames(adornmentClassNames, "right-4")}
               />
             )}
+          </div>
+          <div
+            className={classNames(
+              "max-h-0 overflow-hidden",
+              "transition-[max-height] duration-200",
+              error && errorMessage && "max-h-5"
+            )}
+          >
+            <span className="text-brand-redtext pt-1 pl-4 text-xs">
+              {errorMessage}
+            </span>
           </div>
         </div>
       );

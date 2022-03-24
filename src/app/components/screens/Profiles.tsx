@@ -1,21 +1,16 @@
-import { FC, memo, useCallback, useMemo, useState, useRef } from "react";
+import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
-import { nanoid } from "nanoid";
 
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import Input from "app/components/elements/Input";
-import NewButton from "app/components/elements/NewButton";
-import AutoIcon from "app/components/elements/AutoIcon";
+import ProfileGen from "app/components/blocks/ProfileGen";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as AddNewIcon } from "app/icons/add-new.svg";
-import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
-import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
 
 const Profiles: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
@@ -26,7 +21,12 @@ const Profiles: FC = () => {
     setAdding(false);
   }, [setAdding]);
 
+  const processingRef = useRef(false);
+
   const handleAdd = useCallback(async (name: string, profileSeed: string) => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+
     try {
       await addProfile(name, profileSeed);
 
@@ -34,6 +34,8 @@ const Profiles: FC = () => {
     } catch (err) {
       console.error(err);
     }
+
+    processingRef.current = false;
   }, []);
 
   const handleSelect = useCallback((profile) => {
@@ -102,7 +104,7 @@ const Profiles: FC = () => {
         open={adding}
         profilesLength={all.length}
         onOpenChange={handleCancelAdding}
-        onAdd={handleAdd}
+        handleAddProfile={handleAdd}
       />
     </BoardingPageLayout>
   );
@@ -112,84 +114,27 @@ export default Profiles;
 
 type AddProfileDialogProps = SecondaryModalProps & {
   profilesLength: number;
-  onAdd: (name: string, profileSeed: string) => void;
+  handleAddProfile: (name: string, profileSeed: string) => void;
 };
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
-  ({ open, onOpenChange, profilesLength, onAdd }) => {
-    const [profileSeed, setProfileSeed] = useState(nanoid);
-
-    const nameFieldRef = useRef<HTMLInputElement>(null);
-
+  ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
     const defaultNameValue = useMemo(
       () => `Profile ${profilesLength + 1}`,
       [profilesLength]
     );
-
-    const [nameValue, setNameValue] = useState(defaultNameValue);
-
-    const handleNameFieldChange = useCallback(
-      (evt) => {
-        setNameValue(evt.target.value);
-      },
-      [setNameValue]
-    );
-
-    const regenerateProfileSeed = useCallback(() => {
-      setProfileSeed(nanoid());
-    }, []);
-
-    const handleAdd = useCallback(() => {
-      const value = nameFieldRef.current?.value;
-      if (value) {
-        onAdd(value, profileSeed);
-      }
-    }, [onAdd, profileSeed]);
 
     return (
       <SecondaryModal open={open} onOpenChange={onOpenChange}>
         <h2 className="mb-[3.25rem] text-[2rem] font-bold">
           Add a New Profile
         </h2>
-        <div className="flex justify-center items-center w-full">
-          <div className="mr-16 flex flex-col items-center">
-            <AutoIcon
-              seed={profileSeed}
-              source="boring"
-              variant="marble"
-              autoColors
-              initialsSource={nameValue}
-              className={"w-[7.75rem] h-[7.75rem] text-5xl"}
-            />
-            <NewButton
-              theme="tertiary"
-              className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
-              onClick={regenerateProfileSeed}
-            >
-              <RegenerateIcon className="mr-2" />
-              Regenerate
-            </NewButton>
-          </div>
-          <form className="w-full max-w-[18rem]">
-            <Input
-              ref={nameFieldRef}
-              label="Name"
-              placeholder="Enter your name"
-              value={nameValue}
-              onChange={handleNameFieldChange}
-              required
-            />
-
-            <NewButton
-              type="submit"
-              className="mt-6 w-full flex items-center"
-              onClick={handleAdd}
-            >
-              Add
-              <PlusIcon className="ml-1" />
-            </NewButton>
-          </form>
-        </div>
+        <ProfileGen
+          className="justify-center"
+          defaultProfileName={defaultNameValue}
+          onSubmit={handleAddProfile}
+          label="Name"
+        />
       </SecondaryModal>
     );
   }
