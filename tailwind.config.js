@@ -26,6 +26,8 @@ module.exports = {
           disabledbackground: "#343434",
           disabledcolor: "#535364",
           inactivedark2: "#7D8398",
+          redobject: "#B82D41",
+          redtext: "#EA556A",
         },
       },
       fontFamily: {

@@ -3,6 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 import type { FormApi } from "final-form";
+import { FORM_ERROR } from "final-form";
 import { updateProfile } from "lib/ext/profile";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 
@@ -19,11 +20,11 @@ import ProfileGen from "app/components/blocks/ProfileGen";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 
-interface Values {
+type FormValuesType = {
   oldPwd: string;
   newPwd: string;
   confirmNewPwd: string;
-}
+};
 
 const Profile: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
@@ -36,7 +37,7 @@ const Profile: FC = () => {
   const currentName = replaceT(currentProfile.name);
   const currentSeed = currentProfile.avatarSeed;
 
-  const handleAdd = useCallback(
+  const handleProfileNameChange = useCallback(
     async (name: string, profileSeed: string) => {
       try {
         await updateProfile(currentId, { name, avatarSeed: profileSeed });
@@ -47,84 +48,68 @@ const Profile: FC = () => {
     [currentId]
   );
 
-  const [invalidPwd, setInvalidPwd] = useState("");
-
-  const onSubmit = async (values: Values, form: FormApi<Values>) => {
-    try {
-      await changePassword(values.oldPwd, values.newPwd);
-      setInvalidPwd("");
-      form.restart();
-    } catch (error: any) {
-      setInvalidPwd(error.message);
-    }
-  };
+  const handlePasswordChange = useCallback(
+    async (values: FormValuesType, form: FormApi<FormValuesType>) => {
+      try {
+        await changePassword(values.oldPwd, values.newPwd);
+        form.restart();
+        return;
+      } catch (error: any) {
+        return { [FORM_ERROR]: error.message };
+      }
+    },
+    []
+  );
 
   return (
     <div className={classNames("flex flex-col grow", "px-6")}>
       <SettingsHeader>Edit Profile</SettingsHeader>
       <ProfileGen
-        className="justify-items-start border-b px-3 pb-6 border-brand-main/[.07]"
-        profilesLength={all.length}
-        onAdd={handleAdd}
-        seed={currentSeed}
         label="Profile name"
-        profileName={currentName}
+        onSubmit={handleProfileNameChange}
+        defaultProfileName={currentName}
+        defaultSeed={currentSeed}
         editMode
+        className="px-2"
       />
 
+      <hr className="w-full border-brand-main/[.07] mt-6 mb-8" />
+
+      <SettingsHeader>Change password</SettingsHeader>
       <Form
-        onSubmit={onSubmit}
-        render={({
-          handleSubmit,
-          submitting,
-          valid,
-          pristine,
-          modifiedSinceLastSubmit,
-        }) => (
-          <form className="mt-6 max-w-[18rem]" onSubmit={handleSubmit}>
-            <SettingsHeader>Change password</SettingsHeader>
+        onSubmit={handlePasswordChange}
+        render={({ handleSubmit, submitting, submitError, values }) => (
+          <form className="max-w-[18rem]" onSubmit={handleSubmit}>
             <PasswordField
               name="oldPwd"
               validate={composeValidators(required)}
-              label="Confirm old password"
+              errorMessage={submitError}
+              label="Old password"
               placeholder="Type old password"
+              className="mb-4"
             />
-            <div
-              className={classNames(
-                "max-h-0 overflow-hidden",
-                invalidPwd && "max-h-6",
-                "transition-[max-height] duration-200"
-              )}
-            >
-              {invalidPwd && (
-                <span className="text-brand-redone pt-2 pl-4 text-sm">
-                  {invalidPwd}
-                </span>
-              )}
-            </div>
             <PasswordField
               name="newPwd"
               validate={composeValidators(required)}
               label="New password"
               placeholder="Type new password"
+              className="mb-4"
             />
             <PasswordField
               name="confirmNewPwd"
               validate={composeValidators(
                 required,
-                differentPasswords("newPwd")
+                differentPasswords(values.newPwd)
               )}
               label="Confirm new password"
               placeholder="Confirm new password"
             />
             <NewButton
               type="submit"
-              className="!py-2 ml-4 mt-8"
-              disabled={
-                submitting || pristine || (!valid && !modifiedSinceLastSubmit)
-              }
+              className="!py-2 mt-8"
+              disabled={submitting}
             >
-              Save
+              {submitting ? "Saving..." : "Save"}
             </NewButton>
           </form>
         )}
@@ -138,9 +123,15 @@ export default Profile;
 type PasswordFieldProps = {
   name: string;
   validate: (val: string) => string | undefined;
+  errorMessage?: string;
 } & Omit<InputProps, "name" | "ref">;
 
-const PasswordField: FC<PasswordFieldProps> = ({ name, validate, ...rest }) => {
+const PasswordField: FC<PasswordFieldProps> = ({
+  name,
+  validate,
+  errorMessage,
+  ...rest
+}) => {
   const [show, setShow] = useState(false);
 
   return (
@@ -150,10 +141,8 @@ const PasswordField: FC<PasswordFieldProps> = ({ name, validate, ...rest }) => {
           <Input
             id={name}
             type={show ? "text" : "password"}
-            error={meta.error && meta.touched}
-            errorMessage={meta.error}
-            className="mt-4"
-            inputClassName="max-h-11"
+            error={errorMessage || (meta.error && meta.touched)}
+            errorMessage={errorMessage ?? meta.error}
             {...rest}
             {...input}
           />

@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useState, useRef } from "react";
+import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
@@ -8,7 +8,7 @@ import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import ProfileGen from "../blocks/ProfileGen";
+import ProfileGen from "app/components/blocks/ProfileGen";
 import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as AddNewIcon } from "app/icons/add-new.svg";
 
@@ -104,7 +104,7 @@ const Profiles: FC = () => {
         open={adding}
         profilesLength={all.length}
         onOpenChange={handleCancelAdding}
-        onAdd={handleAdd}
+        handleAddProfile={handleAdd}
       />
     </BoardingPageLayout>
   );
@@ -114,11 +114,16 @@ export default Profiles;
 
 type AddProfileDialogProps = SecondaryModalProps & {
   profilesLength: number;
-  onAdd: (name: string, profileSeed: string) => void;
+  handleAddProfile: (name: string, profileSeed: string) => void;
 };
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
-  ({ open, onOpenChange, profilesLength, onAdd }) => {
+  ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
+    const defaultNameValue = useMemo(
+      () => `Profile ${profilesLength + 1}`,
+      [profilesLength]
+    );
+
     return (
       <SecondaryModal open={open} onOpenChange={onOpenChange}>
         <h2 className="mb-[3.25rem] text-[2rem] font-bold">
@@ -126,8 +131,8 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
         </h2>
         <ProfileGen
           className="justify-center"
-          profilesLength={profilesLength}
-          onAdd={onAdd}
+          defaultProfileName={defaultNameValue}
+          onSubmit={handleAddProfile}
           label="Name"
         />
       </SecondaryModal>
