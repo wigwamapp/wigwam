@@ -20,6 +20,7 @@ export type InputProps = {
   errorMessage?: string;
   inputClassName?: string;
   adornmentClassName?: string;
+  labelActions?: ReactNode;
   actions?: ReactNode;
 } & HTMLProps<HTMLInputElement>;
 
@@ -40,6 +41,7 @@ const Input = memo(
         inputClassName,
         adornmentClassName,
         optional,
+        labelActions,
         actions,
         onFocus,
         onBlur,
@@ -77,7 +79,7 @@ const Input = memo(
 
       return (
         <div className={classNames("flex flex-col text-base", className)}>
-          {(label || actions || optional) && (
+          {(label || labelActions || optional) && (
             <div className="flex justify-between items-center mx-4 mb-2">
               {label && (
                 <label
@@ -87,8 +89,8 @@ const Input = memo(
                   {label}
                 </label>
               )}
-              {actions}
-              {optional && !actions && (
+              {labelActions}
+              {optional && !labelActions && (
                 <span className="text-xs text-brand-inactivedark2 self-end">
                   optional
                 </span>
@@ -109,7 +111,7 @@ const Input = memo(
                 "w-full",
                 "py-3 px-4",
                 !!StartAdornment && "pl-10",
-                !!EndAdornment && "pr-10",
+                (!!EndAdornment || !!actions) && "pr-10",
                 "box-border",
                 "text-brand-light leading-none",
                 "border",
@@ -137,10 +139,15 @@ const Input = memo(
               disabled={disabled}
               {...rest}
             />
-            {!!EndAdornment && (
+            {!!EndAdornment && !actions && (
               <EndAdornment
                 className={classNames(adornmentClassNames, "right-4")}
               />
+            )}
+            {!!actions && (
+              <span className="absolute top-1/2 -translate-y-1/2 right-3">
+                {actions}
+              </span>
             )}
           </div>
           <div
