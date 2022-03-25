@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, Suspense, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
@@ -32,7 +32,10 @@ function matchSettingTab(settingTab: SettingTab) {
 const SettingsTab: FC = () => {
   const settingTab = useAtomValue(settingTabAtom);
 
-  return useMemo(() => <>{matchSettingTab(settingTab)}</>, [settingTab]);
+  return useMemo(
+    () => <Suspense fallback={null}>{matchSettingTab(settingTab)}</Suspense>,
+    [settingTab]
+  );
 };
 
 export default SettingsTab;

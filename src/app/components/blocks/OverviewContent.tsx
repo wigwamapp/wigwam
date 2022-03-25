@@ -12,6 +12,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
+import { navigate } from "lib/navigation";
 
 import {
   AccountAsset,
@@ -22,6 +23,7 @@ import {
 import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
@@ -171,28 +173,30 @@ const AssetsList: FC = () => {
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
-        <SearchInput
-          ref={searchInputRef}
-          searchValue={searchValue}
-          toggleSearchValue={setSearchValue}
-        />
-        <IconedButton
-          Icon={ControlIcon}
-          iconProps={{
-            isActive: manageModeEnabled,
-          }}
-          theme="tertiary"
-          className={classNames(
-            "ml-2",
-            manageModeEnabled && "bg-brand-main/30"
-          )}
-          aria-label={
-            manageModeEnabled
-              ? "Finish managing assets list"
-              : "Manage assets list"
-          }
-          onClick={toggleManageMode}
-        />
+        <TippySingletonProvider>
+          <SearchInput
+            ref={searchInputRef}
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+          />
+          <IconedButton
+            Icon={ControlIcon}
+            iconProps={{
+              isActive: manageModeEnabled,
+            }}
+            theme="tertiary"
+            className={classNames(
+              "ml-2",
+              manageModeEnabled && "bg-brand-main/30"
+            )}
+            aria-label={
+              manageModeEnabled
+                ? "Finish managing assets list"
+                : "Manage assets list"
+            }
+            onClick={toggleManageMode}
+          />
+        </TippySingletonProvider>
       </div>
       {tokens.length <= 0 && searchValue ? (
         <button
@@ -340,6 +344,13 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
+  const openLink = useCallback(
+    (page: Page) => {
+      navigate({ page, token: tokenSlug });
+    },
+    [tokenSlug]
+  );
+
   if (!tokenInfo || !parsedTokenSlug) {
     return <></>;
   }
@@ -419,7 +430,11 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
-        <NewButton theme="secondary" className="grow !py-2">
+        <NewButton
+          theme="secondary"
+          className="grow !py-2"
+          onClick={() => openLink(Page.Transfer)}
+        >
           <SendIcon className="mr-2" />
           Transfer
         </NewButton>

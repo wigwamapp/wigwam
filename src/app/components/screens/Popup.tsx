@@ -15,11 +15,13 @@ import { dequal } from "dequal/lite";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
+import { createAccountTokenKey } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
+import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens } from "app/hooks/tokens";
 import PopupLayout from "app/components/layouts/PopupLayout";
 import PreloadUnlocked from "app/components/layouts/PreloadUnlocked";
@@ -39,7 +41,6 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
-import { createAccountTokenKey } from "core/common/tokens";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const Popup: FC = () => (
@@ -185,45 +186,46 @@ const AssetsList: FC = () => {
   return (
     <>
       <div className="flex items-center mt-5">
-        <Tooltip
-          content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-          asChild
-        >
-          <span>
-            <AssetsSwitcher
-              theme="small"
-              checked={isNftsSelected}
-              onCheckedChange={setIsNftsSelected}
-            />
-          </span>
-        </Tooltip>
-        <SearchInput
-          ref={searchInputRef}
-          searchValue={searchValue}
-          toggleSearchValue={setSearchValue}
-          className="ml-2"
-          inputClassName="max-h-9 !pl-9 !pr-10"
-          placeholder="Type to search..."
-          adornmentClassName="!left-3"
-          clearButtonClassName="!right-3"
-        />
-        <IconedButton
-          Icon={ControlIcon}
-          iconProps={{
-            isActive: manageModeEnabled,
-          }}
-          theme="tertiary"
-          className={classNames(
-            "ml-2 mr-2",
-            manageModeEnabled && "bg-brand-main/30"
-          )}
-          aria-label={
-            manageModeEnabled
-              ? "Finish managing assets list"
-              : "Manage assets list"
-          }
-          onClick={() => setManageModeEnabled(!manageModeEnabled)}
-        />
+        <TippySingletonProvider>
+          <Tooltip
+            content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+            asChild
+          >
+            <span>
+              <AssetsSwitcher
+                theme="small"
+                checked={isNftsSelected}
+                onCheckedChange={setIsNftsSelected}
+              />
+            </span>
+          </Tooltip>
+          <SearchInput
+            ref={searchInputRef}
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+            className="ml-2"
+            inputClassName="max-h-9 !pl-9"
+            placeholder="Type to search..."
+            adornmentClassName="!left-3"
+          />
+          <IconedButton
+            Icon={ControlIcon}
+            iconProps={{
+              isActive: manageModeEnabled,
+            }}
+            theme="tertiary"
+            className={classNames(
+              "ml-2 mr-2",
+              manageModeEnabled && "bg-brand-main/30"
+            )}
+            aria-label={
+              manageModeEnabled
+                ? "Finish managing assets list"
+                : "Manage assets list"
+            }
+            onClick={() => setManageModeEnabled(!manageModeEnabled)}
+          />
+        </TippySingletonProvider>
       </div>
       {tokens.length <= 0 && searchValue ? (
         <button
@@ -436,7 +438,12 @@ const AssetCard = memo(
               >
                 Info
               </PopoverButton>
-              <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
+              <PopoverButton
+                Icon={SendIcon}
+                onClick={() => openLink(Page.Transfer)}
+              >
+                Transfer
+              </PopoverButton>
               <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
               <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
             </DropdownMenu.Content>

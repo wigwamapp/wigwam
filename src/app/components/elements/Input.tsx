@@ -20,6 +20,7 @@ export type InputProps = {
   errorMessage?: string;
   inputClassName?: string;
   adornmentClassName?: string;
+  labelActions?: ReactNode;
   actions?: ReactNode;
 } & HTMLProps<HTMLInputElement>;
 
@@ -30,6 +31,7 @@ const Input = memo(
         className,
         label,
         id,
+        name,
         StartAdornment,
         EndAdornment,
         disabled,
@@ -39,6 +41,7 @@ const Input = memo(
         inputClassName,
         adornmentClassName,
         optional,
+        labelActions,
         actions,
         onFocus,
         onBlur,
@@ -76,19 +79,24 @@ const Input = memo(
 
       return (
         <div className={classNames("flex flex-col text-base", className)}>
-          <div className="flex justify-between items-center mx-4 mb-2">
-            {label && (
-              <label htmlFor={id} className="cursor-pointer text-brand-gray">
-                {label}
-              </label>
-            )}
-            {actions}
-            {optional && !actions && (
-              <span className="text-xs text-brand-inactivedark2 self-end">
-                optional
-              </span>
-            )}
-          </div>
+          {(label || labelActions || optional) && (
+            <div className="flex justify-between items-center mx-4 mb-2">
+              {label && (
+                <label
+                  htmlFor={id ?? name}
+                  className="cursor-pointer text-brand-gray"
+                >
+                  {label}
+                </label>
+              )}
+              {labelActions}
+              {optional && !labelActions && (
+                <span className="text-xs text-brand-inactivedark2 self-end">
+                  optional
+                </span>
+              )}
+            </div>
+          )}
           <div className="group relative">
             {!!StartAdornment && (
               <StartAdornment
@@ -97,12 +105,13 @@ const Input = memo(
             )}
             <input
               ref={ref}
-              id={id}
+              id={id ?? name}
+              name={name}
               className={classNames(
                 "w-full",
                 "py-3 px-4",
                 !!StartAdornment && "pl-10",
-                !!EndAdornment && "pr-10",
+                (!!EndAdornment || !!actions) && "pr-10",
                 "box-border",
                 "text-brand-light leading-none",
                 "border",
@@ -130,10 +139,15 @@ const Input = memo(
               disabled={disabled}
               {...rest}
             />
-            {!!EndAdornment && (
+            {!!EndAdornment && !actions && (
               <EndAdornment
                 className={classNames(adornmentClassNames, "right-4")}
               />
+            )}
+            {!!actions && (
+              <span className="absolute top-1/2 -translate-y-1/2 right-3">
+                {actions}
+              </span>
             )}
           </div>
           <div

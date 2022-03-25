@@ -92,7 +92,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
         onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        actions={
+        labelActions={
           withMaxButton ? (
             <button
               type="button"

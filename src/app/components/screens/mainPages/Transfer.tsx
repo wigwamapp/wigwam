@@ -1,4 +1,4 @@
-import { FC, Suspense, useMemo } from "react";
+import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { transferTabAtom } from "app/atoms";
@@ -21,17 +21,15 @@ const Transfer: FC = () => {
     <>
       <WalletsList />
 
-      <div className="flex mt-5 min-h-0 grow">
+      <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
         <ScrollAreaContainer
-          className="box-content w-full px-6 -mt-5"
+          className="box-content w-full px-6"
           viewPortClassName="pb-20 pt-5"
           scrollBarClassName="py-0 pt-5 pb-20"
         >
           <div className="max-w-[23.25rem]">
-            <Suspense fallback={null}>
-              <TransferTab />
-            </Suspense>
+            <TransferTab />
           </div>
         </ScrollAreaContainer>
       </div>

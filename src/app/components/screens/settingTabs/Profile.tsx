@@ -1,5 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
-import classNames from "clsx";
+import { FC, useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 import type { FormApi } from "final-form";
@@ -11,14 +10,12 @@ import { changePassword } from "core/client";
 
 import { composeValidators, differentPasswords, required } from "app/utils";
 import { profileStateAtom } from "app/atoms";
-
-import Input, { InputProps } from "app/components/elements/Input";
+import { TippySingletonProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
-import IconedButton from "app/components/elements/IconedButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import ProfileGen from "app/components/blocks/ProfileGen";
-import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
+import Separator from "app/components/elements/Seperator";
+import PasswordField from "app/components/elements/PasswordField";
 
 type FormValuesType = {
   oldPwd: string;
@@ -62,7 +59,7 @@ const Profile: FC = () => {
   );
 
   return (
-    <div className={classNames("flex flex-col grow", "px-6")}>
+    <>
       <SettingsHeader>Edit Profile</SettingsHeader>
       <ProfileGen
         label="Profile name"
@@ -73,37 +70,56 @@ const Profile: FC = () => {
         className="px-2"
       />
 
-      <hr className="w-full border-brand-main/[.07] mt-6 mb-8" />
+      <Separator className="mt-6 mb-8" />
 
       <SettingsHeader>Change password</SettingsHeader>
       <Form
         onSubmit={handlePasswordChange}
         render={({ handleSubmit, submitting, submitError, values }) => (
           <form className="max-w-[18rem]" onSubmit={handleSubmit}>
-            <PasswordField
-              name="oldPwd"
-              validate={composeValidators(required)}
-              errorMessage={submitError}
-              label="Old password"
-              placeholder="Type old password"
-              className="mb-4"
-            />
-            <PasswordField
-              name="newPwd"
-              validate={composeValidators(required)}
-              label="New password"
-              placeholder="Type new password"
-              className="mb-4"
-            />
-            <PasswordField
-              name="confirmNewPwd"
-              validate={composeValidators(
-                required,
-                differentPasswords(values.newPwd)
-              )}
-              label="Confirm new password"
-              placeholder="Confirm new password"
-            />
+            <TippySingletonProvider>
+              <Field name="oldPwd" validate={required}>
+                {({ input, meta }) => (
+                  <PasswordField
+                    error={submitError || (meta.error && meta.touched)}
+                    errorMessage={submitError ?? meta.error}
+                    label="Old password"
+                    placeholder="Type old password"
+                    className="mb-4"
+                    {...input}
+                  />
+                )}
+              </Field>
+              <Field name="newPwd" validate={required}>
+                {({ input, meta }) => (
+                  <PasswordField
+                    error={submitError || (meta.error && meta.touched)}
+                    errorMessage={submitError ?? meta.error}
+                    label="New password"
+                    placeholder="Type new password"
+                    className="mb-4"
+                    {...input}
+                  />
+                )}
+              </Field>
+              <Field
+                name="confirmNewPwd"
+                validate={composeValidators(
+                  required,
+                  differentPasswords(values.newPwd)
+                )}
+              >
+                {({ input, meta }) => (
+                  <PasswordField
+                    error={submitError || (meta.error && meta.touched)}
+                    errorMessage={submitError ?? meta.error}
+                    label="Confirm new password"
+                    placeholder="Confirm new password"
+                    {...input}
+                  />
+                )}
+              </Field>
+            </TippySingletonProvider>
             <NewButton
               type="submit"
               className="!py-2 mt-8"
@@ -114,48 +130,8 @@ const Profile: FC = () => {
           </form>
         )}
       />
-    </div>
+    </>
   );
 };
 
 export default Profile;
-
-type PasswordFieldProps = {
-  name: string;
-  validate: (val: string) => string | undefined;
-  errorMessage?: string;
-} & Omit<InputProps, "name" | "ref">;
-
-const PasswordField: FC<PasswordFieldProps> = ({
-  name,
-  validate,
-  errorMessage,
-  ...rest
-}) => {
-  const [show, setShow] = useState(false);
-
-  return (
-    <Field name={name} validate={validate}>
-      {({ input, meta }) => (
-        <div className="max-w-[19rem] w-full relative">
-          <Input
-            id={name}
-            type={show ? "text" : "password"}
-            error={errorMessage || (meta.error && meta.touched)}
-            errorMessage={errorMessage ?? meta.error}
-            {...rest}
-            {...input}
-          />
-          <IconedButton
-            Icon={show ? EyeIcon : OpenedEyeIcon}
-            aria-label={`${show ? "Hide" : "Show"} password`}
-            theme="tertiary"
-            onClick={() => setShow(!show)}
-            tabIndex={-1}
-            className="absolute top-[2.625rem] right-3"
-          />
-        </div>
-      )}
-    </Field>
-  );
-};

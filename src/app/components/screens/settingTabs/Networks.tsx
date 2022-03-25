@@ -42,7 +42,7 @@ const Networks: FC = () => {
   const cancelEditing = useCallback(() => setTab(null), []);
 
   return (
-    <>
+    <div className="pt-6 flex grow">
       <div
         className={classNames(
           "flex flex-col",
@@ -56,7 +56,7 @@ const Networks: FC = () => {
           toggleSearchValue={(value: string | null) => setSearchValue(value)}
         />
         <ScrollAreaContainer
-          className={classNames("flex flex-col", "pr-5 -mr-5 mt-5")}
+          className={classNames("pr-5 -mr-5 mt-5")}
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
         >
@@ -86,7 +86,7 @@ const Networks: FC = () => {
           onCancelHandler={cancelEditing}
         />
       )}
-    </>
+    </div>
   );
 };
 

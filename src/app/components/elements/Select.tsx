@@ -140,6 +140,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 toggleSearchValue={(value) => {
                   onSearch(value);
                 }}
+                inputClassName="max-h-9 !pl-9"
+                adornmentClassName="!left-3"
               />
             </div>
           )}
