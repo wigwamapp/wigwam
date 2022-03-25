@@ -216,8 +216,9 @@ const AssetsList: FC = () => {
       ) : (
         <ScrollAreaContainer
           ref={scrollAreaRef}
+          viewportAsChild
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          viewPortClassName="pb-20 rounded-t-[.625rem] !flex flex-col"
           scrollBarClassName="py-0 pb-20"
         >
           {tokens.map((asset, i) => (
@@ -286,8 +287,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
-        <span className="flex flex-col w-full">
-          <span className={"text-sm font-bold leading-4"}>{name}</span>
+        <span className="flex flex-col w-full min-w-0">
+          <span className="text-sm font-bold leading-4 truncate">{name}</span>
           <span className="mt-auto flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}
