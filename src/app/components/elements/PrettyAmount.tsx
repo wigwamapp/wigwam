@@ -36,12 +36,19 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   const integerPart = convertedAmount.decimalPlaces(0);
   const decimalPlaces = convertedAmount.toString().split(".")[1];
 
-  let decSplit = isMinified ? 2 : 6;
+  const isFiatMinified =
+    currency === "$" && (convertedAmount.gte(0.01) || isMinified);
+
+  let decSplit = isMinified || isFiatMinified ? 2 : 6;
   if (integerPart.gte(1_000)) {
     decSplit = 2;
   }
 
-  const finalDecLength = decimalPlaces ? decimalPlaces.length : 0;
+  const finalDecLength = decimalPlaces
+    ? isFiatMinified
+      ? 2
+      : decimalPlaces.length
+    : 0;
 
   let isShownDecTooltip = false;
   if (finalDecLength > decSplit) {
@@ -52,12 +59,16 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     integerPart.toString().length > (isMinified ? 3 : 6);
 
   let tooltipContent = getPrettyAmount({
-    value: convertedAmount,
+    value: isFiatMinified
+      ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+      : convertedAmount,
     dec: isMinified ? 3 : undefined,
     locale: currentLocale,
   });
   let content = getPrettyAmount({
-    value: convertedAmount,
+    value: isFiatMinified
+      ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+      : convertedAmount,
     dec: isMinified ? 3 : undefined,
     locale: currentLocale,
   });

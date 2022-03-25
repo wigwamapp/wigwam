@@ -84,7 +84,6 @@ const syncAccountTokens = mem(
           ? +new BigNumber(rawBalance)
               .div(10 ** token.decimals)
               .times(token.price)
-              .toFixed(2, 1)
           : 0;
 
         const dbKey = createAccountTokenKey({
