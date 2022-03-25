@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, Suspense, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
@@ -24,7 +24,10 @@ function matchTransferTab(transferTab: TransferTabEnum) {
 const TransferTab: FC = () => {
   const transferTab = useAtomValue(transferTabAtom);
 
-  return useMemo(() => <>{matchTransferTab(transferTab)}</>, [transferTab]);
+  return useMemo(
+    () => <Suspense fallback={null}>{matchTransferTab(transferTab)}</Suspense>,
+    [transferTab]
+  );
 };
 
 export default TransferTab;

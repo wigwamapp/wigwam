@@ -1,4 +1,4 @@
-import { FC, Suspense, useMemo } from "react";
+import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { settingTabAtom } from "app/atoms";
@@ -6,9 +6,11 @@ import { SettingTab } from "app/nav";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 
 import SettingsTab from "./Settings.Tab";
+import ScrollAreaContainer from "../../elements/ScrollAreaContainer";
 
 const Settings: FC = () => {
   const activeTabRoute = useAtomValue(settingTabAtom);
+
   const activeRoute = useMemo(
     () =>
       tabsContent.find(({ route }) => route.setting === activeTabRoute)?.route,
@@ -16,12 +18,20 @@ const Settings: FC = () => {
   );
 
   return (
-    <div className="flex mt-5 min-h-0 grow">
+    <div className="flex min-h-0 grow">
       <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
 
-      <Suspense fallback={null}>
+      {activeTabRoute !== SettingTab.Networks ? (
+        <ScrollAreaContainer
+          className="box-content w-full px-6"
+          viewPortClassName="pb-20 pt-5"
+          scrollBarClassName="py-0 pt-5 pb-20"
+        >
+          <SettingsTab />
+        </ScrollAreaContainer>
+      ) : (
         <SettingsTab />
-      </Suspense>
+      )}
     </div>
   );
 };

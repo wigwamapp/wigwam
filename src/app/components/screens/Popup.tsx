@@ -436,7 +436,12 @@ const AssetCard = memo(
               >
                 Info
               </PopoverButton>
-              <PopoverButton Icon={SendIcon}>Transfer</PopoverButton>
+              <PopoverButton
+                Icon={SendIcon}
+                onClick={() => openLink(Page.Transfer)}
+              >
+                Transfer
+              </PopoverButton>
               <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
               <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
             </DropdownMenu.Content>

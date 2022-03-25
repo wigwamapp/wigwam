@@ -1,11 +1,12 @@
 import { FC } from "react";
 import classNames from "clsx";
 
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as VigvamLogo } from "app/icons/Vigvam.svg";
 
 const About: FC = () => {
   return (
-    <div className={classNames("flex flex-col items-start", "pt-3 px-4")}>
+    <div className="flex flex-col items-start pt-3">
       <AboutHeader>Vigvam version</AboutHeader>
       <div className="text-brand-font font-bold text-xl leading-none">
         10.4.1
@@ -16,7 +17,7 @@ const About: FC = () => {
       </p>
       <AboutHeader>Links</AboutHeader>
       <LinksBlock links={linksPolicy} />
-      <hr className="w-[4.5rem] my-3 border-brand-main/[.07]" />
+      <Separator className="w-[4.5rem] my-3" />
       <LinksBlock links={linksInformative} />
       <div className="flex items-center mt-12">
         <VigvamLogo className="w-[3.25rem] h-auto" />

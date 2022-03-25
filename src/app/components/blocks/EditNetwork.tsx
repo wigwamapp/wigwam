@@ -8,7 +8,7 @@ import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
-import { ReactComponent as EditIcon } from "app/icons/edit.svg";
+import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 
 const emptyState = {
   nName: "",
@@ -77,7 +77,7 @@ const EditNetwork = memo<EditNetworkProps>(
     const isNative = network && network.type !== "unknown";
 
     return (
-      <div className={classNames("flex flex-col", "pl-6")}>
+      <div className={classNames("flex flex-col grow", "pl-6")}>
         <div className="flex items-center">
           {isNew ? (
             <PlusCircleIcon className="w-8 h-auto" />
@@ -90,68 +90,70 @@ const EditNetwork = memo<EditNetworkProps>(
         </div>
 
         <ScrollAreaContainer
-          className={classNames("flex flex-col mt-6 pr-8")}
+          className={classNames("flex flex-col grow mt-6 pr-8")}
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
         >
-          <form onSubmit={handleSubmit}>
-            <Input
-              id="network"
-              value={state.nName}
-              onChange={onChangeInput("nName")}
-              label="Network Name"
-              readOnly={isNative}
-            />
-            <Input
-              id="rpc"
-              className="mt-4"
-              value={state.rpcUrl}
-              onChange={onChangeInput("rpcUrl")}
-              label={"RPC URL"}
-              readOnly={isNative}
-            />
-            <Input
-              id="chainId"
-              className="mt-4"
-              value={state.chainId}
-              onChange={onChangeInput("chainId")}
-              label="Chain ID"
-              readOnly={isNative}
-            />
-            <Input
-              id="currencySymbol"
-              className="mt-4"
-              value={state.currencySymbol}
-              onChange={onChangeInput("currencySymbol")}
-              label="Currency symbol"
-              optional
-              readOnly={isNative}
-            />
-            <Input
-              id="blockExplorer"
-              className="mt-4"
-              value={state.blockExplorer}
-              onChange={onChangeInput("blockExplorer")}
-              label="Block explorer"
-              optional
-              readOnly={isNative}
-            />
-            <div className="flex mt-6">
-              <NewButton
-                theme="secondary"
-                onClick={handleClear}
-                className="!py-2 w-full"
-              >
-                Cancel
-              </NewButton>
+          <form onSubmit={handleSubmit} className="flex flex-col items-start">
+            <div>
+              <Input
+                id="network"
+                value={state.nName}
+                onChange={onChangeInput("nName")}
+                label="Network Name"
+                readOnly={isNative}
+              />
+              <Input
+                id="rpc"
+                className="mt-4"
+                value={state.rpcUrl}
+                onChange={onChangeInput("rpcUrl")}
+                label={"RPC URL"}
+                readOnly={isNative}
+              />
+              <Input
+                id="chainId"
+                className="mt-4"
+                value={state.chainId}
+                onChange={onChangeInput("chainId")}
+                label="Chain ID"
+                readOnly={isNative}
+              />
+              <Input
+                id="currencySymbol"
+                className="mt-4"
+                value={state.currencySymbol}
+                onChange={onChangeInput("currencySymbol")}
+                label="Currency symbol"
+                optional
+                readOnly={isNative}
+              />
+              <Input
+                id="blockExplorer"
+                className="mt-4"
+                value={state.blockExplorer}
+                onChange={onChangeInput("blockExplorer")}
+                label="Block explorer"
+                optional
+                readOnly={isNative}
+              />
+              <div className="flex mt-6">
+                <NewButton
+                  theme="secondary"
+                  onClick={handleClear}
+                  className="!py-2 w-full"
+                >
+                  Cancel
+                </NewButton>
 
-              <NewButton
-                type="submit"
-                className="!py-2 ml-4 w-full"
-                disabled={isNative}
-              >
-                {isNew ? "Add" : "Save"}
-              </NewButton>
+                <NewButton
+                  type="submit"
+                  className="!py-2 ml-4 w-full"
+                  disabled={isNative}
+                >
+                  {isNew ? "Add" : "Save"}
+                </NewButton>
+              </div>
             </div>
           </form>
         </ScrollAreaContainer>

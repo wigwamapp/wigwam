@@ -18,7 +18,7 @@ const Switcher: FC<SwitcherProps> = ({
   onCheckedChange,
   className,
 }) => (
-  <div className={classNames("flex flex-col", className)}>
+  <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
     {label && (
       <label
         className={classNames(

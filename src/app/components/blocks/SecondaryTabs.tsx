@@ -4,6 +4,7 @@ import { Destination, Link } from "lib/navigation";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import Separator from "../elements/Seperator";
 
 type SecondaryTabsProps = {
   tabs: SecondaryItemProps[];
@@ -18,13 +19,13 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
 }) => (
   <ScrollAreaContainer
     className={classNames(
+      "relative",
       "flex flex-col",
       "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
-      "border-r border-brand-main/[.07]",
       className
     )}
-    viewPortClassName="pb-20 rounded-t-[.625rem]"
-    scrollBarClassName="py-0 pb-20 !right-1"
+    viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
+    scrollBarClassName="py-0 pt-5 pb-20 !right-1"
   >
     {tabs.map(({ title, route, desc }, i) => (
       <SecondaryItem
@@ -36,6 +37,7 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
         className={classNames(i !== tabs.length - 1 && "mb-2")}
       />
     ))}
+    <Separator direction="vertical" position="end" className="!top-5" />
   </ScrollAreaContainer>
 );
 

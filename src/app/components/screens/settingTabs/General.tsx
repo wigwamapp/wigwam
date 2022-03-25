@@ -1,5 +1,4 @@
 import { FC, useMemo } from "react";
-import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { setLocale } from "lib/ext/i18n";
 
@@ -35,7 +34,7 @@ const General: FC = () => {
   };
 
   return (
-    <div className={classNames("flex flex-col", "px-4")}>
+    <div className="flex flex-col items-start">
       <SettingsHeader>General</SettingsHeader>
       <SelectLanguage
         selected={locale}

@@ -1,5 +1,4 @@
 import { FC, useCallback, useMemo, useState } from "react";
-import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 import type { FormApi } from "final-form";
@@ -17,6 +16,7 @@ import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import ProfileGen from "app/components/blocks/ProfileGen";
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 
@@ -62,7 +62,7 @@ const Profile: FC = () => {
   );
 
   return (
-    <div className={classNames("flex flex-col grow", "px-6")}>
+    <>
       <SettingsHeader>Edit Profile</SettingsHeader>
       <ProfileGen
         label="Profile name"
@@ -73,7 +73,7 @@ const Profile: FC = () => {
         className="px-2"
       />
 
-      <hr className="w-full border-brand-main/[.07] mt-6 mb-8" />
+      <Separator className="mt-6 mb-8" />
 
       <SettingsHeader>Change password</SettingsHeader>
       <Form
@@ -114,7 +114,7 @@ const Profile: FC = () => {
           </form>
         )}
       />
-    </div>
+    </>
   );
 };
 
@@ -139,7 +139,6 @@ const PasswordField: FC<PasswordFieldProps> = ({
       {({ input, meta }) => (
         <div className="max-w-[19rem] w-full relative">
           <Input
-            id={name}
             type={show ? "text" : "password"}
             error={errorMessage || (meta.error && meta.touched)}
             errorMessage={errorMessage ?? meta.error}

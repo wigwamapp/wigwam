@@ -1,10 +1,10 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
-import { Link } from "lib/navigation";
+import { Link, navigate } from "lib/navigation";
 import { Page } from "app/nav";
-import { pageAtom } from "app/atoms";
+import { pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 import { NavLinksPrimary, NavLinksSecondary } from "./Sidebar.Links";
@@ -40,6 +40,8 @@ const Sidebar: FC = () => (
   </nav>
 );
 
+export default Sidebar;
+
 type SidebarBlockProps = {
   links: {
     route: Page;
@@ -51,6 +53,14 @@ type SidebarBlockProps = {
 
 const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
   const page = useAtomValue(pageAtom);
+  const tokenSlug = useAtomValue(tokenSlugAtom);
+
+  const openLink = useCallback(
+    (page: Page) => {
+      navigate(createRoute(page, tokenSlug));
+    },
+    [tokenSlug]
+  );
 
   return (
     <div className={classNames("flex flex-col", className)}>
@@ -58,9 +68,10 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
         const isPageActive = route === page;
 
         return (
-          <Link
+          <button
+            type="button"
             key={route}
-            to={{ page: route }}
+            onClick={() => openLink(route)}
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
@@ -86,11 +97,15 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               )}
             />
             {label}
-          </Link>
+          </button>
         );
       })}
     </div>
   );
 };
 
-export default Sidebar;
+const createRoute = (page: Page, tokenSlug: string | null) =>
+  (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
+  tokenSlug
+    ? { page, tokenSlug: tokenSlug }
+    : { page };

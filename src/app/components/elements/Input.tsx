@@ -30,6 +30,7 @@ const Input = memo(
         className,
         label,
         id,
+        name,
         StartAdornment,
         EndAdornment,
         disabled,
@@ -76,19 +77,24 @@ const Input = memo(
 
       return (
         <div className={classNames("flex flex-col text-base", className)}>
-          <div className="flex justify-between items-center mx-4 mb-2">
-            {label && (
-              <label htmlFor={id} className="cursor-pointer text-brand-gray">
-                {label}
-              </label>
-            )}
-            {actions}
-            {optional && !actions && (
-              <span className="text-xs text-brand-inactivedark2 self-end">
-                optional
-              </span>
-            )}
-          </div>
+          {(label || actions || optional) && (
+            <div className="flex justify-between items-center mx-4 mb-2">
+              {label && (
+                <label
+                  htmlFor={id ?? name}
+                  className="cursor-pointer text-brand-gray"
+                >
+                  {label}
+                </label>
+              )}
+              {actions}
+              {optional && !actions && (
+                <span className="text-xs text-brand-inactivedark2 self-end">
+                  optional
+                </span>
+              )}
+            </div>
+          )}
           <div className="group relative">
             {!!StartAdornment && (
               <StartAdornment
@@ -97,7 +103,8 @@ const Input = memo(
             )}
             <input
               ref={ref}
-              id={id}
+              id={id ?? name}
+              name={name}
               className={classNames(
                 "w-full",
                 "py-3 px-4",

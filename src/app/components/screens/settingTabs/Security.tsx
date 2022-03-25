@@ -21,6 +21,7 @@ import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import IconedButton from "app/components/elements/IconedButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
@@ -31,7 +32,7 @@ const Security: FC = () => {
   const [phishing, setPhishing] = useState(false);
 
   return (
-    <div className="flex flex-col items-start grow pl-4">
+    <div className="flex flex-col items-start">
       <SettingsHeader>Reveal Seed Phrase</SettingsHeader>
       <NewButton
         theme="secondary"
@@ -45,9 +46,10 @@ const Security: FC = () => {
         <RevealIcon className="w-[1.625rem] h-auto mr-3" />
         Reveal
       </NewButton>
-      <hr className="w-full my-8 border-brand-main/[.07]" />
+      <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>
       <Switcher
+        id="syncThirdParty"
         text={syncData ? "Syncing" : "Not syncing"}
         label="Sync data using third-party explorers"
         checked={syncData}
@@ -55,6 +57,7 @@ const Security: FC = () => {
         className="min-w-[20rem]"
       />
       <Switcher
+        id="phishingDetection"
         text={phishing ? "Enabled" : "Disabled"}
         checked={phishing}
         label="Use Phishing Detection"
