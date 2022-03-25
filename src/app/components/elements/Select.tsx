@@ -21,6 +21,7 @@ type SelectProps<T, U> = {
   searchValue?: string | null;
   onSearch?: (value: string | null) => void;
   showSelected?: boolean;
+  showSelectedIcon?: boolean;
   itemRef?: any;
   loadMoreOnItemFromEnd?: number;
   className?: string;
@@ -38,6 +39,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   searchValue,
   onSearch,
   showSelected = false,
+  showSelectedIcon = true,
   modal = true,
   itemRef,
   loadMoreOnItemFromEnd = 1,
@@ -172,9 +174,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
                       "w-full mb-1 last:mb-0",
                       "flex items-center",
                       "px-3",
-                      showSelected && item.key === currentItem.key
+                      showSelected &&
+                        showSelectedIcon &&
+                        item.key === currentItem.key
                         ? "py-1.5"
                         : "py-2",
+                      // showSelected &&
+                      //   item.key === currentItem.key &&
+                      //   "!bg-brand-main/10", // Test this variant
                       "rounded-[.625rem]",
                       "cursor-pointer",
                       "text-sm font-bold",
@@ -203,9 +210,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
                         />
                       )}
                       {item.value}
-                      {showSelected && item.key === currentItem.key && (
-                        <SelectedIcon className="ml-auto" />
-                      )}
+                      {showSelected &&
+                        showSelectedIcon &&
+                        item.key === currentItem.key && (
+                          <SelectedIcon className="ml-auto" />
+                        )}
                     </button>
                   </DropdownMenu.Item>
                 ))}
