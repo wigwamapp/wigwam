@@ -173,28 +173,30 @@ const AssetsList: FC = () => {
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
-        <SearchInput
-          ref={searchInputRef}
-          searchValue={searchValue}
-          toggleSearchValue={setSearchValue}
-        />
-        <IconedButton
-          Icon={ControlIcon}
-          iconProps={{
-            isActive: manageModeEnabled,
-          }}
-          theme="tertiary"
-          className={classNames(
-            "ml-2",
-            manageModeEnabled && "bg-brand-main/30"
-          )}
-          aria-label={
-            manageModeEnabled
-              ? "Finish managing assets list"
-              : "Manage assets list"
-          }
-          onClick={toggleManageMode}
-        />
+        <TippySingletonProvider>
+          <SearchInput
+            ref={searchInputRef}
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+          />
+          <IconedButton
+            Icon={ControlIcon}
+            iconProps={{
+              isActive: manageModeEnabled,
+            }}
+            theme="tertiary"
+            className={classNames(
+              "ml-2",
+              manageModeEnabled && "bg-brand-main/30"
+            )}
+            aria-label={
+              manageModeEnabled
+                ? "Finish managing assets list"
+                : "Manage assets list"
+            }
+            onClick={toggleManageMode}
+          />
+        </TippySingletonProvider>
       </div>
       {tokens.length <= 0 && searchValue ? (
         <button
