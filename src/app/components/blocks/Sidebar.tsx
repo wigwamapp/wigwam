@@ -1,8 +1,8 @@
-import { FC, useCallback } from "react";
+import { FC } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
-import { Link, navigate } from "lib/navigation";
+import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
@@ -55,23 +55,16 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
   const page = useAtomValue(pageAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
 
-  const openLink = useCallback(
-    (page: Page) => {
-      navigate(createRoute(page, tokenSlug));
-    },
-    [tokenSlug]
-  );
-
   return (
     <div className={classNames("flex flex-col", className)}>
       {links.map(({ route, label, Icon }) => {
         const isPageActive = route === page;
 
         return (
-          <button
+          <Link
             type="button"
             key={route}
-            onClick={() => openLink(route)}
+            to={createRoute(route, tokenSlug)}
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
@@ -97,7 +90,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               )}
             />
             {label}
-          </button>
+          </Link>
         );
       })}
     </div>
@@ -107,5 +100,5 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 const createRoute = (page: Page, tokenSlug: string | null) =>
   (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
   tokenSlug
-    ? { page, tokenSlug: tokenSlug }
+    ? { page, token: tokenSlug }
     : { page };

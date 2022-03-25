@@ -6,6 +6,9 @@ import {
   forwardRef,
 } from "react";
 import useForceUpdate from "use-force-update";
+import { dequal } from "dequal/lite";
+import { useMemoCompare } from "lib/react-hooks/useMemoCompare";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 import { changeState, listen } from "lib/history";
 
 import { Destination } from "./types";
@@ -14,30 +17,38 @@ import { isModifiedEvent, toHash, toURL } from "./utils";
 export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   to: Destination;
   replace?: boolean;
-  merge?: boolean;
+  merge?: boolean | string[];
 };
 
 const Link = forwardRef<HTMLAnchorElement, LinkProps>(
   ({ to, replace, merge, children, onClick, target, ...rest }, ref) => {
     const forceUpdate = useForceUpdate();
 
+    to = useMemoCompare(to, dequal);
+    merge = useMemoCompare(merge, dequal);
+
     const urlRef = useRef<string | undefined>();
+
     const generateUrl = useCallback(
       () => toURL(toHash(to, merge)),
       [to, merge]
     );
 
-    if (!urlRef.current) {
+    const prevGenerateUrl = usePrevious(generateUrl);
+
+    if (!urlRef.current || generateUrl !== prevGenerateUrl) {
       urlRef.current = generateUrl();
     }
 
     useEffect(
       () =>
-        listen(() => {
-          urlRef.current = generateUrl();
-          forceUpdate();
-        }),
-      [forceUpdate, generateUrl]
+        merge
+          ? listen(() => {
+              urlRef.current = undefined;
+              forceUpdate();
+            })
+          : undefined,
+      [merge, forceUpdate]
     );
 
     const url = urlRef.current;
