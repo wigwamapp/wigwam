@@ -7,6 +7,7 @@ import { AccountAsset, TokenType } from "core/types";
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
 import Avatar from "./Avatar";
@@ -66,8 +67,15 @@ const TokenSelect: FC = () => {
   );
 
   const preparedTokens = useMemo(
-    () => tokens.map((token) => prepareToken(token as AccountAsset)),
-    [tokens]
+    () =>
+      tokens.map((token) =>
+        prepareToken(
+          token as AccountAsset,
+          "small",
+          token.tokenSlug === tokenSlug
+        )
+      ),
+    [tokenSlug, tokens]
   );
 
   const preparedCurrentToken = useMemo(
@@ -86,6 +94,8 @@ const TokenSelect: FC = () => {
       label="Token"
       itemRef={loadMoreTriggerAssetRef}
       loadMoreOnItemFromEnd={LOAD_MORE_ON_ASSET_FROM_END}
+      showSelected
+      showSelectedIcon={false}
       currentItemClassName={classNames("!p-3")}
       contentClassName="w-[23.25rem] flex flex-col"
     />
@@ -96,10 +106,11 @@ const TokenSelect: FC = () => {
 
 export default TokenSelect;
 
-const Token: FC<{ asset: AccountAsset; size?: "small" | "large" }> = ({
-  asset,
-  size = "small",
-}) => {
+const Token: FC<{
+  asset: AccountAsset;
+  isSelected?: boolean;
+  size?: "small" | "large";
+}> = ({ asset, isSelected = false, size = "small" }) => {
   const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
   return (
@@ -111,13 +122,28 @@ const Token: FC<{ asset: AccountAsset; size?: "small" | "large" }> = ({
         size === "small" && "items-center"
       )}
     >
-      <Avatar
-        src={logoUrl}
-        className={classNames(
-          size === "large" && "w-10 h-10 min-w-[2.5rem] mr-3",
-          size === "small" && "w-8 h-8 min-w-[2rem] mr-3"
+      <span className="relative mr-3">
+        <Avatar
+          src={logoUrl}
+          className={classNames(
+            size === "large" && "w-10 h-10 min-w-[2.5rem]",
+            size === "small" && "w-8 h-8 min-w-[2rem]"
+          )}
+          imageClassName={classNames(isSelected && "opacity-20")}
+        />
+        {isSelected && (
+          <span
+            className={classNames(
+              "absolute inset-0",
+              "rounded-full",
+              "border border-brand-light",
+              "flex items-center justify-center"
+            )}
+          >
+            <SelectedIcon className="fill-brand-light" />
+          </span>
         )}
-      />
+      </span>
       <span className="flex flex-col justify-between text-left grow min-w-0">
         <span className="flex justify-between">
           <span className="truncate">{symbol}</span>
@@ -145,8 +171,9 @@ const Token: FC<{ asset: AccountAsset; size?: "small" | "large" }> = ({
 
 const prepareToken = (
   asset: AccountAsset,
-  size: "large" | "small" = "small"
+  size: "large" | "small" = "small",
+  isSelected = false
 ) => ({
   key: asset.tokenSlug,
-  value: <Token asset={asset} size={size} />,
+  value: <Token asset={asset} size={size} isSelected={isSelected} />,
 });
