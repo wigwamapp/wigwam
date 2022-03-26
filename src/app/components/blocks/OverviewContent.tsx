@@ -299,6 +299,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               <PrettyAmount
                 amount={balanceUSD ?? 0}
                 currency="$"
+                isMinified
                 className={classNames(
                   "ml-2",
                   "text-sm leading-4",
