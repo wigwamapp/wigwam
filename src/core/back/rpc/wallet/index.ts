@@ -53,8 +53,8 @@ browser.windows.onRemoved.addListener((removedWinId) => {
 });
 
 async function createApproveWindow() {
-  const width = 380;
-  const height = 600;
+  const width = 440;
+  const height = 660;
 
   let left = 0;
   let top = 0;

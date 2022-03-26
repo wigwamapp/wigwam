@@ -128,9 +128,12 @@ const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
       } else {
         addressesToAdd.add(address);
       }
+
+      setThToggleChecked(addressesToAdd.size === addresses?.length);
+
       forceUpdate();
     },
-    [forceUpdate]
+    [addresses, forceUpdate]
   );
 
   const [thToggleChecked, setThToggleChecked] = useState(false);
