@@ -244,10 +244,11 @@ const AssetsList: FC = () => {
         </button>
       ) : (
         <ScrollAreaContainer
-          className="pr-3.5 -mr-3.5 mt-2"
-          viewPortClassName="pb-16 rounded-t-[.625rem]"
-          scrollBarClassName="py-0 pb-16"
+          viewportAsChild
           hiddenScrollbar="horizontal"
+          className="pr-3.5 -mr-3.5 mt-2"
+          viewPortClassName="pb-16 rounded-t-[.625rem] !flex flex-col"
+          scrollBarClassName="py-0 pb-16"
         >
           {tokens.map((asset, i) => (
             <AssetCard
@@ -352,8 +353,8 @@ const AssetCard = memo(
             alt={name}
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />
-          <span className="flex flex-col w-full">
-            <span className="text-sm font-bold leading-5">{name}</span>
+          <span className="flex flex-col w-full min-w-0">
+            <span className="text-sm font-bold leading-5 truncate">{name}</span>
             <span className="mt-auto flex justify-between items-end">
               <PrettyAmount
                 amount={rawBalance ?? 0}
