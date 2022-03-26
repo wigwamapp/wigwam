@@ -1,19 +1,21 @@
 import { memo, Suspense, useRef } from "react";
+import { useAtomValue } from "jotai/utils";
+import classNames from "clsx";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "app/components/blocks/addAccountSteps/ChooseAddAccountWay";
-import AddSeedPhrase from "app/components/blocks/addAccountSteps/AddSeedPhrase";
-import VerifySeedPhrase from "app/components/blocks/addAccountSteps/VerifySeedPhrase";
-import SelectAccountDerivation from "app/components/blocks/addAccountSteps/SelectAccountDerivation";
-import AddPrivateKey from "app/components/blocks/addAccountSteps/AddPrivateKey";
-import SelectAccountsToAddMethod from "app/components/blocks/addAccountSteps/SelectAccountsToAddMethod";
-import VerifyAccountToAdd from "app/components/blocks/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "app/components/blocks/addAccountSteps/SetupPassword";
+import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
+import AddSeedPhrase from "../screens/addAccountSteps/AddSeedPhrase";
+import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
+import SelectAccountDerivation from "../screens/addAccountSteps/SelectAccountDerivation";
+import AddPrivateKey from "../screens/addAccountSteps/AddPrivateKey";
+import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
+import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
+import SetupPassword from "../screens/addAccountSteps/SetupPassword";
 
-const STEPS: AllSteps<AddAccountStep> = [
+const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
   [AddAccountStep.AddSeedPhrase, () => <AddSeedPhrase />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
@@ -28,13 +30,22 @@ const STEPS: AllSteps<AddAccountStep> = [
 ];
 
 const AddAccountSteps = memo(() => {
+  const accountStep = useAtomValue(addAccountStepAtom);
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={rootRef} className="overflow-y-scroll h-full">
-      <StepsProvider rootRef={rootRef} atom={addAccountStepAtom} steps={STEPS}>
+      <StepsProvider
+        rootRef={rootRef}
+        atom={addAccountStepAtom}
+        steps={ADD_ACCOUNT_STEPS}
+      >
         {({ children }) => (
-          <div className="mb-24">
+          <div
+            className={classNames(
+              accountStep === AddAccountStep.ChooseWay ? "mb-16" : "mb-24"
+            )}
+          >
             <Suspense fallback={null}>
               <div className="mt-24">{children}</div>
             </Suspense>

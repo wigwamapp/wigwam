@@ -19,7 +19,7 @@ const Tooltip: FC<TooltipProps> = ({
   maxWidth,
   placement,
   hideOnClick = false,
-  size = "large",
+  size = "small",
   asChild = false,
   className,
   children,
@@ -57,12 +57,12 @@ const Tooltip: FC<TooltipProps> = ({
             options: {
               offset: ({ placement }: any) => {
                 if (placement.endsWith("start")) {
-                  return [-10, 10];
+                  return [-10, 6];
                 }
                 if (placement.endsWith("end")) {
-                  return [10, 10];
+                  return [10, 6];
                 }
-                return [0, 10];
+                return [0, 6];
               },
             },
           },
@@ -90,6 +90,6 @@ const getSizeClasses = (size: sizeType) =>
       classNames(
         "rounded-md",
         "bg-brand-main/20 backdrop-blur-[6px]",
-        "py-1.5 px-3"
+        "py-1 px-3"
       )
     );

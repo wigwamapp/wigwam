@@ -14,7 +14,6 @@ type SearchInput = Omit<
   toggleSearchValue: (value: string | null) => void;
   inputClassName?: string;
   adornmentClassName?: string;
-  clearButtonClassName?: string;
 };
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInput>(
@@ -26,39 +25,34 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInput>(
       className,
       inputClassName,
       adornmentClassName,
-      clearButtonClassName,
       ...rest
     },
     ref
   ) => (
-    <div className={classNames("relative w-full", className)}>
-      <Input
-        ref={ref}
-        placeholder={placeholder}
-        StartAdornment={SearchIcon}
-        value={searchValue ?? ""}
-        onChange={(e) => {
-          e.preventDefault();
-          toggleSearchValue(e.currentTarget.value);
-        }}
-        className="w-full"
-        inputClassName={classNames("max-h-10 text-sm pr-11", inputClassName)}
-        adornmentClassName={adornmentClassName}
-        {...rest}
-      />
-      {searchValue && (
-        <IconedButton
-          theme="tertiary"
-          Icon={ClearIcon}
-          aria-label="Clear"
-          onClick={() => toggleSearchValue(null)}
-          className={classNames(
-            "absolute right-4 top-1/2 -translate-y-1/2",
-            clearButtonClassName
-          )}
-        />
-      )}
-    </div>
+    <Input
+      ref={ref}
+      placeholder={placeholder}
+      StartAdornment={SearchIcon}
+      value={searchValue ?? ""}
+      onChange={(e) => {
+        e.preventDefault();
+        toggleSearchValue(e.currentTarget.value);
+      }}
+      className={classNames("w-full", className)}
+      inputClassName={classNames("max-h-10 text-sm", inputClassName)}
+      adornmentClassName={adornmentClassName}
+      actions={
+        searchValue && (
+          <IconedButton
+            theme="tertiary"
+            Icon={ClearIcon}
+            aria-label="Clear"
+            onClick={() => toggleSearchValue(null)}
+          />
+        )
+      }
+      {...rest}
+    />
   )
 );
 

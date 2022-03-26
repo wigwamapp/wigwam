@@ -1,13 +1,21 @@
 import { FC } from "react";
+import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
-import { currentLocaleAtom } from "../../atoms";
+import { followCursor } from "tippy.js";
+
+import { currentLocaleAtom } from "app/atoms";
+
+import CopiableTooltip from "./CopiableTooltip";
+
+BigNumber.set({ EXPONENTIAL_AT: 38 });
 
 type PrettyAmountProps = {
-  amount: string | number | BigNumber;
+  amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;
   isMinified?: boolean;
+  copiable?: boolean;
   className?: string;
 };
 
@@ -16,14 +24,13 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   decimals = 0,
   currency,
   isMinified,
+  copiable = false,
   className,
 }) => {
   const currentLocale = useAtomValue(currentLocaleAtom);
 
-  const bigNumberAmount = new BigNumber(amount);
-  if (!bigNumberAmount) {
-    return <></>;
-  }
+  const amountExist = amount !== null;
+  const bigNumberAmount = new BigNumber(amount ?? 0);
 
   const convertedAmount = bigNumberAmount.div(10 ** decimals);
   const integerPart = convertedAmount.decimalPlaces(0);
@@ -41,78 +48,75 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     isShownDecTooltip = true;
   }
 
-  const isWithDots = convertedAmount
-    .decimalPlaces(decSplit, BigNumber.ROUND_DOWN)
-    .gt(0);
-
   const isShownIntTooltip =
     integerPart.toString().length > (isMinified ? 3 : 6);
 
+  let tooltipContent = getPrettyAmount({
+    value: convertedAmount,
+    dec: isMinified ? 3 : undefined,
+    locale: currentLocale,
+  });
+  let content = getPrettyAmount({
+    value: convertedAmount,
+    dec: isMinified ? 3 : undefined,
+    locale: currentLocale,
+  });
+
   if (isShownIntTooltip) {
+    content = getPrettyAmount({
+      value: convertedAmount,
+      dec: isMinified ? 3 : 6,
+      locale: currentLocale,
+    });
+
+    tooltipContent = getPrettyAmount({
+      value: convertedAmount,
+      dec: 38,
+      locale: currentLocale,
+    });
+  }
+
+  if (isShownDecTooltip && !isShownIntTooltip) {
+    content = getPrettyAmount({
+      value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
+      dec: isMinified ? 3 : undefined,
+      locale: currentLocale,
+      withTooltip: true,
+    });
+
+    tooltipContent = getPrettyAmount({
+      value: convertedAmount,
+      locale: currentLocale,
+    });
+  }
+
+  className = classNames(className, "whitespace-nowrap");
+
+  if (!amountExist) {
+    className = classNames(className, "invisible pointer-events-none");
+  }
+
+  const children = <AmountWithCurrency amount={content} currency={currency} />;
+
+  if (copiable) {
     return (
-      <span className={className}>
-        {/*Tooltip*/}
-        {/*<AmountWithCurrency*/}
-        {/*  amount={getPrettyAmount({*/}
-        {/*    value: convertedAmount,*/}
-        {/*    dec: 1e38,*/}
-        {/*    locale: currentLocale,*/}
-        {/*  })}*/}
-        {/*  currency={currency}*/}
-        {/*/>*/}
-        {/*Tooltip*/}
-        <AmountWithCurrency
-          amount={getPrettyAmount({
-            value: convertedAmount,
-            dec: isMinified ? 3 : 6,
-            locale: currentLocale,
-          })}
-          currency={currency}
-        />
-      </span>
+      <CopiableTooltip
+        content={
+          <AmountWithCurrency amount={tooltipContent} currency={currency} />
+        }
+        textToCopy={tooltipContent}
+        followCursor
+        plugins={[followCursor]}
+        asChild
+        className={className}
+        duration={[100, 50]}
+      >
+        {children}
+      </CopiableTooltip>
     );
   }
 
-  if (isShownDecTooltip) {
-    return (
-      <span className={className}>
-        {/*Tooltip*/}
-        {/*<AmountWithCurrency*/}
-        {/*  amount={getPrettyAmount({*/}
-        {/*    value: convertedAmount,*/}
-        {/*    locale: currentLocale,*/}
-        {/*  })}*/}
-        {/*  currency={currency}*/}
-        {/*/>*/}
-        {/*Tooltip*/}
-        <AmountWithCurrency
-          amount={getPrettyAmount({
-            value: convertedAmount.decimalPlaces(
-              decSplit,
-              BigNumber.ROUND_DOWN
-            ),
-            dec: isMinified ? 3 : undefined,
-            locale: currentLocale,
-            withTooltip: isWithDots,
-          })}
-          currency={currency}
-        />
-      </span>
-    );
-  }
-
-  return (
-    <span className={className}>
-      <AmountWithCurrency
-        amount={getPrettyAmount({
-          value: convertedAmount,
-          dec: isMinified ? 3 : undefined,
-          locale: currentLocale,
-        })}
-        currency={currency}
-      />
-    </span>
-  );
+  return <span className={className}>{children}</span>;
 };
 
 export default PrettyAmount;
@@ -163,8 +167,13 @@ export const getPrettyAmount = ({
   withTooltip?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
+    const isLargerThenTrillion = new BigNumber(value).gt(1e18);
+    const minFract = isLargerThenTrillion ? 0 : 2;
+    const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
+
     let finalValue = new Intl.NumberFormat(locale, {
-      maximumFractionDigits: dec > 4 ? 3 : 2,
+      minimumFractionDigits: minFract,
+      maximumFractionDigits: maxFract,
       notation: "compact",
     } as any).format(+value);
 
@@ -172,7 +181,7 @@ export const getPrettyAmount = ({
     if (checkIfObjectsKey(finalSplitLetter)) {
       finalValue = `${new BigNumber(value)
         .div(currenciesCompacts[finalSplitLetter])
-        .decimalPlaces(dec > 4 ? 3 : 2, BigNumber.ROUND_DOWN)
+        .decimalPlaces(maxFract, BigNumber.ROUND_DOWN)
         .toString()}${finalSplitLetter}`;
     }
 
@@ -180,6 +189,7 @@ export const getPrettyAmount = ({
   }
 
   return `${new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 20,
   }).format(+value)}${withTooltip ? "..." : ""}`;
 };

@@ -13,9 +13,6 @@ import * as types from "core/types";
 import * as common from "core/common";
 import * as repo from "core/repo";
 import * as client from "core/client";
-import { AccountToken, TokenStandard, TokenType } from "core/types";
-import { IndexableTypeArray } from "dexie";
-import { createTokenSlug } from "core/common/tokens";
 
 Object.assign(window, {
   ...cryptoUtils,
@@ -33,7 +30,6 @@ Object.assign(window, {
   reset,
   getAllStorage,
   BigNumber,
-  fakeAccountTokens,
 });
 
 async function reset() {
@@ -47,55 +43,91 @@ function getAllStorage() {
   return browser.storage.local.get();
 }
 
-async function fakeAccountTokens(accountAddress: string) {
-  if (!accountAddress) return;
+if (process.env.RELEASE_ENV === "false") {
+  const downloadCurrentProfile = async () => {
+    const { exportCurrentProfile } = await import("core/common/importExport");
+    const { name, blob } = await exportCurrentProfile();
 
-  const data = await fetch(
-    "https://openapi.debank.com/v1/user/token_list?id=0xd61f95aa7a1777c737c3105d3a8991611ddc3b15&chain_id=bsc&is_all=false"
-  ).then((r) => r.json());
+    const fileName = `${name}.vigvam`;
+    const fileURL = URL.createObjectURL(blob);
 
-  const chainId = 1;
-  const tokenType = TokenType.Asset;
+    const anchor = document.createElement("a");
+    anchor.style.display = "none";
+    anchor.href = fileURL;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
 
-  const accTokens: AccountToken[] = [];
-  const dbKeys: IndexableTypeArray = [];
+    setTimeout(() => {
+      anchor.click();
+      document.body.removeChild(anchor);
 
-  for (const token of data) {
-    const tokenSlug = createTokenSlug({
-      standard: TokenStandard.ERC20,
-      address: token.id,
-      id: "0",
+      setTimeout(() => URL.revokeObjectURL(anchor.href), 250);
+    }, 66);
+  };
+
+  const uploadProfile = async () => {
+    const { importProfile } = await import("core/common/importExport");
+
+    const modal = document.createElement("div");
+    Object.assign(modal.style, {
+      position: "fixed",
+      zIndex: 9999,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.90)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
     });
 
-    const rawBalance = ethers.BigNumber.from(
-      token.raw_amount_hex_str
-    ).toString();
+    const profileLabel = document.createElement("label");
+    profileLabel.textContent = "Import profile";
+    profileLabel.className = "font-semibold text-lg text-white mb-2";
 
-    const balanceUSD =
-      rawBalance !== "0"
-        ? token.price &&
-          +new BigNumber(rawBalance)
-            .div(10 ** token.decimals)
-            .times(token.price)
-            .toFormat(2, BigNumber.ROUND_DOWN)
-        : -1;
+    const uploadField = document.createElement("input");
+    uploadField.type = "file";
+    uploadField.accept = ".vigvam";
+    uploadField.className = `mb-6 text-sm text-slate-500
+    p-4 border border-white rounded-md cursor-pointer
+    file:mr-4 file:py-2 file:px-4
+    file:rounded-full file:border-0
+    file:text-sm file:font-semibold
+    file:bg-white file:text-violet-700
+    file:cursor-pointer`;
 
-    accTokens.push({
-      chainId,
-      accountAddress,
-      tokenSlug,
-      tokenType,
-      decimals: token.decimals,
-      name: token.name,
-      symbol: token.symbol,
-      logoUrl: token.logo_url,
-      rawBalance,
-      balanceUSD,
-      priceUSD: token.price,
+    const closeButton = document.createElement("button");
+    closeButton.innerText = "Close";
+    Object.assign(closeButton.style, {
+      padding: "0.5rem 1rem",
+      color: "white",
+      fontSize: "2rem",
     });
+    closeButton.onclick = () => {
+      document.body.removeChild(modal);
+    };
 
-    dbKeys.push([chainId, accountAddress, tokenSlug].join("_"));
-  }
+    modal.appendChild(profileLabel);
+    modal.appendChild(uploadField);
+    modal.appendChild(closeButton);
+    document.body.appendChild(modal);
 
-  await repo.accountTokens.bulkPut(accTokens, dbKeys);
+    uploadField.onchange = () => {
+      const file = uploadField.files?.[0];
+      if (file) {
+        importProfile(file)
+          .then((p) => {
+            profile.changeProfile(p.id);
+          })
+          .catch((err) => alert(err.message));
+      }
+    };
+  };
+
+  Object.assign(window, {
+    downloadCurrentProfile,
+    uploadProfile,
+  });
 }

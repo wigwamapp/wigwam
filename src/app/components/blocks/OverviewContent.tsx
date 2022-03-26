@@ -10,12 +10,22 @@ import {
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
-import { TReplace } from "lib/ext/i18n/react";
+import * as repo from "core/repo";
+import * as Checkbox from "@radix-ui/react-checkbox";
+import { navigate } from "lib/navigation";
 
-import { AccountAsset, TokenStandard, TokenType } from "core/types";
-import { parseTokenSlug } from "core/common/tokens";
+import {
+  AccountAsset,
+  TokenStandard,
+  TokenStatus,
+  TokenType,
+} from "core/types";
+import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 
+import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
 import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
 import IconedButton from "app/components/elements/IconedButton";
@@ -23,12 +33,15 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import NewButton from "app/components/elements/NewButton";
 import SearchInput from "app/components/elements/SearchInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import { ReactComponent as ConfigIcon } from "app/icons/control.svg";
+import ControlIcon from "app/components/elements/ControlIcon";
+import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -44,15 +57,30 @@ const AssetsList: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [manageModeEnabled, setManageModeEnabled] = useState(false);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const setDefaultTokenRef = useRef(!tokenSlug);
+
+  const handleAccountTokensReset = useCallback(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
+
+    setDefaultTokenRef.current = true;
+  }, []);
 
   const { tokens, loadMore, hasMore } = useAccountTokens(
     TokenType.Asset,
     currentAccount.address,
-    { search: searchValue ?? undefined, limit: 10 }
+    {
+      withDisabled: manageModeEnabled,
+      search: searchValue ?? undefined,
+      onReset: handleAccountTokensReset,
+    }
   );
 
   const observer = useRef<IntersectionObserver>();
-  const lastAssetRef = useCallback(
+  const loadMoreTriggerAssetRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -72,11 +100,64 @@ const AssetsList: FC = () => {
     [hasMore, loadMore, tokens]
   );
 
+  // A little hack to avoid using `manageModeEnabled` dependency
+  const manageModeEnabledRef = useRef<boolean>();
+  if (manageModeEnabledRef.current !== manageModeEnabled) {
+    manageModeEnabledRef.current = manageModeEnabled;
+  }
+
   useEffect(() => {
-    if (tokens && tokens[0] && !tokenSlug) {
+    if (
+      setDefaultTokenRef.current &&
+      tokens.length > 0 &&
+      !manageModeEnabledRef.current
+    ) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      setDefaultTokenRef.current = false;
     }
-  }, [setTokenSlug, tokenSlug, tokens]);
+  }, [setTokenSlug, tokens]);
+
+  const handleAssetClick = useCallback(
+    async (asset: AccountAsset) => {
+      if (manageModeEnabled) {
+        if (asset.status === TokenStatus.Native) return;
+
+        try {
+          await repo.accountTokens.put(
+            {
+              ...asset,
+              status:
+                asset.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
+            },
+            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setTokenSlug([asset.tokenSlug, "replace"]);
+      }
+    },
+    [currentAccount.address, manageModeEnabled, setTokenSlug]
+  );
+
+  const toggleManageMode = useCallback(() => {
+    if (!manageModeEnabled) {
+      setTokenSlug([RESET]);
+    }
+
+    setManageModeEnabled((mode) => !mode);
+  }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const focusSearchInput = useCallback(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.select();
+    }
+  }, []);
 
   return (
     <div
@@ -92,40 +173,70 @@ const AssetsList: FC = () => {
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
-        <SearchInput
-          searchValue={searchValue}
-          toggleSearchValue={setSearchValue}
-        />
-        <IconedButton
-          Icon={ConfigIcon}
-          theme="tertiary"
-          className="ml-2"
-          aria-label="Manage assets list"
-        />
+        <TippySingletonProvider>
+          <SearchInput
+            ref={searchInputRef}
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+          />
+          <IconedButton
+            Icon={ControlIcon}
+            iconProps={{
+              isActive: manageModeEnabled,
+            }}
+            theme="tertiary"
+            className={classNames(
+              "ml-2",
+              manageModeEnabled && "bg-brand-main/30"
+            )}
+            aria-label={
+              manageModeEnabled
+                ? "Finish managing assets list"
+                : "Manage assets list"
+            }
+            onClick={toggleManageMode}
+          />
+        </TippySingletonProvider>
       </div>
-      <ScrollAreaContainer
-        className="pr-5 -mr-5 mt-4"
-        viewPortClassName="pb-20 rounded-t-[.625rem]"
-        scrollBarClassName="py-0 pb-20"
-      >
-        {tokens.map((asset, i) => {
-          const isLastOne = i === tokens.length - 1;
-
-          return (
+      {tokens.length <= 0 && searchValue ? (
+        <button
+          type="button"
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
+          )}
+          onClick={focusSearchInput}
+        >
+          <NoResultsFoundIcon className="mb-4" />
+          Can&apos;t find a token?
+          <br />
+          Put an address into the search line to find it.
+        </button>
+      ) : (
+        <ScrollAreaContainer
+          ref={scrollAreaRef}
+          className="pr-5 -mr-5 mt-4"
+          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          scrollBarClassName="py-0 pb-20"
+        >
+          {tokens.map((asset, i) => (
             <AssetCard
-              key={asset.tokenSlug}
-              ref={isLastOne ? lastAssetRef : null}
+              key={createAccountTokenKey(asset)}
+              ref={
+                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
               asset={asset as AccountAsset}
-              isActive={tokenSlug === asset.tokenSlug}
-              onAssetSelect={() => {
-                setTokenSlug([asset.tokenSlug, "replace"]);
-                setSearchValue(null);
-              }}
-              className={classNames(!isLastOne && "mb-2")}
+              isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
+              onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
+              isManageMode={manageModeEnabled}
+              className={classNames(i !== tokens.length - 1 && "mb-2")}
             />
-          );
-        })}
-      </ScrollAreaContainer>
+          ))}
+        </ScrollAreaContainer>
+      )}
     </div>
   );
 };
@@ -134,12 +245,20 @@ type AssetCardProps = {
   asset: AccountAsset;
   isActive?: boolean;
   onAssetSelect: () => void;
+  isManageMode: boolean;
   className?: string;
 };
 
 const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  ({ asset, isActive = false, onAssetSelect, className }, ref) => {
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+  (
+    { asset, isActive = false, onAssetSelect, isManageMode, className },
+    ref
+  ) => {
+    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
+      asset;
+    const nativeAsset = status === TokenStatus.Native;
+    const disabled = status === TokenStatus.Disabled;
+    const hoverable = isManageMode ? !nativeAsset : !isActive;
 
     return (
       <button
@@ -147,54 +266,68 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         type="button"
         onClick={onAssetSelect}
         className={classNames(
+          "relative",
           "flex items-stretch",
           "w-full p-3",
           "text-left",
           "rounded-[.625rem]",
           "group",
-          "transition-colors",
-          !isActive && "hover:bg-brand-main/10",
+          "transition",
+          hoverable && "hover:bg-brand-main/10",
           isActive && "bg-brand-main/20",
+          disabled && "opacity-60",
+          "hover:opacity-100",
           className
         )}
+        disabled={isManageMode && nativeAsset}
       >
-        <span
-          className={classNames(
-            "block",
-            "w-11 h-11 min-w-[2.75rem] mr-3",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </span>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-11 h-11 min-w-[2.75rem] mr-3"
+        />
         <span className="flex flex-col w-full">
-          <span className="text-sm font-bold leading-4">
-            <TReplace msg={name} />
-          </span>
+          <span className={"text-sm font-bold leading-4"}>{name}</span>
           <span className="mt-auto flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}
               decimals={decimals}
               currency={symbol}
-              className="text-base font-bold leading-4"
+              className={"text-base font-bold leading-4"}
             />
-            <PrettyAmount
-              amount={balanceUSD ?? 0}
-              currency="$"
-              className={classNames(
-                "ml-2",
-                "text-sm leading-4",
-                !isActive && "text-brand-inactivedark",
-                isActive && "text-brand-light",
-                "transition-colors",
-                "group-hover:text-brand-light"
-              )}
-            />
+            {!isManageMode && (
+              <PrettyAmount
+                amount={balanceUSD ?? 0}
+                currency="$"
+                className={classNames(
+                  "ml-2",
+                  "text-sm leading-4",
+                  !isActive && "text-brand-inactivedark",
+                  isActive && "text-brand-light",
+                  "group-hover:text-brand-light"
+                )}
+              />
+            )}
+            {isManageMode && !nativeAsset && (
+              <Checkbox.Root
+                className={classNames(
+                  "absolute top-1/2 right-5 -translate-y-1/2",
+                  "w-5 h-5 min-w-[1.25rem]",
+                  "bg-brand-main/20",
+                  "rounded",
+                  "flex items-center justify-center",
+                  !disabled && "border border-brand-main"
+                )}
+                checked={!disabled}
+                asChild
+              >
+                <span>
+                  <Checkbox.Indicator>
+                    {!disabled && <CheckIcon />}
+                  </Checkbox.Indicator>
+                </span>
+              </Checkbox.Root>
+            )}
           </span>
         </span>
       </button>
@@ -203,26 +336,21 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 );
 
 const AssetInfo: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom)!;
-  // const currentAccount = useAtomValue(currentAccountAtom);
-  // const { tokens } = useAccountTokens(TokenType.Asset, currentAccount.address, {
-  //   limit: 1,
-  // });
+  const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
-  const handleTokenReset = useCallback(
-    () => setTokenSlug([RESET]),
-    [setTokenSlug]
-  );
-
-  const tokenInfo = useToken(tokenSlug, handleTokenReset) as AccountAsset;
+  const tokenInfo = useToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
 
-  // if (!tokenInfo && tokens[0]) {
-  //   setTokenSlug([tokens[0].tokenSlug, "replace"]);
-  // }
+  const openLink = useCallback(
+    (page: Page) => {
+      navigate({ page, token: tokenSlug });
+    },
+    [tokenSlug]
+  );
+
   if (!tokenInfo || !parsedTokenSlug) {
     return <></>;
   }
@@ -234,19 +362,11 @@ const AssetInfo: FC = () => {
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <div
-          className={classNames(
-            "w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5",
-            "bg-white",
-            "rounded-full overflow-hidden"
-          )}
-        >
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Avatar
+          src={logoUrl}
+          alt={name}
+          className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
+        />
         <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
             <h2
@@ -255,18 +375,20 @@ const AssetInfo: FC = () => {
               {name}
             </h2>
             {standard && <Tag standard={standard} />}
-            <IconedButton
-              aria-label="View wallet transactions in explorer"
-              Icon={WalletExplorerIcon}
-              className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
-              iconClassName="!w-[1.125rem]"
-            />
-            <IconedButton
-              aria-label="View wallet transactions in explorer"
-              Icon={ClockIcon}
-              className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-              iconClassName="!w-[1.125rem]"
-            />
+            <TippySingletonProvider>
+              <IconedButton
+                aria-label="View wallet transactions in explorer"
+                Icon={WalletExplorerIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
+                iconClassName="!w-[1.125rem]"
+              />
+              <IconedButton
+                aria-label="View wallet transactions in explorer"
+                Icon={ClockIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] ml-2"
+                iconClassName="!w-[1.125rem]"
+              />
+            </TippySingletonProvider>
           </div>
           <div className="flex flex-col">
             <span className="text-base text-brand-gray leading-none mb-0.5">
@@ -276,6 +398,7 @@ const AssetInfo: FC = () => {
               <PrettyAmount
                 amount={priceUSD ?? 0}
                 currency="$"
+                copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
               <PriceChange priceChange="2.8" isPercent />
@@ -292,12 +415,14 @@ const AssetInfo: FC = () => {
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
+            copiable
             className="text-[1.75rem] font-bold leading-none"
           />
 
           <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
+            copiable
             className="text-base text-brand-inactivedark ml-8 mr-4"
           />
 
@@ -305,7 +430,11 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
-        <NewButton theme="secondary" className="grow !py-2">
+        <NewButton
+          theme="secondary"
+          className="grow !py-2"
+          onClick={() => openLink(Page.Transfer)}
+        >
           <SendIcon className="mr-2" />
           Transfer
         </NewButton>
@@ -331,19 +460,20 @@ enum TokenStandardValue {
 
 type TagProps = { standard: TokenStandard };
 
-const Tag: FC<TagProps> = ({ standard }) => (
-  <span
-    className={classNames(
-      "py-2 px-4 mr-4",
-      "text-base font-bold leading-none",
-      "border border-brand-main/20",
-      "rounded-[.625rem]",
-      "whitespace-nowrap"
-    )}
-  >
-    {TokenStandardValue[standard]}
-  </span>
-);
+const Tag: FC<TagProps> = ({ standard }) =>
+  standard !== TokenStandard.Native ? (
+    <span
+      className={classNames(
+        "py-2 px-4 mr-4",
+        "text-base font-bold leading-none",
+        "border border-brand-main/20",
+        "rounded-[.625rem]",
+        "whitespace-nowrap"
+      )}
+    >
+      {TokenStandardValue[standard]}
+    </span>
+  ) : null;
 
 type PriceChangeProps = {
   priceChange: string;

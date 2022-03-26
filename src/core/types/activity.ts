@@ -16,16 +16,18 @@ export type ActivitySource =
       origin: string;
     };
 
-export type ForApproval = TxForApproval;
+export type Approval = TransactionApproval;
 
-export interface ForApprovalBase {
+export interface ApprovalBase {
+  id: string;
   type: ActivityType;
   source: ActivitySource;
   rpcReply: RpcReply;
 }
 
-export interface TxForApproval extends ForApprovalBase {
+export interface TransactionApproval extends ApprovalBase {
   type: ActivityType.Transaction;
   chainId: number;
+  accountAddress: string;
   txParams: any;
 }

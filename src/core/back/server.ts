@@ -13,7 +13,7 @@ import {
 
 import {
   $walletStatus,
-  $awaitingApproval,
+  $approvals,
   ensureInited,
   withStatus,
   withVault,
@@ -21,9 +21,12 @@ import {
   unlocked,
   walletPortsCountUpdated,
   accountsUpdated,
+  $syncStatus,
 } from "./state";
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
+import { processApprove } from "./approve";
+import { addSyncRequest } from "./sync";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -42,10 +45,17 @@ export function startServer() {
     walletPorter.broadcast({ type: MessageType.AccountsUpdated, accounts });
   });
 
-  $awaitingApproval.watch((awaitingApproval) => {
+  $approvals.watch((approvals) => {
     walletPorter.broadcast({
-      type: MessageType.AwaitingApprovalUpdated,
-      awaitingApproval,
+      type: MessageType.ApprovalsUpdated,
+      approvals,
+    });
+  });
+
+  $syncStatus.watch((status) => {
+    walletPorter.broadcast({
+      type: MessageType.SyncStatusUpdated,
+      status,
     });
   });
 
@@ -73,10 +83,10 @@ export function startServer() {
   // dappPorter.onMessage(handleDAppRequest);
 }
 
-async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
+async function handleWalletRequest(
+  ctx: MessageContext<Request | EventMessage, Response>
+) {
   console.debug("New wallet request", ctx);
-
-  if (!ctx.request) return;
 
   try {
     await ensureInited();
@@ -198,6 +208,32 @@ async function handleWalletRequest(ctx: MessageContext<Request, Response>) {
           const extendedKey = vault.getNeuterExtendedKey();
 
           ctx.reply({ type, extendedKey });
+        })
+      )
+      .with({ type: MessageType.GetApprovals }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, () => {
+          const approvals = $approvals.getState();
+
+          ctx.reply({ type, approvals });
+        })
+      )
+      .with({ type: MessageType.Approve }, ({ type, approve, approvalId }) =>
+        withVault(async (vault) => {
+          await processApprove(approvalId, approve, vault);
+
+          ctx.reply({ type });
+        })
+      )
+      .with({ type: MessageType.Sync }, ({ chainId, accountUuid }) =>
+        withStatus(WalletStatus.Unlocked, () => {
+          addSyncRequest({ chainId, accountUuid });
+        })
+      )
+      .with({ type: MessageType.GetSyncStatus }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, () => {
+          const status = $syncStatus.getState();
+
+          ctx.reply({ type, status });
         })
       )
       .with(

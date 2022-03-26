@@ -4,11 +4,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
-import { AddAccountStep } from "app/defaults";
+import { AddAccountStep } from "app/nav";
 import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
 import BackButton from "app/components/elements/BackButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AddAccountSteps from "app/components/blocks/AddAccountSteps";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
@@ -60,7 +61,7 @@ const AddAccountModal = memo(() => {
                 )}
                 ref={ref}
               >
-                <div
+                <ScrollAreaContainer
                   className={classNames(
                     "w-full h-full",
                     "bg-brand-dark/10",
@@ -74,6 +75,14 @@ const AddAccountModal = memo(() => {
                     "after:pointer-events-none",
                     "after:z-30"
                   )}
+                  scrollBarClassName={classNames(
+                    "pt-[4.25rem]",
+                    "!right-1",
+                    accountStep === AddAccountStep.ChooseWay
+                      ? "pb-[3.25rem]"
+                      : "pb-28"
+                  )}
+                  type="scroll"
                 >
                   {accountStep !== AddAccountStep.ChooseWay && (
                     <BackButton className="fixed top-4 left-4 " />
@@ -84,7 +93,7 @@ const AddAccountModal = memo(() => {
                   </Dialog.Close>
 
                   {accModalOpened && <AddAccountSteps />}
-                </div>
+                </ScrollAreaContainer>
               </Dialog.Content>
             )}
           </OverflowProvider>

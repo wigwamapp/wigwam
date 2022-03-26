@@ -7,8 +7,8 @@ import { walletStatusAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
 
 import BaseProvider from "./BaseProvider";
-import Unlock from "./pages/Unlock";
-import Popup from "./pages/Popup";
+import Unlock from "./screens/Unlock";
+import Popup from "./screens/Popup";
 
 const PopupApp: FC = () => (
   <BaseProvider>

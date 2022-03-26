@@ -21,6 +21,8 @@ type SelectProps<T, U> = {
   searchValue?: string | null;
   onSearch?: (value: string | null) => void;
   showSelected?: boolean;
+  itemRef?: any;
+  loadMoreOnItemFromEnd?: number;
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -37,6 +39,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
   onSearch,
   showSelected = false,
   modal = true,
+  itemRef,
+  loadMoreOnItemFromEnd = 1,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -49,15 +53,17 @@ function Select<T extends string | ReactElement, U extends string | number>({
   return (
     <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
       {!!label && (
-        <div
+        <button
+          type="button"
           className={classNames(
             "ml-4 mb-2",
-            "text-base font-normal",
+            "text-base font-normal text-left",
             "text-brand-gray"
           )}
+          onClick={() => setOpened(!opened)}
         >
           {label}
-        </div>
+        </button>
       )}
       <DropdownMenu.Root
         open={opened}
@@ -69,7 +75,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "flex items-center",
             "w-full",
-            "py-[10px] px-5",
+            "py-2.5 px-5",
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",
@@ -94,9 +100,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
           )}
           {currentItem.value}
           <ChevronDownIcon
-            className={classNames("ml-auto", "transition-transform", {
-              "rotate-180": opened,
-            })}
+            className={classNames(
+              "min-w-[1.5rem]",
+              "ml-auto",
+              "transition-transform",
+              {
+                "rotate-180": opened,
+              }
+            )}
           />
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
@@ -129,66 +140,76 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 toggleSearchValue={(value) => {
                   onSearch(value);
                 }}
+                inputClassName="max-h-9 !pl-9"
+                adornmentClassName="!left-3"
               />
             </div>
           )}
           <ScrollAreaContainer
+            viewportAsChild
             className={classNames(
               "max-h-64 pl-3 pr-4",
               "flex flex-col",
               scrollAreaClassName
             )}
-            viewPortClassName="py-3"
+            viewPortClassName="py-3 !flex flex-col"
             scrollBarClassName="py-3"
           >
-            {items
-              .filter((item) =>
-                showSelected ? item.key : item.key !== currentItem.key
-              )
-              .map((item) => (
-                <DropdownMenu.Item
-                  key={item.key}
-                  className={classNames(
-                    "w-full mb-1 last:mb-0",
-                    "flex items-center",
-                    "px-3",
-                    showSelected && item.key === currentItem.key
-                      ? "py-1.5"
-                      : "py-2",
-                    "rounded-[.625rem]",
-                    "cursor-pointer",
-                    "text-sm font-bold",
-                    "outline-none",
-                    "transition-colors",
-                    "hover:bg-brand-main/20 focus-visible:bg-brand-main/20"
-                  )}
-                  onSelect={() => {
-                    setOpened(false);
-                    setItem(item);
-                    if (onSearch) {
-                      onSearch(null);
+            <div>
+              {items
+                .filter((item) =>
+                  showSelected ? item.key : item.key !== currentItem.key
+                )
+                .map((item, i) => (
+                  <DropdownMenu.Item
+                    ref={
+                      i === items.length - loadMoreOnItemFromEnd - 1
+                        ? itemRef
+                        : null
                     }
-                  }}
-                  textValue={!!onSearch ? "" : undefined}
-                  asChild
-                >
-                  <button>
-                    {item.icon && (
-                      <img
-                        src={item.icon}
-                        alt={
-                          typeof item.value === "string" ? item.value : "Icon"
-                        }
-                        className={"w-6 h-6 mr-3"}
-                      />
+                    key={item.key}
+                    className={classNames(
+                      "w-full mb-1 last:mb-0",
+                      "flex items-center",
+                      "px-3",
+                      showSelected && item.key === currentItem.key
+                        ? "py-1.5"
+                        : "py-2",
+                      "rounded-[.625rem]",
+                      "cursor-pointer",
+                      "text-sm font-bold",
+                      "outline-none",
+                      "transition-colors",
+                      "hover:bg-brand-main/20 focus-visible:bg-brand-main/20"
                     )}
-                    {item.value}
-                    {showSelected && item.key === currentItem.key && (
-                      <SelectedIcon className="ml-auto" />
-                    )}
-                  </button>
-                </DropdownMenu.Item>
-              ))}
+                    onSelect={() => {
+                      setOpened(false);
+                      setItem(item);
+                      if (onSearch) {
+                        onSearch(null);
+                      }
+                    }}
+                    textValue={!!onSearch ? "" : undefined}
+                    asChild
+                  >
+                    <button>
+                      {item.icon && (
+                        <img
+                          src={item.icon}
+                          alt={
+                            typeof item.value === "string" ? item.value : "Icon"
+                          }
+                          className={"w-6 h-6 mr-3"}
+                        />
+                      )}
+                      {item.value}
+                      {showSelected && item.key === currentItem.key && (
+                        <SelectedIcon className="ml-auto" />
+                      )}
+                    </button>
+                  </DropdownMenu.Item>
+                ))}
+            </div>
           </ScrollAreaContainer>
         </DropdownMenu.Content>
       </DropdownMenu.Root>

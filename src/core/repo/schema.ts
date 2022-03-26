@@ -19,5 +19,6 @@ db.version(1).stores({
     "",
     "[chainId+tokenSlug]",
     "[chainId+tokenType+accountAddress+balanceUSD]",
+    "[chainId+tokenType+accountAddress+status+balanceUSD]",
   ].join(),
 });

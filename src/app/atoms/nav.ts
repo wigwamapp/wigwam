@@ -1,6 +1,12 @@
 import { atomWithURLHash } from "lib/atom-utils";
 
-import { Page, WelcomeStep, AddAccountStep, SettingTab } from "app/defaults";
+import {
+  Page,
+  WelcomeStep,
+  AddAccountStep,
+  SettingTab,
+  TransferTab,
+} from "app/nav";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
 
@@ -19,6 +25,11 @@ export const addAccountStepAtom = atomWithURLHash(
 export const settingTabAtom = atomWithURLHash<SettingTab>(
   "setting",
   SettingTab.General
+);
+
+export const transferTabAtom = atomWithURLHash<TransferTab>(
+  "transfer",
+  TransferTab.Asset
 );
 
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
