@@ -12,7 +12,6 @@ import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { navigate } from "lib/navigation";
 
 import {
   AccountAsset,
@@ -344,13 +343,6 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
-  const openLink = useCallback(
-    (page: Page) => {
-      navigate({ page, token: tokenSlug });
-    },
-    [tokenSlug]
-  );
-
   if (!tokenInfo || !parsedTokenSlug) {
     return <></>;
   }
@@ -433,7 +425,8 @@ const AssetInfo: FC = () => {
         <NewButton
           theme="secondary"
           className="grow !py-2"
-          onClick={() => openLink(Page.Transfer)}
+          to={{ page: Page.Transfer }}
+          merge={["token"]}
         >
           <SendIcon className="mr-2" />
           Transfer

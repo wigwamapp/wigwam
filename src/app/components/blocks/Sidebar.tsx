@@ -64,7 +64,10 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
           <Link
             type="button"
             key={route}
-            to={createRoute(route, tokenSlug)}
+            to={{
+              page: route,
+            }}
+            merge={withTokenSlug(page, tokenSlug) ? ["token"] : undefined}
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
@@ -97,8 +100,6 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
   );
 };
 
-const createRoute = (page: Page, tokenSlug: string | null) =>
+const withTokenSlug = (page: Page, tokenSlug: string | null) =>
   (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
-  tokenSlug
-    ? { page, token: tokenSlug }
-    : { page };
+  tokenSlug;
