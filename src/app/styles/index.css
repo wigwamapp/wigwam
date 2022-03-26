@@ -1,6 +1,6 @@
 @import "./fonts/inter.css";
 
-body {
+* {
   font-variant-ligatures: none;
 }
 
