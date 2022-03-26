@@ -10,6 +10,7 @@ import { walletStatusAtom, approvalsAtom } from "app/atoms";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
+import ConnectDapp from "./screens/approvePages/ConnectDapp";
 import LongTextField from "./elements/LongTextField";
 
 const ApproveApp: FC = () => (
@@ -24,7 +25,7 @@ const ApproveRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
-    .with(WalletStatus.Unlocked, () => <Approve />)
+    .with(WalletStatus.Unlocked, () => (true ? <ConnectDapp /> : <Approve />))
     .with(WalletStatus.Locked, () => <Unlock />)
     .otherwise(() => <Destroy />);
 };
