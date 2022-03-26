@@ -25,7 +25,7 @@ const ApproveRouter: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
 
   return match(walletStatus)
-    .with(WalletStatus.Unlocked, () => <ConnectDapp />)
+    .with(WalletStatus.Unlocked, () => (true ? <ConnectDapp /> : <Approve />))
     .with(WalletStatus.Locked, () => <Unlock />)
     .otherwise(() => <Destroy />);
 };
