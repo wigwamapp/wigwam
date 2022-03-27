@@ -25,7 +25,7 @@ const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
     AddAccountStep.SelectAccountsToAddMethod,
     () => <SelectAccountsToAddMethod />,
   ],
-  [AddAccountStep.VerifyToAdd, () => <VerifyAccountToAdd initialSetup />],
+  [AddAccountStep.VerifyToAdd, () => <VerifyAccountToAdd />],
   [AddAccountStep.SetupPassword, () => <SetupPassword />],
 ];
 

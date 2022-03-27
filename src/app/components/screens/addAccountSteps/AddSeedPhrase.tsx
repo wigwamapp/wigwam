@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
@@ -27,6 +27,7 @@ const WORDS_COUNT = [12, 15, 18, 21, 24];
 const AddSeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const currentLocale = useAtomValue(currentLocaleAtom);
+  const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
 
   const { stateRef, navigateToStep } = useSteps();
 
@@ -57,16 +58,16 @@ const AddSeedPhrase = memo(() => {
   );
   const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
 
-  const [seedPhraseText, setSeedPhraseText] = useState<string>("");
-
   const generateNew = useCallback(() => {
     const extraEntropy = getRandomBytes();
     const wallet = ethers.Wallet.createRandom({
       locale: wordlistLocale,
       extraEntropy,
     });
-    setSeedPhraseText(wallet.mnemonic.phrase);
-  }, [wordlistLocale, setSeedPhraseText]);
+    if (seedPhraseInputRef.current) {
+      seedPhraseInputRef.current.value = wallet.mnemonic.phrase;
+    }
+  }, [wordlistLocale]);
 
   useEffect(() => {
     if (!importExisting) {
@@ -75,8 +76,12 @@ const AddSeedPhrase = memo(() => {
   }, [generateNew, importExisting, wordlistLocale, wordsCount]);
 
   const handleContinue = useCallback(async () => {
+    const inputSeedPhrase = seedPhraseInputRef.current?.value;
+
+    if (!inputSeedPhrase) return;
+
     const seedPhrase: SeedPharse = {
-      phrase: toProtectedString(seedPhraseText),
+      phrase: toProtectedString(inputSeedPhrase),
       lang: wordlistLocale,
     };
 
@@ -97,14 +102,7 @@ const AddSeedPhrase = memo(() => {
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [
-    wordlistLocale,
-    seedPhraseText,
-    initialSetup,
-    importExisting,
-    stateRef,
-    navigateToStep,
-  ]);
+  }, [wordlistLocale, initialSetup, importExisting, stateRef, navigateToStep]);
 
   return (
     <>
@@ -136,9 +134,8 @@ const AddSeedPhrase = memo(() => {
         </div>
 
         <SeedPhraseField
-          value={seedPhraseText}
+          ref={seedPhraseInputRef}
           onRegenerate={() => generateNew()}
-          onChange={(evt) => setSeedPhraseText(evt.target.value)}
           placeholder={
             importExisting
               ? "Paste there your secret phrase"

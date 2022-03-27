@@ -9,6 +9,8 @@ import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
+import { ReactComponent as VerifiedIcon } from "app/icons/verified.svg";
+import { ReactComponent as BackgroundIcon } from "app/icons/button-full-screen-background.svg";
 
 import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
 
@@ -62,16 +64,20 @@ const ChooseAddAccountWay = memo(() => {
                 )}
               </div>
               <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
-                {section.tiles.map(({ title, Icon, action, soon }, i) => (
-                  <Tile
-                    key={i}
-                    title={title}
-                    Icon={Icon}
-                    action={action}
-                    soon={soon}
-                    className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
-                  />
-                ))}
+                {section.tiles.map(({ title, Icon, action, soon }, i) =>
+                  action ? (
+                    <Tile
+                      key={i}
+                      title={title}
+                      Icon={Icon}
+                      action={action}
+                      soon={soon}
+                      className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                    />
+                  ) : (
+                    <WarningMessage key="warning">{title}</WarningMessage>
+                  )
+                )}
               </div>
             </div>
           ))}
@@ -92,7 +98,7 @@ const ChooseAddAccountWay = memo(() => {
                   key={i}
                   title={title}
                   Icon={Icon}
-                  action={action}
+                  action={action!}
                   soon={soon}
                   className="mr-5"
                 />
@@ -104,7 +110,36 @@ const ChooseAddAccountWay = memo(() => {
   );
 });
 
-type TileProps = WaysReturnTile & {
+export default ChooseAddAccountWay;
+
+type WarningMessageProps = {
+  className?: string;
+};
+
+const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
+  <div
+    className={classNames(
+      "relative",
+      "w-full h-18 p-5 mb-[2.4375rem]",
+      "flex items-center",
+      "text-xs",
+      className
+    )}
+  >
+    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
+    {children}
+    <BackgroundIcon
+      className={classNames(
+        "absolute top-0 left-0 w-full h-full",
+        "bg-opacity-5",
+        "-z-10"
+      )}
+    />
+  </div>
+);
+
+type TileProps = Omit<WaysReturnTile, "action"> & {
+  action: () => void;
   className?: string;
 };
 
@@ -218,5 +253,3 @@ const calcWidth = (n: number, idx: number) =>
     : absToZero(n - idx * 0.2) > 0
     ? (n - idx * 0.2) * 500
     : 0;
-
-export default ChooseAddAccountWay;

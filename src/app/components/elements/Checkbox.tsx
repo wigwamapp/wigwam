@@ -6,10 +6,15 @@ import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 type CheckboxProps = {
   checked: boolean;
+  disabled?: boolean;
   className?: string;
 };
 
-const Checkbox: FC<CheckboxProps> = ({ checked, className }) => (
+const Checkbox: FC<CheckboxProps> = ({
+  checked,
+  disabled = false,
+  className,
+}) => (
   <div
     className={classNames(
       "w-5 h-5",
@@ -17,11 +22,14 @@ const Checkbox: FC<CheckboxProps> = ({ checked, className }) => (
       "rounded",
       "flex items-center justify-center",
       checked && "border border-brand-main",
+      disabled && "border border-brand-main/20",
       className
     )}
   >
     <CheckboxPrimitive.Indicator>
-      {checked && <CheckIcon />}
+      {checked && (
+        <CheckIcon className={classNames(disabled && "opacity-20")} />
+      )}
     </CheckboxPrimitive.Indicator>
   </div>
 );
