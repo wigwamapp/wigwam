@@ -217,6 +217,7 @@ export interface GetPublicKeyResponse extends MessageBase {
 
 export interface GetNeuterExtendedKeyRequest extends MessageBase {
   type: MessageType.GetNeuterExtendedKey;
+  derivationPath: string;
 }
 
 export interface GetNeuterExtendedKeyResponse extends MessageBase {

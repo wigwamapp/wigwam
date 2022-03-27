@@ -43,6 +43,7 @@ import {
   toNeuterExtendedKey,
   getSeedPhraseHDNode,
   validateNoAccountDuplicates,
+  validateDerivationPath,
 } from "core/common";
 
 const {
@@ -227,14 +228,18 @@ export class Vault {
     });
   }
 
-  getNeuterExtendedKey() {
+  getNeuterExtendedKey(derivationPath: string) {
     return withError(t("failedToFetchPublicKey"), () => {
-      const { fields } = this.getSeedPhraseEntry();
-      const neuterExtendedKey = fields.get(
-        "neuterExtendedKey"
-      ) as ProtectedValue;
+      validateDerivationPath(derivationPath);
 
-      return exportProtected(neuterExtendedKey);
+      const seedPhrase = this.getSeedPhraseForce();
+
+      const neuterExtendedKey = toNeuterExtendedKey(
+        getSeedPhraseHDNode(seedPhrase),
+        derivationPath
+      );
+
+      return exportProtected(ProtectedValue.fromString(neuterExtendedKey));
     });
   }
 
@@ -464,14 +469,11 @@ export class Vault {
       throw new PublicError(t("seedPhraseAlreadyExists"));
     }
 
-    const extendedKey = toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase));
-
     const entry = this.createEntry(Gr.SeedPhrases);
 
     setFields(entry, {
       phrase: importProtected(seedPhrase.phrase),
       lang: seedPhrase.lang,
-      neuterExtendedKey: ProtectedValue.fromString(extendedKey),
     });
   }
 

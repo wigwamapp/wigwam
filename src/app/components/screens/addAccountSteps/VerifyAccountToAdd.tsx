@@ -1,5 +1,4 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { fromProtectedString } from "lib/crypto-utils";
@@ -15,7 +14,7 @@ import { addAccounts } from "core/client";
 import { AddAccountStep } from "app/nav";
 import {
   hasSeedPhraseAtom,
-  neuterExtendedKeyAtom,
+  getNeuterExtendedKeyAtom,
   walletStatusAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
@@ -128,22 +127,15 @@ const VerifyAccountToAddInitial: FC = () => {
 const VerifyAccountToAddExisting: FC = () => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const rootNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && neuterExtendedKeyAtom
+    hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
   );
 
   const { reset } = useSteps();
 
-  const neuterExtendedKey = useMemo(() => {
-    if (!rootNeuterExtendedKey) {
-      return null;
-    }
-
-    const unprotectedKey = fromProtectedString(rootNeuterExtendedKey);
-
-    return ethers.utils.HDNode.fromExtendedKey(unprotectedKey).derivePath(
-      rootDerivationPath
-    ).extendedKey;
-  }, [rootNeuterExtendedKey]);
+  const neuterExtendedKey = useMemo(
+    () => rootNeuterExtendedKey && fromProtectedString(rootNeuterExtendedKey),
+    [rootNeuterExtendedKey]
+  );
 
   useEffect(() => {
     if (!neuterExtendedKey) {
