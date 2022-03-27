@@ -42,6 +42,11 @@ const EditNetwork = memo<EditNetworkProps>(
         : emptyState
     );
 
+    const handleClear = useCallback(() => {
+      setState(emptyState);
+      onCancelHandler();
+    }, [onCancelHandler]);
+
     const handleSubmit = useCallback(
       ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
         const processNetwork = async () => {
@@ -65,12 +70,12 @@ const EditNetwork = memo<EditNetworkProps>(
           } catch (err) {
             alert(err);
           }
-          // TODO clear form
+          handleClear();
         };
 
         processNetwork();
       },
-      [isNew]
+      [isNew, handleClear]
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -78,11 +83,6 @@ const EditNetwork = memo<EditNetworkProps>(
         await Repo.networks.delete(Number(state.chainId));
       })();
     }, [state]);
-
-    const handleClear = () => {
-      setState(emptyState);
-      onCancelHandler();
-    };
 
     const isNative = network && network.type !== "unknown";
 
