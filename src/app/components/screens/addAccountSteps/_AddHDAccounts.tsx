@@ -26,7 +26,7 @@ import {
 } from "core/common";
 import { addAccounts, ClientProvider } from "core/client";
 
-import { hasSeedPhraseAtom, neuterExtendedKeyAtom } from "app/atoms";
+import { hasSeedPhraseAtom, getNeuterExtendedKeyAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import AccountPreview from "app/components/elements/AccountPreview";
@@ -41,7 +41,7 @@ const rootDerivationPath = "m/44'/60'/0'/0";
 const AddHDAccounts: FC<AddHDAccountsProps> = ({ initialSetup }) => {
   const hasSeedPhrase = useMaybeAtomValue(!initialSetup && hasSeedPhraseAtom);
   const rootNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && neuterExtendedKeyAtom
+    hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
   );
 
   const { stateRef, reset, navigateToStep } = useSteps();

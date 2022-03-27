@@ -32,7 +32,7 @@ import { addAccounts, ClientProvider } from "core/client";
 import {
   allNetworksAtom,
   hasSeedPhraseAtom,
-  neuterExtendedKeyAtom,
+  getNeuterExtendedKeyAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { TippySingletonProvider } from "app/hooks";
@@ -57,7 +57,7 @@ const rootDerivationPath = "m/44'/60'/0'/0";
 const VerifyAccountToAdd: FC<VerifyAccountToAddProps> = ({ initialSetup }) => {
   const hasSeedPhrase = useMaybeAtomValue(!initialSetup && hasSeedPhraseAtom);
   const rootNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && neuterExtendedKeyAtom
+    hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
   );
   const networks = useAtomValue(allNetworksAtom);
   const preparedNetworks = useMemo(
