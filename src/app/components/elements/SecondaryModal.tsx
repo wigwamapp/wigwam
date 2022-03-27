@@ -7,14 +7,18 @@ import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 export type SecondaryModalProps = DialogProps & {
+  header?: string;
   className?: string;
+  headerClassName?: string;
 };
 
 const SecondaryModal: FC<SecondaryModalProps> = ({
+  header,
   open,
   onOpenChange,
   children,
   className,
+  headerClassName,
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -43,6 +47,13 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
               theme="tertiary"
             />
           </Dialog.Close>
+          {header && (
+            <h2
+              className={classNames("mb-8 text-2xl font-bold", headerClassName)}
+            >
+              {header}
+            </h2>
+          )}
           {children}
         </Dialog.Content>
       </Dialog.Portal>

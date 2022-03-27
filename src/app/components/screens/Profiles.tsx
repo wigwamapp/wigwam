@@ -125,10 +125,12 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
     );
 
     return (
-      <SecondaryModal open={open} onOpenChange={onOpenChange}>
-        <h2 className="mb-[3.25rem] text-[2rem] font-bold">
-          Add a New Profile
-        </h2>
+      <SecondaryModal
+        header="Add a New Profile"
+        open={open}
+        onOpenChange={onOpenChange}
+        headerClassName="!mb-[3.25rem] !text-[2rem]"
+      >
         <ProfileGen
           className="justify-center"
           defaultProfileName={defaultNameValue}
