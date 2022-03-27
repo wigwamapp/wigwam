@@ -203,12 +203,14 @@ async function handleWalletRequest(
           ctx.reply({ type, publicKey });
         })
       )
-      .with({ type: MessageType.GetNeuterExtendedKey }, ({ type }) =>
-        withVault(async (vault) => {
-          const extendedKey = vault.getNeuterExtendedKey();
+      .with(
+        { type: MessageType.GetNeuterExtendedKey },
+        ({ type, derivationPath }) =>
+          withVault(async (vault) => {
+            const extendedKey = vault.getNeuterExtendedKey(derivationPath);
 
-          ctx.reply({ type, extendedKey });
-        })
+            ctx.reply({ type, extendedKey });
+          })
       )
       .with({ type: MessageType.GetApprovals }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, () => {
