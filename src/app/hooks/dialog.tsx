@@ -11,7 +11,7 @@ import { assert } from "lib/system/assert";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
-type WarningContextDataProps =
+type DialogContextDataProps =
   | (Omit<SecondaryModalProps, "header" | "open" | "onOpenChange"> & {
       header: ReactNode;
       primaryButtonText: ReactNode;
@@ -35,9 +35,9 @@ type ConfirmParams = {
   noButtonText?: ReactNode;
 };
 
-type WarningContextProps = {
-  modalData: WarningContextDataProps;
-  addDialog: (params: WarningContextDataProps) => void;
+type DialogContextProps = {
+  modalData: DialogContextDataProps;
+  addDialog: (params: DialogContextDataProps) => void;
   closeCurrentDialog: () => void;
   alert: (params: AlertParams) => Promise<void>;
   confirm: (params: ConfirmParams) => Promise<boolean>;
@@ -45,23 +45,23 @@ type WarningContextProps = {
 
 const OPEN_NEXT_DELAY = 300;
 
-export const warningContext = createContext<WarningContextProps | null>(null);
+export const dialogContext = createContext<DialogContextProps | null>(null);
 
-export const useWarning = () => {
-  const value = useContext(warningContext);
+export const useDialog = () => {
+  const value = useContext(dialogContext);
   assert(value);
 
   return value;
 };
 
-export const WarningProvider: FC = ({ children }) => {
+export const DialogProvider: FC = ({ children }) => {
   const forceUpdate = useForceUpdate();
 
-  const queueRef = useRef<WarningContextDataProps[]>([]);
+  const queueRef = useRef<DialogContextDataProps[]>([]);
   const openedRef = useRef(false);
 
   const addDialog = useCallback(
-    (params: WarningContextDataProps) => {
+    (params: DialogContextDataProps) => {
       queueRef.current.push(params);
 
       if (queueRef.current.length === 1) {
@@ -137,10 +137,10 @@ export const WarningProvider: FC = ({ children }) => {
   );
 
   return (
-    <warningContext.Provider
+    <dialogContext.Provider
       value={{ modalData, addDialog, closeCurrentDialog, alert, confirm }}
     >
       {children}
-    </warningContext.Provider>
+    </dialogContext.Provider>
   );
 };

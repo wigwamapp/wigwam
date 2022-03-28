@@ -1,11 +1,11 @@
 import { FC } from "react";
 
-import { useWarning } from "app/hooks/warning";
+import { useDialog } from "app/hooks/dialog";
 import SecondaryModal from "app/components/elements/SecondaryModal";
 import NewButton from "app/components/elements/NewButton";
 
-const WarningModal: FC = () => {
-  const { modalData } = useWarning();
+const Dialog: FC = () => {
+  const { modalData } = useDialog();
 
   if (!modalData) {
     return null;
@@ -48,4 +48,4 @@ const WarningModal: FC = () => {
   );
 };
 
-export default WarningModal;
+export default Dialog;

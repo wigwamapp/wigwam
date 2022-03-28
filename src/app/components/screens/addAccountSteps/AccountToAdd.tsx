@@ -22,6 +22,7 @@ import { ClientProvider } from "core/client";
 
 import { allNetworksAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
+import { useDialog } from "app/hooks/dialog";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
@@ -54,6 +55,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
     () => networks.filter(({ type }) => type === "mainnet"),
     [networks]
   );
+  const { alert } = useDialog();
 
   useI18NUpdate();
 
@@ -149,19 +151,25 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
     [forceUpdate]
   );
 
-  const canContinue = addressesToAddRef.current.size > 0;
-
   const handleContinue = useCallback(async () => {
-    if (!canContinue) return;
-
     try {
+      if (addressesToAddRef.current.size <= 0) {
+        throw new Error("You have to select at least one wallet to add.");
+      }
+
       const addressesToAdd = Array.from(addressesToAddRef.current);
+
       const addAccountsParams: AddHDAccountParams[] = addressesToAdd.map(
         (address) => {
           const hdIndex = addresses.find(
             ({ address: a }) => a === address
           )!.index;
           const addressName = addressesNamesRef.current.get(address);
+
+          if (!addressName) {
+            throw new Error("You have to fill all the wallets' names.");
+          }
+
           return {
             source: AccountSource.SeedPhrase,
             name: addressName ?? `Wallet ${hdIndex + 1}`,
@@ -171,10 +179,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
       );
 
       onContinue(addAccountsParams);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert({ title: "Error!", content: err.message });
     }
-  }, [canContinue, onContinue, addresses]);
+  }, [onContinue, addresses, alert]);
 
   if (!addresses) {
     return null;

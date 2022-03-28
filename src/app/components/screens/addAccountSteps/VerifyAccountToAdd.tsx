@@ -20,6 +20,7 @@ import {
   addAccountModalAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
+import { useDialog } from "app/hooks/dialog";
 
 import AccountsToAdd from "./AccountToAdd";
 
@@ -40,6 +41,7 @@ export default VerifyAccountToAdd;
 
 const VerifyAccountToAddInitial: FC = () => {
   const { stateRef, reset, navigateToStep } = useSteps();
+  const { alert } = useDialog();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
 
@@ -73,11 +75,11 @@ const VerifyAccountToAddInitial: FC = () => {
       try {
         Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(AddAccountStep.SetupPassword);
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        alert(err.message);
       }
     },
-    [navigateToStep, stateRef]
+    [alert, navigateToStep, stateRef]
   );
 
   if (!addresses) {
@@ -94,6 +96,7 @@ const VerifyAccountToAddExisting: FC = () => {
   );
   const importedAccounts = useMaybeAtomValue(hasSeedPhrase && allAccountsAtom);
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
+  const { alert } = useDialog();
 
   const { reset, stateRef } = useSteps();
 
@@ -194,11 +197,11 @@ const VerifyAccountToAddExisting: FC = () => {
       try {
         await addAccounts(addAccountsParams);
         setAccModalOpened([false]);
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        alert(err.message);
       }
     },
-    [setAccModalOpened]
+    [alert, setAccModalOpened]
   );
 
   if (!addresses) {

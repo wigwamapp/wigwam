@@ -3,7 +3,7 @@ import { FC } from "react";
 import BaseProvider from "./BaseProvider";
 import FullScreenRouter from "./FullScreenRouter";
 import AddAccountModal from "./blocks/AddAccountModal";
-import WarningModal from "./blocks/WarningModal";
+import Dialog from "./blocks/Dialog";
 
 const MainApp: FC = () => (
   <BaseProvider>
@@ -18,7 +18,7 @@ export default MainApp;
 const Modals: FC = () => {
   return (
     <>
-      <WarningModal />
+      <Dialog />
       <AddAccountModal />
     </>
   );

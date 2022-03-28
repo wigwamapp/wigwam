@@ -1,7 +1,6 @@
 import { FC } from "react";
 
 import { useIsSyncing } from "app/hooks";
-import { useWarning } from "app/hooks/warning";
 import NewButton from "app/components/elements/NewButton";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import LockProfileButton from "app/components/elements/LockProfileButton";
@@ -9,22 +8,6 @@ import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();
-
-  const { confirm } = useWarning();
-
-  const handleButtonClick = () => {
-    for (let i = 0; i < 3; i++) {
-      confirm({
-        title: "Test",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam," +
-          " purus sit amet luctus venenatis, lectus magna fringilla urna," +
-          " porttitor rhoncus dolor purus non enim praesent elementum facilisis leo",
-        yesButtonText: "Yes, continue!",
-        noButtonText: "No, I'm not sure",
-      }).then(console.info);
-    }
-  };
 
   return (
     <div className="flex items-center py-4 border-b border-brand-main/[.07]">
@@ -37,11 +20,7 @@ const Menu: FC = () => {
       )}
 
       <div className="ml-auto flex items-center">
-        <NewButton
-          theme="tertiary"
-          className="!min-w-0 w-[8.5rem]"
-          onClick={handleButtonClick}
-        >
+        <NewButton theme="tertiary" className="!min-w-0 w-[8.5rem]">
           <ControlIcon className="-ml-0.5 mr-2" />
           Control
         </NewButton>
