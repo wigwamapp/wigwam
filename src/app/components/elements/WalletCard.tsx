@@ -52,7 +52,7 @@ const WalletCard: FC<WalletCardProps> = ({
           "group-focus-visible:text-brand-light"
         )}
       >
-        <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap">
+        <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap leading-[1.125rem] -mt-px">
           <TReplace msg={name} />
         </h3>
         <HashPreview

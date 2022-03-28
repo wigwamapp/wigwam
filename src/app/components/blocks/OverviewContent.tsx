@@ -286,9 +286,9 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
-        <span className="flex flex-col w-full min-w-0">
+        <span className="flex flex-col justify-center w-full min-w-0">
           <span className="text-sm font-bold leading-4 truncate">{name}</span>
-          <span className="mt-auto flex justify-between items-end">
+          <span className="mt-2 flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}
               decimals={decimals}
