@@ -39,24 +39,24 @@ const methodsExisting: MethodsProps = [
 ];
 
 const SelectAccountsToAddMethod: FC = () => {
-  const { navigateToStep } = useSteps();
+  const { navigateToStep, stateRef } = useSteps();
   const walletStatus = useAtomValue(walletStatusAtom);
 
+  const isInitial = walletStatus === WalletStatus.Welcome;
+
   const methods = useMemo(
-    () =>
-      walletStatus === WalletStatus.Welcome ? methodsInitial : methodsExisting,
-    [walletStatus]
+    () => (isInitial ? methodsInitial : methodsExisting),
+    [isInitial]
   );
 
   const handleContinue = useCallback(
     (method: string) => {
-      navigateToStep(
-        method === methods[0].value
-          ? AddAccountStep.SelectAccountsToAddMethod
-          : AddAccountStep.VerifyToAdd
-      );
+      if (!isInitial) {
+        stateRef.current.addAccounts = `existing-${method}`;
+      }
+      navigateToStep(AddAccountStep.VerifyToAdd);
     },
-    [methods, navigateToStep]
+    [isInitial, navigateToStep, stateRef]
   );
 
   return <SelectAddMethod methods={methods} onContinue={handleContinue} />;

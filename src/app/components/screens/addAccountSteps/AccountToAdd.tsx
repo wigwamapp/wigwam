@@ -36,6 +36,7 @@ type AddressProps = {
   name?: string;
   isDisabled?: boolean;
   isDefaultChecked?: boolean;
+  index: number;
 };
 
 type AccountsToAddProps = {
@@ -153,9 +154,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
       const addressesToAdd = Array.from(addressesToAddRef.current);
       const addAccountsParams: AddHDAccountParams[] = addressesToAdd.map(
         (address) => {
-          const hdIndex = addresses.findIndex(
+          const hdIndex = addresses.find(
             ({ address: a }) => a === address
-          );
+          )!.index;
           const addressName = addressesNamesRef.current.get(address);
           return {
             source: AccountSource.SeedPhrase,

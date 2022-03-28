@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { fromProtectedString } from "lib/crypto-utils";
 
@@ -17,6 +17,7 @@ import {
   getNeuterExtendedKeyAtom,
   walletStatusAtom,
   allAccountsAtom,
+  addAccountModalAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 
@@ -57,9 +58,12 @@ const VerifyAccountToAddInitial: FC = () => {
   const addresses = useMemo(
     () =>
       neuterExtendedKey
-        ? generatePreviewHDNodes(neuterExtendedKey).map(({ address }) => ({
-            address,
-          }))
+        ? generatePreviewHDNodes(neuterExtendedKey).map(
+            ({ address, index }) => ({
+              address,
+              index,
+            })
+          )
         : null,
     [neuterExtendedKey]
   );
@@ -83,17 +87,17 @@ const VerifyAccountToAddInitial: FC = () => {
   return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
 };
 
-// Temporary
-const isOneOnly = true; // TODO: Replace with context from prev step
-
 const VerifyAccountToAddExisting: FC = () => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const rootNeuterExtendedKey = useMaybeAtomValue(
     hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
   );
   const importedAccounts = useMaybeAtomValue(hasSeedPhrase && allAccountsAtom);
+  const setAccModalOpened = useSetAtom(addAccountModalAtom);
 
-  const { reset } = useSteps();
+  const { reset, stateRef } = useSteps();
+
+  const isCreatingNew = stateRef.current.addAccounts === "existing-create";
 
   const neuterExtendedKey = useMemo(
     () => rootNeuterExtendedKey && fromProtectedString(rootNeuterExtendedKey),
@@ -128,6 +132,7 @@ const VerifyAccountToAddExisting: FC = () => {
       return {
         address: filteredAccounts[0].address,
         name: `Wallet ${filteredAccounts[0].index + 1}`,
+        index: filteredAccounts[0].index,
       };
     },
     [importedAccounts]
@@ -138,10 +143,11 @@ const VerifyAccountToAddExisting: FC = () => {
       return null;
     }
 
-    if (!isOneOnly) {
+    if (!isCreatingNew) {
       const newAccounts = generatePreviewHDNodes(neuterExtendedKey).map(
-        ({ address }) => ({
+        ({ address, index }) => ({
           address,
+          index,
         })
       );
 
@@ -149,7 +155,7 @@ const VerifyAccountToAddExisting: FC = () => {
         return newAccounts;
       }
 
-      return newAccounts.map(({ address }) => {
+      return newAccounts.map(({ address, index }) => {
         const isAddressImported = importedAccounts.find(
           ({ address: imported }) => {
             return imported === address;
@@ -158,6 +164,7 @@ const VerifyAccountToAddExisting: FC = () => {
 
         return {
           address,
+          index,
           name: isAddressImported?.name ?? undefined,
           isDisabled: isAddressImported,
           isDefaultChecked: isAddressImported,
@@ -175,16 +182,24 @@ const VerifyAccountToAddExisting: FC = () => {
     }
 
     return [unusedAccount];
-  }, [findFirstUnusedAccount, importedAccounts, neuterExtendedKey]);
+  }, [
+    findFirstUnusedAccount,
+    importedAccounts,
+    isCreatingNew,
+    neuterExtendedKey,
+  ]);
 
-  const handleContinue = useCallback(async (addAccountsParams) => {
-    try {
-      console.log("addAccountsParams", addAccountsParams);
-      await addAccounts(addAccountsParams);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+  const handleContinue = useCallback(
+    async (addAccountsParams) => {
+      try {
+        await addAccounts(addAccountsParams);
+        setAccModalOpened([false]);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [setAccModalOpened]
+  );
 
   if (!addresses) {
     return null;
