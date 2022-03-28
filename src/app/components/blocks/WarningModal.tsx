@@ -5,7 +5,7 @@ import SecondaryModal from "app/components/elements/SecondaryModal";
 import NewButton from "app/components/elements/NewButton";
 
 const WarningModal: FC = () => {
-  const { modalData, setModalData } = useWarning();
+  const { modalData } = useWarning();
 
   if (!modalData) {
     return null;
@@ -18,30 +18,26 @@ const WarningModal: FC = () => {
     onPrimaryButtonClick,
     secondaryButtonText,
     onSecondaryButtonClick,
+    onClose,
     ...rest
   } = modalData;
-
-  const handleButtonClick = (callback?: () => void) => {
-    setModalData(null);
-    callback?.();
-  };
 
   return (
     <SecondaryModal
       open={true}
-      onOpenChange={() => setModalData(null)}
+      onOpenChange={onClose}
       header={header}
       {...rest}
     >
       <div className="text-base font-brand-font text-center">{children}</div>
       <div className="flex mt-5">
-        <NewButton onClick={() => handleButtonClick(onPrimaryButtonClick)}>
+        <NewButton onClick={onPrimaryButtonClick}>
           {primaryButtonText}
         </NewButton>
         {secondaryButtonText && (
           <NewButton
             theme="secondary"
-            onClick={() => handleButtonClick(onSecondaryButtonClick)}
+            onClick={onSecondaryButtonClick}
             className="ml-3"
           >
             {secondaryButtonText}
