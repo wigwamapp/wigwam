@@ -1,12 +1,13 @@
 import { FC, useCallback, useMemo } from "react";
+import { useAtomValue } from "jotai";
 
+import { WalletStatus } from "core/types";
+
+import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
-import { useAtomValue } from "jotai";
-import { walletStatusAtom } from "../../../atoms";
-import { WalletStatus } from "../../../../core/types";
 
 const methodsInitial: MethodsProps = [
   {
@@ -49,7 +50,6 @@ const SelectAccountsToAddMethod: FC = () => {
 
   const handleContinue = useCallback(
     (method: string) => {
-      console.log([method, methods[0].value, method === methods[0].value]);
       navigateToStep(
         method === methods[0].value
           ? AddAccountStep.SelectAccountsToAddMethod

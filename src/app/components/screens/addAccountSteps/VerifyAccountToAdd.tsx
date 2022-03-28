@@ -16,52 +16,11 @@ import {
   hasSeedPhraseAtom,
   getNeuterExtendedKeyAtom,
   walletStatusAtom,
+  allAccountsAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 
 import AccountsToAdd from "./AccountToAdd";
-
-const tempAddresses = [
-  {
-    address: "0x01FBEA0D9116298382Aa22006EE766034d921a74",
-    name: "Degen",
-    isDisabled: true,
-    isDefaultChecked: false,
-  },
-  {
-    address: "0x297c523E096b7472527b7272dE0F75963B1caFaF",
-    name: "Corporat",
-    isDisabled: true,
-    isDefaultChecked: true,
-  },
-  {
-    address: "0xe30FC9Cd5219c20bE959Ee64F84915ee2EA975bf",
-    isDisabled: true,
-    isDefaultChecked: true,
-  },
-  {
-    address: "0x873E4198Ab874C539caBd0c03c14d21C1c942574",
-    name: "Prepared",
-    isDisabled: false,
-    isDefaultChecked: true,
-  },
-  {
-    address: "0x8E6e772cAbd1c1e804916Ec806B2c6663AAc02b2",
-    name: "Personal",
-  },
-  {
-    address: "0x9d817fff8A8e556B51AEaA33C6172B805d6e7b9F",
-  },
-  {
-    address: "0x3072508824A98E3966e422AE88f8625EeBbE66b8",
-  },
-  {
-    address: "0x6DBB362aC14f9A499735F0a44838E9C157F36688",
-  },
-  {
-    address: "0x3001e61f2C1E61e47Ad8571417b1D307908f6f5b",
-  },
-];
 
 const rootDerivationPath = "m/44'/60'/0'/0";
 
@@ -124,11 +83,15 @@ const VerifyAccountToAddInitial: FC = () => {
   return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
 };
 
+// Temporary
+const isOneOnly = true; // TODO: Replace with context from prev step
+
 const VerifyAccountToAddExisting: FC = () => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const rootNeuterExtendedKey = useMaybeAtomValue(
     hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
   );
+  const importedAccounts = useMaybeAtomValue(hasSeedPhrase && allAccountsAtom);
 
   const { reset } = useSteps();
 
@@ -143,18 +106,80 @@ const VerifyAccountToAddExisting: FC = () => {
     }
   }, [neuterExtendedKey, reset]);
 
-  const addresses = useMemo(
-    () =>
-      neuterExtendedKey
-        ? generatePreviewHDNodes(neuterExtendedKey).map(({ address }) => ({
-            address,
-          }))
-        : null,
-    [neuterExtendedKey]
+  const findFirstUnusedAccount = useCallback(
+    (key: string, offset = 0, limit = 9) => {
+      const newAccounts = generatePreviewHDNodes(key, offset, limit);
+
+      if (!importedAccounts || importedAccounts.length <= 0) {
+        return newAccounts[0];
+      }
+
+      const filteredAccounts = newAccounts.filter(
+        ({ address }) =>
+          !importedAccounts.some(
+            ({ address: imported }) => imported === address
+          )
+      );
+
+      if (filteredAccounts.length <= 0) {
+        return null;
+      }
+
+      return {
+        address: filteredAccounts[0].address,
+        name: `Wallet ${filteredAccounts[0].index + 1}`,
+      };
+    },
+    [importedAccounts]
   );
+
+  const addresses = useMemo(() => {
+    if (!neuterExtendedKey) {
+      return null;
+    }
+
+    if (!isOneOnly) {
+      const newAccounts = generatePreviewHDNodes(neuterExtendedKey).map(
+        ({ address }) => ({
+          address,
+        })
+      );
+
+      if (!importedAccounts || importedAccounts.length <= 0) {
+        return newAccounts;
+      }
+
+      return newAccounts.map(({ address }) => {
+        const isAddressImported = importedAccounts.find(
+          ({ address: imported }) => {
+            return imported === address;
+          }
+        );
+
+        return {
+          address,
+          name: isAddressImported?.name ?? undefined,
+          isDisabled: isAddressImported,
+          isDefaultChecked: isAddressImported,
+        };
+      });
+    }
+
+    let offset = 0;
+    let limit = 9;
+    let unusedAccount = null;
+    while (unusedAccount === null) {
+      unusedAccount = findFirstUnusedAccount(neuterExtendedKey, offset, limit);
+      offset = limit;
+      limit += 9;
+    }
+
+    return [unusedAccount];
+  }, [findFirstUnusedAccount, importedAccounts, neuterExtendedKey]);
 
   const handleContinue = useCallback(async (addAccountsParams) => {
     try {
+      console.log("addAccountsParams", addAccountsParams);
       await addAccounts(addAccountsParams);
     } catch (err) {
       console.error(err);
