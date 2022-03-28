@@ -13,6 +13,8 @@ import { useAtomValue } from "jotai";
 import useForceUpdate from "use-force-update";
 import { ethers } from "ethers";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { replaceT } from "lib/ext/i18n";
+import { useI18NUpdate } from "lib/ext/i18n/react";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { AddHDAccountParams, AccountSource, Network } from "core/types";
@@ -52,6 +54,8 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
     () => networks.filter(({ type }) => type === "mainnet"),
     [networks]
   );
+
+  useI18NUpdate();
 
   const [network, setNetwork] = useState(INITIAL_NETWORK);
   const provider = useMemo(
@@ -239,29 +243,35 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
           </thead>
           <tbody>
             <TippySingletonProvider>
-              {addresses.map(({ address, isDisabled, isDefaultChecked }, i) => {
-                const isAdded =
-                  addressesToAddRef.current.has(address) ||
-                  (isDisabled && isDefaultChecked);
-                const addressName = addressesNamesRef.current.get(address);
+              {addresses.map(
+                ({ address, isDisabled, isDefaultChecked, index }, i) => {
+                  const isAdded =
+                    addressesToAddRef.current.has(address) ||
+                    (isDisabled && isDefaultChecked);
+                  const addressName = replaceT(
+                    addressesNamesRef.current.get(address) ?? `Wallet ${index}`
+                  );
 
-                return (
-                  <Account
-                    key={address}
-                    name={addressName ?? `Wallet ${i + 1}`}
-                    address={address}
-                    provider={provider}
-                    network={network}
-                    isAdded={!!isAdded}
-                    onToggleAdd={() => toggleAddress(address)}
-                    isDisabled={isDisabled}
-                    onChangeWalletName={(newName: string) =>
-                      changeWalletName(address, newName)
-                    }
-                    className={i === addresses.length - 1 ? "!border-none" : ""}
-                  />
-                );
-              })}
+                  return (
+                    <Account
+                      key={address}
+                      name={addressName}
+                      address={address}
+                      provider={provider}
+                      network={network}
+                      isAdded={!!isAdded}
+                      onToggleAdd={() => toggleAddress(address)}
+                      isDisabled={isDisabled}
+                      onChangeWalletName={(newName: string) =>
+                        changeWalletName(address, newName)
+                      }
+                      className={
+                        i === addresses.length - 1 ? "!border-none" : ""
+                      }
+                    />
+                  );
+                }
+              )}
             </TippySingletonProvider>
           </tbody>
         </table>
@@ -342,20 +352,43 @@ const Account = memo<AccountProps>(
             seed={address}
             source="dicebear"
             type="personas"
-            className={classNames("h-10 w-10", "rounded-[.625rem]")}
+            className={classNames(
+              "h-10 w-10",
+              "rounded-[.625rem]",
+              "bg-black/20"
+            )}
           />
         </Td>
         <Td widthMaxContent>
-          <Input
-            value={name}
-            onChange={(evt: ChangeEvent<HTMLInputElement>) =>
-              onChangeWalletName(evt.target.value)
-            }
-            theme="clean"
-            disabled={isDisabled}
-            error={!name && !isDisabled}
-            inputClassName="!font-bold min-w-[16rem]"
-          />
+          {!isDisabled ? (
+            <Input
+              value={name}
+              onChange={(evt: ChangeEvent<HTMLInputElement>) =>
+                onChangeWalletName(evt.target.value)
+              }
+              theme="clean"
+              disabled={isDisabled}
+              error={!name && !isDisabled}
+              inputClassName="!font-bold min-w-[16rem]"
+            />
+          ) : (
+            <div className="pl-4 flex items-center max-w-[16rem]">
+              <span className="!font-bold min-width-0 truncate">{name}</span>
+              <span
+                className={classNames(
+                  "py-1 px-2",
+                  "rounded-md",
+                  "bg-brand-main/40",
+                  "border border-brand-main/50",
+                  "shadow-addaccountmodal",
+                  "text-xs font-medium",
+                  "ml-3"
+                )}
+              >
+                Added
+              </span>
+            </div>
+          )}
         </Td>
         <Td>
           <HashPreview hash={address} />

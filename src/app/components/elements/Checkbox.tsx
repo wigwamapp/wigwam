@@ -22,13 +22,13 @@ const Checkbox: FC<CheckboxProps> = ({
       "rounded",
       "flex items-center justify-center",
       checked && "border border-brand-main",
-      disabled && "border border-brand-main/20",
+      disabled && "border border-brand-main/30",
       className
     )}
   >
     <CheckboxPrimitive.Indicator>
       {checked && (
-        <CheckIcon className={classNames(disabled && "opacity-20")} />
+        <CheckIcon className={classNames(disabled && "opacity-30")} />
       )}
     </CheckboxPrimitive.Indicator>
   </div>
