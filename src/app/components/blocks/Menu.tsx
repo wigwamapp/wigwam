@@ -10,18 +10,20 @@ import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();
 
-  const { setModalData } = useWarning();
+  const { confirm } = useWarning();
 
   const handleButtonClick = () => {
-    setModalData({
-      header: "Test",
-      children:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam," +
-        " purus sit amet luctus venenatis, lectus magna fringilla urna," +
-        " porttitor rhoncus dolor purus non enim praesent elementum facilisis leo",
-      primaryButtonText: "Yes, continue!",
-      secondaryButtonText: "No, I'm not sure",
-    });
+    for (let i = 0; i < 3; i++) {
+      confirm({
+        title: "Test",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam," +
+          " purus sit amet luctus venenatis, lectus magna fringilla urna," +
+          " porttitor rhoncus dolor purus non enim praesent elementum facilisis leo",
+        yesButtonText: "Yes, continue!",
+        noButtonText: "No, I'm not sure",
+      }).then(console.info);
+    }
   };
 
   return (

@@ -1,43 +1,146 @@
-import { createContext, FC, useContext, useState } from "react";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useCallback,
+  useContext,
+  useRef,
+} from "react";
+import useForceUpdate from "use-force-update";
+import { assert } from "lib/system/assert";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
 type WarningContextDataProps =
   | (Omit<SecondaryModalProps, "header" | "open" | "onOpenChange"> & {
-      header: string;
-      primaryButtonText: string;
+      header: ReactNode;
+      primaryButtonText: ReactNode;
       onPrimaryButtonClick?: () => void;
-      secondaryButtonText?: string;
+      secondaryButtonText?: ReactNode;
       onSecondaryButtonClick?: () => void;
+      onClose?: () => void;
     })
   | null;
 
+type AlertParams = {
+  title: ReactNode;
+  content: ReactNode;
+  okButtonText?: ReactNode;
+};
+
+type ConfirmParams = {
+  title: ReactNode;
+  content: ReactNode;
+  yesButtonText?: ReactNode;
+  noButtonText?: ReactNode;
+};
+
 type WarningContextProps = {
   modalData: WarningContextDataProps;
-  setModalData: (value: WarningContextDataProps) => void;
+  addDialog: (params: WarningContextDataProps) => void;
+  closeCurrentDialog: () => void;
+  alert: (params: AlertParams) => Promise<void>;
+  confirm: (params: ConfirmParams) => Promise<boolean>;
 };
 
-const defaultWarningContextData = {
-  modalData: null,
-  setModalData: () => undefined,
+const OPEN_NEXT_DELAY = 300;
+
+export const warningContext = createContext<WarningContextProps | null>(null);
+
+export const useWarning = () => {
+  const value = useContext(warningContext);
+  assert(value);
+
+  return value;
 };
 
-export const warningContext = createContext<WarningContextProps>(
-  defaultWarningContextData
-);
+export const WarningProvider: FC = ({ children }) => {
+  const forceUpdate = useForceUpdate();
 
-const WarningProvider: FC = ({ children }) => {
-  const [modalData, setModalData] = useState<WarningContextDataProps>(null);
+  const queueRef = useRef<WarningContextDataProps[]>([]);
+  const openedRef = useRef(false);
+
+  const addDialog = useCallback(
+    (params: WarningContextDataProps) => {
+      queueRef.current.push(params);
+
+      if (queueRef.current.length === 1) {
+        openedRef.current = true;
+      }
+
+      forceUpdate();
+    },
+    [forceUpdate]
+  );
+
+  const closeCurrentDialog = useCallback(() => {
+    if (!openedRef.current) return;
+
+    queueRef.current.shift();
+    openedRef.current = false;
+
+    if (queueRef.current.length > 0) {
+      setTimeout(() => {
+        openedRef.current = true;
+        forceUpdate();
+      }, OPEN_NEXT_DELAY);
+    }
+
+    forceUpdate();
+  }, [forceUpdate]);
+
+  const modalData = openedRef.current ? queueRef.current[0] : null;
+
+  const alert = useCallback(
+    ({ title, content, okButtonText = "OK" }: AlertParams) =>
+      new Promise<void>((res) => {
+        const handleDone = () => {
+          closeCurrentDialog();
+          res();
+        };
+
+        addDialog({
+          header: title,
+          children: content,
+          primaryButtonText: okButtonText,
+          onPrimaryButtonClick: handleDone,
+          onClose: handleDone,
+        });
+      }),
+    [addDialog, closeCurrentDialog]
+  );
+
+  const confirm = useCallback(
+    ({
+      title,
+      content,
+      yesButtonText = "OK",
+      noButtonText = "Cancel",
+    }: ConfirmParams) =>
+      new Promise<boolean>((res) => {
+        const handleConfirm = (confirmed: boolean) => {
+          closeCurrentDialog();
+          res(confirmed);
+        };
+
+        addDialog({
+          header: title,
+          children: content,
+          primaryButtonText: yesButtonText,
+          secondaryButtonText: noButtonText,
+          onPrimaryButtonClick: () => handleConfirm(true),
+          onSecondaryButtonClick: () => handleConfirm(false),
+          onClose: () => handleConfirm(false),
+        });
+      }),
+    [addDialog, closeCurrentDialog]
+  );
 
   return (
-    <warningContext.Provider value={{ modalData, setModalData }}>
+    <warningContext.Provider
+      value={{ modalData, addDialog, closeCurrentDialog, alert, confirm }}
+    >
       {children}
     </warningContext.Provider>
   );
-};
-
-export default WarningProvider;
-
-export const useWarning = () => {
-  return useContext(warningContext);
 };

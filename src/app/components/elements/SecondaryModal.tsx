@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { DialogProps } from "@radix-ui/react-dialog";
 import classNames from "clsx";
@@ -7,7 +7,7 @@ import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 export type SecondaryModalProps = DialogProps & {
-  header?: string;
+  header?: ReactNode;
   className?: string;
   headerClassName?: string;
 };
