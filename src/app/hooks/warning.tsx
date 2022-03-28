@@ -43,6 +43,8 @@ type WarningContextProps = {
   confirm: (params: ConfirmParams) => Promise<boolean>;
 };
 
+const OPEN_NEXT_DELAY = 300;
+
 export const warningContext = createContext<WarningContextProps | null>(null);
 
 export const useWarning = () => {
@@ -71,24 +73,21 @@ export const WarningProvider: FC = ({ children }) => {
     [forceUpdate]
   );
 
-  const closeCurrentDialog = useCallback(
-    (openNextDelay = 300) => {
-      if (!openedRef.current) return;
+  const closeCurrentDialog = useCallback(() => {
+    if (!openedRef.current) return;
 
-      queueRef.current.shift();
-      openedRef.current = false;
+    queueRef.current.shift();
+    openedRef.current = false;
 
-      if (queueRef.current.length > 0) {
-        setTimeout(() => {
-          openedRef.current = true;
-          forceUpdate();
-        }, openNextDelay);
-      }
+    if (queueRef.current.length > 0) {
+      setTimeout(() => {
+        openedRef.current = true;
+        forceUpdate();
+      }, OPEN_NEXT_DELAY);
+    }
 
-      forceUpdate();
-    },
-    [forceUpdate]
-  );
+    forceUpdate();
+  }, [forceUpdate]);
 
   const modalData = openedRef.current ? queueRef.current[0] : null;
 
