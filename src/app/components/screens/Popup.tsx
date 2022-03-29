@@ -15,7 +15,6 @@ import { dequal } from "dequal/lite";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
-import { createAccountTokenKey } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
@@ -255,7 +254,7 @@ const AssetsList: FC = () => {
         >
           {tokens.map((asset, i) => (
             <AssetCard
-              key={createAccountTokenKey(asset)}
+              key={asset.tokenSlug}
               ref={
                 i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
                   ? loadMoreTriggerAssetRef
