@@ -27,8 +27,8 @@ export type Token = Asset | NFT;
 type AccountTokenFields = {
   accountAddress: string;
   status: TokenStatus;
-  rawBalance?: string;
-  balanceUSD?: number;
+  rawBalance: string;
+  balanceUSD: number;
 };
 
 export interface TokenBase {

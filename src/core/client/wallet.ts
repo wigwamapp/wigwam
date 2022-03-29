@@ -206,8 +206,8 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
   });
 }
 
-export function sync(chainId: number, accountUuid: string) {
-  const msg: Sync = { type: MessageType.Sync, chainId, accountUuid };
+export function sync(chainId: number, accountAddress: string) {
+  const msg: Sync = { type: MessageType.Sync, chainId, accountAddress };
 
   porter.sendOneWayMessage(msg);
 }

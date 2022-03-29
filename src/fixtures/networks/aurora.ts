@@ -9,7 +9,7 @@ export const AURORA: Network[] = [
     chainTag: "aurora",
     name: "Aurora",
     nativeCurrency: {
-      symbol: "ETH",
+      symbol: "AETH",
       name: "Ether",
       decimals: 18,
     },

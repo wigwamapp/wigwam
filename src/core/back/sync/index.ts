@@ -3,9 +3,10 @@ import { IndexableTypeArray } from "dexie";
 import axios from "axios";
 import { ethers } from "ethers";
 import mem from "mem";
-import { assert } from "lib/system/assert";
+import { createQueue } from "lib/system/queue";
 
 import {
+  AccountAsset,
   AccountToken,
   TokenStandard,
   TokenStatus,
@@ -14,12 +15,15 @@ import {
 import {
   createAccountTokenKey,
   createTokenSlug,
+  getNativeTokenLogoUrl,
   NATIVE_TOKEN_SLUG,
 } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
+import { requestBalance } from "core/common/balance";
 import * as repo from "core/repo";
 
 import { $accounts, syncStarted, synced } from "../state";
+import { getRpcProvider } from "../rpc";
 
 const debankApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
@@ -28,154 +32,269 @@ const debankApi = axios.create({
 
 export type AddSyncRequestParams = {
   chainId: number;
-  accountUuid: string;
+  accountAddress: string;
 };
+
+const enqueueSync = createQueue();
 
 export async function addSyncRequest({
   chainId,
-  accountUuid,
+  accountAddress,
 }: AddSyncRequestParams) {
-  const allAccounts = $accounts.getState();
-  const account = allAccounts.find((acc) => acc.uuid === accountUuid);
-  assert(account, "Account not found");
+  let started = false;
+  setTimeout(() => {
+    if (!started) syncStarted(chainId);
+    started = true;
+  }, 100);
 
-  syncAccountTokens(chainId, account.address);
+  try {
+    await enqueueSync(async () => {
+      await syncAccountTokens(chainId, accountAddress);
+      await syncNativeTokensForAll(chainId);
+    });
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if (started) synced(chainId);
+    started = true;
+  }
 }
 
-const syncAccountTokens = mem(
-  async (chainId: number, accountAddress: string) => {
-    syncStarted(chainId);
+const syncNativeTokensForAll = mem(
+  async (chainId: number) => {
+    const allAccounts = $accounts.getState();
 
-    try {
+    const dbKeys = allAccounts.map((acc) =>
+      createAccountTokenKey({
+        chainId,
+        accountAddress: acc.address,
+        tokenSlug: NATIVE_TOKEN_SLUG,
+      })
+    );
+
+    const [{ nativeCurrency, chainTag }, existingTokens, balances] =
       await Promise.all([
-        performSync(chainId, accountAddress),
-        new Promise((r) => setTimeout(r, 1_000)),
+        getNetwork(chainId),
+        repo.accountTokens.bulkGet(dbKeys),
+        Promise.all(
+          allAccounts.map((acc) =>
+            getBalance(chainId, NATIVE_TOKEN_SLUG, acc.address)
+          )
+        ),
       ]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      synced(chainId);
-    }
+
+    await repo.accountTokens.bulkPut(
+      allAccounts.map((acc, i) => {
+        const existing = existingTokens[i] as AccountAsset;
+        const balance = balances[i];
+
+        if (existing) {
+          if (!balance) return existing;
+
+          const rawBalance = balance.toString();
+          const balanceUSD = existing.priceUSD
+            ? +new BigNumber(rawBalance)
+                .div(10 ** nativeCurrency.decimals)
+                .times(existing.priceUSD)
+            : existing.balanceUSD;
+
+          return {
+            ...existing,
+            rawBalance,
+            balanceUSD,
+          };
+        } else {
+          return {
+            chainId,
+            accountAddress: acc.address,
+            tokenType: TokenType.Asset,
+            status: TokenStatus.Native,
+            tokenSlug: NATIVE_TOKEN_SLUG,
+            decimals: nativeCurrency.decimals,
+            name: nativeCurrency.name,
+            symbol: nativeCurrency.symbol,
+            logoUrl: getNativeTokenLogoUrl(chainTag),
+            rawBalance: balance?.toString() ?? "0",
+            balanceUSD: 0,
+          };
+        }
+      }),
+      dbKeys
+    );
   },
   {
-    cacheKey: (args) => args.join("_"),
-    maxAge: 30_000, // 30 sec
+    maxAge: 20_000, // 20 sec
   }
 );
 
-const performSync = async (chainId: number, accountAddress: string) => {
-  const debankChain = await getDebankChain(chainId);
+const syncAccountTokens = mem(
+  async (chainId: number, accountAddress: string) => {
+    const [debankChain, existingAccTokens, { nativeCurrency, chainTag }] =
+      await Promise.all([
+        getDebankChain(chainId),
+        repo.accountTokens
+          .where("[chainId+tokenType+accountAddress]")
+          .equals([chainId, TokenType.Asset, accountAddress])
+          .toArray(),
+        getNetwork(chainId),
+      ]);
 
-  const existingTokensColl = repo.accountTokens
-    .where("[chainId+tokenType+accountAddress]")
-    .equals([chainId, TokenType.Asset, accountAddress]);
+    const accTokens: AccountToken[] = [];
+    const dbKeys: IndexableTypeArray = [];
 
-  if (!debankChain) {
-    const totalExisting = await existingTokensColl.count();
+    let existingTokensMap: Map<string, AccountToken> | undefined;
 
-    if (totalExisting === 0) {
-      const { nativeCurrency, chainTag } = await getNetwork(chainId);
-
-      const tokenSlug = NATIVE_TOKEN_SLUG;
-      const dbKey = createAccountTokenKey({
-        chainId,
-        accountAddress,
-        tokenSlug,
-      });
-
-      await repo.accountTokens.add(
-        {
-          chainId,
-          accountAddress,
-          tokenType: TokenType.Asset,
-          status: TokenStatus.Native,
-          tokenSlug,
-          decimals: nativeCurrency.decimals,
-          name: nativeCurrency.name,
-          symbol: nativeCurrency.symbol,
-          logoUrl: `{{native}}/${chainTag}`,
-          rawBalance: "0",
-          balanceUSD: 0,
-          priceUSD: "0",
-        },
-        dbKey
+    if (debankChain) {
+      existingTokensMap = new Map(
+        existingAccTokens.map((t) => [t.tokenSlug, t])
       );
+
+      const { data: debankUserTokens } = await debankApi.get(
+        "/user/token_list",
+        {
+          params: {
+            id: getMyRandomAddress(accountAddress),
+            chain_id: debankChain.id,
+            is_all: false,
+          },
+        }
+      );
+
+      for (const token of debankUserTokens) {
+        const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+
+        const native = token.id === debankChain.native_token_id;
+        const tokenSlug = createTokenSlug({
+          standard: native ? TokenStandard.Native : TokenStandard.ERC20,
+          address: native ? "0" : token.id,
+          id: "0",
+        });
+
+        const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
+
+        if (!existing && rawBalanceBN.isZero()) {
+          continue;
+        }
+
+        const metadata = native
+          ? {
+              symbol: nativeCurrency.symbol,
+              name: nativeCurrency.name,
+              logoUrl: getNativeTokenLogoUrl(chainTag),
+            }
+          : {
+              symbol: token.symbol,
+              name: token.name,
+              logoUrl: token.logo_url,
+            };
+
+        const rawBalance = rawBalanceBN.toString();
+        const priceUSD = token.price;
+        const balanceUSD = priceUSD
+          ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(priceUSD)
+          : 0;
+
+        accTokens.push(
+          existing
+            ? {
+                ...existing,
+                ...metadata,
+                rawBalance,
+                balanceUSD,
+                priceUSD,
+              }
+            : {
+                chainId,
+                accountAddress,
+                tokenSlug,
+                tokenType: TokenType.Asset,
+                status: native ? TokenStatus.Native : TokenStatus.Enabled,
+                // Metadata
+                decimals: native ? nativeCurrency.decimals : token.decimals,
+                ...metadata,
+                // Volumes
+                rawBalance,
+                balanceUSD,
+                priceUSD,
+              }
+        );
+
+        dbKeys.push(
+          createAccountTokenKey({
+            chainId,
+            accountAddress,
+            tokenSlug,
+          })
+        );
+
+        existingTokensMap.delete(tokenSlug);
+      }
     }
 
-    return;
+    const restTokens = existingTokensMap
+      ? Array.from(existingTokensMap.values())
+      : existingAccTokens;
+
+    if (restTokens.length > 0) {
+      const balances = await Promise.all(
+        restTokens.map(({ tokenSlug }) =>
+          tokenSlug !== NATIVE_TOKEN_SLUG
+            ? getBalance(chainId, tokenSlug, accountAddress)
+            : null
+        )
+      );
+
+      for (let i = 0; i < restTokens.length; i++) {
+        const balance = balances[i];
+
+        if (!balance) continue;
+
+        const token = restTokens[i] as AccountAsset;
+
+        const rawBalance = balance.toString();
+        const balanceUSD = token.priceUSD
+          ? +new BigNumber(rawBalance)
+              .div(10 ** token.decimals)
+              .times(token.priceUSD)
+          : token.balanceUSD;
+
+        accTokens.push({
+          ...token,
+          rawBalance,
+          balanceUSD,
+        });
+
+        dbKeys.push(
+          createAccountTokenKey({
+            chainId,
+            accountAddress,
+            tokenSlug: token.tokenSlug,
+          })
+        );
+      }
+    }
+
+    await repo.accountTokens.bulkPut(accTokens, dbKeys);
+  },
+  {
+    cacheKey: (args) => args.join("_"),
+    maxAge: 40_000, // 40 sec
   }
+);
 
-  console.info("here");
+async function getBalance(
+  chainId: number,
+  tokenSlug: string,
+  accountAddress: string
+) {
+  const provider = getRpcProvider(chainId);
 
-  const [{ data: debankUserTokens }, existingAccTokens] = await Promise.all([
-    debankApi.get("/user/token_list", {
-      params: {
-        id: getMyRandomAddress(accountAddress),
-        chain_id: debankChain.id,
-        is_all: false,
-      },
-    }),
-    existingTokensColl.toArray(),
-  ]);
-
-  const tokenType = TokenType.Asset;
-
-  const accTokens: AccountToken[] = [];
-  const dbKeys: IndexableTypeArray = [];
-
-  const existingTokensMap = new Map(
-    existingAccTokens.map((t) => [t.tokenSlug, t])
-  );
-
-  for (const token of debankUserTokens) {
-    const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
-    if (rawBalanceBN.isZero()) continue;
-
-    const native = token.id === debankChain.native_token_id;
-
-    const tokenSlug = createTokenSlug({
-      standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-      address: native ? "0" : token.id,
-      id: "0",
-    });
-
-    const existing = existingTokensMap.get(tokenSlug);
-
-    const rawBalance = rawBalanceBN.toString();
-
-    const status =
-      existing?.status ?? (native ? TokenStatus.Native : TokenStatus.Enabled);
-
-    const balanceUSD = token.price
-      ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(token.price)
-      : 0;
-
-    const dbKey = createAccountTokenKey({
-      chainId,
-      accountAddress,
-      tokenSlug,
-    });
-
-    accTokens.push({
-      chainId,
-      accountAddress,
-      tokenSlug,
-      tokenType,
-      decimals: token.decimals,
-      name: token.name,
-      symbol: token.symbol,
-      logoUrl: token.logo_url,
-      rawBalance,
-      balanceUSD,
-      priceUSD: token.price,
-      status,
-    });
-
-    dbKeys.push(dbKey);
-  }
-
-  await repo.accountTokens.bulkPut(accTokens, dbKeys);
-};
+  return requestBalance(
+    provider,
+    tokenSlug,
+    getMyRandomAddress(accountAddress)
+  ).catch(() => null);
+}
 
 const getDebankChain = mem(async (chainId: number) => {
   const chainList = await getDebankChainList();

@@ -33,3 +33,7 @@ export function createAccountTokenKey({
 }) {
   return `${chainId}_${accountAddress}_${tokenSlug}`;
 }
+
+export function getNativeTokenLogoUrl(chainTag: string) {
+  return `{{native}}/${chainTag}`;
+}
