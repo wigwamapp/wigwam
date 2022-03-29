@@ -1,10 +1,10 @@
-import React, { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
-import { composeValidators, isNumber, required } from "app/utils";
+import { composeValidators, minLength, required } from "app/utils";
 
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
@@ -123,7 +123,10 @@ const EditNetwork = memo<EditNetworkProps>(
                 className="flex flex-col items-start"
               >
                 <div className="w-[21.875rem]">
-                  <Field name="nName" validate={required}>
+                  <Field
+                    name="nName"
+                    validate={composeValidators(required, minLength(8))}
+                  >
                     {({ input, meta }) => (
                       <Input
                         inputClassName="h-11"
@@ -135,7 +138,10 @@ const EditNetwork = memo<EditNetworkProps>(
                       />
                     )}
                   </Field>
-                  <Field name="rpcUrl" validate={required}>
+                  <Field
+                    name="rpcUrl"
+                    validate={composeValidators(required, minLength(8))}
+                  >
                     {({ input, meta }) => (
                       <Input
                         className="mt-4"
@@ -150,10 +156,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="chainId"
-                    validate={composeValidators(required, isNumber)}
+                    validate={composeValidators(required, minLength(8))}
                   >
                     {({ input, meta }) => (
                       <Input
+                        type="number"
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
@@ -164,7 +171,10 @@ const EditNetwork = memo<EditNetworkProps>(
                       />
                     )}
                   </Field>
-                  <Field name="currencySymbol" validate={required}>
+                  <Field
+                    name="currencySymbol"
+                    validate={composeValidators(required, minLength(8))}
+                  >
                     {({ input, meta }) => (
                       <Input
                         className="mt-4"
@@ -177,7 +187,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       />
                     )}
                   </Field>
-                  <Field name="blockExplorer">
+                  <Field name="blockExplorer" validate={minLength(8)}>
                     {({ input, meta }) => (
                       <Input
                         className="mt-4"

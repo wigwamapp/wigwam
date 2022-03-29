@@ -31,7 +31,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
     ref
   ) => {
     const valueStr = useMemo(
-      () => (value === undefined ? "" : new BigNumber(value).toFixed()),
+      () => (!value || value === "" ? "" : new BigNumber(value).toFixed()),
       [value]
     );
 

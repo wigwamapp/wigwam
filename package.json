@@ -73,6 +73,7 @@
     "react-error-boundary": "3.1.4",
     "react-final-form": "6.5.8",
     "react-merge-refs": "1.1.0",
+    "react-number-format": "^4.9.1",
     "spacingjs": "1.0.7",
     "threads": "1.7.0",
     "ts-pattern": "3.3.5",

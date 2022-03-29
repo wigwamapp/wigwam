@@ -1,4 +1,4 @@
-import {
+import React, {
   FC,
   forwardRef,
   HTMLProps,
@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import classNames from "clsx";
+import NumberFormat from "react-number-format";
 
 export type InputProps = {
   className?: string;
@@ -77,6 +78,41 @@ const Input = memo(
         [onBlur]
       );
 
+      const props = {
+        id: id ?? name,
+        name: name,
+        className: classNames(
+          "w-full",
+          "py-3 px-4",
+          !!StartAdornment && "pl-10",
+          (!!EndAdornment || !!actions) && "pr-10",
+          "box-border",
+          "text-brand-light leading-none",
+          "border",
+          theme === "primary" && "bg-black/20 border-brand-main/10",
+          theme === "clean" && "bg-transparent border-transparent",
+          "rounded-[.625rem]",
+          "outline-none",
+          "transition-colors",
+          "placeholder-brand-placeholder",
+          !disabled && [
+            "group-hover:bg-brand-main/5",
+            "group-hover:border-brand-main/5",
+          ],
+          focused && "!bg-brand-main/[.05] !border-brand-main/[.15]",
+          disabled && [
+            "bg-brand-disabledbackground/20",
+            "border-brand-main/5",
+            "text-brand-disabledcolor placeholder-brand-disabledcolor",
+          ],
+          error && "!border-brand-redobject",
+          inputClassName
+        ),
+        onFocus: handleFocus,
+        onBlur: handleBlur,
+        disabled: disabled,
+        ...rest,
+      };
       return (
         <div className={classNames("flex flex-col text-base", className)}>
           {(label || labelActions || optional) && (
@@ -103,7 +139,14 @@ const Input = memo(
                 className={classNames(adornmentClassNames, "left-4")}
               />
             )}
-            <input
+
+            <input ref={ref} {...props} />
+            {/* <UseElement
+              El={
+                rest.type !== "number"
+                  ? ({ ...rest }) => <input {...rest} />
+                  : ({ ...rest }) => <NumberFormat {...rest} />
+              }
               ref={ref}
               id={id ?? name}
               name={name}
@@ -138,7 +181,7 @@ const Input = memo(
               onBlur={handleBlur}
               disabled={disabled}
               {...rest}
-            />
+            /> */}
             {!!EndAdornment && !actions && (
               <EndAdornment
                 className={classNames(adornmentClassNames, "right-4")}
@@ -166,5 +209,17 @@ const Input = memo(
     }
   )
 );
+
+/* type UseElementProps = {
+  El: React.FC<>;
+} & Record<string, unknown>;
+
+const UseElement: FC<UseElementProps> = React.forwardRef(
+  ({ El, ...rest }, ref) => {
+    console.log(`El`, El);
+    console.log(`rest `, rest);
+    return <El ref={ref} {...rest}></El>;
+  }
+); */
 
 export default Input;

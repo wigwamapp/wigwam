@@ -25,3 +25,20 @@ export const differentPasswords = (password1: string) => (password2: string) =>
   password2 && password1 && password2 !== password1
     ? "Provided password doesn't match"
     : undefined;
+
+export const minValue =
+  (min: number, currencySymbol?: string) => (value: string) => {
+    const sum = Number(value);
+    if (!isNaN(sum) && sum >= min) {
+      return undefined;
+    } else {
+      return `Minimal sum is ${min} ${currencySymbol}`;
+    }
+  };
+
+export const seedPhrase = (seed: string) => {
+  const wordL = [12, 15, 18, 21, 24];
+  wordL.includes(seed.split(" ").length)
+    ? undefined
+    : "Available amount of words: " + wordL;
+};
