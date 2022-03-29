@@ -23,18 +23,7 @@ import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens } from "app/hooks/tokens";
-import PopupLayout from "app/components/layouts/PopupLayout";
-import PreloadUnlocked from "app/components/layouts/PreloadUnlocked";
-import NetworkSelect from "app/components/elements/NetworkSelect";
-import AccountSelect from "app/components/elements/AccountSelect";
-import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
-import SearchInput from "app/components/elements/SearchInput";
-import IconedButton from "app/components/elements/IconedButton";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import PrettyAmount from "app/components/elements/PrettyAmount";
-import Tooltip from "app/components/elements/Tooltip";
-import ControlIcon from "app/components/elements/ControlIcon";
-import Avatar from "app/components/elements/Avatar";
+
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoIcon } from "app/icons/info-round.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -42,6 +31,20 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+
+import PopupLayout from "../layouts/PopupLayout";
+import PreloadUnlocked from "../layouts/PreloadUnlocked";
+import NetworkSelect from "../elements/NetworkSelect";
+import AccountSelect from "../elements/AccountSelect";
+import AssetsSwitcher from "../elements/AssetsSwitcher";
+import SearchInput from "../elements/SearchInput";
+import IconedButton from "../elements/IconedButton";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import PrettyAmount from "../elements/PrettyAmount";
+import Tooltip from "../elements/Tooltip";
+import ControlIcon from "../elements/ControlIcon";
+import Avatar from "../elements/Avatar";
+import TokenLogo from "../elements/TokenLogo";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -348,7 +351,7 @@ const AssetCard = memo(
           )}
           disabled={isManageMode && nativeAsset}
         >
-          <Avatar
+          <TokenLogo
             src={logoUrl}
             alt={name}
             className="w-11 h-11 min-w-[2.75rem] mr-3"

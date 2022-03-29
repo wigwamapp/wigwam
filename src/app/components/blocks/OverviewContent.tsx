@@ -26,14 +26,7 @@ import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
-import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
-import IconedButton from "app/components/elements/IconedButton";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import NewButton from "app/components/elements/NewButton";
-import SearchInput from "app/components/elements/SearchInput";
-import PrettyAmount from "app/components/elements/PrettyAmount";
-import ControlIcon from "app/components/elements/ControlIcon";
-import Avatar from "app/components/elements/Avatar";
+
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
@@ -41,6 +34,15 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+
+import AssetsSwitcher from "../elements/AssetsSwitcher";
+import IconedButton from "../elements/IconedButton";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import NewButton from "../elements/NewButton";
+import SearchInput from "../elements/SearchInput";
+import PrettyAmount from "../elements/PrettyAmount";
+import ControlIcon from "../elements/ControlIcon";
+import TokenLogo from "../elements/TokenLogo";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -281,7 +283,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         )}
         disabled={isManageMode && nativeAsset}
       >
-        <Avatar
+        <TokenLogo
           src={logoUrl}
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
@@ -356,7 +358,7 @@ const AssetInfo: FC = () => {
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <Avatar
+        <TokenLogo
           src={logoUrl}
           alt={name}
           className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"

@@ -39,7 +39,7 @@ export interface TokenBase {
 
 export interface Asset extends TokenBase {
   tokenType: TokenType.Asset;
-  decimals: 6;
+  decimals: number;
   name: string;
   symbol: string;
   logoUrl?: string;

@@ -3,7 +3,6 @@ import { IndexableTypeArray } from "dexie";
 import axios from "axios";
 import { ethers } from "ethers";
 import mem from "mem";
-import { match } from "ts-pattern";
 import { assert } from "lib/system/assert";
 
 import {
@@ -12,7 +11,12 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import { createAccountTokenKey, createTokenSlug } from "core/common/tokens";
+import {
+  createAccountTokenKey,
+  createTokenSlug,
+  NATIVE_TOKEN_SLUG,
+} from "core/common/tokens";
+import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
 import { $accounts, syncStarted, synced } from "../state";
@@ -39,78 +43,14 @@ export async function addSyncRequest({
 }
 
 const syncAccountTokens = mem(
-  async (chainId: number, accountAddress) => {
+  async (chainId: number, accountAddress: string) => {
     syncStarted(chainId);
 
     try {
-      const debankChain = await getDebankChain(chainId);
-      if (!debankChain) return;
-
-      const { data } = await debankApi.get("/user/token_list", {
-        params: {
-          id: getMyRandomAddress(accountAddress),
-          chain_id: debankChain.id,
-          is_all: false,
-        },
-      });
-
-      const tokenType = TokenType.Asset;
-
-      const accTokens: AccountToken[] = [];
-      const dbKeys: IndexableTypeArray = [];
-
-      for (const token of data) {
-        const native = token.id === debankChain.native_token_id;
-
-        const tokenSlug = createTokenSlug({
-          standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-          address: native ? "0" : token.id,
-          id: "0",
-        });
-
-        const rawBalance = ethers.BigNumber.from(
-          token.raw_amount_hex_str
-        ).toString();
-
-        const status = match(true)
-          .with(
-            token.id === debankChain.native_token_id,
-            () => TokenStatus.Native
-          )
-          .with(rawBalance === "0", () => TokenStatus.Disabled)
-          .otherwise(() => TokenStatus.Enabled);
-
-        const balanceUSD = token.price
-          ? +new BigNumber(rawBalance)
-              .div(10 ** token.decimals)
-              .times(token.price)
-          : 0;
-
-        const dbKey = createAccountTokenKey({
-          chainId,
-          accountAddress,
-          tokenSlug,
-        });
-
-        accTokens.push({
-          chainId,
-          accountAddress,
-          tokenSlug,
-          tokenType,
-          decimals: token.decimals,
-          name: token.name,
-          symbol: token.symbol,
-          logoUrl: token.logo_url,
-          rawBalance,
-          balanceUSD,
-          priceUSD: token.price,
-          status,
-        });
-
-        dbKeys.push(dbKey);
-      }
-
-      await repo.accountTokens.bulkPut(accTokens, dbKeys);
+      await Promise.all([
+        performSync(chainId, accountAddress),
+        new Promise((r) => setTimeout(r, 1_000)),
+      ]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -119,9 +59,123 @@ const syncAccountTokens = mem(
   },
   {
     cacheKey: (args) => args.join("_"),
-    maxAge: 60_000, // 60 sec
+    maxAge: 30_000, // 30 sec
   }
 );
+
+const performSync = async (chainId: number, accountAddress: string) => {
+  const debankChain = await getDebankChain(chainId);
+
+  const existingTokensColl = repo.accountTokens
+    .where("[chainId+tokenType+accountAddress]")
+    .equals([chainId, TokenType.Asset, accountAddress]);
+
+  if (!debankChain) {
+    const totalExisting = await existingTokensColl.count();
+
+    if (totalExisting === 0) {
+      const { nativeCurrency, chainTag } = await getNetwork(chainId);
+
+      const tokenSlug = NATIVE_TOKEN_SLUG;
+      const dbKey = createAccountTokenKey({
+        chainId,
+        accountAddress,
+        tokenSlug,
+      });
+
+      await repo.accountTokens.add(
+        {
+          chainId,
+          accountAddress,
+          tokenType: TokenType.Asset,
+          status: TokenStatus.Native,
+          tokenSlug,
+          decimals: nativeCurrency.decimals,
+          name: nativeCurrency.name,
+          symbol: nativeCurrency.symbol,
+          logoUrl: `{{native}}/${chainTag}`,
+          rawBalance: "0",
+          balanceUSD: 0,
+          priceUSD: "0",
+        },
+        dbKey
+      );
+    }
+
+    return;
+  }
+
+  console.info("here");
+
+  const [{ data: debankUserTokens }, existingAccTokens] = await Promise.all([
+    debankApi.get("/user/token_list", {
+      params: {
+        id: getMyRandomAddress(accountAddress),
+        chain_id: debankChain.id,
+        is_all: false,
+      },
+    }),
+    existingTokensColl.toArray(),
+  ]);
+
+  const tokenType = TokenType.Asset;
+
+  const accTokens: AccountToken[] = [];
+  const dbKeys: IndexableTypeArray = [];
+
+  const existingTokensMap = new Map(
+    existingAccTokens.map((t) => [t.tokenSlug, t])
+  );
+
+  for (const token of debankUserTokens) {
+    const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+    if (rawBalanceBN.isZero()) continue;
+
+    const native = token.id === debankChain.native_token_id;
+
+    const tokenSlug = createTokenSlug({
+      standard: native ? TokenStandard.Native : TokenStandard.ERC20,
+      address: native ? "0" : token.id,
+      id: "0",
+    });
+
+    const existing = existingTokensMap.get(tokenSlug);
+
+    const rawBalance = rawBalanceBN.toString();
+
+    const status =
+      existing?.status ?? (native ? TokenStatus.Native : TokenStatus.Enabled);
+
+    const balanceUSD = token.price
+      ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(token.price)
+      : 0;
+
+    const dbKey = createAccountTokenKey({
+      chainId,
+      accountAddress,
+      tokenSlug,
+    });
+
+    accTokens.push({
+      chainId,
+      accountAddress,
+      tokenSlug,
+      tokenType,
+      decimals: token.decimals,
+      name: token.name,
+      symbol: token.symbol,
+      logoUrl: token.logo_url,
+      rawBalance,
+      balanceUSD,
+      priceUSD: token.price,
+      status,
+    });
+
+    dbKeys.push(dbKey);
+  }
+
+  await repo.accountTokens.bulkPut(accTokens, dbKeys);
+};
 
 const getDebankChain = mem(async (chainId: number) => {
   const chainList = await getDebankChainList();
