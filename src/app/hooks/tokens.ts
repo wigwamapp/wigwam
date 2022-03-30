@@ -146,15 +146,13 @@ export function useAccountNativeToken(accountAddress: string) {
   const value = useAtomValue(atom);
 
   const data = value.state === "hasData" ? value.data : undefined;
-  const prevDataRef = useRef<typeof data>();
+  const prevDataRef = useRef(data);
 
   useEffect(() => {
     if (data) prevDataRef.current = data;
   }, [data]);
 
-  const lazyData = data ?? prevDataRef.current;
-
-  return (value.state === "loading" ? lazyData : data) as
+  return (value.state === "loading" ? prevDataRef.current : data) as
     | AccountAsset
     | undefined;
 }
