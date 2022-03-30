@@ -148,13 +148,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
             </div>
           )}
           <ScrollAreaContainer
-            viewportAsChild
             className={classNames(
               "max-h-64 pl-3 pr-4",
               "flex flex-col",
               scrollAreaClassName
             )}
-            viewPortClassName="py-3 !flex flex-col"
+            viewPortClassName="py-3 viewportBlock"
             scrollBarClassName="py-3"
           >
             <div>

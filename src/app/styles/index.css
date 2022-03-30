@@ -68,3 +68,7 @@
 div[data-radix-popper-content-wrapper] {
   will-change: scroll-position !important;
 }
+
+div[data-radix-scroll-area-viewport].viewportBlock > div {
+  display: block !important;
+}
