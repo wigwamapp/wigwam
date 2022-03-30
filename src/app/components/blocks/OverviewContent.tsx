@@ -217,9 +217,9 @@ const AssetsList: FC = () => {
       ) : (
         <ScrollAreaContainer
           ref={scrollAreaRef}
-          viewportAsChild
+          hiddenScrollbar="horizontal"
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem] !flex flex-col"
+          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-20"
         >
           {tokens.map((asset, i) => (
