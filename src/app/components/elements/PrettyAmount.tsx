@@ -60,14 +60,20 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
 
   let tooltipContent = getPrettyAmount({
     value: isFiatMinified
-      ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+      ? convertedAmount.decimalPlaces(
+          2,
+          convertedAmount.gte(0.01) ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP
+        )
       : convertedAmount,
     dec: isMinified ? 3 : undefined,
     locale: currentLocale,
   });
   let content = getPrettyAmount({
     value: isFiatMinified
-      ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+      ? convertedAmount.decimalPlaces(
+          2,
+          convertedAmount.gte(0.01) ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP
+        )
       : convertedAmount,
     dec: isMinified ? 3 : undefined,
     locale: currentLocale,
@@ -81,7 +87,9 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     });
 
     tooltipContent = getPrettyAmount({
-      value: convertedAmount,
+      value: isFiatMinified
+        ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+        : convertedAmount,
       dec: 38,
       locale: currentLocale,
     });

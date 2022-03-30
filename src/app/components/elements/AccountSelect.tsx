@@ -3,6 +3,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
@@ -13,14 +15,18 @@ import {
   allAccountsAtom,
   currentAccountAtom,
 } from "app/atoms";
-import Select from "app/components/elements/Select";
-import AutoIcon from "app/components/elements/AutoIcon";
-import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
-import CopiableTooltip from "app/components/elements/CopiableTooltip";
+import { useAccountNativeToken } from "app/hooks";
+
+import Select from "./Select";
+import AutoIcon from "./AutoIcon";
+import HashPreview from "./HashPreview";
+import Balance from "./Balance";
+import CopiableTooltip from "./CopiableTooltip";
+import PrettyAmount from "./PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 type AccountSelectProps = {
   className?: string;
@@ -74,7 +80,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       showSelected
       showSelectedIcon={false}
       currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
-      contentClassName="!min-w-[22.25rem]"
+      contentClassName="!w-[22.25rem]"
     />
   );
 };
@@ -87,9 +93,11 @@ type AccountSelectItemProps = {
 
 const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
   const [copied, setCopied] = useState(false);
+  const nativeToken = useAccountNativeToken(account.address);
+  const protfolioBalane = nativeToken?.portfolioUSD;
 
   return (
-    <span className="flex items-center text-left w-full pr-3">
+    <span className="flex items-center text-left w-full pr-3 min-w-0">
       <AutoIcon
         seed={account.address}
         source="dicebear"
@@ -107,9 +115,10 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         copiedText="Wallet address copied to clipboard"
         onCopiedToggle={setCopied}
         className={classNames(
-          "px-1 -my-1",
+          "px-1 -my-1 mr-4",
           "text-left",
           "rounded",
+          "min-w-0",
           "max-w-full",
           "inline-flex flex-col",
           "transition-colors",
@@ -117,7 +126,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         )}
       >
         <>
-          <span className="font-bold">
+          <span className="font-bold truncate w-full">
             <TReplace msg={account.name} />
           </span>
           <span className="flex items-center mt-auto">
@@ -136,11 +145,39 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <Balance address={account.address} copiable className="font-bold" />
+          <PrettyAmount
+            amount={
+              nativeToken
+                ? protfolioBalane ??
+                  ethers.utils.formatEther(nativeToken.rawBalance)
+                : null
+            }
+            currency={protfolioBalane ? "$" : nativeToken?.symbol}
+            isMinified={
+              protfolioBalane
+                ? new BigNumber(protfolioBalane).isLessThan(0.01)
+                : false
+            }
+            copiable
+            className="font-bold"
+          />
         </span>
-        <span className="text-xs leading-4 text-brand-inactivedark font-normal mt-auto">
-          $ 22,478.34
-        </span>
+        {protfolioBalane && (
+          <div className="flex items-center mt-auto">
+            <GasIcon className="w-2.5 h-2.5" />
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={nativeToken?.symbol}
+              isMinified
+              copiable
+              className="text-xs leading-4 text-brand-inactivedark font-normal ml-0.5"
+            />
+          </div>
+        )}
       </span>
     </span>
   );
@@ -149,7 +186,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
 const AccountSelectItem: FC<
   AccountSelectItemProps & { isSelected?: boolean }
 > = ({ account, isSelected = false }) => (
-  <span className="flex items-center text-left w-full">
+  <span className="flex items-center text-left w-full min-w-0">
     <span
       className={classNames(
         "relative",
@@ -178,8 +215,10 @@ const AccountSelectItem: FC<
         </span>
       )}
     </span>
-    <span className="flex flex-col">
-      <TReplace msg={account.name} />
+    <span className="flex flex-col min-w-0 max-w-[45%]">
+      <span className="truncate">
+        <TReplace msg={account.name} />
+      </span>
       <HashPreview
         hash={account.address}
         className="text-xs text-brand-inactivedark font-normal mt-px"

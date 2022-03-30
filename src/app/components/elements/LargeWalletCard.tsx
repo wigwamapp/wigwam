@@ -1,21 +1,29 @@
 import { FC, useState } from "react";
 import classNames from "clsx";
+import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
-import { TippySingletonProvider, useLazyNetwork } from "app/hooks";
-import AutoIcon from "app/components/elements/AutoIcon";
-import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
-import IconedButton from "app/components/elements/IconedButton";
-import Tooltip from "app/components/elements/Tooltip";
-import CopiableTooltip from "app/components/elements/CopiableTooltip";
-import TooltipIcon from "app/components/elements/TooltipIcon";
+import {
+  TippySingletonProvider,
+  useAccountNativeToken,
+  useLazyNetwork,
+} from "app/hooks";
+
+import PrettyAmount from "./PrettyAmount";
+import AutoIcon from "./AutoIcon";
+import HashPreview from "./HashPreview";
+import IconedButton from "./IconedButton";
+import Tooltip from "./Tooltip";
+import CopiableTooltip from "./CopiableTooltip";
+import TooltipIcon from "./TooltipIcon";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 type LargeWalletCardProps = {
   account: Account;
@@ -29,6 +37,8 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   const [copied, setCopied] = useState(false);
 
   const currentNetwork = useLazyNetwork();
+  const nativeToken = useAccountNativeToken(address);
+  const protfolioBalane = nativeToken?.portfolioUSD;
 
   return (
     <div
@@ -100,8 +110,19 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
                 </span>
               </>
             </CopiableTooltip>
-            <Balance
-              address={address}
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? protfolioBalane ??
+                    ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={protfolioBalane ? "$" : nativeToken?.symbol}
+              isMinified={
+                protfolioBalane
+                  ? new BigNumber(protfolioBalane).isLessThan(0.01)
+                  : false
+              }
               copiable
               className="mt-auto text-xl font-bold leading-none"
             />
@@ -128,9 +149,21 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               />
             )}
           </div>
-          <span className="text-sm leading-none text-brand-inactivedark">
-            <span className="opacity-75">$</span>46,909.13
-          </span>
+          {protfolioBalane && (
+            <div className="flex items-center max-h-[1rem]">
+              <GasIcon />
+              <PrettyAmount
+                amount={
+                  nativeToken
+                    ? ethers.utils.formatEther(nativeToken.rawBalance)
+                    : null
+                }
+                currency={nativeToken?.symbol}
+                copiable
+                className="text-sm leading-none text-brand-inactivedark ml-1"
+              />
+            </div>
+          )}
         </div>
         <Tooltip
           content={
