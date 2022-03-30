@@ -3,23 +3,27 @@ import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
-import { TReplace } from "lib/ext/i18n/react";
+import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { TReplace } from "lib/ext/i18n/react";
 
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
+import { useAccountNativeToken } from "app/hooks";
 import Avatar from "app/components/elements/Avatar";
 import NewButton from "app/components/elements/NewButton";
 import Checkbox from "app/components/elements/Checkbox";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 const ConnectDapp: FC = () => {
   const { currentAccount, allAccounts } = useAtomValue(
@@ -130,8 +134,7 @@ const ConnectDapp: FC = () => {
       <Separator />
       <ScrollAreaContainer
         className="w-full box-content -mr-5 pr-5"
-        viewPortClassName="py-2.5"
-        // flex flex-col
+        viewPortClassName="py-2.5 viewportBlock"
       >
         {preparedAccounts.map(({ name, address }, i) => (
           <Account
@@ -215,46 +218,80 @@ const Account: FC<AccountProps> = ({
   checked,
   onToggleAdd,
   className,
-}) => (
-  <CheckboxPrimitive.Root
-    checked={checked}
-    onCheckedChange={onToggleAdd}
-    className={classNames(
-      "w-full",
-      "flex items-center",
-      "px-3 py-1.5",
-      "rounded-[.625rem]",
-      "transition-colors",
-      "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-      className
-    )}
-  >
-    <Checkbox checked={checked} className="mr-4" />
+}) => {
+  const nativeToken = useAccountNativeToken(address);
+  const protfolioBalane = nativeToken?.portfolioUSD;
 
-    <AutoIcon
-      seed={address}
-      source="dicebear"
-      type="personas"
+  return (
+    <CheckboxPrimitive.Root
+      checked={checked}
+      onCheckedChange={onToggleAdd}
       className={classNames(
-        "h-8 w-8 min-w-[2rem]",
-        "mr-3",
-        "bg-black/20",
-        "rounded-[.625rem]"
+        "w-full",
+        "flex items-center",
+        "min-w-0 px-3 py-1.5",
+        "rounded-[.625rem]",
+        "transition-colors",
+        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+        className
       )}
-    />
-    <span className="flex flex-col text-left">
-      <span className="font-bold">
-        <TReplace msg={name} />
-      </span>
-      <HashPreview
-        hash={address}
-        className="text-xs text-brand-inactivedark font-normal mt-px"
-        withTooltip={false}
+    >
+      <Checkbox checked={checked} className="mr-4 min-w-[1.25rem]" />
+
+      <AutoIcon
+        seed={address}
+        source="dicebear"
+        type="personas"
+        className={classNames(
+          "h-8 w-8 min-w-[2rem]",
+          "mr-3",
+          "bg-black/20",
+          "rounded-[.625rem]"
+        )}
       />
-    </span>
-    <Balance
-      address={address}
-      className="text-sm font-bold text-brand-light ml-auto"
-    />
-  </CheckboxPrimitive.Root>
-);
+
+      <span className="flex flex-col text-left min-w-0 max-w-[40%] mr-auto">
+        <span className="font-bold truncate">
+          <TReplace msg={name} />
+        </span>
+        <HashPreview
+          hash={address}
+          className="text-xs text-brand-inactivedark font-normal mt-[2px]"
+          withTooltip={false}
+        />
+      </span>
+      <span className="flex flex-col text-right min-w-0">
+        <PrettyAmount
+          amount={
+            nativeToken
+              ? protfolioBalane ??
+                ethers.utils.formatEther(nativeToken.rawBalance)
+              : null
+          }
+          currency={protfolioBalane ? "$" : nativeToken?.symbol}
+          isMinified={
+            protfolioBalane
+              ? new BigNumber(protfolioBalane).isLessThan(0.01)
+              : false
+          }
+          className="text-sm font-bold text-brand-light ml-2"
+        />
+        {protfolioBalane && (
+          <span className="flex items-center max-h-[1rem]">
+            <GasIcon className="w-2.5 h-2.5" />
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={nativeToken?.symbol}
+              isMinified
+              className="text-xs leading-4 text-brand-inactivedark font-normal ml-0.5"
+            />
+          </span>
+        )}
+      </span>
+    </CheckboxPrimitive.Root>
+  );
+};
