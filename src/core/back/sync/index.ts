@@ -6,6 +6,7 @@ import mem from "mem";
 import { createQueue } from "lib/system/queue";
 
 import {
+  Account,
   AccountAsset,
   AccountToken,
   TokenStandard,
@@ -50,7 +51,7 @@ export async function addSyncRequest({
   try {
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
-      await syncNativeTokensForAll(chainId);
+      await syncNativeTokensForAll(chainId, accountAddress);
     });
   } catch (err) {
     console.error(err);
@@ -61,68 +62,98 @@ export async function addSyncRequest({
 }
 
 const syncNativeTokensForAll = mem(
-  async (chainId: number) => {
-    const allAccounts = $accounts.getState();
+  async (chainId: number, currentAccountAddress: string) => {
+    const perform = async (accounts: Account[]) => {
+      const dbKeys = accounts.map((acc) =>
+        createAccountTokenKey({
+          chainId,
+          accountAddress: acc.address,
+          tokenSlug: NATIVE_TOKEN_SLUG,
+        })
+      );
 
-    const dbKeys = allAccounts.map((acc) =>
-      createAccountTokenKey({
-        chainId,
-        accountAddress: acc.address,
-        tokenSlug: NATIVE_TOKEN_SLUG,
-      })
-    );
-
-    const [{ nativeCurrency, chainTag }, existingTokens, balances] =
-      await Promise.all([
+      const [
+        { nativeCurrency, chainTag },
+        existingTokens,
+        balances,
+        portfolios,
+      ] = await Promise.all([
         getNetwork(chainId),
         repo.accountTokens.bulkGet(dbKeys),
         Promise.all(
-          allAccounts.map((acc) =>
+          accounts.map((acc) =>
             getBalance(chainId, NATIVE_TOKEN_SLUG, acc.address)
           )
         ),
+        Promise.all(
+          accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
+        ),
       ]);
 
-    await repo.accountTokens.bulkPut(
-      allAccounts.map((acc, i) => {
-        const existing = existingTokens[i] as AccountAsset;
-        const balance = balances[i];
+      await repo.accountTokens.bulkPut(
+        accounts.map((acc, i) => {
+          const existing = existingTokens[i] as AccountAsset;
+          const balance = balances[i];
+          const portfolioUSD = portfolios[i] ?? existing?.portfolioUSD;
 
-        if (existing) {
-          if (!balance) return existing;
+          if (existing) {
+            if (!balance) {
+              return {
+                ...existing,
+                portfolioUSD,
+              };
+            }
 
-          const rawBalance = balance.toString();
-          const balanceUSD = existing.priceUSD
-            ? +new BigNumber(rawBalance)
-                .div(10 ** nativeCurrency.decimals)
-                .times(existing.priceUSD)
-            : existing.balanceUSD;
+            const rawBalance = balance.toString();
+            const balanceUSD = existing.priceUSD
+              ? +new BigNumber(rawBalance)
+                  .div(10 ** nativeCurrency.decimals)
+                  .times(existing.priceUSD)
+              : existing.balanceUSD;
 
-          return {
-            ...existing,
-            rawBalance,
-            balanceUSD,
-          };
-        } else {
-          return {
-            chainId,
-            accountAddress: acc.address,
-            tokenType: TokenType.Asset,
-            status: TokenStatus.Native,
-            tokenSlug: NATIVE_TOKEN_SLUG,
-            decimals: nativeCurrency.decimals,
-            name: nativeCurrency.name,
-            symbol: nativeCurrency.symbol,
-            logoUrl: getNativeTokenLogoUrl(chainTag),
-            rawBalance: balance?.toString() ?? "0",
-            balanceUSD: 0,
-          };
-        }
-      }),
-      dbKeys
-    );
+            return {
+              ...existing,
+              rawBalance,
+              balanceUSD,
+              portfolioUSD,
+            };
+          } else {
+            return {
+              chainId,
+              accountAddress: acc.address,
+              tokenType: TokenType.Asset,
+              status: TokenStatus.Native,
+              tokenSlug: NATIVE_TOKEN_SLUG,
+              decimals: nativeCurrency.decimals,
+              name: nativeCurrency.name,
+              symbol: nativeCurrency.symbol,
+              logoUrl: getNativeTokenLogoUrl(chainTag),
+              rawBalance: balance?.toString() ?? "0",
+              balanceUSD: 0,
+              portfolioUSD,
+            };
+          }
+        }),
+        dbKeys
+      );
+    };
+
+    let currentAccount: Account | undefined;
+    const restAccounts: Account[] = [];
+
+    for (const acc of $accounts.getState()) {
+      if (acc.address === currentAccountAddress) {
+        currentAccount = acc;
+      } else {
+        restAccounts.push(acc);
+      }
+    }
+
+    await perform([currentAccount!]);
+    await perform(restAccounts);
   },
   {
+    cacheKey: (args) => args.join("_"),
     maxAge: 20_000, // 20 sec
   }
 );
@@ -279,6 +310,31 @@ const syncAccountTokens = mem(
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 40_000, // 40 sec
+  }
+);
+
+const getDebankUserChainBalance = mem(
+  async (chainId: number, accountAddress: string) => {
+    try {
+      const debankChain = await getDebankChain(chainId);
+      if (!debankChain) return null;
+
+      const { data } = await debankApi.get("/user/chain_balance", {
+        params: {
+          chain_id: debankChain.id,
+          id: getMyRandomAddress(accountAddress),
+        },
+      });
+
+      return data.usd_value.toString() as string;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  },
+  {
+    cacheKey: (args) => args.join("_"),
+    maxAge: 60_000, // 60 sec
   }
 );
 

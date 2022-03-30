@@ -29,6 +29,7 @@ type AccountTokenFields = {
   status: TokenStatus;
   rawBalance: string;
   balanceUSD: number;
+  portfolioUSD?: string;
 };
 
 export interface TokenBase {

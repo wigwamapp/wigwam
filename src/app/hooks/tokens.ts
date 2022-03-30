@@ -15,6 +15,7 @@ import {
 
 import { useChainId } from "./chainId";
 import { matchNativeToken } from "core/repo";
+import { loadable } from "jotai/utils";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -141,7 +142,33 @@ export function useAccountNativeToken(accountAddress: string) {
     [chainId, accountAddress, tokenSlug]
   );
 
-  const token = useLazyAtomValue(getTokenAtom(params));
+  const atom = loadable(getTokenAtom(params));
+  const value = useAtomValue(atom);
 
-  return token as AccountAsset | undefined;
+  const data = value.state === "hasData" ? value.data : undefined;
+  const prevDataRef = useRef<typeof data>();
+
+  useEffect(() => {
+    if (data) prevDataRef.current = data;
+  }, [data]);
+
+  const lazyData = data ?? prevDataRef.current;
+
+  return (value.state === "loading" ? lazyData : data) as
+    | AccountAsset
+    | undefined;
 }
+
+// export function useAccountNativeToken(accountAddress: string) {
+//   const chainId = useChainId();
+//   const tokenSlug = NATIVE_TOKEN_SLUG;
+
+//   const params = useMemo(
+//     () => ({ chainId, accountAddress, tokenSlug }),
+//     [chainId, accountAddress, tokenSlug]
+//   );
+
+//   const token = useLazyAtomValue(getTokenAtom(params));
+
+//   return token as AccountAsset | undefined;
+// }

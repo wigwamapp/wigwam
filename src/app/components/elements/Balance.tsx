@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 
 import { useAccountNativeToken } from "app/hooks";
 import PrettyAmount from "./PrettyAmount";
@@ -17,12 +18,21 @@ const Balance: FC<BalanceProps> = ({
 }) => {
   const nativeToken = useAccountNativeToken(address);
 
+  const protfolioBalane = nativeToken?.portfolioUSD;
+
   return (
     <PrettyAmount
       amount={
-        nativeToken ? ethers.utils.formatEther(nativeToken.rawBalance) : null
+        nativeToken
+          ? protfolioBalane ?? ethers.utils.formatEther(nativeToken.rawBalance)
+          : null
       }
-      currency={nativeToken?.symbol}
+      currency={protfolioBalane ? "$" : nativeToken?.symbol}
+      isMinified={
+        protfolioBalane
+          ? new BigNumber(protfolioBalane).isLessThan(0.01)
+          : false
+      }
       copiable={copiable}
       className={className}
     />
