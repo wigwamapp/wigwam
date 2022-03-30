@@ -133,7 +133,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             {currentNetwork?.explorerUrls && (
               <IconedButton
                 href={`${currentNetwork.explorerUrls}/address/${address}`}
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6"
                 iconClassName="!w-[1.125rem]"
@@ -142,7 +142,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             {currentNetwork?.explorerUrls && (
               <IconedButton
                 href={`${currentNetwork.explorerUrls}/address/${address}`}
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet activity"
                 Icon={ClockIcon}
                 className="!w-6 !h-6 ml-2"
                 iconClassName="!w-[1.125rem]"

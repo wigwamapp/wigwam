@@ -373,13 +373,13 @@ const AssetInfo: FC = () => {
             {standard && <Tag standard={standard} />}
             <TippySingletonProvider>
               <IconedButton
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
                 iconClassName="!w-[1.125rem]"
               />
               <IconedButton
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet in Explorer"
                 Icon={ClockIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-2"
                 iconClassName="!w-[1.125rem]"
