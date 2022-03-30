@@ -10,8 +10,8 @@ import { useAccountTokens, useToken } from "app/hooks/tokens";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
-import Avatar from "./Avatar";
 import PrettyAmount from "./PrettyAmount";
+import TokenLogo from "./TokenLogo";
 
 const TokenSelect: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -123,7 +123,7 @@ const Token: FC<{
       )}
     >
       <span className="relative mr-3">
-        <Avatar
+        <TokenLogo
           src={logoUrl}
           className={classNames(
             size === "large" && "w-10 h-10 min-w-[2.5rem]",

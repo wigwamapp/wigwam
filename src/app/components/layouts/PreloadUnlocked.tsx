@@ -17,9 +17,9 @@ const PreloadUnlocked: FC = ({ children }) => {
     let t: any;
 
     const syncAndDefer = () => {
-      sync(chainId, currentAccount.uuid);
+      sync(chainId, currentAccount.address);
 
-      t = setTimeout(syncAndDefer, 20_000);
+      t = setTimeout(syncAndDefer, 3_000);
     };
 
     if (windowFocused) {
@@ -27,7 +27,7 @@ const PreloadUnlocked: FC = ({ children }) => {
     }
 
     return () => clearTimeout(t);
-  }, [chainId, currentAccount.uuid, windowFocused]);
+  }, [chainId, currentAccount.address, windowFocused]);
 
   return <>{children}</>;
 };

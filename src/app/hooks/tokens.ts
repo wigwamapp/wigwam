@@ -4,7 +4,7 @@ import useForceUpdate from "use-force-update";
 import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
-import { TokenType } from "core/types";
+import { AccountAsset, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
@@ -130,4 +130,18 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
   const asset = useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
 
   return asset;
+}
+
+export function useAccountNativeToken(accountAddress: string) {
+  const chainId = useChainId();
+  const tokenSlug = NATIVE_TOKEN_SLUG;
+
+  const params = useMemo(
+    () => ({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  const token = useLazyAtomValue(getTokenAtom(params));
+
+  return token as AccountAsset | undefined;
 }

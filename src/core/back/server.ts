@@ -226,9 +226,9 @@ async function handleWalletRequest(
           ctx.reply({ type });
         })
       )
-      .with({ type: MessageType.Sync }, ({ chainId, accountUuid }) =>
+      .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>
         withStatus(WalletStatus.Unlocked, () => {
-          addSyncRequest({ chainId, accountUuid });
+          addSyncRequest({ chainId, accountAddress });
         })
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

@@ -228,7 +228,7 @@ export interface GetNeuterExtendedKeyResponse extends MessageBase {
 export interface Sync extends MessageBase {
   type: MessageType.Sync;
   chainId: number;
-  accountUuid: string;
+  accountAddress: string;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {
