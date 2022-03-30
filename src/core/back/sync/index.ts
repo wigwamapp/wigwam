@@ -371,7 +371,7 @@ const getDebankChainList = mem(
   }
 );
 
-function getMyRandomAddress(accountAddress: string) {
+function getMyRandomAddress(accountAddress: string): string {
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
 
@@ -395,7 +395,12 @@ function getMyRandomAddress(accountAddress: string) {
   const randomIndex = Math.floor(Math.random() * addresses.length);
   const randomAddress = addresses[randomIndex];
 
+  if (randomAddress in localStorage) {
+    return getMyRandomAddress(accountAddress);
+  }
+
   localStorage.setItem(storageKey, randomAddress);
+  localStorage.setItem(randomAddress, accountAddress);
 
   return randomAddress;
 }
