@@ -1,10 +1,10 @@
 import { FC } from "react";
 
+import { useIsSyncing } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
-import { useIsSyncing } from "app/hooks";
 
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();

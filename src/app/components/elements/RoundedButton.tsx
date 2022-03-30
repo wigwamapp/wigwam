@@ -23,6 +23,7 @@ const RoundedButton: FC<RoundedButtonProps> = ({
       theme === "large" && "text-lg",
       theme === "small" && "text-base",
       "group",
+      "z-[2]",
       className
     )}
     {...rest}
@@ -33,7 +34,8 @@ const RoundedButton: FC<RoundedButtonProps> = ({
         "absolute top-0 left-0 w-full h-full",
         "bg-opacity-10",
         "group-hover:bg-opacity-20 group-focus-visible:bg-opacity-20",
-        "glass-icon"
+        "glass-icon",
+        "-z-[1]"
       )}
     />
   </button>

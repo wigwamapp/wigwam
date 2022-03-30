@@ -57,7 +57,9 @@ const Input = memo(
         "pointer-events-none",
         "transition-colors",
         focused && "fill-current text-brand-light",
-        disabled && "fill-current text-brand-disabledcolor",
+        disabled &&
+          theme !== "clean" &&
+          "fill-current text-brand-disabledcolor",
         adornmentClassName
       );
 
@@ -115,22 +117,27 @@ const Input = memo(
                 "box-border",
                 "text-brand-light leading-none",
                 "border",
-                theme === "primary" && "bg-black/20 border-brand-main/10",
-                theme === "clean" && "bg-transparent border-transparent",
+                (theme === "primary" || (theme === "clean" && error)) &&
+                  "bg-black/20 border-brand-main/10",
+                theme === "clean" &&
+                  !error &&
+                  "bg-transparent border-transparent",
                 "rounded-[.625rem]",
                 "outline-none",
                 "transition-colors",
                 "placeholder-brand-placeholder",
-                !disabled && [
-                  "group-hover:bg-brand-main/5",
-                  "group-hover:border-brand-main/5",
-                ],
+                !disabled &&
+                  theme !== "clean" && [
+                    "group-hover:bg-brand-main/5",
+                    "group-hover:border-brand-main/5",
+                  ],
                 focused && "!bg-brand-main/[.05] !border-brand-main/[.15]",
-                disabled && [
-                  "bg-brand-disabledbackground/20",
-                  "border-brand-main/5",
-                  "text-brand-disabledcolor placeholder-brand-disabledcolor",
-                ],
+                disabled &&
+                  theme !== "clean" && [
+                    "bg-brand-disabledbackground/20",
+                    "border-brand-main/5",
+                    "text-brand-disabledcolor placeholder-brand-disabledcolor",
+                  ],
                 error && "!border-brand-redobject",
                 inputClassName
               )}

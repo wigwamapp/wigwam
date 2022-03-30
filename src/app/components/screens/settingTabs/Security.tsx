@@ -107,11 +107,11 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
 
   return (
     <SecondaryModal
+      header="Reveal secret phrase"
       open={open}
       onOpenChange={onOpenChange}
       className="px-[5.25rem]"
     >
-      <h2 className="mb-8 text-2xl font-bold">Reveal secret phrase</h2>
       {seedPhrase ? (
         <SeedPhraseField
           readOnly

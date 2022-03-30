@@ -4,6 +4,7 @@ import { waitForAll } from "jotai/utils";
 
 import { FONTS } from "app/defaults";
 import { fontsAtom, i18nAtom, currentLocaleAtom } from "app/atoms";
+import { DialogProvider } from "app/hooks/dialog";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
@@ -13,7 +14,7 @@ const BaseProvider: FC = ({ children }) => (
         <Suspense fallback={null}>
           <Boot />
 
-          {children}
+          <DialogProvider>{children}</DialogProvider>
         </Suspense>
       </JotaiProvider>
     </ErrBond>
