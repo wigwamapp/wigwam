@@ -152,21 +152,9 @@ export function useAccountNativeToken(accountAddress: string) {
     if (data) prevDataRef.current = data;
   }, [data]);
 
-  return (value.state === "loading" ? prevDataRef.current : data) as
+  const token = (value.state === "loading" ? prevDataRef.current : data) as
     | AccountAsset
     | undefined;
+
+  return token?.portfolioUSD !== "-1" ? token : undefined;
 }
-
-// export function useAccountNativeToken(accountAddress: string) {
-//   const chainId = useChainId();
-//   const tokenSlug = NATIVE_TOKEN_SLUG;
-
-//   const params = useMemo(
-//     () => ({ chainId, accountAddress, tokenSlug }),
-//     [chainId, accountAddress, tokenSlug]
-//   );
-
-//   const token = useLazyAtomValue(getTokenAtom(params));
-
-//   return token as AccountAsset | undefined;
-// }

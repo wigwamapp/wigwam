@@ -46,7 +46,7 @@ export async function addSyncRequest({
   setTimeout(() => {
     if (!started) syncStarted(chainId);
     started = true;
-  }, 100);
+  }, 300);
 
   try {
     await enqueueSync(async () => {
@@ -94,7 +94,10 @@ const syncNativeTokensForAll = mem(
         accounts.map((acc, i) => {
           const existing = existingTokens[i] as AccountAsset;
           const balance = balances[i];
-          const portfolioUSD = portfolios[i] ?? existing?.portfolioUSD;
+          const portfolioUSD =
+            existing?.portfolioUSD === "-1" && !portfolios[i]
+              ? "0"
+              : portfolios[i] ?? existing?.portfolioUSD;
 
           if (existing) {
             if (!balance) {
@@ -247,6 +250,7 @@ const syncAccountTokens = mem(
                 rawBalance,
                 balanceUSD,
                 priceUSD,
+                portfolioUSD: native ? "-1" : undefined,
               }
         );
 
