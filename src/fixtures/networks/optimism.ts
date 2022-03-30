@@ -14,7 +14,7 @@ export const OPTIMISM: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://optimistic.etherscan.io"],
-    iconUrls: ["icons/network/ethereum.png"],
+    iconUrls: [],
     faucetUrls: [],
     infoUrl: "https://optimism.io",
   },

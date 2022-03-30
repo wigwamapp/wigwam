@@ -11,7 +11,9 @@ import { ARBITRUM } from "./arbitrum";
 import { AVALANCHE } from "./avalanche";
 import { HARMONY } from "./harmony";
 import { FANTOM } from "./fantom";
+import { AURORA } from "./aurora";
 import { CELO } from "./celo";
+import { HECO } from "./heco";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -26,7 +28,9 @@ export const DEFAULT_NETWORKS: Network[] = [
   AVALANCHE,
   HARMONY,
   FANTOM,
+  AURORA,
   CELO,
+  HECO,
 ].flat();
 
 if (process.env.RELEASE_ENV === "false") {
@@ -47,3 +51,12 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
     ),
   ])
 );
+
+export function getTokenLogoUrl(logoUrl?: string) {
+  if (logoUrl?.startsWith("{{native}}")) {
+    const [, chainTag] = logoUrl.split("/");
+    return getPublicURL(`icons/nativeToken/${chainTag}.png`);
+  }
+
+  return logoUrl;
+}
