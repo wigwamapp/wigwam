@@ -46,7 +46,7 @@ const VerifySeedPhrase = memo(() => {
       const addAccountsParams: AddHDAccountParams[] = [
         {
           source: AccountSource.SeedPhrase,
-          name: "{{wallet}} 1",
+          name: "True Believer",
           derivationPath: ethers.utils.defaultPath,
         },
       ];

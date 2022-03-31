@@ -15,7 +15,7 @@ const Menu: FC = () => {
       <div className="w-[17.75rem] h-12 bg-brand-main/5 rounded-[.625rem]" />
 
       {isSyncing && (
-        <span className="px-4 text-sm text-white font-semibold">
+        <span className="px-4 text-sm text-white font-semibold invisible">
           Syncing...
         </span>
       )}

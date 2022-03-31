@@ -397,17 +397,22 @@ function getMyRandomAddress(accountAddress: string, hops = 0): string {
   }
 
   const addresses = [
-    "0xbdfa4f4492dd7b7cf211209c4791af8d52bf5c50",
-    "0x9c5083dd4838e120dbeac44c052179692aa5dac5",
-    "0xc1e42f862d202b4a0ed552c1145735ee088f6ccf",
-    "0x50664ede715e131f584d3e7eaabd7818bb20a068",
-    "0x3ec6732676db7996c1b34e64b0503f941025cb63",
-    "0x1d5e65a087ebc3d03a294412e46ce5d6882969f4",
+    // "0xbdfa4f4492dd7b7cf211209c4791af8d52bf5c50",
+    // "0x9c5083dd4838e120dbeac44c052179692aa5dac5",
+    // "0xc1e42f862d202b4a0ed552c1145735ee088f6ccf",
+    // "0x50664ede715e131f584d3e7eaabd7818bb20a068",
+    // "0x3ec6732676db7996c1b34e64b0503f941025cb63",
+    // "0x1d5e65a087ebc3d03a294412e46ce5d6882969f4",
+    // "0x69bab6810fa99475854bca0a3dd72ae6a0728ece",
+    // "0xdb9d281c3d29baa9587f5dac99dd982156913913",
+    // "0x108a8b7200d044bbbe95bef6f671baec5473e05f",
+    // "0x0b5a91adc9a867501fd814cea2caba28f9770b63",
+    // "0xab5801a7d398351b8be11c439e05c5b3259aec9b",
     "0x69bab6810fa99475854bca0a3dd72ae6a0728ece",
-    "0xdb9d281c3d29baa9587f5dac99dd982156913913",
-    "0x108a8b7200d044bbbe95bef6f671baec5473e05f",
-    "0x0b5a91adc9a867501fd814cea2caba28f9770b63",
-    "0xab5801a7d398351b8be11c439e05c5b3259aec9b",
+    "0x6dba7f95386e4129f92b59482fa356bc74f29c5b",
+    "0xcea077172675bf31e879bba71fb46c3188591070",
+    "0xb53349160e38739b37e4bbfcf950ed26e26fcb41",
+    "0x51470680d9ab003a53a81fe7bcd9f3f85ad84069",
   ];
   const randomIndex = Math.floor(Math.random() * addresses.length);
   const randomAddress = addresses[randomIndex];

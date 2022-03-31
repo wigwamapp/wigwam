@@ -1,9 +1,8 @@
-import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import Link from "lib/navigation/Link";
 
 import { Account, AccountSource } from "core/types";
 
@@ -25,6 +24,7 @@ import { generatePreviewHDNodes } from "../../../core/common";
 import { fromProtectedString } from "../../../lib/crypto-utils";
 import { useMaybeAtomValue } from "../../../lib/atom-utils";
 import { addAccounts } from "../../../core/client";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 
 const WalletsList: FC = () => {
   const { currentAccount, allAccounts } = useAtomValue(
@@ -47,11 +47,7 @@ const WalletsList: FC = () => {
   return (
     <div className="flex py-4 border-b border-brand-main/[.07]">
       <LargeWalletCard account={currentAccount} className="mr-6" />
-      {accountsWithoutCurrent.length > 0 ? (
-        <SearchableAccountsScrollArea accounts={accountsWithoutCurrent} />
-      ) : (
-        <EmptyWalletCard />
-      )}
+      <SearchableAccountsScrollArea accounts={accountsWithoutCurrent} />
     </div>
   );
 };
@@ -65,9 +61,12 @@ const emptyClassBg = classNames(
   "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
 );
 
-const EmptyWalletCard: FC = () => (
+const EmptyWalletCard: FC<{ onClick: () => void }> = ({ onClick }) => (
   <div className="flex items-center">
-    <Link to={{ addAccOpened: true }} className={"flex group cursor-pointer"}>
+    <button
+      className={"flex items-stretch group cursor-pointer"}
+      onClick={onClick}
+    >
       <div
         className={classNames(
           "w-[14.5rem] min-w-[14.5rem]",
@@ -104,7 +103,7 @@ const EmptyWalletCard: FC = () => (
       >
         <AddWalletIcon />
       </div>
-    </Link>
+    </button>
   </div>
 );
 
@@ -146,6 +145,18 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
     },
     [setAccountAddress, setSearchValue]
   );
+
+  const prevAccountsLength = usePrevious(accounts.length);
+
+  useEffect(() => {
+    if (prevAccountsLength && accounts.length > prevAccountsLength) {
+      scrollAreaRef.current?.scrollTo({
+        behavior: "smooth",
+        top: 0,
+        left: scrollAreaRef.current?.scrollWidth,
+      });
+    }
+  }, [prevAccountsLength, accounts.length]);
 
   // Temporary for adding new account by button click - START
   const importedAccounts = useMaybeAtomValue(allAccountsAtom);
@@ -206,10 +217,22 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
     try {
       if (addressToAdd) {
         console.log("addressToAdd", addressToAdd);
+
+        const FAKE_NAMES = [
+          "True Believer",
+          "Stable Staker",
+          "NFT Hodler",
+          "Cryptopunk",
+          "Game Dominator",
+          "The Rest 1",
+          "The Rest 2",
+          "The Rest 3",
+        ];
+
         await addAccounts([
           {
             source: AccountSource.SeedPhrase,
-            name: `Wallet ${addressToAdd.index + 1}`,
+            name: FAKE_NAMES[addressToAdd.index],
             derivationPath: `m/44'/60'/0'/0/${addressToAdd.index}`,
           },
         ]);
@@ -220,6 +243,10 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
   }, [addressToAdd]);
 
   // Temporary for adding new account by button click - END
+
+  if (accounts.length === 0) {
+    return <EmptyWalletCard onClick={handleAddNewAccount} />;
+  }
 
   return (
     <div className="flex flex-col w-full min-w-0">
