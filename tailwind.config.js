@@ -1,5 +1,4 @@
 const theme = require("tailwindcss/defaultTheme");
-const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/**/*.{html,js,mjs}"],
@@ -64,22 +63,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-
-    // Rotate X utilities
-    plugin(function ({ addUtilities }) {
-      addUtilities({
-        ".rotate-x-0": {
-          transform: "rotateX(0deg)",
-        },
-        ".rotate-x-90": {
-          transform: "rotateX(90deg)",
-        },
-        ".-rotate-x-90": {
-          transform: "rotateX(-90deg)",
-        },
-      });
-    }),
-  ],
+  plugins: [require("@tailwindcss/typography")],
 };
