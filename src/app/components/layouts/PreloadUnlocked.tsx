@@ -19,7 +19,7 @@ const PreloadUnlocked: FC = ({ children }) => {
     const syncAndDefer = () => {
       sync(chainId, currentAccount.address);
 
-      t = setTimeout(syncAndDefer, 3_000);
+      t = setTimeout(syncAndDefer, 1_500);
     };
 
     if (windowFocused) {
