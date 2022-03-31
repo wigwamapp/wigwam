@@ -5,13 +5,14 @@ import classNames from "clsx";
 import Fuse from "fuse.js";
 import Link from "lib/navigation/Link";
 
-import { Account } from "core/types";
+import { Account, AccountSource } from "core/types";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import {
   accountAddressAtom,
   allAccountsAtom,
   currentAccountAtom,
+  getNeuterExtendedKeyAtom,
 } from "app/atoms";
 import LargeWalletCard from "app/components/elements/LargeWalletCard";
 import NewButton from "app/components/elements/NewButton";
@@ -20,6 +21,10 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { generatePreviewHDNodes } from "../../../core/common";
+import { fromProtectedString } from "../../../lib/crypto-utils";
+import { useMaybeAtomValue } from "../../../lib/atom-utils";
+import { addAccounts } from "../../../core/client";
 
 const WalletsList: FC = () => {
   const { currentAccount, allAccounts } = useAtomValue(
@@ -142,6 +147,80 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
     [setAccountAddress, setSearchValue]
   );
 
+  // Temporary for adding new account by button click - START
+  const importedAccounts = useMaybeAtomValue(allAccountsAtom);
+
+  const rootNeuterExtendedKey = useMaybeAtomValue(
+    getNeuterExtendedKeyAtom("m/44'/60'/0'/0")
+  );
+
+  const neuterExtendedKey = useMemo(
+    () => rootNeuterExtendedKey && fromProtectedString(rootNeuterExtendedKey),
+    [rootNeuterExtendedKey]
+  );
+
+  const findFirstUnusedAccount = useCallback(
+    (key: string, offset = 0, limit = 9) => {
+      const newAccounts = generatePreviewHDNodes(key, offset, limit);
+
+      if (!importedAccounts || importedAccounts.length <= 0) {
+        return newAccounts[0];
+      }
+
+      const filteredAccs = newAccounts.filter(
+        ({ address }) =>
+          !importedAccounts.some(
+            ({ address: imported }) => imported === address
+          )
+      );
+
+      if (filteredAccs.length <= 0) {
+        return null;
+      }
+
+      return {
+        index: filteredAccs[0].index,
+      };
+    },
+    [importedAccounts]
+  );
+
+  const addressToAdd = useMemo(() => {
+    if (!neuterExtendedKey) {
+      return null;
+    }
+
+    let offset = 0;
+    let limit = 9;
+    let unusedAccount = null;
+    while (unusedAccount === null) {
+      unusedAccount = findFirstUnusedAccount(neuterExtendedKey, offset, limit);
+      offset = limit;
+      limit += 9;
+    }
+
+    return unusedAccount;
+  }, [findFirstUnusedAccount, neuterExtendedKey]);
+
+  const handleAddNewAccount = useCallback(async () => {
+    try {
+      if (addressToAdd) {
+        console.log("addressToAdd", addressToAdd);
+        await addAccounts([
+          {
+            source: AccountSource.SeedPhrase,
+            name: `Wallet ${addressToAdd.index + 1}`,
+            derivationPath: `m/44'/60'/0'/0/${addressToAdd.index}`,
+          },
+        ]);
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  }, [addressToAdd]);
+
+  // Temporary for adding new account by button click - END
+
   return (
     <div className="flex flex-col w-full min-w-0">
       <div className="flex items-center mb-3">
@@ -150,7 +229,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
           toggleSearchValue={setSearchValue}
         />
         <NewButton
-          to={{ addAccOpened: true }}
+          onClick={handleAddNewAccount}
           theme="tertiary"
           className="ml-5 !py-2"
         >

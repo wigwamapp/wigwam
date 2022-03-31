@@ -45,7 +45,7 @@ import ControlIcon from "../elements/ControlIcon";
 import TokenLogo from "../elements/TokenLogo";
 
 const OverviewContent: FC = () => (
-  <div className="flex mt-6 min-h-0 grow">
+  <div className="flex mt-6 min-h-0 grow invisible">
     <AssetsList />
     <AssetInfo />
   </div>

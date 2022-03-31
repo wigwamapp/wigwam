@@ -34,7 +34,7 @@ const Sidebar: FC = () => (
       links={NavLinksSecondary}
       className={classNames(
         "mt-[6.25rem] pt-8",
-        "border-t border-brand-main/[.07]"
+        "border-t border-brand-main/[.07] invisible"
       )}
     />
   </nav>

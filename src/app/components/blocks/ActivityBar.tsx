@@ -31,7 +31,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
         "shadow-addaccountmodal",
         "flex justify-between",
         "rounded-[.625rem]",
-        "cursor-pointer",
+        "cursor-pointer invisible",
         theme === "large" && "px-8 py-4",
         theme === "small" && "px-3 py-2"
       )}
