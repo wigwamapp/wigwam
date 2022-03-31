@@ -203,12 +203,14 @@ async function handleWalletRequest(
           ctx.reply({ type, publicKey });
         })
       )
-      .with({ type: MessageType.GetNeuterExtendedKey }, ({ type }) =>
-        withVault(async (vault) => {
-          const extendedKey = vault.getNeuterExtendedKey();
+      .with(
+        { type: MessageType.GetNeuterExtendedKey },
+        ({ type, derivationPath }) =>
+          withVault(async (vault) => {
+            const extendedKey = vault.getNeuterExtendedKey(derivationPath);
 
-          ctx.reply({ type, extendedKey });
-        })
+            ctx.reply({ type, extendedKey });
+          })
       )
       .with({ type: MessageType.GetApprovals }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, () => {
@@ -224,9 +226,9 @@ async function handleWalletRequest(
           ctx.reply({ type });
         })
       )
-      .with({ type: MessageType.Sync }, ({ chainId, accountUuid }) =>
+      .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>
         withStatus(WalletStatus.Unlocked, () => {
-          addSyncRequest({ chainId, accountUuid });
+          addSyncRequest({ chainId, accountAddress });
         })
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

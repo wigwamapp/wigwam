@@ -12,7 +12,6 @@ import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { navigate } from "lib/navigation";
 
 import {
   AccountAsset,
@@ -20,21 +19,14 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
+import { parseTokenSlug } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAccountTokens, useToken } from "app/hooks/tokens";
-import AssetsSwitcher from "app/components/elements/AssetsSwitcher";
-import IconedButton from "app/components/elements/IconedButton";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import NewButton from "app/components/elements/NewButton";
-import SearchInput from "app/components/elements/SearchInput";
-import PrettyAmount from "app/components/elements/PrettyAmount";
-import ControlIcon from "app/components/elements/ControlIcon";
-import Avatar from "app/components/elements/Avatar";
+
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
@@ -42,6 +34,15 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+
+import AssetsSwitcher from "../elements/AssetsSwitcher";
+import IconedButton from "../elements/IconedButton";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import NewButton from "../elements/NewButton";
+import SearchInput from "../elements/SearchInput";
+import PrettyAmount from "../elements/PrettyAmount";
+import ControlIcon from "../elements/ControlIcon";
+import TokenLogo from "../elements/TokenLogo";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -216,13 +217,14 @@ const AssetsList: FC = () => {
       ) : (
         <ScrollAreaContainer
           ref={scrollAreaRef}
+          hiddenScrollbar="horizontal"
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-20"
         >
           {tokens.map((asset, i) => (
             <AssetCard
-              key={createAccountTokenKey(asset)}
+              key={asset.tokenSlug}
               ref={
                 i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
                   ? loadMoreTriggerAssetRef
@@ -281,14 +283,14 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         )}
         disabled={isManageMode && nativeAsset}
       >
-        <Avatar
+        <TokenLogo
           src={logoUrl}
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
-        <span className="flex flex-col w-full">
-          <span className={"text-sm font-bold leading-4"}>{name}</span>
-          <span className="mt-auto flex justify-between items-end">
+        <span className="flex flex-col justify-center w-full min-w-0">
+          <span className="text-sm font-bold leading-4 truncate">{name}</span>
+          <span className="mt-2 flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}
               decimals={decimals}
@@ -299,6 +301,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
               <PrettyAmount
                 amount={balanceUSD ?? 0}
                 currency="$"
+                isMinified
                 className={classNames(
                   "ml-2",
                   "text-sm leading-4",
@@ -344,13 +347,6 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
-  const openLink = useCallback(
-    (page: Page) => {
-      navigate({ page, token: tokenSlug });
-    },
-    [tokenSlug]
-  );
-
   if (!tokenInfo || !parsedTokenSlug) {
     return <></>;
   }
@@ -362,7 +358,7 @@ const AssetInfo: FC = () => {
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <Avatar
+        <TokenLogo
           src={logoUrl}
           alt={name}
           className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
@@ -377,13 +373,13 @@ const AssetInfo: FC = () => {
             {standard && <Tag standard={standard} />}
             <TippySingletonProvider>
               <IconedButton
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
                 iconClassName="!w-[1.125rem]"
               />
               <IconedButton
-                aria-label="View wallet transactions in explorer"
+                aria-label="View wallet in Explorer"
                 Icon={ClockIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-2"
                 iconClassName="!w-[1.125rem]"
@@ -433,7 +429,8 @@ const AssetInfo: FC = () => {
         <NewButton
           theme="secondary"
           className="grow !py-2"
-          onClick={() => openLink(Page.Transfer)}
+          to={{ page: Page.Transfer }}
+          merge={["token"]}
         >
           <SendIcon className="mr-2" />
           Transfer

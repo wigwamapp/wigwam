@@ -4,6 +4,7 @@ import { StepsContext } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import { ReactComponent as ImportIcon } from "app/icons/AddWalletImport.svg";
 import { ReactComponent as CreateIcon } from "app/icons/AddWalletCreate.svg";
+import { ReactComponent as AddNewIcon } from "app/icons/AddWalletAddNew.svg";
 import { ReactComponent as GoogleIcon } from "app/icons/AddWalletGoogle.svg";
 import { ReactComponent as FacebookIcon } from "app/icons/AddWalletFacebook.svg";
 import { ReactComponent as TwitterIcon } from "app/icons/AddWalletTwitter.svg";
@@ -14,7 +15,7 @@ import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 export type WaysReturnTile = {
   title: string;
   Icon?: FC<{ className?: string }>;
-  action: () => void;
+  action?: () => void;
   soon?: boolean;
 };
 
@@ -62,10 +63,14 @@ export const getWays = (
     tiles: hasSeedPhrase
       ? [
           {
-            title: "Add wallet",
-            Icon: ImportIcon,
+            title:
+              "You already have Secret Phrase, and wallets belonging to it.",
+          },
+          {
+            title: "Add new",
+            Icon: AddNewIcon,
             action: () => {
-              alert("Not implemented");
+              navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
             },
           },
         ]

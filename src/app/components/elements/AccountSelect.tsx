@@ -3,6 +3,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
@@ -13,13 +15,18 @@ import {
   allAccountsAtom,
   currentAccountAtom,
 } from "app/atoms";
-import Select from "app/components/elements/Select";
-import AutoIcon from "app/components/elements/AutoIcon";
-import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
-import CopiableTooltip from "app/components/elements/CopiableTooltip";
+import { useAccountNativeToken } from "app/hooks";
+
+import Select from "./Select";
+import AutoIcon from "./AutoIcon";
+import HashPreview from "./HashPreview";
+import Balance from "./Balance";
+import CopiableTooltip from "./CopiableTooltip";
+import PrettyAmount from "./PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 type AccountSelectProps = {
   className?: string;
@@ -48,11 +55,15 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
     if (searchValue) {
       return fuse
         .search(searchValue)
-        .map(({ item: network }) => prepareAccount(network));
+        .map(({ item: network }) =>
+          prepareAccount(network, network.address === currentAccount.address)
+        );
     } else {
-      return allAccounts.map((network) => prepareAccount(network));
+      return allAccounts.map((network) =>
+        prepareAccount(network, network.address === currentAccount.address)
+      );
     }
-  }, [fuse, allAccounts, searchValue]);
+  }, [searchValue, fuse, currentAccount.address, allAccounts]);
 
   const preparedCurrentAccount = useMemo(
     () => prepareCurrentAccount(currentAccount),
@@ -66,8 +77,10 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       setItem={(account) => setAccountAddress(account.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
+      showSelected
+      showSelectedIcon={false}
       currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
-      contentClassName="!min-w-[22.25rem]"
+      contentClassName="!w-[22.25rem]"
     />
   );
 };
@@ -80,9 +93,11 @@ type AccountSelectItemProps = {
 
 const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
   const [copied, setCopied] = useState(false);
+  const nativeToken = useAccountNativeToken(account.address);
+  const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (
-    <span className="flex items-center text-left w-full pr-3">
+    <span className="flex items-center text-left w-full pr-3 min-w-0">
       <AutoIcon
         seed={account.address}
         source="dicebear"
@@ -97,12 +112,12 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       <CopiableTooltip
         content="Copy wallet address to clipboard"
         textToCopy={account.address}
-        copiedText="Wallet address copied to clipboard"
         onCopiedToggle={setCopied}
         className={classNames(
-          "px-1 -my-1",
+          "px-1 -my-1 mr-4",
           "text-left",
           "rounded",
+          "min-w-0",
           "max-w-full",
           "inline-flex flex-col",
           "transition-colors",
@@ -110,7 +125,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         )}
       >
         <>
-          <span className="font-bold">
+          <span className="font-bold truncate w-full">
             <TReplace msg={account.name} />
           </span>
           <span className="flex items-center mt-auto">
@@ -129,43 +144,88 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <Balance address={account.address} copiable className="font-bold" />
+          <PrettyAmount
+            amount={
+              nativeToken
+                ? portfolioBalance ??
+                  ethers.utils.formatEther(nativeToken.rawBalance)
+                : null
+            }
+            currency={portfolioBalance ? "$" : nativeToken?.symbol}
+            isMinified={
+              portfolioBalance
+                ? new BigNumber(portfolioBalance).isLessThan(0.01)
+                : false
+            }
+            copiable
+            className="font-bold"
+          />
         </span>
-        <span className="text-xs leading-4 text-brand-inactivedark font-normal mt-auto">
-          $ 22,478.34
-        </span>
+        {portfolioBalance && (
+          <PrettyAmount
+            amount={
+              nativeToken
+                ? ethers.utils.formatEther(nativeToken.rawBalance)
+                : null
+            }
+            currency={nativeToken?.symbol}
+            isMinified
+            copiable
+            prefix={<GasIcon className="w-2.5 h-2.5 mr-0.5" />}
+            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center mt-px"
+          />
+        )}
       </span>
     </span>
   );
 };
 
-const AccountSelectItem: FC<AccountSelectItemProps> = ({ account }) => (
-  <span className="flex items-center text-left w-full">
-    <AutoIcon
-      seed={account.address}
-      source="dicebear"
-      type="personas"
+const AccountSelectItem: FC<
+  AccountSelectItemProps & { isSelected?: boolean }
+> = ({ account, isSelected = false }) => (
+  <span className="flex items-center text-left w-full min-w-0">
+    <span
       className={classNames(
+        "relative",
         "h-8 w-8 min-w-[2rem]",
         "mr-3",
         "bg-black/20",
         "rounded-[.625rem]"
       )}
-    />
-    <TReplace msg={account.name} />
-    <span className="flex flex-col items-end ml-auto">
+    >
+      <AutoIcon
+        seed={account.address}
+        source="dicebear"
+        type="personas"
+        className={classNames("w-full h-full", isSelected && "opacity-20")}
+      />
+      {isSelected && (
+        <span
+          className={classNames(
+            "absolute inset-0",
+            "rounded-[.625rem]",
+            "border border-brand-light",
+            "flex items-center justify-center"
+          )}
+        >
+          <SelectedIcon className="fill-brand-light" />
+        </span>
+      )}
+    </span>
+    <span className="flex flex-col min-w-0 max-w-[45%]">
+      <span className="truncate">
+        <TReplace msg={account.name} />
+      </span>
       <HashPreview
         hash={account.address}
-        className="text-sm text-brand-light font-normal leading-5"
+        className="text-xs text-brand-inactivedark font-normal mt-px"
         withTooltip={false}
       />
-      <span className="inline-flex min-h-[1rem] mt-auto">
-        <Balance
-          address={account.address}
-          className="text-xs text-brand-inactivedark font-normal"
-        />
-      </span>
     </span>
+    <Balance
+      address={account.address}
+      className="text-sm text-brand-light ml-auto"
+    />
   </span>
 );
 
@@ -174,7 +234,7 @@ const prepareCurrentAccount = (account: Account) => ({
   value: <CurrentAccount account={account} />,
 });
 
-const prepareAccount = (account: Account) => ({
+const prepareAccount = (account: Account, isSelected = false) => ({
   key: account.address,
-  value: <AccountSelectItem account={account} />,
+  value: <AccountSelectItem account={account} isSelected={isSelected} />,
 });

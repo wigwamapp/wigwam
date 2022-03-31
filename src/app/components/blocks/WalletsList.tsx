@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
@@ -42,6 +42,7 @@ const WalletsList: FC = () => {
   return (
     <div className="flex py-4 border-b border-brand-main/[.07]">
       <LargeWalletCard account={currentAccount} className="mr-6" />
+
       {accountsWithoutCurrent.length > 0 ? (
         <SearchableAccountsScrollArea accounts={accountsWithoutCurrent} />
       ) : (
@@ -126,6 +127,22 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
     return accounts;
   }, [accounts, fuse, searchValue]);
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const changeAccount = useCallback(
+    (address: string) => {
+      setAccountAddress(address);
+      setSearchValue(null);
+
+      scrollAreaRef.current?.scrollTo({
+        behavior: "smooth",
+        top: 0,
+        left: 0,
+      });
+    },
+    [setAccountAddress, setSearchValue]
+  );
+
   return (
     <div className="flex flex-col w-full min-w-0">
       <div className="flex items-center mb-3">
@@ -144,6 +161,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
       </div>
       {filteredAccounts.length > 0 ? (
         <ScrollAreaContainer
+          ref={scrollAreaRef}
           className="pb-4 -mb-4"
           viewPortClassName="!flex rounded-[.625rem]"
           scrollBarClassName="w-full px-0"
@@ -153,10 +171,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
             <WalletCard
               key={account.address}
               account={account}
-              onClick={() => {
-                setAccountAddress(account.address);
-                setSearchValue(null);
-              }}
+              onClick={() => changeAccount(account.address)}
               className={classNames(i !== accounts.length - 1 && "mr-4")}
             />
           ))}

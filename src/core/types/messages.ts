@@ -217,6 +217,7 @@ export interface GetPublicKeyResponse extends MessageBase {
 
 export interface GetNeuterExtendedKeyRequest extends MessageBase {
   type: MessageType.GetNeuterExtendedKey;
+  derivationPath: string;
 }
 
 export interface GetNeuterExtendedKeyResponse extends MessageBase {
@@ -227,7 +228,7 @@ export interface GetNeuterExtendedKeyResponse extends MessageBase {
 export interface Sync extends MessageBase {
   type: MessageType.Sync;
   chainId: number;
-  accountUuid: string;
+  accountAddress: string;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {

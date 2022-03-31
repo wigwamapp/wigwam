@@ -4,7 +4,7 @@ import useForceUpdate from "use-force-update";
 import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
-import { TokenType } from "core/types";
+import { AccountAsset, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
@@ -15,6 +15,7 @@ import {
 
 import { useChainId } from "./chainId";
 import { matchNativeToken } from "core/repo";
+import { loadable } from "jotai/utils";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -130,4 +131,30 @@ export function useToken(tokenSlug: string | null, onReset?: () => void) {
   const asset = useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
 
   return asset;
+}
+
+export function useAccountNativeToken(accountAddress: string) {
+  const chainId = useChainId();
+  const tokenSlug = NATIVE_TOKEN_SLUG;
+
+  const params = useMemo(
+    () => ({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  const atom = loadable(getTokenAtom(params));
+  const value = useAtomValue(atom);
+
+  const data = value.state === "hasData" ? value.data : undefined;
+  const prevDataRef = useRef(data);
+
+  useEffect(() => {
+    if (data) prevDataRef.current = data;
+  }, [data]);
+
+  const token = (value.state === "loading" ? prevDataRef.current : data) as
+    | AccountAsset
+    | undefined;
+
+  return token?.portfolioUSD !== "-1" ? token : undefined;
 }

@@ -180,10 +180,10 @@ export async function getPublicKey(accountUuid: string) {
   return res.publicKey;
 }
 
-export async function getNeuterExtendedKey() {
+export async function getNeuterExtendedKey(derivationPath: string) {
   const type = MessageType.GetNeuterExtendedKey;
 
-  const res = await porter.request({ type });
+  const res = await porter.request({ type, derivationPath });
   assert(res?.type === type);
 
   return res.extendedKey;
@@ -206,8 +206,8 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
   });
 }
 
-export function sync(chainId: number, accountUuid: string) {
-  const msg: Sync = { type: MessageType.Sync, chainId, accountUuid };
+export function sync(chainId: number, accountAddress: string) {
+  const msg: Sync = { type: MessageType.Sync, chainId, accountAddress };
 
   porter.sendOneWayMessage(msg);
 }

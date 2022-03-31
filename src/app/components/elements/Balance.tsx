@@ -1,7 +1,8 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 
-import { useNativeCurrency, useProvider } from "app/hooks";
+import { useAccountNativeToken } from "app/hooks";
 import PrettyAmount from "./PrettyAmount";
 
 type BalanceProps = {
@@ -15,30 +16,23 @@ const Balance: FC<BalanceProps> = ({
   copiable = false,
   className,
 }) => {
-  const provider = useProvider();
-  const nativeCurrency = useNativeCurrency();
+  const nativeToken = useAccountNativeToken(address);
 
-  const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    setBalance(null);
-
-    provider
-      .getBalance(address)
-      .then((b) => mounted && setBalance(b))
-      .catch(console.error);
-
-    return () => {
-      mounted = false;
-    };
-  }, [address, provider]);
+  const protfolioBalane = nativeToken?.portfolioUSD;
 
   return (
     <PrettyAmount
-      amount={balance && ethers.utils.formatEther(balance)}
-      currency={nativeCurrency?.symbol}
+      amount={
+        nativeToken
+          ? protfolioBalane ?? ethers.utils.formatEther(nativeToken.rawBalance)
+          : null
+      }
+      currency={protfolioBalane ? "$" : nativeToken?.symbol}
+      isMinified={
+        protfolioBalane
+          ? new BigNumber(protfolioBalane).isLessThan(0.01)
+          : false
+      }
       copiable={copiable}
       className={className}
     />
