@@ -44,33 +44,35 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
     return (
       <div
         className={classNames(
-          "px-4 pt-4 pb-3",
           "w-[23.25rem] min-w-[23.25rem]",
-          "bg-brand-main/10",
-          "rounded-[.625rem]",
-          "flex flex-col",
-          "relative overflow-hidden",
+          "relative",
           className
         )}
+        style={{ perspective: 1000 }}
       >
         <SwitchTransition mode="out-in">
           <CSSTransition
             key={address}
             nodeRef={transitionRef}
-            timeout={{
-              exit: 0,
-              enter: 150,
-            }}
+            timeout={150}
             classNames={{
-              enter: "opacity-0 translate-x-full",
-              enterActive: "opacity-1 translate-x-0",
-              exit: "opacity-1 duration-0",
-              exitActive: "opacity-0 duration-0",
+              enter: "-rotate-x-90",
+              enterActive: "rotate-x-0",
+              exit: "rotate-x-0",
+              exitActive: "rotate-x-90",
             }}
           >
             <div
               ref={transitionRef}
-              className={classNames("transform", "transition")}
+              className={classNames(
+                "transform-gpu transition-transform",
+                "px-4 pt-4 pb-3",
+                "bg-brand-main/10",
+                "rounded-[.625rem]",
+                "flex flex-col",
+                "relative"
+              )}
+              style={{ transformStyle: "preserve-3d" }}
             >
               <TippySingletonProvider>
                 <div className="flex">
