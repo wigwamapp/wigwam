@@ -3,10 +3,11 @@ import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AccountAsset, TokenType } from "core/types";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useAccountTokens, useToken } from "app/hooks/tokens";
+import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
@@ -17,7 +18,7 @@ const TokenSelect: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {
@@ -27,7 +28,7 @@ const TokenSelect: FC = () => {
 
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const currentToken = useToken(tokenSlug);
+  const currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
 
   const setDefaultTokenRef = useRef(!tokenSlug);
 

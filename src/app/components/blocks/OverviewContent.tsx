@@ -25,7 +25,7 @@ import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import { useAccountTokens, useToken } from "app/hooks/tokens";
+import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -43,15 +43,26 @@ import SearchInput from "../elements/SearchInput";
 import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
 import TokenLogo from "../elements/TokenLogo";
+import LongTextField from "../elements/LongTextField";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
-    <AssetsList />
-    <AssetInfo />
+    <TokenExplorer />
   </div>
 );
 
 export default OverviewContent;
+
+const TokenExplorer: FC = () => {
+  const tokenSlug = useAtomValue(tokenSlugAtom);
+
+  return (
+    <>
+      <AssetsList />
+      {tokenSlug && <AssetInfo />}
+    </>
+  );
+};
 
 const AssetsList: FC = () => {
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
@@ -70,7 +81,7 @@ const AssetsList: FC = () => {
     setDefaultTokenRef.current = true;
   }, []);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {
@@ -341,7 +352,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
-  const tokenInfo = useToken(tokenSlug) as AccountAsset;
+  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
@@ -351,9 +362,17 @@ const AssetInfo: FC = () => {
     return <></>;
   }
 
-  const { logoUrl, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
-    tokenInfo;
-  const { standard } = parsedTokenSlug;
+  const {
+    status,
+    logoUrl,
+    name,
+    symbol,
+    rawBalance,
+    decimals,
+    priceUSD,
+    balanceUSD,
+  } = tokenInfo;
+  const { standard, address } = parsedTokenSlug;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
@@ -444,6 +463,18 @@ const AssetInfo: FC = () => {
           Activity
         </NewButton>
       </div>
+
+      {status !== TokenStatus.Native && (
+        <div className="mt-6">
+          <LongTextField
+            key={address}
+            label="Token address"
+            defaultValue={address}
+            textareaClassName="!h-auto"
+            readOnly
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,29 +1,15 @@
-import { useRef, useEffect } from "react";
 import { Atom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
-
-export enum KeepPrevious {
-  WhenNotUndefined,
-  Always,
-  Off,
-}
+import { usePrevious, KeepPrevious } from "lib/react-hooks/usePrevious";
 
 export function useLazyAtomValue<T>(
   atom: Atom<T>,
-  previousMode = KeepPrevious.WhenNotUndefined
+  previousMode: KeepPrevious = "when-not-undefined"
 ) {
   const value = useAtomValue(loadable(atom));
 
   const data = value.state === "hasData" ? value.data : undefined;
+  const prevData = usePrevious(data, previousMode);
 
-  const prevDataRef = useRef<typeof data>();
-  useEffect(() => {
-    if (previousMode !== KeepPrevious.Off) {
-      if (previousMode === KeepPrevious.Always || data !== undefined) {
-        prevDataRef.current = data;
-      }
-    }
-  }, [previousMode, data]);
-
-  return data ?? prevDataRef.current;
+  return data ?? prevData;
 }

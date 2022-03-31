@@ -1,11 +1,15 @@
 import { useRef, useEffect } from "react";
 
-export function usePrevious<T>(value: T) {
+export type KeepPrevious = "off" | "always" | "when-not-undefined";
+
+export function usePrevious<T>(value: T, mode: KeepPrevious = "always") {
   const ref = useRef<T>();
 
   useEffect(() => {
-    ref.current = value;
-  }, [value]);
+    if (mode !== "off" && (mode === "always" || value !== undefined)) {
+      ref.current = value;
+    }
+  }, [mode, value]);
 
   return ref.current;
 }

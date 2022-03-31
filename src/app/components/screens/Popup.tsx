@@ -21,7 +21,7 @@ import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import { useAccountTokens } from "app/hooks/tokens";
+import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoIcon } from "app/icons/info-round.svg";
@@ -147,7 +147,7 @@ const AssetsList: FC = () => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {

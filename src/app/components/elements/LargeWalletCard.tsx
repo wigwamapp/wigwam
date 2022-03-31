@@ -7,11 +7,7 @@ import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
-import {
-  TippySingletonProvider,
-  useAccountNativeToken,
-  useLazyNetwork,
-} from "app/hooks";
+import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
 
 import PrettyAmount from "./PrettyAmount";
 import AutoIcon from "./AutoIcon";
@@ -36,7 +32,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
     const [copied, setCopied] = useState(false);
 
     const currentNetwork = useLazyNetwork();
-    const nativeToken = useAccountNativeToken(address);
+    const nativeToken = useToken(address);
     const portfolioBalance = nativeToken?.portfolioUSD;
 
     const transitionRef = useRef<HTMLDivElement>(null);
