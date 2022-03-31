@@ -42,47 +42,77 @@ export async function addSyncRequest({
   chainId,
   accountAddress,
 }: AddSyncRequestParams) {
-  let started = false;
+  let syncStartedAt: number | undefined;
+
   setTimeout(() => {
-    if (!started) syncStarted(chainId);
-    started = true;
+    if (!syncStartedAt) syncStarted(chainId);
+    syncStartedAt = Date.now();
   }, 300);
 
   try {
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
-      await syncNativeTokensForAll(chainId, accountAddress);
+
+      const allAccounts = $accounts.getState();
+
+      let currentAccount: Account | undefined;
+      const restAccounts: Account[] = [];
+
+      for (const acc of allAccounts) {
+        if (acc.address === accountAddress) {
+          currentAccount = acc;
+        } else {
+          restAccounts.push(acc);
+        }
+      }
+
+      if (!currentAccount) return;
+
+      await syncNativeTokens(
+        chainId,
+        `current_${accountAddress}`,
+        currentAccount
+      );
+
+      await syncNativeTokens(
+        chainId,
+        `rest_${allAccounts.length}`,
+        restAccounts
+      );
     });
   } catch (err) {
     console.error(err);
   } finally {
-    if (started) synced(chainId);
-    started = true;
+    if (syncStartedAt)
+      setTimeout(
+        () => synced(chainId),
+        Math.max(0, syncStartedAt + 1_000 - Date.now())
+      );
+    else syncStartedAt = 1;
   }
 }
 
-const syncNativeTokensForAll = mem(
-  async (chainId: number, currentAccountAddress: string) => {
-    const perform = async (accounts: Account[]) => {
-      const dbKeys = accounts.map((acc) =>
-        createAccountTokenKey({
-          chainId,
-          accountAddress: acc.address,
-          tokenSlug: NATIVE_TOKEN_SLUG,
-        })
-      );
+const syncNativeTokens = mem(
+  async (chainId: number, _buster: string, accounts: Account | Account[]) => {
+    if (!Array.isArray(accounts)) {
+      accounts = [accounts];
+    }
 
-      const [
-        { nativeCurrency, chainTag },
-        existingTokens,
-        balances,
-        portfolios,
-      ] = await Promise.all([
+    const dbKeys = accounts.map((acc) =>
+      createAccountTokenKey({
+        chainId,
+        accountAddress: acc.address,
+        tokenSlug: NATIVE_TOKEN_SLUG,
+      })
+    );
+
+    const [{ nativeCurrency, chainTag }, existingTokens, balances, portfolios] =
+      await Promise.all([
         getNetwork(chainId),
         repo.accountTokens.bulkGet(dbKeys),
         Promise.all(
           accounts.map((acc) =>
-            getBalance(chainId, NATIVE_TOKEN_SLUG, acc.address)
+            getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
           )
         ),
         Promise.all(
@@ -90,73 +120,58 @@ const syncNativeTokensForAll = mem(
         ),
       ]);
 
-      await repo.accountTokens.bulkPut(
-        accounts.map((acc, i) => {
-          const existing = existingTokens[i] as AccountAsset;
-          const balance = balances[i];
-          const portfolioUSD =
-            existing?.portfolioUSD === "-1" && !portfolios[i]
-              ? "0"
-              : portfolios[i] ?? existing?.portfolioUSD;
+    await repo.accountTokens.bulkPut(
+      accounts.map((acc, i) => {
+        const existing = existingTokens[i] as AccountAsset;
+        const balance = balances[i];
+        const portfolioUSD =
+          existing?.portfolioUSD === "-1" && !portfolios[i]
+            ? "0"
+            : portfolios[i] ?? existing?.portfolioUSD;
 
-          if (existing) {
-            if (!balance) {
-              return {
-                ...existing,
-                portfolioUSD,
-              };
-            }
-
-            const rawBalance = balance.toString();
-            const balanceUSD = existing.priceUSD
-              ? +new BigNumber(rawBalance)
-                  .div(10 ** nativeCurrency.decimals)
-                  .times(existing.priceUSD)
-              : existing.balanceUSD;
-
+        if (existing) {
+          if (!balance) {
             return {
               ...existing,
-              rawBalance,
-              balanceUSD,
-              portfolioUSD,
-            };
-          } else {
-            return {
-              chainId,
-              accountAddress: acc.address,
-              tokenType: TokenType.Asset,
-              status: TokenStatus.Native,
-              tokenSlug: NATIVE_TOKEN_SLUG,
-              decimals: nativeCurrency.decimals,
-              name: nativeCurrency.name,
-              symbol: nativeCurrency.symbol,
-              logoUrl: getNativeTokenLogoUrl(chainTag),
-              rawBalance: balance?.toString() ?? "0",
-              balanceUSD: 0,
               portfolioUSD,
             };
           }
-        }),
-        dbKeys
-      );
-    };
 
-    let currentAccount: Account | undefined;
-    const restAccounts: Account[] = [];
+          const rawBalance = balance.toString();
+          const balanceUSD = existing.priceUSD
+            ? +new BigNumber(rawBalance)
+                .div(10 ** nativeCurrency.decimals)
+                .times(existing.priceUSD)
+            : existing.balanceUSD;
 
-    for (const acc of $accounts.getState()) {
-      if (acc.address === currentAccountAddress) {
-        currentAccount = acc;
-      } else {
-        restAccounts.push(acc);
-      }
-    }
-
-    await perform([currentAccount!]);
-    await perform(restAccounts);
+          return {
+            ...existing,
+            rawBalance,
+            balanceUSD,
+            portfolioUSD,
+          };
+        } else {
+          return {
+            chainId,
+            accountAddress: acc.address,
+            tokenType: TokenType.Asset,
+            status: TokenStatus.Native,
+            tokenSlug: NATIVE_TOKEN_SLUG,
+            decimals: nativeCurrency.decimals,
+            name: nativeCurrency.name,
+            symbol: nativeCurrency.symbol,
+            logoUrl: getNativeTokenLogoUrl(chainTag),
+            rawBalance: balance?.toString() ?? "0",
+            balanceUSD: 0,
+            portfolioUSD,
+          };
+        }
+      }),
+      dbKeys
+    );
   },
   {
-    cacheKey: (args) => args.join("_"),
+    cacheKey: ([chainId, buster]) => `${chainId}${buster}`,
     maxAge: 20_000, // 20 sec
   }
 );
@@ -274,7 +289,7 @@ const syncAccountTokens = mem(
       const balances = await Promise.all(
         restTokens.map(({ tokenSlug }) =>
           tokenSlug !== NATIVE_TOKEN_SLUG
-            ? getBalance(chainId, tokenSlug, accountAddress)
+            ? getBalanceFromChain(chainId, tokenSlug, accountAddress)
             : null
         )
       );
@@ -342,19 +357,21 @@ const getDebankUserChainBalance = mem(
   }
 );
 
-async function getBalance(
-  chainId: number,
-  tokenSlug: string,
-  accountAddress: string
-) {
-  const provider = getRpcProvider(chainId);
+const getBalanceFromChain = mem(
+  async (chainId: number, tokenSlug: string, accountAddress: string) => {
+    const provider = getRpcProvider(chainId);
 
-  return requestBalance(
-    provider,
-    tokenSlug,
-    getMyRandomAddress(accountAddress)
-  ).catch(() => null);
-}
+    return requestBalance(
+      provider,
+      tokenSlug,
+      getMyRandomAddress(accountAddress)
+    ).catch(() => null);
+  },
+  {
+    cacheKey: (args) => args.join("_"),
+    maxAge: 3_000,
+  }
+);
 
 const getDebankChain = mem(async (chainId: number) => {
   const chainList = await getDebankChainList();
