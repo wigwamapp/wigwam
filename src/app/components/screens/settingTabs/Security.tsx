@@ -4,6 +4,7 @@ import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 
 import { getSeedPhrase } from "core/client";
+import { fromProtectedString } from "lib/crypto-utils";
 
 import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
@@ -82,7 +83,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     if (password) {
       try {
         const seed = await getSeedPhrase(password);
-        setSeedPhrase(seed.phrase);
+        setSeedPhrase(fromProtectedString(seed.phrase));
       } catch (err: any) {
         alert(err?.message);
       }
