@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
+import { Field, Form } from "react-final-form";
 
 import { SeedPharse, WalletStatus } from "core/types";
 import { toWordlistLang, validateSeedPhrase } from "core/common";
@@ -10,6 +11,7 @@ import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
+import { composeValidators, exactLength, required } from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import Select from "app/components/elements/Select";
@@ -17,6 +19,8 @@ import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import { useConstant } from "app/hooks";
+import { createForm } from "final-form";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -55,9 +59,48 @@ const AddSeedPhrase = memo(() => {
       })),
     []
   );
+
   const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
 
-  const [seedPhraseText, setSeedPhraseText] = useState<string>("");
+  const handleContinue = useCallback(
+    async (values) => {
+      const seedPhrase: SeedPharse = {
+        phrase: toProtectedString(values.seed),
+        lang: wordlistLocale,
+      };
+
+      try {
+        validateSeedPhrase(seedPhrase);
+
+        if (!initialSetup && importExisting) {
+          await addSeedPhrase(seedPhrase);
+        } else {
+          stateRef.current.seedPhrase = seedPhrase;
+        }
+
+        navigateToStep(
+          importExisting
+            ? AddAccountStep.SelectAccountsToAddMethod
+            : AddAccountStep.VerifySeedPhrase
+        );
+      } catch (err: any) {
+        alert(err?.message);
+      }
+    },
+    [wordlistLocale, initialSetup, importExisting, stateRef, navigateToStep]
+  );
+
+  const setPhrase = useCallback((args, state) => {
+    const field = state.fields["seed"];
+    field.change(args[0]);
+  }, []);
+
+  const form = useConstant(() =>
+    createForm({
+      onSubmit: handleContinue,
+      mutators: { setPhrase },
+    })
+  )!;
 
   const generateNew = useCallback(() => {
     const extraEntropy = getRandomBytes();
@@ -65,46 +108,14 @@ const AddSeedPhrase = memo(() => {
       locale: wordlistLocale,
       extraEntropy,
     });
-    setSeedPhraseText(wallet.mnemonic.phrase);
-  }, [wordlistLocale, setSeedPhraseText]);
+    form.mutators.setPhrase(wallet.mnemonic.phrase);
+  }, [form, wordlistLocale]);
 
   useEffect(() => {
     if (!importExisting) {
       setTimeout(generateNew, 0);
     }
   }, [generateNew, importExisting, wordlistLocale, wordsCount]);
-
-  const handleContinue = useCallback(async () => {
-    const seedPhrase: SeedPharse = {
-      phrase: toProtectedString(seedPhraseText),
-      lang: wordlistLocale,
-    };
-
-    try {
-      validateSeedPhrase(seedPhrase);
-
-      if (!initialSetup && importExisting) {
-        await addSeedPhrase(seedPhrase);
-      } else {
-        stateRef.current.seedPhrase = seedPhrase;
-      }
-
-      navigateToStep(
-        importExisting
-          ? AddAccountStep.SelectAccountsToAddMethod
-          : AddAccountStep.VerifySeedPhrase
-      );
-    } catch (err: any) {
-      alert(err?.message);
-    }
-  }, [
-    wordlistLocale,
-    seedPhraseText,
-    initialSetup,
-    importExisting,
-    stateRef,
-    navigateToStep,
-  ]);
 
   return (
     <>
@@ -113,43 +124,62 @@ const AddSeedPhrase = memo(() => {
           ? "Import existing Secret Phrase"
           : "Create new Secret Phrase"}
       </AddAccountHeader>
+      <Form
+        form={form}
+        onSubmit={form.submit}
+        render={({ form, handleSubmit, submitting }) => (
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col max-w-[27.5rem] mx-auto">
+              <div className="flex">
+                <SelectLanguage
+                  selected={locale}
+                  items={SUPPORTED_LOCALES}
+                  onSelect={setLocale}
+                  className="mr-6"
+                />
+                {!importExisting && (
+                  <Select
+                    currentItem={wordsCount}
+                    setItem={setWordsCount}
+                    items={wordsCountList}
+                    label="Words"
+                    showSelected
+                    className="!min-w-[8.375rem]"
+                    contentClassName="!min-w-[8.375rem]"
+                  />
+                )}
+              </div>
 
-      <div className="flex flex-col max-w-[27.5rem] mx-auto">
-        <div className="flex">
-          <SelectLanguage
-            selected={locale}
-            items={SUPPORTED_LOCALES}
-            onSelect={setLocale}
-            className="mr-6"
-          />
-          {!importExisting && (
-            <Select
-              items={wordsCountList}
-              currentItem={wordsCount}
-              setItem={setWordsCount}
-              label="Words"
-              showSelected
-              className="!min-w-[8.375rem]"
-              contentClassName="!min-w-[8.375rem]"
-            />
-          )}
-        </div>
-
-        <SeedPhraseField
-          value={seedPhraseText}
-          onRegenerate={() => generateNew()}
-          onChange={(evt) => setSeedPhraseText(evt.target.value)}
-          placeholder={
-            importExisting
-              ? "Paste there your secret phrase"
-              : "Type there a secret phrase or generate new"
-          }
-          className="mt-8"
-          mode={importExisting ? "import" : "create"}
-          autoFocus={importExisting}
-        />
-      </div>
-      <AddAccountContinueButton onContinue={handleContinue} />
+              <Field
+                name="seed"
+                validate={composeValidators(
+                  required,
+                  exactLength(Number(wordsCount.value))
+                )}
+              >
+                {({ input, meta }) => (
+                  <SeedPhraseField
+                    onRegenerate={generateNew}
+                    mutator={form.mutators.setPhrase}
+                    placeholder={
+                      importExisting
+                        ? "Paste there your secret phrase"
+                        : "Type there a secret phrase or generate new"
+                    }
+                    className="mt-8"
+                    mode={importExisting ? "import" : "create"}
+                    autoFocus={importExisting}
+                    error={meta.touched && meta.error}
+                    errorMessage={meta.error}
+                    {...input}
+                  />
+                )}
+              </Field>
+            </div>
+            <AddAccountContinueButton loading={submitting} />
+          </form>
+        )}
+      />
     </>
   );
 });

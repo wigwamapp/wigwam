@@ -2,7 +2,9 @@ import { useRef } from "react";
 import { FormApi } from "final-form";
 
 type FormValues = Record<string, any>;
-const useConstant = (init: () => FormApi<FormValues, Partial<FormValues>>) => {
+export const useConstant = (
+  init: () => FormApi<FormValues, Partial<FormValues>>
+) => {
   const initiated = useRef(false);
   const ref = useRef<FormApi<FormValues, Partial<FormValues>> | null>(null);
 
@@ -13,5 +15,3 @@ const useConstant = (init: () => FormApi<FormValues, Partial<FormValues>>) => {
 
   return ref.current;
 };
-
-export default useConstant;

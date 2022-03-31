@@ -1,4 +1,4 @@
-import {
+import React, {
   FC,
   forwardRef,
   HTMLProps,
@@ -8,9 +8,14 @@ import {
   useState,
 } from "react";
 import classNames from "clsx";
+import NumberFormat, {
+  InputAttributes,
+  NumberFormatPropsBase,
+} from "react-number-format";
 
-export type InputProps = {
+export type NumberInputProps = {
   className?: string;
+  decimalSeparator?: string;
   label?: string;
   StartAdornment?: FC<{ className?: string }>;
   EndAdornment?: FC<{ className?: string }>;
@@ -24,11 +29,12 @@ export type InputProps = {
   actions?: ReactNode;
 } & HTMLProps<HTMLInputElement>;
 
-const Input = memo(
-  forwardRef<HTMLInputElement, InputProps>(
+const NumberInput = memo(
+  forwardRef<HTMLInputElement, NumberInputProps>(
     (
       {
         className,
+        decimalSeparator = "",
         label,
         id,
         name,
@@ -76,7 +82,6 @@ const Input = memo(
         },
         [onBlur]
       );
-
       return (
         <div className={classNames("flex flex-col text-base", className)}>
           {(label || labelActions || optional) && (
@@ -103,9 +108,11 @@ const Input = memo(
                 className={classNames(adornmentClassNames, "left-4")}
               />
             )}
-
-            <input
-              ref={ref}
+            <NumberFormat
+              getInputRef={ref}
+              customInput={createInputElement}
+              allowLeadingZeros
+              decimalSeparator={decimalSeparator}
               id={id ?? name}
               name={name}
               className={classNames(
@@ -138,7 +145,10 @@ const Input = memo(
               onFocus={handleFocus}
               onBlur={handleBlur}
               disabled={disabled}
-              {...rest}
+              {...(rest as Omit<
+                InputAttributes,
+                keyof NumberFormatPropsBase<unknown> | "ref"
+              >)}
             />
             {!!EndAdornment && !actions && (
               <EndAdornment
@@ -168,4 +178,8 @@ const Input = memo(
   )
 );
 
-export default Input;
+const createInputElement: FC<HTMLProps<HTMLInputElement>> = (props) => {
+  return <input {...props} />;
+};
+
+export default NumberInput;

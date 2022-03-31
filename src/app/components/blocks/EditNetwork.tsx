@@ -4,10 +4,11 @@ import { Field, Form } from "react-final-form";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
-import { composeValidators, minLength, required } from "app/utils";
+import { composeValidators, maxLength, minLength, required } from "app/utils";
 
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
+import NumberInput from "../elements/NumberInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
@@ -104,7 +105,12 @@ const EditNetwork = memo<EditNetworkProps>(
                   Edit network
                 </h3>
               </div>
-              <DeleteIcon className="cursor-pointer" onClick={deleteNetwork} />
+              {!isNative && (
+                <DeleteIcon
+                  className="cursor-pointer"
+                  onClick={deleteNetwork}
+                />
+              )}
             </div>
           )}
         </header>
@@ -125,7 +131,11 @@ const EditNetwork = memo<EditNetworkProps>(
                 <div className="w-[21.875rem]">
                   <Field
                     name="nName"
-                    validate={composeValidators(required, minLength(8))}
+                    validate={composeValidators(
+                      required,
+                      minLength(3),
+                      maxLength(16)
+                    )}
                   >
                     {({ input, meta }) => (
                       <Input
@@ -156,11 +166,14 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="chainId"
-                    validate={composeValidators(required, minLength(8))}
+                    validate={composeValidators(
+                      required,
+                      minLength(8),
+                      maxLength(36)
+                    )}
                   >
                     {({ input, meta }) => (
-                      <Input
-                        type="number"
+                      <NumberInput
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}

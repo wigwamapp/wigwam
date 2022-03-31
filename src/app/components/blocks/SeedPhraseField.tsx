@@ -1,8 +1,8 @@
 import { forwardRef, ReactNode, useRef } from "react";
 import classNames from "clsx";
 import mergeRefs from "react-merge-refs";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-import { usePasteToClipboard } from "lib/react-hooks/usePasteToClipboard";
+import { useCopyToClipboardWithMutator } from "lib/react-hooks/useCopyToClipboardWithMutator";
+import { usePasteToClipboardWithMutator } from "lib/react-hooks/usePasteToClipboardWithMutator";
 
 import IconedButton from "app/components/elements/IconedButton";
 import LongTextField, {
@@ -20,14 +20,16 @@ import { TippySingletonProvider } from "app/hooks";
 
 type SeedPhraseFieldProps = LongTextFieldProps & {
   mode?: "create" | "import";
+  mutator?: (value: string) => void;
   onRegenerate?: () => void;
+  value: string;
 };
 
 const SeedPhraseField = forwardRef<HTMLTextAreaElement, SeedPhraseFieldProps>(
-  ({ mode = "create", onRegenerate, className, ...rest }, ref) => {
+  ({ mode = "create", onRegenerate, mutator, className, ...rest }, ref) => {
     const fieldRef = useRef<HTMLTextAreaElement>(null);
-    const { copy, copied } = useCopyToClipboard(fieldRef);
-    const { paste, pasted } = usePasteToClipboard(fieldRef);
+    const { copy, copied } = useCopyToClipboardWithMutator(rest.value);
+    const { paste, pasted } = usePasteToClipboardWithMutator(mutator);
 
     let buttonContent: ReactNode | undefined;
 
@@ -97,6 +99,7 @@ const SeedPhraseField = forwardRef<HTMLTextAreaElement, SeedPhraseFieldProps>(
         />
         {buttonContent && (
           <NewButton
+            type="button"
             theme="tertiary"
             onClick={mode === "create" ? copy : paste}
             className={classNames(

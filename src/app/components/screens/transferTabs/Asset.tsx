@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useCallback, useEffect, useRef } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
@@ -23,6 +23,7 @@ import {
   TippySingletonProvider,
   useNativeCurrency,
   useProvider,
+  useConstant,
 } from "app/hooks";
 import { useToken } from "app/hooks/tokens";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -35,7 +36,7 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
-import useConstant from "app/hooks/useConstant";
+import { usePasteToClipboardWithMutator } from "lib/react-hooks/usePasteToClipboardWithMutator";
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -44,24 +45,8 @@ const Asset: FC = () => {
   const nativeCurrency = useNativeCurrency();
 
   const recipientAddressRef = useRef<HTMLTextAreaElement>(null);
-  const [pasted, setPasted] = useState(false);
 
   const prevToken = usePrevious(currentToken);
-
-  useEffect(() => {
-    console.log(`current`, currentToken);
-  }, [currentToken]);
-
-  const handlePasting = useCallback((args, state) => {
-    const paste = async () => {
-      const field = state.fields["to"];
-      const text = await navigator.clipboard.readText();
-      field.change(text);
-      setPasted(true);
-      state.formState.submitFailed = true;
-    };
-    paste();
-  }, []);
 
   const provider = useProvider();
 
@@ -113,22 +98,28 @@ const Asset: FC = () => {
     [currentToken, sendEther, sendToken, tokenSlug]
   );
 
-  const setAmount = useCallback((args, state, utils) => {
-    console.log(`args`, args);
-    utils.changeValue(state, "amount", () => args.amount);
-    // state.formState.submitFailed = true;
+  const setAmount = useCallback((args, state) => {
+    const field = state.fields["amount"];
+    field.change(args[0]);
+  }, []);
+
+  const setTo = useCallback((args, state) => {
+    const field = state.fields["to"];
+    field.change(args[0]);
+    state.fields.amount.touched = false;
   }, []);
 
   const form = useConstant(() =>
     createForm({
       onSubmit: handleSubmit,
-      mutators: { setAmount, handlePasting },
+      mutators: { setAmount, setTo },
       initialValues: { amount: undefined },
     })
   )!;
 
+  const { paste, pasted } = usePasteToClipboardWithMutator(form.mutators.setTo);
+
   const handleMaxButtonClick = useCallback(() => {
-    console.log(`currentToken`, currentToken);
     form.mutators.setAmount(
       currentToken?.rawBalance
         ? new BigNumber(currentToken.rawBalance)
@@ -149,7 +140,7 @@ const Asset: FC = () => {
     <Form
       form={form}
       onSubmit={form.submit}
-      render={({ handleSubmit, values, form, submitting }) => (
+      render={({ handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect />
           <div className="relative mt-5">
@@ -163,7 +154,6 @@ const Asset: FC = () => {
             >
               {({ input, meta }) => (
                 <LongTextField
-                  ref={recipientAddressRef}
                   label="Recipient"
                   placeholder="0x0000000000000000000000000000000000000000"
                   textareaClassName="!h-20"
@@ -176,7 +166,7 @@ const Asset: FC = () => {
             </Field>
             <NewButton
               theme="tertiary"
-              onClick={form.mutators.handlePasting}
+              onClick={paste}
               className={classNames(
                 "absolute bottom-[1.125rem] right-3",
                 "text-sm text-brand-light",

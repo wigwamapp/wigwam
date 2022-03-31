@@ -1,31 +1,29 @@
-import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
+import { FC, memo, useCallback, useEffect } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import * as Checkbox from "@radix-ui/react-checkbox";
+import { Field, Form } from "react-final-form";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
+import {
+  marked,
+  composeValidators,
+  differentPasswords,
+  required,
+} from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
-import Input from "app/components/elements/Input";
-import IconedButton from "app/components/elements/IconedButton";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
-import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import PasswordField from "app/components/elements/PasswordField";
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
 
   const { stateRef, reset } = useSteps();
-
-  const [inputShowStates, setInputShowStates] = useState({
-    first: false,
-    second: false,
-  });
-  const [isAcceptedTerms, setIsAcceptedTerms] = useState(false);
 
   const addAccountsParams: AddAccountParams[] | undefined =
     stateRef.current.addAccountsParams;
@@ -37,21 +35,22 @@ const SetupPassword = memo(() => {
     }
   }, [addAccountsParams, reset]);
 
-  const passwordFieldRef = useRef<HTMLInputElement>(null);
+  const handleFinish = useCallback(
+    async (values) => {
+      try {
+        const password = values.password;
 
-  const handleFinish = useCallback(async () => {
-    try {
-      const password = passwordFieldRef.current?.value;
+        if (!addAccountsParams || !password || !values.terms) return;
 
-      if (!addAccountsParams || !password || !isAcceptedTerms) return;
+        await setupWallet(password, addAccountsParams, seedPhrase);
 
-      await setupWallet(password, addAccountsParams, seedPhrase);
-
-      setAccModalOpened([false]);
-    } catch (err: any) {
-      alert(err?.message);
-    }
-  }, [addAccountsParams, isAcceptedTerms, seedPhrase, setAccModalOpened]);
+        setAccModalOpened([false]);
+      } catch (err: any) {
+        alert(err?.message);
+      }
+    },
+    [addAccountsParams, seedPhrase, setAccModalOpened]
+  );
 
   if (!addAccountsParams) {
     return null;
@@ -61,73 +60,86 @@ const SetupPassword = memo(() => {
     <>
       <AddAccountHeader className="mb-7">Setup Password</AddAccountHeader>
 
-      <div className="max-w-[19rem] mx-auto flex flex-col items-center justify-center">
-        <div className="w-full relative mb-3">
-          <Input
-            ref={passwordFieldRef}
-            type={inputShowStates.first ? "text" : "password"}
-            placeholder="Type password"
-            label="New password"
-            className="w-full"
-          />
-          <IconedButton
-            Icon={inputShowStates.first ? EyeIcon : OpenedEyeIcon}
-            theme="tertiary"
-            aria-label={`${inputShowStates.first ? "Hide" : "Show"} password`}
-            onClick={() =>
-              setInputShowStates((prevState) => ({
-                ...prevState,
-                first: !prevState.first,
-              }))
-            }
-            tabIndex={-1}
-            className="absolute bottom-2.5 right-3"
-          />
-        </div>
-        <div className="w-full relative">
-          <Input
-            type={inputShowStates.second ? "text" : "password"}
-            placeholder="Confirm Password"
-            label="Confirm Password"
-            className="w-full"
-          />
-          <IconedButton
-            Icon={inputShowStates.second ? EyeIcon : OpenedEyeIcon}
-            theme="tertiary"
-            aria-label={`${inputShowStates.second ? "Hide" : "Show"} password`}
-            onClick={() =>
-              setInputShowStates((prevState) => ({
-                ...prevState,
-                second: !prevState.second,
-              }))
-            }
-            tabIndex={-1}
-            className="absolute bottom-2.5 right-3"
-          />
-        </div>
-        <AcceptTermsCheckbox
-          checked={isAcceptedTerms}
-          onCheckedChange={() => setIsAcceptedTerms(!isAcceptedTerms)}
-          className="mt-6"
-        />
-      </div>
-
-      <AddAccountContinueButton onContinue={handleFinish} />
+      <Form
+        initialValues={{ terms: "false" }}
+        onSubmit={handleFinish}
+        render={({ handleSubmit, values, submitting }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col max-w-[27.5rem] mx-auto"
+          >
+            <div className="max-w-[19rem] mx-auto flex flex-col items-center justify-center">
+              <div className="w-full relative mb-3">
+                <Field name="password" validate={composeValidators(required)}>
+                  {({ input, meta }) => (
+                    <PasswordField
+                      placeholder="Type password"
+                      label="New password"
+                      className="w-full"
+                      error={meta.touched && meta.error}
+                      errorMessage={meta.error}
+                      {...input}
+                    />
+                  )}
+                </Field>
+              </div>
+              <div className="w-full relative">
+                <Field
+                  name="confirm"
+                  validate={composeValidators(
+                    required,
+                    differentPasswords(values.password)
+                  )}
+                >
+                  {({ input, meta }) => (
+                    <PasswordField
+                      placeholder="Confirm Password"
+                      label="Confirm Password"
+                      className="w-full"
+                      error={meta.touched && meta.error}
+                      errorMessage={meta.error}
+                      {...input}
+                    />
+                  )}
+                </Field>
+              </div>
+              <Field
+                name="terms"
+                validate={composeValidators(required, marked)}
+              >
+                {({ input, meta }) => (
+                  <AcceptTermsCheckbox
+                    {...input}
+                    error={meta.touched && meta.error}
+                    className="mt-6"
+                  />
+                )}
+              </Field>
+            </div>
+            <AddAccountContinueButton loading={submitting} />
+          </form>
+        )}
+      />
     </>
   );
 });
 
 type AcceptTermsCheckboxProps = {
-  checked: boolean;
-  onCheckedChange: () => void;
+  value?: string;
+  error?: boolean;
+  onChange: (isInputChecked: string) => void;
   className?: string;
 };
 
 const AcceptTermsCheckbox: FC<AcceptTermsCheckboxProps> = ({
-  checked,
-  onCheckedChange,
+  value,
+  error,
+  onChange,
   className,
 }) => {
+  const checked = value === "true";
+  console.log(`checked `, checked);
+  console.log(`error `, error);
   return (
     <Checkbox.Root
       className={classNames(
@@ -138,9 +150,12 @@ const AcceptTermsCheckbox: FC<AcceptTermsCheckboxProps> = ({
         "transition-colors",
         "hover:bg-brand-main/[.1]",
         checked && "bg-brand-main/[.1]",
+        !!error && "border !border-brand-redobject",
         className
       )}
-      onCheckedChange={onCheckedChange}
+      onCheckedChange={(e) => {
+        onChange(e.toString());
+      }}
     >
       <div
         className={classNames(
@@ -148,7 +163,8 @@ const AcceptTermsCheckbox: FC<AcceptTermsCheckboxProps> = ({
           "bg-brand-main/20",
           "rounded",
           "flex items-center justify-center",
-          checked && "border border-brand-main"
+          checked && "border border-brand-main",
+          !!error && "border !border-brand-redobject"
         )}
       >
         <Checkbox.Indicator>{checked && <CheckIcon />}</Checkbox.Indicator>

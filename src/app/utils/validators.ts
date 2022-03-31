@@ -36,9 +36,10 @@ export const minValue =
     }
   };
 
-export const seedPhrase = (seed: string) => {
-  const wordL = [12, 15, 18, 21, 24];
-  wordL.includes(seed.split(" ").length)
+export const exactLength = (length: number) => (seed: string) =>
+  seed.split(" ").length === length
     ? undefined
-    : "Available amount of words: " + wordL;
-};
+    : `Available amount of words: ${length}`;
+
+export const marked = (value: string) =>
+  value === "true" ? undefined : "You have to accept it first";
