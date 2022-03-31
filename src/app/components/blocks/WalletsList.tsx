@@ -47,6 +47,7 @@ const WalletsList: FC = () => {
   return (
     <div className="flex py-4 border-b border-brand-main/[.07]">
       <LargeWalletCard account={currentAccount} className="mr-6" />
+
       <SearchableAccountsScrollArea accounts={accountsWithoutCurrent} />
     </div>
   );
