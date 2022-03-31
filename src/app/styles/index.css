@@ -72,3 +72,31 @@ div[data-radix-popper-content-wrapper] {
 div[data-radix-scroll-area-viewport].viewportBlock > div {
   display: block !important;
 }
+
+.card-flip-enter {
+  transform: rotateX(-90deg);
+}
+.card-flip-enter > * {
+  opacity: 0.5;
+}
+
+.card-flip-enter-active {
+  transform: rotateX(0deg);
+}
+.card-flip-enter-active > * {
+  opacity: 1;
+}
+
+.card-flip-exit {
+  transform: rotateX(0deg);
+}
+.card-flip-exit > * {
+  opacity: 1;
+}
+
+.card-flip-exit-active {
+  transform: rotateX(90deg);
+}
+.card-flip-exit-active > * {
+  opacity: 0.5;
+}
