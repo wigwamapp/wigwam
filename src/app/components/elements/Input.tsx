@@ -109,6 +109,7 @@ const Input = memo(
               ref={ref}
               id={id ?? name}
               name={name}
+              spellCheck={false}
               className={classNames(
                 "w-full",
                 "py-3 px-4",
