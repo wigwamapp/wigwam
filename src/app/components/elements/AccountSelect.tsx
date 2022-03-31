@@ -94,7 +94,7 @@ type AccountSelectItemProps = {
 const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
   const [copied, setCopied] = useState(false);
   const nativeToken = useAccountNativeToken(account.address);
-  const protfolioBalane = nativeToken?.portfolioUSD;
+  const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (
     <span className="flex items-center text-left w-full pr-3 min-w-0">
@@ -148,35 +148,33 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           <PrettyAmount
             amount={
               nativeToken
-                ? protfolioBalane ??
+                ? portfolioBalance ??
                   ethers.utils.formatEther(nativeToken.rawBalance)
                 : null
             }
-            currency={protfolioBalane ? "$" : nativeToken?.symbol}
+            currency={portfolioBalance ? "$" : nativeToken?.symbol}
             isMinified={
-              protfolioBalane
-                ? new BigNumber(protfolioBalane).isLessThan(0.01)
+              portfolioBalance
+                ? new BigNumber(portfolioBalance).isLessThan(0.01)
                 : false
             }
             copiable
             className="font-bold"
           />
         </span>
-        {protfolioBalane && (
-          <div className="flex items-center mt-auto">
-            <GasIcon className="w-2.5 h-2.5" />
-            <PrettyAmount
-              amount={
-                nativeToken
-                  ? ethers.utils.formatEther(nativeToken.rawBalance)
-                  : null
-              }
-              currency={nativeToken?.symbol}
-              isMinified
-              copiable
-              className="text-xs leading-4 text-brand-inactivedark font-normal ml-0.5"
-            />
-          </div>
+        {portfolioBalance && (
+          <PrettyAmount
+            amount={
+              nativeToken
+                ? ethers.utils.formatEther(nativeToken.rawBalance)
+                : null
+            }
+            currency={nativeToken?.symbol}
+            isMinified
+            copiable
+            prefix={<GasIcon className="w-2.5 h-2.5 mr-0.5" />}
+            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center mt-px"
+          />
         )}
       </span>
     </span>

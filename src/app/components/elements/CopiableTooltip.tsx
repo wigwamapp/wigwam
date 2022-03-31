@@ -43,6 +43,7 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
         content={copied ? copiedText : content}
         onHidden={handleTooltipHidden}
         asChild
+        missSingleton
       >
         <button
           type="button"

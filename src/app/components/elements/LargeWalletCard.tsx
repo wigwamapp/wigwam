@@ -38,7 +38,7 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
 
   const currentNetwork = useLazyNetwork();
   const nativeToken = useAccountNativeToken(address);
-  const protfolioBalane = nativeToken?.portfolioUSD;
+  const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (
     <div
@@ -113,14 +113,14 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             <PrettyAmount
               amount={
                 nativeToken
-                  ? protfolioBalane ??
+                  ? portfolioBalance ??
                     ethers.utils.formatEther(nativeToken.rawBalance)
                   : null
               }
-              currency={protfolioBalane ? "$" : nativeToken?.symbol}
+              currency={portfolioBalance ? "$" : nativeToken?.symbol}
               isMinified={
-                protfolioBalane
-                  ? new BigNumber(protfolioBalane).isLessThan(0.01)
+                portfolioBalance
+                  ? new BigNumber(portfolioBalance).isLessThan(0.01)
                   : false
               }
               copiable
@@ -149,20 +149,18 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
               />
             )}
           </div>
-          {protfolioBalane && (
-            <div className="flex items-center max-h-[1rem]">
-              <GasIcon />
-              <PrettyAmount
-                amount={
-                  nativeToken
-                    ? ethers.utils.formatEther(nativeToken.rawBalance)
-                    : null
-                }
-                currency={nativeToken?.symbol}
-                copiable
-                className="text-sm leading-none text-brand-inactivedark ml-1"
-              />
-            </div>
+          {portfolioBalance && (
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={nativeToken?.symbol}
+              copiable
+              prefix={<GasIcon className="mr-1" />}
+              className="text-sm leading-none text-brand-inactivedark flex items-center max-h-[1rem]"
+            />
           )}
         </div>
         <Tooltip

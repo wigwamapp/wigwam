@@ -220,7 +220,7 @@ const Account: FC<AccountProps> = ({
   className,
 }) => {
   const nativeToken = useAccountNativeToken(address);
-  const protfolioBalane = nativeToken?.portfolioUSD;
+  const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (
     <CheckboxPrimitive.Root
@@ -264,32 +264,30 @@ const Account: FC<AccountProps> = ({
         <PrettyAmount
           amount={
             nativeToken
-              ? protfolioBalane ??
+              ? portfolioBalance ??
                 ethers.utils.formatEther(nativeToken.rawBalance)
               : null
           }
-          currency={protfolioBalane ? "$" : nativeToken?.symbol}
+          currency={portfolioBalance ? "$" : nativeToken?.symbol}
           isMinified={
-            protfolioBalane
-              ? new BigNumber(protfolioBalane).isLessThan(0.01)
+            portfolioBalance
+              ? new BigNumber(portfolioBalance).isLessThan(0.01)
               : false
           }
           className="text-sm font-bold text-brand-light ml-2"
         />
-        {protfolioBalane && (
-          <span className="flex items-center max-h-[1rem]">
-            <GasIcon className="w-2.5 h-2.5" />
-            <PrettyAmount
-              amount={
-                nativeToken
-                  ? ethers.utils.formatEther(nativeToken.rawBalance)
-                  : null
-              }
-              currency={nativeToken?.symbol}
-              isMinified
-              className="text-xs leading-4 text-brand-inactivedark font-normal ml-0.5"
-            />
-          </span>
+        {portfolioBalance && (
+          <PrettyAmount
+            amount={
+              nativeToken
+                ? ethers.utils.formatEther(nativeToken.rawBalance)
+                : null
+            }
+            currency={nativeToken?.symbol}
+            isMinified
+            prefix={<GasIcon className="w-2.5 h-2.5 mr-0.5" />}
+            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
+          />
         )}
       </span>
     </CheckboxPrimitive.Root>

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
@@ -16,6 +16,7 @@ type PrettyAmountProps = {
   currency?: string;
   isMinified?: boolean;
   copiable?: boolean;
+  prefix?: ReactNode;
   className?: string;
 };
 
@@ -25,6 +26,7 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   currency,
   isMinified,
   copiable = false,
+  prefix,
   className,
 }) => {
   const currentLocale = useAtomValue(currentLocaleAtom);
@@ -115,7 +117,12 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     className = classNames(className, "invisible pointer-events-none");
   }
 
-  const children = <AmountWithCurrency amount={content} currency={currency} />;
+  const children = (
+    <>
+      {prefix}
+      <AmountWithCurrency amount={content} currency={currency} />
+    </>
+  );
 
   if (copiable) {
     return (
@@ -128,7 +135,6 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
         plugins={[followCursor]}
         asChild
         className={className}
-        duration={[100, 50]}
       >
         {children}
       </CopiableTooltip>

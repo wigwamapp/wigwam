@@ -10,6 +10,7 @@ type sizeType = "large" | "small";
 export type TooltipProps = {
   size?: sizeType;
   asChild?: boolean;
+  missSingleton?: boolean;
   className?: string;
 } & Omit<TippyProps, "appendTo">;
 
@@ -21,8 +22,11 @@ const Tooltip: FC<TooltipProps> = ({
   hideOnClick = false,
   size = "small",
   asChild = false,
+  missSingleton,
   className,
   children,
+  delay = [100, 50],
+  duration = [100, 50],
   ...rest
 }) => {
   const overflowElementRef = useOverflowRef();
@@ -49,7 +53,9 @@ const Tooltip: FC<TooltipProps> = ({
       placement={placement ?? (size === "large" ? "right-start" : "bottom")}
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
-      singleton={singletonTarget}
+      singleton={missSingleton ? undefined : singletonTarget}
+      duration={duration}
+      delay={delay}
       popperOptions={{
         modifiers: [
           {
