@@ -54,7 +54,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
           <CSSTransition
             key={address}
             nodeRef={transitionRef}
-            timeout={150}
+            timeout={100}
             classNames={{
               enter: "-rotate-x-90",
               enterActive: "rotate-x-0",
@@ -65,7 +65,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
             <div
               ref={transitionRef}
               className={classNames(
-                "transform-gpu transition-transform",
+                "transform-gpu transition-transform duration-100",
                 "px-4 pt-4 pb-3",
                 "bg-brand-main/10",
                 "rounded-[.625rem]",
