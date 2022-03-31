@@ -43,151 +43,168 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
   return (
     <div
       className={classNames(
-        "px-4 pt-4 pb-3",
         "w-[23.25rem] min-w-[23.25rem]",
-        "bg-brand-main/10",
         "rounded-[.625rem]",
-        "flex flex-col",
-        "relative",
+        "relative overflow-hidden",
         className
       )}
     >
-      <TippySingletonProvider>
-        <div className="flex">
-          <AutoIcon
-            seed={address}
-            source="dicebear"
-            type="personas"
-            className={classNames(
-              "h-18 w-18 min-w-[4.5rem] mr-4",
-              "bg-black/40",
-              "rounded-[.625rem]"
-            )}
-          />
-          <div
-            className={classNames(
-              "flex flex-col items-start",
-              "text-base text-brand-light leading-none",
-              "w-full min-w-0"
-            )}
-          >
-            <CopiableTooltip
-              content="Copy wallet address to clipboard"
-              textToCopy={address}
-              copiedText="Wallet address copied to clipboard"
-              onCopiedToggle={setCopied}
+      <div className="-z-2 absolute inset-0 flex justify-end">
+        <AutoIcon
+          seed={address}
+          source="boring"
+          variant="pixel"
+          autoColors
+          square
+          className={classNames("h-full w-auto opacity-10")}
+        />
+      </div>
+
+      <div
+        className={classNames(
+          "w-full px-4 pt-4 pb-3",
+          "bg-brand-main/10",
+          "flex flex-col",
+          "relative"
+        )}
+      >
+        <TippySingletonProvider>
+          <div className="flex">
+            <AutoIcon
+              seed={address}
+              source="dicebear"
+              type="personas"
               className={classNames(
-                "px-1 pt-1 -mx-1 -mt-1",
-                "text-left",
-                "rounded",
-                "max-w-full",
-                "transition-colors",
-                "hover:bg-brand-main/40"
+                "h-18 w-18 min-w-[4.5rem] mr-4",
+                "bg-black/40",
+                "rounded-[.625rem]"
+              )}
+            />
+            <div
+              className={classNames(
+                "flex flex-col items-start",
+                "text-base text-brand-light leading-none",
+                "w-full min-w-0"
               )}
             >
-              <>
-                <span
-                  className={classNames(
-                    "block",
-                    "pb-0.5 block min-w-0",
-                    "font-bold",
-                    "overflow-ellipsis overflow-hidden whitespace-nowrap"
-                  )}
-                >
-                  <TReplace msg={name} />
-                </span>
-                <span className="inline-flex items-center">
-                  <HashPreview
-                    hash={address}
-                    withTooltip={false}
-                    className="text-sm font-normal leading-none mr-1"
-                  />
-                  {copied ? (
-                    <SuccessIcon className="w-[1.3125rem] h-auto" />
-                  ) : (
-                    <CopyIcon className="w-[1.3125rem] h-auto" />
-                  )}
-                </span>
-              </>
-            </CopiableTooltip>
-            <PrettyAmount
-              amount={
-                nativeToken
-                  ? protfolioBalane ??
-                    ethers.utils.formatEther(nativeToken.rawBalance)
-                  : null
-              }
-              currency={protfolioBalane ? "$" : nativeToken?.symbol}
-              isMinified={
-                protfolioBalane
-                  ? new BigNumber(protfolioBalane).isLessThan(0.01)
-                  : false
-              }
-              copiable
-              className="mt-auto text-xl font-bold leading-none"
-            />
-          </div>
-        </div>
-        <div className="flex mt-2">
-          <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
-            {currentNetwork?.explorerUrls && (
-              <IconedButton
-                href={`${currentNetwork.explorerUrls}/address/${address}`}
-                aria-label="View wallet in Explorer"
-                Icon={WalletExplorerIcon}
-                className="!w-6 !h-6"
-                iconClassName="!w-[1.125rem]"
-              />
-            )}
-            {currentNetwork?.explorerUrls && (
-              <IconedButton
-                href={`${currentNetwork.explorerUrls}/address/${address}`}
-                aria-label="View wallet activity"
-                Icon={ClockIcon}
-                className="!w-6 !h-6 ml-2"
-                iconClassName="!w-[1.125rem]"
-              />
-            )}
-          </div>
-          {protfolioBalane && (
-            <div className="flex items-center max-h-[1rem]">
-              <GasIcon />
+              <CopiableTooltip
+                content="Copy wallet address to clipboard"
+                textToCopy={address}
+                copiedText="Wallet address copied to clipboard"
+                onCopiedToggle={setCopied}
+                className={classNames(
+                  "px-1 pt-1 -mx-1 -mt-1",
+                  "text-left",
+                  "rounded",
+                  "max-w-full",
+                  "transition-colors",
+                  "hover:bg-brand-main/40"
+                )}
+              >
+                <>
+                  <span
+                    className={classNames(
+                      "block",
+                      "pb-0.5 block min-w-0",
+                      "font-bold",
+                      "overflow-ellipsis overflow-hidden whitespace-nowrap"
+                    )}
+                  >
+                    <TReplace msg={name} />
+                  </span>
+                  <span className="inline-flex items-center">
+                    <HashPreview
+                      hash={address}
+                      withTooltip={false}
+                      className="text-sm font-normal leading-none mr-1"
+                    />
+                    {copied ? (
+                      <SuccessIcon className="w-[1.3125rem] h-auto" />
+                    ) : (
+                      <CopyIcon className="w-[1.3125rem] h-auto" />
+                    )}
+                  </span>
+                </>
+              </CopiableTooltip>
               <PrettyAmount
                 amount={
                   nativeToken
-                    ? ethers.utils.formatEther(nativeToken.rawBalance)
+                    ? protfolioBalane ??
+                      ethers.utils.formatEther(nativeToken.rawBalance)
                     : null
                 }
-                currency={nativeToken?.symbol}
+                currency={protfolioBalane ? "$" : nativeToken?.symbol}
+                isMinified={
+                  protfolioBalane
+                    ? new BigNumber(protfolioBalane).isLessThan(0.01)
+                    : false
+                }
                 copiable
-                className="text-sm leading-none text-brand-inactivedark ml-1"
+                className="mt-auto text-xl font-bold leading-none"
               />
             </div>
-          )}
-        </div>
-        <Tooltip
-          content={
-            <>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                aliquam, purus sit amet luctus venenatis, lectus magna fringilla
-                urna, porttitor rhoncus dolor purus non enim praesent elementum
-                facilisis leo
-              </p>
-              <p className="mt-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                aliquam, purus sit amet luctus venenatis, lectus magna fringilla
-                urna, porttitor rhoncus
-              </p>
-            </>
-          }
-          placement="right"
-          size="large"
-          className="absolute right-4 bottom-3"
-        >
-          <TooltipIcon theme="dark" />
-        </Tooltip>
-      </TippySingletonProvider>
+          </div>
+          <div className="flex mt-2">
+            <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
+              {currentNetwork?.explorerUrls && (
+                <IconedButton
+                  href={`${currentNetwork.explorerUrls}/address/${address}`}
+                  aria-label="View wallet in Explorer"
+                  Icon={WalletExplorerIcon}
+                  className="!w-6 !h-6"
+                  iconClassName="!w-[1.125rem]"
+                />
+              )}
+              {currentNetwork?.explorerUrls && (
+                <IconedButton
+                  href={`${currentNetwork.explorerUrls}/address/${address}`}
+                  aria-label="View wallet activity"
+                  Icon={ClockIcon}
+                  className="!w-6 !h-6 ml-2"
+                  iconClassName="!w-[1.125rem]"
+                />
+              )}
+            </div>
+            {protfolioBalane && (
+              <div className="flex items-center max-h-[1rem]">
+                <GasIcon />
+                <PrettyAmount
+                  amount={
+                    nativeToken
+                      ? ethers.utils.formatEther(nativeToken.rawBalance)
+                      : null
+                  }
+                  currency={nativeToken?.symbol}
+                  copiable
+                  className="text-sm leading-none text-brand-inactivedark ml-1"
+                />
+              </div>
+            )}
+          </div>
+          <Tooltip
+            content={
+              <>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                  aliquam, purus sit amet luctus venenatis, lectus magna
+                  fringilla urna, porttitor rhoncus dolor purus non enim
+                  praesent elementum facilisis leo
+                </p>
+                <p className="mt-2">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                  aliquam, purus sit amet luctus venenatis, lectus magna
+                  fringilla urna, porttitor rhoncus
+                </p>
+              </>
+            }
+            placement="right"
+            size="large"
+            className="absolute right-4 bottom-3"
+          >
+            <TooltipIcon theme="dark" />
+          </Tooltip>
+        </TippySingletonProvider>
+      </div>
     </div>
   );
 };
