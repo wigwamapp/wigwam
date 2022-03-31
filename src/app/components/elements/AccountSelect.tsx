@@ -112,7 +112,6 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       <CopiableTooltip
         content="Copy wallet address to clipboard"
         textToCopy={account.address}
-        copiedText="Wallet address copied to clipboard"
         onCopiedToggle={setCopied}
         className={classNames(
           "px-1 -my-1 mr-4",

@@ -74,7 +74,6 @@ const LargeWalletCard: FC<LargeWalletCardProps> = ({
             <CopiableTooltip
               content="Copy wallet address to clipboard"
               textToCopy={address}
-              copiedText="Wallet address copied to clipboard"
               onCopiedToggle={setCopied}
               className={classNames(
                 "px-1 pt-1 -mx-1 -mt-1",
