@@ -112,18 +112,10 @@ const Asset: FC = () => {
   return (
     <Form
       onSubmit={handleSubmit}
-      mutators={{
-        setAmount: (args, state, utils) => {
-          utils.changeValue(state, "amount", () => args[0]);
-        },
-        pasteAddressFromClipboard: (args, state, utils) => {
-          utils.changeValue(state, "recipient", () => args[0]);
-        },
-      }}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect
-            handleTokenChanged={() => form.mutators.setAmount(undefined)}
+            handleTokenChanged={() => form.change("amount", undefined)}
           />
           <Field
             name="recipient"
@@ -131,7 +123,7 @@ const Asset: FC = () => {
           >
             {({ input, meta }) => (
               <AddressField
-                setFromClipboard={form.mutators.pasteAddressFromClipboard}
+                setFromClipboard={(value) => form.change("recipient", value)}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
                 className="mt-5"
@@ -154,9 +146,7 @@ const Asset: FC = () => {
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
-                  handleMaxButtonClick={() =>
-                    form.mutators.setAmount(maxAmount)
-                  }
+                  handleMaxButtonClick={() => form.change("amount", maxAmount)}
                   error={meta.error && meta.modified}
                   errorMessage={meta.error}
                   inputClassName="pr-20"
