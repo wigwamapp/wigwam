@@ -45,7 +45,7 @@ import NewButton from "../elements/NewButton";
 import SearchInput from "../elements/SearchInput";
 import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
-import TokenLogo from "../elements/TokenLogo";
+import AssetLogo from "../elements/AssetLogo";
 import LongTextField from "../elements/LongTextField";
 
 const OverviewContent: FC = () => (
@@ -320,8 +320,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
-      asset;
+    const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
     const nativeAsset = status === TokenStatus.Native;
     const disabled = status === TokenStatus.Disabled;
     const hoverable = isManageMode ? !nativeAsset : !isActive;
@@ -347,8 +346,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         )}
         disabled={isManageMode && nativeAsset}
       >
-        <TokenLogo
-          src={logoUrl}
+        <AssetLogo
+          asset={asset}
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
@@ -415,23 +414,15 @@ const AssetInfo: FC = () => {
     return <></>;
   }
 
-  const {
-    status,
-    logoUrl,
-    name,
-    symbol,
-    rawBalance,
-    decimals,
-    priceUSD,
-    balanceUSD,
-  } = tokenInfo;
+  const { status, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
+    tokenInfo;
   const { standard, address } = parsedTokenSlug;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <TokenLogo
-          src={logoUrl}
+        <AssetLogo
+          asset={tokenInfo}
           alt={name}
           className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
         />

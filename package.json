@@ -79,6 +79,7 @@
     "ts-pattern": "3.3.5",
     "use-debounce": "7.0.1",
     "use-force-update": "1.0.7",
+    "use-resize-observer": "8.0.0",
     "webextension-polyfill": "0.8.0"
   },
   "devDependencies": {

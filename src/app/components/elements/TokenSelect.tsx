@@ -12,7 +12,7 @@ import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
 import PrettyAmount from "./PrettyAmount";
-import TokenLogo from "./TokenLogo";
+import AssetLogo from "./AssetLogo";
 
 const TokenSelect: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -112,7 +112,7 @@ const Token: FC<{
   isSelected?: boolean;
   size?: "small" | "large";
 }> = ({ asset, isSelected = false, size = "small" }) => {
-  const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+  const { name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
   return (
     <span
@@ -123,14 +123,14 @@ const Token: FC<{
         size === "small" && "items-center"
       )}
     >
-      <span className="relative mr-3">
-        <TokenLogo
-          src={logoUrl}
+      <span className="flex relative mr-3">
+        <AssetLogo
+          asset={asset}
           className={classNames(
             size === "large" && "w-10 h-10 min-w-[2.5rem]",
-            size === "small" && "w-8 h-8 min-w-[2rem]"
+            size === "small" && "w-8 h-8 min-w-[2rem]",
+            isSelected && "opacity-20"
           )}
-          imageClassName={classNames(isSelected && "opacity-20")}
         />
         {isSelected && (
           <span

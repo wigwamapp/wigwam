@@ -36,6 +36,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
         variant="marble"
         autoColors
         initialsSource={replaceT(currentProfile.name)}
+        initialsScale={0.5}
         className={classNames(
           !isPopup && "w-[1.875rem] h-[1.875rem]",
           isPopup && "w-8 h-8",
