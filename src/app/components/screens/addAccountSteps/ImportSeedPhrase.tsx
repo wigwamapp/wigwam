@@ -72,8 +72,6 @@ const ImportSeedPhrase = memo(() => {
     [wordlistLocale, initialSetup, navigateToStep, stateRef]
   );
 
-  console.log("locale", locale, wordlistLocale);
-
   return (
     <>
       <AddAccountHeader className="mb-8">
