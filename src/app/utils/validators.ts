@@ -7,11 +7,15 @@ type ValidationType = (value: string) => string | undefined;
 export const required = (value: string) =>
   value ? undefined : "Required field";
 
-export const minLength = (min: number) => (value: string) =>
-  value && value.length >= min ? undefined : `Minimum length is ${min}`;
+export const minLength = (min: number) => (value: string | number) =>
+  value && value.toString().length >= min
+    ? undefined
+    : `Minimum length is ${min}`;
 
-export const maxLength = (max: number) => (value: string) =>
-  value && value.length <= max ? undefined : `Maximum length is ${max}`;
+export const maxLength = (max: number) => (value: string | number) =>
+  value && value.toString().length <= max
+    ? undefined
+    : `Maximum length is ${max}`;
 
 export const composeValidators =
   (...validators: ValidationType[]) =>
