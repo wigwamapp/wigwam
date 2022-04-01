@@ -44,8 +44,6 @@ const Asset: FC = () => {
   const nativeCurrency = useNativeCurrency();
   const { alert } = useDialog();
 
-  // const prevToken = usePrevious(currentToken);
-
   const provider = useProvider();
 
   const sendEther = useCallback(
@@ -111,17 +109,11 @@ const Asset: FC = () => {
     [currentToken]
   );
 
-  // useEffect(() => {
-  //   if (currentToken !== prevToken) {
-  //     form.mutators.setAmount(undefined);
-  //   }
-  // }, [currentToken, prevToken, form]);
-
   return (
     <Form
       onSubmit={handleSubmit}
       mutators={{
-        pasteMaxAmount: (args, state, utils) => {
+        setAmount: (args, state, utils) => {
           utils.changeValue(state, "amount", () => args[0]);
         },
         pasteAddressFromClipboard: (args, state, utils) => {
@@ -130,7 +122,9 @@ const Asset: FC = () => {
       }}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <TokenSelect />
+          <TokenSelect
+            handleTokenChanged={() => form.mutators.setAmount(undefined)}
+          />
           <Field
             name="recipient"
             validate={composeValidators(required, validateAddress)}
@@ -160,7 +154,7 @@ const Asset: FC = () => {
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
                   handleMaxButtonClick={() =>
-                    form.mutators.pasteMaxAmount(maxAmount)
+                    form.mutators.setAmount(maxAmount)
                   }
                   error={meta.error && meta.modified}
                   errorMessage={meta.error}
