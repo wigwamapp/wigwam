@@ -104,8 +104,8 @@ const Profile: FC = () => {
               <Field name="newPwd" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
-                    error={submitError || (meta.error && meta.touched)}
-                    errorMessage={submitError ?? meta.error}
+                    error={meta.error && meta.touched}
+                    errorMessage={meta.error}
                     label="New password"
                     placeholder="Type new password"
                     className="mb-4"
@@ -122,8 +122,8 @@ const Profile: FC = () => {
               >
                 {({ input, meta }) => (
                   <PasswordField
-                    error={submitError || (meta.error && meta.touched)}
-                    errorMessage={submitError ?? meta.error}
+                    error={meta.error && meta.touched}
+                    errorMessage={meta.error}
                     label="Confirm new password"
                     placeholder="Confirm new password"
                     {...input}
