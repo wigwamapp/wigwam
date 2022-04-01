@@ -151,6 +151,7 @@ const Asset: FC = () => {
                 <AssetInput
                   label="Amount"
                   placeholder="0.00"
+                  thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
                   handleMaxButtonClick={() =>
