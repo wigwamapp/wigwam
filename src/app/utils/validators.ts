@@ -1,3 +1,6 @@
+import { ethers } from "ethers";
+import { wordlists } from "@ethersproject/wordlists";
+
 type ValidationType = (value: string) => string | undefined;
 
 export const required = (value: string) =>
@@ -43,3 +46,18 @@ export const exactLength = (length: number) => (seed: string) =>
 
 export const marked = (value: string) =>
   value === "true" ? undefined : "You have to accept it first";
+
+export const validateSeedPhrase = (lang: string) => (phrase: string) => {
+  if (!(lang in wordlists)) {
+    return "Seed phrase language not supported";
+  }
+
+  return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
+    ? undefined
+    : "Seed phrase in not valid";
+};
+
+export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
+  phrase1 && phrase2 && phrase1 !== phrase2
+    ? "Provided seed phrase doesn't match with created one"
+    : undefined;
