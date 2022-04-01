@@ -79,11 +79,6 @@ const ImportSeedPhrase = memo(() => {
       </AddAccountHeader>
       <Form
         onSubmit={handleContinue}
-        mutators={{
-          pasteFromClipboard: (args, state, utils) => {
-            utils.changeValue(state, "seed", () => args[0]);
-          },
-        }}
         render={({ form, handleSubmit, submitting }) => (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col max-w-[27.5rem] mx-auto">
@@ -105,7 +100,7 @@ const ImportSeedPhrase = memo(() => {
                 {({ input, meta }) => (
                   <SeedPhraseField
                     placeholder="Paste there your secret phrase"
-                    setFromClipboard={form.mutators.pasteFromClipboard}
+                    setFromClipboard={(value) => form.change("seed", value)}
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}
                     className="mt-8"
