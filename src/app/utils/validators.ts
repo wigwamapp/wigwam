@@ -6,9 +6,6 @@ type ValidationType = (value: string) => string | undefined;
 export const required = (value: string) =>
   value ? undefined : "Required field";
 
-export const isNumber = (value: string) =>
-  value && isNaN(Number(value)) ? "Value must be an integer" : undefined;
-
 export const minLength = (min: number) => (value: string) =>
   value && value.length >= min ? undefined : `Minimal length is ${min}`;
 
@@ -38,14 +35,6 @@ export const minValue =
       return `Minimal sum is ${min} ${currencySymbol}`;
     }
   };
-
-export const exactLength = (length: number) => (seed: string) =>
-  seed.split(" ").length === length
-    ? undefined
-    : `Available amount of words: ${length}`;
-
-export const marked = (value: string) =>
-  value === "true" ? undefined : "You have to accept it first";
 
 export const validateSeedPhrase = (lang: string) => (phrase: string) => {
   if (!(lang in wordlists)) {
