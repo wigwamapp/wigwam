@@ -9,6 +9,7 @@ import {
   Account,
   Sync,
   SyncStatus,
+  FindToken,
 } from "core/types";
 
 import { porter } from "./base";
@@ -208,6 +209,21 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
 
 export function sync(chainId: number, accountAddress: string) {
   const msg: Sync = { type: MessageType.Sync, chainId, accountAddress };
+
+  porter.sendOneWayMessage(msg);
+}
+
+export function findToken(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) {
+  const msg: FindToken = {
+    type: MessageType.FindToken,
+    chainId,
+    accountAddress,
+    tokenSlug,
+  };
 
   porter.sendOneWayMessage(msg);
 }

@@ -8,8 +8,10 @@ import {
   useMemo,
 } from "react";
 import classNames from "clsx";
+import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
+import { ethers } from "ethers";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
@@ -19,12 +21,13 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import { parseTokenSlug } from "core/common/tokens";
+import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
+import { findToken } from "core/client";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useChainId, useIsSyncing } from "app/hooks";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -65,8 +68,10 @@ const TokenExplorer: FC = () => {
 };
 
 const AssetsList: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+  const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
@@ -170,6 +175,54 @@ const AssetsList: FC = () => {
       searchInputRef.current.select();
     }
   }, []);
+
+  const syncing = useIsSyncing();
+  const forceUpdate = useForceUpdate();
+
+  const searchValueIsAddress = useMemo(
+    () => searchValue && ethers.utils.isAddress(searchValue),
+    [searchValue]
+  );
+
+  const willSearch = Boolean(searchValueIsAddress && tokens.length === 0);
+  const alreadySearchedRef = useRef(false);
+
+  useEffect(() => {
+    if (willSearch) {
+      let mounted = true;
+
+      let t = setTimeout(() => {
+        const tokenSlug = createTokenSlug({
+          standard: TokenStandard.ERC20,
+          address: searchValue!,
+          id: "0",
+        });
+
+        findToken(chainId, currentAccount.address, tokenSlug);
+
+        t = setTimeout(() => {
+          if (mounted) {
+            alreadySearchedRef.current = true;
+            forceUpdate();
+          }
+        }, 500);
+      }, 500);
+
+      return () => {
+        mounted = false;
+        clearTimeout(t);
+        alreadySearchedRef.current = false;
+      };
+    }
+
+    return;
+  }, [forceUpdate, willSearch, searchValue, chainId, currentAccount.address]);
+
+  const searching = willSearch && syncing && !alreadySearchedRef.current;
+
+  useEffect(() => {
+    console.info({ searching });
+  }, [searching]);
 
   return (
     <div

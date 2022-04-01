@@ -4,7 +4,9 @@ import axios from "axios";
 import { ethers } from "ethers";
 import mem from "mem";
 import { createQueue } from "lib/system/queue";
+import { props } from "lib/system/promise";
 
+import { Erc20__factory } from "abi-types";
 import {
   Account,
   AccountAsset,
@@ -18,6 +20,7 @@ import {
   createTokenSlug,
   getNativeTokenLogoUrl,
   NATIVE_TOKEN_SLUG,
+  parseTokenSlug,
 } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 import { requestBalance } from "core/common/balance";
@@ -31,17 +34,100 @@ const debankApi = axios.create({
   timeout: 60_000,
 });
 
-export type AddSyncRequestParams = {
-  chainId: number;
-  accountAddress: string;
-};
-
 const enqueueSync = createQueue();
 
-export async function addSyncRequest({
-  chainId,
-  accountAddress,
-}: AddSyncRequestParams) {
+export async function addFindTokenRequest(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) {
+  syncStarted(chainId);
+
+  try {
+    await enqueueSync(async () => {
+      let tokenToAdd: AccountAsset;
+
+      const debankChain = await getDebankChain(chainId);
+
+      if (debankChain) {
+        const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+
+        const [{ data: token }, balance] = await Promise.all([
+          debankApi.get("/token", {
+            params: {
+              chain_id: debankChain.id,
+              id: tokenAddress,
+            },
+          }),
+          getBalanceFromChain(chainId, tokenSlug, accountAddress),
+        ]);
+
+        const rawBalance = balance?.toString() ?? "0";
+        const priceUSD = token.price;
+        const balanceUSD = priceUSD
+          ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(priceUSD)
+          : 0;
+
+        tokenToAdd = {
+          tokenType: TokenType.Asset,
+          status: TokenStatus.Enabled,
+          chainId,
+          accountAddress,
+          tokenSlug,
+          // Metadata
+          decimals: token.decimals,
+          name: token.name,
+          symbol: token.symbol,
+          logoUrl: token.logo_url,
+          // Volumes
+          rawBalance,
+          priceUSD,
+          balanceUSD,
+        };
+      } else {
+        const token = await getAccountTokenFromChain(
+          chainId,
+          accountAddress,
+          tokenSlug
+        );
+        if (!token) return;
+
+        const rawBalance = token.balance.toString();
+
+        tokenToAdd = {
+          tokenType: TokenType.Asset,
+          status: TokenStatus.Enabled,
+          chainId,
+          accountAddress,
+          tokenSlug,
+          // Metadata
+          decimals: token.decimals,
+          name: token.name,
+          symbol: token.symbol,
+          // Volumes
+          rawBalance,
+          priceUSD: "0",
+          balanceUSD: 0,
+        };
+      }
+
+      await repo.accountTokens.put(
+        tokenToAdd,
+        createAccountTokenKey({
+          chainId,
+          accountAddress,
+          tokenSlug,
+        })
+      );
+    });
+  } catch (err) {
+    console.error(err);
+  }
+
+  synced(chainId);
+}
+
+export async function addSyncRequest(chainId: number, accountAddress: string) {
   let syncStartedAt: number | undefined;
 
   setTimeout(() => {
@@ -356,6 +442,29 @@ const getDebankUserChainBalance = mem(
     maxAge: 60_000, // 60 sec
   }
 );
+
+const getAccountTokenFromChain = async (
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) => {
+  const provider = getRpcProvider(chainId);
+
+  const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+  const contract = Erc20__factory.connect(tokenAddress, provider);
+
+  try {
+    return await props({
+      decimals: contract.decimals(),
+      symbol: contract.symbol(),
+      name: contract.name(),
+      balance: contract.balanceOf(accountAddress),
+    });
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
 
 const getBalanceFromChain = mem(
   async (chainId: number, tokenSlug: string, accountAddress: string) => {
