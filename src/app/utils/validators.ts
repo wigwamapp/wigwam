@@ -7,10 +7,10 @@ export const required = (value: string) =>
   value ? undefined : "Required field";
 
 export const minLength = (min: number) => (value: string) =>
-  value && value.length >= min ? undefined : `Minimal length is ${min}`;
+  value && value.length >= min ? undefined : `Minimum length is ${min}`;
 
 export const maxLength = (max: number) => (value: string) =>
-  value && value.length <= max ? undefined : `Maximal length is ${max}`;
+  value && value.length <= max ? undefined : `Maximum length is ${max}`;
 
 export const composeValidators =
   (...validators: ValidationType[]) =>
@@ -32,7 +32,7 @@ export const minValue =
     if (!isNaN(sum) && sum >= min) {
       return undefined;
     } else {
-      return `Minimal sum is ${min} ${currencySymbol}`;
+      return `Minimum amount is ${min} ${currencySymbol}`;
     }
   };
 
@@ -50,3 +50,10 @@ export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
   phrase1 && phrase2 && phrase1 !== phrase2
     ? "Provided seed phrase doesn't match with created one"
     : undefined;
+
+const linkRegexExpression =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+const linkRegex = new RegExp(linkRegexExpression);
+
+export const isLink = (value: string) =>
+  value?.match(linkRegex) ? undefined : "Please insert a valid link";

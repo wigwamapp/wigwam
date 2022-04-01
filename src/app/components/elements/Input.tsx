@@ -45,6 +45,7 @@ const Input = memo(
         actions,
         onFocus,
         onBlur,
+        readOnly,
         ...rest
       },
       ref
@@ -119,10 +120,11 @@ const Input = memo(
                 "box-border",
                 "text-brand-light leading-none",
                 "border",
-                (theme === "primary" || (theme === "clean" && error)) &&
+                (theme === "primary" ||
+                  (theme === "clean" && error && !readOnly)) &&
                   "bg-black/20 border-brand-main/10",
                 theme === "clean" &&
-                  !error &&
+                  !(error && !readOnly) &&
                   "bg-transparent border-transparent",
                 "rounded-[.625rem]",
                 "outline-none",
@@ -140,12 +142,13 @@ const Input = memo(
                     "border-brand-main/5",
                     "text-brand-disabledcolor placeholder-brand-disabledcolor",
                   ],
-                error && "!border-brand-redobject",
+                error && !readOnly && "!border-brand-redobject",
                 inputClassName
               )}
               onFocus={handleFocus}
               onBlur={handleBlur}
               disabled={disabled}
+              readOnly={readOnly}
               {...rest}
             />
             {!!EndAdornment && !actions && (
@@ -163,7 +166,7 @@ const Input = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && "max-h-5"
+              error && errorMessage && !readOnly && "max-h-5"
             )}
           >
             <span className="text-brand-redtext pt-1 pl-4 text-xs">

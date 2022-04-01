@@ -1,89 +1,77 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
-import { composeValidators, maxLength, minLength, required } from "app/utils";
+import {
+  composeValidators,
+  isLink,
+  maxLength,
+  minLength,
+  required,
+} from "app/utils";
 
+import { useDialog } from "app/hooks/dialog";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
-import NumberInput from "../elements/NumberInput";
+import NumberInput from "app/components/elements/NumberInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
-
-const emptyState = {
-  nName: "",
-  rpcUrl: "",
-  chainId: "",
-  currencySymbol: "",
-  blockExplorer: "",
-};
 
 type EditNetworkProps = {
   isNew: boolean;
   network?: Network;
   onCancelHandler: () => void;
+  onNewNetworkCreated?: () => void;
   className?: string;
 };
 
 const EditNetwork = memo<EditNetworkProps>(
-  ({ isNew, network, onCancelHandler }) => {
-    const [state, setState] = useState(
-      network
-        ? {
-            nName: network.name,
-            rpcUrl: network.rpcUrls[0],
-            chainId: network.chainId,
-            currencySymbol: network.nativeCurrency?.symbol,
-            blockExplorer: network.explorerUrls?.[0] ?? "",
-          }
-        : emptyState
-    );
-
-    const handleClear = useCallback(() => {
-      setState(emptyState);
-      onCancelHandler();
-    }, [onCancelHandler]);
+  ({ isNew, network, onCancelHandler, onNewNetworkCreated }) => {
+    const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
+    const { alert } = useDialog();
 
     const handleSubmit = useCallback(
-      ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
-        const processNetwork = async () => {
-          try {
-            const repoMethod = isNew ? "add" : "put";
-            await Repo.networks[repoMethod]({
-              chainId: isNaN(Number(chainId))
-                ? randomInteger(20, 2000)
-                : Number(chainId),
-              type: "unknown",
-              rpcUrls: [rpcUrl],
-              chainTag: "",
-              name: nName,
-              nativeCurrency: {
-                name: currencySymbol,
-                symbol: currencySymbol,
-                decimals: 18,
-              },
-              explorerUrls: [blockExplorer],
-            });
-          } catch (err) {
-            alert(err);
+      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
+        try {
+          const isChangedChainId = initialChainId && chainId !== initialChainId;
+          if (isChangedChainId) {
+            await Repo.networks.delete(Number(initialChainId));
           }
-          handleClear();
-        };
 
-        processNetwork();
+          const repoMethod = isNew || isChangedChainId ? "add" : "put";
+          await Repo.networks[repoMethod]({
+            chainId: Number(chainId),
+            type: "unknown",
+            rpcUrls: [rpcUrl],
+            chainTag: "",
+            name: nName,
+            nativeCurrency: {
+              name: currencySymbol,
+              symbol: currencySymbol,
+              decimals: 18,
+            },
+            explorerUrls: [blockExplorer],
+          });
+
+          if (isNew && onNewNetworkCreated) {
+            onNewNetworkCreated();
+          }
+          onCancelHandler();
+        } catch (err: any) {
+          alert({ title: "Error!", content: err.message });
+        }
       },
-      [isNew, handleClear]
+      [alert, initialChainId, isNew, onCancelHandler, onNewNetworkCreated]
     );
 
     const deleteNetwork = useCallback(async () => {
-      (async () => {
-        await Repo.networks.delete(Number(state.chainId));
-      })();
-    }, [state]);
+      await Repo.networks.delete(Number(initialChainId));
+    }, [initialChainId]);
 
     const isNative = network && network.type !== "unknown";
 
@@ -98,7 +86,7 @@ const EditNetwork = memo<EditNetworkProps>(
               </h3>
             </>
           ) : (
-            <div className="w-3/4 flex items-center justify-between">
+            <div className="w-[21.875rem] flex items-center justify-between">
               <div className="flex">
                 <EditIcon className="mr-3" />
                 <h3 className="text-brand-light text-2xl font-bold">
@@ -106,9 +94,13 @@ const EditNetwork = memo<EditNetworkProps>(
                 </h3>
               </div>
               {!isNative && (
-                <DeleteIcon
-                  className="cursor-pointer"
+                <IconedButton
+                  Icon={DeleteIcon}
                   onClick={deleteNetwork}
+                  theme="tertiary"
+                  aria-label="Delete network"
+                  className="!w-8 !h-8"
+                  iconClassName="!w-5"
                 />
               )}
             </div>
@@ -122,7 +114,13 @@ const EditNetwork = memo<EditNetworkProps>(
         >
           <Form
             onSubmit={handleSubmit}
-            initialValues={{ ...state }}
+            initialValues={{
+              nName: network?.name,
+              rpcUrl: network?.rpcUrls[0],
+              chainId: network?.chainId,
+              currencySymbol: network?.nativeCurrency?.symbol,
+              blockExplorer: network?.explorerUrls?.[0],
+            }}
             render={({ handleSubmit, submitting }) => (
               <form
                 onSubmit={handleSubmit}
@@ -139,28 +137,30 @@ const EditNetwork = memo<EditNetworkProps>(
                   >
                     {({ input, meta }) => (
                       <Input
-                        inputClassName="h-11"
-                        {...input}
+                        label="Network Name"
+                        placeholder="Type network name"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        label="Network Name"
                         readOnly={isNative}
+                        inputClassName="h-11"
+                        {...input}
                       />
                     )}
                   </Field>
                   <Field
                     name="rpcUrl"
-                    validate={composeValidators(required, minLength(8))}
+                    validate={composeValidators(required, isLink)}
                   >
                     {({ input, meta }) => (
                       <Input
+                        label="RPC URL"
+                        placeholder="Insert rpc url"
+                        error={meta.error && meta.touched}
+                        errorMessage={meta.error}
+                        readOnly={isNative}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
-                        error={meta.error && meta.touched}
-                        errorMessage={meta.error}
-                        label={"RPC URL"}
-                        readOnly={isNative}
                       />
                     )}
                   </Field>
@@ -168,56 +168,66 @@ const EditNetwork = memo<EditNetworkProps>(
                     name="chainId"
                     validate={composeValidators(
                       required,
-                      minLength(8),
-                      maxLength(36)
+                      minLength(4),
+                      maxLength(12)
                     )}
                   >
                     {({ input, meta }) => (
                       <NumberInput
+                        label="Chain ID"
+                        placeholder="Type chain id"
+                        decimalScale={0}
+                        error={meta.error && meta.touched}
+                        errorMessage={meta.error}
+                        readOnly={isNative}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
-                        error={meta.error && meta.touched}
-                        errorMessage={meta.error}
-                        label={"Chain ID"}
-                        readOnly={isNative}
                       />
                     )}
                   </Field>
                   <Field
                     name="currencySymbol"
-                    validate={composeValidators(required, minLength(8))}
+                    format={(v) => (v ? v.toUpperCase() : null)}
+                    validate={composeValidators(
+                      required,
+                      minLength(2),
+                      maxLength(8)
+                    )}
                   >
                     {({ input, meta }) => (
                       <Input
+                        label="Currency symbol"
+                        placeholder="Type currency symbol"
+                        error={meta.error && meta.touched}
+                        errorMessage={meta.error}
+                        readOnly={isNative}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
-                        error={meta.error && meta.touched}
-                        errorMessage={meta.error}
-                        label={"Currency symbol"}
-                        readOnly={isNative}
                       />
                     )}
                   </Field>
-                  <Field name="blockExplorer" validate={minLength(8)}>
+                  <Field name="blockExplorer" validate={isLink}>
                     {({ input, meta }) => (
                       <Input
+                        label="Block explorer"
+                        placeholder="Insert block explorer link"
+                        error={meta.error && meta.touched}
+                        errorMessage={meta.error}
+                        readOnly={isNative}
+                        optional
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
-                        error={meta.error && meta.touched}
-                        errorMessage={meta.error}
-                        label="Block explorer"
-                        readOnly={isNative}
-                        optional
                       />
                     )}
                   </Field>
                   <div className="flex mt-6">
                     <NewButton
+                      type="button"
                       theme="secondary"
-                      onClick={handleClear}
+                      onClick={onCancelHandler}
                       className="!py-2 w-full"
                     >
                       Cancel
@@ -230,7 +240,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     >
                       {submitting
                         ? isNew
-                          ? "Adding"
+                          ? "Adding..."
                           : "Saving..."
                         : isNew
                         ? "Add"
@@ -248,8 +258,3 @@ const EditNetwork = memo<EditNetworkProps>(
 );
 
 export default EditNetwork;
-
-const randomInteger = (min: number, max: number): number => {
-  const rand = min - 0.5 + Math.random() * (max - min + 1);
-  return Math.round(rand);
-};
