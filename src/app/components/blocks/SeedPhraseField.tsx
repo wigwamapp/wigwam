@@ -53,7 +53,7 @@ const CreateSeedPhraseField = forwardRef<
         ref={mergeRefs([ref, fieldRef])}
         id="seedPhrase"
         label="Secret Phrase"
-        readOnly={true}
+        readOnly
         actions={
           <div className="flex items-center">
             <TippySingletonProvider>

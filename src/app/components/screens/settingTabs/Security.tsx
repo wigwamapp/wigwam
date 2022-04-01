@@ -1,11 +1,13 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
 import { Form, Field } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
-
-import { getSeedPhrase } from "core/client";
 import { fromProtectedString } from "lib/crypto-utils";
 
+import { getSeedPhrase } from "core/client";
+
+import { required } from "app/utils";
 import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -14,9 +16,8 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 import NewButton from "app/components/elements/NewButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
-import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 import PasswordField from "app/components/elements/PasswordField";
-import { composeValidators, required } from "app/utils";
+import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 
 const Security: FC = () => {
   const [revealModalOpened, setRevealModalOpened] = useState(false);
@@ -83,11 +84,12 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     if (password) {
       try {
         const seed = await getSeedPhrase(password);
-        setSeedPhrase(fromProtectedString(seed.phrase));
+        setSeedPhrase(seed.phrase);
       } catch (err: any) {
-        alert(err?.message);
+        return { [FORM_ERROR]: err?.message };
       }
     }
+    return;
   }, []);
 
   return (
@@ -98,25 +100,35 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SeedPhraseField readOnly value={seedPhrase} />
+        <SeedPhraseField value={fromProtectedString(seedPhrase)} />
       ) : (
         <Form
           initialValues={{ terms: "false" }}
           onSubmit={handleConfirmPassword}
-          render={({ handleSubmit, submitting }) => (
+          render={({
+            handleSubmit,
+            submitting,
+            modifiedSinceLastSubmit,
+            submitError,
+          }) => (
             <form
               className="flex flex-col items-center"
               onSubmit={handleSubmit}
             >
               <div className="w-[20rem] relative mb-3">
-                <Field name="password" validate={composeValidators(required)}>
+                <Field name="password" validate={required}>
                   {({ input, meta }) => (
                     <PasswordField
                       className="w-full"
                       placeholder="Type password"
                       label="Confirm your password"
-                      error={meta.touched && meta.error}
-                      errorMessage={meta.error}
+                      error={
+                        (meta.touched && meta.error) ||
+                        (!modifiedSinceLastSubmit && submitError)
+                      }
+                      errorMessage={
+                        meta.error || (!modifiedSinceLastSubmit && submitError)
+                      }
                       {...input}
                     />
                   )}
