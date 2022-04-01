@@ -75,14 +75,25 @@ const Profile: FC = () => {
       <SettingsHeader>Change password</SettingsHeader>
       <Form
         onSubmit={handlePasswordChange}
-        render={({ handleSubmit, submitting, submitError, values }) => (
+        render={({
+          handleSubmit,
+          submitting,
+          modifiedSinceLastSubmit,
+          submitError,
+          values,
+        }) => (
           <form className="max-w-[18rem]" onSubmit={handleSubmit}>
             <TippySingletonProvider>
               <Field name="oldPwd" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
-                    error={submitError || (meta.error && meta.touched)}
-                    errorMessage={submitError ?? meta.error}
+                    error={
+                      (!modifiedSinceLastSubmit && submitError) ||
+                      (meta.error && meta.touched)
+                    }
+                    errorMessage={
+                      meta.error || (!modifiedSinceLastSubmit && submitError)
+                    }
                     label="Old password"
                     placeholder="Type old password"
                     className="mb-4"

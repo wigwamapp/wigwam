@@ -3,6 +3,7 @@ import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Field, Form } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
@@ -12,8 +13,8 @@ import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
-import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import PasswordField from "app/components/elements/PasswordField";
+import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
@@ -40,8 +41,9 @@ const SetupPassword = memo(() => {
         await setupWallet(password, addAccountsParams, seedPhrase);
 
         setAccModalOpened([false]);
+        return;
       } catch (err: any) {
-        alert(err?.message);
+        return { [FORM_ERROR]: err?.message };
       }
     },
     [addAccountsParams, seedPhrase, setAccModalOpened]
@@ -58,7 +60,13 @@ const SetupPassword = memo(() => {
       <Form
         initialValues={{ terms: false }}
         onSubmit={handleFinish}
-        render={({ handleSubmit, values, submitting }) => (
+        render={({
+          handleSubmit,
+          values,
+          submitting,
+          modifiedSinceLastSubmit,
+          submitError,
+        }) => (
           <form
             onSubmit={handleSubmit}
             className="flex flex-col max-w-[27.5rem] mx-auto"
@@ -102,8 +110,13 @@ const SetupPassword = memo(() => {
                 {({ input, meta }) => (
                   <AcceptTermsCheckbox
                     {...input}
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
+                    error={
+                      (!modifiedSinceLastSubmit && submitError) ||
+                      (meta.touched && meta.error)
+                    }
+                    errorMessage={
+                      meta.error || (!modifiedSinceLastSubmit && submitError)
+                    }
                     className="mt-6"
                   />
                 )}
