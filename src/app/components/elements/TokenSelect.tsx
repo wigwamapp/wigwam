@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { AccountAsset, TokenType } from "core/types";
 
@@ -13,7 +14,11 @@ import Select from "./Select";
 import PrettyAmount from "./PrettyAmount";
 import TokenLogo from "./TokenLogo";
 
-const TokenSelect: FC = () => {
+type TokenSelectProps = {
+  handleTokenChanged?: () => void;
+};
+
+const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
@@ -83,6 +88,14 @@ const TokenSelect: FC = () => {
       currentToken ? prepareToken(currentToken as AccountAsset, "large") : null,
     [currentToken]
   );
+
+  const prevToken = usePrevious(currentToken);
+
+  useEffect(() => {
+    if (currentToken !== prevToken) {
+      handleTokenChanged?.();
+    }
+  }, [currentToken, prevToken, handleTokenChanged]);
 
   return preparedCurrentToken ? (
     <Select
