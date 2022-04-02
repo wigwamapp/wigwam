@@ -79,15 +79,12 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     }
   }, [onOpenChange, seedPhrase, windowFocused]);
 
-  const handleConfirmPassword = useCallback(async (values) => {
-    const password = values.password;
-    if (password) {
-      try {
-        const seed = await getSeedPhrase(password);
-        setSeedPhrase(seed.phrase);
-      } catch (err: any) {
-        return { [FORM_ERROR]: err?.message };
-      }
+  const handleConfirmPassword = useCallback(async ({ password }) => {
+    try {
+      const seed = await getSeedPhrase(password);
+      setSeedPhrase(seed.phrase);
+    } catch (err: any) {
+      return { [FORM_ERROR]: err?.message };
     }
     return;
   }, []);

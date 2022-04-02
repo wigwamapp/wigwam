@@ -18,6 +18,7 @@ import {
   required,
   validateSeedPhrase,
 } from "app/utils";
+import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
@@ -27,6 +28,7 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { alert } = useDialog();
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
@@ -68,7 +70,7 @@ const VerifySeedPhrase = memo(() => {
         alert(err?.message);
       }
     },
-    [seedPhrase, stateRef, initialSetup, navigateToStep]
+    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
   );
 
   if (!seedPhrase) {

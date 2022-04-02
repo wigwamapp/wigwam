@@ -21,18 +21,15 @@ const PasswordForm = memo<PasswordFormProps>(
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
-      async (values) => {
-        const password = values.password;
-        if (password) {
-          try {
-            if (unlockCallback) {
-              unlockCallback(password);
-            } else {
-              await unlockWallet(password);
-            }
-          } catch (err: any) {
-            return { [FORM_ERROR]: err?.message };
+      async ({ password }) => {
+        try {
+          if (unlockCallback) {
+            unlockCallback(password);
+          } else {
+            await unlockWallet(password);
           }
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
         }
         return;
       },

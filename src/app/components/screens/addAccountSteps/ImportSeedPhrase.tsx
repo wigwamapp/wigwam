@@ -16,6 +16,7 @@ import {
   validateSeedPhrase as validateSeedPhraseValidator,
 } from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
+import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -29,6 +30,7 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 const ImportSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { alert } = useDialog();
 
   const { stateRef, navigateToStep } = useSteps();
 
@@ -50,13 +52,11 @@ const ImportSeedPhrase = memo(() => {
 
   const handleContinue = useCallback(
     async (values) => {
-      const seedPhrase: SeedPharse = {
-        phrase: toProtectedString(values.seed),
-        lang: wordlistLocale,
-      };
-
       try {
-        validateSeedPhrase(seedPhrase);
+        const seedPhrase: SeedPharse = {
+          phrase: toProtectedString(values.seed),
+          lang: wordlistLocale,
+        };
 
         if (initialSetup) {
           stateRef.current.seedPhrase = seedPhrase;
@@ -69,7 +69,7 @@ const ImportSeedPhrase = memo(() => {
         alert(err?.message);
       }
     },
-    [wordlistLocale, initialSetup, navigateToStep, stateRef]
+    [wordlistLocale, initialSetup, navigateToStep, stateRef, alert]
   );
 
   return (
