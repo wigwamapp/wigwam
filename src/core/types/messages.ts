@@ -15,6 +15,7 @@ export type Request =
   | GetAccountsRequest
   | AddAccountsRequest
   | DeleteAccountsRequest
+  | UpdateAccountNameRequest
   | GetSeedPhraseRequest
   | GetPrivateKeyRequest
   | GetPublicKeyRequest
@@ -35,6 +36,7 @@ export type Response =
   | GetAccountsResponse
   | AddAccountsResponse
   | DeleteAccountsResponse
+  | UpdateAccountNameResponse
   | GetSeedPhraseResponse
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
@@ -63,6 +65,7 @@ export enum MessageType {
   GetAccounts = "GET_ACCOUNTS",
   AddAccounts = "ADD_ACCOUNTS",
   DeleteAccounts = "DELETE_ACCOUNTS",
+  UpdateAccountName = "UPDATE_ACCOUNT_NAME",
   AccountsUpdated = "ACCOUNTS_UPDATED",
   GetSeedPhrase = "GET_SEED_PHRASE",
   GetPrivateKey = "GET_PRIVATE_KEY",
@@ -177,6 +180,16 @@ export interface DeleteAccountsRequest extends MessageBase {
 
 export interface DeleteAccountsResponse extends MessageBase {
   type: MessageType.DeleteAccounts;
+}
+
+export interface UpdateAccountNameRequest extends MessageBase {
+  type: MessageType.UpdateAccountName;
+  accountUuid: string;
+  name: string;
+}
+
+export interface UpdateAccountNameResponse extends MessageBase {
+  type: MessageType.UpdateAccountName;
 }
 
 export interface AccountsUpdated extends MessageBase {

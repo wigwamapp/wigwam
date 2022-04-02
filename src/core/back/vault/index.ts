@@ -181,7 +181,7 @@ export class Vault {
   async changePassword(current: string, next: string) {
     await this.verify(current);
 
-    return withError(t("failedToFetchPublicKey"), async () => {
+    return withError(t("failedToChangePassword"), async () => {
       await this.kdbx.credentials.setPassword(importProtected(next));
 
       const keyFile = await Credentials.createRandomKeyFile();
@@ -281,6 +281,30 @@ export class Vault {
           this.kdbx.remove(accEntry);
         }
       }
+
+      await this.saveData();
+    });
+  }
+
+  updateAccountName(accUuid: string, name: string) {
+    return withError(t("failedToUpdateWalletName"), async () => {
+      const accountsGroup = this.getGroup(Gr.Accounts);
+
+      let accEntry: KdbxEntry | undefined;
+
+      for (const entry of accountsGroup.entries) {
+        if (entry.fields.get("name") === name) {
+          throw new PublicError(t("walletNameAlreadyExists"));
+        }
+
+        if (entry.uuid.equals(accUuid)) {
+          accEntry = entry;
+        }
+      }
+
+      assert(accEntry, "Account not found");
+
+      accEntry.fields.set("name", name);
 
       await this.saveData();
     });

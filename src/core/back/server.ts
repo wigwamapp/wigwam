@@ -180,6 +180,18 @@ async function handleWalletRequest(
             ctx.reply({ type });
           })
       )
+      .with(
+        { type: MessageType.UpdateAccountName },
+        ({ type, accountUuid, name }) =>
+          withVault(async (vault) => {
+            await vault.updateAccountName(accountUuid, name);
+
+            const accounts = vault.getAccounts();
+            accountsUpdated(accounts);
+
+            ctx.reply({ type });
+          })
+      )
       .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
         withVault(async (vault) => {
           const seedPhrase = await vault.getSeedPhrase(password);

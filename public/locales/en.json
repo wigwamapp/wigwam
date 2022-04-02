@@ -32,5 +32,8 @@
   "wallet": "Wallet",
   "walletLocked": "Wallet locked",
   "welcomeTo": "Welcome to {{target}}",
-  "letsBegin": "Let's begin"
+  "letsBegin": "Let's begin",
+  "failedToUpdateWalletName": "Failed to update wallet name",
+  "walletNameAlreadyExists": "Wallet with the same name already exists",
+  "failedToChangePassword": "Failed to change password"
 }

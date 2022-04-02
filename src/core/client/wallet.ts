@@ -120,6 +120,17 @@ export async function deleteAccounts(password: string, accountUuids: string[]) {
   assert(res?.type === type);
 }
 
+export async function updateAccountName(accountUuid: string, name: string) {
+  const type = MessageType.UpdateAccountName;
+
+  const res = await porter.request({
+    type,
+    accountUuid,
+    name,
+  });
+  assert(res?.type === type);
+}
+
 export async function isWalletHasSeedPhrase() {
   const type = MessageType.HasSeedPhrase;
 
