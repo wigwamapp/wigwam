@@ -39,7 +39,7 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
-  const tokenSlug = useAtomValue(tokenSlugAtom);
+  const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
   const currentToken = useToken(tokenSlug) as AccountAsset;
   const nativeCurrency = useNativeCurrency();
   const { alert } = useDialog();

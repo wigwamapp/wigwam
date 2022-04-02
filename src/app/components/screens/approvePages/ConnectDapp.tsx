@@ -9,7 +9,7 @@ import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
-import { useAccountNativeToken } from "app/hooks";
+import { useToken } from "app/hooks";
 import Avatar from "app/components/elements/Avatar";
 import NewButton from "app/components/elements/NewButton";
 import Checkbox from "app/components/elements/Checkbox";
@@ -219,7 +219,7 @@ const Account: FC<AccountProps> = ({
   onToggleAdd,
   className,
 }) => {
-  const nativeToken = useAccountNativeToken(address);
+  const nativeToken = useToken(address);
   const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (

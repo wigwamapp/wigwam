@@ -8,8 +8,10 @@ import {
   useMemo,
 } from "react";
 import classNames from "clsx";
+import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
+import { ethers } from "ethers";
 import * as repo from "core/repo";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
@@ -19,13 +21,14 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import { parseTokenSlug } from "core/common/tokens";
+import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
+import { findToken } from "core/client";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
-import { useAccountTokens, useToken } from "app/hooks/tokens";
+import { TippySingletonProvider, useChainId, useIsSyncing } from "app/hooks";
+import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -42,20 +45,33 @@ import NewButton from "../elements/NewButton";
 import SearchInput from "../elements/SearchInput";
 import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
-import TokenLogo from "../elements/TokenLogo";
+import AssetLogo from "../elements/AssetLogo";
+import LongTextField from "../elements/LongTextField";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
-    <AssetsList />
-    <AssetInfo />
+    <TokenExplorer />
   </div>
 );
 
 export default OverviewContent;
 
+const TokenExplorer: FC = () => {
+  const tokenSlug = useAtomValue(tokenSlugAtom);
+
+  return (
+    <>
+      <AssetsList />
+      {tokenSlug && <AssetInfo />}
+    </>
+  );
+};
+
 const AssetsList: FC = () => {
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+  const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
@@ -70,7 +86,7 @@ const AssetsList: FC = () => {
     setDefaultTokenRef.current = true;
   }, []);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {
@@ -160,6 +176,50 @@ const AssetsList: FC = () => {
     }
   }, []);
 
+  const syncing = useIsSyncing();
+  const forceUpdate = useForceUpdate();
+
+  const searchValueIsAddress = useMemo(
+    () => searchValue && ethers.utils.isAddress(searchValue),
+    [searchValue]
+  );
+
+  const willSearch = Boolean(searchValueIsAddress && tokens.length === 0);
+  const alreadySearchedRef = useRef(false);
+
+  useEffect(() => {
+    if (willSearch) {
+      let mounted = true;
+
+      let t = setTimeout(() => {
+        const tokenSlug = createTokenSlug({
+          standard: TokenStandard.ERC20,
+          address: searchValue!,
+          id: "0",
+        });
+
+        findToken(chainId, currentAccount.address, tokenSlug);
+
+        t = setTimeout(() => {
+          if (mounted) {
+            alreadySearchedRef.current = true;
+            forceUpdate();
+          }
+        }, 500);
+      }, 500);
+
+      return () => {
+        mounted = false;
+        clearTimeout(t);
+        alreadySearchedRef.current = false;
+      };
+    }
+
+    return;
+  }, [forceUpdate, willSearch, searchValue, chainId, currentAccount.address]);
+
+  const searching = (willSearch || syncing) && !alreadySearchedRef.current;
+
   return (
     <div
       className={classNames(
@@ -209,10 +269,19 @@ const AssetsList: FC = () => {
           )}
           onClick={focusSearchInput}
         >
-          <NoResultsFoundIcon className="mb-4" />
-          Can&apos;t find a token?
-          <br />
-          Put an address into the search line to find it.
+          <NoResultsFoundIcon
+            className={classNames("mb-4", searching && "animate-spin")}
+          />
+
+          {searching ? (
+            <>Searching...</>
+          ) : (
+            <>
+              Can&apos;t find a token?
+              <br />
+              Put an address into the search line to find it.
+            </>
+          )}
         </button>
       ) : (
         <ScrollAreaContainer
@@ -256,8 +325,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD, status } =
-      asset;
+    const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
     const nativeAsset = status === TokenStatus.Native;
     const disabled = status === TokenStatus.Disabled;
     const hoverable = isManageMode ? !nativeAsset : !isActive;
@@ -283,8 +351,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         )}
         disabled={isManageMode && nativeAsset}
       >
-        <TokenLogo
-          src={logoUrl}
+        <AssetLogo
+          asset={asset}
           alt={name}
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
@@ -341,25 +409,25 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
-  const tokenInfo = useToken(tokenSlug) as AccountAsset;
+  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
 
   if (!tokenInfo || !parsedTokenSlug) {
-    return <></>;
+    return null;
   }
 
-  const { logoUrl, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
+  const { status, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
     tokenInfo;
-  const { standard } = parsedTokenSlug;
+  const { standard, address } = parsedTokenSlug;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-4">
-        <TokenLogo
-          src={logoUrl}
+        <AssetLogo
+          asset={tokenInfo}
           alt={name}
           className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
         />
@@ -444,6 +512,18 @@ const AssetInfo: FC = () => {
           Activity
         </NewButton>
       </div>
+
+      {status !== TokenStatus.Native && (
+        <div className="mt-6">
+          <LongTextField
+            key={address}
+            label="Token address"
+            defaultValue={address}
+            textareaClassName="!h-auto"
+            readOnly
+          />
+        </div>
+      )}
     </div>
   );
 };

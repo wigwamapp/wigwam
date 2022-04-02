@@ -21,7 +21,7 @@ import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { currentAccountAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import { useAccountTokens } from "app/hooks/tokens";
+import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoIcon } from "app/icons/info-round.svg";
@@ -43,7 +43,7 @@ import PrettyAmount from "../elements/PrettyAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
-import TokenLogo from "../elements/TokenLogo";
+import AssetLogo from "../elements/AssetLogo";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -147,7 +147,7 @@ const AssetsList: FC = () => {
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {
@@ -282,15 +282,7 @@ const AssetCard = memo(
       const currentAccount = useAtomValue(currentAccountAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
-      const {
-        logoUrl,
-        name,
-        symbol,
-        rawBalance,
-        decimals,
-        balanceUSD,
-        status,
-      } = asset;
+      const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
 
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
@@ -349,8 +341,8 @@ const AssetCard = memo(
           )}
           disabled={isManageMode && nativeAsset}
         >
-          <TokenLogo
-            src={logoUrl}
+          <AssetLogo
+            asset={asset}
             alt={name}
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />

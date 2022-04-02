@@ -1,4 +1,4 @@
-import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { allNetworksAtom, getNetworkAtom } from "app/atoms";
 
@@ -12,10 +12,7 @@ export function useLazyNetwork(previous = true) {
   const chainId = useChainId();
   const networkAtom = getNetworkAtom(chainId);
 
-  return useLazyAtomValue(
-    networkAtom,
-    previous ? KeepPrevious.Always : KeepPrevious.Off
-  );
+  return useLazyAtomValue(networkAtom, previous ? "always" : "off");
 }
 
 export function useNativeCurrency() {

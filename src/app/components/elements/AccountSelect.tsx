@@ -15,7 +15,7 @@ import {
   allAccountsAtom,
   currentAccountAtom,
 } from "app/atoms";
-import { useAccountNativeToken } from "app/hooks";
+import { useToken } from "app/hooks";
 
 import Select from "./Select";
 import AutoIcon from "./AutoIcon";
@@ -93,7 +93,7 @@ type AccountSelectItemProps = {
 
 const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
   const [copied, setCopied] = useState(false);
-  const nativeToken = useAccountNativeToken(account.address);
+  const nativeToken = useToken(account.address);
   const portfolioBalance = nativeToken?.portfolioUSD;
 
   return (
