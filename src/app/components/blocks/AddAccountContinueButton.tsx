@@ -25,7 +25,11 @@ const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
       "before:bg-brand-main/[.07]"
     )}
   >
-    <NewButton type="submit" className="!min-w-[14rem]" onClick={onContinue}>
+    <NewButton
+      type={onContinue ? "button" : "submit"}
+      className="!min-w-[14rem]"
+      onClick={onContinue}
+    >
       {loading ? "Loading..." : "Continue"}
     </NewButton>
   </div>

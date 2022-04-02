@@ -80,7 +80,7 @@ export const getWays = (
             Icon: ImportIcon,
             action: () => {
               stateRef.current.addSeedPhraseType = "import";
-              navigateToStep(AddAccountStep.AddSeedPhrase);
+              navigateToStep(AddAccountStep.ImportSeedPhrase);
             },
           },
           {
@@ -88,7 +88,7 @@ export const getWays = (
             Icon: CreateIcon,
             action: () => {
               stateRef.current.addSeedPhraseType = "create";
-              navigateToStep(AddAccountStep.AddSeedPhrase);
+              navigateToStep(AddAccountStep.CreateSeedPhrase);
             },
           },
         ],

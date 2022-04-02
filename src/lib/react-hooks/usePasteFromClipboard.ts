@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-export function usePasteToClipboardWithMutator(
-  mutator?: (value: string) => void,
+export function usePasteFromClipboard(
+  setValue: (value: string) => void,
   copyDelay: number = 1000 * 2
 ) {
   const [pasted, setPasted] = useState(false);
@@ -20,12 +20,11 @@ export function usePasteToClipboardWithMutator(
 
   const paste = useCallback(async () => {
     if (pasted) return;
-    const value = await navigator.clipboard.readText();
-    if (mutator) {
-      mutator(value);
-    }
+
+    const text = await navigator.clipboard.readText();
+    setValue(text);
     setPasted(true);
-  }, [pasted, mutator]);
+  }, [pasted, setValue]);
 
   return { paste, pasted, setPasted };
 }

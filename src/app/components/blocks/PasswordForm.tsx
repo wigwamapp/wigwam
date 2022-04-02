@@ -1,38 +1,37 @@
 import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
+import { required } from "app/utils";
+import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
+import PasswordField from "app/components/elements/PasswordField";
 
-import { AttentionModal } from "../screens/Unlock";
-import PasswordField from "../elements/PasswordField";
-
-interface PasswordFormProps {
+type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
   className?: string;
-}
+};
 
 const PasswordForm = memo<PasswordFormProps>(
   ({ theme = "large", unlockCallback, className }) => {
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
-      async (values) => {
-        const password = values.password;
-        if (password) {
-          try {
-            if (unlockCallback) {
-              unlockCallback(password);
-            } else {
-              await unlockWallet(password);
-            }
-          } catch (err: any) {
-            alert(err?.message);
+      async ({ password }) => {
+        try {
+          if (unlockCallback) {
+            unlockCallback(password);
+          } else {
+            await unlockWallet(password);
           }
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
         }
+        return;
       },
       [unlockCallback]
     );
@@ -40,7 +39,12 @@ const PasswordForm = memo<PasswordFormProps>(
     return (
       <Form
         onSubmit={handleSubmit}
-        render={({ handleSubmit, submitting }) => (
+        render={({
+          handleSubmit,
+          submitting,
+          modifiedSinceLastSubmit,
+          submitError,
+        }) => (
           <form
             className={classNames(
               "w-full flex flex-col items-center",
@@ -49,12 +53,19 @@ const PasswordForm = memo<PasswordFormProps>(
             onSubmit={handleSubmit}
           >
             <div className="max-w-[19rem] w-full relative">
-              <Field name="password">
+              <Field name="password" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
+                    placeholder="Type password"
+                    label="Password"
+                    error={
+                      (!modifiedSinceLastSubmit && submitError) ||
+                      (meta.touched && meta.error)
+                    }
+                    errorMessage={
+                      meta.error || (!modifiedSinceLastSubmit && submitError)
+                    }
                     {...input}
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
                   />
                 )}
               </Field>

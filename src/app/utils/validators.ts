@@ -1,16 +1,21 @@
+import { ethers } from "ethers";
+import { wordlists } from "@ethersproject/wordlists";
+import BigNumber from "bignumber.js";
+
 type ValidationType = (value: string) => string | undefined;
 
 export const required = (value: string) =>
   value ? undefined : "Required field";
 
-export const isNumber = (value: string) =>
-  value && isNaN(Number(value)) ? "Value must be an integer" : undefined;
+export const minLength = (min: number) => (value: string | number) =>
+  value && value.toString().length >= min
+    ? undefined
+    : `Minimum length is ${min}`;
 
-export const minLength = (min: number) => (value: string) =>
-  value && value.length >= min ? undefined : `Minimal length is ${min}`;
-
-export const maxLength = (max: number) => (value: string) =>
-  value && value.length <= max ? undefined : `Maximal length is ${max}`;
+export const maxLength = (max: number) => (value: string | number) =>
+  value && value.toString().length <= max
+    ? undefined
+    : `Maximum length is ${max}`;
 
 export const composeValidators =
   (...validators: ValidationType[]) =>
@@ -26,20 +31,39 @@ export const differentPasswords = (password1: string) => (password2: string) =>
     ? "Provided password doesn't match"
     : undefined;
 
-export const minValue =
-  (min: number, currencySymbol?: string) => (value: string) => {
-    const sum = Number(value);
-    if (!isNaN(sum) && sum >= min) {
+export const maxValue =
+  (max: BigNumber.Value, currencySymbol?: string) => (value: string) => {
+    const amount = new BigNumber(value);
+    if (amount && amount.lte(max)) {
       return undefined;
-    } else {
-      return `Minimal sum is ${min} ${currencySymbol}`;
     }
+
+    return `Maximum amount is ${max} ${currencySymbol}`;
   };
 
-export const exactLength = (length: number) => (seed: string) =>
-  seed.split(" ").length === length
-    ? undefined
-    : `Available amount of words: ${length}`;
+export const validateSeedPhrase = (lang: string) => (phrase: string) => {
+  if (!(lang in wordlists)) {
+    return "Seed phrase language not supported";
+  }
 
-export const marked = (value: string) =>
-  value === "true" ? undefined : "You have to accept it first";
+  return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
+    ? undefined
+    : "Seed phrase in not valid";
+};
+
+export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
+  phrase1 && phrase2 && phrase1 !== phrase2
+    ? "Provided seed phrase doesn't match with created one"
+    : undefined;
+
+const linkRegexExpression =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+const linkRegex = new RegExp(linkRegexExpression);
+
+export const isLink = (value: string) =>
+  value?.match(linkRegex) ? undefined : "Please insert a valid link";
+
+export const validateAddress = (value: string) =>
+  ethers.utils.isAddress(value)
+    ? undefined
+    : "Please insert a valid recipient address";

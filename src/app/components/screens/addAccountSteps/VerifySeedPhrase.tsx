@@ -12,7 +12,13 @@ import {
 } from "core/types";
 import { addSeedPhrase } from "core/client";
 
-import { composeValidators, exactLength, required } from "app/utils";
+import {
+  composeValidators,
+  differentSeedPhrase,
+  required,
+  validateSeedPhrase,
+} from "app/utils";
+import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
@@ -22,6 +28,7 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { alert } = useDialog();
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
@@ -41,9 +48,7 @@ const VerifySeedPhrase = memo(() => {
 
         const inputSeedPhrase = values.seed;
 
-        if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) {
-          throw new Error("Invalid");
-        }
+        if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) return;
 
         const addAccountsParams: AddHDAccountParams[] = [
           {
@@ -65,14 +70,8 @@ const VerifySeedPhrase = memo(() => {
         alert(err?.message);
       }
     },
-    [seedPhrase, stateRef, initialSetup, navigateToStep]
+    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
   );
-
-  const setPhrase = useCallback((args, state) => {
-    const field = state.fields["seed"];
-    console.log(`args[0]`, args[0]);
-    field.change(args[0]);
-  }, []);
 
   if (!seedPhrase) {
     return null;
@@ -88,7 +87,6 @@ const VerifySeedPhrase = memo(() => {
       </AddAccountHeader>
       <Form
         onSubmit={handleContinue}
-        mutators={{ setPhrase }}
         render={({ form, handleSubmit, submitting }) => (
           <form
             onSubmit={handleSubmit}
@@ -96,15 +94,18 @@ const VerifySeedPhrase = memo(() => {
           >
             <Field
               name="seed"
-              validate={composeValidators(required, exactLength(Number(12)))}
+              validate={composeValidators(
+                required,
+                validateSeedPhrase(stateRef.current.seedPhraseLocale),
+                differentSeedPhrase(fromProtectedString(seedPhrase.phrase))
+              )}
             >
               {({ input, meta }) => (
                 <SeedPhraseField
                   placeholder="Paste there your secret phrase"
-                  mode={"import"}
+                  setFromClipboard={(value) => form.change("seed", value)}
                   error={meta.touched && meta.error}
                   errorMessage={meta.error}
-                  mutator={form.mutators.setPhrase}
                   {...input}
                 />
               )}
