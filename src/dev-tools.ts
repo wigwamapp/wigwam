@@ -8,6 +8,7 @@ import * as global from "lib/ext/global";
 import * as i18n from "lib/ext/i18n";
 import { storage } from "lib/ext/storage";
 import * as cryptoUtils from "lib/crypto-utils";
+import { downloadFile } from "lib/download";
 
 import * as types from "core/types";
 import * as common from "core/common";
@@ -30,6 +31,7 @@ Object.assign(window, {
   reset,
   getAllStorage,
   BigNumber,
+  downloadFile,
 });
 
 async function reset() {
@@ -48,21 +50,7 @@ if (process.env.RELEASE_ENV === "false") {
     const { exportCurrentProfile } = await import("core/common/importExport");
     const { name, blob } = await exportCurrentProfile();
 
-    const fileName = `${name}.vigvam`;
-    const fileURL = URL.createObjectURL(blob);
-
-    const anchor = document.createElement("a");
-    anchor.style.display = "none";
-    anchor.href = fileURL;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-
-    setTimeout(() => {
-      anchor.click();
-      document.body.removeChild(anchor);
-
-      setTimeout(() => URL.revokeObjectURL(anchor.href), 250);
-    }, 66);
+    await downloadFile(blob, `${name}.vigvam`);
   };
 
   const uploadProfile = async () => {
