@@ -20,8 +20,7 @@
       rgba(4, 73, 88, 0.1) 0%,
       rgba(13, 14, 29, 0) 100%
     ),
-    #0d0e1d;
-  /* TODO: Change when design will be ready */
+    #101123;
 }
 
 .brandbg-main-fallback,
@@ -65,6 +64,10 @@
   }
 }
 
+/**
+ * Radix
+ */
+
 div[data-radix-popper-content-wrapper] {
   will-change: scroll-position !important;
 }
@@ -72,6 +75,10 @@ div[data-radix-popper-content-wrapper] {
 div[data-radix-scroll-area-viewport].viewportBlock > div {
   display: block !important;
 }
+
+/**
+ * Selected wallet card flip animation
+ */
 
 .card-flip-enter {
   transform: rotateX(-90deg);
