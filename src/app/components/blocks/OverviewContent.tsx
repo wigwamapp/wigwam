@@ -218,11 +218,7 @@ const AssetsList: FC = () => {
     return;
   }, [forceUpdate, willSearch, searchValue, chainId, currentAccount.address]);
 
-  const searching = willSearch && syncing && !alreadySearchedRef.current;
-
-  useEffect(() => {
-    console.info({ searching });
-  }, [searching]);
+  const searching = (willSearch || syncing) && !alreadySearchedRef.current;
 
   return (
     <div
@@ -273,10 +269,19 @@ const AssetsList: FC = () => {
           )}
           onClick={focusSearchInput}
         >
-          <NoResultsFoundIcon className="mb-4" />
-          Can&apos;t find a token?
-          <br />
-          Put an address into the search line to find it.
+          <NoResultsFoundIcon
+            className={classNames("mb-4", searching && "animate-spin")}
+          />
+
+          {searching ? (
+            <>Searching...</>
+          ) : (
+            <>
+              Can&apos;t find a token?
+              <br />
+              Put an address into the search line to find it.
+            </>
+          )}
         </button>
       ) : (
         <ScrollAreaContainer
