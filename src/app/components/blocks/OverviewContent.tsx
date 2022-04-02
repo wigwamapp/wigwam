@@ -411,7 +411,7 @@ const AssetInfo: FC = () => {
   );
 
   if (!tokenInfo || !parsedTokenSlug) {
-    return <></>;
+    return null;
   }
 
   const { status, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =

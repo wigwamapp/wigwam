@@ -105,7 +105,12 @@ const withTooltip = (
       const ariaLabel = rest["aria-label"];
       if (ariaLabel) {
         return (
-          <Tooltip asChild content={ariaLabel} {...tooltipProps}>
+          <Tooltip
+            asChild
+            content={ariaLabel}
+            interactive={false}
+            {...tooltipProps}
+          >
             <WrappedComponent {...rest} ref={ref} />
           </Tooltip>
         );
