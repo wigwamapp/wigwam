@@ -42,14 +42,13 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInput>(
       inputClassName={classNames("max-h-10 text-sm", inputClassName)}
       adornmentClassName={adornmentClassName}
       actions={
-        searchValue && (
-          <IconedButton
-            theme="tertiary"
-            Icon={ClearIcon}
-            aria-label="Clear"
-            onClick={() => toggleSearchValue(null)}
-          />
-        )
+        <IconedButton
+          theme="tertiary"
+          Icon={ClearIcon}
+          aria-label="Clear"
+          onClick={() => toggleSearchValue(null)}
+          className={classNames(!searchValue && "hidden")}
+        />
       }
       {...rest}
     />
