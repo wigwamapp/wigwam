@@ -21,6 +21,7 @@ const LongTextField = memo(
         error,
         errorMessage,
         disabled,
+        readOnly,
         textareaClassName,
         ...rest
       },
@@ -57,7 +58,7 @@ const LongTextField = memo(
               "transition-colors",
               "placeholder-brand-placeholder",
               "resize-none",
-              error && "!border-brand-redobject",
+              error && !readOnly && "!border-brand-redobject",
               !disabled && [
                 "group-hover:bg-brand-main/5",
                 "group-hover:border-brand-main/5",
@@ -77,7 +78,7 @@ const LongTextField = memo(
               "absolute",
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && "max-h-5"
+              error && errorMessage && !readOnly && "max-h-5"
             )}
           >
             <span className="text-brand-redtext pt-1 pl-4 text-xs">
