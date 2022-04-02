@@ -1,3 +1,9 @@
 module.exports = {
-  reject: ["css-loader", "fork-ts-checker-webpack-plugin", "@tippyjs/react"],
+  reject: [
+    "css-loader",
+    "fork-ts-checker-webpack-plugin",
+    "@tippyjs/react",
+    "react",
+    "react-dom",
+  ],
 };
