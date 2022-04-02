@@ -32,19 +32,17 @@ const SetupPassword = memo(() => {
   }, [addAccountsParams, reset]);
 
   const handleFinish = useCallback(
-    async (values) => {
+    async ({ password }) => {
       try {
-        const password = values.password;
-
-        if (!addAccountsParams || !password || !values.terms) return;
+        if (!addAccountsParams) return;
 
         await setupWallet(password, addAccountsParams, seedPhrase);
 
         setAccModalOpened([false]);
-        return;
       } catch (err: any) {
         return { [FORM_ERROR]: err?.message };
       }
+      return;
     },
     [addAccountsParams, seedPhrase, setAccModalOpened]
   );
@@ -72,7 +70,7 @@ const SetupPassword = memo(() => {
             className="flex flex-col max-w-[27.5rem] mx-auto"
           >
             <div className="max-w-[19rem] mx-auto flex flex-col items-center justify-center">
-              <Field name="password" validate={composeValidators(required)}>
+              <Field name="password" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
                     placeholder="Type password"
@@ -105,7 +103,7 @@ const SetupPassword = memo(() => {
               <Field
                 name="terms"
                 format={(v: string) => Boolean(v)}
-                validate={composeValidators(required)}
+                validate={required}
               >
                 {({ input, meta }) => (
                   <AcceptTermsCheckbox

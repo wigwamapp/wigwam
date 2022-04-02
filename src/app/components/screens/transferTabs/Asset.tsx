@@ -75,7 +75,7 @@ const Asset: FC = () => {
 
   const handleSubmit = useCallback(
     async ({ recipient, amount }) => {
-      if (!recipient || !amount || !tokenSlug) {
+      if (!tokenSlug) {
         return;
       }
       try {

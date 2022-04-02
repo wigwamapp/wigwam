@@ -10,6 +10,7 @@ import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
 import { currentLocaleAtom } from "app/atoms";
+import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import Select from "app/components/elements/Select";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
@@ -26,6 +27,7 @@ const WORDS_COUNT = [12, 15, 18, 21, 24];
 const CreateSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
+  const { alert } = useDialog();
 
   const { stateRef, navigateToStep } = useSteps();
 
@@ -58,7 +60,9 @@ const CreateSeedPhrase = memo(() => {
     try {
       const inputSeedPhrase = seedPhraseInputRef.current?.value;
 
-      if (!inputSeedPhrase) return;
+      if (!inputSeedPhrase) {
+        throw new Error("Not a valid seed phrase");
+      }
 
       const seedPhrase: SeedPharse = {
         phrase: toProtectedString(inputSeedPhrase),
@@ -74,7 +78,7 @@ const CreateSeedPhrase = memo(() => {
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [wordlistLocale, stateRef, navigateToStep]);
+  }, [wordlistLocale, stateRef, navigateToStep, alert]);
 
   const generateNew = useCallback(() => {
     const extraEntropy = getRandomBytes();
