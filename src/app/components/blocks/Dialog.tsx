@@ -29,7 +29,9 @@ const Dialog: FC = () => {
       header={header}
       {...rest}
     >
-      <div className="text-base font-brand-font text-center">{children}</div>
+      <div className="text-base font-brand-font text-center w-full break-words">
+        {children}
+      </div>
       <div className="flex mt-5">
         <NewButton onClick={onPrimaryButtonClick}>
           {primaryButtonText}

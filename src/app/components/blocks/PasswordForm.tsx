@@ -1,101 +1,108 @@
-import { FormEventHandler, memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
+import { Field, Form } from "react-final-form";
+import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
-import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
-import Input from "app/components/elements/Input";
+import { required } from "app/utils";
+import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
-import IconedButton from "app/components/elements/IconedButton";
+import PasswordField from "app/components/elements/PasswordField";
 
-import { AttentionModal } from "../screens/Unlock";
-
-interface PasswordFormProps {
+type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
   className?: string;
-}
+};
 
 const PasswordForm = memo<PasswordFormProps>(
   ({ theme = "large", unlockCallback, className }) => {
-    const passwordFieldRef = useRef<HTMLInputElement>(null);
-    const [inputShowContent, setInputShowContent] = useState(false);
     const [attention, setAttention] = useState(false);
 
-    const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-      async (evt) => {
-        evt.preventDefault();
-
-        const password = passwordFieldRef.current?.value;
-        if (password) {
-          try {
-            if (unlockCallback) {
-              unlockCallback(password);
-            } else {
-              await unlockWallet(password);
-            }
-          } catch (err: any) {
-            alert(err?.message);
+    const handleSubmit = useCallback(
+      async ({ password }) => {
+        try {
+          if (unlockCallback) {
+            unlockCallback(password);
+          } else {
+            await unlockWallet(password);
           }
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
         }
+        return;
       },
       [unlockCallback]
     );
 
     return (
-      <form
-        className={classNames("w-full flex flex-col items-center", className)}
+      <Form
         onSubmit={handleSubmit}
-      >
-        <div className="max-w-[19rem] w-full relative">
-          <Input
-            ref={passwordFieldRef}
-            type={inputShowContent ? "text" : "password"}
-            placeholder="Type password"
-            label="Password"
-            className="w-full"
-          />
-          <IconedButton
-            Icon={inputShowContent ? EyeIcon : OpenedEyeIcon}
-            aria-label={`${inputShowContent ? "Hide" : "Show"} password`}
-            theme="tertiary"
-            onClick={() => setInputShowContent(!inputShowContent)}
-            tabIndex={-1}
-            className="absolute bottom-2.5 right-3"
-          />
-        </div>
-
-        <div
-          className={classNames(
-            "max-w-[13.75rem] w-full center",
-            theme === "large" && "mt-6",
-            theme === "small" && "mt-4"
-          )}
-        >
-          <NewButton type="submit" className="w-full">
-            Unlock
-          </NewButton>
-          <button
+        render={({
+          handleSubmit,
+          submitting,
+          modifiedSinceLastSubmit,
+          submitError,
+        }) => (
+          <form
             className={classNames(
-              "w-full text-brand-inactivelight",
-              theme === "large" && "text-sm mt-4",
-              theme === "small" && "text-xs mt-3"
+              "w-full flex flex-col items-center",
+              className
             )}
-            onClick={() => {
-              setAttention(true);
-            }}
+            onSubmit={handleSubmit}
           >
-            <u>Forgot the password?</u>
-            <br />
-            Want to <u>sign into another profile?</u>
-          </button>
-        </div>
-        <AttentionModal
-          open={attention}
-          onOpenChange={() => setAttention(false)}
-        />
-      </form>
+            <div className="max-w-[19rem] w-full relative">
+              <Field name="password" validate={required}>
+                {({ input, meta }) => (
+                  <PasswordField
+                    placeholder="Type password"
+                    label="Password"
+                    error={
+                      (!modifiedSinceLastSubmit && submitError) ||
+                      (meta.touched && meta.error)
+                    }
+                    errorMessage={
+                      meta.error || (!modifiedSinceLastSubmit && submitError)
+                    }
+                    {...input}
+                  />
+                )}
+              </Field>
+            </div>
+
+            <div
+              className={classNames(
+                "max-w-[13.75rem] w-full center",
+                theme === "large" && "mt-6",
+                theme === "small" && "mt-4"
+              )}
+            >
+              <NewButton type="submit" className="w-full" disabled={submitting}>
+                {submitting ? "Unlocking" : "Unlock"}
+              </NewButton>
+              <button
+                className={classNames(
+                  "w-full text-brand-inactivelight",
+                  theme === "large" && "text-sm mt-4",
+                  theme === "small" && "text-xs mt-3"
+                )}
+                onClick={() => {
+                  setAttention(true);
+                }}
+              >
+                <u>Forgot the password?</u>
+                <br />
+                Want to <u>sign into another profile?</u>
+              </button>
+            </div>
+            <AttentionModal
+              open={attention}
+              onOpenChange={() => setAttention(false)}
+            />
+          </form>
+        )}
+      />
     );
   }
 );

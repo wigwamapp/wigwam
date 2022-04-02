@@ -7,17 +7,19 @@ import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
 import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
-import AddSeedPhrase from "../screens/addAccountSteps/AddSeedPhrase";
 import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
 import SelectAccountDerivation from "../screens/addAccountSteps/SelectAccountDerivation";
 import AddPrivateKey from "../screens/addAccountSteps/AddPrivateKey";
 import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
 import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
 import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+import CreateSeedPhrase from "../screens/addAccountSteps/CreateSeedPhrase";
+import ImportSeedPhrase from "../screens/addAccountSteps/ImportSeedPhrase";
 
 const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
-  [AddAccountStep.AddSeedPhrase, () => <AddSeedPhrase />],
+  [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
+  [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
   [AddAccountStep.SelectDerivation, () => <SelectAccountDerivation />],
   [AddAccountStep.AddPrivateKey, () => <AddPrivateKey />],

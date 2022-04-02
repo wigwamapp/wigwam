@@ -1,6 +1,7 @@
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
+import { Field, Form } from "react-final-form";
 import { fromProtectedString } from "lib/crypto-utils";
 
 import {
@@ -11,6 +12,13 @@ import {
 } from "core/types";
 import { addSeedPhrase } from "core/client";
 
+import {
+  composeValidators,
+  differentSeedPhrase,
+  required,
+  validateSeedPhrase,
+} from "app/utils";
+import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
@@ -20,7 +28,7 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
-  const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
+  const { alert } = useDialog();
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
@@ -33,36 +41,37 @@ const VerifySeedPhrase = memo(() => {
     }
   }, [seedPhrase, reset]);
 
-  const handleContinue = useCallback(async () => {
-    try {
-      if (!seedPhrase) return;
+  const handleContinue = useCallback(
+    async (values) => {
+      try {
+        if (!seedPhrase) return;
 
-      const inputSeedPhrase = seedPhraseInputRef.current?.value;
+        const inputSeedPhrase = values.seed;
 
-      if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) {
-        throw new Error("Invalid");
+        if (inputSeedPhrase !== fromProtectedString(seedPhrase.phrase)) return;
+
+        const addAccountsParams: AddHDAccountParams[] = [
+          {
+            source: AccountSource.SeedPhrase,
+            name: "{{wallet}} 1",
+            derivationPath: ethers.utils.defaultPath,
+          },
+        ];
+
+        Object.assign(stateRef.current, { addAccountsParams });
+
+        if (initialSetup) {
+          navigateToStep(AddAccountStep.SetupPassword);
+        } else {
+          await addSeedPhrase(seedPhrase);
+          navigateToStep(AddAccountStep.VerifyToAdd);
+        }
+      } catch (err: any) {
+        alert(err?.message);
       }
-
-      const addAccountsParams: AddHDAccountParams[] = [
-        {
-          source: AccountSource.SeedPhrase,
-          name: "{{wallet}} 1",
-          derivationPath: ethers.utils.defaultPath,
-        },
-      ];
-
-      Object.assign(stateRef.current, { addAccountsParams });
-
-      if (initialSetup) {
-        navigateToStep(AddAccountStep.SetupPassword);
-      } else {
-        await addSeedPhrase(seedPhrase);
-        navigateToStep(AddAccountStep.VerifyToAdd);
-      }
-    } catch (err: any) {
-      alert(err?.message);
-    }
-  }, [seedPhrase, stateRef, initialSetup, navigateToStep]);
+    },
+    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
+  );
 
   if (!seedPhrase) {
     return null;
@@ -76,16 +85,35 @@ const VerifySeedPhrase = memo(() => {
       >
         Verify Secret Phrase
       </AddAccountHeader>
-
-      <div className="flex flex-col max-w-[27.5rem] mx-auto">
-        <SeedPhraseField
-          ref={seedPhraseInputRef}
-          placeholder="Paste there your secret phrase"
-          mode={"import"}
-        />
-      </div>
-
-      <AddAccountContinueButton onContinue={handleContinue} />
+      <Form
+        onSubmit={handleContinue}
+        render={({ form, handleSubmit, submitting }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col max-w-[27.5rem] mx-auto"
+          >
+            <Field
+              name="seed"
+              validate={composeValidators(
+                required,
+                validateSeedPhrase(stateRef.current.seedPhraseLocale),
+                differentSeedPhrase(fromProtectedString(seedPhrase.phrase))
+              )}
+            >
+              {({ input, meta }) => (
+                <SeedPhraseField
+                  placeholder="Paste there your secret phrase"
+                  setFromClipboard={(value) => form.change("seed", value)}
+                  error={meta.touched && meta.error}
+                  errorMessage={meta.error}
+                  {...input}
+                />
+              )}
+            </Field>
+            <AddAccountContinueButton loading={submitting} />
+          </form>
+        )}
+      />
     </>
   );
 });

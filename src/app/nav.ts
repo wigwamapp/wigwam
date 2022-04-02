@@ -20,7 +20,8 @@ export enum WelcomeStep {
 
 export enum AddAccountStep {
   ChooseWay = "choose-way",
-  AddSeedPhrase = "add-seed-phrase",
+  CreateSeedPhrase = "create-seed-phrase",
+  ImportSeedPhrase = "import-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
   SelectDerivation = "select-derivation",
   AddPrivateKey = "add-private-key",

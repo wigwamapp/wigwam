@@ -4,13 +4,13 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
-import { SeedPharse, WalletStatus } from "core/types";
+import { SeedPharse } from "core/types";
 import { toWordlistLang, validateSeedPhrase } from "core/common";
-import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
-import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
+import { currentLocaleAtom } from "app/atoms";
+import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import Select from "app/components/elements/Select";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
@@ -24,15 +24,12 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 
 const WORDS_COUNT = [12, 15, 18, 21, 24];
 
-const AddSeedPhrase = memo(() => {
-  const walletStatus = useAtomValue(walletStatusAtom);
+const CreateSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
+  const { alert } = useDialog();
 
   const { stateRef, navigateToStep } = useSteps();
-
-  const importExisting = stateRef.current.addSeedPhraseType === "import";
-  const initialSetup = walletStatus === WalletStatus.Welcome;
 
   const defaultLocale = useMemo(
     () =>
@@ -56,7 +53,32 @@ const AddSeedPhrase = memo(() => {
       })),
     []
   );
+
   const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
+
+  const handleContinue = useCallback(async () => {
+    try {
+      const inputSeedPhrase = seedPhraseInputRef.current?.value;
+
+      if (!inputSeedPhrase) {
+        throw new Error("Not a valid seed phrase");
+      }
+
+      const seedPhrase: SeedPharse = {
+        phrase: toProtectedString(inputSeedPhrase),
+        lang: wordlistLocale,
+      };
+
+      validateSeedPhrase(seedPhrase);
+
+      stateRef.current.seedPhrase = seedPhrase;
+      stateRef.current.seedPhraseLocale = wordlistLocale;
+
+      navigateToStep(AddAccountStep.VerifySeedPhrase);
+    } catch (err: any) {
+      alert(err?.message);
+    }
+  }, [wordlistLocale, stateRef, navigateToStep, alert]);
 
   const generateNew = useCallback(() => {
     const extraEntropy = getRandomBytes();
@@ -70,48 +92,14 @@ const AddSeedPhrase = memo(() => {
   }, [wordlistLocale]);
 
   useEffect(() => {
-    if (!importExisting) {
-      setTimeout(generateNew, 0);
-    }
-  }, [generateNew, importExisting, wordlistLocale, wordsCount]);
-
-  const handleContinue = useCallback(async () => {
-    const inputSeedPhrase = seedPhraseInputRef.current?.value;
-
-    if (!inputSeedPhrase) return;
-
-    const seedPhrase: SeedPharse = {
-      phrase: toProtectedString(inputSeedPhrase),
-      lang: wordlistLocale,
-    };
-
-    try {
-      validateSeedPhrase(seedPhrase);
-
-      if (!initialSetup && importExisting) {
-        await addSeedPhrase(seedPhrase);
-      } else {
-        stateRef.current.seedPhrase = seedPhrase;
-      }
-
-      navigateToStep(
-        importExisting
-          ? AddAccountStep.SelectAccountsToAddMethod
-          : AddAccountStep.VerifySeedPhrase
-      );
-    } catch (err: any) {
-      alert(err?.message);
-    }
-  }, [wordlistLocale, initialSetup, importExisting, stateRef, navigateToStep]);
+    setTimeout(generateNew, 0);
+  }, [generateNew, wordlistLocale, wordsCount]);
 
   return (
     <>
       <AddAccountHeader className="mb-8">
-        {importExisting
-          ? "Import existing Secret Phrase"
-          : "Create new Secret Phrase"}
+        Create new Secret Phrase
       </AddAccountHeader>
-
       <div className="flex flex-col max-w-[27.5rem] mx-auto">
         <div className="flex">
           <SelectLanguage
@@ -120,30 +108,22 @@ const AddSeedPhrase = memo(() => {
             onSelect={setLocale}
             className="mr-6"
           />
-          {!importExisting && (
-            <Select
-              items={wordsCountList}
-              currentItem={wordsCount}
-              setItem={setWordsCount}
-              label="Words"
-              showSelected
-              className="!min-w-[8.375rem]"
-              contentClassName="!min-w-[8.375rem]"
-            />
-          )}
+          <Select
+            currentItem={wordsCount}
+            setItem={setWordsCount}
+            items={wordsCountList}
+            label="Words"
+            showSelected
+            className="!min-w-[8.375rem]"
+            contentClassName="!min-w-[8.375rem]"
+          />
         </div>
 
         <SeedPhraseField
           ref={seedPhraseInputRef}
-          onRegenerate={() => generateNew()}
-          placeholder={
-            importExisting
-              ? "Paste there your secret phrase"
-              : "Type there a secret phrase or generate new"
-          }
+          onRegenerate={generateNew}
+          placeholder="Type there a secret phrase or generate new"
           className="mt-8"
-          mode={importExisting ? "import" : "create"}
-          autoFocus={importExisting}
         />
       </div>
       <AddAccountContinueButton onContinue={handleContinue} />
@@ -151,4 +131,4 @@ const AddSeedPhrase = memo(() => {
   );
 });
 
-export default AddSeedPhrase;
+export default CreateSeedPhrase;

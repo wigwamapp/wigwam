@@ -4,7 +4,7 @@ import classNames from "clsx";
 import NewButton from "app/components/elements/NewButton";
 
 type AddAccountContinueButtonProps = {
-  onContinue: () => void;
+  onContinue?: () => void;
   loading?: boolean;
 };
 
@@ -25,7 +25,11 @@ const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
       "before:bg-brand-main/[.07]"
     )}
   >
-    <NewButton className="!min-w-[14rem]" onClick={onContinue}>
+    <NewButton
+      type={onContinue ? "button" : "submit"}
+      className="!min-w-[14rem]"
+      onClick={onContinue}
+    >
       {loading ? "Loading..." : "Continue"}
     </NewButton>
   </div>

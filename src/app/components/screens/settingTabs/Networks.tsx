@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
@@ -14,6 +14,7 @@ import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg"
 
 const Networks: FC = () => {
   const allNetworks = useLazyAllNetworks();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const [tab, setTab] = useState<"new" | number | null>(null);
   const [searchValue, setSearchValue] = useState<string | null>(null);
@@ -41,6 +42,16 @@ const Networks: FC = () => {
 
   const cancelEditing = useCallback(() => setTab(null), []);
 
+  const handleScrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      scrollAreaRef.current?.scrollTo({
+        behavior: "smooth",
+        top: scrollAreaRef.current?.scrollHeight,
+        left: 0,
+      });
+    }, 300);
+  }, [scrollAreaRef]);
+
   return (
     <div className="pt-6 flex grow">
       <div
@@ -56,6 +67,7 @@ const Networks: FC = () => {
           toggleSearchValue={(value: string | null) => setSearchValue(value)}
         />
         <ScrollAreaContainer
+          ref={scrollAreaRef}
           className={classNames("pr-5 -mr-5 mt-5")}
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
@@ -84,6 +96,7 @@ const Networks: FC = () => {
           isNew={tab === "new"}
           network={selectedNetwork}
           onCancelHandler={cancelEditing}
+          onNewNetworkCreated={handleScrollToBottom}
         />
       )}
     </div>
