@@ -36,7 +36,7 @@ const AddAccountSteps = memo(() => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={rootRef} className="overflow-y-scroll h-full">
+    <div ref={rootRef} className="h-full">
       <StepsProvider
         rootRef={rootRef}
         atom={addAccountStepAtom}

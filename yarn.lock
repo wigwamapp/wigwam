@@ -7334,6 +7334,11 @@ pure-color@^1.3.0:
   resolved "https://registry.yarnpkg.com/pure-color/-/pure-color-1.3.0.tgz#1fe064fb0ac851f0de61320a8bf796836422f33e"
   integrity sha1-H+Bk+wrIUfDeYTIKi/eWg2Qi8z4=
 
+qrcode.react@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/qrcode.react/-/qrcode.react-3.0.1.tgz#0cb1d7cfdf3955737fbd3509c193985795ca0612"
+  integrity sha512-uCNm16ClMCrdM2R20c/zqmdwHcbMQf3K7ey39EiK/UgEKbqWeM0iH2QxW3iDVFzjQKFzH23ICgOyG4gNsJ0/gw==
+
 queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
