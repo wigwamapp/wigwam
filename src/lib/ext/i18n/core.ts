@@ -76,7 +76,7 @@ export function t(messageName: string, substitutions?: Substitutions) {
 }
 
 export function replaceT(str: string) {
-  return str.replace(/{{(.*?)}}/g, (substr, key) => t(key) ?? substr);
+  return str.replace(/{{(.*?)}}/g, (substr, key) => t(key) || substr);
 }
 
 export async function getLocale() {

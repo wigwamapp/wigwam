@@ -4,15 +4,16 @@ import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { AccountAsset, TokenType } from "core/types";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useAccountTokens, useToken } from "app/hooks/tokens";
+import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
 import PrettyAmount from "./PrettyAmount";
-import TokenLogo from "./TokenLogo";
+import AssetLogo from "./AssetLogo";
 
 type TokenSelectProps = {
   handleTokenChanged?: () => void;
@@ -22,7 +23,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
-  const { tokens, loadMore, hasMore } = useAccountTokens(
+  const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
     currentAccount.address,
     {
@@ -32,7 +33,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const currentToken = useToken(tokenSlug);
+  const currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
 
   const setDefaultTokenRef = useRef(!tokenSlug);
 
@@ -124,7 +125,7 @@ const Token: FC<{
   isSelected?: boolean;
   size?: "small" | "large";
 }> = ({ asset, isSelected = false, size = "small" }) => {
-  const { logoUrl, name, symbol, rawBalance, decimals, balanceUSD } = asset;
+  const { name, symbol, rawBalance, decimals, balanceUSD } = asset;
 
   return (
     <span
@@ -135,14 +136,14 @@ const Token: FC<{
         size === "small" && "items-center"
       )}
     >
-      <span className="relative mr-3">
-        <TokenLogo
-          src={logoUrl}
+      <span className="flex relative mr-3">
+        <AssetLogo
+          asset={asset}
           className={classNames(
             size === "large" && "w-10 h-10 min-w-[2.5rem]",
-            size === "small" && "w-8 h-8 min-w-[2rem]"
+            size === "small" && "w-8 h-8 min-w-[2rem]",
+            isSelected && "opacity-20"
           )}
-          imageClassName={classNames(isSelected && "opacity-20")}
         />
         {isSelected && (
           <span

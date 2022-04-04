@@ -26,7 +26,7 @@ import {
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
 import { processApprove } from "./approve";
-import { addSyncRequest } from "./sync";
+import { addFindTokenRequest, addSyncRequest } from "./sync";
 
 export function startServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -240,8 +240,15 @@ async function handleWalletRequest(
       )
       .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>
         withStatus(WalletStatus.Unlocked, () => {
-          addSyncRequest({ chainId, accountAddress });
+          addSyncRequest(chainId, accountAddress);
         })
+      )
+      .with(
+        { type: MessageType.FindToken },
+        ({ chainId, accountAddress, tokenSlug }) =>
+          withStatus(WalletStatus.Unlocked, () => {
+            addFindTokenRequest(chainId, accountAddress, tokenSlug);
+          })
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, () => {

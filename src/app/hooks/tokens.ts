@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
 import useForceUpdate from "use-force-update";
-import { KeepPrevious, useLazyAtomValue } from "lib/atom-utils";
+import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { AccountAsset, TokenType } from "core/types";
@@ -15,7 +16,6 @@ import {
 
 import { useChainId } from "./chainId";
 import { matchNativeToken } from "core/repo";
-import { loadable } from "jotai/utils";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -24,7 +24,7 @@ export type UseAccountTokensOptions = {
   onReset?: () => void;
 };
 
-export function useAccountTokens(
+export function useAllAccountTokens(
   tokenType: TokenType,
   accountAddress: string,
   { withDisabled, search, limit = 20, onReset }: UseAccountTokensOptions = {}
@@ -78,20 +78,25 @@ export function useAccountTokens(
     prevQueryParamsRef.current = queryParams;
   }, [queryParams]);
 
-  const nativeToken = useToken(NATIVE_TOKEN_SLUG);
-  const restTokens = useLazyAtomValue(accountTokensAtom);
+  const nativeToken = useToken(accountAddress);
+  const restTokens = useLazyAtomValue(accountTokensAtom, "off");
 
-  const tokens = useMemo(() => {
+  const pureTokens = useMemo(() => {
     if (nativeToken && restTokens) {
-      if (search && !matchNativeToken(nativeToken, search)) {
-        return restTokens;
-      }
-
-      return [nativeToken, ...restTokens];
+      return search && !matchNativeToken(nativeToken, search)
+        ? restTokens
+        : [nativeToken, ...restTokens];
     }
 
-    return [];
+    if (!nativeToken && restTokens?.length === 0) {
+      return [];
+    }
+
+    return undefined;
   }, [nativeToken, restTokens, search]);
+
+  const prevTokens = usePrevious(pureTokens, "when-not-undefined");
+  const tokens = pureTokens ?? prevTokens ?? [];
 
   const hasMore = offsetRef.current <= tokens.length;
 
@@ -109,33 +114,17 @@ export function useAccountTokens(
   };
 }
 
-export function useToken(tokenSlug: string | null, onReset?: () => void) {
-  const chainId = useChainId();
-  const { address: accountAddress } = useAtomValue(currentAccountAtom);
+export function useAccountToken(tokenSlug: string) {
+  const acc = useAtomValue(currentAccountAtom);
 
-  const params = useMemo(
-    () => ({ chainId, accountAddress, tokenSlug }),
-    [chainId, accountAddress, tokenSlug]
-  );
-
-  const prevTokenSlugRef = useRef<typeof tokenSlug>();
-
-  useEffect(() => {
-    if (prevTokenSlugRef.current === tokenSlug) {
-      onReset?.();
-    }
-
-    prevTokenSlugRef.current = tokenSlug;
-  }, [onReset, params, tokenSlug]);
-
-  const asset = useLazyAtomValue(getTokenAtom(params), KeepPrevious.Always);
-
-  return asset;
+  return useToken(acc.address, tokenSlug);
 }
 
-export function useAccountNativeToken(accountAddress: string) {
+export function useToken(
+  accountAddress: string,
+  tokenSlug: string = NATIVE_TOKEN_SLUG
+) {
   const chainId = useChainId();
-  const tokenSlug = NATIVE_TOKEN_SLUG;
 
   const params = useMemo(
     () => ({ chainId, accountAddress, tokenSlug }),
@@ -146,13 +135,9 @@ export function useAccountNativeToken(accountAddress: string) {
   const value = useAtomValue(atom);
 
   const data = value.state === "hasData" ? value.data : undefined;
-  const prevDataRef = useRef(data);
+  const prevData = usePrevious(data, "when-not-undefined");
 
-  useEffect(() => {
-    if (data) prevDataRef.current = data;
-  }, [data]);
-
-  const token = (value.state === "loading" ? prevDataRef.current : data) as
+  const token = (value.state === "loading" ? prevData : data) as
     | AccountAsset
     | undefined;
 

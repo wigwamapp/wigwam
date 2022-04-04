@@ -1,4 +1,4 @@
-import { FC, forwardRef, ReactNode, useCallback, useMemo } from "react";
+import { FC, forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
@@ -22,7 +22,7 @@ import {
   useNativeCurrency,
   useProvider,
 } from "app/hooks";
-import { useToken } from "app/hooks/tokens";
+import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
 import LongTextField, {
@@ -39,9 +39,8 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
-  const tokenSlug = useAtomValue(tokenSlugAtom);
-  const currentToken = useToken(tokenSlug) as AccountAsset;
-  const nativeCurrency = useNativeCurrency();
+  const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
+  const currentToken = useAccountToken(tokenSlug) as AccountAsset;
   const { alert } = useDialog();
 
   const provider = useProvider();
@@ -166,93 +165,7 @@ const Asset: FC = () => {
             )}
           </div>
           <div className="mt-6 flex items-start">
-            <Tooltip
-              content={
-                <>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                    aliquam, purus sit amet luctus venenatis, lectus magna
-                    fringilla urna, porttitor rhoncus dolor purus non enim
-                    praesent elementum facilisis leo
-                  </p>
-                  <p className="mt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                    aliquam, purus sit amet luctus venenatis, lectus magna
-                    fringilla urna, porttitor rhoncus
-                  </p>
-                </>
-              }
-              placement="left-start"
-              size="large"
-              className="mr-2"
-            >
-              <TooltipIcon />
-            </Tooltip>
-            <div className="flex flex-col">
-              <TippySingletonProvider>
-                <SummaryRow
-                  header={
-                    <>
-                      Amount:{" "}
-                      <PrettyAmount
-                        amount={values.amount ?? 0}
-                        currency={currentToken?.symbol ?? undefined}
-                        copiable
-                        className="font-bold"
-                      />
-                    </>
-                  }
-                  value={
-                    <PrettyAmount
-                      amount={
-                        values.amount && currentToken
-                          ? new BigNumber(values.amount).multipliedBy(
-                              currentToken.priceUSD ?? 0
-                            )
-                          : 0
-                      }
-                      currency="$"
-                      copiable
-                    />
-                  }
-                  className="mb-1"
-                />
-                <SummaryRow
-                  header={
-                    <>
-                      Average Fee:{" "}
-                      <PrettyAmount
-                        amount={0.13}
-                        currency={nativeCurrency?.symbol ?? undefined}
-                        copiable
-                        className="font-bold"
-                      />
-                    </>
-                  }
-                  value={<PrettyAmount amount={9.55} currency="$" copiable />}
-                  className="mb-1"
-                />
-                <SummaryRow
-                  header={
-                    <>
-                      Total:{" "}
-                      <PrettyAmount
-                        amount={
-                          values.amount && currentToken
-                            ? new BigNumber(values.amount)
-                                .multipliedBy(currentToken.priceUSD ?? 0)
-                                .plus(9.55)
-                            : 9.55
-                        }
-                        currency="$"
-                        copiable
-                        className="font-bold"
-                      />
-                    </>
-                  }
-                />
-              </TippySingletonProvider>
-            </div>
+            <TxCheck currentToken={currentToken} values={values} />
           </div>
           <NewButton
             type="submit"
@@ -269,6 +182,107 @@ const Asset: FC = () => {
 };
 
 export default Asset;
+
+type TxCheckProps = {
+  currentToken: AccountAsset;
+  values: any;
+};
+
+const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
+  const nativeCurrency = useNativeCurrency();
+
+  return (
+    <>
+      <Tooltip
+        content={
+          <>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+              aliquam, purus sit amet luctus venenatis, lectus magna fringilla
+              urna, porttitor rhoncus dolor purus non enim praesent elementum
+              facilisis leo
+            </p>
+            <p className="mt-2">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+              aliquam, purus sit amet luctus venenatis, lectus magna fringilla
+              urna, porttitor rhoncus
+            </p>
+          </>
+        }
+        placement="left-start"
+        size="large"
+        className="mr-2"
+      >
+        <TooltipIcon />
+      </Tooltip>
+      <div className="flex flex-col">
+        <TippySingletonProvider>
+          <SummaryRow
+            header={
+              <>
+                Amount:{" "}
+                <PrettyAmount
+                  amount={values.amount ?? 0}
+                  currency={currentToken?.symbol ?? undefined}
+                  copiable
+                  className="font-bold"
+                />
+              </>
+            }
+            value={
+              <PrettyAmount
+                amount={
+                  values.amount && currentToken
+                    ? new BigNumber(values.amount).multipliedBy(
+                        currentToken.priceUSD ?? 0
+                      )
+                    : 0
+                }
+                currency="$"
+                copiable
+              />
+            }
+            className="mb-1"
+          />
+          <SummaryRow
+            header={
+              <>
+                Average Fee:{" "}
+                <PrettyAmount
+                  amount={0.13}
+                  currency={nativeCurrency?.symbol ?? undefined}
+                  copiable
+                  className="font-bold"
+                />
+              </>
+            }
+            value={<PrettyAmount amount={9.55} currency="$" copiable />}
+            className="mb-1"
+          />
+          <SummaryRow
+            header={
+              <>
+                Total:{" "}
+                <PrettyAmount
+                  amount={
+                    values.amount && currentToken
+                      ? new BigNumber(values.amount)
+                          .multipliedBy(currentToken.priceUSD ?? 0)
+                          .plus(9.55)
+                      : 9.55
+                  }
+                  currency="$"
+                  copiable
+                  className="font-bold"
+                />
+              </>
+            }
+          />
+        </TippySingletonProvider>
+      </div>
+    </>
+  );
+});
 
 type AddressFieldProps = LongTextFieldProps & {
   setFromClipboard: (value: string) => void;

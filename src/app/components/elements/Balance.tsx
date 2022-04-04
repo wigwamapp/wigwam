@@ -2,7 +2,7 @@ import { FC } from "react";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
-import { useAccountNativeToken } from "app/hooks";
+import { useToken } from "app/hooks";
 import PrettyAmount from "./PrettyAmount";
 
 type BalanceProps = {
@@ -16,7 +16,7 @@ const Balance: FC<BalanceProps> = ({
   copiable = false,
   className,
 }) => {
-  const nativeToken = useAccountNativeToken(address);
+  const nativeToken = useToken(address);
 
   const protfolioBalane = nativeToken?.portfolioUSD;
 

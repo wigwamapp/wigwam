@@ -1,7 +1,7 @@
 import { FC, useMemo, useLayoutEffect } from "react";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
-import { match, when, not, __ } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { getLastAction, HistoryAction, resetPosition } from "lib/history";
 import { Redirect } from "lib/navigation";
 
@@ -54,7 +54,7 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
       .with(
         {
           page: Page.Profiles,
-          walletStatus: when((s) =>
+          walletStatus: P.when((s) =>
             [WalletStatus.Welcome, WalletStatus.Locked].includes(s)
           ),
         },
@@ -70,10 +70,10 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
         () => <Welcome />
       )
       // Only ready below
-      .with({ walletStatus: not(WalletStatus.Unlocked) }, () => (
+      .with({ walletStatus: P.not(WalletStatus.Unlocked) }, () => (
         <Redirect to={{ page: Page.Default }} />
       ))
-      .with(__, () => <Main />)
+      .with(P.any, () => <Main />)
       // Redirect to default
       .otherwise(() => <Redirect to={{ page: Page.Default }} />)
   );

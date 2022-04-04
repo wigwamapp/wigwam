@@ -10,11 +10,7 @@ import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
-import {
-  composeValidators,
-  required,
-  validateSeedPhrase as validateSeedPhraseValidator,
-} from "app/utils";
+import { composeValidators, required, validateSeedPhrase } from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
@@ -94,7 +90,7 @@ const ImportSeedPhrase = memo(() => {
                 name="seed"
                 validate={composeValidators(
                   required,
-                  validateSeedPhraseValidator(wordlistLocale)
+                  validateSeedPhrase(wordlistLocale)
                 )}
               >
                 {({ input, meta }) => (
