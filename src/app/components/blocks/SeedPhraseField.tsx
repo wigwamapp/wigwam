@@ -55,7 +55,6 @@ const CreateSeedPhraseField = forwardRef<
 
   const handleDownload = () => {
     const value = fieldRef.current?.value ?? "";
-    console.log(`input value : `, value);
     if (value) {
       confirm({
         title: "Download Secret Phrase",
