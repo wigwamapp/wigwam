@@ -3,6 +3,9 @@ import classNames from "clsx";
 import mergeRefs from "react-merge-refs";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
+import { ethers } from "ethers";
+
+import { getRandomBytes } from "lib/crypto-utils/random";
 
 import { TippySingletonProvider } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
@@ -17,6 +20,7 @@ import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { useDialog } from "app/hooks/dialog";
 
 type SeedPhraseFieldProps =
   | CreateSeedPhraseFieldProps
@@ -47,6 +51,26 @@ const CreateSeedPhraseField = forwardRef<
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const { copy, copied } = useCopyToClipboard(fieldRef);
 
+  const { confirm } = useDialog();
+
+  const handleDownload = () => {
+    const value = fieldRef.current?.value ?? "";
+    console.log(`input value : `, value);
+    if (value) {
+      confirm({
+        title: "Download Secret Phrase",
+        content: `
+        WARNING: Never disclose your Secret Recovery Phrase. Anyone with this phrase can take your Ether forever.
+        Download this Secret Recovery Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
+      }).then((answer) => {
+        if (answer) {
+          const name = ethers.utils.base58.encode(getRandomBytes(10));
+          download(name, value);
+        }
+      });
+    }
+  };
+
   return (
     <>
       <LongTextField
@@ -74,6 +98,7 @@ const CreateSeedPhraseField = forwardRef<
               )}
               <IconedButton
                 aria-label="Download secret phrase"
+                onClick={handleDownload}
                 Icon={DownloadIcon}
                 theme="secondary"
               />
@@ -164,3 +189,19 @@ const ImportSeedPhraseField = forwardRef<
     </>
   );
 });
+
+function download(filename: string, text: string) {
+  const element = document.createElement("a");
+  element.setAttribute(
+    "href",
+    "data:text/richtext," + encodeURIComponent(text)
+  );
+  element.setAttribute("download", filename);
+
+  element.style.display = "none";
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
