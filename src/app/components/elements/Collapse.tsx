@@ -34,7 +34,13 @@ const Collapse: FC<CollapseProps> = ({
         <CollapseIcon
           className={classNames("transition-transform", open && "rotate-90")}
         />
-        <span className={"text-2xl font-bold capitalize ml-3"}>{label}</span>
+        <span
+          className={
+            "text-2xl font-bold capitalize text-brand-inactivelight ml-3"
+          }
+        >
+          {label}
+        </span>
       </Collapsible.Trigger>
       <Collapsible.Content>{children}</Collapsible.Content>
     </Collapsible.Root>

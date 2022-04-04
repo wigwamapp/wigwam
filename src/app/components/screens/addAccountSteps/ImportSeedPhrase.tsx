@@ -5,7 +5,7 @@ import { toProtectedString } from "lib/crypto-utils";
 import { Field, Form } from "react-final-form";
 
 import { SeedPharse, WalletStatus } from "core/types";
-import { toWordlistLang, validateSeedPhrase } from "core/common";
+import { toWordlistLang } from "core/common";
 import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 

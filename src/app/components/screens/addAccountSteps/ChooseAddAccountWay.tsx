@@ -24,64 +24,68 @@ const ChooseAddAccountWay = memo(() => {
   );
 
   return (
-    <div className="w-full max-w-[59rem] mx-auto flex flex-wrap">
+    <>
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
 
-      <TippySingletonProvider>
-        {sections
-          .filter(({ type }) => type !== "advanced")
-          .map((section, index) => (
-            <div
-              key={section.type}
-              className={classNames(
-                "w-1/3",
-                "px-[1.75rem]",
-                index % 3 !== 2 && "border-r border-brand-light/[.03]"
-              )}
-            >
-              <div className="flex items-center mb-5">
-                <h2 className={classNames("text-2xl font-bold capitalize")}>
-                  {section.title}
-                </h2>
-                {section.tooltip && (
-                  <Tooltip
-                    content={
-                      <>
-                        {section.tooltip.content}
-                        {section.points && (
-                          <Points
-                            adoption={section.points.adoption}
-                            security={section.points.security}
-                          />
-                        )}
-                      </>
-                    }
-                    size="large"
-                    className="ml-2"
-                  >
-                    <TooltipIcon />
-                  </Tooltip>
+      <div className="flex mb-auto">
+        <TippySingletonProvider>
+          {sections
+            .filter(({ type }) => type !== "advanced")
+            .map((section, index) => (
+              <div
+                key={section.type}
+                className={classNames(
+                  "w-1/3",
+                  "px-[1.75rem]",
+                  index % 3 !== 2 && "border-r border-brand-light/[.03]"
                 )}
+              >
+                <div className="flex items-center mb-5">
+                  <h2 className={classNames("text-2xl font-bold capitalize")}>
+                    {section.title}
+                  </h2>
+                  {section.tooltip && (
+                    <Tooltip
+                      content={
+                        <>
+                          {section.tooltip.content}
+                          {section.points && (
+                            <Points
+                              adoption={section.points.adoption}
+                              security={section.points.security}
+                            />
+                          )}
+                        </>
+                      }
+                      size="large"
+                      className="ml-2"
+                    >
+                      <TooltipIcon />
+                    </Tooltip>
+                  )}
+                </div>
+                <div
+                  className={classNames("flex flex-wrap items-stretch -mb-5")}
+                >
+                  {section.tiles.map(({ title, Icon, action, soon }, i) =>
+                    action ? (
+                      <Tile
+                        key={i}
+                        title={title}
+                        Icon={Icon}
+                        action={action}
+                        soon={soon}
+                        className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                      />
+                    ) : (
+                      <WarningMessage key="warning">{title}</WarningMessage>
+                    )
+                  )}
+                </div>
               </div>
-              <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
-                {section.tiles.map(({ title, Icon, action, soon }, i) =>
-                  action ? (
-                    <Tile
-                      key={i}
-                      title={title}
-                      Icon={Icon}
-                      action={action}
-                      soon={soon}
-                      className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
-                    />
-                  ) : (
-                    <WarningMessage key="warning">{title}</WarningMessage>
-                  )
-                )}
-              </div>
-            </div>
-          ))}
-      </TippySingletonProvider>
+            ))}
+        </TippySingletonProvider>
+      </div>
 
       {sections
         .filter(({ type }) => type === "advanced")
@@ -90,9 +94,9 @@ const ChooseAddAccountWay = memo(() => {
             key={index}
             label={section.title}
             className="mt-[4.25rem] mx-[1.75rem] w-full"
-            triggerClassName="!mb-5"
+            triggerClassName="!mb-0"
           >
-            <div className={classNames("flex flex-wrap items-stretch")}>
+            <div className={classNames("flex flex-wrap items-stretch pt-5")}>
               {section.tiles.map(({ title, Icon, action, soon }, i) => (
                 <Tile
                   key={i}
@@ -106,7 +110,7 @@ const ChooseAddAccountWay = memo(() => {
             </div>
           </Collapse>
         ))}
-    </div>
+    </>
   );
 });
 
@@ -123,6 +127,7 @@ const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
       "w-full h-18 p-5 mb-[2.4375rem]",
       "flex items-center",
       "text-xs",
+      "z-[25]",
       className
     )}
   >
