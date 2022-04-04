@@ -2,7 +2,7 @@ import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { settingTabAtom } from "app/atoms";
-import { SettingTab } from "app/nav";
+import { SettingTab as SettingTabEnum } from "app/nav";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 
 import SettingsTab from "./Settings.Tab";
@@ -21,7 +21,7 @@ const Settings: FC = () => {
     <div className="flex min-h-0 grow">
       <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
 
-      {activeTabRoute !== SettingTab.Networks ? (
+      {activeTabRoute !== SettingTabEnum.Networks ? (
         <ScrollAreaContainer
           className="box-content w-full px-6"
           viewPortClassName="pb-20 pt-5"
@@ -40,37 +40,37 @@ export default Settings;
 
 const tabsContent = [
   {
-    route: { page: "settings", setting: SettingTab.General },
+    route: { page: "settings", setting: SettingTabEnum.General },
     title: "General",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: { page: "settings", setting: SettingTab.Profile },
+    route: { page: "settings", setting: SettingTabEnum.Profile },
     title: "Profile",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: { page: "settings", setting: SettingTab.Security },
+    route: { page: "settings", setting: SettingTabEnum.Security },
     title: "Security & Privacy",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: { page: "settings", setting: SettingTab.Web3 },
+    route: { page: "settings", setting: SettingTabEnum.Web3 },
     title: "Web 3",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: { page: "settings", setting: SettingTab.Networks },
+    route: { page: "settings", setting: SettingTabEnum.Networks },
     title: "Networks",
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
-    route: { page: "settings", setting: SettingTab.Advanced },
+    route: { page: "settings", setting: SettingTabEnum.Advanced },
     title: "Advanced",
     desc: "Additional features management",
   },
   {
-    route: { page: "settings", setting: SettingTab.About },
+    route: { page: "settings", setting: SettingTabEnum.About },
     title: "About",
     desc: "",
   },

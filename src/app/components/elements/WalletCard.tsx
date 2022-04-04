@@ -5,17 +5,20 @@ import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
 import AutoIcon from "app/components/elements/AutoIcon";
+import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import HashPreview from "app/components/elements/HashPreview";
 import Balance from "app/components/elements/Balance";
 
 type WalletCardProps = {
   account: Account;
+  active?: boolean;
   className?: string;
   onClick?: () => void;
 };
 
 const WalletCard: FC<WalletCardProps> = ({
   account: { name, address },
+  active,
   className,
   onClick,
 }) => {
@@ -61,6 +64,15 @@ const WalletCard: FC<WalletCardProps> = ({
           withTooltip={false}
         />
         <Balance address={address} className="mt-auto" />
+        <ChevronRightIcon
+          className={classNames(
+            "absolute right-2 top-1/2 -translate-y-1/2",
+            "transition",
+            "group-hover:translate-x-0 group-hover:opacity-100",
+            active && "translate-x-0 opacity-100",
+            !active && "-translate-x-1.5 opacity-0"
+          )}
+        />
       </span>
     </>
   );
