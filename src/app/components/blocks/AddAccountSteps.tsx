@@ -39,7 +39,7 @@ const AddAccountSteps = memo(() => {
     <div
       ref={rootRef}
       className={classNames(
-        "max-w-[59rem] mx-auto",
+        "w-[59rem] mx-auto",
         "h-full",
         "pt-24",
         "flex flex-col",

@@ -34,7 +34,8 @@ const AddAccountModal = memo(() => {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className={classNames(
             "fixed z-20",
-            "h-full max-h-[39rem] w-full max-w-6xl min-w-[40rem]",
+            "w-full max-w-6xl min-w-[40rem]",
+            "max-h-[41rem]",
             "m-auto inset-x-0 inset-y-0",
             "rounded-[2.5rem]"
           )}
