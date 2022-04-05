@@ -8,6 +8,7 @@ import { FORM_ERROR } from "final-form";
 import { replaceT } from "lib/ext/i18n";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { deleteAccounts, getSeedPhrase, updateAccountName } from "core/client";
+import { AccountSource } from "core/types";
 import { composeValidators, maxLength, minLength, required } from "app/utils";
 
 import {
@@ -83,7 +84,11 @@ const Wallets: FC = () => {
             "rounded-[.625rem]"
           )}
         />
-        {/* // TODO: Address readonly */}
+        {/* <AddressField
+          defaultValue={currentAccount.address}
+          className="mt-5"
+          readOnly
+        /> */}
         <Form
           onSubmit={onNameUpdate}
           initialValues={{ name: replaceT(currentAccount.name) }}
@@ -120,21 +125,30 @@ const Wallets: FC = () => {
             </form>
           )}
         />
-        <div className="mt-12">
-          <SettingsHeader>Reveal Seed Phrase</SettingsHeader>
-          <NewButton
-            theme="secondary"
-            className={classNames(
-              "flex !justify-start items-center",
-              "text-left",
-              "!px-3 mr-auto"
-            )}
-            onClick={() => setRevealModalOpened(true)}
-          >
-            <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-            Reveal
-          </NewButton>
-        </div>
+        {currentAccount.source === AccountSource.SeedPhrase && (
+          <div className="mt-6">
+            <Input
+              defaultValue={currentAccount.derivationPath}
+              label="Derivation path"
+              inputClassName="h-11"
+              className="max-w-sm mt-4"
+              readOnly
+            />
+            <SettingsHeader className="mt-8">Reveal Seed Phrase</SettingsHeader>
+            <NewButton
+              theme="secondary"
+              className={classNames(
+                "flex !justify-start items-center",
+                "text-left",
+                "!px-3 mr-auto"
+              )}
+              onClick={() => setRevealModalOpened(true)}
+            >
+              <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+              Reveal
+            </NewButton>
+          </div>
+        )}
         <NewButton
           type="button"
           onClick={() => setDeleteModalOpened(true)}
