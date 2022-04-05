@@ -1,9 +1,12 @@
 import browser from "webextension-polyfill";
 import { nanoid } from "nanoid";
+import { assert } from "superstruct";
 import { getPublicURL } from "lib/ext/utils";
 
 import { $approvals, approvalAdded } from "core/back/state";
 import { ActivityType, RpcReply } from "core/types";
+
+import { TxParamsSchema } from "./validation";
 
 export async function sendTransaction(
   chainId: number,
@@ -11,6 +14,8 @@ export async function sendTransaction(
   rpcReply: RpcReply
 ) {
   const txParams = params[0];
+  assert(txParams, TxParamsSchema);
+
   const accountAddress = txParams.from as string;
 
   approvalAdded({
