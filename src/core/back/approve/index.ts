@@ -46,7 +46,7 @@ export async function processApprove(
           }
 
           const rawTx = serializeTransaction(tx);
-          const signature = vault.sign(account.uuid, keccak256(rawTx));
+          const signature = await vault.sign(account.uuid, keccak256(rawTx));
 
           const signedRawTx = serializeTransaction(tx, signature);
 

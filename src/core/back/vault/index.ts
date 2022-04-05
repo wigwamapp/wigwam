@@ -7,7 +7,9 @@ import {
   KdbxEntry,
   KdbxGroup,
 } from "kdbxweb";
-import { ethers } from "ethers";
+import { BytesLike, ethers, Signature } from "ethers";
+import { hexZeroPad, splitSignature, stripZeros } from "@ethersproject/bytes";
+import * as secp256k1 from "@noble/secp256k1";
 import memoizeOne from "memoize-one";
 import {
   createKdbx,
@@ -323,9 +325,8 @@ export class Vault {
   sign(accUuid: string, digest: string) {
     return withError(t("failedToSign"), () => {
       const privKey = this.getKeyForce(accUuid, "privateKey");
-      const signingKey = new ethers.utils.SigningKey(privKey.getText());
 
-      return signingKey.signDigest(digest);
+      return signDigest(digest, privKey);
     });
   }
 
@@ -601,4 +602,24 @@ export class Vault {
 
     throw new Error("Group not found");
   }
+}
+
+async function signDigest(
+  digest: BytesLike,
+  privateKey: ProtectedValue
+): Promise<Signature> {
+  const privKey = stripZeros(privateKey.getText());
+  zeroBuffer(privateKey.value);
+
+  const [sigHex, recoveryParam] = await secp256k1
+    .sign(ethers.utils.arrayify(digest), privKey, { recovered: true })
+    .finally(() => zeroBuffer(privKey));
+
+  const signature = secp256k1.Signature.fromHex(sigHex);
+
+  return splitSignature({
+    recoveryParam,
+    r: hexZeroPad("0x" + signature.r.toString(16), 32),
+    s: hexZeroPad("0x" + signature.s.toString(16), 32),
+  });
 }
