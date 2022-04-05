@@ -498,6 +498,10 @@ const getDebankChainList = mem(
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {
+  if (process.env.VIGVAM_DEV_RANDOM_ADDRESSES === "false") {
+    return accountAddress;
+  }
+
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
 
