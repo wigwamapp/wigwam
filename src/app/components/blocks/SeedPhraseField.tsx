@@ -6,6 +6,7 @@ import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { ethers } from "ethers";
 
 import { getRandomBytes } from "lib/crypto-utils/random";
+import { downloadFile } from "lib/download";
 
 import { TippySingletonProvider } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
@@ -64,7 +65,7 @@ const CreateSeedPhraseField = forwardRef<
       }).then((answer) => {
         if (answer) {
           const name = ethers.utils.base58.encode(getRandomBytes(10));
-          download(name, value);
+          downloadFile(value, name, "text/richtext");
         }
       });
     }
@@ -188,19 +189,3 @@ const ImportSeedPhraseField = forwardRef<
     </>
   );
 });
-
-function download(filename: string, text: string) {
-  const element = document.createElement("a");
-  element.setAttribute(
-    "href",
-    "data:text/richtext," + encodeURIComponent(text)
-  );
-  element.setAttribute("download", filename);
-
-  element.style.display = "none";
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
-}
