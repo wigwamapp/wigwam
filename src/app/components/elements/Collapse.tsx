@@ -50,11 +50,14 @@ const Collapse: FC<CollapseProps> = ({
         )}
       >
         <CollapseIcon
-          className={classNames("transition-transform", open && "rotate-90")}
+          className={classNames(
+            "w-[1.25rem] h-auto transition-transform",
+            open && "rotate-90"
+          )}
         />
         <span
           className={
-            "text-2xl font-bold capitalize text-brand-inactivelight ml-3"
+            "text-xl font-bold capitalize text-brand-inactivelight ml-1.5"
           }
         >
           {label}
