@@ -50,11 +50,12 @@ const SelectAccountsToAddMethod: FC = () => {
   );
 
   const handleContinue = useCallback(
-    (method: string) => {
+    (method: string, derivationPath: string) => {
       if (!isInitial) {
         stateRef.current.addAccounts = `existing-${method}`;
       }
       navigateToStep(AddAccountStep.VerifyToAdd);
+      stateRef.current.derivationPath = derivationPath;
     },
     [isInitial, navigateToStep, stateRef]
   );

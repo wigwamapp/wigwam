@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
 import BigNumber from "bignumber.js";
 
+import { derivationPathRegex } from "core/common";
+
 type ValidationType = (value: string) => string | undefined;
 
 export const required = (value: string) =>
@@ -67,3 +69,6 @@ export const validateAddress = (value: string) =>
   ethers.utils.isAddress(value)
     ? undefined
     : "Please insert a valid recipient address";
+
+export const validateDerivationPath = (value: string) =>
+  value?.match(derivationPathRegex) ? undefined : "Derivation path is invalid";
