@@ -79,7 +79,6 @@ const AddAccountModal = memo(() => {
                     ? "pb-[3.25rem]"
                     : "pb-28"
                 )}
-                viewPortClassName="viewportHeightFull"
                 type="scroll"
               >
                 {accountStep !== AddAccountStep.ChooseWay && (

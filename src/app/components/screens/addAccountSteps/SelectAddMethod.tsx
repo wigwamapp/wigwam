@@ -29,7 +29,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
       <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
       <div className="flex flex-col max-w-[55rem] mx-auto grow">
         <RadioGroupPrimitive.Root
-          className="grid grid-cols-2 gap-6 mb-auto"
+          className="grid grid-cols-2 gap-6"
           value={activeMethod}
           onValueChange={(value) => setActiveMethod(value)}
         >
@@ -43,7 +43,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
             />
           ))}
         </RadioGroupPrimitive.Root>
-        <Collapse label="Customize Derivation path" className="mt-12 mb-8">
+        <Collapse label="Customize Derivation path" className="mt-16 mb-8">
           <div className="max-w-[17.5rem]">
             <p className="mb-3 text-sm">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam

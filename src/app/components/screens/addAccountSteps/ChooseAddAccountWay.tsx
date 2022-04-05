@@ -27,7 +27,7 @@ const ChooseAddAccountWay = memo(() => {
     <>
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
 
-      <div className="flex mb-auto">
+      <div className="flex">
         <TippySingletonProvider>
           {sections
             .filter(({ type }) => type !== "advanced")
@@ -93,7 +93,7 @@ const ChooseAddAccountWay = memo(() => {
           <Collapse
             key={index}
             label={section.title}
-            className="mt-[4.25rem] mx-[1.75rem] w-full"
+            className="mt-20 mx-[1.75rem] w-full"
             triggerClassName="!mb-0"
           >
             <div className={classNames("flex flex-wrap items-stretch pt-5")}>

@@ -100,10 +100,6 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
   display: block !important;
 }
 
-div[data-radix-scroll-area-viewport].viewportHeightFull > div {
-  height: 100%;
-}
-
 /**
  * Selected wallet card flip animation
  */

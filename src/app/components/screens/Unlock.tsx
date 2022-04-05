@@ -40,25 +40,29 @@ const Unlock: FC = () => {
       </div>
       <PasswordForm
         theme={isPopup ? "small" : "large"}
-        className={isPopup ? "mt-11" : "mt-12"}
+        className={isPopup ? "mt-11" : "mt-12 mb-20"}
       />
+      <div
+        className={classNames(
+          "fixed bottom-6 left-1/2 -translate-x-1/2",
+          isPopup ? "text-xl" : "text-2xl",
+          "font-black",
+          "flex items-center"
+        )}
+      >
+        <VigvamIcon
+          className={classNames(
+            isPopup ? "h-[1.375rem]" : "h-[2rem]",
+            "w-auto mr-3"
+          )}
+        />
+        Vigvam
+      </div>
     </>
   );
 
   return isPopup ? (
-    <PopupLayout>
-      {content}
-      <div
-        className={classNames(
-          "absolute bottom-6 left-1/2 -translate-x-1/2",
-          "text-xl font-black",
-          "flex items-center"
-        )}
-      >
-        <VigvamIcon className="h-[1.375rem] w-auto mr-3" />
-        Vigvam
-      </div>
-    </PopupLayout>
+    <PopupLayout>{content}</PopupLayout>
   ) : (
     <BoardingPageLayout profileNav={false}>{content}</BoardingPageLayout>
   );
