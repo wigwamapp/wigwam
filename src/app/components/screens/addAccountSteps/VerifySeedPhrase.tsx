@@ -90,7 +90,7 @@ const VerifySeedPhrase = memo(() => {
         render={({ form, handleSubmit, submitting }) => (
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col max-w-[27.5rem] mx-auto"
+            className="flex flex-col w-full max-w-[27.5rem] mx-auto"
           >
             <Field
               name="seed"
