@@ -126,7 +126,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       className={classNames(
         "relative group",
         "inline-flex justify-start items-center",
-        "w-full py-2 px-3 min-h-[2.75rem]",
+        "w-full py-2 pl-3 pr-9 min-h-[2.75rem]",
         "text-base font-bold whitespace-nowrap",
         "rounded-[.625rem]",
         "transition-colors",
@@ -141,7 +141,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       ) : (
         <PlusCircleIcon className="mr-3" />
       )}
-      {name}
+      <span className="min-w-0 truncate">{name}</span>
       <ChevronRightIcon
         className={classNames(
           "absolute right-2 top-1/2 -translate-y-1/2",
