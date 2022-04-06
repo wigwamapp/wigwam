@@ -97,7 +97,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SeedPhraseField value={fromProtectedString(seedPhrase)} />
+        <SeedPhraseField defaultValue={fromProtectedString(seedPhrase)} />
       ) : (
         <Form
           initialValues={{ terms: "false" }}

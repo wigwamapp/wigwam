@@ -3,6 +3,9 @@ import { useAtomValue } from "jotai";
 
 import { transferTabAtom } from "app/atoms";
 import { TransferTab as TransferTabEnum } from "app/nav";
+import { ReactComponent as AssetIcon } from "app/icons/Asset.svg";
+import { ReactComponent as NFTIcon } from "app/icons/NFT.svg";
+import { ReactComponent as BridgeIcon } from "app/icons/Bridge.svg";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
@@ -43,16 +46,19 @@ const tabsContent = [
   {
     route: { page: "transfer", transfer: TransferTabEnum.Asset },
     title: "Asset",
+    Icon: AssetIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Nft },
     title: "NFT",
+    Icon: NFTIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Bridge },
     title: "Bridge",
+    Icon: BridgeIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
 ];

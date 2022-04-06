@@ -36,23 +36,22 @@ const AddAccountSteps = memo(() => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={rootRef} className="h-full">
+    <div
+      ref={rootRef}
+      className={classNames(
+        "w-[59rem] mx-auto",
+        "h-full",
+        "pt-24",
+        "flex flex-col",
+        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24"
+      )}
+    >
       <StepsProvider
         rootRef={rootRef}
         atom={addAccountStepAtom}
         steps={ADD_ACCOUNT_STEPS}
       >
-        {({ children }) => (
-          <div
-            className={classNames(
-              accountStep === AddAccountStep.ChooseWay ? "mb-16" : "mb-24"
-            )}
-          >
-            <Suspense fallback={null}>
-              <div className="mt-24">{children}</div>
-            </Suspense>
-          </div>
-        )}
+        {({ children }) => <Suspense fallback={null}>{children}</Suspense>}
       </StepsProvider>
     </div>
   );

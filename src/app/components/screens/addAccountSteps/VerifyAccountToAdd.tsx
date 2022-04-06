@@ -24,8 +24,6 @@ import { useDialog } from "app/hooks/dialog";
 
 import AccountsToAdd from "./AccountToAdd";
 
-const rootDerivationPath = "m/44'/60'/0'/0";
-
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const initialSetup = walletStatus === WalletStatus.Welcome;
@@ -44,12 +42,13 @@ const VerifyAccountToAddInitial: FC = () => {
   const { alert } = useDialog();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
+  const derivationPath = stateRef.current.derivationPath;
 
   const neuterExtendedKey = useMemo(() => {
-    return seedPhrase
-      ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), rootDerivationPath)
+    return seedPhrase && derivationPath
+      ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), derivationPath)
       : null;
-  }, [seedPhrase]);
+  }, [derivationPath, seedPhrase]);
 
   useEffect(() => {
     if (!neuterExtendedKey) {
@@ -91,14 +90,18 @@ const VerifyAccountToAddInitial: FC = () => {
 
 const VerifyAccountToAddExisting: FC = () => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
+  const { reset, stateRef } = useSteps();
+
+  const derivationPath = stateRef.current.derivationPath;
+
   const rootNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && getNeuterExtendedKeyAtom(rootDerivationPath)
+    hasSeedPhrase && derivationPath
+      ? getNeuterExtendedKeyAtom(derivationPath)
+      : null
   );
   const importedAccounts = useMaybeAtomValue(hasSeedPhrase && allAccountsAtom);
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
   const { alert } = useDialog();
-
-  const { reset, stateRef } = useSteps();
 
   const isCreatingNew = stateRef.current.addAccounts === "existing-create";
 
