@@ -24,8 +24,8 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
       "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
       className
     )}
-    viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
-    scrollBarClassName="py-0 pt-5 pb-20 !right-1"
+    viewPortClassName="pb-5 rounded-t-[.625rem] pt-5"
+    scrollBarClassName="py-0 pt-5 pb-5 !right-1"
   >
     {tabs.map(({ title, Icon, route, desc }, i) => (
       <SecondaryItem
@@ -54,6 +54,8 @@ type SecondaryItemProps = {
 const SecondaryItem: FC<
   SecondaryItemProps & { isActive?: boolean; className?: string }
 > = ({ title, route, Icon, desc, isActive = false, className }) => {
+  const isSkeleton = title !== "Networks";
+
   return (
     <Link
       key={title}
@@ -65,22 +67,37 @@ const SecondaryItem: FC<
         "rounded-[.625rem]",
         "cursor-pointer",
         isActive && "bg-brand-main/10",
-        !isActive && "hover:bg-brand-main/5",
+        !isActive && !isSkeleton && "hover:bg-brand-main/5",
         className
       )}
     >
       <div className="flex items-center">
-        {Icon && <Icon className="w-4.5 h-4.5 mr-2" />}
-        <h3 className={"text-base font-bold"}>{title}</h3>
+        {!isSkeleton ? (
+          Icon && <Icon className="w-4.5 h-4.5 mr-2" />
+        ) : (
+          <div className="w-[1.125rem] h-[1.125rem] bg-[#303449] rounded-md mr-2" />
+        )}
+        {isSkeleton ? (
+          <div className="h-[1.125rem] w-1/2 bg-[#303449] rounded-md" />
+        ) : (
+          <h3 className={"text-base font-bold"}>{title}</h3>
+        )}
       </div>
-      {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
+      {isSkeleton ? (
+        <div className="flex flex-col mt-3.5">
+          <div className="w-full h-3 bg-brand-darklight rounded-sm" />
+          <div className="w-3/4 h-3 mt-1 bg-brand-darklight rounded-sm" />
+        </div>
+      ) : (
+        desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>
+      )}
       <ChevronRightIcon
         className={classNames(
           "absolute right-2.5 top-1/2 -translate-y-1/2",
           "transition",
-          "group-hover:translate-x-0 group-hover:opacity-100",
+          !isSkeleton && "group-hover:translate-x-0 group-hover:opacity-100",
           !isActive && "-translate-x-1.5 opacity-0",
-          isActive && "translate-x-0 opacity-100"
+          isActive && !isSkeleton && "translate-x-0 opacity-100"
         )}
       />
     </Link>

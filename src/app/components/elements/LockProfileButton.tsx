@@ -63,7 +63,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
       theme="secondary"
       onClick={handleLock}
       className={classNames(
-        "h-full !py-2 !px-4 !min-w-0 w-[8.5rem]",
+        "h-full !py-2 !px-4 !min-w-0 w-[8.5rem] invisible",
         "!rounded-[.625rem]",
         "!justify-start items-center",
         className

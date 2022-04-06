@@ -14,17 +14,17 @@ const Menu: FC = () => {
       <NetworkSelect />
 
       {isSyncing && (
-        <span className="px-4 text-sm text-white font-semibold">
+        <span className="px-4 text-sm text-white font-semibold invisible">
           Syncing...
         </span>
       )}
 
       <div className="ml-auto flex items-center">
-        <NewButton theme="tertiary" className="!min-w-0 w-[8.5rem]">
+        <NewButton theme="tertiary" className="!min-w-0 w-[8.5rem] invisible">
           <ControlIcon className="-ml-0.5 mr-2" />
           Control
         </NewButton>
-        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
+        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05] invisible" />
         <LockProfileButton />
       </div>
     </div>

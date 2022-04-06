@@ -29,7 +29,7 @@ const Sidebar: FC = () => (
       <VigvamIcon className={classNames("h-10 w-auto", "mr-5")} />
       Vigvam
     </Link>
-    <SidebarBlock links={NavLinksPrimary} />
+    <SidebarBlock links={NavLinksPrimary} isPrimary />
     <SidebarBlock
       links={NavLinksSecondary}
       className={classNames(
@@ -49,15 +49,20 @@ type SidebarBlockProps = {
     Icon: FC<{ className?: string }>;
   }[];
   className?: string;
+  isPrimary?: boolean;
 };
 
-const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
+const SidebarBlock: FC<SidebarBlockProps> = ({
+  links,
+  className,
+  isPrimary,
+}) => {
   const page = useAtomValue(pageAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
 
   return (
     <div className={classNames("flex flex-col", className)}>
-      {links.map(({ route, label, Icon }) => {
+      {links.map(({ route, label, Icon }, i) => {
         const isPageActive = route === page;
 
         return (
@@ -78,7 +83,8 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               "hover:text-brand-light",
               "focus:text-brand-light",
               isPageActive && "bg-brand-main/5 !text-brand-light",
-              "last:mb-0"
+              "last:mb-0",
+              isPrimary && i !== 0 && "invisible"
             )}
           >
             <Icon

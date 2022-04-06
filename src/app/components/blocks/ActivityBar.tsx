@@ -23,7 +23,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   return (
     <div
       className={classNames(
-        "fixed bottom-3 left-1/2 -translate-x-1/2",
+        "fixed bottom-3 left-1/2 -translate-x-1/2 invisible",
         "w-[calc(100%-1.5rem)] max-w-[75rem]",
         "bg-brand-darkblue/20",
         "backdrop-blur-[10px]",
