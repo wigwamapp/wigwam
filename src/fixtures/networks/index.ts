@@ -47,7 +47,7 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   DEFAULT_NETWORKS.map((n) => [
     n.chainId,
     getPublicURL(
-      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-test"}.svg`
+      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-testnet"}.png`
     ),
   ])
 );
