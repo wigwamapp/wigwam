@@ -34,6 +34,7 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
     rpcUrls,
     faucetUrls,
     explorerUrls,
+    position,
   } = toMerge;
 
   return {
@@ -46,6 +47,7 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
       ...saved.nativeCurrency,
       name: nativeCurrency.name,
     },
+    position,
     // Merge
     rpcUrls: mergeUrls(saved.rpcUrls, rpcUrls)!,
     faucetUrls: mergeUrls(saved.faucetUrls, faucetUrls),

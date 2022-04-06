@@ -56,6 +56,7 @@ const EditNetwork = memo<EditNetworkProps>(
               decimals: 18,
             },
             explorerUrls: [blockExplorer],
+            position: 0,
           });
 
           if (isNew && onNewNetworkCreated) {
