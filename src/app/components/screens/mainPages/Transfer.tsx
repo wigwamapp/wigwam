@@ -3,12 +3,12 @@ import { useAtomValue } from "jotai";
 
 import { transferTabAtom } from "app/atoms";
 import { TransferTab as TransferTabEnum } from "app/nav";
-import { ReactComponent as AssetIcon } from "app/icons/Asset.svg";
-import { ReactComponent as NFTIcon } from "app/icons/NFT.svg";
-import { ReactComponent as BridgeIcon } from "app/icons/Bridge.svg";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
+import { ReactComponent as AssetIcon } from "app/icons/transfer-asset.svg";
+import { ReactComponent as NFTIcon } from "app/icons/transfer-nft.svg";
+import { ReactComponent as BridgeIcon } from "app/icons/transfer-bridge.svg";
 
 import TransferTab from "./Transfer.Tab";
 
