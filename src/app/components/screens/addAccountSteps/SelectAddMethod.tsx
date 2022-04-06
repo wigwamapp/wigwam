@@ -28,14 +28,14 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
 
   const handleContinue = useCallback(
     ({ derivationPath }) => {
-      onContinue(activeMethod, derivationPath);
+      onContinue(activeMethod, derivationPath.replace("/{index}", ""));
     },
     [activeMethod, onContinue]
   );
 
   return (
     <Form
-      initialValues={{ derivationPath: "m/44'/60'/0'/0" }}
+      initialValues={{ derivationPath: "m/44'/60'/0'/0/{index}" }}
       onSubmit={handleContinue}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
