@@ -2,12 +2,16 @@ import { createQueue } from "lib/system/queue";
 
 const enqueue = createQueue();
 
-export function downloadFile(data: Blob | string, name: string) {
+export function downloadFile(
+  data: Blob | string,
+  name: string,
+  type = "text/plain"
+) {
   return enqueue(
     () =>
       new Promise<void>((res) => {
         if (typeof data === "string") {
-          data = new Blob([data], { type: "text/plain" });
+          data = new Blob([data], { type });
         }
 
         const fileURL = URL.createObjectURL(data);
