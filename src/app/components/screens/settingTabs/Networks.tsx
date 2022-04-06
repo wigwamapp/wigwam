@@ -53,7 +53,7 @@ const Networks: FC = () => {
   }, [scrollAreaRef]);
 
   return (
-    <div className="pt-6 flex grow">
+    <div className="pt-5 flex grow">
       <div
         className={classNames(
           "flex flex-col",
