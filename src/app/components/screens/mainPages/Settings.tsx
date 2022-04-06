@@ -62,12 +62,12 @@ const tabsContent = [
   {
     route: { page: "settings", setting: SettingTab.Networks },
     title: "Networks",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Add a new network or configure the settings of an existing one.",
   },
   {
     route: { page: "settings", setting: SettingTab.Advanced },
     title: "Advanced",
-    desc: "Additional features management",
+    desc: "Enable test networks and other additional features.",
   },
   {
     route: { page: "settings", setting: SettingTab.About },
