@@ -27,6 +27,7 @@ export async function setupFixtures() {
 
 function mergeNetwork(saved: Network, toMerge: Network): Network {
   const {
+    name,
     chainTag,
     infoUrl,
     nativeCurrency,
@@ -38,6 +39,7 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
   return {
     ...saved,
     // Override
+    name,
     chainTag,
     infoUrl,
     nativeCurrency: {
