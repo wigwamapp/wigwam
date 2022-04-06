@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { assert } from "lib/system/assert";
 
-import { ActivityType } from "core/types";
+import { ActivityType, ApprovalResult } from "core/types";
 
 import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
@@ -12,13 +12,13 @@ const { serializeTransaction, keccak256 } = ethers.utils;
 
 export async function processApprove(
   approvalId: string,
-  approve: boolean,
+  { approved }: ApprovalResult,
   vault: Vault
 ) {
   const approval = $approvals.getState().find((a) => a.id === approvalId);
   assert(approval, "Not Found");
 
-  if (approve) {
+  if (approved) {
     await match(approval)
       .with(
         { type: ActivityType.Transaction },

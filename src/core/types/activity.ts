@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { RpcReply } from "./rpc";
 
 export enum ActivityType {
-  AppConnection = "APP_CONNECTION",
+  Connection = "CONNECTION",
   Transaction = "TRANSACTION",
   Signing = "SIGNING",
 }
@@ -17,7 +17,18 @@ export type ActivitySource =
       origin: string;
     };
 
-export type Approval = TransactionApproval;
+export interface ApprovalResult {
+  approved: boolean;
+  rawTx?: string;
+  signedRawTx?: string;
+  signedMessage?: string;
+  accountAddresses?: string[];
+}
+
+export type Approval =
+  | TransactionApproval
+  | SigningApproval
+  | ConnectionApproval;
 
 export interface ApprovalBase {
   id: string;
@@ -31,6 +42,17 @@ export interface TransactionApproval extends ApprovalBase {
   chainId: number;
   accountAddress: string;
   txParams: TxParams;
+}
+
+export interface SigningApproval extends ApprovalBase {
+  type: ActivityType.Signing;
+  message: string;
+}
+
+export interface ConnectionApproval extends ApprovalBase {
+  type: ActivityType.Connection;
+  origin: string;
+  favIconUrl: string;
 }
 
 export type TxParams = {

@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { ethers } from "ethers";
 import { nanoid } from "nanoid";
 import { assert } from "superstruct";
 import { getPublicURL } from "lib/ext/utils";
@@ -16,7 +17,7 @@ export async function sendTransaction(
   const txParams = params[0];
   assert(txParams, TxParamsSchema);
 
-  const accountAddress = txParams.from as string;
+  const accountAddress = ethers.utils.getAddress(txParams.from);
 
   approvalAdded({
     id: nanoid(),

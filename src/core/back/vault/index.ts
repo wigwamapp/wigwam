@@ -609,7 +609,6 @@ async function signDigest(
   privateKey: ProtectedValue
 ): Promise<Signature> {
   const privKey = stripZeros(privateKey.getText());
-  zeroBuffer(privateKey.value);
 
   const [sigHex, recoveryParam] = await secp256k1
     .sign(ethers.utils.arrayify(digest), privKey, { recovered: true })

@@ -231,9 +231,9 @@ async function handleWalletRequest(
           ctx.reply({ type, approvals });
         })
       )
-      .with({ type: MessageType.Approve }, ({ type, approve, approvalId }) =>
+      .with({ type: MessageType.Approve }, ({ type, approvalId, result }) =>
         withVault(async (vault) => {
-          await processApprove(approvalId, approve, vault);
+          await processApprove(approvalId, result, vault);
 
           ctx.reply({ type });
         })
