@@ -4,8 +4,7 @@ import BigNumber from "bignumber.js";
 
 type ValidationType = (value: string) => string | undefined;
 
-export const required = (value: string) =>
-  value ? undefined : "Required field";
+export const required = (value: string) => (value ? undefined : "Required");
 
 export const minLength = (min: number) => (value: string | number) =>
   value && value.toString().length >= min
@@ -28,7 +27,7 @@ export const composeValidators =
 
 export const differentPasswords = (password1: string) => (password2: string) =>
   password2 && password1 && password2 !== password1
-    ? "Provided password doesn't match"
+    ? "Provided passwords don't match"
     : undefined;
 
 export const maxValue =
@@ -48,7 +47,7 @@ export const validateSeedPhrase = (lang: string) => (phrase: string) => {
 
   return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
     ? undefined
-    : "Seed phrase in not valid";
+    : "Seed phrase in invalid";
 };
 
 export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
@@ -61,9 +60,14 @@ const linkRegexExpression =
 const linkRegex = new RegExp(linkRegexExpression);
 
 export const isLink = (value: string) =>
-  value?.match(linkRegex) ? undefined : "Please insert a valid link";
+  !value || value.match(linkRegex) ? undefined : "Link is invalid";
 
 export const validateAddress = (value: string) =>
-  ethers.utils.isAddress(value)
+  ethers.utils.isAddress(value) ? undefined : "Recipient address is invalid";
+
+export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+\\/{index}$");
+
+export const validateDerivationPath = (value: string) =>
+  !value || value.match(derivationPathRegex)
     ? undefined
-    : "Please insert a valid recipient address";
+    : "Derivation path is invalid";

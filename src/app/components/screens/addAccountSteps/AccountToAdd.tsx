@@ -23,6 +23,7 @@ import { ClientProvider } from "core/client";
 import { allNetworksAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
+import { useSteps } from "app/hooks/steps";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
@@ -50,7 +51,11 @@ type AccountsToAddProps = {
 const rootDerivationPath = "m/44'/60'/0'/0";
 
 const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
+  const { stateRef } = useSteps();
   const networks = useAtomValue(allNetworksAtom);
+
+  const derivationPath = stateRef.current.derivationPath;
+
   const preparedNetworks = useMemo(
     () => networks.filter(({ type }) => type === "mainnet"),
     [networks]
@@ -173,7 +178,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
           return {
             source: AccountSource.SeedPhrase,
             name: addressName ?? `Wallet ${hdIndex + 1}`,
-            derivationPath: `${rootDerivationPath}/${hdIndex}`,
+            derivationPath: `${
+              derivationPath ?? rootDerivationPath
+            }/${hdIndex}`,
           };
         }
       );
@@ -182,7 +189,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
     } catch (err: any) {
       alert({ title: "Error!", content: err.message });
     }
-  }, [onContinue, addresses, alert]);
+  }, [onContinue, addresses, derivationPath, alert]);
 
   if (!addresses) {
     return null;
