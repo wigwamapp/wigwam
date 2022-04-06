@@ -1,7 +1,8 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useCallback, useState } from "react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import classNames from "clsx";
 
+import { useOverflowRef } from "app/hooks";
 import { ReactComponent as CollapseIcon } from "app/icons/collapse.svg";
 
 type CollapseProps = Collapsible.CollapsibleProps & {
@@ -16,12 +17,29 @@ const Collapse: FC<CollapseProps> = ({
   triggerClassName,
   ...rest
 }) => {
+  const scrollAreaRef = useOverflowRef();
   const [open, setOpen] = useState(false);
+
+  const handleTriggerClick = useCallback(
+    (state) => {
+      if (state && scrollAreaRef?.current) {
+        setTimeout(() => {
+          scrollAreaRef.current?.scrollTo({
+            behavior: "smooth",
+            top: scrollAreaRef.current?.scrollHeight,
+            left: 0,
+          });
+        }, 100);
+      }
+      setOpen(state);
+    },
+    [scrollAreaRef]
+  );
 
   return (
     <Collapsible.Root
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={handleTriggerClick}
       className={className}
       {...rest}
     >
@@ -32,9 +50,18 @@ const Collapse: FC<CollapseProps> = ({
         )}
       >
         <CollapseIcon
-          className={classNames("transition-transform", open && "rotate-90")}
+          className={classNames(
+            "w-[1.25rem] h-auto transition-transform",
+            open && "rotate-90"
+          )}
         />
-        <span className={"text-2xl font-bold capitalize ml-3"}>{label}</span>
+        <span
+          className={
+            "text-xl font-bold capitalize text-brand-inactivelight ml-1.5"
+          }
+        >
+          {label}
+        </span>
       </Collapsible.Trigger>
       <Collapsible.Content>{children}</Collapsible.Content>
     </Collapsible.Root>
