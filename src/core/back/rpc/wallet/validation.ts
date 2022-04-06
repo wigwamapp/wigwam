@@ -1,4 +1,4 @@
-import { Describe, define, object, optional } from "superstruct";
+import { Describe, define, object, optional, array } from "superstruct";
 import { ethers } from "ethers";
 
 import { TxParams } from "core/types";
@@ -21,4 +21,17 @@ export const TxParamsSchema: Describe<TxParams> = object({
   value: optional(stringHex()),
   data: optional(stringHex()),
   chainId: optional(stringHex()),
+
+  type: optional(stringHex()),
+  accessList: optional(
+    array(
+      object({
+        address: address(),
+        storageKeys: array(stringHex()),
+      })
+    )
+  ),
+
+  maxPriorityFeePerGas: optional(stringHex()),
+  maxFeePerGas: optional(stringHex()),
 });

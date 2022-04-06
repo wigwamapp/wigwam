@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { RpcReply } from "./rpc";
 
 export enum ActivityType {
@@ -42,4 +43,11 @@ export type TxParams = {
   data?: string; // '0x00' - Optional, but used for defining smart contract creation and interaction.
   gas?: string; // '0x2710' - customizable by user during confirmation.
   gasLimit?: string; // '0x2710' - gas alias
+  chainId?: string;
+  // eip2930
+  type?: string;
+  accessList?: ethers.utils.AccessList;
+  // eip1559
+  maxPriorityFeePerGas?: string;
+  maxFeePerGas?: string;
 };

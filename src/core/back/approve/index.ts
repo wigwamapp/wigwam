@@ -39,16 +39,22 @@ export async function processApprove(
 
           const provider = getRpcProvider(chainId).getSigner(account.address);
 
-          const tx: any = await provider.populateTransaction(txParams);
+          const tx = await provider.populateTransaction({
+            ...txParams,
+            type: hexToNum(txParams?.type),
+            chainId: hexToNum(txParams?.chainId),
+          });
 
-          if (tx.type === ethers.utils.TransactionTypes.legacy) {
-            delete tx.from;
-          }
+          const preparedTx = {
+            ...tx,
+            from: undefined,
+            nonce: hexToNum(tx.nonce),
+          };
 
-          const rawTx = serializeTransaction(tx);
+          const rawTx = serializeTransaction(preparedTx);
           const signature = await vault.sign(account.uuid, keccak256(rawTx));
 
-          const signedRawTx = serializeTransaction(tx, signature);
+          const signedRawTx = serializeTransaction(preparedTx, signature);
 
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
             signedRawTx,
@@ -77,4 +83,8 @@ export async function processApprove(
   }
 
   approvalResolved(approvalId);
+}
+
+function hexToNum(v?: ethers.BigNumberish) {
+  return v !== undefined ? ethers.BigNumber.from(v).toNumber() : undefined;
 }
