@@ -13,14 +13,16 @@ import {
 } from "app/utils";
 
 import { useDialog } from "app/hooks/dialog";
-import Input from "app/components/elements/Input";
-import NewButton from "app/components/elements/NewButton";
-import NumberInput from "app/components/elements/NumberInput";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
+
+import Input from "../elements/Input";
+import NewButton from "../elements/NewButton";
+import NumberInput from "../elements/NumberInput";
+import LongTextField from "../elements/LongTextField";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import IconedButton from "../elements/IconedButton";
 
 type EditNetworkProps = {
   isNew: boolean;
@@ -153,14 +155,15 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(required, isLink)}
                   >
                     {({ input, meta }) => (
-                      <Input
+                      <LongTextField
                         label="RPC URL"
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
                         readOnly={isNative}
                         className="mt-4"
-                        inputClassName="h-11"
+                        textareaClassName="!h-auto"
+                        rows={2}
                         {...input}
                       />
                     )}
