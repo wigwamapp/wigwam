@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { getPublicURL } from "lib/ext/utils";
 
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
@@ -9,8 +10,8 @@ import { useLazyAllNetworks } from "app/hooks";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
-import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 const Networks: FC = () => {
   const allNetworks = useLazyAllNetworks();
@@ -76,6 +77,7 @@ const Networks: FC = () => {
             name="Add new network"
             isActive={tab === "new"}
             onClick={() => setTab("new")}
+            isNewButton
             className="bg-brand-main/[.05]"
           />
           {preparedNetworks?.map(({ chainId, name }) => (
@@ -110,6 +112,7 @@ type NetworkBtnProps = {
   name: string;
   onClick: () => void;
   isActive?: boolean;
+  isNewButton?: boolean;
   className?: string;
 };
 
@@ -118,6 +121,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
   name,
   onClick,
   isActive = false,
+  isNewButton = false,
   className,
 }) => {
   return (
@@ -136,10 +140,14 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       )}
       onClick={onClick}
     >
-      {icon ? (
-        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
-      ) : (
+      {isNewButton ? (
         <PlusCircleIcon className="mr-3" />
+      ) : (
+        <img
+          src={icon ?? getPublicURL(`icons/network/unknown.png`)}
+          alt={name}
+          className={"w-6 h-6 mr-3"}
+        />
       )}
       <span className="min-w-0 truncate">{name}</span>
       <ChevronRightIcon
