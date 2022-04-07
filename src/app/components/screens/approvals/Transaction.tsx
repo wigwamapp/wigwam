@@ -1,8 +1,9 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { ethers } from "ethers";
 
 import { TransactionApproval } from "core/types";
 
-import { ChainIdProvider } from "app/hooks";
+import { useProvider } from "app/hooks";
 import WalletCard from "app/components/elements/WalletCard";
 
 import ApprovalLayout from "./Layout";
@@ -22,6 +23,37 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, allAccounts]
   );
 
+  const provider = useProvider().getSigner(account.address);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        let { txParams } = approval;
+
+        if ("gas" in txParams) {
+          const { gas, ...rest } = txParams;
+          txParams = { ...rest, gasLimit: gas };
+        }
+
+        const tx = await provider.populateTransaction({
+          ...txParams,
+          type: hexToNum(txParams?.type),
+          chainId: hexToNum(txParams?.chainId),
+        });
+
+        const preparedTx = {
+          ...tx,
+          from: undefined,
+          nonce: hexToNum(tx.nonce),
+        };
+
+        console.info({ preparedTx });
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [provider, approval]);
+
   const [lastError, setLastError] = useState<any>(null);
 
   const handleApprove = useCallback(
@@ -38,22 +70,24 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   return (
     <ApprovalLayout onApprove={handleApprove}>
-      <ChainIdProvider chainId={approval.chainId}>
-        <WalletCard account={account} />
+      <WalletCard account={account} />
 
-        {lastError && (
-          <div className="mb-8 px-4">
-            <h2 className="mb-2 text-white text-xl font-semibold">Error</h2>
+      {lastError && (
+        <div className="mb-8 px-4">
+          <h2 className="mb-2 text-white text-xl font-semibold">Error</h2>
 
-            <LongTextField
-              readOnly
-              value={lastError?.message || "Unknown error."}
-            />
-          </div>
-        )}
-      </ChainIdProvider>
+          <LongTextField
+            readOnly
+            value={lastError?.message || "Unknown error."}
+          />
+        </div>
+      )}
     </ApprovalLayout>
   );
 };
 
 export default ApproveTransaction;
+
+function hexToNum(v?: ethers.BigNumberish) {
+  return v !== undefined ? ethers.BigNumber.from(v).toNumber() : undefined;
+}

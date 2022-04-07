@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { ActivityType, WalletStatus } from "core/types";
 
 import { walletStatusAtom, approvalsAtom } from "app/atoms";
+import { ChainIdProvider } from "app/hooks";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
@@ -49,7 +50,9 @@ const Approvals: FC = () => {
   return (
     match(currentApproval)
       .with({ type: ActivityType.Transaction }, (txApproval) => (
-        <ApproveTransaction approval={txApproval} />
+        <ChainIdProvider chainId={txApproval.chainId}>
+          <ApproveTransaction approval={txApproval} />
+        </ChainIdProvider>
       ))
       // .with({ type: ActivityType.Signing }, (sigApproval) => <ApproveSigning approval={sigApproval} />)
       .with({ type: ActivityType.Connection }, (conApproval) => (
