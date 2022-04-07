@@ -1,5 +1,6 @@
 import { FC, useMemo, useState } from "react";
 import Fuse from "fuse.js";
+import { getPublicURL } from "lib/ext/utils";
 
 import { Network } from "core/types";
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
@@ -10,7 +11,9 @@ import Select from "app/components/elements/Select";
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
-  icon: NETWORK_ICON_MAP.get(network.chainId),
+  icon:
+    NETWORK_ICON_MAP.get(network.chainId) ??
+    getPublicURL(`icons/network/unknown.png`),
 });
 
 type NetworkSelectProps = {
