@@ -54,7 +54,7 @@ type SecondaryItemProps = {
 const SecondaryItem: FC<
   SecondaryItemProps & { isActive?: boolean; className?: string }
 > = ({ title, route, Icon, desc, isActive = false, className }) => {
-  const isSkeleton = title !== "Networks";
+  const isSkeleton = title !== "Networks" && title !== "Advanced";
 
   return (
     <Link
