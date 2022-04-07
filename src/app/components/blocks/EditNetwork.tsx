@@ -169,8 +169,8 @@ const EditNetwork = memo<EditNetworkProps>(
                     name="chainId"
                     validate={composeValidators(
                       required,
-                      minLength(4),
-                      maxLength(12)
+                      minLength(1),
+                      maxLength(16)
                     )}
                   >
                     {({ input, meta }) => (
