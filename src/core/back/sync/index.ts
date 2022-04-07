@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 import mem from "mem";
 import { createQueue } from "lib/system/queue";
 import { props } from "lib/system/promise";
+import { storage } from "lib/ext/storage";
 
 import { Erc20__factory } from "abi-types";
 import {
@@ -136,6 +137,8 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
   }, 300);
 
   try {
+    console.log(`sync any`);
+    await syncConversionRates();
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
 
@@ -495,6 +498,43 @@ const getDebankChainList = mem(
   {
     maxAge: 60 * 60_000, // 1 hour
   }
+);
+
+export const syncConversionRates = mem(
+  async () => {
+    const { data } = await axios.get(
+      "https://api.coingecko.com/api/v3/exchange_rates"
+    );
+    const currencies: { rates: Record<string, Currency> } = await data.json();
+
+    type Currency = {
+      name: string;
+      type: string;
+      unit: string;
+      value: number;
+    };
+    const arr = Object.values(currencies.rates).filter((curr: Currency) => {
+      if (curr.type === "fiat" || curr.unit === "BTC" || curr.unit === "ETH") {
+        if (curr.name !== "Russian Ruble") {
+          return true;
+        }
+      }
+      return false;
+    });
+    const btcPrice = new BigNumber(
+      arr.find((curr) => (curr.name = "US Dollar"))!.value
+    );
+    // const btcToUsd = new BigNumber(1).div(btcPrice);
+
+    const rates: Record<string, BigNumber> = {};
+    arr.forEach((curr) => {
+      const value = new BigNumber(1).div(curr.value).multipliedBy(btcPrice);
+      rates[curr.name] = value;
+    });
+    console.log(`rates`, rates);
+    storage.put("rates", rates);
+  },
+  { maxAge: 500 }
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {

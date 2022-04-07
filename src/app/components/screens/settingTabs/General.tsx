@@ -30,7 +30,7 @@ const General: FC = () => {
       currencySelectProps.currentItem = itemKey;
     },
     showSelected: true,
-    label: "Primary fiat currency",
+    label: "Currency conversion",
   };
 
   return (
