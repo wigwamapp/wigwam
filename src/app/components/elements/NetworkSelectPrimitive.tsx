@@ -3,10 +3,13 @@ import Fuse from "fuse.js";
 import { getPublicURL } from "lib/ext/utils";
 
 import { Network } from "core/types";
-import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
-import Select from "app/components/elements/Select";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import { Page, SettingTab } from "app/nav";
+import Select from "./Select";
+import IconedButton from "./IconedButton";
+import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
@@ -69,6 +72,15 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
+      actions={
+        <IconedButton
+          aria-label="Manage networks"
+          to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          theme="tertiary"
+          Icon={GearIcon}
+          className="ml-2"
+        />
+      }
     />
   );
 };
