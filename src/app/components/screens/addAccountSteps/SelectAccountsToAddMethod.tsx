@@ -201,19 +201,18 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   return (
     <SecondaryModal
       open={true}
-      header="Scanning Wallets..."
-      headerClassName="mb-3"
+      header="Scanning wallets..."
       onOpenChange={onOpenChange}
+      disabledClickOutside
+      headerClassName="mb-3"
       {...rest}
     >
       <div className="text-base text-brand-font text-center w-full break-words">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam
+        When the scanning process is done, you will be redirected to the next
+        step, where you can verify all founded wallets.
       </div>
-      <div className="relative mt-5">
-        <div className="loader">
-          <span className="background" />
-          <span className="animated" />
-        </div>
+      <div className="relative mt-5 w-[7.5rem] h-[7.5rem]">
+        <CircularProgress percentage={loadingProgress} />
         <span
           className={classNames(
             "absolute inset-0",
@@ -225,6 +224,50 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
         </span>
       </div>
     </SecondaryModal>
+  );
+};
+
+const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    setProgress(percentage);
+  }, [percentage]);
+
+  const size = 120;
+  const strokeWidth = 12;
+
+  const viewBox = `0 0 ${size} ${size}`;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * Math.PI * 2;
+  const dash = (progress * circumference) / 100;
+
+  return (
+    <svg width="100%" height="100%" viewBox={viewBox}>
+      <circle
+        fill="none"
+        stroke="rgba(204, 214, 255, 0.15)"
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        strokeWidth={`${strokeWidth}px`}
+      />
+      <circle
+        fill="none"
+        stroke="url(#loaderLinearColors)"
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        strokeWidth={`${strokeWidth}px`}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        strokeDasharray={[dash, circumference - dash] as any}
+        strokeLinecap="round"
+        style={{ transition: "all 0.5s" }}
+      />
+      <linearGradient id="loaderLinearColors" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="50%" stopColor="#FF002D" />
+        <stop offset="100%" stopColor="#FF7F44" />
+      </linearGradient>
+    </svg>
   );
 };
 
