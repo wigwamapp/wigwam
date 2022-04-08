@@ -21,7 +21,7 @@ export const BSC: Network[] = [
       "https://bsc-dataseed4.ninicoin.io",
     ],
     chainTag: "bsc",
-    name: "BNB Chain",
+    name: "BNB Smart Chain",
     nativeCurrency: {
       symbol: "BNB",
       name: "Binance Native Token",
@@ -45,7 +45,7 @@ export const BSC: Network[] = [
       "https://data-seed-prebsc-2-s3.binance.org:8545",
     ],
     chainTag: "bsc",
-    name: "BNB Testnet",
+    name: "BNB Smart Testnet",
     nativeCurrency: {
       symbol: "tBNB",
       name: "Binance Native Token",

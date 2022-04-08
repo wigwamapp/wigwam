@@ -17,11 +17,11 @@ export const maxLength = (max: number) => (value: string | number) =>
     : `Maximum length is ${max}`;
 
 export const composeValidators =
-  (...validators: ValidationType[]) =>
+  (...validators: (ValidationType | undefined)[]) =>
   (value: string) =>
     validators.reduce(
-      (error: string | undefined, validator: ValidationType) =>
-        error || validator(value),
+      (error: string | undefined, validator?: ValidationType) =>
+        error || validator?.(value),
       undefined
     );
 
@@ -71,3 +71,12 @@ export const validateDerivationPath = (value: string) =>
   !value || value.match(derivationPathRegex)
     ? undefined
     : "Derivation path is invalid";
+
+export const currencySymbolRegex = new RegExp(
+  "^(?=.*[a-zA-Z\\d].*)[a-zA-Z\\d!@#$%&*]+$"
+);
+
+export const validateCurrencySymbol = (value: string) =>
+  !value || value.match(currencySymbolRegex)
+    ? undefined
+    : "Currency symbol is invalid";
