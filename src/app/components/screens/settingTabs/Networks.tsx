@@ -43,15 +43,18 @@ const Networks: FC = () => {
 
   const cancelEditing = useCallback(() => setTab(null), []);
 
-  const handleScrollToBottom = useCallback(() => {
-    setTimeout(() => {
-      scrollAreaRef.current?.scrollTo({
-        behavior: "smooth",
-        top: scrollAreaRef.current?.scrollHeight,
-        left: 0,
-      });
-    }, 300);
-  }, [scrollAreaRef]);
+  const handleScrollList = useCallback(
+    (toTop = false) => {
+      setTimeout(() => {
+        scrollAreaRef.current?.scrollTo({
+          behavior: "smooth",
+          top: toTop ? 0 : scrollAreaRef.current?.scrollHeight,
+          left: 0,
+        });
+      }, 300);
+    },
+    [scrollAreaRef]
+  );
 
   return (
     <div className="pt-5 flex grow">
@@ -98,7 +101,7 @@ const Networks: FC = () => {
           isNew={tab === "new"}
           network={selectedNetwork}
           onCancelHandler={cancelEditing}
-          onNewNetworkCreated={handleScrollToBottom}
+          onActionFinished={handleScrollList}
         />
       )}
     </div>

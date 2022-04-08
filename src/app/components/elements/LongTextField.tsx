@@ -3,6 +3,7 @@ import classNames from "clsx";
 
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
+  labelActions?: ReactNode;
   actions?: ReactNode;
   textareaClassName?: string;
   error?: boolean;
@@ -15,13 +16,14 @@ const LongTextField = memo(
       {
         label,
         id,
-        actions,
+        labelActions,
         spellCheck = false,
-        className,
+        actions,
         error,
         errorMessage,
         disabled,
         readOnly,
+        className,
         textareaClassName,
         ...rest
       },
@@ -29,7 +31,7 @@ const LongTextField = memo(
     ) => {
       return (
         <div className={className}>
-          {(label || actions) && (
+          {(label || labelActions) && (
             <div className="flex items-center justify-between px-4 mb-2 min-h-6">
               {label && (
                 <label
@@ -39,43 +41,45 @@ const LongTextField = memo(
                   {label}
                 </label>
               )}
-              {actions}
+              {labelActions}
             </div>
           )}
-          <textarea
-            ref={ref}
-            spellCheck={spellCheck}
-            id={id}
-            className={classNames(
-              "w-full h-28",
-              "py-3 px-4",
-              "box-border",
-              "text-base leading-5 text-brand-light font-medium",
-              "bg-black/20",
-              "border border-brand-main/10",
-              "rounded-[.625rem]",
-              "outline-none",
-              "transition-colors",
-              "placeholder-brand-placeholder",
-              "resize-none",
-              error && !readOnly && "!border-brand-redobject",
-              !disabled && [
-                "group-hover:bg-brand-main/5",
-                "group-hover:border-brand-main/5",
-              ],
-              "focus:border-brand-main/[.15]",
-              disabled && [
-                "bg-brand-disabledbackground/20",
-                "border-brand-main/5",
-                "text-brand-disabledcolor placeholder-brand-disabledcolor",
-              ],
-              textareaClassName
-            )}
-            {...rest}
-          />
+          <div className="relative">
+            <textarea
+              ref={ref}
+              spellCheck={spellCheck}
+              id={id}
+              className={classNames(
+                "w-full h-28",
+                "py-3 px-4",
+                "box-border",
+                "text-base leading-5 text-brand-light font-medium",
+                "bg-black/20",
+                "border border-brand-main/10",
+                "rounded-[.625rem]",
+                "outline-none",
+                "transition-colors",
+                "placeholder-brand-placeholder",
+                "resize-none",
+                error && !readOnly && "!border-brand-redobject",
+                !disabled && [
+                  "group-hover:bg-brand-main/5",
+                  "group-hover:border-brand-main/5",
+                ],
+                "focus:border-brand-main/[.15]",
+                disabled && [
+                  "bg-brand-disabledbackground/20",
+                  "border-brand-main/5",
+                  "text-brand-disabledcolor placeholder-brand-disabledcolor",
+                ],
+                textareaClassName
+              )}
+              {...rest}
+            />
+            {actions}
+          </div>
           <div
             className={classNames(
-              "absolute",
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
               error && errorMessage && !readOnly && "max-h-5"
