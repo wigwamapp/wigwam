@@ -40,6 +40,7 @@ type AddressProps = {
   name?: string;
   isDisabled?: boolean;
   isDefaultChecked?: boolean;
+  isAdded?: boolean;
   index: number;
 };
 
@@ -87,8 +88,8 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
   useEffect(() => {
     const addressesToAdd = addressesToAddRef.current;
 
-    addresses.forEach(({ address, name, isDefaultChecked, isDisabled }, i) => {
-      if (!addressesToAdd.has(address) && !isDisabled && isDefaultChecked) {
+    addresses.forEach(({ address, name, isDefaultChecked, isAdded }, i) => {
+      if (!addressesToAdd.has(address) && !isAdded && isDefaultChecked) {
         addressesToAdd.add(address);
       }
 
@@ -96,6 +97,11 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
       if (!addressName) {
         addressesNamesRef.current.set(address, name ?? `Wallet ${i + 1}`);
       }
+
+      setThToggleChecked(
+        addressesToAdd.size ===
+          addresses.filter(({ isAdded }) => !isAdded).length
+      );
     });
 
     forceUpdate();
@@ -112,7 +118,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
 
       setThToggleChecked(
         addressesToAdd.size ===
-          addresses.filter(({ isDisabled }) => !isDisabled).length
+          addresses.filter(({ isAdded }) => !isAdded).length
       );
 
       forceUpdate();
@@ -197,7 +203,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
 
   return (
     <>
-      <div className="flex flex-col max-w-[45.25rem] mx-auto">
+      <div className="flex flex-col w-full max-w-[45.25rem] mx-auto">
         <div className="flex mb-9">
           <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
           <div className="flex items-center ml-auto">
@@ -237,9 +243,14 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                 <span className="flex align-center">
                   <CheckboxPrimitive.Root
                     checked={thToggleChecked}
-                    onCheckedChange={(checked) => toggleAllAddresses(!checked)}
+                    onCheckedChange={(checked) =>
+                      addresses.length !== 1 && toggleAllAddresses(!checked)
+                    }
                   >
-                    <Checkbox checked={thToggleChecked} />
+                    <Checkbox
+                      disabled={addresses.length === 1}
+                      checked={thToggleChecked}
+                    />
                   </CheckboxPrimitive.Root>
                 </span>
               </Th>
@@ -252,41 +263,39 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                   </span>
                 </Tooltip>
               </Th>
+              <Th>Index</Th>
               <Th>Address</Th>
               <Th>Balance</Th>
             </tr>
           </thead>
           <tbody>
             <TippySingletonProvider>
-              {addresses.map(
-                ({ address, isDisabled, isDefaultChecked, index }, i) => {
-                  const isAdded =
-                    addressesToAddRef.current.has(address) ||
-                    (isDisabled && isDefaultChecked);
-                  const addressName = replaceT(
-                    addressesNamesRef.current.get(address) ?? `Wallet ${index}`
-                  );
+              {addresses.map(({ address, isDisabled, isAdded, index }, i) => {
+                const isAddedItem =
+                  addressesToAddRef.current.has(address) || isAdded;
+                const addressName = replaceT(
+                  addressesNamesRef.current.get(address) ?? `Wallet ${index}`
+                );
 
-                  return (
-                    <Account
-                      key={address}
-                      name={addressName}
-                      address={address}
-                      provider={provider}
-                      network={network}
-                      isAdded={!!isAdded}
-                      onToggleAdd={() => toggleAddress(address)}
-                      isDisabled={isDisabled}
-                      onChangeWalletName={(newName: string) =>
-                        changeWalletName(address, newName)
-                      }
-                      className={
-                        i === addresses.length - 1 ? "!border-none" : ""
-                      }
-                    />
-                  );
-                }
-              )}
+                return (
+                  <Account
+                    key={address}
+                    name={addressName}
+                    index={index}
+                    address={address}
+                    provider={provider}
+                    network={network}
+                    isAdded={!!isAddedItem}
+                    isAddedTag={isAdded}
+                    onToggleAdd={() => toggleAddress(address)}
+                    isDisabled={isDisabled}
+                    onChangeWalletName={(newName: string) =>
+                      changeWalletName(address, newName)
+                    }
+                    className={i === addresses.length - 1 ? "!border-none" : ""}
+                  />
+                );
+              })}
             </TippySingletonProvider>
           </tbody>
         </table>
@@ -302,9 +311,11 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
+  index: number;
   network: Network;
   isAdded: boolean;
   isDisabled?: boolean;
+  isAddedTag?: boolean;
   onToggleAdd: () => void;
   onChangeWalletName: (name: string) => void;
   className?: string;
@@ -313,11 +324,13 @@ type AccountProps = {
 const Account = memo<AccountProps>(
   ({
     name,
+    index,
     address,
     provider,
     network,
     isAdded,
     isDisabled = false,
+    isAddedTag = false,
     onToggleAdd,
     onChangeWalletName,
     className,
@@ -374,7 +387,7 @@ const Account = memo<AccountProps>(
             )}
           />
         </Td>
-        <Td widthMaxContent>
+        <Td widthMaxContent className="w-[16rem]">
           {!isDisabled ? (
             <Input
               value={name}
@@ -389,23 +402,26 @@ const Account = memo<AccountProps>(
           ) : (
             <div className="pl-4 flex items-center max-w-[16rem]">
               <span className="!font-bold min-width-0 truncate">{name}</span>
-              <span
-                className={classNames(
-                  "py-1 px-2",
-                  "rounded-md",
-                  "bg-brand-main/40",
-                  "border border-brand-main/50",
-                  "shadow-addaccountmodal",
-                  "text-xs font-medium",
-                  "ml-3"
-                )}
-              >
-                Added
-              </span>
+              {isAddedTag && (
+                <span
+                  className={classNames(
+                    "py-1 px-2",
+                    "rounded-md",
+                    "bg-brand-main/40",
+                    "border border-brand-main/50",
+                    "shadow-addaccountmodal",
+                    "text-xs font-medium",
+                    "ml-3"
+                  )}
+                >
+                  Added
+                </span>
+              )}
             </div>
           )}
         </Td>
-        <Td>
+        <Td widthMaxContent>{index}</Td>
+        <Td widthMaxContent>
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
@@ -415,6 +431,7 @@ const Account = memo<AccountProps>(
               baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol
             }
             copiable={true}
+            isMinified
             className="font-bold"
           />
         </Td>

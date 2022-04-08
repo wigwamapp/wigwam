@@ -27,6 +27,26 @@ import AccountsToAdd from "./AccountToAdd";
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const initialSetup = walletStatus === WalletStatus.Welcome;
+  const { stateRef, navigateToStep } = useSteps();
+
+  const addresses = stateRef.current.importAddresses;
+  const { alert } = useDialog();
+
+  const handleContinue = useCallback(
+    async (addAccountsParams) => {
+      try {
+        Object.assign(stateRef.current, { addAccountsParams });
+        navigateToStep(AddAccountStep.SetupPassword);
+      } catch (err: any) {
+        alert(err.message);
+      }
+    },
+    [alert, navigateToStep, stateRef]
+  );
+
+  if (addresses && addresses.length > 0) {
+    return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+  }
 
   if (initialSetup) {
     return <VerifyAccountToAddInitial />;
@@ -139,6 +159,8 @@ const VerifyAccountToAddExisting: FC = () => {
         address: filteredAccounts[0].address,
         name: `Wallet ${filteredAccounts[0].index + 1}`,
         index: filteredAccounts[0].index,
+        isDisabled: true,
+        isDefaultChecked: true,
       };
     },
     [importedAccounts]
@@ -174,6 +196,7 @@ const VerifyAccountToAddExisting: FC = () => {
           name: isAddressImported?.name ?? undefined,
           isDisabled: isAddressImported,
           isDefaultChecked: isAddressImported,
+          isAdded: isAddressImported,
         };
       });
     }
@@ -201,7 +224,7 @@ const VerifyAccountToAddExisting: FC = () => {
         await addAccounts(addAccountsParams);
         setAccModalOpened([false]);
       } catch (err: any) {
-        alert(err.message);
+        alert({ title: "Error!", content: err.message });
       }
     },
     [alert, setAccModalOpened]
