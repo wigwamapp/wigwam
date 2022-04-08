@@ -144,7 +144,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       onClick={onClick}
     >
       {isNewButton ? (
-        <PlusCircleIcon className="mr-3" />
+        <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
         <img
           src={icon ?? getPublicURL(`icons/network/unknown.png`)}
@@ -155,6 +155,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       <span className="min-w-0 truncate">{name}</span>
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2 top-1/2 -translate-y-1/2",
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",

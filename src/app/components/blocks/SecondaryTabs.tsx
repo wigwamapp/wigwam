@@ -60,7 +60,7 @@ const SecondaryItem: FC<
     <>
       <div className="flex items-center">
         {!isSkeleton ? (
-          Icon && <Icon className="w-4.5 h-4.5 mr-2" />
+          Icon && <Icon className="w-[1.125rem] h-auto mr-2" />
         ) : (
           <div className="w-[1.125rem] h-[1.125rem] bg-[#303449] rounded-md mr-2" />
         )}
@@ -80,6 +80,7 @@ const SecondaryItem: FC<
       )}
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2.5 top-1/2 -translate-y-1/2",
           "transition",
           !isSkeleton && "group-hover:translate-x-0 group-hover:opacity-100",

@@ -198,7 +198,15 @@ const ActivityIcon: FC<ActivityIconProps> = ({
     return <Tooltip content={ariaLabel}>{content}</Tooltip>;
   }
 
-  return <Icon />;
+  return (
+    <Icon
+      className={classNames(
+        theme === "small" && "w-[1.125rem] h-[1.125rem]",
+        theme === "large" && "w-6 h-6",
+        className
+      )}
+    />
+  );
 };
 
 type StatusType = "successful" | "pending" | "failed";
@@ -239,7 +247,7 @@ const StatItem: FC<StatItemProps> = ({
         <Icon
           className={classNames(
             theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
-            theme === "large" && "mr-2"
+            theme === "large" && "w-5 h-auto mr-2"
           )}
         />
         {count}
