@@ -107,7 +107,7 @@ const EditNetwork = memo<EditNetworkProps>(
         <header className="flex items-center">
           {isNew ? (
             <>
-              <PlusCircleIcon width={24} height={24} className="mr-4" />
+              <PlusCircleIcon className="w-8 h-auto mr-3" />
               <h3 className="text-brand-light text-2xl font-bold">
                 Add new network
               </h3>
@@ -115,7 +115,7 @@ const EditNetwork = memo<EditNetworkProps>(
           ) : (
             <div className="w-[21.875rem] flex items-center justify-between">
               <div className="flex">
-                <EditIcon className="mr-3" />
+                <EditIcon className="w-8 h-auto mr-3" />
                 <h3 className="text-brand-light text-2xl font-bold">
                   Edit network
                 </h3>
