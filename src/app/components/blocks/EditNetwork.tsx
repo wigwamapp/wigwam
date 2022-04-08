@@ -85,9 +85,13 @@ const EditNetwork = memo<EditNetworkProps>(
     const deleteNetwork = useCallback(async () => {
       const response = await confirm({
         title: "Delete network",
-        content: `Are you sure you want to delete ${
-          network?.name ?? "this"
-        } network with chainId ${initialChainId}?`,
+        content: (
+          <p className="mb-4 mx-auto max-w-[20rem] text-center">
+            Are you sure you want to delete <b>{network?.name ?? "this"}</b>{" "}
+            network with chain id <b>{initialChainId}</b>?
+          </p>
+        ),
+        yesButtonText: "Delete",
       });
 
       if (response) {
