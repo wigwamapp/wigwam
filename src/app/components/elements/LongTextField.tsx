@@ -49,6 +49,8 @@ const LongTextField = memo(
               ref={ref}
               spellCheck={spellCheck}
               id={id}
+              disabled={disabled}
+              readOnly={readOnly}
               className={classNames(
                 "w-full h-28",
                 "py-3 px-4",

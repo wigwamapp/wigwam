@@ -184,7 +184,6 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        readOnly={isNative}
                         setFromClipboard={(value) =>
                           form.change("rpcUrl", value)
                         }
