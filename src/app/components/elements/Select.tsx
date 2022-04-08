@@ -1,4 +1,10 @@
-import { ReactElement, useState } from "react";
+import {
+  KeyboardEventHandler,
+  ReactElement,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -51,6 +57,21 @@ function Select<T extends string | ReactElement, U extends string | number>({
   ...rest
 }: SelectProps<T, U>) {
   const [opened, setOpened] = useState(false);
+
+  const itemsRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchKeyDown = useCallback<
+    KeyboardEventHandler<HTMLInputElement>
+  >((evt) => {
+    if (evt.key === "ArrowDown") {
+      evt.preventDefault();
+
+      const firstItem = itemsRef.current
+        ?.firstElementChild as HTMLButtonElement;
+
+      firstItem?.focus();
+    }
+  }, []);
 
   return (
     <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
@@ -142,6 +163,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 toggleSearchValue={(value) => {
                   onSearch(value);
                 }}
+                onKeyDown={handleSearchKeyDown}
                 inputClassName="max-h-9 !pl-9"
                 adornmentClassName="!left-3"
               />
@@ -156,7 +178,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
             viewPortClassName="py-3 viewportBlock"
             scrollBarClassName="py-3"
           >
-            <div>
+            <div ref={itemsRef}>
               {items
                 .filter((item) =>
                   showSelected ? item.key : item.key !== currentItem.key
