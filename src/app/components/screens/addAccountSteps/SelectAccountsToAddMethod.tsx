@@ -130,8 +130,11 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
       await Promise.all(
         wallets.map(async (wallet) => {
-          const balance = await provider.getBalance(wallet.address);
-          if (balance.gt(0)) {
+          const balance = await provider
+            .getBalance(wallet.address)
+            .catch(() => null);
+
+          if (balance?.gt(0)) {
             if (
               !resultAddresses.some(
                 ({ address: extAdd }) => extAdd === wallet.address
