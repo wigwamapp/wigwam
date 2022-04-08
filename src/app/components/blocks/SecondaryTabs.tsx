@@ -56,21 +56,8 @@ const SecondaryItem: FC<
 > = ({ title, route, Icon, desc, isActive = false, className }) => {
   const isSkeleton = title !== "Networks" && title !== "Advanced";
 
-  return (
-    <Link
-      key={title}
-      to={route}
-      className={classNames(
-        "relative group",
-        "flex flex-col",
-        "py-3 px-4 pr-[2.625rem]",
-        "rounded-[.625rem]",
-        "cursor-pointer",
-        isActive && "bg-brand-main/10",
-        !isActive && !isSkeleton && "hover:bg-brand-main/5",
-        className
-      )}
-    >
+  const content = (
+    <>
       <div className="flex items-center">
         {!isSkeleton ? (
           Icon && <Icon className="w-4.5 h-4.5 mr-2" />
@@ -100,6 +87,27 @@ const SecondaryItem: FC<
           isActive && !isSkeleton && "translate-x-0 opacity-100"
         )}
       />
+    </>
+  );
+
+  const classNamesList = classNames(
+    "relative group",
+    "flex flex-col",
+    "py-3 px-4 pr-[2.625rem]",
+    "rounded-[.625rem]",
+    !isSkeleton && "cursor-pointer",
+    isActive && "bg-brand-main/10",
+    !isActive && !isSkeleton && "hover:bg-brand-main/5",
+    className
+  );
+
+  return isSkeleton ? (
+    <div key={title} className={classNamesList}>
+      {content}
+    </div>
+  ) : (
+    <Link key={title} to={route} className={classNamesList}>
+      {content}
     </Link>
   );
 };
