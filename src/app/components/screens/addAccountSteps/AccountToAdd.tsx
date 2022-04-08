@@ -263,6 +263,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                   </span>
                 </Tooltip>
               </Th>
+              <Th>Index</Th>
               <Th>Address</Th>
               <Th>Balance</Th>
             </tr>
@@ -280,6 +281,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                   <Account
                     key={address}
                     name={addressName}
+                    index={index}
                     address={address}
                     provider={provider}
                     network={network}
@@ -309,6 +311,7 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
+  index: number;
   network: Network;
   isAdded: boolean;
   isDisabled?: boolean;
@@ -321,6 +324,7 @@ type AccountProps = {
 const Account = memo<AccountProps>(
   ({
     name,
+    index,
     address,
     provider,
     network,
@@ -383,7 +387,7 @@ const Account = memo<AccountProps>(
             )}
           />
         </Td>
-        <Td widthMaxContent>
+        <Td widthMaxContent className="w-[16rem]">
           {!isDisabled ? (
             <Input
               value={name}
@@ -416,7 +420,8 @@ const Account = memo<AccountProps>(
             </div>
           )}
         </Td>
-        <Td>
+        <Td widthMaxContent>{index}</Td>
+        <Td widthMaxContent>
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
@@ -426,6 +431,7 @@ const Account = memo<AccountProps>(
               baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol
             }
             copiable={true}
+            isMinified
             className="font-bold"
           />
         </Td>

@@ -1,7 +1,8 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
+import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { SeedPharse, WalletStatus } from "core/types";
 import {
   generatePreviewHDNodes,
@@ -10,7 +11,7 @@ import {
 } from "core/common";
 import { ClientProvider } from "core/client";
 
-import { allNetworksAtom, walletStatusAtom } from "app/atoms";
+import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
@@ -92,10 +93,15 @@ const SelectAccountsToAddMethod: FC = () => {
 
 export default SelectAccountsToAddMethod;
 
+const preparedNetworks = DEFAULT_NETWORKS.filter(
+  ({ type }) => type === "mainnet"
+);
+
 const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const { stateRef, reset, navigateToStep } = useSteps();
   const { alert } = useDialog();
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const isUnmountedRef = useRef(false);
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   const derivationPath = stateRef.current.derivationPath;
@@ -105,12 +111,6 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
       ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), derivationPath)
       : null;
   }, [derivationPath, seedPhrase]);
-
-  const networks = useAtomValue(allNetworksAtom);
-  const preparedNetworks = useMemo(
-    () => networks.filter(({ type }) => type === "mainnet"),
-    [networks]
-  );
 
   const loadActiveWallets = useCallback(async () => {
     if (!neuterExtendedKey) {
@@ -122,6 +122,10 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     const resultAddresses: any[] = [];
 
     for (const [index, network] of preparedNetworks.entries()) {
+      if (isUnmountedRef.current) {
+        break;
+      }
+
       const provider = new ClientProvider(network.chainId);
 
       await Promise.all(
@@ -151,38 +155,44 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
       return resultAddresses;
     }
 
-    const newAddress = generatePreviewHDNodes(neuterExtendedKey, 0, 1);
+    const newAddress = wallets[0];
 
     return [
       {
-        address: newAddress[0].address,
-        index: newAddress[0].index,
+        address: newAddress.address,
+        index: newAddress.index,
         isDisabled: true,
         isDefaultChecked: true,
       },
     ];
-  }, [neuterExtendedKey, preparedNetworks]);
+  }, [neuterExtendedKey]);
 
   const logicProcess = useCallback(async () => {
     try {
       const addresses = await loadActiveWallets();
-      onOpenChange?.(false);
-      if (addresses) {
-        stateRef.current.importAddresses = addresses;
-        navigateToStep(AddAccountStep.VerifyToAdd);
-      } else {
-        reset();
+      if (!isUnmountedRef.current) {
+        onOpenChange?.(false);
+        if (addresses) {
+          stateRef.current.importAddresses = addresses;
+          navigateToStep(AddAccountStep.VerifyToAdd);
+        } else {
+          reset();
+        }
       }
     } catch (err: any) {
       alert({
         title: "Error!",
         content: err.message,
-      });
+      }).then(() => onOpenChange?.(false));
     }
   }, [alert, loadActiveWallets, navigateToStep, onOpenChange, reset, stateRef]);
 
   useEffect(() => {
     logicProcess();
+
+    return () => {
+      isUnmountedRef.current = true;
+    };
   }, [logicProcess]);
 
   return (
