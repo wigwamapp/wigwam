@@ -38,6 +38,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentItemIconClassName,
   contentClassName,
 }) => {
+  const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
@@ -61,6 +62,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
   return (
     <Select
+      open={opened}
+      onOpenChange={setOpened}
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
@@ -76,6 +79,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
         <IconedButton
           aria-label="Manage networks"
           to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          onClick={() => setOpened(false)}
           theme="tertiary"
           Icon={GearIcon}
           className="ml-2"
