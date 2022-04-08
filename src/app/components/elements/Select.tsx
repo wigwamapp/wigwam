@@ -124,7 +124,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {currentItem.value}
           <ChevronDownIcon
             className={classNames(
-              "min-w-[1.5rem]",
+              "w-6 h-auto min-w-[1.5rem]",
               "ml-auto",
               "transition-transform",
               {
@@ -234,7 +234,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                       {showSelected &&
                         showSelectedIcon &&
                         item.key === currentItem.key && (
-                          <SelectedIcon className="ml-auto" />
+                          <SelectedIcon className="w-6 h-auto ml-auto" />
                         )}
                     </button>
                   </DropdownMenu.Item>
