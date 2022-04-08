@@ -29,7 +29,7 @@ const Dialog: FC = () => {
       header={header}
       {...rest}
     >
-      <div className="text-base font-brand-font text-center w-full break-words">
+      <div className="text-base text-brand-font text-center w-full break-words">
         {children}
       </div>
       <div className="flex mt-5">

@@ -8,12 +8,14 @@ import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 export type SecondaryModalProps = DialogProps & {
   header?: ReactNode;
+  disabledClickOutside?: boolean;
   className?: string;
   headerClassName?: string;
 };
 
 const SecondaryModal: FC<SecondaryModalProps> = ({
   header,
+  disabledClickOutside,
   open,
   onOpenChange,
   children,
@@ -39,6 +41,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             className
           )}
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) =>
+            disabledClickOutside ? e.preventDefault() : e
+          }
         >
           <Dialog.Close asChild className="fixed top-4 right-4">
             <IconedButton

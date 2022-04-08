@@ -40,7 +40,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
           <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
-          <div className="flex flex-col max-w-[55rem] mx-auto mb-32">
+          <div className="flex flex-col max-w-[55rem] mx-auto mb-5">
             <RadioGroupPrimitive.Root
               className="grid grid-cols-2 gap-6"
               value={activeMethod}
