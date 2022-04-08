@@ -1,41 +1,44 @@
-import { memo, useCallback, useMemo } from "react";
+import { forwardRef, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
+import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
+
 import {
   composeValidators,
   isLink,
   maxLength,
   minLength,
   required,
+  validateCurrencySymbol,
 } from "app/utils";
-
 import { useDialog } from "app/hooks/dialog";
-import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
-import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
-import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
-
 import Input from "../elements/Input";
 import NewButton from "../elements/NewButton";
 import NumberInput from "../elements/NumberInput";
-import LongTextField from "../elements/LongTextField";
+import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import IconedButton from "../elements/IconedButton";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
+import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
+import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 
 type EditNetworkProps = {
   isNew: boolean;
   network?: Network;
   onCancelHandler: () => void;
-  onNewNetworkCreated?: () => void;
+  onActionFinished?: (toTop?: boolean) => void;
   className?: string;
 };
 
 const EditNetwork = memo<EditNetworkProps>(
-  ({ isNew, network, onCancelHandler, onNewNetworkCreated }) => {
+  ({ isNew, network, onCancelHandler, onActionFinished }) => {
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
-    const { alert } = useDialog();
+    const { alert, confirm } = useDialog();
 
     const handleSubmit = useCallback(
       async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
@@ -48,7 +51,7 @@ const EditNetwork = memo<EditNetworkProps>(
           const repoMethod = isNew || isChangedChainId ? "add" : "put";
           await Repo.networks[repoMethod]({
             chainId: Number(chainId),
-            type: "unknown",
+            type: network?.type ?? "unknown",
             rpcUrls: [rpcUrl],
             chainTag: "",
             name: nName,
@@ -61,20 +64,37 @@ const EditNetwork = memo<EditNetworkProps>(
             position: 0,
           });
 
-          if (isNew && onNewNetworkCreated) {
-            onNewNetworkCreated();
+          if (isNew && onActionFinished) {
+            onActionFinished();
           }
           onCancelHandler();
         } catch (err: any) {
           alert({ title: "Error!", content: err.message });
         }
       },
-      [alert, initialChainId, isNew, onCancelHandler, onNewNetworkCreated]
+      [
+        alert,
+        initialChainId,
+        isNew,
+        network?.type,
+        onCancelHandler,
+        onActionFinished,
+      ]
     );
 
     const deleteNetwork = useCallback(async () => {
-      await Repo.networks.delete(Number(initialChainId));
-    }, [initialChainId]);
+      const response = await confirm({
+        title: "Delete network",
+        content: `Are you sure you want to delete ${
+          network?.name ?? "this"
+        } network with chainId ${initialChainId}?`,
+      });
+
+      if (response) {
+        await Repo.networks.delete(Number(initialChainId));
+        onActionFinished?.(true);
+      }
+    }, [confirm, initialChainId, network?.name, onActionFinished]);
 
     const isNative = network && network.type !== "unknown";
 
@@ -124,7 +144,7 @@ const EditNetwork = memo<EditNetworkProps>(
               currencySymbol: network?.nativeCurrency?.symbol,
               blockExplorer: network?.explorerUrls?.[0],
             }}
-            render={({ handleSubmit, submitting }) => (
+            render={({ form, handleSubmit, submitting }) => (
               <form
                 onSubmit={handleSubmit}
                 className="flex flex-col items-start"
@@ -155,15 +175,17 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(required, isLink)}
                   >
                     {({ input, meta }) => (
-                      <LongTextField
+                      <RPCField
                         label="RPC URL"
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
                         readOnly={isNative}
+                        setFromClipboard={(value) =>
+                          form.change("rpcUrl", value)
+                        }
                         className="mt-4"
-                        textareaClassName="!h-auto"
-                        rows={2}
+                        textareaClassName="!h-[4.5rem]"
                         {...input}
                       />
                     )}
@@ -192,11 +214,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="currencySymbol"
-                    format={(v) => (v ? v.toUpperCase() : null)}
                     validate={composeValidators(
                       required,
                       minLength(2),
-                      maxLength(8)
+                      maxLength(8),
+                      validateCurrencySymbol
                     )}
                   >
                     {({ input, meta }) => (
@@ -212,15 +234,20 @@ const EditNetwork = memo<EditNetworkProps>(
                       />
                     )}
                   </Field>
-                  <Field name="blockExplorer" validate={isLink}>
+                  <Field
+                    name="blockExplorer"
+                    validate={composeValidators(
+                      isLink,
+                      isNative ? required : undefined
+                    )}
+                  >
                     {({ input, meta }) => (
                       <Input
                         label="Block explorer"
                         placeholder="Insert block explorer link"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        readOnly={isNative}
-                        optional
+                        optional={!isNative}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
@@ -240,7 +267,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     <NewButton
                       type="submit"
                       className="!py-2 ml-4 w-full"
-                      disabled={isNative || submitting}
+                      disabled={submitting}
                     >
                       {submitting
                         ? isNew
@@ -262,3 +289,42 @@ const EditNetwork = memo<EditNetworkProps>(
 );
 
 export default EditNetwork;
+
+type RPCFieldProps = LongTextFieldProps & {
+  setFromClipboard: (value: string) => void;
+};
+
+const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
+  ({ setFromClipboard, ...rest }, ref) => {
+    const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
+
+    return (
+      <LongTextField
+        ref={ref}
+        actions={
+          <NewButton
+            type="button"
+            theme="tertiary"
+            onClick={paste}
+            className={classNames(
+              "absolute bottom-4 right-3",
+              "text-sm text-brand-light",
+              "!p-0 !pr-1 !min-w-0",
+              "!font-normal",
+              "cursor-copy",
+              "items-center"
+            )}
+          >
+            {pasted ? (
+              <SuccessIcon className="mr-1" />
+            ) : (
+              <PasteIcon className="mr-1" />
+            )}
+            {pasted ? "Pasted" : "Paste"}
+          </NewButton>
+        }
+        {...rest}
+      />
+    );
+  }
+);
