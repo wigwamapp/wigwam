@@ -387,7 +387,7 @@ const Account = memo<AccountProps>(
             )}
           />
         </Td>
-        <Td widthMaxContent className="w-[16rem]">
+        <Td widthMaxContent className="min-w-[16rem]">
           {!isDisabled ? (
             <Input
               value={name}
