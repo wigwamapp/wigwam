@@ -60,7 +60,9 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
 export function getTokenLogoUrl(logoUrl?: string) {
   if (logoUrl?.startsWith("{{native}}")) {
     const [, chainTag] = logoUrl.split("/");
-    return getPublicURL(`icons/nativeToken/${chainTag}.png`);
+    return chainTag
+      ? getPublicURL(`icons/nativeToken/${chainTag}.png`)
+      : undefined;
   }
 
   return logoUrl;

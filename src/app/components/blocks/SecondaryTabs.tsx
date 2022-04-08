@@ -70,12 +70,13 @@ const SecondaryItem: FC<
       )}
     >
       <div className="flex items-center">
-        {Icon && <Icon className="w-4.5 h-4.5 mr-2" />}
+        {Icon && <Icon className="w-[1.125rem] h-auto mr-2" />}
         <h3 className={"text-base font-bold"}>{title}</h3>
       </div>
       {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2.5 top-1/2 -translate-y-1/2",
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",

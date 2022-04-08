@@ -56,6 +56,7 @@ const Tooltip: FC<TooltipProps> = ({
       singleton={missSingleton ? undefined : singletonTarget}
       duration={duration}
       delay={delay}
+      zIndex={2147483648}
       popperOptions={{
         modifiers: [
           {

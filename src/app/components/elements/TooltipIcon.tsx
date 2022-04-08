@@ -17,7 +17,7 @@ const TooltipIcon: FC<TooltipIconProps> = ({ theme = "light", className }) => (
       className
     )}
   >
-    <InfoIcon />
+    <InfoIcon className="w-full h-auto" />
   </span>
 );
 
