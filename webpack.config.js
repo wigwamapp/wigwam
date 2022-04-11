@@ -122,8 +122,8 @@ module.exports = {
   target: ["web", ES_TARGET],
 
   entry: {
-    back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
-    main: entry("main.tsx", RELEASE_ENV === "false" && "dev-tools.ts"),
+    back: entry("back.ts", NODE_ENV === "development" && "_dev/hotReload.ts"),
+    main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
     approve: entry("approve.tsx"),
     content: entry("content.ts"),
