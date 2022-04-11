@@ -3243,6 +3243,11 @@ ajv@^8.0.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
+anser@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/anser/-/anser-1.4.6.tgz#f159112561e1c30af2c4c9c58f6747af534e8ea2"
+  integrity sha512-dt6DExaJBHjxbe+9k3BYFmg6CwhfHuI8RQ3cF2fnInC0LZ8LTTHeeyNa3YrMn4IYQ7Jz88S5BG36HO/xyiyusQ==
+
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.0:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"
@@ -5387,6 +5392,11 @@ html-encoding-sniffer@^2.0.1:
   dependencies:
     whatwg-encoding "^1.0.5"
 
+html-entities@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
+  integrity sha1-DfKTUfByEWNRXfueVUPl9u7VFi8=
+
 html-escaper@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/html-escaper/-/html-escaper-2.0.2.tgz#dfd60027da36a36dfcbe236262c00a5822681453"
@@ -7464,6 +7474,15 @@ react-error-boundary@3.1.4:
   dependencies:
     "@babel/runtime" "^7.12.5"
 
+react-error-guard@1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-error-guard/-/react-error-guard-1.1.4.tgz#11b9ecc4f9f6e9a0d9fb8ba08f24f2d31c1a674a"
+  integrity sha512-luFgULn0xukYuwPRrzkQzb+A9yZW/oLs5AOlhXcmJH7VdKL8ENrhQ2xXOqSINA8qJ0nE+JLiAR0/hudWL4IM9g==
+  dependencies:
+    anser "1.4.6"
+    html-entities "1.2.1"
+    settle-promise "1.0.0"
+
 react-final-form@6.5.9:
   version "6.5.9"
   resolved "https://registry.yarnpkg.com/react-final-form/-/react-final-form-6.5.9.tgz#644797d4c122801b37b58a76c87761547411190b"
@@ -7872,6 +7891,11 @@ serialize-javascript@^6.0.0:
   integrity sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==
   dependencies:
     randombytes "^2.1.0"
+
+settle-promise@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/settle-promise/-/settle-promise-1.0.0.tgz#697adb58b821f387ce2757c06efc9de5f0ee33d8"
+  integrity sha1-aXrbWLgh84fOJ1fAbvyd5fDuM9g=
 
 sha.js@^2.4.0, sha.js@^2.4.8:
   version "2.4.11"
