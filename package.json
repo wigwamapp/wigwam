@@ -150,8 +150,5 @@
   },
   "engines": {
     "node": ">=16"
-  },
-  "optionalDependencies": {
-    "babel-runtime": "6.26.0"
   }
 }
