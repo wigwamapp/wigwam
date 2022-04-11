@@ -22,4 +22,7 @@ const ErrBond: FC<ErrBondProps> = (props) => (
   />
 );
 
-export default ErrBond;
+export default process.env.NODE_ENV === "production"
+  ? ErrBond
+  : // eslint-disable-next-line
+    require("react-error-guard/lib/DeveloperErrorBoundary").default;

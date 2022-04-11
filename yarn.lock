@@ -3243,6 +3243,11 @@ ajv@^8.0.0, ajv@^8.8.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
+anser@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/anser/-/anser-1.4.6.tgz#f159112561e1c30af2c4c9c58f6747af534e8ea2"
+  integrity sha512-dt6DExaJBHjxbe+9k3BYFmg6CwhfHuI8RQ3cF2fnInC0LZ8LTTHeeyNa3YrMn4IYQ7Jz88S5BG36HO/xyiyusQ==
+
 ansi-escapes@^4.2.1, ansi-escapes@^4.3.0:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-4.3.2.tgz#6b2291d1db7d98b6521d5f1efa42d0f3a9feb65e"
@@ -3538,6 +3543,14 @@ babel-preset-jest@^27.5.1:
   dependencies:
     babel-plugin-jest-hoist "^27.5.1"
     babel-preset-current-node-syntax "^1.0.0"
+
+babel-runtime@6.26.0:
+  version "6.26.0"
+  resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
+  integrity sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
+  dependencies:
+    core-js "^2.4.0"
+    regenerator-runtime "^0.11.0"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -4018,6 +4031,11 @@ core-js-pure@^3.20.2:
   version "3.21.1"
   resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.21.1.tgz#8c4d1e78839f5f46208de7230cebfb72bc3bdb51"
   integrity sha512-12VZfFIu+wyVbBebyHmRTuEE/tZrB4tJToWcwAMcsp3h4+sHR+fMJWbKpYiCRWlhFBq+KNyO8rIV9rTkeVmznQ==
+
+core-js@^2.4.0:
+  version "2.6.12"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
+  integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
 cosmiconfig@^6.0.0:
   version "6.0.0"
@@ -5386,6 +5404,11 @@ html-encoding-sniffer@^2.0.1:
   integrity sha512-D5JbOMBIR/TVZkubHT+OyT2705QvogUW4IBn6nHd756OwieSF9aDYFj4dv6HHEVGYbHaLETa3WggZYWWMyy3ZQ==
   dependencies:
     whatwg-encoding "^1.0.5"
+
+html-entities@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-1.2.1.tgz#0df29351f0721163515dfb9e5543e5f6eed5162f"
+  integrity sha1-DfKTUfByEWNRXfueVUPl9u7VFi8=
 
 html-escaper@^2.0.0:
   version "2.0.2"
@@ -7464,6 +7487,15 @@ react-error-boundary@3.1.4:
   dependencies:
     "@babel/runtime" "^7.12.5"
 
+react-error-guard@1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/react-error-guard/-/react-error-guard-1.1.4.tgz#11b9ecc4f9f6e9a0d9fb8ba08f24f2d31c1a674a"
+  integrity sha512-luFgULn0xukYuwPRrzkQzb+A9yZW/oLs5AOlhXcmJH7VdKL8ENrhQ2xXOqSINA8qJ0nE+JLiAR0/hudWL4IM9g==
+  dependencies:
+    anser "1.4.6"
+    html-entities "1.2.1"
+    settle-promise "1.0.0"
+
 react-final-form@6.5.9:
   version "6.5.9"
   resolved "https://registry.yarnpkg.com/react-final-form/-/react-final-form-6.5.9.tgz#644797d4c122801b37b58a76c87761547411190b"
@@ -7586,6 +7618,11 @@ regenerate@^1.4.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.2.tgz#b9346d8827e8f5a32f7ba29637d398b69014848a"
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
+
+regenerator-runtime@^0.11.0:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
+  integrity sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
 
 regenerator-runtime@^0.13.4:
   version "0.13.9"
@@ -7872,6 +7909,11 @@ serialize-javascript@^6.0.0:
   integrity sha512-Qr3TosvguFt8ePWqsvRfrKyQXIiW+nGbYpy8XK24NQHE83caxWt+mIymTT19DGFbNWNLfEwsrkSmN64lVWB9ag==
   dependencies:
     randombytes "^2.1.0"
+
+settle-promise@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/settle-promise/-/settle-promise-1.0.0.tgz#697adb58b821f387ce2757c06efc9de5f0ee33d8"
+  integrity sha1-aXrbWLgh84fOJ1fAbvyd5fDuM9g=
 
 sha.js@^2.4.0, sha.js@^2.4.8:
   version "2.4.11"
