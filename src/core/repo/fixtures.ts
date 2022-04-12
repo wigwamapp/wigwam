@@ -57,7 +57,7 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
 
 function mergeUrls(base?: string[], toMerge?: string[]) {
   if (base && toMerge) {
-    return Array.from(new Set([...base, ...toMerge].map(formatRpcUrl)));
+    return Array.from(new Set([...toMerge, ...base].map(formatRpcUrl)));
   }
 
   return base ?? toMerge;

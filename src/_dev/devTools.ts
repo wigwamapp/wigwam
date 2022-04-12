@@ -37,7 +37,7 @@ Object.assign(window, {
 });
 
 if (process.env.RELEASE_ENV === "false") {
-  const imports = [import("./importExport")];
+  const imports = [import("./importExport"), import("./controlPanel")];
 
   Promise.all(imports)
     .then((modules) => modules.forEach((m) => m && Object.assign(window, m)))

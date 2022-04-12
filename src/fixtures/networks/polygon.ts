@@ -30,8 +30,8 @@ export const POLYGON: Network[] = [
     chainId: 80001,
     type: "testnet",
     rpcUrls: [
-      "https://rpc-mumbai.matic.today",
       "https://matic-mumbai.chainstacklabs.com",
+      "https://rpc-mumbai.matic.today",
       "https://rpc-mumbai.maticvigil.com",
       "https://matic-testnet-archive-rpc.bwarelabs.com",
     ],
