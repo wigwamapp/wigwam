@@ -29,12 +29,15 @@ const Unlock: FC = () => {
             theme={isPopup ? "small" : "large"}
             className={classNames(
               "absolute top-1/2 -translate-y-1/2",
-              isPopup ? "right-[calc(100%+1rem)]" : "right-[calc(100%+4.5rem)]"
+              isPopup
+                ? "right-[calc(100%+0.5rem)]"
+                : "right-[calc(100%+2.5rem)]"
             )}
           />
           <ProfilePreview
             theme={isPopup ? "extrasmall" : "large"}
             profile={currentProfile}
+            className={classNames(isPopup ? "w-[8.25rem]" : "w-[16rem]")}
           />
         </div>
       </div>
@@ -42,30 +45,27 @@ const Unlock: FC = () => {
         theme={isPopup ? "small" : "large"}
         className={isPopup ? "mt-11" : "mt-12 mb-20"}
       />
-      <div
-        className={classNames(
-          "fixed bottom-6 left-1/2 -translate-x-1/2",
-          isPopup ? "bottom-4" : "bottom-6",
-          isPopup ? "text-xl" : "text-2xl",
-          "font-black",
-          "flex items-center"
-        )}
-      >
-        <VigvamIcon
+      {isPopup && (
+        <div
           className={classNames(
-            isPopup ? "h-[1.375rem]" : "h-[2rem]",
-            "w-auto mr-3"
+            "fixed bottom-6 left-1/2 -translate-x-1/2",
+            "bottom-4",
+            "text-xl",
+            "font-black",
+            "flex items-center"
           )}
-        />
-        Vigvam
-      </div>
+        >
+          <VigvamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
+          Vigvam
+        </div>
+      )}
     </>
   );
 
   return isPopup ? (
     <PopupLayout>{content}</PopupLayout>
   ) : (
-    <BoardingPageLayout profileNav={false}>{content}</BoardingPageLayout>
+    <BoardingPageLayout>{content}</BoardingPageLayout>
   );
 };
 

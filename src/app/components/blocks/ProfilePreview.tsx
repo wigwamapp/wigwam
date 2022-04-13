@@ -8,16 +8,18 @@ import AutoIcon from "app/components/elements/AutoIcon";
 type ProfilePreviewProps = {
   theme?: "large" | "small" | "extrasmall";
   profile: Profile;
+  className?: string;
 };
 
 const ProfilePreview = memo<ProfilePreviewProps>(
-  ({ theme = "large", profile }) => {
+  ({ theme = "large", profile, className }) => {
     return (
       <div
         className={classNames(
-          "flex flex-col items-center",
-          theme === "small" && "max-w-24",
-          theme === "extrasmall" && "max-w-20"
+          "flex flex-col justify-center items-center",
+          "w-full",
+          theme === "extrasmall" && "max-w-20",
+          className
         )}
       >
         <AutoIcon
@@ -38,8 +40,9 @@ const ProfilePreview = memo<ProfilePreviewProps>(
 
         <h3
           className={classNames(
-            "font-bold truncate",
-            theme === "large" ? "text-[2rem]" : "text-lg"
+            "w-full",
+            "font-bold text-center truncate",
+            theme === "large" ? "text-3xl" : "text-lg"
           )}
         >
           <TReplace msg={profile.name} />
