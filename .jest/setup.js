@@ -4,8 +4,12 @@
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
 
+import { TextEncoder, TextDecoder } from "util";
 import { webcrypto } from "crypto";
 
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 global.crypto = webcrypto;
 
+jest.mock("webextension-polyfill", () => global.browser);
 jest.mock("mem", () => (fn) => fn);

@@ -5,5 +5,7 @@ module.exports = {
     "@tippyjs/react",
     "react",
     "react-dom",
+    "@types/react",
+    "@types/react-dom",
   ],
 };
