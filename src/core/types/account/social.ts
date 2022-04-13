@@ -8,5 +8,7 @@ export interface SocialAccount extends AccountBase {
 export interface AddSocialAccountParams extends AddAccountParamsBase {
   source: AccountSource.OpenLogin;
   social: string;
+  socialName?: string;
+  socialEmail?: string;
   privateKey: string;
 }

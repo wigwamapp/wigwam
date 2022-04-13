@@ -1,12 +1,12 @@
 import {
+  ChangeEvent,
   FC,
   memo,
-  useMemo,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
+  useMemo,
   useRef,
-  ChangeEvent,
+  useState,
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
@@ -17,7 +17,7 @@ import { replaceT } from "lib/ext/i18n";
 import { useI18NUpdate } from "lib/ext/i18n/react";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AddHDAccountParams, AccountSource, Network } from "core/types";
+import { AccountSource, AddAccountParams, Network } from "core/types";
 import { ClientProvider } from "core/client";
 
 import { allNetworksAtom } from "app/atoms";
@@ -35,21 +35,18 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
-type AddressProps = {
-  address: string;
+type AddressProps = Omit<AddAccountParams, "name"> & {
   name?: string;
   isDisabled?: boolean;
   isDefaultChecked?: boolean;
   isAdded?: boolean;
-  index: number;
+  index?: number;
 };
 
 type AccountsToAddProps = {
   addresses: AddressProps[];
-  onContinue: (params: AddHDAccountParams[]) => void;
+  onContinue: (params: AddAccountParams[]) => void;
 };
-
-const rootDerivationPath = "m/44'/60'/0'/0";
 
 const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
   const { stateRef } = useSteps();
@@ -170,11 +167,16 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
 
       const addressesToAdd = Array.from(addressesToAddRef.current);
 
-      const addAccountsParams: AddHDAccountParams[] = addressesToAdd.map(
-        (address) => {
-          const hdIndex = addresses.find(
-            ({ address: a }) => a === address
-          )!.index;
+      const addAccountsParams: AddAccountParams[] = addressesToAdd.map(
+        (address, i) => {
+          const {
+            isDefaultChecked,
+            isDisabled,
+            isAdded,
+            name,
+            index,
+            ...adrs
+          } = addresses.find(({ address: a }) => a === address)!;
           const addressName = addressesNamesRef.current.get(address);
 
           if (!addressName) {
@@ -182,11 +184,12 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
           }
 
           return {
-            source: AccountSource.SeedPhrase,
-            name: addressName ?? `Wallet ${hdIndex + 1}`,
-            derivationPath: `${
-              derivationPath ?? rootDerivationPath
-            }/${hdIndex}`,
+            name: addressName ?? `Wallet ${index ?? i + 1}`,
+            derivationPath:
+              adrs.source === AccountSource.SeedPhrase && derivationPath
+                ? `${derivationPath}/${index}`
+                : undefined,
+            ...adrs,
           };
         }
       );
@@ -311,7 +314,7 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
-  index: number;
+  index?: number;
   network: Network;
   isAdded: boolean;
   isDisabled?: boolean;
@@ -388,15 +391,14 @@ const Account = memo<AccountProps>(
           />
         </Td>
         <Td widthMaxContent className="min-w-[16rem]">
-          {!isDisabled ? (
+          {!isAddedTag ? (
             <Input
               value={name}
               onChange={(evt: ChangeEvent<HTMLInputElement>) =>
                 onChangeWalletName(evt.target.value)
               }
               theme="clean"
-              disabled={isDisabled}
-              error={!name && !isDisabled}
+              error={!name}
               inputClassName="!font-bold min-w-[16rem]"
             />
           ) : (

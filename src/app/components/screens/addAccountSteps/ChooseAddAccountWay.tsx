@@ -1,10 +1,15 @@
-import { FC, memo, useMemo } from "react";
+import { FC, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
+import { ethers } from "ethers";
+import { toProtectedString } from "lib/crypto-utils";
+
+import { AccountSource } from "core/types";
 
 import { hasSeedPhraseAtom } from "app/atoms";
-import { useSteps } from "app/hooks/steps";
 import { TippySingletonProvider } from "app/hooks";
+import { useSteps } from "app/hooks/steps";
+import { AddAccountStep } from "app/nav";
 import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -12,7 +17,11 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import { ReactComponent as VerifiedIcon } from "app/icons/verified.svg";
 import { ReactComponent as BackgroundIcon } from "app/icons/button-full-screen-background.svg";
 
-import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
+import {
+  ConnectAuthWay,
+  getWays,
+  WaysReturnTile,
+} from "./ChooseAddAccountWay.Ways";
 
 const ChooseAddAccountWay = memo(() => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
@@ -67,18 +76,17 @@ const ChooseAddAccountWay = memo(() => {
                 <div
                   className={classNames("flex flex-wrap items-stretch -mb-5")}
                 >
-                  {section.tiles.map(({ title, Icon, action, soon }, i) =>
-                    action ? (
+                  {section.tiles.map(
+                    ({ title, Icon, action, openLoginMethod, soon }, i) => (
                       <Tile
                         key={i}
                         title={title}
                         Icon={Icon}
                         action={action}
+                        openLoginMethod={openLoginMethod}
                         soon={soon}
                         className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
                       />
-                    ) : (
-                      <WarningMessage key="warning">{title}</WarningMessage>
                     )
                   )}
                 </div>
@@ -97,16 +105,19 @@ const ChooseAddAccountWay = memo(() => {
             triggerClassName="!mb-0"
           >
             <div className={classNames("flex flex-wrap items-stretch pt-5")}>
-              {section.tiles.map(({ title, Icon, action, soon }, i) => (
-                <Tile
-                  key={i}
-                  title={title}
-                  Icon={Icon}
-                  action={action!}
-                  soon={soon}
-                  className="mr-5"
-                />
-              ))}
+              {section.tiles.map(
+                ({ title, Icon, action, openLoginMethod, soon }, i) => (
+                  <Tile
+                    key={i}
+                    title={title}
+                    Icon={Icon}
+                    action={action}
+                    openLoginMethod={openLoginMethod}
+                    soon={soon}
+                    className="mr-5"
+                  />
+                )
+              )}
             </div>
           </Collapse>
         ))}
@@ -116,39 +127,91 @@ const ChooseAddAccountWay = memo(() => {
 
 export default ChooseAddAccountWay;
 
-type WarningMessageProps = {
+type TileProps = WaysReturnTile & {
   className?: string;
 };
 
-const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
-  <div
-    className={classNames(
-      "relative",
-      "w-full h-18 p-5 mb-[2.4375rem]",
-      "flex items-center",
-      "text-xs",
-      "z-[25]",
-      className
-    )}
-  >
-    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
-    {children}
-    <BackgroundIcon
-      className={classNames(
-        "absolute top-0 left-0 w-full h-full",
-        "bg-opacity-5",
-        "-z-10"
-      )}
-    />
-  </div>
-);
+const Tile: FC<TileProps> = ({ action, openLoginMethod, ...rest }) => {
+  if (action) {
+    return <TileSimple action={action} {...rest} />;
+  }
 
-type TileProps = Omit<WaysReturnTile, "action"> & {
+  if (openLoginMethod) {
+    return <TileAuth openLoginMethod={openLoginMethod} {...rest} />;
+  }
+
+  return <WarningMessage>{rest.title}</WarningMessage>;
+};
+
+type TileAuthProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
+  openLoginMethod: ConnectAuthWay;
+  className?: string;
+};
+
+const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
+  const { navigateToStep, stateRef } = useSteps();
+
+  const handleConnect = useCallback(async () => {
+    try {
+      const { default: OpenLogin, UX_MODE } = await import(
+        "@toruslabs/openlogin"
+      );
+      const openlogin = new OpenLogin({
+        clientId:
+          "BFfHgX9YCLSPWXW6LIYoEUpnVu2w1aV49E97Ns0gFZ1PFMDmtFL89oByFwKCl3QwzGk7tK9hGWaLh5P-bglI4SA",
+        network: "mainnet",
+        uxMode: UX_MODE.POPUP,
+        replaceUrlOnRedirect: false,
+      });
+      await openlogin.init();
+
+      try {
+        await openlogin.logout();
+      } catch {}
+      const { privKey } = await openlogin.login({
+        loginProvider: openLoginMethod,
+      });
+      const { email, name } = await openlogin.getUserInfo();
+
+      const address = new ethers.Wallet(privKey).address;
+      try {
+        await openlogin.logout();
+      } catch {}
+
+      stateRef.current.importAddresses = [
+        {
+          source: AccountSource.OpenLogin,
+          address,
+          name: email || name,
+          isDisabled: true,
+          isDefaultChecked: true,
+          privateKey: toProtectedString(privKey),
+          social: openLoginMethod,
+          socialName: name,
+          socialEmail: email,
+        },
+      ];
+      navigateToStep(AddAccountStep.VerifyToAdd);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [navigateToStep, openLoginMethod, stateRef]);
+
+  return <Tile action={handleConnect} {...rest} />;
+};
+
+type TileSimpleProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
   action: () => void;
   className?: string;
 };
 
-const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
+const TileSimple: FC<TileSimpleProps> = ({
+  title,
+  Icon,
+  action,
+  soon,
+  className,
+}) => (
   <button
     className={classNames(
       "relative",
@@ -183,6 +246,33 @@ const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
     )}
     {title}
   </button>
+);
+
+type WarningMessageProps = {
+  className?: string;
+};
+
+const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
+  <div
+    className={classNames(
+      "relative",
+      "w-full h-18 p-5 mb-[2.4375rem]",
+      "flex items-center",
+      "text-xs",
+      "z-[25]",
+      className
+    )}
+  >
+    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
+    {children}
+    <BackgroundIcon
+      className={classNames(
+        "absolute top-0 left-0 w-full h-full",
+        "bg-opacity-5",
+        "-z-10"
+      )}
+    />
+  </div>
 );
 
 type PointProps = {

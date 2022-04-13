@@ -410,7 +410,7 @@ export class Vault {
             const privateKey = importProtected(params.privateKey);
 
             const publicKey = ethers.utils.computePublicKey(
-              privateKey.getText()
+              `0x${privateKey.getText()}`
             );
             const address = ethers.utils.computeAddress(publicKey);
 

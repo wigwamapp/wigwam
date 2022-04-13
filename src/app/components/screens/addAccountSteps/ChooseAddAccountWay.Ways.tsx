@@ -12,10 +12,13 @@ import { ReactComponent as RedditIcon } from "app/icons/AddWalletReddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/AddWalletLedger.svg";
 import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 
+export type ConnectAuthWay = "google" | "facebook" | "twitter" | "reddit";
+
 export type WaysReturnTile = {
   title: string;
   Icon?: FC<{ className?: string }>;
   action?: () => void;
+  openLoginMethod?: ConnectAuthWay;
   soon?: boolean;
 };
 
@@ -121,30 +124,22 @@ export const getWays = (
       {
         title: "Google",
         Icon: GoogleIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "google",
       },
       {
         title: "Facebook",
         Icon: FacebookIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "facebook",
       },
       {
         title: "Twitter",
         Icon: TwitterIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "twitter",
       },
       {
         title: "Reddit",
         Icon: RedditIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "reddit",
       },
     ],
   },
