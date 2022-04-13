@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { toProtectedString } from "lib/crypto-utils";
 
-import { AccountSource } from "core/types";
+import { AccountSource, SocialProvider } from "core/types";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -17,11 +17,7 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import { ReactComponent as VerifiedIcon } from "app/icons/verified.svg";
 import { ReactComponent as BackgroundIcon } from "app/icons/button-full-screen-background.svg";
 
-import {
-  ConnectAuthWay,
-  getWays,
-  WaysReturnTile,
-} from "./ChooseAddAccountWay.Ways";
+import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
 
 const ChooseAddAccountWay = memo(() => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
@@ -144,7 +140,7 @@ const Tile: FC<TileProps> = ({ action, openLoginMethod, ...rest }) => {
 };
 
 type TileAuthProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
-  openLoginMethod: ConnectAuthWay;
+  openLoginMethod: SocialProvider;
   className?: string;
 };
 
