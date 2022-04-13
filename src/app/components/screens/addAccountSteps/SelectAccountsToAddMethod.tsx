@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
-import { SeedPharse, WalletStatus } from "core/types";
+import { AccountSource, SeedPharse, WalletStatus } from "core/types";
 import {
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
@@ -141,6 +141,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
               )
             ) {
               resultAddresses.push({
+                source: AccountSource.SeedPhrase,
                 address: wallet.address,
                 index: wallet.index,
                 isDisabled: true,
@@ -162,6 +163,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
     return [
       {
+        source: AccountSource.SeedPhrase,
         address: newAddress.address,
         index: newAddress.index,
         isDisabled: true,
