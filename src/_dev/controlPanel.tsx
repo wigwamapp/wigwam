@@ -33,6 +33,7 @@ const ControlPanel: FC = () => {
   return (
     <div
       className={classNames(
+        "overflow-hidden",
         "fixed bottom-[50%] right-[1rem]",
         "p-2",
         "flex flex-col",
@@ -80,15 +81,11 @@ const ControlButton: FC<{
         "bg-black/40 hover:bg-black/20",
         "text-base",
         "transition ease-in-out duration-300",
-        "overflow-hidden"
+        processing && "animate-bounce"
       )}
       onClick={handleClick}
     >
-      <span
-        className={classNames("font-semibold", processing && "animate-ping")}
-      >
-        {children}
-      </span>
+      <div className={classNames("font-semibold")}>{children}</div>
     </button>
   );
 };

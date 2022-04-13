@@ -47,10 +47,12 @@ const Asset: FC = () => {
 
   const sendEther = useCallback(
     async (recipient: string, amount: string) => {
-      return await provider.getSigner(currentAccount.address).sendTransaction({
-        to: recipient,
-        value: ethers.utils.parseEther(amount),
-      });
+      return await provider
+        .getUncheckedSigner(currentAccount.address)
+        .sendTransaction({
+          to: recipient,
+          value: ethers.utils.parseEther(amount),
+        });
     },
     [currentAccount.address, provider]
   );
@@ -62,7 +64,7 @@ const Asset: FC = () => {
       amount: string,
       decimals: number
     ) => {
-      const signer = provider.getSigner(currentAccount.address);
+      const signer = provider.getUncheckedSigner(currentAccount.address);
       const contract = Erc20__factory.connect(tokenContract, signer);
 
       const convertedAmount = ethers.utils.parseUnits(amount, decimals);

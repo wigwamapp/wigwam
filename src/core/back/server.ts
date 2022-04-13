@@ -26,9 +26,12 @@ import {
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
 import { processApprove } from "./approve";
+import { startApproveWindowServer } from "./approve/window";
 import { addFindTokenRequest, addSyncRequest } from "./sync";
 
 export function startServer() {
+  startApproveWindowServer();
+
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
 
   walletPorter.onConnection(() => {
