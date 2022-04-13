@@ -3,6 +3,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { toProtectedString } from "lib/crypto-utils";
+import { assert } from "lib/system/assert";
 
 import { AccountSource, SocialProvider } from "core/types";
 
@@ -152,9 +153,12 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
       const { default: OpenLogin, UX_MODE } = await import(
         "@toruslabs/openlogin"
       );
+
+      const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+      assert(clientId, "Client ID was not specified");
+
       const openlogin = new OpenLogin({
-        clientId:
-          "BFfHgX9YCLSPWXW6LIYoEUpnVu2w1aV49E97Ns0gFZ1PFMDmtFL89oByFwKCl3QwzGk7tK9hGWaLh5P-bglI4SA",
+        clientId,
         network: "mainnet",
         uxMode: UX_MODE.POPUP,
         replaceUrlOnRedirect: false,
@@ -188,8 +192,12 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
         },
       ];
       navigateToStep(AddAccountStep.VerifyToAdd);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      const msg = err?.message ?? "Unknown error";
+
+      if (msg === "user closed popup") return;
+
+      throw new Error(msg);
     }
   }, [navigateToStep, openLoginMethod, stateRef]);
 
