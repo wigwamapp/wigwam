@@ -52,30 +52,29 @@ const PasswordForm = memo<PasswordFormProps>(
             )}
             onSubmit={handleSubmit}
           >
-            <div className="max-w-[19rem] w-full relative">
-              <Field name="password" validate={required}>
-                {({ input, meta }) => (
-                  <PasswordField
-                    placeholder="Type password"
-                    label="Password"
-                    error={
-                      (!modifiedSinceLastSubmit && submitError) ||
-                      (meta.touched && meta.error)
-                    }
-                    errorMessage={
-                      meta.error || (!modifiedSinceLastSubmit && submitError)
-                    }
-                    {...input}
-                  />
-                )}
-              </Field>
-            </div>
+            <Field name="password" validate={required}>
+              {({ input, meta }) => (
+                <PasswordField
+                  className="max-w-[19rem] w-full relative min-h-[6.125rem]"
+                  placeholder="Type password"
+                  label="Password"
+                  error={
+                    (!modifiedSinceLastSubmit && submitError) ||
+                    (meta.touched && meta.error)
+                  }
+                  errorMessage={
+                    meta.error || (!modifiedSinceLastSubmit && submitError)
+                  }
+                  {...input}
+                />
+              )}
+            </Field>
 
             <div
               className={classNames(
                 "max-w-[13.75rem] w-full center",
-                theme === "large" && "mt-6",
-                theme === "small" && "mt-4"
+                theme === "large" && "mt-2",
+                theme === "small" && "mt-1.5"
               )}
             >
               <NewButton type="submit" className="w-full" disabled={submitting}>
@@ -84,8 +83,8 @@ const PasswordForm = memo<PasswordFormProps>(
               <button
                 className={classNames(
                   "w-full text-brand-inactivelight",
-                  theme === "large" && "text-sm mt-4",
-                  theme === "small" && "text-xs mt-3"
+                  theme === "large" && "text-sm mt-6",
+                  theme === "small" && "text-xs mt-4"
                 )}
                 onClick={() => {
                   setAttention(true);

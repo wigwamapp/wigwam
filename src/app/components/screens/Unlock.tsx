@@ -23,7 +23,7 @@ const Unlock: FC = () => {
 
   const content = (
     <>
-      <div className={classNames("flex justify-center", isPopup && "mt-16")}>
+      <div className={classNames("flex justify-center", isPopup && "mt-12")}>
         <div className="relative">
           <ChangeProfileButton
             theme={isPopup ? "small" : "large"}
@@ -45,6 +45,7 @@ const Unlock: FC = () => {
       <div
         className={classNames(
           "fixed bottom-6 left-1/2 -translate-x-1/2",
+          isPopup ? "bottom-4" : "bottom-6",
           isPopup ? "text-xl" : "text-2xl",
           "font-black",
           "flex items-center"

@@ -54,7 +54,7 @@ const Profiles: FC = () => {
               <button
                 key={p.id}
                 className={classNames(
-                  "py-6 px-7 max-h-[11.75rem] w-[9.625rem] mb-2",
+                  "py-6 px-1.5 max-h-[11.75rem] w-[9.625rem] mb-2",
                   "rounded-[.625rem]",
                   "flex items-center justify-center",
                   "transition-colors",

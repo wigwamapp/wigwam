@@ -31,14 +31,14 @@ const ProfilePreview = memo<ProfilePreviewProps>(
             theme === "extrasmall" && "w-20 h-20",
             theme === "extrasmall" ? "text-3xl" : "text-4xl",
             theme === "large" && "mb-5",
-            theme === "small" && "mb-4",
-            theme === "extrasmall" && "mb-3"
+            theme === "small" && "mb-3",
+            theme === "extrasmall" && "mb-2"
           )}
         />
 
         <h3
           className={classNames(
-            "font-bold",
+            "font-bold truncate",
             theme === "large" ? "text-[2rem]" : "text-lg"
           )}
         >
