@@ -83,6 +83,7 @@ const PasswordForm = memo<PasswordFormProps>(
                 {submitting ? "Unlocking" : "Unlock"}
               </NewButton>
               <button
+                type="button"
                 className={classNames(
                   "w-full text-brand-inactivelight",
                   theme === "large" && "text-sm mt-6",
