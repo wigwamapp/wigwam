@@ -1,5 +1,7 @@
 import { FC, ReactNode } from "react";
 
+import { SocialProvider } from "core/types";
+
 import { StepsContext } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import { ReactComponent as ImportIcon } from "app/icons/AddWalletImport.svg";
@@ -12,13 +14,11 @@ import { ReactComponent as RedditIcon } from "app/icons/AddWalletReddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/AddWalletLedger.svg";
 import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
 
-export type ConnectAuthWay = "google" | "facebook" | "twitter" | "reddit";
-
 export type WaysReturnTile = {
   title: string;
   Icon?: FC<{ className?: string }>;
   action?: () => void;
-  openLoginMethod?: ConnectAuthWay;
+  openLoginMethod?: SocialProvider;
   soon?: boolean;
 };
 

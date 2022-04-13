@@ -51,7 +51,9 @@ const VerifyAccountToAdd: FC = () => {
   );
 
   if (addresses && addresses.length > 0) {
-    return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+    return (
+      <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+    );
   }
 
   if (initialSetup) {
@@ -89,7 +91,7 @@ const VerifyAccountToAddInitial: FC = () => {
             ({ address, index }) => ({
               source: AccountSource.SeedPhrase,
               address,
-              index,
+              index: index.toString(),
             })
           )
         : null,
@@ -112,7 +114,9 @@ const VerifyAccountToAddInitial: FC = () => {
     return null;
   }
 
-  return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+  return (
+    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+  );
 };
 
 const VerifyAccountToAddExisting: FC = () => {
@@ -148,7 +152,11 @@ const VerifyAccountToAddExisting: FC = () => {
       const newAccounts = generatePreviewHDNodes(key, offset, limit);
 
       if (!importedAccounts || importedAccounts.length <= 0) {
-        return { source: AccountSource.SeedPhrase, ...newAccounts[0] };
+        return {
+          source: AccountSource.SeedPhrase,
+          address: newAccounts[0].address,
+          index: newAccounts[0].index.toString(),
+        };
       }
 
       const filteredAccounts = newAccounts.filter(
@@ -166,7 +174,7 @@ const VerifyAccountToAddExisting: FC = () => {
         source: AccountSource.SeedPhrase,
         address: filteredAccounts[0].address,
         name: `Wallet ${filteredAccounts[0].index + 1}`,
-        index: filteredAccounts[0].index,
+        index: filteredAccounts[0].index.toString(),
         isDisabled: true,
         isDefaultChecked: true,
       };
@@ -184,7 +192,7 @@ const VerifyAccountToAddExisting: FC = () => {
         ({ address, index }) => ({
           source: AccountSource.SeedPhrase,
           address,
-          index,
+          index: index.toString(),
         })
       );
 
@@ -202,7 +210,7 @@ const VerifyAccountToAddExisting: FC = () => {
         return {
           source: AccountSource.SeedPhrase,
           address,
-          index,
+          index: index.toString(),
           name: isAddressImported?.name ?? undefined,
           isDisabled: isAddressImported,
           isDefaultChecked: isAddressImported,
@@ -244,5 +252,7 @@ const VerifyAccountToAddExisting: FC = () => {
     return null;
   }
 
-  return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+  return (
+    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+  );
 };
