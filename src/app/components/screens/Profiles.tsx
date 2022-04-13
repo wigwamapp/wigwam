@@ -43,7 +43,7 @@ const Profiles: FC = () => {
   }, []);
 
   return (
-    <BoardingPageLayout profileNav={false}>
+    <BoardingPageLayout>
       <div className="max-w-[40rem] mx-auto">
         <div className="flex flex-wrap items-stretch -mb-2">
           {all.map((p, index) => {

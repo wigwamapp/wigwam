@@ -60,7 +60,9 @@ const PasswordForm = memo<PasswordFormProps>(
                   label="Password"
                   error={
                     (!modifiedSinceLastSubmit && submitError) ||
-                    (meta.touched && meta.error)
+                    (meta.submitFailed &&
+                      !meta.modifiedSinceLastSubmit &&
+                      meta.error)
                   }
                   errorMessage={
                     meta.error || (!modifiedSinceLastSubmit && submitError)
