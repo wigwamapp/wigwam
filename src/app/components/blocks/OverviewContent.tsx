@@ -49,9 +49,7 @@ import AssetLogo from "../elements/AssetLogo";
 import LongTextField from "../elements/LongTextField";
 
 const OverviewContent: FC = () => (
-  <div className="flex mt-6 min-h-0 grow">
-    <TokenExplorer />
-  </div>
+  <div className="flex mt-6 min-h-0 grow">{false && <TokenExplorer />}</div>
 );
 
 export default OverviewContent;

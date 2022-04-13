@@ -5,7 +5,7 @@ import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import { ReactComponent as AppsIcon } from "app/icons/Apps.svg";
 import { ReactComponent as ContactsIcon } from "app/icons/Contacts.svg";
-import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
+// import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 
 export const NavLinksPrimary = [
@@ -42,11 +42,11 @@ export const NavLinksPrimary = [
 ];
 
 export const NavLinksSecondary = [
-  {
-    route: Page.Wallets,
-    label: "Wallets",
-    Icon: WalletsIcon,
-  },
+  // {
+  //   route: Page.Wallets,
+  //   label: "Wallets",
+  //   Icon: WalletsIcon,
+  // },
   {
     route: Page.Settings,
     label: "Settings",

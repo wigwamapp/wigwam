@@ -24,7 +24,7 @@ export const addAccountStepAtom = atomWithURLHash(
 
 export const settingTabAtom = atomWithURLHash<SettingTab>(
   "setting",
-  SettingTab.General
+  SettingTab.Profile
 );
 
 export const transferTabAtom = atomWithURLHash<TransferTab>(
