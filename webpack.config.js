@@ -117,7 +117,7 @@ const entry = (...files) =>
 module.exports = {
   mode: NODE_ENV,
   bail: NODE_ENV === "production",
-  devtool: SOURCE_MAP && "inline-cheap-module-source-map",
+  devtool: SOURCE_MAP && "inline-source-map",
 
   target: ["web", ES_TARGET],
 
@@ -148,6 +148,8 @@ module.exports = {
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
+      // For `react-error-guard`
+      "babel-runtime/regenerator": "regenerator-runtime",
     },
     fallback: {
       process: false,
@@ -212,14 +214,24 @@ module.exports = {
             ],
           },
 
-          // Process application JS with Sucrase.
+          // Process application JS with SWC.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             include: [SOURCE_PATH],
-            loader: require.resolve("@sucrase/webpack-loader"),
+            loader: require.resolve("swc-loader"),
             options: {
-              transforms: ["jsx", "typescript"],
-              production: NODE_ENV === "production",
+              jsc: {
+                target: ES_TARGET,
+                parser: {
+                  syntax: "typescript",
+                  tsx: true,
+                },
+                transform: {
+                  react: {
+                    runtime: "automatic",
+                  },
+                },
+              },
             },
           },
 
@@ -307,10 +319,6 @@ module.exports = {
         }
         return appEnvs;
       })(),
-    }),
-
-    new webpack.ProvidePlugin({
-      React: "react",
     }),
 
     new MiniCssExtractPlugin({

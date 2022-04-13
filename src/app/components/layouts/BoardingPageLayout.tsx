@@ -1,15 +1,12 @@
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
-import ProfileNav from "app/components/blocks/ProfileNav";
-import Heading from "app/components/elements/Heading";
 import BackButton from "app/components/elements/BackButton";
+import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 type BoardingPageLayoutProps = {
-  title?: ReactNode;
   header?: boolean;
-  profileNav?: boolean;
   animate?: boolean;
 };
 
@@ -19,9 +16,7 @@ const handleBootAnimationEnd = () => {
 };
 
 const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
-  title,
   header = true,
-  profileNav = true,
   animate = false,
   children,
 }) => (
@@ -34,23 +29,26 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer narrow>
+    <ContentContainer narrow className="mt-[14vh]">
       {header && (
-        <header className="mt-16 mb-8 flex items-stretch">
-          <BackButton />
-          <div className="flex-1" />
-          {title && (
-            <>
-              <Heading className="mt-16">{title}</Heading>
-              <div className="flex-1" />
-            </>
-          )}
-          {profileNav && <ProfileNav />}
+        <header className="flex items-stretch relative">
+          <BackButton className="absolute bottom-2 left-0" />
         </header>
       )}
 
-      {children}
+      <div className="mb-24">{children}</div>
     </ContentContainer>
+    <div
+      className={classNames(
+        "mt-auto mb-6",
+        "text-2xl",
+        "font-black",
+        "w-full flex justify-center items-center"
+      )}
+    >
+      <VigvamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
+      Vigvam
+    </div>
   </div>
 );
 

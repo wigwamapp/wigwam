@@ -408,10 +408,12 @@ export class Vault {
 
           case AccountSource.OpenLogin: {
             const social = params.social;
+            const socialName = params.socialName;
+            const socialEmail = params.socialEmail;
             const privateKey = importProtected(params.privateKey);
 
             const publicKey = ethers.utils.computePublicKey(
-              privateKey.getText()
+              `0x${privateKey.getText()}`
             );
             const address = ethers.utils.computeAddress(publicKey);
 
@@ -420,6 +422,8 @@ export class Vault {
               source,
               address,
               social,
+              socialName,
+              socialEmail,
             };
 
             const keys: AccountKeys = {
