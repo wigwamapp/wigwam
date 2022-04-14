@@ -1,6 +1,7 @@
 import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
+import * as Accordion from "@radix-ui/react-accordion";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { Link } from "lib/navigation";
 
@@ -147,45 +148,73 @@ export const AttentionModal = memo<SecondaryModalProps>(
           "!block"
         )}
       >
-        <HeadingDot>Forgot the password</HeadingDot>
-
-        <p>
-          It is impossible to recover the current profile password. Because
-          Vigvam is <strong>non-custodial</strong> software. Only user knows his
-          password.
-        </p>
-
-        <p>
-          To access the same wallets -{" "}
-          <Link to={{ page: Page.Profiles }}>add a new profile</Link>, and
-          restore this wallets. If you used the <strong>Secret Phrase</strong>{" "}
-          to add them, <strong>use the same one again</strong>.
-        </p>
-
-        <HeadingDot>Import Secret Phrase</HeadingDot>
-
-        <p>
-          To restore wallets with the Secret Phrase, or if you want to start
-          from scratch -{" "}
-          <Link to={{ page: Page.Profiles }}>add a new profile</Link> and use
-          this pharse to add new wallets.
-        </p>
-
-        <HeadingDot>Reset the app</HeadingDot>
-
-        <p>
-          Vigvam does not have a built-in function to reset the application. We
-          recommend using profiles, but if you still want to reset - just
-          reinstall the application (all profiles will be erased).
-        </p>
+        <Accordion.Root type="single" defaultValue={AttentionContent[0].value}>
+          {AttentionContent.map(({ value, header, content }) => (
+            <Accordion.Item key={value} value={value}>
+              <Accordion.Header>
+                <Accordion.Trigger>
+                  <HeadingDot>{header}</HeadingDot>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content className="leading-6">
+                {content}
+              </Accordion.Content>
+            </Accordion.Item>
+          ))}
+        </Accordion.Root>
       </SecondaryModal>
     );
   }
 );
 
 const HeadingDot: FC = ({ children }) => (
-  <h3 className="flex items-center">
+  <span className="flex items-center font-bold">
     <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full" />
     <span>{children}</span>
-  </h3>
+  </span>
 );
+
+const AttentionContent = [
+  {
+    value: "pass",
+    header: "Forgot the password",
+    content: (
+      <>
+        <p className="mb-2">
+          It is impossible to recover the current profile password. Because
+          Vigvam is <strong>non-custodial</strong> software. Only user knows his
+          password.
+        </p>
+
+        <p className="mt-2">
+          To access the same wallets -{" "}
+          <Link to={{ page: Page.Profiles }}>add a new profile</Link>, and
+          restore this wallets. If you used the <strong>Secret Phrase</strong>{" "}
+          to add them, <strong>use the same one again</strong>.
+        </p>
+      </>
+    ),
+  },
+  {
+    value: "seed",
+    header: "Import Secret Phrase",
+    content: (
+      <p>
+        To restore wallets with the Secret Phrase, or if you want to start from
+        scratch - <Link to={{ page: Page.Profiles }}>add a new profile</Link>{" "}
+        and use this pharse to add new wallets.
+      </p>
+    ),
+  },
+  {
+    value: "reset",
+    header: "Reset the app",
+    content: (
+      <p>
+        Vigvam does not have a built-in function to reset the application. We
+        recommend using profiles, but if you still want to reset - just
+        reinstall the application (all profiles will be erased).
+      </p>
+    ),
+  },
+];
