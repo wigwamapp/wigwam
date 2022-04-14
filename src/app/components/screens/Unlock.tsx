@@ -1,4 +1,4 @@
-import { FC, memo, useCallback } from "react";
+import { FC, memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import * as Accordion from "@radix-ui/react-accordion";
@@ -133,6 +133,10 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
 
 export const AttentionModal = memo<SecondaryModalProps>(
   ({ open, onOpenChange }) => {
+    const [accordionValue, setAccordionValue] = useState(
+      AttentionContent[0].value
+    );
+
     const isPopup = isPopupPrimitive();
 
     return (
@@ -148,12 +152,21 @@ export const AttentionModal = memo<SecondaryModalProps>(
           "!block"
         )}
       >
-        <Accordion.Root type="single" defaultValue={AttentionContent[0].value}>
+        <Accordion.Root
+          type="single"
+          value={accordionValue}
+          onValueChange={setAccordionValue}
+          className={classNames(
+            isPopup ? "min-h-[21.5rem]" : "min-h-[18.5rem]"
+          )}
+        >
           {AttentionContent.map(({ value, header, content }) => (
             <Accordion.Item key={value} value={value}>
               <Accordion.Header>
                 <Accordion.Trigger>
-                  <HeadingDot>{header}</HeadingDot>
+                  <HeadingDot active={value === accordionValue}>
+                    {header}
+                  </HeadingDot>
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Content className="leading-6">
@@ -167,9 +180,16 @@ export const AttentionModal = memo<SecondaryModalProps>(
   }
 );
 
-const HeadingDot: FC = ({ children }) => (
-  <span className="flex items-center font-bold">
-    <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full" />
+const HeadingDot: FC<{ active?: boolean }> = ({ children, active }) => (
+  <span className="flex items-center font-bold hover:underline">
+    <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full relative">
+      {!active && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="w-1.5 h-1.5 bg-brand-darklight rounded-full" />
+        </span>
+      )}
+    </span>
+
     <span>{children}</span>
   </span>
 );
@@ -212,8 +232,9 @@ const AttentionContent = [
     content: (
       <p>
         Vigvam does not have a built-in function to reset the application. We
-        recommend using profiles, but if you still want to reset - just
-        reinstall the application (all profiles will be erased).
+        recommend using <Link to={{ page: Page.Profiles }}>profiles</Link>, but
+        if you still want to reset - just reinstall the application (all
+        profiles will be erased).
       </p>
     ),
   },
