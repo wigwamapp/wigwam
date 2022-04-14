@@ -95,7 +95,7 @@ const Profile: FC = () => {
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
                     label="Old password"
-                    placeholder="Type old password"
+                    placeholder={"*".repeat(8)}
                     className="mb-4"
                     {...input}
                   />
@@ -107,7 +107,7 @@ const Profile: FC = () => {
                     error={meta.error && meta.touched}
                     errorMessage={meta.error}
                     label="New password"
-                    placeholder="Type new password"
+                    placeholder={"*".repeat(8)}
                     className="mb-4"
                     {...input}
                   />
@@ -125,7 +125,7 @@ const Profile: FC = () => {
                     error={meta.error && meta.touched}
                     errorMessage={meta.error}
                     label="Confirm new password"
-                    placeholder="Confirm new password"
+                    placeholder={"*".repeat(8)}
                     {...input}
                   />
                 )}

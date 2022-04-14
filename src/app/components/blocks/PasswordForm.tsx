@@ -56,7 +56,7 @@ const PasswordForm = memo<PasswordFormProps>(
               {({ input, meta }) => (
                 <PasswordField
                   className="max-w-[19rem] w-full relative min-h-[6.125rem]"
-                  placeholder="Type password"
+                  placeholder={"*".repeat(8)}
                   label="Password"
                   error={
                     (!modifiedSinceLastSubmit && submitError) ||
@@ -99,6 +99,7 @@ const PasswordForm = memo<PasswordFormProps>(
               </button>
             </div>
             <AttentionModal
+              key={String(attention)}
               open={attention}
               onOpenChange={() => setAttention(false)}
             />
