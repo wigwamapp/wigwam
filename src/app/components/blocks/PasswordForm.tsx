@@ -99,6 +99,7 @@ const PasswordForm = memo<PasswordFormProps>(
               </button>
             </div>
             <AttentionModal
+              key={String(attention)}
               open={attention}
               onOpenChange={() => setAttention(false)}
             />
