@@ -34,6 +34,7 @@
     "@ledgerhq/hw-transport": "6.27.1",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "6.27.1",
+    "@radix-ui/react-accordion": "0.1.6",
     "@radix-ui/react-avatar": "0.1.4",
     "@radix-ui/react-checkbox": "0.1.5",
     "@radix-ui/react-collapsible": "0.1.6",
