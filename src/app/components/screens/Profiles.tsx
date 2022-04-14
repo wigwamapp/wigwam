@@ -86,20 +86,28 @@ const Profiles: FC = () => {
             <span className="text-lg font-bold">Add new</span>
           </button>
         </div>
-        <div className="mt-[7.5rem] prose prose-invert">
-          <h2 className="">FAQ</h2>
+        <div className="mt-[7.5rem] px-6 prose prose-invert">
+          <h2>FAQ</h2>
 
-          {/* <h3>What is Profiles</h3> */}
+          <ul>
+            <li>
+              <strong>Profiles</strong> allows split app usage experience into
+              multiple different sessions and provides more safety for our
+              users. For example, a user can have a work profile and a personal
+              profile.
+            </li>
 
-          <p className="">
-            <strong>What is Profiles.</strong> Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit ut aliquam, purus sit amet luctus
-            venenatis, lectus magna fringilla urna, porttitor rhoncus dolor
-            purus non enim praesent elementum facilisis leo, vel fringilla est
-            ullamcorper eget nulla facilisi etiam dignissim diam quis enim
-            lobortis scelerisque fermentum dui faucibus in ornare quam viverra
-            orci sagittis eu volutpat odio.
-          </p>
+            <li>
+              You will always see your <strong>profile avatar</strong>, on all
+              Vigvam pages. <strong>It is unique!</strong> This feature allows
+              you to <strong>determine</strong> whether the Vigvam you are
+              seeing is <strong>real</strong> or fake.
+            </li>
+
+            <li>
+              Each profile can have <strong>only one Secret Phrase</strong>.
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -130,7 +138,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
 
     return (
       <SecondaryModal
-        header="Add a new Profile"
+        header="Add a new profile"
         open={open}
         onOpenChange={onOpenChange}
         headerClassName="!mb-[3.25rem] !text-[2rem]"
