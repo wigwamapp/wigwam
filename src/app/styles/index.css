@@ -89,6 +89,14 @@
 }
 
 /**
+ * Tailwind Typography
+ */
+
+.prose.prose-invert {
+  --tw-prose-body: theme("colors.brand.inactivelight");
+}
+
+/**
  * Radix
  */
 

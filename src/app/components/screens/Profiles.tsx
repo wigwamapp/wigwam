@@ -86,15 +86,19 @@ const Profiles: FC = () => {
             <span className="text-lg font-bold">Add new</span>
           </button>
         </div>
-        <div className="mt-[7.5rem]">
-          <h2 className="text-2xl font-bold mb-4">FAQ</h2>
-          <p className="text-base	text-brand-inactivelight">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo, vel fringilla est ullamcorper eget nulla facilisi etiam
-            dignissim diam quis enim lobortis scelerisque fermentum dui faucibus
-            in ornare quam viverra orci sagittis eu volutpat odio.
+        <div className="mt-[7.5rem] prose prose-invert">
+          <h2 className="">FAQ</h2>
+
+          {/* <h3>What is Profiles</h3> */}
+
+          <p className="">
+            <strong>What is Profiles.</strong> Lorem ipsum dolor sit amet,
+            consectetur adipiscing elit ut aliquam, purus sit amet luctus
+            venenatis, lectus magna fringilla urna, porttitor rhoncus dolor
+            purus non enim praesent elementum facilisis leo, vel fringilla est
+            ullamcorper eget nulla facilisi etiam dignissim diam quis enim
+            lobortis scelerisque fermentum dui faucibus in ornare quam viverra
+            orci sagittis eu volutpat odio.
           </p>
         </div>
       </div>
@@ -126,7 +130,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
 
     return (
       <SecondaryModal
-        header="Add a New Profile"
+        header="Add a new Profile"
         open={open}
         onOpenChange={onOpenChange}
         headerClassName="!mb-[3.25rem] !text-[2rem]"
