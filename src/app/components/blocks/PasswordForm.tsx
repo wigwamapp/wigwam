@@ -29,6 +29,8 @@ const PasswordForm = memo<PasswordFormProps>(
             await unlockWallet(password);
           }
         } catch (err: any) {
+          await new Promise((r) => setTimeout(r, 300)); // Human delay
+
           return { [FORM_ERROR]: err?.message };
         }
         return;
