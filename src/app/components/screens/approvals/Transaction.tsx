@@ -8,29 +8,31 @@ import {
   useState,
 } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
+import useForceUpdate from "use-force-update";
 import * as Tabs from "@radix-ui/react-tabs";
+import { createQueue } from "lib/system/queue";
 
 import { TransactionApproval } from "core/types";
+import { allAccountsAtom } from "app/atoms";
+import { approveItem } from "core/client";
 
 import { useProvider } from "app/hooks";
 import WalletCard from "app/components/elements/WalletCard";
+import NumberInput from "app/components/elements/NumberInput";
+import LongTextField from "app/components/elements/LongTextField";
 
 import ApprovalLayout from "./Layout";
-import { useAtomValue } from "jotai";
-import { allAccountsAtom } from "app/atoms";
-import { approveItem } from "core/client";
-import LongTextField from "app/components/elements/LongTextField";
-import useForceUpdate from "use-force-update";
-import NumberInput from "app/components/elements/NumberInput";
 
-const TAB_VALUES = ["summary", "fee", "data", "hash"] as const;
+const TAB_VALUES = ["summary", "fee", "data", "hash", "error"] as const;
 
 const TAB_NAMES: Record<TabValue, ReactNode> = {
   summary: "Summary",
   fee: "Fee",
   data: "Data",
   hash: "Hash",
+  error: "Error",
 };
 
 type TabValue = typeof TAB_VALUES[number];
@@ -53,37 +55,53 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
   const [tabValue, setTabValue] = useState<TabValue>("summary");
 
-  useEffect(() => {
-    (async () => {
-      try {
-        let { txParams } = approval;
+  const enqueueEstimate = useMemo(createQueue, []);
 
-        if ("gas" in txParams) {
-          const { gas, ...rest } = txParams;
-          txParams = { ...rest, gasLimit: gas };
+  const estimateTx = useCallback(
+    () =>
+      enqueueEstimate(async () => {
+        try {
+          let { txParams } = approval;
+
+          if ("gas" in txParams) {
+            const { gas, ...rest } = txParams;
+            txParams = { ...rest, gasLimit: gas };
+          }
+
+          const tx = await provider.populateTransaction({
+            ...txParams,
+            type: hexToNum(txParams?.type),
+            chainId: hexToNum(txParams?.chainId),
+          });
+
+          console.info(tx.gasLimit?.toString());
+
+          preparedTxRef.current = {
+            ...tx,
+            nonce: hexToNum(tx.nonce),
+          };
+          forceUpdate();
+        } catch (err) {
+          console.error(err);
         }
+      }),
+    [enqueueEstimate, forceUpdate, provider, approval]
+  );
 
-        const tx = await provider.populateTransaction({
-          ...txParams,
-          type: hexToNum(txParams?.type),
-          chainId: hexToNum(txParams?.chainId),
-        });
-
-        preparedTxRef.current = {
-          ...tx,
-          nonce: hexToNum(tx.nonce),
-        };
-        forceUpdate();
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, [forceUpdate, provider, approval]);
+  useEffect(() => {
+    estimateTx();
+  }, [estimateTx]);
 
   const [lastError, setLastError] = useState<any>(null);
 
+  useEffect(() => {
+    setTabValue(lastError ? "error" : "summary");
+  }, [setTabValue, lastError]);
+
   const handleApprove = useCallback(
     async (approved: boolean) => {
+      setLastError(null);
+
       try {
         await approveItem(approval.id, { approved });
       } catch (err) {
@@ -97,45 +115,49 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const preparedTx = preparedTxRef.current;
 
   return (
-    <ApprovalLayout onApprove={handleApprove}>
+    <ApprovalLayout
+      approveText={lastError ? "Retry" : "Approve"}
+      onApprove={handleApprove}
+    >
       <WalletCard account={account} />
 
-      <div></div>
-
-      {!lastError ? (
-        <Tabs.Root
-          defaultValue="summary"
-          orientation="horizontal"
-          value={tabValue}
-          onValueChange={(v) => setTabValue(v as TabValue)}
-          className="mt-6 w-full flex flex-col"
+      <Tabs.Root
+        defaultValue="summary"
+        orientation="horizontal"
+        value={tabValue}
+        onValueChange={(v) => setTabValue(v as TabValue)}
+        className="mt-6 w-full flex flex-col"
+      >
+        <Tabs.List
+          aria-label="Approve tabs"
+          className={classNames("flex items-center")}
         >
-          <Tabs.List
-            aria-label="Approve tabs"
-            className={classNames("flex items-center")}
-          >
-            {TAB_VALUES.map((value, i, arr) => {
-              const active = value === tabValue;
-              const last = i === arr.length - 1;
+          {TAB_VALUES.map((value, i, arr) => {
+            if (value === "error" && !lastError) return null;
 
-              return (
-                <Tabs.Trigger
-                  key={value}
-                  value={value}
-                  className={classNames(
-                    "font-semibold text-sm",
-                    "px-4 py-2",
-                    !last && "mr-1",
-                    active && "bg-white/10 rounded-md"
-                  )}
-                >
-                  {TAB_NAMES[value]}
-                </Tabs.Trigger>
-              );
-            })}
-          </Tabs.List>
+            const active = value === tabValue;
+            const last = i === arr.length - 1;
 
+            return (
+              <Tabs.Trigger
+                key={value}
+                value={value}
+                className={classNames(
+                  "font-semibold text-sm",
+                  "px-4 py-2",
+                  !last && "mr-1",
+                  active && "bg-white/10 rounded-md"
+                )}
+              >
+                {TAB_NAMES[value]}
+              </Tabs.Trigger>
+            );
+          })}
+        </Tabs.List>
+
+        <div className="mt-4">
           <Tabs.Content value="summary">Transaction summary</Tabs.Content>
+
           <Tabs.Content value="fee">
             {!preparedTx ? (
               <Loading />
@@ -173,19 +195,21 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               </div>
             )}
           </Tabs.Content>
-          <Tabs.Content value="data">Transaction Data</Tabs.Content>
-          <Tabs.Content value="hash">Transaction Hash</Tabs.Content>
-        </Tabs.Root>
-      ) : (
-        <div className="mb-8 px-4">
-          <h2 className="mb-2 text-white text-xl font-semibold">Error</h2>
 
-          <LongTextField
-            readOnly
-            value={lastError?.message || "Unknown error."}
-          />
+          <Tabs.Content value="data">Transaction Data</Tabs.Content>
+
+          <Tabs.Content value="hash">Transaction Hash</Tabs.Content>
+
+          <Tabs.Content value="error">
+            {lastError && (
+              <LongTextField
+                readOnly
+                value={lastError?.message || "Unknown error."}
+              />
+            )}
+          </Tabs.Content>
         </div>
-      )}
+      </Tabs.Root>
     </ApprovalLayout>
   );
 };
