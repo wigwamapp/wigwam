@@ -5,7 +5,7 @@ import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
-import { required } from "app/utils";
+import { required, withHumanDelay } from "app/utils";
 import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
 import PasswordField from "app/components/elements/PasswordField";
@@ -21,20 +21,20 @@ const PasswordForm = memo<PasswordFormProps>(
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
-      async ({ password }) => {
-        try {
-          if (unlockCallback) {
-            unlockCallback(password);
-          } else {
-            await unlockWallet(password);
-          }
-        } catch (err: any) {
-          await new Promise((r) => setTimeout(r, 300)); // Human delay
+      ({ password }) =>
+        withHumanDelay(async () => {
+          try {
+            if (unlockCallback) {
+              unlockCallback(password);
+            } else {
+              await unlockWallet(password);
+            }
 
-          return { [FORM_ERROR]: err?.message };
-        }
-        return;
-      },
+            return;
+          } catch (err: any) {
+            return { [FORM_ERROR]: err?.message };
+          }
+        }),
       [unlockCallback]
     );
 
