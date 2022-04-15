@@ -540,10 +540,9 @@ export const syncConversionRates = mem(
           rates[name] = value.toFormat();
         }
       });
-      console.log(`rates`, rates);
       storage.put("currencies_rate", rates);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
   { maxAge: 500 }

@@ -6,21 +6,20 @@ import { useAtomValue } from "jotai";
 import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 import PrettyAmount, { PrettyAmountProps } from "./PrettyAmount";
 
-type USDAmountProps = {
-  _?: boolean;
-} & PrettyAmountProps;
+type USDAmountProps = PrettyAmountProps;
 
 const USDAmount: FC<USDAmountProps> = ({ amount, ...props }) => {
   const currenciesRate = useAtomValue(currenciesRateAtom);
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
 
-  const conversionDisabled = props.currency ? true : false;
+  const isContverted = props.currency ? true : false;
   const isFiat =
     !props.currency?.includes("ETH") && !props.currency?.includes("BTC");
 
-  const value = conversionDisabled
+  const value = isContverted
     ? amount
     : convert(amount, currenciesRate[selectedCurrency.value.split(" - ")[1]]);
+
   const units =
     props.currency ??
     CONVERSION_CURRENCIES.find(
@@ -40,7 +39,6 @@ export default USDAmount;
 
 const fiatFormat = (amount: BigNumber.Value | null) => {
   const bigNumberAmount = new BigNumber(amount ?? 0);
-  console.log(`bigNUMBER fIAT`, bigNumberAmount.toFixed(2).toString());
   return bigNumberAmount.toFixed(2);
 };
 
