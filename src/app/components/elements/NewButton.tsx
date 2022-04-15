@@ -101,8 +101,17 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
       ),
     };
 
+    const relativeClassName = useMemo(
+      () =>
+        !className?.includes("absolute") &&
+        !className?.includes("fixed") &&
+        "relative",
+      [className]
+    );
+
     const classNamesList = classNames(
-      "relative overflow-hidden",
+      relativeClassName,
+      "overflow-hidden",
       "py-3 px-4",
       theme !== "clean" && "min-w-[10rem]",
       "text-brand-light text-base font-bold",
