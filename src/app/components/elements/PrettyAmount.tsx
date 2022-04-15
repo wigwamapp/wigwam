@@ -10,7 +10,7 @@ import CopiableTooltip from "./CopiableTooltip";
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
-type PrettyAmountProps = {
+export type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;

@@ -32,7 +32,7 @@ import NewButton from "app/components/elements/NewButton";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
-import PrettyAmount from "app/components/elements/PrettyAmount";
+import USDAmount from "app/components/elements/USDAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -221,7 +221,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
             header={
               <>
                 Amount:{" "}
-                <PrettyAmount
+                <USDAmount
                   amount={values.amount ?? 0}
                   currency={currentToken?.symbol ?? undefined}
                   copiable
@@ -230,7 +230,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
               </>
             }
             value={
-              <PrettyAmount
+              <USDAmount
                 amount={
                   values.amount && currentToken
                     ? new BigNumber(values.amount).multipliedBy(
@@ -238,7 +238,6 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
                       )
                     : 0
                 }
-                currency="$"
                 copiable
               />
             }
@@ -248,7 +247,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
             header={
               <>
                 Average Fee:{" "}
-                <PrettyAmount
+                <USDAmount
                   amount={0.13}
                   currency={nativeCurrency?.symbol ?? undefined}
                   copiable
@@ -256,14 +255,14 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
                 />
               </>
             }
-            value={<PrettyAmount amount={9.55} currency="$" copiable />}
+            value={<USDAmount amount={9.55} copiable />}
             className="mb-1"
           />
           <SummaryRow
             header={
               <>
                 Total:{" "}
-                <PrettyAmount
+                <USDAmount
                   amount={
                     values.amount && currentToken
                       ? new BigNumber(values.amount)
@@ -271,7 +270,6 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
                           .plus(9.55)
                       : 9.55
                   }
-                  currency="$"
                   copiable
                   className="font-bold"
                 />

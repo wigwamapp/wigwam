@@ -39,7 +39,7 @@ import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import PrettyAmount from "../elements/PrettyAmount";
+import USDAmount from "app/components/elements/USDAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
@@ -349,7 +349,7 @@ const AssetCard = memo(
           <span className="flex flex-col w-full min-w-0">
             <span className="text-sm font-bold leading-5 truncate">{name}</span>
             <span className="mt-auto flex justify-between items-end">
-              <PrettyAmount
+              <USDAmount
                 amount={rawBalance ?? 0}
                 decimals={decimals}
                 currency={symbol}
@@ -357,9 +357,8 @@ const AssetCard = memo(
                 copiable={!isManageMode}
               />
               {!isManageMode && (
-                <PrettyAmount
+                <USDAmount
                   amount={balanceUSD ?? 0}
-                  currency="$"
                   className={classNames(
                     "ml-2",
                     "text-xs leading-4",

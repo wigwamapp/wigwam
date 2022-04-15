@@ -19,7 +19,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
-import PrettyAmount from "app/components/elements/PrettyAmount";
+import USDAmount from "app/components/elements/USDAmount";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
@@ -261,7 +261,7 @@ const Account: FC<AccountProps> = ({
         />
       </span>
       <span className="flex flex-col text-right min-w-0">
-        <PrettyAmount
+        <USDAmount
           amount={
             nativeToken
               ? portfolioBalance ??
@@ -277,7 +277,7 @@ const Account: FC<AccountProps> = ({
           className="text-sm font-bold text-brand-light ml-2"
         />
         {portfolioBalance && (
-          <PrettyAmount
+          <USDAmount
             amount={
               nativeToken
                 ? ethers.utils.formatEther(nativeToken.rawBalance)

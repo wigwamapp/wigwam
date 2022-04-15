@@ -22,7 +22,7 @@ import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
-import PrettyAmount from "./PrettyAmount";
+import USDAmount from "./USDAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
@@ -144,7 +144,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <PrettyAmount
+          <USDAmount
             amount={
               nativeToken
                 ? portfolioBalance ??
@@ -162,7 +162,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           />
         </span>
         {portfolioBalance && (
-          <PrettyAmount
+          <USDAmount
             amount={
               nativeToken
                 ? ethers.utils.formatEther(nativeToken.rawBalance)

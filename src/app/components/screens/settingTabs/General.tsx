@@ -3,8 +3,16 @@ import { useAtom, useAtomValue } from "jotai";
 import { setLocale } from "lib/ext/i18n";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
+import {
+  ConversionCurrency,
+  CONVERSION_CURRENCIES,
+} from "fixtures/conversionCurrency";
 
-import { currentLocaleAtom, tokensWithoutBalanceAtom } from "app/atoms";
+import {
+  currentLocaleAtom,
+  selectedCurrencyAtom,
+  tokensWithoutBalanceAtom,
+} from "app/atoms";
 import Select from "app/components/elements/Select";
 import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
@@ -12,6 +20,7 @@ import SelectLanguage from "app/components/blocks/SelectLanguage";
 
 const General: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
+  const [selectedCurrency, updateCurrency] = useAtom(selectedCurrencyAtom);
   const [showTokensWithoutBalance, toggleTokensWithoutBalance] = useAtom(
     tokensWithoutBalanceAtom
   );
@@ -24,10 +33,15 @@ const General: FC = () => {
   );
 
   const currencySelectProps = {
-    items: [{ key: "usd", value: "USD ($)" }],
-    currentItem: { key: "usd", value: "USD ($)" },
+    items: CONVERSION_CURRENCIES.map(mapCurrency),
+    currentItem: selectedCurrency,
     setItem: (itemKey: any) => {
-      currencySelectProps.currentItem = itemKey;
+      const newCurrency = CONVERSION_CURRENCIES.find(
+        (currency) => currency.name === itemKey.key
+      );
+      if (newCurrency) {
+        updateCurrency(itemKey);
+      }
     },
     showSelected: true,
     label: "Currency conversion",
@@ -54,3 +68,8 @@ const General: FC = () => {
 };
 
 export default General;
+
+const mapCurrency = (currency: ConversionCurrency) => ({
+  key: currency.name,
+  value: `${currency.code} - ${currency.name}`,
+});

@@ -29,6 +29,7 @@ import * as repo from "core/repo";
 
 import { $accounts, syncStarted, synced } from "../state";
 import { getRpcProvider } from "../rpc";
+import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 
 const debankApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
@@ -137,8 +138,7 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
   }, 300);
 
   try {
-    console.log(`sync any`);
-    await syncConversionRates();
+    syncConversionRates();
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
 
@@ -502,37 +502,49 @@ const getDebankChainList = mem(
 
 export const syncConversionRates = mem(
   async () => {
-    const { data } = await axios.get(
-      "https://api.coingecko.com/api/v3/exchange_rates"
-    );
-    const currencies: { rates: Record<string, Currency> } = await data.json();
+    try {
+      const { data } = await axios.get(
+        "https://api.coingecko.com/api/v3/exchange_rates"
+      );
+      const currencies: { rates: Record<string, Currency> } = data;
 
-    type Currency = {
-      name: string;
-      type: string;
-      unit: string;
-      value: number;
-    };
-    const arr = Object.values(currencies.rates).filter((curr: Currency) => {
-      if (curr.type === "fiat" || curr.unit === "BTC" || curr.unit === "ETH") {
-        if (curr.name !== "Russian Ruble") {
-          return true;
+      type Currency = {
+        name: string;
+        type: string;
+        unit: string;
+        value: number;
+      };
+      const arr = Object.values(currencies.rates).filter((curr: Currency) => {
+        if (
+          curr.type === "fiat" ||
+          curr.unit === "BTC" ||
+          curr.unit === "ETH"
+        ) {
+          if (curr.name !== "Russian Ruble") {
+            return true;
+          }
         }
-      }
-      return false;
-    });
-    const btcPrice = new BigNumber(
-      arr.find((curr) => (curr.name = "US Dollar"))!.value
-    );
-    // const btcToUsd = new BigNumber(1).div(btcPrice);
-
-    const rates: Record<string, BigNumber> = {};
-    arr.forEach((curr) => {
-      const value = new BigNumber(1).div(curr.value).multipliedBy(btcPrice);
-      rates[curr.name] = value;
-    });
-    console.log(`rates`, rates);
-    storage.put("rates", rates);
+        return false;
+      });
+      const btcPrice = new BigNumber(
+        arr.find((curr) => curr.name === "US Dollar")!.value
+      );
+      const btcToUsd = new BigNumber(1).dividedBy(btcPrice);
+      const rates: Record<string, string> = {};
+      arr.forEach((curr) => {
+        const name = CONVERSION_CURRENCIES.find(
+          (conv_curr) => conv_curr.name === curr.name
+        )?.name;
+        if (name) {
+          const value = new BigNumber(curr.value).multipliedBy(btcToUsd);
+          rates[name] = value.toFormat();
+        }
+      });
+      console.log(`rates`, rates);
+      storage.put("currencies_rate", rates);
+    } catch (err) {
+      console.log(err);
+    }
   },
   { maxAge: 500 }
 );

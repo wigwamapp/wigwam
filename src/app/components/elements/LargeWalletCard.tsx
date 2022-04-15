@@ -9,7 +9,7 @@ import { Account } from "core/types";
 
 import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
 
-import PrettyAmount from "./PrettyAmount";
+import USDAmount from "./USDAmount";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import IconedButton from "./IconedButton";
@@ -122,14 +122,13 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                         </span>
                       </>
                     </CopiableTooltip>
-                    <PrettyAmount
+                    <USDAmount
                       amount={
                         nativeToken
                           ? portfolioBalance ??
                             ethers.utils.formatEther(nativeToken.rawBalance)
                           : null
                       }
-                      currency={portfolioBalance ? "$" : nativeToken?.symbol}
                       isMinified={
                         portfolioBalance
                           ? new BigNumber(portfolioBalance).isLessThan(0.01)
@@ -162,7 +161,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                     )}
                   </div>
                   {portfolioBalance && (
-                    <PrettyAmount
+                    <USDAmount
                       amount={
                         nativeToken
                           ? ethers.utils.formatEther(nativeToken.rawBalance)

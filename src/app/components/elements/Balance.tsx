@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
 import { useToken } from "app/hooks";
-import PrettyAmount from "./PrettyAmount";
+import USDAmount from "./USDAmount";
 
 type BalanceProps = {
   address: string;
@@ -21,7 +21,7 @@ const Balance: FC<BalanceProps> = ({
   const protfolioBalane = nativeToken?.portfolioUSD;
 
   return (
-    <PrettyAmount
+    <USDAmount
       amount={
         nativeToken
           ? protfolioBalane ?? ethers.utils.formatEther(nativeToken.rawBalance)

@@ -43,10 +43,10 @@ import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import NewButton from "../elements/NewButton";
 import SearchInput from "../elements/SearchInput";
-import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import LongTextField from "../elements/LongTextField";
+import USDAmount from "../elements/USDAmount";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -359,16 +359,15 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         <span className="flex flex-col justify-center w-full min-w-0">
           <span className="text-sm font-bold leading-4 truncate">{name}</span>
           <span className="mt-2 flex justify-between items-end">
-            <PrettyAmount
+            <USDAmount
               amount={rawBalance ?? 0}
               decimals={decimals}
               currency={symbol}
               className={"text-base font-bold leading-4"}
             />
             {!isManageMode && (
-              <PrettyAmount
+              <USDAmount
                 amount={balanceUSD ?? 0}
-                currency="$"
                 isMinified
                 className={classNames(
                   "ml-2",
@@ -459,9 +458,8 @@ const AssetInfo: FC = () => {
               Price
             </span>
             <span className="flex items-center">
-              <PrettyAmount
+              <USDAmount
                 amount={priceUSD ?? 0}
-                currency="$"
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
@@ -475,7 +473,7 @@ const AssetInfo: FC = () => {
           Balance
         </div>
         <div>
-          <PrettyAmount
+          <USDAmount
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
@@ -483,9 +481,8 @@ const AssetInfo: FC = () => {
             className="text-[1.75rem] font-bold leading-none"
           />
 
-          <PrettyAmount
+          <USDAmount
             amount={balanceUSD ?? 0}
-            currency="$"
             copiable
             className="text-base text-brand-inactivedark ml-8 mr-4"
           />
