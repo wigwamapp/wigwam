@@ -81,8 +81,8 @@ const PasswordForm = memo<PasswordFormProps>(
                 theme === "small" && "mt-1.5"
               )}
             >
-              <NewButton type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Unlocking" : "Unlock"}
+              <NewButton type="submit" className="w-full" loading={submitting}>
+                Unlock
               </NewButton>
               <button
                 type="button"
