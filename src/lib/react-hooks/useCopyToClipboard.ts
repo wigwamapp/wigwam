@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useEffect, useState } from "react";
 
 export function useCopyToClipboard<
-  T extends HTMLInputElement | HTMLTextAreaElement
+  T extends HTMLInputElement | HTMLTextAreaElement | HTMLSpanElement
 >(ref: RefObject<T>, copyDelay: number = 1000 * 2) {
   const [copied, setCopied] = useState(false);
 
@@ -26,12 +26,22 @@ export function useCopyToClipboard<
 
     const textarea = ref.current;
     if (textarea) {
-      textarea.focus();
-      textarea.select();
-      document.execCommand("copy");
+      if (isInput(textarea)) {
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        setCopied(true);
+      } else {
+        // if ref isn't input (e.g. span)
+        navigator.clipboard.writeText(textarea.innerText);
+      }
       setCopied(true);
     }
   }, [ref, copied, setCopied]);
 
   return { copy, copied, setCopied };
+}
+
+function isInput(elem: any): elem is HTMLInputElement | HTMLTextAreaElement {
+  return elem.select ? true : false;
 }

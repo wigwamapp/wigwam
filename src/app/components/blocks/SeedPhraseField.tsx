@@ -52,7 +52,7 @@ const CreateSeedPhraseField = forwardRef<
       <LongTextField
         ref={mergeRefs([ref, fieldRef])}
         id="seedPhrase"
-        label="Secret Phrase"
+        label={rest.label ?? "Secret Phrase"}
         readOnly
         actions={
           <div className="flex items-center">
