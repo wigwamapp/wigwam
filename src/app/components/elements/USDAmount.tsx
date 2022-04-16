@@ -30,6 +30,7 @@ const USDAmount: FC<USDAmountProps> = ({ amount, ...props }) => {
     <PrettyAmount
       {...props}
       amount={isFiat ? fiatFormat(value) : value}
+      currencyCode={selectedCurrency.value.split(" - ")[0]}
       currency={units}
     />
   );

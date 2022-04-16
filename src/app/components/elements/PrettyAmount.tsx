@@ -14,6 +14,7 @@ export type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;
+  currencyCode?: string;
   isMinified?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
@@ -24,6 +25,7 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   amount,
   decimals = 0,
   currency,
+  currencyCode = "USD",
   isMinified,
   copiable = false,
   prefix,
@@ -120,7 +122,12 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   const children = (
     <>
       {prefix}
-      <AmountWithCurrency amount={content} currency={currency} />
+      <AmountWithCurrency
+        amount={content}
+        locale={currentLocale}
+        currency={currency}
+        currencyCode={currencyCode}
+      />
     </>
   );
 
@@ -128,7 +135,12 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     return (
       <CopiableTooltip
         content={
-          <AmountWithCurrency amount={tooltipContent} currency={currency} />
+          <AmountWithCurrency
+            amount={tooltipContent}
+            locale={currentLocale}
+            currency={currency}
+            currencyCode={currencyCode}
+          />
         }
         textToCopy={tooltipContent}
         followCursor
@@ -146,24 +158,42 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
 
 export default PrettyAmount;
 
-const AmountWithCurrency: FC<{ amount: string; currency?: string }> = ({
+type AmountCurrencyType = {
+  amount: string;
+  locale?: string;
+  currency?: string;
+  currencyCode?: string;
+};
+
+const AmountWithCurrency: FC<AmountCurrencyType> = ({
   amount,
+  locale = "en-US",
   currency,
+  currencyCode,
 }) => {
   if (!currency) {
     return <>{amount}</>;
   }
 
+  if (isNaN(Number(amount))) {
+    return (
+      <>
+        {currency === "$" && <span>$</span>}
+        {amount}
+        {currency !== "$" && (
+          <>
+            <span>{currency}</span>
+          </>
+        )}
+      </>
+    );
+  }
   return (
     <>
-      {currency === "$" && <span>$</span>}
-      {amount}
-      {currency !== "$" && (
-        <>
-          {" "}
-          <span>{currency}</span>
-        </>
-      )}
+      {Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: currencyCode,
+      }).format(Number(amount))}
     </>
   );
 };
