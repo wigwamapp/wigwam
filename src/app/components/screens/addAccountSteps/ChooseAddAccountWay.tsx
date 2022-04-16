@@ -10,7 +10,7 @@ import { AccountSource, SocialProvider } from "core/types";
 import { hasSeedPhraseAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
-import { useDialog } from "app/hooks/dialog";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
@@ -150,37 +150,42 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
   const { navigateToStep, stateRef } = useSteps();
   const { waitLoading } = useDialog();
 
-  const handleConnect = useCallback(async () => {
-    try {
-      const { default: OpenLogin, UX_MODE } = await import(
-        "@toruslabs/openlogin"
-      );
-
-      const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
-      assert(clientId, "Client ID was not specified");
-
-      const openlogin = new OpenLogin({
-        clientId,
-        network: "mainnet",
-        uxMode: UX_MODE.POPUP,
-        replaceUrlOnRedirect: false,
-      });
-
+  const handleConnect = useCallback<LoadingHandler>(
+    async (onClose) => {
       try {
-        await openlogin.init();
+        let closed = false;
+        onClose(() => (closed = true));
 
-        try {
-          await openlogin.logout();
-        } catch {}
+        const { default: OpenLogin, UX_MODE } = await import(
+          "@toruslabs/openlogin"
+        );
+
+        const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+        assert(clientId, "Client ID was not specified");
+
+        const openlogin = new OpenLogin({
+          clientId,
+          network: "mainnet",
+          uxMode: UX_MODE.POPUP,
+          replaceUrlOnRedirect: false,
+        });
+
+        onClose(() => openlogin._cleanup());
+
+        await openlogin.init();
+        await openlogin.logout().catch(console.warn);
+
+        if (closed) return false;
+
         const { privKey } = await openlogin.login({
           loginProvider: openLoginMethod,
         });
         const { email, name } = await openlogin.getUserInfo();
+        await openlogin.logout().catch(console.warn);
+
+        if (closed) return false;
 
         const address = new ethers.Wallet(privKey).address;
-        try {
-          await openlogin.logout();
-        } catch {}
 
         stateRef.current.importAddresses = [
           {
@@ -195,19 +200,18 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
             socialEmail: email,
           },
         ];
-      } finally {
-        await openlogin._cleanup();
+
+        return true;
+      } catch (err: any) {
+        const msg = err?.message ?? "Unknown error";
+
+        if (msg === "user closed popup") return false;
+
+        throw new Error(msg);
       }
-
-      return true;
-    } catch (err: any) {
-      const msg = err?.message ?? "Unknown error";
-
-      if (msg === "user closed popup") return false;
-
-      throw new Error(msg);
-    }
-  }, [openLoginMethod, stateRef]);
+    },
+    [openLoginMethod, stateRef]
+  );
 
   const handleTileClick = useCallback(() => {
     waitLoading({

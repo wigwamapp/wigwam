@@ -7,7 +7,9 @@ import {
   useRef,
 } from "react";
 import useForceUpdate from "use-force-update";
+import memoizeOne from "memoize-one";
 import { assert } from "lib/system/assert";
+import { forEachSafe } from "lib/system/forEachSafe";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
@@ -40,7 +42,7 @@ type ConfirmParams = {
 type WaitLoadingParams = {
   title: ReactNode;
   content: ReactNode;
-  loadingHandler: () => Promise<boolean>;
+  loadingHandler: LoadingHandler;
 } & ModalProps;
 
 type DialogContextProps = {
@@ -51,6 +53,10 @@ type DialogContextProps = {
   confirm: (params: ConfirmParams) => Promise<boolean>;
   waitLoading: (params: WaitLoadingParams) => Promise<boolean>;
 };
+
+export type LoadingHandler = (
+  onClose: (callback: () => void) => void
+) => Promise<boolean>;
 
 const OPEN_NEXT_DELAY = 300;
 
@@ -151,10 +157,13 @@ export const DialogProvider: FC = ({ children }) => {
   const waitLoading = useCallback(
     ({ title, content, loadingHandler, ...rest }: WaitLoadingParams) =>
       new Promise<boolean>(async (res) => {
-        const handleConfirm = (confirmed: boolean) => {
+        const closeHandlers = new Set<() => void>();
+
+        const handleConfirm = memoizeOne((confirmed: boolean) => {
+          forEachSafe(closeHandlers, (handle) => handle());
           closeCurrentDialog();
           res(confirmed);
-        };
+        });
 
         addDialog({
           header: title,
@@ -165,7 +174,9 @@ export const DialogProvider: FC = ({ children }) => {
         });
 
         try {
-          const res = await loadingHandler();
+          const res = await loadingHandler((handler) => {
+            closeHandlers.add(handler);
+          });
           handleConfirm(res);
         } catch (err: any) {
           const msg = err?.message ?? "Unknown error";
