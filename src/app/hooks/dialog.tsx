@@ -14,7 +14,7 @@ import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 type DialogContextDataProps =
   | (Omit<SecondaryModalProps, "header" | "open" | "onOpenChange"> & {
       header: ReactNode;
-      primaryButtonText: ReactNode;
+      primaryButtonText?: ReactNode;
       onPrimaryButtonClick?: () => void;
       secondaryButtonText?: ReactNode;
       onSecondaryButtonClick?: () => void;
@@ -35,12 +35,19 @@ type ConfirmParams = {
   noButtonText?: ReactNode;
 };
 
+type WaitLoadingParams = {
+  title: ReactNode;
+  content: ReactNode;
+  loadingHandler: () => void;
+};
+
 type DialogContextProps = {
   modalData: DialogContextDataProps;
   addDialog: (params: DialogContextDataProps) => void;
   closeCurrentDialog: () => void;
   alert: (params: AlertParams) => Promise<void>;
   confirm: (params: ConfirmParams) => Promise<boolean>;
+  waitLoading: (params: WaitLoadingParams) => Promise<boolean>;
 };
 
 const OPEN_NEXT_DELAY = 300;
@@ -136,9 +143,49 @@ export const DialogProvider: FC = ({ children }) => {
     [addDialog, closeCurrentDialog]
   );
 
+  const waitLoading = useCallback(
+    ({ title, content, loadingHandler }: WaitLoadingParams) =>
+      new Promise<boolean>(async (res) => {
+        const handleConfirm = (confirmed: boolean) => {
+          closeCurrentDialog();
+          res(confirmed);
+        };
+
+        addDialog({
+          header: title,
+          children: content,
+          onClose: () => handleConfirm(false),
+        });
+
+        try {
+          await loadingHandler();
+          handleConfirm(true);
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+
+          handleConfirm(false);
+
+          if (msg !== "user closed popup") {
+            alert({
+              title: "Error!",
+              content: msg,
+            });
+          }
+        }
+      }),
+    [addDialog, alert, closeCurrentDialog]
+  );
+
   return (
     <dialogContext.Provider
-      value={{ modalData, addDialog, closeCurrentDialog, alert, confirm }}
+      value={{
+        modalData,
+        addDialog,
+        closeCurrentDialog,
+        alert,
+        confirm,
+        waitLoading,
+      }}
     >
       {children}
     </dialogContext.Provider>

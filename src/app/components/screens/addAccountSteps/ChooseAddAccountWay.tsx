@@ -19,6 +19,7 @@ import { ReactComponent as VerifiedIcon } from "app/icons/verified.svg";
 import { ReactComponent as BackgroundIcon } from "app/icons/button-full-screen-background.svg";
 
 import { getWays, WaysReturnTile } from "./ChooseAddAccountWay.Ways";
+import { useDialog } from "../../../hooks/dialog";
 
 const ChooseAddAccountWay = memo(() => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
@@ -147,67 +148,70 @@ type TileAuthProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
 
 const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
   const { navigateToStep, stateRef } = useSteps();
+  const { waitLoading } = useDialog();
 
   const handleConnect = useCallback(async () => {
+    const { default: OpenLogin, UX_MODE } = await import(
+      "@toruslabs/openlogin"
+    );
+
+    const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+    assert(clientId, "Client ID was not specified");
+
+    const openlogin = new OpenLogin({
+      clientId,
+      network: "mainnet",
+      uxMode: UX_MODE.POPUP,
+      replaceUrlOnRedirect: false,
+    });
+
     try {
-      const { default: OpenLogin, UX_MODE } = await import(
-        "@toruslabs/openlogin"
-      );
-
-      const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
-      assert(clientId, "Client ID was not specified");
-
-      const openlogin = new OpenLogin({
-        clientId,
-        network: "mainnet",
-        uxMode: UX_MODE.POPUP,
-        replaceUrlOnRedirect: false,
-      });
+      await openlogin.init();
 
       try {
-        await openlogin.init();
+        await openlogin.logout();
+      } catch {}
+      const { privKey } = await openlogin.login({
+        loginProvider: openLoginMethod,
+      });
+      const { email, name } = await openlogin.getUserInfo();
 
-        try {
-          await openlogin.logout();
-        } catch {}
-        const { privKey } = await openlogin.login({
-          loginProvider: openLoginMethod,
-        });
-        const { email, name } = await openlogin.getUserInfo();
+      const address = new ethers.Wallet(privKey).address;
+      try {
+        await openlogin.logout();
+      } catch {}
 
-        const address = new ethers.Wallet(privKey).address;
-        try {
-          await openlogin.logout();
-        } catch {}
-
-        stateRef.current.importAddresses = [
-          {
-            source: AccountSource.OpenLogin,
-            address,
-            name: email || name,
-            isDisabled: true,
-            isDefaultChecked: true,
-            privateKey: toProtectedString(privKey),
-            social: openLoginMethod,
-            socialName: name,
-            socialEmail: email,
-          },
-        ];
-
-        navigateToStep(AddAccountStep.VerifyToAdd);
-      } finally {
-        await openlogin._cleanup();
-      }
-    } catch (err: any) {
-      const msg = err?.message ?? "Unknown error";
-
-      if (msg === "user closed popup") return;
-
-      throw new Error(msg);
+      stateRef.current.importAddresses = [
+        {
+          source: AccountSource.OpenLogin,
+          address,
+          name: email || name,
+          isDisabled: true,
+          isDefaultChecked: true,
+          privateKey: toProtectedString(privKey),
+          social: openLoginMethod,
+          socialName: name,
+          socialEmail: email,
+        },
+      ];
+    } finally {
+      await openlogin._cleanup();
     }
-  }, [navigateToStep, openLoginMethod, stateRef]);
+  }, [openLoginMethod, stateRef]);
 
-  return <Tile action={handleConnect} {...rest} />;
+  const handleTileClick = useCallback(() => {
+    waitLoading({
+      title: "Loading...",
+      content: "Loading...",
+      loadingHandler: handleConnect,
+    }).then((answer) => {
+      if (answer) {
+        navigateToStep(AddAccountStep.VerifyToAdd);
+      }
+    });
+  }, [handleConnect, navigateToStep, waitLoading]);
+
+  return <Tile action={handleTileClick} {...rest} />;
 };
 
 type TileSimpleProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
