@@ -11,8 +11,10 @@ import { assert } from "lib/system/assert";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
+type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
+
 type DialogContextDataProps =
-  | (Omit<SecondaryModalProps, "header" | "open" | "onOpenChange"> & {
+  | (ModalProps & {
       header: ReactNode;
       primaryButtonText?: ReactNode;
       onPrimaryButtonClick?: () => void;
@@ -26,20 +28,20 @@ type AlertParams = {
   title: ReactNode;
   content: ReactNode;
   okButtonText?: ReactNode;
-};
+} & ModalProps;
 
 type ConfirmParams = {
   title: ReactNode;
   content: ReactNode;
   yesButtonText?: ReactNode;
   noButtonText?: ReactNode;
-};
+} & ModalProps;
 
 type WaitLoadingParams = {
   title: ReactNode;
   content: ReactNode;
-  loadingHandler: () => void;
-};
+  loadingHandler: () => Promise<boolean>;
+} & ModalProps;
 
 type DialogContextProps = {
   modalData: DialogContextDataProps;
@@ -99,7 +101,7 @@ export const DialogProvider: FC = ({ children }) => {
   const modalData = openedRef.current ? queueRef.current[0] : null;
 
   const alert = useCallback(
-    ({ title, content, okButtonText = "OK" }: AlertParams) =>
+    ({ title, content, okButtonText = "OK", ...rest }: AlertParams) =>
       new Promise<void>((res) => {
         const handleDone = () => {
           closeCurrentDialog();
@@ -112,6 +114,7 @@ export const DialogProvider: FC = ({ children }) => {
           primaryButtonText: okButtonText,
           onPrimaryButtonClick: handleDone,
           onClose: handleDone,
+          ...rest,
         });
       }),
     [addDialog, closeCurrentDialog]
@@ -123,6 +126,7 @@ export const DialogProvider: FC = ({ children }) => {
       content,
       yesButtonText = "OK",
       noButtonText = "Cancel",
+      ...rest
     }: ConfirmParams) =>
       new Promise<boolean>((res) => {
         const handleConfirm = (confirmed: boolean) => {
@@ -138,13 +142,14 @@ export const DialogProvider: FC = ({ children }) => {
           onPrimaryButtonClick: () => handleConfirm(true),
           onSecondaryButtonClick: () => handleConfirm(false),
           onClose: () => handleConfirm(false),
+          ...rest,
         });
       }),
     [addDialog, closeCurrentDialog]
   );
 
   const waitLoading = useCallback(
-    ({ title, content, loadingHandler }: WaitLoadingParams) =>
+    ({ title, content, loadingHandler, ...rest }: WaitLoadingParams) =>
       new Promise<boolean>(async (res) => {
         const handleConfirm = (confirmed: boolean) => {
           closeCurrentDialog();
@@ -155,22 +160,20 @@ export const DialogProvider: FC = ({ children }) => {
           header: title,
           children: content,
           onClose: () => handleConfirm(false),
+          disabledClickOutside: true,
+          ...rest,
         });
 
         try {
-          await loadingHandler();
-          handleConfirm(true);
+          const res = await loadingHandler();
+          handleConfirm(res);
         } catch (err: any) {
           const msg = err?.message ?? "Unknown error";
-
           handleConfirm(false);
-
-          if (msg !== "user closed popup") {
-            alert({
-              title: "Error!",
-              content: msg,
-            });
-          }
+          alert({
+            title: "Error!",
+            content: msg,
+          });
         }
       }),
     [addDialog, alert, closeCurrentDialog]
