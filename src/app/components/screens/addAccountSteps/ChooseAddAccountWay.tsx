@@ -163,35 +163,41 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
         uxMode: UX_MODE.POPUP,
         replaceUrlOnRedirect: false,
       });
-      await openlogin.init();
 
       try {
-        await openlogin.logout();
-      } catch {}
-      const { privKey } = await openlogin.login({
-        loginProvider: openLoginMethod,
-      });
-      const { email, name } = await openlogin.getUserInfo();
+        await openlogin.init();
 
-      const address = new ethers.Wallet(privKey).address;
-      try {
-        await openlogin.logout();
-      } catch {}
+        try {
+          await openlogin.logout();
+        } catch {}
+        const { privKey } = await openlogin.login({
+          loginProvider: openLoginMethod,
+        });
+        const { email, name } = await openlogin.getUserInfo();
 
-      stateRef.current.importAddresses = [
-        {
-          source: AccountSource.OpenLogin,
-          address,
-          name: email || name,
-          isDisabled: true,
-          isDefaultChecked: true,
-          privateKey: toProtectedString(privKey),
-          social: openLoginMethod,
-          socialName: name,
-          socialEmail: email,
-        },
-      ];
-      navigateToStep(AddAccountStep.VerifyToAdd);
+        const address = new ethers.Wallet(privKey).address;
+        try {
+          await openlogin.logout();
+        } catch {}
+
+        stateRef.current.importAddresses = [
+          {
+            source: AccountSource.OpenLogin,
+            address,
+            name: email || name,
+            isDisabled: true,
+            isDefaultChecked: true,
+            privateKey: toProtectedString(privKey),
+            social: openLoginMethod,
+            socialName: name,
+            socialEmail: email,
+          },
+        ];
+
+        navigateToStep(AddAccountStep.VerifyToAdd);
+      } finally {
+        await openlogin._cleanup();
+      }
     } catch (err: any) {
       const msg = err?.message ?? "Unknown error";
 
