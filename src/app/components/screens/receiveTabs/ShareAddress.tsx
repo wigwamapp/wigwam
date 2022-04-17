@@ -13,7 +13,6 @@ const ShareAddress: FC = () => {
       <AddressField
         defaultValue={currentAccount.address}
         label="Wallet address"
-        className="mt-5"
         readOnly
       />
       <div className="border-2 border-brand-light rounded-xl mt-4 p-4 mr-auto">
