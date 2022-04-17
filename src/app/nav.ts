@@ -23,7 +23,6 @@ export enum AddAccountStep {
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
-  SelectDerivation = "select-derivation",
   AddPrivateKey = "add-private-key",
   SelectAccountsToAddMethod = "select-accounts-to-add-method",
   VerifyToAdd = "verify-to-add",

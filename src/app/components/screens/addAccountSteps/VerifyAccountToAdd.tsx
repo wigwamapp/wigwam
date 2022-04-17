@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { fromProtectedString } from "lib/crypto-utils";
 
-import { SeedPharse, WalletStatus } from "core/types";
+import { AccountSource, SeedPharse, WalletStatus } from "core/types";
 import {
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
@@ -27,6 +27,34 @@ import AccountsToAdd from "./AccountToAdd";
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const initialSetup = walletStatus === WalletStatus.Welcome;
+  const { stateRef, navigateToStep } = useSteps();
+  const setAccModalOpened = useSetAtom(addAccountModalAtom);
+
+  const addresses = stateRef.current.importAddresses;
+  const { alert } = useDialog();
+
+  const handleContinue = useCallback(
+    async (addAccountsParams) => {
+      try {
+        if (initialSetup) {
+          Object.assign(stateRef.current, { addAccountsParams });
+          navigateToStep(AddAccountStep.SetupPassword);
+        } else {
+          await addAccounts(addAccountsParams);
+          setAccModalOpened([false]);
+        }
+      } catch (err: any) {
+        alert({ title: "Error!", content: err.message });
+      }
+    },
+    [alert, initialSetup, navigateToStep, setAccModalOpened, stateRef]
+  );
+
+  if (addresses && addresses.length > 0) {
+    return (
+      <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+    );
+  }
 
   if (initialSetup) {
     return <VerifyAccountToAddInitial />;
@@ -61,8 +89,9 @@ const VerifyAccountToAddInitial: FC = () => {
       neuterExtendedKey
         ? generatePreviewHDNodes(neuterExtendedKey).map(
             ({ address, index }) => ({
+              source: AccountSource.SeedPhrase,
               address,
-              index,
+              index: index.toString(),
             })
           )
         : null,
@@ -75,7 +104,7 @@ const VerifyAccountToAddInitial: FC = () => {
         Object.assign(stateRef.current, { addAccountsParams });
         navigateToStep(AddAccountStep.SetupPassword);
       } catch (err: any) {
-        alert(err.message);
+        alert({ title: "Error!", content: err.message });
       }
     },
     [alert, navigateToStep, stateRef]
@@ -85,7 +114,9 @@ const VerifyAccountToAddInitial: FC = () => {
     return null;
   }
 
-  return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+  return (
+    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+  );
 };
 
 const VerifyAccountToAddExisting: FC = () => {
@@ -121,7 +152,11 @@ const VerifyAccountToAddExisting: FC = () => {
       const newAccounts = generatePreviewHDNodes(key, offset, limit);
 
       if (!importedAccounts || importedAccounts.length <= 0) {
-        return newAccounts[0];
+        return {
+          source: AccountSource.SeedPhrase,
+          address: newAccounts[0].address,
+          index: newAccounts[0].index.toString(),
+        };
       }
 
       const filteredAccounts = newAccounts.filter(
@@ -136,9 +171,12 @@ const VerifyAccountToAddExisting: FC = () => {
       }
 
       return {
+        source: AccountSource.SeedPhrase,
         address: filteredAccounts[0].address,
         name: `Wallet ${filteredAccounts[0].index + 1}`,
-        index: filteredAccounts[0].index,
+        index: filteredAccounts[0].index.toString(),
+        isDisabled: true,
+        isDefaultChecked: true,
       };
     },
     [importedAccounts]
@@ -152,8 +190,9 @@ const VerifyAccountToAddExisting: FC = () => {
     if (!isCreatingNew) {
       const newAccounts = generatePreviewHDNodes(neuterExtendedKey).map(
         ({ address, index }) => ({
+          source: AccountSource.SeedPhrase,
           address,
-          index,
+          index: index.toString(),
         })
       );
 
@@ -169,11 +208,13 @@ const VerifyAccountToAddExisting: FC = () => {
         );
 
         return {
+          source: AccountSource.SeedPhrase,
           address,
-          index,
+          index: index.toString(),
           name: isAddressImported?.name ?? undefined,
           isDisabled: isAddressImported,
           isDefaultChecked: isAddressImported,
+          isAdded: isAddressImported,
         };
       });
     }
@@ -201,7 +242,7 @@ const VerifyAccountToAddExisting: FC = () => {
         await addAccounts(addAccountsParams);
         setAccModalOpened([false]);
       } catch (err: any) {
-        alert(err.message);
+        alert({ title: "Error!", content: err.message });
       }
     },
     [alert, setAccModalOpened]
@@ -211,5 +252,7 @@ const VerifyAccountToAddExisting: FC = () => {
     return null;
   }
 
-  return <AccountsToAdd addresses={addresses} onContinue={handleContinue} />;
+  return (
+    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
+  );
 };

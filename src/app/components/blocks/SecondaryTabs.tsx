@@ -3,8 +3,8 @@ import classNames from "clsx";
 import { Destination, Link } from "lib/navigation";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
-import Separator from "../elements/Seperator";
 
 type SecondaryTabsProps = {
   tabs: SecondaryItemProps[];
@@ -46,7 +46,7 @@ export default SecondaryTabs;
 
 type SecondaryItemProps = {
   route: Destination;
-  Icon?: FC;
+  Icon?: FC<{ className?: string }>;
   title: string;
   desc: string;
 };
@@ -70,16 +70,13 @@ const SecondaryItem: FC<
       )}
     >
       <div className="flex items-center">
-        {Icon && <Icon />}
-        <h3
-          className={classNames("text-base font-bold", Icon && "ml-[0.6rem]")}
-        >
-          {title}
-        </h3>
+        {Icon && <Icon className="w-[1.125rem] h-auto mr-2" />}
+        <h3 className={"text-base font-bold"}>{title}</h3>
       </div>
-      <p className="text-xs text-[#BCC2DB] pt-1">{desc}</p>
+      {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2.5 top-1/2 -translate-y-1/2",
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",

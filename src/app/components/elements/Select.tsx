@@ -1,7 +1,15 @@
-import { ReactElement, useState } from "react";
+import {
+  KeyboardEventHandler,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
+import { OverflowProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
@@ -20,6 +28,7 @@ type SelectProps<T, U> = {
   label?: string;
   searchValue?: string | null;
   onSearch?: (value: string | null) => void;
+  actions?: ReactNode;
   showSelected?: boolean;
   showSelectedIcon?: boolean;
   itemRef?: any;
@@ -38,6 +47,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   label,
   searchValue,
   onSearch,
+  actions,
   showSelected = false,
   showSelectedIcon = true,
   modal = true,
@@ -51,6 +61,21 @@ function Select<T extends string | ReactElement, U extends string | number>({
   ...rest
 }: SelectProps<T, U>) {
   const [opened, setOpened] = useState(false);
+
+  const itemsRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchKeyDown = useCallback<
+    KeyboardEventHandler<HTMLInputElement>
+  >((evt) => {
+    if (evt.key === "ArrowDown") {
+      evt.preventDefault();
+
+      const firstItem = itemsRef.current
+        ?.firstElementChild as HTMLButtonElement;
+
+      firstItem?.focus();
+    }
+  }, []);
 
   return (
     <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
@@ -103,7 +128,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {currentItem.value}
           <ChevronDownIcon
             className={classNames(
-              "min-w-[1.5rem]",
+              "w-6 h-auto min-w-[1.5rem]",
               "ml-auto",
               "transition-transform",
               {
@@ -112,114 +137,124 @@ function Select<T extends string | ReactElement, U extends string | number>({
             )}
           />
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          className={classNames(
-            "shadow-xs",
-            "focus-visible:outline-none",
-            "mt-2",
-            "w-full min-w-[17.75rem]",
-            "rounded-[.625rem]",
-            "bg-brand-dark/10",
-            "backdrop-blur-[30px]",
-            "border border-brand-light/5",
-            "z-10",
-            contentClassName
-          )}
-        >
-          {!!onSearch && (
-            <div
+        <OverflowProvider>
+          {(ref) => (
+            <DropdownMenu.Content
+              ref={ref}
               className={classNames(
-                "relative",
-                "p-3",
-                "after:absolute after:bottom-0 after:left-3",
-                "after:w-[calc(100%-1.5rem)] after:h-[1px]",
-                "after:bg-brand-main/[.07]"
+                "shadow-xs",
+                "focus-visible:outline-none",
+                "mt-2",
+                "w-full min-w-[17.75rem]",
+                "rounded-[.625rem]",
+                "bg-brand-dark/10",
+                "backdrop-blur-[30px]",
+                "border border-brand-light/5",
+                "z-10",
+                contentClassName
               )}
             >
-              <SearchInput
-                placeholder="Type name to search..."
-                searchValue={searchValue}
-                toggleSearchValue={(value) => {
-                  onSearch(value);
-                }}
-                inputClassName="max-h-9 !pl-9"
-                adornmentClassName="!left-3"
-              />
-            </div>
-          )}
-          <ScrollAreaContainer
-            className={classNames(
-              "max-h-64 pl-3 pr-4",
-              "flex flex-col",
-              scrollAreaClassName
-            )}
-            viewPortClassName="py-3 viewportBlock"
-            scrollBarClassName="py-3"
-          >
-            <div>
-              {items
-                .filter((item) =>
-                  showSelected ? item.key : item.key !== currentItem.key
-                )
-                .map((item, i) => (
-                  <DropdownMenu.Item
-                    ref={
-                      i === items.length - loadMoreOnItemFromEnd - 1
-                        ? itemRef
-                        : null
-                    }
-                    key={item.key}
-                    className={classNames(
-                      "w-full mb-1 last:mb-0",
-                      "flex items-center",
-                      "px-3",
-                      showSelected &&
-                        showSelectedIcon &&
-                        item.key === currentItem.key
-                        ? "py-1.5"
-                        : "py-2",
-                      // showSelected &&
-                      //   item.key === currentItem.key &&
-                      //   "!bg-brand-main/10", // Test this variant
-                      "rounded-[.625rem]",
-                      "cursor-pointer",
-                      "text-sm font-bold",
-                      "outline-none",
-                      "transition-colors",
-                      "hover:bg-brand-main/20 focus-visible:bg-brand-main/20"
-                    )}
-                    onSelect={() => {
-                      setOpened(false);
-                      setItem(item);
-                      if (onSearch) {
-                        onSearch(null);
-                      }
+              {!!onSearch && (
+                <div
+                  className={classNames(
+                    "relative",
+                    "flex items-center",
+                    "p-3",
+                    "after:absolute after:bottom-0 after:left-3",
+                    "after:w-[calc(100%-1.5rem)] after:h-[1px]",
+                    "after:bg-brand-main/[.07]"
+                  )}
+                >
+                  <SearchInput
+                    placeholder="Type name to search..."
+                    searchValue={searchValue}
+                    toggleSearchValue={(value) => {
+                      onSearch(value);
                     }}
-                    textValue={!!onSearch ? "" : undefined}
-                    asChild
-                  >
-                    <button>
-                      {item.icon && (
-                        <img
-                          src={item.icon}
-                          alt={
-                            typeof item.value === "string" ? item.value : "Icon"
-                          }
-                          className={"w-6 h-6 mr-3"}
-                        />
-                      )}
-                      {item.value}
-                      {showSelected &&
-                        showSelectedIcon &&
-                        item.key === currentItem.key && (
-                          <SelectedIcon className="ml-auto" />
+                    onKeyDown={handleSearchKeyDown}
+                    inputClassName="max-h-9 !pl-9"
+                    adornmentClassName="!left-3"
+                  />
+                  {actions}
+                </div>
+              )}
+              <ScrollAreaContainer
+                className={classNames(
+                  "max-h-64 pl-3 pr-4",
+                  "flex flex-col",
+                  scrollAreaClassName
+                )}
+                viewPortClassName="py-3 viewportBlock"
+                scrollBarClassName="py-3"
+              >
+                <div ref={itemsRef}>
+                  {items
+                    .filter((item) =>
+                      showSelected ? item.key : item.key !== currentItem.key
+                    )
+                    .map((item, i) => (
+                      <DropdownMenu.Item
+                        ref={
+                          i === items.length - loadMoreOnItemFromEnd - 1
+                            ? itemRef
+                            : null
+                        }
+                        key={item.key}
+                        className={classNames(
+                          "w-full mb-1 last:mb-0",
+                          "flex items-center",
+                          "px-3",
+                          showSelected &&
+                            showSelectedIcon &&
+                            item.key === currentItem.key
+                            ? "py-1.5"
+                            : "py-2",
+                          // showSelected &&
+                          //   item.key === currentItem.key &&
+                          //   "!bg-brand-main/10", // Test this variant
+                          "rounded-[.625rem]",
+                          "cursor-pointer",
+                          "text-sm font-bold",
+                          "outline-none",
+                          "transition-colors",
+                          "hover:bg-brand-main/20 focus-visible:bg-brand-main/20"
                         )}
-                    </button>
-                  </DropdownMenu.Item>
-                ))}
-            </div>
-          </ScrollAreaContainer>
-        </DropdownMenu.Content>
+                        onSelect={() => {
+                          setOpened(false);
+                          setItem(item);
+                          if (onSearch) {
+                            onSearch(null);
+                          }
+                        }}
+                        textValue={!!onSearch ? "" : undefined}
+                        asChild
+                      >
+                        <button>
+                          {item.icon && (
+                            <img
+                              src={item.icon}
+                              alt={
+                                typeof item.value === "string"
+                                  ? item.value
+                                  : "Icon"
+                              }
+                              className={"w-6 h-6 mr-3"}
+                            />
+                          )}
+                          {item.value}
+                          {showSelected &&
+                            showSelectedIcon &&
+                            item.key === currentItem.key && (
+                              <SelectedIcon className="w-6 h-auto ml-auto" />
+                            )}
+                        </button>
+                      </DropdownMenu.Item>
+                    ))}
+                </div>
+              </ScrollAreaContainer>
+            </DropdownMenu.Content>
+          )}
+        </OverflowProvider>
       </DropdownMenu.Root>
     </div>
   );

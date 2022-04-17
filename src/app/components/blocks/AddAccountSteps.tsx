@@ -8,7 +8,6 @@ import { AllSteps, StepsProvider } from "app/hooks/steps";
 
 import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
 import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
-import SelectAccountDerivation from "../screens/addAccountSteps/SelectAccountDerivation";
 import AddPrivateKey from "../screens/addAccountSteps/AddPrivateKey";
 import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
 import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
@@ -21,7 +20,6 @@ const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
-  [AddAccountStep.SelectDerivation, () => <SelectAccountDerivation />],
   [AddAccountStep.AddPrivateKey, () => <AddPrivateKey />],
   [
     AddAccountStep.SelectAccountsToAddMethod,

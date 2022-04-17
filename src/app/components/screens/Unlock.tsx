@@ -1,20 +1,23 @@
-import { FC, memo, useCallback } from "react";
+import { FC, memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
+import * as Accordion from "@radix-ui/react-accordion";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
+import { Link } from "lib/navigation";
 
 import { Page } from "app/nav";
 import { currentProfileAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
-import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
-import PopupLayout from "app/components/layouts/PopupLayout";
-import SecondaryModal, {
-  SecondaryModalProps,
-} from "app/components/elements/SecondaryModal";
-import ProfilePreview from "app/components/blocks/ProfilePreview";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+
+import BoardingPageLayout from "../layouts/BoardingPageLayout";
+import PopupLayout from "../layouts/PopupLayout";
+import ProfilePreview from "../blocks/ProfilePreview";
 import PasswordForm from "../blocks/PasswordForm";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "../elements/SecondaryModal";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
@@ -23,18 +26,21 @@ const Unlock: FC = () => {
 
   const content = (
     <>
-      <div className={classNames("flex justify-center", isPopup && "mt-16")}>
+      <div className={classNames("flex justify-center", isPopup && "mt-12")}>
         <div className="relative">
           <ChangeProfileButton
             theme={isPopup ? "small" : "large"}
             className={classNames(
               "absolute top-1/2 -translate-y-1/2",
-              isPopup ? "right-[calc(100%+1rem)]" : "right-[calc(100%+4.5rem)]"
+              isPopup
+                ? "right-[calc(100%+0.5rem)]"
+                : "right-[calc(100%+2.5rem)]"
             )}
           />
           <ProfilePreview
             theme={isPopup ? "extrasmall" : "large"}
             profile={currentProfile}
+            className={classNames(isPopup ? "w-[8.25rem]" : "w-[16rem]")}
           />
         </div>
       </div>
@@ -42,29 +48,27 @@ const Unlock: FC = () => {
         theme={isPopup ? "small" : "large"}
         className={isPopup ? "mt-11" : "mt-12 mb-20"}
       />
-      <div
-        className={classNames(
-          "fixed bottom-6 left-1/2 -translate-x-1/2",
-          isPopup ? "text-xl" : "text-2xl",
-          "font-black",
-          "flex items-center"
-        )}
-      >
-        <VigvamIcon
+      {isPopup && (
+        <div
           className={classNames(
-            isPopup ? "h-[1.375rem]" : "h-[2rem]",
-            "w-auto mr-3"
+            "fixed bottom-6 left-1/2 -translate-x-1/2",
+            "bottom-4",
+            "text-xl",
+            "font-black",
+            "flex items-center"
           )}
-        />
-        Vigvam
-      </div>
+        >
+          <VigvamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
+          Vigvam
+        </div>
+      )}
     </>
   );
 
   return isPopup ? (
     <PopupLayout>{content}</PopupLayout>
   ) : (
-    <BoardingPageLayout profileNav={false}>{content}</BoardingPageLayout>
+    <BoardingPageLayout>{content}</BoardingPageLayout>
   );
 };
 
@@ -129,37 +133,109 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
 
 export const AttentionModal = memo<SecondaryModalProps>(
   ({ open, onOpenChange }) => {
+    const [accordionValue, setAccordionValue] = useState(
+      AttentionContent[0].value
+    );
+
+    const isPopup = isPopupPrimitive();
+
     return (
       <SecondaryModal
         open={open}
         onOpenChange={onOpenChange}
-        className="px-[5.25rem]"
+        className={classNames(
+          isPopup ? "px-6" : "px-[4rem]",
+          isPopup ? "py-6" : "py-[3rem]",
+          isPopup && "max-w-[92vw] max-h-[70vh]",
+          "prose prose-invert",
+          isPopup && "prose-sm",
+          "!block"
+        )}
       >
-        <ul>
-          <ListBlock className="mb-5">You cannot reset Application.</ListBlock>
-          <ListBlock>
-            To restore with Seed Phrase, or if you want to start from scratch,
-            go to Profiles and Add a New Profile!
-          </ListBlock>
-        </ul>
-        <p className="text-base text-brand-inactivelight mt-5">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-          purus sit amet luctus venenatis, lectus magna fringilla urna,
-          porttitor rhoncus dolor purus non enim praesent elementum facilisis
-          leo
-        </p>
+        <Accordion.Root
+          type="single"
+          value={accordionValue}
+          onValueChange={setAccordionValue}
+          className={classNames(
+            isPopup ? "min-h-[21.5rem]" : "min-h-[18.5rem]"
+          )}
+        >
+          {AttentionContent.map(({ value, header, content }) => (
+            <Accordion.Item key={value} value={value}>
+              <Accordion.Header>
+                <Accordion.Trigger>
+                  <HeadingDot active={value === accordionValue}>
+                    {header}
+                  </HeadingDot>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content className="leading-6">
+                {content}
+              </Accordion.Content>
+            </Accordion.Item>
+          ))}
+        </Accordion.Root>
       </SecondaryModal>
     );
   }
 );
 
-type ListBlockProps = {
-  className?: string;
-};
+const HeadingDot: FC<{ active?: boolean }> = ({ children, active }) => (
+  <span className="flex items-center font-bold hover:underline">
+    <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full relative">
+      {!active && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="w-1.5 h-1.5 bg-brand-darklight rounded-full" />
+        </span>
+      )}
+    </span>
 
-const ListBlock: FC<ListBlockProps> = ({ children, className }) => (
-  <li className={classNames("relative pl-[1.375rem]", className)}>
-    <span className="absolute left-0 top-2 w-2.5 h-2.5 bg-radio rounded-full" />
-    <span className="text-xl font-bold">{children}</span>
-  </li>
+    <span>{children}</span>
+  </span>
 );
+
+const AttentionContent = [
+  {
+    value: "pass",
+    header: "Forgot the password",
+    content: (
+      <>
+        <p className="mb-2">
+          It is impossible to recover the current profile password. Because
+          Vigvam is <strong>non-custodial</strong> software. Only user knows his
+          password.
+        </p>
+
+        <p className="mt-2">
+          To access the same wallets -{" "}
+          <Link to={{ page: Page.Profiles }}>add a new profile</Link>, and
+          restore this wallets. If you used the <strong>Secret Phrase</strong>{" "}
+          to add them, <strong>use the same one again</strong>.
+        </p>
+      </>
+    ),
+  },
+  {
+    value: "seed",
+    header: "Import Secret Phrase",
+    content: (
+      <p>
+        To restore wallets with the Secret Phrase, or if you want to start from
+        scratch - <Link to={{ page: Page.Profiles }}>add a new profile</Link>{" "}
+        and use this pharse to add new wallets.
+      </p>
+    ),
+  },
+  {
+    value: "reset",
+    header: "Reset the app",
+    content: (
+      <p>
+        Vigvam does not have a built-in function to reset the application. We
+        recommend using <Link to={{ page: Page.Profiles }}>profiles</Link>, but
+        if you still want to reset - just reinstall the application (all
+        profiles will be erased).
+      </p>
+    ),
+  },
+];

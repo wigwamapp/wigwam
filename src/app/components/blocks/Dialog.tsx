@@ -29,23 +29,27 @@ const Dialog: FC = () => {
       header={header}
       {...rest}
     >
-      <div className="text-base font-brand-font text-center w-full break-words">
+      <div className="text-base text-brand-font text-center w-full break-words flex flex-col items-center">
         {children}
       </div>
-      <div className="flex mt-5">
-        <NewButton onClick={onPrimaryButtonClick}>
-          {primaryButtonText}
-        </NewButton>
-        {secondaryButtonText && (
-          <NewButton
-            theme="secondary"
-            onClick={onSecondaryButtonClick}
-            className="ml-3"
-          >
-            {secondaryButtonText}
-          </NewButton>
-        )}
-      </div>
+      {(primaryButtonText || secondaryButtonText) && (
+        <div className="flex mt-5">
+          {primaryButtonText && (
+            <NewButton onClick={onPrimaryButtonClick}>
+              {primaryButtonText}
+            </NewButton>
+          )}
+          {secondaryButtonText && (
+            <NewButton
+              theme="secondary"
+              onClick={onSecondaryButtonClick}
+              className="ml-3"
+            >
+              {secondaryButtonText}
+            </NewButton>
+          )}
+        </div>
+      )}
     </SecondaryModal>
   );
 };

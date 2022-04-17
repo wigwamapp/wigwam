@@ -117,13 +117,13 @@ const entry = (...files) =>
 module.exports = {
   mode: NODE_ENV,
   bail: NODE_ENV === "production",
-  devtool: SOURCE_MAP && "inline-cheap-module-source-map",
+  devtool: SOURCE_MAP && "inline-source-map",
 
   target: ["web", ES_TARGET],
 
   entry: {
-    back: entry("back.ts", NODE_ENV === "development" && "hot-reload.ts"),
-    main: entry("main.tsx", RELEASE_ENV === "false" && "dev-tools.ts"),
+    back: entry("back.ts", NODE_ENV === "development" && "_dev/hotReload.ts"),
+    main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
     approve: entry("approve.tsx"),
     content: entry("content.ts"),
@@ -148,6 +148,8 @@ module.exports = {
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
+      // For `react-error-guard`
+      "babel-runtime/regenerator": "regenerator-runtime",
     },
     fallback: {
       process: false,
@@ -212,14 +214,24 @@ module.exports = {
             ],
           },
 
-          // Process application JS with Sucrase.
+          // Process application JS with SWC.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             include: [SOURCE_PATH],
-            loader: require.resolve("@sucrase/webpack-loader"),
+            loader: require.resolve("swc-loader"),
             options: {
-              transforms: ["jsx", "typescript"],
-              production: NODE_ENV === "production",
+              jsc: {
+                target: ES_TARGET,
+                parser: {
+                  syntax: "typescript",
+                  tsx: true,
+                },
+                transform: {
+                  react: {
+                    runtime: "automatic",
+                  },
+                },
+              },
             },
           },
 
@@ -307,10 +319,6 @@ module.exports = {
         }
         return appEnvs;
       })(),
-    }),
-
-    new webpack.ProvidePlugin({
-      React: "react",
     }),
 
     new MiniCssExtractPlugin({
@@ -480,6 +488,11 @@ module.exports = {
   // Turn off performance processing because we utilize
   // our own hints via the FileSizeReporter
   performance: false,
+
+  // Avoid double-compilations
+  watchOptions: {
+    aggregateTimeout: 300,
+  },
 };
 
 function getStyleLoaders(cssOptions = {}) {

@@ -21,17 +21,22 @@ import { HECO } from "./heco";
 
 export const DEFAULT_NETWORKS: Network[] = [
   ETHEREUM,
-  OPTIMISM,
-  POLYGON,
-  BSC,
-  ARBITRUM,
   AVALANCHE,
-  HARMONY,
+  BSC,
+  POLYGON,
   FANTOM,
+  OPTIMISM,
+  ARBITRUM,
   AURORA,
-  CELO,
+  HARMONY,
   HECO,
-].flat();
+  CELO,
+].flatMap((chainNets, i) =>
+  chainNets.map((n) => ({
+    ...n,
+    position: i,
+  }))
+);
 
 if (process.env.RELEASE_ENV === "false") {
   assert(
@@ -47,7 +52,7 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   DEFAULT_NETWORKS.map((n) => [
     n.chainId,
     getPublicURL(
-      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-test"}.svg`
+      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-testnet"}.png`
     ),
   ])
 );
@@ -55,7 +60,9 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
 export function getTokenLogoUrl(logoUrl?: string) {
   if (logoUrl?.startsWith("{{native}}")) {
     const [, chainTag] = logoUrl.split("/");
-    return getPublicURL(`icons/nativeToken/${chainTag}.png`);
+    return chainTag
+      ? getPublicURL(`icons/nativeToken/${chainTag}.png`)
+      : undefined;
   }
 
   return logoUrl;
