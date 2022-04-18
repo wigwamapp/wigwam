@@ -81,8 +81,10 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
               nodeRef={spinnerTransitionRef}
               in={loading}
               timeout={loadingTransitionTimeout}
+              appear
               unmountOnExit
               classNames={{
+                appear: "-translate-y-1/2",
                 enter: "opacity-0 translate-y-[150%]",
                 enterActive: "!opacity-100 !-translate-y-1/2",
                 enterDone: "opacity-100 -translate-y-1/2",
