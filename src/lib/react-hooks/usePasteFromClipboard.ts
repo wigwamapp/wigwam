@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export function usePasteFromClipboard(
-  setValue: (value: string) => void,
+  setValue?: (value: string) => void,
   copyDelay: number = 1000 * 2
 ) {
   const [pasted, setPasted] = useState(false);
@@ -22,7 +22,9 @@ export function usePasteFromClipboard(
     if (pasted) return;
 
     const text = await navigator.clipboard.readText();
-    setValue(text);
+    if (setValue) {
+      setValue(text);
+    }
     setPasted(true);
   }, [pasted, setValue]);
 

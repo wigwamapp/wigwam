@@ -1,11 +1,10 @@
-import { FC, forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
+import { FC, memo, ReactNode, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { Erc20__factory } from "abi-types";
-import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -25,16 +24,12 @@ import {
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
-import LongTextField, {
-  LongTextFieldProps,
-} from "app/components/elements/LongTextField";
 import NewButton from "app/components/elements/NewButton";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
+import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 const Asset: FC = () => {
@@ -285,48 +280,6 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
     </>
   );
 });
-
-type AddressFieldProps = LongTextFieldProps & {
-  setFromClipboard: (value: string) => void;
-};
-
-const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
-  ({ setFromClipboard, className, ...rest }, ref) => {
-    const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
-
-    return (
-      <div className={classNames("relative", className)}>
-        <LongTextField
-          ref={ref}
-          label="Recipient"
-          placeholder="0x0000000000000000000000000000000000000000"
-          textareaClassName="!h-20"
-          maxLength={42}
-          {...rest}
-        />
-        <NewButton
-          theme="tertiary"
-          onClick={paste}
-          className={classNames(
-            "absolute bottom-[1.125rem] right-3",
-            "text-sm text-brand-light",
-            "!p-0 !pr-1 !min-w-0",
-            "!font-normal",
-            "cursor-copy",
-            "items-center"
-          )}
-        >
-          {pasted ? (
-            <SuccessIcon className="mr-1" />
-          ) : (
-            <PasteIcon className="mr-1" />
-          )}
-          {pasted ? "Pasted" : "Paste"}
-        </NewButton>
-      </div>
-    );
-  }
-);
 
 type SummaryRowProps = {
   header: string | ReactNode;

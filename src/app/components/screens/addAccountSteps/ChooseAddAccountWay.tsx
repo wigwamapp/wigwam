@@ -10,7 +10,9 @@ import { AccountSource, SocialProvider } from "core/types";
 import { hasSeedPhraseAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
+import { withHumanDelay } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -147,61 +149,93 @@ type TileAuthProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
 
 const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
   const { navigateToStep, stateRef } = useSteps();
+  const { waitLoading } = useDialog();
 
-  const handleConnect = useCallback(async () => {
-    try {
-      const { default: OpenLogin, UX_MODE } = await import(
-        "@toruslabs/openlogin"
-      );
+  const handleConnect = useCallback<LoadingHandler>(
+    (onClose) =>
+      withHumanDelay(async () => {
+        try {
+          let closed = false;
+          onClose(() => (closed = true));
 
-      const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
-      assert(clientId, "Client ID was not specified");
+          const { default: OpenLogin, UX_MODE } = await import(
+            "@toruslabs/openlogin"
+          );
 
-      const openlogin = new OpenLogin({
-        clientId,
-        network: "mainnet",
-        uxMode: UX_MODE.POPUP,
-        replaceUrlOnRedirect: false,
-      });
-      await openlogin.init();
+          const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+          assert(clientId, "Client ID was not specified");
 
-      try {
-        await openlogin.logout();
-      } catch {}
-      const { privKey } = await openlogin.login({
-        loginProvider: openLoginMethod,
-      });
-      const { email, name } = await openlogin.getUserInfo();
+          const openlogin = new OpenLogin({
+            clientId,
+            network: "mainnet",
+            uxMode: UX_MODE.POPUP,
+            replaceUrlOnRedirect: false,
+          });
 
-      const address = new ethers.Wallet(privKey).address;
-      try {
-        await openlogin.logout();
-      } catch {}
+          onClose(() => openlogin._cleanup());
 
-      stateRef.current.importAddresses = [
-        {
-          source: AccountSource.OpenLogin,
-          address,
-          name: email || name,
-          isDisabled: true,
-          isDefaultChecked: true,
-          privateKey: toProtectedString(privKey),
-          social: openLoginMethod,
-          socialName: name,
-          socialEmail: email,
-        },
-      ];
-      navigateToStep(AddAccountStep.VerifyToAdd);
-    } catch (err: any) {
-      const msg = err?.message ?? "Unknown error";
+          await openlogin.init();
+          await openlogin.logout().catch(console.warn);
 
-      if (msg === "user closed popup") return;
+          if (closed) return false;
 
-      throw new Error(msg);
-    }
-  }, [navigateToStep, openLoginMethod, stateRef]);
+          const { privKey } = await openlogin.login({
+            loginProvider: openLoginMethod,
+          });
+          const { email, name } = await openlogin.getUserInfo();
+          await openlogin.logout().catch(console.warn);
 
-  return <Tile action={handleConnect} {...rest} />;
+          if (closed) return false;
+
+          const address = new ethers.Wallet(privKey).address;
+
+          stateRef.current.importAddresses = [
+            {
+              source: AccountSource.OpenLogin,
+              address,
+              name: email || name,
+              isDisabled: true,
+              isDefaultChecked: true,
+              privateKey: toProtectedString(privKey),
+              social: openLoginMethod,
+              socialName: name,
+              socialEmail: email,
+            },
+          ];
+
+          return true;
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+
+          if (msg === "user closed popup") return false;
+
+          throw new Error(msg);
+        }
+      }),
+    [openLoginMethod, stateRef]
+  );
+
+  const handleTileClick = useCallback(() => {
+    waitLoading({
+      title: "Loading...",
+      headerClassName: "mb-3",
+      content: (
+        <>
+          <span className="mb-5">
+            Please proceed connecting in the opened dialog.
+          </span>
+          <Spinner />
+        </>
+      ),
+      loadingHandler: handleConnect,
+    }).then((answer) => {
+      if (answer) {
+        navigateToStep(AddAccountStep.VerifyToAdd);
+      }
+    });
+  }, [handleConnect, navigateToStep, waitLoading]);
+
+  return <Tile action={handleTileClick} {...rest} />;
 };
 
 type TileSimpleProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
@@ -344,6 +378,40 @@ const Points: FC<PointsProps> = ({ security, adoption }) => (
     </div>
   </div>
 );
+
+const Spinner = memo<{ className?: string }>(({ className }) => (
+  <svg
+    viewBox="0 0 120 120"
+    fill="none"
+    className={classNames("animate-spin w-[7.5rem] h-[7.5rem]", className)}
+  >
+    <circle
+      cx="60"
+      cy="60"
+      r="54"
+      stroke="#CCD6FF"
+      strokeOpacity="0.15"
+      strokeWidth="12"
+    />
+    <path
+      d="M65.0054 6.23253C65.3125 2.93309 62.883 -0.0222163 59.5694 0.00154181C48.9029 0.0780186 38.4099 2.9984 29.1944 8.51206C18.2565 15.0563 9.68679 24.9138 4.72759 36.6557C-0.231603 48.3976 -1.32262 61.4138 1.61268 73.8174C4.08574 84.2677 9.30857 93.8257 16.6909 101.525C18.9843 103.917 22.7967 103.598 24.9477 101.077V101.077C27.0987 98.5565 26.7659 94.792 24.5331 92.3435C19.0597 86.3416 15.1758 79.022 13.2902 71.0539C10.9419 61.131 11.8147 50.7181 15.7821 41.3246C19.7494 31.9311 26.6052 24.0451 35.3555 18.8097C42.3821 14.6056 50.3371 12.2862 58.4557 12.0249C61.7677 11.9182 64.6982 9.53198 65.0054 6.23253V6.23253Z"
+      fill="url(#paint0_linear_3870_37340)"
+    />
+    <defs>
+      <linearGradient
+        id="paint0_linear_3870_37340"
+        x1="37.5926"
+        y1="-63.4817"
+        x2="-63.4501"
+        y2="-40.3675"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#FF002D" />
+        <stop offset="1" stopColor="#FF7F44" />
+      </linearGradient>
+    </defs>
+  </svg>
+));
 
 const absToZero = (n: number) => (n < 0 ? 0 : Math.abs(n));
 const calcWidth = (n: number, idx: number) =>

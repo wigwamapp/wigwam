@@ -44,3 +44,9 @@ export enum TransferTab {
   Nft = "nft",
   Bridge = "bridge",
 }
+
+export enum ReceiveTab {
+  ShareAddress = "share-address",
+  BuyWithCrypto = "buy-with-crypto",
+  BuyWithFiat = "buy-with-fiat",
+}

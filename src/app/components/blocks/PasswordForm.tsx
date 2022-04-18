@@ -5,7 +5,7 @@ import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
-import { required } from "app/utils";
+import { required, withHumanDelay } from "app/utils";
 import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
 import PasswordField from "app/components/elements/PasswordField";
@@ -21,18 +21,20 @@ const PasswordForm = memo<PasswordFormProps>(
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
-      async ({ password }) => {
-        try {
-          if (unlockCallback) {
-            unlockCallback(password);
-          } else {
-            await unlockWallet(password);
+      ({ password }) =>
+        withHumanDelay(async () => {
+          try {
+            if (unlockCallback) {
+              unlockCallback(password);
+            } else {
+              await unlockWallet(password);
+            }
+
+            return;
+          } catch (err: any) {
+            return { [FORM_ERROR]: err?.message };
           }
-        } catch (err: any) {
-          return { [FORM_ERROR]: err?.message };
-        }
-        return;
-      },
+        }),
       [unlockCallback]
     );
 
@@ -56,7 +58,7 @@ const PasswordForm = memo<PasswordFormProps>(
               {({ input, meta }) => (
                 <PasswordField
                   className="max-w-[19rem] w-full relative min-h-[6.125rem]"
-                  placeholder="Type password"
+                  placeholder={"*".repeat(8)}
                   label="Password"
                   error={
                     (!modifiedSinceLastSubmit && submitError) ||
@@ -79,8 +81,8 @@ const PasswordForm = memo<PasswordFormProps>(
                 theme === "small" && "mt-1.5"
               )}
             >
-              <NewButton type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Unlocking" : "Unlock"}
+              <NewButton type="submit" className="w-full" loading={submitting}>
+                Unlock
               </NewButton>
               <button
                 type="button"
@@ -99,6 +101,7 @@ const PasswordForm = memo<PasswordFormProps>(
               </button>
             </div>
             <AttentionModal
+              key={String(attention)}
               open={attention}
               onOpenChange={() => setAttention(false)}
             />

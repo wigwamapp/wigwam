@@ -4,6 +4,11 @@
   font-variant-ligatures: none;
 }
 
+img,
+a {
+  -webkit-user-drag: none;
+}
+
 /**
  * Custom utilities
  */
