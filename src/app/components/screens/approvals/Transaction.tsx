@@ -118,10 +118,13 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, setLastError, preparedTx]
   );
 
+  const loading = !preparedTx && !lastError;
+
   return (
     <ApprovalLayout
       approveText={lastError ? "Retry" : "Approve"}
       onApprove={handleApprove}
+      loading={loading}
     >
       <WalletCard account={account} />
 
