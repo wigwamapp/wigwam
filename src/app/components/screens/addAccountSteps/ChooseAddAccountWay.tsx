@@ -12,6 +12,7 @@ import { TippySingletonProvider } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
+import { withHumanDelay } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -151,65 +152,66 @@ const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
   const { waitLoading } = useDialog();
 
   const handleConnect = useCallback<LoadingHandler>(
-    async (onClose) => {
-      try {
-        let closed = false;
-        onClose(() => (closed = true));
+    (onClose) =>
+      withHumanDelay(async () => {
+        try {
+          let closed = false;
+          onClose(() => (closed = true));
 
-        const { default: OpenLogin, UX_MODE } = await import(
-          "@toruslabs/openlogin"
-        );
+          const { default: OpenLogin, UX_MODE } = await import(
+            "@toruslabs/openlogin"
+          );
 
-        const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
-        assert(clientId, "Client ID was not specified");
+          const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+          assert(clientId, "Client ID was not specified");
 
-        const openlogin = new OpenLogin({
-          clientId,
-          network: "mainnet",
-          uxMode: UX_MODE.POPUP,
-          replaceUrlOnRedirect: false,
-        });
+          const openlogin = new OpenLogin({
+            clientId,
+            network: "mainnet",
+            uxMode: UX_MODE.POPUP,
+            replaceUrlOnRedirect: false,
+          });
 
-        onClose(() => openlogin._cleanup());
+          onClose(() => openlogin._cleanup());
 
-        await openlogin.init();
-        await openlogin.logout().catch(console.warn);
+          await openlogin.init();
+          await openlogin.logout().catch(console.warn);
 
-        if (closed) return false;
+          if (closed) return false;
 
-        const { privKey } = await openlogin.login({
-          loginProvider: openLoginMethod,
-        });
-        const { email, name } = await openlogin.getUserInfo();
-        await openlogin.logout().catch(console.warn);
+          const { privKey } = await openlogin.login({
+            loginProvider: openLoginMethod,
+          });
+          const { email, name } = await openlogin.getUserInfo();
+          await openlogin.logout().catch(console.warn);
 
-        if (closed) return false;
+          if (closed) return false;
 
-        const address = new ethers.Wallet(privKey).address;
+          const address = new ethers.Wallet(privKey).address;
 
-        stateRef.current.importAddresses = [
-          {
-            source: AccountSource.OpenLogin,
-            address,
-            name: email || name,
-            isDisabled: true,
-            isDefaultChecked: true,
-            privateKey: toProtectedString(privKey),
-            social: openLoginMethod,
-            socialName: name,
-            socialEmail: email,
-          },
-        ];
+          stateRef.current.importAddresses = [
+            {
+              source: AccountSource.OpenLogin,
+              address,
+              name: email || name,
+              isDisabled: true,
+              isDefaultChecked: true,
+              privateKey: toProtectedString(privKey),
+              social: openLoginMethod,
+              socialName: name,
+              socialEmail: email,
+            },
+          ];
 
-        return true;
-      } catch (err: any) {
-        const msg = err?.message ?? "Unknown error";
+          return true;
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
 
-        if (msg === "user closed popup") return false;
+          if (msg === "user closed popup") return false;
 
-        throw new Error(msg);
-      }
-    },
+          throw new Error(msg);
+        }
+      }),
     [openLoginMethod, stateRef]
   );
 
