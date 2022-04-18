@@ -17,6 +17,7 @@ type NewButtonProps = {
   theme?: "primary" | "secondary" | "tertiary" | "clean";
   disabled?: boolean;
   loading?: boolean;
+  plainFocus?: boolean;
   children: ReactNode;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
@@ -24,7 +25,13 @@ const loadingTransitionTimeout = 300;
 
 const NewButton = forwardRef<HTMLElement, NewButtonProps>(
   (
-    { theme = "primary", className, loading: parentLoading = false, ...rest },
+    {
+      theme = "primary",
+      className,
+      loading: parentLoading = false,
+      plainFocus,
+      ...rest
+    },
     ref
   ) => {
     const { disabled = false, children } = rest;
@@ -123,14 +130,15 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
       theme === "primary" &&
         !disabled && [
           "hover:bg-opacity-100 hover:shadow-buttonaccent",
-          "focus:bg-opacity-100 focus:shadow-buttonaccent",
+          plainFocus && "focus:bg-opacity-100 focus:shadow-buttonaccent",
           "focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent",
           "active:bg-opacity-70 active:shadow-none",
         ],
       (theme === "secondary" || theme === "tertiary") &&
         !disabled && [
           "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
-          "focus:bg-brand-darklight focus:bg-opacity-100 focus:shadow-buttonsecondary",
+          plainFocus &&
+            "focus:bg-brand-darklight focus:bg-opacity-100 focus:shadow-buttonsecondary",
           "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
           "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
         ],

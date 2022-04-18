@@ -38,7 +38,7 @@ const Dialog: FC = () => {
       {withActions && (
         <div className="flex flex-row-reverse mt-5">
           {primaryButtonText && (
-            <NewButton onClick={onPrimaryButtonClick}>
+            <NewButton plainFocus onClick={onPrimaryButtonClick}>
               {primaryButtonText}
             </NewButton>
           )}
@@ -46,6 +46,7 @@ const Dialog: FC = () => {
           {secondaryButtonText && (
             <NewButton
               theme="secondary"
+              plainFocus
               className="mr-3"
               onClick={onSecondaryButtonClick}
             >
