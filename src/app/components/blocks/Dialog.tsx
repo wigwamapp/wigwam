@@ -22,28 +22,32 @@ const Dialog: FC = () => {
     ...rest
   } = modalData;
 
+  const withActions = Boolean(primaryButtonText || secondaryButtonText);
+
   return (
     <SecondaryModal
       open={true}
       onOpenChange={onClose}
       header={header}
+      autoFocus={withActions}
       {...rest}
     >
       <div className="text-base text-brand-font text-center w-full break-words flex flex-col items-center">
         {children}
       </div>
-      {(primaryButtonText || secondaryButtonText) && (
-        <div className="flex mt-5">
+      {withActions && (
+        <div className="flex flex-row-reverse mt-5">
           {primaryButtonText && (
             <NewButton onClick={onPrimaryButtonClick}>
               {primaryButtonText}
             </NewButton>
           )}
+
           {secondaryButtonText && (
             <NewButton
               theme="secondary"
+              className="mr-3"
               onClick={onSecondaryButtonClick}
-              className="ml-3"
             >
               {secondaryButtonText}
             </NewButton>

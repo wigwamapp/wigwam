@@ -34,15 +34,27 @@ module.exports = {
         sans: ["Inter", ...theme.fontFamily.sans],
       },
       animation: {
-        bootfadein: "bootfadein 0.15s ease-in-out",
+        bootfadein: "fadein 0.15s ease-in-out",
+        dialogcontent:
+          "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
       keyframes: {
-        bootfadein: {
+        fadein: {
           from: {
             opacity: "0",
           },
           to: {
             opacity: "1",
+          },
+        },
+        dialogfadein: {
+          from: {
+            opacity: "0",
+            transform: "translate(-50%, -48%) scale(.96)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translate(-50%, -50%) scale(1)",
           },
         },
       },
