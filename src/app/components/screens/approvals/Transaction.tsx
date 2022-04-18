@@ -1,6 +1,7 @@
 import {
   FC,
   ReactNode,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -25,13 +26,13 @@ import LongTextField from "app/components/elements/LongTextField";
 
 import ApprovalLayout from "./Layout";
 
-const TAB_VALUES = ["summary", "fee", "data", "hash", "error"] as const;
+const TAB_VALUES = ["summary", "fee", "data", "raw", "error"] as const;
 
 const TAB_NAMES: Record<TabValue, ReactNode> = {
   summary: "Summary",
   fee: "Fee",
   data: "Data",
-  hash: "Hash",
+  raw: "Raw",
   error: "Error",
 };
 
@@ -52,9 +53,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const forceUpdate = useForceUpdate();
 
-  const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
   const [tabValue, setTabValue] = useState<TabValue>("summary");
   const [lastError, setLastError] = useState<any>(null);
+
+  const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
+  const preparedTx = preparedTxRef.current;
 
   const enqueueEstimate = useMemo(createQueue, []);
 
@@ -74,8 +77,6 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             type: hexToNum(txParams?.type),
             chainId: hexToNum(txParams?.chainId),
           });
-
-          console.info(tx.gasLimit?.toString());
 
           preparedTxRef.current = {
             ...tx,
@@ -98,7 +99,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     setTabValue(lastError ? "error" : "summary");
   }, [setTabValue, lastError]);
 
-  const preparedTx = preparedTxRef.current;
+  useEffect(() => {
+    if (preparedTx) console.info({ preparedTx });
+  }, [preparedTx]);
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -166,46 +169,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           <Tabs.Content value="summary">Transaction summary</Tabs.Content>
 
           <Tabs.Content value="fee">
-            {!preparedTx ? (
-              <Loading />
-            ) : (
-              <div className="w-full p-4">
-                <NumberInput
-                  label="Gas Limit"
-                  placeholder="0"
-                  thousandSeparator
-                  decimalScale={0}
-                  defaultValue={formatUnits(preparedTx.gasLimit)}
-                  className="w-full mb-4"
-                />
-
-                <NumberInput
-                  label="Max priority fee"
-                  placeholder="0.00"
-                  thousandSeparator
-                  decimalScale={9}
-                  defaultValue={formatUnits(
-                    preparedTx.maxPriorityFeePerGas,
-                    "gwei"
-                  )}
-                  className="w-full mb-4"
-                />
-
-                <NumberInput
-                  label="Max fee"
-                  placeholder="0.00"
-                  thousandSeparator
-                  decimalScale={9}
-                  defaultValue={formatUnits(preparedTx.maxFeePerGas, "gwei")}
-                  className="w-full mb-4"
-                />
-              </div>
-            )}
+            {preparedTx ? <TxFee tx={preparedTx} /> : <Loading />}
           </Tabs.Content>
 
-          <Tabs.Content value="data">Transaction Data</Tabs.Content>
+          <Tabs.Content value="data">
+            {preparedTx ? <TxData tx={preparedTx} /> : <Loading />}
+          </Tabs.Content>
 
-          <Tabs.Content value="hash">Transaction Hash</Tabs.Content>
+          <Tabs.Content value="raw">
+            {preparedTx ? <TxSign tx={preparedTx} /> : <Loading />}
+          </Tabs.Content>
 
           <Tabs.Content value="error">
             {lastError && (
@@ -222,6 +195,79 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 };
 
 export default ApproveTransaction;
+
+type TxFeeProps = {
+  tx: ethers.utils.UnsignedTransaction;
+};
+
+const TxFee = memo<TxFeeProps>(({ tx }) => {
+  return (
+    <div className="w-full p-4">
+      <NumberInput
+        label="Gas Limit"
+        placeholder="0"
+        thousandSeparator
+        decimalScale={0}
+        defaultValue={formatUnits(tx.gasLimit)}
+        className="w-full mb-4"
+      />
+
+      <NumberInput
+        label="Max priority fee"
+        placeholder="0.00"
+        thousandSeparator
+        decimalScale={9}
+        defaultValue={formatUnits(tx.maxPriorityFeePerGas, "gwei")}
+        className="w-full mb-4"
+      />
+
+      <NumberInput
+        label="Max fee"
+        placeholder="0.00"
+        thousandSeparator
+        decimalScale={9}
+        defaultValue={formatUnits(tx.maxFeePerGas, "gwei")}
+        className="w-full mb-4"
+      />
+    </div>
+  );
+});
+
+type TxDataProps = {
+  tx: ethers.utils.UnsignedTransaction;
+};
+
+const TxData = memo<TxDataProps>(({ tx }) => {
+  return (
+    <div className="w-full p-4">
+      <LongTextField
+        label="Data"
+        readOnly
+        value={ethers.utils.hexlify(tx.data ?? "0x00")}
+        textareaClassName="!h-36"
+      />
+    </div>
+  );
+});
+
+type TxSignProps = {
+  tx: ethers.utils.UnsignedTransaction;
+};
+
+const TxSign = memo<TxSignProps>(({ tx }) => {
+  const rawTx = useMemo(() => ethers.utils.serializeTransaction(tx), [tx]);
+
+  return (
+    <div className="w-full p-4">
+      <LongTextField
+        label="Raw transaction"
+        readOnly
+        value={rawTx}
+        textareaClassName="!h-48"
+      />
+    </div>
+  );
+});
 
 const Loading: FC = () => (
   <div

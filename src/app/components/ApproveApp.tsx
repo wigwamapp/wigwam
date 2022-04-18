@@ -1,8 +1,8 @@
-import { FC, useLayoutEffect, useMemo } from "react";
+import { FC, memo, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
-import { ActivityType, WalletStatus } from "core/types";
+import { ActivityType, Approval, WalletStatus } from "core/types";
 
 import { walletStatusAtom, approvalsAtom } from "app/atoms";
 import { ChainIdProvider } from "app/hooks";
@@ -40,24 +40,29 @@ const Destroy: FC = () => {
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
 
-  const currentApproval = useMemo(
-    () => approvals[approvals.length - 1],
-    [approvals]
-  );
+  const currentApproval = approvals[0];
 
   if (!currentApproval) return null;
 
   return (
-    match(currentApproval)
-      .with({ type: ActivityType.Transaction }, (txApproval) => (
-        <ChainIdProvider chainId={txApproval.chainId}>
-          <ApproveTransaction approval={txApproval} />
-        </ChainIdProvider>
-      ))
-      // .with({ type: ActivityType.Signing }, (sigApproval) => <ApproveSigning approval={sigApproval} />)
-      .with({ type: ActivityType.Connection }, (conApproval) => (
-        <ApproveConnection approval={conApproval} />
-      ))
-      .otherwise(() => null)
+    <CurrentApproval key={currentApproval.id} approval={currentApproval} />
   );
 };
+
+type CurrentApprovalProps = {
+  approval: Approval;
+};
+
+const CurrentApproval = memo<CurrentApprovalProps>(({ approval }) =>
+  match(approval)
+    .with({ type: ActivityType.Transaction }, (txApproval) => (
+      <ChainIdProvider chainId={txApproval.chainId}>
+        <ApproveTransaction approval={txApproval} />
+      </ChainIdProvider>
+    ))
+    // .with({ type: ActivityType.Signing }, (sigApproval) => <ApproveSigning approval={sigApproval} />)
+    .with({ type: ActivityType.Connection }, (conApproval) => (
+      <ApproveConnection approval={conApproval} />
+    ))
+    .otherwise(() => null)
+);
