@@ -54,6 +54,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
   const [tabValue, setTabValue] = useState<TabValue>("summary");
+  const [lastError, setLastError] = useState<any>(null);
 
   const enqueueEstimate = useMemo(createQueue, []);
 
@@ -83,36 +84,39 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           forceUpdate();
         } catch (err) {
           console.error(err);
+          setLastError(err);
         }
       }),
-    [enqueueEstimate, forceUpdate, provider, approval]
+    [enqueueEstimate, forceUpdate, provider, approval, setLastError]
   );
 
   useEffect(() => {
     estimateTx();
   }, [estimateTx]);
 
-  const [lastError, setLastError] = useState<any>(null);
-
   useEffect(() => {
     setTabValue(lastError ? "error" : "summary");
   }, [setTabValue, lastError]);
 
+  const preparedTx = preparedTxRef.current;
+
   const handleApprove = useCallback(
     async (approved: boolean) => {
+      if (!preparedTx) return;
+
       setLastError(null);
 
       try {
-        await approveItem(approval.id, { approved });
+        const rawTx = ethers.utils.serializeTransaction(preparedTx);
+
+        await approveItem(approval.id, { approved, rawTx });
       } catch (err) {
         console.error(err);
         setLastError(err);
       }
     },
-    [approval, setLastError]
+    [approval, setLastError, preparedTx]
   );
-
-  const preparedTx = preparedTxRef.current;
 
   return (
     <ApprovalLayout
