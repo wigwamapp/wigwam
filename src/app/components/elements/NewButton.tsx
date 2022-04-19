@@ -14,7 +14,7 @@ import { CSSTransition } from "react-transition-group";
 import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
-  theme?: "primary" | "secondary" | "tertiary" | "clean";
+  theme?: "primary" | "secondary" | "tertiary" | "clean" | "primary-reverse";
   disabled?: boolean;
   loading?: boolean;
   plainFocus?: boolean;
@@ -123,6 +123,8 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
       theme !== "clean" && "min-w-[10rem]",
       "text-brand-light text-base font-bold",
       theme === "primary" && "bg-buttonaccent bg-opacity-90",
+      theme === "primary-reverse" &&
+        "bg-buttonaccent bg-opacity-100 shadow-buttonaccent",
       theme === "secondary" && "bg-brand-main bg-opacity-10",
       "rounded-[.375rem]",
       "inline-flex justify-center",
@@ -132,8 +134,16 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
           "hover:bg-opacity-100 hover:shadow-buttonaccent",
           plainFocus && "focus:bg-opacity-100 focus:shadow-buttonaccent",
           "focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent",
-          "active:bg-opacity-70 active:shadow-none",
         ],
+      theme === "primary-reverse" &&
+        !disabled && [
+          "hover:bg-opacity-90 hover:shadow-none",
+          plainFocus && "focus:bg-opacity-90 focus:shadow-none",
+          "focus-visible:bg-opacity-90 focus-visible:shadow-none",
+        ],
+      (theme === "primary" || theme === "primary-reverse") &&
+        !disabled &&
+        "active:bg-opacity-70 active:shadow-none",
       (theme === "secondary" || theme === "tertiary") &&
         !disabled && [
           "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",

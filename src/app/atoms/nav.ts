@@ -2,7 +2,6 @@ import { atomWithURLHash } from "lib/atom-utils";
 
 import {
   Page,
-  WelcomeStep,
   AddAccountStep,
   SettingTab,
   TransferTab,
@@ -10,11 +9,6 @@ import {
 } from "app/nav";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
-
-export const welcomeStepAtom = atomWithURLHash(
-  "welcomeStep",
-  WelcomeStep.LetsBegin
-);
 
 export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
 

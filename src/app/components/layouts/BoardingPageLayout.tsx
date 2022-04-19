@@ -1,10 +1,12 @@
 import { FC } from "react";
 import classNames from "clsx";
+import { getPublicURL } from "lib/ext/utils";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
+import NewButton from "app/components/elements/NewButton";
 import BackButton from "app/components/elements/BackButton";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
-import { getPublicURL } from "../../../lib/ext/utils";
+import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
 
 type BoardingPageLayoutProps = {
   header?: boolean;
@@ -32,10 +34,27 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
       bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
     }
   >
-    <ContentContainer narrow className="mt-[14vh]">
+    <ContentContainer narrow className="relative pt-[14vh]">
       {header && (
         <header className="flex items-stretch relative">
-          <BackButton className="absolute bottom-2 left-0" />
+          {isWelcome ? (
+            <NewButton
+              theme="clean"
+              to={{ page: "profiles" }}
+              className="absolute bottom-2 left-0 group"
+            >
+              <ArrowLeftLongIcon
+                className={classNames(
+                  "mr-2",
+                  "transition-transform",
+                  "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
+                )}
+              />
+              Profiles
+            </NewButton>
+          ) : (
+            <BackButton className="absolute bottom-2 left-0" />
+          )}
         </header>
       )}
 
@@ -54,13 +73,13 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
         Vigvam
       </div>
     ) : (
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[360px] flex items-center justify-center">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[50%] flex items-center justify-center">
         <img
           src={getPublicURL("icons/test-welcome-bg.png")}
           className="w-auto h-full"
           alt=""
         />
-        <span className="welcome-image" />
+        <span className="absolute inset-0 bg-gradient-to-t from-[#0D0E1D]/80 to-[#0D0E1D]/0" />
       </div>
     )}
   </div>
