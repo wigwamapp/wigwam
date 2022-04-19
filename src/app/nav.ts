@@ -13,8 +13,6 @@ export enum Page {
 }
 
 export enum WelcomeStep {
-  Hello = "hello",
-  ChooseLanguage = "choose-language",
   LetsBegin = "lets-begin",
 }
 

@@ -4,10 +4,12 @@ import classNames from "clsx";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import BackButton from "app/components/elements/BackButton";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import { getPublicURL } from "../../../lib/ext/utils";
 
 type BoardingPageLayoutProps = {
   header?: boolean;
   animate?: boolean;
+  isWelcome?: boolean;
 };
 
 let bootAnimationDisplayed = true;
@@ -18,6 +20,7 @@ const handleBootAnimationEnd = () => {
 const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
   header = true,
   animate = false,
+  isWelcome = false,
   children,
 }) => (
   <div
@@ -38,17 +41,28 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
 
       <div className="mb-24">{children}</div>
     </ContentContainer>
-    <div
-      className={classNames(
-        "mt-auto mb-6",
-        "text-2xl",
-        "font-black",
-        "w-full flex justify-center items-center"
-      )}
-    >
-      <VigvamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
-      Vigvam
-    </div>
+    {!isWelcome ? (
+      <div
+        className={classNames(
+          "mt-auto mb-6",
+          "text-2xl",
+          "font-black",
+          "w-full flex justify-center items-center"
+        )}
+      >
+        <VigvamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
+        Vigvam
+      </div>
+    ) : (
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[360px] flex items-center justify-center">
+        <img
+          src={getPublicURL("icons/test-welcome-bg.png")}
+          className="w-auto h-full"
+          alt=""
+        />
+        <span className="welcome-image" />
+      </div>
+    )}
   </div>
 );
 

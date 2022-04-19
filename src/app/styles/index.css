@@ -144,3 +144,104 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
 .card-flip-exit-active > * {
   opacity: 0.5;
 }
+
+/**/
+
+.card-flip-horizontal-enter {
+  transform: rotateY(-90deg);
+}
+.card-flip-horizontal-enter > * {
+  opacity: 0.5;
+}
+
+.card-flip-horizontal-enter-active {
+  transform: rotateY(0deg);
+}
+.card-flip-horizontal-enter-active > * {
+  opacity: 1;
+}
+
+.card-flip-horizontal-exit {
+  transform: rotateY(0deg);
+}
+.card-flip-horizontal-exit > * {
+  opacity: 1;
+}
+
+.card-flip-horizontal-exit-active {
+  transform: rotateY(90deg);
+}
+.card-flip-horizontal-exit-active > * {
+  opacity: 0.5;
+}
+
+.welcome-image {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    0,
+    rgba(13, 14, 29, 0.8) -11.51%,
+    rgba(13, 14, 29, 0) 110.02%
+  );
+}
+
+.caret {
+  height: 100%;
+  border-right: 0.1em solid;
+  animation: caret 1s steps(1) infinite;
+  margin-left: 8px;
+}
+
+@keyframes caret {
+  50% {
+    border-color: transparent;
+  }
+}
+
+.ether {
+  color: #0057ff;
+}
+
+.avalanche {
+  color: #ff002d;
+}
+
+.bnb {
+  color: #ffd600;
+}
+
+.polygon {
+  color: #8a45ff;
+}
+
+.fantom {
+  color: #57b5eb;
+}
+
+.optimism {
+  color: #d9172c;
+}
+
+.arbitrum {
+  color: #28a0f0;
+}
+
+.aurora {
+  color: #7bd0cd;
+}
+
+.harmony {
+  color: #00aee9;
+}
+
+.huobi {
+  color: #3845ad;
+}
+
+.celo {
+  color: #00f977;
+}

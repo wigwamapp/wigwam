@@ -5,12 +5,8 @@ import { welcomeStepAtom } from "app/atoms";
 import { WelcomeStep } from "app/nav";
 
 import LetsBegin from "./welcomeSteps/LetsBegin";
-import ChooseLanguage from "./welcomeSteps/ChooseLanguage";
-import Hello from "./welcomeSteps/Hello";
 
 const WELCOME_STEPS: AllSteps<WelcomeStep> = [
-  [WelcomeStep.Hello, () => <Hello />],
-  [WelcomeStep.ChooseLanguage, () => <ChooseLanguage />],
   [WelcomeStep.LetsBegin, () => <LetsBegin />],
 ];
 

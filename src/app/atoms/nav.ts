@@ -13,7 +13,7 @@ export const pageAtom = atomWithURLHash("page", Page.Default);
 
 export const welcomeStepAtom = atomWithURLHash(
   "welcomeStep",
-  WelcomeStep.Hello
+  WelcomeStep.LetsBegin
 );
 
 export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
