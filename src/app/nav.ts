@@ -12,12 +12,6 @@ export enum Page {
   Settings = "settings",
 }
 
-export enum WelcomeStep {
-  Hello = "hello",
-  ChooseLanguage = "choose-language",
-  LetsBegin = "lets-begin",
-}
-
 export enum AddAccountStep {
   ChooseWay = "choose-way",
   CreateSeedPhrase = "create-seed-phrase",
