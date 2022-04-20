@@ -25,10 +25,11 @@ export type InputProps = {
   errorMessage?: string;
   success?: boolean;
   successWithIcon?: boolean;
-  inputClassName?: string;
-  adornmentClassName?: string;
   labelActions?: ReactNode;
   actions?: ReactNode;
+  actionsClassName?: string;
+  inputClassName?: string;
+  adornmentClassName?: string;
 } & HTMLProps<HTMLInputElement>;
 
 const Input = memo(
@@ -52,6 +53,7 @@ const Input = memo(
         optional,
         labelActions,
         actions,
+        actionsClassName,
         onFocus,
         onBlur,
         readOnly,
@@ -183,7 +185,12 @@ const Input = memo(
               />
             )}
             {actions && (
-              <span className="absolute top-1/2 -translate-y-1/2 right-3">
+              <span
+                className={classNames(
+                  "absolute top-1/2 -translate-y-1/2 right-3",
+                  actionsClassName
+                )}
+              >
                 {actions}
               </span>
             )}
