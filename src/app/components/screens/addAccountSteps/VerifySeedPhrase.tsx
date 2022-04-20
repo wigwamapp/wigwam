@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo } from "react";
+import { ChangeEvent, memo, useCallback, useEffect, useMemo } from "react";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
@@ -12,7 +12,7 @@ import {
 } from "core/types";
 import { addSeedPhrase } from "core/client";
 
-import { composeValidators, differentPasswords, required } from "app/utils";
+import { composeValidators, required } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
@@ -80,7 +80,7 @@ const VerifySeedPhrase = memo(() => {
     <>
       <AddAccountHeader
         className="mb-8"
-        description="Fill in the blanks and enter your secret phrase"
+        description="Fill in the empty fields with words according to their serial number"
       >
         Verify Secret Phrase
       </AddAccountHeader>
@@ -89,7 +89,7 @@ const VerifySeedPhrase = memo(() => {
         render={({ handleSubmit, submitting }) => (
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-3 gap-y-6 gap-x-9 w-full max-w-[35rem] mx-auto"
+            className="grid grid-cols-3 gap-y-6 gap-x-9 w-full max-w-[35rem] mx-auto pt-8"
           >
             {wordsToCheckPositions.map((indexToFill, i) => (
               <div key={indexToFill} className="flex items-center">
@@ -100,7 +100,7 @@ const VerifySeedPhrase = memo(() => {
                   name={`word-${indexToFill}`}
                   validate={composeValidators(
                     required,
-                    differentPasswords(words[indexToFill])
+                    validateWord(words[indexToFill])
                   )}
                 >
                   {({ input, meta }) => (
@@ -111,15 +111,10 @@ const VerifySeedPhrase = memo(() => {
                       successWithIcon
                       readOnly={meta.dirty && !meta.error}
                       inputClassName="max-h-10"
-                      onChange={(evt: any) => {
+                      onChange={(evt: ChangeEvent<HTMLInputElement>) => {
                         const { value } = evt.target;
-                        const isError = differentPasswords(value)(
-                          words[indexToFill]
-                        );
-                        if (meta.dirty && !isError) {
-                          if (words[i + 1]) {
-                            focusByName(`word-${wordsToCheckPositions[i + 1]}`);
-                          }
+                        if (value === words[indexToFill] && words[i + 1]) {
+                          focusByName(`word-${wordsToCheckPositions[i + 1]}`);
                         }
                         input.onChange(evt);
                       }}
@@ -172,3 +167,6 @@ const focusByName = (fieldName: string) => {
     (elem as HTMLInputElement).focus()
   );
 };
+
+const validateWord = (word: string) => (value: string) =>
+  value !== word ? "Error" : undefined;
