@@ -21,7 +21,7 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
 }) => (
   <div
     className={classNames(
-      "h-screen flex flex-col items-center",
+      "h-screen flex flex-col",
       "pt-8 pb-5 px-6",
       className
     )}

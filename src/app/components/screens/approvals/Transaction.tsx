@@ -13,18 +13,20 @@ import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import useForceUpdate from "use-force-update";
 import * as Tabs from "@radix-ui/react-tabs";
-import { createQueue } from "lib/system/queue";
+import { createOrganicThrottle } from "lib/system/organicThrottle";
 
 import { TransactionApproval } from "core/types";
 import { allAccountsAtom } from "app/atoms";
 import { approveItem } from "core/client";
 
-import { useProvider } from "app/hooks";
+import { useOnBlock, useProvider } from "app/hooks";
 import WalletCard from "app/components/elements/WalletCard";
 import NumberInput from "app/components/elements/NumberInput";
 import LongTextField from "app/components/elements/LongTextField";
+import NetworkPreview from "app/components/elements/NetworkPreview";
 
 import ApprovalLayout from "./Layout";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 const TAB_VALUES = ["summary", "fee", "data", "raw", "error"] as const;
 
@@ -49,7 +51,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, allAccounts]
   );
 
-  const provider = useProvider().getUncheckedSigner(account.address);
+  const provider = useProvider();
 
   const forceUpdate = useForceUpdate();
 
@@ -59,11 +61,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
   const preparedTx = preparedTxRef.current;
 
-  const enqueueEstimate = useMemo(createQueue, []);
+  const withThrottle = useMemo(createOrganicThrottle, []);
 
   const estimateTx = useCallback(
     () =>
-      enqueueEstimate(async () => {
+      withThrottle(async () => {
         try {
           let { txParams } = approval;
 
@@ -72,11 +74,13 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             txParams = { ...rest, gasLimit: gas };
           }
 
-          const tx = await provider.populateTransaction({
-            ...txParams,
-            type: hexToNum(txParams?.type),
-            chainId: hexToNum(txParams?.chainId),
-          });
+          const tx = await provider
+            .getUncheckedSigner(account.address)
+            .populateTransaction({
+              ...txParams,
+              type: hexToNum(txParams?.type),
+              chainId: hexToNum(txParams?.chainId),
+            });
 
           preparedTxRef.current = {
             ...tx,
@@ -88,12 +92,21 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           setLastError(err);
         }
       }),
-    [enqueueEstimate, forceUpdate, provider, approval, setLastError]
+    [
+      withThrottle,
+      forceUpdate,
+      provider,
+      account.address,
+      approval,
+      setLastError,
+    ]
   );
 
   useEffect(() => {
     estimateTx();
   }, [estimateTx]);
+
+  useOnBlock(() => estimateTx());
 
   useEffect(() => {
     setTabValue(lastError ? "error" : "summary");
@@ -129,44 +142,51 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       onApprove={handleApprove}
       loading={loading}
     >
-      <WalletCard account={account} />
-
-      <Tabs.Root
-        defaultValue="summary"
-        orientation="horizontal"
-        value={tabValue}
-        onValueChange={(v) => setTabValue(v as TabValue)}
-        className="mt-6 w-full flex flex-col"
+      <ScrollAreaContainer
+        className="w-full box-content -mr-5 pr-5"
+        viewPortClassName="viewportBlock"
       >
-        <Tabs.List
-          aria-label="Approve tabs"
-          className={classNames("flex items-center")}
+        <NetworkPreview className="mb-4" />
+
+        <WalletCard account={account} className="!w-full" />
+
+        <Tabs.Root
+          defaultValue="summary"
+          orientation="horizontal"
+          value={tabValue}
+          onValueChange={(v) => setTabValue(v as TabValue)}
+          className="mt-6 w-full"
         >
-          {TAB_VALUES.map((value, i, arr) => {
-            if (value === "error" && !lastError) return null;
+          <Tabs.List
+            aria-label="Approve tabs"
+            className={classNames("flex items-center")}
+          >
+            {TAB_VALUES.map((value, i, arr) => {
+              if (value === "error" && !lastError) return null;
 
-            const active = value === tabValue;
-            const last = i === arr.length - 1;
+              const active = value === tabValue;
+              const last = i === arr.length - 1;
 
-            return (
-              <Tabs.Trigger
-                key={value}
-                value={value}
-                className={classNames(
-                  "font-semibold text-sm",
-                  "px-4 py-2",
-                  !last && "mr-1",
-                  active && "bg-white/10 rounded-md"
-                )}
-              >
-                {TAB_NAMES[value]}
-              </Tabs.Trigger>
-            );
-          })}
-        </Tabs.List>
+              return (
+                <Tabs.Trigger
+                  key={value}
+                  value={value}
+                  className={classNames(
+                    "font-semibold text-sm",
+                    "px-4 py-2",
+                    !last && "mr-1",
+                    active && "bg-white/10 rounded-md"
+                  )}
+                >
+                  {TAB_NAMES[value]}
+                </Tabs.Trigger>
+              );
+            })}
+          </Tabs.List>
 
-        <div className="mt-4">
-          <Tabs.Content value="summary">Transaction summary</Tabs.Content>
+          <Tabs.Content value="summary">
+            <div className="w-full p-4"></div>
+          </Tabs.Content>
 
           <Tabs.Content value="fee">
             {preparedTx ? <TxFee tx={preparedTx} /> : <Loading />}
@@ -188,8 +208,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               />
             )}
           </Tabs.Content>
-        </div>
-      </Tabs.Root>
+        </Tabs.Root>
+      </ScrollAreaContainer>
     </ApprovalLayout>
   );
 };

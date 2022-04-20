@@ -102,7 +102,11 @@ const ApproveConnection: FC<ApproveConnectionProps> = () => {
   );
 
   return (
-    <ApprovalLayout approveText="Connect" declineText="Deny">
+    <ApprovalLayout
+      approveText="Connect"
+      declineText="Deny"
+      className="items-center"
+    >
       <DappLogos />
       <h1 className="text-2xl font-bold mt-4 mb-1">Connect to website</h1>
       <span className="text-base mb-6">compound.finance</span>
