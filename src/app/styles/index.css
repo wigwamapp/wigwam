@@ -144,3 +144,11 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
 .card-flip-exit-active > * {
   opacity: 0.5;
 }
+
+.opacity-transition-enter {
+  opacity: 0;
+}
+.opacity-transition-enter-done {
+  opacity: 1;
+  transition: opacity 200ms;
+}
