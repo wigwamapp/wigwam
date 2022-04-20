@@ -6,6 +6,7 @@ import {
   ReactNode,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
@@ -88,15 +89,21 @@ const Input = memo(
         [onBlur]
       );
 
+      const successIconRef = useRef(null);
+
       const [isHiddenWithSuccess, setIsHiddenWithSuccess] = useState(false);
 
       useEffect(() => {
-        const timeout = setTimeout(
-          () => setIsHiddenWithSuccess(!!success),
-          500
-        );
-        return () => clearTimeout(timeout);
-      }, [success]);
+        if (successWithIcon) {
+          const timeout = setTimeout(
+            () => setIsHiddenWithSuccess(Boolean(success)),
+            500
+          );
+          return () => clearTimeout(timeout);
+        }
+
+        return;
+      }, [successWithIcon, success]);
 
       return (
         <div className={classNames("flex flex-col text-base", className)}>
@@ -170,23 +177,25 @@ const Input = memo(
               readOnly={readOnly}
               {...rest}
             />
-            {!!EndAdornment && !actions && (
+            {EndAdornment && !actions && (
               <EndAdornment
                 className={classNames(adornmentClassNames, "right-4")}
               />
             )}
-            {!!actions && (
+            {actions && (
               <span className="absolute top-1/2 -translate-y-1/2 right-3">
                 {actions}
               </span>
             )}
             {success && successWithIcon && (
               <CSSTransition
+                nodeRef={successIconRef}
                 in={isHiddenWithSuccess}
                 timeout={150}
                 classNames="opacity-transition"
               >
                 <span
+                  ref={successIconRef}
                   className={classNames(
                     "absolute inset-px",
                     "bg-[#0a0a19]",
