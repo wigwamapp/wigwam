@@ -5,9 +5,13 @@ import {
   memo,
   ReactNode,
   useCallback,
+  useEffect,
   useState,
 } from "react";
 import classNames from "clsx";
+import { CSSTransition } from "react-transition-group";
+
+import { ReactComponent as SuccessIcon } from "app/icons/green-check.svg";
 
 export type InputProps = {
   className?: string;
@@ -18,6 +22,8 @@ export type InputProps = {
   optional?: boolean;
   error?: boolean;
   errorMessage?: string;
+  success?: boolean;
+  successWithIcon?: boolean;
   inputClassName?: string;
   adornmentClassName?: string;
   labelActions?: ReactNode;
@@ -38,6 +44,8 @@ const Input = memo(
         theme = "primary",
         error,
         errorMessage,
+        success,
+        successWithIcon,
         inputClassName,
         adornmentClassName,
         optional,
@@ -79,6 +87,16 @@ const Input = memo(
         },
         [onBlur]
       );
+
+      const [isHiddenWithSuccess, setIsHiddenWithSuccess] = useState(false);
+
+      useEffect(() => {
+        const timeout = setTimeout(
+          () => setIsHiddenWithSuccess(!!success),
+          500
+        );
+        return () => clearTimeout(timeout);
+      }, [success]);
 
       return (
         <div className={classNames("flex flex-col text-base", className)}>
@@ -143,6 +161,7 @@ const Input = memo(
                     "text-brand-disabledcolor placeholder-brand-disabledcolor",
                   ],
                 error && !readOnly && "!border-brand-redobject",
+                success && "!border-brand-greenobject",
                 inputClassName
               )}
               onFocus={handleFocus}
@@ -160,6 +179,25 @@ const Input = memo(
               <span className="absolute top-1/2 -translate-y-1/2 right-3">
                 {actions}
               </span>
+            )}
+            {success && successWithIcon && (
+              <CSSTransition
+                in={isHiddenWithSuccess}
+                timeout={150}
+                classNames="opacity-transition"
+              >
+                <span
+                  className={classNames(
+                    "absolute inset-px",
+                    "bg-[#0a0a19]",
+                    "rounded-[.625rem]",
+                    "flex items-center justify-center",
+                    "opacity-0"
+                  )}
+                >
+                  <SuccessIcon />
+                </span>
+              </CSSTransition>
             )}
           </div>
           <div
