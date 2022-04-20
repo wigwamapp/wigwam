@@ -172,7 +172,8 @@ export const getWays = (
         title: "Ledger",
         Icon: LedgerIcon,
         action: () => {
-          alert("Not implemented");
+          stateRef.current.hardDevice = "ledger";
+          navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
         },
       },
       {

@@ -69,13 +69,22 @@ const VerifyAccountToAddInitial: FC = () => {
   const { stateRef, reset, navigateToStep } = useSteps();
   const { alert } = useDialog();
 
+  const extendedKey: string | undefined = stateRef.current.extendedKey;
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   const derivationPath = stateRef.current.derivationPath;
 
   const neuterExtendedKey = useMemo(() => {
-    return seedPhrase && derivationPath
-      ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), derivationPath)
-      : null;
+    if (extendedKey) {
+      return extendedKey;
+    }
+    if (seedPhrase && derivationPath) {
+      return toNeuterExtendedKey(
+        getSeedPhraseHDNode(seedPhrase),
+        derivationPath
+      );
+    }
+
+    return null;
   }, [derivationPath, seedPhrase]);
 
   useEffect(() => {

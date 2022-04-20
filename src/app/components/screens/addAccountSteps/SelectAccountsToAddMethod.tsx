@@ -14,12 +14,19 @@ import { ClientProvider } from "core/client";
 import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
-import { useDialog } from "app/hooks/dialog";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
+import { withHumanDelay } from "../../../utils";
+import { assert } from "../../../../lib/system/assert";
+import { ethers } from "ethers";
+import { toProtectedString } from "../../../../lib/crypto-utils";
+import retry from "async-retry";
+import Transport from "@ledgerhq/hw-transport";
+import { Spinner } from "./ChooseAddAccountWay";
 
 const methodsInitial: MethodsProps = [
   {
@@ -53,23 +60,112 @@ const methodsExisting: MethodsProps = [
 const SelectAccountsToAddMethod: FC = () => {
   const { navigateToStep, stateRef } = useSteps();
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { waitLoading } = useDialog();
+
+  const [derivat, setDerivate] = useState<string | undefined>(undefined);
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
 
   const isInitial = walletStatus === WalletStatus.Welcome;
+  const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
 
   const methods = useMemo(
     () => (isInitial ? methodsInitial : methodsExisting),
     [isInitial]
   );
 
+  const transportRef = useRef<Transport>();
+
+  const handleConnect = useCallback(
+    (onClose: any) =>
+      withHumanDelay(async () => {
+        try {
+          let closed = false;
+          let extendedKey = "";
+          onClose(() => (closed = true));
+
+          const [{ default: LedgerEth }, { LedgerTransport, getExtendedKey }] =
+            await Promise.all([
+              import("@ledgerhq/hw-app-eth"),
+              import("lib/ledger"),
+            ]);
+
+          await retry(
+            async () => {
+              await transportRef.current?.close();
+              transportRef.current = await LedgerTransport.create();
+
+              console.log("transportRef.current", transportRef.current);
+
+              const ledgerEth = new LedgerEth(transportRef.current);
+
+              console.log("ledgerEth", ledgerEth);
+              console.log("derivationPath", derivat);
+              const { publicKey, chainCode } = await ledgerEth.getAddress(
+                derivat ?? "m/44'/60'/0'/0",
+                false,
+                true
+              );
+
+              console.log("publicKey", publicKey);
+              console.log("ledgerEth", ledgerEth);
+
+              extendedKey = getExtendedKey(publicKey, chainCode!);
+            },
+            { retries: 5, maxTimeout: 2_000 }
+          );
+
+          return extendedKey;
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+
+          if (msg === "user closed popup") return false;
+
+          throw new Error(msg);
+        }
+      }),
+    [derivat]
+  );
+
   const handleContinue = useCallback(
-    (method: string, derivationPath: string) => {
+    async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
         isInitial ? "initial" : "existing"
       }-${method}`;
       stateRef.current.derivationPath = derivationPath;
       stateRef.current.importAddresses = null;
+
+      if (isHardDevice) {
+        console.log("testing", derivationPath);
+        setDerivate(derivationPath);
+        const answer = await waitLoading({
+          title: "Loading...",
+          headerClassName: "mb-3",
+          content: (
+            <>
+              <span className="mb-5">
+                Please proceed connecting to the ledger.
+              </span>
+              <Spinner />
+            </>
+          ),
+          loadingHandler: handleConnect,
+        });
+
+        if (answer) {
+          stateRef.current.extendedKey = answer;
+          console.log("answer", answer);
+          if (isInitial && method === "auto") {
+            setOpenedLoadingModal(true);
+            return;
+          }
+
+          navigateToStep(AddAccountStep.VerifyToAdd);
+          return;
+        }
+
+        return;
+      }
 
       if (isInitial && method === "auto") {
         setOpenedLoadingModal(true);
@@ -78,7 +174,14 @@ const SelectAccountsToAddMethod: FC = () => {
 
       navigateToStep(AddAccountStep.VerifyToAdd);
     },
-    [isInitial, navigateToStep, stateRef]
+    [
+      handleConnect,
+      isHardDevice,
+      isInitial,
+      navigateToStep,
+      stateRef,
+      waitLoading,
+    ]
   );
 
   return (
@@ -104,13 +207,22 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const isUnmountedRef = useRef(false);
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
+  const extendedKey: string | undefined = stateRef.current.extendedKey;
   const derivationPath = stateRef.current.derivationPath;
 
   const neuterExtendedKey = useMemo(() => {
-    return seedPhrase && derivationPath
-      ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), derivationPath)
-      : null;
-  }, [derivationPath, seedPhrase]);
+    if (extendedKey) {
+      return extendedKey;
+    }
+    if (seedPhrase && derivationPath) {
+      return toNeuterExtendedKey(
+        getSeedPhraseHDNode(seedPhrase),
+        derivationPath
+      );
+    }
+
+    return null;
+  }, [derivationPath, extendedKey, seedPhrase]);
 
   const loadActiveWallets = useCallback(async () => {
     if (!neuterExtendedKey) {

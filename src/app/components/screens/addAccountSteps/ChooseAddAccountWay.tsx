@@ -136,18 +136,21 @@ const Tile: FC<TileProps> = ({ action, openLoginMethod, ...rest }) => {
   }
 
   if (openLoginMethod) {
-    return <TileAuth openLoginMethod={openLoginMethod} {...rest} />;
+    return <TileOpenLogin openLoginMethod={openLoginMethod} {...rest} />;
   }
 
   return <WarningMessage>{rest.title}</WarningMessage>;
 };
 
-type TileAuthProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
+type TileOpenLoginProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
   openLoginMethod: SocialProvider;
   className?: string;
 };
 
-const TileAuth: FC<TileAuthProps> = ({ openLoginMethod, ...rest }) => {
+const TileOpenLogin: FC<TileOpenLoginProps> = ({
+  openLoginMethod,
+  ...rest
+}) => {
   const { navigateToStep, stateRef } = useSteps();
   const { waitLoading } = useDialog();
 
@@ -379,7 +382,7 @@ const Points: FC<PointsProps> = ({ security, adoption }) => (
   </div>
 );
 
-const Spinner = memo<{ className?: string }>(({ className }) => (
+export const Spinner = memo<{ className?: string }>(({ className }) => (
   <svg
     viewBox="0 0 120 120"
     fill="none"
