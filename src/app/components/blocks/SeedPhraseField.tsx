@@ -3,6 +3,10 @@ import classNames from "clsx";
 import mergeRefs from "react-merge-refs";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
+import { ethers } from "ethers";
+
+import { getRandomBytes } from "lib/crypto-utils/random";
+import { downloadFile } from "lib/download";
 
 import { TippySingletonProvider } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
@@ -17,6 +21,7 @@ import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { useDialog } from "app/hooks/dialog";
 
 type SeedPhraseFieldProps =
   | CreateSeedPhraseFieldProps
@@ -47,62 +52,82 @@ const CreateSeedPhraseField = forwardRef<
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const { copy, copied } = useCopyToClipboard(fieldRef);
 
+  const { confirm } = useDialog();
+
+  const handleDownload = () => {
+    const value = fieldRef.current?.value ?? "";
+    if (value) {
+      confirm({
+        title: "Download Secret Phrase",
+        content: `
+        WARNING: Never disclose your Secret Recovery Phrase. Anyone with this phrase can take your Ether forever.
+        Download this Secret Recovery Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
+      }).then((answer) => {
+        if (answer) {
+          const name = ethers.utils.base58.encode(getRandomBytes(10));
+          downloadFile(value, name, "text/richtext");
+        }
+      });
+    }
+  };
+
   return (
-    <>
-      <LongTextField
-        ref={mergeRefs([ref, fieldRef])}
-        id="seedPhrase"
-        label="Secret Phrase"
-        readOnly
-        actions={
-          <div className="flex items-center">
-            <TippySingletonProvider>
+    <LongTextField
+      ref={mergeRefs([ref, fieldRef])}
+      id="seedPhrase"
+      label="Secret Phrase"
+      readOnly
+      labelActions={
+        <div className="flex items-center">
+          <TippySingletonProvider>
+            <IconedButton
+              aria-label="Show / hide"
+              Icon={EyeIcon}
+              className="mr-2"
+              theme="secondary"
+            />
+            {onRegenerate && (
               <IconedButton
-                aria-label="Show / hide"
-                Icon={EyeIcon}
+                aria-label="Regenerate secret phrase"
+                Icon={RegenerateIcon}
+                onClick={onRegenerate}
                 className="mr-2"
                 theme="secondary"
               />
-              {onRegenerate && (
-                <IconedButton
-                  aria-label="Regenerate secret phrase"
-                  Icon={RegenerateIcon}
-                  onClick={onRegenerate}
-                  className="mr-2"
-                  theme="secondary"
-                />
-              )}
-              <IconedButton
-                aria-label="Download secret phrase"
-                Icon={DownloadIcon}
-                theme="secondary"
-              />
-            </TippySingletonProvider>
-          </div>
-        }
-        {...rest}
-      />
-      <NewButton
-        type="button"
-        theme="tertiary"
-        onClick={copy}
-        className={classNames(
-          "absolute bottom-[1.125rem] right-3",
-          "text-sm text-brand-light",
-          "!p-0 !pr-1 !min-w-0",
-          "!font-normal",
-          "cursor-copy",
-          "items-center"
-        )}
-      >
-        {copied ? (
-          <SuccessIcon className="mr-1" />
-        ) : (
-          <CopyIcon className="mr-1" />
-        )}
-        {copied ? "Copied" : "Copy"}
-      </NewButton>
-    </>
+            )}
+            <IconedButton
+              aria-label="Download secret phrase"
+              onClick={handleDownload}
+              Icon={DownloadIcon}
+              theme="secondary"
+            />
+          </TippySingletonProvider>
+        </div>
+      }
+      actions={
+        <NewButton
+          type="button"
+          theme="tertiary"
+          onClick={copy}
+          className={classNames(
+            "absolute bottom-[1.125rem] right-3",
+            "text-sm text-brand-light",
+            "!p-0 !pr-1 !min-w-0",
+            "!font-normal",
+            "cursor-copy",
+            "items-center"
+          )}
+        >
+          {copied ? (
+            <SuccessIcon className="mr-1" />
+          ) : (
+            <CopyIcon className="mr-1" />
+          )}
+          {copied ? "Copied" : "Copy"}
+        </NewButton>
+      }
+      {...rest}
+    />
   );
 });
 
@@ -117,50 +142,50 @@ const ImportSeedPhraseField = forwardRef<
   const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
 
   return (
-    <>
-      <LongTextField
-        ref={ref}
-        id="seedPhrase"
-        label="Secret Phrase"
-        actions={
-          <div className="flex items-center">
-            <TippySingletonProvider>
-              <IconedButton
-                aria-label="Show / hide"
-                Icon={EyeIcon}
-                className="mr-2"
-                theme="secondary"
-              />
-              <IconedButton
-                aria-label="Upload secret phrase"
-                Icon={UploadIcon}
-                theme="secondary"
-              />
-            </TippySingletonProvider>
-          </div>
-        }
-        {...rest}
-      />
-      <NewButton
-        type="button"
-        theme="tertiary"
-        onClick={paste}
-        className={classNames(
-          "absolute bottom-[1.125rem] right-3",
-          "text-sm text-brand-light",
-          "!p-0 !pr-1 !min-w-0",
-          "!font-normal",
-          "cursor-copy",
-          "items-center"
-        )}
-      >
-        {pasted ? (
-          <SuccessIcon className="mr-1" />
-        ) : (
-          <PasteIcon className="mr-1" />
-        )}
-        {pasted ? "Pasted" : "Paste"}
-      </NewButton>
-    </>
+    <LongTextField
+      ref={ref}
+      id="seedPhrase"
+      label="Secret Phrase"
+      labelActions={
+        <div className="flex items-center">
+          <TippySingletonProvider>
+            <IconedButton
+              aria-label="Show / hide"
+              Icon={EyeIcon}
+              className="mr-2"
+              theme="secondary"
+            />
+            <IconedButton
+              aria-label="Upload secret phrase"
+              Icon={UploadIcon}
+              theme="secondary"
+            />
+          </TippySingletonProvider>
+        </div>
+      }
+      actions={
+        <NewButton
+          type="button"
+          theme="tertiary"
+          onClick={paste}
+          className={classNames(
+            "absolute bottom-[1.125rem] right-3",
+            "text-sm text-brand-light",
+            "!p-0 !pr-1 !min-w-0",
+            "!font-normal",
+            "cursor-copy",
+            "items-center"
+          )}
+        >
+          {pasted ? (
+            <SuccessIcon className="mr-1" />
+          ) : (
+            <PasteIcon className="mr-1" />
+          )}
+          {pasted ? "Pasted" : "Paste"}
+        </NewButton>
+      }
+      {...rest}
+    />
   );
 });

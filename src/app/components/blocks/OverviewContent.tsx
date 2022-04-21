@@ -270,7 +270,7 @@ const AssetsList: FC = () => {
           onClick={focusSearchInput}
         >
           <NoResultsFoundIcon
-            className={classNames("mb-4", searching && "animate-spin")}
+            className={classNames("mb-4", searching && "animate-waving-hand")}
           />
 
           {searching ? (
@@ -492,20 +492,20 @@ const AssetInfo: FC = () => {
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
         <NewButton
-          theme="secondary"
-          className="grow !py-2"
           to={{ page: Page.Transfer }}
           merge={["token"]}
+          theme="secondary"
+          className="grow !py-2"
         >
-          <SendIcon className="mr-2" />
+          <SendIcon className="w-6 h-auto mr-2" />
           Transfer
         </NewButton>
         <NewButton theme="secondary" className="grow !py-2">
-          <SwapIcon className="mr-2" />
+          <SwapIcon className="w-6 h-auto mr-2" />
           Swap
         </NewButton>
         <NewButton theme="secondary" className="grow !py-2">
-          <ActivityIcon className="mr-2" />
+          <ActivityIcon className="w-6 h-auto mr-2" />
           Activity
         </NewButton>
       </div>

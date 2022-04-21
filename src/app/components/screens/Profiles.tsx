@@ -43,7 +43,7 @@ const Profiles: FC = () => {
   }, []);
 
   return (
-    <BoardingPageLayout profileNav={false}>
+    <BoardingPageLayout>
       <div className="max-w-[40rem] mx-auto">
         <div className="flex flex-wrap items-stretch -mb-2">
           {all.map((p, index) => {
@@ -54,7 +54,7 @@ const Profiles: FC = () => {
               <button
                 key={p.id}
                 className={classNames(
-                  "py-6 px-7 max-h-[11.75rem] w-[9.625rem] mb-2",
+                  "py-6 px-1.5 max-h-[11.75rem] w-[9.625rem] mb-2",
                   "rounded-[.625rem]",
                   "flex items-center justify-center",
                   "transition-colors",
@@ -86,16 +86,28 @@ const Profiles: FC = () => {
             <span className="text-lg font-bold">Add new</span>
           </button>
         </div>
-        <div className="mt-[7.5rem]">
-          <h2 className="text-2xl font-bold mb-4">FAQ</h2>
-          <p className="text-base	text-brand-inactivelight">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo, vel fringilla est ullamcorper eget nulla facilisi etiam
-            dignissim diam quis enim lobortis scelerisque fermentum dui faucibus
-            in ornare quam viverra orci sagittis eu volutpat odio.
-          </p>
+        <div className="mt-[7.5rem] px-6 prose prose-invert">
+          <h2>FAQ</h2>
+
+          <ul>
+            <li>
+              <strong>Profiles</strong> allows split app usage experience into
+              multiple different sessions and provides more safety for our
+              users. For example, a user can have a work profile and a personal
+              profile.
+            </li>
+
+            <li>
+              You will always see your <strong>profile avatar</strong>, on all
+              Vigvam pages. <strong>It is unique!</strong> This feature allows
+              you to <strong>determine</strong> whether the Vigvam you are
+              seeing is <strong>real</strong> or fake.
+            </li>
+
+            <li>
+              Each profile can have <strong>only one Secret Phrase</strong>.
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -126,7 +138,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
 
     return (
       <SecondaryModal
-        header="Add a New Profile"
+        header="Add a new profile"
         open={open}
         onOpenChange={onOpenChange}
         headerClassName="!mb-[3.25rem] !text-[2rem]"

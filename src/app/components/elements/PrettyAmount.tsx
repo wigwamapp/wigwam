@@ -155,7 +155,7 @@ const AmountWithCurrency: FC<{ amount: string; currency?: string }> = ({
   }
 
   return (
-    <>
+    <span>
       {currency === "$" && <span>$</span>}
       {amount}
       {currency !== "$" && (
@@ -164,7 +164,7 @@ const AmountWithCurrency: FC<{ amount: string; currency?: string }> = ({
           <span>{currency}</span>
         </>
       )}
-    </>
+    </span>
   );
 };
 

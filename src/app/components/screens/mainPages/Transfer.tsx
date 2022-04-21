@@ -6,6 +6,9 @@ import { TransferTab as TransferTabEnum } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
+import { ReactComponent as AssetIcon } from "app/icons/transfer-asset.svg";
+import { ReactComponent as NFTIcon } from "app/icons/transfer-nft.svg";
+import { ReactComponent as BridgeIcon } from "app/icons/transfer-bridge.svg";
 
 import TransferTab from "./Transfer.Tab";
 
@@ -43,16 +46,19 @@ const tabsContent = [
   {
     route: { page: "transfer", transfer: TransferTabEnum.Asset },
     title: "Asset",
+    Icon: AssetIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Nft },
     title: "NFT",
+    Icon: NFTIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Bridge },
     title: "Bridge",
+    Icon: BridgeIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
 ];

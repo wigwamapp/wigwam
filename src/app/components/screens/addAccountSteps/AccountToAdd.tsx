@@ -1,12 +1,12 @@
 import {
+  ChangeEvent,
   FC,
   memo,
-  useMemo,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
+  useMemo,
   useRef,
-  ChangeEvent,
+  useState,
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
@@ -17,12 +17,13 @@ import { replaceT } from "lib/ext/i18n";
 import { useI18NUpdate } from "lib/ext/i18n/react";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { AddHDAccountParams, AccountSource, Network } from "core/types";
+import { AccountSource, AddAccountParams, Network } from "core/types";
 import { ClientProvider } from "core/client";
 
 import { allNetworksAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
+import { useSteps } from "app/hooks/steps";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
@@ -34,23 +35,28 @@ import USDAmount from "app/components/elements/USDAmount";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
-type AddressProps = {
-  address: string;
+type AccountsToVerifyProps = Omit<AddAccountParams, "name"> & {
   name?: string;
   isDisabled?: boolean;
   isDefaultChecked?: boolean;
-  index: number;
+  isAdded?: boolean;
+  index?: string;
 };
 
 type AccountsToAddProps = {
-  addresses: AddressProps[];
-  onContinue: (params: AddHDAccountParams[]) => void;
+  accountsToVerify: AccountsToVerifyProps[];
+  onContinue: (params: AddAccountParams[]) => void;
 };
 
-const rootDerivationPath = "m/44'/60'/0'/0";
-
-const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
+const AccountsToAdd: FC<AccountsToAddProps> = ({
+  accountsToVerify,
+  onContinue,
+}) => {
+  const { stateRef } = useSteps();
   const networks = useAtomValue(allNetworksAtom);
+
+  const derivationPath = stateRef.current.derivationPath;
+
   const preparedNetworks = useMemo(
     () => networks.filter(({ type }) => type === "mainnet"),
     [networks]
@@ -82,19 +88,26 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
   useEffect(() => {
     const addressesToAdd = addressesToAddRef.current;
 
-    addresses.forEach(({ address, name, isDefaultChecked, isDisabled }, i) => {
-      if (!addressesToAdd.has(address) && !isDisabled && isDefaultChecked) {
-        addressesToAdd.add(address);
-      }
+    accountsToVerify.forEach(
+      ({ address, name, isDefaultChecked, isAdded }, i) => {
+        if (!addressesToAdd.has(address) && !isAdded && isDefaultChecked) {
+          addressesToAdd.add(address);
+        }
 
-      const addressName = addressesNamesRef.current.get(address);
-      if (!addressName) {
-        addressesNamesRef.current.set(address, name ?? `Wallet ${i + 1}`);
+        const addressName = addressesNamesRef.current.get(address);
+        if (!addressName) {
+          addressesNamesRef.current.set(address, name ?? `Wallet ${i + 1}`);
+        }
+
+        setThToggleChecked(
+          addressesToAdd.size ===
+            accountsToVerify.filter(({ isAdded }) => !isAdded).length
+        );
       }
-    });
+    );
 
     forceUpdate();
-  }, [addresses, forceUpdate]);
+  }, [accountsToVerify, forceUpdate]);
 
   const toggleAddress = useCallback(
     (address: string) => {
@@ -107,12 +120,12 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
 
       setThToggleChecked(
         addressesToAdd.size ===
-          addresses.filter(({ isDisabled }) => !isDisabled).length
+          accountsToVerify.filter(({ isAdded }) => !isAdded).length
       );
 
       forceUpdate();
     },
-    [addresses, forceUpdate]
+    [accountsToVerify, forceUpdate]
   );
 
   const [thToggleChecked, setThToggleChecked] = useState(false);
@@ -120,7 +133,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
   const toggleAllAddresses = useCallback(
     (remove = false) => {
       const addressesToAdd = addressesToAddRef.current;
-      addresses.forEach(({ address, isDisabled }) => {
+      accountsToVerify.forEach(({ address, isDisabled }) => {
         if (!isDisabled) {
           if (remove) {
             if (addressesToAdd.has(address)) {
@@ -136,7 +149,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
       setThToggleChecked((prevState) => !prevState);
       forceUpdate();
     },
-    [addresses, forceUpdate]
+    [accountsToVerify, forceUpdate]
   );
 
   const changeWalletName = useCallback(
@@ -159,38 +172,44 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
 
       const addressesToAdd = Array.from(addressesToAddRef.current);
 
-      const addAccountsParams: AddHDAccountParams[] = addressesToAdd.map(
-        (address) => {
-          const hdIndex = addresses.find(
-            ({ address: a }) => a === address
-          )!.index;
-          const addressName = addressesNamesRef.current.get(address);
+      const addAccountsParams = addressesToAdd.map((address, i) => {
+        // eslint-disable-next-line
+        const { isDefaultChecked, isDisabled, isAdded, index, ...adrs } =
+          accountsToVerify.find(({ address: a }) => a === address)!; // TODO: Refactor
+        const addressName = addressesNamesRef.current.get(address);
 
-          if (!addressName) {
-            throw new Error("You have to fill all the wallets' names.");
-          }
-
-          return {
-            source: AccountSource.SeedPhrase,
-            name: addressName ?? `Wallet ${hdIndex + 1}`,
-            derivationPath: `${rootDerivationPath}/${hdIndex}`,
-          };
+        if (!addressName) {
+          throw new Error("You have to fill all the wallets' names.");
         }
-      );
+
+        return {
+          derivationPath:
+            adrs.source === AccountSource.SeedPhrase && derivationPath
+              ? `${derivationPath}/${index}`
+              : undefined,
+          ...adrs,
+          name: addressName ?? `Wallet ${index ?? i + 1}`,
+        } as AddAccountParams;
+      });
 
       onContinue(addAccountsParams);
     } catch (err: any) {
       alert({ title: "Error!", content: err.message });
     }
-  }, [onContinue, addresses, alert]);
+  }, [onContinue, accountsToVerify, derivationPath, alert]);
 
-  if (!addresses) {
+  const isIndexExisting = useMemo(
+    () => !!accountsToVerify.find(({ index }) => index && index !== ""),
+    [accountsToVerify]
+  );
+
+  if (!accountsToVerify) {
     return null;
   }
 
   return (
     <>
-      <div className="flex flex-col max-w-[45.25rem] mx-auto">
+      <div className="flex flex-col w-full max-w-[45.25rem] mx-auto">
         <div className="flex mb-9">
           <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
           <div className="flex items-center ml-auto">
@@ -230,9 +249,15 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                 <span className="flex align-center">
                   <CheckboxPrimitive.Root
                     checked={thToggleChecked}
-                    onCheckedChange={(checked) => toggleAllAddresses(!checked)}
+                    onCheckedChange={(checked) =>
+                      accountsToVerify.length !== 1 &&
+                      toggleAllAddresses(!checked)
+                    }
                   >
-                    <Checkbox checked={thToggleChecked} />
+                    <Checkbox
+                      disabled={accountsToVerify.length === 1}
+                      checked={thToggleChecked}
+                    />
                   </CheckboxPrimitive.Root>
                 </span>
               </Th>
@@ -245,17 +270,17 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                   </span>
                 </Tooltip>
               </Th>
+              {isIndexExisting && <Th>Index</Th>}
               <Th>Address</Th>
               <Th>Balance</Th>
             </tr>
           </thead>
           <tbody>
             <TippySingletonProvider>
-              {addresses.map(
-                ({ address, isDisabled, isDefaultChecked, index }, i) => {
-                  const isAdded =
-                    addressesToAddRef.current.has(address) ||
-                    (isDisabled && isDefaultChecked);
+              {accountsToVerify.map(
+                ({ address, isDisabled, isAdded, index }, i) => {
+                  const isAddedItem =
+                    addressesToAddRef.current.has(address) || isAdded;
                   const addressName = replaceT(
                     addressesNamesRef.current.get(address) ?? `Wallet ${index}`
                   );
@@ -264,17 +289,20 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({ addresses, onContinue }) => {
                     <Account
                       key={address}
                       name={addressName}
+                      index={index}
                       address={address}
                       provider={provider}
                       network={network}
-                      isAdded={!!isAdded}
+                      isAdded={!!isAddedItem}
+                      isAddedTag={isAdded}
                       onToggleAdd={() => toggleAddress(address)}
                       isDisabled={isDisabled}
+                      isIndexExisting={isIndexExisting}
                       onChangeWalletName={(newName: string) =>
                         changeWalletName(address, newName)
                       }
                       className={
-                        i === addresses.length - 1 ? "!border-none" : ""
+                        i === accountsToVerify.length - 1 ? "!border-none" : ""
                       }
                     />
                   );
@@ -295,9 +323,12 @@ type AccountProps = {
   name: string;
   address: string;
   provider: ethers.providers.Provider;
+  index?: string;
   network: Network;
   isAdded: boolean;
   isDisabled?: boolean;
+  isAddedTag?: boolean;
+  isIndexExisting?: boolean;
   onToggleAdd: () => void;
   onChangeWalletName: (name: string) => void;
   className?: string;
@@ -306,11 +337,14 @@ type AccountProps = {
 const Account = memo<AccountProps>(
   ({
     name,
+    index,
     address,
     provider,
     network,
     isAdded,
     isDisabled = false,
+    isAddedTag = false,
+    isIndexExisting = true,
     onToggleAdd,
     onChangeWalletName,
     className,
@@ -367,38 +401,40 @@ const Account = memo<AccountProps>(
             )}
           />
         </Td>
-        <Td widthMaxContent>
-          {!isDisabled ? (
+        <Td widthMaxContent className="min-w-[16rem]">
+          {!isAddedTag ? (
             <Input
               value={name}
               onChange={(evt: ChangeEvent<HTMLInputElement>) =>
                 onChangeWalletName(evt.target.value)
               }
               theme="clean"
-              disabled={isDisabled}
-              error={!name && !isDisabled}
+              error={!name}
               inputClassName="!font-bold min-w-[16rem]"
             />
           ) : (
             <div className="pl-4 flex items-center max-w-[16rem]">
               <span className="!font-bold min-width-0 truncate">{name}</span>
-              <span
-                className={classNames(
-                  "py-1 px-2",
-                  "rounded-md",
-                  "bg-brand-main/40",
-                  "border border-brand-main/50",
-                  "shadow-addaccountmodal",
-                  "text-xs font-medium",
-                  "ml-3"
-                )}
-              >
-                Added
-              </span>
+              {isAddedTag && (
+                <span
+                  className={classNames(
+                    "py-1 px-2",
+                    "rounded-md",
+                    "bg-brand-main/40",
+                    "border border-brand-main/50",
+                    "shadow-addaccountmodal",
+                    "text-xs font-medium",
+                    "ml-3"
+                  )}
+                >
+                  Added
+                </span>
+              )}
             </div>
           )}
         </Td>
-        <Td>
+        {isIndexExisting && <Td widthMaxContent>{index}</Td>}
+        <Td widthMaxContent>
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
@@ -408,6 +444,7 @@ const Account = memo<AccountProps>(
               baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol
             }
             copiable={true}
+            isMinified
             className="font-bold"
           />
         </Td>

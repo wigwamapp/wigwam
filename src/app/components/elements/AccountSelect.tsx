@@ -171,7 +171,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
             currency={nativeToken?.symbol}
             isMinified
             copiable
-            prefix={<GasIcon className="w-2.5 h-2.5 mr-0.5" />}
+            prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
             className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center mt-px"
           />
         )}
