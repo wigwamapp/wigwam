@@ -13,7 +13,7 @@ import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
-import * as repo from "core/repo";
+import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
 import {
@@ -24,6 +24,7 @@ import {
 } from "core/types";
 import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
+import * as repo from "core/repo";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
@@ -52,8 +53,7 @@ import SearchInput from "../elements/SearchInput";
 import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
-import LongTextField from "../elements/LongTextField";
-import BigNumber from "bignumber.js";
+import AddressField from "../elements/AddressField";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -540,6 +540,7 @@ const AssetInfo: FC = () => {
           <PriceChange
             priceChange={new BigNumber(priceChange)
               .times(balanceUSD)
+              .div(100)
               .toFixed(2)}
           />
         </div>
@@ -565,12 +566,11 @@ const AssetInfo: FC = () => {
       </div>
 
       {status !== TokenStatus.Native && (
-        <div className="mt-6">
-          <LongTextField
+        <div className="mt-6 max-w-[23.25rem]">
+          <AddressField
             key={address}
             label="Token address"
             defaultValue={address}
-            textareaClassName="!h-auto"
             readOnly
           />
         </div>
