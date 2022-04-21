@@ -27,16 +27,21 @@ import { findToken } from "core/client";
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { TippySingletonProvider, useChainId, useIsSyncing } from "app/hooks";
+import {
+  TippySingletonProvider,
+  useChainId,
+  useIsSyncing,
+  useLazyNetwork,
+} from "app/hooks";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -325,7 +330,8 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
     { asset, isActive = false, onAssetSelect, isManageMode, className },
     ref
   ) => {
-    const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
+    const { name, symbol, rawBalance, decimals, balanceUSD, status, priceUSD } =
+      asset;
     const nativeAsset = status === TokenStatus.Native;
     const disabled = status === TokenStatus.Disabled;
     const hoverable = isManageMode ? !nativeAsset : !isActive;
@@ -357,7 +363,19 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
           className="w-11 h-11 min-w-[2.75rem] mr-3"
         />
         <span className="flex flex-col justify-center w-full min-w-0">
-          <span className="text-sm font-bold leading-4 truncate">{name}</span>
+          <span className="flex justify-between items-end">
+            <span className="text-sm font-bold leading-4 truncate">{name}</span>
+            <PrettyAmount
+              amount={priceUSD ?? 0}
+              currency="$"
+              copiable
+              className={classNames(
+                "text-xs leading-4",
+                "ml-2",
+                +getRandom(-1, 1) > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"
+              )}
+            />
+          </span>
           <span className="mt-2 flex justify-between items-end">
             <PrettyAmount
               amount={rawBalance ?? 0}
@@ -408,6 +426,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
 
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
+  const currentNetwork = useLazyNetwork();
 
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
   const parsedTokenSlug = useMemo(
@@ -440,17 +459,25 @@ const AssetInfo: FC = () => {
             </h2>
             {standard && <Tag standard={standard} />}
             <TippySingletonProvider>
+              {currentNetwork?.explorerUrls?.[0] && (
+                <IconedButton
+                  aria-label="View wallet in Explorer"
+                  Icon={WalletExplorerIcon}
+                  className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
+                  iconClassName="!w-[1.125rem]"
+                  href={`${currentNetwork.explorerUrls[0]}/address/${
+                    status === TokenStatus.Native ? name.toLowerCase() : address
+                  }`}
+                />
+              )}
               <IconedButton
-                aria-label="View wallet in Explorer"
-                Icon={WalletExplorerIcon}
-                className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
-                iconClassName="!w-[1.125rem]"
-              />
-              <IconedButton
-                aria-label="View wallet in Explorer"
-                Icon={ClockIcon}
+                aria-label="View asset in coingecko.com"
+                Icon={CoinGeckoIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-2"
                 iconClassName="!w-[1.125rem]"
+                href={`https://www.coingecko.com/en/coins/${
+                  status === TokenStatus.Native ? name.toLowerCase() : address
+                }`}
               />
             </TippySingletonProvider>
           </div>
@@ -465,7 +492,7 @@ const AssetInfo: FC = () => {
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
-              <PriceChange priceChange="2.8" isPercent />
+              <PriceChange priceChange={getRandom(-5, 5)} isPercent />
             </span>
           </div>
         </div>
@@ -490,7 +517,9 @@ const AssetInfo: FC = () => {
             className="text-base text-brand-inactivedark ml-8 mr-4"
           />
 
-          <PriceChange priceChange={"-2.8"} />
+          <PriceChange
+            priceChange={getRandom(-1 * balanceUSD * 0.1, balanceUSD * 0.15)}
+          />
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
@@ -541,9 +570,10 @@ const Tag: FC<TagProps> = ({ standard }) =>
   standard !== TokenStandard.Native ? (
     <span
       className={classNames(
-        "py-2 px-4 mr-4",
+        "px-4 mr-4",
         "text-base font-bold leading-none",
-        "border border-brand-main/20",
+        "h-8 box-border border border-brand-main/20",
+        "flex items-center",
         "rounded-[.625rem]",
         "whitespace-nowrap"
       )}
@@ -584,9 +614,14 @@ const PriceChange: FC<PriceChangeProps> = ({
       )}
     >
       {isPositive ? "+" : "-"}
-      {!isPercent ? "$" : ""}
-      {Math.abs(priceChangeNumber)}
+      <PrettyAmount
+        amount={Math.abs(priceChangeNumber)}
+        currency={isPercent ? undefined : "$"}
+      />
       {isPercent ? "%" : ""}
     </span>
   );
 };
+
+const getRandom = (min: number, max: number) =>
+  (Math.random() * (max - min + 1) + min).toFixed(2);
