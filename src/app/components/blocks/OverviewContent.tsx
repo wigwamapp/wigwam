@@ -270,7 +270,7 @@ const AssetsList: FC = () => {
           onClick={focusSearchInput}
         >
           <NoResultsFoundIcon
-            className={classNames("mb-4", searching && "animate-spin")}
+            className={classNames("mb-4", searching && "animate-waving-hand")}
           />
 
           {searching ? (

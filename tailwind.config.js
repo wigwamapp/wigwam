@@ -38,6 +38,7 @@ module.exports = {
         bootfadein: "fadein 0.15s ease-in-out",
         dialogcontent:
           "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "waving-hand": "wave 2s linear infinite",
       },
       keyframes: {
         fadein: {
@@ -57,6 +58,16 @@ module.exports = {
             opacity: "1",
             transform: "translate(-50%, -50%) scale(1)",
           },
+        },
+        wave: {
+          "0%": { transform: "rotate(0.0deg)" },
+          "10%": { transform: "rotate(14deg)" },
+          "20%": { transform: "rotate(-8deg)" },
+          "30%": { transform: "rotate(14deg)" },
+          "40%": { transform: "rotate(-4deg)" },
+          "50%": { transform: "rotate(10.0deg)" },
+          "60%": { transform: "rotate(0.0deg)" },
+          "100%": { transform: "rotate(0.0deg)" },
         },
       },
       boxShadow: {
