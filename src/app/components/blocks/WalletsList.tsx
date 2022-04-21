@@ -3,6 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { Flipper, Flipped } from "react-flip-toolkit";
 import Link from "lib/navigation/Link";
 
 import { Account } from "core/types";
@@ -143,6 +144,9 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
     [setAccountAddress, setSearchValue]
   );
 
+  const flipId = filteredAccounts.map((a) => a.uuid).join();
+  console.info({ flipId });
+
   return (
     <div className="flex flex-col w-full min-w-0">
       <div className="flex items-center mb-3">
@@ -167,14 +171,32 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
           scrollBarClassName="w-full px-0"
           viewportAsChild
         >
-          {filteredAccounts.map((account, i) => (
-            <WalletCard
-              key={account.address}
-              account={account}
-              onClick={() => changeAccount(account.address)}
-              className={classNames(i !== accounts.length - 1 && "mr-4")}
-            />
-          ))}
+          <Flipper flipKey={flipId} className="flex" spring="stiff">
+            {filteredAccounts.map((account, i) => (
+              <Flipped key={account.uuid} flipId={account.uuid}>
+                <button
+                  type="button"
+                  className={classNames(
+                    "relative",
+                    "p-3",
+                    "w-[16.5rem] min-w-[16.5rem]",
+                    "bg-brand-main/5",
+                    "rounded-[.625rem]",
+                    "flex items-stretch",
+                    "group",
+                    "cursor-pointer",
+                    "transition-colors",
+                    "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+                    "text-left",
+                    i !== accounts.length - 1 && "mr-4"
+                  )}
+                  onClick={() => changeAccount(account.address)}
+                >
+                  <WalletCard account={account} />
+                </button>
+              </Flipped>
+            ))}
+          </Flipper>
         </ScrollAreaContainer>
       ) : (
         <div
