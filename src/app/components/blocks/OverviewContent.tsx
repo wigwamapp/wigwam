@@ -403,8 +403,8 @@ const AssetCard = memo(
                     "text-base font-bold leading-4",
                     !isActive && "text-brand-lightgray",
                     isActive && "text-brand-light",
-                    "group-hover:text-brand-light",
-                    "transform -translate-y-[0.75rem]"
+                    "group-hover:text-brand-light"
+                    // "transform -translate-y-[0.75rem]"
                   )}
                 />
               )}
@@ -536,7 +536,7 @@ const AssetInfo: FC = () => {
               .times(balanceUSD)
               .div(100)
               .toFixed(2)}
-            className="!text-lg"
+            className="!text-sm"
           />
         </div>
       </div>

@@ -16,9 +16,9 @@ type PrettyAmountProps = {
   decimals?: number;
   currency?: string;
   isMinified?: boolean;
-  threeDots?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
+  threeDots?: boolean;
   className?: string;
 };
 
@@ -28,9 +28,9 @@ const PrettyAmount = memo<PrettyAmountProps>(
     decimals = 0,
     currency,
     isMinified,
-    threeDots = true,
     copiable = false,
     prefix,
+    threeDots = true,
     className,
   }) => {
     const currentLocale = useAtomValue(currentLocaleAtom);
@@ -205,9 +205,12 @@ export const getPrettyAmount = ({
     const minFract = isLargerThenTrillion ? 0 : 2;
     const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
-    let finalValue = getIntlNumberFormat(locale, minFract, maxFract).format(
-      +value
-    );
+    let finalValue = getIntlNumberFormat(
+      locale,
+      minFract,
+      maxFract,
+      "compact"
+    ).format(+value);
 
     const finalSplitLetter = finalValue.slice(-1);
     if (checkIfObjectsKey(finalSplitLetter)) {
@@ -229,14 +232,15 @@ const getIntlNumberFormat = memoize(
   (
     locale: string,
     minimumFractionDigits: number,
-    maximumFractionDigits: number
+    maximumFractionDigits: number,
+    notation?: "standard" | "scientific" | "engineering" | "compact"
   ) =>
     new Intl.NumberFormat(locale, {
       minimumFractionDigits,
       maximumFractionDigits,
-      notation: "compact",
-    } as any),
+      notation,
+    }),
   {
-    cacheKey: (args) => args.join("_"),
+    cacheKey: (args) => args.join(),
   }
 );
