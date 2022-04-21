@@ -7,7 +7,7 @@ import { Erc20__factory } from "abi-types";
 import { getClientProvider } from "core/client";
 import useForceUpdate from "use-force-update";
 
-async function sendLinkTokens() {
+async function sendPolygonTokens() {
   const chainId = 80001;
 
   const fromAccount = "0x0fA75abBE87608A6c3EA36e879C58ddC3e93F870";
@@ -25,9 +25,28 @@ async function sendLinkTokens() {
   console.info({ txResult });
 }
 
+async function sendBscTokens() {
+  const chainId = 97;
+
+  const fromAccount = "0x0fA75abBE87608A6c3EA36e879C58ddC3e93F870";
+  const recipient = "0xc6B7d9a476674DF8E8C39ec33585AAc3e38C75e3";
+
+  const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
+
+  const provider = getClientProvider(chainId).getSigner(fromAccount);
+
+  const contract = Erc20__factory.connect(daiTokenAddress, provider);
+
+  const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
+
+  const txResult = await contract.transfer(recipient, convertedAmount);
+  console.info({ txResult });
+}
+
 const ControlPanel: FC = () => {
   const actions: Record<string, () => Promise<void>> = {
-    sendLinkTokens,
+    sendPolygonTokens,
+    sendBscTokens,
   };
 
   return (
@@ -76,7 +95,7 @@ const ControlButton: FC<{
   return (
     <button
       className={classNames(
-        "w-auto py-4 px-6",
+        "w-auto py-4 px-6 last:mb-0 mb-3",
         "rounded-md",
         "bg-black/40 hover:bg-black/20",
         "text-base",
