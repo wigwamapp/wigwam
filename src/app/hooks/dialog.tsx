@@ -55,7 +55,8 @@ type DialogContextProps = {
 };
 
 export type LoadingHandler = (
-  onClose: (callback: () => void) => void
+  onClose: (callback: () => void) => void,
+  params?: any[]
 ) => Promise<boolean>;
 
 const OPEN_NEXT_DELAY = 300;

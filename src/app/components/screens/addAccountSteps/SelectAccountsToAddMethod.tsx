@@ -14,16 +14,13 @@ import { ClientProvider } from "core/client";
 import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
-import { LoadingHandler, useDialog } from "app/hooks/dialog";
+import { useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
 import { withHumanDelay } from "../../../utils";
-import { assert } from "../../../../lib/system/assert";
-import { ethers } from "ethers";
-import { toProtectedString } from "../../../../lib/crypto-utils";
 import retry from "async-retry";
 import Transport from "@ledgerhq/hw-transport";
 import { Spinner } from "./ChooseAddAccountWay";
@@ -65,6 +62,9 @@ const SelectAccountsToAddMethod: FC = () => {
   const [derivat, setDerivate] = useState<string | undefined>(undefined);
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
+  const [connectionState, setConnectionState] = useState<
+    "loading" | "connectApp"
+  >("loading");
 
   const isInitial = walletStatus === WalletStatus.Welcome;
   const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
@@ -95,20 +95,27 @@ const SelectAccountsToAddMethod: FC = () => {
               await transportRef.current?.close();
               transportRef.current = await LedgerTransport.create();
 
-              console.log("transportRef.current", transportRef.current);
+              const { name: currentApp } = await getAppInfo(
+                transportRef.current
+              );
+
+              if (currentApp !== "Ethereum") {
+                if (currentApp !== "BOLOS") {
+                  await disconnectFromConnectedApp(transportRef.current);
+                  await timeout(500);
+                }
+                setConnectionState("connectApp");
+                await connectToEthereumApp(transportRef.current);
+                await timeout(500);
+              }
 
               const ledgerEth = new LedgerEth(transportRef.current);
 
-              console.log("ledgerEth", ledgerEth);
-              console.log("derivationPath", derivat);
               const { publicKey, chainCode } = await ledgerEth.getAddress(
                 derivat ?? "m/44'/60'/0'/0",
                 false,
                 true
               );
-
-              console.log("publicKey", publicKey);
-              console.log("ledgerEth", ledgerEth);
 
               extendedKey = getExtendedKey(publicKey, chainCode!);
             },
@@ -136,7 +143,6 @@ const SelectAccountsToAddMethod: FC = () => {
       stateRef.current.importAddresses = null;
 
       if (isHardDevice) {
-        console.log("testing", derivationPath);
         setDerivate(derivationPath);
         const answer = await waitLoading({
           title: "Loading...",
@@ -146,15 +152,17 @@ const SelectAccountsToAddMethod: FC = () => {
               <span className="mb-5">
                 Please proceed connecting to the ledger.
               </span>
-              <Spinner />
+              {connectionState === "loading" && <Spinner />}
+              {connectionState === "connectApp" &&
+                "Please connect to Ethereum app"}
             </>
           ),
           loadingHandler: handleConnect,
+          // handlerParams: [derivationPath],
         });
 
         if (answer) {
           stateRef.current.extendedKey = answer;
-          console.log("answer", answer);
           if (isInitial && method === "auto") {
             setOpenedLoadingModal(true);
             return;
@@ -175,6 +183,7 @@ const SelectAccountsToAddMethod: FC = () => {
       navigateToStep(AddAccountStep.VerifyToAdd);
     },
     [
+      connectionState,
       handleConnect,
       isHardDevice,
       isInitial,
@@ -387,3 +396,51 @@ const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
 
 const preparePercentString = (percent: number) =>
   (percent > 9 ? percent.toFixed(0) : `0${percent.toFixed(0)}`) + "%";
+
+const getAppInfo = async (
+  transport: Transport
+): Promise<{
+  name: string;
+  version: string;
+  flags: number | Buffer;
+}> => {
+  const r = await transport.send(0xb0, 0x01, 0x00, 0x00);
+  let i = 0;
+  const format = r[i++];
+
+  if (format !== 1) {
+    throw new Error("getAppAndVersion: format not supported");
+  }
+
+  const nameLength = r[i++];
+  const name = r.slice(i, (i += nameLength)).toString("ascii");
+  const versionLength = r[i++];
+  const version = r.slice(i, (i += versionLength)).toString("ascii");
+  const flagLength = r[i++];
+  const flags = r.slice(i, (i += flagLength));
+  return {
+    name,
+    version,
+    flags,
+  };
+};
+
+const connectToEthereumApp = async (transport: Transport): Promise<void> => {
+  await transport.send(
+    0xe0,
+    0xd8,
+    0x00,
+    0x00,
+    Buffer.from("Ethereum", "ascii")
+  );
+};
+
+const disconnectFromConnectedApp = async (
+  transport: Transport
+): Promise<void> => {
+  await transport.send(0xb0, 0xa7, 0x00, 0x00);
+};
+
+const timeout = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
