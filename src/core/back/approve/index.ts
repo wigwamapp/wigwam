@@ -9,7 +9,7 @@ import { sendRpc } from "../rpc";
 import { ethers } from "ethers";
 import { dequal } from "dequal/lite";
 
-const { serializeTransaction, parseTransaction, keccak256, hexlify } =
+const { serializeTransaction, parseTransaction, keccak256, hexValue } =
   ethers.utils;
 
 export async function processApprove(
@@ -27,7 +27,9 @@ export async function processApprove(
         async ({ chainId, accountAddress, txParams, rpcReply }) => {
           assert(rawTx || signedRawTx, "Transaction not provided");
 
-          const tx = parseTransaction(rawTx ?? signedRawTx!);
+          const tx = rawTx
+            ? parseUnsignedTx(rawTx)
+            : parseTransaction(signedRawTx!);
           validateTxOrigin(tx, txParams);
 
           if (!signedRawTx) {
@@ -51,9 +53,9 @@ export async function processApprove(
 
             rpcReply({ result: txHash });
           } else {
-            console.info(rpcRes.error);
-            const { message, ...data } = rpcRes.error;
+            console.warn(rpcRes.error);
 
+            const { message, ...data } = rpcRes.error;
             const err = new Error(message);
             Object.assign(err, { data });
 
@@ -77,16 +79,13 @@ const STRICT_TX_PROPS = [
   "accessList",
   "type",
   "chainId",
-  "accessList",
   "value",
 ] as const;
 
 function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
   for (const key of STRICT_TX_PROPS) {
-    const txValue = hexlifyMaybe(tx[key]);
-    const originValue = hexlifyMaybe(originTxParams[key]);
-
-    console.info({ txValue, originValue });
+    const txValue = hexValueMaybe(tx[key]);
+    const originValue = hexValueMaybe(originTxParams[key]);
 
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");
@@ -94,9 +93,26 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
   }
 }
 
-function hexlifyMaybe<T>(smth: T) {
-  return ethers.BigNumber.isBigNumber(smth) ||
+function hexValueMaybe<T>(smth: T) {
+  if (smth === undefined) return;
+
+  if (
+    ethers.BigNumber.isBigNumber(smth) ||
     ["string", "number"].includes(typeof smth)
-    ? hexlify(smth as any)
-    : smth;
+  ) {
+    return hexValue(smth as any);
+  }
+
+  return smth;
+}
+
+function parseUnsignedTx(rawTx: ethers.BytesLike): ethers.Transaction {
+  const tx = parseTransaction(rawTx);
+
+  // Remove signature props
+  delete tx.r;
+  delete tx.v;
+  delete tx.s;
+
+  return tx;
 }

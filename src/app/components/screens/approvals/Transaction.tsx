@@ -27,6 +27,7 @@ import NetworkPreview from "app/components/elements/NetworkPreview";
 
 import ApprovalLayout from "./Layout";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import { withHumanDelay } from "app/utils";
 
 const TAB_VALUES = ["summary", "fee", "data", "raw", "error"] as const;
 
@@ -57,6 +58,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const [tabValue, setTabValue] = useState<TabValue>("summary");
   const [lastError, setLastError] = useState<any>(null);
+  const [approving, setApproving] = useState(false);
 
   const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
   const preparedTx = preparedTxRef.current;
@@ -78,14 +80,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             .getUncheckedSigner(account.address)
             .populateTransaction({
               ...txParams,
-              type: hexToNum(txParams?.type),
-              chainId: hexToNum(txParams?.chainId),
+              type: bnify(txParams?.type)?.toNumber(),
+              chainId: bnify(txParams?.chainId)?.toNumber(),
             });
+          delete tx.from;
 
           preparedTxRef.current = {
             ...tx,
-            nonce: hexToNum(tx.nonce),
+            nonce: bnify(tx.nonce)?.toNumber(),
           };
+
           forceUpdate();
         } catch (err) {
           console.error(err);
@@ -118,23 +122,31 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
-      if (!preparedTx) return;
-
       setLastError(null);
+      setApproving(true);
 
       try {
-        const rawTx = ethers.utils.serializeTransaction(preparedTx);
+        await withHumanDelay(async () => {
+          let rawTx: string | undefined;
 
-        await approveItem(approval.id, { approved, rawTx });
+          if (approved) {
+            if (!preparedTx) return;
+
+            rawTx = ethers.utils.serializeTransaction(preparedTx);
+          }
+
+          await approveItem(approval.id, { approved, rawTx });
+        });
       } catch (err) {
         console.error(err);
         setLastError(err);
+        setApproving(false);
       }
     },
-    [approval, setLastError, preparedTx]
+    [approval, setLastError, setApproving, preparedTx]
   );
 
-  const loading = !preparedTx && !lastError;
+  const loading = approving || (!preparedTx && !lastError);
 
   return (
     <ApprovalLayout
@@ -232,23 +244,38 @@ const TxFee = memo<TxFeeProps>(({ tx }) => {
         className="w-full mb-4"
       />
 
-      <NumberInput
-        label="Max priority fee"
-        placeholder="0.00"
-        thousandSeparator
-        decimalScale={9}
-        defaultValue={formatUnits(tx.maxPriorityFeePerGas, "gwei")}
-        className="w-full mb-4"
-      />
+      {tx.maxPriorityFeePerGas ? (
+        <>
+          <NumberInput
+            label="Max priority fee"
+            placeholder="0.00"
+            thousandSeparator
+            decimalScale={9}
+            defaultValue={formatUnits(tx.maxPriorityFeePerGas, "gwei")}
+            className="w-full mb-4"
+          />
 
-      <NumberInput
-        label="Max fee"
-        placeholder="0.00"
-        thousandSeparator
-        decimalScale={9}
-        defaultValue={formatUnits(tx.maxFeePerGas, "gwei")}
-        className="w-full mb-4"
-      />
+          <NumberInput
+            label="Max fee"
+            placeholder="0.00"
+            thousandSeparator
+            decimalScale={9}
+            defaultValue={formatUnits(tx.maxFeePerGas, "gwei")}
+            className="w-full mb-4"
+          />
+        </>
+      ) : (
+        <>
+          <NumberInput
+            label="Gas Price"
+            placeholder="0.00"
+            thousandSeparator
+            decimalScale={9}
+            defaultValue={formatUnits(tx.gasPrice, "gwei")}
+            className="w-full mb-4"
+          />
+        </>
+      )}
     </div>
   );
 });
@@ -300,8 +327,8 @@ const Loading: FC = () => (
   </div>
 );
 
-function hexToNum(v?: ethers.BigNumberish) {
-  return v !== undefined ? ethers.BigNumber.from(v).toNumber() : undefined;
+function bnify(v?: ethers.BigNumberish) {
+  return v !== undefined ? ethers.BigNumber.from(v) : undefined;
 }
 
 function formatUnits(v?: ethers.BigNumberish, unit: ethers.BigNumberish = 0) {
