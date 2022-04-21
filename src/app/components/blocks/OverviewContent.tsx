@@ -1,5 +1,6 @@
 import {
   FC,
+  memo,
   forwardRef,
   useCallback,
   useRef,
@@ -52,6 +53,7 @@ import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import LongTextField from "../elements/LongTextField";
+import BigNumber from "bignumber.js";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -139,7 +141,7 @@ const AssetsList: FC = () => {
     }
   }, [setTokenSlug, tokens]);
 
-  const handleAssetClick = useCallback(
+  const handleAssetSelect = useCallback(
     async (asset: AccountAsset) => {
       if (manageModeEnabled) {
         if (asset.status === TokenStatus.Native) return;
@@ -306,7 +308,7 @@ const AssetsList: FC = () => {
               }
               asset={asset as AccountAsset}
               isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
-              onAssetSelect={() => handleAssetClick(asset as AccountAsset)}
+              onAssetSelect={handleAssetSelect}
               isManageMode={manageModeEnabled}
               className={classNames(i !== tokens.length - 1 && "mb-2")}
             />
@@ -320,108 +322,124 @@ const AssetsList: FC = () => {
 type AssetCardProps = {
   asset: AccountAsset;
   isActive?: boolean;
-  onAssetSelect: () => void;
+  onAssetSelect: (asset: AccountAsset) => void;
   isManageMode: boolean;
   className?: string;
 };
 
-const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
-  (
-    { asset, isActive = false, onAssetSelect, isManageMode, className },
-    ref
-  ) => {
-    const { name, symbol, rawBalance, decimals, balanceUSD, status, priceUSD } =
-      asset;
-    const nativeAsset = status === TokenStatus.Native;
-    const disabled = status === TokenStatus.Disabled;
-    const hoverable = isManageMode ? !nativeAsset : !isActive;
+const AssetCard = memo(
+  forwardRef<HTMLButtonElement, AssetCardProps>(
+    (
+      { asset, isActive = false, onAssetSelect, isManageMode, className },
+      ref
+    ) => {
+      const {
+        name,
+        symbol,
+        rawBalance,
+        decimals,
+        balanceUSD,
+        status,
+        priceUSD,
+      } = asset;
+      const nativeAsset = status === TokenStatus.Native;
+      const disabled = status === TokenStatus.Disabled;
+      const hoverable = isManageMode ? !nativeAsset : !isActive;
 
-    return (
-      <button
-        ref={ref}
-        type="button"
-        onClick={onAssetSelect}
-        className={classNames(
-          "relative",
-          "flex items-stretch",
-          "w-full p-3",
-          "text-left",
-          "rounded-[.625rem]",
-          "group",
-          "transition",
-          hoverable && "hover:bg-brand-main/10",
-          isActive && "bg-brand-main/20",
-          disabled && "opacity-60",
-          "hover:opacity-100",
-          className
-        )}
-        disabled={isManageMode && nativeAsset}
-      >
-        <AssetLogo
-          asset={asset}
-          alt={name}
-          className="w-11 h-11 min-w-[2.75rem] mr-3"
-        />
-        <span className="flex flex-col justify-center w-full min-w-0">
-          <span className="flex justify-between items-end">
-            <span className="text-sm font-bold leading-4 truncate">{name}</span>
-            <PrettyAmount
-              amount={priceUSD ?? 0}
-              currency="$"
-              copiable
-              className={classNames(
-                "text-xs leading-4",
-                "ml-2",
-                +getRandom(-1, 1) > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"
-              )}
-            />
-          </span>
-          <span className="mt-2 flex justify-between items-end">
-            <PrettyAmount
-              amount={rawBalance ?? 0}
-              decimals={decimals}
-              currency={symbol}
-              className={"text-base font-bold leading-4"}
-            />
-            {!isManageMode && (
+      const priceClassName = useMemo(
+        () => (+getRandom(-1, 1) > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"),
+        []
+      );
+
+      return (
+        <button
+          ref={ref}
+          type="button"
+          onClick={() => onAssetSelect(asset)}
+          className={classNames(
+            "relative",
+            "flex items-stretch",
+            "w-full p-3",
+            "text-left",
+            "rounded-[.625rem]",
+            "group",
+            "transition",
+            hoverable && "hover:bg-brand-main/10",
+            isActive && "bg-brand-main/20",
+            disabled && "opacity-60",
+            "hover:opacity-100",
+            className
+          )}
+          disabled={isManageMode && nativeAsset}
+        >
+          <AssetLogo
+            asset={asset}
+            alt={name}
+            className="w-11 h-11 min-w-[2.75rem] mr-3"
+          />
+          <span className="flex flex-col justify-center w-full min-w-0">
+            <span className="flex justify-between items-end">
+              <span className="text-sm font-bold leading-4 truncate">
+                {name}
+              </span>
               <PrettyAmount
-                amount={balanceUSD ?? 0}
+                amount={priceUSD ?? 0}
                 currency="$"
-                isMinified
+                copiable
                 className={classNames(
+                  "text-xs leading-4",
                   "ml-2",
-                  "text-sm leading-4",
-                  !isActive && "text-brand-inactivedark",
-                  isActive && "text-brand-light",
-                  "group-hover:text-brand-light"
+                  priceClassName
                 )}
               />
-            )}
-            {isManageMode && !nativeAsset && (
-              <Checkbox.Root
-                className={classNames(
-                  "absolute top-1/2 right-5 -translate-y-1/2",
-                  "w-5 h-5 min-w-[1.25rem]",
-                  "bg-brand-main/20",
-                  "rounded",
-                  "flex items-center justify-center",
-                  !disabled && "border border-brand-main"
-                )}
-                checked={!disabled}
-                asChild
-              >
-                <span>
-                  <Checkbox.Indicator>
-                    {!disabled && <CheckIcon />}
-                  </Checkbox.Indicator>
-                </span>
-              </Checkbox.Root>
-            )}
+            </span>
+            <span className="mt-2 flex justify-between items-end">
+              <PrettyAmount
+                amount={rawBalance ?? 0}
+                decimals={decimals}
+                currency={symbol}
+                className={"text-base font-bold leading-4"}
+              />
+              {!isManageMode && (
+                <PrettyAmount
+                  amount={balanceUSD ?? 0}
+                  currency="$"
+                  isMinified
+                  className={classNames(
+                    "ml-2",
+                    "text-sm leading-4",
+                    !isActive && "text-brand-inactivedark",
+                    isActive && "text-brand-light",
+                    "group-hover:text-brand-light"
+                  )}
+                />
+              )}
+              {isManageMode && !nativeAsset && (
+                <Checkbox.Root
+                  className={classNames(
+                    "absolute top-1/2 right-5 -translate-y-1/2",
+                    "w-5 h-5 min-w-[1.25rem]",
+                    "bg-brand-main/20",
+                    "rounded",
+                    "flex items-center justify-center",
+                    !disabled && "border border-brand-main"
+                  )}
+                  checked={!disabled}
+                  asChild
+                >
+                  <span>
+                    <Checkbox.Indicator>
+                      {!disabled && <CheckIcon />}
+                    </Checkbox.Indicator>
+                  </span>
+                </Checkbox.Root>
+              )}
+            </span>
           </span>
-        </span>
-      </button>
-    );
-  }
+        </button>
+      );
+    }
+  )
 );
 
 const AssetInfo: FC = () => {
@@ -433,6 +451,8 @@ const AssetInfo: FC = () => {
     () => tokenSlug && parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
+
+  const priceChange = useMemo(() => tokenSlug && getRandom(-5, 5), [tokenSlug]);
 
   if (!tokenInfo || !parsedTokenSlug) {
     return null;
@@ -461,7 +481,7 @@ const AssetInfo: FC = () => {
             <TippySingletonProvider>
               {currentNetwork?.explorerUrls?.[0] && (
                 <IconedButton
-                  aria-label="View wallet in Explorer"
+                  aria-label="View asset in Explorer"
                   Icon={WalletExplorerIcon}
                   className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
                   iconClassName="!w-[1.125rem]"
@@ -471,7 +491,7 @@ const AssetInfo: FC = () => {
                 />
               )}
               <IconedButton
-                aria-label="View asset in coingecko.com"
+                aria-label="View asset in CoinGecko"
                 Icon={CoinGeckoIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-2"
                 iconClassName="!w-[1.125rem]"
@@ -492,7 +512,7 @@ const AssetInfo: FC = () => {
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
-              <PriceChange priceChange={getRandom(-5, 5)} isPercent />
+              <PriceChange priceChange={priceChange} isPercent />
             </span>
           </div>
         </div>
@@ -518,7 +538,9 @@ const AssetInfo: FC = () => {
           />
 
           <PriceChange
-            priceChange={getRandom(-1 * balanceUSD * 0.1, balanceUSD * 0.15)}
+            priceChange={new BigNumber(priceChange)
+              .times(balanceUSD)
+              .toFixed(2)}
           />
         </div>
       </div>
