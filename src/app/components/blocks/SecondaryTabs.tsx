@@ -3,8 +3,8 @@ import classNames from "clsx";
 import { Destination, Link } from "lib/navigation";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
-import Separator from "../elements/Seperator";
 
 type SecondaryTabsProps = {
   tabs: SecondaryItemProps[];
@@ -27,10 +27,11 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
     viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
     scrollBarClassName="py-0 pt-5 pb-20 !right-1"
   >
-    {tabs.map(({ title, route, desc }, i) => (
+    {tabs.map(({ title, Icon, route, desc }, i) => (
       <SecondaryItem
         key={title}
         title={title}
+        Icon={Icon}
         route={route}
         desc={desc}
         isActive={route === activeRoute}
@@ -45,13 +46,14 @@ export default SecondaryTabs;
 
 type SecondaryItemProps = {
   route: Destination;
+  Icon?: FC<{ className?: string }>;
   title: string;
   desc: string;
 };
 
 const SecondaryItem: FC<
   SecondaryItemProps & { isActive?: boolean; className?: string }
-> = ({ title, route, desc, isActive = false, className }) => {
+> = ({ title, route, Icon, desc, isActive = false, className }) => {
   return (
     <Link
       key={title}
@@ -67,10 +69,14 @@ const SecondaryItem: FC<
         className
       )}
     >
-      <h3 className="text-base font-bold">{title}</h3>
-      <p className="text-xs text-[#BCC2DB] pt-1">{desc}</p>
+      <div className="flex items-center">
+        {Icon && <Icon className="w-[1.125rem] h-auto mr-2" />}
+        <h3 className={"text-base font-bold"}>{title}</h3>
+      </div>
+      {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2.5 top-1/2 -translate-y-1/2",
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",

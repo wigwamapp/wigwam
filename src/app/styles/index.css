@@ -4,6 +4,11 @@
   font-variant-ligatures: none;
 }
 
+img,
+a {
+  -webkit-user-drag: none;
+}
+
 /**
  * Custom utilities
  */
@@ -26,6 +31,30 @@
 .brandbg-main-fallback,
 .brandbg-popup-fallback {
   @apply bg-brand-dark;
+}
+
+.brandbg-large-modal {
+  background: radial-gradient(
+      31.72% 37.17% at 85.81% 79.17%,
+      rgba(43, 44, 65, 0.2) 0%,
+      rgba(13, 14, 32, 0.2) 100%
+    ),
+    radial-gradient(
+      23.27% 20.91% at 21% 5.21%,
+      rgba(39, 39, 66, 0.2) 0%,
+      rgba(10, 11, 29, 0.2) 100%
+    ),
+    radial-gradient(
+      22.34% 32.22% at 56.41% 11.32%,
+      rgba(68, 69, 94, 0.2) 0%,
+      rgba(12, 13, 31, 0.2) 100%
+    ),
+    radial-gradient(
+      27.94% 35% at 25.62% 50%,
+      rgba(118, 123, 160, 0.2) 0%,
+      rgba(13, 14, 32, 0.2) 100%
+    ),
+    #0c0d1e;
 }
 
 /**
@@ -62,6 +91,14 @@
     --color-1: theme("colors.brand.redone");
     --color-2: theme("colors.brand.redtwo");
   }
+}
+
+/**
+ * Tailwind Typography
+ */
+
+.prose.prose-invert {
+  --tw-prose-body: theme("colors.brand.inactivelight");
 }
 
 /**
@@ -106,4 +143,12 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
 }
 .card-flip-exit-active > * {
   opacity: 0.5;
+}
+
+.opacity-transition-enter {
+  opacity: 0;
+}
+.opacity-transition-enter-done {
+  opacity: 1;
+  transition: opacity 200ms;
 }

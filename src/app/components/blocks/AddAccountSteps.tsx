@@ -8,7 +8,6 @@ import { AllSteps, StepsProvider } from "app/hooks/steps";
 
 import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
 import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
-import SelectAccountDerivation from "../screens/addAccountSteps/SelectAccountDerivation";
 import AddPrivateKey from "../screens/addAccountSteps/AddPrivateKey";
 import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
 import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
@@ -21,7 +20,6 @@ const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
-  [AddAccountStep.SelectDerivation, () => <SelectAccountDerivation />],
   [AddAccountStep.AddPrivateKey, () => <AddPrivateKey />],
   [
     AddAccountStep.SelectAccountsToAddMethod,
@@ -36,23 +34,22 @@ const AddAccountSteps = memo(() => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={rootRef} className="overflow-y-scroll h-full">
+    <div
+      ref={rootRef}
+      className={classNames(
+        "w-[59rem] mx-auto",
+        "h-full",
+        "pt-24",
+        "flex flex-col",
+        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24"
+      )}
+    >
       <StepsProvider
         rootRef={rootRef}
         atom={addAccountStepAtom}
         steps={ADD_ACCOUNT_STEPS}
       >
-        {({ children }) => (
-          <div
-            className={classNames(
-              accountStep === AddAccountStep.ChooseWay ? "mb-16" : "mb-24"
-            )}
-          >
-            <Suspense fallback={null}>
-              <div className="mt-24">{children}</div>
-            </Suspense>
-          </div>
-        )}
+        {({ children }) => <Suspense fallback={null}>{children}</Suspense>}
       </StepsProvider>
     </div>
   );

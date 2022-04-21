@@ -155,7 +155,7 @@ const Token: FC<{
               "flex items-center justify-center"
             )}
           >
-            <SelectedIcon className="fill-brand-light" />
+            <SelectedIcon className="w-6 h-auto fill-brand-light" />
           </span>
         )}
       </span>

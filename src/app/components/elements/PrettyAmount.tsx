@@ -211,7 +211,7 @@ const currenciesCompacts: {
 export const getPrettyAmount = ({
   value,
   dec = 6,
-  locale = "uk",
+  locale = "en-US",
   currencySymbol,
   currencyCode = "USD",
   withTooltip = false,

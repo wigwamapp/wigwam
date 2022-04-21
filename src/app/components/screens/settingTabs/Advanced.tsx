@@ -14,7 +14,7 @@ const Advanced: FC = () => {
       <SettingsHeader>Advanced</SettingsHeader>
       <Switcher
         id="testNetworks"
-        label="Show/hide test networks"
+        label="Test networks"
         text={testnetsVisibility ? "Visible" : "Hidden"}
         checked={testnetsVisibility}
         onCheckedChange={toggleTestnetsVisibility}

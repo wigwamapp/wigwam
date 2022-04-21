@@ -1,8 +1,10 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import classNames from "clsx";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
+import { Field, Form } from "react-final-form";
 
+import { composeValidators, required, validateDerivationPath } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Input from "app/components/elements/Input";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -18,42 +20,67 @@ export type MethodsProps = [MethodProps, MethodProps];
 
 type SelectAddMethodProps = {
   methods: MethodsProps;
-  onContinue: (method: string) => void;
+  onContinue: (method: string, derivationPath: string) => void;
 };
 
 const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
   const [activeMethod, setActiveMethod] = useState(methods[0].value);
 
+  const handleContinue = useCallback(
+    ({ derivationPath }) => {
+      onContinue(activeMethod, derivationPath.replace("/{index}", ""));
+    },
+    [activeMethod, onContinue]
+  );
+
   return (
-    <>
-      <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
-      <div className="flex flex-col max-w-[55rem] mx-auto mb-32">
-        <RadioGroupPrimitive.Root
-          className="grid grid-cols-2 gap-6"
-          value={activeMethod}
-          onValueChange={(value) => setActiveMethod(value)}
-        >
-          {methods.map(({ value, title, description }) => (
-            <RadioGroup
-              key={value}
-              value={value}
-              activeValue={activeMethod}
-              title={title}
-              description={description}
-            />
-          ))}
-        </RadioGroupPrimitive.Root>
-        <Collapse label="Customize Derivationa path" className="mt-12">
-          <div className="max-w-[17.5rem]">
-            <p className="mb-3 text-sm">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam
-            </p>
-            <Input defaultValue="m/44'/60'/0'/0/{index}" />
+    <Form
+      initialValues={{ derivationPath: "m/44'/60'/0'/0/{index}" }}
+      onSubmit={handleContinue}
+      render={({ handleSubmit }) => (
+        <form onSubmit={handleSubmit}>
+          <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
+          <div className="flex flex-col max-w-[55rem] mx-auto mb-5">
+            <RadioGroupPrimitive.Root
+              className="grid grid-cols-2 gap-6"
+              value={activeMethod}
+              onValueChange={(value) => setActiveMethod(value)}
+            >
+              {methods.map(({ value, title, description }) => (
+                <RadioGroup
+                  key={value}
+                  value={value}
+                  activeValue={activeMethod}
+                  title={title}
+                  description={description}
+                />
+              ))}
+            </RadioGroupPrimitive.Root>
+            <Collapse label="Customize Derivation path" className="mt-12">
+              <div className="max-w-[17.5rem]">
+                <p className="mb-3 text-sm">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
+                  aliquam
+                </p>
+                <Field
+                  name="derivationPath"
+                  validate={composeValidators(required, validateDerivationPath)}
+                >
+                  {({ input, meta }) => (
+                    <Input
+                      error={meta.touched && meta.error}
+                      errorMessage={meta.error}
+                      {...input}
+                    />
+                  )}
+                </Field>
+              </div>
+            </Collapse>
           </div>
-        </Collapse>
-      </div>
-      <AddAccountContinueButton onContinue={() => onContinue(activeMethod)} />
-    </>
+          <AddAccountContinueButton />
+        </form>
+      )}
+    />
   );
 };
 

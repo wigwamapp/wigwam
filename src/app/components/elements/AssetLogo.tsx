@@ -17,7 +17,7 @@ const AssetLogo: FC<AssetLogoProps> = ({ asset, ...rest }) => {
     <Avatar src={src} {...rest} />
   ) : (
     <AutoIcon
-      seed={asset.tokenSlug}
+      seed={`${asset.chainId}_${asset.tokenSlug}`}
       source="boring"
       variant="ring"
       initialsSource={asset.symbol[0]}

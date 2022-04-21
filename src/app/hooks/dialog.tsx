@@ -7,14 +7,18 @@ import {
   useRef,
 } from "react";
 import useForceUpdate from "use-force-update";
+import memoizeOne from "memoize-one";
 import { assert } from "lib/system/assert";
+import { forEachSafe } from "lib/system/forEachSafe";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
+type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
+
 type DialogContextDataProps =
-  | (Omit<SecondaryModalProps, "header" | "open" | "onOpenChange"> & {
+  | (ModalProps & {
       header: ReactNode;
-      primaryButtonText: ReactNode;
+      primaryButtonText?: ReactNode;
       onPrimaryButtonClick?: () => void;
       secondaryButtonText?: ReactNode;
       onSecondaryButtonClick?: () => void;
@@ -26,14 +30,20 @@ type AlertParams = {
   title: ReactNode;
   content: ReactNode;
   okButtonText?: ReactNode;
-};
+} & ModalProps;
 
 type ConfirmParams = {
   title: ReactNode;
   content: ReactNode;
   yesButtonText?: ReactNode;
   noButtonText?: ReactNode;
-};
+} & ModalProps;
+
+type WaitLoadingParams = {
+  title: ReactNode;
+  content: ReactNode;
+  loadingHandler: LoadingHandler;
+} & ModalProps;
 
 type DialogContextProps = {
   modalData: DialogContextDataProps;
@@ -41,7 +51,12 @@ type DialogContextProps = {
   closeCurrentDialog: () => void;
   alert: (params: AlertParams) => Promise<void>;
   confirm: (params: ConfirmParams) => Promise<boolean>;
+  waitLoading: (params: WaitLoadingParams) => Promise<boolean>;
 };
+
+export type LoadingHandler = (
+  onClose: (callback: () => void) => void
+) => Promise<boolean>;
 
 const OPEN_NEXT_DELAY = 300;
 
@@ -92,7 +107,7 @@ export const DialogProvider: FC = ({ children }) => {
   const modalData = openedRef.current ? queueRef.current[0] : null;
 
   const alert = useCallback(
-    ({ title, content, okButtonText = "OK" }: AlertParams) =>
+    ({ title, content, okButtonText = "OK", ...rest }: AlertParams) =>
       new Promise<void>((res) => {
         const handleDone = () => {
           closeCurrentDialog();
@@ -105,6 +120,7 @@ export const DialogProvider: FC = ({ children }) => {
           primaryButtonText: okButtonText,
           onPrimaryButtonClick: handleDone,
           onClose: handleDone,
+          ...rest,
         });
       }),
     [addDialog, closeCurrentDialog]
@@ -116,6 +132,7 @@ export const DialogProvider: FC = ({ children }) => {
       content,
       yesButtonText = "OK",
       noButtonText = "Cancel",
+      ...rest
     }: ConfirmParams) =>
       new Promise<boolean>((res) => {
         const handleConfirm = (confirmed: boolean) => {
@@ -131,14 +148,58 @@ export const DialogProvider: FC = ({ children }) => {
           onPrimaryButtonClick: () => handleConfirm(true),
           onSecondaryButtonClick: () => handleConfirm(false),
           onClose: () => handleConfirm(false),
+          ...rest,
         });
       }),
     [addDialog, closeCurrentDialog]
   );
 
+  const waitLoading = useCallback(
+    ({ title, content, loadingHandler, ...rest }: WaitLoadingParams) =>
+      new Promise<boolean>(async (res) => {
+        const closeHandlers = new Set<() => void>();
+
+        const handleConfirm = memoizeOne((confirmed: boolean) => {
+          forEachSafe(closeHandlers, (handle) => handle());
+          closeCurrentDialog();
+          res(confirmed);
+        });
+
+        addDialog({
+          header: title,
+          children: content,
+          onClose: () => handleConfirm(false),
+          disabledClickOutside: true,
+          ...rest,
+        });
+
+        try {
+          const res = await loadingHandler((handler) => {
+            closeHandlers.add(handler);
+          });
+          handleConfirm(res);
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+          handleConfirm(false);
+          alert({
+            title: "Error!",
+            content: msg,
+          });
+        }
+      }),
+    [addDialog, alert, closeCurrentDialog]
+  );
+
   return (
     <dialogContext.Provider
-      value={{ modalData, addDialog, closeCurrentDialog, alert, confirm }}
+      value={{
+        modalData,
+        addDialog,
+        closeCurrentDialog,
+        alert,
+        confirm,
+        waitLoading,
+      }}
     >
       {children}
     </dialogContext.Provider>

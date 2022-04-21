@@ -1,8 +1,8 @@
 export interface Network {
   chainId: number;
   type: NetworkType;
-  rpcUrls: string[];
   chainTag: string;
+  rpcUrls: string[];
   name: string;
   nativeCurrency: {
     name: string;
@@ -14,6 +14,7 @@ export interface Network {
   iconUrls?: string[];
   faucetUrls?: string[];
   infoUrl?: string;
+  position?: number;
 }
 
 export type NetworkType = "mainnet" | "testnet" | "unknown";

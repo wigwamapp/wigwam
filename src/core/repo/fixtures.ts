@@ -27,23 +27,27 @@ export async function setupFixtures() {
 
 function mergeNetwork(saved: Network, toMerge: Network): Network {
   const {
+    name,
     chainTag,
     infoUrl,
     nativeCurrency,
     rpcUrls,
     faucetUrls,
     explorerUrls,
+    position,
   } = toMerge;
 
   return {
     ...saved,
     // Override
+    name,
     chainTag,
     infoUrl,
     nativeCurrency: {
       ...saved.nativeCurrency,
       name: nativeCurrency.name,
     },
+    position,
     // Merge
     rpcUrls: mergeUrls(saved.rpcUrls, rpcUrls)!,
     faucetUrls: mergeUrls(saved.faucetUrls, faucetUrls),

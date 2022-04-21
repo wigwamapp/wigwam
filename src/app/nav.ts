@@ -12,18 +12,11 @@ export enum Page {
   Settings = "settings",
 }
 
-export enum WelcomeStep {
-  Hello = "hello",
-  ChooseLanguage = "choose-language",
-  LetsBegin = "lets-begin",
-}
-
 export enum AddAccountStep {
   ChooseWay = "choose-way",
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
-  SelectDerivation = "select-derivation",
   AddPrivateKey = "add-private-key",
   SelectAccountsToAddMethod = "select-accounts-to-add-method",
   VerifyToAdd = "verify-to-add",
@@ -44,4 +37,10 @@ export enum TransferTab {
   Asset = "asset",
   Nft = "nft",
   Bridge = "bridge",
+}
+
+export enum ReceiveTab {
+  ShareAddress = "share-address",
+  BuyWithCrypto = "buy-with-crypto",
+  BuyWithFiat = "buy-with-fiat",
 }

@@ -61,7 +61,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                 className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
                 onClick={regenerateProfileSeed}
               >
-                <RegenerateIcon className="mr-2" />
+                <RegenerateIcon className="w-4 h-auto mr-2" />
                 Regenerate
               </NewButton>
             </div>

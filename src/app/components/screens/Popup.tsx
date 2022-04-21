@@ -52,7 +52,7 @@ const Popup: FC = () => (
       <NetworkSelect
         className="max-w-auto"
         currentItemClassName="pr-3 pl-3.5 !py-1.5"
-        currentItemIconClassName="w-8 h-8 !mr-3.5"
+        currentItemIconClassName="!w-8 !h-8 !mr-3.5"
         contentClassName="!min-w-[22.25rem]"
       />
       <AccountSelect className="mt-2" />
