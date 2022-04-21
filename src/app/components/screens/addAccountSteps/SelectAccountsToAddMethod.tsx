@@ -75,8 +75,10 @@ const SelectAccountsToAddMethod: FC = () => {
   const transportRef = useRef<Transport>();
 
   const handleConnect = useCallback<LoadingHandler>(
-    (onClose, [derivationPath]) =>
+    (onClose, args) =>
       withHumanDelay(async () => {
+        const [derivationPath] = args as [string];
+
         try {
           let closed = false;
           let extendedKey = "";
