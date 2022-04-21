@@ -14,7 +14,7 @@ import { ClientProvider } from "core/client";
 import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
-import { useDialog } from "app/hooks/dialog";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
@@ -59,8 +59,6 @@ const SelectAccountsToAddMethod: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const { waitLoading } = useDialog();
 
-  const [derivat, setDerivate] = useState<string | undefined>(undefined);
-
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
   const [connectionState, setConnectionState] = useState<
     "loading" | "connectApp"
@@ -76,8 +74,8 @@ const SelectAccountsToAddMethod: FC = () => {
 
   const transportRef = useRef<Transport>();
 
-  const handleConnect = useCallback(
-    (onClose: any) =>
+  const handleConnect = useCallback<LoadingHandler>(
+    (onClose, [derivationPath]) =>
       withHumanDelay(async () => {
         try {
           let closed = false;
@@ -90,39 +88,47 @@ const SelectAccountsToAddMethod: FC = () => {
               import("lib/ledger"),
             ]);
 
-          await retry(
+          return await retry(
             async () => {
               await transportRef.current?.close();
               transportRef.current = await LedgerTransport.create();
 
+              onClose(() => transportRef.current?.close());
+
               const { name: currentApp } = await getAppInfo(
                 transportRef.current
               );
+              if (closed) return false;
 
               if (currentApp !== "Ethereum") {
                 if (currentApp !== "BOLOS") {
                   await disconnectFromConnectedApp(transportRef.current);
                   await timeout(500);
+                  if (closed) return false;
                 }
+
                 setConnectionState("connectApp");
                 await connectToEthereumApp(transportRef.current);
                 await timeout(500);
+                if (closed) return false;
               }
 
               const ledgerEth = new LedgerEth(transportRef.current);
+              if (closed) return false;
 
               const { publicKey, chainCode } = await ledgerEth.getAddress(
-                derivat ?? "m/44'/60'/0'/0",
+                derivationPath,
                 false,
                 true
               );
+              if (closed) return false;
 
               extendedKey = getExtendedKey(publicKey, chainCode!);
+              stateRef.current.extendedKey = extendedKey;
+              return true;
             },
             { retries: 5, maxTimeout: 2_000 }
           );
-
-          return extendedKey;
         } catch (err: any) {
           const msg = err?.message ?? "Unknown error";
 
@@ -131,7 +137,7 @@ const SelectAccountsToAddMethod: FC = () => {
           throw new Error(msg);
         }
       }),
-    [derivat]
+    [stateRef]
   );
 
   const handleContinue = useCallback(
@@ -143,7 +149,6 @@ const SelectAccountsToAddMethod: FC = () => {
       stateRef.current.importAddresses = null;
 
       if (isHardDevice) {
-        setDerivate(derivationPath);
         const answer = await waitLoading({
           title: "Loading...",
           headerClassName: "mb-3",
@@ -158,11 +163,10 @@ const SelectAccountsToAddMethod: FC = () => {
             </>
           ),
           loadingHandler: handleConnect,
-          // handlerParams: [derivationPath],
+          handlerParams: [derivationPath],
         });
 
         if (answer) {
-          stateRef.current.extendedKey = answer;
           if (isInitial && method === "auto") {
             setOpenedLoadingModal(true);
             return;

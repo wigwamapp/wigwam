@@ -43,6 +43,7 @@ type WaitLoadingParams = {
   title: ReactNode;
   content: ReactNode;
   loadingHandler: LoadingHandler;
+  handlerParams?: any[];
 } & ModalProps;
 
 type DialogContextProps = {
@@ -156,7 +157,13 @@ export const DialogProvider: FC = ({ children }) => {
   );
 
   const waitLoading = useCallback(
-    ({ title, content, loadingHandler, ...rest }: WaitLoadingParams) =>
+    ({
+      title,
+      content,
+      loadingHandler,
+      handlerParams,
+      ...rest
+    }: WaitLoadingParams) =>
       new Promise<boolean>(async (res) => {
         const closeHandlers = new Set<() => void>();
 
@@ -177,7 +184,7 @@ export const DialogProvider: FC = ({ children }) => {
         try {
           const res = await loadingHandler((handler) => {
             closeHandlers.add(handler);
-          });
+          }, handlerParams);
           handleConfirm(res);
         } catch (err: any) {
           const msg = err?.message ?? "Unknown error";
