@@ -136,7 +136,7 @@ const CreateSeedPhraseField = forwardRef<
       readOnly
       labelActions={labelActions}
       actions={actions}
-      {...rest}
+      {...(rest as LongTextFieldProps)}
     />
   ) : (
     <Input
@@ -151,7 +151,7 @@ const CreateSeedPhraseField = forwardRef<
   );
 });
 
-type ImportSeedPhraseFieldProps = LongTextFieldProps & {
+type ImportSeedPhraseFieldProps = (LongTextFieldProps | InputProps) & {
   setFromClipboard: (value: string) => void;
 };
 
@@ -204,16 +204,7 @@ const ImportSeedPhraseField = forwardRef<
     </NewButton>
   );
 
-  return isShown ? (
-    <LongTextField
-      ref={ref as RefObject<HTMLTextAreaElement>}
-      id="seedPhrase"
-      label="Secret Phrase"
-      labelActions={labelActions}
-      actions={actions}
-      {...rest}
-    />
-  ) : (
+  return !isShown ? (
     <Input
       ref={ref as RefObject<HTMLInputElement>}
       type="password"
@@ -224,6 +215,15 @@ const ImportSeedPhraseField = forwardRef<
       inputClassName="pb-[4.90625rem] !pr-4"
       actionsClassName="absolute !top-auto bottom-3 flex transform-none"
       {...(rest as InputProps)}
+    />
+  ) : (
+    <LongTextField
+      ref={ref as RefObject<HTMLTextAreaElement>}
+      id="seedPhrase"
+      label="Secret Phrase"
+      labelActions={labelActions}
+      actions={actions}
+      {...(rest as LongTextFieldProps)}
     />
   );
 });

@@ -30,7 +30,7 @@ export type InputProps = {
   actionsClassName?: string;
   inputClassName?: string;
   adornmentClassName?: string;
-} & HTMLProps<HTMLInputElement>;
+} & Omit<HTMLProps<HTMLInputElement>, "ref">;
 
 const Input = memo(
   forwardRef<HTMLInputElement, InputProps>(
