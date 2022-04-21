@@ -28,6 +28,7 @@ module.exports = {
           inactivedark2: "#7D8398",
           redobject: "#B82D41",
           redtext: "#EA556A",
+          greenobject: "#4F9A5E",
         },
       },
       fontFamily: {
