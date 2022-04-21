@@ -333,15 +333,8 @@ const AssetCard = memo(
       { asset, isActive = false, onAssetSelect, isManageMode, className },
       ref
     ) => {
-      const {
-        name,
-        symbol,
-        rawBalance,
-        decimals,
-        balanceUSD,
-        status,
-        priceUSD,
-      } = asset;
+      const { symbol, rawBalance, decimals, balanceUSD, status, priceUSD } =
+        asset;
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
       const hoverable = isManageMode ? !nativeAsset : !isActive;
@@ -374,18 +367,18 @@ const AssetCard = memo(
         >
           <AssetLogo
             asset={asset}
-            alt={name}
+            alt={symbol}
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />
           <span className="flex flex-col justify-center w-full min-w-0">
-            <span className="flex justify-between items-end">
+            <span className="flex items-end">
               <span className="text-sm font-bold leading-4 truncate">
-                {name}
+                {symbol}
               </span>
               <PrettyAmount
                 amount={priceUSD ?? 0}
                 currency="$"
-                copiable
+                threeDots={false}
                 className={classNames(
                   "text-xs leading-4",
                   "ml-2",
@@ -397,8 +390,8 @@ const AssetCard = memo(
               <PrettyAmount
                 amount={rawBalance ?? 0}
                 decimals={decimals}
-                currency={symbol}
                 className={"text-base font-bold leading-4"}
+                threeDots={false}
               />
               {!isManageMode && (
                 <PrettyAmount
@@ -407,10 +400,11 @@ const AssetCard = memo(
                   isMinified
                   className={classNames(
                     "ml-2",
-                    "text-sm leading-4",
-                    !isActive && "text-brand-inactivedark",
+                    "text-base font-bold leading-4",
+                    !isActive && "text-brand-lightgray",
                     isActive && "text-brand-light",
-                    "group-hover:text-brand-light"
+                    "group-hover:text-brand-light",
+                    "transform -translate-y-[0.75rem]"
                   )}
                 />
               )}
@@ -529,19 +523,20 @@ const AssetInfo: FC = () => {
             copiable
             className="text-[1.75rem] font-bold leading-none"
           />
-
+        </div>
+        <div className="mt-4">
           <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
             copiable
-            className="text-base text-brand-inactivedark ml-8 mr-4"
+            className="text-lg font-bold text-brand-lightgray mr-4"
           />
-
           <PriceChange
             priceChange={new BigNumber(priceChange)
               .times(balanceUSD)
               .div(100)
               .toFixed(2)}
+            className="!text-lg"
           />
         </div>
       </div>
@@ -607,11 +602,13 @@ const Tag: FC<TagProps> = ({ standard }) =>
 type PriceChangeProps = {
   priceChange: string;
   isPercent?: boolean;
+  className?: string;
 };
 
 const PriceChange: FC<PriceChangeProps> = ({
   priceChange,
   isPercent = false,
+  className,
 }) => {
   const priceChangeNumber = +priceChange;
 
@@ -632,7 +629,8 @@ const PriceChange: FC<PriceChangeProps> = ({
         isPositive && isPercent && "bg-[#4F9A5E]",
         !isPositive && isPercent && "bg-[#B82D41]",
         isPositive && !isPercent && "text-[#6BB77A]",
-        !isPositive && !isPercent && "text-[#EA556A]"
+        !isPositive && !isPercent && "text-[#EA556A]",
+        className
       )}
     >
       {isPositive ? "+" : "-"}

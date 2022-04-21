@@ -1,8 +1,9 @@
-import { FC, ReactNode } from "react";
+import { FC, memo, ReactNode } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { followCursor } from "tippy.js";
+import memoize from "mem";
 
 import { currentLocaleAtom } from "app/atoms";
 
@@ -15,134 +16,142 @@ type PrettyAmountProps = {
   decimals?: number;
   currency?: string;
   isMinified?: boolean;
+  threeDots?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
   className?: string;
 };
 
-const PrettyAmount: FC<PrettyAmountProps> = ({
-  amount,
-  decimals = 0,
-  currency,
-  isMinified,
-  copiable = false,
-  prefix,
-  className,
-}) => {
-  const currentLocale = useAtomValue(currentLocaleAtom);
+const PrettyAmount = memo<PrettyAmountProps>(
+  ({
+    amount,
+    decimals = 0,
+    currency,
+    isMinified,
+    threeDots = true,
+    copiable = false,
+    prefix,
+    className,
+  }) => {
+    const currentLocale = useAtomValue(currentLocaleAtom);
 
-  const amountExist = amount !== null;
-  const bigNumberAmount = new BigNumber(amount ?? 0);
+    const amountExist = amount !== null;
+    const bigNumberAmount = new BigNumber(amount ?? 0);
 
-  const convertedAmount = bigNumberAmount.div(10 ** decimals);
-  const integerPart = convertedAmount.decimalPlaces(0);
-  const decimalPlaces = convertedAmount.toString().split(".")[1];
+    const convertedAmount = bigNumberAmount.div(10 ** decimals);
+    const integerPart = convertedAmount.decimalPlaces(0);
+    const decimalPlaces = convertedAmount.toString().split(".")[1];
 
-  const isFiatMinified =
-    currency === "$" && (convertedAmount.gte(0.01) || isMinified);
+    const isFiatMinified =
+      currency === "$" && (convertedAmount.gte(0.01) || isMinified);
 
-  let decSplit = isMinified || isFiatMinified ? 2 : 6;
-  if (integerPart.gte(1_000)) {
-    decSplit = 2;
-  }
+    let decSplit = isMinified || isFiatMinified ? 2 : 6;
+    if (integerPart.gte(1_000)) {
+      decSplit = 2;
+    }
 
-  const finalDecLength = decimalPlaces
-    ? isFiatMinified
-      ? 2
-      : decimalPlaces.length
-    : 0;
+    const finalDecLength = decimalPlaces
+      ? isFiatMinified
+        ? 2
+        : decimalPlaces.length
+      : 0;
 
-  let isShownDecTooltip = false;
-  if (finalDecLength > decSplit) {
-    isShownDecTooltip = true;
-  }
+    let isShownDecTooltip = false;
+    if (finalDecLength > decSplit) {
+      isShownDecTooltip = true;
+    }
 
-  const isShownIntTooltip =
-    integerPart.toString().length > (isMinified ? 3 : 6);
+    const isShownIntTooltip =
+      integerPart.toString().length > (isMinified ? 3 : 6);
 
-  let tooltipContent = getPrettyAmount({
-    value: isFiatMinified
-      ? convertedAmount.decimalPlaces(
-          2,
-          convertedAmount.gte(0.01) ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP
-        )
-      : convertedAmount,
-    dec: isMinified ? 3 : undefined,
-    locale: currentLocale,
-  });
-  let content = getPrettyAmount({
-    value: isFiatMinified
-      ? convertedAmount.decimalPlaces(
-          2,
-          convertedAmount.gte(0.01) ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP
-        )
-      : convertedAmount,
-    dec: isMinified ? 3 : undefined,
-    locale: currentLocale,
-  });
-
-  if (isShownIntTooltip) {
-    content = getPrettyAmount({
-      value: convertedAmount,
-      dec: isMinified ? 3 : 6,
-      locale: currentLocale,
-    });
-
-    tooltipContent = getPrettyAmount({
+    let tooltipContent = getPrettyAmount({
       value: isFiatMinified
-        ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+        ? convertedAmount.decimalPlaces(
+            2,
+            convertedAmount.gte(0.01)
+              ? BigNumber.ROUND_DOWN
+              : BigNumber.ROUND_UP
+          )
         : convertedAmount,
-      dec: 38,
-      locale: currentLocale,
-    });
-  }
-
-  if (isShownDecTooltip && !isShownIntTooltip) {
-    content = getPrettyAmount({
-      value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
-      withTooltip: true,
     });
-
-    tooltipContent = getPrettyAmount({
-      value: convertedAmount,
+    let content = getPrettyAmount({
+      value: isFiatMinified
+        ? convertedAmount.decimalPlaces(
+            2,
+            convertedAmount.gte(0.01)
+              ? BigNumber.ROUND_DOWN
+              : BigNumber.ROUND_UP
+          )
+        : convertedAmount,
+      dec: isMinified ? 3 : undefined,
       locale: currentLocale,
     });
-  }
 
-  className = classNames(className, "whitespace-nowrap");
+    if (isShownIntTooltip) {
+      content = getPrettyAmount({
+        value: convertedAmount,
+        dec: isMinified ? 3 : 6,
+        locale: currentLocale,
+      });
 
-  if (!amountExist) {
-    className = classNames(className, "invisible pointer-events-none");
-  }
+      tooltipContent = getPrettyAmount({
+        value: isFiatMinified
+          ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+          : convertedAmount,
+        dec: 38,
+        locale: currentLocale,
+      });
+    }
 
-  const children = (
-    <>
-      {prefix}
-      <AmountWithCurrency amount={content} currency={currency} />
-    </>
-  );
+    if (isShownDecTooltip && !isShownIntTooltip) {
+      content = getPrettyAmount({
+        value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
+        dec: isMinified ? 3 : undefined,
+        locale: currentLocale,
+        threeDots,
+      });
 
-  if (copiable) {
-    return (
-      <CopiableTooltip
-        content={
-          <AmountWithCurrency amount={tooltipContent} currency={currency} />
-        }
-        textToCopy={tooltipContent}
-        followCursor
-        plugins={[followCursor]}
-        asChild
-        className={className}
-      >
-        {children}
-      </CopiableTooltip>
+      tooltipContent = getPrettyAmount({
+        value: convertedAmount,
+        locale: currentLocale,
+      });
+    }
+
+    className = classNames(className, "whitespace-nowrap");
+
+    if (!amountExist) {
+      className = classNames(className, "invisible pointer-events-none");
+    }
+
+    const children = (
+      <>
+        {prefix}
+        <AmountWithCurrency amount={content} currency={currency} />
+      </>
     );
-  }
 
-  return <span className={className}>{children}</span>;
-};
+    if (copiable) {
+      return (
+        <CopiableTooltip
+          content={
+            <AmountWithCurrency amount={tooltipContent} currency={currency} />
+          }
+          textToCopy={tooltipContent}
+          followCursor
+          plugins={[followCursor]}
+          asChild
+          className={className}
+        >
+          {children}
+        </CopiableTooltip>
+      );
+    }
+
+    return <span className={className}>{children}</span>;
+  }
+);
 
 export default PrettyAmount;
 
@@ -184,23 +193,21 @@ export const getPrettyAmount = ({
   value,
   dec = 6,
   locale = "en",
-  withTooltip = false,
+  threeDots = false,
 }: {
   value: number | BigNumber;
   dec?: number;
   locale?: string;
-  withTooltip?: boolean;
+  threeDots?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
     const isLargerThenTrillion = new BigNumber(value).gt(1e18);
     const minFract = isLargerThenTrillion ? 0 : 2;
     const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
-    let finalValue = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: minFract,
-      maximumFractionDigits: maxFract,
-      notation: "compact",
-    } as any).format(+value);
+    let finalValue = getIntlNumberFormat(locale, minFract, maxFract).format(
+      +value
+    );
 
     const finalSplitLetter = finalValue.slice(-1);
     if (checkIfObjectsKey(finalSplitLetter)) {
@@ -213,8 +220,23 @@ export const getPrettyAmount = ({
     return finalValue;
   }
 
-  return `${new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 20,
-  }).format(+value)}${withTooltip ? "..." : ""}`;
+  return `${getIntlNumberFormat(locale, 2, 20).format(+value)}${
+    threeDots ? "..." : ""
+  }`;
 };
+
+const getIntlNumberFormat = memoize(
+  (
+    locale: string,
+    minimumFractionDigits: number,
+    maximumFractionDigits: number
+  ) =>
+    new Intl.NumberFormat(locale, {
+      minimumFractionDigits,
+      maximumFractionDigits,
+      notation: "compact",
+    } as any),
+  {
+    cacheKey: (args) => args.join("_"),
+  }
+);
