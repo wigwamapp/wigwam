@@ -14,6 +14,7 @@ import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import Select from "./Select";
 import USDAmount from "./USDAmount";
 import AssetLogo from "./AssetLogo";
+import PrettyAmount from "./PrettyAmount";
 
 type TokenSelectProps = {
   handleTokenChanged?: () => void;
@@ -161,7 +162,7 @@ const Token: FC<{
       <span className="flex flex-col justify-between text-left grow min-w-0">
         <span className="flex justify-between">
           <span className="truncate">{symbol}</span>
-          <USDAmount
+          <PrettyAmount
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}

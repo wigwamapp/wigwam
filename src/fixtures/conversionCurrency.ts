@@ -34,7 +34,7 @@ export const CONVERSION_CURRENCIES: ConversionCurrency[] = [
   { code: "LKR", name: "Sri Lankan Rupee", unit: "Rs" },
   { code: "MMK", name: "Burmese Kyat", unit: "K" },
   { code: "MXN", name: "Mexican Peso", unit: "MX$" },
-  { code: "RM", name: "Malaysian Ringgit", unit: "RM" },
+  { code: "MYR", name: "Malaysian Ringgit", unit: "RM" },
   { code: "NGN", name: "Nigerian Naira", unit: "₦" },
   { code: "NOK", name: "Norwegian Krone", unit: "kr" },
   { code: "NZD", name: "New Zealand Dollar", unit: "NZ$" },

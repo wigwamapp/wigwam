@@ -33,6 +33,7 @@ import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import USDAmount from "app/components/elements/USDAmount";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -247,7 +248,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
             header={
               <>
                 Average Fee:{" "}
-                <USDAmount
+                <PrettyAmount
                   amount={0.13}
                   currency={nativeCurrency?.symbol ?? undefined}
                   copiable

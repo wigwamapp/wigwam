@@ -3,7 +3,6 @@ import { currenciesRateAtom, selectedCurrencyAtom } from "app/atoms";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 
-import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 import PrettyAmount, { PrettyAmountProps } from "./PrettyAmount";
 
 type USDAmountProps = PrettyAmountProps;
@@ -13,25 +12,21 @@ const USDAmount: FC<USDAmountProps> = ({ amount, ...props }) => {
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
 
   const isContverted = props.currency ? true : false;
-  const isFiat =
-    !props.currency?.includes("ETH") && !props.currency?.includes("BTC");
+
+  const isCoin = props.currencyCode
+    ? isBTCorETH(props.currencyCode)
+    : isBTCorETH(selectedCurrency);
 
   const value = isContverted
     ? amount
-    : convert(amount, currenciesRate[selectedCurrency.value.split(" - ")[1]]);
-
-  const units =
-    props.currency ??
-    CONVERSION_CURRENCIES.find(
-      (CUR) => CUR.name === selectedCurrency.value.split(" - ")[1]
-    )?.unit;
+    : convert(amount, currenciesRate[selectedCurrency]);
 
   return (
     <PrettyAmount
       {...props}
-      amount={isFiat ? fiatFormat(value) : value}
-      currencyCode={selectedCurrency.value.split(" - ")[0]}
-      currency={units}
+      amount={isCoin ? value : fiatFormat(value)}
+      currencyCode={selectedCurrency}
+      USDAmount
     />
   );
 };
@@ -47,3 +42,7 @@ const convert = (amount: BigNumber.Value | null, rate: number) => {
   const bigNumberAmount = new BigNumber(amount ?? 0);
   return bigNumberAmount.multipliedBy(Number(rate));
 };
+
+type COIN = "ETH" | "BTC";
+const isBTCorETH = (currency: string): currency is COIN =>
+  currency === "ETH" || currency === "BTC";

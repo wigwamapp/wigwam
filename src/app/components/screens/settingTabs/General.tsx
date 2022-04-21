@@ -32,15 +32,26 @@ const General: FC = () => {
     [currentLocale]
   );
 
+  const currentItem = useMemo(
+    () => ({
+      key: selectedCurrency,
+      value: `${selectedCurrency} - ${
+        CONVERSION_CURRENCIES.find(
+          (currency) => currency.code === selectedCurrency
+        )?.name
+      }`,
+    }),
+    [selectedCurrency]
+  );
   const currencySelectProps = {
     items: CONVERSION_CURRENCIES.map(mapCurrency),
-    currentItem: selectedCurrency,
-    setItem: (itemKey: any) => {
+    currentItem,
+    setItem: (item: any) => {
       const newCurrency = CONVERSION_CURRENCIES.find(
-        (currency) => currency.name === itemKey.key
+        (currency) => currency.code === item.key
       );
       if (newCurrency) {
-        updateCurrency(itemKey);
+        updateCurrency(item.key);
       }
     },
     showSelected: true,
@@ -70,6 +81,6 @@ const General: FC = () => {
 export default General;
 
 const mapCurrency = (currency: ConversionCurrency) => ({
-  key: currency.name,
+  key: currency.code,
   value: `${currency.code} - ${currency.name}`,
 });

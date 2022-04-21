@@ -18,6 +18,7 @@ export type PrettyAmountProps = {
   isMinified?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
+  USDAmount?: boolean;
   className?: string;
 };
 
@@ -25,23 +26,22 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
   amount,
   decimals = 0,
   currency,
-  currencyCode = "USD",
+  currencyCode,
   isMinified,
   copiable = false,
   prefix,
+  USDAmount,
   className,
 }) => {
   const currentLocale = useAtomValue(currentLocaleAtom);
 
   const amountExist = amount !== null;
   const bigNumberAmount = new BigNumber(amount ?? 0);
-
   const convertedAmount = bigNumberAmount.div(10 ** decimals);
   const integerPart = convertedAmount.decimalPlaces(0);
   const decimalPlaces = convertedAmount.toString().split(".")[1];
 
-  const isFiatMinified =
-    currency === "$" && (convertedAmount.gte(0.01) || isMinified);
+  const isFiatMinified = USDAmount && (convertedAmount.gte(0.01) || isMinified);
 
   let decSplit = isMinified || isFiatMinified ? 2 : 6;
   if (integerPart.gte(1_000)) {
@@ -70,6 +70,8 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
         )
       : convertedAmount,
     dec: isMinified ? 3 : undefined,
+    currencySymbol: currency,
+    currencyCode,
     locale: currentLocale,
   });
   let content = getPrettyAmount({
@@ -80,6 +82,8 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
         )
       : convertedAmount,
     dec: isMinified ? 3 : undefined,
+    currencySymbol: currency,
+    currencyCode,
     locale: currentLocale,
   });
 
@@ -87,6 +91,8 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
     content = getPrettyAmount({
       value: convertedAmount,
       dec: isMinified ? 3 : 6,
+      currencySymbol: currency,
+      currencyCode,
       locale: currentLocale,
     });
 
@@ -95,6 +101,7 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
         ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
         : convertedAmount,
       dec: 38,
+      currencyCode,
       locale: currentLocale,
     });
   }
@@ -104,11 +111,15 @@ const PrettyAmount: FC<PrettyAmountProps> = ({
       value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
+      currencySymbol: currency,
+      currencyCode,
       withTooltip: true,
     });
 
     tooltipContent = getPrettyAmount({
       value: convertedAmount,
+      currencySymbol: currency,
+      currencyCode,
       locale: currentLocale,
     });
   }
@@ -171,23 +182,10 @@ const AmountWithCurrency: FC<AmountCurrencyType> = ({
   currency,
   currencyCode,
 }) => {
-  if (!currency) {
+  if (!currency || !currencyCode || isNaN(Number(amount))) {
     return <>{amount}</>;
   }
 
-  if (isNaN(Number(amount))) {
-    return (
-      <>
-        {currency === "$" && <span>$</span>}
-        {amount}
-        {currency !== "$" && (
-          <>
-            <span>{currency}</span>
-          </>
-        )}
-      </>
-    );
-  }
   return (
     <>
       {Intl.NumberFormat(locale, {
@@ -213,12 +211,16 @@ const currenciesCompacts: {
 export const getPrettyAmount = ({
   value,
   dec = 6,
-  locale = "en",
+  locale = "uk",
+  currencySymbol,
+  currencyCode = "USD",
   withTooltip = false,
 }: {
   value: number | BigNumber;
   dec?: number;
   locale?: string;
+  currencySymbol?: string;
+  currencyCode?: string;
   withTooltip?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
@@ -226,25 +228,47 @@ export const getPrettyAmount = ({
     const minFract = isLargerThenTrillion ? 0 : 2;
     const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
-    let finalValue = new Intl.NumberFormat(locale, {
-      minimumFractionDigits: minFract,
-      maximumFractionDigits: maxFract,
-      notation: "compact",
-    } as any).format(+value);
-
-    const finalSplitLetter = finalValue.slice(-1);
-    if (checkIfObjectsKey(finalSplitLetter)) {
-      finalValue = `${new BigNumber(value)
-        .div(currenciesCompacts[finalSplitLetter])
-        .decimalPlaces(maxFract, BigNumber.ROUND_DOWN)
-        .toString()}${finalSplitLetter}`;
+    if (currencySymbol) {
+      let finalValue = Intl.NumberFormat(locale, {
+        minimumFractionDigits: minFract,
+        maximumFractionDigits: maxFract,
+        notation: "compact",
+      } as any).format(+value);
+      const finalSplitLetter = finalValue.slice(-1);
+      if (checkIfObjectsKey(finalSplitLetter)) {
+        finalValue = `${new BigNumber(value)
+          .div(currenciesCompacts[finalSplitLetter])
+          .decimalPlaces(maxFract, BigNumber.ROUND_DOWN)
+          .toString()}${finalSplitLetter}`;
+      }
+      return currencySymbol + " " + finalValue;
+    } else {
+      const finalValue = new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: currencyCode,
+        minimumFractionDigits: minFract,
+        maximumFractionDigits: maxFract,
+        notation: "compact",
+      } as any).format(+value);
+      return finalValue;
     }
-
-    return finalValue;
   }
 
-  return `${new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 20,
-  }).format(+value)}${withTooltip ? "..." : ""}`;
+  if (currencySymbol) {
+    return (
+      currencySymbol +
+      " " +
+      `${new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 20,
+      }).format(+value)}${withTooltip ? "..." : ""}`
+    );
+  } else {
+    return `${new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 20,
+    }).format(+value)}${withTooltip ? "..." : ""}`;
+  }
 };
