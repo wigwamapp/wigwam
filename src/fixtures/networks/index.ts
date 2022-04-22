@@ -70,9 +70,9 @@ export function getTokenLogoUrl(logoUrl?: string) {
 
 export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
   [1, "ethereum"],
-  [43114, "avalanche"],
-  [56, "bnb"],
-  [137, "polygon"],
+  [43114, "avalanche-2"],
+  [56, "binancecoin"],
+  [137, "matic-network"],
   [250, "fantom"],
   [10, "ethereum"],
   [42161, "ethereum"],

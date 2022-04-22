@@ -198,19 +198,28 @@ const syncNativeTokens = mem(
       })
     );
 
-    const [{ nativeCurrency, chainTag }, existingTokens, balances, portfolios] =
-      await Promise.all([
-        getNetwork(chainId),
-        repo.accountTokens.bulkGet(dbKeys),
-        Promise.all(
-          accounts.map((acc) =>
-            getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
-          )
-        ),
-        Promise.all(
-          accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
-        ),
-      ]);
+    const [
+      { nativeCurrency, chainTag },
+      existingTokens,
+      balances,
+      portfolios,
+      cgPrice,
+    ] = await Promise.all([
+      getNetwork(chainId),
+      repo.accountTokens.bulkGet(dbKeys),
+      Promise.all(
+        accounts.map((acc) =>
+          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
+        )
+      ),
+      Promise.all(
+        accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
+      ),
+      getCoinGeckoNativeTokenPrice(chainId),
+    ]);
+
+    const priceUSD = cgPrice?.usd.toFixed(2);
+    const priceUSDChange = cgPrice?.usd_24h_change.toFixed(2);
 
     await repo.accountTokens.bulkPut(
       accounts.map((acc, i) => {
@@ -225,24 +234,36 @@ const syncNativeTokens = mem(
           if (!balance) {
             return {
               ...existing,
+              priceUSD,
+              priceUSDChange,
               portfolioUSD,
             };
           }
 
           const rawBalance = balance.toString();
-          const balanceUSD = existing.priceUSD
+          const balanceUSD = priceUSD
             ? +new BigNumber(rawBalance)
                 .div(10 ** nativeCurrency.decimals)
-                .times(existing.priceUSD)
+                .times(priceUSD)
             : existing.balanceUSD;
 
           return {
             ...existing,
             rawBalance,
             balanceUSD,
+            priceUSD,
+            priceUSDChange,
             portfolioUSD,
           };
         } else {
+          const rawBalance = balance?.toString() ?? "0";
+          const balanceUSD =
+            balance && priceUSD
+              ? +new BigNumber(rawBalance)
+                  .div(10 ** nativeCurrency.decimals)
+                  .times(priceUSD)
+              : 0;
+
           return {
             chainId,
             accountAddress: acc.address,
@@ -253,8 +274,10 @@ const syncNativeTokens = mem(
             name: nativeCurrency.name,
             symbol: nativeCurrency.symbol,
             logoUrl: getNativeTokenLogoUrl(chainTag),
-            rawBalance: balance?.toString() ?? "0",
-            balanceUSD: 0,
+            rawBalance,
+            balanceUSD,
+            priceUSD,
+            priceUSDChange,
             portfolioUSD,
           };
         }
@@ -303,6 +326,8 @@ const syncAccountTokens = mem(
 
       for (const token of debankUserTokens) {
         const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+
+        if (token.id === debankChain.native_token_id) continue;
 
         const native = token.id === debankChain.native_token_id;
         const tokenSlug = createTokenSlug({
@@ -422,20 +447,16 @@ const syncAccountTokens = mem(
         tokenAddresses.push(parseTokenSlug(t.tokenSlug).address);
     }
 
-    const [cgNativePrice, cgRestPrices] = await Promise.all([
-      getCoinGeckoNativeTokenPrice(chainId),
-      getCoinGeckoPrices(chainId, tokenAddresses),
-    ]);
+    const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
 
     for (const token of accTokens) {
-      const price =
-        token.status === TokenStatus.Native
-          ? cgNativePrice
-          : cgRestPrices[parseTokenSlug(token.tokenSlug).address];
+      if (token.status === TokenStatus.Native) continue;
+
+      const price = cgPrices[parseTokenSlug(token.tokenSlug).address];
 
       if (price) {
         token.priceUSD = price.usd?.toString();
-        token.priceUSDChange = price.usd_24h_change?.toString();
+        token.priceUSDChange = price.usd_24h_change?.toFixed(2);
       } else {
         delete token.priceUSD;
         delete token.priceUSDChange;

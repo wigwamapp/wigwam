@@ -333,15 +333,25 @@ const AssetCard = memo(
       { asset, isActive = false, onAssetSelect, isManageMode, className },
       ref
     ) => {
-      const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
+      const {
+        name,
+        symbol,
+        rawBalance,
+        decimals,
+        balanceUSD,
+        priceUSDChange,
+        status,
+      } = asset;
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
       const hoverable = isManageMode ? !nativeAsset : !isActive;
 
-      const priceChange = useMemo(() => getRandom(-5, 5), []);
       const priceClassName = useMemo(
-        () => (+priceChange > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"),
-        [priceChange]
+        () =>
+          priceUSDChange && +priceUSDChange > 0
+            ? "text-[#6BB77A]"
+            : "text-[#EA556A]",
+        [priceUSDChange]
       );
 
       return (
@@ -406,7 +416,7 @@ const AssetCard = memo(
                   isManageMode && "mr-14"
                 )}
               />
-              {!isManageMode && (
+              {!isManageMode && priceUSDChange && (
                 <span
                   className={classNames(
                     "inline-flex items-center",
@@ -420,12 +430,12 @@ const AssetCard = memo(
                   <PriceArrow
                     className={classNames(
                       "w-2 h-2 mr-[0.125rem]",
-                      +priceChange < 0 && "transform rotate-180"
+                      +priceUSDChange < 0 && "transform rotate-180"
                     )}
                   />
 
                   <span className="text-xs leading-3">
-                    {+priceChange > 0 ? priceChange : -priceChange}%
+                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
                   </span>
                 </span>
               )}
@@ -467,14 +477,20 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
-  const priceChange = useMemo(() => tokenSlug && getRandom(-5, 5), [tokenSlug]);
-
   if (!tokenInfo || !parsedTokenSlug) {
     return null;
   }
 
-  const { status, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
-    tokenInfo;
+  const {
+    status,
+    name,
+    symbol,
+    rawBalance,
+    decimals,
+    priceUSD,
+    priceUSDChange,
+    balanceUSD,
+  } = tokenInfo;
   const { standard, address } = parsedTokenSlug;
 
   return (
@@ -526,7 +542,9 @@ const AssetInfo: FC = () => {
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
-              <PriceChange priceChange={priceChange} isPercent />
+              {priceUSDChange && (
+                <PriceChange priceChange={priceUSDChange} isPercent />
+              )}
             </span>
           </div>
         </div>
@@ -535,22 +553,25 @@ const AssetInfo: FC = () => {
         <div className="text-base text-brand-gray leading-none mb-3">
           Balance
         </div>
-        <div>
+
+        <div className="flex items-end">
           <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
             copiable
             className="text-[1.75rem] font-bold leading-none mr-4"
           />
-          <PriceChange
-            priceChange={new BigNumber(priceChange)
-              .times(balanceUSD)
-              .div(100)
-              .toFixed(2)}
-            className="!text-lg !font-semibold"
-          />
+          {priceUSDChange && (
+            <PriceChange
+              priceChange={new BigNumber(priceUSDChange)
+                .times(balanceUSD)
+                .div(100)
+                .toFixed(2)}
+              className="!text-lg !font-semibold"
+            />
+          )}
         </div>
-        <div className="mt-0.5">
+        <div className="mt-1">
           <PrettyAmount
             amount={rawBalance ?? 0}
             decimals={decimals}
@@ -685,6 +706,3 @@ const PriceArrow: FC<{ className?: string }> = ({ className }) => (
     />
   </svg>
 );
-
-const getRandom = (min: number, max: number) =>
-  (Math.random() * (max - min + 1) + min).toFixed(2);
