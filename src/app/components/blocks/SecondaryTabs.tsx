@@ -8,14 +8,12 @@ import Separator from "../elements/Seperator";
 
 type SecondaryTabsProps = {
   tabs?: SecondaryItemProps[];
-  items?: React.ReactNode;
   activeRoute?: Destination;
   className?: string;
 };
 
 const SecondaryTabs: FC<SecondaryTabsProps> = ({
   tabs,
-  items,
   activeRoute,
   className,
 }) => (
@@ -37,7 +35,6 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
         className={classNames(i !== tabs.length - 1 && "mb-2")}
       />
     ))}
-    {items}
     <Separator direction="vertical" position="end" className="!top-5" />
   </ScrollAreaContainer>
 );

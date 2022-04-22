@@ -12,7 +12,6 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
-import { TReplace } from "lib/ext/i18n/react";
 
 import { replaceT } from "lib/ext/i18n";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -23,7 +22,7 @@ import {
   getSeedPhrase,
   updateAccountName,
 } from "core/client";
-import { Account, AccountSource } from "core/types";
+import { AccountSource } from "core/types";
 import { composeValidators, maxLength, minLength, required } from "app/utils";
 
 import {
@@ -35,12 +34,9 @@ import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
 import { ReactComponent as NoteIcon } from "app/icons/note.svg";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
-import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
-import SecondaryTabs from "app/components/blocks/SecondaryTabs";
-import HashPreview from "app/components/elements/HashPreview";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AutoIcon from "app/components/elements/AutoIcon";
 import NewButton from "app/components/elements/NewButton";
@@ -51,7 +47,7 @@ import SecondaryModal, {
 import PasswordField from "app/components/elements/PasswordField";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 import { fromProtectedString } from "lib/crypto-utils";
-import Balance from "app/components/elements/Balance";
+import WalletTabs from "app/components/blocks/WalletTabs";
 
 const Wallets: FC = () => {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
@@ -78,21 +74,15 @@ const Wallets: FC = () => {
 
   return (
     <div className="flex min-h-0 grow">
-      <SecondaryTabs
-        items={allAccounts.map((acc) => (
-          <WalletTab
-            key={acc.address}
-            active={acc.address === currentAccount.address}
-            className="mt-5"
-            account={acc}
-            onClick={() => setAccountAddress(acc.address)}
-          />
-        ))}
-        activeRoute={currentAccount}
+      <WalletTabs
+        setAccountAddress={setAccountAddress}
+        currentAccount={currentAccount}
+        allAccounts={allAccounts}
+        className="mt-5"
       />
       <ScrollAreaContainer
         className="flex flex-col items-start ml-6 w-full min-w-[17.75rem]"
-        viewPortClassName="pb-20 pt-5"
+        viewPortClassName="pb-20 pt-5 pr-5"
         scrollBarClassName="py-0 pt-5 pb-20"
       >
         <div className="border-b border-brand-main/[.07]">
@@ -123,7 +113,7 @@ const Wallets: FC = () => {
                       error={meta.error && meta.touched}
                       errorMessage={meta.error}
                       inputClassName="h-11"
-                      className="max-w-sm mt-4"
+                      className="max-w-[23.125rem] mt-4"
                       {...input}
                     />
                   )}
@@ -131,7 +121,7 @@ const Wallets: FC = () => {
                 <NewButton
                   type="submit"
                   theme="primary"
-                  className="my-6 !py-2"
+                  className="mt-4 mb-6 !py-2"
                   disabled={submitting}
                 >
                   {submitting ? "Saving..." : "Save"}
@@ -150,7 +140,7 @@ const Wallets: FC = () => {
             <KeyIcon className="mr-3" />
             Private Key
           </div>
-          <p className="py-2 text-sm text-brand-font max-w-[18.75rem]">
+          <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
             Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
             way.
           </p>
@@ -179,7 +169,7 @@ const Wallets: FC = () => {
               <NoteIcon className="mr-3" />
               Secret phrase
             </div>
-            <p className="py-2 text-sm text-brand-font max-w-[18.75rem]">
+            <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
               Vigvam lets you to explore DeFi and NFTs in safer, faster and
               modern way.
             </p>
@@ -211,11 +201,12 @@ const Wallets: FC = () => {
           onClick={() => setDeleteModalOpened(true)}
           className={classNames(
             "mt-6 w-48",
-            "flex items-center justify-between",
+            "!py-2",
+            "flex items-center",
             "text-brand-light"
           )}
         >
-          <DeleteIcon width={16} height={16} className="ml-2" />
+          <DeleteIcon width={16} height={16} className="ml-1 mr-3" />
           Delete account
         </NewButton>
         {(deleteModalOpened || revealPrivateOpened || revealPharseOpened) && (
@@ -350,76 +341,6 @@ const DeleteAccountModal = memo<
     </SecondaryModal>
   );
 });
-
-type WalletTabProps = {
-  account: Account;
-  active?: boolean;
-  className?: string;
-  onClick: () => void;
-};
-
-const WalletTab: FC<WalletTabProps> = ({
-  active,
-  account: { name, address },
-  className,
-  onClick,
-}) => {
-  const classNamesList = classNames(
-    "relative group",
-    "p-3",
-    "w-[17.8rem] min-w-[16.5rem]",
-    active && "bg-brand-main/10",
-    "hover:bg-brand-main/5",
-    "rounded-[.625rem]",
-    "flex items-stretch",
-    "text-left"
-  );
-
-  return (
-    <button className={classNames(classNamesList, className)} onClick={onClick}>
-      <AutoIcon
-        seed={address}
-        source="dicebear"
-        type="personas"
-        className={classNames(
-          "h-14 w-14 min-w-[3.5rem]",
-          "mr-3",
-          "bg-black/20",
-          "rounded-[.625rem]"
-        )}
-      />
-      <span
-        className={classNames(
-          "flex flex-col",
-          "text-base font-bold text-brand-light leading-none",
-          "min-w-0",
-          "transition-colors",
-          "group-hover:text-brand-light",
-          "group-focus-visible:text-brand-light"
-        )}
-      >
-        <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap leading-[1.125rem] -mt-px">
-          <TReplace msg={name} />
-        </h3>
-        <HashPreview
-          hash={address}
-          className="text-sm text-brand-inactivedark mt-0.5 font-normal leading-none"
-          withTooltip={false}
-        />
-        <Balance address={address} className="mt-auto" />
-        <ChevronRightIcon
-          className={classNames(
-            "absolute right-2 top-1/2 -translate-y-1/2",
-            "transition",
-            "group-hover:translate-x-0 group-hover:opacity-100",
-            active && "translate-x-0 opacity-100",
-            !active && "-translate-x-1.5 opacity-0"
-          )}
-        />
-      </span>
-    </button>
-  );
-};
 
 type AddressFieldProps = {
   address: string;
