@@ -16,6 +16,8 @@ import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";
 
+import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
+
 import {
   AccountAsset,
   TokenStandard,
@@ -416,7 +418,7 @@ const AssetCard = memo(
                   isManageMode && "mr-14"
                 )}
               />
-              {!isManageMode && priceUSDChange && (
+              {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
                 <span
                   className={classNames(
                     "inline-flex items-center",
@@ -482,6 +484,7 @@ const AssetInfo: FC = () => {
   }
 
   const {
+    chainId,
     status,
     name,
     symbol,
@@ -492,6 +495,11 @@ const AssetInfo: FC = () => {
     balanceUSD,
   } = tokenInfo;
   const { standard, address } = parsedTokenSlug;
+
+  const coinGeckoId =
+    status === TokenStatus.Native
+      ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
+      : address;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
@@ -520,15 +528,15 @@ const AssetInfo: FC = () => {
                   }`}
                 />
               )}
-              <IconedButton
-                aria-label="View asset in CoinGecko"
-                Icon={CoinGeckoIcon}
-                className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-                iconClassName="!w-[1.125rem]"
-                href={`https://www.coingecko.com/en/coins/${
-                  status === TokenStatus.Native ? name.toLowerCase() : address
-                }`}
-              />
+              {coinGeckoId && (
+                <IconedButton
+                  aria-label="View asset in CoinGecko"
+                  Icon={CoinGeckoIcon}
+                  className="!w-6 !h-6 min-w-[1.5rem] ml-2"
+                  iconClassName="!w-[1.125rem]"
+                  href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                />
+              )}
             </TippySingletonProvider>
           </div>
           <div className="flex flex-col">
