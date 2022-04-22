@@ -497,7 +497,7 @@ const AssetInfo: FC = () => {
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
-      <div className="flex mb-4">
+      <div className="flex mb-5">
         <AssetLogo
           asset={tokenInfo}
           alt={name}
@@ -551,7 +551,7 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div>
-        <div className="text-base text-brand-gray leading-none mb-3">
+        <div className="text-base text-brand-gray leading-none mb-2">
           Balance
         </div>
         <div>
@@ -563,7 +563,7 @@ const AssetInfo: FC = () => {
             className="text-[1.75rem] font-bold leading-none"
           />
         </div>
-        <div className="mt-4">
+        <div className="mt-1">
           <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
