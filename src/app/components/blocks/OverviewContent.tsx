@@ -384,7 +384,7 @@ const AssetCard = memo(
                 />
               )}
             </span>
-            <span className="mt-2 flex justify-between items-end">
+            <span className="mt-1.5 flex justify-between items-end">
               <PrettyAmount
                 amount={rawBalance}
                 decimals={decimals}
@@ -409,44 +409,18 @@ const AssetCard = memo(
                     priceClassName
                   )}
                 >
-                  {/* <svg
-                    viewBox="-5 -5 30 30"
+                  <PriceArrow
                     className={classNames(
                       "w-2 h-2 mr-[0.125rem]",
                       +priceChange < 0 && "transform rotate-180"
                     )}
-                  >
-                    <polygon
-                      className="fill-current stroke-current stroke-[4]"
-                      strokeLinejoin="round"
-                      points="10,5 0,15 20,15"
-                    />
-                  </svg>
+                  />
 
-                  <span className="text-xs">
+                  <span className="text-xs leading-3">
                     {+priceChange > 0 ? priceChange : -priceChange}%
-                  </span> */}
-
-                  <span className="text-xs">
-                    {+priceChange > 0 && "+"}
-                    {priceChange}%
                   </span>
                 </span>
               )}
-              {/* {!isManageMode && (
-                <PrettyAmount
-                  amount={balanceUSD ?? 0}
-                  currency="$"
-                  isMinified
-                  className={classNames(
-                    "ml-2",
-                    "text-sm leading-4",
-                    !isActive && "text-brand-inactivedark",
-                    isActive && "text-brand-light",
-                    "group-hover:text-brand-light"
-                  )}
-                />
-              )} */}
               {isManageMode && !nativeAsset && (
                 <Checkbox.Root
                   className={classNames(
@@ -551,31 +525,31 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div>
-        <div className="text-base text-brand-gray leading-none mb-2">
+        <div className="text-base text-brand-gray leading-none mb-3">
           Balance
         </div>
         <div>
           <PrettyAmount
-            amount={rawBalance ?? 0}
-            decimals={decimals}
-            currency={symbol}
-            copiable
-            className="text-[1.75rem] font-bold leading-none"
-          />
-        </div>
-        <div className="mt-1">
-          <PrettyAmount
             amount={balanceUSD ?? 0}
             currency="$"
             copiable
-            className="text-lg font-bold text-brand-lightgray mr-4"
+            className="text-[1.75rem] font-bold leading-none mr-4"
           />
           <PriceChange
             priceChange={new BigNumber(priceChange)
               .times(balanceUSD)
               .div(100)
               .toFixed(2)}
-            className="!text-sm"
+            className="!text-lg !font-semibold"
+          />
+        </div>
+        <div className="mt-0.5">
+          <PrettyAmount
+            amount={rawBalance ?? 0}
+            decimals={decimals}
+            currency={symbol}
+            copiable
+            className="text-lg text-brand-inactivelight"
           />
         </div>
       </div>
@@ -660,6 +634,7 @@ const PriceChange: FC<PriceChangeProps> = ({
   return (
     <span
       className={classNames(
+        "inline-flex items-center",
         isPercent && "text-sm leading-4",
         !isPercent && "text-base",
         "font-bold",
@@ -672,7 +647,18 @@ const PriceChange: FC<PriceChangeProps> = ({
         className
       )}
     >
-      {isPositive ? "+" : "-"}
+      {isPercent ? (
+        <PriceArrow
+          className={classNames(
+            "w-2.5 h-2.5 mr-[0.2rem]",
+            !isPositive && "transform rotate-180"
+          )}
+        />
+      ) : isPositive ? (
+        "+"
+      ) : (
+        "-"
+      )}
       <PrettyAmount
         amount={Math.abs(priceChangeNumber)}
         currency={isPercent ? undefined : "$"}
@@ -681,6 +667,16 @@ const PriceChange: FC<PriceChangeProps> = ({
     </span>
   );
 };
+
+const PriceArrow: FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="-5 -5 30 30" className={className}>
+    <polygon
+      className="fill-current stroke-current stroke-[4]"
+      strokeLinejoin="round"
+      points="10,5 0,15 20,15"
+    />
+  </svg>
+);
 
 const getRandom = (min: number, max: number) =>
   (Math.random() * (max - min + 1) + min).toFixed(2);
