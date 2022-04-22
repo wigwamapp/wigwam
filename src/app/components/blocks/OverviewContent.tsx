@@ -372,7 +372,12 @@ const AssetCard = memo(
           />
           <span className="flex flex-col justify-center w-full min-w-0">
             <span className="flex items-end">
-              <span className="text-base font-bold leading-4 truncate mr-auto">
+              <span
+                className={classNames(
+                  "text-base font-bold leading-4 truncate mr-auto",
+                  isManageMode && "mr-14"
+                )}
+              >
                 {name}
               </span>
               {!isManageMode && (
@@ -396,7 +401,9 @@ const AssetCard = memo(
                   !isActive && "text-brand-inactivedark",
                   isActive && "text-brand-light",
                   "group-hover:text-brand-light",
-                  "transition-colors"
+                  "transition-colors",
+                  "truncate min-w-0",
+                  isManageMode && "mr-14"
                 )}
               />
               {!isManageMode && (
@@ -406,6 +413,7 @@ const AssetCard = memo(
                     !isActive && "opacity-75",
                     "group-hover:opacity-100",
                     "transition",
+                    "ml-2",
                     priceClassName
                   )}
                 >
@@ -480,11 +488,10 @@ const AssetInfo: FC = () => {
         <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
             <h2
-              className={classNames("text-2xl font-bold", "mr-3", "truncate")}
+              className={classNames("text-2xl font-bold", "mr-4", "truncate")}
             >
               {name}
             </h2>
-            {standard && <Tag standard={standard} />}
             <TippySingletonProvider>
               {currentNetwork?.explorerUrls?.[0] && (
                 <IconedButton
@@ -580,6 +587,7 @@ const AssetInfo: FC = () => {
             label="Token address"
             defaultValue={address}
             readOnly
+            labelActions={standard ? <Tag standard={standard} /> : undefined}
           />
         </div>
       )}
@@ -600,11 +608,11 @@ const Tag: FC<TagProps> = ({ standard }) =>
   standard !== TokenStandard.Native ? (
     <span
       className={classNames(
-        "px-4 mr-4",
-        "text-base font-bold leading-none",
-        "h-8 box-border border border-brand-main/20",
+        "px-3",
+        "text-xs font-bold text-brand-inactivelight leading-none",
+        "h-6 box-border border border-brand-main/20",
         "flex items-center",
-        "rounded-[.625rem]",
+        "rounded-lg",
         "whitespace-nowrap"
       )}
     >
