@@ -24,12 +24,12 @@ const Menu: FC = () => {
         <NewButton
           to={{ page: Page.Settings, setting: SettingTab.General }}
           theme="tertiary"
-          className="!min-w-0 w-[8.5rem]"
+          className="!min-w-0 w-[8.5rem] invisible"
         >
           <ControlIcon className="w-6 h-auto -ml-0.5 mr-2" />
           Control
         </NewButton>
-        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
+        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05] invisible" />
         <LockProfileButton />
       </div>
     </div>
