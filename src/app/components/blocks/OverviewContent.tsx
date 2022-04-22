@@ -339,16 +339,19 @@ const AssetCard = memo(
         rawBalance,
         decimals,
         balanceUSD,
+        priceUSDChange,
         status,
-        priceUSD,
       } = asset;
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
       const hoverable = isManageMode ? !nativeAsset : !isActive;
 
       const priceClassName = useMemo(
-        () => (+getRandom(-1, 1) > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"),
-        []
+        () =>
+          priceUSDChange && +priceUSDChange > 0
+            ? "text-[#6BB77A]"
+            : "text-[#EA556A]",
+        [priceUSDChange]
       );
 
       return (
@@ -374,45 +377,67 @@ const AssetCard = memo(
         >
           <AssetLogo
             asset={asset}
-            alt={name}
+            alt={symbol}
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />
           <span className="flex flex-col justify-center w-full min-w-0">
-            <span className="flex justify-between items-end">
-              <span className="text-sm font-bold leading-4 truncate">
+            <span className="flex items-end">
+              <span
+                className={classNames(
+                  "text-base font-bold leading-4 truncate mr-auto",
+                  isManageMode && "mr-14"
+                )}
+              >
                 {name}
               </span>
-              <PrettyAmount
-                amount={priceUSD ?? 0}
-                currency="$"
-                copiable
-                className={classNames(
-                  "text-xs leading-4",
-                  "ml-2",
-                  priceClassName
-                )}
-              />
-            </span>
-            <span className="mt-2 flex justify-between items-end">
-              <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                currency={symbol}
-                className={"text-base font-bold leading-4"}
-              />
               {!isManageMode && (
                 <PrettyAmount
-                  amount={balanceUSD ?? 0}
+                  amount={balanceUSD}
                   currency="$"
-                  isMinified
-                  className={classNames(
-                    "ml-2",
-                    "text-sm leading-4",
-                    !isActive && "text-brand-inactivedark",
-                    isActive && "text-brand-light",
-                    "group-hover:text-brand-light"
-                  )}
+                  className={"text-base font-bold leading-4 ml-2"}
+                  threeDots={false}
                 />
+              )}
+            </span>
+            <span className="mt-1.5 flex justify-between items-end">
+              <PrettyAmount
+                amount={rawBalance}
+                decimals={decimals}
+                currency={symbol}
+                threeDots={false}
+                className={classNames(
+                  "mr-auto",
+                  "text-sm leading-4",
+                  !isActive && "text-brand-inactivedark",
+                  isActive && "text-brand-light",
+                  "group-hover:text-brand-light",
+                  "transition-colors",
+                  "truncate min-w-0",
+                  isManageMode && "mr-14"
+                )}
+              />
+              {!isManageMode && priceUSDChange && (
+                <span
+                  className={classNames(
+                    "inline-flex items-center",
+                    !isActive && "opacity-75",
+                    "group-hover:opacity-100",
+                    "transition",
+                    "ml-2",
+                    priceClassName
+                  )}
+                >
+                  <PriceArrow
+                    className={classNames(
+                      "w-2 h-2 mr-[0.125rem]",
+                      +priceUSDChange < 0 && "transform rotate-180"
+                    )}
+                  />
+
+                  <span className="text-xs leading-3">
+                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                  </span>
+                </span>
               )}
               {isManageMode && !nativeAsset && (
                 <Checkbox.Root
@@ -452,19 +477,25 @@ const AssetInfo: FC = () => {
     [tokenSlug]
   );
 
-  const priceChange = useMemo(() => tokenSlug && getRandom(-5, 5), [tokenSlug]);
-
   if (!tokenInfo || !parsedTokenSlug) {
     return null;
   }
 
-  const { status, name, symbol, rawBalance, decimals, priceUSD, balanceUSD } =
-    tokenInfo;
+  const {
+    status,
+    name,
+    symbol,
+    rawBalance,
+    decimals,
+    priceUSD,
+    priceUSDChange,
+    balanceUSD,
+  } = tokenInfo;
   const { standard, address } = parsedTokenSlug;
 
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
-      <div className="flex mb-4">
+      <div className="flex mb-5">
         <AssetLogo
           asset={tokenInfo}
           alt={name}
@@ -473,11 +504,10 @@ const AssetInfo: FC = () => {
         <div className="flex flex-col justify-between grow min-w-0">
           <div className="flex items-center">
             <h2
-              className={classNames("text-2xl font-bold", "mr-3", "truncate")}
+              className={classNames("text-2xl font-bold", "mr-4", "truncate")}
             >
               {name}
             </h2>
-            {standard && <Tag standard={standard} />}
             <TippySingletonProvider>
               {currentNetwork?.explorerUrls?.[0] && (
                 <IconedButton
@@ -512,7 +542,9 @@ const AssetInfo: FC = () => {
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
-              <PriceChange priceChange={priceChange} isPercent />
+              {priceUSDChange && (
+                <PriceChange priceChange={priceUSDChange} isPercent />
+              )}
             </span>
           </div>
         </div>
@@ -521,27 +553,31 @@ const AssetInfo: FC = () => {
         <div className="text-base text-brand-gray leading-none mb-3">
           Balance
         </div>
-        <div>
+
+        <div className="flex items-end">
+          <PrettyAmount
+            amount={balanceUSD ?? 0}
+            currency="$"
+            copiable
+            className="text-[1.75rem] font-bold leading-none mr-4"
+          />
+          {priceUSDChange && (
+            <PriceChange
+              priceChange={new BigNumber(priceUSDChange)
+                .times(balanceUSD)
+                .div(100)
+                .toFixed(2)}
+              className="!text-lg !font-semibold"
+            />
+          )}
+        </div>
+        <div className="mt-1">
           <PrettyAmount
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
             copiable
-            className="text-[1.75rem] font-bold leading-none"
-          />
-
-          <PrettyAmount
-            amount={balanceUSD ?? 0}
-            currency="$"
-            copiable
-            className="text-base text-brand-inactivedark ml-8 mr-4"
-          />
-
-          <PriceChange
-            priceChange={new BigNumber(priceChange)
-              .times(balanceUSD)
-              .div(100)
-              .toFixed(2)}
+            className="text-lg text-brand-inactivelight"
           />
         </div>
       </div>
@@ -572,6 +608,7 @@ const AssetInfo: FC = () => {
             label="Token address"
             defaultValue={address}
             readOnly
+            labelActions={standard ? <Tag standard={standard} /> : undefined}
           />
         </div>
       )}
@@ -592,11 +629,11 @@ const Tag: FC<TagProps> = ({ standard }) =>
   standard !== TokenStandard.Native ? (
     <span
       className={classNames(
-        "px-4 mr-4",
-        "text-base font-bold leading-none",
-        "h-8 box-border border border-brand-main/20",
+        "px-3",
+        "text-xs font-bold text-brand-inactivelight leading-none",
+        "h-6 box-border border border-brand-main/20",
         "flex items-center",
-        "rounded-[.625rem]",
+        "rounded-lg",
         "whitespace-nowrap"
       )}
     >
@@ -607,11 +644,13 @@ const Tag: FC<TagProps> = ({ standard }) =>
 type PriceChangeProps = {
   priceChange: string;
   isPercent?: boolean;
+  className?: string;
 };
 
 const PriceChange: FC<PriceChangeProps> = ({
   priceChange,
   isPercent = false,
+  className,
 }) => {
   const priceChangeNumber = +priceChange;
 
@@ -624,6 +663,7 @@ const PriceChange: FC<PriceChangeProps> = ({
   return (
     <span
       className={classNames(
+        "inline-flex items-center",
         isPercent && "text-sm leading-4",
         !isPercent && "text-base",
         "font-bold",
@@ -632,10 +672,22 @@ const PriceChange: FC<PriceChangeProps> = ({
         isPositive && isPercent && "bg-[#4F9A5E]",
         !isPositive && isPercent && "bg-[#B82D41]",
         isPositive && !isPercent && "text-[#6BB77A]",
-        !isPositive && !isPercent && "text-[#EA556A]"
+        !isPositive && !isPercent && "text-[#EA556A]",
+        className
       )}
     >
-      {isPositive ? "+" : "-"}
+      {isPercent ? (
+        <PriceArrow
+          className={classNames(
+            "w-2.5 h-2.5 mr-[0.2rem]",
+            !isPositive && "transform rotate-180"
+          )}
+        />
+      ) : isPositive ? (
+        "+"
+      ) : (
+        "-"
+      )}
       <PrettyAmount
         amount={Math.abs(priceChangeNumber)}
         currency={isPercent ? undefined : "$"}
@@ -645,5 +697,12 @@ const PriceChange: FC<PriceChangeProps> = ({
   );
 };
 
-const getRandom = (min: number, max: number) =>
-  (Math.random() * (max - min + 1) + min).toFixed(2);
+const PriceArrow: FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="-5 -5 30 30" className={className}>
+    <polygon
+      className="fill-current stroke-current stroke-[4]"
+      strokeLinejoin="round"
+      points="10,5 0,15 20,15"
+    />
+  </svg>
+);
