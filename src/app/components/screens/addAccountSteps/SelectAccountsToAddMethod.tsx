@@ -1,6 +1,8 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import Transport from "@ledgerhq/hw-transport";
+import retry from "async-retry";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { AccountSource, SeedPharse, WalletStatus } from "core/types";
@@ -11,6 +13,7 @@ import {
 } from "core/common";
 import { ClientProvider } from "core/client";
 
+import { withHumanDelay } from "app/utils";
 import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
@@ -20,9 +23,6 @@ import SecondaryModal, {
 } from "app/components/elements/SecondaryModal";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
-import { withHumanDelay } from "../../../utils";
-import retry from "async-retry";
-import Transport from "@ledgerhq/hw-transport";
 import { Spinner } from "./ChooseAddAccountWay";
 
 const methodsInitial: MethodsProps = [
