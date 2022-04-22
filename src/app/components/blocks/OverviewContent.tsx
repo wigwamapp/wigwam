@@ -333,15 +333,15 @@ const AssetCard = memo(
       { asset, isActive = false, onAssetSelect, isManageMode, className },
       ref
     ) => {
-      const { symbol, rawBalance, decimals, balanceUSD, status, priceUSD } =
-        asset;
+      const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
       const hoverable = isManageMode ? !nativeAsset : !isActive;
 
+      const priceChange = useMemo(() => getRandom(-5, 5), []);
       const priceClassName = useMemo(
-        () => (+getRandom(-1, 1) > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"),
-        []
+        () => (+priceChange > 0 ? "text-[#6BB77A]" : "text-[#EA556A]"),
+        [priceChange]
       );
 
       return (
@@ -373,12 +373,12 @@ const AssetCard = memo(
           <span className="flex flex-col justify-center w-full min-w-0">
             <span className="flex items-end">
               <span className="text-base font-bold leading-4 truncate mr-auto">
-                {symbol}
+                {name}
               </span>
               {!isManageMode && (
                 <PrettyAmount
-                  amount={rawBalance ?? 0}
-                  decimals={decimals}
+                  amount={balanceUSD}
+                  currency="$"
                   className={"text-base font-bold leading-4 ml-2"}
                   threeDots={false}
                 />
@@ -386,19 +386,54 @@ const AssetCard = memo(
             </span>
             <span className="mt-2 flex justify-between items-end">
               <PrettyAmount
-                amount={(isManageMode ? rawBalance : priceUSD) ?? 0}
-                decimals={isManageMode ? decimals : undefined}
-                currency={isManageMode ? undefined : "$"}
+                amount={rawBalance}
+                decimals={decimals}
+                currency={symbol}
                 threeDots={false}
                 className={classNames(
                   "mr-auto",
                   "text-sm leading-4",
                   !isActive && "text-brand-inactivedark",
                   isActive && "text-brand-light",
-                  "group-hover:text-brand-light"
+                  "group-hover:text-brand-light",
+                  "transition-colors"
                 )}
               />
               {!isManageMode && (
+                <span
+                  className={classNames(
+                    "inline-flex items-center",
+                    !isActive && "opacity-75",
+                    "group-hover:opacity-100",
+                    "transition",
+                    priceClassName
+                  )}
+                >
+                  {/* <svg
+                    viewBox="-5 -5 30 30"
+                    className={classNames(
+                      "w-2 h-2 mr-[0.125rem]",
+                      +priceChange < 0 && "transform rotate-180"
+                    )}
+                  >
+                    <polygon
+                      className="fill-current stroke-current stroke-[4]"
+                      strokeLinejoin="round"
+                      points="10,5 0,15 20,15"
+                    />
+                  </svg>
+
+                  <span className="text-xs">
+                    {+priceChange > 0 ? priceChange : -priceChange}%
+                  </span> */}
+
+                  <span className="text-xs">
+                    {+priceChange > 0 && "+"}
+                    {priceChange}%
+                  </span>
+                </span>
+              )}
+              {/* {!isManageMode && (
                 <PrettyAmount
                   amount={balanceUSD ?? 0}
                   currency="$"
@@ -411,7 +446,7 @@ const AssetCard = memo(
                     "group-hover:text-brand-light"
                   )}
                 />
-              )}
+              )} */}
               {isManageMode && !nativeAsset && (
                 <Checkbox.Root
                   className={classNames(

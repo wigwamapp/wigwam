@@ -15,6 +15,7 @@ type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;
+  currencyFirst?: boolean;
   isMinified?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
@@ -27,6 +28,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     amount,
     decimals = 0,
     currency,
+    currencyFirst,
     isMinified,
     copiable = false,
     prefix,
@@ -128,7 +130,11 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const children = (
       <>
         {prefix}
-        <AmountWithCurrency amount={content} currency={currency} />
+        <AmountWithCurrency
+          amount={content}
+          currency={currency}
+          currencyFirst={currencyFirst}
+        />
       </>
     );
 
@@ -136,7 +142,11 @@ const PrettyAmount = memo<PrettyAmountProps>(
       return (
         <CopiableTooltip
           content={
-            <AmountWithCurrency amount={tooltipContent} currency={currency} />
+            <AmountWithCurrency
+              amount={tooltipContent}
+              currency={currency}
+              currencyFirst={currencyFirst}
+            />
           }
           textToCopy={tooltipContent}
           followCursor
@@ -155,10 +165,11 @@ const PrettyAmount = memo<PrettyAmountProps>(
 
 export default PrettyAmount;
 
-const AmountWithCurrency: FC<{ amount: string; currency?: string }> = ({
-  amount,
-  currency,
-}) => {
+const AmountWithCurrency: FC<{
+  amount: string;
+  currency?: string;
+  currencyFirst?: boolean;
+}> = ({ amount, currency, currencyFirst = false }) => {
   if (!currency) {
     return <>{amount}</>;
   }
@@ -166,8 +177,13 @@ const AmountWithCurrency: FC<{ amount: string; currency?: string }> = ({
   return (
     <span>
       {currency === "$" && <span>$</span>}
+      {currency !== "$" && currencyFirst && (
+        <>
+          <span>{currency}</span>{" "}
+        </>
+      )}
       {amount}
-      {currency !== "$" && (
+      {currency !== "$" && !currencyFirst && (
         <>
           {" "}
           <span>{currency}</span>
