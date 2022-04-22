@@ -372,26 +372,31 @@ const AssetCard = memo(
           />
           <span className="flex flex-col justify-center w-full min-w-0">
             <span className="flex items-end">
-              <span className="text-sm font-bold leading-4 truncate">
+              <span className="text-base font-bold leading-4 truncate mr-auto">
                 {symbol}
               </span>
-              <PrettyAmount
-                amount={priceUSD ?? 0}
-                currency="$"
-                threeDots={false}
-                className={classNames(
-                  "text-xs leading-4",
-                  "ml-2",
-                  priceClassName
-                )}
-              />
+              {!isManageMode && (
+                <PrettyAmount
+                  amount={rawBalance ?? 0}
+                  decimals={decimals}
+                  className={"text-base font-bold leading-4 ml-2"}
+                  threeDots={false}
+                />
+              )}
             </span>
             <span className="mt-2 flex justify-between items-end">
               <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                className={"text-base font-bold leading-4"}
+                amount={(isManageMode ? rawBalance : priceUSD) ?? 0}
+                decimals={isManageMode ? decimals : undefined}
+                currency={isManageMode ? undefined : "$"}
                 threeDots={false}
+                className={classNames(
+                  "mr-auto",
+                  "text-sm leading-4",
+                  !isActive && "text-brand-inactivedark",
+                  isActive && "text-brand-light",
+                  "group-hover:text-brand-light"
+                )}
               />
               {!isManageMode && (
                 <PrettyAmount
@@ -400,11 +405,10 @@ const AssetCard = memo(
                   isMinified
                   className={classNames(
                     "ml-2",
-                    "text-base font-bold leading-4",
-                    !isActive && "text-brand-lightgray",
+                    "text-sm leading-4",
+                    !isActive && "text-brand-inactivedark",
                     isActive && "text-brand-light",
                     "group-hover:text-brand-light"
-                    // "transform -translate-y-[0.75rem]"
                   )}
                 />
               )}
