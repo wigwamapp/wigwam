@@ -45,6 +45,7 @@ export interface Asset extends TokenBase {
   symbol: string;
   logoUrl?: string;
   priceUSD?: string;
+  priceUSDChange?: string;
   displaySymbol?: string;
   optimizedSymbol?: string;
   protocolId?: string;

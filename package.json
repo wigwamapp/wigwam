@@ -61,6 +61,7 @@
     "effector": "22.3.0",
     "eth-phishing-detect": "1.1.16",
     "ethers": "5.6.4",
+    "expiry-map": "2.0.0",
     "final-form": "4.20.6",
     "fontfaceobserver": "2.1.0",
     "fuse.js": "6.5.3",
