@@ -60,9 +60,6 @@ const SelectAccountsToAddMethod: FC = () => {
   const { waitLoading } = useDialog();
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
-  const [connectionState, setConnectionState] = useState<
-    "loading" | "connectApp"
-  >("loading");
 
   const isInitial = walletStatus === WalletStatus.Welcome;
   const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
@@ -74,11 +71,11 @@ const SelectAccountsToAddMethod: FC = () => {
 
   const transportRef = useRef<Transport>();
 
-  const handleConnect = useCallback<LoadingHandler>(
-    (onClose, args) =>
+  const handleConnect = useCallback<
+    LoadingHandler<string, "loading" | "connectApp">
+  >(
+    ({ params: derivationPath, onClose, setState }) =>
       withHumanDelay(async () => {
-        const [derivationPath] = args as [string];
-
         try {
           let closed = false;
           let extendedKey = "";
@@ -92,6 +89,8 @@ const SelectAccountsToAddMethod: FC = () => {
 
           return await retry(
             async () => {
+              if (closed) return false;
+
               await transportRef.current?.close();
               transportRef.current = await LedgerTransport.create();
 
@@ -109,7 +108,7 @@ const SelectAccountsToAddMethod: FC = () => {
                   if (closed) return false;
                 }
 
-                setConnectionState("connectApp");
+                setState("connectApp");
                 await connectToEthereumApp(transportRef.current);
                 await timeout(500);
                 if (closed) return false;
@@ -154,18 +153,18 @@ const SelectAccountsToAddMethod: FC = () => {
         const answer = await waitLoading({
           title: "Loading...",
           headerClassName: "mb-3",
-          content: (
+          content: (state: "loading" | "connectApp") => (
             <>
               <span className="mb-5">
                 Please proceed connecting to the ledger.
               </span>
-              {connectionState === "loading" && <Spinner />}
-              {connectionState === "connectApp" &&
-                "Please connect to Ethereum app"}
+              {state === "loading" && <Spinner />}
+              {state === "connectApp" && "Please connect to Ethereum app"}
             </>
           ),
           loadingHandler: handleConnect,
-          handlerParams: [derivationPath],
+          handlerParams: derivationPath,
+          state: "loading",
         });
 
         if (answer) {
@@ -189,7 +188,6 @@ const SelectAccountsToAddMethod: FC = () => {
       navigateToStep(AddAccountStep.VerifyToAdd);
     },
     [
-      connectionState,
       handleConnect,
       isHardDevice,
       isInitial,

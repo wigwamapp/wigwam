@@ -155,7 +155,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
   const { waitLoading } = useDialog();
 
   const handleConnect = useCallback<LoadingHandler>(
-    (onClose) =>
+    ({ onClose }) =>
       withHumanDelay(async () => {
         try {
           let closed = false;
