@@ -85,7 +85,7 @@ const VerifyAccountToAddInitial: FC = () => {
     }
 
     return null;
-  }, [derivationPath, seedPhrase]);
+  }, [extendedKey, derivationPath, seedPhrase]);
 
   useEffect(() => {
     if (!neuterExtendedKey) {
