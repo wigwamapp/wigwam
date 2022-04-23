@@ -112,6 +112,7 @@ const SelectAccountsToAddMethod: FC = () => {
                 await connectToEthereumApp(transportRef.current);
                 await timeout(500);
                 if (closed) return false;
+                setState("loading");
               }
 
               const ledgerEth = new LedgerEth(transportRef.current);
