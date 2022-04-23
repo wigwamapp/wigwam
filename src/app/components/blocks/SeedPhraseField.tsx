@@ -22,6 +22,8 @@ import { ReactComponent as DownloadIcon } from "app/icons/download.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as HiddenSeedPhraseIcon } from "app/icons/hidden-seed-phrase.svg";
+import { ReactComponent as LockIcon } from "app/icons/lock.svg";
 // import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 
 type SeedPhraseFieldProps =
@@ -36,7 +38,10 @@ const SeedPhraseField = forwardRef<
     {"setFromClipboard" in rest ? (
       <ImportSeedPhraseField ref={ref} {...rest} />
     ) : (
-      <CreateSeedPhraseField ref={ref} {...rest} />
+      <CreateSeedPhraseField
+        ref={ref as RefObject<HTMLTextAreaElement>}
+        {...rest}
+      />
     )}
   </div>
 ));
@@ -48,11 +53,11 @@ type CreateSeedPhraseFieldProps = (LongTextFieldProps | InputProps) & {
 };
 
 const CreateSeedPhraseField = forwardRef<
-  HTMLTextAreaElement | HTMLInputElement,
+  HTMLTextAreaElement,
   CreateSeedPhraseFieldProps
 >(({ onRegenerate, ...rest }, ref) => {
-  const fieldRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const { copy, copied } = useCopyToClipboard(fieldRef, true);
   const [isShown, setIsShown] = useState(false);
 
   const { confirm } = useDialog();
@@ -103,11 +108,15 @@ const CreateSeedPhraseField = forwardRef<
     </div>
   );
 
-  const actions = (
+  const copyButton = (
     <NewButton
       type="button"
       theme="tertiary"
-      onClick={copy}
+      onClick={(evt: any) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        copy();
+      }}
       className={classNames(
         "absolute bottom-3 right-3",
         "text-sm text-brand-light",
@@ -126,27 +135,42 @@ const CreateSeedPhraseField = forwardRef<
     </NewButton>
   );
 
-  console.log(rest);
+  const actions = isShown ? (
+    copyButton
+  ) : (
+    <div
+      className={classNames(
+        "absolute",
+        "inset-0",
+        "rounded-[.625rem]",
+        "bg-brand-main/10",
+        "flex flex-col items-center justify-center",
+        "transition-opacity",
+        isShown ? "opacity-0 pointer-events-none" : "cursor-pointer"
+      )}
+      onClick={isShown ? undefined : () => setIsShown(true)}
+      onKeyDown={isShown ? undefined : () => setIsShown(true)}
+    >
+      <HiddenSeedPhraseIcon className="absolute inset-0" />
+      <LockIcon className="w-[2.125rem] h-auto" />
+      <span className="text-xs font-bold mt-1">
+        Click here to reveal secret phrase
+      </span>
+      {copyButton}
+    </div>
+  );
 
-  return isShown ? (
+  return (
     <LongTextField
-      ref={mergeRefs([ref as RefObject<HTMLTextAreaElement>, fieldRef])}
+      ref={mergeRefs([ref, fieldRef])}
       id="seedPhrase"
       label="Secret Phrase"
       readOnly
       labelActions={labelActions}
       actions={actions}
+      textareaClassName={isShown ? undefined : "text-transparent"}
       {...(rest as LongTextFieldProps)}
-    />
-  ) : (
-    <Input
-      ref={mergeRefs([ref as RefObject<HTMLInputElement>, fieldRef])}
-      type="password"
-      id="seedPhrase"
-      label="Secret Phrase"
-      labelActions={labelActions}
-      inputClassName="pb-[4.90625rem]"
-      {...(rest as InputProps)}
+      placeholder=""
     />
   );
 });
