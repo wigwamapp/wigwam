@@ -18,7 +18,7 @@
     "check-updates": "npx npm-check-updates"
   },
   "dependencies": {
-    "@0xsequence/multicall": "0.36.10",
+    "@0xsequence/multicall": "0.36.11",
     "@dicebear/avatars": "4.10.2",
     "@dicebear/avatars-avataaars-sprites": "4.10.2",
     "@dicebear/avatars-jdenticon-sprites": "4.10.2",
@@ -57,7 +57,7 @@
     "dexie": "3.2.1",
     "dexie-export-import": "1.0.3",
     "effector": "22.3.0",
-    "eth-phishing-detect": "1.1.16",
+    "eth-phishing-detect": "1.2.0",
     "ethers": "5.6.4",
     "expiry-map": "2.0.0",
     "final-form": "4.20.6",
@@ -76,7 +76,7 @@
     "react-error-boundary": "3.1.4",
     "react-final-form": "6.5.9",
     "react-merge-refs": "1.1.0",
-    "react-number-format": "4.9.1",
+    "react-number-format": "4.9.3",
     "react-transition-group": "4.4.2",
     "spacingjs": "1.0.7",
     "threads": "1.7.0",
@@ -90,7 +90,7 @@
     "@babel/core": "7.17.9",
     "@babel/runtime": "7.17.9",
     "@svgr/webpack": "6.2.1",
-    "@swc/core": "1.2.168",
+    "@swc/core": "1.2.171",
     "@swc/jest": "0.2.20",
     "@tailwindcss/typography": "0.5.2",
     "@testing-library/jest-dom": "5.16.4",
@@ -105,9 +105,9 @@
     "@types/react-transition-group": "4.4.4",
     "@types/webextension-polyfill": "0.8.3",
     "@types/webpack-env": "1.16.4",
-    "@typescript-eslint/eslint-plugin": "5.19.0",
-    "@typescript-eslint/parser": "5.19.0",
-    "autoprefixer": "10.4.4",
+    "@typescript-eslint/eslint-plugin": "5.20.0",
+    "@typescript-eslint/parser": "5.20.0",
+    "autoprefixer": "10.4.5",
     "case-sensitive-paths-webpack-plugin": "2.4.0",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "10.2.4",
@@ -115,7 +115,7 @@
     "css-loader": "5.2.7",
     "css-minimizer-webpack-plugin": "3.4.1",
     "dotenv": "16.0.0",
-    "eslint": "8.13.0",
+    "eslint": "8.14.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "4.0.0",
@@ -128,7 +128,7 @@
     "identity-obj-proxy": "3.0.0",
     "jest": "27.5.1",
     "jest-webextension-mock": "3.7.22",
-    "lint-staged": "12.3.8",
+    "lint-staged": "12.4.0",
     "mini-css-extract-plugin": "2.6.0",
     "postcss": "8.4.12",
     "postcss-loader": "6.2.1",
@@ -149,7 +149,8 @@
     "zip-webpack-plugin": "4.0.1"
   },
   "resolutions": {
-    "ethers": "5.6.4"
+    "ethers": "5.6.4",
+    "minimist": ">=1.2.6"
   },
   "engines": {
     "node": ">=16"
