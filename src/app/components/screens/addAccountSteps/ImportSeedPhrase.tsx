@@ -93,7 +93,7 @@ const ImportSeedPhrase = memo(() => {
                   validateSeedPhrase(wordlistLocale)
                 )}
                 format={(value) =>
-                  value ? value.replace(/\n/g, " ").trim() : ""
+                  value ? value.replace(/\n/g, " ").trim() : undefined
                 }
                 formatOnBlur
               >
