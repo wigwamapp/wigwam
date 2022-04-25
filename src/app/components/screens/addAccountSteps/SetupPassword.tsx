@@ -4,11 +4,17 @@ import classNames from "clsx";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
+import createDecorator from "final-form-focus";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
-import { composeValidators, differentPasswords, required } from "app/utils";
+import {
+  composeValidators,
+  differentPasswords,
+  required,
+  withHumanDelay,
+} from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -32,24 +38,27 @@ const SetupPassword = memo(() => {
   }, [addAccountsParams, reset]);
 
   const handleFinish = useCallback(
-    async ({ password }) => {
-      try {
-        if (!addAccountsParams) return;
+    async ({ password }) =>
+      withHumanDelay(async () => {
+        try {
+          if (!addAccountsParams) return;
 
-        await setupWallet(password, addAccountsParams, seedPhrase);
+          await setupWallet(password, addAccountsParams, seedPhrase);
 
-        setAccModalOpened([false]);
-      } catch (err: any) {
-        return { [FORM_ERROR]: err?.message };
-      }
-      return;
-    },
+          setAccModalOpened([false]);
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
+        }
+        return;
+      }),
     [addAccountsParams, seedPhrase, setAccModalOpened]
   );
 
   if (!addAccountsParams) {
     return null;
   }
+
+  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <>
@@ -58,6 +67,7 @@ const SetupPassword = memo(() => {
       <Form
         initialValues={{ terms: false }}
         onSubmit={handleFinish}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           values,

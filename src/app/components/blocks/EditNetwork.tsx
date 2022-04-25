@@ -2,6 +2,7 @@ import { forwardRef, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
+import createDecorator from "final-form-focus";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
@@ -13,6 +14,7 @@ import {
   minLength,
   required,
   validateCurrencySymbol,
+  withHumanDelay,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import Input from "../elements/Input";
@@ -41,37 +43,39 @@ const EditNetwork = memo<EditNetworkProps>(
     const { alert, confirm } = useDialog();
 
     const handleSubmit = useCallback(
-      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
-        try {
-          const isChangedChainId = initialChainId && chainId !== initialChainId;
-          if (isChangedChainId) {
-            await Repo.networks.delete(Number(initialChainId));
-          }
+      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
+        withHumanDelay(async () => {
+          try {
+            const isChangedChainId =
+              initialChainId && chainId !== initialChainId;
+            if (isChangedChainId) {
+              await Repo.networks.delete(Number(initialChainId));
+            }
 
-          const repoMethod = isNew || isChangedChainId ? "add" : "put";
-          await Repo.networks[repoMethod]({
-            chainId: Number(chainId),
-            type: network?.type ?? "unknown",
-            rpcUrls: [rpcUrl],
-            chainTag: "",
-            name: nName,
-            nativeCurrency: {
-              name: currencySymbol,
-              symbol: currencySymbol,
-              decimals: 18,
-            },
-            explorerUrls: [blockExplorer],
-            position: 0,
-          });
+            const repoMethod = isNew || isChangedChainId ? "add" : "put";
+            await Repo.networks[repoMethod]({
+              chainId: Number(chainId),
+              type: network?.type ?? "unknown",
+              rpcUrls: [rpcUrl],
+              chainTag: "",
+              name: nName,
+              nativeCurrency: {
+                name: currencySymbol,
+                symbol: currencySymbol,
+                decimals: 18,
+              },
+              explorerUrls: [blockExplorer],
+              position: 0,
+            });
 
-          if (isNew && onActionFinished) {
-            onActionFinished();
+            if (isNew && onActionFinished) {
+              onActionFinished();
+            }
+            onCancelHandler();
+          } catch (err: any) {
+            alert({ title: "Error!", content: err.message });
           }
-          onCancelHandler();
-        } catch (err: any) {
-          alert({ title: "Error!", content: err.message });
-        }
-      },
+        }),
       [
         alert,
         initialChainId,
@@ -101,6 +105,11 @@ const EditNetwork = memo<EditNetworkProps>(
     }, [confirm, initialChainId, network?.name, onActionFinished]);
 
     const isNative = network && network.type !== "unknown";
+
+    const focusOnErrors = createDecorator();
+    const setRpc = useCallback((args, state, utils) => {
+      utils.changeValue(state, "rpcUrl", () => args[0]);
+    }, []);
 
     return (
       <section className={classNames("flex flex-col grow", "pl-6")}>
@@ -141,6 +150,8 @@ const EditNetwork = memo<EditNetworkProps>(
         >
           <Form
             onSubmit={handleSubmit}
+            mutators={{ setRpc }}
+            decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
               rpcUrl: network?.rpcUrls[0],
@@ -184,9 +195,7 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        setFromClipboard={(value) =>
-                          form.change("rpcUrl", value)
-                        }
+                        setFromClipboard={form.mutators.setRpc}
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
                         {...input}
@@ -270,7 +279,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     <NewButton
                       type="submit"
                       className="!py-2 ml-4 w-full"
-                      disabled={submitting}
+                      loading={submitting}
                     >
                       {submitting
                         ? isNew

@@ -30,8 +30,9 @@ const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
       type={onContinue ? "button" : "submit"}
       className="!min-w-[14rem]"
       onClick={onContinue}
+      loading={loading}
     >
-      {loading ? "Loading..." : "Continue"}
+      Continue
     </NewButton>
   </div>
 );

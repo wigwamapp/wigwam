@@ -5,10 +5,16 @@ import type { FormApi } from "final-form";
 import { FORM_ERROR } from "final-form";
 import { updateProfile } from "lib/ext/profile";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
+import createDecorator from "final-form-focus";
 
 import { changePassword } from "core/client";
 
-import { composeValidators, differentPasswords, required } from "app/utils";
+import {
+  composeValidators,
+  differentPasswords,
+  required,
+  withHumanDelay,
+} from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
@@ -46,17 +52,20 @@ const Profile: FC = () => {
   );
 
   const handlePasswordChange = useCallback(
-    async (values: FormValuesType, form: FormApi<FormValuesType>) => {
-      try {
-        await changePassword(values.oldPwd, values.newPwd);
-        form.restart();
-        return;
-      } catch (error: any) {
-        return { [FORM_ERROR]: error.message };
-      }
-    },
+    async (values: FormValuesType, form: FormApi<FormValuesType>) =>
+      withHumanDelay(async () => {
+        try {
+          await changePassword(values.oldPwd, values.newPwd);
+          form.restart();
+          return;
+        } catch (error: any) {
+          return { [FORM_ERROR]: error.message };
+        }
+      }),
     []
   );
+
+  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <>
@@ -75,6 +84,7 @@ const Profile: FC = () => {
       <SettingsHeader>Change password</SettingsHeader>
       <Form
         onSubmit={handlePasswordChange}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           submitting,
@@ -134,7 +144,7 @@ const Profile: FC = () => {
             <NewButton
               type="submit"
               className="!py-2 mt-8"
-              disabled={submitting}
+              loading={submitting}
             >
               {submitting ? "Saving..." : "Save"}
             </NewButton>

@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import { wordlists } from "@ethersproject/wordlists";
 import { toProtectedString } from "lib/crypto-utils";
 import { Field, Form } from "react-final-form";
+import createDecorator from "final-form-focus";
 
 import { SeedPharse, WalletStatus } from "core/types";
 import { toWordlistLang } from "core/common";
@@ -10,7 +11,12 @@ import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
-import { composeValidators, required, validateSeedPhrase } from "app/utils";
+import {
+  composeValidators,
+  required,
+  validateSeedPhrase,
+  withHumanDelay,
+} from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
@@ -47,26 +53,32 @@ const ImportSeedPhrase = memo(() => {
   );
 
   const handleContinue = useCallback(
-    async (values) => {
-      try {
-        const seedPhrase: SeedPharse = {
-          phrase: toProtectedString(values.seed),
-          lang: wordlistLocale,
-        };
+    async (values) =>
+      withHumanDelay(async () => {
+        try {
+          const seedPhrase: SeedPharse = {
+            phrase: toProtectedString(values.seed),
+            lang: wordlistLocale,
+          };
 
-        if (initialSetup) {
-          stateRef.current.seedPhrase = seedPhrase;
-        } else {
-          await addSeedPhrase(seedPhrase);
+          if (initialSetup) {
+            stateRef.current.seedPhrase = seedPhrase;
+          } else {
+            await addSeedPhrase(seedPhrase);
+          }
+
+          navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
+        } catch (err: any) {
+          alert(err?.message);
         }
-
-        navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
-      } catch (err: any) {
-        alert(err?.message);
-      }
-    },
+      }),
     [wordlistLocale, initialSetup, navigateToStep, stateRef, alert]
   );
+
+  const focusOnErrors = createDecorator();
+  const setSeed = useCallback((args, state, utils) => {
+    utils.changeValue(state, "seed", () => args[0]);
+  }, []);
 
   return (
     <>
@@ -75,6 +87,8 @@ const ImportSeedPhrase = memo(() => {
       </AddAccountHeader>
       <Form
         onSubmit={handleContinue}
+        decorators={[focusOnErrors]}
+        mutators={{ setSeed }}
         render={({ form, handleSubmit, submitting }) => (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col max-w-[27.5rem] mx-auto">
@@ -96,7 +110,7 @@ const ImportSeedPhrase = memo(() => {
                 {({ input, meta }) => (
                   <SeedPhraseField
                     placeholder="Paste there your secret phrase"
-                    setFromClipboard={(value) => form.change("seed", value)}
+                    setFromClipboard={(value) => form.mutators.setSeed(value)}
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}
                     className="mt-8"

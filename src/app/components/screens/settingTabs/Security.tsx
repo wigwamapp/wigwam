@@ -4,10 +4,11 @@ import { Form, Field } from "react-final-form";
 import { FORM_ERROR } from "final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
+import createDecorator from "final-form-focus";
 
 import { getSeedPhrase } from "core/client";
 
-import { required } from "app/utils";
+import { required, withHumanDelay } from "app/utils";
 import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -79,15 +80,21 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     }
   }, [onOpenChange, seedPhrase, windowFocused]);
 
-  const handleConfirmPassword = useCallback(async ({ password }) => {
-    try {
-      const seed = await getSeedPhrase(password);
-      setSeedPhrase(seed.phrase);
-    } catch (err: any) {
-      return { [FORM_ERROR]: err?.message };
-    }
-    return;
-  }, []);
+  const handleConfirmPassword = useCallback(
+    async ({ password }) =>
+      withHumanDelay(async () => {
+        try {
+          const seed = await getSeedPhrase(password);
+          setSeedPhrase(seed.phrase);
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
+        }
+        return;
+      }),
+    []
+  );
+
+  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <SecondaryModal
@@ -101,6 +108,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       ) : (
         <Form
           initialValues={{ terms: "false" }}
+          decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
           render={({
             handleSubmit,
@@ -134,9 +142,9 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               <NewButton
                 type="submit"
                 className="mt-6 !min-w-[14rem]"
-                disabled={submitting}
+                loading={submitting}
               >
-                {submitting ? "Loading" : "Reveal"}
+                Reveal
               </NewButton>
             </form>
           )}

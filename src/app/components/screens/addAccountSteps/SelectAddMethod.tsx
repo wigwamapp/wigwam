@@ -3,8 +3,14 @@ import classNames from "clsx";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
 import { Field, Form } from "react-final-form";
+import createDecorator from "final-form-focus";
 
-import { composeValidators, required, validateDerivationPath } from "app/utils";
+import {
+  composeValidators,
+  required,
+  validateDerivationPath,
+  withHumanDelay,
+} from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Input from "app/components/elements/Input";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -27,15 +33,19 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
   const [activeMethod, setActiveMethod] = useState(methods[0].value);
 
   const handleContinue = useCallback(
-    ({ derivationPath }) => {
-      onContinue(activeMethod, derivationPath.replace("/{index}", ""));
-    },
+    ({ derivationPath }) =>
+      withHumanDelay(async () => {
+        onContinue(activeMethod, derivationPath.replace("/{index}", ""));
+      }),
     [activeMethod, onContinue]
   );
+
+  const focusOnErrors = createDecorator();
 
   return (
     <Form
       initialValues={{ derivationPath: "m/44'/60'/0'/0/{index}" }}
+      decorators={[focusOnErrors]}
       onSubmit={handleContinue}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>

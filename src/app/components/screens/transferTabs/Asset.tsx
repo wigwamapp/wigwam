@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { Erc20__factory } from "abi-types";
+import createDecorator from "final-form-focus";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -14,6 +15,7 @@ import {
   maxValue,
   required,
   validateAddress,
+  withHumanDelay,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
@@ -68,27 +70,28 @@ const Asset: FC = () => {
   );
 
   const handleSubmit = useCallback(
-    async ({ recipient, amount }) => {
-      if (!tokenSlug) {
-        return;
-      }
-      try {
-        if (tokenSlug === NATIVE_TOKEN_SLUG) {
-          await sendEther(recipient, amount);
-        } else {
-          const tokenContract = parseTokenSlug(tokenSlug).address;
-
-          await sendToken(
-            recipient,
-            tokenContract,
-            amount,
-            currentToken.decimals
-          );
+    async ({ recipient, amount }) =>
+      withHumanDelay(async () => {
+        if (!tokenSlug) {
+          return;
         }
-      } catch (err: any) {
-        alert({ title: "Error!", content: err.message });
-      }
-    },
+        try {
+          if (tokenSlug === NATIVE_TOKEN_SLUG) {
+            await sendEther(recipient, amount);
+          } else {
+            const tokenContract = parseTokenSlug(tokenSlug).address;
+
+            await sendToken(
+              recipient,
+              tokenContract,
+              amount,
+              currentToken.decimals
+            );
+          }
+        } catch (err: any) {
+          alert({ title: "Error!", content: err.message });
+        }
+      }),
     [alert, currentToken, sendEther, sendToken, tokenSlug]
   );
 
@@ -103,13 +106,23 @@ const Asset: FC = () => {
     [currentToken]
   );
 
+  const focusOnErrors = createDecorator();
+  const setAmount = useCallback((args, state, utils) => {
+    utils.changeValue(state, "amount", () => args[0]);
+  }, []);
+  const setRecipient = useCallback((args, state, utils) => {
+    utils.changeValue(state, "recipient", () => args[0]);
+  }, []);
+
   return (
     <Form
       onSubmit={handleSubmit}
+      decorators={[focusOnErrors]}
+      mutators={{ setAmount, setRecipient }}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect
-            handleTokenChanged={() => form.change("amount", undefined)}
+            handleTokenChanged={() => form.mutators.setAmount(undefined)}
           />
           <Field
             name="recipient"
@@ -117,7 +130,7 @@ const Asset: FC = () => {
           >
             {({ input, meta }) => (
               <AddressField
-                setFromClipboard={(value) => form.change("recipient", value)}
+                setFromClipboard={form.mutators.setRecipient}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
                 className="mt-5"
@@ -140,7 +153,9 @@ const Asset: FC = () => {
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
-                  handleMaxButtonClick={() => form.change("amount", maxAmount)}
+                  handleMaxButtonClick={() =>
+                    form.mutators.setAmount(maxAmount)
+                  }
                   error={meta.error && meta.modified}
                   errorMessage={meta.error}
                   inputClassName="pr-20"
@@ -165,7 +180,7 @@ const Asset: FC = () => {
           <NewButton
             type="submit"
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-            disabled={submitting}
+            loading={submitting}
           >
             <SendIcon className="mr-2" />
             {submitting ? "Transfering" : "Transfer"}

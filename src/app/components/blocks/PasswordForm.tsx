@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
+import createDecorator from "final-form-focus";
 
 import { unlockWallet } from "core/client";
 
@@ -38,9 +39,12 @@ const PasswordForm = memo<PasswordFormProps>(
       [unlockCallback]
     );
 
+    const focusOnErrors = createDecorator();
+
     return (
       <Form
         onSubmit={handleSubmit}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           submitting,

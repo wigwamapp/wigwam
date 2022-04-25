@@ -2,8 +2,9 @@ import { FC, useCallback, useState } from "react";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
+import createDecorator from "final-form-focus";
 
-import { required } from "app/utils";
+import { required, withHumanDelay } from "app/utils";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
@@ -14,7 +15,7 @@ type ProfileGenProps = {
   label: string;
   defaultProfileName: string;
   defaultSeed?: string;
-  onSubmit: (value: string, profileSeed: string) => void;
+  onSubmit: (value: string, profileSeed: string) => Promise<void>;
   editMode?: boolean;
   className?: string;
 };
@@ -34,16 +35,20 @@ const ProfileGen: FC<ProfileGenProps> = ({
   }, []);
 
   const handleAdd = useCallback(
-    ({ profileName }) => {
-      onSubmit(profileName, profileSeed);
-    },
+    async ({ profileName }) =>
+      withHumanDelay(async () => {
+        await onSubmit(profileName, profileSeed);
+      }),
     [onSubmit, profileSeed]
   );
+
+  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <div className={classNames("flex w-full", className)}>
       <Form
         onSubmit={handleAdd}
+        decorators={[focusOnErrors]}
         initialValues={{ profileName: defaultProfileName }}
         render={({ handleSubmit, submitting, values }) => (
           <>
@@ -89,7 +94,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                   "mt-5",
                   editMode ? "!py-2" : "w-full flex items-center"
                 )}
-                disabled={submitting}
+                loading={submitting}
               >
                 {submitting ? (
                   editMode ? (

@@ -41,7 +41,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
             }
           }}
           className={classNames(
-            "absolute bottom-[1.125rem] right-3",
+            "absolute top-[5.125rem] right-3",
             "text-sm text-brand-light",
             "!p-0 !pr-1 !min-w-0",
             "!font-normal",
