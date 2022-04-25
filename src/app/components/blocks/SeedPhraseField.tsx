@@ -1,9 +1,11 @@
-import { forwardRef, RefObject, useRef, useState } from "react";
+import { forwardRef, RefObject, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
 import mergeRefs from "react-merge-refs";
+import { ethers } from "ethers";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
-import { ethers } from "ethers";
+import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
+import { useWindowInteracted } from "lib/react-hooks/useWindowInteracted";
 
 import { getRandomBytes } from "lib/crypto-utils/random";
 import { downloadFile } from "lib/download";
@@ -24,7 +26,6 @@ import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as HiddenSeedPhraseIcon } from "app/icons/hidden-seed-phrase.svg";
 import { ReactComponent as LockIcon } from "app/icons/lock.svg";
-// import { ReactComponent as UploadIcon } from "app/icons/upload.svg";
 
 type SeedPhraseFieldProps =
   | CreateSeedPhraseFieldProps
@@ -61,6 +62,14 @@ const CreateSeedPhraseField = forwardRef<
   const [isShown, setIsShown] = useState(false);
 
   const { confirm } = useDialog();
+  const windowFocused = useWindowFocus();
+  const windowInteracted = useWindowInteracted();
+
+  useEffect(() => {
+    if (!windowFocused || !windowInteracted) {
+      setIsShown(false);
+    }
+  }, [windowFocused, windowInteracted]);
 
   const handleDownload = () => {
     const value = rest.value as string;
@@ -118,12 +127,15 @@ const CreateSeedPhraseField = forwardRef<
         copy();
       }}
       className={classNames(
-        "absolute bottom-3 right-3",
+        "absolute",
         "text-sm text-brand-light",
         "!p-0 !pr-1 !min-w-0",
         "!font-normal",
         "cursor-copy",
-        "items-center"
+        "items-center",
+        isShown
+          ? "bottom-3 right-3"
+          : "bottom-[calc(.75rem-1px)] right-[calc(.75rem-1px)]"
       )}
     >
       {copied ? (
@@ -140,10 +152,10 @@ const CreateSeedPhraseField = forwardRef<
   ) : (
     <div
       className={classNames(
-        "absolute",
-        "inset-0",
-        "rounded-[.625rem]",
-        "bg-brand-main/10",
+        "absolute z-10",
+        "inset-0 box-border",
+        "rounded-[.5625rem]",
+        "bg-[#1e2031] border border-brand-main/10",
         "flex flex-col items-center justify-center",
         "transition-opacity",
         isShown ? "opacity-0 pointer-events-none" : "cursor-pointer"
@@ -168,7 +180,7 @@ const CreateSeedPhraseField = forwardRef<
       readOnly
       labelActions={labelActions}
       actions={actions}
-      textareaClassName={isShown ? undefined : "text-transparent"}
+      textareaClassName={isShown ? "z-0 relative" : "text-transparent"}
       {...(rest as LongTextFieldProps)}
       placeholder=""
     />
