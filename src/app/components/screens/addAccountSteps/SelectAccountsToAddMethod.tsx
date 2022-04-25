@@ -1,6 +1,8 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import Transport from "@ledgerhq/hw-transport";
+import retry from "async-retry";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { AccountSource, SeedPharse, WalletStatus } from "core/types";
@@ -11,15 +13,17 @@ import {
 } from "core/common";
 import { ClientProvider } from "core/client";
 
+import { withHumanDelay } from "app/utils";
 import { walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
-import { useDialog } from "app/hooks/dialog";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
+import { Spinner } from "./ChooseAddAccountWay";
 
 const methodsInitial: MethodsProps = [
   {
@@ -53,23 +57,129 @@ const methodsExisting: MethodsProps = [
 const SelectAccountsToAddMethod: FC = () => {
   const { navigateToStep, stateRef } = useSteps();
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { waitLoading } = useDialog();
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
 
   const isInitial = walletStatus === WalletStatus.Welcome;
+  const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
 
   const methods = useMemo(
     () => (isInitial ? methodsInitial : methodsExisting),
     [isInitial]
   );
 
+  const transportRef = useRef<Transport>();
+
+  const handleConnect = useCallback<
+    LoadingHandler<string, "loading" | "connectApp">
+  >(
+    ({ params: derivationPath, onClose, setState }) =>
+      withHumanDelay(async () => {
+        try {
+          let closed = false;
+          let extendedKey = "";
+          onClose(() => (closed = true));
+
+          const [{ default: LedgerEth }, { LedgerTransport, getExtendedKey }] =
+            await Promise.all([
+              import("@ledgerhq/hw-app-eth"),
+              import("lib/ledger"),
+            ]);
+
+          return await retry(
+            async () => {
+              if (closed) return false;
+
+              await transportRef.current?.close();
+              transportRef.current = await LedgerTransport.create();
+
+              onClose(() => transportRef.current?.close());
+
+              const { name: currentApp } = await getAppInfo(
+                transportRef.current
+              );
+              if (closed) return false;
+
+              if (currentApp !== "Ethereum") {
+                if (currentApp !== "BOLOS") {
+                  await disconnectFromConnectedApp(transportRef.current);
+                  await timeout(500);
+                  if (closed) return false;
+                }
+
+                setState("connectApp");
+                await connectToEthereumApp(transportRef.current);
+                await timeout(500);
+                if (closed) return false;
+                setState("loading");
+              }
+
+              const ledgerEth = new LedgerEth(transportRef.current);
+              if (closed) return false;
+
+              const { publicKey, chainCode } = await ledgerEth.getAddress(
+                derivationPath,
+                false,
+                true
+              );
+              if (closed) return false;
+
+              extendedKey = getExtendedKey(publicKey, chainCode!);
+              stateRef.current.extendedKey = extendedKey;
+              return true;
+            },
+            { retries: 5, maxTimeout: 2_000 }
+          );
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+
+          if (msg === "user closed popup") return false;
+
+          throw new Error(msg);
+        }
+      }),
+    [stateRef]
+  );
+
   const handleContinue = useCallback(
-    (method: string, derivationPath: string) => {
+    async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
         isInitial ? "initial" : "existing"
       }-${method}`;
       stateRef.current.derivationPath = derivationPath;
       stateRef.current.importAddresses = null;
+
+      if (isHardDevice) {
+        const answer = await waitLoading({
+          title: "Loading...",
+          headerClassName: "mb-3",
+          content: (state: "loading" | "connectApp") => (
+            <>
+              <span className="mb-5">
+                Please proceed connecting to the ledger.
+              </span>
+              {state === "loading" && <Spinner />}
+              {state === "connectApp" && "Please connect to Ethereum app"}
+            </>
+          ),
+          loadingHandler: handleConnect,
+          handlerParams: derivationPath,
+          state: "loading",
+        });
+
+        if (answer) {
+          if (isInitial && method === "auto") {
+            setOpenedLoadingModal(true);
+            return;
+          }
+
+          navigateToStep(AddAccountStep.VerifyToAdd);
+          return;
+        }
+
+        return;
+      }
 
       if (isInitial && method === "auto") {
         setOpenedLoadingModal(true);
@@ -78,7 +188,14 @@ const SelectAccountsToAddMethod: FC = () => {
 
       navigateToStep(AddAccountStep.VerifyToAdd);
     },
-    [isInitial, navigateToStep, stateRef]
+    [
+      handleConnect,
+      isHardDevice,
+      isInitial,
+      navigateToStep,
+      stateRef,
+      waitLoading,
+    ]
   );
 
   return (
@@ -104,13 +221,22 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const isUnmountedRef = useRef(false);
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
+  const extendedKey: string | undefined = stateRef.current.extendedKey;
   const derivationPath = stateRef.current.derivationPath;
 
   const neuterExtendedKey = useMemo(() => {
-    return seedPhrase && derivationPath
-      ? toNeuterExtendedKey(getSeedPhraseHDNode(seedPhrase), derivationPath)
-      : null;
-  }, [derivationPath, seedPhrase]);
+    if (extendedKey) {
+      return extendedKey;
+    }
+    if (seedPhrase && derivationPath) {
+      return toNeuterExtendedKey(
+        getSeedPhraseHDNode(seedPhrase),
+        derivationPath
+      );
+    }
+
+    return null;
+  }, [derivationPath, extendedKey, seedPhrase]);
 
   const loadActiveWallets = useCallback(async () => {
     if (!neuterExtendedKey) {
@@ -275,3 +401,51 @@ const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
 
 const preparePercentString = (percent: number) =>
   (percent > 9 ? percent.toFixed(0) : `0${percent.toFixed(0)}`) + "%";
+
+const getAppInfo = async (
+  transport: Transport
+): Promise<{
+  name: string;
+  version: string;
+  flags: number | Buffer;
+}> => {
+  const r = await transport.send(0xb0, 0x01, 0x00, 0x00);
+  let i = 0;
+  const format = r[i++];
+
+  if (format !== 1) {
+    throw new Error("getAppAndVersion: format not supported");
+  }
+
+  const nameLength = r[i++];
+  const name = r.slice(i, (i += nameLength)).toString("ascii");
+  const versionLength = r[i++];
+  const version = r.slice(i, (i += versionLength)).toString("ascii");
+  const flagLength = r[i++];
+  const flags = r.slice(i, (i += flagLength));
+  return {
+    name,
+    version,
+    flags,
+  };
+};
+
+const connectToEthereumApp = async (transport: Transport): Promise<void> => {
+  await transport.send(
+    0xe0,
+    0xd8,
+    0x00,
+    0x00,
+    Buffer.from("Ethereum", "ascii")
+  );
+};
+
+const disconnectFromConnectedApp = async (
+  transport: Transport
+): Promise<void> => {
+  await transport.send(0xb0, 0xa7, 0x00, 0x00);
+};
+
+const timeout = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
