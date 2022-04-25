@@ -19,6 +19,7 @@ import LongTextField, {
 import NewButton from "app/components/elements/NewButton";
 import Input, { InputProps } from "app/components/elements/Input";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as DownloadIcon } from "app/icons/download.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -92,8 +93,8 @@ const CreateSeedPhraseField = forwardRef<
     <div className="flex items-center">
       <TippySingletonProvider>
         <IconedButton
-          aria-label="Show / hide"
-          Icon={EyeIcon}
+          aria-label={`${isShown ? "Hide" : "Show"} secret phrase`}
+          Icon={isShown ? EyeIcon : OpenedEyeIcon}
           className="mr-2"
           theme="secondary"
           onClick={() => setIsShown((prevState) => !prevState)}
@@ -202,8 +203,8 @@ const ImportSeedPhraseField = forwardRef<
     <div className="flex items-center">
       <TippySingletonProvider>
         <IconedButton
-          aria-label="Show / hide"
-          Icon={EyeIcon}
+          aria-label={`${isShown ? "Hide" : "Show"} secret phrase`}
+          Icon={isShown ? EyeIcon : OpenedEyeIcon}
           theme="secondary"
           onClick={() => setIsShown((prevState) => !prevState)}
         />

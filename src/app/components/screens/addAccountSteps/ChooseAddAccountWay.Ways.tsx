@@ -41,7 +41,7 @@ export const getWays = (
 ): WaysReturn => [
   {
     type: "seed_phrase",
-    title: "Seed Phrase",
+    title: "Secret Phrase",
     tooltip: {
       content: (
         <>

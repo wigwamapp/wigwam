@@ -68,7 +68,7 @@ const CreateSeedPhrase = memo(() => {
       const inputSeedPhrase = seedPhraseFiled;
 
       if (!inputSeedPhrase) {
-        throw new Error("Not a valid seed phrase");
+        throw new Error("Not a valid secret phrase");
       }
 
       const seedPhrase: SeedPharse = {
