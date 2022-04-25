@@ -47,6 +47,7 @@ import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import LongTextField from "../elements/LongTextField";
 import USDAmount from "../elements/USDAmount";
+import PrettyAmount from "../elements/PrettyAmount";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -359,7 +360,7 @@ const AssetCard = forwardRef<HTMLButtonElement, AssetCardProps>(
         <span className="flex flex-col justify-center w-full min-w-0">
           <span className="text-sm font-bold leading-4 truncate">{name}</span>
           <span className="mt-2 flex justify-between items-end">
-            <USDAmount
+            <PrettyAmount
               amount={rawBalance ?? 0}
               decimals={decimals}
               currency={symbol}

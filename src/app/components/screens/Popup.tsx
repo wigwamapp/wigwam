@@ -44,6 +44,7 @@ import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
+import PrettyAmount from "../elements/PrettyAmount";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -349,7 +350,7 @@ const AssetCard = memo(
           <span className="flex flex-col w-full min-w-0">
             <span className="text-sm font-bold leading-5 truncate">{name}</span>
             <span className="mt-auto flex justify-between items-end">
-              <USDAmount
+              <PrettyAmount
                 amount={rawBalance ?? 0}
                 decimals={decimals}
                 currency={symbol}

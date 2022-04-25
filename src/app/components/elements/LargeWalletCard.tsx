@@ -21,6 +21,7 @@ import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import PrettyAmount from "./PrettyAmount";
 
 type LargeWalletCardProps = {
   account: Account;
@@ -161,7 +162,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                     )}
                   </div>
                   {portfolioBalance && (
-                    <USDAmount
+                    <PrettyAmount
                       amount={
                         nativeToken
                           ? ethers.utils.formatEther(nativeToken.rawBalance)

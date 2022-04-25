@@ -514,38 +514,32 @@ export const syncConversionRates = mem(
         unit: string;
         value: number;
       };
-      const arr = Object.values(currencies.rates).filter((curr: Currency) => {
-        if (
-          curr.type === "fiat" ||
-          curr.unit === "BTC" ||
-          curr.unit === "ETH"
-        ) {
-          if (curr.name !== "Russian Ruble") {
-            return true;
+      const rates: Record<string, string> = {};
+
+      const btcPrice = new BigNumber(currencies.rates["usd"].value);
+      const btcToUsd = new BigNumber(1).dividedBy(btcPrice);
+      Object.entries(currencies.rates).forEach(([key, value]) => {
+        if (value.type === "fiat" || key === "btc" || key === "eth") {
+          if (value.name === "Russian Ruble") {
+            return;
+          }
+          const code = CONVERSION_CURRENCIES.find(
+            (conv_curr) => conv_curr.code === key.toUpperCase()
+          )?.code;
+          if (code) {
+            const convertedAmount = new BigNumber(value.value).multipliedBy(
+              btcToUsd
+            );
+            rates[code] = convertedAmount.toFormat();
           }
         }
-        return false;
       });
-      const btcPrice = new BigNumber(
-        arr.find((curr) => curr.name === "US Dollar")!.value
-      );
-      const btcToUsd = new BigNumber(1).dividedBy(btcPrice);
-      const rates: Record<string, string> = {};
-      arr.forEach((curr) => {
-        const name = CONVERSION_CURRENCIES.find(
-          (conv_curr) => conv_curr.name === curr.name
-        )?.name;
-        if (name) {
-          const value = new BigNumber(curr.value).multipliedBy(btcToUsd);
-          rates[name] = value.toFormat();
-        }
-      });
-      storage.put("currencies_rate", rates);
+      await storage.put("currencies_rate", rates);
     } catch (err) {
       console.error(err);
     }
   },
-  { maxAge: 500 }
+  { maxAge: 300000 }
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {

@@ -38,10 +38,10 @@ export const currenciesRateAtom = atomWithStorage<Record<string, number>>(
   { USD: 1 }
 );
 
-export const selectedCurrencyAtom = atom({
-  key: "USD",
-  value: "USD - US Dollar",
-});
+export const selectedCurrencyAtom = atomWithStorage(
+  "preferred_currency",
+  "USD"
+);
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
