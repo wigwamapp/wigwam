@@ -22,54 +22,55 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
     const { copy, copied } = useCopyToClipboard(longTextFieldRef);
 
     return (
-      <div className={classNames("relative", className)}>
-        <LongTextField
-          ref={mergeRefs([ref, longTextFieldRef])}
-          label="Recipient"
-          placeholder="0x0000000000000000000000000000000000000000"
-          textareaClassName="!h-20"
-          maxLength={42}
-          {...rest}
-        />
-        <NewButton
-          theme="tertiary"
-          onClick={() => {
-            if (setFromClipboard) {
-              paste();
-            } else {
-              copy();
-            }
-          }}
-          className={classNames(
-            "absolute bottom-[1.125rem] right-3",
-            "text-sm text-brand-light",
-            "!p-0 !pr-1 !min-w-0",
-            "!font-normal",
-            "cursor-copy",
-            "items-center"
-          )}
-        >
-          {setFromClipboard ? (
-            <>
-              {pasted ? (
-                <SuccessIcon className="mr-1" />
-              ) : (
-                <PasteIcon className="mr-1" />
-              )}
-              {pasted ? "Pasted" : "Paste"}
-            </>
-          ) : (
-            <>
-              {copied ? (
-                <SuccessIcon className="mr-1" />
-              ) : (
-                <CopyIcon className="mr-1" />
-              )}
-              {copied ? "Copied" : "Copy"}
-            </>
-          )}
-        </NewButton>
-      </div>
+      <LongTextField
+        ref={mergeRefs([ref, longTextFieldRef])}
+        label="Recipient"
+        placeholder="0x0000000000000000000000000000000000000000"
+        textareaClassName="!h-20"
+        maxLength={42}
+        actions={
+          <NewButton
+            theme="tertiary"
+            onClick={() => {
+              if (setFromClipboard) {
+                paste();
+              } else {
+                copy();
+              }
+            }}
+            className={classNames(
+              "absolute bottom-3 right-3",
+              "text-sm text-brand-light",
+              "!p-0 !pr-1 !min-w-0",
+              "!font-normal",
+              !setFromClipboard && "cursor-copy",
+              "items-center"
+            )}
+          >
+            {setFromClipboard ? (
+              <>
+                {pasted ? (
+                  <SuccessIcon className="mr-1" />
+                ) : (
+                  <PasteIcon className="mr-1" />
+                )}
+                {pasted ? "Pasted" : "Paste"}
+              </>
+            ) : (
+              <>
+                {copied ? (
+                  <SuccessIcon className="mr-1" />
+                ) : (
+                  <CopyIcon className="mr-1" />
+                )}
+                {copied ? "Copied" : "Copy"}
+              </>
+            )}
+          </NewButton>
+        }
+        className={className}
+        {...rest}
+      />
     );
   }
 );

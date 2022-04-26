@@ -14,6 +14,8 @@ import {
   maxValue,
   required,
   validateAddress,
+  withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
@@ -32,6 +34,8 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
+type FormValues = { amount: string; recipient: string };
+
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
@@ -42,10 +46,12 @@ const Asset: FC = () => {
 
   const sendEther = useCallback(
     async (recipient: string, amount: string) => {
-      return await provider.getSigner(currentAccount.address).sendTransaction({
-        to: recipient,
-        value: ethers.utils.parseEther(amount),
-      });
+      return await provider
+        .getUncheckedSigner(currentAccount.address)
+        .sendTransaction({
+          to: recipient,
+          value: ethers.utils.parseEther(amount),
+        });
     },
     [currentAccount.address, provider]
   );
@@ -57,7 +63,7 @@ const Asset: FC = () => {
       amount: string,
       decimals: number
     ) => {
-      const signer = provider.getSigner(currentAccount.address);
+      const signer = provider.getUncheckedSigner(currentAccount.address);
       const contract = Erc20__factory.connect(tokenContract, signer);
 
       const convertedAmount = ethers.utils.parseUnits(amount, decimals);
@@ -68,27 +74,28 @@ const Asset: FC = () => {
   );
 
   const handleSubmit = useCallback(
-    async ({ recipient, amount }) => {
-      if (!tokenSlug) {
-        return;
-      }
-      try {
-        if (tokenSlug === NATIVE_TOKEN_SLUG) {
-          await sendEther(recipient, amount);
-        } else {
-          const tokenContract = parseTokenSlug(tokenSlug).address;
-
-          await sendToken(
-            recipient,
-            tokenContract,
-            amount,
-            currentToken.decimals
-          );
+    async ({ recipient, amount }) =>
+      withHumanDelay(async () => {
+        if (!tokenSlug) {
+          return;
         }
-      } catch (err: any) {
-        alert({ title: "Error!", content: err.message });
-      }
-    },
+        try {
+          if (tokenSlug === NATIVE_TOKEN_SLUG) {
+            await sendEther(recipient, amount);
+          } else {
+            const tokenContract = parseTokenSlug(tokenSlug).address;
+
+            await sendToken(
+              recipient,
+              tokenContract,
+              amount,
+              currentToken.decimals
+            );
+          }
+        } catch (err: any) {
+          alert({ title: "Error!", content: err.message });
+        }
+      }),
     [alert, currentToken, sendEther, sendToken, tokenSlug]
   );
 
@@ -104,8 +111,9 @@ const Asset: FC = () => {
   );
 
   return (
-    <Form
+    <Form<FormValues>
       onSubmit={handleSubmit}
+      decorators={[focusOnErrors]}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect
@@ -141,7 +149,7 @@ const Asset: FC = () => {
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
                   handleMaxButtonClick={() => form.change("amount", maxAmount)}
-                  error={meta.error && meta.modified}
+                  error={meta.modified && meta.error}
                   errorMessage={meta.error}
                   inputClassName="pr-20"
                   {...input}
@@ -165,7 +173,7 @@ const Asset: FC = () => {
           <NewButton
             type="submit"
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-            disabled={submitting}
+            loading={submitting}
           >
             <SendIcon className="mr-2" />
             {submitting ? "Transfering" : "Transfer"}

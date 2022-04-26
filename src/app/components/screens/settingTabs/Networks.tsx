@@ -1,9 +1,8 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import { getPublicURL } from "lib/ext/utils";
 
-import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { getNetworkIconUrl } from "fixtures/networks";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { useLazyAllNetworks } from "app/hooks";
@@ -86,7 +85,7 @@ const Networks: FC = () => {
           {preparedNetworks?.map(({ chainId, name }) => (
             <NetworkBtn
               key={chainId}
-              icon={NETWORK_ICON_MAP.get(chainId)}
+              icon={getNetworkIconUrl(chainId)}
               name={name}
               onClick={() => setTab(chainId)}
               isActive={tab === chainId}
@@ -146,11 +145,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       {isNewButton ? (
         <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
-        <img
-          src={icon ?? getPublicURL(`icons/network/unknown.png`)}
-          alt={name}
-          className={"w-6 h-6 mr-3"}
-        />
+        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
       )}
       <span className="min-w-0 truncate">{name}</span>
       <ChevronRightIcon

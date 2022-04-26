@@ -1,7 +1,7 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
-import { Approval } from "./activity";
+import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 
 export type Request =
@@ -285,7 +285,7 @@ export interface ApprovalsUpdated extends MessageBase {
 export interface ApproveRequest extends MessageBase {
   type: MessageType.Approve;
   approvalId: string;
-  approve: boolean;
+  result: ApprovalResult;
 }
 
 export interface ApproveResponse extends MessageBase {

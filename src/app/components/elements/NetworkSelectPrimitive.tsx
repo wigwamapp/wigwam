@@ -1,9 +1,8 @@
 import { FC, useMemo, useState } from "react";
 import Fuse from "fuse.js";
-import { getPublicURL } from "lib/ext/utils";
 
 import { Network } from "core/types";
-import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { getNetworkIconUrl } from "fixtures/networks";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { Page, SettingTab } from "app/nav";
@@ -14,9 +13,7 @@ import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
-  icon:
-    NETWORK_ICON_MAP.get(network.chainId) ??
-    getPublicURL(`icons/network/unknown.png`),
+  icon: getNetworkIconUrl(network.chainId),
 });
 
 type NetworkSelectProps = {

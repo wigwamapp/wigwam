@@ -5,11 +5,14 @@ import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
-import { required, withHumanDelay } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
 import PasswordField from "app/components/elements/PasswordField";
 
+type FormValues = {
+  password: string;
+};
 type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
@@ -39,8 +42,9 @@ const PasswordForm = memo<PasswordFormProps>(
     );
 
     return (
-      <Form
+      <Form<FormValues>
         onSubmit={handleSubmit}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           submitting,

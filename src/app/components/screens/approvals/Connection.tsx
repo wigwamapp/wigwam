@@ -8,10 +8,11 @@ import BigNumber from "bignumber.js";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { TReplace } from "lib/ext/i18n/react";
 
+import { ConnectionApproval } from "core/types";
+
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import { useToken } from "app/hooks";
 import Avatar from "app/components/elements/Avatar";
-import NewButton from "app/components/elements/NewButton";
 import Checkbox from "app/components/elements/Checkbox";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -25,7 +26,13 @@ import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
-const ConnectDapp: FC = () => {
+import ApprovalLayout from "./Layout";
+
+type ApproveConnectionProps = {
+  approval: ConnectionApproval;
+};
+
+const ApproveConnection: FC<ApproveConnectionProps> = () => {
   const { currentAccount, allAccounts } = useAtomValue(
     useMemo(
       () =>
@@ -95,7 +102,11 @@ const ConnectDapp: FC = () => {
   );
 
   return (
-    <div className="h-screen flex flex-col items-center pt-8 pb-5 px-6">
+    <ApprovalLayout
+      approveText="Connect"
+      declineText="Deny"
+      className="items-center"
+    >
       <DappLogos />
       <h1 className="text-2xl font-bold mt-4 mb-1">Connect to website</h1>
       <span className="text-base mb-6">compound.finance</span>
@@ -148,17 +159,11 @@ const ConnectDapp: FC = () => {
         ))}
       </ScrollAreaContainer>
       <ConnectionWarnings />
-      <div className="grid grid-cols-2 gap-3 w-full mt-5">
-        <NewButton theme="secondary" className="w-full">
-          Deny
-        </NewButton>
-        <NewButton className="w-full">Connect</NewButton>
-      </div>
-    </div>
+    </ApprovalLayout>
   );
 };
 
-export default ConnectDapp;
+export default ApproveConnection;
 
 const iconsClassNames = classNames(
   "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
