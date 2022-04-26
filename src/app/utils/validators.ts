@@ -47,7 +47,7 @@ export const validateSeedPhrase = (lang: string) => (phrase: string) => {
 
   return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
     ? undefined
-    : "Secret phrase in invalid";
+    : "Invalid phrase";
 };
 
 export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
