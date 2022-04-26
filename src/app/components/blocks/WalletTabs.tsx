@@ -8,13 +8,13 @@ import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
+import { allAccountsAtom } from "app/atoms";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Balance from "app/components/elements/Balance";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
-import { allAccountsAtom } from "app/atoms";
-import NewButton from "../elements/NewButton";
+import NewButton from "app/components/elements/NewButton";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-acc-20-15.svg";
 
