@@ -4,10 +4,10 @@ import { RESET } from "jotai/utils";
 import { SetStateAction, useAtomValue } from "jotai";
 import Fuse from "fuse.js";
 
-import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
+import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { allAccountsAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
