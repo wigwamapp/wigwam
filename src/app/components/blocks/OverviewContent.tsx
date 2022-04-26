@@ -474,7 +474,7 @@ const AssetInfo: FC = () => {
           Balance
         </div>
         <div>
-          <USDAmount
+          <PrettyAmount
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
