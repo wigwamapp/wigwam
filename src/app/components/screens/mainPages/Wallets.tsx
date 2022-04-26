@@ -37,6 +37,10 @@ import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
+import { ReactComponent as GoogleIcon } from "app/icons/google.svg";
+import { ReactComponent as FacebookIcon } from "app/icons/facebook.svg";
+import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
+import { ReactComponent as RedditIcon } from "app/icons/reddit.svg";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AutoIcon from "app/components/elements/AutoIcon";
 import NewButton from "app/components/elements/NewButton";
@@ -54,7 +58,7 @@ const Wallets: FC = () => {
   const [revealPrivateOpened, setRevealPrivateOpened] = useState(false);
   const [revealPharseOpened, setRevealPhraseOpened] = useState(false);
   const setAccountAddress = useSetAtom(accountAddressAtom);
-  const { currentAccount, allAccounts } = useAtomValue(
+  const { currentAccount } = useAtomValue(
     useMemo(
       () =>
         waitForAll({
@@ -77,7 +81,6 @@ const Wallets: FC = () => {
       <WalletTabs
         setAccountAddress={setAccountAddress}
         currentAccount={currentAccount}
-        allAccounts={allAccounts}
         className="mt-5"
       />
       <ScrollAreaContainer
@@ -157,6 +160,42 @@ const Wallets: FC = () => {
             <RevealIcon className="w-[1.625rem] h-auto mr-3" />
             Reveal
           </NewButton>
+        </div>
+        <div
+          className={classNames(
+            "mt-6 pb-6",
+            "border-b border-brand-main/[.07]"
+          )}
+        >
+          <div className="flex text-lg font-bold text-brand-light justify-between">
+            <div className="flex items-center ">
+              <GoogleIcon className="mr-3" />
+              Google
+            </div>
+            <div className="flex items-center justify-between min-w-[6.25rem]">
+              <FacebookIcon />
+              <RedditIcon />
+              <TwitterIcon />
+            </div>
+          </div>
+          <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
+            Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
+            way.
+          </p>
+          <Input
+            defaultValue={"Oleh Khalin"}
+            label="Name"
+            inputClassName="h-11"
+            className="max-w-sm mt-4"
+            readOnly
+          />
+          <Input
+            defaultValue={"olehkhalin@gmail.com"}
+            label="Email"
+            inputClassName="h-11"
+            className="max-w-sm mt-4"
+            readOnly
+          />
         </div>
         {currentAccount.source === AccountSource.SeedPhrase && (
           <div
@@ -280,7 +319,13 @@ const DeleteAccountModal = memo<
 
   return (
     <SecondaryModal
-      header="Type password"
+      header={
+        seedPhrase
+          ? "Your secret phrase"
+          : privateKey
+          ? "Your private key"
+          : "Type password"
+      }
       open={open}
       onOpenChange={onOpenChange}
       className="px-[5.25rem]"
@@ -357,6 +402,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         "flex",
         "bg-brand-main/[.05]",
         "max-w-[23.188rem] min-h-[6.25rem]",
+        "rounded-[0.625rem]",
         className
       )}
     >

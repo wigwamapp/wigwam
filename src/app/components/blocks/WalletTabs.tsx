@@ -1,8 +1,10 @@
-import { FC } from "react";
+import { FC, useMemo, useState } from "react";
 import classNames from "clsx";
 import { RESET } from "jotai/utils";
-import { SetStateAction } from "jotai";
+import { SetStateAction, useAtomValue } from "jotai";
+import Fuse from "fuse.js";
 
+import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
@@ -10,45 +12,77 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Balance from "app/components/elements/Balance";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
+import SearchInput from "app/components/elements/SearchInput";
+import { allAccountsAtom } from "app/atoms";
+import NewButton from "../elements/NewButton";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-acc-20-15.svg";
 
 type WalletTabsProps = {
   setAccountAddress: (
     update: typeof RESET | SetStateAction<string | null>
   ) => void;
   currentAccount: Account;
-  allAccounts: Account[];
   className?: string;
 };
 
 const WalletTabs: FC<WalletTabsProps> = ({
   setAccountAddress,
   currentAccount,
-  allAccounts,
   className,
-}) => (
-  <ScrollAreaContainer
-    className={classNames(
-      "relative",
-      "flex flex-col",
-      "min-w-[21.75rem] ",
-      "border-r border-brand-main/[.07]",
-      className
-    )}
-    viewPortClassName="pb-20 rounded-t-[.625rem]"
-    scrollBarClassName="py-0 pb-20 !right-1"
-  >
-    {allAccounts.map((acc) => (
-      <WalletTab
-        key={acc.address}
-        active={acc.address === currentAccount.address}
-        className="mb-2"
-        account={acc}
-        onClick={() => setAccountAddress(acc.address)}
-      />
-    ))}
-  </ScrollAreaContainer>
-);
+}) => {
+  const accounts = useAtomValue(allAccountsAtom);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
+  const fuse = useMemo(
+    () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
+    [accounts]
+  );
+
+  const filteredAccounts = useMemo(() => {
+    if (searchValue) {
+      return fuse.search(searchValue).map(({ item: account }) => account);
+    }
+    return accounts;
+  }, [accounts, fuse, searchValue]);
+
+  return (
+    <ScrollAreaContainer
+      className={classNames(
+        "relative",
+        "flex flex-col",
+        "min-w-[21.75rem] ",
+        "border-r border-brand-main/[.07]",
+        className
+      )}
+      viewPortClassName="pb-20 rounded-t-[.625rem]"
+      scrollBarClassName="py-0 pb-20 !right-1"
+    >
+      <div className="flex mb-[1.625rem] mr-[1.625rem]">
+        <SearchInput
+          searchValue={searchValue}
+          toggleSearchValue={setSearchValue}
+        />
+        <NewButton
+          to={{ addAccOpened: true }}
+          theme="tertiary"
+          className="!min-w-[4rem]"
+        >
+          <AddWalletIcon />
+        </NewButton>
+      </div>
+      {filteredAccounts.map((acc) => (
+        <WalletTab
+          key={acc.address}
+          active={acc.address === currentAccount.address}
+          className="mb-2"
+          account={acc}
+          onClick={() => setAccountAddress(acc.address)}
+        />
+      ))}
+    </ScrollAreaContainer>
+  );
+};
 
 export default WalletTabs;
 
