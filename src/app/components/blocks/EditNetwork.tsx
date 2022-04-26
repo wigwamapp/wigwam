@@ -2,7 +2,6 @@ import { forwardRef, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
-import createDecorator from "final-form-focus";
 
 import * as Repo from "core/repo";
 import { Network } from "core/types";
@@ -15,6 +14,7 @@ import {
   required,
   validateCurrencySymbol,
   withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import Input from "../elements/Input";
@@ -36,7 +36,6 @@ type FormValues = {
   currencySymbol: string;
   blockExplorer: string;
 };
-const focusOnErrors = createDecorator<FormValues>();
 
 type EditNetworkProps = {
   isNew: boolean;
@@ -324,7 +323,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             theme="tertiary"
             onClick={paste}
             className={classNames(
-              "absolute bottom-4 right-3",
+              "absolute bottom-3 right-3",
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",

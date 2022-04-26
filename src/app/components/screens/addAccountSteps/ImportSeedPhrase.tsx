@@ -3,7 +3,6 @@ import { useAtomValue } from "jotai";
 import { wordlists } from "@ethersproject/wordlists";
 import { toProtectedString } from "lib/crypto-utils";
 import { Field, Form } from "react-final-form";
-import createDecorator from "final-form-focus";
 
 import { SeedPharse, WalletStatus } from "core/types";
 import { toWordlistLang } from "core/common";
@@ -16,6 +15,7 @@ import {
   required,
   validateSeedPhrase,
   withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
@@ -28,7 +28,6 @@ import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 type FormValues = {
   seed: string;
 };
-const focusOnErrors = createDecorator<FormValues>();
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists

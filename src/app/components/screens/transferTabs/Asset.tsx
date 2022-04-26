@@ -5,7 +5,6 @@ import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { Erc20__factory } from "abi-types";
-import createDecorator from "final-form-focus";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -16,6 +15,7 @@ import {
   required,
   validateAddress,
   withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
@@ -35,7 +35,6 @@ import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 type FormValues = { amount: string; recipient: string };
-const focusOnErrors = createDecorator<FormValues>();
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -148,7 +147,7 @@ const Asset: FC = () => {
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
                   handleMaxButtonClick={() => form.change("amount", maxAmount)}
-                  error={meta.error && meta.modified}
+                  error={meta.modified && meta.error}
                   errorMessage={meta.error}
                   inputClassName="pr-20"
                   {...input}

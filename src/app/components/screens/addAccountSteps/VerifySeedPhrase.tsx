@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { fromProtectedString } from "lib/crypto-utils";
-import createDecorator from "final-form-focus";
 
 import {
   AddHDAccountParams,
@@ -12,7 +11,12 @@ import {
   WalletStatus,
 } from "core/types";
 import { addSeedPhrase } from "core/client";
-import { composeValidators, required, withHumanDelay } from "app/utils";
+import {
+  composeValidators,
+  required,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
@@ -80,8 +84,6 @@ const VerifySeedPhrase = memo(() => {
   if (!seedPhrase) {
     return null;
   }
-
-  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <>

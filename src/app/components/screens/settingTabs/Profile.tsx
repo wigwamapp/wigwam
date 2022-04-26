@@ -5,7 +5,6 @@ import type { FormApi } from "final-form";
 import { FORM_ERROR } from "final-form";
 import { updateProfile } from "lib/ext/profile";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
-import createDecorator from "final-form-focus";
 
 import { changePassword } from "core/client";
 
@@ -14,6 +13,7 @@ import {
   differentPasswords,
   required,
   withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -23,7 +23,7 @@ import ProfileGen from "app/components/blocks/ProfileGen";
 import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
 
-type FormValuesType = {
+type FormValues = {
   oldPwd: string;
   newPwd: string;
   confirmNewPwd: string;
@@ -52,7 +52,7 @@ const Profile: FC = () => {
   );
 
   const handlePasswordChange = useCallback(
-    async (values: FormValuesType, form: FormApi<FormValuesType>) =>
+    async (values: FormValues, form: FormApi<FormValues>) =>
       withHumanDelay(async () => {
         try {
           await changePassword(values.oldPwd, values.newPwd);
@@ -64,8 +64,6 @@ const Profile: FC = () => {
       }),
     []
   );
-
-  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <>
@@ -82,7 +80,7 @@ const Profile: FC = () => {
       <Separator className="mt-6 mb-8" />
 
       <SettingsHeader>Change password</SettingsHeader>
-      <Form
+      <Form<FormValues>
         onSubmit={handlePasswordChange}
         decorators={[focusOnErrors]}
         render={({

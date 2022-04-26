@@ -2,11 +2,10 @@ import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
-import createDecorator from "final-form-focus";
 
 import { unlockWallet } from "core/client";
 
-import { required, withHumanDelay } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
 import PasswordField from "app/components/elements/PasswordField";
@@ -14,8 +13,6 @@ import PasswordField from "app/components/elements/PasswordField";
 type FormValues = {
   password: string;
 };
-const focusOnErrors = createDecorator<FormValues>();
-
 type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;

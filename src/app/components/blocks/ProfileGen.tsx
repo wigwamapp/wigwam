@@ -2,14 +2,17 @@ import { FC, useCallback, useState } from "react";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
-import createDecorator from "final-form-focus";
 
-import { required, withHumanDelay } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
+
+type FormValues = {
+  profileName: string;
+};
 
 type ProfileGenProps = {
   label: string;
@@ -42,11 +45,9 @@ const ProfileGen: FC<ProfileGenProps> = ({
     [onSubmit, profileSeed]
   );
 
-  const focusOnErrors = createDecorator<any, any>();
-
   return (
     <div className={classNames("flex w-full", className)}>
-      <Form
+      <Form<FormValues>
         onSubmit={handleAdd}
         decorators={[focusOnErrors]}
         initialValues={{ profileName: defaultProfileName }}
