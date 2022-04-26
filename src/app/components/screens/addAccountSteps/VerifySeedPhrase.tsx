@@ -10,7 +10,6 @@ import {
   SeedPharse,
   WalletStatus,
 } from "core/types";
-import { addSeedPhrase } from "core/client";
 
 import { composeValidators, required } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
@@ -61,12 +60,9 @@ const VerifySeedPhrase = memo(() => {
 
       Object.assign(stateRef.current, { addAccountsParams });
 
-      if (initialSetup) {
-        navigateToStep(AddAccountStep.SetupPassword);
-      } else {
-        await addSeedPhrase(seedPhrase);
-        navigateToStep(AddAccountStep.VerifyToAdd);
-      }
+      navigateToStep(
+        initialSetup ? AddAccountStep.SetupPassword : AddAccountStep.VerifyToAdd
+      );
     } catch (err: any) {
       alert(err?.message);
     }

@@ -4,14 +4,13 @@ import { wordlists } from "@ethersproject/wordlists";
 import { toProtectedString } from "lib/crypto-utils";
 import { Field, Form } from "react-final-form";
 
-import { SeedPharse, WalletStatus } from "core/types";
+import { SeedPharse } from "core/types";
 import { toWordlistLang } from "core/common";
-import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
 import { composeValidators, required, validateSeedPhrase } from "app/utils";
-import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
+import { currentLocaleAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
@@ -25,12 +24,9 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
 
 const ImportSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
-  const walletStatus = useAtomValue(walletStatusAtom);
   const { alert } = useDialog();
 
   const { stateRef, navigateToStep } = useSteps();
-
-  const initialSetup = walletStatus === WalletStatus.Welcome;
 
   const defaultLocale = useMemo(
     () =>
@@ -54,18 +50,14 @@ const ImportSeedPhrase = memo(() => {
           lang: wordlistLocale,
         };
 
-        if (initialSetup) {
-          stateRef.current.seedPhrase = seedPhrase;
-        } else {
-          await addSeedPhrase(seedPhrase);
-        }
+        stateRef.current.seedPhrase = seedPhrase;
 
         navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
       } catch (err: any) {
         alert(err?.message);
       }
     },
-    [wordlistLocale, initialSetup, navigateToStep, stateRef, alert]
+    [wordlistLocale, navigateToStep, stateRef, alert]
   );
 
   return (

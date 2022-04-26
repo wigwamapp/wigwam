@@ -11,7 +11,6 @@ export type Request =
   | LockWalletRequest
   | ChangePasswordRequest
   | HasSeedPhraseRequest
-  | AddSeedPhraseRequest
   | GetAccountsRequest
   | AddAccountsRequest
   | DeleteAccountsRequest
@@ -32,7 +31,6 @@ export type Response =
   | LockWalletResponse
   | ChangePasswordResponse
   | HasSeedPhraseResponse
-  | AddSeedPhraseResponse
   | GetAccountsResponse
   | AddAccountsResponse
   | DeleteAccountsResponse
@@ -62,7 +60,6 @@ export enum MessageType {
   LockWallet = "LOCK_WALLET",
   ChangePassword = "CHANGE_PASSWORD",
   HasSeedPhrase = "HAS_SEED_PHRASE",
-  AddSeedPhrase = "ADD_SEED_PHRASE",
   GetAccounts = "GET_ACCOUNTS",
   AddAccounts = "ADD_ACCOUNTS",
   DeleteAccounts = "DELETE_ACCOUNTS",
@@ -147,15 +144,6 @@ export interface HasSeedPhraseResponse extends MessageBase {
   seedPhraseExists: boolean;
 }
 
-export interface AddSeedPhraseRequest extends MessageBase {
-  type: MessageType.AddSeedPhrase;
-  seedPhrase: SeedPharse;
-}
-
-export interface AddSeedPhraseResponse extends MessageBase {
-  type: MessageType.AddSeedPhrase;
-}
-
 export interface GetAccountsRequest extends MessageBase {
   type: MessageType.GetAccounts;
 }
@@ -168,6 +156,7 @@ export interface GetAccountsResponse extends MessageBase {
 export interface AddAccountsRequest extends MessageBase {
   type: MessageType.AddAccounts;
   accountsParams: AddAccountParams[];
+  seedPhrase?: SeedPharse;
 }
 
 export interface AddAccountsResponse extends MessageBase {
