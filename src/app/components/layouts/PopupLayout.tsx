@@ -29,14 +29,13 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
       )}
     >
       <div className="flex px-3 pt-3">
-        {isUnlocked && <LockProfileButton />}
+        {isUnlocked && <LockProfileButton className="mr-2" />}
 
         <RoundedButton
           theme={isUnlocked ? "small" : "large"}
           onClick={() => openInTab()}
           className={classNames(
             "w-full",
-            "ml-2",
             !isUnlocked && "p-3.5",
             isUnlocked && "p-3"
           )}

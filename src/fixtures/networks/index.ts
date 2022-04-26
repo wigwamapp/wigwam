@@ -21,17 +21,22 @@ import { HECO } from "./heco";
 
 export const DEFAULT_NETWORKS: Network[] = [
   ETHEREUM,
-  OPTIMISM,
-  POLYGON,
-  BSC,
-  ARBITRUM,
   AVALANCHE,
-  HARMONY,
+  BSC,
+  POLYGON,
   FANTOM,
+  OPTIMISM,
+  ARBITRUM,
   AURORA,
-  CELO,
+  HARMONY,
   HECO,
-].flat();
+  CELO,
+].flatMap((chainNets, i) =>
+  chainNets.map((n) => ({
+    ...n,
+    position: i,
+  }))
+);
 
 if (process.env.RELEASE_ENV === "false") {
   assert(
@@ -47,16 +52,38 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   DEFAULT_NETWORKS.map((n) => [
     n.chainId,
     getPublicURL(
-      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-test"}.svg`
+      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-testnet"}.png`
     ),
   ])
 );
 
+export function getNetworkIconUrl(chainId: number) {
+  return (
+    NETWORK_ICON_MAP.get(chainId) ?? getPublicURL(`icons/network/unknown.png`)
+  );
+}
+
 export function getTokenLogoUrl(logoUrl?: string) {
   if (logoUrl?.startsWith("{{native}}")) {
     const [, chainTag] = logoUrl.split("/");
-    return getPublicURL(`icons/nativeToken/${chainTag}.png`);
+    return chainTag
+      ? getPublicURL(`icons/nativeToken/${chainTag}.png`)
+      : undefined;
   }
 
   return logoUrl;
 }
+
+export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
+  [1, "ethereum"],
+  [43114, "avalanche-2"],
+  [56, "binancecoin"],
+  [137, "matic-network"],
+  [250, "fantom"],
+  [10, "ethereum"],
+  [42161, "ethereum"],
+  [1313161554, "ethereum"],
+  [1666600000, "harmony"],
+  [128, "huobi-token"],
+  [42220, "celo"],
+]);

@@ -20,6 +20,7 @@ const PasswordField = forwardRef<
           Icon={show ? EyeIcon : OpenedEyeIcon}
           aria-label={`${show ? "Hide" : "Show"} password`}
           theme="tertiary"
+          tabIndex={-1}
           onClick={() => setShow(!show)}
         />
       }

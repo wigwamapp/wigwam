@@ -1,11 +1,10 @@
-import { FC, forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
+import { FC, memo, ReactNode, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { Erc20__factory } from "abi-types";
-import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -15,6 +14,8 @@ import {
   maxValue,
   required,
   validateAddress,
+  withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
@@ -25,17 +26,15 @@ import {
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
-import LongTextField, {
-  LongTextFieldProps,
-} from "app/components/elements/LongTextField";
 import NewButton from "app/components/elements/NewButton";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
+import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+
+type FormValues = { amount: string; recipient: string };
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -47,10 +46,12 @@ const Asset: FC = () => {
 
   const sendEther = useCallback(
     async (recipient: string, amount: string) => {
-      return await provider.getSigner(currentAccount.address).sendTransaction({
-        to: recipient,
-        value: ethers.utils.parseEther(amount),
-      });
+      return await provider
+        .getUncheckedSigner(currentAccount.address)
+        .sendTransaction({
+          to: recipient,
+          value: ethers.utils.parseEther(amount),
+        });
     },
     [currentAccount.address, provider]
   );
@@ -62,7 +63,7 @@ const Asset: FC = () => {
       amount: string,
       decimals: number
     ) => {
-      const signer = provider.getSigner(currentAccount.address);
+      const signer = provider.getUncheckedSigner(currentAccount.address);
       const contract = Erc20__factory.connect(tokenContract, signer);
 
       const convertedAmount = ethers.utils.parseUnits(amount, decimals);
@@ -73,27 +74,28 @@ const Asset: FC = () => {
   );
 
   const handleSubmit = useCallback(
-    async ({ recipient, amount }) => {
-      if (!tokenSlug) {
-        return;
-      }
-      try {
-        if (tokenSlug === NATIVE_TOKEN_SLUG) {
-          await sendEther(recipient, amount);
-        } else {
-          const tokenContract = parseTokenSlug(tokenSlug).address;
-
-          await sendToken(
-            recipient,
-            tokenContract,
-            amount,
-            currentToken.decimals
-          );
+    async ({ recipient, amount }) =>
+      withHumanDelay(async () => {
+        if (!tokenSlug) {
+          return;
         }
-      } catch (err: any) {
-        alert({ title: "Error!", content: err.message });
-      }
-    },
+        try {
+          if (tokenSlug === NATIVE_TOKEN_SLUG) {
+            await sendEther(recipient, amount);
+          } else {
+            const tokenContract = parseTokenSlug(tokenSlug).address;
+
+            await sendToken(
+              recipient,
+              tokenContract,
+              amount,
+              currentToken.decimals
+            );
+          }
+        } catch (err: any) {
+          alert({ title: "Error!", content: err.message });
+        }
+      }),
     [alert, currentToken, sendEther, sendToken, tokenSlug]
   );
 
@@ -109,8 +111,9 @@ const Asset: FC = () => {
   );
 
   return (
-    <Form
+    <Form<FormValues>
       onSubmit={handleSubmit}
+      decorators={[focusOnErrors]}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect
@@ -146,7 +149,7 @@ const Asset: FC = () => {
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
                   handleMaxButtonClick={() => form.change("amount", maxAmount)}
-                  error={meta.error && meta.modified}
+                  error={meta.modified && meta.error}
                   errorMessage={meta.error}
                   inputClassName="pr-20"
                   {...input}
@@ -170,7 +173,7 @@ const Asset: FC = () => {
           <NewButton
             type="submit"
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-            disabled={submitting}
+            loading={submitting}
           >
             <SendIcon className="mr-2" />
             {submitting ? "Transfering" : "Transfer"}
@@ -283,48 +286,6 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
     </>
   );
 });
-
-type AddressFieldProps = LongTextFieldProps & {
-  setFromClipboard: (value: string) => void;
-};
-
-const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
-  ({ setFromClipboard, className, ...rest }, ref) => {
-    const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
-
-    return (
-      <div className={classNames("relative", className)}>
-        <LongTextField
-          ref={ref}
-          label="Recipient"
-          placeholder="0x0000000000000000000000000000000000000000"
-          textareaClassName="!h-20"
-          maxLength={42}
-          {...rest}
-        />
-        <NewButton
-          theme="tertiary"
-          onClick={paste}
-          className={classNames(
-            "absolute bottom-[1.125rem] right-3",
-            "text-sm text-brand-light",
-            "!p-0 !pr-1 !min-w-0",
-            "!font-normal",
-            "cursor-copy",
-            "items-center"
-          )}
-        >
-          {pasted ? (
-            <SuccessIcon className="mr-1" />
-          ) : (
-            <PasteIcon className="mr-1" />
-          )}
-          {pasted ? "Pasted" : "Paste"}
-        </NewButton>
-      </div>
-    );
-  }
-);
 
 type SummaryRowProps = {
   header: string | ReactNode;

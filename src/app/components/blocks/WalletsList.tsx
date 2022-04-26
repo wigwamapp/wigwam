@@ -152,10 +152,11 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
         />
         <NewButton
           to={{ addAccOpened: true }}
+          merge
           theme="tertiary"
           className="ml-5 !py-2"
         >
-          <AddWalletIcon className="mr-2" />
+          <AddWalletIcon className="h-6 w-auto mr-2" />
           Add Wallet
         </NewButton>
       </div>

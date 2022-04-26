@@ -1,4 +1,11 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { wordlists } from "@ethersproject/wordlists";
@@ -26,8 +33,8 @@ const WORDS_COUNT = [12, 15, 18, 21, 24];
 
 const CreateSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
-  const seedPhraseInputRef = useRef<HTMLTextAreaElement>(null);
   const { alert } = useDialog();
+  const [seedPhraseFiled, setSeedPhraseField] = useState("");
 
   const { stateRef, navigateToStep } = useSteps();
 
@@ -58,10 +65,10 @@ const CreateSeedPhrase = memo(() => {
 
   const handleContinue = useCallback(async () => {
     try {
-      const inputSeedPhrase = seedPhraseInputRef.current?.value;
+      const inputSeedPhrase = seedPhraseFiled;
 
       if (!inputSeedPhrase) {
-        throw new Error("Not a valid seed phrase");
+        throw new Error("Not a valid secret phrase");
       }
 
       const seedPhrase: SeedPharse = {
@@ -78,7 +85,7 @@ const CreateSeedPhrase = memo(() => {
     } catch (err: any) {
       alert(err?.message);
     }
-  }, [wordlistLocale, stateRef, navigateToStep, alert]);
+  }, [seedPhraseFiled, wordlistLocale, stateRef, navigateToStep, alert]);
 
   const generateNew = useCallback(() => {
     const extraEntropy = getRandomBytes();
@@ -86,9 +93,7 @@ const CreateSeedPhrase = memo(() => {
       locale: wordlistLocale,
       extraEntropy,
     });
-    if (seedPhraseInputRef.current) {
-      seedPhraseInputRef.current.value = wallet.mnemonic.phrase;
-    }
+    setSeedPhraseField(wallet.mnemonic.phrase);
   }, [wordlistLocale]);
 
   useEffect(() => {
@@ -120,10 +125,16 @@ const CreateSeedPhrase = memo(() => {
         </div>
 
         <SeedPhraseField
-          ref={seedPhraseInputRef}
           onRegenerate={generateNew}
           placeholder="Type there a secret phrase or generate new"
           className="mt-8"
+          value={seedPhraseFiled}
+          onChange={(
+            evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+          ) => {
+            const { value } = evt.target;
+            setSeedPhraseField(value);
+          }}
         />
       </div>
       <AddAccountContinueButton onContinue={handleContinue} />

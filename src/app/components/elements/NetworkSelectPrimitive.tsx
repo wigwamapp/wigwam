@@ -2,15 +2,18 @@ import { FC, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 
 import { Network } from "core/types";
-import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { getNetworkIconUrl } from "fixtures/networks";
 
-import Select from "app/components/elements/Select";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import { Page, SettingTab } from "app/nav";
+import Select from "./Select";
+import IconedButton from "./IconedButton";
+import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
-  icon: NETWORK_ICON_MAP.get(network.chainId),
+  icon: getNetworkIconUrl(network.chainId),
 });
 
 type NetworkSelectProps = {
@@ -32,6 +35,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentItemIconClassName,
   contentClassName,
 }) => {
+  const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
@@ -55,6 +59,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
   return (
     <Select
+      open={opened}
+      onOpenChange={setOpened}
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
@@ -66,6 +72,16 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
+      actions={
+        <IconedButton
+          aria-label="Manage networks"
+          to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          onClick={() => setOpened(false)}
+          theme="tertiary"
+          Icon={GearIcon}
+          className="ml-2"
+        />
+      }
     />
   );
 };

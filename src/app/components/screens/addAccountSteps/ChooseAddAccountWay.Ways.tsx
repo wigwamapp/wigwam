@@ -1,5 +1,7 @@
 import { FC, ReactNode } from "react";
 
+import { SocialProvider } from "core/types";
+
 import { StepsContext } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import { ReactComponent as ImportIcon } from "app/icons/AddWalletImport.svg";
@@ -16,6 +18,7 @@ export type WaysReturnTile = {
   title: string;
   Icon?: FC<{ className?: string }>;
   action?: () => void;
+  openLoginMethod?: SocialProvider;
   soon?: boolean;
 };
 
@@ -38,7 +41,7 @@ export const getWays = (
 ): WaysReturn => [
   {
     type: "seed_phrase",
-    title: "Seed Phrase",
+    title: "Secret Phrase",
     tooltip: {
       content: (
         <>
@@ -121,30 +124,22 @@ export const getWays = (
       {
         title: "Google",
         Icon: GoogleIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "google",
       },
       {
         title: "Facebook",
         Icon: FacebookIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "facebook",
       },
       {
         title: "Twitter",
         Icon: TwitterIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "twitter",
       },
       {
         title: "Reddit",
         Icon: RedditIcon,
-        action: () => {
-          alert("Not implemented");
-        },
+        openLoginMethod: "reddit",
       },
     ],
   },
@@ -177,7 +172,8 @@ export const getWays = (
         title: "Ledger",
         Icon: LedgerIcon,
         action: () => {
-          alert("Not implemented");
+          stateRef.current.hardDevice = "ledger";
+          navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
         },
       },
       {
