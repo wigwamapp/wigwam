@@ -4,11 +4,10 @@ import { Form, Field } from "react-final-form";
 import { FORM_ERROR } from "final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
-import createDecorator from "final-form-focus";
 
 import { getSeedPhrase } from "core/client";
 
-import { required, withHumanDelay } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -70,6 +69,10 @@ const Security: FC = () => {
 
 export default Security;
 
+type FormValues = {
+  password: string;
+};
+
 const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const windowFocused = useWindowFocus();
@@ -94,8 +97,6 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     []
   );
 
-  const focusOnErrors = createDecorator<any, any>();
-
   return (
     <SecondaryModal
       header="Reveal secret phrase"
@@ -106,8 +107,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       {seedPhrase ? (
         <SeedPhraseField defaultValue={fromProtectedString(seedPhrase)} />
       ) : (
-        <Form
-          initialValues={{ terms: "false" }}
+        <Form<FormValues>
           decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
           render={({

@@ -4,12 +4,16 @@ import classNames from "clsx";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
-import createDecorator from "final-form-focus";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
-import { differentPasswords, required, withHumanDelay } from "app/utils";
+import {
+  differentPasswords,
+  required,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -58,8 +62,6 @@ const SetupPassword = memo(() => {
   if (!addAccountsParams) {
     return null;
   }
-
-  const focusOnErrors = createDecorator<any, any>();
 
   return (
     <>

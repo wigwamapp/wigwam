@@ -3,13 +3,13 @@ import classNames from "clsx";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
 import { Field, Form } from "react-final-form";
-import createDecorator from "final-form-focus";
 
 import {
   composeValidators,
   required,
   validateDerivationPath,
   withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Input from "app/components/elements/Input";
@@ -27,7 +27,6 @@ export type MethodsProps = [MethodProps, MethodProps];
 type FormValues = {
   derivationPath: string;
 };
-const focusOnErrors = createDecorator<FormValues>();
 
 type SelectAddMethodProps = {
   methods: MethodsProps;
