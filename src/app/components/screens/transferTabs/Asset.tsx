@@ -34,6 +34,9 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
+type FormValues = { amount: string; recipient: string };
+const focusOnErrors = createDecorator<FormValues>();
+
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
@@ -106,23 +109,14 @@ const Asset: FC = () => {
     [currentToken]
   );
 
-  const focusOnErrors = createDecorator();
-  const setAmount = useCallback((args, state, utils) => {
-    utils.changeValue(state, "amount", () => args[0]);
-  }, []);
-  const setRecipient = useCallback((args, state, utils) => {
-    utils.changeValue(state, "recipient", () => args[0]);
-  }, []);
-
   return (
-    <Form
+    <Form<FormValues>
       onSubmit={handleSubmit}
       decorators={[focusOnErrors]}
-      mutators={{ setAmount, setRecipient }}
       render={({ form, handleSubmit, values, submitting }) => (
         <form onSubmit={handleSubmit} className="flex flex-col">
           <TokenSelect
-            handleTokenChanged={() => form.mutators.setAmount(undefined)}
+            handleTokenChanged={() => form.change("amount", undefined)}
           />
           <Field
             name="recipient"
@@ -130,7 +124,7 @@ const Asset: FC = () => {
           >
             {({ input, meta }) => (
               <AddressField
-                setFromClipboard={form.mutators.setRecipient}
+                setFromClipboard={(value) => form.change("recipient", value)}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
                 className="mt-5"
@@ -153,9 +147,7 @@ const Asset: FC = () => {
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
                   withMaxButton
-                  handleMaxButtonClick={() =>
-                    form.mutators.setAmount(maxAmount)
-                  }
+                  handleMaxButtonClick={() => form.change("amount", maxAmount)}
                   error={meta.error && meta.modified}
                   errorMessage={meta.error}
                   inputClassName="pr-20"

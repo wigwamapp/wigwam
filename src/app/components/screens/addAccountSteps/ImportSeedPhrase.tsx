@@ -25,6 +25,11 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
 
+type FormValues = {
+  seed: string;
+};
+const focusOnErrors = createDecorator<FormValues>();
+
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
 );
@@ -75,20 +80,14 @@ const ImportSeedPhrase = memo(() => {
     [wordlistLocale, initialSetup, navigateToStep, stateRef, alert]
   );
 
-  const focusOnErrors = createDecorator();
-  const setSeed = useCallback((args, state, utils) => {
-    utils.changeValue(state, "seed", () => args[0]);
-  }, []);
-
   return (
     <>
       <AddAccountHeader className="mb-8">
         Import existing Secret Phrase
       </AddAccountHeader>
-      <Form
+      <Form<FormValues>
         onSubmit={handleContinue}
         decorators={[focusOnErrors]}
-        mutators={{ setSeed }}
         render={({ form, handleSubmit, submitting }) => (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col max-w-[27.5rem] mx-auto">
@@ -110,7 +109,7 @@ const ImportSeedPhrase = memo(() => {
                 {({ input, meta }) => (
                   <SeedPhraseField
                     placeholder="Paste there your secret phrase"
-                    setFromClipboard={(value) => form.mutators.setSeed(value)}
+                    setFromClipboard={(value) => form.change("seed", value)}
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}
                     className="mt-8"

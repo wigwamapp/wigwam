@@ -11,6 +11,11 @@ import { AttentionModal } from "app/components/screens/Unlock";
 import NewButton from "app/components/elements/NewButton";
 import PasswordField from "app/components/elements/PasswordField";
 
+type FormValues = {
+  password: string;
+};
+const focusOnErrors = createDecorator<FormValues>();
+
 type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
@@ -39,10 +44,8 @@ const PasswordForm = memo<PasswordFormProps>(
       [unlockCallback]
     );
 
-    const focusOnErrors = createDecorator();
-
     return (
-      <Form
+      <Form<FormValues>
         onSubmit={handleSubmit}
         decorators={[focusOnErrors]}
         render={({

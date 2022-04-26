@@ -29,6 +29,15 @@ import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 
+type FormValues = {
+  nName: string;
+  rpcUrl: string;
+  chainId: number;
+  currencySymbol: string;
+  blockExplorer: string;
+};
+const focusOnErrors = createDecorator<FormValues>();
+
 type EditNetworkProps = {
   isNew: boolean;
   network?: Network;
@@ -106,11 +115,6 @@ const EditNetwork = memo<EditNetworkProps>(
 
     const isNative = network && network.type !== "unknown";
 
-    const focusOnErrors = createDecorator();
-    const setRpc = useCallback((args, state, utils) => {
-      utils.changeValue(state, "rpcUrl", () => args[0]);
-    }, []);
-
     return (
       <section className={classNames("flex flex-col grow", "pl-6")}>
         <header className="flex items-center">
@@ -148,9 +152,8 @@ const EditNetwork = memo<EditNetworkProps>(
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
         >
-          <Form
+          <Form<FormValues>
             onSubmit={handleSubmit}
-            mutators={{ setRpc }}
             decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
@@ -195,7 +198,9 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        setFromClipboard={form.mutators.setRpc}
+                        setFromClipboard={(value) =>
+                          form.change("rpcUrl", value)
+                        }
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
                         {...input}

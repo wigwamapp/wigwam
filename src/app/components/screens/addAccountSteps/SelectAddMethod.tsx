@@ -24,6 +24,11 @@ type MethodProps = {
 
 export type MethodsProps = [MethodProps, MethodProps];
 
+type FormValues = {
+  derivationPath: string;
+};
+const focusOnErrors = createDecorator<FormValues>();
+
 type SelectAddMethodProps = {
   methods: MethodsProps;
   onContinue: (method: string, derivationPath: string) => void;
@@ -40,10 +45,8 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
     [activeMethod, onContinue]
   );
 
-  const focusOnErrors = createDecorator();
-
   return (
-    <Form
+    <Form<FormValues>
       initialValues={{ derivationPath: "m/44'/60'/0'/0/{index}" }}
       decorators={[focusOnErrors]}
       onSubmit={handleContinue}
