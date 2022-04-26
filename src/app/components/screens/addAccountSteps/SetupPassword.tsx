@@ -8,13 +8,19 @@ import { FORM_ERROR } from "final-form";
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
-import { composeValidators, differentPasswords, required } from "app/utils";
+import { differentPasswords, required } from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import PasswordField from "app/components/elements/PasswordField";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+
+type FormValues = {
+  password: string;
+  confirm: string;
+  terms: boolean;
+};
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
@@ -55,12 +61,14 @@ const SetupPassword = memo(() => {
     <>
       <AddAccountHeader className="mb-7">Setup Password</AddAccountHeader>
 
-      <Form
+      <Form<FormValues>
         initialValues={{ terms: false }}
         onSubmit={handleFinish}
+        validate={(values) => ({
+          confirm: differentPasswords(values.confirm)(values.password),
+        })}
         render={({
           handleSubmit,
-          values,
           submitting,
           modifiedSinceLastSubmit,
           submitError,
@@ -73,7 +81,7 @@ const SetupPassword = memo(() => {
               <Field name="password" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
-                    placeholder="Type password"
+                    placeholder={"*".repeat(8)}
                     label="New password"
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}
@@ -82,16 +90,10 @@ const SetupPassword = memo(() => {
                   />
                 )}
               </Field>
-              <Field
-                name="confirm"
-                validate={composeValidators(
-                  required,
-                  differentPasswords(values.password)
-                )}
-              >
+              <Field name="confirm" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
-                    placeholder="Confirm Password"
+                    placeholder={"*".repeat(8)}
                     label="Confirm Password"
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}

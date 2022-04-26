@@ -26,7 +26,7 @@ const Security: FC = () => {
 
   return (
     <div className="flex flex-col items-start">
-      <SettingsHeader>Reveal Seed Phrase</SettingsHeader>
+      <SettingsHeader>Reveal Secret Phrase</SettingsHeader>
       <NewButton
         theme="secondary"
         className={classNames(
@@ -117,7 +117,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                   {({ input, meta }) => (
                     <PasswordField
                       className="w-full"
-                      placeholder="Type password"
+                      placeholder={"*".repeat(8)}
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||

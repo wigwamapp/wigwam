@@ -42,17 +42,17 @@ export const maxValue =
 
 export const validateSeedPhrase = (lang: string) => (phrase: string) => {
   if (!(lang in wordlists)) {
-    return "Seed phrase language not supported";
+    return "Secret phrase language not supported";
   }
 
   return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
     ? undefined
-    : "Seed phrase in invalid";
+    : "Invalid phrase";
 };
 
 export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
   phrase1 && phrase2 && phrase1 !== phrase2
-    ? "Provided seed phrase doesn't match with created one"
+    ? "Provided secret phrase doesn't match with created one"
     : undefined;
 
 const linkRegexExpression =
