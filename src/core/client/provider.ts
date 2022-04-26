@@ -17,8 +17,8 @@ export class ClientProvider extends JsonRpcProvider {
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
-
   getSigner = memoize(super.getSigner.bind(this));
+  getUncheckedSigner = memoize(super.getUncheckedSigner.bind(this));
 
   async send(method: string, params: Array<any>): Promise<any> {
     const type = MessageType.SendRpc;

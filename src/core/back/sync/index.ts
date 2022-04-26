@@ -3,6 +3,7 @@ import { IndexableTypeArray } from "dexie";
 import axios from "axios";
 import { ethers } from "ethers";
 import mem from "mem";
+import retry from "async-retry";
 // import ExpiryMap from 'expiry-map';
 import { createQueue } from "lib/system/queue";
 import { props } from "lib/system/promise";
@@ -507,12 +508,16 @@ const getAccountTokenFromChain = async (
   const contract = Erc20__factory.connect(tokenAddress, provider);
 
   try {
-    return await props({
-      decimals: contract.decimals(),
-      symbol: contract.symbol(),
-      name: contract.name(),
-      balance: contract.balanceOf(accountAddress),
-    });
+    return await retry(
+      () =>
+        props({
+          decimals: contract.decimals(),
+          symbol: contract.symbol(),
+          name: contract.name(),
+          balance: contract.balanceOf(accountAddress),
+        }),
+      { retries: 3 }
+    );
   } catch (err) {
     console.error(err);
     return null;
@@ -629,6 +634,10 @@ const getCoinGeckoPlatformPrices = mem(
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {
+  if (process.env.VIGVAM_DEV_RANDOM_ADDRESSES === "false") {
+    return accountAddress;
+  }
+
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
 
