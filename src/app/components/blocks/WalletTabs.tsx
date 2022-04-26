@@ -9,14 +9,16 @@ import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
 import { allAccountsAtom } from "app/atoms";
+import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Balance from "app/components/elements/Balance";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
-import NewButton from "app/components/elements/NewButton";
+import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
-import { ReactComponent as AddWalletIcon } from "app/icons/add-acc-20-15.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 type WalletTabsProps = {
   setAccountAddress: (
@@ -47,40 +49,62 @@ const WalletTabs: FC<WalletTabsProps> = ({
   }, [accounts, fuse, searchValue]);
 
   return (
-    <ScrollAreaContainer
+    <div
       className={classNames(
-        "relative",
-        "flex flex-col",
-        "min-w-[21.75rem] ",
+        "w-[23.25rem] min-w-[23.25rem] pr-6",
         "border-r border-brand-main/[.07]",
+        "flex flex-col",
         className
       )}
-      viewPortClassName="pb-20 rounded-t-[.625rem]"
-      scrollBarClassName="py-0 pb-20 !right-1"
     >
-      <div className="flex mb-[1.625rem] mr-[1.625rem]">
-        <SearchInput
-          searchValue={searchValue}
-          toggleSearchValue={setSearchValue}
-        />
-        <NewButton
-          to={{ addAccOpened: true }}
-          theme="tertiary"
-          className="!min-w-[4rem]"
-        >
-          <AddWalletIcon />
-        </NewButton>
+      <div className="flex items-center">
+        <TippySingletonProvider>
+          <SearchInput
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+          />
+          <IconedButton
+            to={{ addAccOpened: true }}
+            merge
+            theme="tertiary"
+            className="ml-2"
+            Icon={AddWalletIcon}
+            aria-label="Add new wallet"
+          />
+        </TippySingletonProvider>
       </div>
-      {filteredAccounts.map((acc) => (
-        <WalletTab
-          key={acc.address}
-          active={acc.address === currentAccount.address}
-          className="mb-2"
-          account={acc}
-          onClick={() => setAccountAddress(acc.address)}
-        />
-      ))}
-    </ScrollAreaContainer>
+      {filteredAccounts.length > 0 ? (
+        <ScrollAreaContainer
+          hiddenScrollbar="horizontal"
+          className="pr-5 -mr-5 mt-4"
+          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-20"
+        >
+          {filteredAccounts.map((acc, i) => (
+            <WalletTab
+              key={acc.address}
+              active={acc.address === currentAccount.address}
+              className={classNames(
+                i !== filteredAccounts.length - 1 && "mb-2"
+              )}
+              account={acc}
+              onClick={() => setAccountAddress(acc.address)}
+            />
+          ))}
+        </ScrollAreaContainer>
+      ) : (
+        <div
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
+          )}
+        >
+          <NoResultsFoundIcon className="mb-4" />
+          No results found
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -98,60 +122,62 @@ const WalletTab: FC<WalletTabProps> = ({
   account: { name, address },
   className,
   onClick,
-}) => {
-  const classNamesList = classNames(
-    "relative group",
-    "min-w-[20.25rem]",
-    "p-3",
-    active && "bg-brand-main/10",
-    "hover:bg-brand-main/5",
-    "rounded-[.625rem]",
-    "flex items-stretch",
-    "text-left"
-  );
-
-  return (
-    <button className={classNames(classNamesList, className)} onClick={onClick}>
-      <AutoIcon
-        seed={address}
-        source="dicebear"
-        type="personas"
-        className={classNames(
-          "h-14 w-14 min-w-[3.5rem]",
-          "mr-3",
-          "bg-black/20",
-          "rounded-[.625rem]"
-        )}
+}) => (
+  <button
+    type="button"
+    className={classNames(
+      "relative group",
+      "w-full",
+      "p-3",
+      "rounded-[.625rem]",
+      "flex items-stretch",
+      "text-left",
+      "transition-colors",
+      active && "bg-brand-main/10",
+      !active && "hover:bg-brand-main/5",
+      className
+    )}
+    onClick={onClick}
+  >
+    <AutoIcon
+      seed={address}
+      source="dicebear"
+      type="personas"
+      className={classNames(
+        "h-14 w-14 min-w-[3.5rem]",
+        "mr-3",
+        "bg-black/20",
+        "rounded-[.625rem]"
+      )}
+    />
+    <span
+      className={classNames(
+        "flex flex-col",
+        "text-base font-bold text-brand-light leading-none",
+        "min-w-0",
+        "transition-colors",
+        "group-hover:text-brand-light",
+        "group-focus-visible:text-brand-light"
+      )}
+    >
+      <h3 className="truncate">
+        <TReplace msg={name} />
+      </h3>
+      <HashPreview
+        hash={address}
+        className="text-sm text-brand-inactivedark font-normal"
+        withTooltip={false}
       />
-      <span
-        className={classNames(
-          "flex flex-col",
-          "text-base font-bold text-brand-light leading-none",
-          "min-w-0",
-          "transition-colors",
-          "group-hover:text-brand-light",
-          "group-focus-visible:text-brand-light"
-        )}
-      >
-        <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap leading-[1.125rem] -mt-px">
-          <TReplace msg={name} />
-        </h3>
-        <HashPreview
-          hash={address}
-          className="text-sm text-brand-inactivedark mt-0.5 font-normal leading-none"
-          withTooltip={false}
-        />
-        <Balance address={address} className="mt-auto" />
-        <ChevronRightIcon
-          className={classNames(
-            "absolute right-2 top-1/2 -translate-y-1/2",
-            "transition",
-            "group-hover:translate-x-0 group-hover:opacity-100",
-            active && "translate-x-0 opacity-100",
-            !active && "-translate-x-1.5 opacity-0"
-          )}
-        />
-      </span>
-    </button>
-  );
-};
+      <Balance address={address} className="mt-auto" />
+    </span>
+    <ChevronRightIcon
+      className={classNames(
+        "absolute right-2 top-1/2 -translate-y-1/2",
+        "transition",
+        "group-hover:translate-x-0 group-hover:opacity-100",
+        active && "translate-x-0 opacity-100",
+        !active && "-translate-x-1.5 opacity-0"
+      )}
+    />
+  </button>
+);
