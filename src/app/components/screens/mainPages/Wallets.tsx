@@ -393,7 +393,7 @@ type AddressFieldProps = {
 };
 
 const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
-  const fieldRef = useRef<HTMLSpanElement>(null);
+  const fieldRef = useRef<HTMLInputElement>(null);
   const { copy, copied } = useCopyToClipboard(fieldRef);
 
   return (
@@ -425,9 +425,16 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
           "text-brand-light text-sm"
         )}
       >
-        <span ref={fieldRef} className="w-full p-4 break-words">
-          {address}
-        </span>
+        {address && (
+          <input
+            ref={fieldRef}
+            value={address}
+            onChange={() => undefined}
+            tabIndex={-1}
+            className="sr-only"
+          />
+        )}
+        <span className="w-full p-4 break-words">{address}</span>
         <NewButton
           type="button"
           theme="tertiary"
