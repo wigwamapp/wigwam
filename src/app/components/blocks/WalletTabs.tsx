@@ -1,7 +1,6 @@
 import { FC, useMemo, useState } from "react";
 import classNames from "clsx";
-import { RESET } from "jotai/utils";
-import { SetStateAction, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import Fuse from "fuse.js";
 
 import { TReplace } from "lib/ext/i18n/react";
@@ -21,16 +20,14 @@ import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 type WalletTabsProps = {
-  setAccountAddress: (
-    update: typeof RESET | SetStateAction<string | null>
-  ) => void;
-  currentAccount: Account;
+  selectedAccount: Account;
+  onAccountChange: (account: Account) => void;
   className?: string;
 };
 
 const WalletTabs: FC<WalletTabsProps> = ({
-  setAccountAddress,
-  currentAccount,
+  selectedAccount,
+  onAccountChange,
   className,
 }) => {
   const accounts = useAtomValue(allAccountsAtom);
@@ -83,12 +80,12 @@ const WalletTabs: FC<WalletTabsProps> = ({
           {filteredAccounts.map((acc, i) => (
             <WalletTab
               key={acc.address}
-              active={acc.address === currentAccount.address}
+              active={acc.address === selectedAccount.address}
               className={classNames(
                 i !== filteredAccounts.length - 1 && "mb-2"
               )}
               account={acc}
-              onClick={() => setAccountAddress(acc.address)}
+              onClick={() => onAccountChange(acc)}
             />
           ))}
         </ScrollAreaContainer>
