@@ -84,18 +84,15 @@ const Wallets: FC = () => {
         className="mt-5"
       />
       <ScrollAreaContainer
-        className="flex flex-col items-start ml-6 w-full min-w-[17.75rem]"
-        viewPortClassName="pb-20 pt-5 pr-5"
+        className="w-full min-w-[17.75rem]"
+        viewPortClassName="pb-20 pt-5 pr-5 pl-6"
         scrollBarClassName="py-0 pt-5 pb-20"
       >
         <div className="border-b border-brand-main/[.07]">
-          <h2 className="text-2xl text-brand-light font-bold">
+          <h2 className="text-2xl text-brand-light font-bold mb-6">
             {replaceT(currentAccount.name)}
           </h2>
-          <AddressField
-            address={currentAccount.address}
-            className="mt-[1.625rem]"
-          />
+          <AddressField address={currentAccount.address} />
           <Form
             onSubmit={onNameUpdate}
             initialValues={{ name: replaceT(currentAccount.name) }}
@@ -125,9 +122,9 @@ const Wallets: FC = () => {
                   type="submit"
                   theme="primary"
                   className="mt-4 mb-6 !py-2"
-                  disabled={submitting}
+                  loading={submitting}
                 >
-                  {submitting ? "Saving..." : "Save"}
+                  Save
                 </NewButton>
               </form>
             )}
@@ -401,7 +398,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
       className={classNames(
         "flex",
         "bg-brand-main/[.05]",
-        "max-w-[23.188rem] min-h-[6.25rem]",
+        "max-w-[23.188rem]",
         "rounded-[0.625rem]",
         className
       )}
@@ -411,18 +408,17 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         source="dicebear"
         type="personas"
         className={classNames(
-          "h-24 w-24",
-          "m-[0.125rem]",
-          "bg-black/20",
-          "rounded-[.625rem]"
+          "h-24 w-24 min-w-[6rem] m-0.5",
+          "bg-black/40",
+          "rounded-l-[.5625rem]"
         )}
       />
       <div
         className={classNames(
           "flex relative",
-          "max-w-[16.875rem]",
-          "text-ellipsis",
-          "text-brand-light text-sm"
+          "text-brand-light text-sm",
+          "min-w-0",
+          "p-4"
         )}
       >
         {address && (
@@ -434,13 +430,13 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
             className="sr-only"
           />
         )}
-        <span className="w-full p-4 break-words">{address}</span>
+        <span className="w-full font-medium break-words">{address}</span>
         <NewButton
           type="button"
           theme="tertiary"
           onClick={copy}
           className={classNames(
-            "absolute bottom-[1.125rem] right-3",
+            "absolute bottom-3 right-3",
             "text-sm text-brand-light",
             "!p-0 !pr-1 !min-w-0",
             "!font-normal",
