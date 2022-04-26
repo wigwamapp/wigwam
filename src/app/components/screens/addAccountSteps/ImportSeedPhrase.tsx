@@ -88,6 +88,7 @@ const ImportSeedPhrase = memo(() => {
       <Form<FormValues>
         onSubmit={handleContinue}
         decorators={[focusOnErrors]}
+        initialValues={{ seed: "" }}
         render={({ form, handleSubmit, submitting }) => (
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col max-w-[27.5rem] mx-auto">
@@ -105,6 +106,10 @@ const ImportSeedPhrase = memo(() => {
                   required,
                   validateSeedPhrase(wordlistLocale)
                 )}
+                format={(value) =>
+                  value ? value.replace(/\n/g, " ").trim() : ""
+                }
+                formatOnBlur
               >
                 {({ input, meta }) => (
                   <SeedPhraseField

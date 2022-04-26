@@ -386,7 +386,7 @@ const AssetCard = memo(
             <span className="flex items-end">
               <span
                 className={classNames(
-                  "text-base font-bold leading-4 truncate mr-auto",
+                  "text-base font-bold leading-4 truncate mr-auto pb-1 -mb-1",
                   isManageMode && "mr-14"
                 )}
               >

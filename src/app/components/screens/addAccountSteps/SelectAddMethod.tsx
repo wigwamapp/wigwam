@@ -69,7 +69,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
                 />
               ))}
             </RadioGroupPrimitive.Root>
-            <Collapse label="Customize Derivation path" className="mt-12">
+            <Collapse label="Customize derivation path" className="mt-12">
               <div className="max-w-[17.5rem]">
                 <p className="mb-3 text-sm">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit ut

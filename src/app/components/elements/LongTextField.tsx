@@ -44,7 +44,7 @@ const LongTextField = memo(
               {labelActions}
             </div>
           )}
-          <div className="relative">
+          <div className="relative flex">
             <textarea
               ref={ref}
               spellCheck={spellCheck}
