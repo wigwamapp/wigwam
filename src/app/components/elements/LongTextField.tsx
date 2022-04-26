@@ -30,7 +30,7 @@ const LongTextField = memo(
       ref
     ) => {
       return (
-        <div className={className}>
+        <div className={classNames("flex flex-col", className)}>
           {(label || labelActions) && (
             <div className="flex items-center justify-between px-4 mb-2 min-h-6">
               {label && (

@@ -8,7 +8,13 @@ import { replaceT, useI18NUpdate } from "lib/ext/react";
 
 import { changePassword } from "core/client";
 
-import { composeValidators, differentPasswords, required } from "app/utils";
+import {
+  composeValidators,
+  differentPasswords,
+  required,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
@@ -17,7 +23,7 @@ import ProfileGen from "app/components/blocks/ProfileGen";
 import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
 
-type FormValuesType = {
+type FormValues = {
   oldPwd: string;
   newPwd: string;
   confirmNewPwd: string;
@@ -46,15 +52,16 @@ const Profile: FC = () => {
   );
 
   const handlePasswordChange = useCallback(
-    async (values: FormValuesType, form: FormApi<FormValuesType>) => {
-      try {
-        await changePassword(values.oldPwd, values.newPwd);
-        form.restart();
-        return;
-      } catch (error: any) {
-        return { [FORM_ERROR]: error.message };
-      }
-    },
+    async (values: FormValues, form: FormApi<FormValues>) =>
+      withHumanDelay(async () => {
+        try {
+          await changePassword(values.oldPwd, values.newPwd);
+          form.restart();
+          return;
+        } catch (error: any) {
+          return { [FORM_ERROR]: error.message };
+        }
+      }),
     []
   );
 
@@ -73,8 +80,9 @@ const Profile: FC = () => {
       <Separator className="mt-6 mb-8" />
 
       <SettingsHeader>Change password</SettingsHeader>
-      <Form
+      <Form<FormValues>
         onSubmit={handlePasswordChange}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           submitting,
@@ -134,7 +142,7 @@ const Profile: FC = () => {
             <NewButton
               type="submit"
               className="!py-2 mt-8"
-              disabled={submitting}
+              loading={submitting}
             >
               {submitting ? "Saving..." : "Save"}
             </NewButton>

@@ -13,6 +13,8 @@ import {
   minLength,
   required,
   validateCurrencySymbol,
+  withHumanDelay,
+  focusOnErrors,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import Input from "../elements/Input";
@@ -26,6 +28,14 @@ import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
+
+type FormValues = {
+  nName: string;
+  rpcUrl: string;
+  chainId: number;
+  currencySymbol: string;
+  blockExplorer: string;
+};
 
 type EditNetworkProps = {
   isNew: boolean;
@@ -41,37 +51,39 @@ const EditNetwork = memo<EditNetworkProps>(
     const { alert, confirm } = useDialog();
 
     const handleSubmit = useCallback(
-      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) => {
-        try {
-          const isChangedChainId = initialChainId && chainId !== initialChainId;
-          if (isChangedChainId) {
-            await Repo.networks.delete(Number(initialChainId));
-          }
+      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
+        withHumanDelay(async () => {
+          try {
+            const isChangedChainId =
+              initialChainId && chainId !== initialChainId;
+            if (isChangedChainId) {
+              await Repo.networks.delete(Number(initialChainId));
+            }
 
-          const repoMethod = isNew || isChangedChainId ? "add" : "put";
-          await Repo.networks[repoMethod]({
-            chainId: Number(chainId),
-            type: network?.type ?? "unknown",
-            rpcUrls: [rpcUrl],
-            chainTag: "",
-            name: nName,
-            nativeCurrency: {
-              name: currencySymbol,
-              symbol: currencySymbol,
-              decimals: 18,
-            },
-            explorerUrls: [blockExplorer],
-            position: 0,
-          });
+            const repoMethod = isNew || isChangedChainId ? "add" : "put";
+            await Repo.networks[repoMethod]({
+              chainId: Number(chainId),
+              type: network?.type ?? "unknown",
+              rpcUrls: [rpcUrl],
+              chainTag: "",
+              name: nName,
+              nativeCurrency: {
+                name: currencySymbol,
+                symbol: currencySymbol,
+                decimals: 18,
+              },
+              explorerUrls: [blockExplorer],
+              position: 0,
+            });
 
-          if (isNew && onActionFinished) {
-            onActionFinished();
+            if (isNew && onActionFinished) {
+              onActionFinished();
+            }
+            onCancelHandler();
+          } catch (err: any) {
+            alert({ title: "Error!", content: err.message });
           }
-          onCancelHandler();
-        } catch (err: any) {
-          alert({ title: "Error!", content: err.message });
-        }
-      },
+        }),
       [
         alert,
         initialChainId,
@@ -139,8 +151,9 @@ const EditNetwork = memo<EditNetworkProps>(
           viewPortClassName="pb-20 rounded-t-[.625rem]"
           scrollBarClassName="py-0 pb-20"
         >
-          <Form
+          <Form<FormValues>
             onSubmit={handleSubmit}
+            decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
               rpcUrl: network?.rpcUrls[0],
@@ -270,7 +283,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     <NewButton
                       type="submit"
                       className="!py-2 ml-4 w-full"
-                      disabled={submitting}
+                      loading={submitting}
                     >
                       {submitting
                         ? isNew
@@ -310,7 +323,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             theme="tertiary"
             onClick={paste}
             className={classNames(
-              "absolute bottom-4 right-3",
+              "absolute bottom-3 right-3",
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",

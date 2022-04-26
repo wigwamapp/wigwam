@@ -10,7 +10,13 @@ import { addSeedPhrase } from "core/client";
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 
 import { AddAccountStep } from "app/nav";
-import { composeValidators, required, validateSeedPhrase } from "app/utils";
+import {
+  composeValidators,
+  required,
+  validateSeedPhrase,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 import { currentLocaleAtom, walletStatusAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
@@ -18,6 +24,10 @@ import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+
+type FormValues = {
+  seed: string;
+};
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -47,24 +57,25 @@ const ImportSeedPhrase = memo(() => {
   );
 
   const handleContinue = useCallback(
-    async (values) => {
-      try {
-        const seedPhrase: SeedPharse = {
-          phrase: toProtectedString(values.seed),
-          lang: wordlistLocale,
-        };
+    async (values) =>
+      withHumanDelay(async () => {
+        try {
+          const seedPhrase: SeedPharse = {
+            phrase: toProtectedString(values.seed),
+            lang: wordlistLocale,
+          };
 
-        if (initialSetup) {
-          stateRef.current.seedPhrase = seedPhrase;
-        } else {
-          await addSeedPhrase(seedPhrase);
+          if (initialSetup) {
+            stateRef.current.seedPhrase = seedPhrase;
+          } else {
+            await addSeedPhrase(seedPhrase);
+          }
+
+          navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
+        } catch (err: any) {
+          alert(err?.message);
         }
-
-        navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
-      } catch (err: any) {
-        alert(err?.message);
-      }
-    },
+      }),
     [wordlistLocale, initialSetup, navigateToStep, stateRef, alert]
   );
 
@@ -73,8 +84,9 @@ const ImportSeedPhrase = memo(() => {
       <AddAccountHeader className="mb-8">
         Import existing Secret Phrase
       </AddAccountHeader>
-      <Form
+      <Form<FormValues>
         onSubmit={handleContinue}
+        decorators={[focusOnErrors]}
         initialValues={{ seed: "" }}
         render={({ form, handleSubmit, submitting }) => (
           <form onSubmit={handleSubmit}>

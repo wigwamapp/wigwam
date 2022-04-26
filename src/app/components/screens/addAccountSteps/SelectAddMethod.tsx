@@ -4,7 +4,13 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
 import { Field, Form } from "react-final-form";
 
-import { composeValidators, required, validateDerivationPath } from "app/utils";
+import {
+  composeValidators,
+  required,
+  validateDerivationPath,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Input from "app/components/elements/Input";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -18,6 +24,10 @@ type MethodProps = {
 
 export type MethodsProps = [MethodProps, MethodProps];
 
+type FormValues = {
+  derivationPath: string;
+};
+
 type SelectAddMethodProps = {
   methods: MethodsProps;
   onContinue: (method: string, derivationPath: string) => void;
@@ -27,15 +37,17 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
   const [activeMethod, setActiveMethod] = useState(methods[0].value);
 
   const handleContinue = useCallback(
-    ({ derivationPath }) => {
-      onContinue(activeMethod, derivationPath.replace("/{index}", ""));
-    },
+    ({ derivationPath }) =>
+      withHumanDelay(async () => {
+        onContinue(activeMethod, derivationPath.replace("/{index}", ""));
+      }),
     [activeMethod, onContinue]
   );
 
   return (
-    <Form
+    <Form<FormValues>
       initialValues={{ derivationPath: "m/44'/60'/0'/0/{index}" }}
+      decorators={[focusOnErrors]}
       onSubmit={handleContinue}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>

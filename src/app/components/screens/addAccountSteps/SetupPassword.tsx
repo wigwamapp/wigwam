@@ -8,7 +8,12 @@ import { FORM_ERROR } from "final-form";
 import { AddAccountParams, SeedPharse } from "core/types";
 import { setupWallet } from "core/client";
 
-import { differentPasswords, required } from "app/utils";
+import {
+  differentPasswords,
+  required,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -38,18 +43,19 @@ const SetupPassword = memo(() => {
   }, [addAccountsParams, reset]);
 
   const handleFinish = useCallback(
-    async ({ password }) => {
-      try {
-        if (!addAccountsParams) return;
+    async ({ password }) =>
+      withHumanDelay(async () => {
+        try {
+          if (!addAccountsParams) return;
 
-        await setupWallet(password, addAccountsParams, seedPhrase);
+          await setupWallet(password, addAccountsParams, seedPhrase);
 
-        setAccModalOpened([false]);
-      } catch (err: any) {
-        return { [FORM_ERROR]: err?.message };
-      }
-      return;
-    },
+          setAccModalOpened([false]);
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
+        }
+        return;
+      }),
     [addAccountsParams, seedPhrase, setAccModalOpened]
   );
 
@@ -67,6 +73,7 @@ const SetupPassword = memo(() => {
         validate={(values) => ({
           confirm: differentPasswords(values.confirm)(values.password),
         })}
+        decorators={[focusOnErrors]}
         render={({
           handleSubmit,
           submitting,
