@@ -16,7 +16,7 @@ const Wallets: FC = () => {
         onAccountChange={setSelectedAccount}
         className="mt-5"
       />
-      <EditWalletSection account={selectedAccount} />
+      <EditWalletSection key={selectedAccount.uuid} account={selectedAccount} />
     </div>
   );
 };
