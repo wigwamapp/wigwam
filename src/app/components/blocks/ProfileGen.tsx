@@ -3,18 +3,22 @@ import { nanoid } from "nanoid";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
-import { required } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import NewButton from "app/components/elements/NewButton";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
 
+type FormValues = {
+  profileName: string;
+};
+
 type ProfileGenProps = {
   label: string;
   defaultProfileName: string;
   defaultSeed?: string;
-  onSubmit: (value: string, profileSeed: string) => void;
+  onSubmit: (value: string, profileSeed: string) => Promise<void>;
   editMode?: boolean;
   className?: string;
 };
@@ -34,16 +38,18 @@ const ProfileGen: FC<ProfileGenProps> = ({
   }, []);
 
   const handleAdd = useCallback(
-    ({ profileName }) => {
-      onSubmit(profileName, profileSeed);
-    },
+    async ({ profileName }) =>
+      withHumanDelay(async () => {
+        await onSubmit(profileName, profileSeed);
+      }),
     [onSubmit, profileSeed]
   );
 
   return (
     <div className={classNames("flex w-full", className)}>
-      <Form
+      <Form<FormValues>
         onSubmit={handleAdd}
+        decorators={[focusOnErrors]}
         initialValues={{ profileName: defaultProfileName }}
         render={({ handleSubmit, submitting, values }) => (
           <>
@@ -61,7 +67,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                 className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
                 onClick={regenerateProfileSeed}
               >
-                <RegenerateIcon className="mr-2" />
+                <RegenerateIcon className="w-4 h-auto mr-2" />
                 Regenerate
               </NewButton>
             </div>
@@ -89,7 +95,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                   "mt-5",
                   editMode ? "!py-2" : "w-full flex items-center"
                 )}
-                disabled={submitting}
+                loading={submitting}
               >
                 {submitting ? (
                   editMode ? (

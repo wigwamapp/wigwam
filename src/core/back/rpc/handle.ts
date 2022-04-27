@@ -14,12 +14,14 @@ export async function handleRpc(
       // case "eth_accounts":
 
       case "eth_sendTransaction":
-        return sendTransaction(chainId, params, reply);
+        return await sendTransaction(chainId, params, reply);
 
       default:
         reply(await sendRpc(chainId, method, params));
     }
   } catch (err: any) {
+    console.warn(err);
+
     // @TODO: Handle non rpc errors, and wrap them to rpc format
     reply({ error: { message: err.message } });
   }

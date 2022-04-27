@@ -7,7 +7,7 @@ import { fromProtectedString } from "lib/crypto-utils";
 
 import { getSeedPhrase } from "core/client";
 
-import { required } from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -26,7 +26,7 @@ const Security: FC = () => {
 
   return (
     <div className="flex flex-col items-start">
-      <SettingsHeader>Reveal Seed Phrase</SettingsHeader>
+      <SettingsHeader>Reveal Secret Phrase</SettingsHeader>
       <NewButton
         theme="secondary"
         className={classNames(
@@ -69,6 +69,10 @@ const Security: FC = () => {
 
 export default Security;
 
+type FormValues = {
+  password: string;
+};
+
 const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const windowFocused = useWindowFocus();
@@ -79,15 +83,19 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     }
   }, [onOpenChange, seedPhrase, windowFocused]);
 
-  const handleConfirmPassword = useCallback(async ({ password }) => {
-    try {
-      const seed = await getSeedPhrase(password);
-      setSeedPhrase(seed.phrase);
-    } catch (err: any) {
-      return { [FORM_ERROR]: err?.message };
-    }
-    return;
-  }, []);
+  const handleConfirmPassword = useCallback(
+    async ({ password }) =>
+      withHumanDelay(async () => {
+        try {
+          const seed = await getSeedPhrase(password);
+          setSeedPhrase(seed.phrase);
+        } catch (err: any) {
+          return { [FORM_ERROR]: err?.message };
+        }
+        return;
+      }),
+    []
+  );
 
   return (
     <SecondaryModal
@@ -97,10 +105,10 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SeedPhraseField value={fromProtectedString(seedPhrase)} />
+        <SeedPhraseField defaultValue={fromProtectedString(seedPhrase)} />
       ) : (
-        <Form
-          initialValues={{ terms: "false" }}
+        <Form<FormValues>
+          decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
           render={({
             handleSubmit,
@@ -117,7 +125,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                   {({ input, meta }) => (
                     <PasswordField
                       className="w-full"
-                      placeholder="Type password"
+                      placeholder={"*".repeat(8)}
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||
@@ -134,9 +142,9 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               <NewButton
                 type="submit"
                 className="mt-6 !min-w-[14rem]"
-                disabled={submitting}
+                loading={submitting}
               >
-                {submitting ? "Loading" : "Reveal"}
+                Reveal
               </NewButton>
             </form>
           )}

@@ -1,6 +1,7 @@
-import { FC, ReactElement, useState } from "react";
-import { match } from "ts-pattern";
+import { FC, ReactElement, useCallback, useState } from "react";
 import classNames from "clsx";
+import { match } from "ts-pattern";
+import browser from "webextension-polyfill";
 
 import { TippySingletonProvider } from "app/hooks";
 import Tooltip from "app/components/elements/Tooltip";
@@ -19,6 +20,10 @@ type WithThemeProps = {
 
 const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const [activityHovered, setActivityHovered] = useState(false);
+
+  const handleClick = useCallback(() => {
+    browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
+  }, []);
 
   return (
     <div
@@ -39,6 +44,8 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
       onFocus={() => setActivityHovered(true)}
       onMouseLeave={() => setActivityHovered(false)}
       onBlur={() => setActivityHovered(true)}
+      onClick={handleClick}
+      role="presentation"
     >
       <TippySingletonProvider>
         <div className="flex items-center">
@@ -198,7 +205,15 @@ const ActivityIcon: FC<ActivityIconProps> = ({
     return <Tooltip content={ariaLabel}>{content}</Tooltip>;
   }
 
-  return <Icon />;
+  return (
+    <Icon
+      className={classNames(
+        theme === "small" && "w-[1.125rem] h-[1.125rem]",
+        theme === "large" && "w-6 h-6",
+        className
+      )}
+    />
+  );
 };
 
 type StatusType = "successful" | "pending" | "failed";
@@ -239,7 +254,7 @@ const StatItem: FC<StatItemProps> = ({
         <Icon
           className={classNames(
             theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
-            theme === "large" && "mr-2"
+            theme === "large" && "w-5 h-auto mr-2"
           )}
         />
         {count}

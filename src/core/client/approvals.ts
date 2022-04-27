@@ -1,5 +1,10 @@
 import { assert } from "lib/system/assert";
-import { EventMessage, MessageType, Approval } from "core/types";
+import {
+  EventMessage,
+  MessageType,
+  Approval,
+  ApprovalResult,
+} from "core/types";
 
 import { porter } from "./base";
 
@@ -22,9 +27,9 @@ export function onApprovalsUpdated(
   });
 }
 
-export async function approveItem(approvalId: string, approve: boolean) {
+export async function approveItem(approvalId: string, result: ApprovalResult) {
   const type = MessageType.Approve;
 
-  const res = await porter.request({ type, approvalId, approve });
+  const res = await porter.request({ type, approvalId, result });
   assert(res?.type === type);
 }

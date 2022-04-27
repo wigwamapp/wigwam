@@ -2,7 +2,7 @@ import { RefObject, useCallback, useEffect, useState } from "react";
 
 export function useCopyToClipboard<
   T extends HTMLInputElement | HTMLTextAreaElement
->(ref: RefObject<T>, copyDelay: number = 1000 * 2) {
+>(ref: RefObject<T>, immediatelyBlur = false, copyDelay: number = 1000 * 2) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -30,8 +30,11 @@ export function useCopyToClipboard<
       textarea.select();
       document.execCommand("copy");
       setCopied(true);
+      if (immediatelyBlur && document.activeElement === textarea) {
+        textarea.blur();
+      }
     }
-  }, [ref, copied, setCopied]);
+  }, [copied, ref, immediatelyBlur]);
 
   return { copy, copied, setCopied };
 }

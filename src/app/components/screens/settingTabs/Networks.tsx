@@ -2,15 +2,15 @@ import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
-import { NETWORK_ICON_MAP } from "fixtures/networks";
+import { getNetworkIconUrl } from "fixtures/networks";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { useLazyAllNetworks } from "app/hooks";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
-import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 const Networks: FC = () => {
   const allNetworks = useLazyAllNetworks();
@@ -42,18 +42,21 @@ const Networks: FC = () => {
 
   const cancelEditing = useCallback(() => setTab(null), []);
 
-  const handleScrollToBottom = useCallback(() => {
-    setTimeout(() => {
-      scrollAreaRef.current?.scrollTo({
-        behavior: "smooth",
-        top: scrollAreaRef.current?.scrollHeight,
-        left: 0,
-      });
-    }, 300);
-  }, [scrollAreaRef]);
+  const handleScrollList = useCallback(
+    (toTop = false) => {
+      setTimeout(() => {
+        scrollAreaRef.current?.scrollTo({
+          behavior: "smooth",
+          top: toTop ? 0 : scrollAreaRef.current?.scrollHeight,
+          left: 0,
+        });
+      }, 300);
+    },
+    [scrollAreaRef]
+  );
 
   return (
-    <div className="pt-6 flex grow">
+    <div className="pt-5 flex grow">
       <div
         className={classNames(
           "flex flex-col",
@@ -76,12 +79,13 @@ const Networks: FC = () => {
             name="Add new network"
             isActive={tab === "new"}
             onClick={() => setTab("new")}
+            isNewButton
             className="bg-brand-main/[.05]"
           />
           {preparedNetworks?.map(({ chainId, name }) => (
             <NetworkBtn
               key={chainId}
-              icon={NETWORK_ICON_MAP.get(chainId)}
+              icon={getNetworkIconUrl(chainId)}
               name={name}
               onClick={() => setTab(chainId)}
               isActive={tab === chainId}
@@ -96,7 +100,7 @@ const Networks: FC = () => {
           isNew={tab === "new"}
           network={selectedNetwork}
           onCancelHandler={cancelEditing}
-          onNewNetworkCreated={handleScrollToBottom}
+          onActionFinished={handleScrollList}
         />
       )}
     </div>
@@ -110,6 +114,7 @@ type NetworkBtnProps = {
   name: string;
   onClick: () => void;
   isActive?: boolean;
+  isNewButton?: boolean;
   className?: string;
 };
 
@@ -118,6 +123,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
   name,
   onClick,
   isActive = false,
+  isNewButton = false,
   className,
 }) => {
   return (
@@ -126,7 +132,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       className={classNames(
         "relative group",
         "inline-flex justify-start items-center",
-        "w-full py-2 px-3 min-h-[2.75rem]",
+        "w-full py-2 pl-3 pr-9 min-h-[2.75rem]",
         "text-base font-bold whitespace-nowrap",
         "rounded-[.625rem]",
         "transition-colors",
@@ -136,14 +142,15 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       )}
       onClick={onClick}
     >
-      {icon ? (
-        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
+      {isNewButton ? (
+        <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
-        <PlusCircleIcon className="mr-3" />
+        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
       )}
-      {name}
+      <span className="min-w-0 truncate">{name}</span>
       <ChevronRightIcon
         className={classNames(
+          "w-6 h-auto",
           "absolute right-2 top-1/2 -translate-y-1/2",
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",

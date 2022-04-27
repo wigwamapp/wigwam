@@ -8,12 +8,16 @@ import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 export type SecondaryModalProps = DialogProps & {
   header?: ReactNode;
+  disabledClickOutside?: boolean;
+  autoFocus?: boolean;
   className?: string;
   headerClassName?: string;
 };
 
 const SecondaryModal: FC<SecondaryModalProps> = ({
   header,
+  disabledClickOutside,
+  autoFocus,
   open,
   onOpenChange,
   children,
@@ -24,7 +28,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger />
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-20 bg-brand-darkblue/50" />
+        <Dialog.Overlay
+          className={classNames("fixed inset-0 z-20 bg-brand-darkblue/50")}
+        />
         <Dialog.Content
           className={classNames(
             "fixed z-20",
@@ -35,18 +41,15 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             "backdrop-blur-[40px]",
             "rounded-[1.875rem]",
             "overflow-hidden",
+            "animate-dialogcontent",
             "flex flex-col justify-center items-center",
             className
           )}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={!autoFocus ? (e) => e.preventDefault() : undefined}
+          onPointerDownOutside={
+            disabledClickOutside ? (e) => e.preventDefault() : undefined
+          }
         >
-          <Dialog.Close asChild className="fixed top-4 right-4">
-            <IconedButton
-              Icon={CloseIcon}
-              aria-label="Close"
-              theme="tertiary"
-            />
-          </Dialog.Close>
           {header && (
             <h2
               className={classNames("mb-8 text-2xl font-bold", headerClassName)}
@@ -54,7 +57,16 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
               {header}
             </h2>
           )}
+
           {children}
+
+          <Dialog.Close asChild className="fixed top-4 right-4">
+            <IconedButton
+              Icon={CloseIcon}
+              aria-label="Close"
+              theme="tertiary"
+            />
+          </Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

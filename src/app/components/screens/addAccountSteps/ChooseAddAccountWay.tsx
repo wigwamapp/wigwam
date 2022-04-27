@@ -1,10 +1,18 @@
-import { FC, memo, useMemo } from "react";
+import { FC, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
+import { ethers } from "ethers";
+import { toProtectedString } from "lib/crypto-utils";
+import { assert } from "lib/system/assert";
+
+import { AccountSource, SocialProvider } from "core/types";
 
 import { hasSeedPhraseAtom } from "app/atoms";
-import { useSteps } from "app/hooks/steps";
 import { TippySingletonProvider } from "app/hooks";
+import { useSteps } from "app/hooks/steps";
+import { LoadingHandler, useDialog } from "app/hooks/dialog";
+import { AddAccountStep } from "app/nav";
+import { withHumanDelay } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -24,64 +32,67 @@ const ChooseAddAccountWay = memo(() => {
   );
 
   return (
-    <div className="w-full max-w-[59rem] mx-auto flex flex-wrap">
+    <>
       <AddAccountHeader className="mb-11">Add wallet</AddAccountHeader>
 
-      <TippySingletonProvider>
-        {sections
-          .filter(({ type }) => type !== "advanced")
-          .map((section, index) => (
-            <div
-              key={section.type}
-              className={classNames(
-                "w-1/3",
-                "px-[1.75rem]",
-                index % 3 !== 2 && "border-r border-brand-light/[.03]"
-              )}
-            >
-              <div className="flex items-center mb-5">
-                <h2 className={classNames("text-2xl font-bold capitalize")}>
-                  {section.title}
-                </h2>
-                {section.tooltip && (
-                  <Tooltip
-                    content={
-                      <>
-                        {section.tooltip.content}
-                        {section.points && (
-                          <Points
-                            adoption={section.points.adoption}
-                            security={section.points.security}
-                          />
-                        )}
-                      </>
-                    }
-                    size="large"
-                    className="ml-2"
-                  >
-                    <TooltipIcon />
-                  </Tooltip>
+      <div className="flex">
+        <TippySingletonProvider>
+          {sections
+            .filter(({ type }) => type !== "advanced")
+            .map((section, index) => (
+              <div
+                key={section.type}
+                className={classNames(
+                  "w-1/3",
+                  "px-[1.75rem]",
+                  index % 3 !== 2 && "border-r border-brand-light/[.03]"
                 )}
+              >
+                <div className="flex items-center mb-5">
+                  <h2 className={classNames("text-2xl font-bold capitalize")}>
+                    {section.title}
+                  </h2>
+                  {section.tooltip && (
+                    <Tooltip
+                      content={
+                        <>
+                          {section.tooltip.content}
+                          {section.points && (
+                            <Points
+                              adoption={section.points.adoption}
+                              security={section.points.security}
+                            />
+                          )}
+                        </>
+                      }
+                      size="large"
+                      className="ml-2"
+                    >
+                      <TooltipIcon />
+                    </Tooltip>
+                  )}
+                </div>
+                <div
+                  className={classNames("flex flex-wrap items-stretch -mb-5")}
+                >
+                  {section.tiles.map(
+                    ({ title, Icon, action, openLoginMethod, soon }, i) => (
+                      <Tile
+                        key={i}
+                        title={title}
+                        Icon={Icon}
+                        action={action}
+                        openLoginMethod={openLoginMethod}
+                        soon={soon}
+                        className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                      />
+                    )
+                  )}
+                </div>
               </div>
-              <div className={classNames("flex flex-wrap items-stretch -mb-5")}>
-                {section.tiles.map(({ title, Icon, action, soon }, i) =>
-                  action ? (
-                    <Tile
-                      key={i}
-                      title={title}
-                      Icon={Icon}
-                      action={action}
-                      soon={soon}
-                      className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
-                    />
-                  ) : (
-                    <WarningMessage key="warning">{title}</WarningMessage>
-                  )
-                )}
-              </div>
-            </div>
-          ))}
-      </TippySingletonProvider>
+            ))}
+        </TippySingletonProvider>
+      </div>
 
       {sections
         .filter(({ type }) => type === "advanced")
@@ -89,61 +100,159 @@ const ChooseAddAccountWay = memo(() => {
           <Collapse
             key={index}
             label={section.title}
-            className="mt-[4.25rem] mx-[1.75rem] w-full"
-            triggerClassName="!mb-5"
+            className="mt-20 mx-[1.75rem] w-full"
+            triggerClassName="!mb-0"
           >
-            <div className={classNames("flex flex-wrap items-stretch")}>
-              {section.tiles.map(({ title, Icon, action, soon }, i) => (
-                <Tile
-                  key={i}
-                  title={title}
-                  Icon={Icon}
-                  action={action!}
-                  soon={soon}
-                  className="mr-5"
-                />
-              ))}
+            <div className={classNames("flex flex-wrap items-stretch pt-5")}>
+              {section.tiles.map(
+                ({ title, Icon, action, openLoginMethod, soon }, i) => (
+                  <Tile
+                    key={i}
+                    title={title}
+                    Icon={Icon}
+                    action={action}
+                    openLoginMethod={openLoginMethod}
+                    soon={soon}
+                    className="mr-5"
+                  />
+                )
+              )}
             </div>
           </Collapse>
         ))}
-    </div>
+    </>
   );
 });
 
 export default ChooseAddAccountWay;
 
-type WarningMessageProps = {
+type TileProps = WaysReturnTile & {
   className?: string;
 };
 
-const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
-  <div
-    className={classNames(
-      "relative",
-      "w-full h-18 p-5 mb-[2.4375rem]",
-      "flex items-center",
-      "text-xs",
-      className
-    )}
-  >
-    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
-    {children}
-    <BackgroundIcon
-      className={classNames(
-        "absolute top-0 left-0 w-full h-full",
-        "bg-opacity-5",
-        "-z-10"
-      )}
-    />
-  </div>
-);
+const Tile: FC<TileProps> = ({ action, openLoginMethod, ...rest }) => {
+  if (action) {
+    return <TileSimple action={action} {...rest} />;
+  }
 
-type TileProps = Omit<WaysReturnTile, "action"> & {
+  if (openLoginMethod) {
+    return <TileOpenLogin openLoginMethod={openLoginMethod} {...rest} />;
+  }
+
+  return <WarningMessage>{rest.title}</WarningMessage>;
+};
+
+type TileOpenLoginProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
+  openLoginMethod: SocialProvider;
+  className?: string;
+};
+
+const TileOpenLogin: FC<TileOpenLoginProps> = ({
+  openLoginMethod,
+  ...rest
+}) => {
+  const { navigateToStep, stateRef } = useSteps();
+  const { waitLoading } = useDialog();
+
+  const handleConnect = useCallback<LoadingHandler>(
+    ({ onClose }) =>
+      withHumanDelay(async () => {
+        try {
+          let closed = false;
+          onClose(() => (closed = true));
+
+          const { default: OpenLogin, UX_MODE } = await import(
+            "@toruslabs/openlogin"
+          );
+
+          const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+          assert(clientId, "Client ID was not specified");
+
+          const openlogin = new OpenLogin({
+            clientId,
+            network: "mainnet",
+            uxMode: UX_MODE.POPUP,
+            replaceUrlOnRedirect: false,
+          });
+
+          onClose(() => openlogin._cleanup());
+
+          await openlogin.init();
+          await openlogin.logout().catch(console.warn);
+
+          if (closed) return false;
+
+          const { privKey } = await openlogin.login({
+            loginProvider: openLoginMethod,
+          });
+          const { email, name } = await openlogin.getUserInfo();
+          await openlogin.logout().catch(console.warn);
+
+          if (closed) return false;
+
+          const address = new ethers.Wallet(privKey).address;
+
+          stateRef.current.importAddresses = [
+            {
+              source: AccountSource.OpenLogin,
+              address,
+              name: email || name,
+              isDisabled: true,
+              isDefaultChecked: true,
+              privateKey: toProtectedString(privKey),
+              social: openLoginMethod,
+              socialName: name,
+              socialEmail: email,
+            },
+          ];
+
+          return true;
+        } catch (err: any) {
+          const msg = err?.message ?? "Unknown error";
+
+          if (msg === "user closed popup") return false;
+
+          throw new Error(msg);
+        }
+      }),
+    [openLoginMethod, stateRef]
+  );
+
+  const handleTileClick = useCallback(() => {
+    waitLoading({
+      title: "Loading...",
+      headerClassName: "mb-3",
+      content: (
+        <>
+          <span className="mb-5">
+            Please proceed connecting in the opened dialog.
+          </span>
+          <Spinner />
+        </>
+      ),
+      loadingHandler: handleConnect,
+    }).then((answer) => {
+      if (answer) {
+        navigateToStep(AddAccountStep.VerifyToAdd);
+      }
+    });
+  }, [handleConnect, navigateToStep, waitLoading]);
+
+  return <Tile action={handleTileClick} {...rest} />;
+};
+
+type TileSimpleProps = Omit<WaysReturnTile, "action" | "openLoginMethod"> & {
   action: () => void;
   className?: string;
 };
 
-const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
+const TileSimple: FC<TileSimpleProps> = ({
+  title,
+  Icon,
+  action,
+  soon,
+  className,
+}) => (
   <button
     className={classNames(
       "relative",
@@ -178,6 +287,33 @@ const Tile: FC<TileProps> = ({ title, Icon, action, soon, className }) => (
     )}
     {title}
   </button>
+);
+
+type WarningMessageProps = {
+  className?: string;
+};
+
+const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
+  <div
+    className={classNames(
+      "relative",
+      "w-full h-18 p-5 mb-[2.4375rem]",
+      "flex items-center",
+      "text-xs",
+      "z-[25]",
+      className
+    )}
+  >
+    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
+    {children}
+    <BackgroundIcon
+      className={classNames(
+        "absolute top-0 left-0 w-full h-full",
+        "bg-opacity-5",
+        "-z-10"
+      )}
+    />
+  </div>
 );
 
 type PointProps = {
@@ -245,6 +381,40 @@ const Points: FC<PointsProps> = ({ security, adoption }) => (
     </div>
   </div>
 );
+
+export const Spinner = memo<{ className?: string }>(({ className }) => (
+  <svg
+    viewBox="0 0 120 120"
+    fill="none"
+    className={classNames("animate-spin w-[7.5rem] h-[7.5rem]", className)}
+  >
+    <circle
+      cx="60"
+      cy="60"
+      r="54"
+      stroke="#CCD6FF"
+      strokeOpacity="0.15"
+      strokeWidth="12"
+    />
+    <path
+      d="M65.0054 6.23253C65.3125 2.93309 62.883 -0.0222163 59.5694 0.00154181C48.9029 0.0780186 38.4099 2.9984 29.1944 8.51206C18.2565 15.0563 9.68679 24.9138 4.72759 36.6557C-0.231603 48.3976 -1.32262 61.4138 1.61268 73.8174C4.08574 84.2677 9.30857 93.8257 16.6909 101.525C18.9843 103.917 22.7967 103.598 24.9477 101.077V101.077C27.0987 98.5565 26.7659 94.792 24.5331 92.3435C19.0597 86.3416 15.1758 79.022 13.2902 71.0539C10.9419 61.131 11.8147 50.7181 15.7821 41.3246C19.7494 31.9311 26.6052 24.0451 35.3555 18.8097C42.3821 14.6056 50.3371 12.2862 58.4557 12.0249C61.7677 11.9182 64.6982 9.53198 65.0054 6.23253V6.23253Z"
+      fill="url(#paint0_linear_3870_37340)"
+    />
+    <defs>
+      <linearGradient
+        id="paint0_linear_3870_37340"
+        x1="37.5926"
+        y1="-63.4817"
+        x2="-63.4501"
+        y2="-40.3675"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#FF002D" />
+        <stop offset="1" stopColor="#FF7F44" />
+      </linearGradient>
+    </defs>
+  </svg>
+));
 
 const absToZero = (n: number) => (n < 0 ? 0 : Math.abs(n));
 const calcWidth = (n: number, idx: number) =>

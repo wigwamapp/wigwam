@@ -14,7 +14,7 @@ export function livePromise<T>(
 
         pick()
           .then((value) => {
-            if (!resolved && value) {
+            if (!resolved && value !== undefined) {
               res(value);
               resolved = true;
             }
