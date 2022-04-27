@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  Dispatch,
   ReactNode,
   useCallback,
   useContext,
@@ -23,6 +24,7 @@ type DialogContextDataProps =
       secondaryButtonText?: ReactNode;
       onSecondaryButtonClick?: () => void;
       onClose?: () => void;
+      state?: any;
     })
   | null;
 
@@ -39,10 +41,12 @@ type ConfirmParams = {
   noButtonText?: ReactNode;
 } & ModalProps;
 
-type WaitLoadingParams = {
+type WaitLoadingParams<P = any, S = any> = {
   title: ReactNode;
-  content: ReactNode;
+  content: ReactNode | ((state: S) => ReactNode);
   loadingHandler: LoadingHandler;
+  handlerParams?: P;
+  state?: S;
 } & ModalProps;
 
 type DialogContextProps = {
@@ -54,9 +58,11 @@ type DialogContextProps = {
   waitLoading: (params: WaitLoadingParams) => Promise<boolean>;
 };
 
-export type LoadingHandler = (
-  onClose: (callback: () => void) => void
-) => Promise<boolean>;
+export type LoadingHandler<P = any, S = any> = (opts: {
+  params: P;
+  setState: Dispatch<S>;
+  onClose: (callback: () => void) => void;
+}) => Promise<boolean>;
 
 const OPEN_NEXT_DELAY = 300;
 
@@ -104,15 +110,22 @@ export const DialogProvider: FC = ({ children }) => {
     forceUpdate();
   }, [forceUpdate]);
 
-  const modalData = openedRef.current ? queueRef.current[0] : null;
+  let modalData = openedRef.current ? queueRef.current[0] : null;
+
+  if (typeof modalData?.children === "function") {
+    modalData = {
+      ...modalData,
+      children: modalData.children(modalData.state),
+    };
+  }
 
   const alert = useCallback(
     ({ title, content, okButtonText = "OK", ...rest }: AlertParams) =>
       new Promise<void>((res) => {
-        const handleDone = () => {
+        const handleDone = memoizeOne(() => {
           closeCurrentDialog();
           res();
-        };
+        });
 
         addDialog({
           header: title,
@@ -135,10 +148,10 @@ export const DialogProvider: FC = ({ children }) => {
       ...rest
     }: ConfirmParams) =>
       new Promise<boolean>((res) => {
-        const handleConfirm = (confirmed: boolean) => {
+        const handleConfirm = memoizeOne((confirmed: boolean) => {
           closeCurrentDialog();
           res(confirmed);
-        };
+        });
 
         addDialog({
           header: title,
@@ -155,7 +168,13 @@ export const DialogProvider: FC = ({ children }) => {
   );
 
   const waitLoading = useCallback(
-    ({ title, content, loadingHandler, ...rest }: WaitLoadingParams) =>
+    ({
+      title,
+      content,
+      loadingHandler,
+      handlerParams,
+      ...rest
+    }: WaitLoadingParams) =>
       new Promise<boolean>(async (res) => {
         const closeHandlers = new Set<() => void>();
 
@@ -165,17 +184,28 @@ export const DialogProvider: FC = ({ children }) => {
           res(confirmed);
         });
 
-        addDialog({
+        const dialogParams = {
           header: title,
           children: content,
           onClose: () => handleConfirm(false),
           disabledClickOutside: true,
           ...rest,
-        });
+        };
+
+        addDialog(dialogParams);
 
         try {
-          const res = await loadingHandler((handler) => {
-            closeHandlers.add(handler);
+          const res = await loadingHandler({
+            params: handlerParams,
+            setState: (val) => {
+              dialogParams.state =
+                typeof val === "function" ? val(dialogParams.state) : val;
+
+              forceUpdate();
+            },
+            onClose: (handler) => {
+              closeHandlers.add(handler);
+            },
           });
           handleConfirm(res);
         } catch (err: any) {
@@ -187,7 +217,7 @@ export const DialogProvider: FC = ({ children }) => {
           });
         }
       }),
-    [addDialog, alert, closeCurrentDialog]
+    [forceUpdate, addDialog, alert, closeCurrentDialog]
   );
 
   return (

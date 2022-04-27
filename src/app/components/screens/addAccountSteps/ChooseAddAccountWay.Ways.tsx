@@ -41,7 +41,7 @@ export const getWays = (
 ): WaysReturn => [
   {
     type: "seed_phrase",
-    title: "Seed Phrase",
+    title: "Secret Phrase",
     tooltip: {
       content: (
         <>
@@ -172,7 +172,8 @@ export const getWays = (
         title: "Ledger",
         Icon: LedgerIcon,
         action: () => {
-          alert("Not implemented");
+          stateRef.current.hardDevice = "ledger";
+          navigateToStep(AddAccountStep.SelectAccountsToAddMethod);
         },
       },
       {

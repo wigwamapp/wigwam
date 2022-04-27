@@ -11,8 +11,13 @@ import {
   WalletStatus,
 } from "core/types";
 import { addSeedPhrase } from "core/client";
+import {
+  composeValidators,
+  required,
+  withHumanDelay,
+  focusOnErrors,
+} from "app/utils";
 
-import { composeValidators, required } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
@@ -47,30 +52,34 @@ const VerifySeedPhrase = memo(() => {
     [words]
   );
 
-  const handleContinue = useCallback(async () => {
-    try {
-      if (!seedPhrase) return;
+  const handleContinue = useCallback(
+    async () =>
+      withHumanDelay(async () => {
+        try {
+          if (!seedPhrase) return;
 
-      const addAccountsParams: AddHDAccountParams[] = [
-        {
-          source: AccountSource.SeedPhrase,
-          name: "{{wallet}} 1",
-          derivationPath: ethers.utils.defaultPath,
-        },
-      ];
+          const addAccountsParams: AddHDAccountParams[] = [
+            {
+              source: AccountSource.SeedPhrase,
+              name: "{{wallet}} 1",
+              derivationPath: ethers.utils.defaultPath,
+            },
+          ];
 
-      Object.assign(stateRef.current, { addAccountsParams });
+          Object.assign(stateRef.current, { addAccountsParams });
 
-      if (initialSetup) {
-        navigateToStep(AddAccountStep.SetupPassword);
-      } else {
-        await addSeedPhrase(seedPhrase);
-        navigateToStep(AddAccountStep.VerifyToAdd);
-      }
-    } catch (err: any) {
-      alert(err?.message);
-    }
-  }, [seedPhrase, stateRef, initialSetup, navigateToStep, alert]);
+          if (initialSetup) {
+            navigateToStep(AddAccountStep.SetupPassword);
+          } else {
+            await addSeedPhrase(seedPhrase);
+            navigateToStep(AddAccountStep.VerifyToAdd);
+          }
+        } catch (err: any) {
+          alert(err?.message);
+        }
+      }),
+    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
+  );
 
   if (!seedPhrase) {
     return null;
@@ -86,6 +95,7 @@ const VerifySeedPhrase = memo(() => {
       </AddAccountHeader>
       <Form
         onSubmit={handleContinue}
+        decorators={[focusOnErrors]}
         render={({ handleSubmit, submitting }) => (
           <form
             onSubmit={handleSubmit}

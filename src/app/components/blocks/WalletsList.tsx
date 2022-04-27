@@ -152,6 +152,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
         />
         <NewButton
           to={{ addAccOpened: true }}
+          merge
           theme="tertiary"
           className="ml-5 !py-2"
         >

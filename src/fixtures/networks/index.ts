@@ -57,6 +57,12 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   ])
 );
 
+export function getNetworkIconUrl(chainId: number) {
+  return (
+    NETWORK_ICON_MAP.get(chainId) ?? getPublicURL(`icons/network/unknown.png`)
+  );
+}
+
 export function getTokenLogoUrl(logoUrl?: string) {
   if (logoUrl?.startsWith("{{native}}")) {
     const [, chainTag] = logoUrl.split("/");
@@ -67,3 +73,17 @@ export function getTokenLogoUrl(logoUrl?: string) {
 
   return logoUrl;
 }
+
+export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
+  [1, "ethereum"],
+  [43114, "avalanche-2"],
+  [56, "binancecoin"],
+  [137, "matic-network"],
+  [250, "fantom"],
+  [10, "ethereum"],
+  [42161, "ethereum"],
+  [1313161554, "ethereum"],
+  [1666600000, "harmony"],
+  [128, "huobi-token"],
+  [42220, "celo"],
+]);

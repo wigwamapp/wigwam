@@ -3,10 +3,13 @@ import { IndexableTypeArray } from "dexie";
 import axios from "axios";
 import { ethers } from "ethers";
 import mem from "mem";
+import retry from "async-retry";
+// import ExpiryMap from 'expiry-map';
 import { createQueue } from "lib/system/queue";
 import { props } from "lib/system/promise";
 import { storage } from "lib/ext/storage";
 
+import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 import { Erc20__factory } from "abi-types";
 import {
   Account,
@@ -33,6 +36,10 @@ import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 
 const debankApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
+  timeout: 60_000,
+});
+const coinGeckoApi = axios.create({
+  baseURL: "https://api.coingecko.com/api/v3",
   timeout: 60_000,
 });
 
@@ -195,19 +202,28 @@ const syncNativeTokens = mem(
       })
     );
 
-    const [{ nativeCurrency, chainTag }, existingTokens, balances, portfolios] =
-      await Promise.all([
-        getNetwork(chainId),
-        repo.accountTokens.bulkGet(dbKeys),
-        Promise.all(
-          accounts.map((acc) =>
-            getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
-          )
-        ),
-        Promise.all(
-          accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
-        ),
-      ]);
+    const [
+      { nativeCurrency, chainTag },
+      existingTokens,
+      balances,
+      portfolios,
+      cgPrice,
+    ] = await Promise.all([
+      getNetwork(chainId),
+      repo.accountTokens.bulkGet(dbKeys),
+      Promise.all(
+        accounts.map((acc) =>
+          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
+        )
+      ),
+      Promise.all(
+        accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
+      ),
+      getCoinGeckoNativeTokenPrice(chainId),
+    ]);
+
+    const priceUSD = cgPrice?.usd.toFixed(2);
+    const priceUSDChange = cgPrice?.usd_24h_change.toFixed(2);
 
     await repo.accountTokens.bulkPut(
       accounts.map((acc, i) => {
@@ -222,24 +238,36 @@ const syncNativeTokens = mem(
           if (!balance) {
             return {
               ...existing,
+              priceUSD,
+              priceUSDChange,
               portfolioUSD,
             };
           }
 
           const rawBalance = balance.toString();
-          const balanceUSD = existing.priceUSD
+          const balanceUSD = priceUSD
             ? +new BigNumber(rawBalance)
                 .div(10 ** nativeCurrency.decimals)
-                .times(existing.priceUSD)
+                .times(priceUSD)
             : existing.balanceUSD;
 
           return {
             ...existing,
             rawBalance,
             balanceUSD,
+            priceUSD,
+            priceUSDChange,
             portfolioUSD,
           };
         } else {
+          const rawBalance = balance?.toString() ?? "0";
+          const balanceUSD =
+            balance && priceUSD
+              ? +new BigNumber(rawBalance)
+                  .div(10 ** nativeCurrency.decimals)
+                  .times(priceUSD)
+              : 0;
+
           return {
             chainId,
             accountAddress: acc.address,
@@ -250,8 +278,10 @@ const syncNativeTokens = mem(
             name: nativeCurrency.name,
             symbol: nativeCurrency.symbol,
             logoUrl: getNativeTokenLogoUrl(chainTag),
-            rawBalance: balance?.toString() ?? "0",
-            balanceUSD: 0,
+            rawBalance,
+            balanceUSD,
+            priceUSD,
+            priceUSDChange,
             portfolioUSD,
           };
         }
@@ -277,7 +307,7 @@ const syncAccountTokens = mem(
         getNetwork(chainId),
       ]);
 
-    const accTokens: AccountToken[] = [];
+    const accTokens: AccountAsset[] = [];
     const dbKeys: IndexableTypeArray = [];
 
     let existingTokensMap: Map<string, AccountToken> | undefined;
@@ -300,6 +330,8 @@ const syncAccountTokens = mem(
 
       for (const token of debankUserTokens) {
         const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+
+        if (token.id === debankChain.native_token_id) continue;
 
         const native = token.id === debankChain.native_token_id;
         const tokenSlug = createTokenSlug({
@@ -413,6 +445,28 @@ const syncAccountTokens = mem(
       }
     }
 
+    const tokenAddresses: string[] = [];
+    for (const t of accTokens) {
+      if (t.status !== TokenStatus.Native)
+        tokenAddresses.push(parseTokenSlug(t.tokenSlug).address);
+    }
+
+    const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
+
+    for (const token of accTokens) {
+      if (token.status === TokenStatus.Native) continue;
+
+      const price = cgPrices[parseTokenSlug(token.tokenSlug).address];
+
+      if (price) {
+        token.priceUSD = price.usd?.toString();
+        token.priceUSDChange = price.usd_24h_change?.toFixed(2);
+      } else {
+        delete token.priceUSD;
+        delete token.priceUSDChange;
+      }
+    }
+
     await repo.accountTokens.bulkPut(accTokens, dbKeys);
   },
   {
@@ -457,12 +511,16 @@ const getAccountTokenFromChain = async (
   const contract = Erc20__factory.connect(tokenAddress, provider);
 
   try {
-    return await props({
-      decimals: contract.decimals(),
-      symbol: contract.symbol(),
-      name: contract.name(),
-      balance: contract.balanceOf(accountAddress),
-    });
+    return await retry(
+      () =>
+        props({
+          decimals: contract.decimals(),
+          symbol: contract.symbol(),
+          name: contract.name(),
+          balance: contract.balanceOf(accountAddress),
+        }),
+      { retries: 3 }
+    );
   } catch (err) {
     console.error(err);
     return null;
@@ -497,6 +555,84 @@ const getDebankChainList = mem(
   },
   {
     maxAge: 60 * 60_000, // 1 hour
+  }
+);
+
+type CoinGeckoPrices = Record<string, { usd: number; usd_24h_change: number }>;
+
+// const tokenPricesCache = new ExpiryMap(60_000);
+
+async function getCoinGeckoPrices(chainId: number, tokenAddresses: string[]) {
+  try {
+    const platformIds = await getCoinGeckoPlatformIds();
+
+    const platform = platformIds.get(chainId);
+    if (!platform) return {};
+
+    const { data } = await coinGeckoApi.get(`/simple/token_price/${platform}`, {
+      params: {
+        contract_addresses: tokenAddresses.join(),
+        vs_currencies: "USD",
+        include_24hr_change: true,
+      },
+    });
+
+    return data as CoinGeckoPrices;
+  } catch (err) {
+    console.warn(err);
+
+    return {};
+  }
+}
+
+const getCoinGeckoPlatformIds = mem(
+  async () => {
+    const { data } = await coinGeckoApi.get("/asset_platforms");
+
+    const platformIds = new Map<number, string>();
+
+    for (const { id, chain_identifier } of data) {
+      if (typeof chain_identifier === "number" && chain_identifier) {
+        platformIds.set(chain_identifier, id);
+      }
+    }
+
+    return platformIds;
+  },
+  {
+    maxAge: 60 * 60_000, // 1 hour
+  }
+);
+
+const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
+  const platformId = COINGECKO_NATIVE_TOKEN_IDS.get(chainId);
+  if (!platformId) return null;
+
+  try {
+    const prices = await getCoinGeckoPlatformPrices();
+
+    return platformId in prices ? prices[platformId] : null;
+  } catch (err) {
+    console.warn(err);
+
+    return null;
+  }
+};
+
+const getCoinGeckoPlatformPrices = mem(
+  async () => {
+    const { data } = await coinGeckoApi.get("/simple/price", {
+      params: {
+        ids: Array.from(COINGECKO_NATIVE_TOKEN_IDS.values()).join(),
+        vs_currencies: "USD",
+        include_24hr_change: true,
+      },
+    });
+
+    return data as CoinGeckoPrices;
+  },
+  {
+    maxAge: 60_000, // 1 min
   }
 );
 
@@ -543,6 +679,10 @@ export const syncConversionRates = mem(
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {
+  if (process.env.VIGVAM_DEV_RANDOM_ADDRESSES === "false") {
+    return accountAddress;
+  }
+
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
 

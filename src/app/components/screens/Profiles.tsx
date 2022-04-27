@@ -126,7 +126,7 @@ export default Profiles;
 
 type AddProfileDialogProps = SecondaryModalProps & {
   profilesLength: number;
-  handleAddProfile: (name: string, profileSeed: string) => void;
+  handleAddProfile: (name: string, profileSeed: string) => Promise<void>;
 };
 
 const AddProfileDialog = memo<AddProfileDialogProps>(
