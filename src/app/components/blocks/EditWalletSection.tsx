@@ -2,13 +2,12 @@ import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { FORM_ERROR } from "final-form";
 import { replaceT } from "lib/ext/i18n";
 import { fromProtectedString } from "lib/crypto-utils";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import { Account, AccountSource } from "core/types";
+import { Account, AccountSource, SocialProvider } from "core/types";
 import {
   deleteAccounts,
   getPrivateKey,
@@ -16,7 +15,14 @@ import {
   updateAccountName,
 } from "core/client";
 
-import { composeValidators, maxLength, minLength, required } from "app/utils";
+import {
+  composeValidators,
+  focusOnErrors,
+  maxLength,
+  minLength,
+  required,
+  withHumanDelay,
+} from "app/utils";
 import { currentAccountAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import Input from "app/components/elements/Input";
@@ -38,20 +44,27 @@ import { ReactComponent as RedditIcon } from "app/icons/reddit.svg";
 import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as NoteIcon } from "app/icons/note.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
+import { ReactComponent as LedgerIcon } from "app/icons/ledger.svg";
 
 type EditWalletSectionProps = {
   account: Account;
 };
 
 const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
-  const [revealPrivateOpened, setRevealPrivateOpened] = useState(false);
-  const [revealPharseOpened, setRevealPhraseOpened] = useState(false);
+  const [modalState, setModalState] = useState<
+    null | "delete" | "phrase" | "private-key"
+  >(null);
 
-  const onNameUpdate = useCallback(
-    ({ name }) => {
-      updateAccountName(account.uuid, name);
-    },
+  const handleNameUpdate = useCallback(
+    async ({ name }) =>
+      withHumanDelay(async () => {
+        try {
+          await updateAccountName(account.uuid, name);
+        } catch (err: any) {
+          return { name: err?.message };
+        }
+        return;
+      }),
     [account.uuid]
   );
 
@@ -61,59 +74,61 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       viewPortClassName="pb-20 pt-5 pr-5 pl-6"
       scrollBarClassName="py-0 pt-5 pb-20"
     >
-      <div className="border-b border-brand-main/[.07]">
-        <h2 className="text-2xl text-brand-light font-bold mb-6">
-          {replaceT(account.name)}
-        </h2>
-        <AddressField address={account.address} className="mb-6" />
-        <Form
-          onSubmit={onNameUpdate}
-          initialValues={{ name: replaceT(account.name) }}
-          render={({ handleSubmit, submitting }) => (
-            <form onSubmit={handleSubmit}>
-              <Field
-                name="name"
-                validate={composeValidators(
-                  required,
-                  minLength(3),
-                  maxLength(32)
-                )}
-              >
-                {({ input, meta }) => (
-                  <Input
-                    label="Wallet Name"
-                    placeholder="Type wallet name"
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    inputClassName="h-11"
-                    className="max-w-[23.125rem] mt-4"
-                    {...input}
-                  />
-                )}
-              </Field>
-              <NewButton
-                type="submit"
-                theme="primary"
-                className="mt-4 mb-6 !py-2"
-                loading={submitting}
-              >
-                Save
-              </NewButton>
-            </form>
-          )}
-        />
-      </div>
-      <div
-        className={classNames("mt-6 pb-6", "border-b border-brand-main/[.07]")}
+      <h2 className="text-2xl text-brand-light font-bold mb-6">
+        {replaceT(account.name)}
+      </h2>
+      <AddressField address={account.address} className="mb-6" />
+      <Form
+        onSubmit={handleNameUpdate}
+        initialValues={{ name: replaceT(account.name) }}
+        decorators={[focusOnErrors]}
+        render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="pb-7 border-b border-brand-main/[.07]"
+          >
+            <Field
+              name="name"
+              validate={composeValidators(
+                required,
+                minLength(3),
+                maxLength(32)
+              )}
+            >
+              {({ input, meta }) => (
+                <Input
+                  label="Wallet Name"
+                  placeholder="Type wallet name"
+                  error={
+                    (meta.error && meta.touched) ||
+                    (meta.submitError && !modifiedSinceLastSubmit)
+                  }
+                  errorMessage={
+                    meta.error || (!modifiedSinceLastSubmit && meta.submitError)
+                  }
+                  inputClassName="h-11"
+                  className="max-w-[23.125rem] mt-4"
+                  {...input}
+                />
+              )}
+            </Field>
+            <NewButton
+              type="submit"
+              theme="primary"
+              className="mt-4 !py-2"
+              loading={submitting}
+            >
+              Save
+            </NewButton>
+          </form>
+        )}
+      />
+      <WalletBlock
+        Icon={KeyIcon}
+        title="Private key"
+        description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+        className="mt-6"
       >
-        <div className="flex text-lg font-bold text-brand-light items-center">
-          <KeyIcon className="mr-3" />
-          Private Key
-        </div>
-        <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
-          Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
-          way.
-        </p>
         <NewButton
           theme="secondary"
           className={classNames(
@@ -122,73 +137,77 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             "text-left",
             "mt-2 !px-3 mr-auto"
           )}
-          onClick={() => setRevealPrivateOpened(true)}
+          onClick={() => setModalState("private-key")}
         >
           <RevealIcon className="w-[1.625rem] h-auto mr-3" />
           Reveal
         </NewButton>
-      </div>
-      <div
-        className={classNames("mt-6 pb-6", "border-b border-brand-main/[.07]")}
-      >
-        <div className="flex text-lg font-bold text-brand-light justify-between">
-          <div className="flex items-center ">
-            <GoogleIcon className="mr-3" />
-            Google
-          </div>
-          <div className="flex items-center justify-between min-w-[6.25rem]">
-            <FacebookIcon />
-            <RedditIcon />
-            <TwitterIcon />
-          </div>
-        </div>
-        <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
-          Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
-          way.
-        </p>
-        <Input
-          defaultValue={"Oleh Khalin"}
-          label="Name"
-          inputClassName="h-11"
-          className="max-w-sm mt-4"
-          readOnly
-        />
-        <Input
-          defaultValue={"olehkhalin@gmail.com"}
-          label="Email"
-          inputClassName="h-11"
-          className="max-w-sm mt-4"
-          readOnly
-        />
-      </div>
-      {account.source === AccountSource.SeedPhrase && (
-        <div
-          className={classNames(
-            "mt-6 pb-6",
-            "border-b border-brand-main/[.07]"
-          )}
+      </WalletBlock>
+      {account.source === AccountSource.OpenLogin && (
+        <WalletBlock
+          Icon={getSocialIcon(account.social)}
+          title={capitalizeFirstLetter(account.social)}
+          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          className="mt-6"
         >
-          <div className="flex text-lg font-bold text-brand-light items-center">
-            <NoteIcon className="mr-3" />
-            Secret phrase
-          </div>
-          <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
-            Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
-            way.
-          </p>
-          <NewButton
-            theme="secondary"
-            className={classNames(
-              "max-h-[2.625rem]",
-              "flex !justify-start items-center",
-              "text-left",
-              "mt-2 !px-3 mr-auto"
-            )}
-            onClick={() => setRevealPhraseOpened(true)}
-          >
-            <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-            Reveal
-          </NewButton>
+          {account.socialName && (
+            <Input
+              defaultValue={account.socialName}
+              label="Name"
+              inputClassName="h-11"
+              className="max-w-sm mt-4"
+              readOnly
+            />
+          )}
+          {account.socialEmail && (
+            <Input
+              defaultValue={account.socialEmail}
+              label="Email"
+              inputClassName="h-11"
+              className="max-w-sm mt-4"
+              readOnly
+            />
+          )}
+        </WalletBlock>
+      )}
+      {account.source === AccountSource.SeedPhrase && (
+        <WalletBlock
+          Icon={NoteIcon}
+          title="Secret phrase"
+          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          className="mt-6"
+        >
+          <>
+            <NewButton
+              theme="secondary"
+              className={classNames(
+                "max-h-[2.625rem]",
+                "flex !justify-start items-center",
+                "text-left",
+                "mt-2 !px-3 mr-auto"
+              )}
+              onClick={() => setModalState("phrase")}
+            >
+              <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+              Reveal
+            </NewButton>
+            <Input
+              defaultValue={account.derivationPath}
+              label="Derivation path"
+              inputClassName="h-11"
+              className="max-w-sm mt-4"
+              readOnly
+            />
+          </>
+        </WalletBlock>
+      )}
+      {account.source === AccountSource.Ledger && (
+        <WalletBlock
+          Icon={LedgerIcon}
+          title="Ledger"
+          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          className="mt-6"
+        >
           <Input
             defaultValue={account.derivationPath}
             label="Derivation path"
@@ -196,12 +215,12 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             className="max-w-sm mt-4"
             readOnly
           />
-        </div>
+        </WalletBlock>
       )}
       <NewButton
         type="button"
         theme="secondary"
-        onClick={() => setDeleteModalOpened(true)}
+        onClick={() => setModalState("delete")}
         className={classNames(
           "mt-6 w-48",
           "!py-2",
@@ -209,24 +228,14 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           "text-brand-light"
         )}
       >
-        <DeleteIcon width={16} height={16} className="ml-1 mr-3" />
-        Delete account
+        <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
+        Remove wallet
       </NewButton>
-      {(deleteModalOpened || revealPrivateOpened || revealPharseOpened) && (
+      {modalState && (
         <DeleteAccountModal
           open={true}
-          cause={
-            deleteModalOpened
-              ? "delete"
-              : revealPharseOpened
-              ? "phrase"
-              : "private-key"
-          }
-          onOpenChange={(value) => {
-            setDeleteModalOpened(value);
-            setRevealPrivateOpened(value);
-            setRevealPhraseOpened(value);
-          }}
+          cause={modalState}
+          onOpenChange={() => setModalState(null)}
         />
       )}
     </ScrollAreaContainer>
@@ -234,6 +243,38 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
 };
 
 export default EditWalletSection;
+
+type WalletBlockProps = {
+  Icon: FC<{ className?: string }>;
+  title: string;
+  description: string;
+  className?: string;
+};
+
+const WalletBlock: FC<WalletBlockProps> = ({
+  Icon,
+  title,
+  description,
+  children,
+  className,
+}) => (
+  <div
+    className={classNames(
+      "pb-7",
+      "border-b border-brand-main/[.07]",
+      className
+    )}
+  >
+    <h2 className="flex text-lg font-bold text-brand-light items-center">
+      <Icon className="w-[1.125rem] h-auto mr-3" />
+      {title}
+    </h2>
+    <p className="my-2 text-sm text-brand-font max-w-[18.75rem]">
+      {description}
+    </p>
+    {children}
+  </div>
+);
 
 const DeleteAccountModal = memo<
   SecondaryModalProps & { cause: "delete" | "phrase" | "private-key" }
@@ -245,38 +286,40 @@ const DeleteAccountModal = memo<
   const { confirm } = useDialog();
 
   useEffect(() => {
-    if (!windowFocused) {
+    if (!windowFocused && cause !== "delete") {
       onOpenChange?.(false);
     }
-  }, [onOpenChange, windowFocused]);
+  }, [cause, onOpenChange, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }) => {
-      try {
-        if (cause !== "delete") {
-          if (cause === "phrase") {
-            const seed = await getSeedPhrase(password); // check is password correct
-            setSeedPhrase(seed.phrase);
-          } else {
-            const key = await getPrivateKey(password, currentAccount.uuid);
-            setPrivateKey(key);
-          }
-        } else {
-          confirm({
-            title: "Delete wallet account",
-            content: `Are you sure you want to delete the ${currentAccount.name} account?`,
-          }).then((answer) => {
-            if (answer) {
-              deleteAccounts(password, [currentAccount.uuid]);
+    async ({ password }) =>
+      withHumanDelay(async () => {
+        try {
+          if (cause !== "delete") {
+            if (cause === "phrase") {
+              const seed = await getSeedPhrase(password); // check is password correct
+              setSeedPhrase(seed.phrase);
+            } else {
+              const key = await getPrivateKey(password, currentAccount.uuid);
+              setPrivateKey(key);
             }
-            onOpenChange?.(false);
-          });
+          } else {
+            // TODO: Add password validation
+            confirm({
+              title: "Delete wallet account",
+              content: `Are you sure you want to delete the ${currentAccount.name} wallet?`,
+            }).then((answer) => {
+              if (answer) {
+                deleteAccounts(password, [currentAccount.uuid]);
+              }
+              onOpenChange?.(false);
+            });
+          }
+        } catch (err: any) {
+          return { password: err?.message };
         }
-      } catch (err: any) {
-        return { [FORM_ERROR]: err?.message };
-      }
-      return;
-    },
+        return;
+      }),
     [cause, currentAccount, onOpenChange, confirm]
   );
 
@@ -300,14 +343,9 @@ const DeleteAccountModal = memo<
         />
       ) : (
         <Form
-          initialValues={{ terms: "false" }}
           onSubmit={handleConfirmPassword}
-          render={({
-            handleSubmit,
-            submitting,
-            modifiedSinceLastSubmit,
-            submitError,
-          }) => (
+          decorators={[focusOnErrors]}
+          render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"
               onSubmit={handleSubmit}
@@ -321,10 +359,11 @@ const DeleteAccountModal = memo<
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||
-                        (!modifiedSinceLastSubmit && submitError)
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       errorMessage={
-                        meta.error || (!modifiedSinceLastSubmit && submitError)
+                        meta.error ||
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       {...input}
                     />
@@ -334,13 +373,9 @@ const DeleteAccountModal = memo<
               <NewButton
                 type="submit"
                 className="mt-6 !min-w-[14rem]"
-                disabled={submitting}
+                loading={submitting}
               >
-                {submitting
-                  ? "Loading"
-                  : cause === "delete"
-                  ? "Confirm"
-                  : "Reveal"}
+                {cause === "delete" ? "Confirm" : "Reveal"}
               </NewButton>
             </form>
           )}
@@ -426,3 +461,19 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
     </div>
   );
 };
+
+const getSocialIcon = (social: SocialProvider) => {
+  switch (social) {
+    case "google":
+      return GoogleIcon;
+    case "facebook":
+      return FacebookIcon;
+    case "twitter":
+      return TwitterIcon;
+    case "reddit":
+      return RedditIcon;
+  }
+};
+
+const capitalizeFirstLetter = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1);

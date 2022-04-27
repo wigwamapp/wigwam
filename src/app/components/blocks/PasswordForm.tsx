@@ -1,7 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
-import { FORM_ERROR } from "final-form";
 
 import { unlockWallet } from "core/client";
 
@@ -35,7 +34,7 @@ const PasswordForm = memo<PasswordFormProps>(
 
             return;
           } catch (err: any) {
-            return { [FORM_ERROR]: err?.message };
+            return { password: err?.message };
           }
         }),
       [unlockCallback]
@@ -45,12 +44,7 @@ const PasswordForm = memo<PasswordFormProps>(
       <Form<FormValues>
         onSubmit={handleSubmit}
         decorators={[focusOnErrors]}
-        render={({
-          handleSubmit,
-          submitting,
-          modifiedSinceLastSubmit,
-          submitError,
-        }) => (
+        render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
           <form
             className={classNames(
               "w-full flex flex-col items-center",
@@ -65,13 +59,13 @@ const PasswordForm = memo<PasswordFormProps>(
                   placeholder={"*".repeat(8)}
                   label="Password"
                   error={
-                    (!modifiedSinceLastSubmit && submitError) ||
+                    (!modifiedSinceLastSubmit && meta.submitError) ||
                     (meta.submitFailed &&
                       !meta.modifiedSinceLastSubmit &&
                       meta.error)
                   }
                   errorMessage={
-                    meta.error || (!modifiedSinceLastSubmit && submitError)
+                    meta.error || (!modifiedSinceLastSubmit && meta.submitError)
                   }
                   {...input}
                 />

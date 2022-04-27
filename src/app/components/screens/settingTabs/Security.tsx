@@ -1,7 +1,6 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
 import { Form, Field } from "react-final-form";
-import { FORM_ERROR } from "final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
 
@@ -90,7 +89,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
           const seed = await getSeedPhrase(password);
           setSeedPhrase(seed.phrase);
         } catch (err: any) {
-          return { [FORM_ERROR]: err?.message };
+          return { password: err?.message };
         }
         return;
       }),
@@ -110,12 +109,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
         <Form<FormValues>
           decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
-          render={({
-            handleSubmit,
-            submitting,
-            modifiedSinceLastSubmit,
-            submitError,
-          }) => (
+          render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"
               onSubmit={handleSubmit}
@@ -129,10 +123,11 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||
-                        (!modifiedSinceLastSubmit && submitError)
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       errorMessage={
-                        meta.error || (!modifiedSinceLastSubmit && submitError)
+                        meta.error ||
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       {...input}
                     />
