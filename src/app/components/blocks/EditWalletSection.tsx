@@ -33,7 +33,7 @@ import SecondaryModal, {
 } from "app/components/elements/SecondaryModal";
 import PasswordField from "app/components/elements/PasswordField";
 import AutoIcon from "app/components/elements/AutoIcon";
-import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import SecretField from "app/components/blocks/SecretField";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
@@ -51,6 +51,8 @@ type EditWalletSectionProps = {
 };
 
 const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
+  const { confirm } = useDialog();
+
   const [modalState, setModalState] = useState<
     null | "delete" | "phrase" | "private-key"
   >(null);
@@ -67,6 +69,17 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       }),
     [account.uuid]
   );
+
+  const handleDeleteAccount = useCallback(() => {
+    confirm({
+      title: "Delete wallet account",
+      content: `Are you sure you want to delete the wallet "${account.name}"?`,
+    }).then((answer) => {
+      if (answer) {
+        setModalState("delete");
+      }
+    });
+  }, [account.name, confirm]);
 
   return (
     <ScrollAreaContainer
@@ -220,7 +233,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       <NewButton
         type="button"
         theme="secondary"
-        onClick={() => setModalState("delete")}
+        onClick={handleDeleteAccount}
         className={classNames(
           "mt-6 w-48",
           "!py-2",
@@ -283,7 +296,6 @@ const DeleteAccountModal = memo<
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const currentAccount = useAtomValue(currentAccountAtom);
   const windowFocused = useWindowFocus();
-  const { confirm } = useDialog();
 
   useEffect(() => {
     if (!windowFocused && cause !== "delete") {
@@ -304,23 +316,19 @@ const DeleteAccountModal = memo<
               setPrivateKey(key);
             }
           } else {
-            // TODO: Add password validation
-            confirm({
-              title: "Delete wallet account",
-              content: `Are you sure you want to delete the ${currentAccount.name} wallet?`,
-            }).then((answer) => {
-              if (answer) {
-                deleteAccounts(password, [currentAccount.uuid]);
-              }
+            try {
+              await deleteAccounts(password, [currentAccount.uuid]);
               onOpenChange?.(false);
-            });
+            } catch (err: any) {
+              throw new Error(err?.message);
+            }
           }
         } catch (err: any) {
           return { password: err?.message };
         }
         return;
       }),
-    [cause, currentAccount, onOpenChange, confirm]
+    [cause, currentAccount, onOpenChange]
   );
 
   return (
@@ -329,7 +337,7 @@ const DeleteAccountModal = memo<
         seedPhrase
           ? "Your secret phrase"
           : privateKey
-          ? "Your private key"
+          ? `Private key for wallet "${currentAccount.name}"`
           : "Type password"
       }
       open={open}
@@ -337,7 +345,7 @@ const DeleteAccountModal = memo<
       className="px-[5.25rem]"
     >
       {seedPhrase || privateKey ? (
-        <SeedPhraseField
+        <SecretField
           label={seedPhrase ? "Secret phrase" : "Private key"}
           value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
         />

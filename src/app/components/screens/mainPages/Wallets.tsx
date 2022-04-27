@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 
 import { allAccountsAtom } from "app/atoms";
@@ -8,6 +8,8 @@ import EditWalletSection from "app/components/blocks/EditWalletSection";
 const Wallets: FC = () => {
   const accounts = useAtomValue(allAccountsAtom);
   const [selectedAccount, setSelectedAccount] = useState(accounts[0]);
+
+  useEffect(() => setSelectedAccount(accounts[0]), [accounts]);
 
   return (
     <div className="flex min-h-0 grow">

@@ -11,7 +11,7 @@ import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import SecretField from "app/components/blocks/SecretField";
 import NewButton from "app/components/elements/NewButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
@@ -104,7 +104,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SeedPhraseField defaultValue={fromProtectedString(seedPhrase)} />
+        <SecretField defaultValue={fromProtectedString(seedPhrase)} />
       ) : (
         <Form<FormValues>
           decorators={[focusOnErrors]}
