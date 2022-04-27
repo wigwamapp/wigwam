@@ -104,7 +104,7 @@ const WalletTab: FC<WalletTabProps> = ({
     "min-w-[20.25rem]",
     "p-3",
     active && "bg-brand-main/10",
-    "hover:bg-brand-main/5",
+    !active && "hover:bg-brand-main/5",
     "rounded-[.625rem]",
     "flex items-stretch",
     "text-left"
