@@ -7,7 +7,7 @@ import Separator from "app/components/elements/Seperator";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
 type SecondaryTabsProps = {
-  tabs?: SecondaryItemProps[];
+  tabs: SecondaryItemProps[];
   activeRoute?: Destination;
   className?: string;
 };
