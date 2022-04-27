@@ -33,13 +33,13 @@ const USDAmount: FC<USDAmountProps> = ({ amount, ...props }) => {
 
 export default USDAmount;
 
-const fiatFormat = (amount: BigNumber.Value | null) => {
-  const bigNumberAmount = new BigNumber(amount ?? 0);
+const fiatFormat = (amount: BigNumber.Value) => {
+  const bigNumberAmount = new BigNumber(amount);
   return bigNumberAmount.toFixed(2);
 };
 
-const convert = (amount: BigNumber.Value | null, rate: number) => {
-  const bigNumberAmount = new BigNumber(amount ?? 0);
+const convert = (amount: BigNumber.Value, rate: number) => {
+  const bigNumberAmount = new BigNumber(amount);
   return bigNumberAmount.multipliedBy(Number(rate));
 };
 

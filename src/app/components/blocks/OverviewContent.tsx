@@ -55,7 +55,7 @@ import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import AddressField from "../elements/AddressField";
-import USDAmount from "../elements/USDAmount";
+// import USDAmount from "../elements/USDAmount";
 import PrettyAmount from "../elements/PrettyAmount";
 
 const OverviewContent: FC = () => (
