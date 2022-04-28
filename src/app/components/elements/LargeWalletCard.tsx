@@ -1,7 +1,5 @@
 import { memo, useRef, useState } from "react";
 import classNames from "clsx";
-import { ethers } from "ethers";
-import BigNumber from "bignumber.js";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { TReplace } from "lib/ext/i18n/react";
 
@@ -9,9 +7,9 @@ import { Account } from "core/types";
 
 import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
 
-import PrettyAmount from "./PrettyAmount";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
+import Balance from "./Balance";
 import IconedButton from "./IconedButton";
 import Tooltip from "./Tooltip";
 import CopiableTooltip from "./CopiableTooltip";
@@ -32,8 +30,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
     const [copied, setCopied] = useState(false);
 
     const currentNetwork = useLazyNetwork();
-    const nativeToken = useToken(address);
-    const portfolioBalance = nativeToken?.portfolioUSD;
+    const portfolioBalance = useToken(address)?.portfolioUSD;
 
     const transitionRef = useRef<HTMLDivElement>(null);
 
@@ -122,19 +119,8 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                         </span>
                       </>
                     </CopiableTooltip>
-                    <PrettyAmount
-                      amount={
-                        nativeToken
-                          ? portfolioBalance ??
-                            ethers.utils.formatEther(nativeToken.rawBalance)
-                          : null
-                      }
-                      currency={portfolioBalance ? "$" : nativeToken?.symbol}
-                      isMinified={
-                        portfolioBalance
-                          ? new BigNumber(portfolioBalance).isLessThan(0.01)
-                          : false
-                      }
+                    <Balance
+                      address={address}
                       copiable
                       className="mt-auto text-xl font-bold leading-none"
                     />
@@ -162,14 +148,10 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                     )}
                   </div>
                   {portfolioBalance && (
-                    <PrettyAmount
-                      amount={
-                        nativeToken
-                          ? ethers.utils.formatEther(nativeToken.rawBalance)
-                          : null
-                      }
-                      currency={nativeToken?.symbol}
+                    <Balance
+                      address={address}
                       copiable
+                      isNative
                       prefix={<GasIcon className="w-3 h-auto mr-1" />}
                       className="text-sm leading-none text-brand-inactivedark flex items-center max-h-[1rem]"
                     />

@@ -3,8 +3,6 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import { ethers } from "ethers";
-import BigNumber from "bignumber.js";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
@@ -22,7 +20,6 @@ import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
-import PrettyAmount from "./PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
@@ -91,15 +88,16 @@ type AccountSelectItemProps = {
   account: Account;
 };
 
-const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
+const CurrentAccount: FC<AccountSelectItemProps> = ({
+  account: { address, name },
+}) => {
   const [copied, setCopied] = useState(false);
-  const nativeToken = useToken(account.address);
-  const portfolioBalance = nativeToken?.portfolioUSD;
+  const portfolioBalance = useToken(address)?.portfolioUSD;
 
   return (
     <span className="flex items-center text-left w-full pr-3 min-w-0">
       <AutoIcon
-        seed={account.address}
+        seed={address}
         source="dicebear"
         type="personas"
         className={classNames(
@@ -111,7 +109,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       />
       <CopiableTooltip
         content="Copy wallet address to clipboard"
-        textToCopy={account.address}
+        textToCopy={address}
         onCopiedToggle={setCopied}
         className={classNames(
           "px-1 -my-1 mr-4",
@@ -126,11 +124,11 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       >
         <>
           <span className="font-bold truncate w-full">
-            <TReplace msg={account.name} />
+            <TReplace msg={name} />
           </span>
           <span className="flex items-center mt-auto">
             <HashPreview
-              hash={account.address}
+              hash={address}
               className="text-xs text-brand-light font-normal leading-4 mr-1"
               withTooltip={false}
             />
@@ -144,31 +142,12 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <PrettyAmount
-            amount={
-              nativeToken
-                ? portfolioBalance ??
-                  ethers.utils.formatEther(nativeToken.rawBalance)
-                : null
-            }
-            currency={portfolioBalance ? "$" : nativeToken?.symbol}
-            isMinified={
-              portfolioBalance
-                ? new BigNumber(portfolioBalance).isLessThan(0.01)
-                : false
-            }
-            copiable
-            className="font-bold"
-          />
+          <Balance address={address} copiable className="font-bold" />
         </span>
         {portfolioBalance && (
-          <PrettyAmount
-            amount={
-              nativeToken
-                ? ethers.utils.formatEther(nativeToken.rawBalance)
-                : null
-            }
-            currency={nativeToken?.symbol}
+          <Balance
+            address={address}
+            isNative
             isMinified
             copiable
             prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}

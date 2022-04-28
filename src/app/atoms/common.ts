@@ -33,6 +33,16 @@ export const tokensWithoutBalanceAtom = atomWithStorage<boolean>(
   true
 );
 
+export const currenciesRateAtom = atomWithStorage<Record<string, number>>(
+  "currencies_rate",
+  { USD: 1 }
+);
+
+export const selectedCurrencyAtom = atomWithStorage(
+  "preferred_currency",
+  "USD"
+);
+
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
     return query(() => Repo.networks.get(chainId));

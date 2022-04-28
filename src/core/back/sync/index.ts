@@ -7,8 +7,10 @@ import retry from "async-retry";
 // import ExpiryMap from 'expiry-map';
 import { createQueue } from "lib/system/queue";
 import { props } from "lib/system/promise";
+import { storage } from "lib/ext/storage";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
+import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 import { Erc20__factory } from "abi-types";
 import {
   Account,
@@ -143,6 +145,8 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
   }, 300);
 
   try {
+    await syncConversionRates();
+
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
 
@@ -631,6 +635,48 @@ const getCoinGeckoPlatformPrices = mem(
   {
     maxAge: 60_000, // 1 min
   }
+);
+
+type Currency = {
+  name: string;
+  type: string;
+  unit: string;
+  value: number;
+};
+
+const syncConversionRates = mem(
+  async () => {
+    try {
+      const { data } = await coinGeckoApi.get("/exchange_rates");
+      const currencies: { rates: Record<string, Currency> } = data;
+
+      const rates: Record<string, string> = {};
+
+      const btcPrice = new BigNumber(currencies.rates["usd"].value);
+      const btcToUsd = new BigNumber(1).dividedBy(btcPrice);
+      Object.entries(currencies.rates).forEach(([key, value]) => {
+        if (value.type === "fiat" || key === "btc" || key === "eth") {
+          if (value.name === "Russian Ruble") {
+            return;
+          }
+          const code = CONVERSION_CURRENCIES.find(
+            (conv_curr) => conv_curr.code === key.toUpperCase()
+          )?.code;
+          if (code) {
+            const convertedAmount = new BigNumber(value.value).multipliedBy(
+              btcToUsd
+            );
+            rates[code] = convertedAmount.toString();
+          }
+        }
+      });
+
+      await storage.put("currencies_rate", rates);
+    } catch (err) {
+      console.error(err);
+    }
+  },
+  { maxAge: 300000 }
 );
 
 function getMyRandomAddress(accountAddress: string, hops = 0): string {

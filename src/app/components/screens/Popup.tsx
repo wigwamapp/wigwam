@@ -39,11 +39,12 @@ import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import PrettyAmount from "../elements/PrettyAmount";
+import FiatAmount from "../elements/FiatAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
+import PrettyAmount from "../elements/PrettyAmount";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -357,9 +358,8 @@ const AssetCard = memo(
                 copiable={!isManageMode}
               />
               {!isManageMode && (
-                <PrettyAmount
+                <FiatAmount
                   amount={balanceUSD ?? 0}
-                  currency="$"
                   className={classNames(
                     "ml-2",
                     "text-xs leading-4",
