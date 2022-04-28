@@ -145,7 +145,8 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
   }, 300);
 
   try {
-    syncConversionRates();
+    await syncConversionRates();
+
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
 
@@ -643,12 +644,10 @@ type Currency = {
   value: number;
 };
 
-export const syncConversionRates = mem(
+const syncConversionRates = mem(
   async () => {
     try {
-      const { data } = await axios.get(
-        "https://api.coingecko.com/api/v3/exchange_rates"
-      );
+      const { data } = await coinGeckoApi.get("/exchange_rates");
       const currencies: { rates: Record<string, Currency> } = data;
 
       const rates: Record<string, string> = {};
@@ -667,10 +666,11 @@ export const syncConversionRates = mem(
             const convertedAmount = new BigNumber(value.value).multipliedBy(
               btcToUsd
             );
-            rates[code] = convertedAmount.toFormat();
+            rates[code] = convertedAmount.toString();
           }
         }
       });
+
       await storage.put("currencies_rate", rates);
     } catch (err) {
       console.error(err);
