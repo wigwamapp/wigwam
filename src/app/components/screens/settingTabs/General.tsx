@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { setLocale } from "lib/ext/i18n";
 
@@ -17,10 +17,10 @@ import Select from "app/components/elements/Select";
 import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
+import classNames from "clsx";
 
 const General: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
-  const [selectedCurrency, updateCurrency] = useAtom(selectedCurrencyAtom);
   const [showTokensWithoutBalance, toggleTokensWithoutBalance] = useAtom(
     tokensWithoutBalanceAtom
   );
@@ -30,6 +30,40 @@ const General: FC = () => {
       DEFAULT_LOCALES.find(({ code }) => currentLocale === code) ??
       FALLBACK_LOCALE,
     [currentLocale]
+  );
+
+  return (
+    <div className="flex flex-col items-start">
+      <SettingsHeader>General</SettingsHeader>
+      <SelectLanguage
+        selected={locale}
+        items={DEFAULT_LOCALES}
+        onSelect={({ code }) => setLocale(code)}
+        className="mb-3"
+      />
+      <SelectCurrency className="mb-3" />
+      <Switcher
+        label="Tokens without balance"
+        text={showTokensWithoutBalance ? "Visible" : "Hidden"}
+        checked={showTokensWithoutBalance}
+        onCheckedChange={toggleTokensWithoutBalance}
+      />
+    </div>
+  );
+};
+
+export default General;
+
+const SelectCurrency: FC<{ className?: string }> = ({ className }) => {
+  const [selectedCurrency, updateCurrency] = useAtom(selectedCurrencyAtom);
+
+  const preparedCurrencies = useMemo(
+    () =>
+      CONVERSION_CURRENCIES.map((currency: ConversionCurrency) => ({
+        key: currency.code,
+        value: `${currency.code} - ${currency.name}`,
+      })),
+    []
   );
 
   const currentItem = useMemo(
@@ -43,10 +77,9 @@ const General: FC = () => {
     }),
     [selectedCurrency]
   );
-  const currencySelectProps = {
-    items: CONVERSION_CURRENCIES.map(mapCurrency),
-    currentItem,
-    setItem: (item: any) => {
+
+  const handleSelectCurrency = useCallback(
+    (item: { icon?: string; key: string; value: string }) => {
       const newCurrency = CONVERSION_CURRENCIES.find(
         (currency) => currency.code === item.key
       );
@@ -54,33 +87,18 @@ const General: FC = () => {
         updateCurrency(item.key);
       }
     },
-    showSelected: true,
-    label: "Currency conversion",
-  };
+    [updateCurrency]
+  );
 
   return (
-    <div className="flex flex-col items-start">
-      <SettingsHeader>General</SettingsHeader>
-      <SelectLanguage
-        selected={locale}
-        items={DEFAULT_LOCALES}
-        onSelect={({ code }) => setLocale(code)}
-        className="mb-3"
-      />
-      <Select {...currencySelectProps} className="mb-3" />
-      <Switcher
-        label="Tokens without balance"
-        text={showTokensWithoutBalance ? "Visible" : "Hidden"}
-        checked={showTokensWithoutBalance}
-        onCheckedChange={toggleTokensWithoutBalance}
-      />
-    </div>
+    <Select
+      label="Currency conversion"
+      items={preparedCurrencies}
+      currentItem={currentItem}
+      setItem={handleSelectCurrency}
+      showSelected={true}
+      className={classNames("max-w-[17.75rem]", className)}
+      contentClassName="max-w-[17.75rem]"
+    />
   );
 };
-
-export default General;
-
-const mapCurrency = (currency: ConversionCurrency) => ({
-  key: currency.code,
-  value: `${currency.code} - ${currency.name}`,
-});

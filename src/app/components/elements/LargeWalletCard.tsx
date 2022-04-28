@@ -140,9 +140,9 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                             : null
                         }
                         currency={nativeToken?.symbol}
+                        isMinified={false}
                         copiable
-                        prefix={<GasIcon className="w-3 h-auto mr-1" />}
-                        className="text-sm leading-none text-brand-inactivedark flex items-center max-h-[1rem]"
+                        className="mt-auto text-xl font-bold leading-none"
                       />
                     )}
                   </div>

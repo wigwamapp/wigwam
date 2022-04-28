@@ -125,7 +125,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
               className={classNames("w-7 mr-2", currentItemIconClassName)}
             />
           )}
-          {currentItem.value}
+          {typeof currentItem.value === "string" ? (
+            <span className="min-w-0 truncate">{currentItem.value}</span>
+          ) : (
+            currentItem.value
+          )}
           <ChevronDownIcon
             className={classNames(
               "w-6 h-auto min-w-[1.5rem]",
@@ -241,7 +245,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               className={"w-6 h-6 mr-3"}
                             />
                           )}
-                          {item.value}
+                          {typeof currentItem.value === "string" ? (
+                            <span className="min-w-0 truncate">
+                              {item.value}
+                            </span>
+                          ) : (
+                            item.value
+                          )}
                           {showSelected &&
                             showSelectedIcon &&
                             item.key === currentItem.key && (
