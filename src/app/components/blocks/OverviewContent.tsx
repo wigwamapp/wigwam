@@ -55,8 +55,8 @@ import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import AddressField from "../elements/AddressField";
-// import USDAmount from "../elements/USDAmount";
 import PrettyAmount from "../elements/PrettyAmount";
+import FiatAmount from "../elements/FiatAmount";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -394,9 +394,8 @@ const AssetCard = memo(
                 {name}
               </span>
               {!isManageMode && (
-                <PrettyAmount
+                <FiatAmount
                   amount={balanceUSD}
-                  currency="$"
                   className={"text-base font-bold leading-4 ml-2"}
                   threeDots={false}
                 />
@@ -545,9 +544,8 @@ const AssetInfo: FC = () => {
               Price
             </span>
             <span className="flex items-center">
-              <PrettyAmount
+              <FiatAmount
                 amount={priceUSD ?? 0}
-                currency="$"
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
@@ -564,9 +562,8 @@ const AssetInfo: FC = () => {
         </div>
 
         <div className="flex items-end">
-          <PrettyAmount
+          <FiatAmount
             amount={balanceUSD ?? 0}
-            currency="$"
             copiable
             className="text-[1.75rem] font-bold leading-none mr-4"
           />
@@ -576,7 +573,6 @@ const AssetInfo: FC = () => {
                 .times(balanceUSD)
                 .div(100)
                 .toFixed(2)}
-              className="!text-lg !font-semibold"
             />
           )}
         </div>
@@ -674,7 +670,6 @@ const PriceChange: FC<PriceChangeProps> = ({
       className={classNames(
         "inline-flex items-center",
         isPercent && "text-sm leading-4",
-        !isPercent && "text-base",
         "font-bold",
         isPercent && "py-1 px-2",
         "rounded-md",
@@ -686,21 +681,26 @@ const PriceChange: FC<PriceChangeProps> = ({
       )}
     >
       {isPercent ? (
-        <PriceArrow
-          className={classNames(
-            "w-2.5 h-2.5 mr-[0.2rem]",
-            !isPositive && "transform rotate-180"
-          )}
+        <PrettyAmount
+          prefix={
+            <PriceArrow
+              className={classNames(
+                "w-2.5 h-2.5 mr-[0.2rem]",
+                !isPositive && "transform rotate-180"
+              )}
+            />
+          }
+          amount={Math.abs(priceChangeNumber)}
+          className="inline-flex items-center"
         />
-      ) : isPositive ? (
-        "+"
       ) : (
-        "-"
+        <FiatAmount
+          prefix={isPositive ? "+" : "-"}
+          amount={Math.abs(priceChangeNumber)}
+          copiable
+          className="text-lg font-semibold"
+        />
       )}
-      <PrettyAmount
-        amount={Math.abs(priceChangeNumber)}
-        currency={isPercent ? undefined : "$"}
-      />
       {isPercent ? "%" : ""}
     </span>
   );

@@ -22,7 +22,8 @@ import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
-import USDAmount from "./USDAmount";
+import FiatAmount from "./FiatAmount";
+import PrettyAmount from "./PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
@@ -144,25 +145,29 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <USDAmount
-            amount={
-              nativeToken
-                ? portfolioBalance ??
-                  ethers.utils.formatEther(nativeToken.rawBalance)
-                : null
-            }
-            currency={portfolioBalance ? "$" : nativeToken?.symbol}
-            isMinified={
-              portfolioBalance
-                ? new BigNumber(portfolioBalance).isLessThan(0.01)
-                : false
-            }
-            copiable
-            className="font-bold"
-          />
+          {portfolioBalance ? (
+            <FiatAmount
+              amount={nativeToken ? portfolioBalance : null}
+              isMinified={new BigNumber(portfolioBalance).isLessThan(0.01)}
+              copiable
+              className="font-bold"
+            />
+          ) : (
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={nativeToken?.symbol}
+              isMinified={false}
+              copiable
+              className="font-bold"
+            />
+          )}
         </span>
         {portfolioBalance && (
-          <USDAmount
+          <PrettyAmount
             amount={
               nativeToken
                 ? ethers.utils.formatEther(nativeToken.rawBalance)

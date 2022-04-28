@@ -1,11 +1,9 @@
 import { FC } from "react";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
-import { useAtomValue } from "jotai";
 
 import { useToken } from "app/hooks";
-import { selectedCurrencyAtom } from "app/atoms";
-import USDAmount from "./USDAmount";
+import FiatAmount from "./FiatAmount";
 import PrettyAmount from "./PrettyAmount";
 
 type BalanceProps = {
@@ -20,48 +18,30 @@ const Balance: FC<BalanceProps> = ({
   className,
 }) => {
   const nativeToken = useToken(address);
-  const selectedCurrency = useAtomValue(selectedCurrencyAtom);
 
-  const protfolioBalane = nativeToken?.portfolioUSD;
+  const portfolioBalance = nativeToken?.portfolioUSD;
+
+  if (portfolioBalance) {
+    return (
+      <FiatAmount
+        amount={nativeToken ? portfolioBalance : null}
+        isMinified={new BigNumber(portfolioBalance).isLessThan(0.01)}
+        copiable={copiable}
+        className={className}
+      />
+    );
+  }
 
   return (
-    <>
-      {protfolioBalane ? (
-        <USDAmount
-          amount={
-            nativeToken
-              ? protfolioBalane ??
-                ethers.utils.formatEther(nativeToken.rawBalance)
-              : null
-          }
-          currencyCode={selectedCurrency}
-          isMinified={
-            protfolioBalane
-              ? new BigNumber(protfolioBalane).isLessThan(0.01)
-              : false
-          }
-          copiable={copiable}
-          className={className}
-        />
-      ) : (
-        <PrettyAmount
-          amount={
-            nativeToken
-              ? protfolioBalane ??
-                ethers.utils.formatEther(nativeToken.rawBalance)
-              : null
-          }
-          currency={nativeToken?.symbol}
-          isMinified={
-            protfolioBalane
-              ? new BigNumber(protfolioBalane).isLessThan(0.01)
-              : false
-          }
-          copiable={copiable}
-          className={className}
-        />
-      )}
-    </>
+    <PrettyAmount
+      amount={
+        nativeToken ? ethers.utils.formatEther(nativeToken.rawBalance) : null
+      }
+      currency={nativeToken?.symbol}
+      isMinified={false}
+      copiable={copiable}
+      className={className}
+    />
   );
 };
 

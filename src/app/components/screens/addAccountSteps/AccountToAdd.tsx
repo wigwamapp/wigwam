@@ -31,7 +31,7 @@ import Input from "app/components/elements/Input";
 import Checkbox from "app/components/elements/Checkbox";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
-import USDAmount from "app/components/elements/USDAmount";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
 
@@ -438,7 +438,7 @@ const Account = memo<AccountProps>(
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
-          <USDAmount
+          <PrettyAmount
             amount={baseAsset ? ethers.utils.formatEther(baseAsset.balance) : 0}
             currency={
               baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol

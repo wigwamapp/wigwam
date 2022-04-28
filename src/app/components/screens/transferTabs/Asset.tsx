@@ -30,7 +30,7 @@ import NewButton from "app/components/elements/NewButton";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
-import USDAmount from "app/components/elements/USDAmount";
+import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -225,7 +225,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
             header={
               <>
                 Amount:{" "}
-                <USDAmount
+                <PrettyAmount
                   amount={values.amount ?? 0}
                   currency={currentToken?.symbol ?? undefined}
                   copiable
@@ -234,7 +234,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
               </>
             }
             value={
-              <USDAmount
+              <FiatAmount
                 amount={
                   values.amount && currentToken
                     ? new BigNumber(values.amount).multipliedBy(
@@ -259,14 +259,14 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
                 />
               </>
             }
-            value={<USDAmount amount={9.55} copiable />}
+            value={<FiatAmount amount={9.55} copiable />}
             className="mb-1"
           />
           <SummaryRow
             header={
               <>
                 Total:{" "}
-                <USDAmount
+                <FiatAmount
                   amount={
                     values.amount && currentToken
                       ? new BigNumber(values.amount)

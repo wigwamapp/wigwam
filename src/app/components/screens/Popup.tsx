@@ -39,7 +39,7 @@ import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import USDAmount from "app/components/elements/USDAmount";
+import FiatAmount from "../elements/FiatAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
@@ -358,7 +358,7 @@ const AssetCard = memo(
                 copiable={!isManageMode}
               />
               {!isManageMode && (
-                <USDAmount
+                <FiatAmount
                   amount={balanceUSD ?? 0}
                   className={classNames(
                     "ml-2",

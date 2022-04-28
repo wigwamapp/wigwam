@@ -12,7 +12,7 @@ import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
-import USDAmount from "./USDAmount";
+import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
 import PrettyAmount from "./PrettyAmount";
 
@@ -173,7 +173,7 @@ const Token: FC<{
           <span className="text-xs text-brand-inactivedark font-normal truncate">
             {name}
           </span>
-          <USDAmount
+          <FiatAmount
             amount={balanceUSD ?? 0}
             className="text-xs font-normal ml-1"
           />

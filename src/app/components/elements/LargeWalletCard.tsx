@@ -9,7 +9,8 @@ import { Account } from "core/types";
 
 import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
 
-import USDAmount from "./USDAmount";
+import FiatAmount from "./FiatAmount";
+import PrettyAmount from "./PrettyAmount";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import IconedButton from "./IconedButton";
@@ -21,7 +22,6 @@ import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
-import PrettyAmount from "./PrettyAmount";
 
 type LargeWalletCardProps = {
   account: Account;
@@ -123,21 +123,28 @@ const LargeWalletCard = memo<LargeWalletCardProps>(
                         </span>
                       </>
                     </CopiableTooltip>
-                    <USDAmount
-                      amount={
-                        nativeToken
-                          ? portfolioBalance ??
-                            ethers.utils.formatEther(nativeToken.rawBalance)
-                          : null
-                      }
-                      isMinified={
-                        portfolioBalance
-                          ? new BigNumber(portfolioBalance).isLessThan(0.01)
-                          : false
-                      }
-                      copiable
-                      className="mt-auto text-xl font-bold leading-none"
-                    />
+                    {portfolioBalance ? (
+                      <FiatAmount
+                        amount={nativeToken ? portfolioBalance : null}
+                        isMinified={new BigNumber(portfolioBalance).isLessThan(
+                          0.01
+                        )}
+                        copiable
+                        className="mt-auto text-xl font-bold leading-none"
+                      />
+                    ) : (
+                      <PrettyAmount
+                        amount={
+                          nativeToken
+                            ? ethers.utils.formatEther(nativeToken.rawBalance)
+                            : null
+                        }
+                        currency={nativeToken?.symbol}
+                        copiable
+                        prefix={<GasIcon className="w-3 h-auto mr-1" />}
+                        className="text-sm leading-none text-brand-inactivedark flex items-center max-h-[1rem]"
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="flex mt-2">

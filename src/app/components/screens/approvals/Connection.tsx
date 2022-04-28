@@ -20,7 +20,8 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
-import USDAmount from "app/components/elements/USDAmount";
+import FiatAmount from "app/components/elements/FiatAmount";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
@@ -266,32 +267,36 @@ const Account: FC<AccountProps> = ({
         />
       </span>
       <span className="flex flex-col text-right min-w-0">
-        <USDAmount
-          amount={
-            nativeToken
-              ? portfolioBalance ??
-                ethers.utils.formatEther(nativeToken.rawBalance)
-              : null
-          }
-          currency={portfolioBalance ? "$" : nativeToken?.symbol}
-          isMinified={
-            portfolioBalance
-              ? new BigNumber(portfolioBalance).isLessThan(0.01)
-              : false
-          }
-          className="text-sm font-bold text-brand-light ml-2"
-        />
-        {portfolioBalance && (
-          <USDAmount
+        {portfolioBalance ? (
+          <>
+            <FiatAmount
+              amount={nativeToken ? portfolioBalance : null}
+              isMinified={new BigNumber(portfolioBalance).isLessThan(0.01)}
+              className="text-sm font-bold text-brand-light ml-2"
+            />
+
+            <PrettyAmount
+              amount={
+                nativeToken
+                  ? ethers.utils.formatEther(nativeToken.rawBalance)
+                  : null
+              }
+              currency={nativeToken?.symbol}
+              isMinified
+              prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
+              className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
+            />
+          </>
+        ) : (
+          <PrettyAmount
             amount={
               nativeToken
                 ? ethers.utils.formatEther(nativeToken.rawBalance)
                 : null
             }
             currency={nativeToken?.symbol}
-            isMinified
-            prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
-            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
+            isMinified={false}
+            className="text-sm font-bold text-brand-light ml-2"
           />
         )}
       </span>
