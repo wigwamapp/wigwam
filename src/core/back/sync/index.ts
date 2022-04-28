@@ -10,6 +10,7 @@ import { props } from "lib/system/promise";
 import { storage } from "lib/ext/storage";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
+import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 import { Erc20__factory } from "abi-types";
 import {
   Account,
@@ -32,7 +33,6 @@ import * as repo from "core/repo";
 
 import { $accounts, syncStarted, synced } from "../state";
 import { getRpcProvider } from "../rpc";
-import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 
 const debankApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
@@ -636,6 +636,13 @@ const getCoinGeckoPlatformPrices = mem(
   }
 );
 
+type Currency = {
+  name: string;
+  type: string;
+  unit: string;
+  value: number;
+};
+
 export const syncConversionRates = mem(
   async () => {
     try {
@@ -644,12 +651,6 @@ export const syncConversionRates = mem(
       );
       const currencies: { rates: Record<string, Currency> } = data;
 
-      type Currency = {
-        name: string;
-        type: string;
-        unit: string;
-        value: number;
-      };
       const rates: Record<string, string> = {};
 
       const btcPrice = new BigNumber(currencies.rates["usd"].value);
