@@ -186,7 +186,7 @@ const AmountWithCurrency: FC<{
   }
 
   return (
-    <>
+    <span>
       {amount}
       {!isFiat && (
         <>
@@ -194,7 +194,7 @@ const AmountWithCurrency: FC<{
           <span>{currency}</span>
         </>
       )}
-    </>
+    </span>
   );
 };
 

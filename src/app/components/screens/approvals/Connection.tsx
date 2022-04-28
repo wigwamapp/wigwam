@@ -3,8 +3,6 @@ import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
-import { ethers } from "ethers";
-import BigNumber from "bignumber.js";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { TReplace } from "lib/ext/i18n/react";
 
@@ -20,8 +18,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
-import FiatAmount from "app/components/elements/FiatAmount";
-import PrettyAmount from "app/components/elements/PrettyAmount";
+import Balance from "app/components/elements/Balance";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
@@ -225,8 +222,7 @@ const Account: FC<AccountProps> = ({
   onToggleAdd,
   className,
 }) => {
-  const nativeToken = useToken(address);
-  const portfolioBalance = nativeToken?.portfolioUSD;
+  const portfolioBalance = useToken(address)?.portfolioUSD;
 
   return (
     <CheckboxPrimitive.Root
@@ -267,36 +263,17 @@ const Account: FC<AccountProps> = ({
         />
       </span>
       <span className="flex flex-col text-right min-w-0">
-        {portfolioBalance ? (
-          <>
-            <FiatAmount
-              amount={nativeToken ? portfolioBalance : null}
-              isMinified={new BigNumber(portfolioBalance).isLessThan(0.01)}
-              className="text-sm font-bold text-brand-light ml-2"
-            />
-
-            <PrettyAmount
-              amount={
-                nativeToken
-                  ? ethers.utils.formatEther(nativeToken.rawBalance)
-                  : null
-              }
-              currency={nativeToken?.symbol}
-              isMinified
-              prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
-              className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
-            />
-          </>
-        ) : (
-          <PrettyAmount
-            amount={
-              nativeToken
-                ? ethers.utils.formatEther(nativeToken.rawBalance)
-                : null
-            }
-            currency={nativeToken?.symbol}
-            isMinified={false}
-            className="text-sm font-bold text-brand-light ml-2"
+        <Balance
+          address={address}
+          className="text-sm font-bold text-brand-light ml-2"
+        />
+        {portfolioBalance && (
+          <Balance
+            address={address}
+            isNative
+            isMinified
+            prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
+            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
           />
         )}
       </span>

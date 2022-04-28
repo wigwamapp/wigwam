@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
@@ -9,24 +9,33 @@ import PrettyAmount from "./PrettyAmount";
 type BalanceProps = {
   address: string;
   copiable?: boolean;
+  isMinified?: boolean;
+  isNative?: boolean;
+  prefix?: ReactNode;
   className?: string;
 };
 
 const Balance: FC<BalanceProps> = ({
   address,
   copiable = false,
+  isMinified,
+  isNative = false,
+  prefix,
   className,
 }) => {
   const nativeToken = useToken(address);
 
   const portfolioBalance = nativeToken?.portfolioUSD;
 
-  if (portfolioBalance) {
+  if (portfolioBalance && !isNative) {
     return (
       <FiatAmount
         amount={nativeToken ? portfolioBalance : null}
-        isMinified={new BigNumber(portfolioBalance).isLessThan(0.01)}
+        isMinified={
+          isMinified ?? new BigNumber(portfolioBalance).isLessThan(0.01)
+        }
         copiable={copiable}
+        prefix={prefix}
         className={className}
       />
     );
@@ -38,8 +47,9 @@ const Balance: FC<BalanceProps> = ({
         nativeToken ? ethers.utils.formatEther(nativeToken.rawBalance) : null
       }
       currency={nativeToken?.symbol}
-      isMinified={false}
+      isMinified={isMinified ?? false}
       copiable={copiable}
+      prefix={prefix}
       className={className}
     />
   );
