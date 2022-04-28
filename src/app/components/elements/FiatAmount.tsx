@@ -1,15 +1,18 @@
 import { FC } from "react";
-import { currenciesRateAtom, selectedCurrencyAtom } from "app/atoms";
-import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
+import { waitForAll } from "jotai/utils";
+import BigNumber from "bignumber.js";
+
+import { currenciesRateAtom, selectedCurrencyAtom } from "app/atoms";
 
 import PrettyAmount, { PrettyAmountProps } from "./PrettyAmount";
 
 type FiatAmountProps = Omit<PrettyAmountProps, "isFiat" | "currency">;
 
 const FiatAmount: FC<FiatAmountProps> = ({ amount, ...rest }) => {
-  const currenciesRate = useAtomValue(currenciesRateAtom);
-  const selectedCurrency = useAtomValue(selectedCurrencyAtom);
+  const [currenciesRate, selectedCurrency] = useAtomValue(
+    waitForAll([currenciesRateAtom, selectedCurrencyAtom])
+  );
 
   const value = new BigNumber(amount ?? 0).multipliedBy(
     currenciesRate[selectedCurrency]
