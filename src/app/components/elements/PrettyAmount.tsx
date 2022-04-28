@@ -232,7 +232,9 @@ export const getPrettyAmount = ({
       "compact",
       isFiat ? "currency" : undefined,
       isFiat ? currency : undefined
-    ).format(+minifiedFractions);
+    )
+      .format(+minifiedFractions)
+      .replace("US$", "$");
   }
 
   return `${getIntlNumberFormat(
@@ -242,7 +244,9 @@ export const getPrettyAmount = ({
     "standard",
     isFiat ? "currency" : undefined,
     isFiat ? currency : undefined
-  ).format(+value)}${threeDots ? "..." : ""}`;
+  )
+    .format(+value)
+    .replace("US$", "$")}${threeDots ? "..." : ""}`;
 };
 
 const getIntlNumberFormat = memoize(
