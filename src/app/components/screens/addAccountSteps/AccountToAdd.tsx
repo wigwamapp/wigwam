@@ -184,7 +184,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
         return {
           derivationPath:
-            adrs.source === AccountSource.SeedPhrase && derivationPath
+            (adrs.source === AccountSource.SeedPhrase ||
+              adrs.source === AccountSource.Ledger) &&
+            derivationPath
               ? `${derivationPath}/${index}`
               : undefined,
           ...adrs,
