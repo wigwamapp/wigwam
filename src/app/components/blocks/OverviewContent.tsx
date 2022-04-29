@@ -436,7 +436,7 @@ const AssetCard = memo(
                     )}
                   />
 
-                  <span className="text-xs leading-3">
+                  <span className="text-xs leading-4">
                     {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
                   </span>
                 </span>
@@ -706,7 +706,7 @@ const PriceChange: FC<PriceChangeProps> = ({
   );
 };
 
-const PriceArrow: FC<{ className?: string }> = ({ className }) => (
+export const PriceArrow: FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="-5 -5 30 30" className={className}>
     <polygon
       className="fill-current stroke-current stroke-[4]"
