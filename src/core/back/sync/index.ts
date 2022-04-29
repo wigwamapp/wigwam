@@ -322,7 +322,7 @@ const syncAccountTokens = mem(
         "/user/token_list",
         {
           params: {
-            id: getMyRandomAddress(accountAddress),
+            id: await getMyRandomAddress(accountAddress, chainId),
             chain_id: debankChain.id,
             is_all: false,
           },
@@ -485,7 +485,7 @@ const getDebankUserChainBalance = mem(
       const { data } = await debankApi.get("/user/chain_balance", {
         params: {
           chain_id: debankChain.id,
-          id: getMyRandomAddress(accountAddress),
+          id: await getMyRandomAddress(accountAddress, chainId),
         },
       });
 
@@ -535,7 +535,7 @@ const getBalanceFromChain = mem(
     return requestBalance(
       provider,
       tokenSlug,
-      getMyRandomAddress(accountAddress)
+      await getMyRandomAddress(accountAddress, chainId)
     ).catch(() => null);
   },
   {
@@ -679,10 +679,17 @@ const syncConversionRates = mem(
   { maxAge: 300000 }
 );
 
-function getMyRandomAddress(accountAddress: string, hops = 0): string {
+async function getMyRandomAddress(
+  accountAddress: string,
+  chainId: number,
+  hops = 0
+): Promise<string> {
   if (process.env.VIGVAM_DEV_RANDOM_ADDRESSES === "false") {
     return accountAddress;
   }
+
+  const net = await getNetworkMemo(chainId);
+  if (net.type === "testnet") return accountAddress;
 
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
@@ -709,7 +716,7 @@ function getMyRandomAddress(accountAddress: string, hops = 0): string {
 
   if (randomAddress in localStorage) {
     if (hops > 10) return accountAddress;
-    return getMyRandomAddress(accountAddress, hops + 1);
+    return getMyRandomAddress(accountAddress, chainId, hops + 1);
   }
 
   localStorage.setItem(storageKey, randomAddress);
@@ -717,3 +724,5 @@ function getMyRandomAddress(accountAddress: string, hops = 0): string {
 
   return randomAddress;
 }
+
+const getNetworkMemo = mem(getNetwork);
