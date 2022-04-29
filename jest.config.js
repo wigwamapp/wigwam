@@ -15,7 +15,7 @@ module.exports = {
       "<rootDir>/.jest/fileTransform.js",
   },
   transformIgnorePatterns: [
-    "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+    "[/\\\\]node_modules[/\\\\](?!(mem|nanoid|dexie)/).+\\.(js|jsx|mjs|cjs|ts|tsx)$",
     "^.+\\.module\\.(css|sass|scss)$",
   ],
   moduleDirectories: ["node_modules", "src"],
