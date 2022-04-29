@@ -78,6 +78,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       showSelectedIcon={false}
       currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
       contentClassName="!w-[22.25rem]"
+      itemClassName="group"
     />
   );
 };
@@ -197,7 +198,12 @@ const AccountSelectItem: FC<
       </span>
       <HashPreview
         hash={account.address}
-        className="text-xs text-brand-inactivedark font-normal mt-px"
+        className={classNames(
+          "text-xs text-brand-inactivedark font-normal",
+          "mt-px",
+          "transition-colors",
+          "group-hover:text-brand-light"
+        )}
         withTooltip={false}
       />
     </span>

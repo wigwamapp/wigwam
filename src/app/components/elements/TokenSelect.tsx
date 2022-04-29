@@ -113,6 +113,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       showSelectedIcon={false}
       currentItemClassName={classNames("!p-3")}
       contentClassName="w-[23.25rem] flex flex-col"
+      itemClassName="group"
     />
   ) : (
     <></>
@@ -166,15 +167,24 @@ const Token: FC<{
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
+            threeDots={false}
             className="ml-2"
           />
         </span>
         <span className="flex justify-between">
-          <span className="text-xs text-brand-inactivedark font-normal truncate">
+          <span
+            className={classNames(
+              "text-xs text-brand-inactivedark font-normal",
+              "truncate",
+              "transition-colors",
+              size === "small" && "group-hover:text-brand-light"
+            )}
+          >
             {name}
           </span>
           <FiatAmount
             amount={balanceUSD ?? 0}
+            threeDots={false}
             className="text-xs font-normal ml-1"
           />
         </span>

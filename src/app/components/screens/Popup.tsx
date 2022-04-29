@@ -6,6 +6,7 @@ import {
   memo,
   useRef,
   useState,
+  useMemo,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -45,6 +46,7 @@ import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
 import PrettyAmount from "../elements/PrettyAmount";
+import PriceArrow from "../elements/PriceArrow";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -283,7 +285,15 @@ const AssetCard = memo(
       const currentAccount = useAtomValue(currentAccountAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
-      const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
+      const {
+        name,
+        symbol,
+        rawBalance,
+        decimals,
+        balanceUSD,
+        status,
+        priceUSDChange,
+      } = asset;
 
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
@@ -320,6 +330,14 @@ const AssetCard = memo(
         }
       }, [asset, currentAccount.address, isManageMode, popoverOpened]);
 
+      const priceClassName = useMemo(
+        () =>
+          priceUSDChange && +priceUSDChange > 0
+            ? "text-[#6BB77A]"
+            : "text-[#EA556A]",
+        [priceUSDChange]
+      );
+
       const content = (
         <button
           ref={ref}
@@ -348,27 +366,53 @@ const AssetCard = memo(
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />
           <span className="flex flex-col w-full min-w-0">
-            <span className="text-sm font-bold leading-5 truncate">{name}</span>
-            <span className="mt-auto flex justify-between items-end">
+            <span className="flex items-end">
+              <span className="text-sm font-bold leading-5 truncate mr-auto">
+                {name}
+              </span>
+              {!isManageMode && (
+                <FiatAmount
+                  amount={balanceUSD}
+                  copiable
+                  className={"text-sm font-bold leading-5 ml-2"}
+                  threeDots={false}
+                />
+              )}
+            </span>
+            <span className="mt-1 flex justify-between items-end">
               <PrettyAmount
                 amount={rawBalance ?? 0}
                 decimals={decimals}
                 currency={symbol}
-                className="text-sm font-bold leading-5"
+                className={classNames(
+                  // "text-sm",
+                  "text-xs leading-4",
+                  "text-brand-inactivedark"
+                )}
                 copiable={!isManageMode}
+                threeDots={false}
               />
-              {!isManageMode && (
-                <FiatAmount
-                  amount={balanceUSD ?? 0}
+              {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
+                <span
                   className={classNames(
+                    "inline-flex items-center",
+                    "opacity-75",
+                    "transition",
                     "ml-2",
-                    "text-xs leading-4",
-                    "text-brand-inactivedark",
-                    "transition-colors"
-                    // "group-hover:text-brand-light group-focus-visible:text-brand-light"
+                    priceClassName
                   )}
-                  copiable
-                />
+                >
+                  <PriceArrow
+                    className={classNames(
+                      "w-2 h-2 mr-[0.125rem]",
+                      +priceUSDChange < 0 && "transform rotate-180"
+                    )}
+                  />
+
+                  <span className="text-xs leading-4">
+                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                  </span>
+                </span>
               )}
             </span>
           </span>
