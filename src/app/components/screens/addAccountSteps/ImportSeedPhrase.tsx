@@ -23,7 +23,7 @@ import { useSteps } from "app/hooks/steps";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
-import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import SecretField from "app/components/blocks/SecretField";
 
 type FormValues = {
   seed: string;
@@ -111,7 +111,7 @@ const ImportSeedPhrase = memo(() => {
                 formatOnBlur
               >
                 {({ input, meta }) => (
-                  <SeedPhraseField
+                  <SecretField
                     placeholder="Paste there your secret phrase"
                     setFromClipboard={(value) => form.change("seed", value)}
                     error={meta.touched && meta.error}

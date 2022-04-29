@@ -23,7 +23,7 @@ import Select from "app/components/elements/Select";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
-import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import SecretField from "app/components/blocks/SecretField";
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
@@ -124,7 +124,7 @@ const CreateSeedPhrase = memo(() => {
           />
         </div>
 
-        <SeedPhraseField
+        <SecretField
           onRegenerate={generateNew}
           placeholder="Type there a secret phrase or generate new"
           className="mt-8"

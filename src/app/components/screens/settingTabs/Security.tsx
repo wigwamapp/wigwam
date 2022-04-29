@@ -1,7 +1,6 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
 import { Form, Field } from "react-final-form";
-import { FORM_ERROR } from "final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
 
@@ -12,7 +11,7 @@ import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import SeedPhraseField from "app/components/blocks/SeedPhraseField";
+import SecretField from "app/components/blocks/SecretField";
 import NewButton from "app/components/elements/NewButton";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
@@ -90,7 +89,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
           const seed = await getSeedPhrase(password);
           setSeedPhrase(seed.phrase);
         } catch (err: any) {
-          return { [FORM_ERROR]: err?.message };
+          return { password: err?.message };
         }
         return;
       }),
@@ -105,17 +104,12 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SeedPhraseField defaultValue={fromProtectedString(seedPhrase)} />
+        <SecretField defaultValue={fromProtectedString(seedPhrase)} />
       ) : (
         <Form<FormValues>
           decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
-          render={({
-            handleSubmit,
-            submitting,
-            modifiedSinceLastSubmit,
-            submitError,
-          }) => (
+          render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"
               onSubmit={handleSubmit}
@@ -129,10 +123,11 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||
-                        (!modifiedSinceLastSubmit && submitError)
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       errorMessage={
-                        meta.error || (!modifiedSinceLastSubmit && submitError)
+                        meta.error ||
+                        (!modifiedSinceLastSubmit && meta.submitError)
                       }
                       {...input}
                     />

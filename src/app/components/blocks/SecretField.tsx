@@ -28,36 +28,40 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as HiddenSeedPhraseIcon } from "app/icons/hidden-seed-phrase.svg";
 import { ReactComponent as LockIcon } from "app/icons/lock.svg";
 
-type SeedPhraseFieldProps =
-  | CreateSeedPhraseFieldProps
-  | ImportSeedPhraseFieldProps;
+type SecretFieldBaseProps = {
+  isDownloadable?: boolean;
+};
 
-const SeedPhraseField = forwardRef<
+type SecretFieldProps = CreateSecretFieldProps | ImportSecretFieldProps;
+
+const SecretField = forwardRef<
   HTMLTextAreaElement | HTMLInputElement,
-  SeedPhraseFieldProps
->(({ className, ...rest }, ref) => (
+  SecretFieldProps
+>(({ label = "Secret phrase", className, ...rest }, ref) => (
   <div className={classNames("w-full max-w-[27.5rem] relative", className)}>
     {"setFromClipboard" in rest ? (
-      <ImportSeedPhraseField ref={ref} {...rest} />
+      <ImportSecretField ref={ref} label={label} {...rest} />
     ) : (
-      <CreateSeedPhraseField
+      <CreateSecretField
         ref={ref as RefObject<HTMLTextAreaElement>}
+        label={label}
         {...rest}
       />
     )}
   </div>
 ));
 
-export default SeedPhraseField;
+export default SecretField;
 
-type CreateSeedPhraseFieldProps = (LongTextFieldProps | InputProps) & {
-  onRegenerate?: () => void;
-};
+type CreateSecretFieldProps = SecretFieldBaseProps &
+  (LongTextFieldProps | InputProps) & {
+    onRegenerate?: () => void;
+  };
 
-const CreateSeedPhraseField = forwardRef<
+const CreateSecretField = forwardRef<
   HTMLTextAreaElement,
-  CreateSeedPhraseFieldProps
->(({ onRegenerate, ...rest }, ref) => {
+  CreateSecretFieldProps
+>(({ label = "Secret phrase", isDownloadable, onRegenerate, ...rest }, ref) => {
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const { copy, copied } = useCopyToClipboard(fieldRef, true);
   const [isShown, setIsShown] = useState(false);
@@ -74,7 +78,7 @@ const CreateSeedPhraseField = forwardRef<
 
   const handleDownload = () => {
     const value = rest.value as string;
-    if (value) {
+    if (isDownloadable && value) {
       confirm({
         title: "Download Secret Phrase",
         content: `
@@ -93,27 +97,29 @@ const CreateSeedPhraseField = forwardRef<
     <div className="flex items-center">
       <TippySingletonProvider>
         <IconedButton
-          aria-label={`${isShown ? "Hide" : "Show"} secret phrase`}
+          aria-label={`${isShown ? "Hide" : "Show"} ${label.toLowerCase()}`}
           Icon={isShown ? EyeIcon : OpenedEyeIcon}
-          className="mr-2"
           theme="secondary"
           onClick={() => setIsShown((prevState) => !prevState)}
         />
         {onRegenerate && (
           <IconedButton
-            aria-label="Regenerate secret phrase"
+            aria-label={`Regenerate ${label.toLowerCase()}`}
             Icon={RegenerateIcon}
             onClick={onRegenerate}
-            className="mr-2"
+            className="ml-2"
             theme="secondary"
           />
         )}
-        <IconedButton
-          aria-label="Download secret phrase"
-          onClick={handleDownload}
-          Icon={DownloadIcon}
-          theme="secondary"
-        />
+        {isDownloadable && (
+          <IconedButton
+            aria-label={`Download ${label.toLowerCase()}`}
+            onClick={handleDownload}
+            Icon={DownloadIcon}
+            theme="secondary"
+            className="ml-2"
+          />
+        )}
       </TippySingletonProvider>
     </div>
   );
@@ -167,7 +173,7 @@ const CreateSeedPhraseField = forwardRef<
       <HiddenSeedPhraseIcon className="absolute inset-0" />
       <LockIcon className="w-[2.125rem] h-auto" />
       <span className="text-xs font-bold mt-1">
-        Click here to reveal secret phrase
+        Click here to reveal {label.toLowerCase()}
       </span>
       {copyButton}
     </div>
@@ -176,8 +182,7 @@ const CreateSeedPhraseField = forwardRef<
   return (
     <LongTextField
       ref={mergeRefs([ref, fieldRef])}
-      id="seedPhrase"
-      label="Secret Phrase"
+      label={label}
       readOnly
       labelActions={labelActions}
       actions={actions}
@@ -188,14 +193,15 @@ const CreateSeedPhraseField = forwardRef<
   );
 });
 
-type ImportSeedPhraseFieldProps = (LongTextFieldProps | InputProps) & {
-  setFromClipboard: (value: string) => void;
-};
+type ImportSecretFieldProps = SecretFieldBaseProps &
+  (LongTextFieldProps | InputProps) & {
+    setFromClipboard: (value: string) => void;
+  };
 
-const ImportSeedPhraseField = forwardRef<
+const ImportSecretField = forwardRef<
   HTMLTextAreaElement | HTMLInputElement,
-  ImportSeedPhraseFieldProps
->(({ setFromClipboard, ...rest }, ref) => {
+  ImportSecretFieldProps
+>(({ label = "Secret phrase", setFromClipboard, ...rest }, ref) => {
   const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
   const [isShown, setIsShown] = useState(false);
 
@@ -203,13 +209,13 @@ const ImportSeedPhraseField = forwardRef<
     <div className="flex items-center">
       <TippySingletonProvider>
         <IconedButton
-          aria-label={`${isShown ? "Hide" : "Show"} secret phrase`}
+          aria-label={`${isShown ? "Hide" : "Show"} ${label.toLowerCase()}`}
           Icon={isShown ? EyeIcon : OpenedEyeIcon}
           theme="secondary"
           onClick={() => setIsShown((prevState) => !prevState)}
         />
         {/*<IconedButton*/}
-        {/*  aria-label="Upload secret phrase"*/}
+        {/*  aria-label={`Upload ${label.toLowerCase()}`}*/}
         {/*  Icon={UploadIcon}*/}
         {/*  theme="secondary"*/}
         {/*  className="ml-2"*/}
@@ -244,8 +250,7 @@ const ImportSeedPhraseField = forwardRef<
     <Input
       ref={ref as RefObject<HTMLInputElement>}
       type="password"
-      id="seedPhrase"
-      label="Secret Phrase"
+      label={label}
       labelActions={labelActions}
       actions={actions}
       inputClassName="pb-[4.90625rem] !pr-4"
@@ -255,8 +260,7 @@ const ImportSeedPhraseField = forwardRef<
   ) : (
     <LongTextField
       ref={ref as RefObject<HTMLTextAreaElement>}
-      id="seedPhrase"
-      label="Secret Phrase"
+      label={label}
       labelActions={labelActions}
       actions={actions}
       {...(rest as LongTextFieldProps)}

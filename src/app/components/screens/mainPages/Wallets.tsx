@@ -1,9 +1,24 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import { useAtomValue } from "jotai";
+
+import { allAccountsAtom } from "app/atoms";
+import WalletTabs from "app/components/blocks/WalletTabs";
+import EditWalletSection from "app/components/blocks/EditWalletSection";
 
 const Wallets: FC = () => {
+  const accounts = useAtomValue(allAccountsAtom);
+  const [selectedAccount, setSelectedAccount] = useState(accounts[0]);
+
+  useEffect(() => setSelectedAccount(accounts[0]), [accounts]);
+
   return (
-    <div className="p-4">
-      <h3 className="font-bold text-2xl leading-none mb-6">Wallets</h3>
+    <div className="flex min-h-0 grow">
+      <WalletTabs
+        selectedAccount={selectedAccount}
+        onAccountChange={setSelectedAccount}
+        className="mt-5"
+      />
+      <EditWalletSection key={selectedAccount.uuid} account={selectedAccount} />
     </div>
   );
 };
