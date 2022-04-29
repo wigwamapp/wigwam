@@ -15,11 +15,7 @@ const MainPageLayout: FC = ({ children }) => (
         <Sidebar />
 
         <main
-          className={classNames(
-            "w-full min-w-0 pl-6",
-            "grow overflow-hidden",
-            "flex flex-col"
-          )}
+          className={classNames("w-full min-w-0 pl-6", "grow", "flex flex-col")}
         >
           <Menu />
 

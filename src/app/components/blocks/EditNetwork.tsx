@@ -115,8 +115,8 @@ const EditNetwork = memo<EditNetworkProps>(
     const isNative = network && network.type !== "unknown";
 
     return (
-      <section className={classNames("flex flex-col grow", "pl-6")}>
-        <header className="flex items-center">
+      <section className={classNames("flex flex-col grow")}>
+        <header className="flex items-center ml-6 pb-3">
           {isNew ? (
             <>
               <PlusCircleIcon className="w-8 h-auto mr-3" />
@@ -147,8 +147,8 @@ const EditNetwork = memo<EditNetworkProps>(
         </header>
 
         <ScrollAreaContainer
-          className={classNames("flex flex-col  mt-6")}
-          viewPortClassName="pb-20 rounded-t-[.625rem]"
+          className={classNames("flex flex-col")}
+          viewPortClassName="pb-20 rounded-t-[.625rem] pl-6 pt-3"
           scrollBarClassName="py-0 pb-20"
         >
           <Form<FormValues>
