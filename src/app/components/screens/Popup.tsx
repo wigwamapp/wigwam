@@ -46,7 +46,7 @@ import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
 import PrettyAmount from "../elements/PrettyAmount";
-import { PriceArrow } from "../blocks/OverviewContent";
+import PriceArrow from "../elements/PriceArrow";
 
 const Popup: FC = () => (
   <PopupLayout>
