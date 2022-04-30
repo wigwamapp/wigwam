@@ -7,12 +7,7 @@ import { AccountSource } from "core/types";
 import { validatePrivateKey } from "core/common";
 
 import { AddAccountStep } from "app/nav";
-import {
-  composeValidators,
-  required,
-  withHumanDelay,
-  focusOnErrors,
-} from "app/utils";
+import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import { useSteps } from "app/hooks/steps";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -66,7 +61,7 @@ const ImportPrivateKey = memo(() => {
             <div className="flex flex-col max-w-[27.5rem] mx-auto">
               <Field
                 name="privateKey"
-                validate={composeValidators(required)}
+                validate={required}
                 format={(value) =>
                   value ? value.replace(/\n/g, " ").trim() : ""
                 }
