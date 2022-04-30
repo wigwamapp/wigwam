@@ -136,26 +136,28 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           </form>
         )}
       />
-      <WalletBlock
-        Icon={KeyIcon}
-        title="Private key"
-        description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
-        className="mt-6"
-      >
-        <NewButton
-          theme="secondary"
-          className={classNames(
-            "max-h-[2.625rem]",
-            "flex !justify-start items-center",
-            "text-left",
-            "mt-2 !px-3 mr-auto"
-          )}
-          onClick={() => setModalState("private-key")}
+      {account.source !== AccountSource.Address && (
+        <WalletBlock
+          Icon={KeyIcon}
+          title="Private key"
+          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          className="mt-6"
         >
-          <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-          Reveal
-        </NewButton>
-      </WalletBlock>
+          <NewButton
+            theme="secondary"
+            className={classNames(
+              "max-h-[2.625rem]",
+              "flex !justify-start items-center",
+              "text-left",
+              "mt-2 !px-3 mr-auto"
+            )}
+            onClick={() => setModalState("private-key")}
+          >
+            <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+            Reveal
+          </NewButton>
+        </WalletBlock>
+      )}
       {account.source === AccountSource.OpenLogin && (
         <WalletBlock
           Icon={getSocialIcon(account.social)}

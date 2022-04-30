@@ -10,6 +10,7 @@ import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as RedditIcon } from "app/icons/reddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/ledger.svg";
 import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
+import { ReactComponent as EyeIcon } from "app/icons/opened-eye.svg";
 
 type WalletNameProps = {
   wallet: Account;
@@ -83,6 +84,10 @@ const getIcon = (wallet: Account) => {
 
   if (wallet.source === AccountSource.PrivateKey) {
     return KeyIcon;
+  }
+
+  if (wallet.source === AccountSource.Address) {
+    return EyeIcon;
   }
 
   return null;
