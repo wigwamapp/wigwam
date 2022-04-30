@@ -48,7 +48,7 @@ const ShareAddress: FC = () => {
           <NewButton
             theme="tertiary"
             wrapperClassName="w-full"
-            className="mt-[0.5rem] !pl-0 max-w-[6.5rem]"
+            className="mt-[0.5rem] !pl-0 max-w-[6.5rem] items-center"
             onClick={async () => {
               const blob = new Blob();
               await navigator.clipboard.write([
