@@ -300,15 +300,16 @@ const SummaryRow: FC<SummaryRowProps> = ({
     <h4 className="flex-nowrap text-brand-inactivedark font-semibold">
       {header}
     </h4>
-    {value && (
-      <span className="ml-1 font-semibold">
-        {value}{" "}
-        {inBrackets && (
+    <span className="ml-1 font-semibold">
+      {value}
+      {inBrackets && (
+        <>
+          {" "}
           <span className="text-brand-inactivedark font-normal">
             ({inBrackets})
           </span>
-        )}
-      </span>
-    )}
+        </>
+      )}
+    </span>
   </div>
 );
