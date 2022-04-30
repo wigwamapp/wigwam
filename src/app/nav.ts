@@ -1,3 +1,5 @@
+import ImportPrivateKey from "./components/screens/addAccountSteps/ImportPrivateKey";
+
 export enum Page {
   Default = "default",
   Setup = "setup",
@@ -16,6 +18,7 @@ export enum AddAccountStep {
   ChooseWay = "choose-way",
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
+  ImportPrivateKey = "import-private-key",
   VerifySeedPhrase = "verify-seed-phrase",
   AddPrivateKey = "add-private-key",
   SelectAccountsToAddMethod = "select-accounts-to-add-method",

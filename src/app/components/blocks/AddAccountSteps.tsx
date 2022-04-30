@@ -14,11 +14,13 @@ import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
 import SetupPassword from "../screens/addAccountSteps/SetupPassword";
 import CreateSeedPhrase from "../screens/addAccountSteps/CreateSeedPhrase";
 import ImportSeedPhrase from "../screens/addAccountSteps/ImportSeedPhrase";
+import ImportPrivateKey from "../screens/addAccountSteps/ImportPrivateKey";
 
 const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
+  [AddAccountStep.ImportPrivateKey, () => <ImportPrivateKey />],
   [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
   [AddAccountStep.AddPrivateKey, () => <AddPrivateKey />],
   [

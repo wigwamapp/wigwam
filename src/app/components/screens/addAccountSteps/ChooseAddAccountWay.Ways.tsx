@@ -13,6 +13,8 @@ import { ReactComponent as TwitterIcon } from "app/icons/AddWalletTwitter.svg";
 import { ReactComponent as RedditIcon } from "app/icons/AddWalletReddit.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/AddWalletLedger.svg";
 import { ReactComponent as TrezorIcon } from "app/icons/AddWalletTrezor.svg";
+import { ReactComponent as PrivateKeyIcon } from "app/icons/AddWalletPrivateKey.svg";
+import { ReactComponent as WatchOnlyIcon } from "app/icons/AddWalletWatchOnly.svg";
 
 export type WaysReturnTile = {
   title: string;
@@ -192,15 +194,14 @@ export const getWays = (
     tiles: [
       {
         title: "Import Private key",
-        Icon: ImportIcon,
-        soon: true,
+        Icon: PrivateKeyIcon,
         action: () => {
-          alert("Not implemented");
+          navigateToStep(AddAccountStep.ImportPrivateKey);
         },
       },
       {
         title: "Create Private key",
-        Icon: ImportIcon,
+        Icon: WatchOnlyIcon,
         soon: true,
         action: () => {
           alert("Not implemented");
