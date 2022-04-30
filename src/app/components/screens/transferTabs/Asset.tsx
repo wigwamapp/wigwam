@@ -174,7 +174,7 @@ const Asset: FC = () => {
             loading={submitting}
           >
             <SendIcon className="mr-2" />
-            Send
+            Transfer
           </NewButton>
         </form>
       )}
