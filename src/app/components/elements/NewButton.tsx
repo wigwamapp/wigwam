@@ -15,6 +15,7 @@ import Link, { LinkProps } from "lib/navigation/Link";
 
 type NewButtonProps = {
   theme?: "primary" | "secondary" | "tertiary" | "clean" | "primary-reverse";
+  wrapperClassName?: string;
   disabled?: boolean;
   loading?: boolean;
   plainFocus?: boolean;
@@ -28,6 +29,7 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
     {
       theme = "primary",
       className,
+      wrapperClassName = "",
       loading: parentLoading = false,
       plainFocus,
       ...rest
@@ -71,7 +73,8 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
               className={classNames(
                 "inline-flex items-center",
                 "transition transform duration-300",
-                loading && "opacity-0 -translate-y-[calc(100%+0.75rem)]"
+                loading && "opacity-0 -translate-y-[calc(100%+0.75rem)]",
+                wrapperClassName
               )}
             >
               {children}
@@ -98,7 +101,8 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
                   "absolute inline-flex",
                   "top-1/2 left-1/2",
                   "-translate-x-1/2",
-                  "transition duration-300"
+                  "transition duration-300",
+                  wrapperClassName
                 )}
               >
                 <Spinner />
@@ -106,7 +110,7 @@ const NewButton = forwardRef<HTMLElement, NewButtonProps>(
             </CSSTransition>
           </>
         ),
-        [loading, children]
+        [loading, children, wrapperClassName]
       ),
     };
 
