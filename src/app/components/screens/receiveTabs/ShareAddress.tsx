@@ -9,7 +9,7 @@ const ShareAddress: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col max-w-[23.25rem]">
       <AddressField
         defaultValue={currentAccount.address}
         label="Wallet address"

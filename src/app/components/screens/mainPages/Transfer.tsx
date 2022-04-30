@@ -31,7 +31,7 @@ const Transfer: FC = () => {
           viewPortClassName="pb-20 pt-5"
           scrollBarClassName="py-0 pt-5 pb-20"
         >
-          <div className="max-w-[23.25rem]">
+          <div>
             <TransferTab />
           </div>
         </ScrollAreaContainer>

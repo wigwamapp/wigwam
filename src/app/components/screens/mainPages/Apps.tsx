@@ -1,9 +1,11 @@
 import { FC } from "react";
 
+import ComingSoon from "./ComingSoon";
+
 const Apps: FC = () => {
   return (
     <div className="p-4">
-      <h3 className="font-bold text-2xl leading-none mb-6">Apps</h3>
+      <ComingSoon label="Apps" />
     </div>
   );
 };
