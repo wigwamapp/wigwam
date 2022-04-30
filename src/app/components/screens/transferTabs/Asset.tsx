@@ -177,7 +177,7 @@ const Asset: FC = () => {
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
             loading={submitting}
           >
-            <SendIcon className="ml-[-0.75rem] mr-2" />
+            <SendIcon className="mr-2" />
             Send
           </NewButton>
         </form>
@@ -228,6 +228,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
               <PrettyAmount
                 amount={values.amount ?? 0}
                 currency={currentToken?.symbol ?? undefined}
+                className="font-semibold"
                 copiable
               />
             }
@@ -251,15 +252,17 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
               <PrettyAmount
                 amount={0.13}
                 currency={nativeCurrency?.symbol ?? undefined}
+                copiable
+                className="font-semibold"
               />
             }
             inBrackets={<FiatAmount amount={9.55} copiable />}
-            className="mb-1"
+            className="mb-2"
           />
           <hr className="border-brand-main/[.2]" />
           <SummaryRow
             className="mt-2"
-            header="Total:"
+            header={<span className="font-bold">Total</span>}
             value={
               <FiatAmount
                 amount={
@@ -303,8 +306,8 @@ const SummaryRow: FC<SummaryRowProps> = ({
       {header}
     </h4>
     {value && (
-      <span className="ml-1">
-        {value}
+      <span className="ml-1 font-semibold">
+        {value}{" "}
         {inBrackets && (
           <span className="text-brand-inactivedark font-normal">
             ({inBrackets})
