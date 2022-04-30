@@ -18,6 +18,7 @@ export enum AddAccountStep {
   ImportSeedPhrase = "import-seed-phrase",
   VerifySeedPhrase = "verify-seed-phrase",
   AddPrivateKey = "add-private-key",
+  AddWatchOnly = "add-watch-only",
   SelectAccountsToAddMethod = "select-accounts-to-add-method",
   VerifyToAdd = "verify-to-add",
   SetupPassword = "setup-password",

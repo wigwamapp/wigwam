@@ -4,6 +4,9 @@ import { SocialProvider } from "core/types";
 
 import { StepsContext } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
+
+import { ReactComponent as ImportPrivateKeyIcon } from "app/icons/ImportPrivateKey.svg";
+import { ReactComponent as WatchOnlyAccountIcon } from "app/icons/WatchOnlyAccount.svg";
 import { ReactComponent as ImportIcon } from "app/icons/AddWalletImport.svg";
 import { ReactComponent as CreateIcon } from "app/icons/AddWalletCreate.svg";
 import { ReactComponent as AddNewIcon } from "app/icons/AddWalletAddNew.svg";
@@ -192,18 +195,18 @@ export const getWays = (
     tiles: [
       {
         title: "Import Private key",
-        Icon: ImportIcon,
-        soon: true,
+        Icon: ImportPrivateKeyIcon,
+        soon: false,
         action: () => {
-          alert("Not implemented");
+          navigateToStep(AddAccountStep.AddPrivateKey);
         },
       },
       {
-        title: "Create Private key",
-        Icon: ImportIcon,
-        soon: true,
+        title: "Watch-only account",
+        Icon: WatchOnlyAccountIcon,
+        soon: false,
         action: () => {
-          alert("Not implemented");
+          navigateToStep(AddAccountStep.AddWatchOnly);
         },
       },
     ],
