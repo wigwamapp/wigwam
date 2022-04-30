@@ -15,7 +15,7 @@ type AddressFieldProps = LongTextFieldProps & {
 };
 
 const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
-  ({ setFromClipboard, className, ...rest }, ref) => {
+  ({ label = "Recipient", setFromClipboard, className, ...rest }, ref) => {
     const longTextFieldRef = useRef(null);
 
     const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
@@ -24,7 +24,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
     return (
       <LongTextField
         ref={mergeRefs([ref, longTextFieldRef])}
-        label="Recipient"
+        label={label}
         placeholder="0x0000000000000000000000000000000000000000"
         textareaClassName="!h-20"
         maxLength={42}

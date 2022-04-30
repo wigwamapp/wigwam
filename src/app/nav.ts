@@ -1,5 +1,3 @@
-import ImportPrivateKey from "./components/screens/addAccountSteps/ImportPrivateKey";
-
 export enum Page {
   Default = "default",
   Setup = "setup",
@@ -19,8 +17,8 @@ export enum AddAccountStep {
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
   ImportPrivateKey = "import-private-key",
+  AddWatchOnlyAccount = "add-watch-only",
   VerifySeedPhrase = "verify-seed-phrase",
-  AddPrivateKey = "add-private-key",
   SelectAccountsToAddMethod = "select-accounts-to-add-method",
   VerifyToAdd = "verify-to-add",
   SetupPassword = "setup-password",

@@ -200,11 +200,10 @@ export const getWays = (
         },
       },
       {
-        title: "Create Private key",
+        title: "Watch-only accounts",
         Icon: WatchOnlyIcon,
-        soon: true,
         action: () => {
-          alert("Not implemented");
+          navigateToStep(AddAccountStep.AddWatchOnlyAccount);
         },
       },
     ],
