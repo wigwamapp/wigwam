@@ -1,9 +1,9 @@
 import { FC } from "react";
 
-import ComingSoon from "../mainPages/ComingSoon";
+import ComingSoon from "app/components/elements/ComingSoon";
 
 const BuyWithCrypto: FC = () => {
-  return <ComingSoon label="Buy with Crypto" className="mt-2" />;
+  return <ComingSoon label="Buy with Crypto" size="medium" />;
 };
 
 export default BuyWithCrypto;

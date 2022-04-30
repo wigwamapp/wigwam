@@ -1,15 +1,9 @@
 import { FC } from "react";
 
-import ComingSoon from "./ComingSoon";
+import ComingSoon from "app/components/elements/ComingSoon";
 
 const Swap: FC = () => {
-  return (
-    <>
-      <div className="p-4">
-        <ComingSoon label="Swap" />
-      </div>
-    </>
-  );
+  return <ComingSoon label="Swap" />;
 };
 
 export default Swap;

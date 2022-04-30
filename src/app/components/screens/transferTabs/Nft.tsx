@@ -1,7 +1,7 @@
 import { FC } from "react";
 
-import ComingSoon from "../mainPages/ComingSoon";
+import ComingSoon from "app/components/elements/ComingSoon";
 
-const Nft: FC = () => <ComingSoon label="Transfer - NFT" className="mt-2" />;
+const Nft: FC = () => <ComingSoon label="Transfer - NFT" size="medium" />;
 
 export default Nft;
