@@ -58,7 +58,7 @@ import AddressField from "../elements/AddressField";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
 import PriceArrow from "../elements/PriceArrow";
-import ComingSoon from "../screens/mainPages/ComingSoon";
+import ComingSoon from "../elements/ComingSoon";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -232,6 +232,20 @@ const AssetsList: FC = () => {
 
   const searching = (willSearch || syncing) && !alreadySearchedRef.current;
 
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      if (value) {
+        setTokenSlug([RESET]);
+        setSearchValue(null);
+        setManageModeEnabled(false);
+      } else {
+        setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      }
+      setIsNftsSelected(value);
+    },
+    [setTokenSlug, tokens]
+  );
+
   return (
     <div
       className={classNames(
@@ -242,7 +256,7 @@ const AssetsList: FC = () => {
     >
       <AssetsSwitcher
         checked={isNftsSelected}
-        onCheckedChange={setIsNftsSelected}
+        onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
@@ -251,6 +265,7 @@ const AssetsList: FC = () => {
             ref={searchInputRef}
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
+            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -267,11 +282,14 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
+            disabled={isNftsSelected}
             onClick={toggleManageMode}
           />
         </TippySingletonProvider>
       </div>
-      {tokens.length <= 0 && searchValue ? (
+      {isNftsSelected ? (
+        <ComingSoon label="NFTs" size="small" />
+      ) : tokens.length <= 0 && searchValue ? (
         <button
           type="button"
           className={classNames(
@@ -303,25 +321,21 @@ const AssetsList: FC = () => {
           viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-20"
         >
-          {isNftsSelected ? (
-            <ComingSoon label={"NFTs"} size={"small"} />
-          ) : (
-            tokens.map((asset, i) => (
-              <AssetCard
-                key={asset.tokenSlug}
-                ref={
-                  i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                    ? loadMoreTriggerAssetRef
-                    : null
-                }
-                asset={asset as AccountAsset}
-                isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
-                onAssetSelect={handleAssetSelect}
-                isManageMode={manageModeEnabled}
-                className={classNames(i !== tokens.length - 1 && "mb-2")}
-              />
-            ))
-          )}
+          {tokens.map((asset, i) => (
+            <AssetCard
+              key={asset.tokenSlug}
+              ref={
+                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
+              asset={asset as AccountAsset}
+              isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
+              onAssetSelect={handleAssetSelect}
+              isManageMode={manageModeEnabled}
+              className={classNames(i !== tokens.length - 1 && "mb-2")}
+            />
+          ))}
         </ScrollAreaContainer>
       )}
     </div>

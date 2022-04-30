@@ -12,6 +12,7 @@ import Link, { LinkProps } from "lib/navigation/Link";
 import Tooltip, { TooltipProps } from "app/components/elements/Tooltip";
 
 type IconedButtonProps = {
+  disabled?: boolean;
   Icon: FC<{ className?: string }>;
   iconProps?: any;
   theme?: "primary" | "secondary" | "tertiary";
@@ -20,7 +21,15 @@ type IconedButtonProps = {
 
 const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
   (
-    { theme = "primary", className, Icon, iconProps, iconClassName, ...rest },
+    {
+      theme = "primary",
+      disabled = false,
+      className,
+      Icon,
+      iconProps,
+      iconClassName,
+      ...rest
+    },
     ref
   ) => {
     const classNamesList = classNames(
@@ -32,9 +41,12 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       "rounded",
       "flex justify-center items-center",
       "transition",
-      "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-      "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
-      "active:bg-brand-main/20 active:shadow-none",
+      disabled && "cursor-not-allowed",
+      !disabled && [
+        "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
+        "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
+        "active:bg-brand-main/20 active:shadow-none",
+      ],
       className
     );
 
@@ -83,6 +95,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
         ref={ref as ForwardedRef<HTMLButtonElement>}
         type="button"
         className={classNamesList}
+        disabled={disabled}
         {...rest}
       >
         {content}

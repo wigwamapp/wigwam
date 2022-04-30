@@ -22,15 +22,19 @@ const Receive: FC = () => {
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
-        <ScrollAreaContainer
-          className="box-content w-full px-6"
-          viewPortClassName="pb-20 pt-5"
-          scrollBarClassName="py-0 pt-5 pb-20"
-        >
-          <div>
-            <ReceiveTab />
-          </div>
-        </ScrollAreaContainer>
+        {activeRoute?.receive === ReceiveTabEnum.ShareAddress ? (
+          <ScrollAreaContainer
+            className="box-content w-full px-6"
+            viewPortClassName="pb-20 pt-5"
+            scrollBarClassName="py-0 pt-5 pb-20"
+          >
+            <div>
+              <ReceiveTab />
+            </div>
+          </ScrollAreaContainer>
+        ) : (
+          <ReceiveTab />
+        )}
       </div>
     </>
   );

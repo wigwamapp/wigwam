@@ -1,13 +1,9 @@
 import { FC } from "react";
 
-import ComingSoon from "./ComingSoon";
+import ComingSoon from "app/components/elements/ComingSoon";
 
 const Apps: FC = () => {
-  return (
-    <div className="p-4">
-      <ComingSoon label="Apps" />
-    </div>
-  );
+  return <ComingSoon label="Apps" />;
 };
 
 export default Apps;
