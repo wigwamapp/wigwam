@@ -3,7 +3,6 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import Fuse from "fuse.js";
 
-import { TReplace } from "lib/ext/i18n/react";
 import { Account } from "core/types";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
@@ -15,6 +14,7 @@ import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
 import IconedButton from "app/components/elements/IconedButton";
+import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
@@ -116,65 +116,67 @@ type WalletTabProps = {
 
 const WalletTab: FC<WalletTabProps> = ({
   active,
-  account: { name, address },
+  account,
   className,
   onClick,
-}) => (
-  <button
-    type="button"
-    className={classNames(
-      "relative group",
-      "w-full",
-      "p-3",
-      "rounded-[.625rem]",
-      "flex items-stretch",
-      "text-left",
-      "transition-colors",
-      active && "bg-brand-main/10",
-      !active && "hover:bg-brand-main/5",
-      className
-    )}
-    onClick={onClick}
-  >
-    <AutoIcon
-      seed={address}
-      source="dicebear"
-      type="personas"
+}) => {
+  const { address } = account;
+
+  return (
+    <button
+      type="button"
       className={classNames(
-        "h-14 w-14 min-w-[3.5rem]",
-        "mr-3",
-        "bg-black/20",
-        "rounded-[.625rem]"
-      )}
-    />
-    <span
-      className={classNames(
-        "flex flex-col",
-        "text-base font-bold text-brand-light leading-none",
-        "min-w-0",
+        "relative group",
+        "w-full",
+        "p-3",
+        "rounded-[.625rem]",
+        "flex items-stretch",
+        "text-left",
         "transition-colors",
-        "group-hover:text-brand-light",
-        "group-focus-visible:text-brand-light"
+        active && "bg-brand-main/10",
+        !active && "hover:bg-brand-main/5",
+        className
       )}
+      onClick={onClick}
     >
-      <h3 className="truncate">
-        <TReplace msg={name} />
-      </h3>
-      <HashPreview
-        hash={address}
-        className="text-sm text-brand-inactivedark font-normal"
-        withTooltip={false}
+      <AutoIcon
+        seed={address}
+        source="dicebear"
+        type="personas"
+        className={classNames(
+          "h-14 w-14 min-w-[3.5rem]",
+          "mr-3",
+          "bg-black/20",
+          "rounded-[.625rem]"
+        )}
       />
-      <Balance address={address} className="mt-auto" />
-    </span>
-    <ChevronRightIcon
-      className={classNames(
-        "absolute right-2 top-1/2 -translate-y-1/2",
-        "transition",
-        "group-hover:translate-x-0 group-hover:opacity-100",
-        active && "translate-x-0 opacity-100",
-        !active && "-translate-x-1.5 opacity-0"
-      )}
-    />
-  </button>
-);
+      <span
+        className={classNames(
+          "flex flex-col",
+          "text-base font-bold text-brand-light leading-[1.125rem]",
+          "min-w-0",
+          "transition-colors",
+          "group-hover:text-brand-light",
+          "group-focus-visible:text-brand-light"
+        )}
+      >
+        <WalletName wallet={account} />
+        <HashPreview
+          hash={address}
+          className="text-sm text-brand-inactivedark font-normal -mt-px"
+          withTooltip={false}
+        />
+        <Balance address={address} className="mt-auto" />
+      </span>
+      <ChevronRightIcon
+        className={classNames(
+          "absolute right-2 top-1/2 -translate-y-1/2",
+          "transition",
+          "group-hover:translate-x-0 group-hover:opacity-100",
+          active && "translate-x-0 opacity-100",
+          !active && "-translate-x-1.5 opacity-0"
+        )}
+      />
+    </button>
+  );
+};

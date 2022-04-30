@@ -1,12 +1,12 @@
 import { FC } from "react";
 import classNames from "clsx";
-import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
-import AutoIcon from "app/components/elements/AutoIcon";
-import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
+import AutoIcon from "./AutoIcon";
+import HashPreview from "./HashPreview";
+import Balance from "./Balance";
+import WalletName from "./WalletName";
 
 type WalletCardProps = {
   account: Account;
@@ -14,11 +14,8 @@ type WalletCardProps = {
   onClick?: () => void;
 };
 
-const WalletCard: FC<WalletCardProps> = ({
-  account: { name, address },
-  className,
-  onClick,
-}) => {
+const WalletCard: FC<WalletCardProps> = ({ account, className, onClick }) => {
+  const { address } = account;
   const classNamesList = classNames(
     "relative",
     "p-3",
@@ -52,9 +49,7 @@ const WalletCard: FC<WalletCardProps> = ({
           "group-focus-visible:text-brand-light"
         )}
       >
-        <h3 className="overflow-ellipsis overflow-hidden whitespace-nowrap leading-[1.125rem] -mt-px">
-          <TReplace msg={name} />
-        </h3>
+        <WalletName wallet={account} className="-mt-px" />
         <HashPreview
           hash={address}
           className="text-sm text-brand-inactivedark mt-0.5 font-normal leading-none"
