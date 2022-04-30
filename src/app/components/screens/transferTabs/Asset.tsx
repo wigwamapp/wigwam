@@ -18,11 +18,7 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import {
-  TippySingletonProvider,
-  useNativeCurrency,
-  useProvider,
-} from "app/hooks";
+import { useNativeCurrency, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -221,71 +217,70 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
         <TooltipIcon />
       </Tooltip>
       <div className="flex flex-col w-full">
-        <TippySingletonProvider>
-          <SummaryRow
-            header="Amount"
-            value={
-              <PrettyAmount
-                amount={values.amount ?? 0}
-                currency={currentToken?.symbol ?? undefined}
-                className="font-semibold"
-                copiable
-              />
-            }
-            inBrackets={
-              <FiatAmount
-                amount={
-                  values.amount && currentToken
-                    ? new BigNumber(values.amount).multipliedBy(
-                        currentToken.priceUSD ?? 0
-                      )
-                    : 0
-                }
-                copiable
-              />
-            }
-            className="mb-1"
-          />
-          <SummaryRow
-            header="Average Fee"
-            value={
-              <PrettyAmount
-                amount={0.13}
-                currency={nativeCurrency?.symbol ?? undefined}
-                copiable
-                className="font-semibold"
-              />
-            }
-            inBrackets={<FiatAmount amount={9.55} copiable />}
-            className="mb-2"
-          />
-          <hr className="border-brand-main/[.2]" />
-          <SummaryRow
-            className="mt-2"
-            header={<span className="font-bold">Total</span>}
-            value={
-              <FiatAmount
-                amount={
-                  values.amount && currentToken
-                    ? new BigNumber(values.amount)
-                        .multipliedBy(currentToken.priceUSD ?? 0)
-                        .plus(9.55)
-                    : 9.55
-                }
-                className="font-bold text-lg"
-              />
-            }
-          ></SummaryRow>
-        </TippySingletonProvider>
+        <SummaryRow
+          header="Amount"
+          value={
+            <PrettyAmount
+              amount={values.amount ?? 0}
+              currency={currentToken?.symbol}
+              className="font-semibold"
+              copiable
+            />
+          }
+          inBrackets={
+            <FiatAmount
+              amount={
+                values.amount && currentToken
+                  ? new BigNumber(values.amount).multipliedBy(
+                      currentToken.priceUSD ?? 0
+                    )
+                  : 0
+              }
+              copiable
+            />
+          }
+          className="mb-1.5"
+        />
+        <SummaryRow
+          header="Average Fee"
+          value={
+            <PrettyAmount
+              amount={0.13}
+              currency={nativeCurrency?.symbol}
+              copiable
+              className="font-semibold"
+            />
+          }
+          inBrackets={<FiatAmount amount={9.55} copiable />}
+          className="mb-2"
+        />
+        <hr className="border-brand-main/[.07]" />
+        <SummaryRow
+          className="mt-2"
+          header="Total"
+          value={
+            <FiatAmount
+              amount={
+                values.amount && currentToken
+                  ? new BigNumber(values.amount)
+                      .multipliedBy(currentToken.priceUSD ?? 0)
+                      .plus(9.55)
+                  : 9.55
+              }
+              copiable
+              className="font-bold text-lg"
+            />
+          }
+        />
       </div>
     </>
   );
 });
 
 type SummaryRowProps = {
-  header: string | ReactNode;
-  value?: string | ReactNode;
-  inBrackets?: string | ReactNode;
+  header: ReactNode;
+  value: ReactNode;
+  inBrackets?: ReactNode;
   className?: string;
 };
 
