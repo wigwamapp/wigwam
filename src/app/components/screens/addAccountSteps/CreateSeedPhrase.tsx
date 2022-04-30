@@ -126,6 +126,7 @@ const CreateSeedPhrase = memo(() => {
 
         <SecretField
           onRegenerate={generateNew}
+          isDownloadable
           placeholder="Type there a secret phrase or generate new"
           className="mt-8"
           value={seedPhraseFiled}

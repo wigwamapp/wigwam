@@ -347,7 +347,8 @@ const DeleteAccountModal = memo<
       {seedPhrase || privateKey ? (
         <SecretField
           label={seedPhrase ? "Secret phrase" : "Private key"}
-          value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
+          isDownloadable={Boolean(seedPhrase)}
+          defaultValue={fromProtectedString(seedPhrase ?? privateKey ?? "")}
         />
       ) : (
         <Form
@@ -363,7 +364,7 @@ const DeleteAccountModal = memo<
                   {({ input, meta }) => (
                     <PasswordField
                       className="w-full"
-                      placeholder="Type password"
+                      placeholder={"*".repeat(8)}
                       label="Confirm your password"
                       error={
                         (meta.touched && meta.error) ||

@@ -104,7 +104,10 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SecretField defaultValue={fromProtectedString(seedPhrase)} />
+        <SecretField
+          isDownloadable
+          defaultValue={fromProtectedString(seedPhrase)}
+        />
       ) : (
         <Form<FormValues>
           decorators={[focusOnErrors]}
