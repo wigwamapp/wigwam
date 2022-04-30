@@ -177,8 +177,8 @@ const Asset: FC = () => {
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
             loading={submitting}
           >
-            <SendIcon className="mr-2" />
-            {submitting ? "Transfering" : "Transfer"}
+            <SendIcon className="ml-[-0.75rem] mr-2" />
+            Send
           </NewButton>
         </form>
       )}
@@ -220,21 +220,18 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
       >
         <TooltipIcon />
       </Tooltip>
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <TippySingletonProvider>
           <SummaryRow
-            header={
-              <>
-                Amount:{" "}
-                <PrettyAmount
-                  amount={values.amount ?? 0}
-                  currency={currentToken?.symbol ?? undefined}
-                  copiable
-                  className="font-bold"
-                />
-              </>
-            }
+            header="Amount"
             value={
+              <PrettyAmount
+                amount={values.amount ?? 0}
+                currency={currentToken?.symbol ?? undefined}
+                copiable
+              />
+            }
+            inBrackets={
               <FiatAmount
                 amount={
                   values.amount && currentToken
@@ -249,38 +246,33 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
             className="mb-1"
           />
           <SummaryRow
-            header={
-              <>
-                Average Fee:{" "}
-                <PrettyAmount
-                  amount={0.13}
-                  currency={nativeCurrency?.symbol ?? undefined}
-                  copiable
-                  className="font-bold"
-                />
-              </>
+            header="Average Fee"
+            value={
+              <PrettyAmount
+                amount={0.13}
+                currency={nativeCurrency?.symbol ?? undefined}
+              />
             }
-            value={<FiatAmount amount={9.55} copiable />}
+            inBrackets={<FiatAmount amount={9.55} copiable />}
             className="mb-1"
           />
+          <hr className="border-brand-main/[.2]" />
           <SummaryRow
-            header={
-              <>
-                Total:{" "}
-                <FiatAmount
-                  amount={
-                    values.amount && currentToken
-                      ? new BigNumber(values.amount)
-                          .multipliedBy(currentToken.priceUSD ?? 0)
-                          .plus(9.55)
-                      : 9.55
-                  }
-                  copiable
-                  className="font-bold"
-                />
-              </>
+            className="mt-2"
+            header="Total:"
+            value={
+              <FiatAmount
+                amount={
+                  values.amount && currentToken
+                    ? new BigNumber(values.amount)
+                        .multipliedBy(currentToken.priceUSD ?? 0)
+                        .plus(9.55)
+                    : 9.55
+                }
+                className="font-bold text-lg"
+              />
             }
-          />
+          ></SummaryRow>
         </TippySingletonProvider>
       </div>
     </>
@@ -290,12 +282,35 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
 type SummaryRowProps = {
   header: string | ReactNode;
   value?: string | ReactNode;
+  inBrackets?: string | ReactNode;
   className?: string;
 };
 
-const SummaryRow: FC<SummaryRowProps> = ({ header, value, className }) => (
-  <div className={classNames("flex items-center", "text-sm", className)}>
-    <h4 className="font-bold">{header}</h4>
-    {value && <span className="text-brand-inactivedark ml-1">({value})</span>}
+const SummaryRow: FC<SummaryRowProps> = ({
+  header,
+  value,
+  inBrackets,
+  className,
+}) => (
+  <div
+    className={classNames(
+      "flex items-center justify-between",
+      "text-sm",
+      className
+    )}
+  >
+    <h4 className="flex-nowrap text-brand-inactivedark font-semibold">
+      {header}
+    </h4>
+    {value && (
+      <span className="ml-1">
+        {value}
+        {inBrackets && (
+          <span className="text-brand-inactivedark font-normal">
+            ({inBrackets})
+          </span>
+        )}
+      </span>
+    )}
   </div>
 );
