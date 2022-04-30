@@ -18,11 +18,7 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import {
-  TippySingletonProvider,
-  useNativeCurrency,
-  useProvider,
-} from "app/hooks";
+import { useNativeCurrency, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -178,7 +174,7 @@ const Asset: FC = () => {
             loading={submitting}
           >
             <SendIcon className="mr-2" />
-            {submitting ? "Transfering" : "Transfer"}
+            Transfer
           </NewButton>
         </form>
       )}
@@ -220,82 +216,100 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
       >
         <TooltipIcon />
       </Tooltip>
-      <div className="flex flex-col">
-        <TippySingletonProvider>
-          <SummaryRow
-            header={
-              <>
-                Amount:{" "}
-                <PrettyAmount
-                  amount={values.amount ?? 0}
-                  currency={currentToken?.symbol ?? undefined}
-                  copiable
-                  className="font-bold"
-                />
-              </>
-            }
-            value={
-              <FiatAmount
-                amount={
-                  values.amount && currentToken
-                    ? new BigNumber(values.amount).multipliedBy(
-                        currentToken.priceUSD ?? 0
-                      )
-                    : 0
-                }
-                copiable
-              />
-            }
-            className="mb-1"
-          />
-          <SummaryRow
-            header={
-              <>
-                Average Fee:{" "}
-                <PrettyAmount
-                  amount={0.13}
-                  currency={nativeCurrency?.symbol ?? undefined}
-                  copiable
-                  className="font-bold"
-                />
-              </>
-            }
-            value={<FiatAmount amount={9.55} copiable />}
-            className="mb-1"
-          />
-          <SummaryRow
-            header={
-              <>
-                Total:{" "}
-                <FiatAmount
-                  amount={
-                    values.amount && currentToken
-                      ? new BigNumber(values.amount)
-                          .multipliedBy(currentToken.priceUSD ?? 0)
-                          .plus(9.55)
-                      : 9.55
-                  }
-                  copiable
-                  className="font-bold"
-                />
-              </>
-            }
-          />
-        </TippySingletonProvider>
+      <div className="flex flex-col w-full">
+        <SummaryRow
+          header="Amount"
+          value={
+            <PrettyAmount
+              amount={values.amount ?? 0}
+              currency={currentToken?.symbol}
+              className="font-semibold"
+              copiable
+            />
+          }
+          inBrackets={
+            <FiatAmount
+              amount={
+                values.amount && currentToken
+                  ? new BigNumber(values.amount).multipliedBy(
+                      currentToken.priceUSD ?? 0
+                    )
+                  : 0
+              }
+              copiable
+            />
+          }
+          className="mb-1.5"
+        />
+        <SummaryRow
+          header="Average Fee"
+          value={
+            <PrettyAmount
+              amount={0.13}
+              currency={nativeCurrency?.symbol}
+              copiable
+              className="font-semibold"
+            />
+          }
+          inBrackets={<FiatAmount amount={9.55} copiable />}
+          className="mb-2"
+        />
+        <hr className="border-brand-main/[.07]" />
+        <SummaryRow
+          className="mt-2"
+          header="Total"
+          value={
+            <FiatAmount
+              amount={
+                values.amount && currentToken
+                  ? new BigNumber(values.amount)
+                      .multipliedBy(currentToken.priceUSD ?? 0)
+                      .plus(9.55)
+                  : 9.55
+              }
+              copiable
+              className="font-bold text-lg"
+            />
+          }
+        />
       </div>
     </>
   );
 });
 
 type SummaryRowProps = {
-  header: string | ReactNode;
-  value?: string | ReactNode;
+  header: ReactNode;
+  value: ReactNode;
+  inBrackets?: ReactNode;
   className?: string;
 };
 
-const SummaryRow: FC<SummaryRowProps> = ({ header, value, className }) => (
-  <div className={classNames("flex items-center", "text-sm", className)}>
-    <h4 className="font-bold">{header}</h4>
-    {value && <span className="text-brand-inactivedark ml-1">({value})</span>}
+const SummaryRow: FC<SummaryRowProps> = ({
+  header,
+  value,
+  inBrackets,
+  className,
+}) => (
+  <div
+    className={classNames(
+      "flex items-center justify-between",
+      "text-sm",
+      className
+    )}
+  >
+    <h4 className="flex-nowrap text-brand-inactivedark font-semibold">
+      {header}
+    </h4>
+    <span className="ml-1 font-semibold">
+      {value}
+      {inBrackets && (
+        <>
+          {" "}
+          <span className="text-brand-inactivedark font-normal">
+            ({inBrackets})
+          </span>
+        </>
+      )}
+    </span>
   </div>
 );
