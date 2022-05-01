@@ -6,10 +6,29 @@ import { QRCodeCanvas } from "qrcode.react";
 import { currentAccountAtom } from "app/atoms";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import NewButton from "app/components/elements/NewButton";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 const ShareAddress: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
+
+  const handleCopying = async () => {
+    const canvas = document.getElementsByTagName("canvas")[0];
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.canvas.toBlob((blob) => {
+        const item = new ClipboardItem({ "image/png": blob ?? "" });
+        navigator.clipboard.write([item]);
+      });
+    }
+  };
+  const { copy, copied } = useCopyToClipboard(
+    undefined,
+    undefined,
+    undefined,
+    handleCopying
+  );
 
   return (
     <div className="flex flex-col">
@@ -32,7 +51,7 @@ const ShareAddress: FC = () => {
           )}
         >
           <QRCodeCanvas
-            bgColor="rgb(255 255 255 / .08)"
+            bgColor="#1C1E2F"
             fgColor="#F8F9FD"
             includeMargin={false}
             size={80}
@@ -49,15 +68,12 @@ const ShareAddress: FC = () => {
             theme="tertiary"
             wrapperClassName="w-full"
             className="mt-[0.5rem] !pl-0 max-w-[6.5rem] items-center"
-            onClick={async () => {
-              const blob = new Blob();
-              await navigator.clipboard.write([
-                new ClipboardItem({ "image/png": blob }),
-              ]);
-            }}
+            onClick={copy}
           >
-            <CopyIcon />
-            <span className="ml-3 text-sm font-medium">Copy Media</span>
+            {copied ? <SuccessIcon /> : <CopyIcon />}
+            <span className="ml-3 text-sm font-medium">
+              {copied ? "Media copied" : "Copy Media"}
+            </span>
           </NewButton>
         </div>
       </div>
