@@ -75,6 +75,8 @@ module.exports = {
         buttonsecondary: "0px 4px 15px rgba(204, 214, 255, 0.07)",
         addaccountmodal:
           "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(114, 114, 114, 0.15)",
+        receiveqrcode:
+          "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(255, 255, 255, 0.15)",
       },
       dropShadow: {
         profileinitial: "0px 2px 5px rgba(112, 113, 129, 0.37)",
