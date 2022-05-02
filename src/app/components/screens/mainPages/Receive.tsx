@@ -6,6 +6,10 @@ import { ReceiveTab as ReceiveTabEnum } from "app/nav";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import { ReactComponent as AddressIcon } from "app/icons/receive-address.svg";
+import { ReactComponent as CryptoIcon } from "app/icons/receive-crypto.svg";
+import { ReactComponent as FiatIcon } from "app/icons/receive-fiat.svg";
+
 import ReceiveTab from "./Receive.Tab";
 
 const Receive: FC = () => {
@@ -46,16 +50,19 @@ const tabsContent = [
   {
     route: { page: "receive", receive: ReceiveTabEnum.ShareAddress },
     title: "Share address",
-    desc: "View your current wallet address. Share it or use it on exchanges to receive funds.",
+    Icon: AddressIcon,
+    desc: "View current wallet address. Share it or use it on exchanges to receive funds.",
   },
   {
     route: { page: "receive", receive: ReceiveTabEnum.BuyWithCrypto },
     title: "Buy with Crypto",
-    desc: "Top up balance with cryptocurrency from other networks using third-party services.",
+    Icon: CryptoIcon,
+    desc: "Top up balance with crypto from other networks using third-party services.",
   },
   {
     route: { page: "receive", receive: ReceiveTabEnum.BuyWithFiat },
     title: "Buy with Fiat",
+    Icon: FiatIcon,
     desc: "Top up balance with regular credit or debit cards using third-party services.",
   },
 ];
