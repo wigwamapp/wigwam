@@ -7,8 +7,10 @@ import retry from "async-retry";
 // import ExpiryMap from 'expiry-map';
 import { createQueue } from "lib/system/queue";
 import { props } from "lib/system/promise";
+import { storage } from "lib/ext/storage";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
+import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 import { Erc20__factory } from "abi-types";
 import {
   Account,
@@ -143,6 +145,8 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
   }, 300);
 
   try {
+    await syncConversionRates();
+
     await enqueueSync(async () => {
       await syncAccountTokens(chainId, accountAddress);
 
@@ -318,7 +322,7 @@ const syncAccountTokens = mem(
         "/user/token_list",
         {
           params: {
-            id: getMyRandomAddress(accountAddress),
+            id: await getMyRandomAddress(accountAddress, chainId),
             chain_id: debankChain.id,
             is_all: false,
           },
@@ -481,7 +485,7 @@ const getDebankUserChainBalance = mem(
       const { data } = await debankApi.get("/user/chain_balance", {
         params: {
           chain_id: debankChain.id,
-          id: getMyRandomAddress(accountAddress),
+          id: await getMyRandomAddress(accountAddress, chainId),
         },
       });
 
@@ -531,7 +535,7 @@ const getBalanceFromChain = mem(
     return requestBalance(
       provider,
       tokenSlug,
-      getMyRandomAddress(accountAddress)
+      await getMyRandomAddress(accountAddress, chainId)
     ).catch(() => null);
   },
   {
@@ -633,10 +637,59 @@ const getCoinGeckoPlatformPrices = mem(
   }
 );
 
-function getMyRandomAddress(accountAddress: string, hops = 0): string {
+type Currency = {
+  name: string;
+  type: string;
+  unit: string;
+  value: number;
+};
+
+const syncConversionRates = mem(
+  async () => {
+    try {
+      const { data } = await coinGeckoApi.get("/exchange_rates");
+      const currencies: { rates: Record<string, Currency> } = data;
+
+      const rates: Record<string, string> = {};
+
+      const btcPrice = new BigNumber(currencies.rates["usd"].value);
+      const btcToUsd = new BigNumber(1).dividedBy(btcPrice);
+      Object.entries(currencies.rates).forEach(([key, value]) => {
+        if (value.type === "fiat" || key === "btc" || key === "eth") {
+          if (value.name === "Russian Ruble") {
+            return;
+          }
+          const code = CONVERSION_CURRENCIES.find(
+            (conv_curr) => conv_curr.code === key.toUpperCase()
+          )?.code;
+          if (code) {
+            const convertedAmount = new BigNumber(value.value).multipliedBy(
+              btcToUsd
+            );
+            rates[code] = convertedAmount.toString();
+          }
+        }
+      });
+
+      await storage.put("currencies_rate", rates);
+    } catch (err) {
+      console.error(err);
+    }
+  },
+  { maxAge: 300000 }
+);
+
+async function getMyRandomAddress(
+  accountAddress: string,
+  chainId: number,
+  hops = 0
+): Promise<string> {
   if (process.env.VIGVAM_DEV_RANDOM_ADDRESSES === "false") {
     return accountAddress;
   }
+
+  const net = await getNetworkMemo(chainId);
+  if (net.type === "testnet") return accountAddress;
 
   const storageKey = `__random_address_${accountAddress}`;
   const stored = localStorage.getItem(storageKey);
@@ -663,7 +716,7 @@ function getMyRandomAddress(accountAddress: string, hops = 0): string {
 
   if (randomAddress in localStorage) {
     if (hops > 10) return accountAddress;
-    return getMyRandomAddress(accountAddress, hops + 1);
+    return getMyRandomAddress(accountAddress, chainId, hops + 1);
   }
 
   localStorage.setItem(storageKey, randomAddress);
@@ -671,3 +724,5 @@ function getMyRandomAddress(accountAddress: string, hops = 0): string {
 
   return randomAddress;
 }
+
+const getNetworkMemo = mem(getNetwork);

@@ -11,11 +11,11 @@ import CopiableTooltip from "./CopiableTooltip";
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
-type PrettyAmountProps = {
+export type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;
   currency?: string;
-  currencyFirst?: boolean;
+  isFiat?: boolean;
   isMinified?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
@@ -28,8 +28,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
     amount,
     decimals = 0,
     currency,
-    currencyFirst,
-    isMinified,
+    isFiat = false,
+    isMinified = false,
     copiable = false,
     prefix,
     threeDots = true,
@@ -44,8 +44,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
-    const isFiatMinified =
-      currency === "$" && (convertedAmount.gte(0.01) || isMinified);
+    const isFiatMinified = isFiat && (convertedAmount.gte(0.01) || isMinified);
 
     let decSplit = isMinified || isFiatMinified ? 2 : 6;
     if (integerPart.gte(1_000)) {
@@ -77,6 +76,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
         : convertedAmount,
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
+      isFiat,
+      currency,
     });
     let content = getPrettyAmount({
       value: isFiatMinified
@@ -89,6 +90,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
         : convertedAmount,
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
+      isFiat,
+      currency,
     });
 
     if (isShownIntTooltip) {
@@ -96,6 +99,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
         value: convertedAmount,
         dec: isMinified ? 3 : 6,
         locale: currentLocale,
+        isFiat,
+        currency,
       });
 
       tooltipContent = getPrettyAmount({
@@ -104,6 +109,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
           : convertedAmount,
         dec: 38,
         locale: currentLocale,
+        isFiat,
+        currency,
       });
     }
 
@@ -113,11 +120,15 @@ const PrettyAmount = memo<PrettyAmountProps>(
         dec: isMinified ? 3 : undefined,
         locale: currentLocale,
         threeDots,
+        isFiat,
+        currency,
       });
 
       tooltipContent = getPrettyAmount({
         value: convertedAmount,
         locale: currentLocale,
+        isFiat,
+        currency,
       });
     }
 
@@ -133,7 +144,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
         <AmountWithCurrency
           amount={content}
           currency={currency}
-          currencyFirst={currencyFirst}
+          isFiat={isFiat}
         />
       </>
     );
@@ -145,7 +156,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
             <AmountWithCurrency
               amount={tooltipContent}
               currency={currency}
-              currencyFirst={currencyFirst}
+              isFiat={isFiat}
             />
           }
           textToCopy={tooltipContent}
@@ -168,80 +179,74 @@ export default PrettyAmount;
 const AmountWithCurrency: FC<{
   amount: string;
   currency?: string;
-  currencyFirst?: boolean;
-}> = ({ amount, currency, currencyFirst = false }) => {
+  isFiat?: boolean;
+}> = ({ amount, currency, isFiat = false }) => {
   if (!currency) {
     return <>{amount}</>;
   }
 
   return (
-    <>
-      {currency === "$" && <span>$</span>}
-      {currency !== "$" && currencyFirst && (
-        <>
-          <span>{currency}</span>{" "}
-        </>
-      )}
+    <span>
       {amount}
-      {currency !== "$" && !currencyFirst && (
+      {!isFiat && (
         <>
           {" "}
           <span>{currency}</span>
         </>
       )}
-    </>
+    </span>
   );
-};
-
-const checkIfObjectsKey = (key: string) =>
-  key === "K" || key === "M" || key === "B" || key === "T";
-
-const currenciesCompacts: {
-  [key: string]: number;
-} = {
-  K: 1e3,
-  M: 1e6,
-  B: 1e9,
-  T: 1e12,
 };
 
 export const getPrettyAmount = ({
   value,
   dec = 6,
-  locale = "en",
+  locale = "en-US",
+  isFiat = false,
+  currency,
   threeDots = false,
 }: {
   value: number | BigNumber;
   dec?: number;
   locale?: string;
+  isFiat?: boolean;
+  currency?: string;
   threeDots?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
-    const isLargerThenTrillion = new BigNumber(value).gt(1e18);
+    const isLargerThenTrillion = new BigNumber(value).gt(1e16);
     const minFract = isLargerThenTrillion ? 0 : 2;
     const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
-    let finalValue = getIntlNumberFormat(
+    let minifiedFractions = new BigNumber(value);
+    if (minifiedFractions.gte(1e9)) {
+      minifiedFractions = minifyFractions(minifiedFractions, maxFract, 9);
+    } else if (minifiedFractions.gte(1e6)) {
+      minifiedFractions = minifyFractions(minifiedFractions, maxFract, 6);
+    }
+
+    return getIntlNumberFormat(
       locale,
       minFract,
       maxFract,
-      "compact"
-    ).format(+value);
-
-    const finalSplitLetter = finalValue.slice(-1);
-    if (checkIfObjectsKey(finalSplitLetter)) {
-      finalValue = `${new BigNumber(value)
-        .div(currenciesCompacts[finalSplitLetter])
-        .decimalPlaces(maxFract, BigNumber.ROUND_DOWN)
-        .toString()}${finalSplitLetter}`;
-    }
-
-    return finalValue;
+      "compact",
+      isFiat ? "currency" : undefined,
+      isFiat ? currency : undefined
+    )
+      .format(+minifiedFractions)
+      .replace("US$", "$");
   }
 
-  return `${getIntlNumberFormat(locale, 2, 20).format(+value)}${
-    threeDots ? "..." : ""
-  }`;
+  return `${getIntlNumberFormat(
+    locale,
+    2,
+    20,
+    "standard",
+    isFiat ? "currency" : undefined,
+    isFiat ? currency : undefined
+  )
+    .format(+value)
+    .replace("US$", "$")}${threeDots ? "..." : ""}`;
 };
 
 const getIntlNumberFormat = memoize(
@@ -249,14 +254,31 @@ const getIntlNumberFormat = memoize(
     locale: string,
     minimumFractionDigits: number,
     maximumFractionDigits: number,
-    notation?: "standard" | "scientific" | "engineering" | "compact"
+    notation?: "standard" | "scientific" | "engineering" | "compact",
+    style?: "currency",
+    currency?: string
   ) =>
     new Intl.NumberFormat(locale, {
       minimumFractionDigits,
       maximumFractionDigits,
       notation,
+      style,
+      currency,
     }),
   {
     cacheKey: (args) => args.join(),
   }
 );
+
+const minifyFractions = (
+  value: BigNumber.Value,
+  maxRound: number,
+  fractions: number
+) => {
+  const multiplier = new BigNumber(10).pow(fractions);
+
+  return new BigNumber(value)
+    .div(multiplier)
+    .decimalPlaces(maxRound, BigNumber.ROUND_DOWN)
+    .multipliedBy(multiplier);
+};

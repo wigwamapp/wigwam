@@ -12,8 +12,9 @@ import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 import Select from "./Select";
-import PrettyAmount from "./PrettyAmount";
+import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
+import PrettyAmount from "./PrettyAmount";
 
 type TokenSelectProps = {
   handleTokenChanged?: () => void;
@@ -112,6 +113,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       showSelectedIcon={false}
       currentItemClassName={classNames("!p-3")}
       contentClassName="w-[23.25rem] flex flex-col"
+      itemClassName="group"
     />
   ) : (
     <></>
@@ -165,16 +167,24 @@ const Token: FC<{
             amount={rawBalance ?? 0}
             decimals={decimals}
             currency={symbol}
+            threeDots={false}
             className="ml-2"
           />
         </span>
         <span className="flex justify-between">
-          <span className="text-xs text-brand-inactivedark font-normal truncate">
+          <span
+            className={classNames(
+              "text-xs text-brand-inactivedark font-normal",
+              "truncate",
+              "transition-colors",
+              size === "small" && "group-hover:text-brand-light"
+            )}
+          >
             {name}
           </span>
-          <PrettyAmount
+          <FiatAmount
             amount={balanceUSD ?? 0}
-            currency="$"
+            threeDots={false}
             className="text-xs font-normal ml-1"
           />
         </span>

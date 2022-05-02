@@ -7,5 +7,7 @@ module.exports = {
     "react-dom",
     "@types/react",
     "@types/react-dom",
+    "final-form",
+    "@types/async-retry",
   ],
 };

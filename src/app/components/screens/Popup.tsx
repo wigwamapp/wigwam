@@ -6,6 +6,7 @@ import {
   memo,
   useRef,
   useState,
+  useMemo,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -39,11 +40,14 @@ import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import PrettyAmount from "../elements/PrettyAmount";
+import FiatAmount from "../elements/FiatAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
+import PrettyAmount from "../elements/PrettyAmount";
+import PriceArrow from "../elements/PriceArrow";
+import ComingSoon from "../elements/ComingSoon";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -185,6 +189,14 @@ const AssetsList: FC = () => {
     }
   }, []);
 
+  const toggleNftSwitcher = useCallback((value: boolean) => {
+    if (value) {
+      setSearchValue(null);
+      setManageModeEnabled(false);
+    }
+    setIsNftsSelected(value);
+  }, []);
+
   return (
     <>
       <div className="flex items-center mt-5">
@@ -197,7 +209,7 @@ const AssetsList: FC = () => {
               <AssetsSwitcher
                 theme="small"
                 checked={isNftsSelected}
-                onCheckedChange={setIsNftsSelected}
+                onCheckedChange={toggleNftSwitcher}
               />
             </span>
           </Tooltip>
@@ -209,6 +221,7 @@ const AssetsList: FC = () => {
             inputClassName="max-h-9 !pl-9"
             placeholder="Type to search..."
             adornmentClassName="!left-3"
+            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -225,11 +238,14 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
+            disabled={isNftsSelected}
             onClick={() => setManageModeEnabled(!manageModeEnabled)}
           />
         </TippySingletonProvider>
       </div>
-      {tokens.length <= 0 && searchValue ? (
+      {isNftsSelected ? (
+        <ComingSoon label="NFTs" size="extra-small" />
+      ) : tokens.length <= 0 && searchValue ? (
         <button
           type="button"
           className={classNames(
@@ -282,7 +298,15 @@ const AssetCard = memo(
       const currentAccount = useAtomValue(currentAccountAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
-      const { name, symbol, rawBalance, decimals, balanceUSD, status } = asset;
+      const {
+        name,
+        symbol,
+        rawBalance,
+        decimals,
+        balanceUSD,
+        status,
+        priceUSDChange,
+      } = asset;
 
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
@@ -319,6 +343,14 @@ const AssetCard = memo(
         }
       }, [asset, currentAccount.address, isManageMode, popoverOpened]);
 
+      const priceClassName = useMemo(
+        () =>
+          priceUSDChange && +priceUSDChange > 0
+            ? "text-[#6BB77A]"
+            : "text-[#EA556A]",
+        [priceUSDChange]
+      );
+
       const content = (
         <button
           ref={ref}
@@ -347,28 +379,53 @@ const AssetCard = memo(
             className="w-11 h-11 min-w-[2.75rem] mr-3"
           />
           <span className="flex flex-col w-full min-w-0">
-            <span className="text-sm font-bold leading-5 truncate">{name}</span>
-            <span className="mt-auto flex justify-between items-end">
+            <span className="flex items-end">
+              <span className="text-sm font-bold leading-5 truncate mr-auto">
+                {name}
+              </span>
+              {!isManageMode && (
+                <FiatAmount
+                  amount={balanceUSD}
+                  copiable
+                  className={"text-sm font-bold leading-5 ml-2"}
+                  threeDots={false}
+                />
+              )}
+            </span>
+            <span className="mt-1 flex justify-between items-end">
               <PrettyAmount
                 amount={rawBalance ?? 0}
                 decimals={decimals}
                 currency={symbol}
-                className="text-sm font-bold leading-5"
+                className={classNames(
+                  // "text-sm",
+                  "text-xs leading-4",
+                  "text-brand-inactivedark"
+                )}
                 copiable={!isManageMode}
+                threeDots={false}
               />
-              {!isManageMode && (
-                <PrettyAmount
-                  amount={balanceUSD ?? 0}
-                  currency="$"
+              {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
+                <span
                   className={classNames(
+                    "inline-flex items-center",
+                    "opacity-75",
+                    "transition",
                     "ml-2",
-                    "text-xs leading-4",
-                    "text-brand-inactivedark",
-                    "transition-colors"
-                    // "group-hover:text-brand-light group-focus-visible:text-brand-light"
+                    priceClassName
                   )}
-                  copiable
-                />
+                >
+                  <PriceArrow
+                    className={classNames(
+                      "w-2 h-2 mr-[0.125rem]",
+                      +priceUSDChange < 0 && "transform rotate-180"
+                    )}
+                  />
+
+                  <span className="text-xs leading-4">
+                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                  </span>
+                </span>
               )}
             </span>
           </span>

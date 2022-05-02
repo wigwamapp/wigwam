@@ -7,6 +7,8 @@ module.exports = {
   process(_code, filename) {
     const assetFilename = JSON.stringify(path.basename(filename));
 
+    let code;
+
     if (filename.match(/\.svg$/)) {
       // Based on how SVGR generates a component name:
       // https://github.com/smooth-code/svgr/blob/01b194cf967347d43d4cbe6b434404731b87cf27/packages/core/src/state.js#L6
@@ -14,7 +16,8 @@ module.exports = {
         pascalCase: true,
       });
       const componentName = `Svg${pascalCaseFilename}`;
-      return `const React = require('react');
+
+      code = `const React = require('react');
       module.exports = {
         __esModule: true,
         default: ${assetFilename},
@@ -32,9 +35,11 @@ module.exports = {
       };`;
     }
 
-    return `module.exports = {
+    code = `module.exports = {
       __esModule: true,
       default: ${assetFilename},
     };`;
+
+    return { code };
   },
 };

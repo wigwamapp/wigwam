@@ -52,10 +52,13 @@ import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import NewButton from "../elements/NewButton";
 import SearchInput from "../elements/SearchInput";
-import PrettyAmount from "../elements/PrettyAmount";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
 import AddressField from "../elements/AddressField";
+import PrettyAmount from "../elements/PrettyAmount";
+import FiatAmount from "../elements/FiatAmount";
+import PriceArrow from "../elements/PriceArrow";
+import ComingSoon from "../elements/ComingSoon";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -67,21 +70,32 @@ export default OverviewContent;
 
 const TokenExplorer: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
+  const [isNftsSelected, setIsNftsSelected] = useState(false);
 
   return (
     <>
-      <AssetsList />
-      {tokenSlug && <AssetInfo />}
+      <AssetsList
+        isNftsSelected={isNftsSelected}
+        setIsNftsSelected={setIsNftsSelected}
+      />
+      {tokenSlug && !isNftsSelected && <AssetInfo />}
     </>
   );
 };
 
-const AssetsList: FC = () => {
+type AssetsListProps = {
+  isNftsSelected: boolean;
+  setIsNftsSelected: (value: boolean) => void;
+};
+
+const AssetsList: FC<AssetsListProps> = ({
+  isNftsSelected,
+  setIsNftsSelected,
+}) => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
@@ -229,6 +243,20 @@ const AssetsList: FC = () => {
 
   const searching = (willSearch || syncing) && !alreadySearchedRef.current;
 
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      if (value) {
+        setTokenSlug([RESET]);
+        setSearchValue(null);
+        setManageModeEnabled(false);
+      } else {
+        setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      }
+      setIsNftsSelected(value);
+    },
+    [setIsNftsSelected, setTokenSlug, tokens]
+  );
+
   return (
     <div
       className={classNames(
@@ -239,7 +267,7 @@ const AssetsList: FC = () => {
     >
       <AssetsSwitcher
         checked={isNftsSelected}
-        onCheckedChange={setIsNftsSelected}
+        onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
@@ -248,6 +276,7 @@ const AssetsList: FC = () => {
             ref={searchInputRef}
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
+            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -264,11 +293,14 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
+            disabled={isNftsSelected}
             onClick={toggleManageMode}
           />
         </TippySingletonProvider>
       </div>
-      {tokens.length <= 0 && searchValue ? (
+      {isNftsSelected ? (
+        <ComingSoon label="NFTs" size="small" />
+      ) : tokens.length <= 0 && searchValue ? (
         <button
           type="button"
           className={classNames(
@@ -393,9 +425,8 @@ const AssetCard = memo(
                 {name}
               </span>
               {!isManageMode && (
-                <PrettyAmount
+                <FiatAmount
                   amount={balanceUSD}
-                  currency="$"
                   className={"text-base font-bold leading-4 ml-2"}
                   threeDots={false}
                 />
@@ -436,7 +467,7 @@ const AssetCard = memo(
                     )}
                   />
 
-                  <span className="text-xs leading-3">
+                  <span className="text-xs leading-4">
                     {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
                   </span>
                 </span>
@@ -544,9 +575,8 @@ const AssetInfo: FC = () => {
               Price
             </span>
             <span className="flex items-center">
-              <PrettyAmount
+              <FiatAmount
                 amount={priceUSD ?? 0}
-                currency="$"
                 copiable
                 className="text-lg font-bold leading-6 mr-3"
               />
@@ -563,9 +593,8 @@ const AssetInfo: FC = () => {
         </div>
 
         <div className="flex items-end">
-          <PrettyAmount
+          <FiatAmount
             amount={balanceUSD ?? 0}
-            currency="$"
             copiable
             className="text-[1.75rem] font-bold leading-none mr-4"
           />
@@ -575,7 +604,6 @@ const AssetInfo: FC = () => {
                 .times(balanceUSD)
                 .div(100)
                 .toFixed(2)}
-              className="!text-lg !font-semibold"
             />
           )}
         </div>
@@ -673,7 +701,6 @@ const PriceChange: FC<PriceChangeProps> = ({
       className={classNames(
         "inline-flex items-center",
         isPercent && "text-sm leading-4",
-        !isPercent && "text-base",
         "font-bold",
         isPercent && "py-1 px-2",
         "rounded-md",
@@ -685,32 +712,27 @@ const PriceChange: FC<PriceChangeProps> = ({
       )}
     >
       {isPercent ? (
-        <PriceArrow
-          className={classNames(
-            "w-2.5 h-2.5 mr-[0.2rem]",
-            !isPositive && "transform rotate-180"
-          )}
+        <PrettyAmount
+          prefix={
+            <PriceArrow
+              className={classNames(
+                "w-2.5 h-2.5 mr-[0.2rem]",
+                !isPositive && "transform rotate-180"
+              )}
+            />
+          }
+          amount={Math.abs(priceChangeNumber)}
+          className="inline-flex items-center"
         />
-      ) : isPositive ? (
-        "+"
       ) : (
-        "-"
+        <FiatAmount
+          prefix={isPositive ? "+" : "-"}
+          amount={Math.abs(priceChangeNumber)}
+          copiable
+          className="text-lg font-semibold"
+        />
       )}
-      <PrettyAmount
-        amount={Math.abs(priceChangeNumber)}
-        currency={isPercent ? undefined : "$"}
-      />
       {isPercent ? "%" : ""}
     </span>
   );
 };
-
-const PriceArrow: FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="-5 -5 30 30" className={className}>
-    <polygon
-      className="fill-current stroke-current stroke-[4]"
-      strokeLinejoin="round"
-      points="10,5 0,15 20,15"
-    />
-  </svg>
-);

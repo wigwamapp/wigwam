@@ -3,12 +3,9 @@ import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
-import { ethers } from "ethers";
-import BigNumber from "bignumber.js";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { TReplace } from "lib/ext/i18n/react";
 
-import { ConnectionApproval } from "core/types";
+import { Account as AccountType, ConnectionApproval } from "core/types";
 
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import { useToken } from "app/hooks";
@@ -20,7 +17,8 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
-import PrettyAmount from "app/components/elements/PrettyAmount";
+import Balance from "app/components/elements/Balance";
+import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
@@ -147,13 +145,12 @@ const ApproveConnection: FC<ApproveConnectionProps> = () => {
         className="w-full box-content -mr-5 pr-5"
         viewPortClassName="py-2.5 viewportBlock"
       >
-        {preparedAccounts.map(({ name, address }, i) => (
+        {preparedAccounts.map((account, i) => (
           <Account
-            key={address}
-            name={name}
-            address={address}
-            checked={accountsToConnectRef.current.has(address)}
-            onToggleAdd={() => toggleAccount(address)}
+            key={account.address}
+            account={account}
+            checked={accountsToConnectRef.current.has(account.address)}
+            onToggleAdd={() => toggleAccount(account.address)}
             className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
           />
         ))}
@@ -210,22 +207,20 @@ const ConnectionWarnings: FC = () => (
 );
 
 type AccountProps = {
-  name: string;
-  address: string;
+  account: AccountType;
   checked: boolean;
   onToggleAdd: () => void;
   className?: string;
 };
 
 const Account: FC<AccountProps> = ({
-  name,
-  address,
+  account,
   checked,
   onToggleAdd,
   className,
 }) => {
-  const nativeToken = useToken(address);
-  const portfolioBalance = nativeToken?.portfolioUSD;
+  const { address } = account;
+  const portfolioBalance = useToken(address)?.portfolioUSD;
 
   return (
     <CheckboxPrimitive.Root
@@ -256,9 +251,7 @@ const Account: FC<AccountProps> = ({
       />
 
       <span className="flex flex-col text-left min-w-0 max-w-[40%] mr-auto">
-        <span className="font-bold truncate">
-          <TReplace msg={name} />
-        </span>
+        <WalletName wallet={account} theme="small" />
         <HashPreview
           hash={address}
           className="text-xs text-brand-inactivedark font-normal mt-[2px]"
@@ -266,29 +259,14 @@ const Account: FC<AccountProps> = ({
         />
       </span>
       <span className="flex flex-col text-right min-w-0">
-        <PrettyAmount
-          amount={
-            nativeToken
-              ? portfolioBalance ??
-                ethers.utils.formatEther(nativeToken.rawBalance)
-              : null
-          }
-          currency={portfolioBalance ? "$" : nativeToken?.symbol}
-          isMinified={
-            portfolioBalance
-              ? new BigNumber(portfolioBalance).isLessThan(0.01)
-              : false
-          }
+        <Balance
+          address={address}
           className="text-sm font-bold text-brand-light ml-2"
         />
         {portfolioBalance && (
-          <PrettyAmount
-            amount={
-              nativeToken
-                ? ethers.utils.formatEther(nativeToken.rawBalance)
-                : null
-            }
-            currency={nativeToken?.symbol}
+          <Balance
+            address={address}
+            isNative
             isMinified
             prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
             className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"

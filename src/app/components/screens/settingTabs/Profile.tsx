@@ -2,7 +2,6 @@ import { FC, useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { Form, Field } from "react-final-form";
 import type { FormApi } from "final-form";
-import { FORM_ERROR } from "final-form";
 import { updateProfile } from "lib/ext/profile";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 
@@ -59,7 +58,7 @@ const Profile: FC = () => {
           form.restart();
           return;
         } catch (error: any) {
-          return { [FORM_ERROR]: error.message };
+          return { oldPwd: error.message };
         }
       }),
     []
@@ -87,7 +86,6 @@ const Profile: FC = () => {
           handleSubmit,
           submitting,
           modifiedSinceLastSubmit,
-          submitError,
           values,
         }) => (
           <form className="max-w-[18rem]" onSubmit={handleSubmit}>
@@ -96,11 +94,12 @@ const Profile: FC = () => {
                 {({ input, meta }) => (
                   <PasswordField
                     error={
-                      (!modifiedSinceLastSubmit && submitError) ||
+                      (!modifiedSinceLastSubmit && meta.submitError) ||
                       (meta.error && meta.touched)
                     }
                     errorMessage={
-                      meta.error || (!modifiedSinceLastSubmit && submitError)
+                      meta.error ||
+                      (!modifiedSinceLastSubmit && meta.submitError)
                     }
                     label="Old password"
                     placeholder={"*".repeat(8)}

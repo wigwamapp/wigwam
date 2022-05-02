@@ -1,11 +1,9 @@
 import { FC } from "react";
 
+import ComingSoon from "app/components/elements/ComingSoon";
+
 const Contacts: FC = () => {
-  return (
-    <div className="p-4">
-      <h3 className="font-bold text-2xl leading-none mb-6">Contacts</h3>
-    </div>
-  );
+  return <ComingSoon label="Contacts" />;
 };
 
 export default Contacts;

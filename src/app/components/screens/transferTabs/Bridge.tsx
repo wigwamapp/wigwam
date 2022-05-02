@@ -1,7 +1,7 @@
 import { FC } from "react";
 
-const Bridge: FC = () => (
-  <h3 className="font-bold text-2xl leading-none mb-6">Transfer - Bridge</h3>
-);
+import ComingSoon from "app/components/elements/ComingSoon";
+
+const Bridge: FC = () => <ComingSoon label="Transfer - Bridge" size="medium" />;
 
 export default Bridge;
