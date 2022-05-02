@@ -1,9 +1,9 @@
 import { FC } from "react";
 
+import ComingSoon from "app/components/elements/ComingSoon";
+
 const BuyWithFiat: FC = () => {
-  return (
-    <h3 className="font-bold text-2xl leading-none mb-6">Buy with Fiat</h3>
-  );
+  return <ComingSoon label="Buy with Fiat" size="medium" />;
 };
 
 export default BuyWithFiat;

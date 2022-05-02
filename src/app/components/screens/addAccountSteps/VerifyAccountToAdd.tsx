@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useMaybeAtomValue } from "lib/atom-utils";
-import { fromProtectedString } from "lib/crypto-utils";
+import { fromProtectedString, toProtectedString } from "lib/crypto-utils";
 
 import { AccountSource, SeedPharse, WalletStatus } from "core/types";
 import {
@@ -13,11 +13,11 @@ import { addAccounts } from "core/client";
 
 import { AddAccountStep } from "app/nav";
 import {
-  hasSeedPhraseAtom,
-  getNeuterExtendedKeyAtom,
-  walletStatusAtom,
-  allAccountsAtom,
   addAccountModalAtom,
+  allAccountsAtom,
+  getNeuterExtendedKeyAtom,
+  hasSeedPhraseAtom,
+  walletStatusAtom,
 } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
@@ -97,14 +97,17 @@ const VerifyAccountToAddInitial: FC = () => {
     () =>
       neuterExtendedKey
         ? generatePreviewHDNodes(neuterExtendedKey).map(
-            ({ address, index }) => ({
-              source: AccountSource.SeedPhrase,
+            ({ address, index, publicKey }) => ({
+              source: extendedKey
+                ? AccountSource.Ledger
+                : AccountSource.SeedPhrase,
               address,
               index: index.toString(),
+              publicKey: toProtectedString(publicKey),
             })
           )
         : null,
-    [neuterExtendedKey]
+    [extendedKey, neuterExtendedKey]
   );
 
   const handleContinue = useCallback(
@@ -132,6 +135,7 @@ const VerifyAccountToAddExisting: FC = () => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const { reset, stateRef } = useSteps();
 
+  const extendedKey: string | undefined = stateRef.current.extendedKey;
   const derivationPath = stateRef.current.derivationPath;
 
   const rootNeuterExtendedKey = useMaybeAtomValue(
@@ -139,16 +143,23 @@ const VerifyAccountToAddExisting: FC = () => {
       ? getNeuterExtendedKeyAtom(derivationPath)
       : null
   );
-  const importedAccounts = useMaybeAtomValue(hasSeedPhrase && allAccountsAtom);
+
+  const importedAccounts = useMaybeAtomValue(allAccountsAtom);
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
   const { alert } = useDialog();
 
   const isCreatingNew = stateRef.current.addAccounts === "existing-create";
 
-  const neuterExtendedKey = useMemo(
-    () => rootNeuterExtendedKey && fromProtectedString(rootNeuterExtendedKey),
-    [rootNeuterExtendedKey]
-  );
+  const neuterExtendedKey = useMemo(() => {
+    if (extendedKey) {
+      return extendedKey;
+    }
+    if (rootNeuterExtendedKey) {
+      return fromProtectedString(rootNeuterExtendedKey);
+    }
+
+    return null;
+  }, [extendedKey, rootNeuterExtendedKey]);
 
   useEffect(() => {
     if (!neuterExtendedKey) {
@@ -162,9 +173,10 @@ const VerifyAccountToAddExisting: FC = () => {
 
       if (!importedAccounts || importedAccounts.length <= 0) {
         return {
-          source: AccountSource.SeedPhrase,
+          source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
           address: newAccounts[0].address,
           index: newAccounts[0].index.toString(),
+          publicKey: toProtectedString(newAccounts[0].publicKey),
         };
       }
 
@@ -180,15 +192,16 @@ const VerifyAccountToAddExisting: FC = () => {
       }
 
       return {
-        source: AccountSource.SeedPhrase,
+        source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
         address: filteredAccounts[0].address,
         name: `Wallet ${filteredAccounts[0].index + 1}`,
         index: filteredAccounts[0].index.toString(),
         isDisabled: true,
         isDefaultChecked: true,
+        publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [importedAccounts]
+    [extendedKey, importedAccounts]
   );
 
   const addresses = useMemo(() => {
@@ -198,10 +211,11 @@ const VerifyAccountToAddExisting: FC = () => {
 
     if (!isCreatingNew) {
       const newAccounts = generatePreviewHDNodes(neuterExtendedKey).map(
-        ({ address, index }) => ({
-          source: AccountSource.SeedPhrase,
+        ({ address, index, publicKey }) => ({
+          source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
           address,
           index: index.toString(),
+          publicKey: toProtectedString(publicKey),
         })
       );
 
@@ -209,7 +223,7 @@ const VerifyAccountToAddExisting: FC = () => {
         return newAccounts;
       }
 
-      return newAccounts.map(({ address, index }) => {
+      return newAccounts.map(({ address, index, publicKey }) => {
         const isAddressImported = importedAccounts.find(
           ({ address: imported }) => {
             return imported === address;
@@ -217,13 +231,14 @@ const VerifyAccountToAddExisting: FC = () => {
         );
 
         return {
-          source: AccountSource.SeedPhrase,
+          source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
           address,
           index: index.toString(),
           name: isAddressImported?.name ?? undefined,
           isDisabled: isAddressImported,
           isDefaultChecked: isAddressImported,
           isAdded: isAddressImported,
+          publicKey: publicKey,
         };
       });
     }
@@ -239,6 +254,7 @@ const VerifyAccountToAddExisting: FC = () => {
 
     return [unusedAccount];
   }, [
+    extendedKey,
     findFirstUnusedAccount,
     importedAccounts,
     isCreatingNew,

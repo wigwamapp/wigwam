@@ -3,7 +3,6 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import { TReplace } from "lib/ext/i18n/react";
 
 import { Account } from "core/types";
 
@@ -20,6 +19,7 @@ import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
+import WalletName from "./WalletName";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
@@ -89,9 +89,8 @@ type AccountSelectItemProps = {
   account: Account;
 };
 
-const CurrentAccount: FC<AccountSelectItemProps> = ({
-  account: { address, name },
-}) => {
+const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
+  const { address } = account;
   const [copied, setCopied] = useState(false);
   const portfolioBalance = useToken(address)?.portfolioUSD;
 
@@ -124,9 +123,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({
         )}
       >
         <>
-          <span className="font-bold truncate w-full">
-            <TReplace msg={name} />
-          </span>
+          <WalletName wallet={account} theme="small" />
           <span className="flex items-center mt-auto">
             <HashPreview
               hash={address}
@@ -193,9 +190,7 @@ const AccountSelectItem: FC<
       )}
     </span>
     <span className="flex flex-col min-w-0 max-w-[45%]">
-      <span className="truncate">
-        <TReplace msg={account.name} />
-      </span>
+      <WalletName wallet={account} theme="small" />
       <HashPreview
         hash={account.address}
         className={classNames(

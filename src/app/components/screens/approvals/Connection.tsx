@@ -4,9 +4,8 @@ import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { TReplace } from "lib/ext/i18n/react";
 
-import { ConnectionApproval } from "core/types";
+import { Account as AccountType, ConnectionApproval } from "core/types";
 
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import { useToken } from "app/hooks";
@@ -19,6 +18,7 @@ import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import Balance from "app/components/elements/Balance";
+import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
@@ -145,13 +145,12 @@ const ApproveConnection: FC<ApproveConnectionProps> = () => {
         className="w-full box-content -mr-5 pr-5"
         viewPortClassName="py-2.5 viewportBlock"
       >
-        {preparedAccounts.map(({ name, address }, i) => (
+        {preparedAccounts.map((account, i) => (
           <Account
-            key={address}
-            name={name}
-            address={address}
-            checked={accountsToConnectRef.current.has(address)}
-            onToggleAdd={() => toggleAccount(address)}
+            key={account.address}
+            account={account}
+            checked={accountsToConnectRef.current.has(account.address)}
+            onToggleAdd={() => toggleAccount(account.address)}
             className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
           />
         ))}
@@ -208,20 +207,19 @@ const ConnectionWarnings: FC = () => (
 );
 
 type AccountProps = {
-  name: string;
-  address: string;
+  account: AccountType;
   checked: boolean;
   onToggleAdd: () => void;
   className?: string;
 };
 
 const Account: FC<AccountProps> = ({
-  name,
-  address,
+  account,
   checked,
   onToggleAdd,
   className,
 }) => {
+  const { address } = account;
   const portfolioBalance = useToken(address)?.portfolioUSD;
 
   return (
@@ -253,9 +251,7 @@ const Account: FC<AccountProps> = ({
       />
 
       <span className="flex flex-col text-left min-w-0 max-w-[40%] mr-auto">
-        <span className="font-bold truncate">
-          <TReplace msg={name} />
-        </span>
+        <WalletName wallet={account} theme="small" />
         <HashPreview
           hash={address}
           className="text-xs text-brand-inactivedark font-normal mt-[2px]"

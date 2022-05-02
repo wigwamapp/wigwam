@@ -47,6 +47,7 @@ import Avatar from "../elements/Avatar";
 import AssetLogo from "../elements/AssetLogo";
 import PrettyAmount from "../elements/PrettyAmount";
 import PriceArrow from "../elements/PriceArrow";
+import ComingSoon from "../elements/ComingSoon";
 
 const Popup: FC = () => (
   <PopupLayout>
@@ -188,6 +189,14 @@ const AssetsList: FC = () => {
     }
   }, []);
 
+  const toggleNftSwitcher = useCallback((value: boolean) => {
+    if (value) {
+      setSearchValue(null);
+      setManageModeEnabled(false);
+    }
+    setIsNftsSelected(value);
+  }, []);
+
   return (
     <>
       <div className="flex items-center mt-5">
@@ -200,7 +209,7 @@ const AssetsList: FC = () => {
               <AssetsSwitcher
                 theme="small"
                 checked={isNftsSelected}
-                onCheckedChange={setIsNftsSelected}
+                onCheckedChange={toggleNftSwitcher}
               />
             </span>
           </Tooltip>
@@ -212,6 +221,7 @@ const AssetsList: FC = () => {
             inputClassName="max-h-9 !pl-9"
             placeholder="Type to search..."
             adornmentClassName="!left-3"
+            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -228,11 +238,14 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
+            disabled={isNftsSelected}
             onClick={() => setManageModeEnabled(!manageModeEnabled)}
           />
         </TippySingletonProvider>
       </div>
-      {tokens.length <= 0 && searchValue ? (
+      {isNftsSelected ? (
+        <ComingSoon label="NFTs" size="extra-small" />
+      ) : tokens.length <= 0 && searchValue ? (
         <button
           type="button"
           className={classNames(

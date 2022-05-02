@@ -15,13 +15,8 @@ const ShareAddress: FC = () => {
   const { copy, copied } = useCopyCanvasToClipboard("#receive-canvas canvas");
 
   return (
-    <>
-      <AddressField
-        className="max-w-[23.25rem]"
-        defaultValue={address}
-        label="Wallet address"
-        readOnly
-      />
+    <div className="flex flex-col max-w-[23.25rem]">
+      <AddressField defaultValue={address} label="Wallet address" readOnly />
       <div className="mt-6 flex">
         <div
           className={classNames(
@@ -67,7 +62,7 @@ const ShareAddress: FC = () => {
           </NewButton>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
