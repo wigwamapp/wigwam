@@ -170,7 +170,7 @@ const CreateSecretField = forwardRef<
       onClick={isShown ? undefined : () => setIsShown(true)}
       onKeyDown={isShown ? undefined : () => setIsShown(true)}
     >
-      <HiddenSeedPhraseIcon className="absolute inset-0" />
+      <HiddenSeedPhraseIcon className="w-full h-auto absolute inset-0" />
       <LockIcon className="w-[2.125rem] h-auto" />
       <span className="text-xs font-bold mt-1">
         Click here to reveal {label.toLowerCase()}
