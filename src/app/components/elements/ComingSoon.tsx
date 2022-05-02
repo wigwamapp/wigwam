@@ -1,6 +1,7 @@
 import { FC } from "react";
 import classNames from "clsx";
-import { getPublicURL } from "lib/ext/utils";
+
+import ComingSoonImage from "app/images/coming-soon.png";
 
 interface ComingSoonProps {
   label: string;
@@ -24,12 +25,12 @@ const ComingSoon: FC<ComingSoonProps> = ({
       )}
     >
       <img
-        src={getPublicURL("icons/coming-soon.svg")}
+        src={ComingSoonImage}
         alt={`${label} section is under development`}
         className={classNames(
-          size === "large" && "w-[33.5rem]",
-          size === "medium" && "w-[29rem]",
-          size === "extra-small" && "w-[18rem]",
+          size === "large" && "w-[33.5rem] h-[14.25rem]",
+          size === "medium" && "w-[29rem] h-[12.3358rem]",
+          size === "extra-small" && "w-[18rem] h-[7.6567rem]",
           "h-auto"
         )}
       />
