@@ -261,6 +261,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
         <SummaryRow
           className="mt-2"
           header="Total"
+          lightHeader
           value={
             <FiatAmount
               amount={
@@ -283,6 +284,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
 type SummaryRowProps = {
   header: ReactNode;
   value: ReactNode;
+  lightHeader?: boolean;
   inBrackets?: ReactNode;
   className?: string;
 };
@@ -290,6 +292,7 @@ type SummaryRowProps = {
 const SummaryRow: FC<SummaryRowProps> = ({
   header,
   value,
+  lightHeader,
   inBrackets,
   className,
 }) => (
@@ -300,7 +303,12 @@ const SummaryRow: FC<SummaryRowProps> = ({
       className
     )}
   >
-    <h4 className="flex-nowrap text-brand-inactivedark font-semibold">
+    <h4
+      className={classNames(
+        "flex-nowrap font-semibold",
+        lightHeader ? "text-brand-light" : "text-brand-inactivedark"
+      )}
+    >
       {header}
     </h4>
     <span className="ml-1 font-semibold">
