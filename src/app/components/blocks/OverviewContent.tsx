@@ -58,6 +58,7 @@ import AddressField from "../elements/AddressField";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
 import PriceArrow from "../elements/PriceArrow";
+import ComingSoon from "../elements/ComingSoon";
 
 const OverviewContent: FC = () => (
   <div className="flex mt-6 min-h-0 grow">
@@ -69,21 +70,32 @@ export default OverviewContent;
 
 const TokenExplorer: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
+  const [isNftsSelected, setIsNftsSelected] = useState(false);
 
   return (
     <>
-      <AssetsList />
-      {tokenSlug && <AssetInfo />}
+      <AssetsList
+        isNftsSelected={isNftsSelected}
+        setIsNftsSelected={setIsNftsSelected}
+      />
+      {tokenSlug && !isNftsSelected && <AssetInfo />}
     </>
   );
 };
 
-const AssetsList: FC = () => {
+type AssetsListProps = {
+  isNftsSelected: boolean;
+  setIsNftsSelected: (value: boolean) => void;
+};
+
+const AssetsList: FC<AssetsListProps> = ({
+  isNftsSelected,
+  setIsNftsSelected,
+}) => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
@@ -231,6 +243,20 @@ const AssetsList: FC = () => {
 
   const searching = (willSearch || syncing) && !alreadySearchedRef.current;
 
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      if (value) {
+        setTokenSlug([RESET]);
+        setSearchValue(null);
+        setManageModeEnabled(false);
+      } else {
+        setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      }
+      setIsNftsSelected(value);
+    },
+    [setIsNftsSelected, setTokenSlug, tokens]
+  );
+
   return (
     <div
       className={classNames(
@@ -241,7 +267,7 @@ const AssetsList: FC = () => {
     >
       <AssetsSwitcher
         checked={isNftsSelected}
-        onCheckedChange={setIsNftsSelected}
+        onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
       <div className="flex items-center">
@@ -250,6 +276,7 @@ const AssetsList: FC = () => {
             ref={searchInputRef}
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
+            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -266,11 +293,14 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
+            disabled={isNftsSelected}
             onClick={toggleManageMode}
           />
         </TippySingletonProvider>
       </div>
-      {tokens.length <= 0 && searchValue ? (
+      {isNftsSelected ? (
+        <ComingSoon label="NFTs" size="small" />
+      ) : tokens.length <= 0 && searchValue ? (
         <button
           type="button"
           className={classNames(

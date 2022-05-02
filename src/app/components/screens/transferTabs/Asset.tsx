@@ -112,7 +112,10 @@ const Asset: FC = () => {
       onSubmit={handleSubmit}
       decorators={[focusOnErrors]}
       render={({ form, handleSubmit, values, submitting }) => (
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col max-w-[23.25rem]"
+        >
           <TokenSelect
             handleTokenChanged={() => form.change("amount", undefined)}
           />
