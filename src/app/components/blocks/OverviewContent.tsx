@@ -70,21 +70,32 @@ export default OverviewContent;
 
 const TokenExplorer: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
+  const [isNftsSelected, setIsNftsSelected] = useState(false);
 
   return (
     <>
-      <AssetsList />
-      {tokenSlug && <AssetInfo />}
+      <AssetsList
+        isNftsSelected={isNftsSelected}
+        setIsNftsSelected={setIsNftsSelected}
+      />
+      {tokenSlug && !isNftsSelected && <AssetInfo />}
     </>
   );
 };
 
-const AssetsList: FC = () => {
+type AssetsListProps = {
+  isNftsSelected: boolean;
+  setIsNftsSelected: (value: boolean) => void;
+};
+
+const AssetsList: FC<AssetsListProps> = ({
+  isNftsSelected,
+  setIsNftsSelected,
+}) => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
@@ -243,7 +254,7 @@ const AssetsList: FC = () => {
       }
       setIsNftsSelected(value);
     },
-    [setTokenSlug, tokens]
+    [setIsNftsSelected, setTokenSlug, tokens]
   );
 
   return (
