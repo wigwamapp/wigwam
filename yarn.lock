@@ -2789,6 +2789,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/canvas-txt@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/canvas-txt/-/canvas-txt-3.0.0.tgz#5a6b5ad6413fb6940a4f5e98f0ccf395fbc40c11"
+  integrity sha512-KfJk5YWbujYQqKzHBzHOsq68dnqg7MwMxPlwwnvgjXG0ViwafIqYveEPpUZK5G7TrlwEEHqEvgE6LAJig+valw==
+
 "@types/chrome@0.0.183":
   version "0.0.183"
   resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.183.tgz#c12649c00ae5ae8fca511248256c0b11f91c95e2"
@@ -3896,6 +3901,11 @@ canvas-renderer@~2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/canvas-renderer/-/canvas-renderer-2.1.1.tgz#d91fe9511ab48056ff9fa8a04514bede76535f55"
   integrity sha512-/V0XetN7s1Mk3NO7x2wxPZYv0pLMQtGAhecuOuKR88beiYCUle1AbCcFZNLu+4NVzi9RVHS0rXtIgzPEaKidLw==
+
+canvas-txt@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/canvas-txt/-/canvas-txt-3.0.0.tgz#47d84e8870201d21604cc2d2964be22c46360ec4"
+  integrity sha512-SrNIp4aaGsgddjQX7S0D8jDaYNaOkPjC/k6VjaaT3h1GZ5RonSvmoCv2FyQfNk9mPZto84C8sNURgEC8dsC/vA==
 
 case-sensitive-paths-webpack-plugin@2.4.0:
   version "2.4.0"
