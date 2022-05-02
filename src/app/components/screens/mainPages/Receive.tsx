@@ -42,12 +42,12 @@ const tabsContent = [
   {
     route: { page: "receive", receive: ReceiveTabEnum.ShareAddress },
     title: "Share address",
-    desc: "View your current wallet address. Share it or use it on exchanges to receive funds.",
+    desc: "View current wallet address. Share it or use it on exchanges to receive funds.",
   },
   {
     route: { page: "receive", receive: ReceiveTabEnum.BuyWithCrypto },
     title: "Buy with Crypto",
-    desc: "Top up balance with cryptocurrency from other networks using third-party services.",
+    desc: "Top up balance with crypto from other networks using third-party services.",
   },
   {
     route: { page: "receive", receive: ReceiveTabEnum.BuyWithFiat },
