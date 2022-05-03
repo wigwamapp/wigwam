@@ -4,7 +4,7 @@ import NumberFormat, { NumberFormatProps } from "react-number-format";
 import Input, { InputProps } from "./Input";
 
 export type NumberInputProps = Omit<NumberFormatProps, "type"> &
-  Omit<InputProps, "ref" | "value" | "defaultValue" | "type"> & {
+  Omit<InputProps, "ref" | "value" | "defaultValue" | "type" | "onChange"> & {
     defaultValue?: string | number;
     value?: string | number;
     decimalSeparator?: string;

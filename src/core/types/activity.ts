@@ -57,7 +57,7 @@ export interface ConnectionApproval extends ApprovalBase {
 
 export type TxParams = {
   from: string; // '0x0000000000000000000000000000000000000000' - must match user's active address.
-  to: string; // '0x0000000000000000000000000000000000000000' - Required except during contract publications.
+  to?: string; // '0x0000000000000000000000000000000000000000' - Required except during contract publications.
   // chainId?: string; // '0x3' - Used to prevent transaction reuse across blockchains.
   nonce?: string; // '0x00' - ignored
   gasPrice?: string; // '0x09184e72a000' - customizable by user during confirmation.

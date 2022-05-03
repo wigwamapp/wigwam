@@ -2,7 +2,7 @@ import { FC, StrictMode, useCallback, useRef } from "react";
 import classNames from "clsx";
 import { render } from "react-dom";
 import { ethers } from "ethers";
-import { Erc20__factory } from "abi-types";
+import { ERC20__factory } from "abi-types";
 
 import { getClientProvider } from "core/client";
 import useForceUpdate from "use-force-update";
@@ -17,7 +17,7 @@ async function sendPolygonTokens() {
 
   const provider = getClientProvider(chainId).getSigner(fromAccount);
 
-  const contract = Erc20__factory.connect(linkTokenAddress, provider);
+  const contract = ERC20__factory.connect(linkTokenAddress, provider);
 
   const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
 
@@ -35,7 +35,7 @@ async function sendBscTokens() {
 
   const provider = getClientProvider(chainId).getSigner(fromAccount);
 
-  const contract = Erc20__factory.connect(daiTokenAddress, provider);
+  const contract = ERC20__factory.connect(daiTokenAddress, provider);
 
   const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
 

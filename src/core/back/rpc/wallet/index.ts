@@ -17,8 +17,14 @@ export async function sendTransaction(
 ) {
   await validateNetwork(chainId);
 
-  const txParams = params[0];
-  assertSchema(txParams, TxParamsSchema);
+  const txParams = params?.[0];
+
+  try {
+    assertSchema(txParams, TxParamsSchema);
+    assert(txParams.to || txParams.data);
+  } catch {
+    throw new Error("Invalid transaction");
+  }
 
   const accountAddress = ethers.utils.getAddress(txParams.from);
 

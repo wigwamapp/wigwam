@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
-import { Erc20__factory } from "abi-types";
+import { ERC20__factory } from "abi-types";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -61,7 +61,7 @@ const Asset: FC = () => {
       decimals: number
     ) => {
       const signer = provider.getUncheckedSigner(currentAccount.address);
-      const contract = Erc20__factory.connect(tokenContract, signer);
+      const contract = ERC20__factory.connect(tokenContract, signer);
 
       const convertedAmount = ethers.utils.parseUnits(amount, decimals);
 

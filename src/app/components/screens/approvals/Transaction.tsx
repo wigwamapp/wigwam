@@ -1,17 +1,17 @@
 import {
   FC,
   ReactNode,
+  Dispatch,
+  SetStateAction,
   memo,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
-import useForceUpdate from "use-force-update";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
@@ -19,7 +19,7 @@ import { TransactionApproval } from "core/types";
 import { allAccountsAtom } from "app/atoms";
 import { approveItem } from "core/client";
 
-import { useOnBlock, useProvider } from "app/hooks";
+import { useNativeCurrency, useOnBlock, useProvider } from "app/hooks";
 import WalletCard from "app/components/elements/WalletCard";
 import NumberInput from "app/components/elements/NumberInput";
 import LongTextField from "app/components/elements/LongTextField";
@@ -28,6 +28,7 @@ import NetworkPreview from "app/components/elements/NetworkPreview";
 import ApprovalLayout from "./Layout";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { withHumanDelay } from "app/utils";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 
 const TAB_VALUES = ["summary", "fee", "data", "raw", "error"] as const;
 
@@ -40,6 +41,7 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
 };
 
 type TabValue = typeof TAB_VALUES[number];
+type Tx = ethers.utils.UnsignedTransaction;
 
 type ApproveTransactionProps = {
   approval: TransactionApproval;
@@ -53,15 +55,37 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   );
 
   const provider = useProvider();
-
-  const forceUpdate = useForceUpdate();
+  const nativeCurrency = useNativeCurrency();
 
   const [tabValue, setTabValue] = useState<TabValue>("summary");
   const [lastError, setLastError] = useState<any>(null);
   const [approving, setApproving] = useState(false);
 
-  const preparedTxRef = useRef<ethers.utils.UnsignedTransaction>();
-  const preparedTx = preparedTxRef.current;
+  const [preparedTx, setPreparedTx] = useState<Tx>();
+  const [txOverrides, setTxOverrides] = useState<Partial<Tx>>({});
+
+  const finalTx = useMemo<typeof preparedTx>(() => {
+    if (!preparedTx) return preparedTx;
+
+    const tx = { ...preparedTx };
+    for (const [key, value] of Object.entries(txOverrides)) {
+      if (value || value === 0) {
+        (tx as any)[key] = value;
+      }
+    }
+
+    return tx;
+  }, [preparedTx, txOverrides]);
+
+  const averageFee = useMemo(() => {
+    if (!finalTx) return null;
+
+    try {
+      return ethers.BigNumber.from(finalTx.gasLimit).mul(finalTx.gasPrice!);
+    } catch {
+      return null;
+    }
+  }, [finalTx]);
 
   const withThrottle = useMemo(createOrganicThrottle, []);
 
@@ -85,12 +109,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             });
           delete tx.from;
 
-          preparedTxRef.current = {
+          setPreparedTx({
             ...tx,
             nonce: bnify(tx.nonce)?.toNumber(),
-          };
-
-          forceUpdate();
+          });
         } catch (err) {
           console.error(err);
           setLastError(err);
@@ -98,7 +120,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       }),
     [
       withThrottle,
-      forceUpdate,
+      setPreparedTx,
       provider,
       account.address,
       approval,
@@ -117,8 +139,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [setTabValue, lastError]);
 
   useEffect(() => {
-    if (preparedTx) console.info({ preparedTx });
-  }, [preparedTx]);
+    if (finalTx && averageFee) console.info({ finalTx, averageFee });
+  }, [finalTx, averageFee]);
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -130,9 +152,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           let rawTx: string | undefined;
 
           if (approved) {
-            if (!preparedTx) return;
+            if (!finalTx) return;
 
-            rawTx = ethers.utils.serializeTransaction(preparedTx);
+            rawTx = ethers.utils.serializeTransaction(finalTx);
           }
 
           await approveItem(approval.id, { approved, rawTx });
@@ -143,10 +165,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, setLastError, setApproving, preparedTx]
+    [approval, setLastError, setApproving, finalTx]
   );
 
-  const loading = approving || (!preparedTx && !lastError);
+  const loading = approving || (!finalTx && !lastError);
 
   return (
     <ApprovalLayout
@@ -197,19 +219,40 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           </Tabs.List>
 
           <Tabs.Content value="summary">
-            <div className="w-full p-4"></div>
+            <div className="w-full mt-4">
+              {averageFee && nativeCurrency && (
+                <div className="text-lg text-brand-inactivelight">
+                  <span className="">Avarage Fee: </span>
+                  <PrettyAmount
+                    amount={averageFee.toString()}
+                    decimals={nativeCurrency.decimals}
+                    currency={nativeCurrency.symbol}
+                    copiable
+                    className=""
+                  />
+                </div>
+              )}
+            </div>
           </Tabs.Content>
 
           <Tabs.Content value="fee">
-            {preparedTx ? <TxFee tx={preparedTx} /> : <Loading />}
+            {preparedTx ? (
+              <TxFee
+                tx={preparedTx}
+                overrides={txOverrides}
+                onOverridesChange={setTxOverrides}
+              />
+            ) : (
+              <Loading />
+            )}
           </Tabs.Content>
 
           <Tabs.Content value="data">
-            {preparedTx ? <TxData tx={preparedTx} /> : <Loading />}
+            {finalTx ? <TxData tx={finalTx} /> : <Loading />}
           </Tabs.Content>
 
           <Tabs.Content value="raw">
-            {preparedTx ? <TxSign tx={preparedTx} /> : <Loading />}
+            {finalTx ? <TxSign tx={finalTx} /> : <Loading />}
           </Tabs.Content>
 
           <Tabs.Content value="error">
@@ -229,29 +272,63 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 export default ApproveTransaction;
 
 type TxFeeProps = {
-  tx: ethers.utils.UnsignedTransaction;
+  tx: Tx;
+  overrides: Partial<Tx>;
+  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
 };
 
-const TxFee = memo<TxFeeProps>(({ tx }) => {
+const TxFee = memo<TxFeeProps>(({ tx, overrides, onOverridesChange }) => {
+  const gasLimit = overrides.gasLimit ?? tx.gasLimit;
+  const maxPriorityFeePerGas =
+    overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas;
+  const maxFeePerGas = overrides.maxFeePerGas ?? tx.maxFeePerGas;
+  const gasPrice = overrides.gasPrice ?? tx.gasPrice;
+
+  const changeValue = useCallback(
+    (name: string, value: ethers.BigNumberish | null) => {
+      onOverridesChange((o) => ({ ...o, [name]: value }));
+    },
+    [onOverridesChange]
+  );
+
+  const fixValue = useCallback(
+    (name: string, value?: string) => {
+      if (!value) {
+        onOverridesChange((o) => ({ ...o, [name]: null }));
+      }
+    },
+    [onOverridesChange]
+  );
+
   return (
-    <div className="w-full p-4">
+    <div className="w-full mt-4">
       <NumberInput
         label="Gas Limit"
         placeholder="0"
         thousandSeparator
         decimalScale={0}
-        defaultValue={formatUnits(tx.gasLimit)}
+        name="gasLimit"
+        value={formatUnits(gasLimit)}
+        onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
+        onBlur={(e) => fixValue("gasLimit", e.target.value)}
         className="w-full mb-4"
       />
 
-      {tx.maxPriorityFeePerGas ? (
+      {maxPriorityFeePerGas ? (
         <>
           <NumberInput
             label="Max priority fee"
             placeholder="0.00"
             thousandSeparator
             decimalScale={9}
-            defaultValue={formatUnits(tx.maxPriorityFeePerGas, "gwei")}
+            value={formatUnits(maxPriorityFeePerGas, "gwei")}
+            onChange={(e) =>
+              changeValue(
+                "maxPriorityFeePerGas",
+                parseUnits(e.target.value, "gwei")
+              )
+            }
+            onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
             className="w-full mb-4"
           />
 
@@ -260,7 +337,11 @@ const TxFee = memo<TxFeeProps>(({ tx }) => {
             placeholder="0.00"
             thousandSeparator
             decimalScale={9}
-            defaultValue={formatUnits(tx.maxFeePerGas, "gwei")}
+            value={formatUnits(maxFeePerGas, "gwei")}
+            onChange={(e) =>
+              changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
+            }
+            onBlur={(e) => fixValue("maxFeePerGas", e.target.value)}
             className="w-full mb-4"
           />
         </>
@@ -271,7 +352,11 @@ const TxFee = memo<TxFeeProps>(({ tx }) => {
             placeholder="0.00"
             thousandSeparator
             decimalScale={9}
-            defaultValue={formatUnits(tx.gasPrice, "gwei")}
+            value={formatUnits(gasPrice, "gwei")}
+            onChange={(e) =>
+              changeValue("gasPrice", parseUnits(e.target.value, "gwei"))
+            }
+            onBlur={(e) => fixValue("gasPrice", e.target.value)}
             className="w-full mb-4"
           />
         </>
@@ -281,12 +366,12 @@ const TxFee = memo<TxFeeProps>(({ tx }) => {
 });
 
 type TxDataProps = {
-  tx: ethers.utils.UnsignedTransaction;
+  tx: Tx;
 };
 
 const TxData = memo<TxDataProps>(({ tx }) => {
   return (
-    <div className="w-full p-4">
+    <div className="w-full mt-4">
       <LongTextField
         label="Data"
         readOnly
@@ -298,14 +383,14 @@ const TxData = memo<TxDataProps>(({ tx }) => {
 });
 
 type TxSignProps = {
-  tx: ethers.utils.UnsignedTransaction;
+  tx: Tx;
 };
 
 const TxSign = memo<TxSignProps>(({ tx }) => {
   const rawTx = useMemo(() => ethers.utils.serializeTransaction(tx), [tx]);
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full mt-4">
       <LongTextField
         label="Raw transaction"
         readOnly
@@ -332,6 +417,14 @@ function bnify(v?: ethers.BigNumberish) {
 }
 
 function formatUnits(v?: ethers.BigNumberish, unit: ethers.BigNumberish = 0) {
-  if (v === undefined) return v;
+  if (!v && v !== 0) return "";
   return ethers.utils.formatUnits(v, unit);
+}
+
+function parseUnits(v: string, unit: ethers.BigNumberish = 0) {
+  try {
+    return ethers.utils.parseUnits(v, unit);
+  } catch {
+    return "";
+  }
 }
