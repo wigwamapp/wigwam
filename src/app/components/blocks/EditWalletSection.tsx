@@ -350,7 +350,7 @@ const DeleteAccountModal = memo<
         <SecretField
           label={seedPhrase ? "Secret phrase" : "Private key"}
           isDownloadable={Boolean(seedPhrase)}
-          defaultValue={fromProtectedString(seedPhrase ?? privateKey ?? "")}
+          value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
         />
       ) : (
         <Form

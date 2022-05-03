@@ -8,6 +8,7 @@ const canvasMultiplier = 3;
 
 export type CanvasTextFieldProps = {
   value?: string;
+  defaultValue?: string;
   label?: string;
   labelActions?: ReactNode;
   actions?: ReactNode;
@@ -20,6 +21,7 @@ const CanvasTextField = memo(
     (
       {
         value,
+        defaultValue,
         label,
         labelActions,
         actions,
@@ -30,7 +32,7 @@ const CanvasTextField = memo(
       ref
     ) => {
       const canvasRef = useRef<HTMLCanvasElement>();
-      const prevValue = usePrevious(value);
+      const prevValue = usePrevious(value ?? defaultValue);
 
       useEffect(() => {
         const canvas = canvasRef.current;
@@ -43,11 +45,11 @@ const CanvasTextField = memo(
 
             ctx.fillStyle = "#f8f9fd";
 
-            if (prevValue !== value) {
+            if (prevValue !== (value ?? defaultValue)) {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            const txt = value ?? "";
+            const txt = value ?? defaultValue ?? "";
             canvasTxt.font = `Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
             canvasTxt.fontSize = 16;
             canvasTxt.align = "left";
@@ -58,7 +60,7 @@ const CanvasTextField = memo(
             canvasTxt.drawText(ctx, txt, 16, 12, 406, 86);
           }
         }
-      }, [prevValue, value]);
+      }, [defaultValue, prevValue, value]);
 
       return (
         <div className={classNames("flex flex-col", className)}>

@@ -16,7 +16,9 @@ type AddressFieldProps = LongTextFieldProps & {
 const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
   ({ label = "Recipient", setFromClipboard, className, ...rest }, ref) => {
     const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
-    const { copy, copied } = useCopyToClipboard(rest.value);
+    const { copy, copied } = useCopyToClipboard(
+      rest.value ?? rest.defaultValue
+    );
 
     return (
       <LongTextField
