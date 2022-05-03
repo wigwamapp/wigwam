@@ -4,8 +4,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
+import { WalletStatus } from "core/types";
+
 import { AddAccountStep } from "app/nav";
-import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
+import {
+  addAccountModalAtom,
+  addAccountStepAtom,
+  walletStatusAtom,
+} from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import NewButton from "app/components/elements/NewButton";
 import BackButton from "app/components/elements/BackButton";
@@ -16,6 +22,8 @@ import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isInitial = walletStatus === WalletStatus.Welcome;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -64,7 +72,9 @@ const AddAccountModal = memo(() => {
                 ref={ref}
                 className={classNames(
                   "w-full h-full",
-                  "brandbg-large-modal",
+                  isInitial
+                    ? "bg-brand-dark/10 backdrop-blur-[30px]"
+                    : "brandbg-large-modal",
                   "border border-brand-light/5",
                   "rounded-[2.5rem]",
                   "after:absolute after:inset-0",
