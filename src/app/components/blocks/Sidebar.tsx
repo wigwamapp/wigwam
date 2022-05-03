@@ -19,6 +19,7 @@ const Sidebar: FC = () => (
   >
     <Link
       to={{ page: Page.Default }}
+      merge={["token"]}
       className={classNames(
         "mb-5 py-5",
         "border-b border-brand-main/[.07]",
