@@ -25,8 +25,6 @@ export function useCopyCanvasToClipboard(
       | HTMLCanvasElement
       | undefined;
 
-    console.log("canvas", canvas);
-
     if (canvas) {
       const ctx = canvas.getContext("2d");
       if (ctx) {

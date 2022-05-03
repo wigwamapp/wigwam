@@ -642,7 +642,7 @@ const AssetInfo: FC = () => {
           <AddressField
             key={address}
             label="Token address"
-            defaultValue={address}
+            value={address}
             readOnly
             labelActions={standard ? <Tag standard={standard} /> : undefined}
           />
