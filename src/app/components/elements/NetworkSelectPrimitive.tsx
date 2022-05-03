@@ -60,7 +60,6 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
   const handleLinkClick = useCallback(() => {
     setOpened(false);
-    setSearchValue(null);
   }, []);
 
   return (

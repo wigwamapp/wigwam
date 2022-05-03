@@ -101,11 +101,6 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
 
-  const handleLinkClick = useCallback(() => {
-    setOpened(false);
-    setSearchValue(null);
-  }, []);
-
   return preparedCurrentToken ? (
     <Select
       open={opened}
@@ -125,7 +120,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
           You can manage your assets in{" "}
           <Link
             to={{ page: Page.Default }}
-            onClick={handleLinkClick}
+            onClick={() => setOpened(false)}
             className="underline underline-offset-2"
           >
             Overview

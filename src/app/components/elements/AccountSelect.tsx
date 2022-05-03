@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
@@ -69,11 +69,6 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
     [currentAccount]
   );
 
-  const handleLinkClick = useCallback(() => {
-    setOpened(false);
-    setSearchValue(null);
-  }, []);
-
   return (
     <Select
       open={opened}
@@ -93,7 +88,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
           You can manage your wallets in{" "}
           <SmartLink
             to={{ page: Page.Wallets }}
-            onClick={handleLinkClick}
+            onClick={() => setOpened(false)}
             className="underline underline-offset-2"
           >
             Wallets
