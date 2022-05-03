@@ -300,7 +300,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     >
                       <NoResultsFoundIcon className="mb-4" />
                       <span>
-                        There is no items found on your request.
+                        There are no items found.
+                        <br />
                         {emptySearchText ? " " : ""}
                         {emptySearchText}
                       </span>
