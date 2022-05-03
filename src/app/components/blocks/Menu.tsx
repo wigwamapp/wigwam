@@ -12,7 +12,7 @@ const Menu: FC = () => {
 
   return (
     <div className="flex items-center py-4 border-b border-brand-main/[.07]">
-      <NetworkSelect />
+      <NetworkSelect className="w-[17.75rem]" contentClassName="w-[17.75rem]" />
 
       {isSyncing && (
         <span className="px-4 text-sm text-white font-semibold">

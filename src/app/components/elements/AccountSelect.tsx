@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
@@ -13,13 +13,14 @@ import {
   currentAccountAtom,
 } from "app/atoms";
 import { useToken } from "app/hooks";
-
+import { Page } from "app/nav";
 import Select from "./Select";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
 import WalletName from "./WalletName";
+import SmartLink from "./SmartLink";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
@@ -30,6 +31,7 @@ type AccountSelectProps = {
 };
 
 const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
+  const [opened, setOpened] = useState(false);
   const { currentAccount, allAccounts } = useAtomValue(
     useMemo(
       () =>
@@ -67,8 +69,15 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
     [currentAccount]
   );
 
+  const handleLinkClick = useCallback(() => {
+    setOpened(false);
+    setSearchValue(null);
+  }, []);
+
   return (
     <Select
+      open={opened}
+      onOpenChange={setOpened}
       items={preparedAccounts}
       currentItem={preparedCurrentAccount}
       setItem={(account) => setAccountAddress(account.key)}
@@ -79,6 +88,19 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
       contentClassName="!w-[22.25rem]"
       itemClassName="group"
+      emptySearchText={
+        <>
+          You can manage your wallets in{" "}
+          <SmartLink
+            to={{ page: Page.Wallets }}
+            onClick={handleLinkClick}
+            className="underline underline-offset-2"
+          >
+            Wallets
+          </SmartLink>{" "}
+          tab.
+        </>
+      }
     />
   );
 };
