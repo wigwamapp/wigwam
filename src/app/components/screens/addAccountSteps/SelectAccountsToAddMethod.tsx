@@ -5,7 +5,7 @@ import Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
-import { AccountSource, SeedPharse, WalletStatus } from "core/types";
+import { AccountSource, SeedPharse } from "core/types";
 import {
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
@@ -14,7 +14,7 @@ import {
 import { ClientProvider } from "core/client";
 
 import { withHumanDelay } from "app/utils";
-import { walletStatusAtom } from "app/atoms";
+import { hasSeedPhraseAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useSteps } from "app/hooks/steps";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
@@ -55,19 +55,19 @@ const methodsExisting: MethodsProps = [
 ];
 
 const SelectAccountsToAddMethod: FC = () => {
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+
   const { navigateToStep, stateRef } = useSteps();
-  const walletStatus = useAtomValue(walletStatusAtom);
   const { waitLoading } = useDialog();
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
 
-  const isInitial = walletStatus === WalletStatus.Welcome;
   const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
 
-  const methods = useMemo(
-    () => (isInitial ? methodsInitial : methodsExisting),
-    [isInitial]
-  );
+  const methods = useMemo(() => {
+    if (isHardDevice) return methodsInitial;
+    return hasSeedPhrase ? methodsExisting : methodsInitial;
+  }, [isHardDevice, hasSeedPhrase]);
 
   const transportRef = useRef<Transport>();
 
@@ -145,7 +145,7 @@ const SelectAccountsToAddMethod: FC = () => {
   const handleContinue = useCallback(
     async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
-        isInitial ? "initial" : "existing"
+        hasSeedPhrase ? "initial" : "existing"
       }-${method}`;
       stateRef.current.derivationPath = derivationPath;
       stateRef.current.importAddresses = null;
@@ -169,7 +169,7 @@ const SelectAccountsToAddMethod: FC = () => {
         });
 
         if (answer) {
-          if (isInitial && method === "auto") {
+          if (method === "auto") {
             setOpenedLoadingModal(true);
             return;
           }
@@ -181,7 +181,7 @@ const SelectAccountsToAddMethod: FC = () => {
         return;
       }
 
-      if (isInitial && method === "auto") {
+      if (!hasSeedPhrase && method === "auto") {
         setOpenedLoadingModal(true);
         return;
       }
@@ -191,7 +191,7 @@ const SelectAccountsToAddMethod: FC = () => {
     [
       handleConnect,
       isHardDevice,
-      isInitial,
+      hasSeedPhrase,
       navigateToStep,
       stateRef,
       waitLoading,

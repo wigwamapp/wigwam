@@ -26,6 +26,7 @@ import AccountsToAdd from "./AccountToAdd";
 
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
   const initialSetup = walletStatus === WalletStatus.Welcome;
   const { stateRef, navigateToStep } = useSteps();
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
@@ -40,7 +41,7 @@ const VerifyAccountToAdd: FC = () => {
           Object.assign(stateRef.current, { addAccountsParams });
           navigateToStep(AddAccountStep.SetupPassword);
         } else {
-          await addAccounts(addAccountsParams);
+          await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
           setAccModalOpened([false]);
         }
       } catch (err: any) {
@@ -56,7 +57,7 @@ const VerifyAccountToAdd: FC = () => {
     );
   }
 
-  if (initialSetup) {
+  if (!hasSeedPhrase) {
     return <VerifyAccountToAddInitial />;
   }
 
