@@ -9,13 +9,15 @@ import {
 import classNames from "clsx";
 import Link, { LinkProps } from "lib/navigation/Link";
 
-import Tooltip, { TooltipProps } from "app/components/elements/Tooltip";
+import Tooltip, { TooltipProps } from "./Tooltip";
+import SmartLink from "./SmartLink";
 
 type IconedButtonProps = {
   disabled?: boolean;
   Icon: FC<{ className?: string }>;
   iconProps?: any;
   theme?: "primary" | "secondary" | "tertiary";
+  smartLink?: boolean;
   iconClassName?: string;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
@@ -27,6 +29,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       className,
       Icon,
       iconProps,
+      smartLink = false,
       iconClassName,
       ...rest
     },
@@ -79,14 +82,16 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
     }
 
     if ("to" in rest) {
+      const Component = smartLink ? SmartLink : Link;
+
       return (
-        <Link
+        <Component
           ref={ref as ForwardedRef<HTMLAnchorElement>}
           className={classNamesList}
           {...rest}
         >
           {content}
-        </Link>
+        </Component>
       );
     }
 

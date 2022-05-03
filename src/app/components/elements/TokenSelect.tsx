@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
+import { Link } from "lib/navigation";
 
 import { AccountAsset, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
@@ -9,12 +10,12 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
-import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
-
+import { Page } from "app/nav";
 import Select from "./Select";
 import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
 import PrettyAmount from "./PrettyAmount";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 type TokenSelectProps = {
   handleTokenChanged?: () => void;
@@ -22,6 +23,7 @@ type TokenSelectProps = {
 
 const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
   const currentAccount = useAtomValue(currentAccountAtom);
+  const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
@@ -101,6 +103,8 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
   return preparedCurrentToken ? (
     <Select
+      open={opened}
+      onOpenChange={setOpened}
       items={preparedTokens}
       currentItem={preparedCurrentToken}
       setItem={(asset) => onTokenSelect(asset.key)}
@@ -111,6 +115,19 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       loadMoreOnItemFromEnd={LOAD_MORE_ON_ASSET_FROM_END}
       showSelected
       showSelectedIcon={false}
+      emptySearchText={
+        <>
+          You can manage your assets in{" "}
+          <Link
+            to={{ page: Page.Default }}
+            onClick={() => setOpened(false)}
+            className="underline underline-offset-2"
+          >
+            Overview
+          </Link>{" "}
+          tab.
+        </>
+      }
       currentItemClassName={classNames("!p-3")}
       contentClassName="w-[23.25rem] flex flex-col"
       itemClassName="group"
