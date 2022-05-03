@@ -1,6 +1,5 @@
-import { forwardRef, RefObject, useEffect, useRef, useState } from "react";
+import { forwardRef, RefObject, useEffect, useState } from "react";
 import classNames from "clsx";
-import mergeRefs from "react-merge-refs";
 import { ethers } from "ethers";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
@@ -18,6 +17,9 @@ import LongTextField, {
 } from "app/components/elements/LongTextField";
 import NewButton from "app/components/elements/NewButton";
 import Input, { InputProps } from "app/components/elements/Input";
+import CanvasTextField, {
+  CanvasTextFieldProps,
+} from "app/components/elements/CanvasTextField";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
@@ -27,9 +29,6 @@ import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as HiddenSeedPhraseIcon } from "app/icons/hidden-seed-phrase.svg";
 import { ReactComponent as LockIcon } from "app/icons/lock.svg";
-import CanvasTextField, {
-  CanvasTextFieldProps,
-} from "../elements/CanvasTextField";
 
 type SecretFieldBaseProps = {
   isDownloadable?: boolean;
@@ -67,8 +66,7 @@ type CreateSecretFieldProps = SecretFieldBaseProps &
 
 const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
   ({ label = "Secret phrase", isDownloadable, onRegenerate, ...rest }, ref) => {
-    const fieldRef = useRef<HTMLCanvasElement>(null);
-    const { copy, copied } = useCopyToClipboard(fieldRef as any, true);
+    const { copy, copied } = useCopyToClipboard(rest.value);
     const [isShown, setIsShown] = useState(false);
 
     const { confirm } = useDialog();
@@ -186,7 +184,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
 
     return (
       <CanvasTextField
-        ref={mergeRefs([ref, fieldRef])}
+        ref={ref}
         label={label}
         labelActions={labelActions}
         actions={actions}

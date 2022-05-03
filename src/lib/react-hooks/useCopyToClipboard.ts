@@ -1,40 +1,41 @@
-import { RefObject, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export function useCopyToClipboard<
-  T extends HTMLInputElement | HTMLTextAreaElement
->(ref: RefObject<T>, immediatelyBlur = false, copyDelay: number = 1000 * 2) {
+export function useCopyToClipboard(
+  text?: string | number | readonly string[],
+  copyDelay: number = 1000 * 2
+) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (copied) {
       const timeout = setTimeout(() => {
         setCopied(false);
-        const textarea = ref.current;
-        if (textarea && document.activeElement === textarea) {
-          textarea.blur();
-        }
       }, copyDelay);
 
       return () => clearTimeout(timeout);
     }
 
     return;
-  }, [ref, copied, setCopied, copyDelay]);
+  }, [copied, setCopied, copyDelay]);
 
-  const copy = useCallback(() => {
-    if (copied) return;
+  const copy = useCallback(async () => {
+    if (copied || !text) return;
 
-    const textarea = ref.current;
-    if (textarea) {
-      textarea.focus();
-      textarea.select();
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text.toString());
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.innerText = text.toString();
+      const wrapper =
+        document.querySelector('[role="dialog"]') ?? document.body;
+      wrapper.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
       document.execCommand("copy");
-      setCopied(true);
-      if (immediatelyBlur && document.activeElement === textarea) {
-        textarea.blur();
-      }
+      textArea.remove();
     }
-  }, [copied, ref, immediatelyBlur]);
+    setCopied(true);
+  }, [copied, text]);
 
   return { copy, copied, setCopied };
 }

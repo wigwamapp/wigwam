@@ -2,7 +2,9 @@ import { memo, forwardRef, ReactNode, useEffect, useRef } from "react";
 import classNames from "clsx";
 import mergeRefs from "react-merge-refs";
 import canvasTxt from "canvas-txt";
-import { usePrevious } from "../../../lib/react-hooks/usePrevious";
+import { usePrevious } from "lib/react-hooks/usePrevious";
+
+const canvasMultiplier = 3;
 
 export type CanvasTextFieldProps = {
   value?: string;
@@ -28,14 +30,17 @@ const CanvasTextField = memo(
       ref
     ) => {
       const canvasRef = useRef<HTMLCanvasElement>();
-
       const prevValue = usePrevious(value);
 
       useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
+          canvas.width = 438 * canvasMultiplier;
+          canvas.height = 110 * canvasMultiplier;
           const ctx = canvas.getContext("2d");
           if (ctx) {
+            ctx.setTransform(canvasMultiplier, 0, 0, canvasMultiplier, 0, 0);
+
             ctx.fillStyle = "#f8f9fd";
 
             if (prevValue !== value) {
