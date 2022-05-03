@@ -63,7 +63,11 @@ const emptyClassBg = classNames(
 
 const EmptyWalletCard: FC = () => (
   <div className="flex items-center">
-    <Link to={{ addAccOpened: true }} className={"flex group cursor-pointer"}>
+    <Link
+      to={{ addAccOpened: true }}
+      merge
+      className={"flex group cursor-pointer"}
+    >
       <div
         className={classNames(
           "w-[14.5rem] min-w-[14.5rem]",

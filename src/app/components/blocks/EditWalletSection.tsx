@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
+import { FC, memo, useCallback, useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
@@ -350,7 +350,7 @@ const DeleteAccountModal = memo<
         <SecretField
           label={seedPhrase ? "Secret phrase" : "Private key"}
           isDownloadable={Boolean(seedPhrase)}
-          defaultValue={fromProtectedString(seedPhrase ?? privateKey ?? "")}
+          value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
         />
       ) : (
         <Form
@@ -402,8 +402,7 @@ type AddressFieldProps = {
 };
 
 const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
-  const fieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied } = useCopyToClipboard(fieldRef);
+  const { copy, copied } = useCopyToClipboard(address);
 
   return (
     <div
@@ -433,15 +432,6 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
           "p-4"
         )}
       >
-        {address && (
-          <input
-            ref={fieldRef}
-            value={address}
-            onChange={() => undefined}
-            tabIndex={-1}
-            className="sr-only"
-          />
-        )}
         <span className="w-full font-medium break-words">{address}</span>
         <NewButton
           type="button"

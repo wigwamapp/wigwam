@@ -6,6 +6,7 @@ import { Account, Network } from "core/types";
 export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   includeScore: true,
   threshold: 0.3,
+  fieldNormWeight: 1,
   keys: [
     {
       name: "name",
@@ -30,6 +31,7 @@ export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
   includeScore: true,
   shouldSort: true,
   threshold: 0.45,
+  fieldNormWeight: 1,
   keys: [
     {
       name: "name",

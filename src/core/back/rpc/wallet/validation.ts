@@ -13,7 +13,7 @@ const address = () =>
 
 export const TxParamsSchema: Describe<TxParams> = object({
   from: address(),
-  to: address(),
+  to: optional(address()),
   nonce: optional(stringHex()),
   gasPrice: optional(stringHex()),
   gas: optional(stringHex()),

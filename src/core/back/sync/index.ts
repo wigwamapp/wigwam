@@ -11,7 +11,7 @@ import { storage } from "lib/ext/storage";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
-import { Erc20__factory } from "abi-types";
+import { ERC20__factory } from "abi-types";
 import {
   Account,
   AccountAsset,
@@ -509,7 +509,7 @@ const getAccountTokenFromChain = async (
   const provider = getRpcProvider(chainId);
 
   const { address: tokenAddress } = parseTokenSlug(tokenSlug);
-  const contract = Erc20__factory.connect(tokenAddress, provider);
+  const contract = ERC20__factory.connect(tokenAddress, provider);
 
   try {
     return await retry(

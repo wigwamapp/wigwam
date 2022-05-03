@@ -1,4 +1,4 @@
-import { FC, ComponentProps, useCallback, useRef, useEffect } from "react";
+import { FC, ComponentProps, useCallback, useEffect } from "react";
 import classNames from "clsx";
 import * as Tippy from "tippy.js";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -21,8 +21,7 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
   className,
   ...rest
 }) => {
-  const copyFieldRef = useRef<HTMLInputElement>(null);
-  const { copy, copied, setCopied } = useCopyToClipboard(copyFieldRef);
+  const { copy, copied, setCopied } = useCopyToClipboard(textToCopy);
 
   const handleTooltipHidden = useCallback(
     (instance: Tippy.Instance<Tippy.Props>) => {
@@ -37,38 +36,26 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
   }, [copied, onCopiedToggle]);
 
   return (
-    <>
-      <Tooltip
-        {...rest}
-        content={copied ? copiedText : content}
-        onHidden={handleTooltipHidden}
-        asChild
-        missSingleton
+    <Tooltip
+      {...rest}
+      content={copied ? copiedText : content}
+      onHidden={handleTooltipHidden}
+      asChild
+      missSingleton
+    >
+      <button
+        type="button"
+        onPointerDown={(e) => e.preventDefault()}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          copy();
+        }}
+        className={classNames("cursor-pointer", className)}
       >
-        <button
-          type="button"
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            copy();
-          }}
-          className={classNames("cursor-pointer", className)}
-        >
-          {children}
-        </button>
-      </Tooltip>
-
-      {textToCopy && (
-        <input
-          ref={copyFieldRef}
-          value={textToCopy}
-          onChange={() => undefined}
-          tabIndex={-1}
-          className="sr-only"
-        />
-      )}
-    </>
+        {children}
+      </button>
+    </Tooltip>
   );
 };
 

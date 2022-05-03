@@ -1,5 +1,4 @@
-import { forwardRef, useRef } from "react";
-import mergeRefs from "react-merge-refs";
+import { forwardRef } from "react";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
@@ -16,14 +15,14 @@ type AddressFieldProps = LongTextFieldProps & {
 
 const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
   ({ label = "Recipient", setFromClipboard, className, ...rest }, ref) => {
-    const longTextFieldRef = useRef(null);
-
     const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
-    const { copy, copied } = useCopyToClipboard(longTextFieldRef);
+    const { copy, copied } = useCopyToClipboard(
+      rest.value ?? rest.defaultValue
+    );
 
     return (
       <LongTextField
-        ref={mergeRefs([ref, longTextFieldRef])}
+        ref={ref}
         label={label}
         placeholder="0x0000000000000000000000000000000000000000"
         textareaClassName="!h-20"
