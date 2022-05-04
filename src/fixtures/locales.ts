@@ -18,3 +18,26 @@ export const DEFAULT_LOCALES: LocaleMeta[] = [
 ];
 
 export const FALLBACK_LOCALE = DEFAULT_LOCALES[0];
+
+type SeparatorType = "." | "," | " ";
+
+export interface LocaleSeparators {
+  code: string;
+  thousands: SeparatorType;
+  decimals: SeparatorType;
+}
+
+export const DEFAULT_LOCALES_SEPARATORS: LocaleSeparators[] = [
+  { code: "en", thousands: ",", decimals: "." },
+  { code: "es", thousands: ".", decimals: "," },
+  { code: "fr", thousands: " ", decimals: "," },
+  { code: "it", thousands: ".", decimals: "," },
+  { code: "ja", thousands: ",", decimals: "." },
+  { code: "ko", thousands: ",", decimals: "." },
+  { code: "ru", thousands: " ", decimals: "," },
+  { code: "uk", thousands: " ", decimals: "," },
+  { code: "zh-CN", thousands: ",", decimals: "." },
+  { code: "zh-TW", thousands: ",", decimals: "." },
+];
+
+export const FALLBACK_LOCALE_SEPARATORS = DEFAULT_LOCALES_SEPARATORS[0];
