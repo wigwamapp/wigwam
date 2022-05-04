@@ -31,8 +31,6 @@ const NumberInput = memo(
         [currentLocale]
       );
 
-      console.log("rest.value", rest.value);
-
       return (
         <NumberFormat
           getInputRef={ref}
@@ -40,16 +38,19 @@ const NumberInput = memo(
           allowNegative={allowNegative}
           onValueChange={({ value }, { source, event }) => {
             if (source === "event" && value !== prevValueRef.current) {
-              console.log("value", value, prevValueRef.current);
               prevValueRef.current = value;
               Object.assign(event, {
-                value,
+                target: { value },
               });
               onChange?.(event);
             }
           }}
           {...rest}
-          value={rest.value ? (rest.value as string).replace(",", ".") : ""}
+          value={
+            rest.value
+              ? (rest.value as string).replace(".", separators.decimals)
+              : ""
+          }
           thousandSeparator={separators.thousands}
           decimalSeparator={separators.decimals}
           allowedDecimalSeparators={[",", "."]}
