@@ -16,7 +16,7 @@ import {
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import ProfileGen from "app/components/blocks/ProfileGen";
 import Separator from "app/components/elements/Seperator";
@@ -138,13 +138,9 @@ const Profile: FC = () => {
                 )}
               </Field>
             </TippySingletonProvider>
-            <NewButton
-              type="submit"
-              className="!py-2 mt-8"
-              loading={submitting}
-            >
+            <Button type="submit" className="!py-2 mt-8" loading={submitting}>
               {submitting ? "Saving..." : "Save"}
-            </NewButton>
+            </Button>
           </form>
         )}
       />

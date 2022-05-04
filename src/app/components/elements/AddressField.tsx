@@ -4,7 +4,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import LongTextField, { LongTextFieldProps } from "./LongTextField";
-import NewButton from "./NewButton";
+import Button from "./Button";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -28,7 +28,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
         textareaClassName="!h-20"
         maxLength={42}
         actions={
-          <NewButton
+          <Button
             theme="tertiary"
             onClick={() => {
               if (setFromClipboard) {
@@ -65,7 +65,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
                 {copied ? "Copied" : "Copy"}
               </>
             )}
-          </NewButton>
+          </Button>
         }
         className={className}
         {...rest}

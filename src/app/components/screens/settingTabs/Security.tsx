@@ -12,7 +12,7 @@ import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 import SecretField from "app/components/blocks/SecretField";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
@@ -26,7 +26,7 @@ const Security: FC = () => {
   return (
     <div className="flex flex-col items-start">
       <SettingsHeader>Reveal Secret Phrase</SettingsHeader>
-      <NewButton
+      <Button
         theme="secondary"
         className={classNames(
           "flex !justify-start items-center",
@@ -37,7 +37,7 @@ const Security: FC = () => {
       >
         <RevealIcon className="w-[1.625rem] h-auto mr-3" />
         Reveal
-      </NewButton>
+      </Button>
       <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>
       <Switcher
@@ -134,13 +134,13 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                   )}
                 </Field>
               </div>
-              <NewButton
+              <Button
                 type="submit"
                 className="mt-6 !min-w-[14rem]"
                 loading={submitting}
               >
                 Reveal
-              </NewButton>
+              </Button>
             </form>
           )}
         />

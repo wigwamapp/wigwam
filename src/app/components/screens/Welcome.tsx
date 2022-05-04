@@ -5,7 +5,7 @@ import classNames from "clsx";
 import { profileStateAtom } from "app/atoms";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 import { ReactComponent as WelcomeArrowIcon } from "app/icons/welcome-arrow.svg";
 
@@ -28,14 +28,14 @@ const Welcome: FC = () => {
           <WelcomeArrowIcon className="absolute -right-16 top-5" />
         </div>
 
-        <NewButton
+        <Button
           theme="primary-reverse"
           to={{ addAccOpened: true }}
           merge
           className="w-[14rem]"
         >
           {isInitial ? "Get started" : "Add wallet"}
-        </NewButton>
+        </Button>
       </div>
     </BoardingPageLayout>
   );

@@ -26,7 +26,7 @@ import {
 import { currentAccountAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import Input from "app/components/elements/Input";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -125,14 +125,14 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 />
               )}
             </Field>
-            <NewButton
+            <Button
               type="submit"
               theme="primary"
               className="mt-4 !py-2"
               loading={submitting}
             >
               Save
-            </NewButton>
+            </Button>
           </form>
         )}
       />
@@ -143,7 +143,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
           className="mt-6"
         >
-          <NewButton
+          <Button
             theme="secondary"
             className={classNames(
               "max-h-[2.625rem]",
@@ -155,7 +155,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           >
             <RevealIcon className="w-[1.625rem] h-auto mr-3" />
             Reveal
-          </NewButton>
+          </Button>
         </WalletBlock>
       )}
       {account.source === AccountSource.OpenLogin && (
@@ -193,7 +193,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           className="mt-6"
         >
           <>
-            <NewButton
+            <Button
               theme="secondary"
               className={classNames(
                 "max-h-[2.625rem]",
@@ -205,7 +205,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             >
               <RevealIcon className="w-[1.625rem] h-auto mr-3" />
               Reveal
-            </NewButton>
+            </Button>
             <Input
               defaultValue={account.derivationPath}
               label="Derivation path"
@@ -232,8 +232,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           />
         </WalletBlock>
       )}
-      <NewButton
-        type="button"
+      <Button
         theme="secondary"
         onClick={handleDeleteAccount}
         className={classNames(
@@ -245,7 +244,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       >
         <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
         Remove wallet
-      </NewButton>
+      </Button>
       {modalState && (
         <DeleteAccountModal
           open={true}
@@ -381,13 +380,13 @@ const DeleteAccountModal = memo<
                   )}
                 </Field>
               </div>
-              <NewButton
+              <Button
                 type="submit"
                 className="mt-6 !min-w-[14rem]"
                 loading={submitting}
               >
                 {cause === "delete" ? "Confirm" : "Reveal"}
-              </NewButton>
+              </Button>
             </form>
           )}
         />
@@ -433,8 +432,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         )}
       >
         <span className="w-full font-medium break-words">{address}</span>
-        <NewButton
-          type="button"
+        <Button
           theme="tertiary"
           onClick={copy}
           className={classNames(
@@ -457,7 +455,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
               Copy
             </>
           )}
-        </NewButton>
+        </Button>
       </div>
     </div>
   );

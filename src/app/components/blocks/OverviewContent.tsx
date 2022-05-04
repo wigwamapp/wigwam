@@ -50,7 +50,7 @@ import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import NewButton from "../elements/NewButton";
+import Button from "../elements/Button";
 import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
@@ -620,7 +620,7 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
-        <NewButton
+        <Button
           to={{ page: Page.Transfer }}
           merge={["token"]}
           theme="secondary"
@@ -628,15 +628,15 @@ const AssetInfo: FC = () => {
         >
           <SendIcon className="w-6 h-auto mr-2" />
           Transfer
-        </NewButton>
-        <NewButton theme="secondary" className="grow !py-2">
+        </Button>
+        <Button theme="secondary" className="grow !py-2">
           <SwapIcon className="w-6 h-auto mr-2" />
           Swap
-        </NewButton>
-        <NewButton theme="secondary" className="grow !py-2">
+        </Button>
+        <Button theme="secondary" className="grow !py-2">
           <ActivityIcon className="w-6 h-auto mr-2" />
           Activity
-        </NewButton>
+        </Button>
       </div>
 
       {status !== TokenStatus.Native && (
