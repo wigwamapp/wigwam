@@ -2,7 +2,7 @@ import { FC } from "react";
 import classNames from "clsx";
 import { getPublicURL } from "lib/ext/utils";
 
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as VigvamLogo } from "app/icons/Vigvam.svg";
 import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
@@ -62,14 +62,14 @@ const ComingSoon: FC = () => {
               />
             ))}
 
-            <NewButton
+            <Button
               theme="secondary"
               href="https://vigvam.app/"
               className="ml-6 !rounded-full items-center py-[.875rem] !px-7 !text-xl"
             >
               vigvam.app
               <ExternalLinkIcon className="ml-4" />
-            </NewButton>
+            </Button>
           </div>
         </div>
 

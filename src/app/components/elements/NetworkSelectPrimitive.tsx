@@ -19,7 +19,7 @@ export const prepareNetwork = (network: Network) => ({
 
 type NetworkSelectProps = {
   networks: Network[];
-  currentNetwork: Network;
+  currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
   className?: string;
   currentItemClassName?: string;
@@ -54,7 +54,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   }, [fuse, networks, searchValue]);
 
   const preparedCurrentNetwork = useMemo(
-    () => prepareNetwork(currentNetwork),
+    () => (currentNetwork ? prepareNetwork(currentNetwork) : undefined),
     [currentNetwork]
   );
 

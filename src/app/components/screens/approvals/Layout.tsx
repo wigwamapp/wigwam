@@ -1,7 +1,7 @@
 import { FC, ReactNode } from "react";
 import classNames from "clsx";
 
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 
 type ApprovalLayoutProps = {
   className?: string;
@@ -31,23 +31,21 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
     <div className="flex-1" />
 
     <div className="grid grid-cols-2 gap-3 w-full mt-5">
-      <NewButton
-        type="button"
+      <Button
         theme="secondary"
         className="w-full"
         onClick={() => onApprove?.(false)}
       >
         {declineText}
-      </NewButton>
+      </Button>
 
-      <NewButton
-        type="button"
+      <Button
         className="w-full"
         loading={loading}
         onClick={() => onApprove?.(true)}
       >
         {approveText}
-      </NewButton>
+      </Button>
     </div>
   </div>
 );

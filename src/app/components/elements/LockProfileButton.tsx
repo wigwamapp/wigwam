@@ -7,7 +7,7 @@ import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { lockWallet } from "core/client";
 
 import { currentProfileAtom } from "app/atoms";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import AutoIcon from "app/components/elements/AutoIcon";
 import RoundedButton from "app/components/elements/RoundedButton";
 
@@ -59,7 +59,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
   }
 
   return (
-    <NewButton
+    <Button
       theme="secondary"
       onClick={handleLock}
       className={classNames(
@@ -70,7 +70,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
       )}
     >
       {content}
-    </NewButton>
+    </Button>
   );
 };
 

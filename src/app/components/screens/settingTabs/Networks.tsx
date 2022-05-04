@@ -79,7 +79,7 @@ const Networks: FC = () => {
             name="Add new network"
             isActive={tab === "new"}
             onClick={() => setTab("new")}
-            isNewButton
+            isCreateNew
             className="bg-brand-main/[.05]"
           />
           {preparedNetworks?.map(({ chainId, name }) => (
@@ -114,7 +114,7 @@ type NetworkBtnProps = {
   name: string;
   onClick: () => void;
   isActive?: boolean;
-  isNewButton?: boolean;
+  isCreateNew?: boolean;
   className?: string;
 };
 
@@ -123,7 +123,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
   name,
   onClick,
   isActive = false,
-  isNewButton = false,
+  isCreateNew = false,
   className,
 }) => {
   return (
@@ -142,7 +142,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       )}
       onClick={onClick}
     >
-      {isNewButton ? (
+      {isCreateNew ? (
         <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
         <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />

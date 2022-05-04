@@ -14,7 +14,7 @@ import {
   currentAccountAtom,
 } from "app/atoms";
 import LargeWalletCard from "app/components/elements/LargeWalletCard";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import WalletCard from "app/components/elements/WalletCard";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
@@ -154,7 +154,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
           searchValue={searchValue}
           toggleSearchValue={setSearchValue}
         />
-        <NewButton
+        <Button
           to={{ addAccOpened: true }}
           merge
           theme="tertiary"
@@ -162,7 +162,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
         >
           <AddWalletIcon className="h-6 w-auto mr-2" />
           Add Wallet
-        </NewButton>
+        </Button>
       </div>
       {filteredAccounts.length > 0 ? (
         <ScrollAreaContainer
