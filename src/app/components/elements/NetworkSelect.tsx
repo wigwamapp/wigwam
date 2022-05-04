@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { useSetAtom } from "jotai";
-
-import { INITIAL_NETWORK } from "fixtures/networks";
+import classNames from "clsx";
 
 import { chainIdAtom } from "app/atoms";
 import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
@@ -20,7 +19,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   currentItemIconClassName,
   contentClassName,
 }) => {
-  const currentNetwork = useLazyNetwork() ?? INITIAL_NETWORK;
+  const currentNetwork = useLazyNetwork();
   const allNetworks = useLazyAllNetworks() ?? [];
 
   const setChainId = useSetAtom(chainIdAtom);
@@ -31,7 +30,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       currentNetwork={currentNetwork}
       onNetworkChange={setChainId}
       className={className}
-      currentItemClassName={currentItemClassName}
+      currentItemClassName={classNames("h-12", currentItemClassName)}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
     />
