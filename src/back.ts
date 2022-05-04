@@ -1,10 +1,13 @@
 import browser from "webextension-polyfill";
+import BigNumber from "bignumber.js";
 import { initProfiles } from "lib/ext/profile";
 import { getMainURL } from "lib/ext/utils";
 import { setupArgon2Impl } from "lib/kdbx";
 
 import { setupFixtures } from "core/repo";
 import { startServer } from "core/back/server";
+
+BigNumber.set({ EXPONENTIAL_AT: 38 });
 
 setupArgon2Impl();
 

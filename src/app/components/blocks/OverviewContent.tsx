@@ -469,7 +469,7 @@ const AssetCard = memo(
                   />
 
                   <span className="text-xs leading-4">
-                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
                   </span>
                 </span>
               )}
@@ -604,8 +604,7 @@ const AssetInfo: FC = () => {
             <PriceChange
               priceChange={new BigNumber(priceUSDChange)
                 .times(balanceUSD)
-                .div(100)
-                .toFixed(2)}
+                .div(100)}
             />
           )}
         </div>
@@ -680,7 +679,7 @@ const Tag: FC<TagProps> = ({ standard }) =>
   ) : null;
 
 type PriceChangeProps = {
-  priceChange: string;
+  priceChange: BigNumber.Value;
   isPercent?: boolean;
   className?: string;
 };
@@ -697,6 +696,9 @@ const PriceChange: FC<PriceChangeProps> = ({
   }
 
   const isPositive = priceChangeNumber > 0;
+  const value = new BigNumber(priceChange).abs().toFixed(2);
+
+  if (+value === 0) return <></>;
 
   return (
     <span
@@ -723,13 +725,13 @@ const PriceChange: FC<PriceChangeProps> = ({
               )}
             />
           }
-          amount={Math.abs(priceChangeNumber)}
+          amount={value}
           className="inline-flex items-center"
         />
       ) : (
         <FiatAmount
           prefix={isPositive ? "+" : "-"}
-          amount={Math.abs(priceChangeNumber)}
+          amount={value}
           copiable
           className="text-lg font-semibold"
         />

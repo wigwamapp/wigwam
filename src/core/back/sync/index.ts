@@ -54,7 +54,7 @@ export async function addFindTokenRequest(
 
   try {
     await enqueueSync(async () => {
-      let tokenToAdd: AccountAsset;
+      let tokenToAdd: AccountAsset | undefined;
 
       const debankChain = await getDebankChain(chainId);
 
@@ -62,38 +62,46 @@ export async function addFindTokenRequest(
         const { address: tokenAddress } = parseTokenSlug(tokenSlug);
 
         const [{ data: token }, balance] = await Promise.all([
-          debankApi.get("/token", {
-            params: {
-              chain_id: debankChain.id,
-              id: tokenAddress,
-            },
-          }),
+          debankApi
+            .get("/token", {
+              params: {
+                chain_id: debankChain.id,
+                id: tokenAddress,
+              },
+            })
+            .catch(() => ({ data: null })),
           getBalanceFromChain(chainId, tokenSlug, accountAddress),
         ]);
 
-        const rawBalance = balance?.toString() ?? "0";
-        const priceUSD = token.price;
-        const balanceUSD = priceUSD
-          ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(priceUSD)
-          : 0;
+        if (token) {
+          const rawBalance = balance?.toString() ?? "0";
+          const priceUSD = new BigNumber(token.price).toString();
+          const balanceUSD = priceUSD
+            ? +new BigNumber(rawBalance)
+                .div(10 ** token.decimals)
+                .times(priceUSD)
+            : 0;
 
-        tokenToAdd = {
-          tokenType: TokenType.Asset,
-          status: TokenStatus.Enabled,
-          chainId,
-          accountAddress,
-          tokenSlug,
-          // Metadata
-          decimals: token.decimals,
-          name: token.name,
-          symbol: token.symbol,
-          logoUrl: token.logo_url,
-          // Volumes
-          rawBalance,
-          priceUSD,
-          balanceUSD,
-        };
-      } else {
+          tokenToAdd = {
+            tokenType: TokenType.Asset,
+            status: TokenStatus.Enabled,
+            chainId,
+            accountAddress,
+            tokenSlug,
+            // Metadata
+            decimals: token.decimals,
+            name: token.name,
+            symbol: token.symbol,
+            logoUrl: token.logo_url,
+            // Volumes
+            rawBalance,
+            priceUSD,
+            balanceUSD,
+          };
+        }
+      }
+
+      if (!tokenToAdd) {
         const token = await getAccountTokenFromChain(
           chainId,
           accountAddress,
@@ -223,8 +231,8 @@ const syncNativeTokens = mem(
       getCoinGeckoNativeTokenPrice(chainId),
     ]);
 
-    const priceUSD = cgPrice?.usd.toFixed(2);
-    const priceUSDChange = cgPrice?.usd_24h_change.toFixed(2);
+    const priceUSD = cgPrice?.usd?.toString();
+    const priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
     await repo.accountTokens.bulkPut(
       accounts.map((acc, i) => {
@@ -247,9 +255,10 @@ const syncNativeTokens = mem(
 
           const rawBalance = balance.toString();
           const balanceUSD = priceUSD
-            ? +new BigNumber(rawBalance)
+            ? new BigNumber(rawBalance)
                 .div(10 ** nativeCurrency.decimals)
                 .times(priceUSD)
+                .toNumber()
             : existing.balanceUSD;
 
           return {
@@ -264,9 +273,10 @@ const syncNativeTokens = mem(
           const rawBalance = balance?.toString() ?? "0";
           const balanceUSD =
             balance && priceUSD
-              ? +new BigNumber(rawBalance)
+              ? new BigNumber(rawBalance)
                   .div(10 ** nativeCurrency.decimals)
                   .times(priceUSD)
+                  .toNumber()
               : 0;
 
           return {
@@ -318,88 +328,92 @@ const syncAccountTokens = mem(
         existingAccTokens.map((t) => [t.tokenSlug, t])
       );
 
-      const { data: debankUserTokens } = await debankApi.get(
-        "/user/token_list",
-        {
+      const { data: debankUserTokens } = await debankApi
+        .get("/user/token_list", {
           params: {
             id: await getMyRandomAddress(accountAddress, chainId),
             chain_id: debankChain.id,
             is_all: false,
           },
-        }
-      );
+        })
+        .catch(() => ({ data: null }));
 
-      for (const token of debankUserTokens) {
-        const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+      if (debankUserTokens) {
+        for (const token of debankUserTokens) {
+          const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
 
-        if (token.id === debankChain.native_token_id) continue;
+          if (token.id === debankChain.native_token_id) continue;
 
-        const native = token.id === debankChain.native_token_id;
-        const tokenSlug = createTokenSlug({
-          standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-          address: native ? "0" : token.id,
-          id: "0",
-        });
+          const native = token.id === debankChain.native_token_id;
+          const tokenSlug = createTokenSlug({
+            standard: native ? TokenStandard.Native : TokenStandard.ERC20,
+            address: native ? "0" : token.id,
+            id: "0",
+          });
 
-        const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
+          const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
-        if (!existing && rawBalanceBN.isZero()) {
-          continue;
-        }
+          if (!existing && rawBalanceBN.isZero()) {
+            continue;
+          }
 
-        const metadata = native
-          ? {
-              symbol: nativeCurrency.symbol,
-              name: nativeCurrency.name,
-              logoUrl: getNativeTokenLogoUrl(chainTag),
-            }
-          : {
-              symbol: token.symbol,
-              name: token.name,
-              logoUrl: token.logo_url,
-            };
-
-        const rawBalance = rawBalanceBN.toString();
-        const priceUSD = token.price;
-        const balanceUSD = priceUSD
-          ? +new BigNumber(rawBalance).div(10 ** token.decimals).times(priceUSD)
-          : 0;
-
-        accTokens.push(
-          existing
+          const metadata = native
             ? {
-                ...existing,
-                ...metadata,
-                rawBalance,
-                balanceUSD,
-                priceUSD,
+                symbol: nativeCurrency.symbol,
+                name: nativeCurrency.name,
+                logoUrl: getNativeTokenLogoUrl(chainTag),
               }
             : {
-                chainId,
-                accountAddress,
-                tokenSlug,
-                tokenType: TokenType.Asset,
-                status: native ? TokenStatus.Native : TokenStatus.Enabled,
-                // Metadata
-                decimals: native ? nativeCurrency.decimals : token.decimals,
-                ...metadata,
-                // Volumes
-                rawBalance,
-                balanceUSD,
-                priceUSD,
-                portfolioUSD: native ? "-1" : undefined,
-              }
-        );
+                symbol: token.symbol,
+                name: token.name,
+                logoUrl: token.logo_url,
+              };
 
-        dbKeys.push(
-          createAccountTokenKey({
-            chainId,
-            accountAddress,
-            tokenSlug,
-          })
-        );
+          const rawBalance = rawBalanceBN.toString();
+          const priceUSD = new BigNumber(token.price).toString();
+          const balanceUSD = priceUSD
+            ? new BigNumber(rawBalance)
+                .div(10 ** token.decimals)
+                .times(priceUSD)
+                .toNumber()
+            : 0;
 
-        existingTokensMap.delete(tokenSlug);
+          accTokens.push(
+            existing
+              ? {
+                  ...existing,
+                  ...metadata,
+                  rawBalance,
+                  balanceUSD,
+                  priceUSD,
+                }
+              : {
+                  chainId,
+                  accountAddress,
+                  tokenSlug,
+                  tokenType: TokenType.Asset,
+                  status: native ? TokenStatus.Native : TokenStatus.Enabled,
+                  // Metadata
+                  decimals: native ? nativeCurrency.decimals : token.decimals,
+                  ...metadata,
+                  // Volumes
+                  rawBalance,
+                  balanceUSD,
+                  priceUSD,
+                  portfolioUSD: native ? "-1" : undefined,
+                }
+          );
+
+          dbKeys.push(
+            createAccountTokenKey({
+              chainId,
+              accountAddress,
+              tokenSlug,
+            })
+          );
+
+          existingTokensMap.delete(tokenSlug);
+        }
       }
     }
 
@@ -425,9 +439,10 @@ const syncAccountTokens = mem(
 
         const rawBalance = balance.toString();
         const balanceUSD = token.priceUSD
-          ? +new BigNumber(rawBalance)
+          ? new BigNumber(rawBalance)
               .div(10 ** token.decimals)
               .times(token.priceUSD)
+              .toNumber()
           : token.balanceUSD;
 
         accTokens.push({
@@ -459,12 +474,19 @@ const syncAccountTokens = mem(
 
       const price = cgPrices[parseTokenSlug(token.tokenSlug).address];
 
-      if (price) {
-        token.priceUSD = price.usd?.toString();
-        token.priceUSDChange = price.usd_24h_change?.toFixed(2);
+      if (price && price.usd) {
+        const priceUSD = new BigNumber(price.usd);
+
+        token.priceUSD = priceUSD.toString();
+        token.priceUSDChange = price.usd_24h_change?.toString();
+        token.balanceUSD = new BigNumber(token.rawBalance)
+          .div(10 ** token.decimals)
+          .times(priceUSD)
+          .toNumber();
       } else {
         delete token.priceUSD;
         delete token.priceUSDChange;
+        token.balanceUSD = 0;
       }
     }
 
@@ -545,8 +567,13 @@ const getBalanceFromChain = mem(
 );
 
 const getDebankChain = mem(async (chainId: number) => {
-  const chainList = await getDebankChainList();
-  return chainList.find((c: any) => c.community_id === chainId);
+  try {
+    const chainList = await getDebankChainList();
+    return chainList.find((c: any) => c.community_id === chainId);
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
 });
 
 const getDebankChainList = mem(
