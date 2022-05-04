@@ -429,6 +429,7 @@ const AssetCard = memo(
                   amount={balanceUSD}
                   className={"text-base font-bold leading-4 ml-2"}
                   threeDots={false}
+                  isDecimalsMinified
                 />
               )}
             </span>

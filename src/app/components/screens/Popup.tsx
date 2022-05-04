@@ -389,6 +389,7 @@ const AssetCard = memo(
                   copiable
                   className={"text-sm font-bold leading-5 ml-2"}
                   threeDots={false}
+                  isDecimalsMinified
                 />
               )}
             </span>
