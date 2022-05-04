@@ -19,7 +19,7 @@ export type NumberInputProps = Omit<NumberFormatProps, "type"> &
 
 const NumberInput = memo(
   forwardRef<HTMLInputElement, NumberInputProps>(
-    ({ allowNegative = false, onChange, ...rest }, ref) => {
+    ({ allowNegative = false, value, onChange, ...rest }, ref) => {
       const currentLocale = useAtomValue(currentLocaleAtom);
 
       const prevValueRef = useRef<string>();
@@ -31,11 +31,14 @@ const NumberInput = memo(
         [currentLocale]
       );
 
+      value = value?.toString()?.replace(".", separators.decimals);
+
       return (
         <NumberFormat
           getInputRef={ref}
           customInput={Input}
           allowNegative={allowNegative}
+          value={value}
           onValueChange={({ value }, { source, event }) => {
             if (source === "event" && value !== prevValueRef.current) {
               prevValueRef.current = value;
@@ -46,11 +49,6 @@ const NumberInput = memo(
             }
           }}
           {...rest}
-          value={
-            rest.value
-              ? (rest.value as string).replace(".", separators.decimals)
-              : ""
-          }
           thousandSeparator={separators.thousands}
           decimalSeparator={separators.decimals}
           allowedDecimalSeparators={[",", "."]}
