@@ -549,26 +549,27 @@ const AssetInfo: FC = () => {
               {name}
             </h2>
             <TippySingletonProvider>
-              {currentNetwork?.explorerUrls?.[0] && (
-                <IconedButton
-                  aria-label="View asset in Explorer"
-                  Icon={WalletExplorerIcon}
-                  className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
-                  iconClassName="!w-[1.125rem]"
-                  href={`${currentNetwork.explorerUrls[0]}/address/${
-                    status === TokenStatus.Native ? name.toLowerCase() : address
-                  }`}
-                />
-              )}
-              {coinGeckoId && (
-                <IconedButton
-                  aria-label="View asset in CoinGecko"
-                  Icon={CoinGeckoIcon}
-                  className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-                  iconClassName="!w-[1.125rem]"
-                  href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
-                />
-              )}
+              <div className="ml-auto flex items-center">
+                {currentNetwork?.explorerUrls?.[0] &&
+                  status !== TokenStatus.Native && (
+                    <IconedButton
+                      aria-label="View asset in Explorer"
+                      Icon={WalletExplorerIcon}
+                      className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                      iconClassName="!w-[1.125rem]"
+                      href={`${currentNetwork.explorerUrls[0]}/address/${address}`}
+                    />
+                  )}
+                {coinGeckoId && (
+                  <IconedButton
+                    aria-label="View asset in CoinGecko"
+                    Icon={CoinGeckoIcon}
+                    className="!w-6 !h-6 min-w-[1.5rem]"
+                    iconClassName="!w-[1.125rem]"
+                    href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                  />
+                )}
+              </div>
             </TippySingletonProvider>
           </div>
           <div className="flex flex-col">
