@@ -119,25 +119,29 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     () =>
       withThrottle(async () => {
         try {
-          let { txParams } = approval;
-
-          if ("gas" in txParams) {
-            const { gas, ...rest } = txParams;
-            txParams = { ...rest, gasLimit: gas };
-          }
+          const { txParams } = approval;
+          const { gasLimit, ...rest } = txParams;
 
           const tx = await provider
             .getUncheckedSigner(account.address)
             .populateTransaction({
-              ...txParams,
-              type: bnify(txParams?.type)?.toNumber(),
-              chainId: bnify(txParams?.chainId)?.toNumber(),
+              ...rest,
+              type: bnify(rest?.type)?.toNumber(),
+              chainId: bnify(rest?.chainId)?.toNumber(),
             });
           delete tx.from;
+
+          const estimatedGasLimit = ethers.BigNumber.from(tx.gasLimit);
+          const minGasLimit = estimatedGasLimit.mul(5).div(4);
+          const averageGasLimit = estimatedGasLimit.mul(3).div(2);
 
           setPrepatedTx({
             ...tx,
             nonce: bnify(tx.nonce)?.toNumber(),
+            gasLimit:
+              gasLimit && minGasLimit.lte(gasLimit)
+                ? ethers.BigNumber.from(gasLimit)
+                : averageGasLimit,
           });
         } catch (err) {
           console.error(err);
@@ -248,7 +252,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             <div className="w-full mt-4">
               {averageFee && nativeCurrency && (
                 <div className="text-lg text-brand-inactivelight">
-                  <span className="">Avarage Fee: </span>
+                  <span className="">Average Fee: </span>
                   <PrettyAmount
                     amount={averageFee.toString()}
                     decimals={nativeCurrency.decimals}
@@ -328,23 +332,27 @@ const TxFee = memo<TxFeeProps>(
     );
 
     return (
-      <div className="w-full mt-4">
-        <NumberInput
-          label="Gas Limit"
-          placeholder="0"
-          thousandSeparator
-          decimalScale={0}
-          name="gasLimit"
-          value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
-          onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
-          onBlur={(e) => fixValue("gasLimit", e.target.value)}
-          className="w-full mb-4"
-        />
-
+      <div className="w-full my-4">
         {tx.maxPriorityFeePerGas ? (
           <>
             <NumberInput
-              label="Max priority fee"
+              label="Max base fee"
+              placeholder="0.00"
+              thousandSeparator
+              decimalScale={9}
+              value={formatUnits(
+                overrides.maxFeePerGas ?? tx.maxFeePerGas,
+                "gwei"
+              )}
+              onChange={(e) =>
+                changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
+              }
+              onBlur={(e) => fixValue("maxFeePerGas", e.target.value)}
+              className="w-full mb-4"
+            />
+
+            <NumberInput
+              label="Priority fee"
               placeholder="0.00"
               thousandSeparator
               decimalScale={9}
@@ -359,22 +367,6 @@ const TxFee = memo<TxFeeProps>(
                 )
               }
               onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
-              className="w-full mb-4"
-            />
-
-            <NumberInput
-              label="Max fee"
-              placeholder="0.00"
-              thousandSeparator
-              decimalScale={9}
-              value={formatUnits(
-                overrides.maxFeePerGas ?? tx.maxFeePerGas,
-                "gwei"
-              )}
-              onChange={(e) =>
-                changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
-              }
-              onBlur={(e) => fixValue("maxFeePerGas", e.target.value)}
               className="w-full mb-4"
             />
           </>
@@ -422,7 +414,19 @@ const TxAdvanced = memo<TxAdvancedProps>(
     );
 
     return (
-      <div className="w-full mt-4">
+      <div className="w-full my-4">
+        <NumberInput
+          label="Gas Limit"
+          placeholder="0"
+          thousandSeparator
+          decimalScale={0}
+          name="gasLimit"
+          value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
+          onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
+          onBlur={(e) => fixValue("gasLimit", e.target.value)}
+          className="w-full mb-4"
+        />
+
         <NumberInput
           label="Nonce"
           placeholder="0"

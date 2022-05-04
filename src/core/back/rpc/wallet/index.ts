@@ -17,7 +17,11 @@ export async function sendTransaction(
 ) {
   await validateNetwork(chainId);
 
-  const txParams = params?.[0];
+  let txParams = params?.[0];
+  if ("gas" in txParams) {
+    const { gas, ...rest } = txParams;
+    txParams = { ...rest, gasLimit: gas };
+  }
 
   try {
     assertSchema(txParams, TxParamsSchema);
