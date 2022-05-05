@@ -201,7 +201,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   }, [onContinue, accountsToVerify, derivationPath, alert]);
 
   const isIndexExisting = useMemo(
-    () => !!accountsToVerify.find(({ index }) => index && index !== ""),
+    () =>
+      !!accountsToVerify.find(
+        ({ index }) => index !== undefined && index !== null && index !== ""
+      ),
     [accountsToVerify]
   );
 
