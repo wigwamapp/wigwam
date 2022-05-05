@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 
 import { Network } from "core/types";
@@ -8,6 +8,7 @@ import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { Page, SettingTab } from "app/nav";
 import Select from "./Select";
 import IconedButton from "./IconedButton";
+import SmartLink from "./SmartLink";
 import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 
 export const prepareNetwork = (network: Network) => ({
@@ -18,7 +19,7 @@ export const prepareNetwork = (network: Network) => ({
 
 type NetworkSelectProps = {
   networks: Network[];
-  currentNetwork: Network;
+  currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
   className?: string;
   currentItemClassName?: string;
@@ -53,9 +54,13 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   }, [fuse, networks, searchValue]);
 
   const preparedCurrentNetwork = useMemo(
-    () => prepareNetwork(currentNetwork),
+    () => (currentNetwork ? prepareNetwork(currentNetwork) : undefined),
     [currentNetwork]
   );
+
+  const handleLinkClick = useCallback(() => {
+    setOpened(false);
+  }, []);
 
   return (
     <Select
@@ -76,11 +81,25 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
         <IconedButton
           aria-label="Manage networks"
           to={{ page: Page.Settings, setting: SettingTab.Networks }}
-          onClick={() => setOpened(false)}
+          smartLink
+          onClick={handleLinkClick}
           theme="tertiary"
           Icon={GearIcon}
           className="ml-2"
         />
+      }
+      emptySearchText={
+        <>
+          You can add a new network in{" "}
+          <SmartLink
+            to={{ page: Page.Settings, setting: SettingTab.Networks }}
+            onClick={handleLinkClick}
+            className="underline underline-offset-2"
+          >
+            Settings &gt; Networks
+          </SmartLink>{" "}
+          tab.
+        </>
       }
     />
   );

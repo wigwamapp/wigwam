@@ -1,7 +1,6 @@
 import browser, { Storage } from "webextension-polyfill";
 import { utils } from "ethers";
 import { utf8ToBytes } from "lib/crypto-utils/bytes";
-import { createQueue } from "lib/system/queue";
 
 export type StorageItems = { [key: string]: unknown } | [string, unknown][];
 
@@ -16,8 +15,6 @@ export class StorageArea {
   private get area(): Storage.StorageArea {
     return (browser.storage as any)[this.name];
   }
-
-  transact = createQueue();
 
   async isStored(key: string) {
     const val = await this.fetchForce(key);

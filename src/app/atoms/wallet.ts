@@ -1,5 +1,6 @@
 import { atomFamily } from "jotai/utils";
-import { atomWithAutoReset } from "lib/atom-utils";
+import { dequal } from "dequal/lite";
+import { atomWithAutoReset, atomWithStorage } from "lib/atom-utils";
 
 import {
   getWalletStatus,
@@ -9,6 +10,7 @@ import {
   getSyncStatus,
   onSyncStatusUpdated,
 } from "core/client";
+import { nonceStorageKey } from "core/common/nonce";
 
 export const walletStatusAtom = atomWithAutoReset(getWalletStatus, {
   onMount: onWalletStatusUpdated,
@@ -25,3 +27,12 @@ export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
 export const syncStatusAtom = atomWithAutoReset(getSyncStatus, {
   onMount: onSyncStatusUpdated,
 });
+
+export const getLocalNonceAtom = atomFamily(
+  ({ chainId, accountAddress }: { chainId: number; accountAddress: string }) =>
+    atomWithStorage<string | null>(
+      nonceStorageKey(chainId, accountAddress),
+      null
+    ),
+  dequal
+);

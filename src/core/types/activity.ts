@@ -63,7 +63,7 @@ export type TxParams = {
   gasPrice?: string; // '0x09184e72a000' - customizable by user during confirmation.
   value?: string; // '0x00' - Only required to send ether to the recipient from the initiating external account.
   data?: string; // '0x00' - Optional, but used for defining smart contract creation and interaction.
-  gas?: string; // '0x2710' - customizable by user during confirmation.
+  // gas?: string; // '0x2710' - customizable by user during confirmation.
   gasLimit?: string; // '0x2710' - gas alias
   chainId?: string;
   // eip2930

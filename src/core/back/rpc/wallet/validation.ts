@@ -16,7 +16,6 @@ export const TxParamsSchema: Describe<TxParams> = object({
   to: optional(address()),
   nonce: optional(stringHex()),
   gasPrice: optional(stringHex()),
-  gas: optional(stringHex()),
   gasLimit: optional(stringHex()),
   value: optional(stringHex()),
   data: optional(stringHex()),

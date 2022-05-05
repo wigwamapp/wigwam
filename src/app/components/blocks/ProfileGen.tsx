@@ -6,7 +6,7 @@ import { Field, Form } from "react-final-form";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import { ReactComponent as RegenerateIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlusIcon } from "app/icons/bold-plus.svg";
 
@@ -62,14 +62,14 @@ const ProfileGen: FC<ProfileGenProps> = ({
                 initialsSource={values.profileName}
                 className={"w-[7.75rem] h-[7.75rem] text-5xl"}
               />
-              <NewButton
+              <Button
                 theme="tertiary"
                 className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
                 onClick={regenerateProfileSeed}
               >
                 <RegenerateIcon className="w-4 h-auto mr-2" />
                 Regenerate
-              </NewButton>
+              </Button>
             </div>
 
             <form
@@ -89,7 +89,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                 )}
               </Field>
 
-              <NewButton
+              <Button
                 type="submit"
                 className={classNames(
                   "mt-5",
@@ -111,7 +111,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                     <PlusIcon className="ml-1" />
                   </>
                 )}
-              </NewButton>
+              </Button>
             </form>
           </>
         )}

@@ -17,6 +17,7 @@ export type PrettyAmountProps = {
   currency?: string;
   isFiat?: boolean;
   isMinified?: boolean;
+  isDecimalsMinified?: boolean;
   copiable?: boolean;
   prefix?: ReactNode;
   threeDots?: boolean;
@@ -30,6 +31,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     currency,
     isFiat = false,
     isMinified = false,
+    isDecimalsMinified = false,
     copiable = false,
     prefix,
     threeDots = true,
@@ -44,7 +46,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
-    const isFiatMinified = isFiat && (convertedAmount.gte(0.01) || isMinified);
+    const isFiatMinified = isFiat && convertedAmount.gte(0.01);
+    const isFiatDecimalsMinified = isFiat && isDecimalsMinified;
 
     let decSplit = isMinified || isFiatMinified ? 2 : 6;
     if (integerPart.gte(1_000)) {
@@ -116,7 +119,10 @@ const PrettyAmount = memo<PrettyAmountProps>(
 
     if (isShownDecTooltip && !isShownIntTooltip) {
       content = getPrettyAmount({
-        value: convertedAmount.decimalPlaces(decSplit, BigNumber.ROUND_DOWN),
+        value: convertedAmount.decimalPlaces(
+          isFiatDecimalsMinified ? 2 : decSplit,
+          isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN
+        ),
         dec: isMinified ? 3 : undefined,
         locale: currentLocale,
         threeDots,

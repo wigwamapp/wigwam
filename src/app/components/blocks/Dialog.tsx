@@ -2,7 +2,7 @@ import { FC } from "react";
 
 import { useDialog } from "app/hooks/dialog";
 import SecondaryModal from "app/components/elements/SecondaryModal";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 
 const Dialog: FC = () => {
   const { modalData } = useDialog();
@@ -38,20 +38,20 @@ const Dialog: FC = () => {
       {withActions && (
         <div className="flex flex-row-reverse mt-5">
           {primaryButtonText && (
-            <NewButton plainFocus onClick={onPrimaryButtonClick}>
+            <Button plainFocus onClick={onPrimaryButtonClick}>
               {primaryButtonText}
-            </NewButton>
+            </Button>
           )}
 
           {secondaryButtonText && (
-            <NewButton
+            <Button
               theme="secondary"
               plainFocus
               className="mr-3"
               onClick={onSecondaryButtonClick}
             >
               {secondaryButtonText}
-            </NewButton>
+            </Button>
           )}
         </div>
       )}

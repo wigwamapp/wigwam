@@ -3,6 +3,8 @@ import {
   ReactElement,
   ReactNode,
   useCallback,
+  useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -14,6 +16,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 type ItemProps<T, U> = {
   icon?: string;
@@ -23,7 +26,7 @@ type ItemProps<T, U> = {
 
 type SelectProps<T, U> = {
   items: ItemProps<T, U>[];
-  currentItem: ItemProps<T, U>;
+  currentItem?: ItemProps<T, U>;
   setItem: (itemKey: ItemProps<T, U>) => void;
   label?: string;
   searchValue?: string | null;
@@ -33,6 +36,7 @@ type SelectProps<T, U> = {
   showSelectedIcon?: boolean;
   itemRef?: any;
   loadMoreOnItemFromEnd?: number;
+  emptySearchText?: ReactNode;
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -54,6 +58,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
   modal = true,
   itemRef,
   loadMoreOnItemFromEnd = 1,
+  emptySearchText,
+  onOpenChange,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -79,6 +85,29 @@ function Select<T extends string | ReactElement, U extends string | number>({
     }
   }, []);
 
+  useEffect(() => {
+    if (rest.open !== undefined) {
+      setOpened(rest.open);
+    }
+  }, [rest.open]);
+
+  const filteredItems = useMemo(
+    () =>
+      items.filter((item) =>
+        showSelected ? item.key : item.key !== currentItem?.key
+      ),
+    [currentItem?.key, items, showSelected]
+  );
+
+  const handleOpenChange = useCallback(
+    (opn: boolean) => {
+      setOpened(opn);
+      onSearch?.(null);
+      onOpenChange?.(opn);
+    },
+    [onOpenChange, onSearch]
+  );
+
   return (
     <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
       {!!label && (
@@ -96,11 +125,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
       )}
       <DropdownMenu.Root
         open={opened}
-        onOpenChange={() => setOpened(!opened)}
         modal={modal}
+        onOpenChange={handleOpenChange}
         {...rest}
       >
         <DropdownMenu.Trigger
+          disabled={!currentItem}
           className={classNames(
             "flex items-center",
             "w-full",
@@ -108,7 +138,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            currentItem &&
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
               "bg-brand-main/10": opened,
             },
@@ -116,32 +147,36 @@ function Select<T extends string | ReactElement, U extends string | number>({
             currentItemClassName
           )}
         >
-          {currentItem.icon && (
-            <img
-              src={currentItem.icon}
-              alt={
-                typeof currentItem.value === "string"
-                  ? currentItem.value
-                  : "Icon"
-              }
-              className={classNames("w-7 mr-2", currentItemIconClassName)}
-            />
+          {currentItem && (
+            <>
+              {currentItem.icon && (
+                <img
+                  src={currentItem.icon}
+                  alt={
+                    typeof currentItem.value === "string"
+                      ? currentItem.value
+                      : "Icon"
+                  }
+                  className={classNames("w-7 mr-2", currentItemIconClassName)}
+                />
+              )}
+              {typeof currentItem.value === "string" ? (
+                <span className="min-w-0 truncate">{currentItem.value}</span>
+              ) : (
+                currentItem.value
+              )}
+              <ChevronDownIcon
+                className={classNames(
+                  "w-6 h-auto min-w-[1.5rem]",
+                  "ml-auto",
+                  "transition-transform",
+                  {
+                    "rotate-180": opened,
+                  }
+                )}
+              />
+            </>
           )}
-          {typeof currentItem.value === "string" ? (
-            <span className="min-w-0 truncate">{currentItem.value}</span>
-          ) : (
-            currentItem.value
-          )}
-          <ChevronDownIcon
-            className={classNames(
-              "w-6 h-auto min-w-[1.5rem]",
-              "ml-auto",
-              "transition-transform",
-              {
-                "rotate-180": opened,
-              }
-            )}
-          />
         </DropdownMenu.Trigger>
         <OverflowProvider>
           {(ref) => (
@@ -180,6 +215,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     onKeyDown={handleSearchKeyDown}
                     inputClassName="max-h-9 !pl-9"
                     adornmentClassName="!left-3"
+                    autoFocus={true}
                   />
                   {actions}
                 </div>
@@ -194,11 +230,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 scrollBarClassName="py-3"
               >
                 <div ref={itemsRef}>
-                  {items
-                    .filter((item) =>
-                      showSelected ? item.key : item.key !== currentItem.key
-                    )
-                    .map((item, i) => (
+                  {filteredItems.length > 0 ? (
+                    filteredItems.map((item, i) => (
                       <DropdownMenu.Item
                         ref={
                           i === items.length - loadMoreOnItemFromEnd - 1
@@ -212,7 +245,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "px-3",
                           showSelected &&
                             showSelectedIcon &&
-                            item.key === currentItem.key
+                            item.key === currentItem?.key
                             ? "py-1.5"
                             : "py-2",
                           // showSelected &&
@@ -248,7 +281,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               className={"w-6 h-6 mr-3"}
                             />
                           )}
-                          {typeof currentItem.value === "string" ? (
+                          {typeof item.value === "string" ? (
                             <span className="min-w-0 truncate">
                               {item.value}
                             </span>
@@ -257,12 +290,29 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           )}
                           {showSelected &&
                             showSelectedIcon &&
-                            item.key === currentItem.key && (
+                            item.key === currentItem?.key && (
                               <SelectedIcon className="w-6 h-auto ml-auto" />
                             )}
                         </button>
                       </DropdownMenu.Item>
-                    ))}
+                    ))
+                  ) : (
+                    <span
+                      className={classNames(
+                        "flex flex-col items-center justify-center mx-auto",
+                        "w-full h-full py-4",
+                        "text-sm text-brand-inactivedark2 text-center"
+                      )}
+                    >
+                      <NoResultsFoundIcon className="mb-4" />
+                      <span>
+                        There are no items found.
+                        <br />
+                        {emptySearchText ? " " : ""}
+                        {emptySearchText}
+                      </span>
+                    </span>
+                  )}
                 </div>
               </ScrollAreaContainer>
             </DropdownMenu.Content>

@@ -254,6 +254,7 @@ const TileSimple: FC<TileSimpleProps> = ({
   className,
 }) => (
   <button
+    type="button"
     className={classNames(
       "relative",
       "flex flex-col items-center",

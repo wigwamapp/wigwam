@@ -6,7 +6,7 @@ import { unlockWallet } from "core/client";
 
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import { AttentionModal } from "app/components/screens/Unlock";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import PasswordField from "app/components/elements/PasswordField";
 
 type FormValues = {
@@ -79,9 +79,9 @@ const PasswordForm = memo<PasswordFormProps>(
                 theme === "small" && "mt-1.5"
               )}
             >
-              <NewButton type="submit" className="w-full" loading={submitting}>
+              <Button type="submit" className="w-full" loading={submitting}>
                 Unlock
-              </NewButton>
+              </Button>
               <button
                 type="button"
                 className={classNames(

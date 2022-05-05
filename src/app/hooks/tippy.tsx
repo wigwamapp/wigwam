@@ -15,6 +15,8 @@ const singletonParams: UseSingletonProps = {
     "offset",
     "maxWidth",
     "interactive",
+    "delay",
+    "duration",
   ],
 };
 
