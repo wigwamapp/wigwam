@@ -5,11 +5,12 @@ import { Field, Form } from "react-final-form";
 import { fromProtectedString } from "lib/crypto-utils";
 
 import {
-  AddHDAccountParams,
   AccountSource,
+  AddHDAccountParams,
   SeedPharse,
   WalletStatus,
 } from "core/types";
+import { getSeedPhraseHDNode } from "core/common";
 import {
   composeValidators,
   required,
@@ -57,21 +58,40 @@ const VerifySeedPhrase = memo(() => {
         try {
           if (!seedPhrase) return;
 
-          const addAccountsParams: AddHDAccountParams[] = [
-            {
-              source: AccountSource.SeedPhrase,
-              name: "{{wallet}} 1",
-              derivationPath: ethers.utils.defaultPath,
-            },
-          ];
+          if (initialSetup) {
+            const addAccountsParams: AddHDAccountParams[] = [
+              {
+                source: AccountSource.SeedPhrase,
+                name: "{{wallet}} 1",
+                derivationPath: ethers.utils.defaultPath,
+              },
+            ];
 
-          Object.assign(stateRef.current, { addAccountsParams });
+            Object.assign(stateRef.current, { addAccountsParams });
 
-          navigateToStep(
-            initialSetup
-              ? AddAccountStep.SetupPassword
-              : AddAccountStep.VerifyToAdd
-          );
+            navigateToStep(AddAccountStep.SetupPassword);
+          } else {
+            const derivationPath = ethers.utils.defaultPath;
+            const importAddresses = [
+              {
+                // Base
+                source: AccountSource.SeedPhrase,
+                name: "{{wallet}} 1",
+                derivationPath,
+                // Misc
+                address:
+                  getSeedPhraseHDNode(seedPhrase).derivePath(derivationPath)
+                    .address,
+                index: 0,
+                isDisabled: true,
+                isDefaultChecked: true,
+              },
+            ];
+
+            Object.assign(stateRef.current, { importAddresses });
+
+            navigateToStep(AddAccountStep.VerifyToAdd);
+          }
         } catch (err: any) {
           alert(err?.message);
         }

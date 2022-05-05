@@ -22,15 +22,18 @@ import {
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
 
-import AccountsToAdd from "./AccountToAdd";
+import AccountsToAdd, { AccountsToAddProps } from "./AccountToAdd";
 
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const initialSetup = walletStatus === WalletStatus.Welcome;
   const { stateRef, navigateToStep } = useSteps();
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
+  const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+  const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
 
-  const addresses = stateRef.current.importAddresses;
+  const { importAddresses: addresses, hardDevice } = stateRef.current;
   const { alert } = useDialog();
 
   const handleContinue = useCallback(
@@ -40,7 +43,7 @@ const VerifyAccountToAdd: FC = () => {
           Object.assign(stateRef.current, { addAccountsParams });
           navigateToStep(AddAccountStep.SetupPassword);
         } else {
-          await addAccounts(addAccountsParams);
+          await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
           setAccModalOpened([false]);
         }
       } catch (err: any) {
@@ -50,24 +53,38 @@ const VerifyAccountToAdd: FC = () => {
     [alert, initialSetup, navigateToStep, setAccModalOpened, stateRef]
   );
 
+  const isAnyLedgerAccounts = useMemo(
+    () =>
+      importedAccounts?.filter(({ source }) => source === AccountSource.Ledger),
+    [importedAccounts]
+  );
+
   if (addresses && addresses.length > 0) {
     return (
       <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
     );
   }
 
-  if (initialSetup) {
-    return <VerifyAccountToAddInitial />;
+  if (
+    (hasSeedPhrase && hardDevice !== "ledger") ||
+    (hardDevice === "ledger" &&
+      isAnyLedgerAccounts &&
+      isAnyLedgerAccounts.length > 0)
+  ) {
+    return <VerifyAccountToAddExisting onContinue={handleContinue} />;
   }
 
-  return <VerifyAccountToAddExisting />;
+  return <VerifyAccountToAddInitial onContinue={handleContinue} />;
 };
 
 export default VerifyAccountToAdd;
 
-const VerifyAccountToAddInitial: FC = () => {
-  const { stateRef, reset, navigateToStep } = useSteps();
-  const { alert } = useDialog();
+type VerifyAccountToAddProps = Pick<AccountsToAddProps, "onContinue">;
+
+const VerifyAccountToAddInitial: FC<VerifyAccountToAddProps> = ({
+  onContinue,
+}) => {
+  const { stateRef, reset } = useSteps();
 
   const extendedKey: string | undefined = stateRef.current.extendedKey;
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
@@ -110,28 +127,16 @@ const VerifyAccountToAddInitial: FC = () => {
     [extendedKey, neuterExtendedKey]
   );
 
-  const handleContinue = useCallback(
-    async (addAccountsParams) => {
-      try {
-        Object.assign(stateRef.current, { addAccountsParams });
-        navigateToStep(AddAccountStep.SetupPassword);
-      } catch (err: any) {
-        alert({ title: "Error!", content: err.message });
-      }
-    },
-    [alert, navigateToStep, stateRef]
-  );
-
   if (!addresses) {
     return null;
   }
 
-  return (
-    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
-  );
+  return <AccountsToAdd accountsToVerify={addresses} onContinue={onContinue} />;
 };
 
-const VerifyAccountToAddExisting: FC = () => {
+const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
+  onContinue,
+}) => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const { reset, stateRef } = useSteps();
 
@@ -145,8 +150,6 @@ const VerifyAccountToAddExisting: FC = () => {
   );
 
   const importedAccounts = useMaybeAtomValue(allAccountsAtom);
-  const setAccModalOpened = useSetAtom(addAccountModalAtom);
-  const { alert } = useDialog();
 
   const isCreatingNew = stateRef.current.addAccounts === "existing-create";
 
@@ -261,23 +264,9 @@ const VerifyAccountToAddExisting: FC = () => {
     neuterExtendedKey,
   ]);
 
-  const handleContinue = useCallback(
-    async (addAccountsParams) => {
-      try {
-        await addAccounts(addAccountsParams);
-        setAccModalOpened([false]);
-      } catch (err: any) {
-        alert({ title: "Error!", content: err.message });
-      }
-    },
-    [alert, setAccModalOpened]
-  );
-
   if (!addresses) {
     return null;
   }
 
-  return (
-    <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
-  );
+  return <AccountsToAdd accountsToVerify={addresses} onContinue={onContinue} />;
 };

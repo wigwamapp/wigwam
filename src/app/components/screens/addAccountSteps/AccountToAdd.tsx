@@ -43,7 +43,7 @@ type AccountsToVerifyProps = Omit<AddAccountParams, "name"> & {
   index?: string;
 };
 
-type AccountsToAddProps = {
+export type AccountsToAddProps = {
   accountsToVerify: AccountsToVerifyProps[];
   onContinue: (params: AddAccountParams[]) => void;
 };
