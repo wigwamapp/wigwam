@@ -130,6 +130,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
         {...rest}
       >
         <DropdownMenu.Trigger
+          disabled={!currentItem}
           className={classNames(
             "flex items-center",
             "w-full",
@@ -137,7 +138,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            currentItem &&
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
               "bg-brand-main/10": opened,
             },
