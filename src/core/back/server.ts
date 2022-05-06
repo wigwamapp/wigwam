@@ -147,13 +147,6 @@ async function handleWalletRequest(
           ctx.reply({ type, seedPhraseExists });
         })
       )
-      .with({ type: MessageType.AddSeedPhrase }, ({ type, seedPhrase }) =>
-        withVault(async (vault) => {
-          await vault.addSeedPhrase(seedPhrase);
-
-          ctx.reply({ type });
-        })
-      )
       .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
           const accounts = vault.getAccounts();
@@ -161,15 +154,17 @@ async function handleWalletRequest(
           ctx.reply({ type, accounts });
         })
       )
-      .with({ type: MessageType.AddAccounts }, ({ type, accountsParams }) =>
-        withVault(async (vault) => {
-          await vault.addAccounts(accountsParams);
+      .with(
+        { type: MessageType.AddAccounts },
+        ({ type, accountsParams, seedPhrase }) =>
+          withVault(async (vault) => {
+            await vault.addAccounts(accountsParams, seedPhrase);
 
-          const accounts = vault.getAccounts();
-          accountsUpdated(accounts);
+            const accounts = vault.getAccounts();
+            accountsUpdated(accounts);
 
-          ctx.reply({ type });
-        })
+            ctx.reply({ type });
+          })
       )
       .with(
         { type: MessageType.DeleteAccounts },
