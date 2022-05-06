@@ -13,6 +13,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
+import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
@@ -424,7 +425,7 @@ const AssetCard = memo(
                   />
 
                   <span className="text-xs leading-4">
-                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
                   </span>
                 </span>
               )}
