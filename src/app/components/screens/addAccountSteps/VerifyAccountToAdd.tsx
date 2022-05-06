@@ -19,6 +19,7 @@ import {
   hasSeedPhraseAtom,
   walletStatusAtom,
 } from "app/atoms";
+import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
 
@@ -139,6 +140,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
 }) => {
   const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const { reset, stateRef } = useSteps();
+  const { getNextAccountName } = useNextAccountName();
 
   const extendedKey: string | undefined = stateRef.current.extendedKey;
   const derivationPath = stateRef.current.derivationPath;
@@ -197,14 +199,14 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
       return {
         source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
         address: filteredAccounts[0].address,
-        name: `Wallet ${filteredAccounts[0].index + 1}`,
+        name: getNextAccountName(),
         index: filteredAccounts[0].index.toString(),
         isDisabled: true,
         isDefaultChecked: true,
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, importedAccounts]
+    [extendedKey, getNextAccountName, importedAccounts]
   );
 
   const addresses = useMemo(() => {

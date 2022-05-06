@@ -21,6 +21,7 @@ import {
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
+import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import Input from "app/components/elements/Input";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -31,6 +32,7 @@ const WORDS_TO_FILL = 6;
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const { alert } = useDialog();
+  const { getNextAccountName } = useNextAccountName();
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
@@ -62,7 +64,7 @@ const VerifySeedPhrase = memo(() => {
             const addAccountsParams: AddHDAccountParams[] = [
               {
                 source: AccountSource.SeedPhrase,
-                name: "{{wallet}} 1",
+                name: getNextAccountName(),
                 derivationPath: ethers.utils.defaultPath,
               },
             ];
@@ -76,7 +78,7 @@ const VerifySeedPhrase = memo(() => {
               {
                 // Base
                 source: AccountSource.SeedPhrase,
-                name: "{{wallet}} 1",
+                name: getNextAccountName(),
                 derivationPath,
                 // Misc
                 address:
@@ -96,7 +98,14 @@ const VerifySeedPhrase = memo(() => {
           alert(err?.message);
         }
       }),
-    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
+    [
+      seedPhrase,
+      initialSetup,
+      stateRef,
+      navigateToStep,
+      getNextAccountName,
+      alert,
+    ]
   );
 
   if (!seedPhrase) {

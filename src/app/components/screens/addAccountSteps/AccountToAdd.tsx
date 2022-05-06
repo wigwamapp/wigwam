@@ -21,7 +21,7 @@ import { AccountSource, AddAccountParams, Network } from "core/types";
 import { ClientProvider } from "core/client";
 
 import { allNetworksAtom } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useNextAccountName } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
@@ -54,6 +54,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 }) => {
   const { stateRef } = useSteps();
   const networks = useAtomValue(allNetworksAtom);
+  const { getNextAccountName } = useNextAccountName();
 
   const derivationPath = stateRef.current.derivationPath;
 
@@ -88,26 +89,28 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   useEffect(() => {
     const addressesToAdd = addressesToAddRef.current;
 
-    accountsToVerify.forEach(
-      ({ address, name, isDefaultChecked, isAdded }, i) => {
-        if (!addressesToAdd.has(address) && !isAdded && isDefaultChecked) {
-          addressesToAdd.add(address);
-        }
-
-        const addressName = addressesNamesRef.current.get(address);
-        if (!addressName) {
-          addressesNamesRef.current.set(address, name ?? `Wallet ${i + 1}`);
-        }
-
-        setThToggleChecked(
-          addressesToAdd.size ===
-            accountsToVerify.filter(({ isAdded }) => !isAdded).length
-        );
+    let inx = 0;
+    accountsToVerify.forEach(({ address, name, isDefaultChecked, isAdded }) => {
+      if (!addressesToAdd.has(address) && !isAdded && isDefaultChecked) {
+        addressesToAdd.add(address);
       }
-    );
+
+      const addressName = addressesNamesRef.current.get(address);
+      if (!addressName) {
+        addressesNamesRef.current.set(address, name ?? getNextAccountName(inx));
+      }
+      if (!isAdded) {
+        inx += 1;
+      }
+
+      setThToggleChecked(
+        addressesToAdd.size ===
+          accountsToVerify.filter(({ isAdded }) => !isAdded).length
+      );
+    });
 
     forceUpdate();
-  }, [accountsToVerify, forceUpdate]);
+  }, [accountsToVerify, forceUpdate, getNextAccountName]);
 
   const toggleAddress = useCallback(
     (address: string) => {
@@ -172,7 +175,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
       const addressesToAdd = Array.from(addressesToAddRef.current);
 
-      const addAccountsParams = addressesToAdd.map((address, i) => {
+      const addAccountsParams = addressesToAdd.map((address) => {
         // eslint-disable-next-line
         const { isDefaultChecked, isDisabled, isAdded, index, ...adrs } =
           accountsToVerify.find(({ address: a }) => a === address)!; // TODO: Refactor
@@ -190,7 +193,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               ? `${derivationPath}/${index}`
               : undefined,
           ...adrs,
-          name: addressName ?? `Wallet ${index ?? i + 1}`,
+          name: addressName,
         } as AddAccountParams;
       });
 
@@ -287,7 +290,8 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
                   const isAddedItem =
                     addressesToAddRef.current.has(address) || isAdded;
                   const addressName = replaceT(
-                    addressesNamesRef.current.get(address) ?? `Wallet ${index}`
+                    addressesNamesRef.current.get(address) ??
+                      getNextAccountName(i)
                   );
 
                   return (

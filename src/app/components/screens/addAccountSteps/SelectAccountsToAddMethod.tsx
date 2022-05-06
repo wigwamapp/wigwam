@@ -22,6 +22,7 @@ import {
   walletStatusAtom,
 } from "app/atoms";
 import { AddAccountStep } from "app/nav";
+import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
@@ -227,6 +228,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
   const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const { getNextAccountName } = useNextAccountName();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   const extendedKey: string | undefined = stateRef.current.extendedKey;
@@ -275,14 +277,14 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
       return {
         source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
         address: filteredAccounts[0].address,
-        name: `Wallet ${filteredAccounts[0].index + 1}`,
+        name: getNextAccountName(),
         index: filteredAccounts[0].index.toString(),
         isDisabled: true,
         isDefaultChecked: true,
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, importedAccounts]
+    [extendedKey, getNextAccountName, importedAccounts]
   );
 
   const loadActiveWallets = useCallback(async () => {
