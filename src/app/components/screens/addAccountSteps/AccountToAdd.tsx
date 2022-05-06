@@ -43,7 +43,7 @@ type AccountsToVerifyProps = Omit<AddAccountParams, "name"> & {
   index?: string;
 };
 
-type AccountsToAddProps = {
+export type AccountsToAddProps = {
   accountsToVerify: AccountsToVerifyProps[];
   onContinue: (params: AddAccountParams[]) => void;
 };
@@ -201,7 +201,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   }, [onContinue, accountsToVerify, derivationPath, alert]);
 
   const isIndexExisting = useMemo(
-    () => !!accountsToVerify.find(({ index }) => index && index !== ""),
+    () =>
+      !!accountsToVerify.find(
+        ({ index }) => index !== undefined && index !== null && index !== ""
+      ),
     [accountsToVerify]
   );
 
