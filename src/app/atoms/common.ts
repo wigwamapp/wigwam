@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { atomFamily } from "jotai/utils";
+import { dequal } from "dequal/lite";
 import {
   atomWithStorage,
   atomWithRepoQuery,
@@ -74,3 +75,9 @@ export const currentAccountAtom = atom<Account>((get) => {
 
   return allAccounts[index === -1 ? 0 : index];
 });
+
+export const getContactsAtom = atomFamily(
+  (params: Repo.QueryContactsParams) =>
+    atomWithRepoQuery((query) => query(() => Repo.queryContacts(params))),
+  dequal
+);
