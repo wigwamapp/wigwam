@@ -56,9 +56,6 @@ const EditNetwork = memo<EditNetworkProps>(
           try {
             const isChangedChainId =
               initialChainId && chainId !== initialChainId;
-            if (isChangedChainId) {
-              await Repo.networks.delete(Number(initialChainId));
-            }
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
             await Repo.networks[repoMethod]({
@@ -75,6 +72,9 @@ const EditNetwork = memo<EditNetworkProps>(
               explorerUrls: [blockExplorer],
               position: 0,
             });
+            if (isChangedChainId) {
+              await Repo.networks.delete(Number(initialChainId));
+            }
 
             if (isNew && onActionFinished) {
               onActionFinished();
@@ -284,13 +284,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       className="!py-2 ml-4 w-full"
                       loading={submitting}
                     >
-                      {submitting
-                        ? isNew
-                          ? "Adding..."
-                          : "Saving..."
-                        : isNew
-                        ? "Add"
-                        : "Save"}
+                      {isNew ? "Add" : "Save"}
                     </Button>
                   </div>
                 </div>
