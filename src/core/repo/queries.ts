@@ -1,7 +1,7 @@
 import { parseTokenSlug } from "core/common/tokens";
 import { AccountToken, TokenStatus, TokenType } from "core/types";
 
-import { accountTokens } from "./helpers";
+import { accountTokens, contacts } from "./helpers";
 
 export type QueryAccountTokensParams = {
   chainId: number;
@@ -56,6 +56,36 @@ export function queryAccountTokens({
           match(token.name) ||
           match(token.symbol)
         : true
+    );
+  }
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryContactsParams = {
+  search?: string;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryContacts({ search, offset, limit }: QueryContactsParams) {
+  let coll;
+
+  coll = contacts.orderBy("addedAt").reverse();
+
+  if (search) {
+    const match = createSearchMatcher(search);
+
+    coll = coll.filter(
+      (contact) => match(contact.name) || match(contact.address)
     );
   }
 

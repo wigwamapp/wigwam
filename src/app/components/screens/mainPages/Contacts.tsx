@@ -1,9 +1,7 @@
 import { FC } from "react";
 
-import ComingSoon from "app/components/elements/ComingSoon";
+import ContactsSection from "app/components/blocks/ContactsSection";
 
-const Contacts: FC = () => {
-  return <ComingSoon label="Contacts" />;
-};
+const Contacts: FC = () => <ContactsSection />;
 
 export default Contacts;
