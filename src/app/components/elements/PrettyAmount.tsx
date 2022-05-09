@@ -82,6 +82,19 @@ const PrettyAmount = memo<PrettyAmountProps>(
       isFiat,
       currency,
     });
+    let contentToCopy = getPrettyAmount({
+      value: isFiatMinified
+        ? convertedAmount.decimalPlaces(
+            2,
+            convertedAmount.gte(0.01)
+              ? BigNumber.ROUND_DOWN
+              : BigNumber.ROUND_UP
+          )
+        : convertedAmount,
+      dec: isMinified ? 3 : undefined,
+      locale: currentLocale,
+      useGrouping: false,
+    });
     let content = getPrettyAmount({
       value: isFiatMinified
         ? convertedAmount.decimalPlaces(
@@ -115,6 +128,15 @@ const PrettyAmount = memo<PrettyAmountProps>(
         isFiat,
         currency,
       });
+
+      contentToCopy = getPrettyAmount({
+        value: isFiatMinified
+          ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
+          : convertedAmount,
+        dec: 38,
+        locale: currentLocale,
+        useGrouping: false,
+      });
     }
 
     if (isShownDecTooltip && !isShownIntTooltip) {
@@ -135,6 +157,12 @@ const PrettyAmount = memo<PrettyAmountProps>(
         locale: currentLocale,
         isFiat,
         currency,
+      });
+
+      contentToCopy = getPrettyAmount({
+        value: convertedAmount,
+        locale: currentLocale,
+        useGrouping: false,
       });
     }
 
@@ -165,7 +193,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
               isFiat={isFiat}
             />
           }
-          textToCopy={tooltipContent}
+          textToCopy={contentToCopy}
           followCursor
           plugins={[followCursor]}
           asChild
@@ -208,6 +236,7 @@ export const getPrettyAmount = ({
   value,
   dec = 6,
   locale = "en-US",
+  useGrouping = true,
   isFiat = false,
   currency,
   threeDots = false,
@@ -215,6 +244,7 @@ export const getPrettyAmount = ({
   value: number | BigNumber;
   dec?: number;
   locale?: string;
+  useGrouping?: boolean;
   isFiat?: boolean;
   currency?: string;
   threeDots?: boolean;
@@ -236,6 +266,7 @@ export const getPrettyAmount = ({
       minFract,
       maxFract,
       "compact",
+      useGrouping,
       isFiat ? "currency" : undefined,
       isFiat ? currency : undefined
     )
@@ -248,6 +279,7 @@ export const getPrettyAmount = ({
     2,
     20,
     "standard",
+    useGrouping,
     isFiat ? "currency" : undefined,
     isFiat ? currency : undefined
   )
@@ -261,6 +293,7 @@ const getIntlNumberFormat = memoize(
     minimumFractionDigits: number,
     maximumFractionDigits: number,
     notation?: "standard" | "scientific" | "engineering" | "compact",
+    useGrouping?: boolean,
     style?: "currency",
     currency?: string
   ) =>
@@ -268,6 +301,7 @@ const getIntlNumberFormat = memoize(
       minimumFractionDigits,
       maximumFractionDigits,
       notation,
+      useGrouping,
       style,
       currency,
     }),
