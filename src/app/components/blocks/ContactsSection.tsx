@@ -77,7 +77,7 @@ const ContactsSection: FC = () => {
         title: "Delete contact",
         content: (
           <p className="mb-4 mx-auto text-center">
-            Are you sure you want to delete <b>{name}</b> account with address{" "}
+            Are you sure you want to delete <b>{name}</b> contact with address{" "}
             <b>{address}</b>?
           </p>
         ),
@@ -326,7 +326,7 @@ const ContactModal: FC<ContactModalProps> = ({
   return (
     <SecondaryModal
       onOpenChange={onOpenChange}
-      header="Edit contact"
+      header={isNew ? "Add new contact" : "Edit contact"}
       className="max-w-[43.75rem]"
       headerClassName="!text-[2rem] !mb-6"
       {...rest}
