@@ -87,8 +87,8 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         confirm({
           title: "Download Secret Phrase",
           content: `
-        WARNING: Never disclose your Secret Recovery Phrase. Anyone with this phrase can take your Ether forever.
-        Download this Secret Recovery Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
+        WARNING: Never disclose your Secret Phrase. Anyone with this phrase can take your funds forever.
+        Download this Secret Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
         }).then((answer) => {
           if (answer) {
             const name = ethers.utils.base58.encode(getRandomBytes(10));
