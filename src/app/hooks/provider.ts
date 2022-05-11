@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 import { getClientProvider } from "core/client";
 
@@ -9,14 +10,39 @@ export function useProvider() {
   return getClientProvider(chainId);
 }
 
-export function useOnBlock(callback: (blockNumber: number) => void) {
+export type UseOnBlockOptions = {
+  debounceWait?: number;
+  callFirstTime?: boolean;
+};
+
+export function useOnBlock(
+  callback: (blockNumber: number) => void,
+  opts: UseOnBlockOptions = {}
+) {
   const provider = useProvider();
 
+  const latestBlockRef = useRef<number>();
+  const handleNewBlock = useCallback(
+    (blockNumber: number) => {
+      if (latestBlockRef.current || opts.callFirstTime) {
+        callback(blockNumber);
+      }
+
+      latestBlockRef.current = blockNumber;
+    },
+    [callback, opts.callFirstTime]
+  );
+
+  const debouncedCallback = useDebouncedCallback(
+    handleNewBlock,
+    opts.debounceWait ?? 500
+  );
+
   useEffect(() => {
-    provider.on("block", callback);
+    provider.on("block", debouncedCallback);
 
     return () => {
-      provider.off("block", callback);
+      provider.off("block", debouncedCallback);
     };
-  }, [provider, callback]);
+  }, [provider, debouncedCallback]);
 }

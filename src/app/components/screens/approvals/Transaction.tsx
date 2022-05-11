@@ -166,7 +166,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     estimateTx();
   }, [estimateTx]);
 
-  useOnBlock(() => estimateTx());
+  useOnBlock(estimateTx);
 
   useEffect(() => {
     setTabValue(lastError ? "error" : "details");
