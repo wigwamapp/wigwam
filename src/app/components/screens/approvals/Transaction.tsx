@@ -22,9 +22,10 @@ import { getNextNonce } from "core/common/nonce";
 
 import {
   useChainId,
-  useNativeCurrency,
   useOnBlock,
   useProvider,
+  useSync,
+  useToken,
 } from "app/hooks";
 import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
@@ -65,13 +66,15 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     ])
   );
 
+  useSync(chainId, accountAddress);
+
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === approval.accountAddress)!,
     [approval, allAccounts]
   );
 
   const provider = useProvider();
-  const nativeCurrency = useNativeCurrency();
+  const nativeToken = useToken(accountAddress);
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
   const [lastError, setLastError] = useState<any>(null);
@@ -103,11 +106,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     return tx;
   }, [originTx, txOverrides]);
 
-  const averageFee = useMemo(() => {
+  const maxFee = useMemo(() => {
     if (!finalTx) return null;
 
     try {
-      return ethers.BigNumber.from(finalTx.gasLimit).mul(finalTx.gasPrice!);
+      const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
+      return ethers.BigNumber.from(finalTx.gasLimit).mul(gasPrice!);
     } catch {
       return null;
     }
@@ -169,8 +173,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [setTabValue, lastError]);
 
   useEffect(() => {
-    if (finalTx && averageFee) console.info({ finalTx, averageFee });
-  }, [finalTx, averageFee]);
+    if (finalTx && maxFee) console.info({ finalTx, maxFee });
+  }, [finalTx, maxFee]);
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -250,13 +254,13 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           <Tabs.Content value="details">
             <div className="w-full mt-4">
-              {averageFee && nativeCurrency && (
+              {maxFee && nativeToken && (
                 <div className="text-lg text-brand-inactivelight">
-                  <span className="">Average Fee: </span>
+                  <span className="">Max Fee: </span>
                   <PrettyAmount
-                    amount={averageFee.toString()}
-                    decimals={nativeCurrency.decimals}
-                    currency={nativeCurrency.symbol}
+                    amount={maxFee.toString()}
+                    decimals={nativeToken.decimals}
+                    currency={nativeToken.symbol}
                     copiable
                     className=""
                   />

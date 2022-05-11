@@ -56,12 +56,19 @@ export async function addFindTokenRequest(
     await enqueueSync(async () => {
       let tokenToAdd: AccountAsset | undefined;
 
-      const debankChain = await getDebankChain(chainId);
+      const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+
+      const [debankChain, coinGeckoPrices] = await Promise.all([
+        getDebankChain(chainId),
+        getCoinGeckoPrices(chainId, [tokenAddress]),
+      ]);
+
+      const cgPrice = coinGeckoPrices[tokenAddress];
+      let priceUSD = cgPrice?.usd?.toString();
+      const priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
       if (debankChain) {
-        const { address: tokenAddress } = parseTokenSlug(tokenSlug);
-
-        const [{ data: token }, balance] = await Promise.all([
+        const [{ data: dbToken }, balance] = await Promise.all([
           debankApi
             .get("/token", {
               params: {
@@ -73,13 +80,17 @@ export async function addFindTokenRequest(
           getBalanceFromChain(chainId, tokenSlug, accountAddress),
         ]);
 
-        if (token) {
+        if (dbToken) {
+          if (!priceUSD && dbToken.price) {
+            priceUSD = new BigNumber(dbToken.price).toString();
+          }
+
           const rawBalance = balance?.toString() ?? "0";
-          const priceUSD = new BigNumber(token.price).toString();
           const balanceUSD = priceUSD
-            ? +new BigNumber(rawBalance)
-                .div(10 ** token.decimals)
+            ? new BigNumber(rawBalance)
+                .div(10 ** dbToken.decimals)
                 .times(priceUSD)
+                .toNumber()
             : 0;
 
           tokenToAdd = {
@@ -89,14 +100,15 @@ export async function addFindTokenRequest(
             accountAddress,
             tokenSlug,
             // Metadata
-            decimals: token.decimals,
-            name: token.name,
-            symbol: token.symbol,
-            logoUrl: token.logo_url,
+            decimals: dbToken.decimals,
+            name: dbToken.name,
+            symbol: dbToken.symbol,
+            logoUrl: dbToken.logo_url,
             // Volumes
             rawBalance,
-            priceUSD,
             balanceUSD,
+            priceUSD,
+            priceUSDChange,
           };
         }
       }
@@ -110,6 +122,12 @@ export async function addFindTokenRequest(
         if (!token) return;
 
         const rawBalance = token.balance.toString();
+        const balanceUSD = priceUSD
+          ? new BigNumber(rawBalance)
+              .div(10 ** token.decimals)
+              .times(priceUSD)
+              .toNumber()
+          : 0;
 
         tokenToAdd = {
           tokenType: TokenType.Asset,
@@ -123,8 +141,9 @@ export async function addFindTokenRequest(
           symbol: token.symbol,
           // Volumes
           rawBalance,
-          priceUSD: "0",
-          balanceUSD: 0,
+          balanceUSD,
+          priceUSD,
+          priceUSDChange,
         };
       }
 
@@ -370,13 +389,15 @@ const syncAccountTokens = mem(
               };
 
           const rawBalance = rawBalanceBN.toString();
-          const priceUSD = new BigNumber(token.price).toString();
+          const priceUSD = token.price
+            ? new BigNumber(token.price).toString()
+            : existing.priceUSD;
           const balanceUSD = priceUSD
             ? new BigNumber(rawBalance)
                 .div(10 ** token.decimals)
                 .times(priceUSD)
                 .toNumber()
-            : 0;
+            : existing.balanceUSD;
 
           accTokens.push(
             existing

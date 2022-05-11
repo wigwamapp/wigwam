@@ -1,8 +1,11 @@
-import { FC, createContext, useContext } from "react";
+import { FC, createContext, useContext, useEffect } from "react";
 import { useAtomValue } from "jotai";
+import { useLazyAtomValue } from "lib/atom-utils";
+import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
+
+import { sync } from "core/client";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
-import { useLazyAtomValue } from "lib/atom-utils";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -27,4 +30,24 @@ export function useIsSyncing() {
   const status = useLazyAtomValue(syncStatusAtom) ?? [];
 
   return status.includes(chainId);
+}
+
+export function useSync(chainId: number, accountAddress: string) {
+  const windowFocused = useWindowFocus();
+
+  useEffect(() => {
+    let t: any;
+
+    const syncAndDefer = () => {
+      sync(chainId, accountAddress);
+
+      t = setTimeout(syncAndDefer, 1_500);
+    };
+
+    if (windowFocused) {
+      t = setTimeout(syncAndDefer);
+    }
+
+    return () => clearTimeout(t);
+  }, [chainId, windowFocused, accountAddress]);
 }
