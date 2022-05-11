@@ -107,6 +107,18 @@ const Asset: FC = () => {
     [currentToken]
   );
 
+  const assetInputStyle = useMemo(
+    () =>
+      currentToken
+        ? {
+            paddingRight: `${
+              (currentToken.symbol.length * 10 + 12 + 16) / 16
+            }rem`,
+          }
+        : undefined,
+    [currentToken]
+  );
+
   return (
     <Form<FormValues>
       onSubmit={handleSubmit}
@@ -147,26 +159,33 @@ const Asset: FC = () => {
                   placeholder="0.00"
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
-                  withMaxButton
-                  handleMaxButtonClick={() => form.change("amount", maxAmount)}
                   error={meta.modified && meta.error}
                   errorMessage={meta.error}
-                  inputClassName="pr-20"
+                  labelActions={
+                    <button
+                      type="button"
+                      onClick={() => form.change("amount", maxAmount)}
+                      className={classNames(
+                        "py-1 px-3",
+                        "bg-brand-main/10",
+                        "rounded-md",
+                        "text-xs font-bold",
+                        "transition-colors",
+                        "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
+                        "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
+                        "active:bg-brand-main/20 active:shadow-none"
+                      )}
+                    >
+                      MAX
+                    </button>
+                  }
+                  actions={currentToken ? currentToken.symbol : undefined}
+                  actionsClassName="text-sm font-bold pointer-events-none !right-4"
+                  style={assetInputStyle}
                   {...input}
                 />
               )}
             </Field>
-            {currentToken && (
-              <span
-                className={classNames(
-                  "absolute top-11 right-4",
-                  "text-sm font-bold",
-                  "pointer-events-none"
-                )}
-              >
-                {currentToken.symbol}
-              </span>
-            )}
           </div>
           <div className="mt-6 flex items-start">
             <TxCheck currentToken={currentToken} values={values} />
