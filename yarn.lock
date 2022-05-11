@@ -1474,7 +1474,7 @@
   dependencies:
     "@ethersproject/logger" "^5.6.0"
 
-"@ethersproject/providers@5.6.5":
+"@ethersproject/providers@5.6.5", "@ethersproject/providers@^5.5.0":
   version "5.6.5"
   resolved "https://registry.yarnpkg.com/@ethersproject/providers/-/providers-5.6.5.tgz#aefecf78459817a323452e05a16d56afcf807e27"
   integrity sha512-TRS+c2Ud+cMpWodmGAc9xbnYRPWzRNYt2zkCSnj58nJoamBQ6x4cUbBeo0lTC3y+6RDVIBeJv18OqsDbSktLVg==
@@ -2524,6 +2524,16 @@
   integrity sha512-g3hnE/UcOg7REdewduRPAK88EPuLZtaq7sA9ouu8S+YEtnyFRI16jgv6GZYe3VMoQLL1T171ebmEPtDjyxWLzw==
   dependencies:
     "@babel/runtime" "^7.13.10"
+
+"@rainbow-me/fee-suggestions@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@rainbow-me/fee-suggestions/-/fee-suggestions-2.0.0.tgz#6556697ce560d6963dca0c81cc719999c3ca2c36"
+  integrity sha512-1fD/nlq4e1Rgih2Vt/yxTMOjrN46ofYlwHrKQpEunwvzW9KrZB44p6XuoMyxVn2MX0QWcxA5uQKMtz4Psh4yrw==
+  dependencies:
+    "@ethersproject/providers" "^5.5.0"
+    bignumber.js "^9.0.1"
+    ethers "^5.4.2"
+    moving-averages "^4.0.6"
 
 "@sinclair/typebox@^0.23.3":
   version "0.23.5"
@@ -3821,7 +3831,7 @@ big.js@^5.2.2:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
 
-bignumber.js@9.0.2, bignumber.js@^9.0.2:
+bignumber.js@9.0.2, bignumber.js@^9.0.1, bignumber.js@^9.0.2:
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.2.tgz#71c6c6bed38de64e24a65ebe16cfcf23ae693673"
   integrity sha512-GAcQvbpsM0pUb0zw1EI0KhQEZ+lRwR5fYaAp3vPOYuP7aDvGy6cVN6XHLauvF8SOga2y0dcLcjt3iQDTSEliyw==
@@ -5137,7 +5147,7 @@ eth-rpc-errors@^4.0.3:
   dependencies:
     fast-safe-stringify "^2.0.6"
 
-ethers@5.6.5, ethers@^5.5.2:
+ethers@5.6.5, ethers@^5.4.2, ethers@^5.5.2:
   version "5.6.5"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.5.tgz#3185ac7815dc640993408adf6f133ffabfbcbb63"
   integrity sha512-9CTmplO9bv0s/aPw3HB3txGzKz3tUSI2EfO4dJo0W2WvaEq1ArgsEX6obV+bj5X3yY+Zgb1kAux8TDtJKe1FaA==
@@ -7002,6 +7012,11 @@ mkdirp@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
+
+moving-averages@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/moving-averages/-/moving-averages-4.0.6.tgz#4978d4d9f68aef8f2b5fa028b1ec316da0cc8c95"
+  integrity sha512-Jv+mH0emTFP40Q5ONsBqTfIO9NuUyK9zuW4pWbOzWJm8jEqpLBtAH2CnE2MFIuH/G9f9nDugmnDVUJaHx9jckw==
 
 mrmime@^1.0.0:
   version "1.0.0"

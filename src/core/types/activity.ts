@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+
 import { RpcReply } from "./rpc";
 
 export enum ActivityType {
@@ -73,3 +74,47 @@ export type TxParams = {
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
 };
+
+export enum TxActionType {
+  TokenTransfer = "TOKEN_TRANSFER",
+  TokenApprove = "TOKEN_APPROVE",
+  ContractInteraction = "CONTRACT_INTERACTION",
+  ContractDeployment = "CONTRACT_DEPLOYMENT",
+}
+
+export type TxAction =
+  | TokenTransferAction
+  | TokenApproveAction
+  | ContractInteractionAction
+  | ContractDeploymentAction;
+
+export interface TokenTransferAction {
+  type: TxActionType.TokenTransfer;
+  toAddress: string;
+  tokens: {
+    slug: string;
+    amount: string;
+  }[];
+  fromAddress?: string;
+  data?: string;
+}
+
+export interface TokenApproveAction {
+  type: TxActionType.TokenApprove;
+  toAddress?: string;
+  tokenSlug?: string;
+  allTokensContract?: string;
+  amount?: string;
+  clears?: boolean;
+}
+
+export interface ContractInteractionAction {
+  type: TxActionType.ContractInteraction;
+  contractAddress: string;
+  method?: string;
+  args?: any[];
+}
+
+export interface ContractDeploymentAction {
+  type: TxActionType.ContractDeployment;
+}

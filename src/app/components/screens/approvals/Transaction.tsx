@@ -13,12 +13,14 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
+import { suggestFees } from "@rainbow-me/fee-suggestions";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
-import { TransactionApproval } from "core/types";
-import { approveItem } from "core/client";
+import { TransactionApproval, TxActionType } from "core/types";
+import { approveItem, findToken } from "core/client";
 import { getNextNonce } from "core/common/nonce";
+import { isSmartContractAddress, matchTxAction } from "core/common/transaction";
 
 import {
   useChainId,
@@ -50,13 +52,14 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
 
 type TabValue = typeof TAB_VALUES[number];
 type Tx = ethers.utils.UnsignedTransaction;
+type FeeSuggestions = Awaited<ReturnType<typeof suggestFees>>;
 
 type ApproveTransactionProps = {
   approval: TransactionApproval;
 };
 
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
-  const { accountAddress } = approval;
+  const { accountAddress, txParams } = approval;
   const chainId = useChainId();
 
   const [allAccounts, localNonce] = useAtomValue(
@@ -73,15 +76,31 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, allAccounts]
   );
 
+  const action = useMemo(() => {
+    try {
+      return matchTxAction(txParams);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  }, [txParams]);
+
   const provider = useProvider();
   const nativeToken = useToken(accountAddress);
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
+  const [estimating, setEstimating] = useState(false);
   const [lastError, setLastError] = useState<any>(null);
   const [approving, setApproving] = useState(false);
 
-  const [preparedTx, setPrepatedTx] = useState<Tx>();
+  const [prepared, setPrepared] = useState<{
+    tx: Tx;
+    fees: FeeSuggestions | null;
+    destinationIsContract: boolean;
+  }>();
   const [txOverrides, setTxOverrides] = useState<Partial<Tx>>({});
+
+  const preparedTx = prepared?.tx;
 
   const originTx = useMemo(
     () =>
@@ -122,42 +141,57 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const estimateTx = useCallback(
     () =>
       withThrottle(async () => {
+        setEstimating(true);
+
         try {
-          const { txParams } = approval;
           const { gasLimit, ...rest } = txParams;
 
-          const tx = await provider
-            .getUncheckedSigner(account.address)
-            .populateTransaction({
-              ...rest,
-              type: bnify(rest?.type)?.toNumber(),
-              chainId: bnify(rest?.chainId)?.toNumber(),
-            });
+          const [tx, feeSuggestions, destinationIsContract] = await Promise.all(
+            [
+              provider.getUncheckedSigner(account.address).populateTransaction({
+                ...rest,
+                type: bnify(rest?.type)?.toNumber(),
+                chainId: bnify(rest?.chainId)?.toNumber(),
+              }),
+              suggestFees(provider).catch(() => null),
+              txParams.to
+                ? isSmartContractAddress(provider, txParams.to)
+                : false,
+            ]
+          );
+
           delete tx.from;
 
           const estimatedGasLimit = ethers.BigNumber.from(tx.gasLimit);
           const minGasLimit = estimatedGasLimit.mul(5).div(4);
           const averageGasLimit = estimatedGasLimit.mul(3).div(2);
 
-          setPrepatedTx({
-            ...tx,
-            nonce: bnify(tx.nonce)?.toNumber(),
-            gasLimit:
-              gasLimit && minGasLimit.lte(gasLimit)
-                ? ethers.BigNumber.from(gasLimit)
-                : averageGasLimit,
+          setPrepared({
+            tx: {
+              ...tx,
+              nonce: bnify(tx.nonce)?.toNumber(),
+              gasLimit:
+                gasLimit && minGasLimit.lte(gasLimit)
+                  ? ethers.BigNumber.from(gasLimit)
+                  : averageGasLimit,
+            },
+            fees: feeSuggestions,
+            destinationIsContract,
           });
         } catch (err) {
           console.error(err);
           setLastError(err);
         }
+
+        setEstimating(false);
       }),
     [
       withThrottle,
-      setPrepatedTx,
+      setEstimating,
+      setPrepared,
       provider,
       account.address,
-      approval,
+      txParams,
       setLastError,
     ]
   );
@@ -173,8 +207,32 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [setTabValue, lastError]);
 
   useEffect(() => {
-    if (finalTx && maxFee) console.info({ finalTx, maxFee });
-  }, [finalTx, maxFee]);
+    if (!action) return;
+
+    switch (action.type) {
+      case TxActionType.TokenTransfer:
+        action.tokens.forEach(({ slug }) => {
+          findToken(chainId, accountAddress, slug);
+        });
+        break;
+
+      case TxActionType.TokenApprove:
+        if (action.tokenSlug) {
+          findToken(chainId, accountAddress, action.tokenSlug);
+        }
+        break;
+    }
+  }, [action, chainId, accountAddress]);
+
+  // TODO: Only for dev mode
+
+  useEffect(() => {
+    console.info("action", action);
+  }, [action]);
+
+  useEffect(() => {
+    if (prepared && finalTx) console.info({ prepared, finalTx });
+  }, [prepared, finalTx]);
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -202,13 +260,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, setLastError, setApproving, finalTx]
   );
 
-  const loading = approving || (!finalTx && !lastError);
-
   return (
     <ApprovalLayout
       approveText={lastError ? "Retry" : "Approve"}
       onApprove={handleApprove}
-      loading={loading}
+      disabled={estimating}
+      approving={approving}
     >
       <ScrollAreaContainer
         className="w-full box-content -mr-5 pr-5"

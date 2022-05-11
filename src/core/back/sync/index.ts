@@ -57,6 +57,14 @@ export async function addFindTokenRequest(
       let tokenToAdd: AccountAsset | undefined;
 
       const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+      const dbKey = createAccountTokenKey({
+        chainId,
+        accountAddress,
+        tokenSlug,
+      });
+
+      const existing = await repo.accountTokens.get(dbKey);
+      if (existing) return;
 
       const [debankChain, coinGeckoPrices] = await Promise.all([
         getDebankChain(chainId),
@@ -147,14 +155,7 @@ export async function addFindTokenRequest(
         };
       }
 
-      await repo.accountTokens.put(
-        tokenToAdd,
-        createAccountTokenKey({
-          chainId,
-          accountAddress,
-          tokenSlug,
-        })
-      );
+      await repo.accountTokens.put(tokenToAdd, dbKey);
     });
   } catch (err) {
     console.error(err);

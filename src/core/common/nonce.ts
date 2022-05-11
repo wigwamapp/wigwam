@@ -9,7 +9,7 @@ export function getNextNonce(
   tx: UnsignedTransaction,
   localNonce?: string | null
 ) {
-  assert(tx.nonce, "Nonce not found in transaction");
+  assert(tx.nonce !== undefined, "Nonce not found in transaction");
 
   if (!localNonce) return tx.nonce;
 
