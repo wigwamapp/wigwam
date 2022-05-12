@@ -233,12 +233,6 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [setTabValue, lastError]);
 
   useEffect(() => {
-    setTxOverrides((o) => ({
-      ...o,
-    }));
-  }, [setTxOverrides, feeMode]);
-
-  useEffect(() => {
     if (!action) return;
 
     switch (action.type) {
