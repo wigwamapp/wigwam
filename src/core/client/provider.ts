@@ -12,7 +12,7 @@ export const getClientProvider = memoize(
 );
 
 export class ClientProvider extends JsonRpcProvider {
-  constructor(chainId: number) {
+  constructor(public chainId: number) {
     super("", chainId);
   }
 

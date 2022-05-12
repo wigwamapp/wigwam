@@ -232,3 +232,12 @@ export function findToken(
 
   porter.sendOneWayMessage(msg);
 }
+
+export async function getThirdPartyGasPrices(chainId: number) {
+  const type = MessageType.GetTPGasPrices;
+
+  const res = await porter.request({ type, chainId });
+  assert(res?.type === type);
+
+  return res.gasPrices;
+}
