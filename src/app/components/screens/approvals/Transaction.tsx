@@ -167,6 +167,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const estimateTx = useCallback(
     () =>
       withThrottle(async () => {
+        if (approving) return;
+
         setEstimating(true);
 
         try {
@@ -174,12 +176,15 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           const [tx, feeSuggestions, destinationIsContract] = await Promise.all(
             [
+              // Prepare transaction with other fields
               provider.getUncheckedSigner(account.address).populateTransaction({
                 ...rest,
                 type: bnify(rest?.type)?.toNumber(),
                 chainId: bnify(rest?.chainId)?.toNumber(),
               }),
+              // Fetch fee data
               suggestFees(provider).catch(() => null),
+              // Check is destination is smart contract
               txParams.to
                 ? isSmartContractAddress(provider, txParams.to)
                 : false,
@@ -215,10 +220,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       withThrottle,
       setEstimating,
       setPrepared,
+      setLastError,
+      approving,
       provider,
       account.address,
       txParams,
-      setLastError,
     ]
   );
 

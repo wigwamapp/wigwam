@@ -24,7 +24,10 @@ export function useOnBlock(
   const latestBlockRef = useRef<number>();
   const handleNewBlock = useCallback(
     (blockNumber: number) => {
-      if (latestBlockRef.current || opts.callFirstTime) {
+      if (
+        (!latestBlockRef.current && opts.callFirstTime) ||
+        (latestBlockRef.current && blockNumber > latestBlockRef.current)
+      ) {
         callback(blockNumber);
       }
 
