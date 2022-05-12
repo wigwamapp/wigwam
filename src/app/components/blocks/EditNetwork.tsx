@@ -1,6 +1,14 @@
-import { forwardRef, memo, useCallback, useMemo } from "react";
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import classNames from "clsx";
-import { Field, Form } from "react-final-form";
+import { Field, FieldMetaState, Form } from "react-final-form";
+import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import * as Repo from "core/repo";
@@ -28,6 +36,7 @@ import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
 type FormValues = {
   nName: string;
@@ -58,10 +67,20 @@ const EditNetwork = memo<EditNetworkProps>(
               initialChainId && chainId !== initialChainId;
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
+
+            let restRpcUrls: string[] = [];
+            if (network?.rpcUrls) {
+              if (network.rpcUrls.indexOf(rpcUrl) !== -1) {
+                restRpcUrls = network.rpcUrls.filter((el) => el !== rpcUrl);
+              } else {
+                restRpcUrls = network.rpcUrls;
+              }
+            }
+
             await Repo.networks[repoMethod]({
               chainId: Number(chainId),
               type: network?.type ?? "unknown",
-              rpcUrls: [rpcUrl],
+              rpcUrls: [rpcUrl, ...restRpcUrls],
               chainTag: "",
               name: nName,
               nativeCurrency: {
@@ -85,12 +104,13 @@ const EditNetwork = memo<EditNetworkProps>(
           }
         }),
       [
-        alert,
         initialChainId,
         isNew,
+        network?.rpcUrls,
         network?.type,
-        onCancelHandler,
         onActionFinished,
+        onCancelHandler,
+        alert,
       ]
     );
 
@@ -197,11 +217,11 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        setFromClipboard={(value) =>
-                          form.change("rpcUrl", value)
-                        }
+                        setValue={(value) => form.change("rpcUrl", value)}
+                        rpcList={network?.rpcUrls}
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
+                        meta={meta}
                         {...input}
                       />
                     )}
@@ -300,16 +320,83 @@ const EditNetwork = memo<EditNetworkProps>(
 export default EditNetwork;
 
 type RPCFieldProps = LongTextFieldProps & {
-  setFromClipboard: (value: string) => void;
+  meta: FieldMetaState<any>;
+  rpcList?: string[];
+  setValue: (value: string) => void;
 };
 
 const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
-  ({ setFromClipboard, ...rest }, ref) => {
-    const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
+  ({ rpcList, setValue, meta, ...rest }, ref) => {
+    const { paste, pasted } = usePasteFromClipboard(setValue);
+    const [opened, setOpened] = useState(false);
+    const [activeSuggestion, setActiveSuggestion] = useState<number | null>(0);
 
-    return (
+    useEffect(() => {
+      if (meta.active) {
+        setOpened(true);
+      } else {
+        setOpened(false);
+      }
+    }, [meta.active]);
+
+    useEffect(() => {
+      if (rpcList && rest.value) {
+        let index = 0;
+        let found = false;
+        for (const rpc of rpcList) {
+          if (rpc.includes(rest.value as string)) {
+            setActiveSuggestion(index);
+            found = true;
+            break;
+          }
+          index++;
+        }
+        if (!found) {
+          setActiveSuggestion(null);
+        }
+      }
+    }, [rest.value, rpcList]);
+
+    const handleKeyClick = useCallback(
+      (e) => {
+        if (rpcList) {
+          if (e.keyCode === 40) {
+            setActiveSuggestion((prevState) =>
+              prevState === null
+                ? 0
+                : prevState + 1 > rpcList.length - 1
+                ? 0
+                : prevState + 1
+            );
+            e.preventDefault();
+          }
+          if (e.keyCode === 38) {
+            setActiveSuggestion((prevState) =>
+              prevState === null
+                ? 0
+                : prevState - 1 < 0
+                ? rpcList.length - 1
+                : prevState - 1
+            );
+            e.preventDefault();
+          }
+          if (e.keyCode === 32 || e.keyCode === 13) {
+            if (activeSuggestion) {
+              setValue(rpcList[activeSuggestion]);
+              (document.activeElement as any)?.blur();
+            }
+            e.preventDefault();
+          }
+        }
+        rest.onKeyDown?.(e);
+      },
+      [activeSuggestion, rest, rpcList, setValue]
+    );
+
+    const content = (
       <LongTextField
         ref={ref}
+        onKeyDown={handleKeyClick}
         actions={
           <Button
             theme="tertiary"
@@ -332,7 +419,70 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
           </Button>
         }
         {...rest}
+        error={opened ? undefined : rest.error}
       />
     );
+
+    if (rpcList && rpcList.length > 0) {
+      return (
+        <Popover.Root
+          open={opened}
+          modal={false}
+          onOpenChange={() => undefined}
+        >
+          <Popover.Trigger className="w-full">{content}</Popover.Trigger>
+          <Popover.Content
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+            }}
+            className={classNames(
+              "shadow-xs",
+              "focus-visible:outline-none",
+              "mt-2",
+              "w-full min-w-[17.75rem]",
+              "rounded-[.625rem]",
+              "bg-brand-dark/10",
+              "backdrop-blur-[30px]",
+              "border border-brand-light/5",
+              "z-10",
+              "w-[21.875rem]"
+            )}
+          >
+            <ScrollAreaContainer
+              className={classNames("max-h-64 pl-3 pr-4", "flex flex-col")}
+              viewPortClassName="py-3 viewportBlock"
+              scrollBarClassName="py-3"
+            >
+              {rpcList.map((item, index) => (
+                <button
+                  key={item}
+                  className={classNames(
+                    "w-full mb-1 last:mb-0",
+                    "flex items-center",
+                    "px-3",
+                    item === rpcList[0] ? "py-1.5" : "py-2",
+                    "rounded-[.625rem]",
+                    "cursor-pointer",
+                    "text-sm",
+                    "outline-none",
+                    "transition-colors",
+                    "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
+                    activeSuggestion === index && "bg-brand-main/20"
+                  )}
+                  onPointerDown={() => setValue(item)}
+                >
+                  <span className="min-w-0 truncate">{item}</span>
+                  {item === rpcList[0] && (
+                    <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
+                  )}
+                </button>
+              ))}
+            </ScrollAreaContainer>
+          </Popover.Content>
+        </Popover.Root>
+      );
+    }
+
+    return content;
   }
 );
