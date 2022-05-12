@@ -1,33 +1,16 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
-import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 
 import { chainIdAtom, currentAccountAtom } from "app/atoms";
-import { sync } from "core/client";
+import { useSync } from "app/hooks";
 
 const PreloadUnlocked: FC = ({ children }) => {
   const [chainId, currentAccount] = useAtomValue(
     waitForAll([chainIdAtom, currentAccountAtom])
   );
 
-  const windowFocused = useWindowFocus();
-
-  useEffect(() => {
-    let t: any;
-
-    const syncAndDefer = () => {
-      sync(chainId, currentAccount.address);
-
-      t = setTimeout(syncAndDefer, 1_500);
-    };
-
-    if (windowFocused) {
-      t = setTimeout(syncAndDefer);
-    }
-
-    return () => clearTimeout(t);
-  }, [chainId, currentAccount.address, windowFocused]);
+  useSync(chainId, currentAccount.address);
 
   return <>{children}</>;
 };

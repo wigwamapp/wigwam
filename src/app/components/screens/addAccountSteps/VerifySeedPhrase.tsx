@@ -5,12 +5,12 @@ import { Field, Form } from "react-final-form";
 import { fromProtectedString } from "lib/crypto-utils";
 
 import {
-  AddHDAccountParams,
   AccountSource,
+  AddHDAccountParams,
   SeedPharse,
   WalletStatus,
 } from "core/types";
-import { addSeedPhrase } from "core/client";
+import { getSeedPhraseHDNode } from "core/common";
 import {
   composeValidators,
   required,
@@ -21,6 +21,7 @@ import {
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
 import { walletStatusAtom } from "app/atoms";
+import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import Input from "app/components/elements/Input";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -31,6 +32,7 @@ const WORDS_TO_FILL = 6;
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const { alert } = useDialog();
+  const { getNextAccountName } = useNextAccountName();
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
 
@@ -58,27 +60,52 @@ const VerifySeedPhrase = memo(() => {
         try {
           if (!seedPhrase) return;
 
-          const addAccountsParams: AddHDAccountParams[] = [
-            {
-              source: AccountSource.SeedPhrase,
-              name: "{{wallet}} 1",
-              derivationPath: ethers.utils.defaultPath,
-            },
-          ];
-
-          Object.assign(stateRef.current, { addAccountsParams });
-
           if (initialSetup) {
+            const addAccountsParams: AddHDAccountParams[] = [
+              {
+                source: AccountSource.SeedPhrase,
+                name: getNextAccountName(),
+                derivationPath: ethers.utils.defaultPath,
+              },
+            ];
+
+            Object.assign(stateRef.current, { addAccountsParams });
+
             navigateToStep(AddAccountStep.SetupPassword);
           } else {
-            await addSeedPhrase(seedPhrase);
+            const derivationPath = ethers.utils.defaultPath;
+            const importAddresses = [
+              {
+                // Base
+                source: AccountSource.SeedPhrase,
+                name: getNextAccountName(),
+                derivationPath,
+                // Misc
+                address:
+                  getSeedPhraseHDNode(seedPhrase).derivePath(derivationPath)
+                    .address,
+                index: 0,
+                isDisabled: true,
+                isDefaultChecked: true,
+              },
+            ];
+
+            Object.assign(stateRef.current, { importAddresses });
+
             navigateToStep(AddAccountStep.VerifyToAdd);
           }
         } catch (err: any) {
           alert(err?.message);
         }
       }),
-    [seedPhrase, stateRef, initialSetup, navigateToStep, alert]
+    [
+      seedPhrase,
+      initialSetup,
+      stateRef,
+      navigateToStep,
+      getNextAccountName,
+      alert,
+    ]
   );
 
   if (!seedPhrase) {

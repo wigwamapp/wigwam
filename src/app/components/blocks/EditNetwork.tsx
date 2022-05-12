@@ -18,7 +18,7 @@ import {
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import Input from "../elements/Input";
-import NewButton from "../elements/NewButton";
+import Button from "../elements/Button";
 import NumberInput from "../elements/NumberInput";
 import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -56,9 +56,6 @@ const EditNetwork = memo<EditNetworkProps>(
           try {
             const isChangedChainId =
               initialChainId && chainId !== initialChainId;
-            if (isChangedChainId) {
-              await Repo.networks.delete(Number(initialChainId));
-            }
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
             await Repo.networks[repoMethod]({
@@ -75,6 +72,9 @@ const EditNetwork = memo<EditNetworkProps>(
               explorerUrls: [blockExplorer],
               position: 0,
             });
+            if (isChangedChainId) {
+              await Repo.networks.delete(Number(initialChainId));
+            }
 
             if (isNew && onActionFinished) {
               onActionFinished();
@@ -271,28 +271,21 @@ const EditNetwork = memo<EditNetworkProps>(
                     )}
                   </Field>
                   <div className="flex mt-6">
-                    <NewButton
-                      type="button"
+                    <Button
                       theme="secondary"
                       onClick={onCancelHandler}
                       className="!py-2 w-full"
                     >
                       Cancel
-                    </NewButton>
+                    </Button>
 
-                    <NewButton
+                    <Button
                       type="submit"
                       className="!py-2 ml-4 w-full"
                       loading={submitting}
                     >
-                      {submitting
-                        ? isNew
-                          ? "Adding..."
-                          : "Saving..."
-                        : isNew
-                        ? "Add"
-                        : "Save"}
-                    </NewButton>
+                      {isNew ? "Add" : "Save"}
+                    </Button>
                   </div>
                 </div>
               </form>
@@ -318,8 +311,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
       <LongTextField
         ref={ref}
         actions={
-          <NewButton
-            type="button"
+          <Button
             theme="tertiary"
             onClick={paste}
             className={classNames(
@@ -337,7 +329,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               <PasteIcon className="mr-1" />
             )}
             {pasted ? "Pasted" : "Paste"}
-          </NewButton>
+          </Button>
         }
         {...rest}
       />

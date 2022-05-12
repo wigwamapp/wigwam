@@ -22,7 +22,7 @@ import { useNativeCurrency, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
@@ -171,14 +171,14 @@ const Asset: FC = () => {
           <div className="mt-6 flex items-start">
             <TxCheck currentToken={currentToken} values={values} />
           </div>
-          <NewButton
+          <Button
             type="submit"
             className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
             loading={submitting}
           >
             <SendIcon className="mr-2" />
             Transfer
-          </NewButton>
+          </Button>
         </form>
       )}
     />

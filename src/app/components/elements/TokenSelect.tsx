@@ -89,7 +89,9 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
   const preparedCurrentToken = useMemo(
     () =>
-      currentToken ? prepareToken(currentToken as AccountAsset, "large") : null,
+      currentToken
+        ? prepareToken(currentToken as AccountAsset, "large")
+        : undefined,
     [currentToken]
   );
 
@@ -101,7 +103,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
 
-  return preparedCurrentToken ? (
+  return (
     <Select
       open={opened}
       onOpenChange={setOpened}
@@ -128,12 +130,10 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
           tab.
         </>
       }
-      currentItemClassName={classNames("!p-3")}
+      currentItemClassName="h-16 !p-3"
       contentClassName="w-[23.25rem] flex flex-col"
       itemClassName="group"
     />
-  ) : (
-    <></>
   );
 };
 

@@ -13,6 +13,7 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
+import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
@@ -54,8 +55,8 @@ const Popup: FC = () => (
     <PreloadUnlocked>
       <NetworkSelect
         className="max-w-auto"
-        currentItemClassName="pr-3 pl-3.5 !py-1.5"
-        currentItemIconClassName="!w-8 !h-8 !mr-3.5"
+        currentItemClassName="!h-11 pr-3 pl-3 !py-1.5"
+        currentItemIconClassName="!w-8 !h-8 !mr-3"
         contentClassName="w-[22.25rem]"
       />
       <AccountSelect className="mt-2" />
@@ -389,6 +390,7 @@ const AssetCard = memo(
                   copiable
                   className={"text-sm font-bold leading-5 ml-2"}
                   threeDots={false}
+                  isDecimalsMinified
                 />
               )}
             </span>
@@ -423,7 +425,7 @@ const AssetCard = memo(
                   />
 
                   <span className="text-xs leading-4">
-                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
                   </span>
                 </span>
               )}

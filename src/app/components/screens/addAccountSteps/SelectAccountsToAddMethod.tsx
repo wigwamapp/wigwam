@@ -3,6 +3,8 @@ import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
+import { useMaybeAtomValue } from "lib/atom-utils";
+import { toProtectedString } from "lib/crypto-utils";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { AccountSource, SeedPharse, WalletStatus } from "core/types";
@@ -14,8 +16,13 @@ import {
 import { ClientProvider } from "core/client";
 
 import { withHumanDelay } from "app/utils";
-import { walletStatusAtom } from "app/atoms";
+import {
+  allAccountsAtom,
+  hasSeedPhraseAtom,
+  walletStatusAtom,
+} from "app/atoms";
 import { AddAccountStep } from "app/nav";
+import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
 import SecondaryModal, {
@@ -56,17 +63,16 @@ const methodsExisting: MethodsProps = [
 
 const SelectAccountsToAddMethod: FC = () => {
   const { navigateToStep, stateRef } = useSteps();
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
   const { waitLoading } = useDialog();
 
   const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
 
-  const isInitial = walletStatus === WalletStatus.Welcome;
   const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
 
   const methods = useMemo(
-    () => (isInitial ? methodsInitial : methodsExisting),
-    [isInitial]
+    () => (!hasSeedPhrase || isHardDevice ? methodsInitial : methodsExisting),
+    [isHardDevice, hasSeedPhrase]
   );
 
   const transportRef = useRef<Transport>();
@@ -145,7 +151,7 @@ const SelectAccountsToAddMethod: FC = () => {
   const handleContinue = useCallback(
     async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
-        isInitial ? "initial" : "existing"
+        !hasSeedPhrase || isHardDevice ? "initial" : "existing"
       }-${method}`;
       stateRef.current.derivationPath = derivationPath;
       stateRef.current.importAddresses = null;
@@ -169,7 +175,7 @@ const SelectAccountsToAddMethod: FC = () => {
         });
 
         if (answer) {
-          if (isInitial && method === "auto") {
+          if (method === "auto") {
             setOpenedLoadingModal(true);
             return;
           }
@@ -181,7 +187,7 @@ const SelectAccountsToAddMethod: FC = () => {
         return;
       }
 
-      if (isInitial && method === "auto") {
+      if (!hasSeedPhrase && method === "auto") {
         setOpenedLoadingModal(true);
         return;
       }
@@ -191,7 +197,7 @@ const SelectAccountsToAddMethod: FC = () => {
     [
       handleConnect,
       isHardDevice,
-      isInitial,
+      hasSeedPhrase,
       navigateToStep,
       stateRef,
       waitLoading,
@@ -219,6 +225,10 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const { alert } = useDialog();
   const [loadingProgress, setLoadingProgress] = useState(0);
   const isUnmountedRef = useRef(false);
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+  const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const { getNextAccountName } = useNextAccountName();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
   const extendedKey: string | undefined = stateRef.current.extendedKey;
@@ -237,6 +247,45 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
     return null;
   }, [derivationPath, extendedKey, seedPhrase]);
+
+  const findFirstUnusedAccount = useCallback(
+    (key: string, offset = 0, limit = 9) => {
+      const newAccounts = generatePreviewHDNodes(key, offset, limit);
+
+      if (!importedAccounts || importedAccounts.length <= 0) {
+        return {
+          source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
+          address: newAccounts[0].address,
+          index: newAccounts[0].index.toString(),
+          publicKey: toProtectedString(newAccounts[0].publicKey),
+          isDisabled: true,
+          isDefaultChecked: true,
+        };
+      }
+
+      const filteredAccounts = newAccounts.filter(
+        ({ address }) =>
+          !importedAccounts.some(
+            ({ address: imported }) => imported === address
+          )
+      );
+
+      if (filteredAccounts.length <= 0) {
+        return null;
+      }
+
+      return {
+        source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
+        address: filteredAccounts[0].address,
+        name: getNextAccountName(),
+        index: filteredAccounts[0].index.toString(),
+        isDisabled: true,
+        isDefaultChecked: true,
+        publicKey: toProtectedString(filteredAccounts[0].publicKey),
+      };
+    },
+    [extendedKey, getNextAccountName, importedAccounts]
+  );
 
   const loadActiveWallets = useCallback(async () => {
     if (!neuterExtendedKey) {
@@ -264,10 +313,15 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
             if (
               !resultAddresses.some(
                 ({ address: extAdd }) => extAdd === wallet.address
+              ) &&
+              !importedAccounts?.some(
+                ({ address: imported }) => imported === wallet.address
               )
             ) {
               resultAddresses.push({
-                source: AccountSource.SeedPhrase,
+                source: extendedKey
+                  ? AccountSource.Ledger
+                  : AccountSource.SeedPhrase,
                 address: wallet.address,
                 index: wallet.index,
                 isDisabled: true,
@@ -285,18 +339,22 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
       return resultAddresses;
     }
 
-    const newAddress = wallets[0];
+    let offset = 0;
+    let limit = 9;
+    let unusedAccount = null;
+    while (unusedAccount === null) {
+      unusedAccount = findFirstUnusedAccount(neuterExtendedKey, offset, limit);
+      offset = limit;
+      limit += 9;
+    }
 
-    return [
-      {
-        source: AccountSource.SeedPhrase,
-        address: newAddress.address,
-        index: newAddress.index,
-        isDisabled: true,
-        isDefaultChecked: true,
-      },
-    ];
-  }, [neuterExtendedKey]);
+    return [unusedAccount];
+  }, [
+    extendedKey,
+    findFirstUnusedAccount,
+    importedAccounts,
+    neuterExtendedKey,
+  ]);
 
   const logicProcess = useCallback(async () => {
     try {

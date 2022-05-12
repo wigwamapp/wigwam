@@ -53,6 +53,7 @@ const Profiles: FC = () => {
             return (
               <button
                 key={p.id}
+                type="button"
                 className={classNames(
                   "py-6 px-1.5 max-h-[11.75rem] w-[9.625rem] mb-2",
                   "rounded-[.625rem]",

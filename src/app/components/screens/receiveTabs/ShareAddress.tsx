@@ -8,7 +8,7 @@ import { currentAccountAtom } from "app/atoms";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 
 const ShareAddress: FC = () => {
   const { address } = useAtomValue(currentAccountAtom);
@@ -16,7 +16,7 @@ const ShareAddress: FC = () => {
 
   return (
     <div className="flex flex-col max-w-[23.25rem]">
-      <AddressField defaultValue={address} label="Wallet address" readOnly />
+      <AddressField value={address} label="Wallet address" readOnly />
       <div className="mt-6 flex">
         <div
           className={classNames(
@@ -42,7 +42,7 @@ const ShareAddress: FC = () => {
             This address can be used to receive funds. Share it with someone or
             just use it for withdrawal on exchanges.
           </p>
-          <NewButton
+          <Button
             theme="tertiary"
             className={classNames(
               "text-sm text-brand-light !font-normal",
@@ -59,7 +59,7 @@ const ShareAddress: FC = () => {
               <CopyIcon className="mr-1" />
             )}
             {copied ? "Media copied" : "Copy Media"}
-          </NewButton>
+          </Button>
         </div>
       </div>
     </div>

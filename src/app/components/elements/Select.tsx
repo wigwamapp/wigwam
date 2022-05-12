@@ -26,7 +26,7 @@ type ItemProps<T, U> = {
 
 type SelectProps<T, U> = {
   items: ItemProps<T, U>[];
-  currentItem: ItemProps<T, U>;
+  currentItem?: ItemProps<T, U>;
   setItem: (itemKey: ItemProps<T, U>) => void;
   label?: string;
   searchValue?: string | null;
@@ -94,9 +94,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
   const filteredItems = useMemo(
     () =>
       items.filter((item) =>
-        showSelected ? item.key : item.key !== currentItem.key
+        showSelected ? item.key : item.key !== currentItem?.key
       ),
-    [currentItem.key, items, showSelected]
+    [currentItem?.key, items, showSelected]
   );
 
   const handleOpenChange = useCallback(
@@ -130,6 +130,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
         {...rest}
       >
         <DropdownMenu.Trigger
+          disabled={!currentItem}
           className={classNames(
             "flex items-center",
             "w-full",
@@ -137,7 +138,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
             "text-sm font-bold",
             "bg-brand-main/5",
             "rounded-[.625rem]",
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            currentItem &&
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
               "bg-brand-main/10": opened,
             },
@@ -145,32 +147,36 @@ function Select<T extends string | ReactElement, U extends string | number>({
             currentItemClassName
           )}
         >
-          {currentItem.icon && (
-            <img
-              src={currentItem.icon}
-              alt={
-                typeof currentItem.value === "string"
-                  ? currentItem.value
-                  : "Icon"
-              }
-              className={classNames("w-7 mr-2", currentItemIconClassName)}
-            />
+          {currentItem && (
+            <>
+              {currentItem.icon && (
+                <img
+                  src={currentItem.icon}
+                  alt={
+                    typeof currentItem.value === "string"
+                      ? currentItem.value
+                      : "Icon"
+                  }
+                  className={classNames("w-7 mr-2", currentItemIconClassName)}
+                />
+              )}
+              {typeof currentItem.value === "string" ? (
+                <span className="min-w-0 truncate">{currentItem.value}</span>
+              ) : (
+                currentItem.value
+              )}
+              <ChevronDownIcon
+                className={classNames(
+                  "w-6 h-auto min-w-[1.5rem]",
+                  "ml-auto",
+                  "transition-transform",
+                  {
+                    "rotate-180": opened,
+                  }
+                )}
+              />
+            </>
           )}
-          {typeof currentItem.value === "string" ? (
-            <span className="min-w-0 truncate">{currentItem.value}</span>
-          ) : (
-            currentItem.value
-          )}
-          <ChevronDownIcon
-            className={classNames(
-              "w-6 h-auto min-w-[1.5rem]",
-              "ml-auto",
-              "transition-transform",
-              {
-                "rotate-180": opened,
-              }
-            )}
-          />
         </DropdownMenu.Trigger>
         <OverflowProvider>
           {(ref) => (
@@ -239,7 +245,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "px-3",
                           showSelected &&
                             showSelectedIcon &&
-                            item.key === currentItem.key
+                            item.key === currentItem?.key
                             ? "py-1.5"
                             : "py-2",
                           // showSelected &&
@@ -275,7 +281,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               className={"w-6 h-6 mr-3"}
                             />
                           )}
-                          {typeof currentItem.value === "string" ? (
+                          {typeof item.value === "string" ? (
                             <span className="min-w-0 truncate">
                               {item.value}
                             </span>
@@ -284,7 +290,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           )}
                           {showSelected &&
                             showSelectedIcon &&
-                            item.key === currentItem.key && (
+                            item.key === currentItem?.key && (
                               <SelectedIcon className="w-6 h-auto ml-auto" />
                             )}
                         </button>

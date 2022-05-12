@@ -15,7 +15,7 @@ import IconedButton from "app/components/elements/IconedButton";
 import LongTextField, {
   LongTextFieldProps,
 } from "app/components/elements/LongTextField";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import Input, { InputProps } from "app/components/elements/Input";
 import CanvasTextField, {
   CanvasTextFieldProps,
@@ -87,8 +87,8 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         confirm({
           title: "Download Secret Phrase",
           content: `
-        WARNING: Never disclose your Secret Recovery Phrase. Anyone with this phrase can take your Ether forever.
-        Download this Secret Recovery Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
+        WARNING: Never disclose your Secret Phrase. Anyone with this phrase can take your funds forever.
+        Download this Secret Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
         }).then((answer) => {
           if (answer) {
             const name = ethers.utils.base58.encode(getRandomBytes(10));
@@ -130,8 +130,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
     );
 
     const copyButton = (
-      <NewButton
-        type="button"
+      <Button
         theme="tertiary"
         onClick={(evt: any) => {
           evt.preventDefault();
@@ -156,7 +155,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           <CopyIcon className="mr-1" />
         )}
         {copied ? "Copied" : "Copy"}
-      </NewButton>
+      </Button>
     );
 
     const actions = isShown ? (
@@ -230,8 +229,7 @@ const ImportSecretField = forwardRef<
   );
 
   const actions = (
-    <NewButton
-      type="button"
+    <Button
       theme="tertiary"
       onClick={paste}
       className={classNames(
@@ -248,7 +246,7 @@ const ImportSecretField = forwardRef<
         <PasteIcon className="mr-1" />
       )}
       {pasted ? "Pasted" : "Paste"}
-    </NewButton>
+    </Button>
   );
 
   return !isShown ? (

@@ -50,7 +50,7 @@ import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import NewButton from "../elements/NewButton";
+import Button from "../elements/Button";
 import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
@@ -429,6 +429,7 @@ const AssetCard = memo(
                   amount={balanceUSD}
                   className={"text-base font-bold leading-4 ml-2"}
                   threeDots={false}
+                  isDecimalsMinified
                 />
               )}
             </span>
@@ -468,7 +469,7 @@ const AssetCard = memo(
                   />
 
                   <span className="text-xs leading-4">
-                    {+priceUSDChange > 0 ? priceUSDChange : -priceUSDChange}%
+                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
                   </span>
                 </span>
               )}
@@ -548,26 +549,27 @@ const AssetInfo: FC = () => {
               {name}
             </h2>
             <TippySingletonProvider>
-              {currentNetwork?.explorerUrls?.[0] && (
-                <IconedButton
-                  aria-label="View asset in Explorer"
-                  Icon={WalletExplorerIcon}
-                  className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
-                  iconClassName="!w-[1.125rem]"
-                  href={`${currentNetwork.explorerUrls[0]}/address/${
-                    status === TokenStatus.Native ? name.toLowerCase() : address
-                  }`}
-                />
-              )}
-              {coinGeckoId && (
-                <IconedButton
-                  aria-label="View asset in CoinGecko"
-                  Icon={CoinGeckoIcon}
-                  className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-                  iconClassName="!w-[1.125rem]"
-                  href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
-                />
-              )}
+              <div className="ml-auto flex items-center">
+                {currentNetwork?.explorerUrls?.[0] &&
+                  status !== TokenStatus.Native && (
+                    <IconedButton
+                      aria-label="View asset in Explorer"
+                      Icon={WalletExplorerIcon}
+                      className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                      iconClassName="!w-[1.125rem]"
+                      href={`${currentNetwork.explorerUrls[0]}/address/${address}`}
+                    />
+                  )}
+                {coinGeckoId && (
+                  <IconedButton
+                    aria-label="View asset in CoinGecko"
+                    Icon={CoinGeckoIcon}
+                    className="!w-6 !h-6 min-w-[1.5rem]"
+                    iconClassName="!w-[1.125rem]"
+                    href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                  />
+                )}
+              </div>
             </TippySingletonProvider>
           </div>
           <div className="flex flex-col">
@@ -602,8 +604,7 @@ const AssetInfo: FC = () => {
             <PriceChange
               priceChange={new BigNumber(priceUSDChange)
                 .times(balanceUSD)
-                .div(100)
-                .toFixed(2)}
+                .div(100)}
             />
           )}
         </div>
@@ -618,7 +619,7 @@ const AssetInfo: FC = () => {
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-2">
-        <NewButton
+        <Button
           to={{ page: Page.Transfer }}
           merge={["token"]}
           theme="secondary"
@@ -626,15 +627,15 @@ const AssetInfo: FC = () => {
         >
           <SendIcon className="w-6 h-auto mr-2" />
           Transfer
-        </NewButton>
-        <NewButton theme="secondary" className="grow !py-2">
+        </Button>
+        <Button theme="secondary" className="grow !py-2">
           <SwapIcon className="w-6 h-auto mr-2" />
           Swap
-        </NewButton>
-        <NewButton theme="secondary" className="grow !py-2">
+        </Button>
+        <Button theme="secondary" className="grow !py-2">
           <ActivityIcon className="w-6 h-auto mr-2" />
           Activity
-        </NewButton>
+        </Button>
       </div>
 
       {status !== TokenStatus.Native && (
@@ -678,7 +679,7 @@ const Tag: FC<TagProps> = ({ standard }) =>
   ) : null;
 
 type PriceChangeProps = {
-  priceChange: string;
+  priceChange: BigNumber.Value;
   isPercent?: boolean;
   className?: string;
 };
@@ -695,6 +696,9 @@ const PriceChange: FC<PriceChangeProps> = ({
   }
 
   const isPositive = priceChangeNumber > 0;
+  const value = new BigNumber(priceChange).abs().toFixed(2);
+
+  if (+value === 0) return <></>;
 
   return (
     <span
@@ -721,13 +725,13 @@ const PriceChange: FC<PriceChangeProps> = ({
               )}
             />
           }
-          amount={Math.abs(priceChangeNumber)}
+          amount={value}
           className="inline-flex items-center"
         />
       ) : (
         <FiatAmount
           prefix={isPositive ? "+" : "-"}
-          amount={Math.abs(priceChangeNumber)}
+          amount={value}
           copiable
           className="text-lg font-semibold"
         />

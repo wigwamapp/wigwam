@@ -221,15 +221,6 @@ export class Vault {
     );
   }
 
-  async addSeedPhrase(seedPhrase: SeedPharse) {
-    return withError(t("failedToAddSeedPhrase"), async () => {
-      validateSeedPhrase(seedPhrase);
-      this.addSeedPhraseForce(seedPhrase);
-
-      await this.saveData();
-    });
-  }
-
   getNeuterExtendedKey(derivationPath: string) {
     return withError(t("failedToFetchPublicKey"), () => {
       validateDerivationPath(derivationPath);
@@ -257,9 +248,21 @@ export class Vault {
     );
   }
 
-  async addAccounts(accountParams: AddAccountParams[]) {
+  async addAccounts(
+    accountParams: AddAccountParams[],
+    seedPhrase?: SeedPharse
+  ) {
     return withError(t("failedToAddWallets"), async () => {
+      if (seedPhrase) {
+        validateSeedPhrase(seedPhrase);
+      }
+
       accountParams.forEach(validateAddAccountParams);
+
+      if (seedPhrase) {
+        this.addSeedPhraseForce(seedPhrase);
+      }
+
       this.addAccountsForce(accountParams);
 
       await this.saveData();

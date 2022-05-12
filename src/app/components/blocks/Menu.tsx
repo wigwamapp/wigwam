@@ -2,7 +2,7 @@ import { FC } from "react";
 
 import { useIsSyncing } from "app/hooks";
 import { Page, SettingTab } from "app/nav";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
@@ -21,14 +21,14 @@ const Menu: FC = () => {
       )}
 
       <div className="ml-auto flex items-center">
-        <NewButton
+        <Button
           to={{ page: Page.Settings, setting: SettingTab.General }}
           theme="tertiary"
           className="!min-w-0 w-[8.5rem]"
         >
           <ControlIcon className="w-6 h-auto -ml-0.5 mr-2" />
           Control
-        </NewButton>
+        </Button>
         <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
         <LockProfileButton />
       </div>

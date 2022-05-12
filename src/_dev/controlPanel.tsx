@@ -3,8 +3,10 @@ import classNames from "clsx";
 import { render } from "react-dom";
 import { ethers } from "ethers";
 import { ERC20__factory } from "abi-types";
+import { getRandomName } from "lib/random-name";
 
 import { getClientProvider } from "core/client";
+import * as Repo from "core/repo";
 import useForceUpdate from "use-force-update";
 
 async function sendPolygonTokens() {
@@ -43,10 +45,22 @@ async function sendBscTokens() {
   console.info({ txResult });
 }
 
+async function generateRandomContacts() {
+  for (let i = 0; i < 99; i++) {
+    const name = getRandomName();
+    const address = `0x29D7d1dd5B6f9C864d9db560D72a247c178aE8${
+      i > 10 ? i : `0${i}`
+    }`;
+    const addedAt = new Date().getTime();
+    await Repo.contacts.add({ name, address, addedAt });
+  }
+}
+
 const ControlPanel: FC = () => {
   const actions: Record<string, () => Promise<void>> = {
     sendPolygonTokens,
     sendBscTokens,
+    generateRandomContacts,
   };
 
   return (

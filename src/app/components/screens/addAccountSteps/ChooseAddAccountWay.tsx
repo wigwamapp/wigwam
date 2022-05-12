@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useMemo } from "react";
+import { FC, memo, useCallback, useEffect, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
@@ -30,6 +30,10 @@ const ChooseAddAccountWay = memo(() => {
     () => getWays(hasSeedPhrase, stepsCtx),
     [hasSeedPhrase, stepsCtx]
   );
+
+  useEffect(() => {
+    stepsCtx.stateRef.current = {};
+  }, [stepsCtx.stateRef]);
 
   return (
     <>
@@ -254,6 +258,7 @@ const TileSimple: FC<TileSimpleProps> = ({
   className,
 }) => (
   <button
+    type="button"
     className={classNames(
       "relative",
       "flex flex-col items-center",

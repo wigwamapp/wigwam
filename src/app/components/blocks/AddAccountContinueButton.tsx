@@ -1,7 +1,7 @@
 import { FC } from "react";
 import classNames from "clsx";
 
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 
 type AddAccountContinueButtonProps = {
   onContinue?: () => void;
@@ -26,14 +26,14 @@ const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
       "before:bg-brand-main/[.07]"
     )}
   >
-    <NewButton
+    <Button
       type={onContinue ? "button" : "submit"}
       className="!min-w-[14rem]"
       onClick={onContinue}
       loading={loading}
     >
       Continue
-    </NewButton>
+    </Button>
   </div>
 );
 

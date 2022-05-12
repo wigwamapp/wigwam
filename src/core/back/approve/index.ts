@@ -8,6 +8,7 @@ import { $accounts, $approvals, approvalResolved } from "../state";
 import { sendRpc } from "../rpc";
 import { ethers } from "ethers";
 import { dequal } from "dequal/lite";
+import { saveNonce } from "core/common/nonce";
 
 const { serializeTransaction, parseTransaction, keccak256, hexValue } =
   ethers.utils;
@@ -49,6 +50,8 @@ export async function processApprove(
           ]);
 
           if ("result" in rpcRes) {
+            await saveNonce(chainId, accountAddress, tx.nonce);
+
             const txHash = rpcRes.result;
 
             rpcReply({ result: txHash });

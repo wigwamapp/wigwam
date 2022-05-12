@@ -10,7 +10,7 @@ import { getPosition, goBack } from "lib/history";
 
 import { Page } from "app/nav";
 import { pageAtom } from "app/atoms";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
 
 type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
@@ -45,7 +45,7 @@ const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
   );
 
   return canBack ? (
-    <NewButton
+    <Button
       theme="clean"
       onClick={handleClick}
       className={classNames("group", className)}
@@ -59,7 +59,7 @@ const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
         )}
       />
       Back
-    </NewButton>
+    </Button>
   ) : null;
 });
 

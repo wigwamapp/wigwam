@@ -2,7 +2,7 @@ import { FC } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
@@ -42,7 +42,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
       {header && (
         <header className="flex items-stretch relative">
           {isWelcome ? (
-            <NewButton
+            <Button
               theme="clean"
               to={{ page: "profiles" }}
               className="absolute bottom-2 left-0 group"
@@ -55,7 +55,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
                 )}
               />
               Profiles
-            </NewButton>
+            </Button>
           ) : (
             <BackButton className="absolute bottom-2 left-0" />
           )}

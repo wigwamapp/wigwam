@@ -5,6 +5,7 @@ import { AsyncDexie } from "./asyncDexie";
 export enum RepoTable {
   Networks = "networks",
   AccountTokens = "account_tokens",
+  Contacts = "contacts",
 }
 
 export const db = new AsyncDexie(underProfile("main"));
@@ -21,4 +22,5 @@ db.version(1).stores({
     "[chainId+tokenType+accountAddress+balanceUSD]",
     "[chainId+tokenType+accountAddress+status+balanceUSD]",
   ].join(),
+  [RepoTable.Contacts]: "&address,name,addedAt",
 });

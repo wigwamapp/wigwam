@@ -13,7 +13,7 @@ import {
   walletStatusAtom,
 } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
-import NewButton from "app/components/elements/NewButton";
+import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AddAccountSteps from "app/components/blocks/AddAccountSteps";
@@ -97,7 +97,7 @@ const AddAccountModal = memo(() => {
                 )}
 
                 <Dialog.Close className="absolute top-4 right-4" asChild>
-                  <NewButton theme="clean">Cancel</NewButton>
+                  <Button theme="clean">Cancel</Button>
                 </Dialog.Close>
 
                 {accModalOpened && <AddAccountSteps />}

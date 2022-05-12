@@ -98,12 +98,16 @@ export async function getAccounts() {
   return res.accounts;
 }
 
-export async function addAccounts(accountsParams: AddAccountParams[]) {
+export async function addAccounts(
+  accountsParams: AddAccountParams[],
+  seedPhrase?: SeedPharse
+) {
   const type = MessageType.AddAccounts;
 
   const res = await porter.request({
     type,
     accountsParams,
+    seedPhrase,
   });
   assert(res?.type === type);
 }
@@ -139,16 +143,6 @@ export async function isWalletHasSeedPhrase() {
   assert(res?.type === type);
 
   return res.seedPhraseExists;
-}
-
-export async function addSeedPhrase(seedPhrase: SeedPharse) {
-  const type = MessageType.AddSeedPhrase;
-
-  const res = await porter.request({
-    type,
-    seedPhrase,
-  });
-  assert(res?.type === type);
 }
 
 export async function getSeedPhrase(password: string) {
