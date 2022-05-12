@@ -25,12 +25,12 @@ import { AddAccountStep } from "app/nav";
 import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
+import LargeSpinner from "app/components/elements/LargeSpinner";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 
 import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
-import { Spinner } from "./ChooseAddAccountWay";
 
 const methodsInitial: MethodsProps = [
   {
@@ -165,7 +165,7 @@ const SelectAccountsToAddMethod: FC = () => {
               <span className="mb-5">
                 Please proceed connecting to the ledger.
               </span>
-              {state === "loading" && <Spinner />}
+              {state === "loading" && <LargeSpinner />}
               {state === "connectApp" && "Please connect to Ethereum app"}
             </>
           ),
