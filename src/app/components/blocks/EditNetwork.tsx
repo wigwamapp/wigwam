@@ -8,12 +8,19 @@ import {
 } from "react";
 import classNames from "clsx";
 import { Field, FieldMetaState, Form } from "react-final-form";
+import { FormApi } from "final-form";
+import { useThrottledCallback } from "use-debounce";
 import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
-import { useMaybeAtomValue } from "lib/atom-utils";
+import { storage } from "lib/ext/storage";
 
 import * as Repo from "core/repo";
-import { cleanupNetwork, mergeNetworkUrls, setRpcUrl } from "core/common";
+import {
+  cleanupNetwork,
+  getRpcUrlKey,
+  mergeNetworkUrls,
+  setRpcUrl,
+} from "core/common";
 import { Network } from "core/types";
 
 import {
@@ -26,7 +33,6 @@ import {
   withHumanDelay,
   focusOnErrors,
 } from "app/utils";
-import { getRpcUrlAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
@@ -62,19 +68,8 @@ type EditNetworkProps = {
 const EditNetwork = memo<EditNetworkProps>(
   ({ isNew, network, onCancelHandler, onActionFinished }) => {
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
-    const preferredRpcUrl = useMaybeAtomValue(
-      typeof initialChainId === "number" ? getRpcUrlAtom(initialChainId) : null
-    );
 
     const { alert, confirm } = useDialog();
-
-    const rpcList = useMemo(
-      () =>
-        preferredRpcUrl
-          ? mergeNetworkUrls(network?.rpcUrls, [preferredRpcUrl])
-          : network?.rpcUrls,
-      [preferredRpcUrl, network?.rpcUrls]
-    );
 
     const handleSubmit = useCallback(
       async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
@@ -124,7 +119,10 @@ const EditNetwork = memo<EditNetworkProps>(
             );
 
             if (network) {
-              await setRpcUrl(chainId, rpcUrl);
+              await setRpcUrl(
+                chainId,
+                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null
+              );
             }
 
             if (isChangedChainId) {
@@ -204,7 +202,6 @@ const EditNetwork = memo<EditNetworkProps>(
             decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
-              rpcUrl: preferredRpcUrl ?? network?.rpcUrls[0],
               chainId: network?.chainId,
               currencySymbol: network?.nativeCurrency?.symbol,
               blockExplorer: network?.explorerUrls?.[0],
@@ -245,11 +242,11 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        setValue={(value) => form.change("rpcUrl", value)}
-                        rpcList={rpcList}
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
+                        formApi={form}
                         meta={meta}
+                        network={network}
                         {...input}
                       />
                     )}
@@ -348,16 +345,41 @@ const EditNetwork = memo<EditNetworkProps>(
 export default EditNetwork;
 
 type RPCFieldProps = LongTextFieldProps & {
+  formApi: FormApi<FormValues, Partial<FormValues>>;
   meta: FieldMetaState<any>;
-  rpcList?: string[];
-  setValue: (value: string) => void;
+  network?: Network;
 };
 
 const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
-  ({ rpcList, setValue, meta, ...rest }, ref) => {
+  ({ formApi, meta, network, ...rest }, ref) => {
+    const setValue = useThrottledCallback(
+      (value) => formApi.change("rpcUrl", value),
+      300
+    );
+
     const { paste, pasted } = usePasteFromClipboard(setValue);
     const [opened, setOpened] = useState(false);
     const [activeSuggestion, setActiveSuggestion] = useState<number | null>(0);
+    const [savedRpcUrl, setSavedRpcUrl] = useState<string>();
+
+    const rpcList = useMemo(() => {
+      if (!network) return undefined;
+      if (!savedRpcUrl) return network.rpcUrls;
+
+      return mergeNetworkUrls(network.rpcUrls, [savedRpcUrl]);
+    }, [network, savedRpcUrl]);
+
+    useEffect(() => {
+      if (network) {
+        storage
+          .fetchForce<string>(getRpcUrlKey(network.chainId))
+          .then((saved) => {
+            setValue(saved ?? network.rpcUrls[0]);
+            if (saved) setSavedRpcUrl(saved);
+          })
+          .catch(console.error);
+      }
+    }, [network, setValue, setSavedRpcUrl]);
 
     useEffect(() => {
       if (meta.active) {
