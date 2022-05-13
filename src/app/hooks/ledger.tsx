@@ -26,7 +26,7 @@ export function useLedger() {
   const loadingHandler = useCallback<
     LoadingHandler<LedgerHandler, "loading" | "connectApp">
   >(
-    ({ params: ledgerHandler, onClose }) =>
+    ({ params: ledgerHandler, onClose, setState }) =>
       withHumanDelay(async () => {
         try {
           let closed = false;
@@ -52,24 +52,26 @@ export function useLedger() {
                 })
               );
 
-              // const { name: currentApp } = await getAppInfo(
-              //   transportRef.current
-              // );
-              // if (closed) return false;
-              //
-              // if (currentApp !== "Ethereum") {
-              //   if (currentApp !== "BOLOS") {
-              //     await disconnectFromConnectedApp(transportRef.current);
-              //     await timeout(500);
-              //     if (closed) return false;
-              //   }
-              //
-              //   setState("connectApp");
-              //   await connectToEthereumApp(transportRef.current);
-              //   await timeout(500);
-              //   if (closed) return false;
-              //   setState("loading");
-              // }
+              const { name: currentApp } = await getAppInfo(
+                transportRef.current
+              );
+              if (closed) return false;
+
+              if (currentApp !== "Ethereum") {
+                if (currentApp !== "BOLOS") {
+                  await disconnectFromConnectedApp(transportRef.current);
+                  transportRef.current = await LedgerTransport.create();
+                  await timeout(500);
+                  if (closed) return false;
+                }
+
+                setState("connectApp");
+                await connectToEthereumApp(transportRef.current);
+                transportRef.current = await LedgerTransport.create();
+                await timeout(500);
+                if (closed) return false;
+                setState("loading");
+              }
 
               const ledgerEth = new LedgerEth(transportRef.current);
               await ledgerHandler({ ledgerEth, getExtendedKey }, onClose);
@@ -112,50 +114,50 @@ export function useLedger() {
   );
 }
 
-// const getAppInfo = async (
-//   transport: Transport
-// ): Promise<{
-//   name: string;
-//   version: string;
-//   flags: number | Buffer;
-// }> => {
-//   const r = await transport.send(0xb0, 0x01, 0x00, 0x00);
-//   let i = 0;
-//   const format = r[i++];
-//
-//   if (format !== 1) {
-//     throw new Error("getAppAndVersion: format not supported");
-//   }
-//
-//   const nameLength = r[i++];
-//   const name = r.slice(i, (i += nameLength)).toString("ascii");
-//   const versionLength = r[i++];
-//   const version = r.slice(i, (i += versionLength)).toString("ascii");
-//   const flagLength = r[i++];
-//   const flags = r.slice(i, (i += flagLength));
-//   return {
-//     name,
-//     version,
-//     flags,
-//   };
-// };
-//
-// const connectToEthereumApp = async (transport: Transport): Promise<void> => {
-//   await transport.send(
-//     0xe0,
-//     0xd8,
-//     0x00,
-//     0x00,
-//     Buffer.from("Ethereum", "ascii")
-//   );
-// };
-//
-// const disconnectFromConnectedApp = async (
-//   transport: Transport
-// ): Promise<void> => {
-//   await transport.send(0xb0, 0xa7, 0x00, 0x00);
-// };
-//
-// const timeout = (ms: number) => {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// };
+const getAppInfo = async (
+  transport: Transport
+): Promise<{
+  name: string;
+  version: string;
+  flags: number | Buffer;
+}> => {
+  const r = await transport.send(0xb0, 0x01, 0x00, 0x00);
+  let i = 0;
+  const format = r[i++];
+
+  if (format !== 1) {
+    throw new Error("getAppAndVersion: format not supported");
+  }
+
+  const nameLength = r[i++];
+  const name = r.slice(i, (i += nameLength)).toString("ascii");
+  const versionLength = r[i++];
+  const version = r.slice(i, (i += versionLength)).toString("ascii");
+  const flagLength = r[i++];
+  const flags = r.slice(i, (i += flagLength));
+  return {
+    name,
+    version,
+    flags,
+  };
+};
+
+const connectToEthereumApp = async (transport: Transport): Promise<void> => {
+  await transport.send(
+    0xe0,
+    0xd8,
+    0x00,
+    0x00,
+    Buffer.from("Ethereum", "ascii")
+  );
+};
+
+const disconnectFromConnectedApp = async (
+  transport: Transport
+): Promise<void> => {
+  await transport.send(0xb0, 0xa7, 0x00, 0x00);
+};
+
+const timeout = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
