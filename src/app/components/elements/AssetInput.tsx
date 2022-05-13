@@ -1,14 +1,34 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 
 import NumberInput, { NumberInputProps } from "./NumberInput";
 
 type AssetInputProps = NumberInputProps & {
   assetDecimals?: number;
+  currency?: string;
 };
 
 const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
-  ({ assetDecimals = 18, ...rest }, ref) => {
-    return <NumberInput ref={ref} decimalScale={assetDecimals} {...rest} />;
+  ({ assetDecimals = 18, currency, style, ...rest }, ref) => {
+    const assetInputStyle = useMemo(
+      () =>
+        currency
+          ? {
+              paddingRight: `${(currency.length * 10 + 12 + 16) / 16}rem`,
+            }
+          : undefined,
+      [currency]
+    );
+
+    return (
+      <NumberInput
+        ref={ref}
+        decimalScale={assetDecimals}
+        style={{ ...assetInputStyle, ...style }}
+        actions={currency}
+        actionsClassName="text-sm font-bold pointer-events-none !right-4"
+        {...rest}
+      />
+    );
   }
 );
 

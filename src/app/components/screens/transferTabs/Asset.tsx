@@ -29,6 +29,7 @@ import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
+import InputLabelAction from "app/components/elements/InputLabelAction";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 type FormValues = { amount: string; recipient: string };
@@ -107,18 +108,6 @@ const Asset: FC = () => {
     [currentToken]
   );
 
-  const assetInputStyle = useMemo(
-    () =>
-      currentToken
-        ? {
-            paddingRight: `${
-              (currentToken.symbol.length * 10 + 12 + 16) / 16
-            }rem`,
-          }
-        : undefined,
-    [currentToken]
-  );
-
   return (
     <Form<FormValues>
       onSubmit={handleSubmit}
@@ -159,29 +148,16 @@ const Asset: FC = () => {
                   placeholder="0.00"
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
-                  error={meta.modified && meta.error}
-                  errorMessage={meta.error}
                   labelActions={
-                    <button
-                      type="button"
+                    <InputLabelAction
                       onClick={() => form.change("amount", maxAmount)}
-                      className={classNames(
-                        "py-1 px-3",
-                        "bg-brand-main/10",
-                        "rounded-md",
-                        "text-xs font-bold",
-                        "transition-colors",
-                        "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-                        "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
-                        "active:bg-brand-main/20 active:shadow-none"
-                      )}
                     >
                       MAX
-                    </button>
+                    </InputLabelAction>
                   }
-                  actions={currentToken ? currentToken.symbol : undefined}
-                  actionsClassName="text-sm font-bold pointer-events-none !right-4"
-                  style={assetInputStyle}
+                  currency={currentToken ? currentToken.symbol : undefined}
+                  error={meta.modified && meta.error}
+                  errorMessage={meta.error}
                   {...input}
                 />
               )}
