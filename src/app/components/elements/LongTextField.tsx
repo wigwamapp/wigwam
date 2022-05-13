@@ -87,7 +87,7 @@ const LongTextField = memo(
               error && errorMessage && !readOnly && "max-h-5"
             )}
           >
-            <span className="text-brand-redtext pt-1 pl-4 text-xs">
+            <span className="block text-brand-redtext text-left pt-1 pl-4 text-xs">
               {errorMessage}
             </span>
           </div>

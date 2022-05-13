@@ -16,7 +16,7 @@ const ShareAddress: FC = () => {
 
   return (
     <div className="flex flex-col max-w-[23.25rem]">
-      <AddressField defaultValue={address} label="Wallet address" readOnly />
+      <AddressField value={address} label="Wallet address" readOnly />
       <div className="mt-6 flex">
         <div
           className={classNames(
