@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { FC, Suspense, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
@@ -95,13 +95,15 @@ const Networks: FC = () => {
         </ScrollAreaContainer>
       </div>
       {(selectedNetwork || tab === "new") && (
-        <EditNetwork
-          key={selectedNetwork ? selectedNetwork.chainId : "new"}
-          isNew={tab === "new"}
-          network={selectedNetwork}
-          onCancelHandler={cancelEditing}
-          onActionFinished={handleScrollList}
-        />
+        <Suspense fallback={null}>
+          <EditNetwork
+            key={selectedNetwork ? selectedNetwork.chainId : "new"}
+            isNew={tab === "new"}
+            network={selectedNetwork}
+            onCancelHandler={cancelEditing}
+            onActionFinished={handleScrollList}
+          />
+        </Suspense>
       )}
     </div>
   );

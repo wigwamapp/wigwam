@@ -6,11 +6,12 @@ import {
   atomWithRepoQuery,
   atomWithAutoReset,
 } from "lib/atom-utils";
+import { INITIAL_NETWORK } from "fixtures/networks";
 
 import * as Repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
-import { INITIAL_NETWORK } from "fixtures/networks";
 import { Account } from "core/types";
+import { getRpcUrlKey } from "core/common/network";
 
 import { testNetworksAtom } from "./settings";
 
@@ -48,6 +49,10 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
     return query(() => Repo.networks.get(chainId));
   })
+);
+
+export const getRpcUrlAtom = atomFamily((chainId: number) =>
+  atomWithStorage<string | null>(getRpcUrlKey(chainId), null)
 );
 
 export const allNetworksAtom = atomWithRepoQuery((query, get) => {

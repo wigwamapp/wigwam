@@ -10,8 +10,10 @@ import classNames from "clsx";
 import { Field, FieldMetaState, Form } from "react-final-form";
 import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
+import { useMaybeAtomValue } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
+import { cleanupNetwork, mergeNetworkUrls, setRpcUrl } from "core/common";
 import { Network } from "core/types";
 
 import {
@@ -24,19 +26,22 @@ import {
   withHumanDelay,
   focusOnErrors,
 } from "app/utils";
+import { getRpcUrlAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
-import Input from "../elements/Input";
-import Button from "../elements/Button";
-import NumberInput from "../elements/NumberInput";
-import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import IconedButton from "../elements/IconedButton";
+
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+
+import Input from "../elements/Input";
+import Button from "../elements/Button";
+import NumberInput from "../elements/NumberInput";
+import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import IconedButton from "../elements/IconedButton";
 
 type FormValues = {
   nName: string;
@@ -57,42 +62,73 @@ type EditNetworkProps = {
 const EditNetwork = memo<EditNetworkProps>(
   ({ isNew, network, onCancelHandler, onActionFinished }) => {
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
+    const preferredRpcUrl = useMaybeAtomValue(
+      typeof initialChainId === "number" ? getRpcUrlAtom(initialChainId) : null
+    );
+
     const { alert, confirm } = useDialog();
+
+    const rpcList = useMemo(
+      () =>
+        preferredRpcUrl
+          ? mergeNetworkUrls(network?.rpcUrls, [preferredRpcUrl])
+          : network?.rpcUrls,
+      [preferredRpcUrl, network?.rpcUrls]
+    );
 
     const handleSubmit = useCallback(
       async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
         withHumanDelay(async () => {
+          chainId = Number(chainId);
+
           try {
             const isChangedChainId =
               initialChainId && chainId !== initialChainId;
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
 
-            let restRpcUrls: string[] = [];
-            if (network?.rpcUrls) {
-              if (network.rpcUrls.indexOf(rpcUrl) !== -1) {
-                restRpcUrls = network.rpcUrls.filter((el) => el !== rpcUrl);
-              } else {
-                restRpcUrls = network.rpcUrls;
-              }
+            await Repo.networks[repoMethod](
+              network
+                ? {
+                    ...network,
+                    chainId,
+                    name: nName,
+                    nativeCurrency: {
+                      ...network.nativeCurrency,
+                      symbol: currencySymbol,
+                      name:
+                        network.type === "unknown"
+                          ? currencySymbol
+                          : network.nativeCurrency.name,
+                    },
+                    rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
+                    explorerUrls: mergeNetworkUrls(
+                      [blockExplorer],
+                      network.explorerUrls
+                    ),
+                  }
+                : {
+                    chainId,
+                    type: "unknown",
+                    rpcUrls: [rpcUrl],
+                    chainTag: "",
+                    name: nName,
+                    nativeCurrency: {
+                      name: currencySymbol,
+                      symbol: currencySymbol,
+                      decimals: 18,
+                    },
+                    explorerUrls: [blockExplorer],
+                    position: 0,
+                  }
+            );
+
+            if (network) {
+              await setRpcUrl(chainId, rpcUrl);
             }
 
-            await Repo.networks[repoMethod]({
-              chainId: Number(chainId),
-              type: network?.type ?? "unknown",
-              rpcUrls: [rpcUrl, ...restRpcUrls],
-              chainTag: "",
-              name: nName,
-              nativeCurrency: {
-                name: currencySymbol,
-                symbol: currencySymbol,
-                decimals: 18,
-              },
-              explorerUrls: [blockExplorer],
-              position: 0,
-            });
             if (isChangedChainId) {
-              await Repo.networks.delete(Number(initialChainId));
+              await cleanupNetwork(initialChainId);
             }
 
             if (isNew && onActionFinished) {
@@ -103,15 +139,7 @@ const EditNetwork = memo<EditNetworkProps>(
             alert({ title: "Error!", content: err.message });
           }
         }),
-      [
-        initialChainId,
-        isNew,
-        network?.rpcUrls,
-        network?.type,
-        onActionFinished,
-        onCancelHandler,
-        alert,
-      ]
+      [initialChainId, isNew, network, onActionFinished, onCancelHandler, alert]
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -127,7 +155,7 @@ const EditNetwork = memo<EditNetworkProps>(
       });
 
       if (response) {
-        await Repo.networks.delete(Number(initialChainId));
+        await cleanupNetwork(initialChainId!);
         onActionFinished?.(true);
       }
     }, [confirm, initialChainId, network?.name, onActionFinished]);
@@ -176,7 +204,7 @@ const EditNetwork = memo<EditNetworkProps>(
             decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
-              rpcUrl: network?.rpcUrls[0],
+              rpcUrl: preferredRpcUrl ?? network?.rpcUrls[0],
               chainId: network?.chainId,
               currencySymbol: network?.nativeCurrency?.symbol,
               blockExplorer: network?.explorerUrls?.[0],
@@ -218,7 +246,7 @@ const EditNetwork = memo<EditNetworkProps>(
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
                         setValue={(value) => form.change("rpcUrl", value)}
-                        rpcList={network?.rpcUrls}
+                        rpcList={rpcList}
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
                         meta={meta}
