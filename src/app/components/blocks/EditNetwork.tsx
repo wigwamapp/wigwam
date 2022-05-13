@@ -97,10 +97,9 @@ const EditNetwork = memo<EditNetworkProps>(
                           : network.nativeCurrency.name,
                     },
                     rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
-                    explorerUrls: mergeNetworkUrls(
-                      [blockExplorer],
-                      network.explorerUrls
-                    ),
+                    explorerUrls: blockExplorer
+                      ? mergeNetworkUrls([blockExplorer], network.explorerUrls)
+                      : network.explorerUrls,
                   }
                 : {
                     chainId,
