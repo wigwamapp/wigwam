@@ -291,7 +291,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           {showSelected &&
                             showSelectedIcon &&
                             item.key === currentItem?.key && (
-                              <SelectedIcon className="w-6 h-auto ml-auto" />
+                              <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
                             )}
                         </button>
                       </DropdownMenu.Item>
