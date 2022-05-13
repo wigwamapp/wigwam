@@ -430,10 +430,10 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             e.preventDefault();
           }
           if (e.keyCode === 32 || e.keyCode === 13) {
-            if (activeSuggestion) {
+            if (activeSuggestion !== null) {
               setValue(rpcList[activeSuggestion]);
-              (document.activeElement as any)?.blur();
             }
+            (document.activeElement as any)?.blur();
             e.preventDefault();
           }
         }
@@ -479,7 +479,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
           modal={false}
           onOpenChange={() => undefined}
         >
-          <Popover.Trigger className="w-full">{content}</Popover.Trigger>
+          <Popover.Trigger className="w-full" asChild>
+            {content}
+          </Popover.Trigger>
           <Popover.Content
             onOpenAutoFocus={(e) => {
               e.preventDefault();
@@ -504,6 +506,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             >
               {rpcList.map((item, index) => (
                 <button
+                  type="button"
                   key={item}
                   className={classNames(
                     "w-full mb-1 last:mb-0",
@@ -515,10 +518,13 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                     "text-sm",
                     "outline-none",
                     "transition-colors",
-                    "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
                     activeSuggestion === index && "bg-brand-main/20"
                   )}
                   onPointerDown={() => setValue(item)}
+                  onMouseOver={() =>
+                    setActiveSuggestion(rpcList?.indexOf(item))
+                  }
+                  onFocus={() => setActiveSuggestion(rpcList?.indexOf(item))}
                 >
                   <span className="min-w-0 truncate">{item}</span>
                   {item === rpcList[0] && (
