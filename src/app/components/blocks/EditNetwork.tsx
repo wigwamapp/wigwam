@@ -8,10 +8,19 @@ import {
 } from "react";
 import classNames from "clsx";
 import { Field, FieldMetaState, Form } from "react-final-form";
+import { FormApi } from "final-form";
+import { useThrottledCallback } from "use-debounce";
 import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
+import { storage } from "lib/ext/storage";
 
 import * as Repo from "core/repo";
+import {
+  cleanupNetwork,
+  getRpcUrlKey,
+  mergeNetworkUrls,
+  setRpcUrl,
+} from "core/common";
 import { Network } from "core/types";
 
 import {
@@ -25,18 +34,20 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
-import Input from "../elements/Input";
-import Button from "../elements/Button";
-import NumberInput from "../elements/NumberInput";
-import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import IconedButton from "../elements/IconedButton";
+
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+
+import Input from "../elements/Input";
+import Button from "../elements/Button";
+import NumberInput from "../elements/NumberInput";
+import LongTextField, { LongTextFieldProps } from "../elements/LongTextField";
+import ScrollAreaContainer from "../elements/ScrollAreaContainer";
+import IconedButton from "../elements/IconedButton";
 
 type FormValues = {
   nName: string;
@@ -57,42 +68,64 @@ type EditNetworkProps = {
 const EditNetwork = memo<EditNetworkProps>(
   ({ isNew, network, onCancelHandler, onActionFinished }) => {
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
+
     const { alert, confirm } = useDialog();
 
     const handleSubmit = useCallback(
       async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
         withHumanDelay(async () => {
+          chainId = Number(chainId);
+
           try {
             const isChangedChainId =
               initialChainId && chainId !== initialChainId;
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
 
-            let restRpcUrls: string[] = [];
-            if (network?.rpcUrls) {
-              if (network.rpcUrls.indexOf(rpcUrl) !== -1) {
-                restRpcUrls = network.rpcUrls.filter((el) => el !== rpcUrl);
-              } else {
-                restRpcUrls = network.rpcUrls;
-              }
+            await Repo.networks[repoMethod](
+              network
+                ? {
+                    ...network,
+                    chainId,
+                    name: nName,
+                    nativeCurrency: {
+                      ...network.nativeCurrency,
+                      symbol: currencySymbol,
+                      name:
+                        network.type === "unknown"
+                          ? currencySymbol
+                          : network.nativeCurrency.name,
+                    },
+                    rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
+                    explorerUrls: blockExplorer
+                      ? mergeNetworkUrls([blockExplorer], network.explorerUrls)
+                      : network.explorerUrls,
+                  }
+                : {
+                    chainId,
+                    type: "unknown",
+                    rpcUrls: [rpcUrl],
+                    chainTag: "",
+                    name: nName,
+                    nativeCurrency: {
+                      name: currencySymbol,
+                      symbol: currencySymbol,
+                      decimals: 18,
+                    },
+                    explorerUrls: [blockExplorer],
+                    position: 0,
+                  }
+            );
+
+            if (network) {
+              await setRpcUrl(
+                chainId,
+                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null
+              );
             }
 
-            await Repo.networks[repoMethod]({
-              chainId: Number(chainId),
-              type: network?.type ?? "unknown",
-              rpcUrls: [rpcUrl, ...restRpcUrls],
-              chainTag: "",
-              name: nName,
-              nativeCurrency: {
-                name: currencySymbol,
-                symbol: currencySymbol,
-                decimals: 18,
-              },
-              explorerUrls: [blockExplorer],
-              position: 0,
-            });
             if (isChangedChainId) {
-              await Repo.networks.delete(Number(initialChainId));
+              await cleanupNetwork(initialChainId);
             }
 
             if (isNew && onActionFinished) {
@@ -103,15 +136,7 @@ const EditNetwork = memo<EditNetworkProps>(
             alert({ title: "Error!", content: err.message });
           }
         }),
-      [
-        initialChainId,
-        isNew,
-        network?.rpcUrls,
-        network?.type,
-        onActionFinished,
-        onCancelHandler,
-        alert,
-      ]
+      [initialChainId, isNew, network, onActionFinished, onCancelHandler, alert]
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -127,7 +152,7 @@ const EditNetwork = memo<EditNetworkProps>(
       });
 
       if (response) {
-        await Repo.networks.delete(Number(initialChainId));
+        await cleanupNetwork(initialChainId!);
         onActionFinished?.(true);
       }
     }, [confirm, initialChainId, network?.name, onActionFinished]);
@@ -176,7 +201,6 @@ const EditNetwork = memo<EditNetworkProps>(
             decorators={[focusOnErrors]}
             initialValues={{
               nName: network?.name,
-              rpcUrl: network?.rpcUrls[0],
               chainId: network?.chainId,
               currencySymbol: network?.nativeCurrency?.symbol,
               blockExplorer: network?.explorerUrls?.[0],
@@ -217,11 +241,11 @@ const EditNetwork = memo<EditNetworkProps>(
                         placeholder="Insert rpc url"
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        setValue={(value) => form.change("rpcUrl", value)}
-                        rpcList={network?.rpcUrls}
                         className="mt-4"
                         textareaClassName="!h-[4.5rem]"
+                        formApi={form}
                         meta={meta}
+                        network={network}
                         {...input}
                       />
                     )}
@@ -320,16 +344,41 @@ const EditNetwork = memo<EditNetworkProps>(
 export default EditNetwork;
 
 type RPCFieldProps = LongTextFieldProps & {
+  formApi: FormApi<FormValues, Partial<FormValues>>;
   meta: FieldMetaState<any>;
-  rpcList?: string[];
-  setValue: (value: string) => void;
+  network?: Network;
 };
 
 const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
-  ({ rpcList, setValue, meta, ...rest }, ref) => {
+  ({ formApi, meta, network, ...rest }, ref) => {
+    const setValue = useThrottledCallback(
+      (value) => formApi.change("rpcUrl", value),
+      300
+    );
+
     const { paste, pasted } = usePasteFromClipboard(setValue);
     const [opened, setOpened] = useState(false);
     const [activeSuggestion, setActiveSuggestion] = useState<number | null>(0);
+    const [savedRpcUrl, setSavedRpcUrl] = useState<string>();
+
+    const rpcList = useMemo(() => {
+      if (!network) return undefined;
+      if (!savedRpcUrl) return network.rpcUrls;
+
+      return mergeNetworkUrls(network.rpcUrls, [savedRpcUrl]);
+    }, [network, savedRpcUrl]);
+
+    useEffect(() => {
+      if (network) {
+        storage
+          .fetchForce<string>(getRpcUrlKey(network.chainId))
+          .then((saved) => {
+            setValue(saved ?? network.rpcUrls[0]);
+            if (saved) setSavedRpcUrl(saved);
+          })
+          .catch(console.error);
+      }
+    }, [network, setValue, setSavedRpcUrl]);
 
     useEffect(() => {
       if (meta.active) {
@@ -381,10 +430,10 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             e.preventDefault();
           }
           if (e.keyCode === 32 || e.keyCode === 13) {
-            if (activeSuggestion) {
+            if (activeSuggestion !== null) {
               setValue(rpcList[activeSuggestion]);
-              (document.activeElement as any)?.blur();
             }
+            (document.activeElement as any)?.blur();
             e.preventDefault();
           }
         }
@@ -430,7 +479,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
           modal={false}
           onOpenChange={() => undefined}
         >
-          <Popover.Trigger className="w-full">{content}</Popover.Trigger>
+          <Popover.Trigger className="w-full" asChild>
+            {content}
+          </Popover.Trigger>
           <Popover.Content
             onOpenAutoFocus={(e) => {
               e.preventDefault();
@@ -455,6 +506,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             >
               {rpcList.map((item, index) => (
                 <button
+                  type="button"
                   key={item}
                   className={classNames(
                     "w-full mb-1 last:mb-0",
@@ -466,10 +518,13 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                     "text-sm",
                     "outline-none",
                     "transition-colors",
-                    "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
                     activeSuggestion === index && "bg-brand-main/20"
                   )}
                   onPointerDown={() => setValue(item)}
+                  onMouseOver={() =>
+                    setActiveSuggestion(rpcList?.indexOf(item))
+                  }
+                  onFocus={() => setActiveSuggestion(rpcList?.indexOf(item))}
                 >
                   <span className="min-w-0 truncate">{item}</span>
                   {item === rpcList[0] && (

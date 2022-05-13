@@ -1,4 +1,4 @@
-import { formatRpcUrl } from "core/common";
+import { mergeNetworkUrls } from "core/common";
 import { Network } from "core/types";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
@@ -49,16 +49,8 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
     },
     position,
     // Merge
-    rpcUrls: mergeUrls(saved.rpcUrls, rpcUrls)!,
-    faucetUrls: mergeUrls(saved.faucetUrls, faucetUrls),
-    explorerUrls: mergeUrls(saved.explorerUrls, explorerUrls),
+    rpcUrls: mergeNetworkUrls(saved.rpcUrls, rpcUrls)!,
+    faucetUrls: mergeNetworkUrls(saved.faucetUrls, faucetUrls),
+    explorerUrls: mergeNetworkUrls(saved.explorerUrls, explorerUrls),
   };
-}
-
-function mergeUrls(base?: string[], toMerge?: string[]) {
-  if (base && toMerge) {
-    return Array.from(new Set([...toMerge, ...base].map(formatRpcUrl)));
-  }
-
-  return base ?? toMerge;
 }
