@@ -45,7 +45,12 @@ export function useLedger() {
               await transportRef.current?.close();
               transportRef.current = await LedgerTransport.create();
 
-              onClose(() => transportRef.current?.close());
+              onClose(() =>
+                setTimeout(() => {
+                  transportRef.current?.close();
+                  transportRef.current = undefined;
+                })
+              );
 
               const { name: currentApp } = await getAppInfo(
                 transportRef.current
@@ -55,24 +60,23 @@ export function useLedger() {
               if (currentApp !== "Ethereum") {
                 if (currentApp !== "BOLOS") {
                   await disconnectFromConnectedApp(transportRef.current);
+                  transportRef.current = await LedgerTransport.create();
                   await timeout(500);
                   if (closed) return false;
                 }
 
                 setState("connectApp");
                 await connectToEthereumApp(transportRef.current);
+                transportRef.current = await LedgerTransport.create();
                 await timeout(500);
                 if (closed) return false;
                 setState("loading");
               }
 
               const ledgerEth = new LedgerEth(transportRef.current);
-
               await ledgerHandler({ ledgerEth, getExtendedKey }, onClose);
 
-              if (closed) return false;
-
-              return true;
+              return !closed;
             },
             { retries: 5, maxTimeout: 2_000 }
           );
@@ -87,9 +91,9 @@ export function useLedger() {
     []
   );
 
-  const withLedgerAction = useCallback(
+  return useCallback(
     async (handler: LedgerHandler) => {
-      const answer = await waitLoading({
+      return await waitLoading({
         title: "Loading...",
         headerClassName: "mb-3",
         content: (state: "loading" | "connectApp") => (
@@ -105,13 +109,9 @@ export function useLedger() {
         handlerParams: handler,
         state: "loading",
       });
-
-      return answer;
     },
-    [loadingHandler]
+    [loadingHandler, waitLoading]
   );
-
-  return withLedgerAction;
 }
 
 const getAppInfo = async (
