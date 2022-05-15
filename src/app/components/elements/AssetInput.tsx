@@ -1,48 +1,31 @@
-import { forwardRef } from "react";
-import classNames from "clsx";
+import { forwardRef, useMemo } from "react";
 
 import NumberInput, { NumberInputProps } from "./NumberInput";
 
 type AssetInputProps = NumberInputProps & {
   assetDecimals?: number;
-  withMaxButton?: boolean;
-  handleMaxButtonClick?: () => void;
+  currency?: string;
 };
 
 const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
-  (
-    {
-      assetDecimals = 18,
-      withMaxButton = false,
-      handleMaxButtonClick,
-      ...rest
-    },
-    ref
-  ) => {
+  ({ assetDecimals = 18, currency, style, ...rest }, ref) => {
+    const assetInputStyle = useMemo(
+      () =>
+        currency
+          ? {
+              paddingRight: `${(currency.length * 10 + 12 + 16) / 16}rem`,
+            }
+          : undefined,
+      [currency]
+    );
+
     return (
       <NumberInput
         ref={ref}
         decimalScale={assetDecimals}
-        labelActions={
-          withMaxButton ? (
-            <button
-              type="button"
-              onClick={handleMaxButtonClick}
-              className={classNames(
-                "py-1 px-3",
-                "bg-brand-main/10",
-                "rounded-md",
-                "text-xs font-bold",
-                "transition-colors",
-                "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-                "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
-                "active:bg-brand-main/20 active:shadow-none"
-              )}
-            >
-              MAX
-            </button>
-          ) : undefined
-        }
+        style={{ ...assetInputStyle, ...style }}
+        actions={currency}
+        actionsClassName="text-sm font-bold pointer-events-none !right-4"
         {...rest}
       />
     );
