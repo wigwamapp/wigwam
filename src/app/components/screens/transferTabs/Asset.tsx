@@ -1,8 +1,17 @@
-import { FC, memo, ReactNode, useCallback, useMemo } from "react";
+import {
+  FC,
+  memo,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
+import { useForm, useField } from "react-final-form-hooks";
 import { ethers } from "ethers";
 import { ERC20__factory } from "abi-types";
 
@@ -18,7 +27,7 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useNativeCurrency, useProvider } from "app/hooks";
+import { useNativeCurrency, useProvider, useToken } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -31,8 +40,11 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
 import InputLabelAction from "app/components/elements/InputLabelAction";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+import { suggestFees } from "../../../../core/client";
 
-type FormValues = { amount: string; recipient: string };
+type FormValues = { amount: string; recipient: string; gas: ethers.BigNumber };
+
+// TODO: Replace with final form hooks
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -71,7 +83,7 @@ const Asset: FC = () => {
     [currentAccount.address, provider]
   );
 
-  const handleSubmit = useCallback(
+  const handleFormSubmit = useCallback(
     async ({ recipient, amount }) =>
       withHumanDelay(async () => {
         if (!tokenSlug) {
@@ -108,75 +120,120 @@ const Asset: FC = () => {
     [currentToken]
   );
 
+  const { form, handleSubmit, values, submitting } = useForm<FormValues>({
+    onSubmit: handleFormSubmit,
+    initialValues: {
+      gas: ethers.BigNumber.from(0),
+    },
+  });
+  const recipientInput = useField(
+    "recipient",
+    form,
+    composeValidators(required, validateAddress)
+  );
+  const amountInput = useField(
+    "amount",
+    form,
+    composeValidators(required, maxValue(maxAmount, currentToken?.symbol))
+  );
+
+  useEffect(() => {
+    const unsubscribe = focusOnErrors(form);
+    return () => unsubscribe();
+  }, [form]);
+
+  const estimateGas = useCallback(async () => {
+    if (
+      recipientInput.input.value &&
+      !recipientInput.meta.error &&
+      tokenSlug &&
+      currentToken
+    ) {
+      let gasLimit;
+      if (tokenSlug === NATIVE_TOKEN_SLUG) {
+        gasLimit = await provider.estimateGas({
+          to: recipientInput.input.value,
+          value: ethers.utils.parseEther("1"),
+        });
+      } else {
+        const tokenContract = parseTokenSlug(tokenSlug).address;
+
+        const signer = provider.getUncheckedSigner(currentAccount.address);
+        const contract = ERC20__factory.connect(tokenContract, signer);
+
+        const convertedAmount = ethers.utils.parseUnits(
+          "1",
+          currentToken.decimals
+        );
+
+        gasLimit = await contract.estimateGas.transfer(
+          recipientInput.input.value,
+          convertedAmount
+        );
+      }
+
+      const gasPrice = await suggestFees(provider);
+      if (gasPrice) {
+        form.change("gas", gasPrice.modes.average.max.mul(gasLimit));
+      }
+    }
+  }, [
+    currentAccount.address,
+    currentToken,
+    form,
+    provider,
+    recipientInput.input.value,
+    recipientInput.meta.error,
+    tokenSlug,
+  ]);
+
+  useEffect(() => {
+    estimateGas();
+  }, []);
+
+  console.log("values", values);
+
   return (
-    <Form<FormValues>
-      onSubmit={handleSubmit}
-      decorators={[focusOnErrors]}
-      render={({ form, handleSubmit, values, submitting }) => (
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col max-w-[23.25rem]"
-        >
-          <TokenSelect
-            handleTokenChanged={() => form.change("amount", undefined)}
-          />
-          <Field
-            name="recipient"
-            validate={composeValidators(required, validateAddress)}
-          >
-            {({ input, meta }) => (
-              <AddressField
-                setFromClipboard={(value) => form.change("recipient", value)}
-                error={meta.error && meta.touched}
-                errorMessage={meta.error}
-                className="mt-5"
-                {...input}
-              />
-            )}
-          </Field>
-          <div className="relative mt-5">
-            <Field
-              name="amount"
-              validate={composeValidators(
-                required,
-                maxValue(maxAmount, currentToken?.symbol)
-              )}
-            >
-              {({ input, meta }) => (
-                <AssetInput
-                  label="Amount"
-                  placeholder="0.00"
-                  thousandSeparator={true}
-                  assetDecimals={currentToken?.decimals}
-                  labelActions={
-                    <InputLabelAction
-                      onClick={() => form.change("amount", maxAmount)}
-                    >
-                      MAX
-                    </InputLabelAction>
-                  }
-                  currency={currentToken ? currentToken.symbol : undefined}
-                  error={meta.modified && meta.error}
-                  errorMessage={meta.error}
-                  {...input}
-                />
-              )}
-            </Field>
-          </div>
-          <div className="mt-6 flex items-start">
-            <TxCheck currentToken={currentToken} values={values} />
-          </div>
-          <Button
-            type="submit"
-            className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-            loading={submitting}
-          >
-            <SendIcon className="mr-2" />
-            Transfer
-          </Button>
-        </form>
-      )}
-    />
+    <form onSubmit={handleSubmit} className="flex flex-col max-w-[23.25rem]">
+      <TokenSelect
+        handleTokenChanged={() => form.change("amount", undefined)}
+      />
+      <AddressField
+        setFromClipboard={(value) => form.change("recipient", value)}
+        error={recipientInput.meta.error && recipientInput.meta.touched}
+        errorMessage={recipientInput.meta.error}
+        className="mt-5"
+        {...recipientInput.input}
+      />
+      <div className="relative mt-5">
+        <AssetInput
+          label="Amount"
+          placeholder="0.00"
+          thousandSeparator={true}
+          assetDecimals={currentToken?.decimals}
+          labelActions={
+            <InputLabelAction onClick={() => form.change("amount", maxAmount)}>
+              MAX
+            </InputLabelAction>
+          }
+          currency={currentToken ? currentToken.symbol : undefined}
+          error={amountInput.meta.modified && amountInput.meta.error}
+          errorMessage={amountInput.meta.error}
+          {...amountInput.input}
+        />
+      </div>
+      <div className="mt-6 flex items-start">
+        <TxCheck currentToken={currentToken} values={values} />
+      </div>
+      <Button
+        type="submit"
+        className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
+        loading={submitting}
+      >
+        <SendIcon className="mr-2" />
+        Transfer
+      </Button>
+    </form>
   );
 };
 
@@ -188,7 +245,30 @@ type TxCheckProps = {
 };
 
 const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
-  const nativeCurrency = useNativeCurrency();
+  const provider = useProvider();
+  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
+  const [fee, setFee] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
+
+  // const preparedTx = useMemo(() => {
+  //   // Create pseudo transaction
+  // }, []);
+
+  const estimateFee = useCallback(async () => {
+    try {
+      // const gasPrice = await provider.estimateGas();
+      // OR contract.estimateGas.transfer(recipient, convertedAmount)
+      const fee = await suggestFees(provider);
+      if (fee) {
+        setFee(fee.modes.average.max);
+      }
+    } catch (e) {}
+  }, [provider]);
+
+  useEffect(() => {
+    estimateFee();
+  }, [estimateFee]);
+
+  console.log("gas", +fee);
 
   return (
     <>
@@ -243,13 +323,39 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
           header="Average Fee"
           value={
             <PrettyAmount
-              amount={0.13}
-              currency={nativeCurrency?.symbol}
+              amount={fee.toString()}
+              currency={nativeToken?.symbol}
+              decimals={nativeToken?.decimals}
               copiable
               className="font-semibold"
             />
+            // <PrettyAmount
+            //   amount={0.13}
+            //   currency={nativeCurrency?.symbol}
+            //   copiable
+            //   className="font-semibold"
+            // />
           }
-          inBrackets={<FiatAmount amount={9.55} copiable />}
+          inBrackets={
+            <FiatAmount
+              amount={
+                nativeToken
+                  ? new BigNumber(
+                      fee
+                        .div(
+                          new BigNumber(10)
+                            .pow(nativeToken?.decimals)
+                            .toString()
+                        )
+                        .toString()
+                    )
+                      .multipliedBy(nativeToken?.priceUSD ?? 0)
+                      .toString()
+                  : 0
+              }
+              copiable
+            />
+          }
           className="mb-2"
         />
         <hr className="border-brand-main/[.07]" />
