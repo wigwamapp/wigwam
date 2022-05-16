@@ -1,4 +1,4 @@
-import { TokenStandard } from "core/types";
+import { TokenActivity, TokenStandard } from "core/types";
 
 export const NATIVE_TOKEN_SLUG = createTokenSlug({
   standard: TokenStandard.Native,
@@ -14,6 +14,14 @@ export type ParsedTokenSlug = {
 
 export function createTokenSlug({ standard, address, id }: ParsedTokenSlug) {
   return `${standard}_${address}_${id}`;
+}
+
+export function createERC20TokenSlug(address: string) {
+  return createTokenSlug({
+    standard: TokenStandard.ERC20,
+    address,
+    id: "0",
+  });
 }
 
 export function parseTokenSlug(slug: string) {
@@ -32,6 +40,15 @@ export function createAccountTokenKey({
   tokenSlug: string;
 }) {
   return `${chainId}_${accountAddress}_${tokenSlug}`;
+}
+
+export function createTokenActivityKey({
+  accountAddress,
+  tokenSlug,
+  txHash,
+  anotherAddress,
+}: TokenActivity) {
+  return `${accountAddress}_${tokenSlug}_${txHash}_${anotherAddress}`;
 }
 
 export function getNativeTokenLogoUrl(chainTag: string) {
