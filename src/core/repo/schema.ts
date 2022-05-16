@@ -27,5 +27,5 @@ db.version(1).stores({
   [RepoTable.TokenActivities]: [
     "",
     "[chainId+accountAddress+tokenSlug+timeAt]",
-  ].join(""),
+  ].join(),
 });

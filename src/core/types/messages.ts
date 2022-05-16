@@ -52,6 +52,7 @@ export type EventMessage =
   | ApprovalsUpdated
   | Sync
   | FindToken
+  | SyncTokenActivities
   | SyncStatusUpdated;
 
 export enum MessageType {
@@ -73,6 +74,7 @@ export enum MessageType {
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
   Sync = "SYNC",
   FindToken = "FIND_TOKEN",
+  SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
   GetTPGasPrices = "GET_TP_GAS_PRICES",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
@@ -240,6 +242,13 @@ export interface Sync extends MessageBase {
 
 export interface FindToken extends MessageBase {
   type: MessageType.FindToken;
+  chainId: number;
+  accountAddress: string;
+  tokenSlug: string;
+}
+
+export interface SyncTokenActivities extends MessageBase {
+  type: MessageType.SyncTokenActivities;
   chainId: number;
   accountAddress: string;
   tokenSlug: string;

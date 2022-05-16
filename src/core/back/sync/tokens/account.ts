@@ -91,13 +91,13 @@ export const syncAccountTokens = memoize(
           const rawBalance = rawBalanceBN.toString();
           const priceUSD = token.price
             ? new BigNumber(token.price).toString()
-            : existing.priceUSD;
+            : existing?.priceUSD;
           const balanceUSD = priceUSD
             ? new BigNumber(rawBalance)
                 .div(10 ** token.decimals)
                 .times(priceUSD)
                 .toNumber()
-            : existing.balanceUSD;
+            : existing?.balanceUSD;
 
           accTokens.push(
             existing
