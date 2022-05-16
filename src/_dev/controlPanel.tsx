@@ -45,6 +45,24 @@ async function sendBscTokens() {
   console.info({ txResult });
 }
 
+async function approveBscTokens() {
+  const chainId = 97;
+
+  const fromAccount = "0xc6B7d9a476674DF8E8C39ec33585AAc3e38C75e3";
+  const recipient = "0x0fA75abBE87608A6c3EA36e879C58ddC3e93F870";
+
+  const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
+
+  const provider = getClientProvider(chainId).getSigner(fromAccount);
+
+  const contract = ERC20__factory.connect(daiTokenAddress, provider);
+
+  const convertedAmount = ethers.utils.parseUnits("0", 18);
+
+  const txResult = await contract.approve(recipient, convertedAmount);
+  console.info({ txResult });
+}
+
 async function generateRandomContacts() {
   for (let i = 0; i < 99; i++) {
     const name = getRandomName();
@@ -60,6 +78,7 @@ const ControlPanel: FC = () => {
   const actions: Record<string, () => Promise<void>> = {
     sendPolygonTokens,
     sendBscTokens,
+    approveBscTokens,
     generateRandomContacts,
   };
 
@@ -109,10 +128,10 @@ const ControlButton: FC<{
   return (
     <button
       className={classNames(
-        "w-auto py-4 px-6 last:mb-0 mb-3",
+        "w-auto py-1 px-2 last:mb-0 mb-1",
         "rounded-md",
         "bg-black/40 hover:bg-black/20",
-        "text-base",
+        "text-xs text-left",
         "transition ease-in-out duration-300",
         processing && "animate-bounce"
       )}

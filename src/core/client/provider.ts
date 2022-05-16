@@ -12,12 +12,13 @@ export const getClientProvider = memoize(
 );
 
 export class ClientProvider extends JsonRpcProvider {
-  constructor(chainId: number) {
+  constructor(public chainId: number) {
     super("", chainId);
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
   getSigner = memoize(super.getSigner.bind(this));
+  getCode = memoize(super.getCode.bind(this));
   getUncheckedSigner = memoize(super.getUncheckedSigner.bind(this));
 
   async send(method: string, params: Array<any>): Promise<any> {

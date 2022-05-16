@@ -14,14 +14,23 @@ import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 import * as Tabs from "@radix-ui/react-tabs";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
-import { TransactionApproval } from "core/types";
-import { approveItem } from "core/client";
+import {
+  TransactionApproval,
+  TxActionType,
+  FeeMode,
+  FeeSuggestions,
+  FEE_MODES,
+} from "core/types";
+import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
+import { isSmartContractAddress, matchTxAction } from "core/common/transaction";
 
 import {
   useChainId,
+  useNativeCurrency,
   useOnBlock,
   useProvider,
   useSync,
@@ -48,6 +57,12 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
   error: "Error",
 };
 
+const FEE_MODE_NAMES: Record<FeeMode, ReactNode> = {
+  low: "Low",
+  average: "Average",
+  high: "High",
+};
+
 type TabValue = typeof TAB_VALUES[number];
 type Tx = ethers.utils.UnsignedTransaction;
 
@@ -56,7 +71,7 @@ type ApproveTransactionProps = {
 };
 
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
-  const { accountAddress } = approval;
+  const { accountAddress, txParams } = approval;
   const chainId = useChainId();
 
   const [allAccounts, localNonce] = useAtomValue(
@@ -73,24 +88,54 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, allAccounts]
   );
 
+  const action = useMemo(() => {
+    try {
+      return matchTxAction(txParams);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  }, [txParams]);
+
   const provider = useProvider();
   const nativeToken = useToken(accountAddress);
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
+  const [feeMode, setFeeMode] = useState<FeeMode>("average");
+  const [estimating, setEstimating] = useState(false);
   const [lastError, setLastError] = useState<any>(null);
   const [approving, setApproving] = useState(false);
 
-  const [preparedTx, setPrepatedTx] = useState<Tx>();
+  const [prepared, setPrepared] = useState<{
+    tx: Tx;
+    fees: FeeSuggestions | null;
+    destinationIsContract: boolean;
+  }>();
   const [txOverrides, setTxOverrides] = useState<Partial<Tx>>({});
 
-  const originTx = useMemo(
-    () =>
-      preparedTx && {
-        ...preparedTx,
-        nonce: getNextNonce(preparedTx, localNonce),
-      },
-    [preparedTx, localNonce]
-  );
+  const preparedTx = prepared?.tx;
+  const fees = prepared?.fees;
+
+  const originTx = useMemo(() => {
+    if (!prepared) return null;
+
+    const tx = { ...prepared.tx };
+    tx.nonce = getNextNonce(tx, localNonce);
+
+    const feeSug = prepared.fees?.modes[feeMode];
+    if (feeSug) {
+      if (prepared.tx.maxPriorityFeePerGas) {
+        tx.maxFeePerGas = feeSug.max;
+        if ("priority" in feeSug) {
+          tx.maxPriorityFeePerGas = feeSug.priority;
+        }
+      } else {
+        tx.gasPrice = feeSug.max;
+      }
+    }
+
+    return tx;
+  }, [prepared, feeMode, localNonce]);
 
   const finalTx = useMemo<typeof originTx>(() => {
     if (!originTx) return originTx;
@@ -122,43 +167,64 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const estimateTx = useCallback(
     () =>
       withThrottle(async () => {
+        if (approving) return;
+
+        setEstimating(true);
+
         try {
-          const { txParams } = approval;
           const { gasLimit, ...rest } = txParams;
 
-          const tx = await provider
-            .getUncheckedSigner(account.address)
-            .populateTransaction({
-              ...rest,
-              type: bnify(rest?.type)?.toNumber(),
-              chainId: bnify(rest?.chainId)?.toNumber(),
-            });
+          const [tx, feeSuggestions, destinationIsContract] = await Promise.all(
+            [
+              // Prepare transaction with other fields
+              provider.getUncheckedSigner(account.address).populateTransaction({
+                ...rest,
+                type: bnify(rest?.type)?.toNumber(),
+                chainId: bnify(rest?.chainId)?.toNumber(),
+              }),
+              // Fetch fee data
+              suggestFees(provider).catch(() => null),
+              // Check is destination is smart contract
+              txParams.to
+                ? isSmartContractAddress(provider, txParams.to)
+                : false,
+            ]
+          );
+
           delete tx.from;
 
           const estimatedGasLimit = ethers.BigNumber.from(tx.gasLimit);
           const minGasLimit = estimatedGasLimit.mul(5).div(4);
           const averageGasLimit = estimatedGasLimit.mul(3).div(2);
 
-          setPrepatedTx({
-            ...tx,
-            nonce: bnify(tx.nonce)?.toNumber(),
-            gasLimit:
-              gasLimit && minGasLimit.lte(gasLimit)
-                ? ethers.BigNumber.from(gasLimit)
-                : averageGasLimit,
+          setPrepared({
+            tx: {
+              ...tx,
+              nonce: bnify(tx.nonce)?.toNumber(),
+              gasLimit:
+                gasLimit && minGasLimit.lte(gasLimit)
+                  ? ethers.BigNumber.from(gasLimit)
+                  : averageGasLimit,
+            },
+            fees: feeSuggestions,
+            destinationIsContract,
           });
         } catch (err) {
           console.error(err);
           setLastError(err);
         }
+
+        setEstimating(false);
       }),
     [
       withThrottle,
-      setPrepatedTx,
+      setEstimating,
+      setPrepared,
+      setLastError,
+      approving,
       provider,
       account.address,
-      approval,
-      setLastError,
+      txParams,
     ]
   );
 
@@ -173,8 +239,46 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [setTabValue, lastError]);
 
   useEffect(() => {
-    if (finalTx && maxFee) console.info({ finalTx, maxFee });
-  }, [finalTx, maxFee]);
+    if (!action) return;
+
+    switch (action.type) {
+      case TxActionType.TokenTransfer:
+        action.tokens.forEach(({ slug }) => {
+          findToken(chainId, accountAddress, slug);
+        });
+        break;
+
+      case TxActionType.TokenApprove:
+        if (action.tokenSlug) {
+          findToken(chainId, accountAddress, action.tokenSlug);
+        }
+        break;
+    }
+  }, [action, chainId, accountAddress]);
+
+  // TODO: Only for dev mode
+  // START
+
+  useEffect(() => {
+    console.info("action", action);
+  }, [action]);
+
+  useEffect(() => {
+    if (preparedTx && finalTx) {
+      console.info({ preparedTx, finalTx });
+
+      if (fees) {
+        const { low, average, high } = fees.modes;
+        console.info(
+          "f",
+          [low, average, high].map((m) => formatUnits(m.max, "gwei"))
+        );
+      }
+    }
+  }, [preparedTx, fees, finalTx]);
+
+  // TODO: Only for dev mode
+  // END
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -202,13 +306,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, setLastError, setApproving, finalTx]
   );
 
-  const loading = approving || (!finalTx && !lastError);
-
   return (
     <ApprovalLayout
       approveText={lastError ? "Retry" : "Approve"}
       onApprove={handleApprove}
-      loading={loading}
+      disabled={estimating}
+      approving={approving}
     >
       <ScrollAreaContainer
         className="w-full box-content -mr-5 pr-5"
@@ -273,6 +376,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             {originTx ? (
               <TxFee
                 originTx={originTx}
+                fees={fees ?? null}
+                feeMode={feeMode}
+                setFeeMode={setFeeMode}
+                maxFee={maxFee}
                 overrides={txOverrides}
                 onOverridesChange={setTxOverrides}
               />
@@ -315,12 +422,24 @@ export default ApproveTransaction;
 
 type TxFeeProps = {
   originTx: Tx;
+  fees: FeeSuggestions | null;
+  maxFee: ethers.BigNumber | null;
+  feeMode: FeeMode;
+  setFeeMode: Dispatch<FeeMode>;
   overrides: Partial<Tx>;
   onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
 };
 
 const TxFee = memo<TxFeeProps>(
-  ({ originTx: tx, overrides, onOverridesChange }) => {
+  ({
+    originTx: tx,
+    overrides,
+    onOverridesChange,
+    fees,
+    maxFee,
+    feeMode,
+    setFeeMode,
+  }) => {
     const changeValue = useCallback(
       (name: string, value: ethers.BigNumberish | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value }));
@@ -335,8 +454,38 @@ const TxFee = memo<TxFeeProps>(
       [changeValue]
     );
 
+    const handleFeeModeChange = useCallback(
+      (mode: FeeMode) => {
+        if (!mode) return;
+
+        setFeeMode(mode);
+        // Clean-up ovverides if mode (re)enabled
+        onOverridesChange(
+          (o) =>
+            ({
+              ...o,
+              gasPrice: null,
+              maxFeePerGas: null,
+              maxPriorityFeePerGas: null,
+            } as any)
+        );
+      },
+      [setFeeMode, onOverridesChange]
+    );
+
     return (
       <div className="w-full my-4">
+        {fees && maxFee && (
+          <FeeModeSelect
+            gasLimit={ethers.BigNumber.from(overrides.gasLimit ?? tx.gasLimit!)}
+            fees={fees}
+            maxFee={maxFee}
+            value={feeMode}
+            onValueChange={handleFeeModeChange}
+            className="mb-6"
+          />
+        )}
+
         {tx.maxPriorityFeePerGas ? (
           <>
             <NumberInput
@@ -394,6 +543,96 @@ const TxFee = memo<TxFeeProps>(
     );
   }
 );
+
+type FeeModeSelectProps = {
+  gasLimit: ethers.BigNumber;
+  fees: FeeSuggestions;
+  maxFee: ethers.BigNumber;
+  value: FeeMode;
+  onValueChange: (value: FeeMode) => void;
+  className?: string;
+};
+
+const FeeModeSelect = memo<FeeModeSelectProps>(
+  ({ gasLimit, fees, maxFee, value, onValueChange, className }) => {
+    return (
+      <ToggleGroup.Root
+        type="single"
+        orientation="horizontal"
+        value={
+          gasLimit.mul(fees.modes[value].max).eq(maxFee) ? value : undefined
+        }
+        onValueChange={onValueChange}
+        className={classNames("grid grid-cols-3 gap-2", className)}
+      >
+        {FEE_MODES.map((mode) => {
+          const modeMaxFee = gasLimit.mul(fees.modes[mode].max);
+
+          return (
+            <FeeModeItem
+              key={mode}
+              value={mode}
+              fee={modeMaxFee}
+              selected={modeMaxFee.eq(maxFee)}
+            />
+          );
+        })}
+      </ToggleGroup.Root>
+    );
+  }
+);
+
+type FeeModeItemProps = {
+  value: FeeMode;
+  fee: ethers.BigNumber;
+  selected: boolean;
+};
+
+const FeeModeItem: FC<FeeModeItemProps> = ({ value, fee, selected }) => {
+  const nativeCurrency = useNativeCurrency();
+
+  return (
+    <ToggleGroup.Item
+      value={value}
+      className={classNames(
+        "relative last:flex",
+        "bg-brand-main/[.05]",
+        "w-full py-2 px-1",
+        "rounded-[.25rem]",
+        "transition-colors",
+        "hover:bg-brand-main/10",
+        selected && "bg-brand-main/10"
+      )}
+    >
+      <div className="flex flex-col text-left px-1">
+        <span className="mb-1 text-lg font-bold inline-flex items-center">
+          <span
+            className={classNames(
+              "w-3 h-3 mr-2",
+              "bg-brand-main/10",
+              "rounded-full",
+              "flex justify-center items-center"
+            )}
+          >
+            {selected && <span className="bg-radio w-2 h-2 rounded-full" />}
+          </span>
+
+          <span>{FEE_MODE_NAMES[value]}</span>
+        </span>
+
+        <span className="text-sm text-brand-inactivelight truncate">
+          {nativeCurrency && (
+            <PrettyAmount
+              amount={fee.toString()}
+              currency={nativeCurrency.symbol}
+              decimals={nativeCurrency.decimals}
+            />
+          )}
+        </span>
+      </div>
+    </ToggleGroup.Item>
+  );
+};
 
 type TxAdvancedProps = {
   originTx: Tx;

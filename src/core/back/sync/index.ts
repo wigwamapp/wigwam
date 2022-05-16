@@ -43,6 +43,34 @@ const coinGeckoApi = axios.create({
   timeout: 60_000,
 });
 
+export const getTPGasPrices = mem(
+  async (chainId: number) => {
+    try {
+      const debankChain = await getDebankChain(chainId);
+      if (!debankChain) return null;
+
+      const res = await debankApi
+        .get<any[]>("/wallet/gas_market", {
+          params: { chain_id: debankChain.id },
+        })
+        .catch(() => null);
+      if (!res?.data) return null;
+
+      const [slow, normal, fast] = res.data.map((v) =>
+        new BigNumber(v.price).toString()
+      );
+
+      return [slow, normal, fast] as const;
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  },
+  {
+    maxAge: 60_000,
+  }
+);
+
 const enqueueSync = createQueue();
 
 export async function addFindTokenRequest(
@@ -57,6 +85,14 @@ export async function addFindTokenRequest(
       let tokenToAdd: AccountAsset | undefined;
 
       const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+      const dbKey = createAccountTokenKey({
+        chainId,
+        accountAddress,
+        tokenSlug,
+      });
+
+      const existing = await repo.accountTokens.get(dbKey);
+      if (existing) return;
 
       const [debankChain, coinGeckoPrices] = await Promise.all([
         getDebankChain(chainId),
@@ -147,14 +183,7 @@ export async function addFindTokenRequest(
         };
       }
 
-      await repo.accountTokens.put(
-        tokenToAdd,
-        createAccountTokenKey({
-          chainId,
-          accountAddress,
-          tokenSlug,
-        })
-      );
+      await repo.accountTokens.put(tokenToAdd, dbKey);
     });
   } catch (err) {
     console.error(err);

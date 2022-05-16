@@ -22,6 +22,7 @@ export type Request =
   | SendRpcRequest
   | GetApprovalsRequest
   | ApproveRequest
+  | GetTPGasPricesRequest
   | GetSyncStatusRequest;
 
 export type Response =
@@ -39,6 +40,7 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
+  | GetTPGasPricesResponse
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
@@ -71,6 +73,7 @@ export enum MessageType {
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
   Sync = "SYNC",
   FindToken = "FIND_TOKEN",
+  GetTPGasPrices = "GET_TP_GAS_PRICES",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
@@ -240,6 +243,16 @@ export interface FindToken extends MessageBase {
   chainId: number;
   accountAddress: string;
   tokenSlug: string;
+}
+
+export interface GetTPGasPricesRequest extends MessageBase {
+  type: MessageType.GetTPGasPrices;
+  chainId: number;
+}
+
+export interface GetTPGasPricesResponse extends MessageBase {
+  type: MessageType.GetTPGasPrices;
+  gasPrices: readonly [string, string, string] | null;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {

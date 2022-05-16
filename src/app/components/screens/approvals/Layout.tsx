@@ -7,7 +7,8 @@ type ApprovalLayoutProps = {
   className?: string;
   approveText?: ReactNode;
   declineText?: ReactNode;
-  loading?: boolean;
+  disabled?: boolean;
+  approving?: boolean;
   onApprove?: (approved: boolean) => void;
 };
 
@@ -16,7 +17,8 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
   children,
   approveText = "Approve",
   declineText = "Decline",
-  loading,
+  disabled,
+  approving,
   onApprove,
 }) => (
   <div
@@ -41,7 +43,8 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
 
       <Button
         className="w-full"
-        loading={loading}
+        disabled={disabled}
+        loading={approving}
         onClick={() => onApprove?.(true)}
       >
         {approveText}
