@@ -69,7 +69,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
                   source="dicebear"
                   type="personas"
                   className={classNames(
-                    "h-18 w-18 min-w-[4.5rem] mr-4",
+                    "h-[4.5rem] w-[4.5rem] min-w-[4.5rem] mr-4",
                     "bg-black/40",
                     "rounded-[.625rem]"
                   )}
