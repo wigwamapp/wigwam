@@ -36,6 +36,7 @@ import {
   useChainId,
   useIsSyncing,
   useLazyNetwork,
+  useTokenActivitiesSync,
 } from "app/hooks";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
@@ -503,20 +504,23 @@ const AssetCard = memo(
 
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const currentNetwork = useLazyNetwork();
 
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
-  const parsedTokenSlug = useMemo(
-    () => tokenSlug && parseTokenSlug(tokenSlug),
+  const chainId = useChainId();
+  const currentAccount = useAtomValue(currentAccountAtom);
+
+  useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
+
+  const currentNetwork = useLazyNetwork();
+  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  const { standard, address } = useMemo(
+    () => parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
 
-  if (!tokenInfo || !parsedTokenSlug) {
-    return null;
-  }
+  if (!tokenInfo) return null;
 
   const {
-    chainId,
     status,
     name,
     symbol,
@@ -526,7 +530,6 @@ const AssetInfo: FC = () => {
     priceUSDChange,
     balanceUSD,
   } = tokenInfo;
-  const { standard, address } = parsedTokenSlug;
 
   const coinGeckoId =
     status === TokenStatus.Native

@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import memoize from "mem";
+import BigNumber from "bignumber.js";
 import { ERC20__factory } from "abi-types";
 
 import { AccountAsset, TokenActivity, TokenStandard } from "core/types";
@@ -13,7 +14,8 @@ import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
 import { debankApi, getDebankChain } from "../debank";
-import BigNumber from "bignumber.js";
+
+const GET_LOGS_ENABLED = false;
 
 export const syncTokenActivities = memoize(
   async (chainId: number, accountAddress: string, tokenSlug: string) => {
@@ -143,6 +145,7 @@ export const syncTokenActivities = memoize(
         }
       }
 
+      if (!GET_LOGS_ENABLED) return;
       if (token.standard !== TokenStandard.ERC20) return;
 
       const provider = getRpcProvider(chainId);
@@ -155,7 +158,7 @@ export const syncTokenActivities = memoize(
       const approvalTopic = erc20Token.filters.Approval(accountAddress);
 
       const step = 3_500 - 1;
-      const limit = step * 20;
+      const limit = step * 10;
       let range = 0;
 
       while (range < limit) {
