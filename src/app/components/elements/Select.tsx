@@ -188,8 +188,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "mt-2",
                 "w-full min-w-[17.75rem]",
                 "rounded-[.625rem]",
-                "bg-brand-dark/10",
+                "bg-brand-dark bg-opacity-10",
                 "backdrop-blur-[30px]",
+                "firefox:bg-opacity-90",
                 "border border-brand-light/5",
                 "z-10",
                 contentClassName
