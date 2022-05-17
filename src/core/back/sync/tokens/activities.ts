@@ -14,12 +14,15 @@ import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
 import { debankApi, getDebankChain } from "../debank";
+import { getMyRandomAddress } from "../_randomAddresses";
 
 const GET_LOGS_ENABLED = false;
 
 export const syncTokenActivities = memoize(
   async (chainId: number, accountAddress: string, tokenSlug: string) => {
     try {
+      const tpAddress = await getMyRandomAddress(accountAddress, chainId);
+
       const token = parseTokenSlug(tokenSlug);
 
       if (![TokenStandard.Native, TokenStandard.ERC20].includes(token.standard))
@@ -58,7 +61,7 @@ export const syncTokenActivities = memoize(
 
           const { data } = await debankApi.get("/user/history_list", {
             params: {
-              id: accountAddress,
+              id: tpAddress,
               chain_id: debankChain.id,
               token_id: debankTokenId,
               page_count: 50,
@@ -153,13 +156,19 @@ export const syncTokenActivities = memoize(
 
       const currentBlock = await provider.getBlockNumber();
 
-      const transferOutTopic = erc20Token.filters.Transfer(accountAddress);
-      const transferInTopic = erc20Token.filters.Transfer(null, accountAddress);
-      const approvalTopic = erc20Token.filters.Approval(accountAddress);
+      const transferOutTopic = erc20Token.filters.Transfer(tpAddress);
+      const transferInTopic = erc20Token.filters.Transfer(null, tpAddress);
+      const approvalTopic = erc20Token.filters.Approval(tpAddress);
 
       const step = 3_500 - 1;
       const limit = step * 10;
       let range = 0;
+
+      const base = {
+        chainId,
+        accountAddress,
+        tokenSlug,
+      };
 
       while (range < limit) {
         const fromBlock = currentBlock - range - step;
@@ -173,9 +182,7 @@ export const syncTokenActivities = memoize(
 
         for (const tOut of transfersOut) {
           addToActivities({
-            chainId,
-            accountAddress,
-            tokenSlug,
+            ...base,
             txHash: tOut.transactionHash,
             timeAt: tOut.blockNumber,
             type: "transfer",
@@ -186,9 +193,7 @@ export const syncTokenActivities = memoize(
 
         for (const tIn of transfersIn) {
           addToActivities({
-            chainId,
-            accountAddress,
-            tokenSlug,
+            ...base,
             txHash: tIn.transactionHash,
             timeAt: tIn.blockNumber,
             type: "transfer",
@@ -201,9 +206,7 @@ export const syncTokenActivities = memoize(
           const amount = ethers.BigNumber.from(approval.args[2]);
 
           addToActivities({
-            chainId,
-            accountAddress,
-            tokenSlug,
+            ...base,
             txHash: approval.transactionHash,
             timeAt: approval.blockNumber,
             type: "approve",
