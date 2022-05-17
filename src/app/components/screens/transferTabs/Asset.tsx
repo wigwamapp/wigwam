@@ -11,12 +11,15 @@ import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
-import { useForm, useField } from "react-final-form-hooks";
+import { OnChange } from "react-final-form-listeners";
 import { ethers } from "ethers";
+import { useDebouncedCallback } from "use-debounce";
 import { ERC20__factory } from "abi-types";
+import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
+import { suggestFees } from "core/client";
 
 import {
   composeValidators,
@@ -27,7 +30,7 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useNativeCurrency, useProvider, useToken } from "app/hooks";
+import { useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -40,11 +43,9 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
 import InputLabelAction from "app/components/elements/InputLabelAction";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
-import { suggestFees } from "../../../../core/client";
+import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
 
-type FormValues = { amount: string; recipient: string; gas: ethers.BigNumber };
-
-// TODO: Replace with final form hooks
+type FormValues = { amount: string; recipient: string };
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
@@ -83,7 +84,7 @@ const Asset: FC = () => {
     [currentAccount.address, provider]
   );
 
-  const handleFormSubmit = useCallback(
+  const handleSubmit = useCallback(
     async ({ recipient, amount }) =>
       withHumanDelay(async () => {
         if (!tokenSlug) {
@@ -109,166 +110,234 @@ const Asset: FC = () => {
     [alert, currentToken, sendEther, sendToken, tokenSlug]
   );
 
-  const maxAmount = useMemo(
-    () =>
-      currentToken?.rawBalance
-        ? new BigNumber(currentToken.rawBalance)
-            .div(new BigNumber(10).pow(currentToken.decimals))
-            .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN)
-            .toString()
-        : "0",
-    [currentToken]
-  );
+  const [recipientAddr, setRecipientAddr] = useState<string>();
+  const [gas, setGas] = useState<ethers.BigNumber>();
+  const [estimationError, setEstimationError] = useState(false);
 
-  const { form, handleSubmit, values, submitting } = useForm<FormValues>({
-    onSubmit: handleFormSubmit,
-    initialValues: {
-      gas: ethers.BigNumber.from(0),
-    },
-  });
-  const recipientInput = useField(
-    "recipient",
-    form,
-    composeValidators(required, validateAddress)
-  );
-  const amountInput = useField(
-    "amount",
-    form,
-    composeValidators(required, maxValue(maxAmount, currentToken?.symbol))
-  );
-
-  useEffect(() => {
-    const unsubscribe = focusOnErrors(form);
-    return () => unsubscribe();
-  }, [form]);
+  const maxAmount = useMemo(() => {
+    if (currentToken?.rawBalance) {
+      let finalValue = new BigNumber(currentToken.rawBalance);
+      if (tokenSlug === NATIVE_TOKEN_SLUG) {
+        finalValue = finalValue.minus(new BigNumber(gas ? gas.toString() : 0));
+      }
+      const convertedValue = finalValue
+        .div(new BigNumber(10).pow(currentToken.decimals))
+        .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN);
+      if (convertedValue.lt(0)) {
+        return "0";
+      }
+      return convertedValue.toString();
+    }
+    return "0";
+  }, [currentToken, gas, tokenSlug]);
 
   const estimateGas = useCallback(async () => {
-    if (
-      recipientInput.input.value &&
-      !recipientInput.meta.error &&
-      tokenSlug &&
-      currentToken
-    ) {
-      let gasLimit;
-      if (tokenSlug === NATIVE_TOKEN_SLUG) {
-        gasLimit = await provider.estimateGas({
-          to: recipientInput.input.value,
-          value: ethers.utils.parseEther("1"),
-        });
-      } else {
-        const tokenContract = parseTokenSlug(tokenSlug).address;
+    if (recipientAddr && tokenSlug && currentToken) {
+      const value = 1;
+      let gasLimit = ethers.BigNumber.from(0);
+      try {
+        if (tokenSlug === NATIVE_TOKEN_SLUG) {
+          gasLimit = await provider.estimateGas({
+            to: recipientAddr,
+            value,
+          });
+        } else {
+          const tokenContract = parseTokenSlug(tokenSlug).address;
 
-        const signer = provider.getUncheckedSigner(currentAccount.address);
-        const contract = ERC20__factory.connect(tokenContract, signer);
+          const signer = provider.getUncheckedSigner(currentAccount.address);
+          const contract = ERC20__factory.connect(tokenContract, signer);
 
-        const convertedAmount = ethers.utils.parseUnits(
-          "1",
-          currentToken.decimals
-        );
-
-        gasLimit = await contract.estimateGas.transfer(
-          recipientInput.input.value,
-          convertedAmount
-        );
+          gasLimit = await contract.estimateGas.transfer(recipientAddr, value);
+        }
+      } catch (e) {
+        setEstimationError(true);
       }
 
       const gasPrice = await suggestFees(provider);
       if (gasPrice) {
-        form.change("gas", gasPrice.modes.average.max.mul(gasLimit));
+        setGas(gasPrice.modes.average.max.mul(gasLimit));
       }
     }
   }, [
     currentAccount.address,
     currentToken,
-    form,
     provider,
-    recipientInput.input.value,
-    recipientInput.meta.error,
+    recipientAddr,
     tokenSlug,
   ]);
 
+  const handleRecipientChange = useDebouncedCallback((recipient: string) => {
+    if (recipient && ethers.utils.isAddress(recipient)) {
+      setRecipientAddr(recipient);
+    }
+  }, 150);
+
   useEffect(() => {
     estimateGas();
-  }, []);
+  }, [estimateGas]);
 
-  console.log("values", values);
+  const amountFieldKey = useMemo(
+    () => `amount-${currentToken?.tokenSlug}-${maxAmount}`,
+    [maxAmount, currentToken]
+  );
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col max-w-[23.25rem]">
-      <TokenSelect
-        handleTokenChanged={() => form.change("amount", undefined)}
-      />
-      <AddressField
-        setFromClipboard={(value) => form.change("recipient", value)}
-        error={recipientInput.meta.error && recipientInput.meta.touched}
-        errorMessage={recipientInput.meta.error}
-        className="mt-5"
-        {...recipientInput.input}
-      />
-      <div className="relative mt-5">
-        <AssetInput
-          label="Amount"
-          placeholder="0.00"
-          thousandSeparator={true}
-          assetDecimals={currentToken?.decimals}
-          labelActions={
-            <InputLabelAction onClick={() => form.change("amount", maxAmount)}>
-              MAX
-            </InputLabelAction>
-          }
-          currency={currentToken ? currentToken.symbol : undefined}
-          error={amountInput.meta.modified && amountInput.meta.error}
-          errorMessage={amountInput.meta.error}
-          {...amountInput.input}
-        />
-      </div>
-      <div className="mt-6 flex items-start">
-        <TxCheck currentToken={currentToken} values={values} />
-      </div>
-      <Button
-        type="submit"
-        className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-        loading={submitting}
-      >
-        <SendIcon className="mr-2" />
-        Transfer
-      </Button>
-    </form>
+    <Form<FormValues>
+      onSubmit={handleSubmit}
+      decorators={[focusOnErrors]}
+      render={({ form, handleSubmit, values, submitting }) => (
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col max-w-[23.25rem]"
+        >
+          <OnChange name="recipient">{handleRecipientChange}</OnChange>
+          <AccountChangeObserver onChange={() => form.restart()} />
+          <TokenSelect handleTokenChanged={() => form.change("amount", "")} />
+          <Field
+            name="recipient"
+            validate={composeValidators(required, validateAddress)}
+          >
+            {({ input, meta }) => (
+              <AddressField
+                setFromClipboard={(value) => form.change("recipient", value)}
+                error={meta.error && meta.touched}
+                errorMessage={meta.error}
+                className="mt-5"
+                {...input}
+              />
+            )}
+          </Field>
+          <div className="relative mt-5">
+            <Field
+              key={amountFieldKey}
+              name="amount"
+              validate={composeValidators(
+                required,
+                maxValue(maxAmount, currentToken?.symbol)
+              )}
+            >
+              {({ input, meta }) => (
+                <AssetInput
+                  label="Amount"
+                  placeholder="0.00"
+                  thousandSeparator={true}
+                  assetDecimals={currentToken?.decimals}
+                  labelActions={
+                    <InputLabelAction
+                      onClick={() => form.change("amount", maxAmount)}
+                    >
+                      MAX
+                    </InputLabelAction>
+                  }
+                  currency={currentToken ? currentToken.symbol : undefined}
+                  error={meta.touched && meta.error}
+                  errorMessage={meta.error}
+                  {...input}
+                />
+              )}
+            </Field>
+          </div>
+          <div className="mt-6 flex items-start">
+            <TxCheck
+              currentToken={currentToken}
+              values={{ gas, ...values }}
+              error={estimationError}
+            />
+          </div>
+          <Button
+            type="submit"
+            className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
+            loading={submitting}
+          >
+            <SendIcon className="mr-2" />
+            Transfer
+          </Button>
+        </form>
+      )}
+    />
   );
 };
 
 export default Asset;
 
-type TxCheckProps = {
-  currentToken: AccountAsset;
-  values: any;
+type AccountChangeObserverProps = {
+  onChange: () => void;
 };
 
-const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
-  const provider = useProvider();
-  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
-  const [fee, setFee] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
-
-  // const preparedTx = useMemo(() => {
-  //   // Create pseudo transaction
-  // }, []);
-
-  const estimateFee = useCallback(async () => {
-    try {
-      // const gasPrice = await provider.estimateGas();
-      // OR contract.estimateGas.transfer(recipient, convertedAmount)
-      const fee = await suggestFees(provider);
-      if (fee) {
-        setFee(fee.modes.average.max);
-      }
-    } catch (e) {}
-  }, [provider]);
+const AccountChangeObserver: FC<AccountChangeObserverProps> = ({
+  onChange,
+}) => {
+  const currentAccount = useAtomValue(currentAccountAtom);
+  const prevAccountAddress = usePrevious(currentAccount.address);
 
   useEffect(() => {
-    estimateFee();
-  }, [estimateFee]);
+    if (currentAccount.address !== prevAccountAddress) {
+      onChange();
+    }
+  }, [currentAccount, onChange, prevAccountAddress]);
 
-  console.log("gas", +fee);
+  return null;
+};
+
+type TxCheckProps = {
+  currentToken: AccountAsset;
+  values: FormValues & { gas?: ethers.BigNumber };
+  error: boolean;
+};
+
+const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
+  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
+
+  const tokenUsdAmount = useMemo(
+    () =>
+      values.amount && currentToken
+        ? new BigNumber(values.amount).multipliedBy(currentToken.priceUSD ?? 0)
+        : new BigNumber(0),
+    [currentToken, values.amount]
+  );
+
+  const gas = useMemo(() => {
+    const amount =
+      values.gas && nativeToken
+        ? new BigNumber(values.gas.toString())
+        : new BigNumber(0);
+
+    const usdAmount =
+      values.gas && nativeToken?.priceUSD
+        ? new BigNumber(values.gas.toString())
+            .div(new BigNumber(10).pow(nativeToken.decimals))
+            .multipliedBy(nativeToken.priceUSD)
+        : new BigNumber(0);
+
+    return {
+      amount,
+      usdAmount,
+    };
+  }, [nativeToken, values.gas]);
+
+  if (
+    !nativeToken?.rawBalance ||
+    new BigNumber(nativeToken.rawBalance).lte(0) ||
+    new BigNumber(nativeToken.rawBalance).lt((values.gas ?? 0).toString()) ||
+    error
+  ) {
+    return (
+      <div
+        className={classNames(
+          "w-full",
+          "flex items-center",
+          "p-4",
+          "bg-brand-redobject/[.05]",
+          "border border-brand-redobject/[.8]",
+          "rounded-[.625rem]",
+          "text-sm"
+        )}
+      >
+        <WarningIcon className="mr-2 w-6 h-auto" />
+        Insufficient funds for Network Fee
+      </div>
+    );
+  }
 
   return (
     <>
@@ -299,63 +368,27 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
           header="Amount"
           value={
             <PrettyAmount
-              amount={values.amount ?? 0}
+              amount={values.amount || 0}
               currency={currentToken?.symbol}
               className="font-semibold"
               copiable
             />
           }
-          inBrackets={
-            <FiatAmount
-              amount={
-                values.amount && currentToken
-                  ? new BigNumber(values.amount).multipliedBy(
-                      currentToken.priceUSD ?? 0
-                    )
-                  : 0
-              }
-              copiable
-            />
-          }
+          inBrackets={<FiatAmount amount={tokenUsdAmount} copiable />}
           className="mb-1.5"
         />
         <SummaryRow
           header="Average Fee"
           value={
             <PrettyAmount
-              amount={fee.toString()}
+              amount={gas.amount}
               currency={nativeToken?.symbol}
               decimals={nativeToken?.decimals}
               copiable
               className="font-semibold"
             />
-            // <PrettyAmount
-            //   amount={0.13}
-            //   currency={nativeCurrency?.symbol}
-            //   copiable
-            //   className="font-semibold"
-            // />
           }
-          inBrackets={
-            <FiatAmount
-              amount={
-                nativeToken
-                  ? new BigNumber(
-                      fee
-                        .div(
-                          new BigNumber(10)
-                            .pow(nativeToken?.decimals)
-                            .toString()
-                        )
-                        .toString()
-                    )
-                      .multipliedBy(nativeToken?.priceUSD ?? 0)
-                      .toString()
-                  : 0
-              }
-              copiable
-            />
-          }
+          inBrackets={<FiatAmount amount={gas.usdAmount} copiable />}
           className="mb-2"
         />
         <hr className="border-brand-main/[.07]" />
@@ -365,13 +398,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values }) => {
           lightHeader
           value={
             <FiatAmount
-              amount={
-                values.amount && currentToken
-                  ? new BigNumber(values.amount)
-                      .multipliedBy(currentToken.priceUSD ?? 0)
-                      .plus(9.55)
-                  : 9.55
-              }
+              amount={tokenUsdAmount.plus(gas.usdAmount)}
               copiable
               className="font-bold text-lg"
             />
