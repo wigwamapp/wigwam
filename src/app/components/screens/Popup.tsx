@@ -337,12 +337,20 @@ const AssetCard = memo(
           } catch (e) {
             console.error(e);
           }
-        } else {
-          if (!popoverOpened) {
-            setPopoverOpened(true);
-          }
         }
-      }, [asset, currentAccount.address, isManageMode, popoverOpened]);
+      }, [asset, currentAccount.address, isManageMode]);
+
+      const handleAssetContextMenu = useCallback(
+        async (e) => {
+          if (!isManageMode) {
+            e.preventDefault();
+            if (!popoverOpened) {
+              setPopoverOpened(true);
+            }
+          }
+        },
+        [isManageMode, popoverOpened]
+      );
 
       const priceClassName = useMemo(
         () =>
@@ -357,6 +365,7 @@ const AssetCard = memo(
           ref={ref}
           type="button"
           onClick={handleAssetClick}
+          onContextMenu={handleAssetContextMenu}
           className={classNames(
             "relative",
             "flex items-stretch",
@@ -366,6 +375,7 @@ const AssetCard = memo(
             "cursor-default",
             "group",
             "transition",
+            popoverOpened && "bg-brand-main/10",
             isManageMode &&
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
             disabled && "opacity-60",

@@ -38,6 +38,7 @@ import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/delete-medium.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as AvatarPlaceholderIcon } from "app/icons/avatar-placeholder.svg";
+import { ReactComponent as NoResultsFoundIcon } from "../../icons/no-results-found.svg";
 
 const ContactsSection: FC = () => {
   const { confirm } = useDialog();
@@ -113,20 +114,37 @@ const ContactsSection: FC = () => {
             >
               <div className="grid grid-cols-5 gap-5">
                 <NewContactCard onClick={() => setModalData("new")} />
-                {contacts.map(({ name, address, addedAt }, i) => (
-                  <ContactCard
-                    key={address}
-                    ref={
-                      i === contacts.length - LOAD_MORE_ON_CONTACTS_FROM_END - 2
-                        ? loadMoreTriggerCardRef
-                        : null
-                    }
-                    name={name}
-                    address={address}
-                    onDelete={() => handleDelete(name, address)}
-                    onEdit={() => setModalData({ name, address, addedAt })}
-                  />
-                ))}
+                {contacts.length === 0 ? (
+                  <div
+                    className={classNames(
+                      "flex flex-col justify-center items-center",
+                      "h-full",
+                      "border border-brand-light/[.05]",
+                      "rounded-[.625rem]",
+                      "text-sm text-brand-placeholder",
+                      "col-span-4"
+                    )}
+                  >
+                    <NoResultsFoundIcon className="mb-4" />
+                    No results found
+                  </div>
+                ) : (
+                  contacts.map(({ name, address, addedAt }, i) => (
+                    <ContactCard
+                      key={address}
+                      ref={
+                        i ===
+                        contacts.length - LOAD_MORE_ON_CONTACTS_FROM_END - 2
+                          ? loadMoreTriggerCardRef
+                          : null
+                      }
+                      name={name}
+                      address={address}
+                      onDelete={() => handleDelete(name, address)}
+                      onEdit={() => setModalData({ name, address, addedAt })}
+                    />
+                  ))
+                )}
               </div>
             </ScrollAreaContainer>
           )}

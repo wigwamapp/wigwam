@@ -29,6 +29,7 @@ import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddressField from "app/components/elements/AddressField";
+import InputLabelAction from "app/components/elements/InputLabelAction";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 
 type FormValues = { amount: string; recipient: string };
@@ -147,26 +148,20 @@ const Asset: FC = () => {
                   placeholder="0.00"
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
-                  withMaxButton
-                  handleMaxButtonClick={() => form.change("amount", maxAmount)}
+                  labelActions={
+                    <InputLabelAction
+                      onClick={() => form.change("amount", maxAmount)}
+                    >
+                      MAX
+                    </InputLabelAction>
+                  }
+                  currency={currentToken ? currentToken.symbol : undefined}
                   error={meta.modified && meta.error}
                   errorMessage={meta.error}
-                  inputClassName="pr-20"
                   {...input}
                 />
               )}
             </Field>
-            {currentToken && (
-              <span
-                className={classNames(
-                  "absolute top-11 right-4",
-                  "text-sm font-bold",
-                  "pointer-events-none"
-                )}
-              >
-                {currentToken.symbol}
-              </span>
-            )}
           </div>
           <div className="mt-6 flex items-start">
             <TxCheck currentToken={currentToken} values={values} />

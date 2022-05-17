@@ -36,14 +36,28 @@ export async function getRpcUrl(chainId: number) {
   return url;
 }
 
-export async function setRpcUrl(chainId: number, url: string) {
-  await storage.put(getRpcUrlKey(chainId), url);
+export function setRpcUrl(chainId: number, url: string | null) {
+  const key = getRpcUrlKey(chainId);
+  return url ? storage.put(key, url) : storage.remove(key);
+}
+
+export async function cleanupNetwork(chainId: number) {
+  await Repo.networks.delete(chainId);
+  await setRpcUrl(chainId, null);
 }
 
 export async function getNetwork(chainId: number) {
   const net = await Repo.networks.get(chainId);
   assert(net, undefined, NetworkNotFoundError);
   return net;
+}
+
+export function mergeNetworkUrls(base?: string[], toMerge?: string[]) {
+  if (base && toMerge) {
+    return Array.from(new Set([...toMerge, ...base].map(formatRpcUrl)));
+  }
+
+  return base ?? toMerge ?? [];
 }
 
 export function formatRpcUrl(url: string) {
@@ -55,6 +69,6 @@ export class NetworkNotFoundError implements Error {
   message = "Network Not Found";
 }
 
-function getRpcUrlKey(chainId: number) {
+export function getRpcUrlKey(chainId: number) {
   return `rpc_url_${chainId}`;
 }

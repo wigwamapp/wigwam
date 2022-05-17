@@ -250,7 +250,7 @@ const AssetsList: FC<AssetsListProps> = ({
         setTokenSlug([RESET]);
         setSearchValue(null);
         setManageModeEnabled(false);
-      } else {
+      } else if (tokens.length > 0) {
         setTokenSlug([tokens[0].tokenSlug, "replace"]);
       }
       setIsNftsSelected(value);
