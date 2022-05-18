@@ -118,3 +118,29 @@ export interface ContractInteractionAction {
 export interface ContractDeploymentAction {
   type: TxActionType.ContractDeployment;
 }
+
+export type TokenActivityType = "transfer" | "approve";
+
+export interface TokenActivityBase {
+  chainId: number;
+  accountAddress: string;
+  tokenSlug: string;
+  txHash: string;
+  timeAt: number;
+  type: TokenActivityType;
+}
+
+export type TokenActivity = TransferTokenActivity | ApproveTokenActivity;
+
+export interface TransferTokenActivity extends TokenActivityBase {
+  type: "transfer";
+  anotherAddress: string;
+  amount: string;
+}
+
+export interface ApproveTokenActivity extends TokenActivityBase {
+  type: "approve";
+  anotherAddress: string;
+  amount?: string;
+  clears?: boolean;
+}
