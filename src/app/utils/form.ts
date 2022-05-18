@@ -14,11 +14,14 @@ export const OnChange: FC<OnChangeProps> = ({ name, callback }) => {
     subscription: { value: true },
     allowNull: true,
   });
+  const { value } = field.input;
 
   const loadedRef = useRef(false);
   const callbackRef = useRef(callback);
 
-  const value = field.input.value;
+  if (callbackRef.current !== callback) {
+    callbackRef.current = callback;
+  }
 
   useEffect(() => {
     if (!loadedRef.current) {
