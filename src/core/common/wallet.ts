@@ -61,7 +61,8 @@ export function validateDerivationPath(path: string) {
 
 export function validatePrivateKey(privKey: string) {
   try {
-    new ethers.Wallet(privKey);
+    privKey = add0x(privKey);
+    assert(ethers.utils.isHexString(privKey, 32));
   } catch {
     throw new PublicError(t("invalidPrivateKey"));
   }
@@ -69,8 +70,16 @@ export function validatePrivateKey(privKey: string) {
 
 export function validatePublicKey(pubKey: string) {
   try {
-    ethers.utils.computeAddress(pubKey);
+    pubKey = add0x(pubKey);
+    assert(
+      ethers.utils.isHexString(pubKey, 33) ||
+        ethers.utils.isHexString(pubKey, 65)
+    );
   } catch {
     throw new PublicError(t("invalidPublicKey"));
   }
+}
+
+export function add0x(value: string) {
+  return /^[0-9a-f]*$/i.test(value) ? `0x${value}` : value;
 }
