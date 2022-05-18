@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 
-import { sync } from "core/client";
+import { sync, syncTokenActivities } from "core/client";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
 
@@ -50,4 +50,28 @@ export function useSync(chainId: number, accountAddress: string) {
 
     return () => clearTimeout(t);
   }, [chainId, windowFocused, accountAddress]);
+}
+
+export function useTokenActivitiesSync(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) {
+  const windowFocused = useWindowFocus();
+
+  useEffect(() => {
+    let t: any;
+
+    const syncAndDefer = () => {
+      syncTokenActivities(chainId, accountAddress, tokenSlug);
+
+      t = setTimeout(syncAndDefer, 3_000);
+    };
+
+    if (windowFocused) {
+      t = setTimeout(syncAndDefer, 1_500);
+    }
+
+    return () => clearTimeout(t);
+  }, [chainId, accountAddress, tokenSlug, windowFocused]);
 }
