@@ -11,7 +11,6 @@ import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
-import { OnChange } from "react-final-form-listeners";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC20__factory } from "abi-types";
@@ -28,6 +27,7 @@ import {
   validateAddress,
   withHumanDelay,
   focusOnErrors,
+  OnChange,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useProvider } from "app/hooks";
@@ -190,7 +190,7 @@ const Asset: FC = () => {
           onSubmit={handleSubmit}
           className="flex flex-col max-w-[23.25rem]"
         >
-          <OnChange name="recipient">{handleRecipientChange}</OnChange>
+          <OnChange name="recipient" callback={handleRecipientChange} />
           <AccountChangeObserver onChange={() => form.restart()} />
           <TokenSelect handleTokenChanged={() => form.change("amount", "")} />
           <Field
