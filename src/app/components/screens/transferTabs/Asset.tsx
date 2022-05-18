@@ -50,7 +50,7 @@ type FormValues = { amount: string; recipient: string };
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
-  const currentToken = useAccountToken(tokenSlug) as AccountAsset;
+  const currentToken = useAccountToken(tokenSlug);
   const { alert } = useDialog();
 
   const provider = useProvider();
@@ -87,27 +87,25 @@ const Asset: FC = () => {
   const handleSubmit = useCallback(
     async ({ recipient, amount }) =>
       withHumanDelay(async () => {
-        if (!tokenSlug) {
+        if (!currentToken) {
           return;
         }
+
         try {
+          const { tokenSlug, decimals } = currentToken;
+
           if (tokenSlug === NATIVE_TOKEN_SLUG) {
             await sendEther(recipient, amount);
           } else {
             const tokenContract = parseTokenSlug(tokenSlug).address;
 
-            await sendToken(
-              recipient,
-              tokenContract,
-              amount,
-              currentToken.decimals
-            );
+            await sendToken(recipient, tokenContract, amount, decimals);
           }
         } catch (err: any) {
           alert({ title: "Error!", content: err.message });
         }
       }),
-    [alert, currentToken, sendEther, sendToken, tokenSlug]
+    [alert, currentToken, sendEther, sendToken]
   );
 
   const [recipientAddr, setRecipientAddr] = useState<string>();
@@ -178,7 +176,7 @@ const Asset: FC = () => {
 
   const amountFieldKey = useMemo(
     () => `amount-${currentToken?.tokenSlug}-${maxAmount}`,
-    [maxAmount, currentToken]
+    [currentToken, maxAmount]
   );
 
   return (
@@ -192,7 +190,12 @@ const Asset: FC = () => {
         >
           <OnChange name="recipient" callback={handleRecipientChange} />
           <AccountChangeObserver onChange={() => form.restart()} />
-          <TokenSelect handleTokenChanged={() => form.change("amount", "")} />
+          <TokenSelect
+            handleTokenChanged={() => {
+              form.change("amount", "");
+              setTimeout(() => form.blur("amount"));
+            }}
+          />
           <Field
             name="recipient"
             validate={composeValidators(required, validateAddress)}
@@ -280,7 +283,7 @@ const AccountChangeObserver: FC<AccountChangeObserverProps> = ({
 };
 
 type TxCheckProps = {
-  currentToken: AccountAsset;
+  currentToken?: AccountAsset;
   values: FormValues & { gas?: ethers.BigNumber };
   error: boolean;
 };
