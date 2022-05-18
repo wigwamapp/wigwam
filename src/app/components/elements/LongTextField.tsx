@@ -25,6 +25,7 @@ const LongTextField = memo(
         readOnly,
         className,
         textareaClassName,
+        autoComplete = "off",
         ...rest
       },
       ref
@@ -76,6 +77,7 @@ const LongTextField = memo(
                 ],
                 textareaClassName
               )}
+              autoComplete={autoComplete}
               {...rest}
             />
             {actions}

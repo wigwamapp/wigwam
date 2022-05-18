@@ -57,6 +57,7 @@ const Input = memo(
         onFocus,
         onBlur,
         readOnly,
+        autoComplete = "off",
         ...rest
       },
       ref
@@ -177,6 +178,7 @@ const Input = memo(
               onBlur={handleBlur}
               disabled={disabled}
               readOnly={readOnly}
+              autoComplete={autoComplete}
               {...rest}
             />
             {EndAdornment && !actions && (
