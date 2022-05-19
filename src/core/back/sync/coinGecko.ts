@@ -21,6 +21,8 @@ export async function getCoinGeckoPrices(
   tokenAddresses: string[]
 ) {
   try {
+    if (tokenAddresses.length === 0) return {};
+
     const platformIds = await getCoinGeckoPlatformIds();
 
     const platform = platformIds.get(chainId);
