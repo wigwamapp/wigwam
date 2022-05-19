@@ -46,3 +46,4 @@ export const FONTS: Font[] = [["Inter", 300, 400, 600, 700, 900]];
 
 export const LOAD_MORE_ON_ASSET_FROM_END = 3;
 export const LOAD_MORE_ON_CONTACTS_FROM_END = 15;
+export const LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END = 5;

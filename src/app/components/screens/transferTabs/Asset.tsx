@@ -40,8 +40,8 @@ import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import AddressField from "app/components/elements/AddressField";
 import InputLabelAction from "app/components/elements/InputLabelAction";
+import ContactAutocomplete from "app/components/elements/ContactAutocomplete";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
 
@@ -197,11 +197,15 @@ const Asset: FC = () => {
             name="recipient"
             validate={composeValidators(required, validateAddress)}
           >
-            {({ input, meta }) => (
-              <AddressField
-                setFromClipboard={(value) => form.change("recipient", value)}
+            {({ input, focus, meta }) => (
+              <ContactAutocomplete
+                setValue={(value) => {
+                  form.change("recipient", value);
+                  focus();
+                }}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
+                meta={meta}
                 className="mt-5"
                 {...input}
               />
