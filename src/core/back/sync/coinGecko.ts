@@ -1,20 +1,18 @@
 import axios from "axios";
 import memoize from "mem";
-// import ExpiryMap from 'expiry-map';
+import ExpiryMap from "expiry-map";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 
-export type CoinGeckoPrices = Record<
-  string,
-  { usd: number; usd_24h_change: number }
->;
+export type CGPriceRecord = { usd: number; usd_24h_change: number };
+export type CoinGeckoPrices = Record<string, CGPriceRecord>;
 
 export const coinGeckoApi = axios.create({
   baseURL: "https://api.coingecko.com/api/v3",
   timeout: 60_000,
 });
 
-// const tokenPricesCache = new ExpiryMap(60_000);
+const tokenPricesCache = new ExpiryMap<string, CGPriceRecord>(3 * 60_000);
 
 export async function getCoinGeckoPrices(
   chainId: number,
@@ -28,15 +26,42 @@ export async function getCoinGeckoPrices(
     const platform = platformIds.get(chainId);
     if (!platform) return {};
 
-    const { data } = await coinGeckoApi.get(`/simple/token_price/${platform}`, {
-      params: {
-        contract_addresses: tokenAddresses.join(),
-        vs_currencies: "USD",
-        include_24hr_change: true,
-      },
-    });
+    const getCacheKey = (ta: string) => `${chainId}_${ta}`;
 
-    return data as CoinGeckoPrices;
+    const tokenAddressesToRefresh: string[] = [];
+    const data: CoinGeckoPrices = {};
+
+    for (let tokenAddress of tokenAddresses) {
+      tokenAddress = tokenAddress.toLowerCase();
+      const cached = tokenPricesCache.get(getCacheKey(tokenAddress));
+
+      if (cached) {
+        data[tokenAddress] = cached;
+      } else {
+        tokenAddressesToRefresh.push(tokenAddress);
+      }
+    }
+
+    if (tokenAddressesToRefresh.length === 0) {
+      return data;
+    }
+
+    const { data: freshData } = await coinGeckoApi.get<CoinGeckoPrices>(
+      `/simple/token_price/${platform}`,
+      {
+        params: {
+          contract_addresses: tokenAddressesToRefresh.join(),
+          vs_currencies: "USD",
+          include_24hr_change: true,
+        },
+      }
+    );
+
+    for (const [tokenAddress, price] of Object.entries(freshData)) {
+      tokenPricesCache.set(getCacheKey(tokenAddress), price);
+    }
+
+    return { ...data, ...freshData };
   } catch (err) {
     console.warn(err);
 
@@ -91,6 +116,6 @@ export const getCoinGeckoPlatformPrices = memoize(
     return data as CoinGeckoPrices;
   },
   {
-    maxAge: 60_000, // 1 min
+    maxAge: 3 * 60_000, // 3 min
   }
 );
