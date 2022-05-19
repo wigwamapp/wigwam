@@ -36,7 +36,8 @@ export async function addFindTokenRequest(
         getCoinGeckoPrices(chainId, [tokenAddress]),
       ]);
 
-      const cgPrice = coinGeckoPrices[tokenAddress];
+      const cgTokenAddress = tokenAddress.toLowerCase();
+      const cgPrice = coinGeckoPrices[cgTokenAddress];
       let priceUSD = cgPrice?.usd?.toString();
       const priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
