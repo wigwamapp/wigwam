@@ -123,7 +123,6 @@ export const contactsDialogContext =
 
 export const useContactsDialog = () => {
   const value = useContext(contactsDialogContext);
-  console.log("value");
   assert(value);
 
   return value;
@@ -131,7 +130,6 @@ export const useContactsDialog = () => {
 
 export const ContactsDialogProvider: FC = ({ children }) => {
   const [modalData, setModalData] = useState<ContactDialogParams>(null);
-  console.log("modalData", modalData);
 
   return (
     <contactsDialogContext.Provider

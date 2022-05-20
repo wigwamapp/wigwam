@@ -50,11 +50,8 @@ const AddLedgerAccounts: FC<AddLedgerAccountsProps> = ({ initialSetup }) => {
           await transportRef.current?.close();
           transportRef.current = await LedgerTransport.create();
 
-          console.log("transportRef.current", transportRef.current);
-
           const ledgerEth = new LedgerEth(transportRef.current);
 
-          console.log("ledgerEth", ledgerEth);
           const { publicKey, chainCode } = await ledgerEth.getAddress(
             rootDerivationPath,
             false,
