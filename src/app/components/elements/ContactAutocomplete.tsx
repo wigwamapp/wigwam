@@ -28,11 +28,10 @@ import { useContacts } from "app/hooks/contacts";
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
-import InputLabelAction from "./InputLabelAction";
 import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
-import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
+import SmallContactCard from "./SmallContactCard";
 
 type ContactAutocompleteProps = {
   meta: FieldMetaState<any>;
@@ -150,45 +149,12 @@ const ContactAutocomplete = forwardRef<
   );
 
   const labelAction = useMemo(() => {
-    if (!meta.error && mergedAccounts.length === 0) {
-      return (
-        <InputLabelAction className="pl-2 flex items-center">
-          <PlusIcon className="mr-1 w-4 h-auto" />
-          Save contact
-        </InputLabelAction>
-      );
-    }
-    if (mergedAccounts.length === 1 && !meta.error) {
-      const contact = mergedAccounts[0];
-      return (
-        <span
-          className={classNames(
-            "py-0.5 pl-0.5 pr-3 -my-1",
-            "rounded-md",
-            "border border-brand-main/[.07] text-sm",
-            "flex items-center"
-          )}
-        >
-          <AutoIcon
-            seed={contact.address}
-            source="dicebear"
-            type="personas"
-            className={classNames(
-              "h-6 w-6 min-w-[1.5rem] mr-2",
-              "bg-black/40",
-              "rounded"
-            )}
-          />
-          {"source" in contact ? (
-            <WalletName wallet={contact} className="!font-normal" />
-          ) : (
-            <TReplace msg={contact.name} />
-          )}
-        </span>
-      );
+    if (!meta.error && mergedAccounts.length <= 1) {
+      const contact = mergedAccounts[0] ?? undefined;
+      return <SmallContactCard contact={contact} address={value as string} />;
     }
     return undefined;
-  }, [mergedAccounts, meta.error]);
+  }, [mergedAccounts, meta.error, value]);
 
   return (
     <Popover.Root open={opened} modal={false} onOpenChange={() => undefined}>

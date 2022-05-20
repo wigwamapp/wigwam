@@ -1,9 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import useForceUpdate from "use-force-update";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
+import { assert } from "lib/system/assert";
 
 import { getContactsAtom } from "app/atoms";
+import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
 
 export type UseContactsOptions = {
   search?: string;
@@ -91,3 +102,42 @@ export function useContacts({
     loadMore,
   };
 }
+
+type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
+
+type ContactDialogParams =
+  | ({
+      name?: string;
+      address?: string;
+      addedAt?: number;
+    } & ModalProps)
+  | null;
+
+type ContactsDialogContextProps = {
+  modalData: ContactDialogParams;
+  upsertContact: (value: ContactDialogParams) => void;
+};
+
+export const contactsDialogContext =
+  createContext<ContactsDialogContextProps | null>(null);
+
+export const useContactsDialog = () => {
+  const value = useContext(contactsDialogContext);
+  console.log("value");
+  assert(value);
+
+  return value;
+};
+
+export const ContactsDialogProvider: FC = ({ children }) => {
+  const [modalData, setModalData] = useState<ContactDialogParams>(null);
+  console.log("modalData", modalData);
+
+  return (
+    <contactsDialogContext.Provider
+      value={{ modalData, upsertContact: setModalData }}
+    >
+      {children}
+    </contactsDialogContext.Provider>
+  );
+};
