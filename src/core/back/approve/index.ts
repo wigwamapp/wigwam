@@ -1,14 +1,15 @@
 import { match } from "ts-pattern";
+import { ethers } from "ethers";
+import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
 
-import { ActivityType, ApprovalResult, TxParams } from "core/types";
+import { Activity, ActivityType, ApprovalResult, TxParams } from "core/types";
+import { saveNonce } from "core/common/nonce";
+import * as repo from "core/repo";
 
 import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
 import { sendRpc } from "../rpc";
-import { ethers } from "ethers";
-import { dequal } from "dequal/lite";
-import { saveNonce } from "core/common/nonce";
 
 const { serializeTransaction, parseTransaction, keccak256, hexValue } =
   ethers.utils;
@@ -25,12 +26,10 @@ export async function processApprove(
     await match(approval)
       .with(
         { type: ActivityType.Transaction },
-        async ({ chainId, accountAddress, txParams, rpcReply }) => {
+        async ({ chainId, accountAddress, txParams, rpcReply, ...rest }) => {
           assert(rawTx || signedRawTx, "Transaction not provided");
 
-          const tx = rawTx
-            ? parseUnsignedTx(rawTx)
-            : parseTransaction(signedRawTx!);
+          const tx = parseTxSafe(rawTx ?? signedRawTx!);
           validateTxOrigin(tx, txParams);
 
           if (!signedRawTx) {
@@ -43,6 +42,8 @@ export async function processApprove(
 
             const signature = await vault.sign(account.uuid, keccak256(rawTx!));
             signedRawTx = serializeTransaction(tx, signature);
+          } else {
+            rawTx = serializeTransaction(tx);
           }
 
           if (
@@ -57,11 +58,22 @@ export async function processApprove(
           ]);
 
           if ("result" in rpcRes) {
-            await saveNonce(chainId, accountAddress, tx.nonce);
-
             const txHash = rpcRes.result;
 
-            rpcReply({ result: txHash });
+            await Promise.all([
+              saveNonce(chainId, accountAddress, tx.nonce),
+              saveActivity({
+                ...rest,
+                chainId,
+                accountAddress,
+                txParams,
+                rawTx: rawTx!,
+                txHash,
+                timeAt: Date.now(),
+              }),
+            ]);
+
+            rpcReply?.({ result: txHash });
           } else {
             console.warn(rpcRes.error);
 
@@ -77,10 +89,22 @@ export async function processApprove(
         throw new Error("Not Found");
       });
   } else {
-    approval.rpcReply({ error: { message: "Declined" } });
+    approval.rpcReply?.({ error: { message: "Declined" } });
   }
 
   approvalResolved(approvalId);
+}
+
+async function saveActivity(activity: Activity) {
+  try {
+    // const existing = await repo.activities.get(activity.id);
+    // if (existing) {
+
+    // }
+    await repo.activities.put(activity);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 const STRICT_TX_PROPS = [
@@ -116,7 +140,7 @@ function hexValueMaybe<T>(smth: T) {
   return smth;
 }
 
-function parseUnsignedTx(rawTx: ethers.BytesLike): ethers.Transaction {
+function parseTxSafe(rawTx: ethers.BytesLike): ethers.Transaction {
   const tx = parseTransaction(rawTx);
 
   // Remove signature props

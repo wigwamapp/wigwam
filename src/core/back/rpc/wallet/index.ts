@@ -39,6 +39,7 @@ export async function sendTransaction(
     id: nanoid(),
     type: ActivityType.Transaction,
     source: { type: "self", kind: "unknown_transaction" },
+    timeAt: Date.now(),
     chainId,
     accountAddress,
     txParams,
