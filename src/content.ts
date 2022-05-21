@@ -1,74 +1,60 @@
-/* eslint-disable */
-
-// import { PorterClient } from "lib/ext/porter/client";
-// import { assert } from "lib/system/assert";
-// import { MessageType, Request, Response } from "core/types";
-
-// const porter = new PorterClient<Request, Response>("CONTENT_SCRIPT");
-
-// (async () => {
-//   try {
-//     const res = await porter.request(
-//       { type: MessageType.GetWalletStatus },
-//       5_000
-//     );
-//     assert(res?.type === MessageType.GetWalletStatus);
-//     console.info(res.status);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// })();
-
 import browser from "webextension-polyfill";
+import { PorterClient } from "lib/ext/porter/client";
 
-import { Emitter } from "lib/emitter";
 import { PorterChannel } from "core/types/shared";
+import { shouldInject } from "core/inpage/shouldInject";
+import { InpageProtocol } from "core/inpage/protocol";
 
-interface RequestArguments {
-  readonly method: string;
-  readonly params?: readonly unknown[] | Record<string, unknown>;
+if (shouldInject()) {
+  injectScript(browser.runtime.getURL("scripts/inpage.js"));
+  initMsgGateway();
 }
 
-interface ProviderMessage {
-  readonly type: string;
-  readonly data: unknown;
-}
+function initMsgGateway() {
+  const porter = new PorterClient();
+  porter.connect(PorterChannel.Page);
+  porter.onFullyDisconnect = () => {
+    if (process.env.NODE_ENV === "development") {
+      location.reload();
+      return;
+    }
 
-interface EthSubscription extends ProviderMessage {
-  readonly type: "eth_subscription";
-  readonly data: {
-    readonly subscription: string;
-    readonly result: unknown;
+    console.error(
+      "Vigvam: Provider disconnected." +
+        " A page reload is required to reestablish the connection."
+    );
   };
+
+  const inpage = new InpageProtocol("content", "injected");
+
+  let firstMsg: any;
+
+  // Redirect messages: Background --> Injected
+  porter.onOneWayMessage((msg) => {
+    if (!firstMsg) {
+      firstMsg = msg;
+      return;
+    }
+
+    inpage.send(msg);
+  });
+
+  // Redirect messages: Injected --> Background
+  inpage.subscribe((msg) => {
+    if (msg === "inited" && firstMsg) {
+      inpage.send(firstMsg);
+      return;
+    }
+
+    try {
+      porter.sendOneWayMessage(msg);
+    } catch (err) {
+      console.error(err);
+      // TODO: Handle disconnect error,
+      // and reply with rpc corresponding rpc error
+    }
+  });
 }
-
-interface ProviderConnectInfo {
-  readonly chainId: string;
-}
-
-class ProviderRpcError extends Error {
-  name = "ProviderRpcError";
-
-  constructor(public code: number, public data?: unknown) {
-    super(PROVIDER_ERRORS[code] ?? "Unknown error occurred");
-  }
-}
-
-const PROVIDER_ERRORS: Record<number, string> = {
-  4001: "The user rejected the request",
-  4100: "The requested method and/or account has not been authorized by the user",
-  4200: "The Provider does not support the requested method",
-  4900: "The Provider is disconnected from all chains",
-  4901: "The Provider is not connected to the requested chain",
-};
-
-class Ethereum extends Emitter<ProviderMessage> {
-  async enable() {}
-
-  async request(_req: RequestArguments) {}
-}
-
-injectScript(browser.runtime.getURL("scripts/inpage.js"));
 
 function injectScript(src: string) {
   try {

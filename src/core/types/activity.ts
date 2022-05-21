@@ -18,14 +18,20 @@ export enum SigningStandard {
   SignTypedDataV4 = "signTypedData_v4",
 }
 
+export enum SelfActivityKind {
+  Transfer,
+  Swap,
+  Unknown,
+}
+
 export type ActivitySource =
   | {
       type: "self";
-      kind: string;
+      kind: SelfActivityKind;
     }
   | {
-      type: "dapp";
-      origin: string;
+      type: "page";
+      url: string;
     };
 
 export interface ApprovalResult {

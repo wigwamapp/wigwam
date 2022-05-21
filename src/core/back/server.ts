@@ -38,6 +38,22 @@ export function startServer() {
   startApproveWindowServer();
 
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
+  const pagePorter = new PorterServer<any>(PorterChannel.Page);
+
+  pagePorter.onMessage(handlePageRequest);
+
+  pagePorter.onConnection((action, port) => {
+    if (action === "connect") {
+      pagePorter.notify(port, {
+        jsonrpc: "2.0",
+        method: "vigvam_state",
+        params: {
+          chainId: 1,
+          accountAddress: null,
+        },
+      });
+    }
+  });
 
   walletPorter.onConnection(() => {
     walletPortsCountUpdated(walletPorter.portsCount);
@@ -76,11 +92,8 @@ export function startServer() {
       attempts++;
 
       if (attempts > 5) {
-        await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
-      }
-
-      if (attempts > 3) {
         locked();
+        await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
       }
     }
 
@@ -89,6 +102,18 @@ export function startServer() {
 
   // const dappPorter = new PorterServer(PorterChannel.DApp);
   // dappPorter.onMessage(handleDAppRequest);
+}
+
+async function handlePageRequest(
+  ctx: MessageContext<Request | EventMessage, Response>
+) {
+  console.debug("New page request", ctx);
+
+  try {
+    await ensureInited();
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function handleWalletRequest(

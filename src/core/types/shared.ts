@@ -1,4 +1,4 @@
 export enum PorterChannel {
   Wallet = "WALLET",
-  DApp = "DAPP",
+  Page = "PAGE",
 }

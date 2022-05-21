@@ -4,6 +4,7 @@ import { sendRpc } from "./network";
 import { sendTransaction } from "./wallet";
 
 export async function handleRpc(
+  // source: ActivitySource,
   chainId: number,
   method: string,
   params: any[],

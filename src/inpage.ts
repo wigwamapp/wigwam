@@ -1,16 +1,24 @@
-export {};
+import { InpageProvider } from "core/inpage/provider";
 
-const providers: any[] = [];
-if ("ethereum" in window) {
-  providers.push((window as any).ethereum);
+injectUniversal("ethereum");
+injectUniversal("vigvamEthereum");
+
+function injectUniversal(key: string) {
+  const providers: InpageProvider[] = [new InpageProvider()];
+
+  if (key in window) {
+    providers.push((window as any)[key]);
+  }
+
+  Object.defineProperty(window, key, {
+    configurable: true,
+    get() {
+      return providers.find((p) => p.selectedAddress) ?? providers[0];
+    },
+    set(value) {
+      providers.push(value);
+    },
+  });
+
+  window.dispatchEvent(new Event(`${key}#initialized`));
 }
-
-Object.defineProperty(window, "ethereum", {
-  configurable: true,
-  get() {
-    return providers[0];
-  },
-  set(value) {
-    providers.push(value);
-  },
-});
