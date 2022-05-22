@@ -27,7 +27,12 @@ import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
 import { processApprove } from "./approve";
 import { startApproveWindowServer } from "./approve/window";
-import { addFindTokenRequest, addSyncRequest, getTPGasPrices } from "./sync";
+import {
+  addFindTokenRequest,
+  addSyncRequest,
+  getTPGasPrices,
+  syncTokenActivities,
+} from "./sync";
 
 export function startServer() {
   startApproveWindowServer();
@@ -246,6 +251,13 @@ async function handleWalletRequest(
         ({ chainId, accountAddress, tokenSlug }) =>
           withStatus(WalletStatus.Unlocked, () => {
             addFindTokenRequest(chainId, accountAddress, tokenSlug);
+          })
+      )
+      .with(
+        { type: MessageType.SyncTokenActivities },
+        ({ chainId, accountAddress, tokenSlug }) =>
+          withStatus(WalletStatus.Unlocked, () => {
+            syncTokenActivities(chainId, accountAddress, tokenSlug);
           })
       )
       .with({ type: MessageType.GetTPGasPrices }, ({ type, chainId }) =>

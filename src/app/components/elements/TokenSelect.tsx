@@ -98,7 +98,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
   const prevTokenSlug = usePrevious(currentToken?.tokenSlug);
 
   useEffect(() => {
-    if (currentToken?.tokenSlug !== prevTokenSlug) {
+    if (prevTokenSlug && currentToken?.tokenSlug !== prevTokenSlug) {
       handleTokenChanged?.();
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
