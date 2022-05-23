@@ -1,6 +1,7 @@
 import { FC, useCallback } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
+import { ethers } from "ethers";
 
 import * as Repo from "core/repo";
 
@@ -35,6 +36,7 @@ const ContactsDialog: FC = () => {
     async ({ name: newName, address: newAddress }) =>
       withHumanDelay(async () => {
         if (modalData) {
+          newAddress = ethers.utils.getAddress(newAddress);
           const { name, address, addedAt } = modalData;
           const isNew = !name || !address;
           try {
@@ -49,14 +51,11 @@ const ContactsDialog: FC = () => {
                 await Repo.contacts.delete(address);
               }
             } else {
-              await Repo.contacts.put(
-                {
-                  name: newName,
-                  address: newAddress,
-                  addedAt: addedAt!,
-                },
-                address
-              );
+              await Repo.contacts.put({
+                name: newName,
+                address: newAddress,
+                addedAt: addedAt!,
+              });
             }
 
             upsertContact(null);
