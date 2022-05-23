@@ -52,7 +52,10 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         >
           {header && (
             <h2
-              className={classNames("mb-8 text-2xl font-bold", headerClassName)}
+              className={classNames(
+                "mb-8 text-2xl text-center font-bold",
+                headerClassName
+              )}
             >
               {header}
             </h2>
