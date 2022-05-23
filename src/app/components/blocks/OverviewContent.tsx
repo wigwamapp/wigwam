@@ -218,7 +218,7 @@ const AssetsList: FC<AssetsListProps> = ({
       let t = setTimeout(() => {
         const tokenSlug = createTokenSlug({
           standard: TokenStandard.ERC20,
-          address: searchValue!,
+          address: ethers.utils.getAddress(searchValue!),
           id: "0",
         });
 

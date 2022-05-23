@@ -258,7 +258,7 @@ export async function isSmartContractAddress(
 
 function ethStringify(v: ethers.BigNumberish) {
   return typeof v === "string" && ethers.utils.isAddress(v)
-    ? ethers.utils.getAddress(v).toLowerCase()
+    ? ethers.utils.getAddress(v)
     : v.toString();
 }
 

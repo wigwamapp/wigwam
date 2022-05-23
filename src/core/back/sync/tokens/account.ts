@@ -59,16 +59,16 @@ export const syncAccountTokens = memoize(
 
       if (debankUserTokens) {
         for (const token of debankUserTokens) {
-          const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
-
-          if (token.id === debankChain.native_token_id) continue;
-
           const native = token.id === debankChain.native_token_id;
+
+          if (native) continue;
+
           const tokenSlug = createTokenSlug({
             standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-            address: native ? "0" : token.id,
+            address: native ? "0" : ethers.utils.getAddress(token.id),
             id: "0",
           });
+          const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
 
           const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
@@ -193,7 +193,10 @@ export const syncAccountTokens = memoize(
     for (const token of accTokens) {
       if (token.status === TokenStatus.Native) continue;
 
-      const price = cgPrices[parseTokenSlug(token.tokenSlug).address];
+      const cgTokenAddress = parseTokenSlug(
+        token.tokenSlug
+      ).address.toLowerCase();
+      const price = cgPrices[cgTokenAddress];
 
       if (price && price.usd) {
         const priceUSD = new BigNumber(price.usd);
