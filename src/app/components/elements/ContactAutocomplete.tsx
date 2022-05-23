@@ -87,12 +87,14 @@ const ContactAutocomplete = forwardRef<
 
   useEffect(() => {
     if (meta.active) {
-      setOpened((prevState) => {
-        if (!prevState) {
-          setActiveSuggestion(0);
-        }
-        return true;
-      });
+      setTimeout(() => {
+        setOpened((prevState) => {
+          if (!prevState) {
+            setActiveSuggestion(0);
+          }
+          return true;
+        });
+      }, 50);
     } else {
       setOpened(false);
     }
