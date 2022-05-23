@@ -72,16 +72,16 @@ const AddAccountModal = memo(() => {
                 ref={ref}
                 className={classNames(
                   "w-full h-full",
-                  isInitial
-                    ? "bg-brand-dark/10 backdrop-blur-[30px]"
-                    : "brandbg-large-modal",
-                  "border border-brand-light/5",
                   "rounded-[2.5rem]",
-                  "after:absolute after:inset-0",
-                  "after:shadow-addaccountmodal",
-                  "after:rounded-[2.5rem]",
-                  "after:pointer-events-none",
-                  "after:z-20"
+                  "border border-brand-light/5",
+                  !isInitial && [
+                    "brandbg-large-modal",
+                    "after:absolute after:inset-0",
+                    "after:shadow-addaccountmodal",
+                    "after:rounded-[2.5rem]",
+                    "after:pointer-events-none",
+                    "after:z-20",
+                  ]
                 )}
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
@@ -92,6 +92,14 @@ const AddAccountModal = memo(() => {
                 )}
                 type="scroll"
               >
+                {isInitial && (
+                  <div
+                    className={classNames(
+                      "absolute inset-0 z-[-5] rounded-[2.5rem] overflow-hidden",
+                      "bg-brand-dark/10 backdrop-blur-[30px]"
+                    )}
+                  />
+                )}
                 {accountStep !== AddAccountStep.ChooseWay && (
                   <BackButton className="absolute top-4 left-4 " />
                 )}
@@ -101,6 +109,17 @@ const AddAccountModal = memo(() => {
                 </Dialog.Close>
 
                 {accModalOpened && <AddAccountSteps />}
+                {isInitial && (
+                  <div
+                    className={classNames(
+                      "absolute inset-0",
+                      "shadow-addaccountmodal",
+                      "rounded-[2.5rem]",
+                      "pointer-events-none",
+                      "z-20"
+                    )}
+                  />
+                )}
               </ScrollAreaContainer>
             )}
           </OverflowProvider>

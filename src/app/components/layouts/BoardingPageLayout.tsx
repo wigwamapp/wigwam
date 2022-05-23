@@ -50,7 +50,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
             <Button
               theme="clean"
               to={{ page: "profiles" }}
-              className="absolute bottom-2 left-0 group"
+              className="absolute bottom-2 left-0 group !font-bold"
             >
               <ArrowLeftLongIcon
                 className={classNames(
@@ -62,7 +62,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
               Profiles
             </Button>
           ) : (
-            <BackButton className="absolute bottom-2 left-0" />
+            <BackButton className="absolute bottom-2 left-0 !font-bold" />
           )}
         </header>
       )}
