@@ -1,5 +1,6 @@
 import { memo, useCallback } from "react";
 import { Field, Form } from "react-final-form";
+import { ethers } from "ethers";
 
 import { AccountSource } from "core/types";
 
@@ -30,7 +31,7 @@ const AddWatchOnlyAccount = memo(() => {
           stateRef.current.importAddresses = [
             {
               source: AccountSource.Address,
-              address: address,
+              address: ethers.utils.getAddress(address),
               isDisabled: true,
               isDefaultChecked: true,
             },

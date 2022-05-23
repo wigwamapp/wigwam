@@ -57,6 +57,7 @@ const Input = memo(
         onFocus,
         onBlur,
         readOnly,
+        autoComplete = "off",
         ...rest
       },
       ref
@@ -177,6 +178,7 @@ const Input = memo(
               onBlur={handleBlur}
               disabled={disabled}
               readOnly={readOnly}
+              autoComplete={autoComplete}
               {...rest}
             />
             {EndAdornment && !actions && (
@@ -223,7 +225,7 @@ const Input = memo(
               error && errorMessage && !readOnly && "max-h-5"
             )}
           >
-            <span className="text-brand-redtext pt-1 pl-4 text-xs">
+            <span className="block text-brand-redtext pt-1 pl-4 text-xs">
               {errorMessage}
             </span>
           </div>

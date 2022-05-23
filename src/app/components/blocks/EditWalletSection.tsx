@@ -1,11 +1,11 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
 import { replaceT } from "lib/ext/i18n";
 import { fromProtectedString } from "lib/crypto-utils";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { TReplace } from "lib/ext/i18n/react";
 
 import { Account, AccountSource, SocialProvider } from "core/types";
 import {
@@ -23,7 +23,6 @@ import {
   required,
   withHumanDelay,
 } from "app/utils";
-import { currentAccountAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import Input from "app/components/elements/Input";
 import Button from "app/components/elements/Button";
@@ -136,28 +135,29 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           </form>
         )}
       />
-      {account.source !== AccountSource.Address && (
-        <WalletBlock
-          Icon={KeyIcon}
-          title="Private key"
-          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
-          className="mt-6"
-        >
-          <Button
-            theme="secondary"
-            className={classNames(
-              "max-h-[2.625rem]",
-              "flex !justify-start items-center",
-              "text-left",
-              "mt-2 !px-3 mr-auto"
-            )}
-            onClick={() => setModalState("private-key")}
+      {account.source !== AccountSource.Address &&
+        account.source !== AccountSource.Ledger && (
+          <WalletBlock
+            Icon={KeyIcon}
+            title="Private key"
+            description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+            className="mt-6"
           >
-            <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-            Reveal
-          </Button>
-        </WalletBlock>
-      )}
+            <Button
+              theme="secondary"
+              className={classNames(
+                "max-h-[2.625rem]",
+                "flex !justify-start items-center",
+                "text-left",
+                "mt-2 !px-3 min-w-[11.25rem] mr-auto"
+              )}
+              onClick={() => setModalState("private-key")}
+            >
+              <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+              Reveal key
+            </Button>
+          </WalletBlock>
+        )}
       {account.source === AccountSource.OpenLogin && (
         <WalletBlock
           Icon={getSocialIcon(account.social)}
@@ -199,12 +199,12 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 "max-h-[2.625rem]",
                 "flex !justify-start items-center",
                 "text-left",
-                "mt-2 !px-3 mr-auto"
+                "mt-2 !px-3 min-w-[11.25rem] mr-auto"
               )}
               onClick={() => setModalState("phrase")}
             >
               <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-              Reveal
+              Reveal phrase
             </Button>
             <Input
               defaultValue={account.derivationPath}
@@ -247,6 +247,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       </Button>
       {modalState && (
         <DeleteAccountModal
+          account={account}
           open={true}
           cause={modalState}
           onOpenChange={() => setModalState(null)}
@@ -291,11 +292,13 @@ const WalletBlock: FC<WalletBlockProps> = ({
 );
 
 const DeleteAccountModal = memo<
-  SecondaryModalProps & { cause: "delete" | "phrase" | "private-key" }
->(({ cause, open, onOpenChange }) => {
+  SecondaryModalProps & {
+    account: Account;
+    cause: "delete" | "phrase" | "private-key";
+  }
+>(({ account, cause, open, onOpenChange }) => {
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
-  const currentAccount = useAtomValue(currentAccountAtom);
   const windowFocused = useWindowFocus();
 
   useEffect(() => {
@@ -313,12 +316,12 @@ const DeleteAccountModal = memo<
               const seed = await getSeedPhrase(password); // check is password correct
               setSeedPhrase(seed.phrase);
             } else {
-              const key = await getPrivateKey(password, currentAccount.uuid);
+              const key = await getPrivateKey(password, account.uuid);
               setPrivateKey(key);
             }
           } else {
             try {
-              await deleteAccounts(password, [currentAccount.uuid]);
+              await deleteAccounts(password, [account.uuid]);
               onOpenChange?.(false);
             } catch (err: any) {
               throw new Error(err?.message);
@@ -329,17 +332,23 @@ const DeleteAccountModal = memo<
         }
         return;
       }),
-    [cause, currentAccount, onOpenChange]
+    [cause, account, onOpenChange]
   );
 
   return (
     <SecondaryModal
       header={
-        seedPhrase
-          ? "Your secret phrase"
-          : privateKey
-          ? `Private key for wallet "${currentAccount.name}"`
-          : "Type password"
+        seedPhrase ? (
+          "Your secret phrase"
+        ) : privateKey ? (
+          <>
+            Private key for wallet &#34;
+            <TReplace msg={account.name} />
+            &#34;
+          </>
+        ) : (
+          "Type password"
+        )
       }
       open={open}
       onOpenChange={onOpenChange}
@@ -385,7 +394,9 @@ const DeleteAccountModal = memo<
                 className="mt-6 !min-w-[14rem]"
                 loading={submitting}
               >
-                {cause === "delete" ? "Confirm" : "Reveal"}
+                {cause === "delete"
+                  ? "Confirm"
+                  : `Reveal ${cause === "phrase" ? "phrase" : "key"}`}
               </Button>
             </form>
           )}

@@ -46,6 +46,7 @@ import {
   getSeedPhraseHDNode,
   validateNoAccountDuplicates,
   validateDerivationPath,
+  add0x,
 } from "core/common";
 
 const {
@@ -388,11 +389,10 @@ export class Vault {
           }
 
           case AccountSource.PrivateKey: {
-            const privateKey = importProtected(params.privateKey);
-
-            const publicKey = ethers.utils.computePublicKey(
-              privateKey.getText()
+            const privateKey = add0x(
+              importProtected(params.privateKey).getText()
             );
+            const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
 
             const account: PrivateKeyAccount = {
@@ -402,7 +402,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey,
+              privateKey: ProtectedValue.fromString(privateKey),
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -410,15 +410,13 @@ export class Vault {
           }
 
           case AccountSource.OpenLogin: {
-            const social = params.social;
-            const socialName = params.socialName;
-            const socialEmail = params.socialEmail;
-            const privateKey = importProtected(params.privateKey);
-
-            const publicKey = ethers.utils.computePublicKey(
-              `0x${privateKey.getText()}`
+            const privateKey = add0x(
+              importProtected(params.privateKey).getText()
             );
+            const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
+
+            const { social, socialName, socialEmail } = params;
 
             const account: SocialAccount = {
               ...base,
@@ -430,7 +428,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey,
+              privateKey: ProtectedValue.fromString(privateKey),
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -439,9 +437,11 @@ export class Vault {
 
           case AccountSource.Ledger: {
             const derivationPath = params.derivationPath;
-            const publicKey = importProtected(params.publicKey);
-
-            const address = ethers.utils.computeAddress(publicKey.getText());
+            const publicKey = ethers.utils.computePublicKey(
+              add0x(importProtected(params.publicKey).getText()),
+              true
+            );
+            const address = ethers.utils.computeAddress(publicKey);
 
             const account: LedgerAccount = {
               ...base,
@@ -451,7 +451,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              publicKey,
+              publicKey: ProtectedValue.fromString(publicKey),
             };
 
             return { account, keys };

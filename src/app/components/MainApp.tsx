@@ -4,6 +4,7 @@ import BaseProvider from "./BaseProvider";
 import FullScreenRouter from "./FullScreenRouter";
 import AddAccountModal from "./blocks/AddAccountModal";
 import Dialog from "./blocks/Dialog";
+import ContactsDialog from "./blocks/ContactsDialog";
 
 const MainApp: FC = () => (
   <BaseProvider>
@@ -19,6 +20,7 @@ const Modals: FC = () => {
   return (
     <>
       <Dialog />
+      <ContactsDialog />
       <AddAccountModal />
     </>
   );

@@ -36,6 +36,7 @@ import {
   useChainId,
   useIsSyncing,
   useLazyNetwork,
+  useTokenActivitiesSync,
 } from "app/hooks";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 
@@ -217,7 +218,7 @@ const AssetsList: FC<AssetsListProps> = ({
       let t = setTimeout(() => {
         const tokenSlug = createTokenSlug({
           standard: TokenStandard.ERC20,
-          address: searchValue!,
+          address: ethers.utils.getAddress(searchValue!),
           id: "0",
         });
 
@@ -249,7 +250,7 @@ const AssetsList: FC<AssetsListProps> = ({
         setTokenSlug([RESET]);
         setSearchValue(null);
         setManageModeEnabled(false);
-      } else {
+      } else if (tokens.length > 0) {
         setTokenSlug([tokens[0].tokenSlug, "replace"]);
       }
       setIsNftsSelected(value);
@@ -503,20 +504,23 @@ const AssetCard = memo(
 
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const currentNetwork = useLazyNetwork();
 
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
-  const parsedTokenSlug = useMemo(
-    () => tokenSlug && parseTokenSlug(tokenSlug),
+  const chainId = useChainId();
+  const currentAccount = useAtomValue(currentAccountAtom);
+
+  useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
+
+  const currentNetwork = useLazyNetwork();
+  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  const { standard, address } = useMemo(
+    () => parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
 
-  if (!tokenInfo || !parsedTokenSlug) {
-    return null;
-  }
+  if (!tokenInfo) return null;
 
   const {
-    chainId,
     status,
     name,
     symbol,
@@ -526,7 +530,6 @@ const AssetInfo: FC = () => {
     priceUSDChange,
     balanceUSD,
   } = tokenInfo;
-  const { standard, address } = parsedTokenSlug;
 
   const coinGeckoId =
     status === TokenStatus.Native

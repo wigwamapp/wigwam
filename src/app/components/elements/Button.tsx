@@ -1,5 +1,4 @@
 import {
-  HTMLAttributes,
   ForwardedRef,
   forwardRef,
   ReactNode,
@@ -20,7 +19,7 @@ type ButtonProps = {
   loading?: boolean;
   plainFocus?: boolean;
   children: ReactNode;
-} & (HTMLAttributes<HTMLButtonElement> | LinkProps);
+} & (ButtonHTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const loadingTransitionTimeout = 300;
 

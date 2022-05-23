@@ -9,7 +9,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
-type AddressFieldProps = LongTextFieldProps & {
+export type AddressFieldProps = LongTextFieldProps & {
   setFromClipboard?: (value: string) => void;
 };
 

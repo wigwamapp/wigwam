@@ -45,6 +45,13 @@ export async function processApprove(
             signedRawTx = serializeTransaction(tx, signature);
           }
 
+          if (
+            process.env.NODE_ENV === "development" &&
+            process.env.VIGVAM_DEV_BLOCK_TX_SEND === "true"
+          ) {
+            throw new Error("Blocked by VIGVAM_DEV_BLOCK_TX_SEND env variable");
+          }
+
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
             signedRawTx,
           ]);

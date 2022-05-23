@@ -10,6 +10,7 @@ import {
   Sync,
   SyncStatus,
   FindToken,
+  SyncTokenActivities,
 } from "core/types";
 
 import { porter } from "./base";
@@ -231,4 +232,28 @@ export function findToken(
   };
 
   porter.sendOneWayMessage(msg);
+}
+
+export function syncTokenActivities(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) {
+  const msg: SyncTokenActivities = {
+    type: MessageType.SyncTokenActivities,
+    chainId,
+    accountAddress,
+    tokenSlug,
+  };
+
+  porter.sendOneWayMessage(msg);
+}
+
+export async function getThirdPartyGasPrices(chainId: number) {
+  const type = MessageType.GetTPGasPrices;
+
+  const res = await porter.request({ type, chainId });
+  assert(res?.type === type);
+
+  return res.gasPrices;
 }

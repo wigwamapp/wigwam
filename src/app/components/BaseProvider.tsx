@@ -11,6 +11,7 @@ import {
   selectedCurrencyAtom,
 } from "app/atoms";
 import { DialogProvider } from "app/hooks/dialog";
+import { ContactsDialogProvider } from "app/hooks/contacts";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
@@ -20,7 +21,9 @@ const BaseProvider: FC = ({ children }) => (
         <Suspense fallback={null}>
           <Boot />
 
-          <DialogProvider>{children}</DialogProvider>
+          <DialogProvider>
+            <ContactsDialogProvider>{children}</ContactsDialogProvider>
+          </DialogProvider>
         </Suspense>
       </JotaiProvider>
     </ErrBond>
