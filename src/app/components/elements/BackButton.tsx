@@ -13,54 +13,58 @@ import { pageAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
 
-type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type BackButtonProps = {
+  theme?: "primary" | "secondary" | "tertiary" | "clean" | "primary-reverse";
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
-  const [page, setPage] = useAtom(pageAtom);
-  const historyPosition = getPosition();
+const BackButton = memo<BackButtonProps>(
+  ({ theme = "clean", className, onClick, ...rest }) => {
+    const [page, setPage] = useAtom(pageAtom);
+    const historyPosition = getPosition();
 
-  const inHome = page === Page.Default;
-  const canBack = historyPosition > 0 || !inHome;
+    const inHome = page === Page.Default;
+    const canBack = historyPosition > 0 || !inHome;
 
-  const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
-    (evt) => {
-      if (onClick) {
-        onClick(evt);
-        if (evt.defaultPrevented) {
-          return;
+    const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
+      (evt) => {
+        if (onClick) {
+          onClick(evt);
+          if (evt.defaultPrevented) {
+            return;
+          }
         }
-      }
 
-      switch (true) {
-        case historyPosition > 0:
-          goBack();
-          break;
+        switch (true) {
+          case historyPosition > 0:
+            goBack();
+            break;
 
-        case !inHome:
-          setPage([Page.Default, "replace"]);
-          break;
-      }
-    },
-    [onClick, historyPosition, inHome, setPage]
-  );
+          case !inHome:
+            setPage([Page.Default, "replace"]);
+            break;
+        }
+      },
+      [onClick, historyPosition, inHome, setPage]
+    );
 
-  return canBack ? (
-    <Button
-      theme="clean"
-      onClick={handleClick}
-      className={classNames("group", className)}
-      {...rest}
-    >
-      <ArrowLeftLongIcon
-        className={classNames(
-          "mr-2",
-          "transition-transform",
-          "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
-        )}
-      />
-      Back
-    </Button>
-  ) : null;
-});
+    return canBack ? (
+      <Button
+        theme={theme}
+        onClick={handleClick}
+        className={classNames("group", className)}
+        {...rest}
+      >
+        <ArrowLeftLongIcon
+          className={classNames(
+            "mr-2",
+            "transition-transform",
+            "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
+          )}
+        />
+        Back
+      </Button>
+    ) : null;
+  }
+);
 
 export default BackButton;

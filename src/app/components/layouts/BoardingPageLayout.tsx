@@ -23,6 +23,14 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
+const buttonClassNames = classNames(
+  "absolute bottom-2 left-0",
+  "group",
+  "!py-2",
+  "!min-w-[8.5rem]",
+  "backdrop-blur-[8px]"
+);
+
 const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
   header = true,
   animate = false,
@@ -48,9 +56,9 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
         <header className="flex items-stretch relative">
           {isWelcome ? (
             <Button
-              theme="clean"
+              theme="secondary"
               to={{ page: "profiles" }}
-              className="absolute bottom-2 left-0 group !font-bold"
+              className={buttonClassNames}
             >
               <ArrowLeftLongIcon
                 className={classNames(
@@ -62,7 +70,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
               Profiles
             </Button>
           ) : (
-            <BackButton className="absolute bottom-2 left-0 !font-bold" />
+            <BackButton theme="secondary" className={buttonClassNames} />
           )}
         </header>
       )}
