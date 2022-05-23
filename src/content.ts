@@ -6,11 +6,13 @@ import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
 if (shouldInject()) {
-  injectScript(browser.runtime.getURL("scripts/inpage.js"));
-  initMsgGateway();
+  const injected = injectScript(browser.runtime.getURL("scripts/inpage.js"));
+  injected && initMsgGateway(injected);
 }
 
-function initMsgGateway() {
+function initMsgGateway(injected: Promise<void>) {
+  const inpage = new InpageProtocol("content", "injected");
+
   const porter = new PorterClient();
   porter.connect(PorterChannel.Page);
   porter.onFullyDisconnect = () => {
@@ -25,27 +27,13 @@ function initMsgGateway() {
     );
   };
 
-  const inpage = new InpageProtocol("content", "injected");
-
-  let firstMsg: any;
-
   // Redirect messages: Background --> Injected
   porter.onOneWayMessage((msg) => {
-    if (!firstMsg) {
-      firstMsg = msg;
-      return;
-    }
-
-    inpage.send(msg);
+    injected.then(() => inpage.send(msg));
   });
 
   // Redirect messages: Injected --> Background
   inpage.subscribe((msg) => {
-    if (msg === "inited" && firstMsg) {
-      inpage.send(firstMsg);
-      return;
-    }
-
     try {
       porter.sendOneWayMessage(msg);
     } catch (err) {
@@ -64,7 +52,12 @@ function injectScript(src: string) {
     script.src = src;
     container.insertBefore(script, container.children[0]);
     container.removeChild(script);
+
+    return new Promise<void>((res) =>
+      script.addEventListener("load", () => res(), true)
+    );
   } catch (err) {
     console.error("Vigvam: Provider injection failed.", err);
+    return null;
   }
 }

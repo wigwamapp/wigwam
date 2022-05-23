@@ -2,26 +2,31 @@ import { ethErrors } from "eth-rpc-errors";
 import { nanoid } from "nanoid";
 import { Emitter } from "lib/emitter";
 
-import { JsonRpcResponse, JsonRpcRequest, JsonRpcNotification } from "./types";
+import {
+  JsonRpcResponse,
+  JsonRpcRequest,
+  JsonRpcNotification,
+  JsonRpcCallback,
+  JsonRpcCallbackBatch,
+  JsonRpcError,
+  JsonRpcMethod,
+  AUTHORIZED_METHODS,
+} from "./types";
 import { InpageProtocol } from "./protocol";
+import { FilterObserver } from "./filterObserver";
 
 const JSONRPC = "2.0";
 const VIGVAM_STATE = "vigvam_state";
 const ETH_SUBSCRIPTION = "eth_subscription";
 
-const GatewayMsg = Symbol();
+const gatewayEventType = Symbol();
 
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 type ProviderEvent = EthSubscription | GatewayPayload<unknown>;
-type InpageProviderOptions = Partial<{
-  isMetaMask: boolean;
-}>;
 
 export class InpageProvider extends Emitter<ProviderEvent> {
-  /**
-   * Indicating that this provider is a MetaMask provider.
-   */
-  public readonly isMetaMask: boolean;
+  public readonly isMetaMask: boolean = false;
+  public readonly isVigvam: boolean = true;
   public readonly autoRefreshOnNetworkChange = false;
 
   /**
@@ -43,28 +48,29 @@ export class InpageProvider extends Emitter<ProviderEvent> {
   private nextReqId = 0;
 
   private inpage = new InpageProtocol("injected", "content");
+  private filter = new FilterObserver(this);
 
-  constructor(opts: InpageProviderOptions = {}) {
+  constructor() {
     super();
-
-    this.isMetaMask = opts.isMetaMask ?? false;
 
     this.listenInpage();
     this.listenNotifications();
   }
 
+  private getReqId() {
+    return `${this.reqIdPrefix}_${this.nextReqId++}`;
+  }
+
   private listenInpage() {
     this.inpage.subscribe((payload) => {
       if (payload?.jsonrpc === JSONRPC) {
-        this.emit(GatewayMsg, payload);
+        this.emit(gatewayEventType, payload);
       }
     });
-
-    this.inpage.send("inited");
   }
 
   private listenNotifications() {
-    this.on(GatewayMsg, (evt?: JsonRpcNotification<unknown>) => {
+    this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
       if (!evt?.method) return;
 
       switch (evt.method) {
@@ -111,13 +117,112 @@ export class InpageProvider extends Emitter<ProviderEvent> {
     this.emit("accountsChanged", address ? [address] : []);
   }
 
+  private async performRequest(args: RequestArguments): Promise<unknown> {
+    const pipes = [
+      () => this.requestSimpleMethods(args),
+      () => this.requestSubscriptionMethods(args),
+      () => this.requestFilterMethods(args),
+      () => this.restrictAuthorizedMethods(args),
+      () => this.requestGateway(args),
+    ];
+
+    for (const factory of pipes) {
+      const result = await factory();
+      if (result) return result;
+    }
+
+    throw ethErrors.provider.unsupportedMethod();
+  }
+
+  private async requestSimpleMethods({
+    method,
+    params = [],
+  }: RequestArguments): Promise<unknown> {
+    switch (method) {
+      case JsonRpcMethod.eth_chainId:
+        return this.chainId!;
+
+      case JsonRpcMethod.net_version:
+        return this.networkVersion!;
+
+      case JsonRpcMethod.eth_coinbase:
+        return this.selectedAddress;
+
+      case JsonRpcMethod.eth_accounts:
+        return this.selectedAddress ? [this.selectedAddress] : [];
+
+      case JsonRpcMethod.eth_uninstallFilter:
+        const filterId = (params as [string])[0];
+        return this.filter.uninstallFilter(filterId);
+
+      case JsonRpcMethod.eth_requestAccounts:
+        if (this.selectedAddress) return [this.selectedAddress];
+
+      case JsonRpcMethod.wallet_getPermissions:
+        if (!this.selectedAddress) return [];
+
+      default:
+        return;
+    }
+  }
+
+  private async requestSubscriptionMethods({
+    method,
+  }: RequestArguments): Promise<unknown> {
+    switch (method) {
+      case JsonRpcMethod.eth_subscribe:
+      case JsonRpcMethod.eth_unsubscribe:
+        throw ethErrors.provider.unsupportedMethod();
+
+      default:
+        return;
+    }
+  }
+
+  private async requestFilterMethods({
+    method,
+    params = [],
+  }: RequestArguments): Promise<unknown> {
+    const param = (params as any[])[0];
+
+    switch (method) {
+      case JsonRpcMethod.eth_newFilter:
+        return this.filter.newFilter(param);
+
+      case JsonRpcMethod.eth_newBlockFilter:
+        return this.filter.newBlockFilter();
+
+      case JsonRpcMethod.eth_newPendingTransactionFilter:
+        return this.filter.newPendingTransactionFilter();
+
+      case JsonRpcMethod.eth_getFilterChanges:
+        return this.filter.getFilterChanges(param);
+
+      case JsonRpcMethod.eth_getFilterLogs:
+        return this.filter.getFilterLogs(param);
+
+      default:
+        return;
+    }
+  }
+
+  private async restrictAuthorizedMethods({
+    method,
+  }: RequestArguments): Promise<undefined> {
+    if (!this.selectedAddress && AUTHORIZED_METHODS.has(method)) {
+      throw ethErrors.provider.unauthorized();
+    }
+
+    return;
+  }
+
   private requestGateway<T = unknown>({ method, params }: RequestArguments) {
     return new Promise<T>((resolve, reject) => {
       const reqId = this.getReqId();
 
       const handleRpcEvent = (evt?: GatewayPayload<T>) => {
         if (evt && "id" in evt && evt.id === reqId) {
-          this.removeListener(GatewayMsg, handleRpcEvent);
+          this.removeListener(gatewayEventType, handleRpcEvent);
 
           if ("result" in evt) {
             resolve(evt.result);
@@ -130,7 +235,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
         }
       };
 
-      this.on(GatewayMsg, handleRpcEvent);
+      this.on(gatewayEventType, handleRpcEvent);
 
       this.inpage.send({
         jsonrpc: JSONRPC,
@@ -139,10 +244,6 @@ export class InpageProvider extends Emitter<ProviderEvent> {
         params,
       });
     });
-  }
-
-  private getReqId() {
-    return `${this.reqIdPrefix}_${this.nextReqId++}`;
   }
 
   //====================
@@ -163,7 +264,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
    * @returns A Promise that resolves with the result of the RPC method,
    * or rejects if an error is encountered.
    */
-  async request(args: RequestArguments): Promise<unknown> {
+  request(args: RequestArguments): Promise<unknown> {
     if (!this.inited) {
       throw ethErrors.provider.disconnected();
     }
@@ -195,38 +296,18 @@ export class InpageProvider extends Emitter<ProviderEvent> {
       });
     }
 
-    switch (method) {
-      case "eth_chainId":
-        return this.chainId!;
-
-      case "net_version":
-        return this.networkVersion!;
-
-      case "eth_coinbase":
-        return this.selectedAddress;
-
-      case "eth_accounts":
-        return this.selectedAddress ? [this.selectedAddress] : [];
-
-      case "eth_requestAccounts":
-        if (this.selectedAddress) return [this.selectedAddress];
-    }
-
-    // "wallet_getPermissions":
-    // "wallet_requestPermissions"
-    return this.requestGateway(args);
+    return this.performRequest(args);
   }
 
-  /**
-   * Submits an RPC request per the given JSON-RPC request object.
-   *
-   * @param payload - The RPC request object.
-   * @param cb - The callback function.
-   */
-  sendAsync(
+  sendAsync<T>(
     payload: JsonRpcRequest<unknown>,
-    callback: (error: Error | null, result?: JsonRpcResponse<unknown>) => void
-  ): void {
+    callback: JsonRpcCallback<T>
+  ): void;
+  sendAsync(
+    payload: JsonRpcRequest<unknown>[],
+    callback: JsonRpcCallback<unknown>[]
+  ): void;
+  sendAsync(payload: any, callback: any): void {
     this.send(payload, callback);
   }
 
@@ -244,40 +325,13 @@ export class InpageProvider extends Emitter<ProviderEvent> {
     return this.request({ method: "eth_requestAccounts" });
   }
 
-  /**
-   * Submits an RPC request for the given method, with the given params.
-   *
-   * @deprecated Use "request" instead.
-   * @param method - The method to request.
-   * @param params - Any params for the method.
-   * @returns A Promise that resolves with the JSON-RPC response object for the
-   * request.
-   */
   send<T>(method: string, params?: T[]): Promise<JsonRpcResponse<T>>;
-
-  /**
-   * Submits an RPC request per the given JSON-RPC request object.
-   *
-   * @deprecated Use "request" instead.
-   * @param payload - A JSON-RPC request object.
-   * @param callback - An error-first callback that will receive the JSON-RPC
-   * response object.
-   */
-  send<T>(
-    payload: JsonRpcRequest<unknown>,
-    callback: (error: Error | null, result?: JsonRpcResponse<T>) => void
+  send<T>(payload: JsonRpcRequest<unknown>, callback: JsonRpcCallback<T>): void;
+  send(
+    payload: JsonRpcRequest<unknown>[],
+    callback: JsonRpcCallbackBatch
   ): void;
-
-  /**
-   * Accepts a JSON-RPC request object, and synchronously returns the cached result
-   * for the given method. Only supports 4 specific RPC methods.
-   *
-   * @deprecated Use "request" instead.
-   * @param payload - A JSON-RPC request object.
-   * @returns A JSON-RPC response object.
-   */
   send<T>(payload: SendSyncJsonRpcRequest): JsonRpcResponse<T>;
-
   send(methodOrPayload: unknown, callbackOrArgs?: unknown): unknown {
     if (
       typeof methodOrPayload === "string" &&
@@ -286,15 +340,34 @@ export class InpageProvider extends Emitter<ProviderEvent> {
       return this.request({
         method: methodOrPayload,
         params: callbackOrArgs as any,
-      });
+      }).then((result) => wrapRpcResponse({ result }));
     } else if (
       methodOrPayload &&
       typeof methodOrPayload === "object" &&
       typeof callbackOrArgs === "function"
     ) {
-      this.request(methodOrPayload as JsonRpcRequest<any>)
-        .then((result) => callbackOrArgs(null, result))
-        .catch((err) => callbackOrArgs(err));
+      if (Array.isArray(methodOrPayload)) {
+        Promise.all(
+          methodOrPayload.map((payload: JsonRpcRequest<any>) =>
+            this.request(payload)
+              .then((result) => wrapRpcResponse({ result }, payload))
+              .catch((error) => wrapRpcResponse({ error }, payload))
+          )
+        ).then((result) => callbackOrArgs(null, result));
+
+        return;
+      }
+
+      const payload = methodOrPayload as JsonRpcRequest<any>;
+
+      this.request(payload)
+        .then((result) =>
+          callbackOrArgs(null, wrapRpcResponse({ result }, payload))
+        )
+        .catch((error) =>
+          callbackOrArgs(error, wrapRpcResponse({ error }, payload))
+        );
+
       return;
     }
 
@@ -309,20 +382,20 @@ export class InpageProvider extends Emitter<ProviderEvent> {
   protected sendSync(payload: SendSyncJsonRpcRequest) {
     let result;
     switch (payload.method) {
-      case "net_version":
+      case JsonRpcMethod.net_version:
         result = this.networkVersion || null;
         break;
 
-      case "eth_accounts":
+      case JsonRpcMethod.eth_accounts:
         result = this.selectedAddress ? [this.selectedAddress] : [];
         break;
 
-      case "eth_coinbase":
+      case JsonRpcMethod.eth_coinbase:
         result = this.selectedAddress || null;
         break;
 
-      case "eth_uninstallFilter":
-        this.request(payload as any);
+      case JsonRpcMethod.eth_uninstallFilter:
+        this.request(payload as any).catch(console.error);
         result = true;
         break;
 
@@ -330,12 +403,19 @@ export class InpageProvider extends Emitter<ProviderEvent> {
         throw new Error(errorMessages.unsupportedSync(payload.method));
     }
 
-    return {
-      id: payload.id,
-      jsonrpc: payload.jsonrpc,
-      result,
-    };
+    return wrapRpcResponse({ result }, payload);
   }
+}
+
+function wrapRpcResponse<T>(
+  res: { result: T } | { error: JsonRpcError },
+  req?: JsonRpcRequest<unknown>
+): JsonRpcResponse<T> {
+  return {
+    id: req?.id ?? null,
+    jsonrpc: req?.jsonrpc ?? JSONRPC,
+    ...res,
+  };
 }
 
 function toHex(val: number) {
@@ -359,7 +439,7 @@ interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
     | "eth_uninstallFilter";
 }
 
-interface RequestArguments {
+export interface RequestArguments {
   readonly method: string;
   readonly params?: readonly unknown[] | Record<string, unknown>;
 }
@@ -376,23 +456,3 @@ interface EthSubscription extends ProviderMessage {
     readonly result: unknown;
   };
 }
-
-// interface ProviderConnectInfo {
-//   readonly chainId: string;
-// }
-
-// class ProviderRpcError extends Error {
-//   name = "ProviderRpcError";
-
-//   constructor(public code: number, public data?: unknown) {
-//     super(PROVIDER_ERRORS[code] ?? "Unknown error occurred");
-//   }
-// }
-
-// const PROVIDER_ERRORS: Record<number, string> = {
-//   4001: "The user rejected the request",
-//   4100: "The requested method and/or account has not been authorized by the user",
-//   4200: "The Provider does not support the requested method",
-//   4900: "The Provider is disconnected from all chains",
-//   4901: "The Provider is not connected to the requested chain",
-// };

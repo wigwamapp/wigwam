@@ -1,10 +1,12 @@
 import { InpageProvider } from "core/inpage/provider";
 
-injectUniversal("ethereum");
-injectUniversal("vigvamEthereum");
+const provider = new InpageProvider();
 
-function injectUniversal(key: string) {
-  const providers: InpageProvider[] = [new InpageProvider()];
+inject("ethereum", provider);
+inject("vigvamEthereum", provider);
+
+function inject(key: string, provider: InpageProvider) {
+  const providers = [provider];
 
   if (key in window) {
     providers.push((window as any)[key]);
@@ -22,3 +24,17 @@ function injectUniversal(key: string) {
 
   window.dispatchEvent(new Event(`${key}#initialized`));
 }
+
+// class UniversalProvider extends InpageProvider {
+//   isVigvam = false;
+
+//   providers: InpageProvider[] = [];
+//   selectedProvider: InpageProvider | null = null;
+
+//   request(args: RequestArguments): Promise<unknown> {
+//     if (args.method === "wallet_requestPermissions") {
+//     }
+
+//     return super.request(args);
+//   }
+// }
