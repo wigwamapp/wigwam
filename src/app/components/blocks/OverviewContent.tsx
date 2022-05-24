@@ -729,12 +729,14 @@ const PriceChange: FC<PriceChangeProps> = ({
             />
           }
           amount={value}
+          isDecimalsMinified={true}
           className="inline-flex items-center"
         />
       ) : (
         <FiatAmount
           prefix={isPositive ? "+" : "-"}
           amount={value}
+          isDecimalsMinified={true}
           copiable
           className="text-lg font-semibold"
         />
