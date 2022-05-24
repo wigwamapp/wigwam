@@ -21,11 +21,13 @@ export async function sendRpc(
        * Cached
        */
       case "eth_chainId":
+        return plainProvider.getChainId().then(numToHex);
+
       case "net_version":
         return plainProvider.getChainId();
 
       case "eth_blockNumber":
-        return plainProvider._getFastBlockNumber();
+        return plainProvider._getFastBlockNumber().then(numToHex);
 
       case "eth_getBlockByHash":
       case "eth_getBlockByNumber":
@@ -35,7 +37,9 @@ export async function sendRpc(
        * Multicall
        */
       case "eth_getBalance":
-        return multicallProvider.getBalance(params[0], params[1]);
+        return multicallProvider
+          .getBalance(params[0], params[1])
+          .then((b) => b.toHexString());
 
       case "eth_getCode":
         return multicallProvider.getCode(params[0], params[1]);
@@ -77,4 +81,8 @@ class RpcProvider extends JsonRpcProvider {
   getNetwork = memoizeOne(super.getNetwork.bind(this));
 
   getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
+}
+
+function numToHex(value: number): string {
+  return `0x${value.toString(16)}`;
 }

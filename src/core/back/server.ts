@@ -9,6 +9,8 @@ import {
   MessageType,
   PorterChannel,
   WalletStatus,
+  JsonRpcResponse,
+  JsonRpcRequest,
 } from "core/types";
 
 import {
@@ -24,7 +26,7 @@ import {
   $syncStatus,
 } from "./state";
 import { Vault } from "./vault";
-import { handleRpc } from "./rpc";
+import { handleRpc, sendRpc } from "./rpc";
 import { processApprove } from "./approve";
 import { startApproveWindowServer } from "./approve/window";
 import {
@@ -99,18 +101,31 @@ export function startServer() {
 
     sessionStorage.passwordUsageAttempts = attempts;
   };
-
-  // const dappPorter = new PorterServer(PorterChannel.DApp);
-  // dappPorter.onMessage(handleDAppRequest);
 }
 
 async function handlePageRequest(
-  ctx: MessageContext<Request | EventMessage, Response>
+  ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
 ) {
   console.debug("New page request", ctx);
 
   try {
     await ensureInited();
+
+    const { id, jsonrpc, method, params } = ctx.data;
+
+    const res = await sendRpc(1, method, (params as any[]) ?? []);
+
+    ctx.reply({
+      id,
+      jsonrpc,
+      ...res,
+    });
+
+    // const result = await match(ctx.data.method)
+    //   .with(JsonRpcMethod.)
+    //   .otherwise(() => {
+
+    //   });
   } catch (err) {
     console.error(err);
   }

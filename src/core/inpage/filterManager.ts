@@ -1,13 +1,9 @@
 import { range } from "lib/system/range";
 
-import { JsonRpcRequest, JsonRpcResponse } from "./types";
+import type { RequestArguments } from "core/types/rpc";
 import type { InpageProvider } from "./provider";
 
 const TIMEOUT = 5 * 60_000; // 5 minutes
-const JSONRPC_TEMPLATE = {
-  jsonrpc: "2.0",
-  id: 0,
-} as const;
 
 export type BlockHeight = number | "latest";
 
@@ -25,12 +21,12 @@ export interface Filter {
   topics: (string | string[])[];
 }
 
-export class FilterObserver {
+export class FilterManager {
   private readonly logFilters = new Map<number, Filter>(); // <id, filter>
   private readonly blockFilters = new Set<number>(); // <id>
   private readonly pendingTransactionFilters = new Set<number>(); // <id, true>
   private readonly cursors = new Map<number, number>(); // <id, cursor>
-  private readonly timeouts = new Map<number, number>(); // <id, setTimeout id>
+  private readonly timeouts = new Map<number, ReturnType<typeof setTimeout>>(); // <id, setTimeout id>
   private nextFilterId = 1;
 
   constructor(private readonly provider: InpageProvider) {}
@@ -74,7 +70,7 @@ export class FilterObserver {
     return this.deleteFilter(id);
   }
 
-  getFilterChanges(filterId: string): Promise<JsonRpcResponse<unknown>> {
+  getFilterChanges(filterId: string): Promise<unknown> {
     const id = intNumberFromHexString(filterId);
 
     if (this.timeouts.has(id)) {
@@ -92,49 +88,33 @@ export class FilterObserver {
         return this.getPendingTransactionFilterChanges();
 
       default:
-        return Promise.resolve(filterNotFoundError());
+        return Promise.reject(filterNotFoundError());
     }
   }
 
-  async getFilterLogs(filterId: string): Promise<JsonRpcResponse<unknown>> {
+  async getFilterLogs(filterId: string): Promise<unknown> {
     const id = intNumberFromHexString(filterId);
     const filter = this.logFilters.get(id);
 
     if (!filter) {
-      return filterNotFoundError();
+      throw filterNotFoundError();
     }
 
-    return this.sendAsyncPromise({
-      ...JSONRPC_TEMPLATE,
+    return this.requestProvider({
       method: "eth_getLogs",
       params: [paramFromFilter(filter)],
     });
   }
 
   private makeFilterId(): number {
-    return Math.floor(++this.nextFilterId);
+    return this.nextFilterId++;
   }
 
-  private sendAsyncPromise<T = unknown>(
-    request: JsonRpcRequest<unknown>
-  ): Promise<JsonRpcResponse<T>> {
-    return new Promise((resolve, reject) => {
-      this.provider.sendAsync<T>(request, (err, response) => {
-        if (err) {
-          return reject(err);
-        }
-
-        if (Array.isArray(response) || response == null) {
-          return reject(
-            new Error(
-              `unexpected response received: ${JSON.stringify(response)}`
-            )
-          );
-        }
-
-        resolve(response);
-      });
-    });
+  private async requestProvider<T = unknown>(
+    args: RequestArguments
+  ): Promise<T> {
+    const result = await this.provider.request(args);
+    return result as T;
   }
 
   private deleteFilter(id: number): boolean {
@@ -147,14 +127,14 @@ export class FilterObserver {
     ].some(Boolean);
   }
 
-  private async getLogFilterChanges(
-    id: number
-  ): Promise<JsonRpcResponse<unknown>> {
+  private async getLogFilterChanges(id: number): Promise<unknown> {
     const filter = this.logFilters.get(id);
     const cursorPosition = this.cursors.get(id);
+
     if (!cursorPosition || !filter) {
-      return filterNotFoundError();
+      throw filterNotFoundError();
     }
+
     const currentBlockHeight = await this.getCurrentBlockHeight();
     const toBlock =
       filter.toBlock === "latest" ? currentBlockHeight : filter.toBlock;
@@ -166,8 +146,7 @@ export class FilterObserver {
       return emptyResult();
     }
 
-    const response = await this.sendAsyncPromise({
-      ...JSONRPC_TEMPLATE,
+    const result = await this.requestProvider<any[]>({
       method: "eth_getLogs",
       params: [
         paramFromFilter({
@@ -178,27 +157,25 @@ export class FilterObserver {
       ],
     });
 
-    if ("result" in response && Array.isArray(response.result)) {
-      const blocks = response.result.map((log) =>
+    if (Array.isArray(result) && result.length > 0) {
+      const blocks = result.map((log) =>
         intNumberFromHexString(log.blockNumber || "0x0")
       );
 
       const highestBlock = Math.max(...blocks);
       if (highestBlock && highestBlock > cursorPosition) {
-        const newCursorPosition = Math.floor(highestBlock + 1);
+        const newCursorPosition = highestBlock + 1;
         this.cursors.set(id, newCursorPosition);
       }
     }
 
-    return response;
+    return result;
   }
 
-  private async getBlockFilterChanges(
-    id: number
-  ): Promise<JsonRpcResponse<unknown>> {
+  private async getBlockFilterChanges(id: number): Promise<unknown> {
     const cursorPosition = this.cursors.get(id);
     if (!cursorPosition) {
-      return filterNotFoundError();
+      throw filterNotFoundError();
     }
 
     const currentBlockHeight = await this.getCurrentBlockHeight();
@@ -209,20 +186,18 @@ export class FilterObserver {
     const blocks = (
       await Promise.all(
         range(cursorPosition, currentBlockHeight + 1).map((i) =>
-          this.getBlockHashByNumber(Math.floor(i))
+          this.getBlockHashByNumber(i)
         )
       )
     ).filter(Boolean);
 
-    const newCursorPosition = Math.floor(cursorPosition + blocks.length);
+    const newCursorPosition = cursorPosition + blocks.length;
     this.cursors.set(id, newCursorPosition);
 
-    return { ...JSONRPC_TEMPLATE, result: blocks };
+    return blocks;
   }
 
-  private async getPendingTransactionFilterChanges(): Promise<
-    JsonRpcResponse<unknown>
-  > {
+  private async getPendingTransactionFilterChanges(): Promise<unknown> {
     // pending transaction filters are not supported
     return Promise.resolve(emptyResult());
   }
@@ -243,43 +218,32 @@ export class FilterObserver {
   private setFilterTimeout(id: number): void {
     const existing = this.timeouts.get(id);
     if (existing) {
-      window.clearTimeout(existing);
+      clearTimeout(existing);
     }
-    const timeout = window.setTimeout(() => {
-      console.info(`Filter (${id}) timed out`);
-      this.deleteFilter(id);
-    }, TIMEOUT);
+    const timeout = setTimeout(() => this.deleteFilter(id), TIMEOUT);
     this.timeouts.set(id, timeout);
   }
 
   private async getCurrentBlockHeight(): Promise<number> {
-    const res = await this.sendAsyncPromise({
-      ...JSONRPC_TEMPLATE,
+    const result = await this.requestProvider({
       method: "eth_blockNumber",
       params: [],
     });
 
-    return "result" in res
-      ? intNumberFromHexString(ensureHexString(res.result))
-      : 0;
+    return intNumberFromHexString(ensureHexString(result));
   }
 
   private async getBlockHashByNumber(
     blockNumber: number
   ): Promise<string | null> {
-    const response = await this.sendAsyncPromise<{ hash: string }>({
-      ...JSONRPC_TEMPLATE,
+    const result = await this.requestProvider<{ hash: string }>({
       method: "eth_getBlockByNumber",
       params: [hexStringFromIntNumber(blockNumber), false],
     });
-    if (
-      "result" in response &&
-      response.result &&
-      typeof response.result.hash === "string"
-    ) {
-      return ensureHexString(response.result.hash);
-    }
-    return null;
+
+    return typeof result?.hash === "string"
+      ? ensureHexString(result.hash)
+      : null;
   }
 }
 
@@ -313,7 +277,7 @@ function intBlockHeightFromHexBlockHeight(value?: string): BlockHeight {
   if (value === undefined || value === "latest" || value === "pending") {
     return "latest";
   } else if (value === "earliest") {
-    return Math.floor(0);
+    return 0;
   } else if (isHexString(value)) {
     return intNumberFromHexString(value);
   }
@@ -327,15 +291,14 @@ function hexBlockHeightFromIntBlockHeight(value: BlockHeight): string {
   return hexStringFromIntNumber(value);
 }
 
-function filterNotFoundError(): JsonRpcResponse<unknown> {
-  return {
-    ...JSONRPC_TEMPLATE,
-    error: { code: -32000, message: "filter not found" },
-  };
+function filterNotFoundError(): Error {
+  const err = new Error("Filter not found");
+  Object.assign(err, { code: -32000 });
+  return err;
 }
 
-function emptyResult(): JsonRpcResponse<unknown> {
-  return { ...JSONRPC_TEMPLATE, result: [] };
+function emptyResult(): [] {
+  return [];
 }
 
 const HEXADECIMAL_STRING_REGEX = /^[a-f0-9]*$/;

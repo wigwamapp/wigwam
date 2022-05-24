@@ -10,10 +10,12 @@ import {
   JsonRpcCallbackBatch,
   JsonRpcError,
   JsonRpcMethod,
-  AUTHORIZED_METHODS,
-} from "./types";
+  RequestArguments,
+  EthSubscription,
+} from "core/types/rpc";
 import { InpageProtocol } from "./protocol";
-import { FilterObserver } from "./filterObserver";
+import { FilterManager } from "./filterManager";
+// import { SubscriptionManager } from "./subscriptionManager";
 
 const JSONRPC = "2.0";
 const VIGVAM_STATE = "vigvam_state";
@@ -48,7 +50,8 @@ export class InpageProvider extends Emitter<ProviderEvent> {
   private nextReqId = 0;
 
   private inpage = new InpageProtocol("injected", "content");
-  private filter = new FilterObserver(this);
+  private filter = new FilterManager(this);
+  // private subs = new SubscriptionManager(this, this.filter);
 
   constructor() {
     super();
@@ -209,7 +212,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
   private async restrictAuthorizedMethods({
     method,
   }: RequestArguments): Promise<undefined> {
-    if (!this.selectedAddress && AUTHORIZED_METHODS.has(method)) {
+    if (!this.selectedAddress && AUTHORIZED_RPC_METHODS.has(method)) {
       throw ethErrors.provider.unauthorized();
     }
 
@@ -422,6 +425,17 @@ function toHex(val: number) {
   return `0x${val.toString(16)}`;
 }
 
+const AUTHORIZED_RPC_METHODS = new Set<string>([
+  JsonRpcMethod.eth_sign,
+  JsonRpcMethod.personal_sign,
+  JsonRpcMethod.eth_signTransaction,
+  JsonRpcMethod.eth_signTypedData,
+  JsonRpcMethod.eth_signTypedData_v1,
+  JsonRpcMethod.eth_signTypedData_v2,
+  JsonRpcMethod.eth_signTypedData_v3,
+  JsonRpcMethod.eth_signTypedData_v4,
+]);
+
 const errorMessages = {
   invalidRequestArgs: () => "Expected a single, non-array, object argument.",
   invalidRequestMethod: () => `'args.method' must be a non-empty string.`,
@@ -437,22 +451,4 @@ interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
     | "eth_accounts"
     | "eth_coinbase"
     | "eth_uninstallFilter";
-}
-
-export interface RequestArguments {
-  readonly method: string;
-  readonly params?: readonly unknown[] | Record<string, unknown>;
-}
-
-interface ProviderMessage {
-  readonly type: string;
-  readonly data: unknown;
-}
-
-interface EthSubscription extends ProviderMessage {
-  readonly type: "eth_subscription";
-  readonly data: {
-    readonly subscription: string;
-    readonly result: unknown;
-  };
 }
