@@ -4,7 +4,7 @@ import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 
 import { AccountSource } from "core/types";
-import { validatePrivateKey } from "core/common";
+import { validatePrivateKey, add0x } from "core/common";
 
 import { AddAccountStep } from "app/nav";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
@@ -33,7 +33,7 @@ const ImportPrivateKey = memo(() => {
               address: generatedWallet.address,
               isDisabled: true,
               isDefaultChecked: true,
-              privateKey: toProtectedString(`0x${privateKey}`),
+              privateKey: toProtectedString(add0x(privateKey)),
             },
           ];
 
