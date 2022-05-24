@@ -58,13 +58,17 @@ export async function sendRpc(
   try {
     return { result: await getResult() };
   } catch (err: any) {
-    return {
-      error: {
-        message: err?.message,
-        code: err?.code,
-        data: err?.data,
-      },
-    };
+    if (typeof err?.error === "object") {
+      const { message, code, data } = err.error;
+
+      return {
+        error: { message, code, data },
+      };
+    } else {
+      return {
+        error: INTERNAL_JSONRPC_ERROR,
+      };
+    }
   }
 }
 
@@ -86,3 +90,8 @@ class RpcProvider extends JsonRpcProvider {
 function numToHex(value: number): string {
   return `0x${value.toString(16)}`;
 }
+
+const INTERNAL_JSONRPC_ERROR = {
+  code: -32603,
+  message: "Internal JSON-RPC error.",
+};

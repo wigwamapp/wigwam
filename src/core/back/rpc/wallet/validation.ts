@@ -1,7 +1,9 @@
 import { Describe, define, object, optional, array } from "superstruct";
 import { ethers } from "ethers";
+import memoize from "mem";
 
 import { TxParams } from "core/types";
+import { getNetwork } from "core/common";
 
 const stringHex = (length?: number) =>
   define<string>("stringHex", (value) =>
@@ -34,3 +36,5 @@ export const TxParamsSchema: Describe<TxParams> = object({
   maxPriorityFeePerGas: optional(stringHex()),
   maxFeePerGas: optional(stringHex()),
 });
+
+export const validateNetwork = memoize(getNetwork);

@@ -1,10 +1,21 @@
-import { RpcReply } from "core/types";
+import { ethErrors } from "eth-rpc-errors";
+import {
+  ActivitySource,
+  RpcReply,
+  JsonRpcMethod,
+  SigningStandard,
+  JsonRpcError,
+} from "core/types";
 
 import { sendRpc } from "./network";
-import { sendTransaction } from "./wallet";
+import {
+  requestConnection,
+  requestTransaction,
+  requestSigning,
+} from "./wallet";
 
 export async function handleRpc(
-  // source: ActivitySource,
+  source: ActivitySource,
   chainId: number,
   method: string,
   params: any[],
@@ -12,10 +23,40 @@ export async function handleRpc(
 ) {
   try {
     switch (method) {
-      // case "eth_accounts":
+      case JsonRpcMethod.wallet_getPermissions:
+        throw ethErrors.provider.unsupportedMethod();
 
-      case "eth_sendTransaction":
-        return await sendTransaction(chainId, params, reply);
+      case JsonRpcMethod.wallet_requestPermissions:
+      case JsonRpcMethod.eth_requestAccounts: {
+        if (source.type === "self") {
+          throw ethErrors.provider.unsupportedMethod();
+        }
+
+        return await requestConnection(source, params, reply);
+      }
+
+      case JsonRpcMethod.eth_sendTransaction:
+        return await requestTransaction(source, chainId, params, reply);
+
+      case JsonRpcMethod.eth_sign:
+      case JsonRpcMethod.personal_sign:
+      case JsonRpcMethod.eth_signTypedData:
+      case JsonRpcMethod.eth_signTypedData_v1:
+      case JsonRpcMethod.eth_signTypedData_v2:
+      case JsonRpcMethod.eth_signTypedData_v3:
+      case JsonRpcMethod.eth_signTypedData_v4: {
+        const standard = getSigningStandard(method);
+        return await requestSigning(source, standard, params, reply);
+      }
+
+      case JsonRpcMethod.eth_signTransaction:
+      case JsonRpcMethod.eth_ecRecover:
+      case JsonRpcMethod.personal_ecRecover:
+      case JsonRpcMethod.wallet_addEthereumChain:
+      case JsonRpcMethod.wallet_switchEthereumChain:
+      case JsonRpcMethod.wallet_watchAsset:
+        // TODO: Implement separate logic for this methods
+        throw ethErrors.provider.unsupportedMethod();
 
       default:
         reply(await sendRpc(chainId, method, params));
@@ -23,7 +64,37 @@ export async function handleRpc(
   } catch (err: any) {
     console.warn(err);
 
-    // @TODO: Handle non rpc errors, and wrap them to rpc format
-    reply({ error: { message: err.message } });
+    let error: JsonRpcError;
+    if ("code" in err) {
+      const { message, code, data } = err;
+      error = { message, code, data };
+    } else {
+      error = ethErrors.rpc.internal();
+    }
+
+    reply({ error });
+  }
+}
+
+function getSigningStandard(method: string) {
+  switch (method) {
+    case JsonRpcMethod.eth_sign:
+      return SigningStandard.EthSign;
+
+    case JsonRpcMethod.personal_sign:
+      return SigningStandard.PersonalSign;
+
+    case JsonRpcMethod.eth_signTypedData:
+    case JsonRpcMethod.eth_signTypedData_v1:
+      return SigningStandard.SignTypedDataV1;
+
+    case JsonRpcMethod.eth_signTypedData_v3:
+      return SigningStandard.SignTypedDataV3;
+
+    case JsonRpcMethod.eth_signTypedData_v4:
+      return SigningStandard.SignTypedDataV4;
+
+    default:
+      throw ethErrors.provider.unsupportedMethod();
   }
 }

@@ -160,9 +160,11 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
       case JsonRpcMethod.eth_requestAccounts:
         if (this.selectedAddress) return [this.selectedAddress];
+        return;
 
       case JsonRpcMethod.wallet_getPermissions:
         if (!this.selectedAddress) return [];
+        return;
 
       default:
         return;
@@ -230,10 +232,14 @@ export class InpageProvider extends Emitter<ProviderEvent> {
           if ("result" in evt) {
             resolve(evt.result);
           } else {
-            const err = new Error(evt.error.message);
-            Object.assign(err, evt.error);
+            const {
+              message = "Unknown error occurred",
+              code,
+              data,
+            } = evt.error;
+            const err = new Error(message);
 
-            reject(err);
+            reject({ message, code, data, stack: err.stack });
           }
         }
       };

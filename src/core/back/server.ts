@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { ethErrors } from "eth-rpc-errors";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 import { getRandomInt } from "lib/system/randomInt";
 
@@ -11,6 +12,8 @@ import {
   WalletStatus,
   JsonRpcResponse,
   JsonRpcRequest,
+  SelfActivityKind,
+  ActivitySource,
 } from "core/types";
 
 import {
@@ -26,7 +29,7 @@ import {
   $syncStatus,
 } from "./state";
 import { Vault } from "./vault";
-import { handleRpc, sendRpc } from "./rpc";
+import { handleRpc } from "./rpc";
 import { processApprove } from "./approve";
 import { startApproveWindowServer } from "./approve/window";
 import {
@@ -107,27 +110,36 @@ async function handlePageRequest(
   ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
 ) {
   console.debug("New page request", ctx);
+  const { id, jsonrpc, method, params } = ctx.data;
 
   try {
     await ensureInited();
 
-    const { id, jsonrpc, method, params } = ctx.data;
+    const senderUrl = ctx.port.sender?.url;
+    if (!senderUrl) {
+      throw ethErrors.rpc.resourceNotFound();
+    }
 
-    const res = await sendRpc(1, method, (params as any[]) ?? []);
+    const source: ActivitySource = {
+      type: "page",
+      url: senderUrl,
+    };
+
+    handleRpc(source, 1, method, (params as any[]) ?? [], (response) =>
+      ctx.reply({
+        id,
+        jsonrpc,
+        ...response,
+      })
+    );
+  } catch (err) {
+    console.error(err);
 
     ctx.reply({
       id,
       jsonrpc,
-      ...res,
+      error: ethErrors.rpc.internal(),
     });
-
-    // const result = await match(ctx.data.method)
-    //   .with(JsonRpcMethod.)
-    //   .otherwise(() => {
-
-    //   });
-  } catch (err) {
-    console.error(err);
   }
 }
 
@@ -317,7 +329,7 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.SendRpc },
         ({ type, chainId, method, params }) => {
-          handleRpc(chainId, method, params, (response) =>
+          handleRpc(UNKNOWN_SELF_SOURCE, chainId, method, params, (response) =>
             ctx.reply({ type, response })
           );
         }
@@ -329,3 +341,8 @@ async function handleWalletRequest(
     ctx.replyError(err);
   }
 }
+
+const UNKNOWN_SELF_SOURCE = {
+  type: "self",
+  kind: SelfActivityKind.Unknown,
+} as const;

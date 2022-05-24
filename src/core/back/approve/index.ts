@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
+import { ethErrors } from "eth-rpc-errors";
 import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
 
@@ -16,7 +17,7 @@ const { serializeTransaction, parseTransaction, keccak256, hexValue } =
 
 export async function processApprove(
   approvalId: string,
-  { approved, rawTx, signedRawTx }: ApprovalResult,
+  { approved, rawTx, signedRawTx, accountAddresses }: ApprovalResult,
   vault: Vault
 ) {
   const approval = $approvals.getState().find((a) => a.id === approvalId);
@@ -24,6 +25,10 @@ export async function processApprove(
 
   if (approved) {
     await match(approval)
+      .with({ type: ActivityType.Connection }, async ({ rpcReply }) => {
+        assert(accountAddresses?.length, "Accounts not provided");
+        rpcReply?.({ result: [accountAddresses[0]] });
+      })
       .with(
         { type: ActivityType.Transaction },
         async ({ chainId, accountAddress, txParams, rpcReply, ...rest }) => {
@@ -89,7 +94,7 @@ export async function processApprove(
         throw new Error("Not Found");
       });
   } else {
-    approval.rpcReply?.({ error: { message: "Declined" } });
+    approval.rpcReply?.({ error: DECLINE_ERROR });
   }
 
   approvalResolved(approvalId);
@@ -106,6 +111,8 @@ async function saveActivity(activity: Activity) {
     console.error(err);
   }
 }
+
+const DECLINE_ERROR = ethErrors.provider.userRejectedRequest();
 
 const STRICT_TX_PROPS = [
   "to",

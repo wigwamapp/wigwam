@@ -1,6 +1,4 @@
-import browser from "webextension-polyfill";
-
-import { getMainURL } from "../utils";
+import { openMainTab } from "../utils";
 
 import { fetchStateForce, setState } from "./state";
 import { generateProfile } from "./helpers";
@@ -16,9 +14,6 @@ export async function initProfiles() {
   } else if (state.openTab) {
     await setState({ ...state, openTab: false });
 
-    browser.tabs.create({
-      url: getMainURL(),
-      active: true,
-    });
+    openMainTab();
   }
 }

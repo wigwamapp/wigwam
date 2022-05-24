@@ -84,6 +84,7 @@ export type SigningActivity = SigningApproval; // There are no additional fields
 
 export interface ConnectionApproval extends ActivityBase {
   type: ActivityType.Connection;
+  preferredChainId?: number;
 }
 
 export interface ConnectionActivity extends ConnectionApproval {
