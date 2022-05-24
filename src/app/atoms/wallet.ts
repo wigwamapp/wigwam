@@ -1,7 +1,12 @@
 import { atomFamily } from "jotai/utils";
 import { dequal } from "dequal/lite";
-import { atomWithAutoReset, atomWithStorage } from "lib/atom-utils";
+import {
+  atomWithAutoReset,
+  atomWithRepoQuery,
+  atomWithStorage,
+} from "lib/atom-utils";
 
+import * as repo from "core/repo";
 import {
   getWalletStatus,
   isWalletHasSeedPhrase,
@@ -11,6 +16,8 @@ import {
   onSyncStatusUpdated,
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
+
+import { activeTabAtom } from "./ext";
 
 export const walletStatusAtom = atomWithAutoReset(getWalletStatus, {
   onMount: onWalletStatusUpdated,
@@ -36,3 +43,10 @@ export const getLocalNonceAtom = atomFamily(
     ),
   dequal
 );
+
+export const activePermissionAtom = atomWithRepoQuery((query, get) => {
+  const activeTab = get(activeTabAtom);
+  const origin = activeTab?.url && new URL(activeTab.url).origin;
+
+  return query(() => repo.permissions.where({ origin }).first());
+});

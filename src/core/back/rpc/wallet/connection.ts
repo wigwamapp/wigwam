@@ -8,6 +8,8 @@ import {
   ActivityType,
   WalletStatus,
 } from "core/types";
+import * as repo from "core/repo";
+import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { $walletStatus, approvalAdded } from "core/back/state";
 
 import { validateNetwork } from "./validation";
@@ -15,6 +17,7 @@ import { validateNetwork } from "./validation";
 export async function requestConnection(
   source: ActivitySource,
   params: any[],
+  returnSelectedAccount: boolean,
   rpcReply: RpcReply
 ) {
   const status = $walletStatus.getState();
@@ -38,9 +41,18 @@ export async function requestConnection(
     type: ActivityType.Connection,
     source,
     timeAt: Date.now(),
+    returnSelectedAccount,
     preferredChainId,
     rpcReply,
   });
+}
+
+export async function fetchPermission(source: ActivitySource, reply: RpcReply) {
+  const origin = getPageOrigin(source);
+  const permissions = await repo.permissions.where({ origin }).toArray();
+  const result = permissions.map(wrapPermission);
+
+  reply({ result });
 }
 
 function parseChainId(val: any): number | undefined {

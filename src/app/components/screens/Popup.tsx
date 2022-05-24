@@ -11,6 +11,7 @@ import {
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
@@ -21,7 +22,7 @@ import * as repo from "core/repo";
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
-import { currentAccountAtom } from "app/atoms";
+import { activePermissionAtom, currentAccountAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAllAccountTokens } from "app/hooks/tokens";
 
@@ -82,11 +83,24 @@ type InteractionWithDappProps = {
 };
 
 const InteractionWithDapp: FC<InteractionWithDappProps> = ({
-  state = "default",
-  icon,
   name,
+  state,
+  icon,
   className,
 }) => {
+  const permissionLazy = useAtomValue(loadable(activePermissionAtom));
+  const permission =
+    permissionLazy.state === "hasData" ? permissionLazy.data : undefined;
+
+  state = permission ? "connected" : state;
+  name = permission ? permission.origin : name;
+
+  const handlePermission = useCallback(async () => {
+    if (permission) {
+      await repo.permissions.delete(permission.id);
+    }
+  }, [permission]);
+
   if (state === "default" && !icon && !name) {
     return <></>;
   }
@@ -138,6 +152,7 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 ml-auto transition-opacity hover:opacity-70"
+          onClick={handlePermission}
         >
           {state === "connectible" ? "Connect" : "Disconnect"}
         </button>

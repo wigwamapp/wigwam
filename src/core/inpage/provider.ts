@@ -273,7 +273,9 @@ export class InpageProvider extends Emitter<ProviderEvent> {
    * @returns A Promise that resolves with the result of the RPC method,
    * or rejects if an error is encountered.
    */
-  request(args: RequestArguments): Promise<unknown> {
+  async request(args: RequestArguments): Promise<unknown> {
+    console.info("-> req", args);
+
     if (!this.inited) {
       throw ethErrors.provider.disconnected();
     }
@@ -305,7 +307,10 @@ export class InpageProvider extends Emitter<ProviderEvent> {
       });
     }
 
-    return this.performRequest(args);
+    const result = await this.performRequest(args);
+    console.info("<- res", result);
+
+    return result;
   }
 
   sendAsync<T>(

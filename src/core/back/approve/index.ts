@@ -1,11 +1,19 @@
+import { nanoid } from "nanoid";
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
 import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
 
-import { Activity, ActivityType, ApprovalResult, TxParams } from "core/types";
+import {
+  Activity,
+  ActivityType,
+  ApprovalResult,
+  Permission,
+  TxParams,
+} from "core/types";
 import { saveNonce } from "core/common/nonce";
+import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import * as repo from "core/repo";
 
 import { Vault } from "../vault";
@@ -17,7 +25,13 @@ const { serializeTransaction, parseTransaction, keccak256, hexValue } =
 
 export async function processApprove(
   approvalId: string,
-  { approved, rawTx, signedRawTx, accountAddresses }: ApprovalResult,
+  {
+    approved,
+    rawTx,
+    signedRawTx,
+    accountAddresses,
+    overriddenChainId,
+  }: ApprovalResult,
   vault: Vault
 ) {
   const approval = $approvals.getState().find((a) => a.id === approvalId);
@@ -25,10 +39,37 @@ export async function processApprove(
 
   if (approved) {
     await match(approval)
-      .with({ type: ActivityType.Connection }, async ({ rpcReply }) => {
-        assert(accountAddresses?.length, "Accounts not provided");
-        rpcReply?.({ result: [accountAddresses[0]] });
-      })
+      .with(
+        { type: ActivityType.Connection },
+        async ({
+          source,
+          returnSelectedAccount,
+          preferredChainId,
+          rpcReply,
+        }) => {
+          assert(accountAddresses?.length, "Accounts not provided");
+
+          const origin = getPageOrigin(source);
+          const existing = await repo.permissions.where({ origin }).first();
+
+          const newPermission: Permission = {
+            id: existing?.id ?? nanoid(),
+            origin,
+            timeAt: Date.now(),
+            accountAddresses,
+            chainId: overriddenChainId ?? preferredChainId ?? 1,
+            selectedAddress: accountAddresses[0],
+          };
+
+          await repo.permissions.put(newPermission);
+
+          const toReturn = returnSelectedAccount
+            ? accountAddresses[0]
+            : wrapPermission(newPermission);
+
+          rpcReply?.({ result: [toReturn] });
+        }
+      )
       .with(
         { type: ActivityType.Transaction },
         async ({ chainId, accountAddress, txParams, rpcReply, ...rest }) => {

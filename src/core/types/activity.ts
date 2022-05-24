@@ -40,6 +40,7 @@ export interface ApprovalResult {
   signedRawTx?: string;
   signedMessage?: string;
   accountAddresses?: string[];
+  overriddenChainId?: number;
 }
 
 export type Approval =
@@ -84,6 +85,7 @@ export type SigningActivity = SigningApproval; // There are no additional fields
 
 export interface ConnectionApproval extends ActivityBase {
   type: ActivityType.Connection;
+  returnSelectedAccount: boolean; // For legacy eth_requestAccounts
   preferredChainId?: number;
 }
 

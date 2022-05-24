@@ -12,6 +12,7 @@ import {
   requestConnection,
   requestTransaction,
   requestSigning,
+  fetchPermission,
 } from "./wallet";
 
 export async function handleRpc(
@@ -23,8 +24,13 @@ export async function handleRpc(
 ) {
   try {
     switch (method) {
-      case JsonRpcMethod.wallet_getPermissions:
-        throw ethErrors.provider.unsupportedMethod();
+      case JsonRpcMethod.wallet_getPermissions: {
+        if (source.type === "self") {
+          throw ethErrors.provider.unsupportedMethod();
+        }
+
+        return await fetchPermission(source, reply);
+      }
 
       case JsonRpcMethod.wallet_requestPermissions:
       case JsonRpcMethod.eth_requestAccounts: {
@@ -32,7 +38,15 @@ export async function handleRpc(
           throw ethErrors.provider.unsupportedMethod();
         }
 
-        return await requestConnection(source, params, reply);
+        const returnSelectedAccount =
+          method === JsonRpcMethod.eth_requestAccounts;
+
+        return await requestConnection(
+          source,
+          params,
+          returnSelectedAccount,
+          reply
+        );
       }
 
       case JsonRpcMethod.eth_sendTransaction:

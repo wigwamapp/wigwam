@@ -1,5 +1,7 @@
+import { Runtime } from "webextension-polyfill";
 import { match } from "ts-pattern";
 import { ethErrors } from "eth-rpc-errors";
+import { liveQuery, Subscription } from "dexie";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 import { getRandomInt } from "lib/system/randomInt";
 
@@ -14,7 +16,9 @@ import {
   JsonRpcRequest,
   SelfActivityKind,
   ActivitySource,
+  Permission,
 } from "core/types";
+import * as repo from "core/repo";
 
 import {
   $walletStatus,
@@ -47,16 +51,40 @@ export function startServer() {
 
   pagePorter.onMessage(handlePageRequest);
 
-  pagePorter.onConnection((action, port) => {
+  const permissionSubs = new Map<Runtime.Port, Subscription>();
+
+  pagePorter.onConnection(async (action, port) => {
+    if (!port.sender?.url) return;
+    const { origin } = new URL(port.sender.url);
+
     if (action === "connect") {
-      pagePorter.notify(port, {
-        jsonrpc: "2.0",
-        method: "vigvam_state",
-        params: {
-          chainId: 1,
-          accountAddress: null,
-        },
-      });
+      const notifyPermission = (p?: Permission) => {
+        const params = {
+          chainId: p?.chainId ?? 1,
+          accountAddress: p?.selectedAddress ?? null,
+        };
+
+        pagePorter.notify(port, {
+          jsonrpc: "2.0",
+          method: "vigvam_state",
+          params,
+        });
+      };
+
+      const permission = await repo.permissions.where({ origin }).first();
+      notifyPermission(permission);
+
+      const sub = liveQuery(() =>
+        repo.permissions.where({ origin }).first()
+      ).subscribe(notifyPermission);
+
+      permissionSubs.set(port, sub);
+    } else {
+      const sub = permissionSubs.get(port);
+      if (sub) {
+        sub.unsubscribe();
+        permissionSubs.delete(port);
+      }
     }
   });
 

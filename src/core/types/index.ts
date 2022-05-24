@@ -9,3 +9,4 @@ export * from "./tokens";
 export * from "./sync";
 export * from "./fees";
 export * from "./contacts";
+export * from "./permissions";
