@@ -218,7 +218,7 @@ const AssetsList: FC<AssetsListProps> = ({
       let t = setTimeout(() => {
         const tokenSlug = createTokenSlug({
           standard: TokenStandard.ERC20,
-          address: searchValue!,
+          address: ethers.utils.getAddress(searchValue!),
           id: "0",
         });
 
@@ -729,12 +729,14 @@ const PriceChange: FC<PriceChangeProps> = ({
             />
           }
           amount={value}
+          isDecimalsMinified={true}
           className="inline-flex items-center"
         />
       ) : (
         <FiatAmount
           prefix={isPositive ? "+" : "-"}
           amount={value}
+          isDecimalsMinified={true}
           copiable
           className="text-lg font-semibold"
         />

@@ -63,7 +63,7 @@ export const syncTokenActivities = memoize(
             const debankTokenId =
               tokenSlug === NATIVE_TOKEN_SLUG
                 ? debankChain.native_token_id
-                : token.address;
+                : token.address.toLowerCase();
 
             const { data } = await debankApi.get("/user/history_list", {
               params: {
@@ -99,7 +99,7 @@ export const syncTokenActivities = memoize(
                   addToActivities({
                     ...base,
                     type: "transfer",
-                    anotherAddress: send.to_addr,
+                    anotherAddress: ethers.utils.getAddress(send.to_addr),
                     amount: new BigNumber(send.amount)
                       .times(decimalsFactor)
                       .integerValue()
@@ -114,7 +114,7 @@ export const syncTokenActivities = memoize(
                   addToActivities({
                     ...base,
                     type: "transfer",
-                    anotherAddress: receive.from_addr,
+                    anotherAddress: ethers.utils.getAddress(receive.from_addr),
                     amount: new BigNumber(receive.amount)
                       .times(decimalsFactor)
                       .integerValue()
@@ -131,7 +131,9 @@ export const syncTokenActivities = memoize(
                 addToActivities({
                   ...base,
                   type: "approve",
-                  anotherAddress: token_approve.spender,
+                  anotherAddress: ethers.utils.getAddress(
+                    token_approve.spender
+                  ),
                   amount: amount.toString(),
                   clears: amount.isZero(),
                 });
@@ -192,7 +194,7 @@ export const syncTokenActivities = memoize(
               txHash: tOut.transactionHash,
               timeAt: tOut.blockNumber,
               type: "transfer",
-              anotherAddress: tOut.args[1],
+              anotherAddress: ethers.utils.getAddress(tOut.args[1]),
               amount: ethers.BigNumber.from(tOut.args[2]).mul(-1).toString(),
             });
           }
@@ -203,7 +205,7 @@ export const syncTokenActivities = memoize(
               txHash: tIn.transactionHash,
               timeAt: tIn.blockNumber,
               type: "transfer",
-              anotherAddress: tIn.args[0],
+              anotherAddress: ethers.utils.getAddress(tIn.args[0]),
               amount: ethers.BigNumber.from(tIn.args[2]).toString(),
             });
           }
@@ -216,7 +218,7 @@ export const syncTokenActivities = memoize(
               txHash: approval.transactionHash,
               timeAt: approval.blockNumber,
               type: "approve",
-              anotherAddress: approval.args[1],
+              anotherAddress: ethers.utils.getAddress(approval.args[1]),
               amount: amount.toString(),
               clears: amount.isZero(),
             });
