@@ -4,8 +4,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
+import { WalletStatus } from "core/types";
+
 import { AddAccountStep } from "app/nav";
-import { addAccountModalAtom, addAccountStepAtom } from "app/atoms";
+import {
+  addAccountModalAtom,
+  addAccountStepAtom,
+  walletStatusAtom,
+} from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
@@ -16,6 +22,8 @@ import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isInitial = walletStatus === WalletStatus.Welcome;
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -64,14 +72,16 @@ const AddAccountModal = memo(() => {
                 ref={ref}
                 className={classNames(
                   "w-full h-full",
-                  "brandbg-large-modal",
-                  "border border-brand-light/5",
                   "rounded-[2.5rem]",
-                  "after:absolute after:inset-0",
-                  "after:shadow-addaccountmodal",
-                  "after:rounded-[2.5rem]",
-                  "after:pointer-events-none",
-                  "after:z-20"
+                  "border border-brand-light/5",
+                  !isInitial && [
+                    "brandbg-large-modal",
+                    "after:absolute after:inset-0",
+                    "after:shadow-addaccountmodal",
+                    "after:rounded-[2.5rem]",
+                    "after:pointer-events-none",
+                    "after:z-20",
+                  ]
                 )}
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
@@ -82,6 +92,14 @@ const AddAccountModal = memo(() => {
                 )}
                 type="scroll"
               >
+                {isInitial && (
+                  <div
+                    className={classNames(
+                      "absolute inset-0 z-[-5] rounded-[2.5rem] overflow-hidden",
+                      "bg-brand-dark/10 backdrop-blur-[30px]"
+                    )}
+                  />
+                )}
                 {accountStep !== AddAccountStep.ChooseWay && (
                   <BackButton className="absolute top-4 left-4 " />
                 )}
@@ -91,6 +109,17 @@ const AddAccountModal = memo(() => {
                 </Dialog.Close>
 
                 {accModalOpened && <AddAccountSteps />}
+                {isInitial && (
+                  <div
+                    className={classNames(
+                      "absolute inset-0",
+                      "shadow-addaccountmodal",
+                      "rounded-[2.5rem]",
+                      "pointer-events-none",
+                      "z-20"
+                    )}
+                  />
+                )}
               </ScrollAreaContainer>
             )}
           </OverflowProvider>
