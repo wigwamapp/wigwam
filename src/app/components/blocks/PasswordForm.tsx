@@ -45,7 +45,7 @@ const PasswordForm = memo<PasswordFormProps>(
 
     useEffect(() => {
       if (autoFocus) {
-        setTimeout(() => passwordFieldRef.current?.focus?.(), 50);
+        setTimeout(() => passwordFieldRef.current?.focus?.(), 20);
       }
     }, [autoFocus]);
 
