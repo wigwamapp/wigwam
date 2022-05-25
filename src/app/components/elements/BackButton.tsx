@@ -23,7 +23,7 @@ const BackButton = memo(
     const historyPosition = getPosition();
 
     const inHome = currentValue === initialValue;
-    const canBack = historyPosition > 0 && !inHome;
+    const canBack = !inHome;
 
     const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
       (evt) => {
