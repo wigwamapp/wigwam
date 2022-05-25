@@ -247,6 +247,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               networks={preparedNetworks}
               currentNetwork={network}
               onNetworkChange={onNetworkChange}
+              withAction={false}
             />
           </div>
         </div>

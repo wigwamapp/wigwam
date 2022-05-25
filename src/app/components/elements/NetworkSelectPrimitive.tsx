@@ -21,6 +21,7 @@ type NetworkSelectProps = {
   networks: Network[];
   currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
+  withAction?: boolean;
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -31,6 +32,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   networks,
   currentNetwork,
   onNetworkChange,
+  withAction = true,
   className,
   currentItemClassName,
   currentItemIconClassName,
@@ -78,15 +80,17 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       contentClassName={contentClassName}
       modal={true}
       actions={
-        <IconedButton
-          aria-label="Manage networks"
-          to={{ page: Page.Settings, setting: SettingTab.Networks }}
-          smartLink
-          onClick={handleLinkClick}
-          theme="tertiary"
-          Icon={GearIcon}
-          className="ml-2"
-        />
+        withAction ? (
+          <IconedButton
+            aria-label="Manage networks"
+            to={{ page: Page.Settings, setting: SettingTab.Networks }}
+            smartLink
+            onClick={handleLinkClick}
+            theme="tertiary"
+            Icon={GearIcon}
+            className="ml-2"
+          />
+        ) : undefined
       }
       emptySearchText={
         <>
