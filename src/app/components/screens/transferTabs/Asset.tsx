@@ -209,7 +209,7 @@ const Asset: FC = () => {
               <ContactAutocomplete
                 setValue={(value) => {
                   form.change("recipient", value);
-                  focus();
+                  focus?.();
                 }}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
