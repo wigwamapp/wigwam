@@ -47,6 +47,7 @@ const Unlock: FC = () => {
       <PasswordForm
         theme={isPopup ? "small" : "large"}
         className={isPopup ? "mt-11" : "mt-12 mb-20"}
+        autoFocus
       />
       {isPopup && (
         <div

@@ -1,6 +1,8 @@
 import { FC } from "react";
 import classNames from "clsx";
 
+import { Page } from "app/nav";
+import { pageAtom } from "app/atoms";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
@@ -14,7 +16,6 @@ import WelcomeFireImage from "app/images/welcome-fire.png";
 
 type BoardingPageLayoutProps = {
   header?: boolean;
-  animate?: boolean;
   isWelcome?: boolean;
 };
 
@@ -25,13 +26,13 @@ const handleBootAnimationEnd = () => {
 
 const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
   header = true,
-  animate = false,
   isWelcome = false,
   children,
 }) => (
   <div
     className={classNames(
-      (bootAnimationDisplayed || animate) && "animate-bootfadein",
+      bootAnimationDisplayed &&
+        (isWelcome ? "animate-bootfadeinslow" : "animate-bootfadein"),
       "relative",
       "min-h-screen flex flex-col",
       "bg-center bg-cover"
@@ -39,9 +40,7 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
     style={{
       backgroundImage: isWelcome ? `url('${WelcomeBgImage}')` : "none",
     }}
-    onAnimationEnd={
-      bootAnimationDisplayed || animate ? handleBootAnimationEnd : undefined
-    }
+    onAnimationEnd={bootAnimationDisplayed ? handleBootAnimationEnd : undefined}
   >
     <ContentContainer narrow className="relative pt-[14vh]">
       {header && (
@@ -62,7 +61,11 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
               Profiles
             </Button>
           ) : (
-            <BackButton className="absolute bottom-2 left-0 !font-bold" />
+            <BackButton
+              navAtom={pageAtom}
+              initialValue={Page.Default}
+              className="absolute bottom-2 left-0 !font-bold"
+            />
           )}
         </header>
       )}

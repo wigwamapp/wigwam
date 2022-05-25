@@ -35,7 +35,9 @@ module.exports = {
         sans: ["Inter", ...theme.fontFamily.sans],
       },
       animation: {
-        bootfadein: "fadein 0.3s ease-in-out",
+        bootfadein: "fadein 0.15s ease-in",
+        bootfadeinslow: "fadein 0.3s ease-in",
+        bootfadeinfast: "fadein 0.1s ease-in",
         dialogcontent:
           "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "waving-hand": "wave 2s linear infinite",

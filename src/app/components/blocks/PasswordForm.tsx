@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
@@ -16,10 +16,11 @@ type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
   className?: string;
+  autoFocus?: boolean;
 };
 
 const PasswordForm = memo<PasswordFormProps>(
-  ({ theme = "large", unlockCallback, className }) => {
+  ({ theme = "large", unlockCallback, className, autoFocus }) => {
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
@@ -40,6 +41,14 @@ const PasswordForm = memo<PasswordFormProps>(
       [unlockCallback]
     );
 
+    const passwordFieldRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      if (autoFocus) {
+        setTimeout(() => passwordFieldRef.current?.focus?.(), 50);
+      }
+    }, [autoFocus]);
+
     return (
       <Form<FormValues>
         onSubmit={handleSubmit}
@@ -55,6 +64,7 @@ const PasswordForm = memo<PasswordFormProps>(
             <Field name="password" validate={required}>
               {({ input, meta }) => (
                 <PasswordField
+                  ref={passwordFieldRef}
                   className="max-w-[19rem] w-full relative min-h-[6.125rem]"
                   placeholder={"*".repeat(8)}
                   label="Password"

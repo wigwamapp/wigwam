@@ -100,9 +100,12 @@ const AddAccountModal = memo(() => {
                     )}
                   />
                 )}
-                {accountStep !== AddAccountStep.ChooseWay && (
-                  <BackButton className="absolute top-4 left-4 " />
-                )}
+
+                <BackButton
+                  navAtom={addAccountStepAtom}
+                  initialValue={AddAccountStep.ChooseWay}
+                  className="absolute top-4 left-4"
+                />
 
                 <Dialog.Close className="absolute top-4 right-4" asChild>
                   <Button theme="clean">Cancel</Button>
