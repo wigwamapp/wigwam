@@ -14,7 +14,6 @@ import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC20__factory } from "abi-types";
-import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -30,7 +29,7 @@ import {
   OnChange,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useProvider } from "app/hooks";
+import { useLazyNetwork, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import TokenSelect from "app/components/elements/TokenSelect";
@@ -49,6 +48,7 @@ type FormValues = { amount: string; recipient: string };
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
+  const currentNetwork = useLazyNetwork();
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
   const currentToken = useAccountToken(tokenSlug);
   const { alert } = useDialog();
@@ -174,6 +174,11 @@ const Asset: FC = () => {
     estimateGas();
   }, [estimateGas]);
 
+  const formKey = useMemo(
+    () => `${currentAccount.address}-${currentNetwork?.chainId}`,
+    [currentAccount.address, currentNetwork?.chainId]
+  );
+
   const amountFieldKey = useMemo(
     () => `amount-${currentToken?.tokenSlug}-${maxAmount}`,
     [currentToken, maxAmount]
@@ -181,6 +186,7 @@ const Asset: FC = () => {
 
   return (
     <Form<FormValues>
+      key={formKey}
       onSubmit={handleSubmit}
       decorators={[focusOnErrors]}
       render={({ form, handleSubmit, values, submitting }) => (
@@ -189,7 +195,6 @@ const Asset: FC = () => {
           className="flex flex-col max-w-[23.25rem]"
         >
           <OnChange name="recipient" callback={handleRecipientChange} />
-          <AccountChangeObserver onChange={() => form.restart()} />
           <TokenSelect
             handleTokenChanged={() => {
               form.change("amount", "");
@@ -204,7 +209,7 @@ const Asset: FC = () => {
               <ContactAutocomplete
                 setValue={(value) => {
                   form.change("recipient", value);
-                  focus();
+                  focus?.();
                 }}
                 error={meta.error && meta.touched}
                 errorMessage={meta.error}
@@ -237,7 +242,7 @@ const Asset: FC = () => {
                     </InputLabelAction>
                   }
                   currency={currentToken ? currentToken.symbol : undefined}
-                  error={meta.touched && meta.error}
+                  error={meta.modified && meta.error}
                   errorMessage={meta.error}
                   {...input}
                 />
@@ -266,25 +271,6 @@ const Asset: FC = () => {
 };
 
 export default Asset;
-
-type AccountChangeObserverProps = {
-  onChange: () => void;
-};
-
-const AccountChangeObserver: FC<AccountChangeObserverProps> = ({
-  onChange,
-}) => {
-  const currentAccount = useAtomValue(currentAccountAtom);
-  const prevAccountAddress = usePrevious(currentAccount.address);
-
-  useEffect(() => {
-    if (currentAccount.address !== prevAccountAddress) {
-      onChange();
-    }
-  }, [currentAccount, onChange, prevAccountAddress]);
-
-  return null;
-};
 
 type TxCheckProps = {
   currentToken?: AccountAsset;
