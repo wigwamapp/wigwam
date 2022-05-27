@@ -165,7 +165,7 @@ type ActivityIconProps = WithThemeProps & {
   className?: string;
 };
 
-const ActivityIcon: FC<ActivityIconProps> = ({
+export const ActivityIcon: FC<ActivityIconProps> = ({
   theme,
   Icon,
   ariaLabel,
@@ -182,8 +182,9 @@ const ActivityIcon: FC<ActivityIconProps> = ({
           "block",
           "bg-white",
           "rounded-full overflow-hidden",
-          theme === "small" && "w-[1.125rem] h-[1.125rem]",
-          theme === "large" && "w-6 h-6",
+          "h-auto",
+          theme === "small" && "w-[1.125rem]",
+          theme === "large" && "w-6",
           className
         )}
       />
