@@ -20,7 +20,7 @@ const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
   const historyPosition = getPosition();
 
   const inHome = page === Page.Default;
-  const canBack = historyPosition > 0 || !inHome;
+  const canBack = false; // historyPosition > 0 || !inHome;
 
   const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
     (evt) => {
