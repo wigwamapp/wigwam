@@ -64,14 +64,20 @@ async function approveBscTokens() {
 }
 
 async function generateRandomContacts() {
+  const contractsToAdd: any[] = [];
+
+  const seedPhrase = ethers.Wallet.createRandom().mnemonic.phrase;
+  const hdNode = ethers.utils.HDNode.fromMnemonic(seedPhrase);
+
   for (let i = 0; i < 99; i++) {
+    const { address } = hdNode.derivePath(`m/44'/60'/0'/0/${i}`);
     const name = getRandomName();
-    const address = `0x29D7d1dd5B6f9C864d9db560D72a247c178aE8${
-      i > 10 ? i : `0${i}`
-    }`;
     const addedAt = new Date().getTime();
-    await Repo.contacts.add({ name, address, addedAt });
+
+    contractsToAdd.push({ address, name, addedAt });
   }
+
+  await Repo.contacts.bulkPut(contractsToAdd);
 }
 
 const ControlPanel: FC = () => {
