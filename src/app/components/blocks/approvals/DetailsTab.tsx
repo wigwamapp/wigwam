@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, memo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
@@ -226,18 +226,16 @@ type TokenProps = {
   className?: string;
 };
 
-const Token: FC<TokenProps> = ({ token: { slug, amount }, className }) => {
-  const tokenInfo = useAccountToken(slug) as AccountAsset;
+const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
+  const tokenInfo = useAccountToken(slug);
 
-  const { name, symbol, decimals, priceUSD } = tokenInfo;
+  if (!tokenInfo) return null;
 
-  const usdAmount = useMemo(
-    () =>
-      new BigNumber(amount)
-        .div(new BigNumber(10).pow(decimals))
-        .multipliedBy(priceUSD ?? 1),
-    [amount, decimals, priceUSD]
-  );
+  const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
+
+  const usdAmount = new BigNumber(amount)
+    .div(new BigNumber(10).pow(decimals))
+    .multipliedBy(priceUSD ?? 1);
 
   return (
     <div className={classNames("flex items-center", className)}>
@@ -263,7 +261,7 @@ const Token: FC<TokenProps> = ({ token: { slug, amount }, className }) => {
       />
     </div>
   );
-};
+});
 
 const Dot: FC = () => (
   <span className="flex items-center justify-center p-2">
