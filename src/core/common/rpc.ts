@@ -15,3 +15,8 @@ export const AUTHORIZED_RPC_METHODS = new Set<string>([
   JsonRpcMethod.eth_signTypedData_v3,
   JsonRpcMethod.eth_signTypedData_v4,
 ]);
+
+export const DISCONNECT_ERROR = {
+  code: 4900,
+  message: "The provider is disconnected from all chains.",
+};

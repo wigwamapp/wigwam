@@ -31,6 +31,15 @@ export class Emitter<Event = any> {
     }
   }
 
+  once<T = Event>(type: EventType, handler: Handler<T>) {
+    const handleOnce = (event?: T) => {
+      this.removeListener(type, handleOnce);
+      handler(event);
+    };
+
+    this.on<T>(type, handleOnce);
+  }
+
   /**
    * Remove an event handler for the given type.
    * @param {string|symbol} type Type of event to unregister `handler` from

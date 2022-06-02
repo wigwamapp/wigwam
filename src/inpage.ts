@@ -1,64 +1,28 @@
 import { InpageProvider } from "core/inpage/provider";
-// import { RequestArguments } from "core/types/rpc";
+import { UniversalInpageProvider } from "core/inpage/universalProvider";
 
-const provider = new InpageProvider();
+const vigvam = new InpageProvider();
 
-inject("ethereum", provider);
-inject("vigvamEthereum", provider);
+inject("ethereum");
+inject("vigvamEthereum");
 
-function inject(key: string, provider: InpageProvider) {
-  const providers = [provider];
-
-  const existingProvider: InpageProvider = (window as any)[key];
-
-  if (existingProvider) {
-    providers.push(existingProvider);
-  }
+function inject(key: string) {
+  const existing: InpageProvider = (window as any)[key];
+  const universal = new UniversalInpageProvider(
+    existing ? [vigvam, existing] : [vigvam]
+  );
 
   Object.defineProperty(window, key, {
     configurable: true,
     get() {
-      return providers.find((p) => p.selectedAddress) ?? providers[0];
+      return universal;
     },
     set(value) {
-      providers.push(value);
+      universal.addProviders([value]);
     },
   });
 
-  if (!existingProvider) {
+  if (!existing) {
     window.dispatchEvent(new Event(`${key}#initialized`));
   }
 }
-
-// if (key in window) {
-//   const existingProvider = (window as any)[key];
-//   if (Array.isArray(currentProvider?.providers)) {
-//     currentProvider.providers.push(provider);
-//     return;
-//   }
-// }
-
-// if (key in window) {
-//   providers.push((window as any)[key]);
-// }
-
-// class UniversalProvider extends InpageProvider {
-//   providers: InpageProvider[] = [];
-//   selectedProvider: InpageProvider | null = null;
-
-//   constructor(existingProvider?: InpageProvider) {
-//     super();
-//   }
-
-//   request(args: RequestArguments): Promise<unknown> {
-//     if (args.method === "wallet_requestPermissions") {
-//     }
-
-//     return super.request(args);
-//   }
-
-//   #addProvider(newProvider: InpageProvider) {
-//     this.providers.push(newProvider);
-//     this.#reshufle();
-//   }
-// }

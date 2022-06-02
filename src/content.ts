@@ -2,7 +2,7 @@ import browser from "webextension-polyfill";
 import { PorterClient } from "lib/ext/porter/client";
 
 import { PorterChannel } from "core/types/shared";
-import { JSONRPC } from "core/common/rpc";
+import { JSONRPC, DISCONNECT_ERROR } from "core/common/rpc";
 import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
@@ -68,8 +68,3 @@ function injectScript(src: string) {
     return null;
   }
 }
-
-const DISCONNECT_ERROR = {
-  code: 4900,
-  message: "The provider is disconnected from all chains.",
-};

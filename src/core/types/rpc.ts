@@ -112,6 +112,14 @@ export interface EthSubscription extends ProviderMessage {
   };
 }
 
+export interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
+  method:
+    | "net_version"
+    | "eth_accounts"
+    | "eth_coinbase"
+    | "eth_uninstallFilter";
+}
+
 /**
  * Internal
  */

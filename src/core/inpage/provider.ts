@@ -12,6 +12,7 @@ import {
   JsonRpcMethod,
   RequestArguments,
   EthSubscription,
+  SendSyncJsonRpcRequest,
 } from "core/types/rpc";
 import {
   JSONRPC,
@@ -350,7 +351,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
    * @returns A promise that resolves to an array of addresses.
    */
   enable() {
-    return this.request({ method: "eth_requestAccounts" });
+    return this.request({ method: JsonRpcMethod.eth_requestAccounts });
   }
 
   send<T>(method: string, params?: T[]): Promise<JsonRpcResponse<T>>;
@@ -407,7 +408,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
    *
    * @deprecated
    */
-  protected sendSync(payload: SendSyncJsonRpcRequest) {
+  sendSync(payload: SendSyncJsonRpcRequest) {
     let result;
     switch (payload.method) {
       case JsonRpcMethod.net_version:
@@ -458,11 +459,3 @@ const errorMessages = {
   unsupportedSync: (method: string) =>
     `The provider does not support synchronous methods like ${method} without a callback parameter.`,
 };
-
-interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
-  method:
-    | "net_version"
-    | "eth_accounts"
-    | "eth_coinbase"
-    | "eth_uninstallFilter";
-}
