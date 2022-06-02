@@ -2,6 +2,7 @@ import browser from "webextension-polyfill";
 import { PorterClient } from "lib/ext/porter/client";
 
 import { PorterChannel } from "core/types/shared";
+import { JSONRPC } from "core/common/rpc";
 import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
@@ -38,8 +39,14 @@ function initMsgGateway(injected: Promise<void>) {
       porter.sendOneWayMessage(msg);
     } catch (err) {
       console.error(err);
-      // TODO: Handle disconnect error,
-      // and reply with rpc corresponding rpc error
+
+      if (msg?.jsonrpc === JSONRPC && msg.id) {
+        inpage.send({
+          id: msg.id,
+          jsonrpc: JSONRPC,
+          error: DISCONNECT_ERROR,
+        });
+      }
     }
   });
 }
@@ -61,3 +68,8 @@ function injectScript(src: string) {
     return null;
   }
 }
+
+const DISCONNECT_ERROR = {
+  code: 4900,
+  message: "The provider is disconnected from all chains.",
+};

@@ -19,6 +19,7 @@ import {
   Permission,
 } from "core/types";
 import * as repo from "core/repo";
+import { JSONRPC, VIGVAM_STATE } from "core/common/rpc";
 
 import {
   $walletStatus,
@@ -65,8 +66,8 @@ export function startServer() {
         };
 
         pagePorter.notify(port, {
-          jsonrpc: "2.0",
-          method: "vigvam_state",
+          jsonrpc: JSONRPC,
+          method: VIGVAM_STATE,
           params,
         });
       };
@@ -153,13 +154,22 @@ async function handlePageRequest(
       url: senderUrl,
     };
 
-    handleRpc(source, 1, method, (params as any[]) ?? [], (response) =>
+    handleRpc(source, 1, method, (params as any[]) ?? [], (response) => {
+      if ("error" in response) {
+        // Send plain object, not an Error instance
+        // Also remove error stack
+        const { message, code, data } = response.error;
+        response = {
+          error: { message, code, data },
+        };
+      }
+
       ctx.reply({
         id,
         jsonrpc,
         ...response,
-      })
-    );
+      });
+    });
   } catch (err) {
     console.error(err);
 

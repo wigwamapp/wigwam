@@ -15,7 +15,7 @@ export type EventHandlerList = Array<Handler>;
 export type EventHandlerMap = Map<EventType, EventHandlerList>;
 
 export class Emitter<Event = any> {
-  private all: EventHandlerMap = new Map();
+  #all: EventHandlerMap = new Map();
 
   /**
    * Register an event handler for the given type.
@@ -24,10 +24,10 @@ export class Emitter<Event = any> {
    * @memberOf Emitter
    */
   on<T = Event>(type: EventType, handler: Handler<T>) {
-    const handlers = this.all.get(type);
+    const handlers = this.#all.get(type);
     const added = handlers && handlers.push(handler);
     if (!added) {
-      this.all.set(type, [handler]);
+      this.#all.set(type, [handler]);
     }
   }
 
@@ -38,7 +38,7 @@ export class Emitter<Event = any> {
    * @memberOf Emitter
    */
   removeListener<T = Event>(type: EventType, handler: Handler<T>) {
-    const handlers = this.all.get(type);
+    const handlers = this.#all.get(type);
     if (handlers) {
       handlers.splice(handlers.indexOf(handler) >>> 0, 1);
     }
@@ -52,7 +52,7 @@ export class Emitter<Event = any> {
    * @memberOf Emitter
    */
   emit<T = Event>(type: EventType, evt: T) {
-    ((this.all.get(type) || []) as EventHandlerList).slice().map((handler) => {
+    ((this.#all.get(type) || []) as EventHandlerList).slice().map((handler) => {
       try {
         handler(evt);
       } catch {}
