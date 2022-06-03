@@ -6,9 +6,15 @@ import { Vault } from "../vault";
 
 export const inited = createEvent<boolean>();
 
-export const unlocked = createEvent<{ vault: Vault; accounts: Account[] }>();
+export const unlocked = createEvent<{
+  vault: Vault;
+  accounts: Account[];
+  hasSeedPhrase: boolean;
+}>();
 
 export const locked = createEvent();
+
+export const seedPhraseAdded = createEvent();
 
 export const accountsUpdated = createEvent<Account[]>();
 
