@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FC, memo, ReactNode, useCallback, useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { replaceT } from "lib/ext/i18n";
@@ -71,8 +71,10 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
 
   const handleDeleteAccount = useCallback(() => {
     confirm({
-      title: "Delete wallet account",
-      content: `Are you sure you want to delete the wallet "${account.name}"?`,
+      title: "Delete wallet",
+      content: `Are you sure you want to delete the "${replaceT(
+        account.name
+      )}"?`,
     }).then((answer) => {
       if (answer) {
         setModalState("delete");
@@ -109,7 +111,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             >
               {({ input, meta }) => (
                 <Input
-                  label="Wallet Name"
+                  label="Wallet name"
                   placeholder="Type wallet name"
                   error={
                     (meta.error && meta.touched) ||
@@ -140,7 +142,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           <WalletBlock
             Icon={KeyIcon}
             title="Private key"
-            description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+            description="Export the private key of this wallet."
             className="mt-6"
           >
             <Button
@@ -162,7 +164,21 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         <WalletBlock
           Icon={getSocialIcon(account.social)}
           title={capitalizeFirstLetter(account.social)}
-          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          description={
+            <>
+              This wallet is linked to a {capitalizeFirstLetter(account.social)}{" "}
+              account. Powered by{" "}
+              <a
+                href="https://openlogin.com/"
+                target="_blank"
+                rel="nofollow noreferrer"
+                className="underline"
+              >
+                OpenLogin
+              </a>
+              .
+            </>
+          }
           className="mt-6"
         >
           {account.socialName && (
@@ -189,7 +205,13 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         <WalletBlock
           Icon={NoteIcon}
           title="Secret phrase"
-          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          description={
+            <>
+              This wallet is created with a Secret Phrase. It is the same for
+              all such wallets in this profile. Only the derivation path is
+              distinctive.
+            </>
+          }
           className="mt-6"
         >
           <>
@@ -220,7 +242,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         <WalletBlock
           Icon={LedgerIcon}
           title="Ledger"
-          description="Vigvam lets you to explore DeFi and NFTs in safer, faster and modern way."
+          description="This wallet connected with external Ledger hardware device."
           className="mt-6"
         >
           <Input
@@ -236,7 +258,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         theme="secondary"
         onClick={handleDeleteAccount}
         className={classNames(
-          "mt-6 w-48",
+          "mt-6 mb-8 w-48",
           "!py-2",
           "flex items-center",
           "text-brand-light"
@@ -246,7 +268,8 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         Remove wallet
       </Button>
       {modalState && (
-        <DeleteAccountModal
+        <SensetiveActionModal
+          key={modalState}
           account={account}
           open={true}
           cause={modalState}
@@ -262,7 +285,7 @@ export default EditWalletSection;
 type WalletBlockProps = {
   Icon: FC<{ className?: string }>;
   title: string;
-  description: string;
+  description: ReactNode;
   className?: string;
 };
 
@@ -291,7 +314,7 @@ const WalletBlock: FC<WalletBlockProps> = ({
   </div>
 );
 
-const DeleteAccountModal = memo<
+const SensetiveActionModal = memo<
   SecondaryModalProps & {
     account: Account;
     cause: "delete" | "phrase" | "private-key";
@@ -339,10 +362,10 @@ const DeleteAccountModal = memo<
     <SecondaryModal
       header={
         seedPhrase ? (
-          "Your secret phrase"
+          "Your Secret Phrase"
         ) : privateKey ? (
           <>
-            Private key for wallet &#34;
+            Private key for &#34;
             <TReplace msg={account.name} />
             &#34;
           </>
@@ -355,11 +378,35 @@ const DeleteAccountModal = memo<
       className="px-[5.25rem]"
     >
       {seedPhrase || privateKey ? (
-        <SecretField
-          label={seedPhrase ? "Secret phrase" : "Private key"}
-          isDownloadable={Boolean(seedPhrase)}
-          value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
-        />
+        <>
+          <div
+            className={classNames(
+              "mb-4 w-[24rem]",
+              "flex items-center",
+              "p-4",
+              "bg-brand-redobject/[.05]",
+              "border border-brand-redobject/[.8]",
+              "rounded-[.625rem]",
+              "text-sm"
+            )}
+          >
+            <span>
+              <strong>DO NOT share</strong> this set of{" "}
+              {seedPhrase ? "words" : "chars"} with anyone! It can be used to
+              steal{" "}
+              {seedPhrase
+                ? "all wallets belonging to this phrase"
+                : "this wallet"}
+              .
+            </span>
+          </div>
+
+          <SecretField
+            label={seedPhrase ? "Secret phrase" : "Private key"}
+            isDownloadable={Boolean(seedPhrase)}
+            value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
+          />
+        </>
       ) : (
         <Form
           onSubmit={handleConfirmPassword}

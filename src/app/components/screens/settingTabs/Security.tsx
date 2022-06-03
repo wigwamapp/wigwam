@@ -7,21 +7,19 @@ import { fromProtectedString } from "lib/crypto-utils";
 import { getSeedPhrase } from "core/client";
 
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
-import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 import SecretField from "app/components/blocks/SecretField";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
-import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 
 const Security: FC = () => {
   const [revealModalOpened, setRevealModalOpened] = useState(false);
-  const [syncData, setSyncData] = useState(false);
-  const [phishing, setPhishing] = useState(false);
+  // const [syncData, setSyncData] = useState(false);
+  // const [phishing, setPhishing] = useState(false);
 
   return (
     <div className="flex flex-col items-start">
@@ -38,7 +36,7 @@ const Security: FC = () => {
         <RevealIcon className="w-[1.625rem] h-auto mr-3" />
         Reveal
       </Button>
-      <Separator className="my-8" />
+      {/* <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>
       <Switcher
         id="syncThirdParty"
@@ -55,7 +53,7 @@ const Security: FC = () => {
         label="Use Phishing Detection"
         onCheckedChange={setPhishing}
         className="mt-3 min-w-[20rem]"
-      />
+      /> */}
       {revealModalOpened && (
         <SeedPhraseModal
           open={true}
