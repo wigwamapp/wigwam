@@ -498,7 +498,6 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
             "text-sm text-brand-light",
             "!p-0 !pr-1 !min-w-0",
             "!font-normal",
-            "cursor-copy",
             "items-center"
           )}
         >

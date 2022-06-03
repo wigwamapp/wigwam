@@ -142,7 +142,6 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "text-sm text-brand-light",
           "!p-0 !pr-1 !min-w-0",
           "!font-normal",
-          "cursor-copy",
           "items-center",
           isShown
             ? "bottom-3 right-3"
