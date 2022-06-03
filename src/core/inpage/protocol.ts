@@ -1,11 +1,11 @@
-export const INPAGE_PROTOCOL = "VIGVAM_INPAGE_0";
-
 export type InpageMessageTarget = "injected" | "content";
 export type InpageMessage<T = any> = {
-  protocol: typeof INPAGE_PROTOCOL;
+  bid: string; // Build ID
   target: InpageMessageTarget;
   data: T;
 };
+
+const BUILD_ID = process.env.BUILD_ID;
 
 export class InpageProtocol {
   constructor(
@@ -15,7 +15,7 @@ export class InpageProtocol {
 
   send(data: any) {
     const msg: InpageMessage = {
-      protocol: INPAGE_PROTOCOL,
+      bid: BUILD_ID,
       target: this.recipient,
       data,
     };
@@ -30,7 +30,7 @@ export class InpageProtocol {
       if (
         evt.source === window &&
         evt.origin === location.origin &&
-        evt.data?.protocol === INPAGE_PROTOCOL &&
+        evt.data?.bid === BUILD_ID &&
         evt.data.target === this.self
       ) {
         callback(evt.data.data, evt);

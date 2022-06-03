@@ -8,6 +8,12 @@ inject("vigvamEthereum");
 
 function inject(key: string) {
   const existing: InpageProvider = (window as any)[key];
+
+  if (existing?.isVigvam && "addProviders" in existing) {
+    (existing as any).addProviders([vigvam]);
+    return;
+  }
+
   const universal = new UniversalInpageProvider(
     existing ? [vigvam, existing] : [vigvam]
   );
