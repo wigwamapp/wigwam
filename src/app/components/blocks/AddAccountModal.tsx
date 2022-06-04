@@ -45,7 +45,8 @@ const AddAccountModal = memo(() => {
             "w-full max-w-6xl min-w-[40rem]",
             "max-h-[41rem]",
             "m-auto inset-x-0 inset-y-[3.5rem]",
-            "rounded-[2.5rem]"
+            "rounded-[2.5rem]",
+            !isInitial && "animate-modalcontent"
           )}
         >
           <div

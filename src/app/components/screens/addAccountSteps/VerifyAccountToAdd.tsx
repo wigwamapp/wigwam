@@ -27,12 +27,15 @@ import AccountsToAdd, { AccountsToAddProps } from "./AccountToAdd";
 
 const VerifyAccountToAdd: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+
   const initialSetup = walletStatus === WalletStatus.Welcome;
-  const { stateRef, navigateToStep } = useSteps();
-  const setAccModalOpened = useSetAtom(addAccountModalAtom);
-  const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
+
   const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const setAccModalOpened = useSetAtom(addAccountModalAtom);
+
+  const { stateRef, navigateToStep } = useSteps();
 
   const { importAddresses: addresses, hardDevice } = stateRef.current;
   const { alert } = useDialog();

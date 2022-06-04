@@ -47,5 +47,7 @@ export async function withVault<T>(factory: (vault: Vault) => T) {
 async function autoUnlock(password: string) {
   const vault = await Vault.unlock(toProtectedString(password));
   const accounts = vault.getAccounts();
-  unlocked({ vault, accounts });
+  const hasSeedPhrase = vault.isSeedPhraseExists();
+
+  unlocked({ vault, accounts, hasSeedPhrase });
 }
