@@ -3,7 +3,6 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import * as Accordion from "@radix-ui/react-accordion";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
-import { Link } from "lib/navigation";
 
 import { Page } from "app/nav";
 import { currentProfileAtom } from "app/atoms";
@@ -18,6 +17,7 @@ import PasswordForm from "../blocks/PasswordForm";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
+import SmartLink from "../elements/SmartLink";
 
 const Unlock: FC = () => {
   const currentProfile = useAtomValue(currentProfileAtom);
@@ -47,6 +47,7 @@ const Unlock: FC = () => {
       <PasswordForm
         theme={isPopup ? "small" : "large"}
         className={isPopup ? "mt-11" : "mt-12 mb-20"}
+        autoFocus
       />
       {isPopup && (
         <div
@@ -208,9 +209,10 @@ const AttentionContent = [
 
         <p className="mt-2">
           To access the same wallets -{" "}
-          <Link to={{ page: Page.Profiles }}>add a new profile</Link>, and
-          restore this wallets. If you used the <strong>Secret Phrase</strong>{" "}
-          to add them, <strong>use the same one again</strong>.
+          <SmartLink to={{ page: Page.Profiles }}>add a new profile</SmartLink>,
+          and restore this wallets. If you used the{" "}
+          <strong>Secret Phrase</strong> to add them,{" "}
+          <strong>use the same one again</strong>.
         </p>
       </>
     ),
@@ -221,7 +223,8 @@ const AttentionContent = [
     content: (
       <p>
         To restore wallets with the Secret Phrase, or if you want to start from
-        scratch - <Link to={{ page: Page.Profiles }}>add a new profile</Link>{" "}
+        scratch -{" "}
+        <SmartLink to={{ page: Page.Profiles }}>add a new profile</SmartLink>{" "}
         and use this pharse to add new wallets.
       </p>
     ),
@@ -232,9 +235,10 @@ const AttentionContent = [
     content: (
       <p>
         Vigvam does not have a built-in function to reset the application. We
-        recommend using <Link to={{ page: Page.Profiles }}>profiles</Link>, but
-        if you still want to reset - just reinstall the application (all
-        profiles will be erased).
+        recommend using{" "}
+        <SmartLink to={{ page: Page.Profiles }}>profiles</SmartLink>, but if you
+        still want to reset - just reinstall the application (all profiles will
+        be erased).
       </p>
     ),
   },

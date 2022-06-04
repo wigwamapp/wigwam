@@ -11,6 +11,11 @@ import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 
+let bootAnimationDisplayed = true;
+const handleBootAnimationEnd = () => {
+  bootAnimationDisplayed = false;
+};
+
 type PopupLayoutProps = {
   className?: string;
 };
@@ -25,8 +30,12 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
       className={classNames(
         "w-full",
         "flex flex-col items-stretch",
-        "h-screen"
+        "h-screen",
+        bootAnimationDisplayed && "animate-bootfadeinfast"
       )}
+      onAnimationEnd={
+        bootAnimationDisplayed ? handleBootAnimationEnd : undefined
+      }
     >
       <div className="flex px-3 pt-3">
         {isUnlocked && <LockProfileButton className="mr-2" />}

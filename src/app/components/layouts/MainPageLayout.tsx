@@ -8,9 +8,22 @@ import ActivityBar from "app/components/blocks/ActivityBar";
 
 import PreloadUnlocked from "./PreloadUnlocked";
 
+let bootAnimationDisplayed = true;
+const handleBootAnimationEnd = () => {
+  bootAnimationDisplayed = false;
+};
+
 const MainPageLayout: FC = ({ children }) => (
   <PreloadUnlocked>
-    <div className="h-screen flex flex-col">
+    <div
+      className={classNames(
+        "h-screen flex flex-col",
+        bootAnimationDisplayed && "animate-bootfadein"
+      )}
+      onAnimationEnd={
+        bootAnimationDisplayed ? handleBootAnimationEnd : undefined
+      }
+    >
       <ContentContainer className="flex grow max-h-screen">
         <Sidebar />
 
