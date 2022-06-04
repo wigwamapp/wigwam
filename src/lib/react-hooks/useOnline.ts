@@ -14,7 +14,7 @@ export function useOnline() {
       window.removeEventListener("online", setOnline);
       window.removeEventListener("offline", setOffline);
     };
-  }, []);
+  }, [setOnline, setOffline]);
 
   return status;
 }
