@@ -9,5 +9,6 @@ module.exports = {
     "@types/react-dom",
     "final-form",
     "@types/async-retry",
+    "typescript",
   ],
 };
