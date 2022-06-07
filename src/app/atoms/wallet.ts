@@ -1,4 +1,4 @@
-import { atomFamily } from "jotai/utils";
+import { atomFamily, selectAtom } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithAutoReset,
@@ -8,9 +8,8 @@ import {
 
 import * as repo from "core/repo";
 import {
-  getWalletStatus,
-  isWalletHasSeedPhrase,
-  onWalletStatusUpdated,
+  getWalletState,
+  onWalletStateUpdated,
   getNeuterExtendedKey,
   getSyncStatus,
   onSyncStatusUpdated,
@@ -19,12 +18,18 @@ import { nonceStorageKey } from "core/common/nonce";
 
 import { activeTabAtom } from "./ext";
 
-export const walletStatusAtom = atomWithAutoReset(getWalletStatus, {
-  onMount: onWalletStatusUpdated,
+export const walletStateAtom = atomWithAutoReset(getWalletState, {
+  onMount: onWalletStateUpdated,
 });
 
-export const hasSeedPhraseAtom = atomWithAutoReset(() =>
-  isWalletHasSeedPhrase().catch(() => false)
+export const walletStatusAtom = selectAtom(
+  walletStateAtom,
+  ({ status }) => status
+);
+
+export const hasSeedPhraseAtom = selectAtom(
+  walletStateAtom,
+  ({ hasSeedPhrase }) => hasSeedPhrase
 );
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>

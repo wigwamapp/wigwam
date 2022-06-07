@@ -1,4 +1,4 @@
-import { createStore } from "effector";
+import { createStore, combine } from "effector";
 
 import { WalletStatus, Approval, Account, ActivityType } from "core/types";
 import { getPageOrigin } from "core/common/permissions";
@@ -8,6 +8,7 @@ import {
   inited,
   unlocked,
   locked,
+  seedPhraseAdded,
   accountsUpdated,
   walletPortsCountUpdated,
   approvalAdded,
@@ -24,6 +25,13 @@ export const $walletStatus = createStore(WalletStatus.Idle)
   .on(locked, (state) =>
     state === WalletStatus.Unlocked ? WalletStatus.Locked : state
   );
+
+export const $hasSeedPhrase = createStore(false)
+  .on(unlocked, (_s, { hasSeedPhrase }) => hasSeedPhrase)
+  .on(seedPhraseAdded, () => true)
+  .on(locked, () => false);
+
+export const $walletState = combine([$walletStatus, $hasSeedPhrase]);
 
 export const $accounts = createStore<Account[]>([])
   .on(unlocked, (_s, { accounts }) => accounts)

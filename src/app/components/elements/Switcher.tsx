@@ -9,12 +9,14 @@ interface SwitcherProps {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   className?: string;
+  disabled?: boolean;
 }
 const Switcher: FC<SwitcherProps> = ({
   id = "switcher",
   label,
   text,
   checked,
+  disabled,
   onCheckedChange,
   className,
 }) => (
@@ -44,6 +46,7 @@ const Switcher: FC<SwitcherProps> = ({
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
       )}
+      disabled={disabled}
     >
       <span className="text-sm font-bold">{text}</span>
       <span

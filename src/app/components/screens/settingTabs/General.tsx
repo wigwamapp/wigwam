@@ -8,22 +8,17 @@ import {
   CONVERSION_CURRENCIES,
 } from "fixtures/conversionCurrency";
 
-import {
-  currentLocaleAtom,
-  selectedCurrencyAtom,
-  tokensWithoutBalanceAtom,
-} from "app/atoms";
+import { currentLocaleAtom, selectedCurrencyAtom } from "app/atoms";
 import Select from "app/components/elements/Select";
-import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import SelectLanguage from "app/components/blocks/SelectLanguage";
 import classNames from "clsx";
 
 const General: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
-  const [showTokensWithoutBalance, toggleTokensWithoutBalance] = useAtom(
-    tokensWithoutBalanceAtom
-  );
+  // const [showTokensWithoutBalance, toggleTokensWithoutBalance] = useAtom(
+  //   tokensWithoutBalanceAtom
+  // );
 
   const locale = useMemo(
     () =>
@@ -42,12 +37,12 @@ const General: FC = () => {
         className="mb-3"
       />
       <SelectCurrency className="mb-3" />
-      <Switcher
+      {/* <Switcher
         label="Tokens without balance"
         text={showTokensWithoutBalance ? "Visible" : "Hidden"}
         checked={showTokensWithoutBalance}
         onCheckedChange={toggleTokensWithoutBalance}
-      />
+      /> */}
     </div>
   );
 };

@@ -48,7 +48,6 @@ const ShareAddress: FC = () => {
               "text-sm text-brand-light !font-normal",
               "!p-1 !pr-2 !min-w-0",
               "-ml-2 mt-auto",
-              "cursor-copy",
               "items-center"
             )}
             onClick={copy}
