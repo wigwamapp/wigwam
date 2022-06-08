@@ -52,10 +52,10 @@ export class UniversalInpageProvider extends Emitter {
     this.#currentProvider = existingProviders[0];
     this.#proxyEvents();
 
-    this.addProviders(existingProviders);
+    this.addProviders(...existingProviders);
   }
 
-  addProviders(newProviders: InpageProvider[]) {
+  addProviders(...newProviders: InpageProvider[]) {
     for (const provider of newProviders) {
       this.#allProviders.push(provider);
 

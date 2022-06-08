@@ -10,7 +10,7 @@ function inject(key: string) {
   const existing: InpageProvider = (window as any)[key];
 
   if (existing?.isVigvam && "addProviders" in existing) {
-    (existing as any).addProviders([vigvam]);
+    (existing as any).addProviders(vigvam);
     return;
   }
 
@@ -24,7 +24,7 @@ function inject(key: string) {
       return universal;
     },
     set(value) {
-      universal.addProviders([value]);
+      universal.addProviders(value);
     },
   });
 
