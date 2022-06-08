@@ -14,7 +14,7 @@ export function openMainTab() {
 }
 
 export async function openOrFocusMainTab() {
-  const tabs = await browser.tabs.query({ url: getMainURL("/**") });
+  const tabs = await browser.tabs.query({ url: getMainURL() });
   if (tabs.length > 0) {
     return browser.tabs.update(tabs[0].id!, { active: true });
   }
