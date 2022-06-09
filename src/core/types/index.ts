@@ -1,4 +1,5 @@
 export * from "./base";
+export * from "./storage";
 export * from "./account";
 export * from "./network";
 export * from "./messages";

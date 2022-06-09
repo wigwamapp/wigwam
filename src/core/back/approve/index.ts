@@ -5,6 +5,7 @@ import { ethErrors } from "eth-rpc-errors";
 import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
 
+import { INITIAL_NETWORK } from "fixtures/networks";
 import {
   Activity,
   ActivityType,
@@ -50,15 +51,14 @@ export async function processApprove(
           assert(accountAddresses?.length, "Accounts not provided");
 
           const origin = getPageOrigin(source);
-          const existing = await repo.permissions.where({ origin }).first();
 
           const newPermission: Permission = {
-            id: existing?.id ?? nanoid(),
             origin,
+            id: nanoid(),
             timeAt: Date.now(),
             accountAddresses,
-            chainId: overriddenChainId ?? preferredChainId ?? 1,
-            selectedAddress: accountAddresses[0],
+            chainId:
+              overriddenChainId ?? preferredChainId ?? INITIAL_NETWORK.chainId,
           };
 
           await repo.permissions.put(newPermission);

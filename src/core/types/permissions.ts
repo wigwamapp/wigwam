@@ -1,8 +1,7 @@
 export interface Permission {
-  id: string;
   origin: string;
   timeAt: number;
-  accountAddresses: string[];
+  id: string;
   chainId: number;
-  selectedAddress: string;
+  accountAddresses: string[];
 }

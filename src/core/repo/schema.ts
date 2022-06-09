@@ -31,5 +31,5 @@ db.version(1).stores({
     "[chainId+accountAddress+tokenSlug+timeAt]",
   ].join(),
   [RepoTable.Activities]: "&id,timeAt",
-  [RepoTable.Permissions]: "&id,origin,timeAt",
+  [RepoTable.Permissions]: "&origin,timeAt",
 });

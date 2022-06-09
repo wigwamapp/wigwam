@@ -1,6 +1,7 @@
 import type { ethers } from "ethers";
 
 import { RpcReply } from "./rpc";
+import { Permission } from "./permissions";
 
 export enum ActivityType {
   Connection = "CONNECTION",
@@ -32,6 +33,7 @@ export type ActivitySource =
   | {
       type: "page";
       url: string;
+      permission?: Permission;
     };
 
 export interface ApprovalResult {

@@ -12,8 +12,6 @@ import * as repo from "core/repo";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { $walletStatus, approvalAdded } from "core/back/state";
 
-import { validateNetwork } from "./validation";
-
 export async function requestConnection(
   source: ActivitySource,
   params: any[],
@@ -27,14 +25,14 @@ export async function requestConnection(
     return;
   }
 
-  let preferredChainId = parseChainId(params[0]);
-  if (preferredChainId) {
-    try {
-      await validateNetwork(preferredChainId);
-    } catch {
-      preferredChainId = undefined;
-    }
-  }
+  // let preferredChainId = parseChainId(params[0]);
+  // if (preferredChainId) {
+  //   try {
+  //     await validateNetwork(preferredChainId);
+  //   } catch {
+  //     preferredChainId = undefined;
+  //   }
+  // }
 
   approvalAdded({
     id: nanoid(),
@@ -42,20 +40,19 @@ export async function requestConnection(
     source,
     timeAt: Date.now(),
     returnSelectedAccount,
-    preferredChainId,
     rpcReply,
   });
 }
 
 export async function fetchPermission(source: ActivitySource, reply: RpcReply) {
   const origin = getPageOrigin(source);
-  const permissions = await repo.permissions.where({ origin }).toArray();
-  const result = permissions.map(wrapPermission);
+  const permission = await repo.permissions.get(origin);
+  const result = (permission ? [permission] : []).map(wrapPermission);
 
   reply({ result });
 }
 
-function parseChainId(val: any): number | undefined {
-  val = typeof val === "number" ? val : +val;
-  return val > 0 ? val : undefined;
-}
+// function parseChainId(val: any): number | undefined {
+//   val = typeof val === "number" ? val : +val;
+//   return val > 0 ? val : undefined;
+// }

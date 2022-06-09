@@ -234,6 +234,28 @@ export class InpageProvider extends Emitter<ProviderEvent> {
           this.removeListener(gatewayEventType, handleRpcEvent);
 
           if ("result" in evt) {
+            if (
+              method === JsonRpcMethod.eth_requestAccounts &&
+              Array.isArray(evt.result)
+            ) {
+              this.#handleAccountChange(evt.result[0] ?? null);
+            }
+
+            if (
+              method === JsonRpcMethod.wallet_requestPermissions &&
+              Array.isArray(evt.result)
+            ) {
+              try {
+                const { caveats } = evt.result[0];
+                const address = caveats.find(
+                  (c: any) => c.type === "restrictReturnedAccounts"
+                ).value[0];
+                if (typeof address === "string") {
+                  this.#handleAccountChange(address);
+                }
+              } catch {}
+            }
+
             resolve(evt.result);
           } else {
             reject(evt.error);

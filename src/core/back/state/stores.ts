@@ -97,3 +97,7 @@ export const $approvals = createStore<Approval[]>([])
     current.filter((a) => a.id !== approvalId)
   )
   .on(locked, () => []);
+
+export const $accountAddresses = $accounts.map((accounts) =>
+  accounts.map((acc) => acc.address)
+);

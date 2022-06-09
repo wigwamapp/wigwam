@@ -23,11 +23,15 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   get isMetaMask() {
-    return this.#allProviders.some((p) => p.isMetaMask);
+    return this.selectedAddress
+      ? this.#currentProvider.isMetaMask
+      : this.#allProviders.some((p) => p.isMetaMask);
   }
 
   get isVigvam() {
-    return this.#allProviders.some((p) => p.isVigvam);
+    return this.selectedAddress
+      ? this.#currentProvider.isVigvam
+      : this.#allProviders.some((p) => p.isVigvam);
   }
 
   get chainId() {

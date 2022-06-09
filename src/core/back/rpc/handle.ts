@@ -1,4 +1,5 @@
 import { ethErrors } from "eth-rpc-errors";
+
 import {
   ActivitySource,
   RpcReply,
@@ -6,12 +7,15 @@ import {
   SigningStandard,
   JsonRpcError,
 } from "core/types";
+import * as repo from "core/repo";
+import { getPageOrigin } from "core/common/permissions";
 
 import { sendRpc } from "./network";
 import {
   requestConnection,
   requestTransaction,
   requestSigning,
+  requestSwitchChain,
   fetchPermission,
 } from "./wallet";
 
@@ -22,21 +26,33 @@ export async function handleRpc(
   params: any[],
   reply: RpcReply
 ) {
+  const expandPermission = async () => {
+    if (source.type === "page") {
+      const origin = getPageOrigin(source);
+      const permission = await repo.permissions.get(origin);
+
+      if (permission) {
+        source = {
+          ...source,
+          permission,
+        };
+
+        chainId = permission.chainId;
+      }
+    }
+  };
+
   try {
     switch (method) {
       case JsonRpcMethod.wallet_getPermissions: {
-        if (source.type === "self") {
-          throw ethErrors.provider.unsupportedMethod();
-        }
+        dropForSelf(source);
 
         return await fetchPermission(source, reply);
       }
 
       case JsonRpcMethod.wallet_requestPermissions:
       case JsonRpcMethod.eth_requestAccounts: {
-        if (source.type === "self") {
-          throw ethErrors.provider.unsupportedMethod();
-        }
+        dropForSelf(source);
 
         const returnSelectedAccount =
           method === JsonRpcMethod.eth_requestAccounts;
@@ -49,8 +65,11 @@ export async function handleRpc(
         );
       }
 
-      case JsonRpcMethod.eth_sendTransaction:
+      case JsonRpcMethod.eth_sendTransaction: {
+        await expandPermission();
+
         return await requestTransaction(source, chainId, params, reply);
+      }
 
       case JsonRpcMethod.eth_sign:
       case JsonRpcMethod.personal_sign:
@@ -59,21 +78,32 @@ export async function handleRpc(
       case JsonRpcMethod.eth_signTypedData_v2:
       case JsonRpcMethod.eth_signTypedData_v3:
       case JsonRpcMethod.eth_signTypedData_v4: {
+        await expandPermission();
+
         const standard = getSigningStandard(method);
         return await requestSigning(source, standard, params, reply);
+      }
+
+      case JsonRpcMethod.wallet_switchEthereumChain: {
+        await expandPermission();
+
+        return await requestSwitchChain(source, params, reply);
       }
 
       case JsonRpcMethod.eth_signTransaction:
       case JsonRpcMethod.eth_ecRecover:
       case JsonRpcMethod.personal_ecRecover:
       case JsonRpcMethod.wallet_addEthereumChain:
-      case JsonRpcMethod.wallet_switchEthereumChain:
-      case JsonRpcMethod.wallet_watchAsset:
+      case JsonRpcMethod.wallet_watchAsset: {
         // TODO: Implement separate logic for this methods
         throw ethErrors.provider.unsupportedMethod();
+      }
 
-      default:
+      default: {
+        await expandPermission();
+
         reply(await sendRpc(chainId, method, params));
+      }
     }
   } catch (err: any) {
     console.warn(err);
@@ -110,5 +140,11 @@ function getSigningStandard(method: string) {
 
     default:
       throw ethErrors.provider.unsupportedMethod();
+  }
+}
+
+function dropForSelf(source: ActivitySource) {
+  if (source.type === "self") {
+    throw ethErrors.provider.unsupportedMethod();
   }
 }

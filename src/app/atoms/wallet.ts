@@ -16,8 +16,6 @@ import {
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
 
-import { activeTabAtom } from "./ext";
-
 export const walletStateAtom = atomWithAutoReset(getWalletState, {
   onMount: onWalletStateUpdated,
 });
@@ -49,9 +47,8 @@ export const getLocalNonceAtom = atomFamily(
   dequal
 );
 
-export const activePermissionAtom = atomWithRepoQuery((query, get) => {
-  const activeTab = get(activeTabAtom);
-  const origin = activeTab?.url && new URL(activeTab.url).origin;
-
-  return query(() => repo.permissions.where({ origin }).first());
-});
+export const getPermissionAtom = atomFamily((origin?: string) =>
+  atomWithRepoQuery((query) =>
+    query(() => repo.permissions.get(origin || "<stub>"))
+  )
+);
