@@ -48,15 +48,24 @@ export const getWays = (
       content: (
         <>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo
+            <strong>Secret Phrase</strong> is a 12-word or 24-word phrase that
+            is the “master key” to your wallets and funds.
+            <br />
           </p>
+
           <p className="mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus
+            Once created, you will need to make a backup copy of this phrase.
+            Options:
+          </p>
+
+          <ul className="mt-1 list-disc list-inside">
+            <li>Save in a password manager.</li>
+            <li>Encrypt manually and save to any cloud.</li>
+            <li>Write down and store in multiple places.</li>
+          </ul>
+          <p className="mt-2">
+            <strong>Never, ever share</strong> your Secret Phrase, not even with
+            Vigvam!
           </p>
         </>
       ),
@@ -105,16 +114,30 @@ export const getWays = (
       content: (
         <>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo
+            A new experimental way to add wallets directly linked to your
+            existing social media accounts!
           </p>
+
           <p className="mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus
+            Powered by{" "}
+            <a
+              href="https://openlogin.com/"
+              target="_blank"
+              rel="nofollow noreferrer"
+              className="underline"
+            >
+              OpenLogin
+            </a>
+            . Is a plug n play auth suite that combines the simplicity of
+            passwordless authentication with the security of non-custodial
+            public key infrastructure (PKI).
           </p>
+
+          {/* <p className="mt-2">
+            <strong>Attention!</strong> If you lose access to your social
+            account or it gets blocked - you cannot regain access to your
+            wallet.
+          </p> */}
         </>
       ),
     },
@@ -152,15 +175,15 @@ export const getWays = (
       content: (
         <>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus dolor purus non enim praesent elementum facilisis
-            leo
+            <strong>Connect</strong> your existing hardware wallet directly to
+            Vigvam. And use all the power of the available interfaces from
+            Vigvam and the security of an external crypto device!
           </p>
           <p className="mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit ut aliquam,
-            purus sit amet luctus venenatis, lectus magna fringilla urna,
-            porttitor rhoncus
+            A <strong>Hardware device</strong> is a wallet which stores your
+            private keys (critical piece of information used to authorise
+            outgoing transactions on the blockchain network) in a secure
+            hardware.
           </p>
         </>
       ),
@@ -200,7 +223,7 @@ export const getWays = (
         },
       },
       {
-        title: "Watch-only accounts",
+        title: "Watch-only account",
         Icon: WatchOnlyIcon,
         action: () => {
           navigateToStep(AddAccountStep.AddWatchOnlyAccount);

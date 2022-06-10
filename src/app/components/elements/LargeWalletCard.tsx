@@ -30,6 +30,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
   const [copied, setCopied] = useState(false);
 
   const currentNetwork = useLazyNetwork();
+  const explorerUrl = currentNetwork?.explorerUrls?.[0];
   const portfolioBalance = useToken(address)?.portfolioUSD;
 
   const transitionRef = useRef<HTMLDivElement>(null);
@@ -119,18 +120,18 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
               </div>
               <div className="flex mt-2">
                 <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
-                  {currentNetwork?.explorerUrls && (
+                  {explorerUrl && (
                     <IconedButton
-                      href={`${currentNetwork.explorerUrls}/address/${address}`}
+                      href={`${explorerUrl}/address/${address}`}
                       aria-label="View wallet in Explorer"
                       Icon={WalletExplorerIcon}
                       className="!w-6 !h-6"
                       iconClassName="!w-[1.125rem]"
                     />
                   )}
-                  {currentNetwork?.explorerUrls && (
+                  {explorerUrl && (
                     <IconedButton
-                      href={`${currentNetwork.explorerUrls}/address/${address}`}
+                      href={`${explorerUrl}/address/${address}`}
                       aria-label="View wallet activity"
                       Icon={ClockIcon}
                       className="!w-6 !h-6 ml-2"

@@ -50,25 +50,25 @@ const tabsContent = [
     route: { page: "settings", setting: SettingTabEnum.General },
     Icon: GeneralIcon,
     title: "General",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Control display and appearance. Language, currency etc.",
   },
   {
     route: { page: "settings", setting: SettingTabEnum.Profile },
     Icon: ProfileIcon,
     title: "Profile",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Update profile name or avatar. Change profile password.",
   },
   {
     route: { page: "settings", setting: SettingTabEnum.Security },
     Icon: SecurityIcon,
     title: "Security & Privacy",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Back up your current Secret Phrase and other security settings.",
   },
   {
     route: { page: "settings", setting: SettingTabEnum.Web3 },
     Icon: WebIcon,
     title: "Web 3",
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Control access and permissions for decentralized applications.",
   },
   {
     route: { page: "settings", setting: SettingTabEnum.Networks },
@@ -86,6 +86,6 @@ const tabsContent = [
     route: { page: "settings", setting: SettingTabEnum.About },
     Icon: AboutIcon,
     title: "About",
-    desc: "",
+    desc: "Check current Vigvam version. Find us elsewhere.",
   },
 ];
