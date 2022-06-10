@@ -7,60 +7,64 @@ import {
 import classNames from "clsx";
 import { useAtom } from "jotai";
 import { getPosition, goBack } from "lib/history";
+import { URLHashAtom } from "lib/atom-utils";
 
-import { Page } from "app/nav";
-import { pageAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
 
-type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type BackButtonProps<T = any> = ButtonHTMLAttributes<HTMLButtonElement> & {
+  navAtom: URLHashAtom<T>;
+  initialValue: T;
+};
 
-const BackButton = memo<BackButtonProps>(({ className, onClick, ...rest }) => {
-  const [page, setPage] = useAtom(pageAtom);
-  const historyPosition = getPosition();
+const BackButton = memo(
+  ({ navAtom, initialValue, className, onClick, ...rest }: BackButtonProps) => {
+    const [currentValue, setCurrentValue] = useAtom(navAtom);
+    const historyPosition = getPosition();
 
-  const inHome = page === Page.Default;
-  const canBack = historyPosition > 0 || !inHome;
+    const inHome = currentValue === initialValue;
+    const canBack = !inHome;
 
-  const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
-    (evt) => {
-      if (onClick) {
-        onClick(evt);
-        if (evt.defaultPrevented) {
-          return;
+    const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
+      (evt) => {
+        if (onClick) {
+          onClick(evt);
+          if (evt.defaultPrevented) {
+            return;
+          }
         }
-      }
 
-      switch (true) {
-        case historyPosition > 0:
-          goBack();
-          break;
+        switch (true) {
+          case historyPosition > 0:
+            goBack();
+            break;
 
-        case !inHome:
-          setPage([Page.Default, "replace"]);
-          break;
-      }
-    },
-    [onClick, historyPosition, inHome, setPage]
-  );
+          case !inHome:
+            setCurrentValue([initialValue, "replace"]);
+            break;
+        }
+      },
+      [onClick, historyPosition, initialValue, inHome, setCurrentValue]
+    );
 
-  return canBack ? (
-    <Button
-      theme="clean"
-      onClick={handleClick}
-      className={classNames("group", className)}
-      {...rest}
-    >
-      <ArrowLeftLongIcon
-        className={classNames(
-          "mr-2",
-          "transition-transform",
-          "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
-        )}
-      />
-      Back
-    </Button>
-  ) : null;
-});
+    return canBack ? (
+      <Button
+        theme="clean"
+        onClick={handleClick}
+        className={classNames("group", className)}
+        {...rest}
+      >
+        <ArrowLeftLongIcon
+          className={classNames(
+            "mr-2",
+            "transition-transform",
+            "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
+          )}
+        />
+        Back
+      </Button>
+    ) : null;
+  }
+);
 
 export default BackButton;

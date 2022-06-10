@@ -15,7 +15,7 @@ const Welcome: FC = () => {
 
   return (
     <BoardingPageLayout header={!isInitial} isWelcome>
-      <div className="flex flex-col items-center -mt-[3vh] relative z-10 animate-bootfadein">
+      <div className="flex flex-col items-center -mt-[3vh] relative z-10">
         <VigvamIcon className={classNames("w-[5rem] h-auto mb-5")} />
         <h1 className="mb-12 text-5xl font-bold text-brand-light">
           Welcome to Vigvam

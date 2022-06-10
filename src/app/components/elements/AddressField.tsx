@@ -42,7 +42,6 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              !setFromClipboard && "cursor-copy",
               "items-center"
             )}
           >

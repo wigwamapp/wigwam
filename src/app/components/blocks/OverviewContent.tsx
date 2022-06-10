@@ -536,6 +536,8 @@ const AssetInfo: FC = () => {
       ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
       : address;
 
+  const explorerUrl = currentNetwork?.explorerUrls?.[0];
+
   return (
     <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
       <div className="flex mb-5">
@@ -553,16 +555,15 @@ const AssetInfo: FC = () => {
             </h2>
             <TippySingletonProvider>
               <div className="ml-auto flex items-center">
-                {currentNetwork?.explorerUrls?.[0] &&
-                  status !== TokenStatus.Native && (
-                    <IconedButton
-                      aria-label="View asset in Explorer"
-                      Icon={WalletExplorerIcon}
-                      className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                      iconClassName="!w-[1.125rem]"
-                      href={`${currentNetwork.explorerUrls[0]}/address/${address}`}
-                    />
-                  )}
+                {explorerUrl && status !== TokenStatus.Native && (
+                  <IconedButton
+                    aria-label="View asset in Explorer"
+                    Icon={WalletExplorerIcon}
+                    className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                    iconClassName="!w-[1.125rem]"
+                    href={`${explorerUrl}/address/${address}`}
+                  />
+                )}
                 {coinGeckoId && (
                   <IconedButton
                     aria-label="View asset in CoinGecko"

@@ -12,7 +12,7 @@ import {
 } from "core/types";
 
 import {
-  $walletStatus,
+  $walletState,
   $approvals,
   ensureInited,
   withStatus,
@@ -22,6 +22,7 @@ import {
   walletPortsCountUpdated,
   accountsUpdated,
   $syncStatus,
+  seedPhraseAdded,
 } from "./state";
 import { Vault } from "./vault";
 import { handleRpc } from "./rpc";
@@ -45,8 +46,12 @@ export function startServer() {
 
   walletPorter.onMessage<Request, Response>(handleWalletRequest);
 
-  $walletStatus.watch((status) => {
-    walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
+  $walletState.watch(([status, hasSeedPhrase]) => {
+    walletPorter.broadcast({
+      type: MessageType.WalletStateUpdated,
+      status,
+      hasSeedPhrase,
+    });
   });
 
   accountsUpdated.watch((accounts) => {
@@ -100,10 +105,10 @@ async function handleWalletRequest(
     await ensureInited();
 
     await match(ctx.data)
-      .with({ type: MessageType.GetWalletStatus }, async ({ type }) => {
-        const status = $walletStatus.getState();
+      .with({ type: MessageType.GetWalletState }, async ({ type }) => {
+        const [status, hasSeedPhrase] = $walletState.getState();
 
-        ctx.reply({ type, status });
+        ctx.reply({ type, status, hasSeedPhrase });
       })
       .with(
         { type: MessageType.SetupWallet },
@@ -116,7 +121,9 @@ async function handleWalletRequest(
             );
 
             const accounts = vault.getAccounts();
-            unlocked({ vault, accounts });
+            const hasSeedPhrase = vault.isSeedPhraseExists();
+
+            unlocked({ vault, accounts, hasSeedPhrase });
 
             ctx.reply({ type });
           })
@@ -126,7 +133,9 @@ async function handleWalletRequest(
           const vault = await Vault.unlock(password);
 
           const accounts = vault.getAccounts();
-          unlocked({ vault, accounts });
+          const hasSeedPhrase = vault.isSeedPhraseExists();
+
+          unlocked({ vault, accounts, hasSeedPhrase });
 
           ctx.reply({ type });
         })
@@ -145,13 +154,6 @@ async function handleWalletRequest(
             ctx.reply({ type });
           })
       )
-      .with({ type: MessageType.HasSeedPhrase }, async ({ type }) =>
-        withVault(async (vault) => {
-          const seedPhraseExists = vault.isSeedPhraseExists();
-
-          ctx.reply({ type, seedPhraseExists });
-        })
-      )
       .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
           const accounts = vault.getAccounts();
@@ -167,6 +169,10 @@ async function handleWalletRequest(
 
             const accounts = vault.getAccounts();
             accountsUpdated(accounts);
+
+            if (seedPhrase) {
+              seedPhraseAdded();
+            }
 
             ctx.reply({ type });
           })

@@ -1,4 +1,4 @@
-import { forwardRef, RefObject, useCallback } from "react";
+import { forwardRef, useCallback } from "react";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { Link } from "lib/navigation";
 import { LinkProps } from "lib/navigation/Link";
@@ -7,35 +7,42 @@ import { openInTab } from "app/helpers";
 
 type SmartLinkProps = LinkProps;
 
-const SmartLink = forwardRef<
-  HTMLAnchorElement | HTMLButtonElement,
-  SmartLinkProps
->((props, ref) => {
-  const { to, onClick, className, children } = props;
-  const isPopup = isPopupPrimitive();
+const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
+  (props, ref) => {
+    const { to, onClick, children, ...rest } = props;
+    const isPopup = isPopupPrimitive();
 
-  const handleClick = useCallback(
-    (e) => {
-      onClick?.(e);
-      openInTab(to);
-    },
-    [onClick, to]
-  );
+    const handleClick = useCallback(
+      (evt) => {
+        onClick?.(evt);
 
-  if (isPopup) {
-    return (
-      <button
-        ref={ref as RefObject<HTMLButtonElement>}
-        onClick={handleClick}
-        className={className}
-        type="button"
-      >
-        {children}
-      </button>
+        if (!evt.defaultPrevented) {
+          evt.preventDefault();
+          openInTab(to);
+        }
+      },
+      [onClick, to]
     );
-  }
 
-  return <Link ref={ref as RefObject<HTMLAnchorElement>} {...props} />;
-});
+    if (isPopup) {
+      return (
+        <a
+          ref={ref}
+          role="button"
+          tabIndex={0}
+          onClick={handleClick}
+          onKeyDown={(evt) =>
+            ["Enter", "Space"].includes(evt.code) && handleClick(evt)
+          }
+          {...rest}
+        >
+          {children}
+        </a>
+      );
+    }
+
+    return <Link ref={ref} {...props} />;
+  }
+);
 
 export default SmartLink;
