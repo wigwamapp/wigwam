@@ -19,7 +19,6 @@ import {
   TxActionType,
   FeeMode,
   FeeSuggestions,
-  TokenTransferAction,
 } from "core/types";
 import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
@@ -346,7 +345,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     )}
                     feeMode={feeMode}
                     maxFee={maxFee}
-                    action={action as TokenTransferAction}
+                    action={action}
                     onFeeButtonClick={() => setTabValue("fee")}
                   />
                 )}

@@ -1,4 +1,4 @@
-import { FC, memo } from "react";
+import { FC, memo, useMemo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
@@ -7,7 +7,8 @@ import {
   AccountAsset,
   FeeMode,
   FeeSuggestions,
-  TokenTransferAction,
+  TxAction,
+  TxActionType,
 } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
@@ -28,7 +29,7 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
-  action: TokenTransferAction;
+  action: TxAction;
   onFeeButtonClick: () => void;
 };
 
@@ -50,8 +51,8 @@ const DetailsTab: FC<DetailsTabProps> = ({
         feeMode={feeMode}
         onClick={onFeeButtonClick}
       />
-      <Recipient address={action.toAddress} />
-      <Tokens tokens={action.tokens} />
+      <Recipient action={action} />
+      <Tokens action={action} />
     </>
   );
 };
@@ -158,14 +159,20 @@ const FeeModeLabel: FC<FeeModeLabelProps> = ({ feeMode }) => (
 );
 
 type RecipientProps = {
-  address: string;
+  action: TxAction;
 };
 
-const Recipient: FC<RecipientProps> = ({ address }) => {
+const Recipient: FC<RecipientProps> = ({ action }) => {
   const currentNetwork = useLazyNetwork();
+  const label = useMemo(() => getRecipientLabel(action), [action]);
+  const address = useMemo(() => getRecipientAddress(action), [action]);
+
+  if (!address) {
+    return null;
+  }
 
   return (
-    <InfoRaw label="Recipient">
+    <InfoRaw label={label}>
       <div className="flex flex-col items-end">
         <div className="flex items-center">
           <TippySingletonProvider>
@@ -173,7 +180,7 @@ const Recipient: FC<RecipientProps> = ({ address }) => {
             {currentNetwork?.explorerUrls && (
               <IconedButton
                 href={`${currentNetwork.explorerUrls}/address/${address}`}
-                aria-label="View wallet in Explorer"
+                aria-label="View in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 ml-2"
                 iconClassName="!w-[1.125rem]"
@@ -181,33 +188,108 @@ const Recipient: FC<RecipientProps> = ({ address }) => {
             )}
           </TippySingletonProvider>
         </div>
-        <SmallContactCard address={address} className="mt-2 mb-0" />
+        {action.type === TxActionType.TokenTransfer && (
+          <SmallContactCard address={address} className="mt-2 mb-0" />
+        )}
       </div>
     </InfoRaw>
   );
 };
 
-type TokensProps = {
-  tokens: Token[];
+const getRecipientLabel = (action: TxAction) => {
+  switch (action.type) {
+    case TxActionType.TokenApprove:
+      if (action.clears) {
+        return "Contract address";
+      }
+      return "Approve to";
+    case TxActionType.ContractInteraction:
+      return "Contract address";
+    default:
+      return "Recipient";
+  }
 };
 
-const Tokens: FC<TokensProps> = ({ tokens }) => (
-  <InfoRaw label={tokens.length > 1 ? "Tokens" : "Token"}>
-    <div className="flex flex-col">
-      {tokens.map((token, i) => (
-        <Token
-          key={token.slug}
-          token={token}
-          className={classNames(i !== tokens.length - 1 && "mb-2")}
-        />
-      ))}
-    </div>
-  </InfoRaw>
-);
+const getRecipientAddress = (action: TxAction) => {
+  if (
+    action.type === TxActionType.TokenTransfer ||
+    action.type === TxActionType.TokenApprove
+  ) {
+    return action.toAddress;
+  }
+  if (action.type === TxActionType.ContractInteraction) {
+    return action.contractAddress;
+  }
+  return null;
+};
+
+type TokensProps = {
+  action: TxAction;
+};
+
+const Tokens: FC<TokensProps> = ({ action }) => {
+  const currentNetwork = useLazyNetwork();
+  const tokens = useMemo(() => getTokens(action), [action]);
+
+  if (!tokens) {
+    return null;
+  }
+
+  return (
+    <InfoRaw label={tokens.length > 1 ? "Tokens" : "Token"}>
+      {typeof tokens === "string" ? (
+        <div className="flex items-center">
+          <TippySingletonProvider>
+            <HashPreview hash={tokens} className="text-sm" />
+            {currentNetwork?.explorerUrls && (
+              <IconedButton
+                href={`${currentNetwork.explorerUrls}/address/${tokens}`}
+                aria-label="View in Explorer"
+                Icon={WalletExplorerIcon}
+                className="!w-6 !h-6 ml-2"
+                iconClassName="!w-[1.125rem]"
+              />
+            )}
+          </TippySingletonProvider>
+        </div>
+      ) : (
+        <div className="flex flex-col">
+          {tokens.map((token, i) => (
+            <Token
+              key={token.slug}
+              token={token}
+              className={classNames(i !== tokens.length - 1 && "mb-2")}
+            />
+          ))}
+        </div>
+      )}
+    </InfoRaw>
+  );
+};
+
+const getTokens = (action: TxAction) => {
+  if (action.type === TxActionType.TokenTransfer) {
+    return action.tokens;
+  }
+  if (action.type === TxActionType.TokenApprove) {
+    if (action.tokenSlug && (action.amount !== undefined || action.clears)) {
+      return [
+        {
+          slug: action.tokenSlug,
+          amount: action.clears ? undefined : action.amount,
+        },
+      ];
+    }
+    if (action.allTokensContract) {
+      return action.allTokensContract;
+    }
+  }
+  return null;
+};
 
 type Token = {
   slug: string;
-  amount: string;
+  amount?: string;
 };
 
 type TokenProps = {
@@ -222,9 +304,11 @@ const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
 
   const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
 
-  const usdAmount = new BigNumber(amount)
-    .div(new BigNumber(10).pow(decimals))
-    .multipliedBy(priceUSD ?? 1);
+  const usdAmount = amount
+    ? new BigNumber(amount)
+        .div(new BigNumber(10).pow(decimals))
+        .multipliedBy(priceUSD ?? 1)
+    : null;
 
   return (
     <div className={classNames("flex items-center", className)}>
@@ -233,21 +317,29 @@ const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
         alt={name}
         className="w-4 h-4 min-w-[.25rem] mr-2"
       />
-      <PrettyAmount
-        amount={amount}
-        decimals={decimals}
-        currency={symbol}
-        threeDots={false}
-        copiable
-        className="text-sm font-bold"
-      />
-      <Dot />
-      <FiatAmount
-        amount={usdAmount}
-        threeDots={false}
-        copiable
-        className="text-sm text-brand-inactivedark"
-      />
+      {amount !== undefined && (
+        <>
+          <PrettyAmount
+            amount={amount}
+            decimals={decimals}
+            currency={symbol}
+            threeDots={false}
+            copiable
+            className="text-sm font-bold"
+          />
+          {usdAmount !== undefined && (
+            <>
+              <Dot />
+              <FiatAmount
+                amount={usdAmount}
+                threeDots={false}
+                copiable
+                className="text-sm text-brand-inactivedark"
+              />
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 });
