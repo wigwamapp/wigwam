@@ -61,7 +61,7 @@ const LongTextField = memo(
               {labelActions}
             </div>
           )}
-          <div className="relative flex">
+          <div className="relative flex group">
             <textarea
               ref={ref}
               spellCheck={spellCheck}
