@@ -151,6 +151,7 @@ export interface TokenApproveAction {
 export interface ContractInteractionAction {
   type: TxActionType.ContractInteraction;
   contractAddress: string;
+  nativeTokenAmount?: string;
   method?: string;
   args?: any[];
 }
