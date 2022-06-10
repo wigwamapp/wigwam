@@ -33,6 +33,7 @@ export type ActivitySource =
   | {
       type: "page";
       url: string;
+      favIconUrl?: string;
       permission?: Permission;
     };
 

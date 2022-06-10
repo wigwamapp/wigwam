@@ -128,6 +128,7 @@ async function handlePageRequest(
     const source: ActivitySource = {
       type: "page",
       url: senderUrl,
+      favIconUrl: ctx.port.sender?.tab?.favIconUrl,
     };
 
     const chainId = await loadInternalChainId();
