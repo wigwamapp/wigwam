@@ -17,7 +17,10 @@ function initMsgGateway(injected: Promise<void>) {
   const porter = new PorterClient();
   porter.connect(PorterChannel.Page);
   porter.onFullyDisconnect = () => {
-    if (process.env.NODE_ENV === "development") {
+    if (
+      process.env.NODE_ENV === "development" &&
+      process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true"
+    ) {
       location.reload();
       return;
     }

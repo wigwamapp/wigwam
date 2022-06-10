@@ -16,7 +16,7 @@ type ChecksumSnapshot = {
   manifest: string;
 };
 
-const ACTIVE_TAB_RELOAD = process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true";
+const ACTIVE_TAB_RELOAD = false; // process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true";
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
 const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
