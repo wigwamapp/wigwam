@@ -6,9 +6,11 @@ import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 import { Account as AccountType, ConnectionApproval } from "core/types";
+import { approveItem } from "core/client";
 
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import { useToken } from "app/hooks";
+import { withHumanDelay } from "app/utils";
 import Avatar from "app/components/elements/Avatar";
 import Checkbox from "app/components/elements/Checkbox";
 import AutoIcon from "app/components/elements/AutoIcon";
@@ -30,7 +32,7 @@ type ApproveConnectionProps = {
   approval: ConnectionApproval;
 };
 
-const ApproveConnection: FC<ApproveConnectionProps> = () => {
+const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
   const { currentAccount, allAccounts } = useAtomValue(
     useMemo(
       () =>
@@ -99,11 +101,37 @@ const ApproveConnection: FC<ApproveConnectionProps> = () => {
     [allAccounts, forceUpdate]
   );
 
+  const [approving, setApproving] = useState(false);
+
+  const handleApprove = useCallback(
+    async (approved: boolean) => {
+      setApproving(true);
+
+      try {
+        await withHumanDelay(async () => {
+          const accountsToAdd = Array.from(accountsToConnectRef.current);
+          if (approved && accountsToAdd.length === 0) {
+            throw new Error("At least one account");
+          }
+
+          const accountAddresses = approved ? accountsToAdd : undefined;
+          await approveItem(approval.id, { approved, accountAddresses });
+        });
+      } catch (err) {
+        console.error(err);
+        setApproving(false);
+      }
+    },
+    [approval, setApproving]
+  );
+
   return (
     <ApprovalLayout
       approveText="Connect"
       declineText="Deny"
       className="items-center"
+      approving={approving}
+      onApprove={handleApprove}
     >
       <DappLogos />
       <h1 className="text-2xl font-bold mt-4 mb-1">Connect to website</h1>

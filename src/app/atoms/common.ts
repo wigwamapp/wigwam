@@ -10,18 +10,18 @@ import { INITIAL_NETWORK } from "fixtures/networks";
 
 import * as Repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
-import { Account } from "core/types";
+import { Account, CHAIN_ID, ACCOUNT_ADDRESS } from "core/types";
 import { getRpcUrlKey } from "core/common/network";
 
 import { testNetworksAtom } from "./settings";
 
 export const chainIdAtom = atomWithStorage<number>(
-  "chain_id",
+  CHAIN_ID,
   INITIAL_NETWORK.chainId
 );
 
 export const accountAddressAtom = atomWithStorage<string | null>(
-  "account_address",
+  ACCOUNT_ADDRESS,
   null
 );
 

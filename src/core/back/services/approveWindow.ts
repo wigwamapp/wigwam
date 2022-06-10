@@ -6,9 +6,12 @@ import { createQueue } from "lib/system/queue";
 import { $approvals, approvalAdded } from "core/back/state";
 
 const APPROVE_WINDOW_URL = getPublicURL("approve.html");
+const WINDOW_POSITION =
+  process.env.NODE_ENV === "development" ? "center" : "top-right";
+
 const enqueueOpenApprove = createQueue();
 
-export function startApproveWindowServer() {
+export function startApproveWindowOpener() {
   browser.runtime.onMessage.addListener((msg) => {
     if (msg === "__OPEN_APPROVE_WINDOW") {
       openApproveWindow();
@@ -43,7 +46,7 @@ export const openApproveWindow = () =>
           focused: true,
         });
       } else {
-        await createApproveWindow();
+        await createApproveWindow(WINDOW_POSITION);
       }
     } catch (err) {
       console.error(err);
@@ -119,9 +122,7 @@ async function pickCurrentApproveTab() {
   return approveTabs[0] ?? null;
 }
 
-async function createApproveWindow(
-  position: "center" | "top-right" = "center"
-) {
+async function createApproveWindow(position: "center" | "top-right") {
   const width = 440;
   const height = 660;
 
