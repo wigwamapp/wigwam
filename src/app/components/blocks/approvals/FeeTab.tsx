@@ -7,7 +7,7 @@ import classNames from "clsx";
 import { FEE_MODES, FeeMode, FeeSuggestions } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { useAccountToken } from "app/hooks";
+import { useAccountToken, useChainId } from "app/hooks";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
@@ -40,6 +40,8 @@ const FeeTab = memo<FeeTabProps>(
     feeMode,
     setFeeMode,
   }) => {
+    const chainId = useChainId();
+    const changeStepDecimals = chainId === 1 ? 9 : 8;
     const changeValue = useCallback(
       (name: string, value: ethers.BigNumberish | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value }));
@@ -114,6 +116,7 @@ const FeeTab = memo<FeeTabProps>(
                       tx.maxFeePerGas ??
                       0
                     ).toString(),
+                    decimals: changeStepDecimals,
                     operator: "minus",
                   })
                 )
@@ -127,6 +130,7 @@ const FeeTab = memo<FeeTabProps>(
                       tx.maxFeePerGas ??
                       0
                     ).toString(),
+                    decimals: changeStepDecimals,
                   })
                 )
               }
@@ -159,6 +163,7 @@ const FeeTab = memo<FeeTabProps>(
                       tx.maxPriorityFeePerGas ??
                       0
                     ).toString(),
+                    decimals: changeStepDecimals,
                     operator: "minus",
                   })
                 )
@@ -172,6 +177,7 @@ const FeeTab = memo<FeeTabProps>(
                       tx.maxPriorityFeePerGas ??
                       0
                     ).toString(),
+                    decimals: changeStepDecimals,
                   })
                 )
               }
@@ -195,6 +201,7 @@ const FeeTab = memo<FeeTabProps>(
                 "gasPrice",
                 prepareAmountOnChange({
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
+                  decimals: changeStepDecimals,
                   operator: "minus",
                 })
               )
@@ -204,6 +211,7 @@ const FeeTab = memo<FeeTabProps>(
                 "gasPrice",
                 prepareAmountOnChange({
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
+                  decimals: changeStepDecimals,
                 })
               )
             }

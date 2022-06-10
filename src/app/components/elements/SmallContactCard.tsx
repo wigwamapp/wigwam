@@ -3,9 +3,7 @@ import { TReplace } from "lib/ext/i18n/react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
-import Fuse from "fuse.js";
 
-import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { allAccountsAtom, currentAccountAtom } from "app/atoms";
 import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import InputLabelAction from "./InputLabelAction";
@@ -28,7 +26,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
     limit: 1,
   });
 
-  const { currentAccount, allAccounts } = useAtomValue(
+  const { allAccounts } = useAtomValue(
     useMemo(
       () =>
         waitForAll({
@@ -41,25 +39,13 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
 
   const accounts = useMemo(
     () =>
-      allAccounts.filter(({ address }) => address !== currentAccount.address),
-    [allAccounts, currentAccount.address]
+      allAccounts.filter(({ address: accAddress }) => accAddress !== address),
+    [allAccounts, address]
   );
-
-  const fuse = useMemo(
-    () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
-  );
-
-  const filteredAccounts = useMemo(() => {
-    if (address) {
-      return fuse.search(address).map(({ item: account }) => account);
-    }
-    return [];
-  }, [fuse, address]);
 
   const mergedAccounts = useMemo(
-    () => [...contacts, ...filteredAccounts],
-    [contacts, filteredAccounts]
+    () => [...contacts, ...accounts],
+    [contacts, accounts]
   );
 
   if (!address) {

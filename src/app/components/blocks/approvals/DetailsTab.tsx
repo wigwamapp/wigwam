@@ -41,9 +41,10 @@ const DetailsTab: FC<DetailsTabProps> = ({
   action,
   onFeeButtonClick,
 }) => {
+  const tabHeader = useMemo(() => getTabHeader(action), [action]);
   return (
     <>
-      <TabHeader>Tokens transferring</TabHeader>
+      <TabHeader>{tabHeader}</TabHeader>
       <FeeButton
         fees={fees}
         gasLimit={gasLimit}
@@ -58,6 +59,22 @@ const DetailsTab: FC<DetailsTabProps> = ({
 };
 
 export default DetailsTab;
+
+const getTabHeader = (action: TxAction) => {
+  switch (action.type) {
+    case TxActionType.TokenTransfer:
+      return "Transfer tokens";
+    case TxActionType.TokenApprove:
+      if (action.clears) {
+        return "Revoke tokens approval";
+      }
+      return "Approve tokens";
+    case TxActionType.ContractInteraction:
+      return "Interact with contract";
+    default:
+      return "Deploy contract";
+  }
+};
 
 type FeeButton = {
   fees: FeeSuggestions;
@@ -200,7 +217,7 @@ const getRecipientLabel = (action: TxAction) => {
   switch (action.type) {
     case TxActionType.TokenApprove:
       if (action.clears) {
-        return "Contract address";
+        return "Revoke from";
       }
       return "Approve to";
     case TxActionType.ContractInteraction:
@@ -315,9 +332,10 @@ const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
       <AssetLogo
         asset={tokenInfo}
         alt={name}
-        className="w-4 h-4 min-w-[.25rem] mr-2"
+        className="w-4 h-4 min-w-[.25rem]"
       />
-      {amount !== undefined && (
+      {amount !== undefined &&
+      new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
         <>
           <PrettyAmount
             amount={amount}
@@ -325,7 +343,7 @@ const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
             currency={symbol}
             threeDots={false}
             copiable
-            className="text-sm font-bold"
+            className="text-sm font-bold ml-2"
           />
           {usdAmount !== undefined && (
             <>
@@ -339,6 +357,16 @@ const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
             </>
           )}
         </>
+      ) : (
+        <span className="text-sm font-bold ml-2">
+          {amount !== undefined &&
+            new BigNumber(amount).gte(new BigNumber(10).pow(decimals + 12)) && (
+              <>
+                <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+              </>
+            )}
+          {symbol}
+        </span>
       )}
     </div>
   );

@@ -444,5 +444,5 @@ export const prepareAmountOnChange = ({
   );
   const finalValue = preparedValue[operator](valueToChange);
 
-  return finalValue.gt(0) ? ethers.BigNumber.from(finalValue.toString()) : null; // TODO: Set null if 0 ?
+  return finalValue.gt(0) ? ethers.BigNumber.from(finalValue.toString()) : 0;
 };
