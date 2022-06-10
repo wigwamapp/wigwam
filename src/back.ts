@@ -9,6 +9,7 @@ import {
   startBruteForceProtection,
   startInstallOrUpdateListener,
   startApproveWindowOpener,
+  startExtBadge,
 } from "core/back/services";
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
@@ -33,3 +34,4 @@ startBruteForceProtection();
 
 startInstallOrUpdateListener();
 startApproveWindowOpener();
+startExtBadge();
