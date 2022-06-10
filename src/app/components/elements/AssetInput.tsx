@@ -2,7 +2,7 @@ import { forwardRef, useMemo } from "react";
 
 import NumberInput, { NumberInputProps } from "./NumberInput";
 
-type AssetInputProps = NumberInputProps & {
+export type AssetInputProps = NumberInputProps & {
   assetDecimals?: number;
   currency?: string;
 };

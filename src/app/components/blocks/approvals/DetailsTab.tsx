@@ -2,7 +2,6 @@ import { FC, memo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import {
   AccountAsset,
@@ -26,8 +25,6 @@ import SmallContactCard from "app/components/elements/SmallContactCard";
 import AssetLogo from "app/components/elements/AssetLogo";
 import { FEE_MODE_NAMES } from "app/components/screens/approvals/Transaction";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
-import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
@@ -166,7 +163,6 @@ type RecipientProps = {
 
 const Recipient: FC<RecipientProps> = ({ address }) => {
   const currentNetwork = useLazyNetwork();
-  const { copy, copied } = useCopyToClipboard(address);
 
   return (
     <InfoRaw label="Recipient">
@@ -174,13 +170,6 @@ const Recipient: FC<RecipientProps> = ({ address }) => {
         <div className="flex items-center">
           <TippySingletonProvider>
             <HashPreview hash={address} className="text-sm" />
-            <IconedButton
-              aria-label={copied ? "Copied" : "Copy"}
-              Icon={copied ? SuccessIcon : CopyIcon}
-              className="!w-6 !h-6 ml-4"
-              iconClassName="!w-[1.125rem]"
-              onClick={copy}
-            />
             {currentNetwork?.explorerUrls && (
               <IconedButton
                 href={`${currentNetwork.explorerUrls}/address/${address}`}

@@ -16,6 +16,7 @@ import {
   FEE_MODE_NAMES,
   formatUnits,
   parseUnits,
+  prepareAmountOnChange,
   Tx,
 } from "app/components/screens/approvals/Transaction";
 
@@ -93,6 +94,8 @@ const FeeTab = memo<FeeTabProps>(
               placeholder="0.00"
               thousandSeparator
               decimalScale={9}
+              currency="GWEI"
+              tooltip="Max base fee"
               value={formatUnits(
                 overrides.maxFeePerGas ?? tx.maxFeePerGas,
                 "gwei"
@@ -102,8 +105,31 @@ const FeeTab = memo<FeeTabProps>(
               }
               onBlur={(e) => fixValue("maxFeePerGas", e.target.value)}
               className="mb-3"
-              onMinusClick={() => undefined}
-              onPlusClick={() => undefined}
+              onMinusClick={() =>
+                changeValue(
+                  "maxFeePerGas",
+                  prepareAmountOnChange({
+                    value: (
+                      overrides.maxFeePerGas ??
+                      tx.maxFeePerGas ??
+                      0
+                    ).toString(),
+                    operator: "minus",
+                  })
+                )
+              }
+              onPlusClick={() =>
+                changeValue(
+                  "maxFeePerGas",
+                  prepareAmountOnChange({
+                    value: (
+                      overrides.maxFeePerGas ??
+                      tx.maxFeePerGas ??
+                      0
+                    ).toString(),
+                  })
+                )
+              }
             />
 
             <PlusMinusInput
@@ -111,6 +137,8 @@ const FeeTab = memo<FeeTabProps>(
               placeholder="0.00"
               thousandSeparator
               decimalScale={9}
+              currency="GWEI"
+              tooltip="Priority fee"
               value={formatUnits(
                 overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
                 "gwei"
@@ -122,8 +150,31 @@ const FeeTab = memo<FeeTabProps>(
                 )
               }
               onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
-              onMinusClick={() => undefined}
-              onPlusClick={() => undefined}
+              onMinusClick={() =>
+                changeValue(
+                  "maxPriorityFeePerGas",
+                  prepareAmountOnChange({
+                    value: (
+                      overrides.maxPriorityFeePerGas ??
+                      tx.maxPriorityFeePerGas ??
+                      0
+                    ).toString(),
+                    operator: "minus",
+                  })
+                )
+              }
+              onPlusClick={() =>
+                changeValue(
+                  "maxPriorityFeePerGas",
+                  prepareAmountOnChange({
+                    value: (
+                      overrides.maxPriorityFeePerGas ??
+                      tx.maxPriorityFeePerGas ??
+                      0
+                    ).toString(),
+                  })
+                )
+              }
             />
           </>
         ) : (
@@ -132,13 +183,30 @@ const FeeTab = memo<FeeTabProps>(
             placeholder="0.00"
             thousandSeparator
             decimalScale={9}
+            currency="GWEI"
+            tooltip="Gas Price"
             value={formatUnits(overrides.gasPrice ?? tx.gasPrice, "gwei")}
             onChange={(e) =>
               changeValue("gasPrice", parseUnits(e.target.value, "gwei"))
             }
             onBlur={(e) => fixValue("gasPrice", e.target.value)}
-            onMinusClick={() => undefined}
-            onPlusClick={() => undefined}
+            onMinusClick={() =>
+              changeValue(
+                "gasPrice",
+                prepareAmountOnChange({
+                  value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
+                  operator: "minus",
+                })
+              )
+            }
+            onPlusClick={() =>
+              changeValue(
+                "gasPrice",
+                prepareAmountOnChange({
+                  value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
+                })
+              )
+            }
           />
         )}
       </>

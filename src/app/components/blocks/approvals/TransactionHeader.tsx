@@ -40,7 +40,7 @@ const cardClassName = classNames(
   "flex items-center",
   "w-full",
   "py-1 px-3",
-  "text-xs",
+  "text-xs font-bold",
   "bg-brand-main/5",
   "rounded-[.625rem]"
 );
@@ -102,7 +102,7 @@ const WalletCard: FC<WalletCardProps> = ({ account }) => (
       )}
     />
     <span className="flex flex-col min-w-0 text-sm leading-none">
-      <WalletName wallet={account} theme="small" className="font-normal" />
+      <WalletName wallet={account} theme="small" />
       <HashPreview
         hash={account.address}
         className="text-xs leading-none text-brand-inactivedark"

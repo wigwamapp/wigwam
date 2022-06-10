@@ -10,6 +10,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
@@ -428,3 +429,21 @@ export function parseUnits(v: string, unit: ethers.BigNumberish = 0) {
     return "";
   }
 }
+
+export const prepareAmountOnChange = ({
+  value,
+  decimals = 9,
+  operator = "plus",
+}: {
+  value: BigNumber.Value;
+  decimals?: number;
+  operator?: "plus" | "minus";
+}) => {
+  const preparedValue = new BigNumber(value);
+  const valueToChange = new BigNumber(1).multipliedBy(
+    new BigNumber(10).pow(decimals)
+  );
+  const finalValue = preparedValue[operator](valueToChange);
+
+  return finalValue.gt(0) ? ethers.BigNumber.from(finalValue.toString()) : null; // TODO: Set null if 0 ?
+};

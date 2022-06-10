@@ -7,6 +7,7 @@ import TabHeader from "app/components/elements/approvals/TabHeader";
 import {
   formatUnits,
   parseUnits,
+  prepareAmountOnChange,
   Tx,
 } from "app/components/screens/approvals/Transaction";
 
@@ -48,12 +49,30 @@ const AdvancedTab = memo<AdvancedTabProps>(
           thousandSeparator
           decimalScale={0}
           name="gasLimit"
+          tooltip="Gas Limit"
           value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
           onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("gasLimit", e.target.value)}
           className="mb-3"
-          onMinusClick={() => undefined}
-          onPlusClick={() => undefined}
+          onMinusClick={() =>
+            changeValue(
+              "gasLimit",
+              prepareAmountOnChange({
+                value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
+                decimals: 3,
+                operator: "minus",
+              })
+            )
+          }
+          onPlusClick={() =>
+            changeValue(
+              "gasLimit",
+              prepareAmountOnChange({
+                value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
+                decimals: 3,
+              })
+            )
+          }
         />
 
         <PlusMinusInput
@@ -62,17 +81,36 @@ const AdvancedTab = memo<AdvancedTabProps>(
           thousandSeparator
           decimalScale={0}
           name="nonce"
+          tooltip="Nonce"
           value={formatUnits(overrides.nonce ?? tx.nonce)}
           onChange={(e) => changeValue("nonce", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("nonce", e.target.value)}
           className="mb-3"
-          onMinusClick={() => undefined}
-          onPlusClick={() => undefined}
+          onMinusClick={() =>
+            changeValue(
+              "nonce",
+              prepareAmountOnChange({
+                value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
+                decimals: 0,
+                operator: "minus",
+              })
+            )
+          }
+          onPlusClick={() =>
+            changeValue(
+              "nonce",
+              prepareAmountOnChange({
+                value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
+                decimals: 0,
+              })
+            )
+          }
         />
 
         <LongTextField
           label="Data"
           readOnly
+          tooltip="Data"
           value={ethers.utils.hexlify(tx.data ?? "0x00")}
           textareaClassName="!h-36 mb-3"
         />
@@ -80,6 +118,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
         <LongTextField
           label="Raw transaction"
           readOnly
+          tooltip="Raw transaction"
           value={rawTx}
           textareaClassName="!h-48"
         />

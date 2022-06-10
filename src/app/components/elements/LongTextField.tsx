@@ -1,6 +1,9 @@
 import { memo, forwardRef, TextareaHTMLAttributes, ReactNode } from "react";
 import classNames from "clsx";
 
+import Tooltip, { TooltipProps } from "./Tooltip";
+import TooltipIcon from "./TooltipIcon";
+
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
   labelActions?: ReactNode;
@@ -8,6 +11,8 @@ export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   textareaClassName?: string;
   error?: boolean;
   errorMessage?: string;
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
 };
 
 const LongTextField = memo(
@@ -23,6 +28,8 @@ const LongTextField = memo(
         errorMessage,
         disabled,
         readOnly,
+        tooltip,
+        tooltipProps,
         className,
         textareaClassName,
         autoComplete = "off",
@@ -37,9 +44,18 @@ const LongTextField = memo(
               {label && (
                 <label
                   htmlFor={id}
-                  className="text-base text-brand-gray cursor-pointer"
+                  className="text-base text-brand-gray cursor-pointer flex align-center"
                 >
                   {label}
+                  {tooltip && (
+                    <Tooltip
+                      content={tooltip}
+                      {...tooltipProps}
+                      className="ml-2"
+                    >
+                      <TooltipIcon className="!w-4 !h-4" />
+                    </Tooltip>
+                  )}
                 </label>
               )}
               {labelActions}
