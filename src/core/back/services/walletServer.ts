@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
-import { getRandomInt } from "lib/system/randomInt";
 
 import {
   Request,
@@ -9,6 +8,7 @@ import {
   MessageType,
   PorterChannel,
   WalletStatus,
+  SelfActivityKind,
 } from "core/types";
 
 import {
@@ -23,21 +23,18 @@ import {
   accountsUpdated,
   $syncStatus,
   seedPhraseAdded,
-} from "./state";
-import { Vault } from "./vault";
-import { handleRpc } from "./rpc";
-import { processApprove } from "./approve";
-import { startApproveWindowServer } from "./approve/window";
+} from "../state";
+import { Vault } from "../vault";
+import { handleRpc } from "../rpc";
+import { processApprove } from "../approve";
 import {
   addFindTokenRequest,
   addSyncRequest,
   getTPGasPrices,
   syncTokenActivities,
-} from "./sync";
+} from "../sync";
 
-export function startServer() {
-  startApproveWindowServer();
-
+export function startWalletServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
 
   walletPorter.onConnection(() => {
@@ -71,29 +68,6 @@ export function startServer() {
       status,
     });
   });
-
-  let attempts = +sessionStorage.passwordUsageAttempts || 0;
-
-  Vault.onPasswordUsage = async (success) => {
-    if (success) {
-      attempts = 0;
-    } else {
-      attempts++;
-
-      if (attempts > 5) {
-        await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
-      }
-
-      if (attempts > 3) {
-        locked();
-      }
-    }
-
-    sessionStorage.passwordUsageAttempts = attempts;
-  };
-
-  // const dappPorter = new PorterServer(PorterChannel.DApp);
-  // dappPorter.onMessage(handleDAppRequest);
 }
 
 async function handleWalletRequest(
@@ -283,7 +257,7 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.SendRpc },
         ({ type, chainId, method, params }) => {
-          handleRpc(chainId, method, params, (response) =>
+          handleRpc(UNKNOWN_SELF_SOURCE, chainId, method, params, (response) =>
             ctx.reply({ type, response })
           );
         }
@@ -295,3 +269,8 @@ async function handleWalletRequest(
     ctx.replyError(err);
   }
 }
+
+const UNKNOWN_SELF_SOURCE = {
+  type: "self",
+  kind: SelfActivityKind.Unknown,
+} as const;

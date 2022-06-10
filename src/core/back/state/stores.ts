@@ -1,6 +1,7 @@
 import { createStore, combine } from "effector";
 
-import { WalletStatus, Approval, Account } from "core/types";
+import { WalletStatus, Approval, Account, ActivityType } from "core/types";
+import { getPageOrigin } from "core/common/permissions";
 
 import { Vault } from "../vault";
 import {
@@ -77,8 +78,26 @@ export const $syncPool = createStore<number[]>([])
 export const $syncStatus = $syncPool.map((pool) => Array.from(new Set(pool)));
 
 export const $approvals = createStore<Approval[]>([])
-  .on(approvalAdded, (current, item) => [...current, item])
+  .on(approvalAdded, (approvals, newApproval) => {
+    if (newApproval.type === ActivityType.Connection) {
+      const newApprovalOrigin = getPageOrigin(newApproval.source);
+      for (const approval of approvals) {
+        if (
+          approval.type === ActivityType.Connection &&
+          getPageOrigin(approval.source) === newApprovalOrigin
+        ) {
+          return;
+        }
+      }
+    }
+
+    return [...approvals, newApproval];
+  })
   .on(approvalResolved, (current, approvalId) =>
     current.filter((a) => a.id !== approvalId)
   )
   .on(locked, () => []);
+
+export const $accountAddresses = $accounts.map((accounts) =>
+  accounts.map((acc) => acc.address)
+);

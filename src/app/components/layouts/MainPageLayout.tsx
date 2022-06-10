@@ -6,7 +6,7 @@ import Sidebar from "app/components/blocks/Sidebar";
 import Menu from "app/components/blocks/Menu";
 import ActivityBar from "app/components/blocks/ActivityBar";
 
-import PreloadUnlocked from "./PreloadUnlocked";
+import PreloadBaseAndSync from "./PreloadBaseAndSync";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -14,7 +14,7 @@ const handleBootAnimationEnd = () => {
 };
 
 const MainPageLayout: FC = ({ children }) => (
-  <PreloadUnlocked>
+  <PreloadBaseAndSync>
     <div
       className={classNames(
         "h-screen flex flex-col",
@@ -37,7 +37,7 @@ const MainPageLayout: FC = ({ children }) => (
       </ContentContainer>
       <ActivityBar />
     </div>
-  </PreloadUnlocked>
+  </PreloadBaseAndSync>
 );
 
 export default MainPageLayout;

@@ -13,7 +13,14 @@
   "homepage_url": "{{website}}",
   "short_name": "Vigvam",
 
-  "permissions": ["tabs", "storage", "clipboardWrite", "activeTab"],
+  "permissions": [
+    "tabs",
+    "storage",
+    "clipboardWrite",
+    "activeTab",
+    "http://localhost:8545/",
+    "https://*.infura.io/"
+  ],
 
   "__chrome__content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
   "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",

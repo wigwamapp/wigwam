@@ -1,7 +1,12 @@
 import { atomFamily, selectAtom } from "jotai/utils";
 import { dequal } from "dequal/lite";
-import { atomWithAutoReset, atomWithStorage } from "lib/atom-utils";
+import {
+  atomWithAutoReset,
+  atomWithRepoQuery,
+  atomWithStorage,
+} from "lib/atom-utils";
 
+import * as repo from "core/repo";
 import {
   getWalletState,
   onWalletStateUpdated,
@@ -40,4 +45,10 @@ export const getLocalNonceAtom = atomFamily(
       null
     ),
   dequal
+);
+
+export const getPermissionAtom = atomFamily((origin?: string) =>
+  atomWithRepoQuery((query) =>
+    query(() => repo.permissions.get(origin || "<stub>"))
+  )
 );

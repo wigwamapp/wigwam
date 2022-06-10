@@ -7,6 +7,8 @@ export enum RepoTable {
   Contacts = "contacts",
   AccountTokens = "account_tokens",
   TokenActivities = "token_activities",
+  Activities = "activities",
+  Permissions = "permissions",
 }
 
 export const db = new AsyncDexie(underProfile("main"));
@@ -28,4 +30,6 @@ db.version(1).stores({
     "",
     "[chainId+accountAddress+tokenSlug+timeAt]",
   ].join(),
+  [RepoTable.Activities]: "&id,timeAt",
+  [RepoTable.Permissions]: "&origin,timeAt",
 });

@@ -5,9 +5,7 @@ import { forEachSafe } from "lib/system/forEachSafe";
 import {
   PorterMessageType,
   PorterClientMessage,
-  PorterRequest,
-  PorterResponse,
-  PorterErrorResponse,
+  PorterServerMessage,
   PorterOneWay,
 } from "./types";
 import { MESSAGE_TYPES, serializeError } from "./helpers";
@@ -131,16 +129,26 @@ export class MessageContext<Data, ReplyData> {
   }
 
   reply(data: ReplyData) {
-    assertRequest(this.msg);
-    this.send({
-      type: PorterMessageType.Res,
-      reqId: this.msg.reqId,
-      data,
-    });
+    this.send(
+      this.msg.type === PorterMessageType.Req
+        ? {
+            type: PorterMessageType.Res,
+            reqId: this.msg.reqId,
+            data,
+          }
+        : {
+            type: PorterMessageType.OneWay,
+            data,
+          }
+    );
   }
 
   replyError(err: any) {
-    assertRequest(this.msg);
+    assert(
+      this.msg.type === PorterMessageType.Req,
+      "Not allowed for non-request messages"
+    );
+
     this.send({
       type: PorterMessageType.Err,
       reqId: this.msg.reqId,
@@ -148,16 +156,9 @@ export class MessageContext<Data, ReplyData> {
     });
   }
 
-  private send(res: PorterResponse | PorterErrorResponse) {
+  private send(res: PorterServerMessage) {
     if (this.connected) {
       this.port.postMessage(res);
     }
   }
-}
-
-function assertRequest(msg: PorterClientMessage): asserts msg is PorterRequest {
-  assert(
-    msg.type === PorterMessageType.Req,
-    "Not allowed for non-request messages"
-  );
 }

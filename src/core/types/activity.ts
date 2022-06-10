@@ -1,21 +1,40 @@
 import type { ethers } from "ethers";
 
 import { RpcReply } from "./rpc";
+import { Permission } from "./permissions";
 
 export enum ActivityType {
   Connection = "CONNECTION",
   Transaction = "TRANSACTION",
   Signing = "SIGNING",
+  AddNetwork = "ADD_NETWORK",
+  AddToken = "ADD_TOKEN",
+}
+
+export enum SigningStandard {
+  EthSign = "eth_sign",
+  PersonalSign = "personal_sign",
+  SignTypedDataV1 = "signTypedData_v1",
+  SignTypedDataV3 = "signTypedData_v3",
+  SignTypedDataV4 = "signTypedData_v4",
+}
+
+export enum SelfActivityKind {
+  Transfer,
+  Swap,
+  Unknown,
 }
 
 export type ActivitySource =
   | {
       type: "self";
-      kind: string;
+      kind: SelfActivityKind;
     }
   | {
-      type: "dapp";
-      origin: string;
+      type: "page";
+      url: string;
+      favIconUrl?: string;
+      permission?: Permission;
     };
 
 export interface ApprovalResult {
@@ -24,6 +43,7 @@ export interface ApprovalResult {
   signedRawTx?: string;
   signedMessage?: string;
   accountAddresses?: string[];
+  overriddenChainId?: number;
 }
 
 export type Approval =
@@ -31,29 +51,49 @@ export type Approval =
   | SigningApproval
   | ConnectionApproval;
 
-export interface ApprovalBase {
+export type Activity =
+  | TransactionActivity
+  | SigningActivity
+  | ConnectionActivity;
+
+export interface ActivityBase {
   id: string;
   type: ActivityType;
   source: ActivitySource;
-  rpcReply: RpcReply;
+  timeAt: number;
+  rpcReply?: RpcReply; // only exists on approval & on back side
 }
 
-export interface TransactionApproval extends ApprovalBase {
+export interface TransactionApproval extends ActivityBase {
   type: ActivityType.Transaction;
   chainId: number;
   accountAddress: string;
   txParams: TxParams;
 }
 
-export interface SigningApproval extends ApprovalBase {
-  type: ActivityType.Signing;
-  message: string;
+export interface TransactionActivity extends TransactionApproval {
+  rawTx: string;
+  txHash: string;
+  result?: any;
 }
 
-export interface ConnectionApproval extends ApprovalBase {
+export interface SigningApproval extends ActivityBase {
+  type: ActivityType.Signing;
+  standard: SigningStandard;
+  accountAddress: string;
+  message: any;
+}
+
+export type SigningActivity = SigningApproval; // There are no additional fields
+
+export interface ConnectionApproval extends ActivityBase {
   type: ActivityType.Connection;
-  origin: string;
-  favIconUrl: string;
+  returnSelectedAccount: boolean; // For legacy eth_requestAccounts
+  preferredChainId?: number;
+}
+
+export interface ConnectionActivity extends ConnectionApproval {
+  accountAddresses: string[];
 }
 
 export type TxParams = {
