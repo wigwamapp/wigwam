@@ -86,9 +86,11 @@ export const $approvals = createStore<Approval[]>([])
           approval.type === ActivityType.Connection &&
           getPageOrigin(approval.source) === newApprovalOrigin
         ) {
-          return;
+          return approvals;
         }
       }
+
+      return [newApproval, ...approvals];
     }
 
     return [...approvals, newApproval];
