@@ -13,11 +13,13 @@ import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 
 type SmallContactCardProps = {
   address?: string;
+  notAddable?: boolean;
   className?: string;
 };
 
 const SmallContactCard: FC<SmallContactCardProps> = ({
   address,
+  notAddable = false,
   className,
 }) => {
   const { upsertContact } = useContactsDialog();
@@ -39,7 +41,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
 
   const accounts = useMemo(
     () =>
-      allAccounts.filter(({ address: accAddress }) => accAddress !== address),
+      allAccounts.filter(({ address: accAddress }) => accAddress === address),
     [allAccounts, address]
   );
 
@@ -55,6 +57,10 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   const contact = mergedAccounts[0];
 
   if (!contact) {
+    if (notAddable) {
+      return null;
+    }
+
     return (
       <InputLabelAction
         className={classNames("pl-2 flex items-center", className)}

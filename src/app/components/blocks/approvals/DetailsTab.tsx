@@ -227,7 +227,11 @@ const Recipient: FC<RecipientProps> = ({ action }) => {
           </TippySingletonProvider>
         </div>
         {action.type === TxActionType.TokenTransfer && (
-          <SmallContactCard address={address} className="mt-2 mb-0" />
+          <SmallContactCard
+            address={address}
+            notAddable
+            className="mt-2 mb-0"
+          />
         )}
       </div>
     </InfoRaw>
