@@ -42,9 +42,22 @@ const DetailsTab: FC<DetailsTabProps> = ({
   onFeeButtonClick,
 }) => {
   const tabHeader = useMemo(() => getTabHeader(action), [action]);
+  const withDescription = useMemo(
+    () => action.type === TxActionType.TokenApprove && !action.clears,
+    [action]
+  );
   return (
     <>
-      <TabHeader>{tabHeader}</TabHeader>
+      <TabHeader className={withDescription ? "!mb-1" : ""}>
+        {tabHeader}
+      </TabHeader>
+      {withDescription && (
+        <p className="text-sm text-[#BCC2DB] mb-3">
+          Do you trust this site? By granding this permission, you&apos;re
+          allowing <span className="font-semibold">pancakeswap.finance</span> to
+          withdraw tokens and automate transactions for you.
+        </p>
+      )}
       <FeeButton
         fees={fees}
         gasLimit={gasLimit}
