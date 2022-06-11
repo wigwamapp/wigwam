@@ -7,7 +7,7 @@ export const approvalsAtom = atomWithAutoReset(getApprovals, {
   onMount: onApprovalsUpdated,
 });
 
-export const approvalStatus = selectAtom(approvalsAtom, (approvals) => {
+export const approvalStatusAtom = selectAtom(approvalsAtom, (approvals) => {
   const actionMap = new Map<
     string,
     { type: "page" | "self"; name?: string; icon?: string }

@@ -1,6 +1,9 @@
-import { FC, memo, useLayoutEffect } from "react";
+import { FC, memo, useEffect, useLayoutEffect, useRef } from "react";
 import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
+import browser from "webextension-polyfill";
+import { openOrFocusMainTab } from "lib/ext/utils";
+import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 
 import { ActivityType, Approval, WalletStatus } from "core/types";
 
@@ -11,10 +14,13 @@ import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
 import ApproveConnection from "./screens/approvals/Connection";
 import ApproveTransaction from "./screens/approvals/Transaction";
+import Dialog from "./blocks/Dialog";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
     <ApproveRouter />
+
+    <Dialog small />
   </BaseProvider>
 );
 
@@ -39,8 +45,30 @@ const Destroy: FC = () => {
 
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
+  const windowFocused = useWindowFocus();
+  const firstOpen = useRef(true);
 
   const currentApproval = approvals[0];
+
+  useEffect(() => {
+    if (!currentApproval) return;
+
+    if (!firstOpen.current && windowFocused) {
+      if (currentApproval.source.type === "page") {
+        if (currentApproval.source.tabId) {
+          browser.tabs
+            .update(currentApproval.source.tabId, {
+              highlighted: true,
+            })
+            .catch(console.error);
+        }
+      } else {
+        openOrFocusMainTab();
+      }
+    }
+
+    firstOpen.current = false;
+  }, [currentApproval, windowFocused]);
 
   if (!currentApproval) return null;
 

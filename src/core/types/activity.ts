@@ -33,8 +33,9 @@ export type ActivitySource =
   | {
       type: "page";
       url: string;
-      favIconUrl?: string;
       permission?: Permission;
+      tabId?: number;
+      favIconUrl?: string;
     };
 
 export interface ApprovalResult {
