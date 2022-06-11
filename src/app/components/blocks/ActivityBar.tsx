@@ -11,7 +11,7 @@ import { openInTab } from "app/helpers";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as ActivityHoverIcon } from "app/icons/external-link.svg";
-import { ReactComponent as SendIcon } from "app/icons/Send.svg";
+import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
 // import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/activity-successfull.svg";
@@ -229,7 +229,7 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
     content = (
       <Icon
         className={classNames(
-          "glass-icon-stable",
+          "glass-icon--active",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
           theme === "large" && "w-6 h-6",
           className

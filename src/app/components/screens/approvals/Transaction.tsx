@@ -69,7 +69,7 @@ type ApproveTransactionProps = {
 };
 
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
-  const { accountAddress, txParams } = approval;
+  const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
 
   const [allAccounts, localNonce] = useAtomValue(
@@ -311,7 +311,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       approving={approving}
       className="!pt-7"
     >
-      <TransactionHeader account={account} action={action} />
+      <TransactionHeader account={account} action={action} source={source} />
 
       <Tabs.Root
         defaultValue="details"
@@ -346,6 +346,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     feeMode={feeMode}
                     maxFee={maxFee}
                     action={action}
+                    source={source}
                     onFeeButtonClick={() => setTabValue("fee")}
                   />
                 )}

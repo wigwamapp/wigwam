@@ -1,10 +1,11 @@
-import { FC, memo } from "react";
+import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
+import browser from "webextension-polyfill";
 
 import {
   Account,
+  ActivitySource,
   TxAction as TxActionPrimitive,
-  TxActionType,
 } from "core/types";
 import { getNetworkIconUrl } from "fixtures/networks";
 
@@ -16,19 +17,25 @@ import Balance from "app/components/elements/Balance";
 import Avatar from "app/components/elements/Avatar";
 import { ActivityIcon } from "app/components/blocks/ActivityBar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
+import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 
 type TransactionHeaderProps = {
   account: Account;
   action: TxActionPrimitive | null;
+  source: ActivitySource;
 };
 
-const TransactionHeader: FC<TransactionHeaderProps> = ({ account, action }) => {
+const TransactionHeader: FC<TransactionHeaderProps> = ({
+  account,
+  action,
+  source,
+}) => {
   return (
     <div className="flex">
       <WalletCard account={account} />
       <div className="flex flex-col pl-2 w-1/2">
-        <TxAction action={action} className="h-1/2" />
-        <NetworkPreview className="mt-1 h-1/2" />
+        <TxAction action={action} source={source} className="h-1/2 mb-1" />
+        <NetworkPreview className="h-1/2" />
       </div>
     </div>
   );
@@ -47,31 +54,70 @@ const cardClassName = classNames(
 
 type TxActionProps = {
   action: TxActionPrimitive | null;
+  source: ActivitySource;
   className?: string;
 };
 
-const TxAction: FC<TxActionProps> = ({ action, className }) => {
+const TxAction: FC<TxActionProps> = ({ action, source, className }) => {
+  const handleLinkClick = useCallback(async () => {
+    try {
+      if (source.type === "page") {
+        let exist = false;
+        if (source.tabId !== undefined) {
+          exist = Boolean(await browser.tabs.get(source.tabId));
+        }
+        if (exist) {
+          await browser.tabs.update(source.tabId, { highlighted: true });
+        } else {
+          await browser.tabs.create({ url: source.url, active: true });
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [source]);
+
   if (!action) {
     return null;
   }
 
-  let content;
-  switch (action.type) {
-    case TxActionType.TokenTransfer:
-      content = (
-        <>
-          <span className="block w-6 h-6 flex items-center justify-center mr-2">
-            <ActivityIcon
-              Icon={SendIcon}
-              className="!w-5 !h-5 glass-icon-hover"
-            />
-          </span>
-          Transfer
-        </>
-      );
+  if (source.type === "self") {
+    return (
+      <div className={classNames(cardClassName, className)}>
+        <span className="block w-6 h-6 flex items-center justify-center mr-2">
+          <ActivityIcon
+            Icon={SendIcon}
+            className="!w-5 !h-5 glass-icon--active"
+          />
+        </span>
+        Transfer
+      </div>
+    );
   }
 
-  return <div className={classNames(cardClassName, className)}>{content}</div>;
+  return (
+    <button
+      onClick={handleLinkClick}
+      className={classNames(
+        cardClassName,
+        "cursor-pointer",
+        "transition-colors",
+        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+        className
+      )}
+    >
+      <Avatar
+        src={source.favIconUrl}
+        alt={source.url}
+        className={classNames(
+          "w-6 min-w-[1.5rem] h-6 mr-2 object-cover",
+          "!border-none"
+        )}
+      />
+      <span className="min-w-0 truncate">{new URL(source.url).host}</span>
+      <LinkIcon className="ml-1" />
+    </button>
+  );
 };
 
 type WalletCardProps = {

@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 
 import {
   AccountAsset,
+  ActivitySource,
   FeeMode,
   FeeSuggestions,
   TxAction,
@@ -30,6 +31,7 @@ import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg"
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
   action: TxAction;
+  source: ActivitySource;
   onFeeButtonClick: () => void;
 };
 
@@ -39,6 +41,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
   maxFee,
   feeMode,
   action,
+  source,
   onFeeButtonClick,
 }) => {
   const tabHeader = useMemo(() => getTabHeader(action), [action]);
@@ -54,8 +57,13 @@ const DetailsTab: FC<DetailsTabProps> = ({
       {withDescription && (
         <p className="text-sm text-[#BCC2DB] mb-3">
           Do you trust this site? By granding this permission, you&apos;re
-          allowing <span className="font-semibold">pancakeswap.finance</span> to
-          withdraw tokens and automate transactions for you.
+          allowing{" "}
+          <span className="font-semibold">
+            {source.type === "page" && source.url
+              ? new URL(source.url).host
+              : "this site"}
+          </span>{" "}
+          to withdraw tokens and automate transactions for you.
         </p>
       )}
       <FeeButton
@@ -313,6 +321,17 @@ const getTokens = (action: TxAction) => {
     if (action.allTokensContract) {
       return action.allTokensContract;
     }
+  }
+  if (
+    action.type === TxActionType.ContractInteraction &&
+    action.nativeTokenAmount
+  ) {
+    return [
+      {
+        slug: NATIVE_TOKEN_SLUG,
+        amount: action.nativeTokenAmount,
+      },
+    ];
   }
   return null;
 };
