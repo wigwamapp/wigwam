@@ -42,7 +42,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
 
         <RoundedButton
           theme={isUnlocked ? "small" : "large"}
-          onClick={() => openInTab()}
+          onClick={() => openInTab(undefined, ["token"])}
           className={classNames(
             "w-full",
             !isUnlocked && "p-3.5",

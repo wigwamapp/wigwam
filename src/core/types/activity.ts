@@ -33,8 +33,9 @@ export type ActivitySource =
   | {
       type: "page";
       url: string;
-      favIconUrl?: string;
       permission?: Permission;
+      tabId?: number;
+      favIconUrl?: string;
     };
 
 export interface ApprovalResult {
@@ -151,6 +152,7 @@ export interface TokenApproveAction {
 export interface ContractInteractionAction {
   type: TxActionType.ContractInteraction;
   contractAddress: string;
+  nativeTokenAmount?: string;
   method?: string;
   args?: any[];
 }

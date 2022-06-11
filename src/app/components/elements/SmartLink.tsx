@@ -9,7 +9,7 @@ type SmartLinkProps = LinkProps;
 
 const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
   (props, ref) => {
-    const { to, onClick, children, ...rest } = props;
+    const { to, merge, onClick, children, ...rest } = props;
     const isPopup = isPopupPrimitive();
 
     const handleClick = useCallback(
@@ -18,10 +18,10 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
 
         if (!evt.defaultPrevented) {
           evt.preventDefault();
-          openInTab(to);
+          openInTab(to, merge);
         }
       },
-      [onClick, to]
+      [onClick, to, merge]
     );
 
     if (isPopup) {

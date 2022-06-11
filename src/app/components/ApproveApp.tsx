@@ -11,10 +11,13 @@ import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
 import ApproveConnection from "./screens/approvals/Connection";
 import ApproveTransaction from "./screens/approvals/Transaction";
+import Dialog from "./blocks/Dialog";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
     <ApproveRouter />
+
+    <Dialog small />
   </BaseProvider>
 );
 
@@ -39,7 +42,6 @@ const Destroy: FC = () => {
 
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
-
   const currentApproval = approvals[0];
 
   if (!currentApproval) return null;

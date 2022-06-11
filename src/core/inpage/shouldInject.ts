@@ -23,10 +23,8 @@ function doctypeCheck() {
 // that we should not inject the provider into. This check is indifferent of
 // query parameters in the location.
 function suffixCheck() {
-  const prohibitedTypes = [/\.xml$/u, /\.pdf$/u];
-  const currentUrl = window.location.pathname;
-  for (let i = 0; i < prohibitedTypes.length; i++) {
-    if (prohibitedTypes[i].test(currentUrl)) {
+  for (const type of [/\.xml$/u, /\.pdf$/u]) {
+    if (type.test(window.location.pathname)) {
       return false;
     }
   }

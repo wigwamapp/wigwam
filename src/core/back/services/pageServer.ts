@@ -128,6 +128,7 @@ async function handlePageRequest(
     const source: ActivitySource = {
       type: "page",
       url: senderUrl,
+      tabId: ctx.port.sender?.tab?.id,
       favIconUrl: ctx.port.sender?.tab?.favIconUrl,
     };
 

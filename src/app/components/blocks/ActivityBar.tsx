@@ -4,8 +4,10 @@ import { match } from "ts-pattern";
 import browser from "webextension-polyfill";
 import { useAtomValue } from "jotai";
 
-import { approvalStatus } from "app/atoms";
+import { approvalStatusAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
+import { openInTab } from "app/helpers";
+
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as ActivityHoverIcon } from "app/icons/external-link.svg";
@@ -21,13 +23,17 @@ type WithThemeProps = {
 };
 
 const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
-  const { total, previewActions } = useAtomValue(approvalStatus);
+  const { total, previewActions } = useAtomValue(approvalStatusAtom);
 
   const [activityHovered, setActivityHovered] = useState(false);
 
-  const handleClick = useCallback(() => {
-    browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
-  }, []);
+  const handleClick = useCallback(async () => {
+    if (total > 0) {
+      browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
+    } else {
+      openInTab(undefined, ["token"]);
+    }
+  }, [total]);
 
   return (
     <div
@@ -40,7 +46,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
         "shadow-addaccountmodal",
         "flex justify-between",
         "rounded-[.625rem]",
-        "cursor-pointer",
+        "cursor-pointer select-none",
         theme === "large" && "px-8 py-4",
         theme === "small" && "px-3 py-2"
       )}
@@ -123,17 +129,33 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
               centeredClassNames
             )}
           >
-            Coming soon
-            <ActivityHoverIcon
-              className={classNames(
-                "ml-1",
-                theme === "small" && "w-[1.125rem] h-[1.125rem]",
-                theme === "large" && "w-5 h-5"
-              )}
-            />
+            {total > 0 ? (
+              <>
+                Approve
+                <ActivityHoverIcon
+                  className={classNames(
+                    "ml-1",
+                    theme === "small" && "w-[1.125rem] h-[1.125rem]",
+                    theme === "large" && "w-5 h-5"
+                  )}
+                />
+              </>
+            ) : theme === "large" ? (
+              "Click to open"
+            ) : (
+              <>
+                Activity
+                <ActivityHoverIcon
+                  className={classNames(
+                    "ml-1",
+                    theme === "small" && "w-[1.125rem] h-[1.125rem]"
+                  )}
+                />
+              </>
+            )}
           </span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center invisible">
           <StatItem
             count={2}
             ariaLabel="2 successful transactions"

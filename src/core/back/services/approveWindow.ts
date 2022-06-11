@@ -1,5 +1,5 @@
 import browser, { Tabs } from "webextension-polyfill";
-import { getPublicURL } from "lib/ext/utils";
+import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
 import { livePromise } from "lib/system/livePromise";
 import { createQueue } from "lib/system/queue";
 
@@ -21,15 +21,27 @@ export function startApproveWindowOpener() {
   approvalAdded.watch(() => openApproveWindow());
 
   $approvals.watch(async (approvals) => {
-    if (approvals.length === 0) {
-      try {
+    try {
+      if (approvals.length === 0) {
         const currentTab = await loadCurrentApproveTab();
         if (currentTab) {
           await browser.tabs.remove(currentTab.id!);
         }
-      } catch (err) {
-        console.error(err);
+      } else {
+        const currentApproval = approvals[0];
+
+        if (currentApproval.source.type === "page") {
+          if (currentApproval.source.tabId) {
+            await browser.tabs.update(currentApproval.source.tabId, {
+              highlighted: true,
+            });
+          }
+        } else {
+          openOrFocusMainTab();
+        }
       }
+    } catch (err) {
+      console.error(err);
     }
   });
 }

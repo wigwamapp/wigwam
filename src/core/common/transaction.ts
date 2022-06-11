@@ -39,6 +39,10 @@ export function matchTxAction(txParams: TxParams): TxAction | null {
     return {
       type: TxActionType.ContractInteraction,
       contractAddress: destination,
+      nativeTokenAmount:
+        txParams.value && !isZeroHex(txParams.value)
+          ? ethStringify(txParams.value)
+          : undefined,
     };
   }
 

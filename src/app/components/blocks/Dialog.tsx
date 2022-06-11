@@ -4,7 +4,7 @@ import { useDialog } from "app/hooks/dialog";
 import SecondaryModal from "app/components/elements/SecondaryModal";
 import Button from "app/components/elements/Button";
 
-const Dialog: FC = () => {
+const Dialog: FC<{ small?: boolean }> = ({ small }) => {
   const { modalData } = useDialog();
 
   if (!modalData) {
@@ -30,6 +30,7 @@ const Dialog: FC = () => {
       onOpenChange={onClose}
       header={header}
       autoFocus={withActions}
+      small={small}
       {...rest}
     >
       <div className="text-base text-brand-font text-center w-full break-words flex flex-col items-center">

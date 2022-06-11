@@ -223,19 +223,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
           <div className="flex items-center ml-auto">
             <Tooltip
               content={
-                <>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                    aliquam, purus sit amet luctus venenatis, lectus magna
-                    fringilla urna, porttitor rhoncus dolor purus non enim
-                    praesent elementum facilisis leo
-                  </p>
-                  <p className="mt-2">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                    aliquam, purus sit amet luctus venenatis, lectus magna
-                    fringilla urna, porttitor rhoncus
-                  </p>
-                </>
+                <p>
+                  Use this network switcher to preview the balances of the
+                  wallets to select them.
+                </p>
               }
               placement="left-start"
               size="large"
