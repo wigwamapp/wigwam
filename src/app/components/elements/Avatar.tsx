@@ -6,11 +6,18 @@ import { ReactComponent as FallbackIconPrimitive } from "app/icons/Fallback.svg"
 
 type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   FallbackElement?: FC<{ className?: string }>;
+  withBorder?: boolean;
   imageClassName?: string;
 };
 
 const Avatar = memo<AvatarProps>(
-  ({ FallbackElement = FallbackIcon, className, imageClassName, ...rest }) => {
+  ({
+    FallbackElement = FallbackIcon,
+    withBorder = true,
+    className,
+    imageClassName,
+    ...rest
+  }) => {
     const [loadingState, setLoadingState] = useState<
       "idle" | "loading" | "loaded" | "error"
     >("idle");
@@ -19,9 +26,9 @@ const Avatar = memo<AvatarProps>(
       <AvatarPrimitive.Root
         className={classNames(
           "block",
-          "rounded-full overflow-hidden",
-          "bg-brand-main/10",
-          loadingState === "error" && "border border-brand-main/20",
+          withBorder && ["rounded-full overflow-hidden", "bg-brand-main/10"],
+          loadingState === "error" &&
+            "rounded-full bg-brand-main/10 overflow-hidden border border-brand-main/20",
           className
         )}
       >

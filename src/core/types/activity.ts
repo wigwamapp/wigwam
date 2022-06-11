@@ -142,7 +142,7 @@ export interface TokenTransferAction {
 
 export interface TokenApproveAction {
   type: TxActionType.TokenApprove;
-  toAddress?: string;
+  toAddress: string;
   tokenSlug?: string;
   allTokensContract?: string;
   amount?: string;

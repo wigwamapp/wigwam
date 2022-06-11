@@ -1,33 +1,66 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { TReplace } from "lib/ext/i18n/react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
+import { waitForAll } from "jotai/utils";
 
-import { Account, Contact } from "core/types";
-
-import { useContactsDialog } from "app/hooks/contacts";
+import { allAccountsAtom, currentAccountAtom } from "app/atoms";
+import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import InputLabelAction from "./InputLabelAction";
 import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 
 type SmallContactCardProps = {
-  contact?: Contact | Account;
   address?: string;
+  notAddable?: boolean;
   className?: string;
 };
 
 const SmallContactCard: FC<SmallContactCardProps> = ({
-  contact,
   address,
+  notAddable = false,
   className,
 }) => {
   const { upsertContact } = useContactsDialog();
+  const { contacts } = useContacts({
+    search: address ?? undefined,
+    limit: 1,
+  });
 
-  if (!contact && !address) {
+  const { allAccounts } = useAtomValue(
+    useMemo(
+      () =>
+        waitForAll({
+          currentAccount: currentAccountAtom,
+          allAccounts: allAccountsAtom,
+        }),
+      []
+    )
+  );
+
+  const accounts = useMemo(
+    () =>
+      allAccounts.filter(({ address: accAddress }) => accAddress === address),
+    [allAccounts, address]
+  );
+
+  const mergedAccounts = useMemo(
+    () => [...contacts, ...accounts],
+    [contacts, accounts]
+  );
+
+  if (!address) {
     return null;
   }
 
+  const contact = mergedAccounts[0];
+
   if (!contact) {
+    if (notAddable) {
+      return null;
+    }
+
     return (
       <InputLabelAction
         className={classNames("pl-2 flex items-center", className)}
@@ -45,7 +78,8 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
         "py-0.5 pl-0.5 pr-3 -my-1",
         "rounded-md",
         "border border-brand-main/[.07] text-sm",
-        "flex items-center"
+        "flex items-center",
+        className
       )}
     >
       <AutoIcon

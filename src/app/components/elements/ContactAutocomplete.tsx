@@ -152,8 +152,7 @@ const ContactAutocomplete = forwardRef<
 
   const labelAction = useMemo(() => {
     if (!meta.error && mergedAccounts.length <= 1) {
-      const contact = mergedAccounts[0] ?? undefined;
-      return <SmallContactCard contact={contact} address={value as string} />;
+      return <SmallContactCard address={value as string} />;
     }
     return undefined;
   }, [mergedAccounts, meta.error, value]);

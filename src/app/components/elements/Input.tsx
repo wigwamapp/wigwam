@@ -12,6 +12,8 @@ import {
 import classNames from "clsx";
 import { CSSTransition } from "react-transition-group";
 
+import Tooltip, { TooltipProps } from "./Tooltip";
+import TooltipIcon from "./TooltipIcon";
 import { ReactComponent as SuccessIcon } from "app/icons/green-check.svg";
 
 export type InputProps = {
@@ -30,6 +32,8 @@ export type InputProps = {
   actionsClassName?: string;
   inputClassName?: string;
   adornmentClassName?: string;
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
 } & Omit<HTMLProps<HTMLInputElement>, "ref">;
 
 const Input = memo(
@@ -48,6 +52,8 @@ const Input = memo(
         errorMessage,
         success,
         successWithIcon,
+        tooltip,
+        tooltipProps,
         inputClassName,
         adornmentClassName,
         optional,
@@ -115,9 +121,18 @@ const Input = memo(
               {label && (
                 <label
                   htmlFor={id ?? name}
-                  className="cursor-pointer text-brand-gray"
+                  className="cursor-pointer text-brand-gray flex align-center"
                 >
                   {label}
+                  {tooltip && (
+                    <Tooltip
+                      content={tooltip}
+                      {...tooltipProps}
+                      className="ml-2"
+                    >
+                      <TooltipIcon className="!w-4 !h-4" />
+                    </Tooltip>
+                  )}
                 </label>
               )}
               {labelActions}
