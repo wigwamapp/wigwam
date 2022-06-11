@@ -135,7 +135,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
     for (const factory of pipes) {
       const result = await factory();
-      if (result) return result;
+      if (result !== undefined) return result;
     }
 
     throw ethErrors.provider.unsupportedMethod();
