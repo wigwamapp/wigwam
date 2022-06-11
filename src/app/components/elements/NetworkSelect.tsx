@@ -11,7 +11,10 @@ type NetworkSelectProps = {
   currentItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
+  withAction?: boolean;
   onChange?: (chainId: number) => void;
+  changeInternalChainId?: boolean;
+  small?: boolean;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
@@ -19,7 +22,10 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   currentItemClassName,
   currentItemIconClassName,
   contentClassName,
+  withAction,
   onChange,
+  changeInternalChainId = true,
+  small,
 }) => {
   const currentNetwork = useLazyNetwork();
   const allNetworks = useLazyAllNetworks() ?? [];
@@ -28,10 +34,10 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
 
   const handleNetworkChange = useCallback(
     (chainId: number) => {
-      setChainId(chainId);
+      changeInternalChainId && setChainId(chainId);
       onChange?.(chainId);
     },
-    [setChainId, onChange]
+    [changeInternalChainId, setChainId, onChange]
   );
 
   return (
@@ -39,8 +45,12 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       networks={allNetworks}
       currentNetwork={currentNetwork}
       onNetworkChange={handleNetworkChange}
-      className={className}
-      currentItemClassName={classNames("h-12", currentItemClassName)}
+      className={classNames(small && "!min-w-0 w-[10.5rem]", className)}
+      withAction={withAction}
+      currentItemClassName={classNames(
+        small ? "h-[1.75rem]" : "h-12",
+        currentItemClassName
+      )}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
     />

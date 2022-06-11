@@ -35,9 +35,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         />
         <Dialog.Content
           className={classNames(
-            "fixed z-20",
+            "fixed z-20 w-full",
             small ? "max-w-[23.5rem]" : "max-w-[43rem]",
-            "w-full p-[3.75rem]",
+            small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
             "bg-brand-main/[.05]",
             "border border-brand-main/[.15]",
