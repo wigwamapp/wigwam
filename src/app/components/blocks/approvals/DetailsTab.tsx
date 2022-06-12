@@ -174,7 +174,11 @@ const FeeButton: FC<FeeButton> = ({
                 className=""
               />
               <Dot />
-              <FiatAmount amount={usdAmount} threeDots={false} className="" />
+              <FiatAmount
+                amount={usdAmount}
+                threeDots={false}
+                className="font-bold"
+              />
             </span>
           )}
         </span>
@@ -185,7 +189,7 @@ const FeeButton: FC<FeeButton> = ({
 
           {maxFee && nativeToken && (
             <span className="">
-              <span className="font-bold">Max fee:</span>
+              <span className="font-semibold">Max fee:</span>
               <PrettyAmount
                 amount={maxFee.toString()}
                 decimals={nativeToken.decimals}
