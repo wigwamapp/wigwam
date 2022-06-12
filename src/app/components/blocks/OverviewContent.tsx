@@ -1,12 +1,12 @@
 import {
   FC,
-  memo,
   forwardRef,
+  memo,
   useCallback,
-  useRef,
-  useState,
   useEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
@@ -15,6 +15,7 @@ import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 
@@ -29,7 +30,7 @@ import { findToken } from "core/client";
 import * as repo from "core/repo";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
-import { Page } from "app/nav";
+import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
   TippySingletonProvider,
@@ -38,15 +39,17 @@ import {
   useLazyNetwork,
   useTokenActivitiesSync,
 } from "app/hooks";
-import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
+import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -55,7 +58,6 @@ import Button from "../elements/Button";
 import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
-import AddressField from "../elements/AddressField";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
 import PriceArrow from "../elements/PriceArrow";
@@ -513,10 +515,9 @@ const AssetInfo: FC = () => {
   const currentNetwork = useLazyNetwork();
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
 
-  const { standard, address } = useMemo(
-    () => parseTokenSlug(tokenSlug),
-    [tokenSlug]
-  );
+  const { address } = useMemo(() => parseTokenSlug(tokenSlug), [tokenSlug]);
+
+  const { copy, copied } = useCopyToClipboard(address);
 
   if (!tokenInfo) return null;
 
@@ -555,6 +556,15 @@ const AssetInfo: FC = () => {
             </h2>
             <TippySingletonProvider>
               <div className="ml-auto flex items-center">
+                {status !== TokenStatus.Native && (
+                  <IconedButton
+                    aria-label="Copy contract address"
+                    Icon={copied ? SuccessIcon : CopyIcon}
+                    className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                    iconClassName="!w-[1.125rem]"
+                    onClick={copy}
+                  />
+                )}
                 {explorerUrl && status !== TokenStatus.Native && (
                   <IconedButton
                     aria-label="View asset in Explorer"
@@ -632,55 +642,65 @@ const AssetInfo: FC = () => {
           <SendIcon className="w-6 h-auto mr-2" />
           Transfer
         </Button>
-        <Button theme="secondary" className="grow !py-2">
+        <Button
+          to={{ page: Page.Swap }}
+          theme="secondary"
+          className="grow !py-2"
+        >
           <SwapIcon className="w-6 h-auto mr-2" />
           Swap
         </Button>
-        <Button theme="secondary" className="grow !py-2">
-          <ActivityIcon className="w-6 h-auto mr-2" />
-          Activity
-        </Button>
+        {status === TokenStatus.Native && (
+          <Button
+            to={{ page: Page.Receive, receive: ReceiveTabEnum.BuyWithCrypto }}
+            theme="secondary"
+            className="grow !py-2"
+          >
+            <BuyIcon className="w-6 h-auto mr-2" />
+            Buy
+          </Button>
+        )}
       </div>
 
-      {status !== TokenStatus.Native && (
-        <div className="mt-6 max-w-[23.25rem]">
-          <AddressField
-            key={address}
-            label="Token address"
-            value={address}
-            readOnly
-            labelActions={standard ? <Tag standard={standard} /> : undefined}
-          />
-        </div>
-      )}
+      {/*{status !== TokenStatus.Native && (*/}
+      {/*  <div className="mt-6 max-w-[23.25rem]">*/}
+      {/*    <AddressField*/}
+      {/*      key={address}*/}
+      {/*      label="Token address"*/}
+      {/*      value={address}*/}
+      {/*      readOnly*/}
+      {/*      labelActions={standard ? <Tag standard={standard} /> : undefined}*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*)}*/}
     </div>
   );
 };
 
-enum TokenStandardValue {
-  ERC20 = "ERC-20",
-  ERC721 = "ERC-721",
-  ERC777 = "ERC-777",
-  ERC1155 = "ERC-1155",
-}
-
-type TagProps = { standard: TokenStandard };
-
-const Tag: FC<TagProps> = ({ standard }) =>
-  standard !== TokenStandard.Native ? (
-    <span
-      className={classNames(
-        "px-3",
-        "text-xs font-bold text-brand-inactivelight leading-none",
-        "h-6 box-border border border-brand-main/20",
-        "flex items-center",
-        "rounded-lg",
-        "whitespace-nowrap"
-      )}
-    >
-      {TokenStandardValue[standard]}
-    </span>
-  ) : null;
+// enum TokenStandardValue {
+//   ERC20 = "ERC-20",
+//   ERC721 = "ERC-721",
+//   ERC777 = "ERC-777",
+//   ERC1155 = "ERC-1155",
+// }
+//
+// type TagProps = { standard: TokenStandard };
+//
+// const Tag: FC<TagProps> = ({ standard }) =>
+//   standard !== TokenStandard.Native ? (
+//     <span
+//       className={classNames(
+//         "px-3",
+//         "text-xs font-bold text-brand-inactivelight leading-none",
+//         "h-6 box-border border border-brand-main/20",
+//         "flex items-center",
+//         "rounded-lg",
+//         "whitespace-nowrap"
+//       )}
+//     >
+//       {TokenStandardValue[standard]}
+//     </span>
+//   ) : null;
 
 type PriceChangeProps = {
   priceChange: BigNumber.Value;
