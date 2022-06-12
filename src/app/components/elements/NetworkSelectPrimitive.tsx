@@ -22,6 +22,7 @@ type NetworkSelectProps = {
   currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
   withAction?: boolean;
+  size?: "large" | "small";
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -33,6 +34,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentNetwork,
   onNetworkChange,
   withAction = true,
+  size,
   className,
   currentItemClassName,
   currentItemIconClassName,
@@ -72,13 +74,14 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
       searchValue={searchValue}
-      onSearch={setSearchValue}
+      onSearch={size === "large" ? setSearchValue : undefined}
       className={className}
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
+      size={size}
       actions={
         withAction ? (
           <IconedButton
