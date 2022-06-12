@@ -504,6 +504,14 @@ const AssetCard = memo(
   )
 );
 
+enum TokenStandardValue {
+  NATIVE = "Native",
+  ERC20 = "ERC-20",
+  ERC721 = "ERC-721",
+  ERC777 = "ERC-777",
+  ERC1155 = "ERC-1155",
+}
+
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
@@ -515,7 +523,10 @@ const AssetInfo: FC = () => {
   const currentNetwork = useLazyNetwork();
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
 
-  const { address } = useMemo(() => parseTokenSlug(tokenSlug), [tokenSlug]);
+  const { standard, address } = useMemo(
+    () => parseTokenSlug(tokenSlug),
+    [tokenSlug]
+  );
 
   const { copy, copied } = useCopyToClipboard(address);
 
@@ -558,7 +569,11 @@ const AssetInfo: FC = () => {
               <div className="ml-auto flex items-center">
                 {status !== TokenStatus.Native && (
                   <IconedButton
-                    aria-label="Copy contract address"
+                    aria-label={
+                      copied
+                        ? "Copied"
+                        : `Copy ${TokenStandardValue[standard]} token address`
+                    }
                     Icon={copied ? SuccessIcon : CopyIcon}
                     className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                     iconClassName="!w-[1.125rem]"
@@ -677,13 +692,6 @@ const AssetInfo: FC = () => {
   );
 };
 
-// enum TokenStandardValue {
-//   ERC20 = "ERC-20",
-//   ERC721 = "ERC-721",
-//   ERC777 = "ERC-777",
-//   ERC1155 = "ERC-1155",
-// }
-//
 // type TagProps = { standard: TokenStandard };
 //
 // const Tag: FC<TagProps> = ({ standard }) =>
