@@ -184,14 +184,14 @@ const FeeButton: FC<FeeButton> = ({
           <FeeModeLabel feeMode={isCustomMode ? "custom" : feeMode} />
 
           {maxFee && nativeToken && (
-            <span>
+            <span className="">
               <span className="font-bold">Max fee:</span>
               <PrettyAmount
                 amount={maxFee.toString()}
                 decimals={nativeToken.decimals}
                 currency={nativeToken.symbol}
                 threeDots={false}
-                className="ml-2"
+                className="ml-2 mb-0"
               />
             </span>
           )}
