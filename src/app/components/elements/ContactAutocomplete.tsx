@@ -320,7 +320,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
             "rounded-[.625rem]"
           )}
         />
-        <span className="flex flex-col min-w-0 flex flex-col">
+        <span className="flex flex-col min-w-0">
           {"source" in contact ? (
             <WalletName theme="small" wallet={contact} className="mb-0.5" />
           ) : (

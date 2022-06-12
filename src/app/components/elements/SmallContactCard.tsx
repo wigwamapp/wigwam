@@ -1,15 +1,15 @@
 import { FC, useMemo } from "react";
 import { TReplace } from "lib/ext/i18n/react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { allAccountsAtom, currentAccountAtom } from "app/atoms";
+import { allAccountsAtom } from "app/atoms";
 import { useContacts, useContactsDialog } from "app/hooks/contacts";
+import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
+
 import InputLabelAction from "./InputLabelAction";
 import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
-import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 
 type SmallContactCardProps = {
   address?: string;
@@ -22,26 +22,19 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   notAddable = false,
   className,
 }) => {
+  const allAccounts = useLazyAtomValue(allAccountsAtom);
+
   const { upsertContact } = useContactsDialog();
   const { contacts } = useContacts({
     search: address ?? undefined,
     limit: 1,
   });
 
-  const { allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
-
   const accounts = useMemo(
     () =>
-      allAccounts.filter(({ address: accAddress }) => accAddress === address),
+      (allAccounts ?? []).filter(
+        ({ address: accAddress }) => accAddress === address
+      ),
     [allAccounts, address]
   );
 
