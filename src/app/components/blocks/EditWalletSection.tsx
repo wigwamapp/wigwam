@@ -151,7 +151,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 "max-h-[2.625rem]",
                 "flex !justify-start items-center",
                 "text-left",
-                "mt-2 !px-3 min-w-[11.25rem] mr-auto"
+                "mt-2 !px-3 min-w-[12rem] mr-auto"
               )}
               onClick={() => setModalState("private-key")}
             >
@@ -221,7 +221,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 "max-h-[2.625rem]",
                 "flex !justify-start items-center",
                 "text-left",
-                "mt-2 !px-3 min-w-[11.25rem] mr-auto"
+                "mt-2 !px-3 min-w-[12rem] mr-auto"
               )}
               onClick={() => setModalState("phrase")}
             >
@@ -379,9 +379,15 @@ const SensetiveActionModal = memo<
     >
       {seedPhrase || privateKey ? (
         <>
+          <SecretField
+            label={seedPhrase ? "Secret phrase" : "Private key"}
+            isDownloadable={Boolean(seedPhrase)}
+            value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
+          />
+
           <div
             className={classNames(
-              "mb-4 w-[24rem]",
+              "mt-4 w-full max-w-[27.5rem]",
               "flex items-center",
               "p-4",
               "bg-brand-redobject/[.05]",
@@ -400,12 +406,6 @@ const SensetiveActionModal = memo<
               .
             </span>
           </div>
-
-          <SecretField
-            label={seedPhrase ? "Secret phrase" : "Private key"}
-            isDownloadable={Boolean(seedPhrase)}
-            value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
-          />
         </>
       ) : (
         <Form
@@ -431,6 +431,7 @@ const SensetiveActionModal = memo<
                         meta.error ||
                         (!modifiedSinceLastSubmit && meta.submitError)
                       }
+                      autoFocus
                       {...input}
                     />
                   )}
