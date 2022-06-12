@@ -3,7 +3,9 @@ import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
 import { livePromise } from "lib/system/livePromise";
 import { createQueue } from "lib/system/queue";
 
-import { $approvals, approvalAdded } from "core/back/state";
+import { Approval } from "core/types";
+
+import { $approvals, approvalAdded } from "../state";
 
 const APPROVE_WINDOW_URL = getPublicURL("approve.html");
 const WINDOW_POSITION =
@@ -15,33 +17,28 @@ export function startApproveWindowOpener() {
   browser.runtime.onMessage.addListener((msg) => {
     if (msg === "__OPEN_APPROVE_WINDOW") {
       openApproveWindow();
+
+      const currentApproval = $approvals.getState()[0];
+      if (currentApproval) {
+        focusApprovalTab(currentApproval);
+      }
     }
   });
 
   approvalAdded.watch(() => openApproveWindow());
 
   $approvals.watch(async (approvals) => {
-    try {
-      if (approvals.length === 0) {
+    if (approvals.length === 0) {
+      try {
         const currentTab = await loadCurrentApproveTab();
         if (currentTab) {
           await browser.tabs.remove(currentTab.id!);
         }
-      } else {
-        const currentApproval = approvals[0];
-
-        if (currentApproval.source.type === "page") {
-          if (currentApproval.source.tabId) {
-            await browser.tabs.update(currentApproval.source.tabId, {
-              highlighted: true,
-            });
-          }
-        } else {
-          openOrFocusMainTab();
-        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
+    } else {
+      focusApprovalTab(approvals[0]);
     }
   });
 }
@@ -117,6 +114,20 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
     };
   }
 );
+
+function focusApprovalTab(currentApproval: Approval) {
+  if (currentApproval.source.type === "page") {
+    if (currentApproval.source.tabId) {
+      browser.tabs
+        .update(currentApproval.source.tabId, {
+          highlighted: true,
+        })
+        .catch(console.error);
+    }
+  } else {
+    openOrFocusMainTab();
+  }
+}
 
 async function pickCurrentApproveTab() {
   const approveTabs = await browser.tabs.query({
