@@ -24,6 +24,7 @@ export enum JsonRpcMethod {
   wallet_addEthereumChain = "wallet_addEthereumChain",
   wallet_switchEthereumChain = "wallet_switchEthereumChain",
   wallet_watchAsset = "wallet_watchAsset",
+  wallet_registerOnboarding = "wallet_registerOnboarding",
   // Subscribtion
   eth_subscribe = "eth_subscribe",
   eth_unsubscribe = "eth_unsubscribe",

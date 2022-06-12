@@ -150,6 +150,7 @@ module.exports = {
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
+      "@metamask/eth-sig-util": "lib/eth-sig-util",
       // For `react-error-guard`
       "babel-runtime/regenerator": "regenerator-runtime",
     },

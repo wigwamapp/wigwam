@@ -10,6 +10,12 @@ import {
 import { BytesLike, ethers, Signature } from "ethers";
 import { hexZeroPad, splitSignature, stripZeros } from "@ethersproject/bytes";
 import * as secp256k1 from "@noble/secp256k1";
+import {
+  personalSign,
+  signTypedData,
+  SignTypedDataVersion,
+} from "@metamask/eth-sig-util";
+import { Buffer } from "buffer";
 import memoizeOne from "memoize-one";
 import {
   createKdbx,
@@ -36,6 +42,7 @@ import {
   LedgerAccount,
   WatchOnlyAccount,
   Account,
+  SigningStandard,
 } from "core/types";
 import {
   PublicError,
@@ -331,6 +338,47 @@ export class Vault {
       const privKey = this.getKeyForce(accUuid, "privateKey");
 
       return signDigest(digest, privKey);
+    });
+  }
+
+  signMessage(accUuid: string, standard: SigningStandard, data: any) {
+    return withError(t("failedToSign"), () => {
+      const privKeyProtected = this.getKeyForce(accUuid, "privateKey");
+
+      const privateKey = Buffer.from(stripZeros(privKeyProtected.getText()));
+
+      try {
+        switch (standard) {
+          case SigningStandard.PersonalSign:
+            return personalSign({ data, privateKey });
+
+          case SigningStandard.SignTypedDataV1:
+            return signTypedData({
+              version: SignTypedDataVersion.V1,
+              data,
+              privateKey,
+            });
+
+          case SigningStandard.SignTypedDataV3:
+            return signTypedData({
+              version: SignTypedDataVersion.V3,
+              data: JSON.parse(data),
+              privateKey,
+            });
+
+          case SigningStandard.SignTypedDataV4:
+            return signTypedData({
+              version: SignTypedDataVersion.V4,
+              data: JSON.parse(data),
+              privateKey,
+            });
+
+          default:
+            throw null;
+        }
+      } finally {
+        zeroBuffer(privateKey);
+      }
     });
   }
 

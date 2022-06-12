@@ -12,11 +12,12 @@ import { getPageOrigin } from "core/common/permissions";
 
 import { sendRpc } from "./network";
 import {
+  fetchPermission,
   requestConnection,
   requestTransaction,
   requestSigning,
+  recoverPersonalSign,
   requestSwitchChain,
-  fetchPermission,
 } from "./wallet";
 
 export async function handleRpc(
@@ -71,7 +72,6 @@ export async function handleRpc(
         return await requestTransaction(source, chainId, params, reply);
       }
 
-      case JsonRpcMethod.eth_sign:
       case JsonRpcMethod.personal_sign:
       case JsonRpcMethod.eth_signTypedData:
       case JsonRpcMethod.eth_signTypedData_v1:
@@ -84,17 +84,24 @@ export async function handleRpc(
         return await requestSigning(source, standard, params, reply);
       }
 
+      case JsonRpcMethod.personal_ecRecover: {
+        await expandPermission();
+
+        return await recoverPersonalSign(source, params, reply);
+      }
+
       case JsonRpcMethod.wallet_switchEthereumChain: {
         await expandPermission();
 
         return await requestSwitchChain(source, params, reply);
       }
 
+      case JsonRpcMethod.eth_sign:
       case JsonRpcMethod.eth_signTransaction:
       case JsonRpcMethod.eth_ecRecover:
-      case JsonRpcMethod.personal_ecRecover:
       case JsonRpcMethod.wallet_addEthereumChain:
-      case JsonRpcMethod.wallet_watchAsset: {
+      case JsonRpcMethod.wallet_watchAsset:
+      case JsonRpcMethod.wallet_registerOnboarding: {
         // TODO: Implement separate logic for this methods
         throw ethErrors.provider.unsupportedMethod();
       }
