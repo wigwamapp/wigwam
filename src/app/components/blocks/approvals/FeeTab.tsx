@@ -101,7 +101,7 @@ const FeeTab = memo<FeeTabProps>(
             averageFee={averageFee}
             value={feeMode}
             onValueChange={handleFeeModeChange}
-            className="mb-4"
+            className="mb-8"
           />
         )}
 
