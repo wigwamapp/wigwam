@@ -103,13 +103,11 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
 
-  const prevAccount = usePrevious(currentAccount);
-
   useEffect(() => {
-    if (prevAccount !== currentAccount && tokens[0]) {
+    if (tokens[0]) {
       setTokenSlug([tokens[0].tokenSlug, "replace"]);
     }
-  }, [currentAccount, prevAccount, setTokenSlug, tokens]);
+  }, [currentAccount, setTokenSlug, tokens]);
 
   return (
     <Select
