@@ -10,7 +10,6 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
-import BigNumber from "bignumber.js";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
@@ -33,6 +32,7 @@ import {
 } from "app/hooks";
 import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
+import { formatUnits } from "app/utils/txApprove";
 import TransactionHeader from "app/components/blocks/approvals/TransactionHeader";
 import TabsHeader from "app/components/blocks/approvals/TabsHeader";
 import FeeTab from "app/components/blocks/approvals/FeeTab";
@@ -52,17 +52,8 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
   error: "Error",
 };
 
-export const FEE_MODE_NAMES: Record<
-  FeeMode,
-  { icon: ReactNode; name: ReactNode }
-> = {
-  low: { icon: "🐌", name: "Eco" },
-  average: { icon: "🥑", name: "Market" },
-  high: { icon: "💨", name: "ASAP" },
-};
-
 type TabValue = typeof TAB_VALUES[number];
-export type Tx = ethers.utils.UnsignedTransaction;
+type Tx = ethers.utils.UnsignedTransaction;
 
 type ApproveTransactionProps = {
   approval: TransactionApproval;
@@ -105,6 +96,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const [prepared, setPrepared] = useState<{
     tx: Tx;
+    estimatedGasLimit: ethers.BigNumber;
     fees: FeeSuggestions | null;
     destinationIsContract: boolean;
   }>();
@@ -159,6 +151,20 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }
   }, [finalTx]);
 
+  const averageFee = useMemo(() => {
+    if (!finalTx || !prepared?.estimatedGasLimit) return null;
+
+    try {
+      const gasLimit = prepared.estimatedGasLimit.lt(finalTx.gasLimit!)
+        ? prepared.estimatedGasLimit
+        : finalTx.gasLimit;
+      const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
+      return ethers.BigNumber.from(gasLimit).mul(gasPrice!);
+    } catch {
+      return null;
+    }
+  }, [finalTx, prepared?.estimatedGasLimit]);
+
   const withThrottle = useMemo(createOrganicThrottle, []);
 
   const estimateTx = useCallback(
@@ -203,6 +209,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   ? ethers.BigNumber.from(gasLimit)
                   : averageGasLimit,
             },
+            estimatedGasLimit,
             fees: feeSuggestions,
             destinationIsContract,
           });
@@ -341,11 +348,13 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   <DetailsTab
                     accountAddress={accountAddress}
                     fees={fees}
+                    averageGasLimit={prepared.estimatedGasLimit}
                     gasLimit={ethers.BigNumber.from(
-                      txOverrides.gasLimit ?? originTx.gasLimit!
+                      txOverrides.gasLimit || originTx.gasLimit!
                     )}
                     feeMode={feeMode}
                     maxFee={maxFee}
+                    averageFee={averageFee}
                     action={action}
                     source={source}
                     onFeeButtonClick={() => setTabValue("fee")}
@@ -359,9 +368,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     accountAddress={accountAddress}
                     originTx={originTx}
                     fees={fees ?? null}
+                    averageGasLimit={prepared?.estimatedGasLimit ?? null}
                     feeMode={feeMode}
                     setFeeMode={setFeeMode}
                     maxFee={maxFee}
+                    averageFee={averageFee}
                     overrides={txOverrides}
                     onOverridesChange={setTxOverrides}
                   />
@@ -415,37 +426,3 @@ const Loading: FC = () => (
 function bnify(v?: ethers.BigNumberish) {
   return v !== undefined ? ethers.BigNumber.from(v) : undefined;
 }
-
-export function formatUnits(
-  v?: ethers.BigNumberish,
-  unit: ethers.BigNumberish = 0
-) {
-  if (!v && v !== 0) return "";
-  return ethers.utils.formatUnits(v, unit);
-}
-
-export function parseUnits(v: string, unit: ethers.BigNumberish = 0) {
-  try {
-    return ethers.utils.parseUnits(v, unit);
-  } catch {
-    return "";
-  }
-}
-
-export const prepareAmountOnChange = ({
-  value,
-  decimals = 9,
-  operator = "plus",
-}: {
-  value: BigNumber.Value;
-  decimals?: number;
-  operator?: "plus" | "minus";
-}) => {
-  const preparedValue = new BigNumber(value);
-  const valueToChange = new BigNumber(1).multipliedBy(
-    new BigNumber(10).pow(decimals)
-  );
-  const finalValue = preparedValue[operator](valueToChange);
-
-  return finalValue.gt(0) ? ethers.BigNumber.from(finalValue.toString()) : 0;
-};

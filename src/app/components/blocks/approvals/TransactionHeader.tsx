@@ -84,7 +84,7 @@ const TxAction: FC<TxActionProps> = ({ action, source, className }) => {
   if (source.type === "self") {
     return (
       <div className={classNames(cardClassName, className)}>
-        <span className="block w-6 h-6 flex items-center justify-center mr-2">
+        <span className="w-6 h-6 flex items-center justify-center mr-2">
           <ActivityIcon
             Icon={SendIcon}
             className="!w-5 !h-5 glass-icon--active"

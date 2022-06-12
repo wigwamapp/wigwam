@@ -1,15 +1,17 @@
 import { Dispatch, memo, SetStateAction, useCallback, useMemo } from "react";
 import { ethers } from "ethers";
 
-import LongTextField from "app/components/elements/LongTextField";
-import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
-import TabHeader from "app/components/elements/approvals/TabHeader";
 import {
   formatUnits,
   parseUnits,
   prepareAmountOnChange,
-  Tx,
-} from "app/components/screens/approvals/Transaction";
+} from "app/utils/txApprove";
+
+import LongTextField from "app/components/elements/LongTextField";
+import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
+import TabHeader from "app/components/elements/approvals/TabHeader";
+
+type Tx = ethers.utils.UnsignedTransaction;
 
 type AdvancedTabProps = {
   originTx: Tx;

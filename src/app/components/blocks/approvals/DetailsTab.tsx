@@ -14,6 +14,7 @@ import {
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { TippySingletonProvider, useLazyNetwork, useToken } from "app/hooks";
+import { CUSTOM_FEE_MODE, FEE_MODE_NAMES } from "app/utils/txApprove";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
@@ -21,7 +22,6 @@ import HashPreview from "app/components/elements/HashPreview";
 import IconedButton from "app/components/elements/IconedButton";
 import SmallContactCard from "app/components/elements/SmallContactCard";
 import AssetLogo from "app/components/elements/AssetLogo";
-import { FEE_MODE_NAMES } from "app/components/screens/approvals/Transaction";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
@@ -36,7 +36,9 @@ const DetailsTab: FC<DetailsTabProps> = ({
   accountAddress,
   fees,
   gasLimit,
+  averageGasLimit,
   maxFee,
+  averageFee,
   feeMode,
   action,
   source,
@@ -69,7 +71,9 @@ const DetailsTab: FC<DetailsTabProps> = ({
         accountAddress={accountAddress}
         fees={fees}
         gasLimit={gasLimit}
+        averageGasLimit={averageGasLimit}
         maxFee={maxFee}
+        averageFee={averageFee}
         feeMode={feeMode}
         onClick={onFeeButtonClick}
       />
@@ -101,7 +105,9 @@ type FeeButton = {
   accountAddress: string;
   fees: FeeSuggestions;
   gasLimit: ethers.BigNumber;
+  averageGasLimit: ethers.BigNumber;
   maxFee: ethers.BigNumber | null;
+  averageFee: ethers.BigNumber | null;
   feeMode: FeeMode;
   onClick: () => void;
 };
@@ -109,18 +115,31 @@ type FeeButton = {
 const FeeButton: FC<FeeButton> = ({
   accountAddress,
   gasLimit,
+  averageGasLimit,
   fees,
   maxFee,
+  averageFee,
   feeMode,
   onClick,
 }) => {
+  gasLimit = useMemo(
+    () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
+    [averageGasLimit, gasLimit]
+  );
+
   const nativeToken = useToken(accountAddress);
-  const modeMaxFee = gasLimit.mul(fees.modes[feeMode].max).toString();
-  const usdAmount = nativeToken?.priceUSD
-    ? new BigNumber(modeMaxFee)
-        .div(new BigNumber(10).pow(nativeToken.decimals))
-        .multipliedBy(nativeToken.priceUSD)
-    : new BigNumber(0);
+
+  const averageFeeBN = averageFee && new BigNumber(averageFee.toString());
+  const modeFee = gasLimit.mul(fees.modes[feeMode].max).toString();
+
+  const isCustomMode = !averageFeeBN?.eq(modeFee);
+
+  const usdAmount =
+    nativeToken?.priceUSD && averageFeeBN
+      ? averageFeeBN
+          .div(new BigNumber(10).pow(nativeToken.decimals))
+          .multipliedBy(nativeToken.priceUSD)
+      : new BigNumber(0);
 
   return (
     <button
@@ -145,22 +164,25 @@ const FeeButton: FC<FeeButton> = ({
           )}
         >
           Network fee
-          <span className="ml-auto flex items-center">
-            <PrettyAmount
-              amount={modeMaxFee}
-              currency={nativeToken?.symbol}
-              decimals={nativeToken?.decimals}
-              threeDots={false}
-              className=""
-            />
-            <Dot />
-            <FiatAmount amount={usdAmount} threeDots={false} className="" />
-          </span>
+          {averageFeeBN && (
+            <span className="ml-auto flex items-center">
+              <PrettyAmount
+                amount={averageFeeBN}
+                currency={nativeToken?.symbol}
+                decimals={nativeToken?.decimals}
+                threeDots={false}
+                className=""
+              />
+              <Dot />
+              <FiatAmount amount={usdAmount} threeDots={false} className="" />
+            </span>
+          )}
         </span>
         <span
           className={classNames("flex items-center justify-between", "text-xs")}
         >
-          <FeeModeLabel feeMode={feeMode} />
+          <FeeModeLabel feeMode={isCustomMode ? "custom" : feeMode} />
+
           {maxFee && nativeToken && (
             <span>
               <span className="font-bold">Max fee:</span>
@@ -181,22 +203,27 @@ const FeeButton: FC<FeeButton> = ({
 };
 
 type FeeModeLabelProps = {
-  feeMode: FeeMode;
+  feeMode: FeeMode | "custom";
 };
 
-const FeeModeLabel: FC<FeeModeLabelProps> = ({ feeMode }) => (
-  <span
-    className={classNames(
-      "py-0.5 pl-1.5 pr-2.5",
-      "rounded-md",
-      "border border-brand-main/[.07] text-sm",
-      "flex items-center"
-    )}
-  >
-    <span className="mr-1.5 text-xs">{FEE_MODE_NAMES[feeMode].icon}</span>
-    <span className="-mt-px text-xs">{FEE_MODE_NAMES[feeMode].name}</span>
-  </span>
-);
+const FeeModeLabel: FC<FeeModeLabelProps> = ({ feeMode }) => {
+  const { icon, name } =
+    feeMode === "custom" ? CUSTOM_FEE_MODE : FEE_MODE_NAMES[feeMode];
+
+  return (
+    <span
+      className={classNames(
+        "py-0.5 pl-1.5 pr-2.5",
+        "rounded-md",
+        "border border-brand-main/[.07] text-sm",
+        "flex items-center"
+      )}
+    >
+      <span className="mr-1.5 text-xs">{icon}</span>
+      <span className="-mt-px text-xs">{name}</span>
+    </span>
+  );
+};
 
 type RecipientProps = {
   action: TxAction;
