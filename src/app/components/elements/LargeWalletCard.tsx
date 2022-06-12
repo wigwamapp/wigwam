@@ -5,6 +5,7 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Account } from "core/types";
 
 import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
+import { Page } from "app/nav";
 
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
@@ -15,7 +16,7 @@ import CopiableTooltip from "./CopiableTooltip";
 import TooltipIcon from "./TooltipIcon";
 import WalletName from "./WalletName";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { ReactComponent as SettingsIcon } from "app/icons/setting-general.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
@@ -125,19 +126,17 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
                       href={`${explorerUrl}/address/${address}`}
                       aria-label="View wallet in Explorer"
                       Icon={WalletExplorerIcon}
-                      className="!w-6 !h-6"
+                      className="!w-6 !h-6 mr-2"
                       iconClassName="!w-[1.125rem]"
                     />
                   )}
-                  {explorerUrl && (
-                    <IconedButton
-                      href={`${explorerUrl}/address/${address}`}
-                      aria-label="View wallet activity"
-                      Icon={ClockIcon}
-                      className="!w-6 !h-6 ml-2"
-                      iconClassName="!w-[1.125rem]"
-                    />
-                  )}
+                  <IconedButton
+                    aria-label="Edit wallet"
+                    Icon={SettingsIcon}
+                    to={{ page: Page.Wallets }}
+                    className="!w-6 !h-6"
+                    iconClassName="!w-[1.125rem]"
+                  />
                 </div>
                 {portfolioBalance && (
                   <Balance
