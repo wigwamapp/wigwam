@@ -333,6 +333,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           currentValue={tabValue}
           names={TAB_NAMES}
           withError={lastError}
+          oneSuccess={Boolean(prepared)}
         />
 
         <OverflowProvider>
@@ -398,7 +399,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                 {lastError && (
                   <LongTextField
                     readOnly
-                    value={lastError?.message || "Unknown error."}
+                    textareaClassName="!h-48"
+                    value={
+                      lastError?.reason ||
+                      lastError?.message ||
+                      "Unknown error."
+                    }
                   />
                 )}
               </Tabs.Content>
