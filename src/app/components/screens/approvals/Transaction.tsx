@@ -339,6 +339,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               <Tabs.Content value="details">
                 {fees && originTx && action && (
                   <DetailsTab
+                    accountAddress={accountAddress}
                     fees={fees}
                     gasLimit={ethers.BigNumber.from(
                       txOverrides.gasLimit ?? originTx.gasLimit!
@@ -355,6 +356,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               <Tabs.Content value="fee">
                 {originTx ? (
                   <FeeTab
+                    accountAddress={accountAddress}
                     originTx={originTx}
                     fees={fees ?? null}
                     feeMode={feeMode}

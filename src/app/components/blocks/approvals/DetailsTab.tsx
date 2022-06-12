@@ -13,11 +13,7 @@ import {
 } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import {
-  TippySingletonProvider,
-  useAccountToken,
-  useLazyNetwork,
-} from "app/hooks";
+import { TippySingletonProvider, useLazyNetwork, useToken } from "app/hooks";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
@@ -30,12 +26,14 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
+  accountAddress: string;
   action: TxAction;
   source: ActivitySource;
   onFeeButtonClick: () => void;
 };
 
 const DetailsTab: FC<DetailsTabProps> = ({
+  accountAddress,
   fees,
   gasLimit,
   maxFee,
@@ -49,6 +47,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
     () => action.type === TxActionType.TokenApprove && !action.clears,
     [action]
   );
+
   return (
     <>
       <TabHeader className={withDescription ? "!mb-1" : ""}>
@@ -67,6 +66,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
         </p>
       )}
       <FeeButton
+        accountAddress={accountAddress}
         fees={fees}
         gasLimit={gasLimit}
         maxFee={maxFee}
@@ -74,7 +74,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
         onClick={onFeeButtonClick}
       />
       <Recipient action={action} />
-      <Tokens action={action} />
+      <Tokens accountAddress={accountAddress} action={action} />
     </>
   );
 };
@@ -98,6 +98,7 @@ const getTabHeader = (action: TxAction) => {
 };
 
 type FeeButton = {
+  accountAddress: string;
   fees: FeeSuggestions;
   gasLimit: ethers.BigNumber;
   maxFee: ethers.BigNumber | null;
@@ -106,13 +107,14 @@ type FeeButton = {
 };
 
 const FeeButton: FC<FeeButton> = ({
+  accountAddress,
   gasLimit,
   fees,
   maxFee,
   feeMode,
   onClick,
 }) => {
-  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
+  const nativeToken = useToken(accountAddress);
   const modeMaxFee = gasLimit.mul(fees.modes[feeMode].max).toString();
   const usdAmount = nativeToken?.priceUSD
     ? new BigNumber(modeMaxFee)
@@ -266,10 +268,11 @@ const getRecipientAddress = (action: TxAction) => {
 };
 
 type TokensProps = {
+  accountAddress: string;
   action: TxAction;
 };
 
-const Tokens: FC<TokensProps> = ({ action }) => {
+const Tokens: FC<TokensProps> = ({ accountAddress, action }) => {
   const currentNetwork = useLazyNetwork();
   const tokens = useMemo(() => getTokens(action), [action]);
 
@@ -299,6 +302,7 @@ const Tokens: FC<TokensProps> = ({ action }) => {
           {tokens.map((token, i) => (
             <Token
               key={token.slug}
+              accountAddress={accountAddress}
               token={token}
               className={classNames(i !== tokens.length - 1 && "mb-2")}
             />
@@ -346,67 +350,72 @@ type Token = {
 };
 
 type TokenProps = {
+  accountAddress: string;
   token: Token;
   className?: string;
 };
 
-const Token = memo<TokenProps>(({ token: { slug, amount }, className }) => {
-  const tokenInfo = useAccountToken(slug);
+const Token = memo<TokenProps>(
+  ({ accountAddress, token: { slug, amount }, className }) => {
+    const tokenInfo = useToken(accountAddress, slug);
 
-  if (!tokenInfo) return null;
+    if (!tokenInfo) return null;
 
-  const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
+    const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
 
-  const usdAmount = amount
-    ? new BigNumber(amount)
-        .div(new BigNumber(10).pow(decimals))
-        .multipliedBy(priceUSD ?? 1)
-    : null;
+    const usdAmount = amount
+      ? new BigNumber(amount)
+          .div(new BigNumber(10).pow(decimals))
+          .multipliedBy(priceUSD ?? 1)
+      : null;
 
-  return (
-    <div className={classNames("flex items-center", className)}>
-      <AssetLogo
-        asset={tokenInfo}
-        alt={name}
-        className="w-4 h-4 min-w-[.25rem]"
-      />
-      {amount !== undefined &&
-      new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
-        <>
-          <PrettyAmount
-            amount={amount}
-            decimals={decimals}
-            currency={symbol}
-            threeDots={false}
-            copiable
-            className="text-sm font-bold ml-2"
-          />
-          {usdAmount !== undefined && (
-            <>
-              <Dot />
-              <FiatAmount
-                amount={usdAmount}
-                threeDots={false}
-                copiable
-                className="text-sm text-brand-inactivedark"
-              />
-            </>
-          )}
-        </>
-      ) : (
-        <span className="text-sm font-bold ml-2">
-          {amount !== undefined &&
-            new BigNumber(amount).gte(new BigNumber(10).pow(decimals + 12)) && (
+    return (
+      <div className={classNames("flex items-center", className)}>
+        <AssetLogo
+          asset={tokenInfo}
+          alt={name}
+          className="w-4 h-4 min-w-[.25rem]"
+        />
+        {amount !== undefined &&
+        new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
+          <>
+            <PrettyAmount
+              amount={amount}
+              decimals={decimals}
+              currency={symbol}
+              threeDots={false}
+              copiable
+              className="text-sm font-bold ml-2"
+            />
+            {usdAmount !== undefined && (
               <>
-                <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+                <Dot />
+                <FiatAmount
+                  amount={usdAmount}
+                  threeDots={false}
+                  copiable
+                  className="text-sm text-brand-inactivedark"
+                />
               </>
             )}
-          {symbol}
-        </span>
-      )}
-    </div>
-  );
-});
+          </>
+        ) : (
+          <span className="text-sm font-bold ml-2">
+            {amount !== undefined &&
+              new BigNumber(amount).gte(
+                new BigNumber(10).pow(decimals + 12)
+              ) && (
+                <>
+                  <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+                </>
+              )}
+            {symbol}
+          </span>
+        )}
+      </div>
+    );
+  }
+);
 
 const Dot: FC = () => (
   <span className="flex items-center justify-center p-2">

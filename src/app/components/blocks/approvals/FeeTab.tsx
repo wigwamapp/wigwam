@@ -5,9 +5,8 @@ import { ethers } from "ethers";
 import classNames from "clsx";
 
 import { FEE_MODES, FeeMode, FeeSuggestions } from "core/types";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { useAccountToken, useChainId } from "app/hooks";
+import { useChainId, useToken } from "app/hooks";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
@@ -21,6 +20,7 @@ import {
 } from "app/components/screens/approvals/Transaction";
 
 type FeeTabProps = {
+  accountAddress: string;
   originTx: Tx;
   fees: FeeSuggestions | null;
   maxFee: ethers.BigNumber | null;
@@ -32,6 +32,7 @@ type FeeTabProps = {
 
 const FeeTab = memo<FeeTabProps>(
   ({
+    accountAddress,
     originTx: tx,
     overrides,
     onOverridesChange,
@@ -80,6 +81,7 @@ const FeeTab = memo<FeeTabProps>(
         <TabHeader tooltip="Edit network fee">Edit network fee</TabHeader>
         {fees && maxFee && (
           <FeeModeSelect
+            accountAddress={accountAddress}
             gasLimit={ethers.BigNumber.from(overrides.gasLimit ?? tx.gasLimit!)}
             fees={fees}
             maxFee={maxFee}
@@ -225,6 +227,7 @@ const FeeTab = memo<FeeTabProps>(
 export default FeeTab;
 
 type FeeModeSelectProps = {
+  accountAddress: string;
   gasLimit: ethers.BigNumber;
   fees: FeeSuggestions;
   maxFee: ethers.BigNumber;
@@ -234,7 +237,15 @@ type FeeModeSelectProps = {
 };
 
 const FeeModeSelect = memo<FeeModeSelectProps>(
-  ({ gasLimit, fees, maxFee, value, onValueChange, className }) => {
+  ({
+    accountAddress,
+    gasLimit,
+    fees,
+    maxFee,
+    value,
+    onValueChange,
+    className,
+  }) => {
     return (
       <ToggleGroup.Root
         type="single"
@@ -251,6 +262,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
           return (
             <FeeModeItem
               key={mode}
+              accountAddress={accountAddress}
               value={mode}
               fee={modeMaxFee}
               selected={modeMaxFee.eq(maxFee)}
@@ -263,13 +275,19 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
 );
 
 type FeeModeItemProps = {
+  accountAddress: string;
   value: FeeMode;
   fee: ethers.BigNumber;
   selected: boolean;
 };
 
-const FeeModeItem: FC<FeeModeItemProps> = ({ value, fee, selected }) => {
-  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
+const FeeModeItem: FC<FeeModeItemProps> = ({
+  accountAddress,
+  value,
+  fee,
+  selected,
+}) => {
+  const nativeToken = useToken(accountAddress);
 
   const usdAmount =
     fee && nativeToken?.priceUSD
