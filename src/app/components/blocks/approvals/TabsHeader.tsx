@@ -7,6 +7,7 @@ type TabsHeaderProps = {
   currentValue: string;
   names: Record<any, ReactNode>;
   withError?: boolean;
+  oneSuccess?: boolean;
 } & Tabs.TabsListProps;
 
 const TabsHeader: FC<TabsHeaderProps> = ({
@@ -14,6 +15,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
   currentValue,
   names,
   withError = false,
+  oneSuccess = true,
 }) => {
   const buttonsArrayRef = useRef<{ [key: string]: HTMLButtonElement }>({});
   const [backgroundState, setBackgroundState] = useState({
@@ -56,6 +58,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
 
         const active = value === currentValue;
         const last = i === arr.length - 1;
+        const disabled = !oneSuccess && withError && value !== "error";
 
         return (
           <Tabs.Trigger
@@ -80,10 +83,13 @@ const TabsHeader: FC<TabsHeaderProps> = ({
               "after:opacity-0 after:transition-opacity",
               !last && "mr-1",
               active && "font-bold",
-              !active && "hover:bg-brand-main/5 hover:after:opacity-100"
+              !active &&
+                !disabled &&
+                "hover:bg-brand-main/5 hover:after:opacity-100"
             )}
             data-text={names[value]}
             ref={(el) => addToRefs(value, el)}
+            disabled={disabled}
           >
             {names[value]}
           </Tabs.Trigger>
