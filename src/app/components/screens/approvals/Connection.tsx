@@ -182,7 +182,6 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
                 Also to preview the balances of the wallets to select them.
               </p>
             }
-            maxWidth="14rem"
             interactive={false}
             placement="bottom-end"
             size="large"

@@ -1,6 +1,7 @@
 import { FC, ReactNode } from "react";
 import classNames from "clsx";
 
+import { OverflowProvider } from "app/hooks";
 import Button from "app/components/elements/Button";
 
 type ApprovalLayoutProps = {
@@ -21,36 +22,41 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
   approving,
   onApprove,
 }) => (
-  <div
-    className={classNames(
-      "h-screen flex flex-col",
-      "pt-8 pb-5 px-6",
-      className
+  <OverflowProvider>
+    {(ref) => (
+      <div
+        ref={ref}
+        className={classNames(
+          "h-screen flex flex-col",
+          "pt-8 pb-5 px-6",
+          className
+        )}
+      >
+        {children}
+
+        <div className="flex-1" />
+
+        <div className="grid grid-cols-2 gap-3 w-full mt-5">
+          <Button
+            theme="secondary"
+            className="w-full"
+            onClick={() => onApprove?.(false)}
+          >
+            {declineText}
+          </Button>
+
+          <Button
+            className="w-full"
+            disabled={disabled}
+            loading={approving}
+            onClick={() => onApprove?.(true)}
+          >
+            {approveText}
+          </Button>
+        </div>
+      </div>
     )}
-  >
-    {children}
-
-    <div className="flex-1" />
-
-    <div className="grid grid-cols-2 gap-3 w-full mt-5">
-      <Button
-        theme="secondary"
-        className="w-full"
-        onClick={() => onApprove?.(false)}
-      >
-        {declineText}
-      </Button>
-
-      <Button
-        className="w-full"
-        disabled={disabled}
-        loading={approving}
-        onClick={() => onApprove?.(true)}
-      >
-        {approveText}
-      </Button>
-    </div>
-  </div>
+  </OverflowProvider>
 );
 
 export default ApprovalLayout;

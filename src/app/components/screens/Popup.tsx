@@ -207,7 +207,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 wallet, and then click Disconnect on the right.
               </p>
             }
-            placement="right"
+            placement="bottom-end"
             size="large"
             interactive={false}
           >
@@ -252,7 +252,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
               find and click the Connect button.
             </p>
           }
-          placement="right"
+          placement="bottom-end"
           size="large"
           interactive={false}
         >

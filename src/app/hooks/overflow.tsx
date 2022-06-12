@@ -1,32 +1,23 @@
-import {
-  FC,
-  createContext,
-  useRef,
-  RefObject,
-  useContext,
-  ReactNode,
-} from "react";
+import { FC, createContext, Ref, useContext, ReactNode, useState } from "react";
 
-type OverflowContextValue = RefObject<HTMLElement> | null;
+type OverflowContextValue = HTMLElement | null;
 
 const OverflowContext = createContext<OverflowContextValue>(null);
 
-export const useOverflowRef = () => {
-  const ctx = useContext(OverflowContext);
-
-  return ctx ?? undefined;
-};
+export const useOverflowElement = () => useContext(OverflowContext);
 
 type OverflowProviderProps = {
-  children: (ref: RefObject<any>) => ReactNode;
+  children: (ref: Ref<any>) => ReactNode;
 };
 
 export const OverflowProvider: FC<OverflowProviderProps> = ({ children }) => {
-  const overflowElementRef = useRef<HTMLElement>(null);
+  const [overflowElement, setOverflowElement] = useState<HTMLElement | null>(
+    null
+  );
 
   return (
-    <OverflowContext.Provider value={overflowElementRef}>
-      {children(overflowElementRef)}
+    <OverflowContext.Provider value={overflowElement}>
+      {children(setOverflowElement)}
     </OverflowContext.Provider>
   );
 };
