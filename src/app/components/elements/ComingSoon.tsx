@@ -30,6 +30,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
         className={classNames(
           size === "large" && "w-[33.5rem] h-[14.25rem]",
           size === "medium" && "w-[29rem] h-[12.3358rem]",
+          size === "small" && "w-[18.9675rem] h-[8.068125rem]",
           size === "extra-small" && "w-[18rem] h-[7.6567rem]",
           "h-auto"
         )}
