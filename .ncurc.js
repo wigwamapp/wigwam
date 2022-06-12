@@ -10,5 +10,6 @@ module.exports = {
     "final-form",
     "@types/async-retry",
     "typescript",
+    "nanoid",
   ],
 };
