@@ -25,7 +25,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   withAction,
   onChange,
   changeInternalChainId = true,
-  size,
+  size = "large",
 }) => {
   const currentNetwork = useLazyNetwork();
   const allNetworks = useLazyAllNetworks() ?? [];

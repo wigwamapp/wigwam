@@ -34,7 +34,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentNetwork,
   onNetworkChange,
   withAction = true,
-  size,
+  size = "large",
   className,
   currentItemClassName,
   currentItemIconClassName,

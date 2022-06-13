@@ -143,14 +143,10 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "flex items-center",
             "w-full",
-            size === "large" && "py-2.5 pl-5 pr-4",
-            size === "small" && "py-1.5 pl-3 pr-2",
-            size === "large" && "text-sm",
-            size === "small" && "text-xs",
+            size === "large" && "py-2.5 pl-5 pr-4 text-sm rounded-[.625rem]",
+            size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
             "font-bold",
             "bg-brand-main/5",
-            size === "large" && "rounded-[.625rem]",
-            size === "small" && "rounded-lg",
             currentItem &&
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
@@ -204,11 +200,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
               className={classNames(
                 "shadow-xs",
                 "focus-visible:outline-none",
-                size === "large" && "mt-2",
-                size === "small" && "mt-1.5",
+                size === "large" && "mt-2 min-w-[17.75rem]",
+                size === "small" && "mt-1.5 min-w-[10.5rem]",
                 "w-full",
-                size === "large" && "min-w-[17.75rem]",
-                size === "small" && "min-w-[10.5rem]",
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
