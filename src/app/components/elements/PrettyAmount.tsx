@@ -19,6 +19,7 @@ export type PrettyAmountProps = {
   isMinified?: boolean;
   isDecimalsMinified?: boolean;
   copiable?: boolean;
+  asSpan?: boolean;
   prefix?: ReactNode;
   threeDots?: boolean;
   className?: string;
@@ -33,6 +34,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     isMinified = false,
     isDecimalsMinified = false,
     copiable = false,
+    asSpan = false,
     prefix,
     threeDots = true,
     className,
@@ -203,6 +205,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           followCursor
           plugins={[followCursor]}
           asChild
+          asSpan={asSpan}
           className={className}
         >
           {children}

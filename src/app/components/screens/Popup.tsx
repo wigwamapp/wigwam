@@ -536,6 +536,7 @@ const AssetCard = memo(
                   copiable
                   className={"text-sm font-bold leading-5 ml-2"}
                   threeDots={false}
+                  asSpan
                   isDecimalsMinified
                 />
               )}
@@ -551,6 +552,7 @@ const AssetCard = memo(
                   "text-brand-inactivedark"
                 )}
                 copiable={!isManageMode}
+                asSpan
                 threeDots={false}
               />
               {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
@@ -587,6 +589,7 @@ const AssetCard = memo(
                   popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
                 )}
                 tabIndex={-1}
+                asSpan
               />
             </DropdownMenu.Trigger>
           ) : !nativeAsset ? (
