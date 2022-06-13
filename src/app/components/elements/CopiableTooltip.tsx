@@ -8,6 +8,7 @@ import Tooltip from "./Tooltip";
 type CopiableTooltipProps = ComponentProps<typeof Tooltip> & {
   textToCopy: string;
   copiedText?: string;
+  asSpan?: boolean;
   onCopiedToggle?: (state: boolean) => void;
 };
 
@@ -18,6 +19,7 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
   copiedText = "Copied",
   onCopiedToggle,
   children,
+  asSpan = false,
   className,
   ...rest
 }) => {
@@ -43,18 +45,42 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
       asChild
       missSingleton
     >
-      <button
-        type="button"
-        onPointerDown={(e) => e.preventDefault()}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          copy();
-        }}
-        className={classNames("cursor-pointer", className)}
-      >
-        {children}
-      </button>
+      {asSpan ? (
+        <span
+          role="button"
+          tabIndex={0}
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            copy();
+          }}
+          onKeyDown={(e) => {
+            const keyCode = e.keyCode;
+            if (keyCode === 32 || keyCode === 13) {
+              e.preventDefault();
+              e.stopPropagation();
+              copy();
+            }
+          }}
+          className={classNames("cursor-pointer", className)}
+        >
+          {children}
+        </span>
+      ) : (
+        <button
+          type="button"
+          onPointerDown={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            copy();
+          }}
+          className={classNames("cursor-pointer", className)}
+        >
+          {children}
+        </button>
+      )}
     </Tooltip>
   );
 };
