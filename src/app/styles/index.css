@@ -175,3 +175,12 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
     box-shadow: 0 5px 25px rgba(255, 0, 45, 0);
   }
 }
+
+/**
+ * React JSON View
+ */
+
+.react-json-view .variable-row,
+.react-json-view .object-key-val {
+  border-left: none !important;
+}

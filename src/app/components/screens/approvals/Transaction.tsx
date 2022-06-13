@@ -33,7 +33,7 @@ import {
 import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
 import { formatUnits } from "app/utils/txApprove";
-import TransactionHeader from "app/components/blocks/approvals/TransactionHeader";
+import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
 import TabsHeader from "app/components/blocks/approvals/TabsHeader";
 import FeeTab from "app/components/blocks/approvals/FeeTab";
 import AdvancedTab from "app/components/blocks/approvals/AdvancedTab";
@@ -318,7 +318,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       approving={approving}
       className="!pt-7"
     >
-      <TransactionHeader account={account} action={action} source={source} />
+      <ApprovalHeader account={account} source={source} />
 
       <Tabs.Root
         defaultValue="details"

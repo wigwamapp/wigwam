@@ -2,11 +2,7 @@ import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
 import browser from "webextension-polyfill";
 
-import {
-  Account,
-  ActivitySource,
-  TxAction as TxActionPrimitive,
-} from "core/types";
+import { Account, ActivitySource } from "core/types";
 import { getNetworkIconUrl } from "fixtures/networks";
 
 import { useLazyNetwork } from "app/hooks";
@@ -18,30 +14,39 @@ import Avatar from "app/components/elements/Avatar";
 import { ActivityIcon } from "app/components/blocks/ActivityBar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
+import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
 
-type TransactionHeaderProps = {
+type ApprovalHeaderProps = {
   account: Account;
-  action: TxActionPrimitive | null;
   source: ActivitySource;
+  signing?: boolean;
+  className?: string;
 };
 
-const TransactionHeader: FC<TransactionHeaderProps> = ({
+const ApprovalHeader: FC<ApprovalHeaderProps> = ({
   account,
-  action,
   source,
+  signing,
+  className,
 }) => {
   return (
-    <div className="flex">
-      <WalletCard account={account} />
+    <div className={classNames("flex", className)}>
+      <WalletCard account={account} signing={signing} />
+
       <div className="flex flex-col pl-2 w-1/2">
-        <TxAction action={action} source={source} className="h-1/2 mb-1" />
-        <NetworkPreview className="h-1/2" />
+        <ActSource source={source} className="h-1/2 mb-1" />
+
+        {signing ? (
+          <SigningPreview className="h-1/2" />
+        ) : (
+          <NetworkPreview className="h-1/2" />
+        )}
       </div>
     </div>
   );
 };
 
-export default TransactionHeader;
+export default ApprovalHeader;
 
 const cardClassName = classNames(
   "flex items-center",
@@ -52,13 +57,12 @@ const cardClassName = classNames(
   "rounded-[.625rem]"
 );
 
-type TxActionProps = {
-  action: TxActionPrimitive | null;
+type ActSourceProps = {
   source: ActivitySource;
   className?: string;
 };
 
-const TxAction: FC<TxActionProps> = ({ action, source, className }) => {
+const ActSource: FC<ActSourceProps> = ({ source, className }) => {
   const handleLinkClick = useCallback(async () => {
     try {
       if (source.type === "page") {
@@ -76,10 +80,6 @@ const TxAction: FC<TxActionProps> = ({ action, source, className }) => {
       console.error(e);
     }
   }, [source]);
-
-  if (!action) {
-    return null;
-  }
 
   if (source.type === "self") {
     return (
@@ -122,9 +122,10 @@ const TxAction: FC<TxActionProps> = ({ action, source, className }) => {
 
 type WalletCardProps = {
   account: Account;
+  signing?: boolean;
 };
 
-const WalletCard: FC<WalletCardProps> = ({ account }) => (
+const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
   <div
     className={classNames(
       "relative",
@@ -147,13 +148,24 @@ const WalletCard: FC<WalletCardProps> = ({ account }) => (
         "rounded-[.625rem]"
       )}
     />
-    <span className="flex flex-col min-w-0 text-sm leading-none">
-      <WalletName wallet={account} theme="small" />
+    <span
+      className={classNames(
+        "flex flex-col min-w-0 text-sm leading-none",
+        signing && "justify-center"
+      )}
+    >
+      <WalletName
+        wallet={account}
+        theme="small"
+        className={classNames(signing && "mb-1")}
+      />
       <HashPreview
         hash={account.address}
         className="text-xs leading-none text-brand-inactivedark"
       />
-      <Balance address={account.address} className="font-bold mt-auto" />
+      {!signing && (
+        <Balance address={account.address} className="font-bold mt-auto" />
+      )}
     </span>
   </div>
 );
@@ -163,14 +175,23 @@ const NetworkPreview = memo<{ className?: string }>(({ className }) => {
 
   return (
     <div className={classNames(cardClassName, className)}>
-      <Avatar
-        src={network && getNetworkIconUrl(network.chainId)}
-        alt={network?.name}
-        withBorder={false}
-        className="w-6 mr-2"
-      />
+      {network && (
+        <Avatar
+          src={network && getNetworkIconUrl(network.chainId)}
+          alt={network?.name}
+          withBorder={false}
+          className="w-6 mr-2"
+        />
+      )}
 
       {network?.name}
     </div>
   );
 });
+
+const SigningPreview = memo<{ className?: string }>(({ className }) => (
+  <div className={classNames(cardClassName, className)}>
+    <SigningIcon className="h-6 w-6 mr-2" />
+    Signing
+  </div>
+));

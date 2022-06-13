@@ -59,7 +59,7 @@ export function startPageServer() {
 
           params = {
             chainId: perm.chainId,
-            accountAddress,
+            accountAddress: accountAddress?.toLowerCase(),
           };
         } else {
           const internalChainId = await loadInternalChainId();
