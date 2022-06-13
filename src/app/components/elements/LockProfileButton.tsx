@@ -40,9 +40,9 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
                   )}
                 >
                   Are you sure you want to lock the wallet? You have{" "}
-                  {approvalsAmount} transaction{approvalsAmount > 1 ? "s" : ""}{" "}
-                  waiting for approvals. If you lock the wallet now,
-                  transactions will be cleared!
+                  {approvalsAmount} request{approvalsAmount > 1 ? "s" : ""}{" "}
+                  waiting for approvals. If you lock the wallet now, all
+                  requests will be cleared!
                 </p>
               ),
               yesButtonText: "Lock",
