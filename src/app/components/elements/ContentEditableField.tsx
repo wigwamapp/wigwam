@@ -29,6 +29,7 @@ const ContentEditableField = forwardRef<
       onChange,
       value,
       disabled,
+      onBlur,
       label,
       labelActions,
       textareaClassName,
@@ -73,6 +74,7 @@ const ContentEditableField = forwardRef<
               const value = evt.currentTarget.textContent || null;
               onChange?.({ target: { value } } as any);
             }}
+            onBlur={onBlur}
             className={classNames(
               "w-full",
               "h-28",

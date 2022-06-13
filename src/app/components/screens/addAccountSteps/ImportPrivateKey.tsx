@@ -63,7 +63,7 @@ const ImportPrivateKey = memo(() => {
                 name="privateKey"
                 validate={required}
                 format={(value) =>
-                  value ? value.replace(/\n/g, " ").trim() : ""
+                  value ? value.replace(/\s\s+/g, "").trim() : ""
                 }
                 formatOnBlur
               >
