@@ -66,7 +66,7 @@ const ContentEditableField = forwardRef<
           )}
         </div>
 
-        <div className="relative w-full">
+        <div className="relative w-full group">
           <div
             ref={mergeRefs([innerRef, ref])}
             contentEditable
@@ -86,6 +86,7 @@ const ContentEditableField = forwardRef<
               "rounded-[.625rem]",
               "overflow-auto",
               "outline-none",
+              "transition-colors",
               error && "!border-brand-redobject",
               !disabled && [
                 "group-hover:bg-brand-main/5",
