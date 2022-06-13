@@ -36,7 +36,6 @@ import {
 } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { getPrettyDate } from "app/utils/getPrettyDate";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -542,6 +541,11 @@ const AssetInfo: FC = () => {
 
   const { copy, copied } = useCopyToClipboard(address);
 
+  const tokenActivityKey = useMemo(
+    () => `${tokenSlug}-${chainId}`,
+    [chainId, tokenSlug]
+  );
+
   if (!tokenInfo) return null;
 
   const {
@@ -568,156 +572,158 @@ const AssetInfo: FC = () => {
         <ScrollAreaContainer
           ref={ref}
           hiddenScrollbar="horizontal"
-          className="w-[31.5rem] ml-6 pr-5 -mr-5 flex flex-col"
-          viewPortClassName="pb-20 pt-6 rounded-t-[.625rem] viewportBlock"
+          className="ml-6 pr-5 -mr-5 flex flex-col"
+          viewPortClassName="pb-20 pt-6 viewportBlock"
           scrollBarClassName="py-0 pt-[20.375rem] pb-20"
           type="scroll"
         >
-          <div className="flex mb-5">
-            <AssetLogo
-              asset={tokenInfo}
-              alt={name}
-              className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
-            />
-            <div className="flex flex-col justify-between grow min-w-0">
-              <div className="flex items-center">
-                <h2
-                  className={classNames(
-                    "text-2xl font-bold",
-                    "mr-4",
-                    "truncate"
-                  )}
-                >
-                  {name}
-                </h2>
-                <TippySingletonProvider>
-                  <div className="ml-auto flex items-center">
-                    {status !== TokenStatus.Native && (
-                      <IconedButton
-                        aria-label={
-                          copied
-                            ? "Copied"
-                            : `Copy ${TokenStandardValue[standard]} token address`
-                        }
-                        Icon={copied ? SuccessIcon : CopyIcon}
-                        className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                        iconClassName="!w-[1.125rem]"
-                        onClick={copy}
-                      />
+          <div className="w-[31.5rem]">
+            <div className="flex mb-5">
+              <AssetLogo
+                asset={tokenInfo}
+                alt={name}
+                className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
+              />
+              <div className="flex flex-col justify-between grow min-w-0">
+                <div className="flex items-center">
+                  <h2
+                    className={classNames(
+                      "text-2xl font-bold",
+                      "mr-4",
+                      "truncate"
                     )}
-                    {explorerUrl && status !== TokenStatus.Native && (
-                      <IconedButton
-                        aria-label="View asset in Explorer"
-                        Icon={WalletExplorerIcon}
-                        className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                        iconClassName="!w-[1.125rem]"
-                        href={`${explorerUrl}/address/${address}`}
-                      />
+                  >
+                    {name}
+                  </h2>
+                  <TippySingletonProvider>
+                    <div className="ml-auto flex items-center">
+                      {status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label={
+                            copied
+                              ? "Copied"
+                              : `Copy ${TokenStandardValue[standard]} token address`
+                          }
+                          Icon={copied ? SuccessIcon : CopyIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          onClick={copy}
+                        />
+                      )}
+                      {explorerUrl && status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label="View asset in Explorer"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={`${explorerUrl}/address/${address}`}
+                        />
+                      )}
+                      {coinGeckoId && (
+                        <IconedButton
+                          aria-label="View asset in CoinGecko"
+                          Icon={CoinGeckoIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem]"
+                          iconClassName="!w-[1.125rem]"
+                          href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                        />
+                      )}
+                    </div>
+                  </TippySingletonProvider>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-base text-brand-gray leading-none mb-0.5">
+                    Price
+                  </span>
+                  <span className="flex items-center">
+                    <FiatAmount
+                      amount={priceUSD ?? 0}
+                      copiable
+                      className="text-lg font-bold leading-6 mr-3"
+                    />
+                    {priceUSDChange && (
+                      <PriceChange priceChange={priceUSDChange} isPercent />
                     )}
-                    {coinGeckoId && (
-                      <IconedButton
-                        aria-label="View asset in CoinGecko"
-                        Icon={CoinGeckoIcon}
-                        className="!w-6 !h-6 min-w-[1.5rem]"
-                        iconClassName="!w-[1.125rem]"
-                        href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
-                      />
-                    )}
-                  </div>
-                </TippySingletonProvider>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base text-brand-gray leading-none mb-0.5">
-                  Price
-                </span>
-                <span className="flex items-center">
-                  <FiatAmount
-                    amount={priceUSD ?? 0}
-                    copiable
-                    className="text-lg font-bold leading-6 mr-3"
-                  />
-                  {priceUSDChange && (
-                    <PriceChange priceChange={priceUSDChange} isPercent />
-                  )}
-                </span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div>
-            <div className="text-base text-brand-gray leading-none mb-3">
-              Balance
-            </div>
+            <div>
+              <div className="text-base text-brand-gray leading-none mb-3">
+                Balance
+              </div>
 
-            <div className="flex items-end">
-              <FiatAmount
-                amount={balanceUSD ?? 0}
-                copiable
-                className="text-[1.75rem] font-bold leading-none mr-4"
-              />
-              {priceUSDChange && (
-                <PriceChange
-                  priceChange={new BigNumber(priceUSDChange)
-                    .times(balanceUSD)
-                    .div(100)}
+              <div className="flex items-end">
+                <FiatAmount
+                  amount={balanceUSD ?? 0}
+                  copiable
+                  className="text-[1.75rem] font-bold leading-none mr-4"
                 />
-              )}
+                {priceUSDChange && (
+                  <PriceChange
+                    priceChange={new BigNumber(priceUSDChange)
+                      .times(balanceUSD)
+                      .div(100)}
+                  />
+                )}
+              </div>
+              <div className="mt-1">
+                <PrettyAmount
+                  amount={rawBalance ?? 0}
+                  decimals={decimals}
+                  currency={symbol}
+                  copiable
+                  className="text-lg text-brand-inactivelight"
+                />
+              </div>
             </div>
-            <div className="mt-1">
-              <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                currency={symbol}
-                copiable
-                className="text-lg text-brand-inactivelight"
-              />
-            </div>
-          </div>
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            <Button
-              to={{ page: Page.Transfer }}
-              merge={["token"]}
-              theme="secondary"
-              className="grow !py-2"
-            >
-              <SendIcon className="w-6 h-auto mr-2" />
-              Transfer
-            </Button>
-            <Button
-              to={{ page: Page.Swap }}
-              theme="secondary"
-              className="grow !py-2"
-            >
-              <SwapIcon className="w-6 h-auto mr-2" />
-              Swap
-            </Button>
-            {status === TokenStatus.Native && (
+            <div className="mt-6 grid grid-cols-3 gap-2">
               <Button
-                to={{
-                  page: Page.Receive,
-                  receive: ReceiveTabEnum.BuyWithCrypto,
-                }}
+                to={{ page: Page.Transfer }}
+                merge={["token"]}
                 theme="secondary"
                 className="grow !py-2"
               >
-                <BuyIcon className="w-6 h-auto mr-2" />
-                Buy
+                <SendIcon className="w-6 h-auto mr-2" />
+                Transfer
               </Button>
-            )}
+              <Button
+                to={{ page: Page.Swap }}
+                theme="secondary"
+                className="grow !py-2"
+              >
+                <SwapIcon className="w-6 h-auto mr-2" />
+                Swap
+              </Button>
+              {status === TokenStatus.Native && (
+                <Button
+                  to={{
+                    page: Page.Receive,
+                    receive: ReceiveTabEnum.BuyWithCrypto,
+                  }}
+                  theme="secondary"
+                  className="grow !py-2"
+                >
+                  <BuyIcon className="w-6 h-auto mr-2" />
+                  Buy
+                </Button>
+              )}
+            </div>
+
+            <TokenActivity key={tokenActivityKey} />
+
+            {/*{status !== TokenStatus.Native && (*/}
+            {/*  <div className="mt-6 max-w-[23.25rem]">*/}
+            {/*    <AddressField*/}
+            {/*      key={address}*/}
+            {/*      label="Token address"*/}
+            {/*      value={address}*/}
+            {/*      readOnly*/}
+            {/*      labelActions={standard ? <Tag standard={standard} /> : undefined}*/}
+            {/*    />*/}
+            {/*  </div>*/}
+            {/*)}*/}
           </div>
-
-          <TokenActivity key={tokenSlug} />
-
-          {/*{status !== TokenStatus.Native && (*/}
-          {/*  <div className="mt-6 max-w-[23.25rem]">*/}
-          {/*    <AddressField*/}
-          {/*      key={address}*/}
-          {/*      label="Token address"*/}
-          {/*      value={address}*/}
-          {/*      readOnly*/}
-          {/*      labelActions={standard ? <Tag standard={standard} /> : undefined}*/}
-          {/*    />*/}
-          {/*  </div>*/}
-          {/*)}*/}
         </ScrollAreaContainer>
       )}
     </OverflowProvider>
@@ -848,7 +854,7 @@ const TokenActivity: FC = () => {
           }
           key={activ.txHash}
           activity={activ}
-          className={classNames(i !== activity.length - 1 ? "border-b" : "")}
+          // className={classNames(i !== activity.length - 1 ? "border-b" : "")}
         />
       ))}
     </div>
@@ -956,7 +962,7 @@ const getActivityInfo = (activity: TokenActivityPrimitive) => {
       Icon: ActivityApproveIcon,
       prefix: null,
       amountClassName: classNames("text-brand-main"),
-      label: null,
+      label: "Approve to:",
     };
   }
 

@@ -1,5 +1,3 @@
-import { enUS, es, fr, it, ja, ko, uk, ru, zhCN, zhTW } from "date-fns/locale";
-
 export interface LocaleMeta {
   code: string;
   name: string;
@@ -43,18 +41,3 @@ export const DEFAULT_LOCALES_SEPARATORS: LocaleSeparators[] = [
 ];
 
 export const FALLBACK_LOCALE_SEPARATORS = DEFAULT_LOCALES_SEPARATORS[0];
-
-export const DEFAULT_LOCALES_FOR_DATES = [
-  { code: "en", locale: enUS, format: "dd MMM, yyyy" },
-  { code: "es", locale: es, format: "dd/mm/yyyy" },
-  { code: "fr", locale: fr, format: "dd/mm/yyyy" },
-  { code: "it", locale: it, format: "dd/mm/yyyy" },
-  { code: "ja", locale: ja, format: "yyyy-m-d" }, //yyyy年mm月dd日
-  { code: "ko", locale: ko, format: "yyyy-m-d" },
-  { code: "uk", locale: uk, format: "dd.mm.yyyy" },
-  { code: "ru", locale: ru, format: "dd.mm.yyyy" },
-  { code: "zh-CN", locale: zhCN, format: "yyyy-m-d" },
-  { code: "zh-TW", locale: zhTW, format: "yyyy-m-d" },
-];
-
-export const FALLBACK_LOCALES_FOR_DATES = DEFAULT_LOCALES_FOR_DATES[0];

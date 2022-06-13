@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import {
   DEFAULT_LOCALES_FOR_DATES,
   FALLBACK_LOCALES_FOR_DATES,
-} from "fixtures/locales";
+} from "fixtures/date-locales";
 
 import { currentLocaleAtom } from "app/atoms";
 
@@ -27,7 +27,7 @@ export const getPrettyDate = (
 ) => {
   const preparedDate = new Date(date);
 
-  const { locale, format: formatOption } =
+  const { locale } =
     DEFAULT_LOCALES_FOR_DATES.find((loc) => loc.code === currentLocaleCode) ??
     FALLBACK_LOCALES_FOR_DATES;
 
@@ -35,5 +35,5 @@ export const getPrettyDate = (
     return formatDistanceToNowStrict(preparedDate, { locale });
   }
 
-  return format(preparedDate, formatOption, { locale });
+  return format(preparedDate, "PP", { locale });
 };
