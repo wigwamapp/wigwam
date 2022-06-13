@@ -17,9 +17,10 @@ import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
-import { Page } from "app/nav";
+import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
 import {
   activeTabAtom,
@@ -34,7 +35,7 @@ import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
@@ -450,12 +451,9 @@ const AssetCard = memo(
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
 
-      const openLink = useCallback(
-        (page: Page) => {
-          openInTab({ page: page, token: asset.tokenSlug });
-        },
-        [asset.tokenSlug]
-      );
+      const openLink = useCallback((to: Record<string, unknown>) => {
+        openInTab(to);
+      }, []);
 
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
@@ -635,18 +633,39 @@ const AssetCard = memo(
             >
               <PopoverButton
                 Icon={InfoRoundIcon}
-                onClick={() => openLink(Page.Default)}
+                onClick={() =>
+                  openLink({ page: Page.Default, token: asset.tokenSlug })
+                }
               >
                 Info
               </PopoverButton>
               <PopoverButton
                 Icon={SendIcon}
-                onClick={() => openLink(Page.Transfer)}
+                onClick={() =>
+                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
+                }
               >
                 Transfer
               </PopoverButton>
-              <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
-              <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
+              <PopoverButton
+                Icon={SwapIcon}
+                onClick={() => openLink({ page: Page.Swap })}
+              >
+                Swap
+              </PopoverButton>
+              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
+                <PopoverButton
+                  Icon={BuyIcon}
+                  onClick={() =>
+                    openLink({
+                      page: Page.Receive,
+                      receive: ReceiveTabEnum.BuyWithCrypto,
+                    })
+                  }
+                >
+                  Buy
+                </PopoverButton>
+              )}
             </DropdownMenu.Content>
           )}
         </DropdownMenu.Root>
