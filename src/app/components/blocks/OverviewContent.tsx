@@ -73,6 +73,7 @@ import FiatAmount from "../elements/FiatAmount";
 import PriceArrow from "../elements/PriceArrow";
 import ComingSoon from "../elements/ComingSoon";
 import SmallContactCard from "../elements/SmallContactCard";
+import PrettyDate from "../elements/PrettyDate";
 
 const OverviewContent: FC = () => (
   <div className="flex min-h-0 grow">
@@ -940,7 +941,8 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
             )}
           </div>
           <div className="text-xs mt-1 text-brand-inactivedark">
-            {getPrettyDate(activity.timeAt)}
+            <PrettyDate date={activity.timeAt} />
+            {/*{getPrettyDate(activity.timeAt)}*/}
           </div>
         </div>
       </div>
