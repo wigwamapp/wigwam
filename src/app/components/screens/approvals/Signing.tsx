@@ -12,9 +12,10 @@ import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import { SigningApproval, SigningStandard } from "core/types";
+import { AccountSource, SigningApproval, SigningStandard } from "core/types";
 import { approveItem } from "core/client";
 import { useDialog } from "app/hooks/dialog";
+import { useLedger } from "app/hooks/ledger";
 
 import { allAccountsAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
@@ -42,6 +43,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
   );
 
   const { alert } = useDialog();
+  const withLedger = useLedger();
 
   const [initialLoading, setInitialLoading] = useState(true);
   const [approving, setApproving] = useState(false);
@@ -57,19 +59,96 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
 
       try {
         await withHumanDelay(async () => {
-          await approveItem(approval.id, { approved });
+          if (!approved || account.source !== AccountSource.Ledger) {
+            await approveItem(approval.id, { approved });
+            return;
+          }
+
+          let signedMessage: string | undefined;
+          let ledgerError: any;
+
+          await withLedger(async ({ ledgerEth }) => {
+            try {
+              let sig;
+
+              switch (approval.standard) {
+                case SigningStandard.PersonalSign:
+                  sig = await ledgerEth.signPersonalMessage(
+                    account.derivationPath,
+                    ethers.utils.hexlify(approval.message).substring(2)
+                  );
+                  break;
+
+                case SigningStandard.SignTypedDataV1:
+                case SigningStandard.SignTypedDataV3:
+                  throw new Error(
+                    "Ledger: Only version 4 of typed data signing is supported"
+                  );
+
+                case SigningStandard.SignTypedDataV4:
+                  let domainSeparatorHex, hashStructMessageHex;
+
+                  try {
+                    const { TypedDataUtils, SignTypedDataVersion } =
+                      await import("@metamask/eth-sig-util");
+
+                    const { domain, types, primaryType, message } =
+                      TypedDataUtils.sanitizeData(JSON.parse(approval.message));
+
+                    domainSeparatorHex = TypedDataUtils.hashStruct(
+                      "EIP712Domain",
+                      domain,
+                      types,
+                      SignTypedDataVersion.V4
+                    ).toString("hex");
+                    hashStructMessageHex = TypedDataUtils.hashStruct(
+                      primaryType as any,
+                      message,
+                      types,
+                      SignTypedDataVersion.V4
+                    ).toString("hex");
+                  } catch {
+                    throw new Error("Invalid message");
+                  }
+
+                  sig = await ledgerEth.signEIP712HashedMessage(
+                    account.derivationPath,
+                    domainSeparatorHex,
+                    hashStructMessageHex
+                  );
+                  break;
+              }
+
+              if (sig) {
+                signedMessage = ethers.utils.joinSignature({
+                  v: sig.v,
+                  r: "0x" + sig.r,
+                  s: "0x" + sig.s,
+                });
+              }
+            } catch (err) {
+              ledgerError = err;
+            }
+          });
+
+          if (signedMessage) {
+            await approveItem(approval.id, { approved, signedMessage });
+          } else {
+            throw ledgerError ?? new Error("Failed to sign with Ledger");
+          }
         });
       } catch (err: any) {
         console.error(err);
-        setApproving(false);
 
         alert({
           title: "Error",
           content: err?.message ?? "Unknown error occured",
         });
+      } finally {
+        setApproving(false);
       }
     },
-    [approval, setApproving, alert]
+    [approval, account, setApproving, alert]
   );
 
   const message = useMemo(() => {
