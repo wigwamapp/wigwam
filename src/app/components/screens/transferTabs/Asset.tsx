@@ -309,10 +309,11 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
   }, [nativeToken, values.gas]);
 
   if (
-    !nativeToken?.rawBalance ||
-    new BigNumber(nativeToken.rawBalance).lte(0) ||
-    new BigNumber(nativeToken.rawBalance).lt((values.gas ?? 0).toString()) ||
-    error
+    nativeToken &&
+    (!nativeToken.rawBalance ||
+      new BigNumber(nativeToken.rawBalance).lte(0) ||
+      new BigNumber(nativeToken.rawBalance).lt((values.gas ?? 0).toString()) ||
+      error)
   ) {
     return (
       <div
