@@ -6,9 +6,31 @@ import memoize from "mem";
 import { ActivitySource, TxParams } from "core/types";
 import { getNetwork } from "core/common";
 
+import { $accountAddresses } from "core/back/state";
+
 export function validatePermission(source: ActivitySource) {
   if (source.type === "page" && !source.permission) {
     throw ethErrors.provider.unauthorized();
+  }
+}
+
+export function validateAccount(
+  source: ActivitySource,
+  accountAddress: string
+) {
+  if (!(accountAddress && ethers.utils.isAddress(accountAddress))) {
+    throw ethErrors.rpc.invalidParams();
+  }
+
+  if (
+    source.type === "page" &&
+    !source.permission?.accountAddresses.includes(accountAddress)
+  ) {
+    throw ethErrors.provider.unauthorized();
+  }
+
+  if (!$accountAddresses.getState().includes(accountAddress)) {
+    throw ethErrors.rpc.resourceUnavailable();
   }
 }
 

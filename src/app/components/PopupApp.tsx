@@ -9,10 +9,12 @@ import { openInTab } from "app/helpers";
 import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
 import Popup from "./screens/Popup";
+import Dialog from "./blocks/Dialog";
 
 const PopupApp: FC = () => (
   <BaseProvider>
     <PopupRouter />
+    <Dialog small />
   </BaseProvider>
 );
 

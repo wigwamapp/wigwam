@@ -96,13 +96,35 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
 
   return (
     <SecondaryModal
-      header="Reveal secret phrase"
+      header={seedPhrase ? "Your Secret Phrase" : "Type password"}
       open={open}
       onOpenChange={onOpenChange}
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SecretField isDownloadable value={fromProtectedString(seedPhrase)} />
+        <>
+          <SecretField
+            label="Secret phrase"
+            isDownloadable
+            value={fromProtectedString(seedPhrase)}
+          />
+          <div
+            className={classNames(
+              "mt-4 w-full max-w-[27.5rem]",
+              "flex items-center",
+              "p-4",
+              "bg-brand-redobject/[.05]",
+              "border border-brand-redobject/[.8]",
+              "rounded-[.625rem]",
+              "text-sm"
+            )}
+          >
+            <span>
+              <strong>DO NOT share</strong> this set of words with anyone! It
+              can be used to steal all wallets belonging to this phrase.
+            </span>
+          </div>
+        </>
       ) : (
         <Form<FormValues>
           decorators={[focusOnErrors]}
@@ -127,6 +149,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                         meta.error ||
                         (!modifiedSinceLastSubmit && meta.submitError)
                       }
+                      autoFocus
                       {...input}
                     />
                   )}
@@ -137,7 +160,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                 className="mt-6 !min-w-[14rem]"
                 loading={submitting}
               >
-                Reveal
+                Reveal phrase
               </Button>
             </form>
           )}

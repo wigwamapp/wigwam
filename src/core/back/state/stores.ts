@@ -1,4 +1,5 @@
 import { createStore, combine } from "effector";
+import { ethErrors } from "eth-rpc-errors";
 
 import { WalletStatus, Approval, Account, ActivityType } from "core/types";
 import { getPageOrigin } from "core/common/permissions";
@@ -98,7 +99,17 @@ export const $approvals = createStore<Approval[]>([])
   .on(approvalResolved, (current, approvalId) =>
     current.filter((a) => a.id !== approvalId)
   )
-  .on(locked, () => []);
+  .on(locked, (current) => {
+    try {
+      current.forEach(({ rpcReply }) =>
+        rpcReply?.({
+          error: ethErrors.provider.userRejectedRequest(),
+        })
+      );
+    } catch {}
+
+    return [];
+  });
 
 export const $accountAddresses = $accounts.map((accounts) =>
   accounts.map((acc) => acc.address)

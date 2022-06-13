@@ -36,7 +36,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         <Dialog.Content
           className={classNames(
             "fixed z-20 w-full",
-            small ? "max-w-[23.5rem]" : "max-w-[43rem]",
+            small ? "max-w-[22.25rem]" : "max-w-[43rem]",
             small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
             "bg-brand-main/[.05]",
@@ -56,7 +56,11 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
           {header && (
             <h2
               className={classNames(
-                "mb-8 text-2xl text-center font-bold",
+                !small && "mb-8",
+                small && "mb-4",
+                !small && "text-2xl",
+                small && "text-xl",
+                "text-center font-bold",
                 headerClassName
               )}
             >

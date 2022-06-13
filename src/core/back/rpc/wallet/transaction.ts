@@ -4,12 +4,13 @@ import { nanoid } from "nanoid";
 import { assert as assertSchema } from "superstruct";
 import { assert } from "lib/system/assert";
 
-import { $accountAddresses, approvalAdded } from "core/back/state";
+import { approvalAdded } from "core/back/state";
 import { ActivitySource, ActivityType, RpcReply } from "core/types";
 
 import {
   validatePermission,
   validateNetwork,
+  validateAccount,
   TxParamsSchema,
 } from "./validation";
 
@@ -28,25 +29,18 @@ export async function requestTransaction(
     txParams = { ...rest, gasLimit: gas };
   }
 
+  let accountAddress: string;
+
   try {
+    accountAddress = ethers.utils.getAddress(txParams.from);
+
     assertSchema(txParams, TxParamsSchema);
     assert(txParams.to || txParams.data);
   } catch {
     throw ethErrors.rpc.invalidParams();
   }
 
-  const accountAddress = ethers.utils.getAddress(txParams.from);
-
-  if (
-    source.type === "page" &&
-    !source.permission?.accountAddresses.includes(accountAddress)
-  ) {
-    throw ethErrors.provider.unauthorized();
-  }
-
-  if (!$accountAddresses.getState().includes(accountAddress)) {
-    throw ethErrors.rpc.resourceUnavailable();
-  }
+  validateAccount(source, accountAddress);
 
   approvalAdded({
     id: nanoid(),

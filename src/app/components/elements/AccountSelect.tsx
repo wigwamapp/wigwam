@@ -128,6 +128,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
         content="Copy wallet address to clipboard"
         textToCopy={address}
         onCopiedToggle={setCopied}
+        asSpan
         className={classNames(
           "px-1 -my-1 mr-4",
           "text-left",
@@ -157,7 +158,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
       </CopiableTooltip>
       <span className="flex flex-col items-end ml-auto">
         <span className="inline-flex min-h-[1.25rem] mt-auto">
-          <Balance address={address} copiable className="font-bold" />
+          <Balance address={address} copiable asSpan className="font-bold" />
         </span>
         {portfolioBalance && (
           <Balance
@@ -165,6 +166,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
             isNative
             isMinified
             copiable
+            asSpan
             prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
             className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center mt-px"
           />

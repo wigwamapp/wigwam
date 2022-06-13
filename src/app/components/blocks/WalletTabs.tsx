@@ -138,6 +138,7 @@ const WalletTab: FC<WalletTabProps> = ({
         className
       )}
       onClick={onClick}
+      autoFocus={active}
     >
       <AutoIcon
         seed={address}

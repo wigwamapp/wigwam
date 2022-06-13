@@ -30,6 +30,7 @@ export async function processApprove(
     approved,
     rawTx,
     signedRawTx,
+    signedMessage,
     accountAddresses,
     overriddenChainId,
   }: ApprovalResult,
@@ -80,11 +81,7 @@ export async function processApprove(
 
           if (!signedRawTx) {
             accountAddress = ethers.utils.getAddress(accountAddress);
-
-            const account = $accounts
-              .getState()
-              .find((a) => a.address === accountAddress);
-            assert(account, "Account not found");
+            const account = getAccountSave(accountAddress);
 
             const signature = await vault.sign(account.uuid, keccak256(rawTx!));
             signedRawTx = serializeTransaction(tx, signature);
@@ -131,6 +128,21 @@ export async function processApprove(
           }
         }
       )
+      .with(
+        { type: ActivityType.Signing },
+        async ({ standard, accountAddress, message, rpcReply }) => {
+          if (signedMessage) {
+            rpcReply?.({ result: signedMessage });
+            return;
+          }
+
+          accountAddress = ethers.utils.getAddress(accountAddress);
+          const account = getAccountSave(accountAddress);
+
+          const signature = vault.signMessage(account.uuid, standard, message);
+          rpcReply?.({ result: signature });
+        }
+      )
       .otherwise(() => {
         throw new Error("Not Found");
       });
@@ -139,6 +151,15 @@ export async function processApprove(
   }
 
   approvalResolved(approvalId);
+}
+
+function getAccountSave(accountAddress: string) {
+  const account = $accounts
+    .getState()
+    .find((a) => a.address === accountAddress);
+  assert(account, "Account not found");
+
+  return account;
 }
 
 async function saveActivity(activity: Activity) {

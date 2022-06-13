@@ -13,6 +13,7 @@ export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   errorMessage?: string;
   tooltip?: ReactNode;
   tooltipProps?: TooltipProps;
+  hoverStyles?: boolean;
 };
 
 const LongTextField = memo(
@@ -33,6 +34,7 @@ const LongTextField = memo(
         className,
         textareaClassName,
         autoComplete = "off",
+        hoverStyles = true,
         ...rest
       },
       ref
@@ -81,10 +83,11 @@ const LongTextField = memo(
                 "placeholder-brand-placeholder",
                 "resize-none",
                 error && !readOnly && "!border-brand-redobject",
-                !disabled && [
-                  "group-hover:bg-brand-main/5",
-                  "group-hover:border-brand-main/5",
-                ],
+                !disabled &&
+                  hoverStyles && [
+                    "group-hover:bg-brand-main/5",
+                    "group-hover:border-brand-main/5",
+                  ],
                 "focus:border-brand-main/[.15]",
                 disabled && [
                   "bg-brand-disabledbackground/20",
