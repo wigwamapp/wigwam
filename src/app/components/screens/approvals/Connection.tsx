@@ -191,11 +191,11 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           </Tooltip>
 
           <NetworkSelect
-            className="ml-1.5"
+            className="ml-2"
             onChange={setLocalChainId}
             changeInternalChainId={false}
             withAction={false}
-            small
+            size="small"
           />
         </div>
         <Separator />
