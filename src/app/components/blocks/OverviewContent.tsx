@@ -574,7 +574,7 @@ const AssetInfo: FC = () => {
           hiddenScrollbar="horizontal"
           className="ml-6 pr-5 -mr-5 flex flex-col"
           viewPortClassName="pb-20 pt-6 viewportBlock"
-          scrollBarClassName="py-0 pt-[20.375rem] pb-20"
+          scrollBarClassName="py-0 pt-[18.75rem] pb-20"
           type="scroll"
         >
           <div className="w-[31.5rem]">
@@ -843,8 +843,8 @@ const TokenActivity: FC = () => {
   );
 
   return (
-    <div className="flex flex-col pt-5">
-      <h3 className="text-xl font-bold">Token activity</h3>
+    <div className="flex flex-col mt-5 pt-1 border-t border-brand-main/[.07]">
+      {/*<h3 className="text-xl font-bold">Token activity</h3>*/}
       {activity.map((activ, i) => (
         <TokenActivityCard
           ref={
