@@ -15,7 +15,8 @@ import IconedButton from "./IconedButton";
 
 type SmallContactCardProps = {
   address?: string;
-  notAddable?: boolean;
+  isAddable?: boolean;
+  addButton?: boolean;
   extended?: boolean;
   isSmall?: boolean;
   className?: string;
@@ -23,7 +24,8 @@ type SmallContactCardProps = {
 
 const SmallContactCard: FC<SmallContactCardProps> = ({
   address,
-  notAddable = false,
+  isAddable = true,
+  addButton = true,
   extended = false,
   isSmall = false,
   className,
@@ -56,7 +58,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   const contact = mergedAccounts[0];
 
   if (!contact) {
-    if (notAddable) {
+    if (!isAddable) {
       return null;
     }
 
@@ -64,11 +66,13 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
       return (
         <span className={classNames("flex items-center", className)}>
           <HashPreview hash={address} />
-          <IconedButton
-            Icon={PlusIcon}
-            onClick={() => upsertContact({ address })}
-            className="ml-2"
-          />
+          {addButton && (
+            <IconedButton
+              Icon={PlusIcon}
+              onClick={() => upsertContact({ address })}
+              className="ml-2"
+            />
+          )}
         </span>
       );
     }

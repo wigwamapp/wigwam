@@ -1,11 +1,13 @@
 import { FC } from "react";
-import { format, formatDistanceToNowStrict, isToday } from "date-fns";
 import { useAtomValue } from "jotai";
+import format from "date-fns/format";
+import formatDistanceToNowStrict from "date-fns/formatDistanceToNowStrict";
+import isToday from "date-fns/isToday";
 
 import {
   DEFAULT_LOCALES_FOR_DATES,
   FALLBACK_LOCALES_FOR_DATES,
-} from "fixtures/date-locales";
+} from "fixtures/dateLocales";
 
 import { currentLocaleAtom } from "app/atoms";
 
@@ -32,7 +34,7 @@ export const getPrettyDate = (
     FALLBACK_LOCALES_FOR_DATES;
 
   if (isToday(preparedDate)) {
-    return formatDistanceToNowStrict(preparedDate, { locale });
+    return formatDistanceToNowStrict(preparedDate, { locale, addSuffix: true });
   }
 
   return format(preparedDate, "PP", { locale });

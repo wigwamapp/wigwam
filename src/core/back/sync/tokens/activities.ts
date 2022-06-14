@@ -4,7 +4,12 @@ import BigNumber from "bignumber.js";
 import { ERC20__factory } from "abi-types";
 import { createQueue } from "lib/system/queue";
 
-import { AccountAsset, TokenActivity, TokenStandard } from "core/types";
+import {
+  AccountAsset,
+  TokenActivity,
+  TokenActivityBase,
+  TokenStandard,
+} from "core/types";
 import {
   createAccountTokenKey,
   createTokenActivityKey,
@@ -84,15 +89,27 @@ export const syncTokenActivities = memoize(
               receives,
               token_approve,
               time_at,
+              project_id,
             } of data.history_list) {
               const timeAt = time_at * 1_000;
-              const base = {
+              const base: Omit<TokenActivityBase, "type"> = {
                 chainId,
                 accountAddress,
                 tokenSlug,
                 txHash,
                 timeAt,
               };
+
+              if (project_id) {
+                const project = data.project_dict[project_id];
+                if (project) {
+                  base.project = {
+                    name: project.name,
+                    logoUrl: project.logo_url,
+                    siteUrl: project.site_url,
+                  };
+                }
+              }
 
               for (const send of sends) {
                 if (send.token_id === debankTokenId) {
