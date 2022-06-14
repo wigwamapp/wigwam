@@ -52,6 +52,7 @@ import {
   useTokenActivity,
 } from "app/hooks";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
+import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -910,9 +911,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
             <Icon className="w-5 h-5 opacity-75" />
           </div>
           <div className="flex flex-col items-start">
-            {new BigNumber(activity.amount ?? 0).gte(
-              new BigNumber(10).pow(tokenInfo?.decimals + 12)
-            ) ? (
+            {new BigNumber(activity.amount ?? 0).gte(LARGE_AMOUNT) ? (
               <span
                 className={classNames("text-base font-bold", amountClassName)}
               >
