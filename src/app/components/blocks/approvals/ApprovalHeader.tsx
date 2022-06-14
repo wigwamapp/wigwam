@@ -84,7 +84,7 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
   if (source.type === "self") {
     return (
       <div className={classNames(cardClassName, className)}>
-        <span className="w-6 h-6 flex items-center justify-center mr-2">
+        <span className="w-6 h-6 min-w-[1.5rem] flex items-center justify-center mr-2">
           <ActivityIcon
             Icon={SendIcon}
             className="!w-5 !h-5 glass-icon--active"
@@ -150,7 +150,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
     />
     <span
       className={classNames(
-        "flex flex-col min-w-0 text-sm leading-none",
+        "flex flex-col items-start min-w-0 text-sm leading-none",
         signing && "justify-center"
       )}
     >
@@ -164,7 +164,12 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
         className="text-xs leading-none text-brand-inactivedark"
       />
       {!signing && (
-        <Balance address={account.address} className="font-bold mt-auto" />
+        <Balance
+          address={account.address}
+          isMinified
+          copiable
+          className="font-bold mt-auto"
+        />
       )}
     </span>
   </div>
@@ -180,18 +185,18 @@ const NetworkPreview = memo<{ className?: string }>(({ className }) => {
           src={network && getNetworkIconUrl(network.chainId)}
           alt={network?.name}
           withBorder={false}
-          className="w-6 mr-2"
+          className="w-6 mr-2 min-w-[1.5rem]"
         />
       )}
 
-      {network?.name}
+      <span className="truncate min-w-0">{network?.name}</span>
     </div>
   );
 });
 
 const SigningPreview = memo<{ className?: string }>(({ className }) => (
   <div className={classNames(cardClassName, className)}>
-    <SigningIcon className="h-6 w-6 mr-2" />
+    <SigningIcon className="h-6 w-6 mr-2 min-w-[1.5rem]" />
     Signing
   </div>
 ));
