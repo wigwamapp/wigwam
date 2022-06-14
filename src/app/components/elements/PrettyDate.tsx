@@ -34,7 +34,7 @@ export const getPrettyDate = (
     FALLBACK_LOCALES_FOR_DATES;
 
   if (isToday(preparedDate)) {
-    return formatDistanceToNowStrict(preparedDate, { locale });
+    return formatDistanceToNowStrict(preparedDate, { locale, addSuffix: true });
   }
 
   return format(preparedDate, "PP", { locale });
