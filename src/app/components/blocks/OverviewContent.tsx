@@ -1035,7 +1035,7 @@ const getActivityInfo = (activity: TokenActivityPrimitive) => {
 
   return {
     Icon: ActivitySendIcon,
-    prefix: "",
+    prefix: "-",
     amountClassName: "",
     label: activity.project ? "Interaction" : "Transfer",
     anotherAddressLabel: "Recipient",
