@@ -44,6 +44,7 @@ export async function processApprove(
       .with(
         { type: ActivityType.Connection },
         async ({
+          type,
           source,
           returnSelectedAccount,
           preferredChainId,
@@ -68,12 +69,30 @@ export async function processApprove(
             ? accountAddresses[0]
             : wrapPermission(newPermission);
 
+          await saveActivity({
+            id: nanoid(),
+            type,
+            source,
+            returnSelectedAccount,
+            preferredChainId,
+            accountAddresses,
+            timeAt: Date.now(),
+            pending: 0,
+          });
+
           rpcReply?.({ result: [toReturn] });
         }
       )
       .with(
         { type: ActivityType.Transaction },
-        async ({ chainId, accountAddress, txParams, rpcReply, ...rest }) => {
+        async ({
+          type,
+          source,
+          chainId,
+          accountAddress,
+          txParams,
+          rpcReply,
+        }) => {
           assert(rawTx || signedRawTx, "Transaction not provided");
 
           const tx = parseTxSafe(rawTx ?? signedRawTx!);
@@ -106,13 +125,16 @@ export async function processApprove(
             await Promise.all([
               saveNonce(chainId, accountAddress, tx.nonce),
               saveActivity({
-                ...rest,
+                id: nanoid(),
+                type,
+                source,
                 chainId,
                 accountAddress,
                 txParams,
                 rawTx: rawTx!,
                 txHash,
                 timeAt: Date.now(),
+                pending: 1,
               }),
             ]);
 
@@ -130,7 +152,14 @@ export async function processApprove(
       )
       .with(
         { type: ActivityType.Signing },
-        async ({ standard, accountAddress, message, rpcReply }) => {
+        async ({
+          type,
+          source,
+          standard,
+          accountAddress,
+          message,
+          rpcReply,
+        }) => {
           if (signedMessage) {
             rpcReply?.({ result: signedMessage });
             return;
@@ -140,6 +169,18 @@ export async function processApprove(
           const account = getAccountSave(accountAddress);
 
           const signature = vault.signMessage(account.uuid, standard, message);
+
+          await saveActivity({
+            id: nanoid(),
+            type,
+            source,
+            standard,
+            accountAddress,
+            message,
+            timeAt: Date.now(),
+            pending: 0,
+          });
+
           rpcReply?.({ result: signature });
         }
       )
@@ -164,10 +205,7 @@ function getAccountSave(accountAddress: string) {
 
 async function saveActivity(activity: Activity) {
   try {
-    // const existing = await repo.activities.get(activity.id);
-    // if (existing) {
-
-    // }
+    // TODO: Add specific logic for speed-up or cancel tx
     await repo.activities.put(activity);
   } catch (err) {
     console.error(err);
