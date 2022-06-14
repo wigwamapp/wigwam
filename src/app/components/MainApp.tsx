@@ -1,5 +1,7 @@
 import { FC } from "react";
 
+import { ToastProvider } from "app/hooks/toast";
+
 import BaseProvider from "./BaseProvider";
 import FullScreenRouter from "./FullScreenRouter";
 import AddAccountModal from "./blocks/AddAccountModal";
@@ -8,9 +10,11 @@ import ContactsDialog from "./blocks/ContactsDialog";
 
 const MainApp: FC = () => (
   <BaseProvider>
-    <FullScreenRouter />
+    <ToastProvider>
+      <FullScreenRouter />
 
-    <Modals />
+      <Modals />
+    </ToastProvider>
   </BaseProvider>
 );
 

@@ -6,6 +6,7 @@ import { getNetworkIconUrl } from "fixtures/networks";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { useLazyAllNetworks } from "app/hooks";
+import { ToastOverflowProvider } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
@@ -94,7 +95,7 @@ const Networks: FC = () => {
           ))}
         </ScrollAreaContainer>
       </div>
-      {(selectedNetwork || tab === "new") && (
+      {selectedNetwork || tab === "new" ? (
         <EditNetwork
           key={selectedNetwork ? selectedNetwork.chainId : "new"}
           isNew={tab === "new"}
@@ -102,6 +103,10 @@ const Networks: FC = () => {
           onCancelHandler={cancelEditing}
           onActionFinished={handleScrollList}
         />
+      ) : (
+        <section className={classNames("flex flex-col grow relative")}>
+          <ToastOverflowProvider isCorner />
+        </section>
       )}
     </div>
   );

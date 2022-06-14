@@ -24,6 +24,7 @@ import {
   withHumanDelay,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
+import { ToastOverflowProvider, useToast } from "app/hooks/toast";
 import Input from "app/components/elements/Input";
 import Button from "app/components/elements/Button";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -51,6 +52,7 @@ type EditWalletSectionProps = {
 
 const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   const { confirm } = useDialog();
+  const { updateToast } = useToast();
 
   const [modalState, setModalState] = useState<
     null | "delete" | "phrase" | "private-key"
@@ -61,12 +63,19 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       withHumanDelay(async () => {
         try {
           await updateAccountName(account.uuid, name);
+          updateToast(
+            <>
+              Wallet {`"`}
+              <TReplace msg={account.name} />
+              {`"`} successfully updated!
+            </>
+          );
         } catch (err: any) {
           return { name: err?.message };
         }
         return;
       }),
-    [account.uuid]
+    [account.name, account.uuid, updateToast]
   );
 
   const handleDeleteAccount = useCallback(() => {
@@ -88,146 +97,165 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
       viewPortClassName="pb-20 pt-5 pr-5 pl-6"
       scrollBarClassName="py-0 pt-5 pb-20"
     >
-      <h2 className="text-2xl text-brand-light font-bold mb-6">
-        {replaceT(account.name)}
-      </h2>
-      <AddressField address={account.address} className="mb-6" />
-      <Form
-        onSubmit={handleNameUpdate}
-        initialValues={{ name: replaceT(account.name) }}
-        decorators={[focusOnErrors]}
-        render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
-          <form
-            onSubmit={handleSubmit}
-            className="pb-7 border-b border-brand-main/[.07]"
-          >
-            <Field
-              name="name"
-              validate={composeValidators(
-                required,
-                minLength(3),
-                maxLength(32)
-              )}
+      <ToastOverflowProvider>
+        <h2 className="text-2xl text-brand-light font-bold mb-6">
+          {replaceT(account.name)}
+        </h2>
+        <AddressField address={account.address} className="mb-6" />
+        <Form
+          onSubmit={handleNameUpdate}
+          initialValues={{ name: replaceT(account.name) }}
+          decorators={[focusOnErrors]}
+          render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
+            <form
+              onSubmit={handleSubmit}
+              className="pb-7 border-b border-brand-main/[.07]"
             >
-              {({ input, meta }) => (
-                <Input
-                  label="Wallet name"
-                  placeholder="Type wallet name"
-                  error={
-                    (meta.error && meta.touched) ||
-                    (meta.submitError && !modifiedSinceLastSubmit)
-                  }
-                  errorMessage={
-                    meta.error || (!modifiedSinceLastSubmit && meta.submitError)
-                  }
-                  inputClassName="h-11"
-                  className="max-w-[23.125rem] mt-4"
-                  {...input}
-                />
-              )}
-            </Field>
-            <Button
-              type="submit"
-              theme="primary"
-              className="mt-4 !py-2"
-              loading={submitting}
+              <Field
+                name="name"
+                validate={composeValidators(
+                  required,
+                  minLength(3),
+                  maxLength(32)
+                )}
+              >
+                {({ input, meta }) => (
+                  <Input
+                    label="Wallet name"
+                    placeholder="Type wallet name"
+                    error={
+                      (meta.error && meta.touched) ||
+                      (meta.submitError && !modifiedSinceLastSubmit)
+                    }
+                    errorMessage={
+                      meta.error ||
+                      (!modifiedSinceLastSubmit && meta.submitError)
+                    }
+                    inputClassName="h-11"
+                    className="max-w-[23.125rem] mt-4"
+                    {...input}
+                  />
+                )}
+              </Field>
+              <Button
+                type="submit"
+                theme="primary"
+                className="mt-4 !py-2"
+                loading={submitting}
+              >
+                Save
+              </Button>
+            </form>
+          )}
+        />
+        {account.source !== AccountSource.Address &&
+          account.source !== AccountSource.Ledger && (
+            <WalletBlock
+              Icon={KeyIcon}
+              title="Private key"
+              description="Export the private key of this wallet."
+              className="mt-6"
             >
-              Save
-            </Button>
-          </form>
-        )}
-      />
-      {account.source !== AccountSource.Address &&
-        account.source !== AccountSource.Ledger && (
+              <Button
+                theme="secondary"
+                className={classNames(
+                  "max-h-[2.625rem]",
+                  "flex !justify-start items-center",
+                  "text-left",
+                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                )}
+                onClick={() => setModalState("private-key")}
+              >
+                <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+                Reveal key
+              </Button>
+            </WalletBlock>
+          )}
+        {account.source === AccountSource.OpenLogin && (
           <WalletBlock
-            Icon={KeyIcon}
-            title="Private key"
-            description="Export the private key of this wallet."
+            Icon={getSocialIcon(account.social)}
+            title={capitalizeFirstLetter(account.social)}
+            description={
+              <>
+                This wallet is linked to a{" "}
+                {capitalizeFirstLetter(account.social)} account. Powered by{" "}
+                <a
+                  href="https://openlogin.com/"
+                  target="_blank"
+                  rel="nofollow noreferrer"
+                  className="underline"
+                >
+                  OpenLogin
+                </a>
+                .
+              </>
+            }
             className="mt-6"
           >
-            <Button
-              theme="secondary"
-              className={classNames(
-                "max-h-[2.625rem]",
-                "flex !justify-start items-center",
-                "text-left",
-                "mt-2 !px-3 min-w-[12rem] mr-auto"
-              )}
-              onClick={() => setModalState("private-key")}
-            >
-              <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-              Reveal key
-            </Button>
+            {account.socialName && (
+              <Input
+                defaultValue={account.socialName}
+                label="Name"
+                inputClassName="h-11"
+                className="max-w-sm mt-4"
+                readOnly
+              />
+            )}
+            {account.socialEmail && (
+              <Input
+                defaultValue={account.socialEmail}
+                label="Email"
+                inputClassName="h-11"
+                className="max-w-sm mt-4"
+                readOnly
+              />
+            )}
           </WalletBlock>
         )}
-      {account.source === AccountSource.OpenLogin && (
-        <WalletBlock
-          Icon={getSocialIcon(account.social)}
-          title={capitalizeFirstLetter(account.social)}
-          description={
+        {account.source === AccountSource.SeedPhrase && (
+          <WalletBlock
+            Icon={NoteIcon}
+            title="Secret phrase"
+            description={
+              <>
+                This wallet is created with a Secret Phrase. It is the same for
+                all such wallets in this profile. Only the derivation path is
+                distinctive.
+              </>
+            }
+            className="mt-6"
+          >
             <>
-              This wallet is linked to a {capitalizeFirstLetter(account.social)}{" "}
-              account. Powered by{" "}
-              <a
-                href="https://openlogin.com/"
-                target="_blank"
-                rel="nofollow noreferrer"
-                className="underline"
+              <Button
+                theme="secondary"
+                className={classNames(
+                  "max-h-[2.625rem]",
+                  "flex !justify-start items-center",
+                  "text-left",
+                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                )}
+                onClick={() => setModalState("phrase")}
               >
-                OpenLogin
-              </a>
-              .
+                <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+                Reveal phrase
+              </Button>
+              <Input
+                defaultValue={account.derivationPath}
+                label="Derivation path"
+                inputClassName="h-11"
+                className="max-w-sm mt-4"
+                readOnly
+              />
             </>
-          }
-          className="mt-6"
-        >
-          {account.socialName && (
-            <Input
-              defaultValue={account.socialName}
-              label="Name"
-              inputClassName="h-11"
-              className="max-w-sm mt-4"
-              readOnly
-            />
-          )}
-          {account.socialEmail && (
-            <Input
-              defaultValue={account.socialEmail}
-              label="Email"
-              inputClassName="h-11"
-              className="max-w-sm mt-4"
-              readOnly
-            />
-          )}
-        </WalletBlock>
-      )}
-      {account.source === AccountSource.SeedPhrase && (
-        <WalletBlock
-          Icon={NoteIcon}
-          title="Secret phrase"
-          description={
-            <>
-              This wallet is created with a Secret Phrase. It is the same for
-              all such wallets in this profile. Only the derivation path is
-              distinctive.
-            </>
-          }
-          className="mt-6"
-        >
-          <>
-            <Button
-              theme="secondary"
-              className={classNames(
-                "max-h-[2.625rem]",
-                "flex !justify-start items-center",
-                "text-left",
-                "mt-2 !px-3 min-w-[12rem] mr-auto"
-              )}
-              onClick={() => setModalState("phrase")}
-            >
-              <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-              Reveal phrase
-            </Button>
+          </WalletBlock>
+        )}
+        {account.source === AccountSource.Ledger && (
+          <WalletBlock
+            Icon={LedgerIcon}
+            title="Ledger"
+            description="This wallet connected with external Ledger hardware device."
+            className="mt-6"
+          >
             <Input
               defaultValue={account.derivationPath}
               label="Derivation path"
@@ -235,47 +263,31 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
               className="max-w-sm mt-4"
               readOnly
             />
-          </>
-        </WalletBlock>
-      )}
-      {account.source === AccountSource.Ledger && (
-        <WalletBlock
-          Icon={LedgerIcon}
-          title="Ledger"
-          description="This wallet connected with external Ledger hardware device."
-          className="mt-6"
-        >
-          <Input
-            defaultValue={account.derivationPath}
-            label="Derivation path"
-            inputClassName="h-11"
-            className="max-w-sm mt-4"
-            readOnly
-          />
-        </WalletBlock>
-      )}
-      <Button
-        theme="secondary"
-        onClick={handleDeleteAccount}
-        className={classNames(
-          "mt-6 mb-8 w-48",
-          "!py-2",
-          "flex items-center",
-          "text-brand-light"
+          </WalletBlock>
         )}
-      >
-        <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
-        Remove wallet
-      </Button>
-      {modalState && (
-        <SensetiveActionModal
-          key={modalState}
-          account={account}
-          open={true}
-          cause={modalState}
-          onOpenChange={() => setModalState(null)}
-        />
-      )}
+        <Button
+          theme="secondary"
+          onClick={handleDeleteAccount}
+          className={classNames(
+            "mt-6 mb-8 w-48",
+            "!py-2",
+            "flex items-center",
+            "text-brand-light"
+          )}
+        >
+          <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
+          Remove wallet
+        </Button>
+        {modalState && (
+          <SensetiveActionModal
+            key={modalState}
+            account={account}
+            open={true}
+            cause={modalState}
+            onOpenChange={() => setModalState(null)}
+          />
+        )}
+      </ToastOverflowProvider>
     </ScrollAreaContainer>
   );
 };
@@ -323,6 +335,7 @@ const SensetiveActionModal = memo<
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const windowFocused = useWindowFocus();
+  const { updateToast } = useToast();
 
   useEffect(() => {
     if (!windowFocused && cause !== "delete") {
@@ -345,6 +358,13 @@ const SensetiveActionModal = memo<
           } else {
             try {
               await deleteAccounts(password, [account.uuid]);
+              updateToast(
+                <>
+                  Wallet {`"`}
+                  <TReplace msg={account.name} />
+                  {`"`} successfully deleted!
+                </>
+              );
               onOpenChange?.(false);
             } catch (err: any) {
               throw new Error(err?.message);
@@ -355,7 +375,7 @@ const SensetiveActionModal = memo<
         }
         return;
       }),
-    [cause, account, onOpenChange]
+    [cause, account.uuid, account.name, updateToast, onOpenChange]
   );
 
   return (
