@@ -2,9 +2,11 @@ import { FC } from "react";
 
 import BaseProvider from "./BaseProvider";
 import FullScreenRouter from "./FullScreenRouter";
-import AddAccountModal from "./blocks/AddAccountModal";
+
 import Dialog from "./blocks/Dialog";
 import ContactsDialog from "./blocks/ContactsDialog";
+import AddAccountModal from "./blocks/AddAccountModal";
+import ActivityModal from "./blocks/ActivityModal";
 
 const MainApp: FC = () => (
   <BaseProvider>
@@ -22,6 +24,7 @@ const Modals: FC = () => {
       <Dialog />
       <ContactsDialog />
       <AddAccountModal />
+      <ActivityModal />
     </>
   );
 };

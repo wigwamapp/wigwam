@@ -2,9 +2,9 @@ import { FC, ReactElement, useCallback, useState } from "react";
 import classNames from "clsx";
 import { match } from "ts-pattern";
 import browser from "webextension-polyfill";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
-import { approvalStatusAtom } from "app/atoms";
+import { activityModalAtom, approvalStatusAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { openInTab } from "app/helpers";
 
@@ -24,6 +24,7 @@ type WithThemeProps = {
 
 const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const { total, previewActions } = useAtomValue(approvalStatusAtom);
+  const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
 
   const [activityHovered, setActivityHovered] = useState(false);
 
@@ -31,14 +32,20 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
     if (total > 0) {
       browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
     } else {
-      openInTab(undefined, ["token"]);
+      if (theme === "large") {
+        setActivityOpened([true, "replace"]);
+      } else {
+        openInTab({ activityOpened: true }, ["token"]);
+      }
     }
-  }, [total]);
+  }, [theme, total, setActivityOpened]);
 
   return (
     <div
       className={classNames(
         "fixed bottom-3 left-1/2 -translate-x-1/2",
+        "transition-transform duration-300",
+        activityOpened && "!translate-y-[120%]",
         "w-[calc(100%-1.5rem)] max-w-[75rem]",
         "bg-brand-darkblue/20",
         "backdrop-blur-[10px]",
@@ -131,7 +138,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
           >
             {total > 0 ? (
               <>
-                Approve
+                {theme === "large" ? "Open and Approve" : "Approve"}
                 <ActivityHoverIcon
                   className={classNames(
                     "ml-1",
