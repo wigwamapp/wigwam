@@ -12,7 +12,6 @@ import {
 } from "app/atoms";
 import { DialogProvider } from "app/hooks/dialog";
 import { ContactsDialogProvider } from "app/hooks/contacts";
-import { ToastProvider } from "app/hooks/toast";
 import ErrBond from "app/components/layouts/ErrBond";
 
 const BaseProvider: FC = ({ children }) => (
@@ -23,9 +22,7 @@ const BaseProvider: FC = ({ children }) => (
           <Boot />
 
           <DialogProvider>
-            <ToastProvider>
-              <ContactsDialogProvider>{children}</ContactsDialogProvider>
-            </ToastProvider>
+            <ContactsDialogProvider>{children}</ContactsDialogProvider>
           </DialogProvider>
         </Suspense>
       </JotaiProvider>
