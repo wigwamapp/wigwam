@@ -14,7 +14,7 @@ const AssetLogo: FC<AssetLogoProps> = ({ asset, ...rest }) => {
   const src = useMemo(() => getTokenLogoUrl(asset.logoUrl), [asset.logoUrl]);
 
   return src ? (
-    <Avatar src={src} {...rest} />
+    <Avatar src={src} withBg={false} {...rest} />
   ) : (
     <AutoIcon
       seed={`${asset.chainId}_${asset.tokenSlug}`}
