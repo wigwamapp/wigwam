@@ -81,7 +81,11 @@ const ContactAutocomplete = forwardRef<
   }, [accounts, fuse, value]);
 
   const mergedAccounts = useMemo(
-    () => [...contacts, ...filteredAccounts],
+    () =>
+      [...contacts, ...filteredAccounts].filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.address === value.address)
+      ),
     [contacts, filteredAccounts]
   );
 
