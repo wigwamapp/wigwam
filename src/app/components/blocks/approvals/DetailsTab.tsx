@@ -263,7 +263,7 @@ const Recipient: FC<RecipientProps> = ({ action }) => {
         {action.type === TxActionType.TokenTransfer && (
           <SmallContactCard
             address={address}
-            notAddable
+            isAddable={false}
             className="mt-2 mb-0"
           />
         )}
