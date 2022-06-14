@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
+import { waitForAll, loadable } from "jotai/utils";
 
-import { chainIdAtom, currentAccountAtom } from "app/atoms";
+import { chainIdAtom, currentAccountAtom, getNetworkAtom } from "app/atoms";
 import { ChainIdProvider, useSync, useToken } from "app/hooks";
 
 const PreloadBaseAndSync: FC<{ chainId?: number }> = ({
@@ -13,9 +13,12 @@ const PreloadBaseAndSync: FC<{ chainId?: number }> = ({
     waitForAll([chainIdAtom, currentAccountAtom])
   );
 
+  const chainId = overriddenChainId ?? internalChainId;
+
+  useAtomValue(loadable(getNetworkAtom(chainId)));
   useToken(currentAccount.address);
 
-  useSync(overriddenChainId ?? internalChainId, currentAccount.address);
+  useSync(chainId, currentAccount.address);
 
   return overriddenChainId ? (
     <ChainIdProvider chainId={overriddenChainId}>{children}</ChainIdProvider>

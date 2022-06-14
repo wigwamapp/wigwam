@@ -1,5 +1,7 @@
 import { FC } from "react";
 
+import { ToastProvider } from "app/hooks/toast";
+
 import BaseProvider from "./BaseProvider";
 import FullScreenRouter from "./FullScreenRouter";
 
@@ -10,9 +12,11 @@ import ActivityModal from "./blocks/ActivityModal";
 
 const MainApp: FC = () => (
   <BaseProvider>
-    <FullScreenRouter />
+    <ToastProvider>
+      <FullScreenRouter />
 
-    <Modals />
+      <Modals />
+    </ToastProvider>
   </BaseProvider>
 );
 
