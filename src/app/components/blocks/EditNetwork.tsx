@@ -216,7 +216,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(
                       required,
                       minLength(3),
-                      maxLength(16)
+                      maxLength(256)
                     )}
                   >
                     {({ input, meta }) => (
