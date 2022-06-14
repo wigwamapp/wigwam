@@ -21,7 +21,7 @@ export const useToast = () => {
 };
 
 export const ToastProvider: FC = ({ children }) => {
-  const [toastData, updateToast] = useState<ReactNode | null>(null);
+  const [toastData, updateToast] = useState<ReactNode>(null);
 
   return (
     <toastContext.Provider value={{ toastData, updateToast }}>
