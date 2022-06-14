@@ -61,18 +61,6 @@ export function useTokenActivity(
 
   const pureTokenActivity = useLazyAtomValue(tokenActivityAtom, "off");
 
-  // const pureTokenActivity = useMemo(() => {
-  //   if (restTokenActivity && restTokenActivity.length > 0) {
-  //     return restTokenActivity;
-  //   }
-
-  //   if (restTokenActivity?.length === 0) {
-  //     return [];
-  //   }
-
-  //   return undefined;
-  // }, [restTokenActivity]);
-
   const prevTokenActivity = usePrevious(
     pureTokenActivity,
     "when-not-undefined"
