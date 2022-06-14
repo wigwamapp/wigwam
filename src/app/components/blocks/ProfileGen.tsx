@@ -4,6 +4,7 @@ import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
+import { ToastOverflowProvider } from "app/hooks/toast";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import Button from "app/components/elements/Button";
@@ -47,75 +48,77 @@ const ProfileGen: FC<ProfileGenProps> = ({
 
   return (
     <div className={classNames("flex w-full", className)}>
-      <Form<FormValues>
-        onSubmit={handleAdd}
-        decorators={[focusOnErrors]}
-        initialValues={{ profileName: defaultProfileName }}
-        render={({ handleSubmit, submitting, values }) => (
-          <>
-            <div className="mr-16 flex flex-col items-center">
-              <AutoIcon
-                seed={profileSeed}
-                source="boring"
-                variant="marble"
-                autoColors
-                initialsSource={values.profileName}
-                className={"w-[7.75rem] h-[7.75rem] text-5xl"}
-              />
-              <Button
-                theme="tertiary"
-                className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
-                onClick={regenerateProfileSeed}
-              >
-                <RegenerateIcon className="w-4 h-auto mr-2" />
-                Regenerate
-              </Button>
-            </div>
+      <ToastOverflowProvider>
+        <Form<FormValues>
+          onSubmit={handleAdd}
+          decorators={[focusOnErrors]}
+          initialValues={{ profileName: defaultProfileName }}
+          render={({ handleSubmit, submitting, values }) => (
+            <>
+              <div className="mr-16 flex flex-col items-center">
+                <AutoIcon
+                  seed={profileSeed}
+                  source="boring"
+                  variant="marble"
+                  autoColors
+                  initialsSource={values.profileName}
+                  className={"w-[7.75rem] h-[7.75rem] text-5xl"}
+                />
+                <Button
+                  theme="tertiary"
+                  className="flex items-center !text-sm !font-normal !min-w-0 !px-3 !py-2 mt-3"
+                  onClick={regenerateProfileSeed}
+                >
+                  <RegenerateIcon className="w-4 h-auto mr-2" />
+                  Regenerate
+                </Button>
+              </div>
 
-            <form
-              className="w-full max-w-[18rem] flex flex-col items-start pt-1"
-              onSubmit={handleSubmit}
-            >
-              <Field name="profileName" validate={required}>
-                {({ input, meta }) => (
-                  <Input
-                    label={label}
-                    placeholder="Enter profile name"
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    className="w-full"
-                    {...input}
-                  />
-                )}
-              </Field>
-
-              <Button
-                type="submit"
-                className={classNames(
-                  "mt-5",
-                  editMode ? "!py-2" : "w-full flex items-center"
-                )}
-                loading={submitting}
+              <form
+                className="w-full max-w-[18rem] flex flex-col items-start pt-1"
+                onSubmit={handleSubmit}
               >
-                {submitting ? (
-                  editMode ? (
-                    "Updating..."
+                <Field name="profileName" validate={required}>
+                  {({ input, meta }) => (
+                    <Input
+                      label={label}
+                      placeholder="Enter profile name"
+                      error={meta.error && meta.touched}
+                      errorMessage={meta.error}
+                      className="w-full"
+                      {...input}
+                    />
+                  )}
+                </Field>
+
+                <Button
+                  type="submit"
+                  className={classNames(
+                    "mt-5",
+                    editMode ? "!py-2" : "w-full flex items-center"
+                  )}
+                  loading={submitting}
+                >
+                  {submitting ? (
+                    editMode ? (
+                      "Updating..."
+                    ) : (
+                      "Adding..."
+                    )
+                  ) : editMode ? (
+                    "Save"
                   ) : (
-                    "Adding..."
-                  )
-                ) : editMode ? (
-                  "Save"
-                ) : (
-                  <>
-                    Add
-                    <PlusIcon className="ml-1" />
-                  </>
-                )}
-              </Button>
-            </form>
-          </>
-        )}
-      />
+                    <>
+                      Add
+                      <PlusIcon className="ml-1" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            </>
+          )}
+        />
+      </ToastOverflowProvider>
     </div>
   );
 };
