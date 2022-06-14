@@ -22,6 +22,11 @@ type WithThemeProps = {
   theme?: "small" | "large";
 };
 
+let bootAnimationDisplayed = true;
+const handleAnimationEnd = () => {
+  bootAnimationDisplayed = false;
+};
+
 const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const { total, previewActions } = useAtomValue(approvalStatusAtom);
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
@@ -54,10 +59,13 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
         "flex justify-between",
         "rounded-[.625rem]",
         "cursor-pointer select-none",
-        "animate-activitybar translate-y-[150%]",
+        bootAnimationDisplayed &&
+          !activityOpened &&
+          "animate-activitybar translate-y-[120%]",
         theme === "large" && "px-8 py-4",
         theme === "small" && "px-3 py-2"
       )}
+      onAnimationEnd={handleAnimationEnd}
       onMouseOver={() => setActivityHovered(true)}
       onFocus={() => setActivityHovered(true)}
       onMouseLeave={() => setActivityHovered(false)}
