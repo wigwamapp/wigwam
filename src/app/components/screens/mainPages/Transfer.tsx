@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 
 import { transferTabAtom } from "app/atoms";
 import { TransferTab as TransferTabEnum } from "app/nav";
+import { ToastOverflowProvider } from "app/hooks/toast";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
@@ -32,9 +33,11 @@ const Transfer: FC = () => {
             viewPortClassName="pb-20 pt-5"
             scrollBarClassName="py-0 pt-5 pb-20"
           >
-            <div>
-              <TransferTab />
-            </div>
+            <ToastOverflowProvider>
+              <div>
+                <TransferTab />
+              </div>
+            </ToastOverflowProvider>
           </ScrollAreaContainer>
         ) : (
           <TransferTab />

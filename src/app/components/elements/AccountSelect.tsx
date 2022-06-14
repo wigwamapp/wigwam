@@ -80,7 +80,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       onSearch={setSearchValue}
       showSelected
       showSelectedIcon={false}
-      currentItemClassName={classNames("!py-2 pl-2 pr-3", className)}
+      currentItemClassName={classNames("!py-2 !pl-2 pr-3", className)}
       contentClassName="!w-[22.25rem]"
       itemClassName="group"
       emptySearchText={
@@ -149,9 +149,9 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
               withTooltip={false}
             />
             {copied ? (
-              <SuccessIcon className="w-[1.125rem] h-auto" />
+              <SuccessIcon className="w-[1.125rem] min-w-[1.125rem] h-auto" />
             ) : (
-              <CopyIcon className="w-[1.125rem] h-auto" />
+              <CopyIcon className="w-[1.125rem] min-w-[1.125rem] h-auto" />
             )}
           </span>
         </>

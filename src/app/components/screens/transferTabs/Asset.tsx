@@ -32,6 +32,7 @@ import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useLazyNetwork, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
+import { useToast } from "app/hooks/toast";
 import TokenSelect from "app/components/elements/TokenSelect";
 import Button from "app/components/elements/Button";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -52,12 +53,13 @@ const Asset: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
   const currentToken = useAccountToken(tokenSlug);
   const { alert } = useDialog();
+  const { updateToast } = useToast();
 
   const provider = useProvider();
 
   const sendEther = useCallback(
     async (recipient: string, amount: string) => {
-      return await provider
+      return provider
         .getUncheckedSigner(currentAccount.address)
         .sendTransaction({
           to: recipient,
@@ -79,13 +81,13 @@ const Asset: FC = () => {
 
       const convertedAmount = ethers.utils.parseUnits(amount, decimals);
 
-      return await contract.transfer(recipient, convertedAmount);
+      return contract.transfer(recipient, convertedAmount);
     },
     [currentAccount.address, provider]
   );
 
   const handleSubmit = useCallback(
-    async ({ recipient, amount }) =>
+    async ({ recipient, amount }, form) =>
       withHumanDelay(async () => {
         if (!currentToken) {
           return;
@@ -95,17 +97,28 @@ const Asset: FC = () => {
           const { tokenSlug, decimals } = currentToken;
 
           if (tokenSlug === NATIVE_TOKEN_SLUG) {
-            await sendEther(recipient, amount);
+            sendEther(recipient, amount);
           } else {
             const tokenContract = parseTokenSlug(tokenSlug).address;
 
-            await sendToken(recipient, tokenContract, amount, decimals);
+            sendToken(recipient, tokenContract, amount, decimals);
           }
+
+          updateToast(
+            <>
+              Request for transfer{" "}
+              <strong>
+                <PrettyAmount amount={amount} currency={currentToken.symbol} />
+              </strong>{" "}
+              successfully created! Please approve it in the opened window.
+            </>
+          );
+          form.restart();
         } catch (err: any) {
           alert({ title: "Error!", content: err.message });
         }
       }),
-    [alert, currentToken, sendEther, sendToken]
+    [alert, currentToken, sendEther, sendToken, updateToast]
   );
 
   const [recipientAddr, setRecipientAddr] = useState<string>();

@@ -27,7 +27,7 @@ const Toast: FC<ToastProps> = ({ description, ...rest }) => {
       {...rest}
     >
       <ToastPrimitive.Description className="flex mr-2">
-        <SuccessIcon className="w-6 h-6 mr-2" />
+        <SuccessIcon className="w-6 h-6 min-w-[1.5rem] mr-2" />
         <span className="mt-0.5">{description}</span>
       </ToastPrimitive.Description>
       <ToastPrimitive.Close className="ml-auto">
