@@ -12,6 +12,7 @@ import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
+import mergeRefs from "react-merge-refs";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -24,9 +25,14 @@ import {
   TokenStandard,
   TokenStatus,
   TokenType,
+  TokenActivity as TokenActivityPrimitive,
+  TokenActivityProject,
 } from "core/types";
-import { TokenActivity as TokenActivityPrimitive } from "core/types/activity";
-import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
+import {
+  createTokenActivityKey,
+  createTokenSlug,
+  parseTokenSlug,
+} from "core/common/tokens";
 import { findToken } from "core/client";
 import * as repo from "core/repo";
 
@@ -73,6 +79,7 @@ import PriceArrow from "../elements/PriceArrow";
 import ComingSoon from "../elements/ComingSoon";
 import SmallContactCard from "../elements/SmallContactCard";
 import PrettyDate from "../elements/PrettyDate";
+import Avatar from "../elements/Avatar";
 
 const OverviewContent: FC = () => (
   <div className="flex min-h-0 grow">
@@ -541,10 +548,11 @@ const AssetInfo: FC = () => {
 
   const { copy, copied } = useCopyToClipboard(address);
 
-  const tokenActivityKey = useMemo(
-    () => `${tokenSlug}-${chainId}`,
-    [chainId, tokenSlug]
-  );
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
+  }, [tokenSlug]);
 
   if (!tokenInfo) return null;
 
@@ -570,7 +578,7 @@ const AssetInfo: FC = () => {
     <OverflowProvider>
       {(ref) => (
         <ScrollAreaContainer
-          ref={ref}
+          ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
           className="ml-6 pr-5 -mr-5 flex flex-col"
           viewPortClassName="pb-20 pt-6 viewportBlock"
@@ -710,7 +718,7 @@ const AssetInfo: FC = () => {
               )}
             </div>
 
-            <TokenActivity key={tokenActivityKey} />
+            <TokenActivity />
 
             {/*{status !== TokenStatus.Native && (*/}
             {/*  <div className="mt-6 max-w-[23.25rem]">*/}
@@ -842,6 +850,8 @@ const TokenActivity: FC = () => {
     [activity, hasMore, loadMore]
   );
 
+  if (activity.length === 0) return null;
+
   return (
     <div className="flex flex-col mt-5 pt-1 border-t border-brand-main/[.07]">
       {/*<h3 className="text-xl font-bold">Token activity</h3>*/}
@@ -852,7 +862,7 @@ const TokenActivity: FC = () => {
               ? loadMoreTriggerAssetRef
               : null
           }
-          key={activ.txHash}
+          key={createTokenActivityKey(activ)}
           activity={activ}
           // className={classNames(i !== activity.length - 1 ? "border-b" : "")}
         />
@@ -873,7 +883,8 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
     const { copy, copied } = useCopyToClipboard(activity.txHash);
 
     const explorerUrl = currentNetwork?.explorerUrls?.[0];
-    const { Icon, prefix, amountClassName, label } = getActivityInfo(activity);
+    const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
+      getActivityInfo(activity);
 
     return (
       <div
@@ -886,46 +897,60 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
           className
         )}
       >
-        <div className="flex items-center w-[42%]">
+        <div className="flex items-center w-[47%]">
           <div
             className={classNames(
               "flex items-center justify-center",
               "w-9 h-9 min-w-[2.25rem]",
-              "bg-brand-main/10",
+              "bg-brand-main/5",
               "rounded-full",
               "mr-3"
             )}
           >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-5 h-5 opacity-75" />
           </div>
-          {new BigNumber(activity.amount ?? 0).gte(
-            new BigNumber(10).pow(tokenInfo?.decimals + 12)
-          ) ? (
-            <span
-              className={classNames("text-base font-bold", amountClassName)}
-            >
-              ∞ {tokenInfo?.symbol}
-            </span>
-          ) : (
-            <PrettyAmount
-              amount={new BigNumber(activity.amount ?? 0).abs()}
-              decimals={tokenInfo?.decimals}
-              currency={tokenInfo?.symbol}
-              prefix={prefix}
-              isMinified={true}
-              copiable={true}
-              className={classNames("text-base font-bold", amountClassName)}
-            />
-          )}
+          <div className="flex flex-col items-start">
+            {new BigNumber(activity.amount ?? 0).gte(
+              new BigNumber(10).pow(tokenInfo?.decimals + 12)
+            ) ? (
+              <span
+                className={classNames("text-base font-bold", amountClassName)}
+              >
+                ∞ {tokenInfo?.symbol}
+              </span>
+            ) : (
+              <PrettyAmount
+                amount={new BigNumber(activity.amount ?? 0).abs()}
+                decimals={tokenInfo?.decimals}
+                currency={tokenInfo?.symbol}
+                prefix={prefix}
+                isMinified={true}
+                copiable={true}
+                className={classNames("text-base font-bold", amountClassName)}
+              />
+            )}
+
+            <div className="mt-1 text-xs font-medium text-brand-inactivedark">
+              {label}
+            </div>
+          </div>
         </div>
         <div className="flex flex-col items-start text-sm">
-          {label && <div>{label}</div>}
           <SmallContactCard
             address={activity.anotherAddress}
             extended
             isSmall
-            className="mt-1 min-h-[1.5rem]"
+            addButton={activity.type !== "approve" && !activity.project}
+            className="min-h-[1.5rem] text-brand-lightgray !-my-0"
           />
+
+          <div className="mt-1 text-xs font-medium capitalize text-brand-inactivedark">
+            {activity.project ? (
+              <ProjectLabel project={activity.project} />
+            ) : (
+              <span>{anotherAddressLabel}</span>
+            )}
+          </div>
         </div>
         <div className="flex flex-col items-end ml-auto">
           <div className="flex items-center">
@@ -956,13 +981,46 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
   }
 );
 
+type ProjectLabelProps = {
+  project: TokenActivityProject;
+  className?: string;
+};
+
+const ProjectLabel: FC<ProjectLabelProps> = ({ project, className }) => {
+  const children = (
+    <>
+      {project.logoUrl && (
+        <Avatar src={project.logoUrl} className="h-3 w-3 mr-1" />
+      )}
+
+      {project.name}
+    </>
+  );
+
+  return project.siteUrl ? (
+    <a
+      href={project.siteUrl}
+      target="_blank"
+      rel="nofollow noreferrer"
+      className={classNames("flex items-center hover:underline", className)}
+    >
+      {children}
+    </a>
+  ) : (
+    <span className={classNames("flex items-center", className)}>
+      {children}
+    </span>
+  );
+};
+
 const getActivityInfo = (activity: TokenActivityPrimitive) => {
   if (activity.type === "approve") {
     return {
       Icon: ActivityApproveIcon,
       prefix: null,
       amountClassName: classNames("text-brand-main"),
-      label: "Approve to:",
+      label: "Approve",
+      anotherAddressLabel: "Operator",
     };
   }
 
@@ -971,14 +1029,16 @@ const getActivityInfo = (activity: TokenActivityPrimitive) => {
       Icon: ActivityReceiveIcon,
       prefix: "+",
       amountClassName: classNames("text-[#6BB77A]"),
-      label: "Receive from:",
+      label: activity.project ? "Interaction" : "Receive",
+      anotherAddressLabel: "Sender",
     };
   }
 
   return {
     Icon: ActivitySendIcon,
-    prefix: "-",
+    prefix: "",
     amountClassName: "",
-    label: "Send to:",
+    label: activity.project ? "Interaction" : "Transfer",
+    anotherAddressLabel: "Recipient",
   };
 };

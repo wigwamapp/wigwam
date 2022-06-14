@@ -19,8 +19,8 @@ export function useTokenActivity(
   tokenSlug: string = NATIVE_TOKEN_SLUG,
   { limit = 20 }: UseTokenActivityOptions = {}
 ) {
-  const forceUpdate = useForceUpdate();
   const chainId = useChainId();
+  const forceUpdate = useForceUpdate();
 
   const baseParams = useMemo(
     () => ({
@@ -59,19 +59,19 @@ export function useTokenActivity(
     prevQueryParamsRef.current = queryParams;
   }, [queryParams]);
 
-  const restTokenActivity = useLazyAtomValue(tokenActivityAtom, "off");
+  const pureTokenActivity = useLazyAtomValue(tokenActivityAtom, "off");
 
-  const pureTokenActivity = useMemo(() => {
-    if (restTokenActivity && restTokenActivity.length > 0) {
-      return restTokenActivity;
-    }
+  // const pureTokenActivity = useMemo(() => {
+  //   if (restTokenActivity && restTokenActivity.length > 0) {
+  //     return restTokenActivity;
+  //   }
 
-    if (restTokenActivity?.length === 0) {
-      return [];
-    }
+  //   if (restTokenActivity?.length === 0) {
+  //     return [];
+  //   }
 
-    return undefined;
-  }, [restTokenActivity]);
+  //   return undefined;
+  // }, [restTokenActivity]);
 
   const prevTokenActivity = usePrevious(
     pureTokenActivity,
