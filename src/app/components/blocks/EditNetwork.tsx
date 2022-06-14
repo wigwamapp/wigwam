@@ -136,10 +136,10 @@ const EditNetwork = memo<EditNetworkProps>(
 
             updateToast(
               isNew
-                ? `Network${
+                ? `Network ${
                     network?.name ? `"${network?.name}"` : ""
                   } successfully created!`
-                : `Network${
+                : `Network ${
                     network?.name ? `"${network?.name}"` : ""
                   } successfully updated!`
             );
@@ -175,7 +175,7 @@ const EditNetwork = memo<EditNetworkProps>(
         await cleanupNetwork(initialChainId!);
         onActionFinished?.(true);
         updateToast(
-          `Network${
+          `Network ${
             network?.name ? `"${network?.name}"` : ""
           } successfully deleted!`
         );
