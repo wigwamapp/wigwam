@@ -170,6 +170,7 @@ export interface TokenActivityBase {
   txHash: string;
   timeAt: number;
   type: TokenActivityType;
+  project?: TokenActivityProject;
 }
 
 export type TokenActivity = TransferTokenActivity | ApproveTokenActivity;
@@ -186,3 +187,9 @@ export interface ApproveTokenActivity extends TokenActivityBase {
   amount?: string;
   clears?: boolean;
 }
+
+export type TokenActivityProject = {
+  name: string;
+  logoUrl?: string;
+  siteUrl?: string;
+};

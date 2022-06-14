@@ -59,6 +59,7 @@
     "buffer": "6.0.3",
     "canvas-txt": "3.0.0",
     "clsx": "1.1.1",
+    "date-fns": "^2.28.0",
     "dequal": "2.0.2",
     "dexie": "3.2.2",
     "dexie-export-import": "1.0.3",
