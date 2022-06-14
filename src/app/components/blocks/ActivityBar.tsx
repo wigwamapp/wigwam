@@ -36,12 +36,12 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const handleClick = useCallback(async () => {
     if (total > 0) {
       browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
-    } else {
-      if (theme === "large") {
-        setActivityOpened([true, "replace"]);
-      } else {
-        openInTab({ activityOpened: true }, ["token"]);
-      }
+    } else if (theme === "small") {
+      openInTab({ activityOpened: true }, ["token"]);
+    }
+
+    if (theme === "large") {
+      setActivityOpened([true, "replace"]);
     }
   }, [theme, total, setActivityOpened]);
 
