@@ -34,6 +34,7 @@ import {
   focusOnErrors,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
+import { useToast } from "app/hooks/toast";
 
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
@@ -67,9 +68,10 @@ type EditNetworkProps = {
 
 const EditNetwork = memo<EditNetworkProps>(
   ({ isNew, network, onCancelHandler, onActionFinished }) => {
-    const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
-
     const { alert, confirm } = useDialog();
+    const { updateToast } = useToast();
+
+    const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
 
     const handleSubmit = useCallback(
       async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
@@ -131,12 +133,30 @@ const EditNetwork = memo<EditNetworkProps>(
             if (isNew && onActionFinished) {
               onActionFinished();
             }
+
+            updateToast(
+              isNew
+                ? `Network${
+                    network?.name ? `"${network?.name}"` : ""
+                  } successfully created!`
+                : `Network${
+                    network?.name ? `"${network?.name}"` : ""
+                  } successfully updated!`
+            );
             onCancelHandler();
           } catch (err: any) {
             alert({ title: "Error!", content: err.message });
           }
         }),
-      [initialChainId, isNew, network, onActionFinished, onCancelHandler, alert]
+      [
+        initialChainId,
+        isNew,
+        network,
+        onActionFinished,
+        updateToast,
+        onCancelHandler,
+        alert,
+      ]
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -154,8 +174,13 @@ const EditNetwork = memo<EditNetworkProps>(
       if (response) {
         await cleanupNetwork(initialChainId!);
         onActionFinished?.(true);
+        updateToast(
+          `Network${
+            network?.name ? `"${network?.name}"` : ""
+          } successfully deleted!`
+        );
       }
-    }, [confirm, initialChainId, network?.name, onActionFinished]);
+    }, [confirm, initialChainId, network?.name, onActionFinished, updateToast]);
 
     const isNative = network && network.type !== "unknown";
 

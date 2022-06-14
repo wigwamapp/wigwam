@@ -14,6 +14,7 @@ import { LOAD_MORE_ON_CONTACTS_FROM_END } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { useContacts, useContactsDialog } from "app/hooks/contacts";
+import { ToastOverflowProvider, useToast } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -26,6 +27,7 @@ import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found
 const ContactsSection: FC = () => {
   const { confirm } = useDialog();
   const { upsertContact } = useContactsDialog();
+  const { updateToast } = useToast();
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const { contacts, loadMore, hasMore } = useContacts({
@@ -68,9 +70,10 @@ const ContactsSection: FC = () => {
 
       if (response) {
         await Repo.contacts.delete(address);
+        updateToast(`Contact "${name}" successfully deleted!`);
       }
     },
-    [confirm]
+    [confirm, updateToast]
   );
 
   return (
@@ -92,39 +95,42 @@ const ContactsSection: FC = () => {
             viewPortClassName="pb-20 rounded-t-[.625rem]"
             scrollBarClassName="py-0 pb-20"
           >
-            <div className="grid grid-cols-5 gap-5">
-              <NewContactCard onClick={() => upsertContact({})} />
-              {contacts.length === 0 ? (
-                <div
-                  className={classNames(
-                    "flex flex-col justify-center items-center",
-                    "h-full",
-                    "border border-brand-light/[.05]",
-                    "rounded-[.625rem]",
-                    "text-sm text-brand-placeholder",
-                    "col-span-4"
-                  )}
-                >
-                  <NoResultsFoundIcon className="mb-4" />
-                  No results found
-                </div>
-              ) : (
-                contacts.map(({ name, address, addedAt }, i) => (
-                  <ContactCard
-                    key={address}
-                    ref={
-                      i === contacts.length - LOAD_MORE_ON_CONTACTS_FROM_END - 2
-                        ? loadMoreTriggerCardRef
-                        : null
-                    }
-                    name={name}
-                    address={address}
-                    onDelete={() => handleDelete(name, address)}
-                    onEdit={() => upsertContact({ name, address, addedAt })}
-                  />
-                ))
-              )}
-            </div>
+            <ToastOverflowProvider className="top-0">
+              <div className="grid grid-cols-5 gap-5">
+                <NewContactCard onClick={() => upsertContact({})} />
+                {contacts.length === 0 ? (
+                  <div
+                    className={classNames(
+                      "flex flex-col justify-center items-center",
+                      "h-full",
+                      "border border-brand-light/[.05]",
+                      "rounded-[.625rem]",
+                      "text-sm text-brand-placeholder",
+                      "col-span-4"
+                    )}
+                  >
+                    <NoResultsFoundIcon className="mb-4" />
+                    No results found
+                  </div>
+                ) : (
+                  contacts.map(({ name, address, addedAt }, i) => (
+                    <ContactCard
+                      key={address}
+                      ref={
+                        i ===
+                        contacts.length - LOAD_MORE_ON_CONTACTS_FROM_END - 2
+                          ? loadMoreTriggerCardRef
+                          : null
+                      }
+                      name={name}
+                      address={address}
+                      onDelete={() => handleDelete(name, address)}
+                      onEdit={() => upsertContact({ name, address, addedAt })}
+                    />
+                  ))
+                )}
+              </div>
+            </ToastOverflowProvider>
           </ScrollAreaContainer>
         )}
       </OverflowProvider>

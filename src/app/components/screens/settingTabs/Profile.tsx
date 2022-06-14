@@ -31,7 +31,7 @@ type FormValues = {
 
 const Profile: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
-  const { openToast } = useToast();
+  const { updateToast } = useToast();
   useI18NUpdate();
 
   const currentProfile = useMemo(
@@ -45,12 +45,12 @@ const Profile: FC = () => {
     async (name: string, profileSeed: string) => {
       try {
         await updateProfile(currentId, { name, avatarSeed: profileSeed });
-        openToast("Profile has been successfully updated!");
+        updateToast("Profile name successfully updated!");
       } catch (err) {
         console.error(err);
       }
     },
-    [currentId, openToast]
+    [currentId, updateToast]
   );
 
   const handlePasswordChange = useCallback(
@@ -58,13 +58,14 @@ const Profile: FC = () => {
       withHumanDelay(async () => {
         try {
           await changePassword(values.oldPwd, values.newPwd);
+          updateToast("Profile password successfully updated!");
           form.restart();
           return;
         } catch (error: any) {
           return { oldPwd: error.message };
         }
       }),
-    []
+    [updateToast]
   );
 
   return (
@@ -79,74 +80,6 @@ const Profile: FC = () => {
         className="px-2"
       />
 
-      <Separator className="mt-6 mb-8" />
-
-      <SettingsHeader>Change password</SettingsHeader>
-      <Form<FormValues>
-        onSubmit={handlePasswordChange}
-        decorators={[focusOnErrors]}
-        render={({
-          handleSubmit,
-          submitting,
-          modifiedSinceLastSubmit,
-          values,
-        }) => (
-          <form className="max-w-[18rem]" onSubmit={handleSubmit}>
-            <TippySingletonProvider>
-              <Field name="oldPwd" validate={required}>
-                {({ input, meta }) => (
-                  <PasswordField
-                    error={
-                      (!modifiedSinceLastSubmit && meta.submitError) ||
-                      (meta.error && meta.touched)
-                    }
-                    errorMessage={
-                      meta.error ||
-                      (!modifiedSinceLastSubmit && meta.submitError)
-                    }
-                    label="Old password"
-                    placeholder={"*".repeat(8)}
-                    className="mb-4"
-                    {...input}
-                  />
-                )}
-              </Field>
-              <Field name="newPwd" validate={required}>
-                {({ input, meta }) => (
-                  <PasswordField
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    label="New password"
-                    placeholder={"*".repeat(8)}
-                    className="mb-4"
-                    {...input}
-                  />
-                )}
-              </Field>
-              <Field
-                name="confirmNewPwd"
-                validate={composeValidators(
-                  required,
-                  differentPasswords(values.newPwd)
-                )}
-              >
-                {({ input, meta }) => (
-                  <PasswordField
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    label="Confirm new password"
-                    placeholder={"*".repeat(8)}
-                    {...input}
-                  />
-                )}
-              </Field>
-            </TippySingletonProvider>
-            <Button type="submit" className="!py-2 mt-8" loading={submitting}>
-              {submitting ? "Saving..." : "Save"}
-            </Button>
-          </form>
-        )}
-      />
       <Separator className="mt-6 mb-8" />
 
       <SettingsHeader>Change password</SettingsHeader>

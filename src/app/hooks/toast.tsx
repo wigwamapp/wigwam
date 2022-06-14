@@ -1,5 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
+import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 import { assert } from "lib/system/assert";
 
@@ -7,7 +8,7 @@ import Toast from "app/components/elements/Toast";
 
 type ToastContextProps = {
   toastData: ReactNode | null;
-  openToast: (value: ReactNode | null) => void;
+  updateToast: (value: ReactNode | null) => void;
 };
 
 const toastContext = createContext<ToastContextProps | null>(null);
@@ -20,27 +21,42 @@ export const useToast = () => {
 };
 
 export const ToastProvider: FC = ({ children }) => {
-  const [toastData, openToast] = useState<ReactNode | null>(null);
+  const [toastData, updateToast] = useState<ReactNode | null>(null);
 
   return (
-    <toastContext.Provider value={{ toastData, openToast }}>
+    <toastContext.Provider value={{ toastData, updateToast }}>
       {children}
     </toastContext.Provider>
   );
 };
 
-export const ToastOverflowProvider: FC = ({ children }) => {
-  const { toastData, openToast } = useToast();
+type ToastOverflowProviderProps = {
+  isCorner?: boolean;
+  className?: string;
+};
+
+export const ToastOverflowProvider: FC<ToastOverflowProviderProps> = ({
+  isCorner = false,
+  className,
+  children,
+}) => {
+  const { toastData, updateToast } = useToast();
   const prevToastData = usePrevious(toastData);
 
   return (
     <ToastPrimitive.Provider>
-      <ToastPrimitive.Viewport className="absolute top-5 right-6" />
+      <ToastPrimitive.Viewport
+        className={classNames(
+          "absolute",
+          isCorner ? "top-0 right-0" : "top-5 right-6",
+          className
+        )}
+      />
       {children}
       <Toast
         description={toastData === null ? prevToastData : toastData}
         open={Boolean(toastData)}
-        onOpenChange={() => openToast(null)}
+        onOpenChange={() => updateToast(null)}
       />
     </ToastPrimitive.Provider>
   );
