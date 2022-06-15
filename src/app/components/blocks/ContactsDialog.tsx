@@ -52,7 +52,7 @@ const ContactsDialog: FC = () => {
               if (isChangedAddress && address) {
                 await Repo.contacts.delete(address);
               }
-              updateToast(`Contact "${name}" successfully created!`);
+              updateToast(`Contact "${newName}" successfully created!`);
             } else {
               await Repo.contacts.put({
                 name: newName,
