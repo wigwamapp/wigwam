@@ -26,6 +26,7 @@ import { FilterManager } from "./filterManager";
 // import { SubscriptionManager } from "./subscriptionManager";
 
 const gatewayEventType = Symbol();
+const stateUpdatedType = Symbol();
 
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 type ProviderEvent = EthSubscription | GatewayPayload<unknown>;
@@ -86,6 +87,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
           this.#handleNetworkChange(chainId);
           this.#handleAccountChange(accountAddress || null);
+          this.emit(stateUpdatedType, undefined);
           return;
 
         case ETH_SUBSCRIPTION:
@@ -229,31 +231,26 @@ export class InpageProvider extends Emitter<ProviderEvent> {
     return new Promise<T>((resolve, reject) => {
       const reqId = this.#getReqId();
 
-      const handleRpcEvent = (evt?: GatewayPayload<T>) => {
+      const handleRpcEvent = async (evt?: GatewayPayload<T>) => {
         if (evt && "id" in evt && evt.id === reqId) {
           this.removeListener(gatewayEventType, handleRpcEvent);
 
           if ("result" in evt) {
             if (
-              method === JsonRpcMethod.eth_requestAccounts &&
-              Array.isArray(evt.result)
+              method === JsonRpcMethod.eth_requestAccounts ||
+              method === JsonRpcMethod.wallet_requestPermissions
             ) {
-              this.#handleAccountChange(evt.result[0] ?? null);
-            }
+              // Await until state updated
+              await new Promise<void>((res) => {
+                const complete = () => {
+                  res();
+                  this.removeListener(stateUpdatedType, complete);
+                  clearTimeout(t);
+                };
 
-            if (
-              method === JsonRpcMethod.wallet_requestPermissions &&
-              Array.isArray(evt.result)
-            ) {
-              try {
-                const { caveats } = evt.result[0];
-                const address = caveats.find(
-                  (c: any) => c.type === "restrictReturnedAccounts"
-                ).value[0];
-                if (typeof address === "string") {
-                  this.#handleAccountChange(address);
-                }
-              } catch {}
+                this.on(stateUpdatedType, complete);
+                const t = setTimeout(complete, 150);
+              });
             }
 
             resolve(evt.result);
