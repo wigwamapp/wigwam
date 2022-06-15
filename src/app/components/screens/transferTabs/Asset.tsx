@@ -54,6 +54,8 @@ const Asset: FC = () => {
   const provider = useProvider();
   const signerProvider = provider.getUncheckedSigner(currentAccount.address);
 
+  const explorerUrl = currentNetwork?.explorerUrls?.[0];
+
   const handleSubmit = useCallback(
     async ({ recipient, amount }, form) =>
       withHumanDelay(async () => {
@@ -113,18 +115,20 @@ const Asset: FC = () => {
                       successfully transferred!
                     </p>
 
-                    <div className="mt-1 flex items-center">
-                      <a
-                        href={`https://testnet.bscscan.com/tx/${txHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        View transaction in explorer
-                      </a>
+                    {explorerUrl && (
+                      <div className="mt-1 flex items-center">
+                        <a
+                          href={`${explorerUrl}/tx/${txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline"
+                        >
+                          View transaction in explorer
+                        </a>
 
-                      <ExternalLinkIcon className="h-5 w-auto ml-1" />
-                    </div>
+                        <ExternalLinkIcon className="h-5 w-auto ml-1" />
+                      </div>
+                    )}
                   </div>
                 );
               }
@@ -134,7 +138,15 @@ const Asset: FC = () => {
           alert({ title: "Error", content: err.message });
         }
       }),
-    [alert, currentToken, updateToast, isMounted, provider, signerProvider]
+    [
+      alert,
+      currentToken,
+      updateToast,
+      isMounted,
+      provider,
+      signerProvider,
+      explorerUrl,
+    ]
   );
 
   const [recipientAddr, setRecipientAddr] = useSafeState<string>();
