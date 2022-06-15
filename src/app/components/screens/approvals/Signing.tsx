@@ -55,6 +55,26 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
     return () => clearTimeout(t);
   }, [setInitialLoading]);
 
+  const message = useMemo(() => {
+    try {
+      switch (approval.standard) {
+        case SigningStandard.PersonalSign:
+          return toUtf8String(approval.message);
+
+        case SigningStandard.SignTypedDataV1:
+          return approval.message;
+
+        case SigningStandard.SignTypedDataV3:
+        case SigningStandard.SignTypedDataV4:
+          return JSON.parse(approval.message);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
+    return null;
+  }, [approval]);
+
   const handleApprove = useCallback(
     async (approved: boolean) => {
       setApproving(true);
@@ -98,8 +118,14 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                   let domainSeparatorHex, hashStructMessageHex;
 
                   try {
-                    const { domain, types, primaryType, message } =
-                      TypedDataUtils.sanitizeData(JSON.parse(approval.message));
+                    const {
+                      domain,
+                      types,
+                      primaryType,
+                      message: sanitizedMessage,
+                    } = TypedDataUtils.sanitizeData(
+                      JSON.parse(approval.message)
+                    );
 
                     domainSeparatorHex = TypedDataUtils.hashStruct(
                       "EIP712Domain",
@@ -109,7 +135,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                     ).toString("hex");
                     hashStructMessageHex = TypedDataUtils.hashStruct(
                       primaryType as any,
-                      message,
+                      sanitizedMessage,
                       types,
                       SignTypedDataVersion.V4
                     ).toString("hex");
@@ -181,28 +207,8 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, account, setApproving, alert, withLedger]
+    [approval, account, setApproving, alert, withLedger, message]
   );
-
-  const message = useMemo(() => {
-    try {
-      switch (approval.standard) {
-        case SigningStandard.PersonalSign:
-          return toUtf8String(approval.message);
-
-        case SigningStandard.SignTypedDataV1:
-          return approval.message;
-
-        case SigningStandard.SignTypedDataV3:
-        case SigningStandard.SignTypedDataV4:
-          return JSON.parse(approval.message);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-
-    return null;
-  }, [approval]);
 
   if (!message) return null;
 
