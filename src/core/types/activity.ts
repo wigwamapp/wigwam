@@ -52,10 +52,13 @@ export type Approval =
   | SigningApproval
   | ConnectionApproval;
 
-export type Activity =
+export type Activity = (
   | TransactionActivity
   | SigningActivity
-  | ConnectionActivity;
+  | ConnectionActivity
+) & {
+  pending: number;
+};
 
 export interface ActivityBase {
   id: string;

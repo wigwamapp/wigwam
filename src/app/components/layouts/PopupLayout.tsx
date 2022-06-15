@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -70,7 +70,10 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
           >
             {children}
           </main>
-          {isUnlocked && <ActivityBar theme="small" />}
+
+          <Suspense fallback={null}>
+            {isUnlocked && <ActivityBar theme="small" />}
+          </Suspense>
         </div>
       )}
     </OverflowProvider>

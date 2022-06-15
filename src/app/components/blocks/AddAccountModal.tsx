@@ -3,6 +3,7 @@ import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import { WalletStatus } from "core/types";
 
@@ -32,6 +33,9 @@ const AddAccountModal = memo(() => {
     [setAccModalOpened]
   );
 
+  const isMounted = useIsMounted();
+  const bootAnimationDisplayed = !isInitial && accModalOpened && isMounted();
+
   return (
     <Dialog.Root open={accModalOpened} onOpenChange={handleOpenChange} modal>
       <Dialog.Portal>
@@ -46,7 +50,7 @@ const AddAccountModal = memo(() => {
             "max-h-[41rem]",
             "m-auto inset-x-0 inset-y-[3.5rem]",
             "rounded-[2.5rem]",
-            !isInitial && "animate-modalcontent"
+            bootAnimationDisplayed && "animate-modalcontent"
           )}
         >
           <div

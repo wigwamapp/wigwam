@@ -30,6 +30,6 @@ db.version(1).stores({
     "",
     "[chainId+accountAddress+tokenSlug+timeAt]",
   ].join(),
-  [RepoTable.Activities]: "&id,timeAt",
+  [RepoTable.Activities]: ["&id", "[pending+timeAt]", "[type+pending]"].join(),
   [RepoTable.Permissions]: "&origin,timeAt",
 });

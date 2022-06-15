@@ -1,7 +1,12 @@
 import { parseTokenSlug } from "core/common/tokens";
 import { AccountToken, TokenStatus, TokenType } from "core/types";
 
-import { accountTokens, contacts, tokenActivities } from "./helpers";
+import {
+  accountTokens,
+  activities,
+  contacts,
+  tokenActivities,
+} from "./helpers";
 
 export type QueryAccountTokensParams = {
   chainId: number;
@@ -88,6 +93,30 @@ export function queryContacts({ search, offset, limit }: QueryContactsParams) {
       (contact) => match(contact.name) || match(contact.address)
     );
   }
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryActivitiesParams = {
+  pending: boolean;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryActivities({
+  pending,
+  offset,
+  limit,
+}: QueryActivitiesParams) {
+  let coll = activities.where("pending").equals(Number(pending)).reverse();
 
   if (offset) {
     coll = coll.offset(offset);

@@ -9,6 +9,7 @@ import {
   startBruteForceProtection,
   startInstallOrUpdateListener,
   startApproveWindowOpener,
+  startTxObserver,
   startExtBadge,
 } from "core/back/services";
 
@@ -34,4 +35,5 @@ startBruteForceProtection();
 
 startInstallOrUpdateListener();
 startApproveWindowOpener();
+startTxObserver();
 startExtBadge();

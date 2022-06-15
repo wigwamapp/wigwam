@@ -43,7 +43,7 @@ module.exports = {
         "waving-hand": "wave 2s linear infinite",
         modalcontent: "modalfadein 0.2s ease-out",
         activitybar:
-          "barclimb 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
+          "barclimb 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
       },
       keyframes: {
         fadein: {

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
@@ -35,7 +35,10 @@ const MainPageLayout: FC = ({ children }) => (
           {children}
         </main>
       </ContentContainer>
-      <ActivityBar />
+
+      <Suspense fallback={null}>
+        <ActivityBar />
+      </Suspense>
     </div>
   </PreloadBaseAndSync>
 );
