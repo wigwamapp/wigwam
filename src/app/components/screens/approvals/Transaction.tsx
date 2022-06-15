@@ -45,6 +45,9 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 import ApprovalLayout from "./Layout";
 
+const { serializeTransaction, keccak256, recoverAddress, getAddress } =
+  ethers.utils;
+
 const TAB_VALUES = ["details", "fee", "advanced", "error"] as const;
 
 const TAB_NAMES: Record<TabValue, ReactNode> = {
@@ -301,7 +304,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           if (!finalTx) return;
 
-          const rawTx = ethers.utils.serializeTransaction(finalTx);
+          const rawTx = serializeTransaction(finalTx);
 
           if (account.source !== AccountSource.Ledger) {
             await approveItem(approval.id, { approved, rawTx });
@@ -316,11 +319,23 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   rawTx.substring(2)
                 );
 
-                signedRawTx = ethers.utils.serializeTransaction(finalTx, {
+                const formattedSig = {
                   v: ethers.BigNumber.from("0x" + sig.v).toNumber(),
                   r: "0x" + sig.r,
                   s: "0x" + sig.s,
-                });
+                };
+
+                const digest = keccak256(rawTx);
+                const addressSignedWith = recoverAddress(digest, formattedSig);
+                if (
+                  getAddress(addressSignedWith) !== getAddress(account.address)
+                ) {
+                  throw new Error(
+                    "Ledger: The signature doesnt match the right address"
+                  );
+                }
+
+                signedRawTx = serializeTransaction(finalTx, formattedSig);
               } catch (err) {
                 ledgerError = err;
               }
