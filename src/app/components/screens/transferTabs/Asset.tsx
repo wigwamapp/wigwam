@@ -1,12 +1,4 @@
-import {
-  FC,
-  memo,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { FC, memo, ReactNode, useCallback, useEffect, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 import { useAtomValue } from "jotai";
@@ -14,6 +6,9 @@ import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC20__factory } from "abi-types";
+import { createOrganicThrottle } from "lib/system/organicThrottle";
+import { useIsMounted } from "lib/react-hooks/useIsMounted";
+import { useSafeState } from "lib/react-hooks/useSafeState";
 
 import { AccountAsset } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
@@ -25,7 +20,6 @@ import {
   required,
   validateAddress,
   withHumanDelay,
-  focusOnErrors,
   OnChange,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
@@ -44,6 +38,7 @@ import InputLabelAction from "app/components/elements/InputLabelAction";
 import ContactAutocomplete from "app/components/elements/ContactAutocomplete";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
+import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
 type FormValues = { amount: string; recipient: string };
 
@@ -54,37 +49,10 @@ const Asset: FC = () => {
   const currentToken = useAccountToken(tokenSlug);
   const { alert } = useDialog();
   const { updateToast } = useToast();
+  const isMounted = useIsMounted();
 
   const provider = useProvider();
-
-  const sendEther = useCallback(
-    async (recipient: string, amount: string) => {
-      return provider
-        .getUncheckedSigner(currentAccount.address)
-        .sendTransaction({
-          to: recipient,
-          value: ethers.utils.parseEther(amount),
-        });
-    },
-    [currentAccount.address, provider]
-  );
-
-  const sendToken = useCallback(
-    async (
-      recipient: string,
-      tokenContract: string,
-      amount: string,
-      decimals: number
-    ) => {
-      const signer = provider.getUncheckedSigner(currentAccount.address);
-      const contract = ERC20__factory.connect(tokenContract, signer);
-
-      const convertedAmount = ethers.utils.parseUnits(amount, decimals);
-
-      return contract.transfer(recipient, convertedAmount);
-    },
-    [currentAccount.address, provider]
-  );
+  const signerProvider = provider.getUncheckedSigner(currentAccount.address);
 
   const handleSubmit = useCallback(
     async ({ recipient, amount }, form) =>
@@ -96,13 +64,28 @@ const Asset: FC = () => {
         try {
           const { tokenSlug, decimals } = currentToken;
 
+          let tx;
+
           if (tokenSlug === NATIVE_TOKEN_SLUG) {
-            sendEther(recipient, amount);
+            tx = await provider.populateTransaction({
+              to: recipient,
+              value: ethers.utils.parseEther(amount),
+            });
           } else {
             const tokenContract = parseTokenSlug(tokenSlug).address;
+            const contract = ERC20__factory.connect(
+              tokenContract,
+              signerProvider
+            );
+            const convertedAmount = ethers.utils.parseUnits(amount, decimals);
 
-            sendToken(recipient, tokenContract, amount, decimals);
+            tx = await contract.populateTransaction.transfer(
+              recipient,
+              convertedAmount
+            );
           }
+
+          const txRes = signerProvider.sendUncheckedTransaction(tx);
 
           updateToast(
             <>
@@ -114,22 +97,64 @@ const Asset: FC = () => {
             </>
           );
           form.restart();
+
+          txRes
+            .then((txHash) => {
+              if (isMounted()) {
+                updateToast(
+                  <div className="flex flex-col">
+                    <p>
+                      <strong>
+                        <PrettyAmount
+                          amount={amount}
+                          currency={currentToken.symbol}
+                        />
+                      </strong>{" "}
+                      successfully transferred!
+                    </p>
+
+                    <div className="mt-1 flex items-center">
+                      <a
+                        href={`https://testnet.bscscan.com/tx/${txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        View transaction in explorer
+                      </a>
+
+                      <ExternalLinkIcon className="h-5 w-auto ml-1" />
+                    </div>
+                  </div>
+                );
+              }
+            })
+            .catch(console.warn);
         } catch (err: any) {
-          alert({ title: "Error!", content: err.message });
+          alert({ title: "Error", content: err.message });
         }
       }),
-    [alert, currentToken, sendEther, sendToken, updateToast]
+    [alert, currentToken, updateToast, isMounted, provider, signerProvider]
   );
 
-  const [recipientAddr, setRecipientAddr] = useState<string>();
-  const [gas, setGas] = useState<ethers.BigNumber>();
-  const [estimationError, setEstimationError] = useState(false);
+  const [recipientAddr, setRecipientAddr] = useSafeState<string>();
+
+  const [estimating, setEstimating] = useSafeState(false);
+  const [gas, setGas] = useSafeState<{
+    max: ethers.BigNumber;
+    average: ethers.BigNumber;
+  }>();
+  const [estimationError, setEstimationError] = useSafeState<string | null>(
+    null
+  );
 
   const maxAmount = useMemo(() => {
     if (currentToken?.rawBalance) {
       let finalValue = new BigNumber(currentToken.rawBalance);
       if (tokenSlug === NATIVE_TOKEN_SLUG) {
-        finalValue = finalValue.minus(new BigNumber(gas ? gas.toString() : 0));
+        finalValue = finalValue.minus(
+          new BigNumber(gas ? gas.max.toString() : 0)
+        );
       }
       const convertedValue = finalValue
         .div(new BigNumber(10).pow(currentToken.decimals))
@@ -142,40 +167,73 @@ const Asset: FC = () => {
     return "0";
   }, [currentToken, gas, tokenSlug]);
 
-  const estimateGas = useCallback(async () => {
-    if (recipientAddr && tokenSlug && currentToken) {
-      const value = 1;
-      let gasLimit = ethers.BigNumber.from(0);
-      try {
-        if (tokenSlug === NATIVE_TOKEN_SLUG) {
-          gasLimit = await provider.estimateGas({
-            to: recipientAddr,
-            value,
-          });
+  const withThrottle = useMemo(createOrganicThrottle, []);
+
+  const currentTokenExist = Boolean(currentToken);
+  const estimateGas = useCallback(
+    () =>
+      withThrottle(async () => {
+        if (recipientAddr && tokenSlug && currentTokenExist) {
+          try {
+            setEstimating(true);
+
+            const value = 1;
+            let gasLimit = ethers.BigNumber.from(0);
+
+            if (tokenSlug === NATIVE_TOKEN_SLUG) {
+              gasLimit = await provider.estimateGas({
+                to: recipientAddr,
+                value,
+              });
+            } else {
+              const tokenContract = parseTokenSlug(tokenSlug).address;
+
+              const signer = provider.getUncheckedSigner(
+                currentAccount.address
+              );
+              const contract = ERC20__factory.connect(tokenContract, signer);
+
+              gasLimit = await contract.estimateGas.transfer(
+                recipientAddr,
+                value
+              );
+            }
+
+            const fees = await suggestFees(provider);
+            if (fees) {
+              const gasPrice = fees.modes.average.max;
+              const maxGasLimit = gasLimit.mul(3).div(2);
+
+              setGas({
+                average: gasLimit.mul(gasPrice),
+                max: maxGasLimit.mul(gasPrice),
+              });
+            }
+
+            setEstimationError(null);
+          } catch (err) {
+            setEstimationError(
+              "Estimation failed. Transaction may fail or there network issues"
+            );
+          } finally {
+            setEstimating(false);
+          }
         } else {
-          const tokenContract = parseTokenSlug(tokenSlug).address;
-
-          const signer = provider.getUncheckedSigner(currentAccount.address);
-          const contract = ERC20__factory.connect(tokenContract, signer);
-
-          gasLimit = await contract.estimateGas.transfer(recipientAddr, value);
+          setEstimationError(null);
         }
-      } catch (e) {
-        setEstimationError(true);
-      }
-
-      const gasPrice = await suggestFees(provider);
-      if (gasPrice) {
-        setGas(gasPrice.modes.average.max.mul(gasLimit));
-      }
-    }
-  }, [
-    currentAccount.address,
-    currentToken,
-    provider,
-    recipientAddr,
-    tokenSlug,
-  ]);
+      }),
+    [
+      withThrottle,
+      setEstimating,
+      setEstimationError,
+      setGas,
+      currentAccount.address,
+      currentTokenExist,
+      provider,
+      recipientAddr,
+      tokenSlug,
+    ]
+  );
 
   const handleRecipientChange = useDebouncedCallback((recipient: string) => {
     if (recipient && ethers.utils.isAddress(recipient)) {
@@ -184,7 +242,16 @@ const Asset: FC = () => {
   }, 150);
 
   useEffect(() => {
-    estimateGas();
+    let t: any;
+
+    const performAndDefer = () => {
+      estimateGas();
+      t = setTimeout(performAndDefer, 10_000);
+    };
+
+    performAndDefer();
+
+    return () => clearTimeout(t);
   }, [estimateGas]);
 
   const formKey = useMemo(
@@ -201,7 +268,6 @@ const Asset: FC = () => {
     <Form<FormValues>
       key={formKey}
       onSubmit={handleSubmit}
-      decorators={[focusOnErrors]}
       render={({ form, handleSubmit, values, submitting }) => (
         <form
           onSubmit={handleSubmit}
@@ -224,7 +290,7 @@ const Asset: FC = () => {
                   form.change("recipient", value);
                   focus?.();
                 }}
-                error={meta.error && meta.touched}
+                error={meta.error && meta.touched && meta.submitFailed}
                 errorMessage={meta.error}
                 meta={meta}
                 className="mt-5"
@@ -248,15 +314,22 @@ const Asset: FC = () => {
                   thousandSeparator={true}
                   assetDecimals={currentToken?.decimals}
                   labelActions={
-                    <InputLabelAction
-                      onClick={() => form.change("amount", maxAmount)}
-                    >
-                      MAX
-                    </InputLabelAction>
+                    estimating ? (
+                      <span className="text-xs text-brand-inactivedark2 self-end">
+                        Estimating...
+                      </span>
+                    ) : (
+                      <InputLabelAction
+                        onClick={() => form.change("amount", maxAmount)}
+                      >
+                        MAX
+                      </InputLabelAction>
+                    )
                   }
                   currency={currentToken ? currentToken.symbol : undefined}
-                  error={meta.modified && meta.error}
+                  error={(meta.modified || meta.submitFailed) && meta.error}
                   errorMessage={meta.error}
+                  readOnly={estimating}
                   {...input}
                 />
               )}
@@ -265,7 +338,7 @@ const Asset: FC = () => {
           <div className="mt-6 flex items-start">
             <TxCheck
               currentToken={currentToken}
-              values={{ gas, ...values }}
+              values={{ gas: gas?.average, ...values }}
               error={estimationError}
             />
           </div>
@@ -288,7 +361,7 @@ export default Asset;
 type TxCheckProps = {
   currentToken?: AccountAsset;
   values: FormValues & { gas?: ethers.BigNumber };
-  error: boolean;
+  error: string | null;
 };
 
 const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
@@ -341,7 +414,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
         )}
       >
         <WarningIcon className="mr-2 w-6 h-auto" />
-        Insufficient funds for Network Fee
+        {error || "Insufficient funds for Network Fee"}
       </div>
     );
   }

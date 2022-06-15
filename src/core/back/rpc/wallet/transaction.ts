@@ -24,15 +24,15 @@ export async function requestTransaction(
   await validateNetwork(chainId);
 
   let txParams = params?.[0];
-  if ("gas" in txParams) {
-    const { gas, ...rest } = txParams;
-    txParams = { ...rest, gasLimit: gas };
-  }
-
   let accountAddress: string;
 
   try {
     accountAddress = ethers.utils.getAddress(txParams.from);
+
+    if ("gas" in txParams) {
+      const { gas, ...rest } = txParams;
+      txParams = { ...rest, gasLimit: gas };
+    }
 
     assertSchema(txParams, TxParamsSchema);
     assert(txParams.to || txParams.data);

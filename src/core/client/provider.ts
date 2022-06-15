@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { JsonRpcProvider, TransactionRequest } from "@ethersproject/providers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 import { assert } from "lib/system/assert";
@@ -29,6 +29,12 @@ export class ClientProvider extends JsonRpcProvider {
     assert(res?.type === type);
 
     return getResult(res.response);
+  }
+
+  async populateTransaction(
+    transaction: Partial<TransactionRequest>
+  ): Promise<Partial<TransactionRequest>> {
+    return transaction;
   }
 }
 
