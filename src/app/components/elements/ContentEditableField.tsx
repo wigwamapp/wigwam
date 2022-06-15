@@ -2,6 +2,7 @@ import {
   forwardRef,
   HTMLAttributes,
   ReactNode,
+  useCallback,
   useEffect,
   useRef,
 } from "react";
@@ -51,6 +52,21 @@ const ContentEditableField = forwardRef<
       };
     }, []);
 
+    const handleInput = useCallback(
+      (evt) => {
+        const value = evt.currentTarget.textContent || null;
+
+        // Validate is just letters or numbers with spaces
+        if (value && !/^[a-z0-9\s]*$/.test(value)) {
+          evt.currentTarget.textContent = null;
+          return;
+        }
+
+        onChange?.({ target: { value } } as any);
+      },
+      [onChange]
+    );
+
     return (
       <div className={classNames("flex flex-col", className)}>
         <div className="flex items-center justify-between px-4 mb-2 min-h-6">
@@ -70,10 +86,7 @@ const ContentEditableField = forwardRef<
           <div
             ref={mergeRefs([innerRef, ref])}
             contentEditable
-            onInput={(evt) => {
-              const value = evt.currentTarget.textContent || null;
-              onChange?.({ target: { value } } as any);
-            }}
+            onInput={handleInput}
             onBlur={onBlur}
             className={classNames(
               "w-full",

@@ -8,6 +8,7 @@ import { validatePrivateKey, add0x } from "core/common";
 
 import { AddAccountStep } from "app/nav";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
+import { formatPrivateKey } from "app/utils/format";
 import { useSteps } from "app/hooks/steps";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -62,9 +63,7 @@ const ImportPrivateKey = memo(() => {
               <Field
                 name="privateKey"
                 validate={required}
-                format={(value) =>
-                  value ? value.replace(/\s\s+/g, "").trim() : ""
-                }
+                format={formatPrivateKey}
                 formatOnBlur
               >
                 {({ input, meta }) => (
