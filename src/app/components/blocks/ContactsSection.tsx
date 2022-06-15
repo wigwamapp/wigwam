@@ -95,7 +95,7 @@ const ContactsSection: FC = () => {
             viewPortClassName="pb-20 rounded-t-[.625rem]"
             scrollBarClassName="py-0 pb-20"
           >
-            <ToastOverflowProvider className="top-0">
+            <ToastOverflowProvider className="!top-0 !right-5">
               <div className="grid grid-cols-5 gap-5">
                 <NewContactCard onClick={() => upsertContact({})} />
                 {contacts.length === 0 ? (
