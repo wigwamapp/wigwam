@@ -16,6 +16,7 @@ import {
   withHumanDelay,
   focusOnErrors,
 } from "app/utils";
+import { formatSeedPhrase } from "app/utils/format";
 import { currentLocaleAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
@@ -97,9 +98,7 @@ const ImportSeedPhrase = memo(() => {
                   required,
                   validateSeedPhrase(wordlistLocale)
                 )}
-                format={(value) =>
-                  value ? value.replace(/\n/g, " ").trim() : ""
-                }
+                format={formatSeedPhrase}
                 formatOnBlur
               >
                 {({ input, meta }) => (

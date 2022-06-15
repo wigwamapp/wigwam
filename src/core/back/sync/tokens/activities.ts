@@ -4,7 +4,12 @@ import BigNumber from "bignumber.js";
 import { ERC20__factory } from "abi-types";
 import { createQueue } from "lib/system/queue";
 
-import { AccountAsset, TokenActivity, TokenStandard } from "core/types";
+import {
+  AccountAsset,
+  TokenActivity,
+  TokenActivityBase,
+  TokenStandard,
+} from "core/types";
 import {
   createAccountTokenKey,
   createTokenActivityKey,
@@ -84,9 +89,10 @@ export const syncTokenActivities = memoize(
               receives,
               token_approve,
               time_at,
+              project_id,
             } of data.history_list) {
               const timeAt = time_at * 1_000;
-              const base = {
+              const base: Omit<TokenActivityBase, "type"> = {
                 chainId,
                 accountAddress,
                 tokenSlug,
@@ -94,8 +100,22 @@ export const syncTokenActivities = memoize(
                 timeAt,
               };
 
+              if (project_id) {
+                const project = data.project_dict[project_id];
+                if (project) {
+                  base.project = {
+                    name: project.name,
+                    logoUrl: project.logo_url,
+                    siteUrl: project.site_url,
+                  };
+                }
+              }
+
+              let sendOrReceiveAdded = false;
+
               for (const send of sends) {
                 if (send.token_id === debankTokenId) {
+                  sendOrReceiveAdded = true;
                   addToActivities({
                     ...base,
                     type: "transfer",
@@ -111,6 +131,7 @@ export const syncTokenActivities = memoize(
 
               for (const receive of receives) {
                 if (receive.token_id === debankTokenId) {
+                  sendOrReceiveAdded = true;
                   addToActivities({
                     ...base,
                     type: "transfer",
@@ -123,7 +144,20 @@ export const syncTokenActivities = memoize(
                 }
               }
 
-              if (token_approve && token_approve.token_id === debankTokenId) {
+              if (
+                !sendOrReceiveAdded &&
+                token_approve &&
+                token_approve.token_id === debankTokenId
+              ) {
+                console.info({
+                  id: txHash,
+                  sends,
+                  receives,
+                  token_approve,
+                  time_at,
+                  project_id,
+                });
+
                 const amount = new BigNumber(token_approve.value)
                   .times(decimalsFactor)
                   .integerValue();

@@ -42,6 +42,8 @@ module.exports = {
           "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "waving-hand": "wave 2s linear infinite",
         modalcontent: "modalfadein 0.2s ease-out",
+        activitybar:
+          "barclimb 0.15s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
       },
       keyframes: {
         fadein: {
@@ -60,6 +62,14 @@ module.exports = {
           to: {
             opacity: "1",
             transform: "translate(-50%, -50%) scale(1)",
+          },
+        },
+        barclimb: {
+          from: {
+            transform: "translate(-50%, 150%)",
+          },
+          to: {
+            transform: "translate(-50%, 0)",
           },
         },
         modalfadein: {

@@ -10,16 +10,24 @@ import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 import InputLabelAction from "./InputLabelAction";
 import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
+import HashPreview from "./HashPreview";
+import IconedButton from "./IconedButton";
 
 type SmallContactCardProps = {
   address?: string;
-  notAddable?: boolean;
+  isAddable?: boolean;
+  addButton?: boolean;
+  extended?: boolean;
+  isSmall?: boolean;
   className?: string;
 };
 
 const SmallContactCard: FC<SmallContactCardProps> = ({
   address,
-  notAddable = false,
+  isAddable = true,
+  addButton = true,
+  extended = false,
+  isSmall = false,
   className,
 }) => {
   const allAccounts = useLazyAtomValue(allAccountsAtom);
@@ -50,8 +58,23 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   const contact = mergedAccounts[0];
 
   if (!contact) {
-    if (notAddable) {
+    if (!isAddable) {
       return null;
+    }
+
+    if (extended) {
+      return (
+        <span className={classNames("flex items-center", className)}>
+          <HashPreview hash={address} />
+          {addButton && (
+            <IconedButton
+              Icon={PlusIcon}
+              onClick={() => upsertContact({ address })}
+              className="ml-2"
+            />
+          )}
+        </span>
+      );
     }
 
     return (
@@ -68,9 +91,11 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   return (
     <span
       className={classNames(
-        "py-0.5 pl-0.5 pr-3 -my-1",
+        "pr-3 -my-1",
         "rounded-md",
-        "border border-brand-main/[.07] text-sm",
+        "border border-brand-main/[.07]",
+        !isSmall && "py-0.5 pl-0.5 text-sm",
+        isSmall && "py-[0.1875rem] pl-[0.1875rem] text-xs",
         "flex items-center",
         className
       )}
@@ -80,7 +105,8 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
         source="dicebear"
         type="personas"
         className={classNames(
-          "h-6 w-6 min-w-[1.5rem] mr-2",
+          !isSmall && "h-6 w-6 min-w-[1.5rem] mr-2",
+          isSmall && "h-4 w-4 min-w-[1rem] mr-1",
           "bg-black/40",
           "rounded"
         )}

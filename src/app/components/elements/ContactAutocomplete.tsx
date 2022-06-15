@@ -151,7 +151,13 @@ const ContactAutocomplete = forwardRef<
   );
 
   const labelAction = useMemo(() => {
-    if (!meta.error && mergedAccounts.length <= 1) {
+    if (
+      !meta.error &&
+      mergedAccounts.filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.address === value.address)
+      ).length <= 1
+    ) {
       return <SmallContactCard address={value as string} />;
     }
     return undefined;
@@ -171,7 +177,12 @@ const ContactAutocomplete = forwardRef<
         />
       </Popover.Trigger>
       {mergedAccounts.length > 0 &&
-        !(mergedAccounts.length === 1 && !meta.error) && (
+        !(
+          mergedAccounts.filter(
+            (value, index, self) =>
+              index === self.findIndex((t) => t.address === value.address)
+          ).length === 1 && !meta.error
+        ) && (
           <Popover.Content
             onOpenAutoFocus={(e) => {
               e.preventDefault();

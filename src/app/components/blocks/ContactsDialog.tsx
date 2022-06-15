@@ -16,6 +16,7 @@ import {
 } from "app/utils";
 import { useContactsDialog } from "app/hooks/contacts";
 import { useDialog } from "app/hooks/dialog";
+import { useToast } from "app/hooks/toast";
 import SecondaryModal from "app/components/elements/SecondaryModal";
 import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
@@ -30,6 +31,7 @@ type FormValues = {
 
 const ContactsDialog: FC = () => {
   const { alert } = useDialog();
+  const { updateToast } = useToast();
   const { modalData, upsertContact } = useContactsDialog();
 
   const handleSubmit = useCallback(
@@ -50,12 +52,14 @@ const ContactsDialog: FC = () => {
               if (isChangedAddress && address) {
                 await Repo.contacts.delete(address);
               }
+              updateToast(`Contact "${newName}" successfully created!`);
             } else {
               await Repo.contacts.put({
                 name: newName,
                 address: newAddress,
                 addedAt: addedAt!,
               });
+              updateToast(`Contact "${name}" successfully updated!`);
             }
 
             upsertContact(null);
@@ -64,7 +68,7 @@ const ContactsDialog: FC = () => {
           }
         }
       }),
-    [modalData, upsertContact, alert]
+    [modalData, upsertContact, updateToast, alert]
   );
 
   if (modalData === null) {

@@ -15,6 +15,7 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { TippySingletonProvider, useLazyNetwork, useToken } from "app/hooks";
 import { CUSTOM_FEE_MODE, FEE_MODE_NAMES } from "app/utils/txApprove";
+import { LARGE_AMOUNT } from "app/utils/largeAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
@@ -262,7 +263,7 @@ const Recipient: FC<RecipientProps> = ({ action }) => {
         {action.type === TxActionType.TokenTransfer && (
           <SmallContactCard
             address={address}
-            notAddable
+            isAddable={false}
             className="mt-2 mb-0"
           />
         )}
@@ -397,7 +398,7 @@ const Token = memo<TokenProps>(
     const usdAmount = amount
       ? new BigNumber(amount)
           .div(new BigNumber(10).pow(decimals))
-          .multipliedBy(priceUSD ?? 1)
+          .multipliedBy(priceUSD ?? 0)
       : null;
 
     return (
@@ -432,14 +433,11 @@ const Token = memo<TokenProps>(
           </>
         ) : (
           <span className="text-sm font-bold ml-2">
-            {amount !== undefined &&
-              new BigNumber(amount).gte(
-                new BigNumber(10).pow(decimals + 12)
-              ) && (
-                <>
-                  <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
-                </>
-              )}
+            {amount !== undefined && new BigNumber(amount).gte(LARGE_AMOUNT) && (
+              <>
+                <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+              </>
+            )}
             {symbol}
           </span>
         )}
