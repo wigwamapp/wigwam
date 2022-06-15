@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 import Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
+import { Buffer } from "buffer";
 
 import type LedgerEthType from "@ledgerhq/hw-app-eth";
 import type { getExtendedKey as getExtendedKeyType } from "lib/ledger";
