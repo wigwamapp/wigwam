@@ -18,6 +18,7 @@ import {
   requestSigning,
   recoverPersonalSign,
   requestSwitchChain,
+  requestAddChain,
 } from "./wallet";
 
 export async function handleRpc(
@@ -96,10 +97,15 @@ export async function handleRpc(
         return await requestSwitchChain(source, params, reply);
       }
 
+      case JsonRpcMethod.wallet_addEthereumChain: {
+        await expandPermission();
+
+        return await requestAddChain(source, params, reply);
+      }
+
       case JsonRpcMethod.eth_sign:
       case JsonRpcMethod.eth_signTransaction:
       case JsonRpcMethod.eth_ecRecover:
-      case JsonRpcMethod.wallet_addEthereumChain:
       case JsonRpcMethod.wallet_watchAsset:
       case JsonRpcMethod.wallet_registerOnboarding: {
         // TODO: Implement separate logic for this methods

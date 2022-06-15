@@ -7,7 +7,7 @@ import * as repo from "core/repo";
 import { validatePermission, validateNetwork } from "./validation";
 import { getPageOrigin } from "core/common/permissions";
 
-export async function requestSwitchChain(
+export async function requestAddChain(
   source: ActivitySource,
   params: any[],
   rpcReply: RpcReply
@@ -25,9 +25,7 @@ export async function requestSwitchChain(
   try {
     await validateNetwork(chainId);
   } catch {
-    const error = ethErrors.rpc.resourceNotFound("Network not been added");
-    error.code = 4902;
-    throw error;
+    throw ethErrors.provider.unsupportedMethod();
   }
 
   const origin = getPageOrigin(source);
