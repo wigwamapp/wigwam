@@ -111,8 +111,11 @@ export const syncTokenActivities = memoize(
                 }
               }
 
+              let sendOrReceiveAdded = false;
+
               for (const send of sends) {
                 if (send.token_id === debankTokenId) {
+                  sendOrReceiveAdded = true;
                   addToActivities({
                     ...base,
                     type: "transfer",
@@ -128,6 +131,7 @@ export const syncTokenActivities = memoize(
 
               for (const receive of receives) {
                 if (receive.token_id === debankTokenId) {
+                  sendOrReceiveAdded = true;
                   addToActivities({
                     ...base,
                     type: "transfer",
@@ -140,7 +144,20 @@ export const syncTokenActivities = memoize(
                 }
               }
 
-              if (token_approve && token_approve.token_id === debankTokenId) {
+              if (
+                !sendOrReceiveAdded &&
+                token_approve &&
+                token_approve.token_id === debankTokenId
+              ) {
+                console.info({
+                  id: txHash,
+                  sends,
+                  receives,
+                  token_approve,
+                  time_at,
+                  project_id,
+                });
+
                 const amount = new BigNumber(token_approve.value)
                   .times(decimalsFactor)
                   .integerValue();
