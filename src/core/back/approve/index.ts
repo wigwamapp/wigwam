@@ -190,6 +190,10 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
     const txValue = hexValueMaybe(tx[key]);
     const originValue = hexValueMaybe(originTxParams[key]);
 
+    if (key === "type" && originValue === "0x0" && !txValue) {
+      continue;
+    }
+
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");
     }

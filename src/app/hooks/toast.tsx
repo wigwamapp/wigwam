@@ -1,4 +1,11 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
@@ -42,6 +49,8 @@ export const ToastOverflowProvider: FC<ToastOverflowProviderProps> = ({
 }) => {
   const { toastData, updateToast } = useToast();
   const prevToastData = usePrevious(toastData);
+
+  useEffect(() => () => updateToast(null), [updateToast]);
 
   return (
     <ToastPrimitive.Provider>

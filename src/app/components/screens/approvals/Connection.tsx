@@ -135,7 +135,11 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           }
 
           const accountAddresses = approved ? accountsToAdd : undefined;
-          await approveItem(approval.id, { approved, accountAddresses });
+          await approveItem(approval.id, {
+            approved,
+            accountAddresses,
+            overriddenChainId: localChainIdRef.current,
+          });
         });
       } catch (err: any) {
         alert({
