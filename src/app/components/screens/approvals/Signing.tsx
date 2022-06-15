@@ -163,8 +163,8 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
       readOnly
       textareaClassName={heightClassName}
       value={message}
-      actions={[copyButton]}
-      labelActions={[standardLabel]}
+      actions={copyButton}
+      labelActions={standardLabel}
       hoverStyles={false}
     />
   ) : (
