@@ -398,7 +398,7 @@ const Token = memo<TokenProps>(
     const usdAmount = amount
       ? new BigNumber(amount)
           .div(new BigNumber(10).pow(decimals))
-          .multipliedBy(priceUSD ?? 1)
+          .multipliedBy(priceUSD ?? 0)
       : null;
 
     return (
