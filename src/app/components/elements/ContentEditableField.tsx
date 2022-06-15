@@ -18,6 +18,7 @@ export type ContentEditableFieldProps = HTMLAttributes<HTMLDivElement> & {
   actions?: ReactNode;
   error?: boolean;
   errorMessage?: string;
+  placeholder?: string;
 };
 
 const ContentEditableField = forwardRef<
@@ -37,6 +38,7 @@ const ContentEditableField = forwardRef<
       actions,
       error,
       errorMessage,
+      placeholder,
     },
     ref
   ) => {
@@ -83,6 +85,21 @@ const ContentEditableField = forwardRef<
         </div>
 
         <div className="relative w-full group">
+          {!value && placeholder && (
+            <span
+              className={classNames(
+                "absolute",
+                "top-[calc(.75rem+1px)] bottom-[calc(.75rem+1px)]",
+                "right-[calc(1rem+1px)] left-[calc(1rem+1px)]",
+                "text-base leading-5",
+                !disabled && "text-brand-placeholder",
+                disabled && "text-brand-disabledcolor",
+                "pointer-events-none"
+              )}
+            >
+              {placeholder}
+            </span>
+          )}
           <div
             ref={mergeRefs([innerRef, ref])}
             contentEditable
@@ -109,7 +126,7 @@ const ContentEditableField = forwardRef<
               disabled && [
                 "bg-brand-disabledbackground/20",
                 "border-brand-main/5",
-                "text-brand-disabledcolor placeholder-brand-disabledcolor",
+                "text-brand-disabledcolor",
               ],
               textareaClassName
             )}
