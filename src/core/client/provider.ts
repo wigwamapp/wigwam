@@ -31,9 +31,7 @@ export class ClientProvider extends JsonRpcProvider {
     return getResult(res.response);
   }
 
-  async populateTransaction(
-    transaction: Partial<TransactionRequest>
-  ): Promise<Partial<TransactionRequest>> {
+  async populateTransaction(transaction: Partial<TransactionRequest>) {
     return transaction;
   }
 }

@@ -66,28 +66,30 @@ const Asset: FC = () => {
         try {
           const { tokenSlug, decimals } = currentToken;
 
-          let tx;
+          let txParams;
 
           if (tokenSlug === NATIVE_TOKEN_SLUG) {
-            tx = await provider.populateTransaction({
+            txParams = await provider.populateTransaction({
               to: recipient,
               value: ethers.utils.parseEther(amount),
             });
           } else {
             const tokenContract = parseTokenSlug(tokenSlug).address;
-            const contract = ERC20__factory.connect(
-              tokenContract,
-              signerProvider
-            );
+            const contract = ERC20__factory.connect(tokenContract, provider);
             const convertedAmount = ethers.utils.parseUnits(amount, decimals);
 
-            tx = await contract.populateTransaction.transfer(
+            txParams = await contract.populateTransaction.transfer(
               recipient,
               convertedAmount
             );
           }
 
-          const txRes = signerProvider.sendUncheckedTransaction(tx);
+          const gasLimit = await signerProvider.estimateGas(txParams);
+
+          const txResPromise = signerProvider.sendUncheckedTransaction({
+            ...txParams,
+            gasLimit,
+          });
 
           updateToast(
             <>
@@ -100,7 +102,7 @@ const Asset: FC = () => {
           );
           form.restart();
 
-          txRes
+          txResPromise
             .then((txHash) => {
               if (isMounted()) {
                 updateToast(
