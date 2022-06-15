@@ -148,7 +148,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, account, setApproving, alert]
+    [approval, account, setApproving, alert, withLedger]
   );
 
   const message = useMemo(() => {
