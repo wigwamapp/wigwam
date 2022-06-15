@@ -24,7 +24,7 @@ type ItemProps<T, U> = {
   value: T;
 };
 
-type SelectProps<T, U> = {
+export type SelectProps<T, U> = {
   items: ItemProps<T, U>[];
   currentItem?: ItemProps<T, U>;
   setItem: (itemKey: ItemProps<T, U>) => void;
@@ -37,6 +37,7 @@ type SelectProps<T, U> = {
   itemRef?: any;
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
+  size?: "large" | "small";
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -60,6 +61,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   loadMoreOnItemFromEnd = 1,
   emptySearchText,
   onOpenChange,
+  size = "large",
   className,
   contentClassName,
   scrollAreaClassName,
@@ -109,7 +111,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
   );
 
   return (
-    <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
+    <div
+      className={classNames(
+        "flex flex-col",
+        size === "large" && "min-w-[17.75rem]",
+        size === "small" && "min-w-[10.5rem]",
+        className
+      )}
+    >
       {!!label && (
         <button
           type="button"
@@ -134,10 +143,10 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "flex items-center",
             "w-full",
-            "py-2.5 px-5",
-            "text-sm font-bold",
+            size === "large" && "py-2.5 pl-5 pr-4 text-sm rounded-[.625rem]",
+            size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
+            "font-bold",
             "bg-brand-main/5",
-            "rounded-[.625rem]",
             currentItem &&
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
@@ -157,7 +166,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
                       ? currentItem.value
                       : "Icon"
                   }
-                  className={classNames("w-7 mr-2", currentItemIconClassName)}
+                  className={classNames(
+                    size === "large" && "w-7 mr-2",
+                    size === "small" && "w-4 mr-1",
+                    currentItemIconClassName
+                  )}
                 />
               )}
               {typeof currentItem.value === "string" ? (
@@ -167,7 +180,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
               )}
               <ChevronDownIcon
                 className={classNames(
-                  "w-6 h-auto min-w-[1.5rem]",
+                  size === "large" && "w-6 min-w-[1.5rem]",
+                  size === "small" && "w-5 min-w-[1.25rem]",
+                  "h-auto",
                   "ml-auto",
                   "transition-transform",
                   {
@@ -185,8 +200,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
               className={classNames(
                 "shadow-xs",
                 "focus-visible:outline-none",
-                "mt-2",
-                "w-full min-w-[17.75rem]",
+                size === "large" && "mt-2 min-w-[17.75rem]",
+                size === "small" && "mt-1.5 min-w-[10.5rem]",
+                "w-full",
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
@@ -222,12 +238,20 @@ function Select<T extends string | ReactElement, U extends string | number>({
               )}
               <ScrollAreaContainer
                 className={classNames(
-                  "max-h-64 pl-3 pr-4",
+                  size === "large" && "max-h-64 pl-3 pr-4",
+                  size === "small" && "max-h-44 pl-1 pr-[.875rem]",
                   "flex flex-col",
                   scrollAreaClassName
                 )}
-                viewPortClassName="py-3 viewportBlock"
-                scrollBarClassName="py-3"
+                viewPortClassName={classNames(
+                  size === "large" && "py-3",
+                  size === "small" && "py-2",
+                  "viewportBlock"
+                )}
+                scrollBarClassName={classNames(
+                  size === "small" && "w-3.5 py-2 !px-.5",
+                  size === "large" && "py-3"
+                )}
               >
                 <div ref={itemsRef}>
                   {filteredItems.length > 0 ? (
@@ -242,18 +266,24 @@ function Select<T extends string | ReactElement, U extends string | number>({
                         className={classNames(
                           "w-full mb-1 last:mb-0",
                           "flex items-center",
-                          "px-3",
+                          size === "large" && "px-3",
+                          size === "small" && "px-2",
                           showSelected &&
                             showSelectedIcon &&
                             item.key === currentItem?.key
-                            ? "py-1.5"
-                            : "py-2",
+                            ? size === "large"
+                              ? "py-1.5"
+                              : "py-1"
+                            : size === "large"
+                            ? "py-2"
+                            : "py-1.5",
                           // showSelected &&
                           //   item.key === currentItem.key &&
                           //   "!bg-brand-main/10", // Test this variant
-                          "rounded-[.625rem]",
+                          size === "large" && "rounded-[.625rem] text-sm",
+                          size === "small" && "rounded-lg text-xs",
                           "cursor-pointer",
-                          "text-sm font-bold",
+                          "font-bold",
                           "outline-none",
                           "transition-colors",
                           "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
@@ -278,7 +308,10 @@ function Select<T extends string | ReactElement, U extends string | number>({
                                   ? item.value
                                   : "Icon"
                               }
-                              className={"w-6 h-6 mr-3"}
+                              className={classNames(
+                                size === "large" && "w-6 h-6 mr-3",
+                                size === "small" && "w-4 h-4 mr-2"
+                              )}
                             />
                           )}
                           {typeof item.value === "string" ? (
