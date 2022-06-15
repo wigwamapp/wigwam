@@ -18,6 +18,7 @@ import {
   TxActionType,
   FeeMode,
   FeeSuggestions,
+  AccountSource,
 } from "core/types";
 import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
@@ -30,6 +31,7 @@ import {
   useProvider,
   useSync,
 } from "app/hooks";
+import { useLedger } from "app/hooks/ledger";
 import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
 import { formatUnits } from "app/utils/txApprove";
@@ -42,6 +44,9 @@ import LongTextField from "app/components/elements/LongTextField";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 import ApprovalLayout from "./Layout";
+
+const { serializeTransaction, keccak256, recoverAddress, getAddress } =
+  ethers.utils;
 
 const TAB_VALUES = ["details", "fee", "advanced", "error"] as const;
 
@@ -87,6 +92,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [txParams]);
 
   const provider = useProvider();
+  const withLedger = useLedger();
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
   const [feeMode, setFeeMode] = useState<FeeMode>("average");
@@ -291,23 +297,68 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
       try {
         await withHumanDelay(async () => {
-          let rawTx: string | undefined;
-
-          if (approved) {
-            if (!finalTx) return;
-
-            rawTx = ethers.utils.serializeTransaction(finalTx);
+          if (!approved) {
+            await approveItem(approval.id, { approved });
+            return;
           }
 
-          await approveItem(approval.id, { approved, rawTx });
+          if (!finalTx) return;
+
+          const rawTx = serializeTransaction(finalTx);
+
+          if (account.source !== AccountSource.Ledger) {
+            await approveItem(approval.id, { approved, rawTx });
+          } else {
+            let signedRawTx: string | undefined;
+            let ledgerError: any;
+
+            await withLedger(async ({ ledgerEth }) => {
+              try {
+                const sig = await ledgerEth.signTransaction(
+                  account.derivationPath,
+                  rawTx.substring(2)
+                );
+
+                const formattedSig = {
+                  v: ethers.BigNumber.from("0x" + sig.v).toNumber(),
+                  r: "0x" + sig.r,
+                  s: "0x" + sig.s,
+                };
+
+                const digest = keccak256(rawTx);
+                const addressSignedWith = recoverAddress(digest, formattedSig);
+                if (
+                  getAddress(addressSignedWith) !== getAddress(account.address)
+                ) {
+                  throw new Error(
+                    "Ledger: The signature doesnt match the right address"
+                  );
+                }
+
+                signedRawTx = serializeTransaction(finalTx, formattedSig);
+              } catch (err) {
+                ledgerError = err;
+              }
+            });
+
+            if (signedRawTx) {
+              await approveItem(approval.id, { approved, signedRawTx });
+            } else {
+              throw (
+                ledgerError ??
+                new Error("Failed to sign transaction with Ledger")
+              );
+            }
+          }
         });
       } catch (err) {
         console.error(err);
         setLastError(err);
+      } finally {
         setApproving(false);
       }
     },
-    [approval, setLastError, setApproving, finalTx]
+    [approval, account, setLastError, setApproving, finalTx, withLedger]
   );
 
   return (

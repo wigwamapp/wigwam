@@ -11,6 +11,7 @@ import {
   fromSigned,
   toUnsigned,
 } from "ethereumjs-util";
+import { Buffer } from "buffer";
 import { ethers } from "ethers";
 import { ProtectedValue } from "kdbxweb";
 

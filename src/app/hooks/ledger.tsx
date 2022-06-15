@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 import Transport from "@ledgerhq/hw-transport";
 import retry from "async-retry";
+import { Buffer } from "buffer";
 
 import type LedgerEthType from "@ledgerhq/hw-app-eth";
 import type { getExtendedKey as getExtendedKeyType } from "lib/ledger";
@@ -38,7 +39,7 @@ export function useLedger() {
               import("lib/ledger"),
             ]);
 
-          return await retry(
+          const connected = await retry(
             async () => {
               if (closed) return false;
 
@@ -73,13 +74,17 @@ export function useLedger() {
                 setState("loading");
               }
 
-              const ledgerEth = new LedgerEth(transportRef.current);
-              await ledgerHandler({ ledgerEth, getExtendedKey }, onClose);
-
-              return !closed;
+              return true;
             },
             { retries: 5, maxTimeout: 2_000 }
           );
+
+          if (!connected || !transportRef.current) return false;
+
+          const ledgerEth = new LedgerEth(transportRef.current!);
+          await ledgerHandler({ ledgerEth, getExtendedKey }, onClose);
+
+          return !closed;
         } catch (err: any) {
           const msg = err?.message ?? "Unknown error";
 

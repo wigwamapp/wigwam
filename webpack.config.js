@@ -325,6 +325,10 @@ module.exports = {
       })(),
     }),
 
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
+    }),
+
     new MiniCssExtractPlugin({
       filename: "styles/[name].css",
       chunkFilename: "styles/[name].chunk.css",
