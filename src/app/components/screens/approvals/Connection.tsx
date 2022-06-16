@@ -12,6 +12,7 @@ import {
 } from "core/types";
 import { approveItem } from "core/client";
 
+import { openInTabStrict } from "app/helpers";
 import { allAccountsAtom, chainIdAtom, currentAccountAtom } from "app/atoms";
 import { ChainIdProvider, useSync, useToken } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -34,6 +35,9 @@ import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import vigvamLogoUrl from "app/images/vigvam.png";
 
 import ApprovalLayout from "./Layout";
+import { ReactComponent as NoResultsFoundIcon } from "../../../icons/no-results-found.svg";
+import Button from "../../elements/Button";
+import { ReactComponent as AddWalletIcon } from "../../../icons/add-wallet.svg";
 
 type ApproveConnectionProps = {
   approval: ConnectionApproval;
@@ -203,20 +207,24 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           />
         </div>
         <Separator />
-        <ScrollAreaContainer
-          className="w-full box-content -mr-5 pr-5"
-          viewPortClassName="py-2.5 viewportBlock"
-        >
-          {preparedAccounts.map((account, i) => (
-            <Account
-              key={account.address}
-              account={account}
-              checked={accountsToConnectRef.current.has(account.address)}
-              onToggleAdd={() => toggleAccount(account.address)}
-              className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
-            />
-          ))}
-        </ScrollAreaContainer>
+        {preparedAccounts.length === 0 ? (
+          <EmptyAccountsToConnect />
+        ) : (
+          <ScrollAreaContainer
+            className="w-full box-content -mr-5 pr-5 grow"
+            viewPortClassName="py-2.5 viewportBlock"
+          >
+            {preparedAccounts.map((account, i) => (
+              <Account
+                key={account.address}
+                account={account}
+                checked={accountsToConnectRef.current.has(account.address)}
+                onToggleAdd={() => toggleAccount(account.address)}
+                className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
+              />
+            ))}
+          </ScrollAreaContainer>
+        )}
         <ConnectionWarnings />
       </ChainIdProvider>
     </ApprovalLayout>
@@ -267,6 +275,30 @@ const ConnectionWarnings: FC = () => (
         <h4 className="text-xs text-brand-inactivedark mt-2">{label}</h4>
       </div>
     ))}
+  </div>
+);
+
+const EmptyAccountsToConnect: FC = () => (
+  <div
+    className={classNames(
+      "flex flex-col items-center justify-center mx-auto",
+      "w-full h-full py-4",
+      "text-sm text-brand-inactivedark2 text-center"
+    )}
+  >
+    <NoResultsFoundIcon className="mb-4" />
+    <div>There no wallets to connect.</div>
+    <Button
+      theme="secondary"
+      onClick={() => {
+        console.log("click");
+        openInTabStrict({ addAccOpened: true }, ["token"]);
+      }}
+      className="ml-5 !py-1 !text-sm !min-w-[8rem] mt-2.5"
+    >
+      <AddWalletIcon className="h-5 w-auto mr-1.5" />
+      Add Wallet
+    </Button>
   </div>
 );
 
