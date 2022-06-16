@@ -57,6 +57,15 @@ a {
     #0c0d1e;
 }
 
+.brandbg-secondary-modal {
+  background: radial-gradient(
+      33.62% 91.96% at 64.57% 13.41%,
+      #26273a 0%,
+      rgba(19, 20, 39, 0) 78.62%
+    ),
+    linear-gradient(115.9deg, #2b2e41 7.71%, #1b1d31 44.05%, #131427 66.44%);
+}
+
 /**
  * TailwindCSS
  */

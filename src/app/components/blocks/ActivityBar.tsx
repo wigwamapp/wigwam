@@ -52,8 +52,9 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
         "transition-transform duration-300",
         activityOpened && "!translate-y-[120%]",
         "w-[calc(100%-1.5rem)] max-w-[75rem]",
-        "bg-brand-darkblue/20",
-        "backdrop-blur-[10px]",
+        // "bg-brand-darkblue/20",
+        // "backdrop-blur-[10px]",
+        "!bg-[#0D1020]", // TODO: Add firefox:
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
         "flex justify-between",

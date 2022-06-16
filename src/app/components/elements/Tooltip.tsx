@@ -89,14 +89,16 @@ const getSizeClasses = (size: sizeType) =>
     .with("large", () =>
       classNames(
         "rounded-[.625rem]",
-        "bg-brand-main/10 backdrop-blur-[60px]",
+        // "bg-brand-main/10 backdrop-blur-[60px]",
+        "!bg-[#1F2134]/[.95]", // TODO: Add firefox:
         "py-5 px-5"
       )
     )
     .otherwise(() =>
       classNames(
         "rounded-md",
-        "bg-brand-main/20 backdrop-blur-[6px]",
+        // "bg-brand-main/20 backdrop-blur-[6px]",
+        "!bg-[#1F2134]/[.95]", // TODO: Add firefox:
         "py-1 px-3"
       )
     );

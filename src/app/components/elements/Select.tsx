@@ -204,9 +204,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 size === "small" && "mt-1.5 min-w-[10.5rem]",
                 "w-full",
                 "rounded-[.625rem]",
-                "bg-brand-dark bg-opacity-10",
-                "backdrop-blur-[30px]",
-                "firefox:bg-opacity-90",
+                // "bg-brand-dark/10",
+                // "backdrop-blur-[30px]",
+                "!bg-[#111226]", // TODO: firefox:
                 "border border-brand-light/5",
                 "z-10",
                 contentClassName

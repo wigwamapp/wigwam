@@ -40,8 +40,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
             "bg-brand-main/[.05]",
-            "border border-brand-main/[.15]",
-            "backdrop-blur-[40px]",
+            // "border border-brand-main/[.15]",
+            // "backdrop-blur-[40px]",
+            "brandbg-secondary-modal", // TODO: add for firefox
             "rounded-[1.875rem]",
             "overflow-hidden",
             "animate-dialogcontent",

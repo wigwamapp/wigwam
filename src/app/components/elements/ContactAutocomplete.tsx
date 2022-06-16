@@ -195,8 +195,9 @@ const ContactAutocomplete = forwardRef<
               "mt-2",
               "w-full min-w-[17.75rem]",
               "rounded-[.625rem]",
-              "bg-brand-dark/10",
-              "backdrop-blur-[30px]",
+              // "bg-brand-dark/10",
+              // "backdrop-blur-[30px]",
+              "!bg-[#111226]", // TODO: firefox:
               "border border-brand-light/5",
               "z-10",
               "w-[23.25rem]"
