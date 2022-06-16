@@ -20,7 +20,6 @@ import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
 import { debankApi, getDebankChain } from "../debank";
-import { getMyRandomAddress } from "../_randomAddresses";
 
 const GET_LOGS_ENABLED = false;
 
@@ -30,8 +29,6 @@ export const syncTokenActivities = memoize(
   (chainId: number, accountAddress: string, tokenSlug: string) =>
     enqueue(async () => {
       try {
-        const tpAddress = await getMyRandomAddress(accountAddress, chainId);
-
         const token = parseTokenSlug(tokenSlug);
 
         if (
@@ -72,7 +69,7 @@ export const syncTokenActivities = memoize(
 
             const { data } = await debankApi.get("/user/history_list", {
               params: {
-                id: tpAddress,
+                id: accountAddress,
                 chain_id: debankChain.id,
                 token_id: debankTokenId,
                 page_count: 50,
@@ -149,15 +146,6 @@ export const syncTokenActivities = memoize(
                 token_approve &&
                 token_approve.token_id === debankTokenId
               ) {
-                console.info({
-                  id: txHash,
-                  sends,
-                  receives,
-                  token_approve,
-                  time_at,
-                  project_id,
-                });
-
                 const amount = new BigNumber(token_approve.value)
                   .times(decimalsFactor)
                   .integerValue();
@@ -198,9 +186,12 @@ export const syncTokenActivities = memoize(
 
         const currentBlock = await provider.getBlockNumber();
 
-        const transferOutTopic = erc20Token.filters.Transfer(tpAddress);
-        const transferInTopic = erc20Token.filters.Transfer(null, tpAddress);
-        const approvalTopic = erc20Token.filters.Approval(tpAddress);
+        const transferOutTopic = erc20Token.filters.Transfer(accountAddress);
+        const transferInTopic = erc20Token.filters.Transfer(
+          null,
+          accountAddress
+        );
+        const approvalTopic = erc20Token.filters.Approval(accountAddress);
 
         const step = 3_500 - 1;
         const limit = step * 10;

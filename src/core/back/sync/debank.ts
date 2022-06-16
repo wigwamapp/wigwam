@@ -1,8 +1,6 @@
 import axios from "axios";
 import memoize from "mem";
 
-import { getMyRandomAddress } from "./_randomAddresses";
-
 export const debankApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
   timeout: 60_000,
@@ -37,7 +35,7 @@ export const getDebankUserChainBalance = memoize(
       const { data } = await debankApi.get("/user/chain_balance", {
         params: {
           chain_id: debankChain.id,
-          id: await getMyRandomAddress(accountAddress, chainId),
+          id: accountAddress,
         },
       });
 

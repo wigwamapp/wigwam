@@ -8,8 +8,6 @@ import { requestBalance } from "core/common/balance";
 
 import { getRpcProvider } from "../rpc";
 
-import { getMyRandomAddress } from "./_randomAddresses";
-
 export const getAccountTokenFromChain = async (
   chainId: number,
   accountAddress: string,
@@ -41,11 +39,9 @@ export const getBalanceFromChain = memoize(
   async (chainId: number, tokenSlug: string, accountAddress: string) => {
     const provider = getRpcProvider(chainId);
 
-    return requestBalance(
-      provider,
-      tokenSlug,
-      await getMyRandomAddress(accountAddress, chainId)
-    ).catch(() => null);
+    return requestBalance(provider, tokenSlug, accountAddress).catch(
+      () => null
+    );
   },
   {
     cacheKey: (args) => args.join("_"),

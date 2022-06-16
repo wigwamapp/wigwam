@@ -23,7 +23,6 @@ import * as repo from "core/repo";
 import { getDebankChain, debankApi } from "../debank";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
-import { getMyRandomAddress } from "../_randomAddresses";
 
 export const syncAccountTokens = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -50,7 +49,7 @@ export const syncAccountTokens = memoize(
       const { data: debankUserTokens } = await debankApi
         .get("/user/token_list", {
           params: {
-            id: await getMyRandomAddress(accountAddress, chainId),
+            id: accountAddress,
             chain_id: debankChain.id,
             is_all: false,
           },
