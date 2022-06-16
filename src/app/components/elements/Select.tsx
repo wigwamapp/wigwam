@@ -38,6 +38,7 @@ export type SelectProps<T, U> = {
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
   size?: "large" | "small";
+  spinner?: boolean;
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -62,6 +63,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   emptySearchText,
   onOpenChange,
   size = "large",
+  spinner,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -177,6 +179,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 <span className="min-w-0 truncate">{currentItem.value}</span>
               ) : (
                 currentItem.value
+              )}
+              {spinner && (
+                <div className="relative ml-1 h-4 w-4">
+                  <div className="double-bounce1"></div>
+                  <div className="double-bounce2"></div>
+                </div>
               )}
               <ChevronDownIcon
                 className={classNames(

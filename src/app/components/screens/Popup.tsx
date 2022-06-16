@@ -28,7 +28,7 @@ import {
   currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useIsSyncing } from "app/hooks";
 import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
@@ -86,6 +86,7 @@ const PreloadAndSync: FC = ({ children }) => {
 
 const PopupNetworkSelect: FC = () => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
+  const isSyncing = useIsSyncing();
 
   const handleChange = useCallback(
     (chainId: number) => {
@@ -108,6 +109,7 @@ const PopupNetworkSelect: FC = () => {
       currentItemIconClassName="!w-8 !h-8 !mr-3"
       contentClassName="w-[22.25rem]"
       onChange={handleChange}
+      spinner={isSyncing}
     />
   );
 };

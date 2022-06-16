@@ -15,6 +15,7 @@ type NetworkSelectProps = {
   onChange?: (chainId: number) => void;
   changeInternalChainId?: boolean;
   size?: "large" | "small";
+  spinner?: boolean;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
@@ -26,6 +27,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   onChange,
   changeInternalChainId = true,
   size = "large",
+  spinner,
 }) => {
   const currentNetwork = useLazyNetwork();
   const allNetworks = useLazyAllNetworks() ?? [];
@@ -48,6 +50,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       className={className}
       withAction={withAction}
       size={size}
+      spinner={spinner}
       currentItemClassName={classNames(
         size === "small" ? "h-[1.75rem]" : "h-12",
         currentItemClassName

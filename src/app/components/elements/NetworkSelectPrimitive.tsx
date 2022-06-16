@@ -23,6 +23,7 @@ type NetworkSelectProps = {
   onNetworkChange: (chainId: number) => void;
   withAction?: boolean;
   size?: "large" | "small";
+  spinner?: boolean;
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -35,6 +36,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   onNetworkChange,
   withAction = true,
   size = "large",
+  spinner,
   className,
   currentItemClassName,
   currentItemIconClassName,
@@ -82,6 +84,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       contentClassName={contentClassName}
       modal={true}
       size={size}
+      spinner={spinner}
       actions={
         withAction ? (
           <IconedButton
