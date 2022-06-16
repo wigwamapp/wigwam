@@ -1,11 +1,11 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
 import { Field, Form } from "react-final-form";
 
 import { unlockWallet } from "core/client";
 
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
-import { AttentionModal } from "app/components/screens/Unlock";
+import AttentionModal from "app/components/blocks/AttentionModal";
 import Button from "app/components/elements/Button";
 import PasswordField from "app/components/elements/PasswordField";
 
@@ -16,10 +16,18 @@ type PasswordFormProps = {
   theme?: "large" | "small";
   unlockCallback?: (password: string) => void;
   className?: string;
+  autoFocus?: boolean;
+  attentionModal?: boolean;
 };
 
 const PasswordForm = memo<PasswordFormProps>(
-  ({ theme = "large", unlockCallback, className }) => {
+  ({
+    theme = "large",
+    unlockCallback,
+    className,
+    autoFocus,
+    attentionModal = true,
+  }) => {
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
@@ -40,6 +48,14 @@ const PasswordForm = memo<PasswordFormProps>(
       [unlockCallback]
     );
 
+    const passwordFieldRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      if (autoFocus) {
+        setTimeout(() => passwordFieldRef.current?.focus?.(), 20);
+      }
+    }, [autoFocus]);
+
     return (
       <Form<FormValues>
         onSubmit={handleSubmit}
@@ -55,6 +71,7 @@ const PasswordForm = memo<PasswordFormProps>(
             <Field name="password" validate={required}>
               {({ input, meta }) => (
                 <PasswordField
+                  ref={passwordFieldRef}
                   className="max-w-[19rem] w-full relative min-h-[6.125rem]"
                   placeholder={"*".repeat(8)}
                   label="Password"
@@ -82,27 +99,33 @@ const PasswordForm = memo<PasswordFormProps>(
               <Button type="submit" className="w-full" loading={submitting}>
                 Unlock
               </Button>
-              <button
-                type="button"
-                className={classNames(
-                  "w-full text-brand-inactivelight",
-                  theme === "large" && "text-sm mt-6",
-                  theme === "small" && "text-xs mt-4"
-                )}
-                onClick={() => {
-                  setAttention(true);
-                }}
-              >
-                <u>Forgot the password?</u>
-                <br />
-                Want to <u>sign into another profile?</u>
-              </button>
+
+              {attentionModal && (
+                <button
+                  type="button"
+                  className={classNames(
+                    "w-full text-brand-inactivelight",
+                    theme === "large" && "text-sm mt-6",
+                    theme === "small" && "text-xs mt-4"
+                  )}
+                  onClick={() => {
+                    setAttention(true);
+                  }}
+                >
+                  <u>Forgot the password?</u>
+                  <br />
+                  Want to <u>sign into another profile?</u>
+                </button>
+              )}
             </div>
-            <AttentionModal
-              key={String(attention)}
-              open={attention}
-              onOpenChange={() => setAttention(false)}
-            />
+
+            {attentionModal && (
+              <AttentionModal
+                key={String(attention)}
+                open={attention}
+                onOpenChange={() => setAttention(false)}
+              />
+            )}
           </form>
         )}
       />

@@ -1,4 +1,4 @@
-import { FC, memo, useLayoutEffect } from "react";
+import { FC, memo, Suspense, useLayoutEffect } from "react";
 import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
@@ -11,10 +11,14 @@ import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
 import ApproveConnection from "./screens/approvals/Connection";
 import ApproveTransaction from "./screens/approvals/Transaction";
+import ApproveSigning from "./screens/approvals/Signing";
+import Dialog from "./blocks/Dialog";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
     <ApproveRouter />
+
+    <Dialog small />
   </BaseProvider>
 );
 
@@ -25,7 +29,7 @@ const ApproveRouter: FC = () => {
 
   return match(walletStatus)
     .with(WalletStatus.Unlocked, () => <Approvals />)
-    .with(WalletStatus.Locked, () => <Unlock />)
+    .with(WalletStatus.Locked, () => <Unlock isApproval />)
     .otherwise(() => <Destroy />);
 };
 
@@ -39,13 +43,16 @@ const Destroy: FC = () => {
 
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
-
   const currentApproval = approvals[0];
 
   if (!currentApproval) return null;
 
   return (
-    <CurrentApproval key={currentApproval.id} approval={currentApproval} />
+    <div className="h-screen">
+      <Suspense fallback={null}>
+        <CurrentApproval key={currentApproval.id} approval={currentApproval} />
+      </Suspense>
+    </div>
   );
 };
 
@@ -55,14 +62,16 @@ type CurrentApprovalProps = {
 
 const CurrentApproval = memo<CurrentApprovalProps>(({ approval }) =>
   match(approval)
+    .with({ type: ActivityType.Connection }, (conApproval) => (
+      <ApproveConnection approval={conApproval} />
+    ))
     .with({ type: ActivityType.Transaction }, (txApproval) => (
       <ChainIdProvider chainId={txApproval.chainId}>
         <ApproveTransaction approval={txApproval} />
       </ChainIdProvider>
     ))
-    // .with({ type: ActivityType.Signing }, (sigApproval) => <ApproveSigning approval={sigApproval} />)
-    .with({ type: ActivityType.Connection }, (conApproval) => (
-      <ApproveConnection approval={conApproval} />
+    .with({ type: ActivityType.Signing }, (sigApproval) => (
+      <ApproveSigning approval={sigApproval} />
     ))
     .otherwise(() => null)
 );

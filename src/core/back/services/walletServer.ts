@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
-import { getRandomInt } from "lib/system/randomInt";
 
 import {
   Request,
@@ -9,10 +8,11 @@ import {
   MessageType,
   PorterChannel,
   WalletStatus,
+  SelfActivityKind,
 } from "core/types";
 
 import {
-  $walletStatus,
+  $walletState,
   $approvals,
   ensureInited,
   withStatus,
@@ -22,16 +22,19 @@ import {
   walletPortsCountUpdated,
   accountsUpdated,
   $syncStatus,
-} from "./state";
-import { Vault } from "./vault";
-import { handleRpc } from "./rpc";
-import { processApprove } from "./approve";
-import { startApproveWindowServer } from "./approve/window";
-import { addFindTokenRequest, addSyncRequest, getTPGasPrices } from "./sync";
+  seedPhraseAdded,
+} from "../state";
+import { Vault } from "../vault";
+import { handleRpc } from "../rpc";
+import { processApprove } from "../approve";
+import {
+  addFindTokenRequest,
+  addSyncRequest,
+  getTPGasPrices,
+  syncTokenActivities,
+} from "../sync";
 
-export function startServer() {
-  startApproveWindowServer();
-
+export function startWalletServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
 
   walletPorter.onConnection(() => {
@@ -40,8 +43,12 @@ export function startServer() {
 
   walletPorter.onMessage<Request, Response>(handleWalletRequest);
 
-  $walletStatus.watch((status) => {
-    walletPorter.broadcast({ type: MessageType.WalletStatusUpdated, status });
+  $walletState.watch(([status, hasSeedPhrase]) => {
+    walletPorter.broadcast({
+      type: MessageType.WalletStateUpdated,
+      status,
+      hasSeedPhrase,
+    });
   });
 
   accountsUpdated.watch((accounts) => {
@@ -61,29 +68,6 @@ export function startServer() {
       status,
     });
   });
-
-  let attempts = +sessionStorage.passwordUsageAttempts || 0;
-
-  Vault.onPasswordUsage = async (success) => {
-    if (success) {
-      attempts = 0;
-    } else {
-      attempts++;
-
-      if (attempts > 5) {
-        await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
-      }
-
-      if (attempts > 3) {
-        locked();
-      }
-    }
-
-    sessionStorage.passwordUsageAttempts = attempts;
-  };
-
-  // const dappPorter = new PorterServer(PorterChannel.DApp);
-  // dappPorter.onMessage(handleDAppRequest);
 }
 
 async function handleWalletRequest(
@@ -95,10 +79,10 @@ async function handleWalletRequest(
     await ensureInited();
 
     await match(ctx.data)
-      .with({ type: MessageType.GetWalletStatus }, async ({ type }) => {
-        const status = $walletStatus.getState();
+      .with({ type: MessageType.GetWalletState }, async ({ type }) => {
+        const [status, hasSeedPhrase] = $walletState.getState();
 
-        ctx.reply({ type, status });
+        ctx.reply({ type, status, hasSeedPhrase });
       })
       .with(
         { type: MessageType.SetupWallet },
@@ -111,7 +95,9 @@ async function handleWalletRequest(
             );
 
             const accounts = vault.getAccounts();
-            unlocked({ vault, accounts });
+            const hasSeedPhrase = vault.isSeedPhraseExists();
+
+            unlocked({ vault, accounts, hasSeedPhrase });
 
             ctx.reply({ type });
           })
@@ -121,7 +107,9 @@ async function handleWalletRequest(
           const vault = await Vault.unlock(password);
 
           const accounts = vault.getAccounts();
-          unlocked({ vault, accounts });
+          const hasSeedPhrase = vault.isSeedPhraseExists();
+
+          unlocked({ vault, accounts, hasSeedPhrase });
 
           ctx.reply({ type });
         })
@@ -140,13 +128,6 @@ async function handleWalletRequest(
             ctx.reply({ type });
           })
       )
-      .with({ type: MessageType.HasSeedPhrase }, async ({ type }) =>
-        withVault(async (vault) => {
-          const seedPhraseExists = vault.isSeedPhraseExists();
-
-          ctx.reply({ type, seedPhraseExists });
-        })
-      )
       .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
           const accounts = vault.getAccounts();
@@ -162,6 +143,10 @@ async function handleWalletRequest(
 
             const accounts = vault.getAccounts();
             accountsUpdated(accounts);
+
+            if (seedPhrase) {
+              seedPhraseAdded();
+            }
 
             ctx.reply({ type });
           })
@@ -248,6 +233,13 @@ async function handleWalletRequest(
             addFindTokenRequest(chainId, accountAddress, tokenSlug);
           })
       )
+      .with(
+        { type: MessageType.SyncTokenActivities },
+        ({ chainId, accountAddress, tokenSlug }) =>
+          withStatus(WalletStatus.Unlocked, () => {
+            syncTokenActivities(chainId, accountAddress, tokenSlug);
+          })
+      )
       .with({ type: MessageType.GetTPGasPrices }, ({ type, chainId }) =>
         withStatus(WalletStatus.Unlocked, async () => {
           const gasPrices = await getTPGasPrices(chainId);
@@ -265,7 +257,7 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.SendRpc },
         ({ type, chainId, method, params }) => {
-          handleRpc(chainId, method, params, (response) =>
+          handleRpc(UNKNOWN_SELF_SOURCE, chainId, method, params, (response) =>
             ctx.reply({ type, response })
           );
         }
@@ -277,3 +269,8 @@ async function handleWalletRequest(
     ctx.replyError(err);
   }
 }
+
+const UNKNOWN_SELF_SOURCE = {
+  type: "self",
+  kind: SelfActivityKind.Unknown,
+} as const;

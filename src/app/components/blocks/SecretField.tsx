@@ -12,9 +12,10 @@ import { downloadFile } from "lib/download";
 import { TippySingletonProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import IconedButton from "app/components/elements/IconedButton";
-import LongTextField, {
-  LongTextFieldProps,
-} from "app/components/elements/LongTextField";
+import { LongTextFieldProps } from "app/components/elements/LongTextField";
+import ContentEditableField, {
+  ContentEditableFieldProps,
+} from "app/components/elements/ContentEditableField";
 import Button from "app/components/elements/Button";
 import Input, { InputProps } from "app/components/elements/Input";
 import CanvasTextField, {
@@ -142,7 +143,6 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "text-sm text-brand-light",
           "!p-0 !pr-1 !min-w-0",
           "!font-normal",
-          "cursor-copy",
           "items-center",
           isShown
             ? "bottom-3 right-3"
@@ -261,12 +261,22 @@ const ImportSecretField = forwardRef<
       {...(rest as InputProps)}
     />
   ) : (
-    <LongTextField
-      ref={ref as RefObject<HTMLTextAreaElement>}
-      label={label}
-      labelActions={labelActions}
-      actions={actions}
-      {...(rest as LongTextFieldProps)}
-    />
+    <>
+      {/* <LongTextField
+        ref={ref as RefObject<HTMLTextAreaElement>}
+        label={label}
+        labelActions={labelActions}
+        actions={actions}
+        {...(rest as LongTextFieldProps)}
+      /> */}
+
+      <ContentEditableField
+        ref={ref as RefObject<HTMLDivElement>}
+        label={label}
+        labelActions={labelActions}
+        actions={actions}
+        {...(rest as ContentEditableFieldProps)}
+      />
+    </>
   );
 });

@@ -1,6 +1,9 @@
 import { memo, forwardRef, TextareaHTMLAttributes, ReactNode } from "react";
 import classNames from "clsx";
 
+import Tooltip, { TooltipProps } from "./Tooltip";
+import TooltipIcon from "./TooltipIcon";
+
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
   labelActions?: ReactNode;
@@ -8,6 +11,9 @@ export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   textareaClassName?: string;
   error?: boolean;
   errorMessage?: string;
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
+  hoverStyles?: boolean;
 };
 
 const LongTextField = memo(
@@ -23,8 +29,12 @@ const LongTextField = memo(
         errorMessage,
         disabled,
         readOnly,
+        tooltip,
+        tooltipProps,
         className,
         textareaClassName,
+        autoComplete = "off",
+        hoverStyles = true,
         ...rest
       },
       ref
@@ -36,15 +46,24 @@ const LongTextField = memo(
               {label && (
                 <label
                   htmlFor={id}
-                  className="text-base text-brand-gray cursor-pointer"
+                  className="text-base text-brand-gray cursor-pointer flex align-center"
                 >
                   {label}
+                  {tooltip && (
+                    <Tooltip
+                      content={tooltip}
+                      {...tooltipProps}
+                      className="ml-2"
+                    >
+                      <TooltipIcon className="!w-4 !h-4" />
+                    </Tooltip>
+                  )}
                 </label>
               )}
               {labelActions}
             </div>
           )}
-          <div className="relative flex">
+          <div className="relative flex group">
             <textarea
               ref={ref}
               spellCheck={spellCheck}
@@ -64,10 +83,11 @@ const LongTextField = memo(
                 "placeholder-brand-placeholder",
                 "resize-none",
                 error && !readOnly && "!border-brand-redobject",
-                !disabled && [
-                  "group-hover:bg-brand-main/5",
-                  "group-hover:border-brand-main/5",
-                ],
+                !disabled &&
+                  hoverStyles && [
+                    "group-hover:bg-brand-main/5",
+                    "group-hover:border-brand-main/5",
+                  ],
                 "focus:border-brand-main/[.15]",
                 disabled && [
                   "bg-brand-disabledbackground/20",
@@ -76,6 +96,7 @@ const LongTextField = memo(
                 ],
                 textareaClassName
               )}
+              autoComplete={autoComplete}
               {...rest}
             />
             {actions}

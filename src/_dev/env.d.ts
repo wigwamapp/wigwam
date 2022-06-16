@@ -8,6 +8,7 @@ declare namespace NodeJS {
     readonly RELEASE_ENV: "true" | "false";
     readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
     readonly VERSION: string;
+    readonly BUILD_ID: string;
     // Vigvam specific
     readonly VIGVAM_WEBSITE_ORIGIN: string;
     // Dev

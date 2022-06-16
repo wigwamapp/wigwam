@@ -3,6 +3,7 @@
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
+const { nanoid } = require("nanoid");
 const webpack = require("webpack");
 const loaderUtils = require("loader-utils");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -68,6 +69,7 @@ const ENV_BADGE = [
   RELEASE_ENV === "true" ? null : "staging",
 ].find(Boolean);
 const VERSION = pkg.version;
+const BUILD_ID = nanoid();
 const ES_TARGET = tsConfig.compilerOptions.target;
 const SOURCE_MAP = RELEASE_ENV === "false" && SOURCE_MAP_ENV !== "false";
 const IMAGE_INLINE_SIZE_LIMIT = parseInt(IMAGE_INLINE_SIZE_LIMIT_ENV);
@@ -148,6 +150,7 @@ module.exports = {
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
+      "@metamask/eth-sig-util": "lib/eth-sig-util",
       // For `react-error-guard`
       "babel-runtime/regenerator": "regenerator-runtime",
     },
@@ -308,8 +311,9 @@ module.exports = {
       // for env vars
       "process.env.NODE_ENV": JSON.stringify(NODE_ENV),
       "process.env.RELEASE_ENV": JSON.stringify(RELEASE_ENV),
-      "process.env.VERSION": JSON.stringify(VERSION),
       "process.env.TARGET_BROWSER": JSON.stringify(TARGET_BROWSER),
+      "process.env.VERSION": JSON.stringify(VERSION),
+      "process.env.BUILD_ID": JSON.stringify(BUILD_ID),
       ...(() => {
         const appEnvs = {};
         for (const k of Object.keys(process.env)) {
@@ -319,6 +323,10 @@ module.exports = {
         }
         return appEnvs;
       })(),
+    }),
+
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
     }),
 
     new MiniCssExtractPlugin({

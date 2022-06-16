@@ -16,7 +16,6 @@ type ChecksumSnapshot = {
   manifest: string;
 };
 
-const ACTIVE_TAB_RELOAD = process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true";
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
 const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
@@ -72,35 +71,22 @@ async function watchChanges(
       if (
         checksum.content !== lastChecksum.content ||
         checksum.locales !== lastChecksum.locales ||
-        checksum.manifest !== lastChecksum.manifest
+        checksum.manifest !== lastChecksum.manifest ||
+        checksum.background !== lastChecksum.background
       ) {
-        const activeTab = await getActiveTab();
+        const activeTab = await getActiveMainTab();
         if (activeTab?.url)
           localStorage.setItem(RELOAD_TAB_FLAG, activeTab.url);
 
         chrome.runtime.reload();
       } else {
-        let reloadSelf = false;
-        let activeTab: chrome.tabs.Tab | undefined;
-
-        if (checksum.background !== lastChecksum.background) {
-          reloadSelf = true;
-          activeTab = await getActiveTab();
-        }
-
         const tabs = await queryTabs({
           url: getExtensionUrlPattern(),
         });
 
-        // Reload background script
-        if (reloadSelf) location.reload();
-        // Reload active tab
-        if (activeTab) chrome.tabs.reload(activeTab.id!);
-        // Reload other extension tab
+        // Reload extension tabs
         for (const tab of tabs) {
-          if (!activeTab || tab.id !== activeTab.id) {
-            chrome.tabs.reload(tab.id!);
-          }
+          chrome.tabs.reload(tab.id!);
         }
         // Reload popup
         chrome.extension.getViews({ type: "popup" }).forEach((popupWindow) => {
@@ -188,11 +174,11 @@ function getContentScripts() {
   return Array.from(scriptSet);
 }
 
-async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
+async function getActiveMainTab(): Promise<chrome.tabs.Tab | undefined> {
   const tabs = await queryTabs({
     active: true,
     lastFocusedWindow: true,
-    url: ACTIVE_TAB_RELOAD ? undefined : getExtensionUrlPattern(),
+    url: getExtensionUrlPattern("main.html"),
   });
   return tabs[0];
 }
@@ -203,6 +189,6 @@ function queryTabs(params: chrome.tabs.QueryInfo) {
   );
 }
 
-function getExtensionUrlPattern() {
-  return `chrome-extension://${chrome.runtime.id}/**`;
+function getExtensionUrlPattern(path = "**") {
+  return `chrome-extension://${chrome.runtime.id}/${path}`;
 }

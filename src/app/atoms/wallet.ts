@@ -1,23 +1,33 @@
-import { atomFamily } from "jotai/utils";
+import { atomFamily, selectAtom } from "jotai/utils";
 import { dequal } from "dequal/lite";
-import { atomWithAutoReset, atomWithStorage } from "lib/atom-utils";
-
 import {
-  getWalletStatus,
-  isWalletHasSeedPhrase,
-  onWalletStatusUpdated,
+  atomWithAutoReset,
+  atomWithRepoQuery,
+  atomWithStorage,
+} from "lib/atom-utils";
+
+import * as repo from "core/repo";
+import {
+  getWalletState,
+  onWalletStateUpdated,
   getNeuterExtendedKey,
   getSyncStatus,
   onSyncStatusUpdated,
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
 
-export const walletStatusAtom = atomWithAutoReset(getWalletStatus, {
-  onMount: onWalletStatusUpdated,
+export const walletStateAtom = atomWithAutoReset(getWalletState, {
+  onMount: onWalletStateUpdated,
 });
 
-export const hasSeedPhraseAtom = atomWithAutoReset(() =>
-  isWalletHasSeedPhrase().catch(() => false)
+export const walletStatusAtom = selectAtom(
+  walletStateAtom,
+  ({ status }) => status
+);
+
+export const hasSeedPhraseAtom = selectAtom(
+  walletStateAtom,
+  ({ hasSeedPhrase }) => hasSeedPhrase
 );
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
@@ -35,4 +45,10 @@ export const getLocalNonceAtom = atomFamily(
       null
     ),
   dequal
+);
+
+export const getPermissionAtom = atomFamily((origin?: string) =>
+  atomWithRepoQuery((query) =>
+    query(() => repo.permissions.get(origin || "<stub>"))
+  )
 );

@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { match } from "ts-pattern";
 import Tippy, { TippyProps } from "@tippyjs/react";
 
-import { useOverflowRef, useTippySingletonTarget } from "app/hooks";
+import { useOverflowElement, useTippySingletonTarget } from "app/hooks";
 
 type sizeType = "large" | "small";
 
@@ -29,7 +29,7 @@ const Tooltip: FC<TooltipProps> = ({
   duration = [100, 50],
   ...rest
 }) => {
-  const overflowElementRef = useOverflowRef();
+  const overflowElement = useOverflowElement();
   const singletonTarget = useTippySingletonTarget();
 
   return (
@@ -48,7 +48,7 @@ const Tooltip: FC<TooltipProps> = ({
         </>
       }
       interactive={interactive ?? size === "large"}
-      appendTo={overflowElementRef?.current ?? document.body}
+      appendTo={overflowElement ?? document.body}
       maxWidth={maxWidth ?? (size === "large" ? "18rem" : "none")}
       placement={placement ?? (size === "large" ? "right-start" : "bottom")}
       hideOnClick={hideOnClick}

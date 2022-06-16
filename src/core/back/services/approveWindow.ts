@@ -1,17 +1,27 @@
 import browser, { Tabs } from "webextension-polyfill";
-import { getPublicURL } from "lib/ext/utils";
+import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
 import { livePromise } from "lib/system/livePromise";
 import { createQueue } from "lib/system/queue";
 
-import { $approvals, approvalAdded } from "core/back/state";
+import { Approval } from "core/types";
+
+import { $approvals, approvalAdded } from "../state";
 
 const APPROVE_WINDOW_URL = getPublicURL("approve.html");
+const WINDOW_POSITION =
+  process.env.NODE_ENV === "development" ? "center" : "top-right";
+
 const enqueueOpenApprove = createQueue();
 
-export function startApproveWindowServer() {
+export function startApproveWindowOpener() {
   browser.runtime.onMessage.addListener((msg) => {
     if (msg === "__OPEN_APPROVE_WINDOW") {
       openApproveWindow();
+
+      const currentApproval = $approvals.getState()[0];
+      if (currentApproval) {
+        focusApprovalTab(currentApproval);
+      }
     }
   });
 
@@ -27,6 +37,8 @@ export function startApproveWindowServer() {
       } catch (err) {
         console.error(err);
       }
+    } else {
+      focusApprovalTab(approvals[0]);
     }
   });
 }
@@ -43,7 +55,7 @@ export const openApproveWindow = () =>
           focused: true,
         });
       } else {
-        await createApproveWindow();
+        await createApproveWindow(WINDOW_POSITION);
       }
     } catch (err) {
       console.error(err);
@@ -103,6 +115,20 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
   }
 );
 
+function focusApprovalTab(currentApproval: Approval) {
+  if (currentApproval.source.type === "page") {
+    if (currentApproval.source.tabId) {
+      browser.tabs
+        .update(currentApproval.source.tabId, {
+          highlighted: true,
+        })
+        .catch(console.error);
+    }
+  } else {
+    openOrFocusMainTab();
+  }
+}
+
 async function pickCurrentApproveTab() {
   const approveTabs = await browser.tabs.query({
     url: `${APPROVE_WINDOW_URL}*`,
@@ -119,9 +145,7 @@ async function pickCurrentApproveTab() {
   return approveTabs[0] ?? null;
 }
 
-async function createApproveWindow(
-  position: "center" | "top-right" = "center"
-) {
+async function createApproveWindow(position: "center" | "top-right") {
   const width = 440;
   const height = 660;
 

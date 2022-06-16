@@ -10,23 +10,27 @@ import {
   Sync,
   SyncStatus,
   FindToken,
+  SyncTokenActivities,
 } from "core/types";
 
 import { porter } from "./base";
 
-export async function getWalletStatus() {
-  const type = MessageType.GetWalletStatus;
+export async function getWalletState() {
+  const type = MessageType.GetWalletState;
   const res = await porter.request({ type });
   assert(res?.type === type);
-  return res.status;
+
+  const { status, hasSeedPhrase } = res;
+  return { status, hasSeedPhrase };
 }
 
-export function onWalletStatusUpdated(
-  callback: (newWalletStatus: WalletStatus) => void
+export function onWalletStateUpdated(
+  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void
 ) {
   return porter.onOneWayMessage<EventMessage>((msg) => {
-    if (msg?.type === MessageType.WalletStatusUpdated) {
-      callback(msg.status);
+    if (msg?.type === MessageType.WalletStateUpdated) {
+      const { status, hasSeedPhrase } = msg;
+      callback({ status, hasSeedPhrase });
     }
   });
 }
@@ -136,15 +140,6 @@ export async function updateAccountName(accountUuid: string, name: string) {
   assert(res?.type === type);
 }
 
-export async function isWalletHasSeedPhrase() {
-  const type = MessageType.HasSeedPhrase;
-
-  const res = await porter.request({ type });
-  assert(res?.type === type);
-
-  return res.seedPhraseExists;
-}
-
 export async function getSeedPhrase(password: string) {
   password = toProtectedString(password);
 
@@ -225,6 +220,21 @@ export function findToken(
 ) {
   const msg: FindToken = {
     type: MessageType.FindToken,
+    chainId,
+    accountAddress,
+    tokenSlug,
+  };
+
+  porter.sendOneWayMessage(msg);
+}
+
+export function syncTokenActivities(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string
+) {
+  const msg: SyncTokenActivities = {
+    type: MessageType.SyncTokenActivities,
     chainId,
     accountAddress,
     tokenSlug,

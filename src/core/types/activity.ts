@@ -1,21 +1,41 @@
 import type { ethers } from "ethers";
 
 import { RpcReply } from "./rpc";
+import { Permission } from "./permissions";
 
 export enum ActivityType {
   Connection = "CONNECTION",
   Transaction = "TRANSACTION",
   Signing = "SIGNING",
+  AddNetwork = "ADD_NETWORK",
+  AddToken = "ADD_TOKEN",
+}
+
+export enum SigningStandard {
+  EthSign = "eth_sign",
+  PersonalSign = "personal_sign",
+  SignTypedDataV1 = "signTypedData_v1",
+  SignTypedDataV3 = "signTypedData_v3",
+  SignTypedDataV4 = "signTypedData_v4",
+}
+
+export enum SelfActivityKind {
+  Transfer,
+  Swap,
+  Unknown,
 }
 
 export type ActivitySource =
   | {
       type: "self";
-      kind: string;
+      kind: SelfActivityKind;
     }
   | {
-      type: "dapp";
-      origin: string;
+      type: "page";
+      url: string;
+      permission?: Permission;
+      tabId?: number;
+      favIconUrl?: string;
     };
 
 export interface ApprovalResult {
@@ -24,6 +44,7 @@ export interface ApprovalResult {
   signedRawTx?: string;
   signedMessage?: string;
   accountAddresses?: string[];
+  overriddenChainId?: number;
 }
 
 export type Approval =
@@ -31,29 +52,52 @@ export type Approval =
   | SigningApproval
   | ConnectionApproval;
 
-export interface ApprovalBase {
+export type Activity = (
+  | TransactionActivity
+  | SigningActivity
+  | ConnectionActivity
+) & {
+  pending: number;
+};
+
+export interface ActivityBase {
   id: string;
   type: ActivityType;
   source: ActivitySource;
-  rpcReply: RpcReply;
+  timeAt: number;
+  rpcReply?: RpcReply; // only exists on approval & on back side
 }
 
-export interface TransactionApproval extends ApprovalBase {
+export interface TransactionApproval extends ActivityBase {
   type: ActivityType.Transaction;
   chainId: number;
   accountAddress: string;
   txParams: TxParams;
 }
 
-export interface SigningApproval extends ApprovalBase {
-  type: ActivityType.Signing;
-  message: string;
+export interface TransactionActivity extends TransactionApproval {
+  rawTx: string;
+  txHash: string;
+  result?: any;
 }
 
-export interface ConnectionApproval extends ApprovalBase {
+export interface SigningApproval extends ActivityBase {
+  type: ActivityType.Signing;
+  standard: SigningStandard;
+  accountAddress: string;
+  message: any;
+}
+
+export type SigningActivity = SigningApproval; // There are no additional fields
+
+export interface ConnectionApproval extends ActivityBase {
   type: ActivityType.Connection;
-  origin: string;
-  favIconUrl: string;
+  returnSelectedAccount: boolean; // For legacy eth_requestAccounts
+  preferredChainId?: number;
+}
+
+export interface ConnectionActivity extends ConnectionApproval {
+  accountAddresses: string[];
 }
 
 export type TxParams = {
@@ -101,7 +145,7 @@ export interface TokenTransferAction {
 
 export interface TokenApproveAction {
   type: TxActionType.TokenApprove;
-  toAddress?: string;
+  toAddress: string;
   tokenSlug?: string;
   allTokensContract?: string;
   amount?: string;
@@ -111,6 +155,7 @@ export interface TokenApproveAction {
 export interface ContractInteractionAction {
   type: TxActionType.ContractInteraction;
   contractAddress: string;
+  nativeTokenAmount?: string;
   method?: string;
   args?: any[];
 }
@@ -118,3 +163,36 @@ export interface ContractInteractionAction {
 export interface ContractDeploymentAction {
   type: TxActionType.ContractDeployment;
 }
+
+export type TokenActivityType = "transfer" | "approve";
+
+export interface TokenActivityBase {
+  chainId: number;
+  accountAddress: string;
+  tokenSlug: string;
+  txHash: string;
+  timeAt: number;
+  type: TokenActivityType;
+  project?: TokenActivityProject;
+}
+
+export type TokenActivity = TransferTokenActivity | ApproveTokenActivity;
+
+export interface TransferTokenActivity extends TokenActivityBase {
+  type: "transfer";
+  anotherAddress: string;
+  amount: string;
+}
+
+export interface ApproveTokenActivity extends TokenActivityBase {
+  type: "approve";
+  anotherAddress: string;
+  amount?: string;
+  clears?: boolean;
+}
+
+export type TokenActivityProject = {
+  name: string;
+  logoUrl?: string;
+  siteUrl?: string;
+};

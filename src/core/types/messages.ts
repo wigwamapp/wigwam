@@ -5,12 +5,11 @@ import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 
 export type Request =
-  | GetWalletStatusRequest
+  | GetWalletStateRequest
   | SetupWalletRequest
   | UnlockWalletRequest
   | LockWalletRequest
   | ChangePasswordRequest
-  | HasSeedPhraseRequest
   | GetAccountsRequest
   | AddAccountsRequest
   | DeleteAccountsRequest
@@ -26,12 +25,11 @@ export type Request =
   | GetSyncStatusRequest;
 
 export type Response =
-  | GetWalletStatusResponse
+  | GetWalletStateResponse
   | SetupWalletResponse
   | UnlockWalletResponse
   | LockWalletResponse
   | ChangePasswordResponse
-  | HasSeedPhraseResponse
   | GetAccountsResponse
   | AddAccountsResponse
   | DeleteAccountsResponse
@@ -47,21 +45,21 @@ export type Response =
   | ApproveResponse;
 
 export type EventMessage =
-  | WalletStatusUpdated
+  | WalletStateUpdated
   | AccountsUpdated
   | ApprovalsUpdated
   | Sync
   | FindToken
+  | SyncTokenActivities
   | SyncStatusUpdated;
 
 export enum MessageType {
-  GetWalletStatus = "GET_WALLET_STATUS",
-  WalletStatusUpdated = "WALLET_STATUS_UPDATED",
+  GetWalletState = "GET_WALLET_STATE",
+  WalletStateUpdated = "WALLET_STATE_UPDATED",
   SetupWallet = "SETUP_WALLET",
   UnlockWallet = "UNLOCK_WALLET",
   LockWallet = "LOCK_WALLET",
   ChangePassword = "CHANGE_PASSWORD",
-  HasSeedPhrase = "HAS_SEED_PHRASE",
   GetAccounts = "GET_ACCOUNTS",
   AddAccounts = "ADD_ACCOUNTS",
   DeleteAccounts = "DELETE_ACCOUNTS",
@@ -73,6 +71,7 @@ export enum MessageType {
   GetNeuterExtendedKey = "GET_NEUTER_EXTENDED_KEY",
   Sync = "SYNC",
   FindToken = "FIND_TOKEN",
+  SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
   GetTPGasPrices = "GET_TP_GAS_PRICES",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
@@ -86,18 +85,20 @@ export interface MessageBase {
   type: MessageType;
 }
 
-export interface GetWalletStatusRequest extends MessageBase {
-  type: MessageType.GetWalletStatus;
+export interface GetWalletStateRequest extends MessageBase {
+  type: MessageType.GetWalletState;
 }
 
-export interface GetWalletStatusResponse extends MessageBase {
-  type: MessageType.GetWalletStatus;
+export interface GetWalletStateResponse extends MessageBase {
+  type: MessageType.GetWalletState;
   status: WalletStatus;
+  hasSeedPhrase: boolean;
 }
 
-export interface WalletStatusUpdated extends MessageBase {
-  type: MessageType.WalletStatusUpdated;
+export interface WalletStateUpdated extends MessageBase {
+  type: MessageType.WalletStateUpdated;
   status: WalletStatus;
+  hasSeedPhrase: boolean;
 }
 
 export interface SetupWalletRequest extends MessageBase {
@@ -136,15 +137,6 @@ export interface ChangePasswordRequest extends MessageBase {
 
 export interface ChangePasswordResponse extends MessageBase {
   type: MessageType.ChangePassword;
-}
-
-export interface HasSeedPhraseRequest extends MessageBase {
-  type: MessageType.HasSeedPhrase;
-}
-
-export interface HasSeedPhraseResponse extends MessageBase {
-  type: MessageType.HasSeedPhrase;
-  seedPhraseExists: boolean;
 }
 
 export interface GetAccountsRequest extends MessageBase {
@@ -240,6 +232,13 @@ export interface Sync extends MessageBase {
 
 export interface FindToken extends MessageBase {
   type: MessageType.FindToken;
+  chainId: number;
+  accountAddress: string;
+  tokenSlug: string;
+}
+
+export interface SyncTokenActivities extends MessageBase {
+  type: MessageType.SyncTokenActivities;
   chainId: number;
   accountAddress: string;
   tokenSlug: string;

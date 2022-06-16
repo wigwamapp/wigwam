@@ -19,6 +19,7 @@ export type PrettyAmountProps = {
   isMinified?: boolean;
   isDecimalsMinified?: boolean;
   copiable?: boolean;
+  asSpan?: boolean;
   prefix?: ReactNode;
   threeDots?: boolean;
   className?: string;
@@ -33,6 +34,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     isMinified = false,
     isDecimalsMinified = false,
     copiable = false,
+    asSpan = false,
     prefix,
     threeDots = true,
     className,
@@ -94,6 +96,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
       dec: isMinified ? 3 : undefined,
       locale: currentLocale,
       useGrouping: false,
+      isDecimalsMinified,
     });
     let content = getPrettyAmount({
       value: isFiatMinified
@@ -108,6 +111,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
       locale: currentLocale,
       isFiat,
       currency,
+      isDecimalsMinified,
     });
 
     if (isShownIntTooltip) {
@@ -117,6 +121,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
         locale: currentLocale,
         isFiat,
         currency,
+        isDecimalsMinified,
       });
 
       tooltipContent = getPrettyAmount({
@@ -136,6 +141,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
         dec: 38,
         locale: currentLocale,
         useGrouping: false,
+        isDecimalsMinified,
       });
     }
 
@@ -150,6 +156,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
         threeDots,
         isFiat,
         currency,
+        isDecimalsMinified,
       });
 
       tooltipContent = getPrettyAmount({
@@ -163,6 +170,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
         value: convertedAmount,
         locale: currentLocale,
         useGrouping: false,
+        isDecimalsMinified,
       });
     }
 
@@ -197,6 +205,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           followCursor
           plugins={[followCursor]}
           asChild
+          asSpan={asSpan}
           className={className}
         >
           {children}
@@ -240,6 +249,7 @@ export const getPrettyAmount = ({
   isFiat = false,
   currency,
   threeDots = false,
+  isDecimalsMinified = false,
 }: {
   value: number | BigNumber;
   dec?: number;
@@ -248,6 +258,7 @@ export const getPrettyAmount = ({
   isFiat?: boolean;
   currency?: string;
   threeDots?: boolean;
+  isDecimalsMinified?: boolean;
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
     const isLargerThenTrillion = new BigNumber(value).gt(1e16);
@@ -284,7 +295,7 @@ export const getPrettyAmount = ({
     isFiat ? currency : undefined
   )
     .format(+value)
-    .replace("US$", "$")}${threeDots ? "..." : ""}`;
+    .replace("US$", "$")}${threeDots && !isDecimalsMinified ? "..." : ""}`;
 };
 
 const getIntlNumberFormat = memoize(

@@ -4,52 +4,55 @@ import { isPopup } from "lib/ext/view";
 import { getMainURL } from "lib/ext/utils";
 import { Destination, toHash, navigate } from "lib/navigation";
 
-export async function openInTab(to?: Destination) {
+export async function openInTab(to?: Destination, merge?: boolean | string[]) {
   if (!isPopup()) {
     to && navigate(to);
     return;
   }
 
   try {
-    const hash = to && toHash(to);
-
-    const [mainTabs, currentTabs] = await Promise.all(
-      [
-        {
-          url: getMainURL("**"),
-        },
-        {
-          active: true,
-        },
-      ].map((params) =>
-        browser.tabs.query({
-          currentWindow: true,
-          ...params,
-        })
-      )
-    );
-
-    const url = getMainURL(`#${hash ?? ""}`);
+    const mainTabs = await browser.tabs.query({
+      currentWindow: true,
+      url: getMainURL("**"),
+    });
 
     if (mainTabs.length > 0) {
       const tab = mainTabs[0];
+
+      const tabHash = tab.url && new URL(tab.url).hash.slice(1);
+      const tabUsp = tabHash && new URLSearchParams(tabHash);
+      const newTabHash = tabUsp && toHash(to ?? {}, merge, tabUsp);
+      const newTabUrl = getMainURL(`#${newTabHash ?? ""}`);
+
       browser.tabs.update(
         tab.id,
-        tab.url === url ? { active: true } : { url, active: true }
-      );
-    } else if (
-      currentTabs.length > 0 &&
-      currentTabs[0].url &&
-      (currentTabs[0].url.includes("://newtab") ||
-        currentTabs[0].url.includes("://startpageshared"))
-    ) {
-      const tab = currentTabs[0];
-      browser.tabs.update(
-        tab.id,
-        tab.url === url ? { active: true } : { url, active: true }
+        tab.url === newTabUrl
+          ? { active: true }
+          : { url: newTabUrl, active: true }
       );
     } else {
-      browser.tabs.create({ url, active: true });
+      const currentTabs = await browser.tabs.query({
+        currentWindow: true,
+        active: true,
+      });
+
+      const hash = to && toHash(to);
+      const url = getMainURL(`#${hash ?? ""}`);
+
+      if (
+        currentTabs.length > 0 &&
+        currentTabs[0].url &&
+        (currentTabs[0].url.includes("://newtab") ||
+          currentTabs[0].url.includes("://startpageshared"))
+      ) {
+        const tab = currentTabs[0];
+        browser.tabs.update(
+          tab.id,
+          tab.url === url ? { active: true } : { url, active: true }
+        );
+      } else {
+        browser.tabs.create({ url, active: true });
+      }
     }
   } catch (err) {
     console.error(err);

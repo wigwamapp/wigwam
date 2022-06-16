@@ -12,6 +12,7 @@ export type SecondaryModalProps = DialogProps & {
   autoFocus?: boolean;
   className?: string;
   headerClassName?: string;
+  small?: boolean;
 };
 
 const SecondaryModal: FC<SecondaryModalProps> = ({
@@ -23,6 +24,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
   children,
   className,
   headerClassName,
+  small,
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -33,8 +35,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         />
         <Dialog.Content
           className={classNames(
-            "fixed z-20",
-            "max-w-[43rem] w-full p-[3.75rem]",
+            "fixed z-20 w-full",
+            small ? "max-w-[22.25rem]" : "max-w-[43rem]",
+            small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
             "bg-brand-main/[.05]",
             "border border-brand-main/[.15]",
@@ -52,7 +55,14 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         >
           {header && (
             <h2
-              className={classNames("mb-8 text-2xl font-bold", headerClassName)}
+              className={classNames(
+                !small && "mb-8",
+                small && "mb-4",
+                !small && "text-2xl",
+                small && "text-xl",
+                "text-center font-bold",
+                headerClassName
+              )}
             >
               {header}
             </h2>

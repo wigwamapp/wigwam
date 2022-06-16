@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
@@ -6,11 +6,24 @@ import Sidebar from "app/components/blocks/Sidebar";
 import Menu from "app/components/blocks/Menu";
 import ActivityBar from "app/components/blocks/ActivityBar";
 
-import PreloadUnlocked from "./PreloadUnlocked";
+import PreloadBaseAndSync from "./PreloadBaseAndSync";
+
+let bootAnimationDisplayed = true;
+const handleBootAnimationEnd = () => {
+  bootAnimationDisplayed = false;
+};
 
 const MainPageLayout: FC = ({ children }) => (
-  <PreloadUnlocked>
-    <div className="h-screen flex flex-col">
+  <PreloadBaseAndSync>
+    <div
+      className={classNames(
+        "h-screen flex flex-col",
+        bootAnimationDisplayed && "animate-bootfadein"
+      )}
+      onAnimationEnd={
+        bootAnimationDisplayed ? handleBootAnimationEnd : undefined
+      }
+    >
       <ContentContainer className="flex grow max-h-screen">
         <Sidebar />
 
@@ -22,9 +35,12 @@ const MainPageLayout: FC = ({ children }) => (
           {children}
         </main>
       </ContentContainer>
-      <ActivityBar />
+
+      <Suspense fallback={null}>
+        <ActivityBar />
+      </Suspense>
     </div>
-  </PreloadUnlocked>
+  </PreloadBaseAndSync>
 );
 
 export default MainPageLayout;

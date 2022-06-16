@@ -5,3 +5,4 @@ export * from "./tippy";
 export * from "./provider";
 export * from "./tokens";
 export * from "./account";
+export * from "./activity";

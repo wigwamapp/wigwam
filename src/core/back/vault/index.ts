@@ -10,6 +10,12 @@ import {
 import { BytesLike, ethers, Signature } from "ethers";
 import { hexZeroPad, splitSignature, stripZeros } from "@ethersproject/bytes";
 import * as secp256k1 from "@noble/secp256k1";
+import {
+  personalSign,
+  signTypedData,
+  SignTypedDataVersion,
+} from "@metamask/eth-sig-util";
+import { Buffer } from "buffer";
 import memoizeOne from "memoize-one";
 import {
   createKdbx,
@@ -36,6 +42,7 @@ import {
   LedgerAccount,
   WatchOnlyAccount,
   Account,
+  SigningStandard,
 } from "core/types";
 import {
   PublicError,
@@ -46,6 +53,7 @@ import {
   getSeedPhraseHDNode,
   validateNoAccountDuplicates,
   validateDerivationPath,
+  add0x,
 } from "core/common";
 
 const {
@@ -333,6 +341,47 @@ export class Vault {
     });
   }
 
+  signMessage(accUuid: string, standard: SigningStandard, data: any) {
+    return withError(t("failedToSign"), () => {
+      const privKeyProtected = this.getKeyForce(accUuid, "privateKey");
+
+      const privateKey = Buffer.from(stripZeros(privKeyProtected.getText()));
+
+      try {
+        switch (standard) {
+          case SigningStandard.PersonalSign:
+            return personalSign({ data, privateKey });
+
+          case SigningStandard.SignTypedDataV1:
+            return signTypedData({
+              version: SignTypedDataVersion.V1,
+              data,
+              privateKey,
+            });
+
+          case SigningStandard.SignTypedDataV3:
+            return signTypedData({
+              version: SignTypedDataVersion.V3,
+              data: JSON.parse(data),
+              privateKey,
+            });
+
+          case SigningStandard.SignTypedDataV4:
+            return signTypedData({
+              version: SignTypedDataVersion.V4,
+              data: JSON.parse(data),
+              privateKey,
+            });
+
+          default:
+            throw null;
+        }
+      } finally {
+        zeroBuffer(privateKey);
+      }
+    });
+  }
+
   async getPrivateKey(password: string, accUuid: string) {
     await this.verify(password);
 
@@ -388,11 +437,10 @@ export class Vault {
           }
 
           case AccountSource.PrivateKey: {
-            const privateKey = importProtected(params.privateKey);
-
-            const publicKey = ethers.utils.computePublicKey(
-              privateKey.getText()
+            const privateKey = add0x(
+              importProtected(params.privateKey).getText()
             );
+            const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
 
             const account: PrivateKeyAccount = {
@@ -402,7 +450,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey,
+              privateKey: ProtectedValue.fromString(privateKey),
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -410,15 +458,13 @@ export class Vault {
           }
 
           case AccountSource.OpenLogin: {
-            const social = params.social;
-            const socialName = params.socialName;
-            const socialEmail = params.socialEmail;
-            const privateKey = importProtected(params.privateKey);
-
-            const publicKey = ethers.utils.computePublicKey(
-              `0x${privateKey.getText()}`
+            const privateKey = add0x(
+              importProtected(params.privateKey).getText()
             );
+            const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
+
+            const { social, socialName, socialEmail } = params;
 
             const account: SocialAccount = {
               ...base,
@@ -430,7 +476,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              privateKey,
+              privateKey: ProtectedValue.fromString(privateKey),
               publicKey: ProtectedValue.fromString(publicKey),
             };
 
@@ -439,9 +485,11 @@ export class Vault {
 
           case AccountSource.Ledger: {
             const derivationPath = params.derivationPath;
-            const publicKey = importProtected(params.publicKey);
-
-            const address = ethers.utils.computeAddress(publicKey.getText());
+            const publicKey = ethers.utils.computePublicKey(
+              add0x(importProtected(params.publicKey).getText()),
+              true
+            );
+            const address = ethers.utils.computeAddress(publicKey);
 
             const account: LedgerAccount = {
               ...base,
@@ -451,7 +499,7 @@ export class Vault {
             };
 
             const keys: AccountKeys = {
-              publicKey,
+              publicKey: ProtectedValue.fromString(publicKey),
             };
 
             return { account, keys };

@@ -1,20 +1,22 @@
 import {
   FC,
-  memo,
   forwardRef,
+  memo,
   useCallback,
-  useRef,
-  useState,
   useEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
+import mergeRefs from "react-merge-refs";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 
@@ -23,29 +25,47 @@ import {
   TokenStandard,
   TokenStatus,
   TokenType,
+  TokenActivity as TokenActivityPrimitive,
+  TokenActivityProject,
 } from "core/types";
-import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
+import {
+  createTokenActivityKey,
+  createTokenSlug,
+  parseTokenSlug,
+} from "core/common/tokens";
 import { findToken } from "core/client";
 import * as repo from "core/repo";
 
-import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
-import { Page } from "app/nav";
+import {
+  LOAD_MORE_ON_ACTIVITY_FROM_END,
+  LOAD_MORE_ON_ASSET_FROM_END,
+} from "app/defaults";
+import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
+  OverflowProvider,
   TippySingletonProvider,
   useChainId,
   useIsSyncing,
   useLazyNetwork,
+  useTokenActivitiesSync,
+  useTokenActivity,
 } from "app/hooks";
-import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
+import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
+import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg";
+import { ReactComponent as ActivityReceiveIcon } from "app/icons/activity-receive.svg";
+import { ReactComponent as ActivityApproveIcon } from "app/icons/activity-approve.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -54,14 +74,16 @@ import Button from "../elements/Button";
 import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import AssetLogo from "../elements/AssetLogo";
-import AddressField from "../elements/AddressField";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
 import PriceArrow from "../elements/PriceArrow";
 import ComingSoon from "../elements/ComingSoon";
+import SmallContactCard from "../elements/SmallContactCard";
+import PrettyDate from "../elements/PrettyDate";
+import Avatar from "../elements/Avatar";
 
 const OverviewContent: FC = () => (
-  <div className="flex mt-6 min-h-0 grow">
+  <div className="flex min-h-0 grow">
     <TokenExplorer />
   </div>
 );
@@ -217,7 +239,7 @@ const AssetsList: FC<AssetsListProps> = ({
       let t = setTimeout(() => {
         const tokenSlug = createTokenSlug({
           standard: TokenStandard.ERC20,
-          address: searchValue!,
+          address: ethers.utils.getAddress(searchValue!),
           id: "0",
         });
 
@@ -260,7 +282,7 @@ const AssetsList: FC<AssetsListProps> = ({
   return (
     <div
       className={classNames(
-        "w-[23.25rem] min-w-[23.25rem] pr-6",
+        "w-[23.25rem] min-w-[23.25rem] pr-6 mt-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col"
       )}
@@ -501,22 +523,41 @@ const AssetCard = memo(
   )
 );
 
+enum TokenStandardValue {
+  NATIVE = "Native",
+  ERC20 = "ERC-20",
+  ERC721 = "ERC-721",
+  ERC777 = "ERC-777",
+  ERC1155 = "ERC-1155",
+}
+
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const currentNetwork = useLazyNetwork();
 
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset;
-  const parsedTokenSlug = useMemo(
-    () => tokenSlug && parseTokenSlug(tokenSlug),
+  const chainId = useChainId();
+  const currentAccount = useAtomValue(currentAccountAtom);
+
+  useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
+
+  const currentNetwork = useLazyNetwork();
+  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  const { standard, address } = useMemo(
+    () => parseTokenSlug(tokenSlug),
     [tokenSlug]
   );
 
-  if (!tokenInfo || !parsedTokenSlug) {
-    return null;
-  }
+  const { copy, copied } = useCopyToClipboard(address);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
+  }, [tokenSlug]);
+
+  if (!tokenInfo) return null;
 
   const {
-    chainId,
     status,
     name,
     symbol,
@@ -526,157 +567,195 @@ const AssetInfo: FC = () => {
     priceUSDChange,
     balanceUSD,
   } = tokenInfo;
-  const { standard, address } = parsedTokenSlug;
 
   const coinGeckoId =
     status === TokenStatus.Native
       ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
       : address;
 
+  const explorerUrl = currentNetwork?.explorerUrls?.[0];
+
   return (
-    <div className="w-[31.5rem] ml-6 pb-20 flex flex-col">
-      <div className="flex mb-5">
-        <AssetLogo
-          asset={tokenInfo}
-          alt={name}
-          className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
-        />
-        <div className="flex flex-col justify-between grow min-w-0">
-          <div className="flex items-center">
-            <h2
-              className={classNames("text-2xl font-bold", "mr-4", "truncate")}
-            >
-              {name}
-            </h2>
-            <TippySingletonProvider>
-              <div className="ml-auto flex items-center">
-                {currentNetwork?.explorerUrls?.[0] &&
-                  status !== TokenStatus.Native && (
-                    <IconedButton
-                      aria-label="View asset in Explorer"
-                      Icon={WalletExplorerIcon}
-                      className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                      iconClassName="!w-[1.125rem]"
-                      href={`${currentNetwork.explorerUrls[0]}/address/${address}`}
+    <OverflowProvider>
+      {(ref) => (
+        <ScrollAreaContainer
+          ref={mergeRefs([ref, scrollAreaRef])}
+          hiddenScrollbar="horizontal"
+          className="ml-6 pr-5 -mr-5 flex flex-col"
+          viewPortClassName="pb-20 pt-6 viewportBlock"
+          scrollBarClassName="py-0 pt-[18.75rem] pb-20"
+          type="scroll"
+        >
+          <div className="w-[31.5rem]">
+            <div className="flex mb-5">
+              <AssetLogo
+                asset={tokenInfo}
+                alt={name}
+                className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
+              />
+              <div className="flex flex-col justify-between grow min-w-0">
+                <div className="flex items-center">
+                  <h2
+                    className={classNames(
+                      "text-2xl font-bold",
+                      "mr-4",
+                      "truncate"
+                    )}
+                  >
+                    {name}
+                  </h2>
+                  <TippySingletonProvider>
+                    <div className="ml-auto flex items-center">
+                      {status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label={
+                            copied
+                              ? "Copied"
+                              : `Copy ${TokenStandardValue[standard]} token address`
+                          }
+                          Icon={copied ? SuccessIcon : CopyIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          onClick={copy}
+                        />
+                      )}
+                      {explorerUrl && status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label="View asset in Explorer"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={`${explorerUrl}/address/${address}`}
+                        />
+                      )}
+                      {coinGeckoId && (
+                        <IconedButton
+                          aria-label="View asset in CoinGecko"
+                          Icon={CoinGeckoIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem]"
+                          iconClassName="!w-[1.125rem]"
+                          href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                        />
+                      )}
+                    </div>
+                  </TippySingletonProvider>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-base text-brand-gray leading-none mb-0.5">
+                    Price
+                  </span>
+                  <span className="flex items-center">
+                    <FiatAmount
+                      amount={priceUSD ?? 0}
+                      copiable
+                      className="text-lg font-bold leading-6 mr-3"
                     />
-                  )}
-                {coinGeckoId && (
-                  <IconedButton
-                    aria-label="View asset in CoinGecko"
-                    Icon={CoinGeckoIcon}
-                    className="!w-6 !h-6 min-w-[1.5rem]"
-                    iconClassName="!w-[1.125rem]"
-                    href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                    {priceUSDChange && (
+                      <PriceChange priceChange={priceUSDChange} isPercent />
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-base text-brand-gray leading-none mb-3">
+                Balance
+              </div>
+
+              <div className="flex items-end">
+                <FiatAmount
+                  amount={balanceUSD ?? 0}
+                  copiable
+                  className="text-[1.75rem] font-bold leading-none mr-4"
+                />
+                {priceUSDChange && (
+                  <PriceChange
+                    priceChange={new BigNumber(priceUSDChange)
+                      .times(balanceUSD)
+                      .div(100)}
                   />
                 )}
               </div>
-            </TippySingletonProvider>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-base text-brand-gray leading-none mb-0.5">
-              Price
-            </span>
-            <span className="flex items-center">
-              <FiatAmount
-                amount={priceUSD ?? 0}
-                copiable
-                className="text-lg font-bold leading-6 mr-3"
-              />
-              {priceUSDChange && (
-                <PriceChange priceChange={priceUSDChange} isPercent />
+              <div className="mt-1">
+                <PrettyAmount
+                  amount={rawBalance ?? 0}
+                  decimals={decimals}
+                  currency={symbol}
+                  copiable
+                  className="text-lg text-brand-inactivelight"
+                />
+              </div>
+            </div>
+            <div className="mt-6 grid grid-cols-3 gap-2">
+              <Button
+                to={{ page: Page.Transfer }}
+                merge={["token"]}
+                theme="secondary"
+                className="grow !py-2"
+              >
+                <SendIcon className="w-6 h-auto mr-2" />
+                Transfer
+              </Button>
+              <Button
+                to={{ page: Page.Swap }}
+                theme="secondary"
+                className="grow !py-2"
+              >
+                <SwapIcon className="w-6 h-auto mr-2" />
+                Swap
+              </Button>
+              {status === TokenStatus.Native && (
+                <Button
+                  to={{
+                    page: Page.Receive,
+                    receive: ReceiveTabEnum.BuyWithCrypto,
+                  }}
+                  theme="secondary"
+                  className="grow !py-2"
+                >
+                  <BuyIcon className="w-6 h-auto mr-2" />
+                  Buy
+                </Button>
               )}
-            </span>
+            </div>
+
+            <TokenActivity />
+
+            {/*{status !== TokenStatus.Native && (*/}
+            {/*  <div className="mt-6 max-w-[23.25rem]">*/}
+            {/*    <AddressField*/}
+            {/*      key={address}*/}
+            {/*      label="Token address"*/}
+            {/*      value={address}*/}
+            {/*      readOnly*/}
+            {/*      labelActions={standard ? <Tag standard={standard} /> : undefined}*/}
+            {/*    />*/}
+            {/*  </div>*/}
+            {/*)}*/}
           </div>
-        </div>
-      </div>
-      <div>
-        <div className="text-base text-brand-gray leading-none mb-3">
-          Balance
-        </div>
-
-        <div className="flex items-end">
-          <FiatAmount
-            amount={balanceUSD ?? 0}
-            copiable
-            className="text-[1.75rem] font-bold leading-none mr-4"
-          />
-          {priceUSDChange && (
-            <PriceChange
-              priceChange={new BigNumber(priceUSDChange)
-                .times(balanceUSD)
-                .div(100)}
-            />
-          )}
-        </div>
-        <div className="mt-1">
-          <PrettyAmount
-            amount={rawBalance ?? 0}
-            decimals={decimals}
-            currency={symbol}
-            copiable
-            className="text-lg text-brand-inactivelight"
-          />
-        </div>
-      </div>
-      <div className="mt-6 grid grid-cols-3 gap-2">
-        <Button
-          to={{ page: Page.Transfer }}
-          merge={["token"]}
-          theme="secondary"
-          className="grow !py-2"
-        >
-          <SendIcon className="w-6 h-auto mr-2" />
-          Transfer
-        </Button>
-        <Button theme="secondary" className="grow !py-2">
-          <SwapIcon className="w-6 h-auto mr-2" />
-          Swap
-        </Button>
-        <Button theme="secondary" className="grow !py-2">
-          <ActivityIcon className="w-6 h-auto mr-2" />
-          Activity
-        </Button>
-      </div>
-
-      {status !== TokenStatus.Native && (
-        <div className="mt-6 max-w-[23.25rem]">
-          <AddressField
-            key={address}
-            label="Token address"
-            value={address}
-            readOnly
-            labelActions={standard ? <Tag standard={standard} /> : undefined}
-          />
-        </div>
+        </ScrollAreaContainer>
       )}
-    </div>
+    </OverflowProvider>
   );
 };
 
-enum TokenStandardValue {
-  ERC20 = "ERC-20",
-  ERC721 = "ERC-721",
-  ERC777 = "ERC-777",
-  ERC1155 = "ERC-1155",
-}
-
-type TagProps = { standard: TokenStandard };
-
-const Tag: FC<TagProps> = ({ standard }) =>
-  standard !== TokenStandard.Native ? (
-    <span
-      className={classNames(
-        "px-3",
-        "text-xs font-bold text-brand-inactivelight leading-none",
-        "h-6 box-border border border-brand-main/20",
-        "flex items-center",
-        "rounded-lg",
-        "whitespace-nowrap"
-      )}
-    >
-      {TokenStandardValue[standard]}
-    </span>
-  ) : null;
+// type TagProps = { standard: TokenStandard };
+//
+// const Tag: FC<TagProps> = ({ standard }) =>
+//   standard !== TokenStandard.Native ? (
+//     <span
+//       className={classNames(
+//         "px-3",
+//         "text-xs font-bold text-brand-inactivelight leading-none",
+//         "h-6 box-border border border-brand-main/20",
+//         "flex items-center",
+//         "rounded-lg",
+//         "whitespace-nowrap"
+//       )}
+//     >
+//       {TokenStandardValue[standard]}
+//     </span>
+//   ) : null;
 
 type PriceChangeProps = {
   priceChange: BigNumber.Value;
@@ -726,12 +805,14 @@ const PriceChange: FC<PriceChangeProps> = ({
             />
           }
           amount={value}
+          isDecimalsMinified={true}
           className="inline-flex items-center"
         />
       ) : (
         <FiatAmount
           prefix={isPositive ? "+" : "-"}
           amount={value}
+          isDecimalsMinified={true}
           copiable
           className="text-lg font-semibold"
         />
@@ -739,4 +820,224 @@ const PriceChange: FC<PriceChangeProps> = ({
       {isPercent ? "%" : ""}
     </span>
   );
+};
+
+const TokenActivity: FC = () => {
+  const tokenSlug = useAtomValue(tokenSlugAtom)!;
+  const currentAccount = useAtomValue(currentAccountAtom);
+  const { activity, loadMore, hasMore } = useTokenActivity(
+    currentAccount.address,
+    tokenSlug
+  );
+
+  const observer = useRef<IntersectionObserver>();
+  const loadMoreTriggerAssetRef = useCallback(
+    (node) => {
+      if (!activity) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [activity, hasMore, loadMore]
+  );
+
+  if (activity.length === 0) return null;
+
+  return (
+    <div className="flex flex-col mt-5 pt-1 border-t border-brand-main/[.07]">
+      {/*<h3 className="text-xl font-bold">Token activity</h3>*/}
+      {activity.map((activ, i) => (
+        <TokenActivityCard
+          ref={
+            i === activity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
+              ? loadMoreTriggerAssetRef
+              : null
+          }
+          key={createTokenActivityKey(activ)}
+          activity={activ}
+          // className={classNames(i !== activity.length - 1 ? "border-b" : "")}
+        />
+      ))}
+    </div>
+  );
+};
+
+type TokenActivityCardProps = {
+  activity: TokenActivityPrimitive;
+  className?: string;
+};
+
+const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
+  ({ activity, className }, ref) => {
+    const tokenInfo = useAccountToken(activity.tokenSlug)!;
+    const currentNetwork = useLazyNetwork();
+    const { copy, copied } = useCopyToClipboard(activity.txHash);
+
+    const explorerUrl = currentNetwork?.explorerUrls?.[0];
+    const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
+      getActivityInfo(activity);
+
+    return (
+      <div
+        ref={ref}
+        className={classNames(
+          "flex items-center",
+          "h-[4.875rem]",
+          "py-4",
+          "border-brand-main/[.07]",
+          className
+        )}
+      >
+        <div className="flex items-center w-[47%]">
+          <div
+            className={classNames(
+              "flex items-center justify-center",
+              "w-9 h-9 min-w-[2.25rem]",
+              "bg-brand-main/5",
+              "rounded-full",
+              "mr-3"
+            )}
+          >
+            <Icon className="w-5 h-5 opacity-75" />
+          </div>
+          <div className="flex flex-col items-start">
+            {new BigNumber(activity.amount ?? 0).gte(LARGE_AMOUNT) ? (
+              <span
+                className={classNames("text-base font-bold", amountClassName)}
+              >
+                ∞ {tokenInfo?.symbol}
+              </span>
+            ) : (
+              <PrettyAmount
+                amount={new BigNumber(activity.amount ?? 0).abs()}
+                decimals={tokenInfo?.decimals}
+                currency={tokenInfo?.symbol}
+                prefix={prefix}
+                isMinified={true}
+                copiable={true}
+                className={classNames("text-base font-bold", amountClassName)}
+              />
+            )}
+
+            <div className="mt-1 text-xs font-medium text-brand-inactivedark">
+              {label}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-start text-sm">
+          <SmallContactCard
+            address={activity.anotherAddress}
+            extended
+            isSmall
+            addButton={activity.type !== "approve" && !activity.project}
+            className="min-h-[1.5rem] text-brand-lightgray !-my-0"
+          />
+
+          <div className="mt-1 text-xs font-medium capitalize text-brand-inactivedark">
+            {activity.project ? (
+              <ProjectLabel project={activity.project} />
+            ) : (
+              <span>{anotherAddressLabel}</span>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col items-end ml-auto">
+          <div className="flex items-center">
+            <IconedButton
+              aria-label={copied ? "Copied" : "Copy transaction hash"}
+              Icon={copied ? SuccessIcon : CopyIcon}
+              className="!w-6 !h-6 min-w-[1.5rem]"
+              iconClassName="!w-[1.125rem]"
+              onClick={copy}
+            />
+            {explorerUrl && (
+              <IconedButton
+                aria-label="View transaction in Explorer"
+                Icon={WalletExplorerIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] ml-2"
+                iconClassName="!w-[1.125rem]"
+                href={`${explorerUrl}/tx/${activity.txHash}`}
+              />
+            )}
+          </div>
+          <div className="text-xs mt-1 text-brand-inactivedark">
+            <PrettyDate date={activity.timeAt} />
+            {/*{getPrettyDate(activity.timeAt)}*/}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
+type ProjectLabelProps = {
+  project: TokenActivityProject;
+  className?: string;
+};
+
+const ProjectLabel: FC<ProjectLabelProps> = ({ project, className }) => {
+  const children = (
+    <>
+      {project.logoUrl && (
+        <Avatar src={project.logoUrl} className="h-3 w-3 mr-1" />
+      )}
+
+      {project.name}
+    </>
+  );
+
+  return project.siteUrl ? (
+    <a
+      href={project.siteUrl}
+      target="_blank"
+      rel="nofollow noreferrer"
+      className={classNames("flex items-center hover:underline", className)}
+    >
+      {children}
+    </a>
+  ) : (
+    <span className={classNames("flex items-center", className)}>
+      {children}
+    </span>
+  );
+};
+
+const getActivityInfo = (activity: TokenActivityPrimitive) => {
+  if (activity.type === "approve") {
+    return {
+      Icon: ActivityApproveIcon,
+      prefix: null,
+      amountClassName: classNames("text-brand-main"),
+      label: "Approve",
+      anotherAddressLabel: "Operator",
+    };
+  }
+
+  if (new BigNumber(activity.amount).gte(0)) {
+    return {
+      Icon: ActivityReceiveIcon,
+      prefix: "+",
+      amountClassName: classNames("text-[#6BB77A]"),
+      label: activity.project ? "Interaction" : "Receive",
+      anotherAddressLabel: "Sender",
+    };
+  }
+
+  return {
+    Icon: ActivitySendIcon,
+    prefix: "-",
+    amountClassName: "",
+    label: activity.project ? "Interaction" : "Transfer",
+    anotherAddressLabel: "Recipient",
+  };
 };

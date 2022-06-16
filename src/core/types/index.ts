@@ -1,4 +1,5 @@
 export * from "./base";
+export * from "./storage";
 export * from "./account";
 export * from "./network";
 export * from "./messages";
@@ -9,3 +10,4 @@ export * from "./tokens";
 export * from "./sync";
 export * from "./fees";
 export * from "./contacts";
+export * from "./permissions";

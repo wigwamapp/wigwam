@@ -5,6 +5,7 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Account } from "core/types";
 
 import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
+import { Page } from "app/nav";
 
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
@@ -15,7 +16,7 @@ import CopiableTooltip from "./CopiableTooltip";
 import TooltipIcon from "./TooltipIcon";
 import WalletName from "./WalletName";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as ClockIcon } from "app/icons/clock.svg";
+import { ReactComponent as SettingsIcon } from "app/icons/setting-general.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
@@ -30,6 +31,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
   const [copied, setCopied] = useState(false);
 
   const currentNetwork = useLazyNetwork();
+  const explorerUrl = currentNetwork?.explorerUrls?.[0];
   const portfolioBalance = useToken(address)?.portfolioUSD;
 
   const transitionRef = useRef<HTMLDivElement>(null);
@@ -119,24 +121,22 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
               </div>
               <div className="flex mt-2">
                 <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
-                  {currentNetwork?.explorerUrls && (
+                  {explorerUrl && (
                     <IconedButton
-                      href={`${currentNetwork.explorerUrls}/address/${address}`}
+                      href={`${explorerUrl}/address/${address}`}
                       aria-label="View wallet in Explorer"
                       Icon={WalletExplorerIcon}
-                      className="!w-6 !h-6"
+                      className="!w-6 !h-6 mr-2"
                       iconClassName="!w-[1.125rem]"
                     />
                   )}
-                  {currentNetwork?.explorerUrls && (
-                    <IconedButton
-                      href={`${currentNetwork.explorerUrls}/address/${address}`}
-                      aria-label="View wallet activity"
-                      Icon={ClockIcon}
-                      className="!w-6 !h-6 ml-2"
-                      iconClassName="!w-[1.125rem]"
-                    />
-                  )}
+                  <IconedButton
+                    aria-label="Edit wallet"
+                    Icon={SettingsIcon}
+                    to={{ page: Page.Wallets }}
+                    className="!w-6 !h-6"
+                    iconClassName="!w-[1.125rem]"
+                  />
                 </div>
                 {portfolioBalance && (
                   <Balance

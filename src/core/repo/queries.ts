@@ -1,7 +1,12 @@
 import { parseTokenSlug } from "core/common/tokens";
 import { AccountToken, TokenStatus, TokenType } from "core/types";
 
-import { accountTokens, contacts } from "./helpers";
+import {
+  accountTokens,
+  activities,
+  contacts,
+  tokenActivities,
+} from "./helpers";
 
 export type QueryAccountTokensParams = {
   chainId: number;
@@ -26,7 +31,7 @@ export function queryAccountTokens({
 }: QueryAccountTokensParams) {
   let coll;
 
-  const baseArgs: any[] = [chainId, tokenType, accountAddress];
+  const baseArgs = [chainId, tokenType, accountAddress] as const;
 
   if (withDisabled) {
     coll = accountTokens
@@ -88,6 +93,61 @@ export function queryContacts({ search, offset, limit }: QueryContactsParams) {
       (contact) => match(contact.name) || match(contact.address)
     );
   }
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryActivitiesParams = {
+  pending: boolean;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryActivities({
+  pending,
+  offset,
+  limit,
+}: QueryActivitiesParams) {
+  let coll = activities.where("pending").equals(Number(pending)).reverse();
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryTokenActivitiesParams = {
+  chainId: number;
+  accountAddress: string;
+  tokenSlug: string;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryTokenActivities({
+  chainId,
+  accountAddress,
+  tokenSlug,
+  offset,
+  limit,
+}: QueryTokenActivitiesParams) {
+  let coll = tokenActivities
+    .where("[chainId+accountAddress+tokenSlug]")
+    .equals([chainId, accountAddress, tokenSlug])
+    .reverse();
 
   if (offset) {
     coll = coll.offset(offset);

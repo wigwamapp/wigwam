@@ -16,6 +16,7 @@ import {
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
+import { useToast } from "app/hooks/toast";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import ProfileGen from "app/components/blocks/ProfileGen";
@@ -30,6 +31,7 @@ type FormValues = {
 
 const Profile: FC = () => {
   const { all, currentId } = useAtomValue(profileStateAtom);
+  const { updateToast } = useToast();
   useI18NUpdate();
 
   const currentProfile = useMemo(
@@ -43,11 +45,12 @@ const Profile: FC = () => {
     async (name: string, profileSeed: string) => {
       try {
         await updateProfile(currentId, { name, avatarSeed: profileSeed });
+        updateToast("Profile name successfully updated!");
       } catch (err) {
         console.error(err);
       }
     },
-    [currentId]
+    [currentId, updateToast]
   );
 
   const handlePasswordChange = useCallback(
@@ -55,13 +58,14 @@ const Profile: FC = () => {
       withHumanDelay(async () => {
         try {
           await changePassword(values.oldPwd, values.newPwd);
+          updateToast("Profile password successfully updated!");
           form.restart();
           return;
         } catch (error: any) {
           return { oldPwd: error.message };
         }
       }),
-    []
+    [updateToast]
   );
 
   return (

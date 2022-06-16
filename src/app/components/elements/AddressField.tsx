@@ -9,7 +9,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as PasteIcon } from "app/icons/paste.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
-type AddressFieldProps = LongTextFieldProps & {
+export type AddressFieldProps = LongTextFieldProps & {
   setFromClipboard?: (value: string) => void;
 };
 
@@ -42,7 +42,6 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              !setFromClipboard && "cursor-copy",
               "items-center"
             )}
           >

@@ -4,8 +4,11 @@ import { AsyncDexie } from "./asyncDexie";
 
 export enum RepoTable {
   Networks = "networks",
-  AccountTokens = "account_tokens",
   Contacts = "contacts",
+  AccountTokens = "account_tokens",
+  TokenActivities = "token_activities",
+  Activities = "activities",
+  Permissions = "permissions",
 }
 
 export const db = new AsyncDexie(underProfile("main"));
@@ -16,11 +19,17 @@ export const db = new AsyncDexie(underProfile("main"));
 
 db.version(1).stores({
   [RepoTable.Networks]: "&chainId,[type+position],chainTag",
+  [RepoTable.Contacts]: "&address,name,addedAt",
   [RepoTable.AccountTokens]: [
     "",
     "[chainId+tokenSlug]",
     "[chainId+tokenType+accountAddress+balanceUSD]",
     "[chainId+tokenType+accountAddress+status+balanceUSD]",
   ].join(),
-  [RepoTable.Contacts]: "&address,name,addedAt",
+  [RepoTable.TokenActivities]: [
+    "",
+    "[chainId+accountAddress+tokenSlug+timeAt]",
+  ].join(),
+  [RepoTable.Activities]: ["&id", "[pending+timeAt]", "[type+pending]"].join(),
+  [RepoTable.Permissions]: "&origin,timeAt",
 });

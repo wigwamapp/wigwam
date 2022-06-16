@@ -21,6 +21,8 @@ type NetworkSelectProps = {
   networks: Network[];
   currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
+  withAction?: boolean;
+  size?: "large" | "small";
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -31,6 +33,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   networks,
   currentNetwork,
   onNetworkChange,
+  withAction = true,
+  size = "large",
   className,
   currentItemClassName,
   currentItemIconClassName,
@@ -70,23 +74,26 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
       searchValue={searchValue}
-      onSearch={setSearchValue}
+      onSearch={size === "large" ? setSearchValue : undefined}
       className={className}
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
+      size={size}
       actions={
-        <IconedButton
-          aria-label="Manage networks"
-          to={{ page: Page.Settings, setting: SettingTab.Networks }}
-          smartLink
-          onClick={handleLinkClick}
-          theme="tertiary"
-          Icon={GearIcon}
-          className="ml-2"
-        />
+        withAction ? (
+          <IconedButton
+            aria-label="Manage networks"
+            to={{ page: Page.Settings, setting: SettingTab.Networks }}
+            smartLink
+            onClick={handleLinkClick}
+            theme="tertiary"
+            Icon={GearIcon}
+            className="ml-2"
+          />
+        ) : undefined
       }
       emptySearchText={
         <>

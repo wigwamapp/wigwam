@@ -1,10 +1,11 @@
 import { FC } from "react";
+import classNames from "clsx";
 
 import { useDialog } from "app/hooks/dialog";
 import SecondaryModal from "app/components/elements/SecondaryModal";
 import Button from "app/components/elements/Button";
 
-const Dialog: FC = () => {
+const Dialog: FC<{ small?: boolean }> = ({ small }) => {
   const { modalData } = useDialog();
 
   if (!modalData) {
@@ -30,15 +31,32 @@ const Dialog: FC = () => {
       onOpenChange={onClose}
       header={header}
       autoFocus={withActions}
+      small={small}
       {...rest}
     >
-      <div className="text-base text-brand-font text-center w-full break-words flex flex-col items-center">
+      <div
+        className={classNames(
+          !small && "text-base",
+          small && "text-sm",
+          "text-brand-font text-center w-full break-words flex flex-col items-center"
+        )}
+      >
         {children}
       </div>
       {withActions && (
-        <div className="flex flex-row-reverse mt-5">
+        <div
+          className={classNames(
+            "flex flex-row-reverse",
+            !small && "mt-5",
+            small && "mt-3"
+          )}
+        >
           {primaryButtonText && (
-            <Button plainFocus onClick={onPrimaryButtonClick}>
+            <Button
+              plainFocus
+              onClick={onPrimaryButtonClick}
+              className={classNames(small ? "!py-2" : "")}
+            >
               {primaryButtonText}
             </Button>
           )}
@@ -47,7 +65,7 @@ const Dialog: FC = () => {
             <Button
               theme="secondary"
               plainFocus
-              className="mr-3"
+              className={classNames(small && "!py-2", "mr-3")}
               onClick={onSecondaryButtonClick}
             >
               {secondaryButtonText}

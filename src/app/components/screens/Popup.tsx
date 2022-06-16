@@ -17,24 +17,30 @@ import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
-import { Page } from "app/nav";
+import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
-import { currentAccountAtom } from "app/atoms";
+import {
+  activeTabAtom,
+  activeTabOriginAtom,
+  currentAccountAtom,
+  getPermissionAtom,
+} from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
-import { ReactComponent as InfoIcon } from "app/icons/info-round.svg";
+import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as ActivityIcon } from "app/icons/activity.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 import PopupLayout from "../layouts/PopupLayout";
-import PreloadUnlocked from "../layouts/PreloadUnlocked";
+import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
 import NetworkSelect from "../elements/NetworkSelect";
 import AccountSelect from "../elements/AccountSelect";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
@@ -49,47 +55,116 @@ import AssetLogo from "../elements/AssetLogo";
 import PrettyAmount from "../elements/PrettyAmount";
 import PriceArrow from "../elements/PriceArrow";
 import ComingSoon from "../elements/ComingSoon";
+import TooltipIcon from "../elements/TooltipIcon";
 
 const Popup: FC = () => (
-  <PopupLayout>
-    <PreloadUnlocked>
-      <NetworkSelect
-        className="max-w-auto"
-        currentItemClassName="!h-11 pr-3 pl-3 !py-1.5"
-        currentItemIconClassName="!w-8 !h-8 !mr-3"
-        contentClassName="w-[22.25rem]"
-      />
+  <PreloadAndSync>
+    <PopupLayout>
+      <PopupNetworkSelect />
+
       <AccountSelect className="mt-2" />
-      <InteractionWithDapp
-        className="mt-2"
-        state="connected"
-        icon="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAwFBMVEUHCg7///8A05UAAAAHAAAA15gA2poFZEgA0JMDmG0HBgwA3JsHAAwBsX4FdVUDlWoAAAgHAAX5+fny8vLDxMQDo3R6e3zj4+Pb29zLzMwCuoQBwIgGSTYGNSkDoXNiY2SHiIkvMDKys7Nyc3QGQTFZWlsByY6Xl5hNTk+Tk5Q5Ojyio6TU1NUEiGEGKiIFbU8kJikZHB8PEhWurq9SU1VDREYHExMFe1gHGxgGJR4FV0AGOy0HExQ0NTcGUjxqa22LgY92AAANT0lEQVR4nNWd+0PiOBDHWxJYBdTyENHdFUFRVHQRXHVfx///X13a8ugjbZPJN1Dnx7s9rp/NZGYymcw4rm1pd/rdxd1Vbzl5GM5e5s58/jJ7mAx6V3ej7rRj/X/vOjZ/vD+6HwzZRry6sxJv88+cf4P70dTmR9giPBv1VmxOrqxYH3qjM0tfYoPwbDHwitliEvzx8WPfwtegCdvd67mvkBp0seW87rbBXwQl7IzGRLq11MV/P15A7Q+QcPSqp5lZIn5lMsKtJIpweo3B20AuUQYWQ7gYAvHWkLNHyEICCPs95PJFGVkP4EKMCadjK3hryLGxshoSTn9a5AsZf57vkXA6scy3YjRaRwPCvk39jDO+GgQ7ZMLO9Y74QsYlOQqgEj7ukC9kvNsp4fnLbvkCxjnN5JAId6mgW/HY9Y4Iu3vh84Wx7g4I20ujw4OZeGypHcnpEp7vbQFDYZ7ubtQkvNrjAobisSuLhJ2H/S5gKOxByzfqEO7PxMRFz+BoEN7vXUPXoqWp6oTjcixgKGyibFNVCTvDMgEKxJnqZlQknJZkC26FMcUzlRrheWm24FY8RXujRLgo2wKGwhYowsdyAgpElROVAuF9WQEFooLXKCYsMaASYiFhqQEFYs+U8K7cgAqrWEBYWiOzFXZvQlhSNxEX9kgn7H4GQIGY6/rzCKefA1Ag5gVwOYSdEoZqcvFYThieQzj7LEvonzSyD1PZhK+fB1AgvuoTltzTJyXbLWYRfhIzupVMg5pBaMHK1LkvLfTPriXT2mQQ4tOGdf500Kiefuf14j9LEvZPh/DKAuBFrVKpVGsnLY7+7ZVkbEUp4Tl+E/InH9BnrBzbUlUmTfjLCNsWXD0/qKyl8fUbb8L/B46/FWVeUUY4wC9hvVndEFaqjdNfVrYjG6gRjiw4inqzEpVq9Ynb2I5spELYtuEJE4SVSu32i43tKNHTNOH1TggF48UNXlUlepoitHNkkhAKz3HpwBnT9jRFaOdEISP0t+M7ejt68yJCS5knOaG/HX+Dt2MqS5wg7FgKuLMIhec4Agdyyfg0QWjFzDg5hEEg10SqarLqJk54ZuvMlEMoGA+ggRzr5xBau+fNJRTbERnIJc77MUJ7ybUCQqGqpx+w7Rj3GDHCn3sjhAZy7GcWocX8aDEhMpCLLWKU0N4SKhGKcxUokIstYoTQZopbjdD3HBBVjSbBI4Q2C2YUCVGeg41lhH2b+UNlQlAKgJ1JCHslIRSM5imASGCzIbRy8N2IFiHCc2yPwhtCu7e9eoQAz7G9Nt0Q2r1p0iU0TgGwWZLQ8m2oPqHwHIcmZ46Nw1gT2jo2rYRAGKYAyKq6sTVrQstXTSRCM8/B4oQ2cqRRIRL6yeM34jKuc6eO/XjGFyqhH+R8p+3GdVwTEtpKz2ykXq+RESvPtFVcJWxCQvuVQfy9Ui2mkSN+JS7iIkIIVtLgtjfxWfzttEFkbPwgIa7U1LEQsfEvX2vVi98JK9jk374SVfWCuIjtDSG2LIG/NypBIvQ5EZS0+HuVtIy1D1J0ExYvOHB337pphN9VbaQSody5pCxj4xvJ1oROPyCcI+98+eFmnWoHPxJBCU1Va19IahreYfiE2DwwP4poYjoR2uLH2laVSBiegx34wSlGKL7u8iNlVXVVlUy4WBFi7+0ThJIrNF9VGzshHKwIPWjpRZIwvEIzUlUqoeeFhODrmDShzHPwv5fqy0glDDaiAz9XSAhlV2hNfnOhykgnHAWE4CSblFDmOdRVlU7YCwjBVXoZhDLPwVtqVpVO+BAQgs8VmYTiS0/f4tuxzm9UrCqZ0D/oO/Bcdw6hxHMIVT0oVFUDwr4gRFcD5xHKii+4c1grYDQg7ApCdH1JPqGk+EKo6kX+djQgvBOE6ErEAkJZFW2L/8hVVQPCgSBEP9IuJPSzS0nPweuHORkAA8Kh67SxMZsSoSQRWud/sgMAOqHnuA48zaZE6F+h/Y1vR6GqWQEAndBhHQd+MapIKLlC4/xQbnFMCPsO/OmIKqHEcwhVlWYATAi7Djyfr04o8RzyAMCEcOTAyy01CGVnDlkAYEJ458Afj2gRSoovfKuaUFUTwisHXqCgSSjxHC3+FHccJoQ9Z7l3Qv/MkSjb4++xVTQhXDrwUi8CYfrMwU+jP2JCOHH+oV8AUQhT2armG2gNvX/OEEEVFRphmK2K/MpJNK9MJxR8MwBUTIiEvqpGQFr/RXaiCeHMeUFQRYVMKKzqlqTOI+bUhPDFmUOwImJAWKl+bPYiB2mpMV89dbPHNVK9KcLLDUrkwaIRoSGjOKt/8GRxVsGBPV/e1j+GIpwbEfI/R8LMp+oIefOkKLeUJVsWHKGBpWndBCDpbHadfy/ILWWJODOCCV9MvAW/Xa2UX4GevFyiqWr1BE04M4hpWr+3JsUv643/W84pqlo9BBOKmGZCjkv5cUQT0zkJkqrCCUVcSk+XxghlZb0t/uVAkxFPODA4HyYIhaqmnhJqqyqesGdwxk8RSsp6haoe6QQAeMIrgzxNmlD2IESo6q26quIJ7wxybTJCWVkv50/KqoonHBnkS+WEEs9R589HisuIJ+wa5LyzCCWeo6lqVfGEfYN7i0xCmecQqqpSl4gn7Dj02tIcQvFRac/xfFRcQosnbBvcH+YS+rWXTlJVfxdaVTShf39IvwPOJ5R1EypWVTihfwdMbsxWRCi9B/2Vr6pwwntBSHaIxYR+NjvxlLBAVeGEI5N6GhVC6T1ojqrCCfsmNVFKhBLPUecfmaoKJwyqvv4RERUJJZ6jyf/LUFUw4aqujXp+UiYUnuPQSaqq/A0NmjCsTaQ+CVInlJ05+C/ZGxo04cKoRliHUOI5hKqmyxLQhGGNsOvQklF6hP5TwuQ9KH9PriKW0HNWlezEd12ahFLP8XwbZ8QSBm+7DN5baBNKPEfrbxwRTPi4IiT6fP6DkNdOZqv4TexHwIT99bsnWvFe6xslc5/0HPwyuohQwmAbmrxdqzu06xe/9jLy9/QnmouDEkberhGDb/JdaOM0oqn81hrh9v0hMZPR+o96F1o73X5yrLAES7h9Q+oSLy/oF9qN4+1l76ElwlVXM6O33M0P8m3vQWtz2XtiizD6lpuacOPfaQ97xUdvFtEeYfQ9PlVNBSLxfXb1yDZhvKcCPZXRUsuDpuVWh/A34aVzoi+GwYt8/ks1ZR8XDcJKuqZFgbAdI3QNijCVU/ZEwmqDpKTJ/jRGPYZ47CuxhFW/DILwTakeQ2Z9orKK7M0JqS2x2NBNEho+WW/xY02Lo0JYOzgmtjWT9Poy7v7BP0617uyLCasVets2Sb828+fA2TlCEmGldvKX3M8sMo5tSwh4tK54SahGeJl84K5FKOubiGjD499nq543Cggdk/aQ8t6XmKZ0TeXSiyJCE4m2g8b3oBXOUaldkkVCNnHlhKDhK35Bm4Kq2iScZhDCGgnnPJYsInwCEGb3gga2h+TNyyJVlRI2bgDdoOOj9Gz1ZPe7JeRbHBlhA7KEYzebEPlktqizV5qwcfENsgvPcgixXb9EHJejqklCVMPy5HRZq/MtcssS4oS4pvMF8y3QPSRy4rgoYbV2+QYaHJCau5qaMzPHImbHcVvCWuMoWetPlu25MJMQPnMtK8mxITxEzppJD11Nz3uCP5t1eEsWx60JmzfAeUHJESxSQgtz5aRNLzZYwClzHkvhyOau2RjQme56VcUt3FZkozpls/PweirEb3sZDUCJjWVzhS0lNLuafxj0Eow4xxoiPkuI+vxDW4Nko3HcgYMfgKg+w9LeJAj+cbR60PcHPxpQZw6pC2+ttBYRxx3VGrcnyY6fAImfCgsJ7U0dbwV9ovFzSHXnAX/Cmc7STZhD+OnmcieHAhYTfrLZ6rIpskWE1qyNBUmfKJQI7VkbtLAsK1NAaHcCFFISEw/VCT+LQZXF24qElkckgSSVt9AhtDVaFikFgEWE5XeL2Y5QkdCF93PDCrsvAigkLDdiMaACYZkVtVBF1QjLa25W9ZXmhDsYJUQRb12bByAUrr98ARzLPC9RCEUAV7ZlZIlLNFNCt1OykwYb5gTbJEL7o9m0JOc8SCcUjrEsm9FT8RIEQmFvyrGMLP8wYUDodqhPhqHCHlS3oD5hGTTVy0j8ogj3rqmqXpBO6LbHe1xGjy1lly9YQv9txr6WUc/E0And9vVeGFmyUsYeoetOX3aPyIZ5GTU0oX+i2i0jUzopIQndznKHjEJBtXwghFCcNyY7YmRsqXiOABO67vnPHTAy9krbgAhCwWh7HQVfqsppp4TCrI4tMjI2MFo/CKHrngn3aANS/GrPYP8BCYVdfZzBGRmbPWpHaDKBEAqZQhdS/NbAcPttBEUoZDTGQIpfmSwgyxcIkFBoawBpcvTwfLxHsneXCZRQSLt7PSdS+nTsugvFc/GEvpwtBsHXatAFf3z8aOwaJGKD0JezUW/ImAJn8HfBHnojgGOQii3CQPqj+8EwRPDFq8exApm9Xi1QZlMqVgkDaXf63cXdVW85eRjOXubOfP4ye5gMeld3o26/g7OZWfI/OjwSKM7u35MAAAAASUVORK5CYII="
-        name="compound.finance"
-      />
+
+      <InteractionWithDapp className="mt-2" />
 
       <AssetsList />
-    </PreloadUnlocked>
-  </PopupLayout>
+    </PopupLayout>
+  </PreloadAndSync>
 );
 
 export default Popup;
 
-type InteractionWithDappProps = {
-  state?: "default" | "connectible" | "connected";
-  icon?: string;
-  name?: string;
-  className?: string;
+const PreloadAndSync: FC = ({ children }) => {
+  const tabOrigin = useAtomValue(activeTabOriginAtom);
+  const permission = useAtomValue(getPermissionAtom(tabOrigin));
+
+  return (
+    <PreloadBaseAndSync chainId={permission?.chainId}>
+      {children}
+    </PreloadBaseAndSync>
+  );
 };
 
-const InteractionWithDapp: FC<InteractionWithDappProps> = ({
-  state = "default",
-  icon,
-  name,
-  className,
-}) => {
-  if (state === "default" && !icon && !name) {
-    return <></>;
-  }
+const PopupNetworkSelect: FC = () => {
+  const tabOrigin = useAtomValue(activeTabOriginAtom);
+
+  const handleChange = useCallback(
+    (chainId: number) => {
+      if (!tabOrigin) return;
+
+      repo.permissions
+        .where({ origin: tabOrigin })
+        .modify((perm) => {
+          perm.chainId = chainId;
+        })
+        .catch(console.error);
+    },
+    [tabOrigin]
+  );
+
+  return (
+    <NetworkSelect
+      className="max-w-auto"
+      currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
+      currentItemIconClassName="!w-8 !h-8 !mr-3"
+      contentClassName="w-[22.25rem]"
+      onChange={handleChange}
+    />
+  );
+};
+
+const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
+  const activeTab = useAtomValue(activeTabAtom);
+  const tabOrigin = useAtomValue(activeTabOriginAtom);
+  const permission = useAtomValue(getPermissionAtom(tabOrigin));
+  const currentAccount = useAtomValue(currentAccountAtom);
+
+  const accountConnected = useMemo(
+    () =>
+      permission
+        ? permission.accountAddresses.includes(currentAccount.address)
+        : false,
+    [permission, currentAccount]
+  );
+
+  const reallyConnectible = useMemo(() => {
+    if (!activeTab?.url) return false;
+
+    const { protocol, pathname } = new URL(activeTab.url);
+
+    for (const type of [/\.xml$/u, /\.pdf$/u]) {
+      if (type.test(pathname)) {
+        return false;
+      }
+    }
+
+    return protocol.startsWith("http") || protocol.startsWith("file");
+  }, [activeTab]);
+
+  const state = useMemo(() => {
+    if (!permission) return "disconnected";
+    if (accountConnected) return "connected";
+    return "connectible";
+  }, [permission, accountConnected]);
+
+  const handlePermission = useCallback(async () => {
+    if (!permission) return;
+
+    try {
+      if (accountConnected) {
+        await repo.permissions.delete(permission.origin);
+      } else {
+        await repo.permissions
+          .where({ origin: permission.origin })
+          .modify((perm) => {
+            perm.accountAddresses.push(currentAccount.address);
+          });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [permission, accountConnected, currentAccount]);
+
+  if (!reallyConnectible) return null;
 
   return (
     <div
@@ -103,43 +178,107 @@ const InteractionWithDapp: FC<InteractionWithDappProps> = ({
         className
       )}
     >
-      <span
-        className={classNames(
-          "block",
-          "w-5 h-5 mr-1.5",
-          "rounded-full overflow-hidden",
-          "border",
-          state !== "connected" && "border-[#BCC2DB]",
-          state === "connected" && "border-[#4F9A5E]"
-        )}
-      >
-        {icon && (
-          <Avatar
-            src={icon}
-            alt={name ?? "Dapp"}
+      {permission ? (
+        state === "connected" ? (
+          <span
             className={classNames(
-              "w-full h-full object-cover",
-              "!border-none",
-              state === "connectible" && "opacity-50"
+              "block",
+              "w-5 h-5 mr-1.5",
+              "rounded-full overflow-hidden",
+              "border border-[#4F9A5E]"
             )}
+          >
+            <Avatar
+              src={activeTab?.favIconUrl}
+              alt={permission.origin}
+              className={classNames(
+                "w-full h-full object-cover",
+                "!border-none"
+              )}
+            />
+          </span>
+        ) : (
+          <Tooltip
+            content={
+              <p>
+                Current wallet is not connected to this website. To connect it -
+                click Connect on the right.
+                <br />
+                If you want to disconnect all wallets - switch to any connected
+                wallet, and then click Disconnect on the right.
+              </p>
+            }
+            placement="bottom-end"
+            size="large"
+            interactive={false}
+          >
+            <span
+              className={classNames(
+                "block relative",
+                "w-5 h-5 mr-1.5",
+                "rounded-full overflow-hidden",
+                "border border-[#BCC2DB]/[0.7]"
+              )}
+            >
+              <Avatar
+                src={activeTab?.favIconUrl}
+                alt={permission.origin}
+                className={classNames(
+                  "w-full h-full object-cover",
+                  "!border-none opacity-25"
+                )}
+              />
+
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute top-0 left-0 w-4.5 h-4.5"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
+                  fill="#F8F9FD"
+                />
+              </svg>
+            </span>
+          </Tooltip>
+        )
+      ) : (
+        <Tooltip
+          content={
+            <p>
+              Vigvam is not connected to this site. To connect to a web3 site,
+              find and click the Connect button.
+            </p>
+          }
+          placement="bottom-end"
+          size="large"
+          interactive={false}
+        >
+          <TooltipIcon
+            theme="dark"
+            className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
           />
-        )}
-      </span>
-      {name && (
+        </Tooltip>
+      )}
+      {tabOrigin && (
         <span
           className={classNames(
             state !== "connected" && "text-brand-inactivedark"
           )}
         >
-          {name}
+          {new URL(tabOrigin).host}
         </span>
       )}
-      {state !== "default" && (
+      {permission && (
         <button
           type="button"
-          className="leading-[.875rem] px-2 py-1 ml-auto transition-opacity hover:opacity-70"
+          className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
+          onClick={handlePermission}
         >
-          {state === "connectible" ? "Connect" : "Disconnect"}
+          {accountConnected ? "Disconnect" : "Connect"}
         </button>
       )}
     </div>
@@ -312,12 +451,9 @@ const AssetCard = memo(
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
 
-      const openLink = useCallback(
-        (page: Page) => {
-          openInTab({ page: page, token: asset.tokenSlug });
-        },
-        [asset.tokenSlug]
-      );
+      const openLink = useCallback((to: Record<string, unknown>) => {
+        openInTab(to);
+      }, []);
 
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
@@ -400,6 +536,7 @@ const AssetCard = memo(
                   copiable
                   className={"text-sm font-bold leading-5 ml-2"}
                   threeDots={false}
+                  asSpan
                   isDecimalsMinified
                 />
               )}
@@ -415,6 +552,7 @@ const AssetCard = memo(
                   "text-brand-inactivedark"
                 )}
                 copiable={!isManageMode}
+                asSpan
                 threeDots={false}
               />
               {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
@@ -451,6 +589,7 @@ const AssetCard = memo(
                   popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
                 )}
                 tabIndex={-1}
+                asSpan
               />
             </DropdownMenu.Trigger>
           ) : !nativeAsset ? (
@@ -496,19 +635,40 @@ const AssetCard = memo(
               )}
             >
               <PopoverButton
-                Icon={InfoIcon}
-                onClick={() => openLink(Page.Default)}
+                Icon={InfoRoundIcon}
+                onClick={() =>
+                  openLink({ page: Page.Default, token: asset.tokenSlug })
+                }
               >
                 Info
               </PopoverButton>
               <PopoverButton
                 Icon={SendIcon}
-                onClick={() => openLink(Page.Transfer)}
+                onClick={() =>
+                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
+                }
               >
                 Transfer
               </PopoverButton>
-              <PopoverButton Icon={SwapIcon}>Swap</PopoverButton>
-              <PopoverButton Icon={ActivityIcon}>Activity</PopoverButton>
+              <PopoverButton
+                Icon={SwapIcon}
+                onClick={() => openLink({ page: Page.Swap })}
+              >
+                Swap
+              </PopoverButton>
+              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
+                <PopoverButton
+                  Icon={BuyIcon}
+                  onClick={() =>
+                    openLink({
+                      page: Page.Receive,
+                      receive: ReceiveTabEnum.BuyWithCrypto,
+                    })
+                  }
+                >
+                  Buy
+                </PopoverButton>
+              )}
             </DropdownMenu.Content>
           )}
         </DropdownMenu.Root>

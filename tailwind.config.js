@@ -36,10 +36,15 @@ module.exports = {
         sans: ["Inter", ...theme.fontFamily.sans],
       },
       animation: {
-        bootfadein: "fadein 0.15s ease-in-out",
+        bootfadein: "fadein 0.15s ease-in",
+        bootfadeinslow: "fadein 0.3s ease-in",
+        bootfadeinfast: "fadein 0.1s ease-in",
         dialogcontent:
           "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "waving-hand": "wave 2s linear infinite",
+        modalcontent: "modalfadein 0.2s ease-out",
+        activitybar:
+          "barclimb 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
       },
       keyframes: {
         fadein: {
@@ -58,6 +63,24 @@ module.exports = {
           to: {
             opacity: "1",
             transform: "translate(-50%, -50%) scale(1)",
+          },
+        },
+        barclimb: {
+          from: {
+            transform: "translate(-50%, 150%)",
+          },
+          to: {
+            transform: "translate(-50%, 0)",
+          },
+        },
+        modalfadein: {
+          from: {
+            opacity: "0",
+            transform: "scale(1.04)",
+          },
+          to: {
+            opacity: "1",
+            transform: "scale(1)",
           },
         },
         wave: {

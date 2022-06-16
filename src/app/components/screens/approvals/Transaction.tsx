@@ -1,9 +1,6 @@
 import {
   FC,
   ReactNode,
-  Dispatch,
-  SetStateAction,
-  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -14,7 +11,6 @@ import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 import * as Tabs from "@radix-ui/react-tabs";
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
 import {
@@ -22,45 +18,43 @@ import {
   TxActionType,
   FeeMode,
   FeeSuggestions,
-  FEE_MODES,
+  AccountSource,
 } from "core/types";
 import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
 import { isSmartContractAddress, matchTxAction } from "core/common/transaction";
 
 import {
+  OverflowProvider,
   useChainId,
-  useNativeCurrency,
   useOnBlock,
   useProvider,
   useSync,
-  useToken,
 } from "app/hooks";
+import { useLedger } from "app/hooks/ledger";
 import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
-import WalletCard from "app/components/elements/WalletCard";
-import NumberInput from "app/components/elements/NumberInput";
+import { formatUnits } from "app/utils/txApprove";
+import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
+import TabsHeader from "app/components/blocks/approvals/TabsHeader";
+import FeeTab from "app/components/blocks/approvals/FeeTab";
+import AdvancedTab from "app/components/blocks/approvals/AdvancedTab";
+import DetailsTab from "app/components/blocks/approvals/DetailsTab";
 import LongTextField from "app/components/elements/LongTextField";
-import NetworkPreview from "app/components/elements/NetworkPreview";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import PrettyAmount from "app/components/elements/PrettyAmount";
 
 import ApprovalLayout from "./Layout";
 
-const TAB_VALUES = ["details", "fee", "advanced", "raw", "error"] as const;
+const { serializeTransaction, keccak256, recoverAddress, getAddress } =
+  ethers.utils;
+
+const TAB_VALUES = ["details", "fee", "advanced", "error"] as const;
 
 const TAB_NAMES: Record<TabValue, ReactNode> = {
   details: "Details",
   fee: "Fee",
   advanced: "Advanced",
-  raw: "Raw",
   error: "Error",
-};
-
-const FEE_MODE_NAMES: Record<FeeMode, ReactNode> = {
-  low: "Low",
-  average: "Average",
-  high: "High",
 };
 
 type TabValue = typeof TAB_VALUES[number];
@@ -71,7 +65,7 @@ type ApproveTransactionProps = {
 };
 
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
-  const { accountAddress, txParams } = approval;
+  const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
 
   const [allAccounts, localNonce] = useAtomValue(
@@ -98,7 +92,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }, [txParams]);
 
   const provider = useProvider();
-  const nativeToken = useToken(accountAddress);
+  const withLedger = useLedger();
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
   const [feeMode, setFeeMode] = useState<FeeMode>("average");
@@ -108,6 +102,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const [prepared, setPrepared] = useState<{
     tx: Tx;
+    estimatedGasLimit: ethers.BigNumber;
     fees: FeeSuggestions | null;
     destinationIsContract: boolean;
   }>();
@@ -162,6 +157,20 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }
   }, [finalTx]);
 
+  const averageFee = useMemo(() => {
+    if (!finalTx || !prepared?.estimatedGasLimit) return null;
+
+    try {
+      const gasLimit = prepared.estimatedGasLimit.lt(finalTx.gasLimit!)
+        ? prepared.estimatedGasLimit
+        : finalTx.gasLimit;
+      const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
+      return ethers.BigNumber.from(gasLimit).mul(gasPrice!);
+    } catch {
+      return null;
+    }
+  }, [finalTx, prepared?.estimatedGasLimit]);
+
   const withThrottle = useMemo(createOrganicThrottle, []);
 
   const estimateTx = useCallback(
@@ -206,6 +215,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   ? ethers.BigNumber.from(gasLimit)
                   : averageGasLimit,
             },
+            estimatedGasLimit,
             fees: feeSuggestions,
             destinationIsContract,
           });
@@ -287,23 +297,68 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
       try {
         await withHumanDelay(async () => {
-          let rawTx: string | undefined;
-
-          if (approved) {
-            if (!finalTx) return;
-
-            rawTx = ethers.utils.serializeTransaction(finalTx);
+          if (!approved) {
+            await approveItem(approval.id, { approved });
+            return;
           }
 
-          await approveItem(approval.id, { approved, rawTx });
+          if (!finalTx) return;
+
+          const rawTx = serializeTransaction(finalTx);
+
+          if (account.source !== AccountSource.Ledger) {
+            await approveItem(approval.id, { approved, rawTx });
+          } else {
+            let signedRawTx: string | undefined;
+            let ledgerError: any;
+
+            await withLedger(async ({ ledgerEth }) => {
+              try {
+                const sig = await ledgerEth.signTransaction(
+                  account.derivationPath,
+                  rawTx.substring(2)
+                );
+
+                const formattedSig = {
+                  v: ethers.BigNumber.from("0x" + sig.v).toNumber(),
+                  r: "0x" + sig.r,
+                  s: "0x" + sig.s,
+                };
+
+                const digest = keccak256(rawTx);
+                const addressSignedWith = recoverAddress(digest, formattedSig);
+                if (
+                  getAddress(addressSignedWith) !== getAddress(account.address)
+                ) {
+                  throw new Error(
+                    "Ledger: The signature doesnt match the right address"
+                  );
+                }
+
+                signedRawTx = serializeTransaction(finalTx, formattedSig);
+              } catch (err) {
+                ledgerError = err;
+              }
+            });
+
+            if (signedRawTx) {
+              await approveItem(approval.id, { approved, signedRawTx });
+            } else {
+              throw (
+                ledgerError ??
+                new Error("Failed to sign transaction with Ledger")
+              );
+            }
+          }
         });
       } catch (err) {
         console.error(err);
         setLastError(err);
+      } finally {
         setApproving(false);
       }
     },
-    [approval, setLastError, setApproving, finalTx]
+    [approval, account, setLastError, setApproving, finalTx, withLedger]
   );
 
   return (
@@ -312,405 +367,107 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       onApprove={handleApprove}
       disabled={estimating}
       approving={approving}
+      className="!pt-7"
     >
-      <ScrollAreaContainer
-        className="w-full box-content -mr-5 pr-5"
-        viewPortClassName="viewportBlock"
+      <ApprovalHeader account={account} source={source} />
+
+      <Tabs.Root
+        defaultValue="details"
+        orientation="horizontal"
+        value={tabValue}
+        onValueChange={(v) => setTabValue(v as TabValue)}
+        className="mt-5 w-full flex flex-col min-h-0"
       >
-        <NetworkPreview className="mb-4" />
+        <TabsHeader
+          aria-label="Approve tabs"
+          values={TAB_VALUES}
+          currentValue={tabValue}
+          names={TAB_NAMES}
+          withError={lastError}
+          oneSuccess={Boolean(prepared)}
+        />
 
-        <WalletCard account={account} className="!w-full" />
-
-        <Tabs.Root
-          defaultValue="details"
-          orientation="horizontal"
-          value={tabValue}
-          onValueChange={(v) => setTabValue(v as TabValue)}
-          className="mt-6 w-full"
-        >
-          <Tabs.List
-            aria-label="Approve tabs"
-            className={classNames("flex items-center")}
-          >
-            {TAB_VALUES.map((value, i, arr) => {
-              if (value === "error" && !lastError) return null;
-
-              const active = value === tabValue;
-              const last = i === arr.length - 1;
-
-              return (
-                <Tabs.Trigger
-                  key={value}
-                  value={value}
-                  className={classNames(
-                    "font-semibold text-sm",
-                    "px-4 py-2",
-                    !last && "mr-1",
-                    active && "bg-white/10 rounded-md"
-                  )}
-                >
-                  {TAB_NAMES[value]}
-                </Tabs.Trigger>
-              );
-            })}
-          </Tabs.List>
-
-          <Tabs.Content value="details">
-            <div className="w-full mt-4">
-              {maxFee && nativeToken && (
-                <div className="text-lg text-brand-inactivelight">
-                  <span className="">Max Fee: </span>
-                  <PrettyAmount
-                    amount={maxFee.toString()}
-                    decimals={nativeToken.decimals}
-                    currency={nativeToken.symbol}
-                    copiable
-                    className=""
+        <OverflowProvider>
+          {(ref) => (
+            <ScrollAreaContainer
+              ref={ref}
+              className="w-full box-content -mr-5 pr-5"
+              viewPortClassName="viewportBlock pt-5"
+              scrollBarClassName="pt-5 pb-0"
+            >
+              <Tabs.Content value="details">
+                {fees && originTx && action && (
+                  <DetailsTab
+                    accountAddress={accountAddress}
+                    fees={fees}
+                    averageGasLimit={prepared.estimatedGasLimit}
+                    gasLimit={ethers.BigNumber.from(
+                      txOverrides.gasLimit || originTx.gasLimit!
+                    )}
+                    feeMode={feeMode}
+                    maxFee={maxFee}
+                    averageFee={averageFee}
+                    action={action}
+                    source={source}
+                    onFeeButtonClick={() => setTabValue("fee")}
                   />
-                </div>
-              )}
-            </div>
-          </Tabs.Content>
+                )}
+              </Tabs.Content>
 
-          <Tabs.Content value="fee">
-            {originTx ? (
-              <TxFee
-                originTx={originTx}
-                fees={fees ?? null}
-                feeMode={feeMode}
-                setFeeMode={setFeeMode}
-                maxFee={maxFee}
-                overrides={txOverrides}
-                onOverridesChange={setTxOverrides}
-              />
-            ) : (
-              <Loading />
-            )}
-          </Tabs.Content>
+              <Tabs.Content value="fee">
+                {originTx ? (
+                  <FeeTab
+                    accountAddress={accountAddress}
+                    originTx={originTx}
+                    fees={fees ?? null}
+                    averageGasLimit={prepared?.estimatedGasLimit ?? null}
+                    feeMode={feeMode}
+                    setFeeMode={setFeeMode}
+                    maxFee={maxFee}
+                    averageFee={averageFee}
+                    overrides={txOverrides}
+                    onOverridesChange={setTxOverrides}
+                  />
+                ) : (
+                  <Loading />
+                )}
+              </Tabs.Content>
 
-          <Tabs.Content value="advanced">
-            {originTx ? (
-              <TxAdvanced
-                originTx={originTx}
-                overrides={txOverrides}
-                onOverridesChange={setTxOverrides}
-              />
-            ) : (
-              <Loading />
-            )}
-          </Tabs.Content>
+              <Tabs.Content value="advanced">
+                {originTx && finalTx ? (
+                  <AdvancedTab
+                    originTx={originTx}
+                    finalTx={finalTx}
+                    overrides={txOverrides}
+                    onOverridesChange={setTxOverrides}
+                  />
+                ) : (
+                  <Loading />
+                )}
+              </Tabs.Content>
 
-          <Tabs.Content value="raw">
-            {finalTx ? <TxRaw tx={finalTx} /> : <Loading />}
-          </Tabs.Content>
-
-          <Tabs.Content value="error">
-            {lastError && (
-              <LongTextField
-                readOnly
-                value={lastError?.message || "Unknown error."}
-              />
-            )}
-          </Tabs.Content>
-        </Tabs.Root>
-      </ScrollAreaContainer>
+              <Tabs.Content value="error">
+                {lastError && (
+                  <LongTextField
+                    readOnly
+                    textareaClassName="!h-48"
+                    value={
+                      lastError?.reason ||
+                      lastError?.message ||
+                      "Unknown error."
+                    }
+                  />
+                )}
+              </Tabs.Content>
+            </ScrollAreaContainer>
+          )}
+        </OverflowProvider>
+      </Tabs.Root>
     </ApprovalLayout>
   );
 };
 
 export default ApproveTransaction;
-
-type TxFeeProps = {
-  originTx: Tx;
-  fees: FeeSuggestions | null;
-  maxFee: ethers.BigNumber | null;
-  feeMode: FeeMode;
-  setFeeMode: Dispatch<FeeMode>;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
-};
-
-const TxFee = memo<TxFeeProps>(
-  ({
-    originTx: tx,
-    overrides,
-    onOverridesChange,
-    fees,
-    maxFee,
-    feeMode,
-    setFeeMode,
-  }) => {
-    const changeValue = useCallback(
-      (name: string, value: ethers.BigNumberish | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
-      },
-      [onOverridesChange]
-    );
-
-    const fixValue = useCallback(
-      (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
-      },
-      [changeValue]
-    );
-
-    const handleFeeModeChange = useCallback(
-      (mode: FeeMode) => {
-        if (!mode) return;
-
-        setFeeMode(mode);
-        // Clean-up ovverides if mode (re)enabled
-        onOverridesChange(
-          (o) =>
-            ({
-              ...o,
-              gasPrice: null,
-              maxFeePerGas: null,
-              maxPriorityFeePerGas: null,
-            } as any)
-        );
-      },
-      [setFeeMode, onOverridesChange]
-    );
-
-    return (
-      <div className="w-full my-4">
-        {fees && maxFee && (
-          <FeeModeSelect
-            gasLimit={ethers.BigNumber.from(overrides.gasLimit ?? tx.gasLimit!)}
-            fees={fees}
-            maxFee={maxFee}
-            value={feeMode}
-            onValueChange={handleFeeModeChange}
-            className="mb-6"
-          />
-        )}
-
-        {tx.maxPriorityFeePerGas ? (
-          <>
-            <NumberInput
-              label="Max base fee"
-              placeholder="0.00"
-              thousandSeparator
-              decimalScale={9}
-              value={formatUnits(
-                overrides.maxFeePerGas ?? tx.maxFeePerGas,
-                "gwei"
-              )}
-              onChange={(e) =>
-                changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
-              }
-              onBlur={(e) => fixValue("maxFeePerGas", e.target.value)}
-              className="w-full mb-4"
-            />
-
-            <NumberInput
-              label="Priority fee"
-              placeholder="0.00"
-              thousandSeparator
-              decimalScale={9}
-              value={formatUnits(
-                overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
-                "gwei"
-              )}
-              onChange={(e) =>
-                changeValue(
-                  "maxPriorityFeePerGas",
-                  parseUnits(e.target.value, "gwei")
-                )
-              }
-              onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
-              className="w-full mb-4"
-            />
-          </>
-        ) : (
-          <>
-            <NumberInput
-              label="Gas Price"
-              placeholder="0.00"
-              thousandSeparator
-              decimalScale={9}
-              value={formatUnits(overrides.gasPrice ?? tx.gasPrice, "gwei")}
-              onChange={(e) =>
-                changeValue("gasPrice", parseUnits(e.target.value, "gwei"))
-              }
-              onBlur={(e) => fixValue("gasPrice", e.target.value)}
-              className="w-full mb-4"
-            />
-          </>
-        )}
-      </div>
-    );
-  }
-);
-
-type FeeModeSelectProps = {
-  gasLimit: ethers.BigNumber;
-  fees: FeeSuggestions;
-  maxFee: ethers.BigNumber;
-  value: FeeMode;
-  onValueChange: (value: FeeMode) => void;
-  className?: string;
-};
-
-const FeeModeSelect = memo<FeeModeSelectProps>(
-  ({ gasLimit, fees, maxFee, value, onValueChange, className }) => {
-    return (
-      <ToggleGroup.Root
-        type="single"
-        orientation="horizontal"
-        value={
-          gasLimit.mul(fees.modes[value].max).eq(maxFee) ? value : undefined
-        }
-        onValueChange={onValueChange}
-        className={classNames("grid grid-cols-3 gap-2", className)}
-      >
-        {FEE_MODES.map((mode) => {
-          const modeMaxFee = gasLimit.mul(fees.modes[mode].max);
-
-          return (
-            <FeeModeItem
-              key={mode}
-              value={mode}
-              fee={modeMaxFee}
-              selected={modeMaxFee.eq(maxFee)}
-            />
-          );
-        })}
-      </ToggleGroup.Root>
-    );
-  }
-);
-
-type FeeModeItemProps = {
-  value: FeeMode;
-  fee: ethers.BigNumber;
-  selected: boolean;
-};
-
-const FeeModeItem: FC<FeeModeItemProps> = ({ value, fee, selected }) => {
-  const nativeCurrency = useNativeCurrency();
-
-  return (
-    <ToggleGroup.Item
-      value={value}
-      className={classNames(
-        "relative last:flex",
-        "bg-brand-main/[.05]",
-        "w-full py-2 px-1",
-        "rounded-[.25rem]",
-        "transition-colors",
-        "hover:bg-brand-main/10",
-        selected && "bg-brand-main/10"
-      )}
-    >
-      <div className="flex flex-col text-left px-1">
-        <span className="mb-1 text-lg font-bold inline-flex items-center">
-          <span
-            className={classNames(
-              "w-3 h-3 mr-2",
-              "bg-brand-main/10",
-              "rounded-full",
-              "flex justify-center items-center"
-            )}
-          >
-            {selected && <span className="bg-radio w-2 h-2 rounded-full" />}
-          </span>
-
-          <span>{FEE_MODE_NAMES[value]}</span>
-        </span>
-
-        <span className="text-sm text-brand-inactivelight truncate">
-          {nativeCurrency && (
-            <PrettyAmount
-              amount={fee.toString()}
-              currency={nativeCurrency.symbol}
-              decimals={nativeCurrency.decimals}
-            />
-          )}
-        </span>
-      </div>
-    </ToggleGroup.Item>
-  );
-};
-
-type TxAdvancedProps = {
-  originTx: Tx;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
-};
-
-const TxAdvanced = memo<TxAdvancedProps>(
-  ({ originTx: tx, overrides, onOverridesChange }) => {
-    const changeValue = useCallback(
-      (name: string, value: ethers.BigNumberish | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
-      },
-      [onOverridesChange]
-    );
-
-    const fixValue = useCallback(
-      (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
-      },
-      [changeValue]
-    );
-
-    return (
-      <div className="w-full my-4">
-        <NumberInput
-          label="Gas Limit"
-          placeholder="0"
-          thousandSeparator
-          decimalScale={0}
-          name="gasLimit"
-          value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
-          onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
-          onBlur={(e) => fixValue("gasLimit", e.target.value)}
-          className="w-full mb-4"
-        />
-
-        <NumberInput
-          label="Nonce"
-          placeholder="0"
-          thousandSeparator
-          decimalScale={0}
-          name="nonce"
-          value={formatUnits(overrides.nonce ?? tx.nonce)}
-          onChange={(e) => changeValue("nonce", parseUnits(e.target.value))}
-          onBlur={(e) => fixValue("nonce", e.target.value)}
-          className="w-full mb-4"
-        />
-
-        <LongTextField
-          label="Data"
-          readOnly
-          value={ethers.utils.hexlify(tx.data ?? "0x00")}
-          textareaClassName="!h-36"
-        />
-      </div>
-    );
-  }
-);
-
-type TxRawProps = {
-  tx: Tx;
-};
-
-const TxRaw = memo<TxRawProps>(({ tx }) => {
-  const rawTx = useMemo(() => ethers.utils.serializeTransaction(tx), [tx]);
-
-  return (
-    <div className="w-full mt-4">
-      <LongTextField
-        label="Raw transaction"
-        readOnly
-        value={rawTx}
-        textareaClassName="!h-48"
-      />
-    </div>
-  );
-});
 
 const Loading: FC = () => (
   <div
@@ -725,17 +482,4 @@ const Loading: FC = () => (
 
 function bnify(v?: ethers.BigNumberish) {
   return v !== undefined ? ethers.BigNumber.from(v) : undefined;
-}
-
-function formatUnits(v?: ethers.BigNumberish, unit: ethers.BigNumberish = 0) {
-  if (!v && v !== 0) return "";
-  return ethers.utils.formatUnits(v, unit);
-}
-
-function parseUnits(v: string, unit: ethers.BigNumberish = 0) {
-  try {
-    return ethers.utils.parseUnits(v, unit);
-  } catch {
-    return "";
-  }
 }

@@ -7,21 +7,19 @@ import { fromProtectedString } from "lib/crypto-utils";
 import { getSeedPhrase } from "core/client";
 
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
-import Switcher from "app/components/elements/Switcher";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 import SecretField from "app/components/blocks/SecretField";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
-import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 
 const Security: FC = () => {
   const [revealModalOpened, setRevealModalOpened] = useState(false);
-  const [syncData, setSyncData] = useState(false);
-  const [phishing, setPhishing] = useState(false);
+  // const [syncData, setSyncData] = useState(false);
+  // const [phishing, setPhishing] = useState(false);
 
   return (
     <div className="flex flex-col items-start">
@@ -38,7 +36,7 @@ const Security: FC = () => {
         <RevealIcon className="w-[1.625rem] h-auto mr-3" />
         Reveal
       </Button>
-      <Separator className="my-8" />
+      {/* <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>
       <Switcher
         id="syncThirdParty"
@@ -55,7 +53,7 @@ const Security: FC = () => {
         label="Use Phishing Detection"
         onCheckedChange={setPhishing}
         className="mt-3 min-w-[20rem]"
-      />
+      /> */}
       {revealModalOpened && (
         <SeedPhraseModal
           open={true}
@@ -98,13 +96,35 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
 
   return (
     <SecondaryModal
-      header="Reveal secret phrase"
+      header={seedPhrase ? "Your Secret Phrase" : "Type password"}
       open={open}
       onOpenChange={onOpenChange}
       className="px-[5.25rem]"
     >
       {seedPhrase ? (
-        <SecretField isDownloadable value={fromProtectedString(seedPhrase)} />
+        <>
+          <SecretField
+            label="Secret phrase"
+            isDownloadable
+            value={fromProtectedString(seedPhrase)}
+          />
+          <div
+            className={classNames(
+              "mt-4 w-full max-w-[27.5rem]",
+              "flex items-center",
+              "p-4",
+              "bg-brand-redobject/[.05]",
+              "border border-brand-redobject/[.8]",
+              "rounded-[.625rem]",
+              "text-sm"
+            )}
+          >
+            <span>
+              <strong>DO NOT share</strong> this set of words with anyone! It
+              can be used to steal all wallets belonging to this phrase.
+            </span>
+          </div>
+        </>
       ) : (
         <Form<FormValues>
           decorators={[focusOnErrors]}
@@ -129,6 +149,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                         meta.error ||
                         (!modifiedSinceLastSubmit && meta.submitError)
                       }
+                      autoFocus
                       {...input}
                     />
                   )}
@@ -139,7 +160,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
                 className="mt-6 !min-w-[14rem]"
                 loading={submitting}
               >
-                Reveal
+                Reveal phrase
               </Button>
             </form>
           )}

@@ -1,11 +1,17 @@
-import browser from "webextension-polyfill";
 import BigNumber from "bignumber.js";
 import { initProfiles } from "lib/ext/profile";
-import { getMainURL } from "lib/ext/utils";
 import { setupArgon2Impl } from "lib/kdbx";
 
 import { setupFixtures } from "core/repo";
-import { startServer } from "core/back/server";
+import {
+  startWalletServer,
+  startPageServer,
+  startBruteForceProtection,
+  startInstallOrUpdateListener,
+  startApproveWindowOpener,
+  startTxObserver,
+  startExtBadge,
+} from "core/back/services";
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
@@ -21,24 +27,13 @@ setupFixtures();
 
 // Start background server
 // It starts Porter server to communicate with UI & content scripts
-startServer();
+startWalletServer();
+startPageServer();
 
-// Open new tab with extension page after install
-browser.runtime.onInstalled.addListener(({ reason }) => {
-  if (reason === "install") {
-    browser.tabs.create({
-      url: getMainURL(),
-      active: true,
-    });
-  }
+// Start brute force protection
+startBruteForceProtection();
 
-  if (reason === "install" || reason === "update") {
-    browser.tabs
-      .query({ url: `${process.env.VIGVAM_WEBSITE_ORIGIN}/**` })
-      .then((tabs) => {
-        const tabId = tabs[0]?.id;
-        tabId && browser.tabs.reload(tabId);
-      })
-      .catch(() => undefined);
-  }
-});
+startInstallOrUpdateListener();
+startApproveWindowOpener();
+startTxObserver();
+startExtBadge();

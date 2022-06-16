@@ -7,6 +7,7 @@ const InputLabelAction: FC<InputLabelAction> = ({
   type = "button",
   className,
   children,
+  ...rest
 }) => (
   <button
     type={type}
@@ -21,6 +22,7 @@ const InputLabelAction: FC<InputLabelAction> = ({
       "active:bg-brand-main/20 active:shadow-none",
       className
     )}
+    {...rest}
   >
     {children}
   </button>

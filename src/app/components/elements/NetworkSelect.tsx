@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
 
@@ -11,6 +11,10 @@ type NetworkSelectProps = {
   currentItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
+  withAction?: boolean;
+  onChange?: (chainId: number) => void;
+  changeInternalChainId?: boolean;
+  size?: "large" | "small";
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
@@ -18,19 +22,36 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   currentItemClassName,
   currentItemIconClassName,
   contentClassName,
+  withAction,
+  onChange,
+  changeInternalChainId = true,
+  size = "large",
 }) => {
   const currentNetwork = useLazyNetwork();
   const allNetworks = useLazyAllNetworks() ?? [];
 
   const setChainId = useSetAtom(chainIdAtom);
 
+  const handleNetworkChange = useCallback(
+    (chainId: number) => {
+      changeInternalChainId && setChainId(chainId);
+      onChange?.(chainId);
+    },
+    [changeInternalChainId, setChainId, onChange]
+  );
+
   return (
     <NetworkSelectPrimitive
       networks={allNetworks}
       currentNetwork={currentNetwork}
-      onNetworkChange={setChainId}
+      onNetworkChange={handleNetworkChange}
       className={className}
-      currentItemClassName={classNames("h-12", currentItemClassName)}
+      withAction={withAction}
+      size={size}
+      currentItemClassName={classNames(
+        size === "small" ? "h-[1.75rem]" : "h-12",
+        currentItemClassName
+      )}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
     />

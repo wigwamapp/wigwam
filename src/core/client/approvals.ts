@@ -30,6 +30,9 @@ export function onApprovalsUpdated(
 export async function approveItem(approvalId: string, result: ApprovalResult) {
   const type = MessageType.Approve;
 
-  const res = await porter.request({ type, approvalId, result });
+  const res = await porter.request(
+    { type, approvalId, result },
+    { timeout: 3 * 60_000 }
+  );
   assert(res?.type === type);
 }

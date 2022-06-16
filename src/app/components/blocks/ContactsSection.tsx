@@ -7,45 +7,28 @@ import {
   useState,
 } from "react";
 import classNames from "clsx";
-import { Field, Form } from "react-final-form";
 
 import * as Repo from "core/repo";
 
 import { LOAD_MORE_ON_CONTACTS_FROM_END } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
-import { useContacts } from "app/hooks/contacts";
-import {
-  composeValidators,
-  focusOnErrors,
-  maxLength,
-  minLength,
-  required,
-  validateAddress,
-  withHumanDelay,
-} from "app/utils";
+import { useContacts, useContactsDialog } from "app/hooks/contacts";
+import { ToastOverflowProvider, useToast } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import SecondaryModal, {
-  SecondaryModalProps,
-} from "app/components/elements/SecondaryModal";
-import Input from "app/components/elements/Input";
-import Button from "app/components/elements/Button";
-import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/delete-medium.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
-import { ReactComponent as AvatarPlaceholderIcon } from "app/icons/avatar-placeholder.svg";
-import { ReactComponent as NoResultsFoundIcon } from "../../icons/no-results-found.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const ContactsSection: FC = () => {
   const { confirm } = useDialog();
+  const { upsertContact } = useContactsDialog();
+  const { updateToast } = useToast();
   const [searchValue, setSearchValue] = useState<string | null>(null);
-  const [modalData, setModalData] = useState<
-    { name: string; address: string; addedAt: number } | "new" | null
-  >(null);
 
   const { contacts, loadMore, hasMore } = useContacts({
     search: searchValue ?? undefined,
@@ -87,33 +70,34 @@ const ContactsSection: FC = () => {
 
       if (response) {
         await Repo.contacts.delete(address);
+        updateToast(`Contact "${name}" successfully deleted!`);
       }
     },
-    [confirm]
+    [confirm, updateToast]
   );
 
   return (
-    <>
-      <div className="flex flex-col min-h-0 grow">
-        <div className="flex justify-between items-center py-4">
-          <h1 className="text-2xl font-bold">Contacts</h1>
-          <SearchInput
-            placeholder="Type name or address to search..."
-            searchValue={searchValue}
-            toggleSearchValue={(value: string | null) => setSearchValue(value)}
-            className="max-w-[18rem]"
-          />
-        </div>
-        <OverflowProvider>
-          {(ref) => (
-            <ScrollAreaContainer
-              ref={ref}
-              className="pr-5 -mr-5"
-              viewPortClassName="pb-20 rounded-t-[.625rem]"
-              scrollBarClassName="py-0 pb-20"
-            >
+    <div className="flex flex-col min-h-0 grow">
+      <div className="flex justify-between items-center py-4">
+        <h1 className="text-2xl font-bold">Contacts</h1>
+        <SearchInput
+          placeholder="Type name or address to search..."
+          searchValue={searchValue}
+          toggleSearchValue={(value: string | null) => setSearchValue(value)}
+          className="max-w-[18rem]"
+        />
+      </div>
+      <OverflowProvider>
+        {(ref) => (
+          <ScrollAreaContainer
+            ref={ref}
+            className="pr-5 -mr-5"
+            viewPortClassName="pb-20 rounded-t-[.625rem]"
+            scrollBarClassName="py-0 pb-20"
+          >
+            <ToastOverflowProvider className="!top-0 !right-5">
               <div className="grid grid-cols-5 gap-5">
-                <NewContactCard onClick={() => setModalData("new")} />
+                <NewContactCard onClick={() => upsertContact({})} />
                 {contacts.length === 0 ? (
                   <div
                     className={classNames(
@@ -141,26 +125,16 @@ const ContactsSection: FC = () => {
                       name={name}
                       address={address}
                       onDelete={() => handleDelete(name, address)}
-                      onEdit={() => setModalData({ name, address, addedAt })}
+                      onEdit={() => upsertContact({ name, address, addedAt })}
                     />
                   ))
                 )}
               </div>
-            </ScrollAreaContainer>
-          )}
-        </OverflowProvider>
-      </div>
-      {modalData && (
-        <ContactModal
-          isNew={modalData === "new"}
-          name={modalData !== "new" ? modalData.name : undefined}
-          address={modalData !== "new" ? modalData.address : undefined}
-          addedAt={modalData !== "new" ? modalData.addedAt : undefined}
-          open={true}
-          onOpenChange={() => setModalData(null)}
-        />
-      )}
-    </>
+            </ToastOverflowProvider>
+          </ScrollAreaContainer>
+        )}
+      </OverflowProvider>
+    </div>
   );
 };
 
@@ -285,149 +259,3 @@ const ActionButton: FC<ActionButtonProps> = ({ Icon, className, ...rest }) => (
     <Icon className="w-6 h-auto" />
   </button>
 );
-
-type FormValues = {
-  name: string;
-  address: string;
-};
-
-type ContactModalProps = {
-  isNew?: boolean;
-  name?: string;
-  address?: string;
-  addedAt?: number;
-} & SecondaryModalProps;
-
-const ContactModal: FC<ContactModalProps> = ({
-  isNew,
-  name,
-  address,
-  addedAt,
-  onOpenChange,
-  ...rest
-}) => {
-  const { alert } = useDialog();
-
-  const handleSubmit = useCallback(
-    async ({ name: newName, address: newAddress }) =>
-      withHumanDelay(async () => {
-        try {
-          const isChangedAddress = newAddress !== address;
-          if (isNew || isChangedAddress) {
-            await Repo.contacts.add({
-              name: newName,
-              address: newAddress,
-              addedAt: isNew || !addedAt ? new Date().getTime() : addedAt,
-            });
-            if (isChangedAddress && address) {
-              await Repo.contacts.delete(address);
-            }
-          } else {
-            await Repo.contacts.put(
-              {
-                name: newName,
-                address: newAddress,
-                addedAt: addedAt!,
-              },
-              address
-            );
-          }
-
-          onOpenChange?.(false);
-        } catch (err: any) {
-          alert({ title: "Error!", content: err.message });
-        }
-      }),
-    [addedAt, address, alert, isNew, onOpenChange]
-  );
-
-  return (
-    <SecondaryModal
-      onOpenChange={onOpenChange}
-      header={isNew ? "Add new contact" : "Edit contact"}
-      className="max-w-[43.75rem]"
-      headerClassName="!text-[2rem] !mb-6"
-      {...rest}
-    >
-      <Form<FormValues>
-        onSubmit={handleSubmit}
-        decorators={[focusOnErrors]}
-        initialValues={{
-          name: name,
-          address: address,
-        }}
-        render={({ form, handleSubmit, submitting, values }) => (
-          <div className="flex justify-center w-full">
-            <div
-              className={classNames(
-                "h-[7.75rem] w-[7.75rem] min-w-[7.75rem]",
-                "mr-16",
-                "bg-black/20",
-                "rounded-[.625rem]",
-                "overflow-hidden"
-              )}
-            >
-              {address || values.address ? (
-                <AutoIcon
-                  seed={values.address ?? address}
-                  source="dicebear"
-                  type="personas"
-                  className="w-full h-full"
-                />
-              ) : (
-                <AvatarPlaceholderIcon className="w-full h-full" />
-              )}
-            </div>
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col items-start w-full max-w-[22rem]"
-            >
-              <Field
-                name="name"
-                validate={composeValidators(
-                  required,
-                  minLength(3),
-                  maxLength(40)
-                )}
-              >
-                {({ input, meta }) => (
-                  <Input
-                    label="Name"
-                    placeholder="Type contact's name"
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    className="w-full mb-3"
-                    {...input}
-                  />
-                )}
-              </Field>
-              <Field
-                name="address"
-                validate={composeValidators(required, validateAddress)}
-              >
-                {({ input, meta }) => (
-                  <AddressField
-                    label="Address"
-                    placeholder="Type contact's address"
-                    setFromClipboard={(value) => form.change("address", value)}
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
-                    className="w-full"
-                    {...input}
-                  />
-                )}
-              </Field>
-              <Button
-                type="submit"
-                className="mt-5 w-full"
-                loading={submitting}
-              >
-                {isNew ? "Add" : "Save"}
-              </Button>
-            </form>
-          </div>
-        )}
-      />
-    </SecondaryModal>
-  );
-};

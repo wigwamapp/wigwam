@@ -11,6 +11,7 @@ type BalanceProps = {
   copiable?: boolean;
   isMinified?: boolean;
   isNative?: boolean;
+  asSpan?: boolean;
   prefix?: ReactNode;
   className?: string;
 };
@@ -20,6 +21,7 @@ const Balance: FC<BalanceProps> = ({
   copiable = false,
   isMinified,
   isNative = false,
+  asSpan = false,
   prefix,
   className,
 }) => {
@@ -36,6 +38,7 @@ const Balance: FC<BalanceProps> = ({
         }
         copiable={copiable}
         prefix={prefix}
+        asSpan={asSpan}
         className={className}
       />
     );
@@ -50,6 +53,7 @@ const Balance: FC<BalanceProps> = ({
       isMinified={isMinified ?? false}
       copiable={copiable}
       prefix={prefix}
+      asSpan={asSpan}
       className={className}
     />
   );

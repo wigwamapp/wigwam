@@ -13,12 +13,31 @@ export class PorterClient<ReqData = any, ResData = unknown> {
   private reqId = 0;
   private messageHandlers = new Set<(msg: any) => void>();
 
-  private connectedAt?: number;
+  public onFullyDisconnect?: () => void;
 
-  connect(name: string) {
+  connect(name: string, attempts = 0) {
     this.port?.disconnect();
 
-    const port = browser.runtime.connect({ name });
+    const handleReconnect = (err?: any) => {
+      if (attempts > 20 || err?.message === "Extension context invalidated.") {
+        this.onFullyDisconnect?.();
+        return;
+      }
+
+      setTimeout(
+        () => this.connect(name, attempts + 1),
+        attempts < 10 ? 100 : 1_000
+      );
+    };
+
+    let port: Runtime.Port;
+    try {
+      port = browser.runtime.connect({ name });
+    } catch (err) {
+      handleReconnect(err);
+      console.error(err);
+      return;
+    }
 
     port.onMessage.addListener((msg) => {
       forEachSafe(this.messageHandlers, (handle) => handle(msg));
@@ -27,18 +46,14 @@ export class PorterClient<ReqData = any, ResData = unknown> {
     port.onDisconnect.addListener((p) => {
       delete this.port;
 
-      if (Date.now() - this.connectedAt! > 1_000) {
-        this.connect(name);
-      } else {
-        setTimeout(() => this.connect(name), 1_000);
-      }
+      handleReconnect();
 
       const err = p.error ?? browser.runtime.lastError;
       if (err) console.error(new Error(err.message));
     });
 
     this.port = port;
-    this.connectedAt = Date.now();
+    attempts = 0;
   }
 
   /**

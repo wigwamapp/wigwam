@@ -6,7 +6,8 @@ import { isPopup as isPopupPrimitive } from "lib/ext/view";
 
 import { lockWallet } from "core/client";
 
-import { currentProfileAtom } from "app/atoms";
+import { useDialog } from "app/hooks/dialog";
+import { approvalsAtom, currentProfileAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import AutoIcon from "app/components/elements/AutoIcon";
 import RoundedButton from "app/components/elements/RoundedButton";
@@ -17,16 +18,43 @@ type LockProfileButtonProps = {
 
 const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
   const currentProfile = useAtomValue(currentProfileAtom);
+  const approvals = useAtomValue(approvalsAtom);
+  const { confirm } = useDialog();
+
+  const isPopup = isPopupPrimitive();
 
   const handleLock = useCallback(async () => {
     try {
-      await lockWallet();
+      const approvalsAmount = approvals.length;
+      const response =
+        approvalsAmount === 0
+          ? true
+          : await confirm({
+              title: "Lock",
+              content: (
+                <p
+                  className={classNames(
+                    !isPopup && "mb-4",
+                    isPopup && "mb-2",
+                    "mx-auto text-center"
+                  )}
+                >
+                  Are you sure you want to lock the wallet? You have{" "}
+                  {approvalsAmount} request{approvalsAmount > 1 ? "s" : ""}{" "}
+                  waiting for approvals. If you lock the wallet now, all
+                  requests will be cleared!
+                </p>
+              ),
+              yesButtonText: "Lock",
+            });
+
+      if (response) {
+        await lockWallet();
+      }
     } catch (err) {
       console.error(err);
     }
-  }, []);
-
-  const isPopup = isPopupPrimitive();
+  }, [approvals.length, confirm, isPopup]);
 
   const content = (
     <>

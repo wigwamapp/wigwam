@@ -18,6 +18,7 @@ type IconedButtonProps = {
   iconProps?: any;
   theme?: "primary" | "secondary" | "tertiary";
   smartLink?: boolean;
+  asSpan?: boolean;
   iconClassName?: string;
 } & (HTMLAttributes<HTMLButtonElement> | LinkProps);
 
@@ -31,6 +32,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       iconProps,
       smartLink = false,
       iconClassName,
+      asSpan = false,
       ...rest
     },
     ref
@@ -95,7 +97,24 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       );
     }
 
-    return (
+    return asSpan ? (
+      <span
+        ref={ref as ForwardedRef<HTMLButtonElement>}
+        role="button"
+        tabIndex={rest.tabIndex ?? 0}
+        onClick={rest.onClick}
+        onKeyDown={(e) => {
+          const keyCode = e.keyCode;
+          if (keyCode === 32 || keyCode === 13) {
+            rest.onClick?.(e as any);
+          }
+        }}
+        className={classNamesList}
+        {...rest}
+      >
+        {content}
+      </span>
+    ) : (
       <button
         ref={ref as ForwardedRef<HTMLButtonElement>}
         type="button"
