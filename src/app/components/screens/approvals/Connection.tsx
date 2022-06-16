@@ -28,16 +28,16 @@ import Tooltip from "app/components/elements/Tooltip";
 import Balance from "app/components/elements/Balance";
 import WalletName from "app/components/elements/WalletName";
 import NetworkSelect from "app/components/elements/NetworkSelect";
+import Button from "app/components/elements/Button";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import vigvamLogoUrl from "app/images/vigvam.png";
 
 import ApprovalLayout from "./Layout";
-import { ReactComponent as NoResultsFoundIcon } from "../../../icons/no-results-found.svg";
-import Button from "../../elements/Button";
-import { ReactComponent as AddWalletIcon } from "../../../icons/add-wallet.svg";
 
 type ApproveConnectionProps = {
   approval: ConnectionApproval;
@@ -290,10 +290,7 @@ const EmptyAccountsToConnect: FC = () => (
     <div>There no wallets to connect.</div>
     <Button
       theme="secondary"
-      onClick={() => {
-        console.log("click");
-        openInTabStrict({ addAccOpened: true }, ["token"]);
-      }}
+      onClick={() => openInTabStrict({ addAccOpened: true }, ["token"])}
       className="ml-5 !py-1 !text-sm !min-w-[8rem] mt-2.5"
     >
       <AddWalletIcon className="h-5 w-auto mr-1.5" />
