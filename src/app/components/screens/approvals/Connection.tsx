@@ -12,6 +12,7 @@ import {
 } from "core/types";
 import { approveItem } from "core/client";
 
+import { openInTabStrict } from "app/helpers";
 import { allAccountsAtom, chainIdAtom, currentAccountAtom } from "app/atoms";
 import { ChainIdProvider, useSync, useToken } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -27,10 +28,13 @@ import Tooltip from "app/components/elements/Tooltip";
 import Balance from "app/components/elements/Balance";
 import WalletName from "app/components/elements/WalletName";
 import NetworkSelect from "app/components/elements/NetworkSelect";
+import Button from "app/components/elements/Button";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import vigvamLogoUrl from "app/images/vigvam.png";
 
 import ApprovalLayout from "./Layout";
@@ -49,7 +53,9 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 
   const { alert } = useDialog();
 
-  const accountsToConnectRef = useRef(new Set<string>());
+  const accountsToConnectRef = useRef(
+    new Set<string>([currentAccount.address])
+  );
   const forceUpdate = useForceUpdate();
 
   const localChainIdRef = useRef(internalChainId);
@@ -203,20 +209,24 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           />
         </div>
         <Separator />
-        <ScrollAreaContainer
-          className="w-full box-content -mr-5 pr-5"
-          viewPortClassName="py-2.5 viewportBlock"
-        >
-          {preparedAccounts.map((account, i) => (
-            <Account
-              key={account.address}
-              account={account}
-              checked={accountsToConnectRef.current.has(account.address)}
-              onToggleAdd={() => toggleAccount(account.address)}
-              className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
-            />
-          ))}
-        </ScrollAreaContainer>
+        {preparedAccounts.length === 0 ? (
+          <EmptyAccountsToConnect />
+        ) : (
+          <ScrollAreaContainer
+            className="w-full box-content -mr-5 pr-5 grow"
+            viewPortClassName="py-2.5 viewportBlock"
+          >
+            {preparedAccounts.map((account, i) => (
+              <Account
+                key={account.address}
+                account={account}
+                checked={accountsToConnectRef.current.has(account.address)}
+                onToggleAdd={() => toggleAccount(account.address)}
+                className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
+              />
+            ))}
+          </ScrollAreaContainer>
+        )}
         <ConnectionWarnings />
       </ChainIdProvider>
     </ApprovalLayout>
@@ -270,6 +280,27 @@ const ConnectionWarnings: FC = () => (
   </div>
 );
 
+const EmptyAccountsToConnect: FC = () => (
+  <div
+    className={classNames(
+      "flex flex-col items-center justify-center mx-auto",
+      "w-full h-full py-4",
+      "text-sm text-brand-inactivedark2 text-center"
+    )}
+  >
+    <NoResultsFoundIcon className="mb-4" />
+    <div>There no wallets to connect.</div>
+    <Button
+      theme="secondary"
+      onClick={() => openInTabStrict({ addAccOpened: true }, ["token"])}
+      className="ml-5 !py-1 !text-sm !min-w-[8rem] mt-2.5"
+    >
+      <AddWalletIcon className="h-5 w-auto mr-1.5" />
+      Add Wallet
+    </Button>
+  </div>
+);
+
 type AccountProps = {
   account: AccountType;
   checked: boolean;
@@ -290,6 +321,7 @@ const Account: FC<AccountProps> = ({
     <CheckboxPrimitive.Root
       checked={checked}
       onCheckedChange={onToggleAdd}
+      autoFocus={checked}
       className={classNames(
         "w-full",
         "flex items-center",

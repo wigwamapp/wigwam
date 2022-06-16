@@ -113,9 +113,10 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
           "w-6 min-w-[1.5rem] h-6 mr-2 object-cover",
           "!border-none"
         )}
+        fallbackClassName="!h-3/5"
       />
       <span className="min-w-0 truncate">{new URL(source.url).host}</span>
-      <LinkIcon className="ml-1" />
+      <LinkIcon className="ml-1 w-4 h-4 min-w-[1rem]" />
     </button>
   );
 };

@@ -34,7 +34,7 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
       >
         {children}
 
-        <div className="flex-1" />
+        <div className="flex-1 shrink-0" />
 
         <div className="grid grid-cols-2 gap-3 w-full mt-5">
           <Button

@@ -10,6 +10,13 @@ export async function openInTab(to?: Destination, merge?: boolean | string[]) {
     return;
   }
 
+  return openInTabStrict(to, merge);
+}
+
+export async function openInTabStrict(
+  to?: Destination,
+  merge?: boolean | string[]
+) {
   try {
     const mainTabs = await browser.tabs.query({
       currentWindow: true,
