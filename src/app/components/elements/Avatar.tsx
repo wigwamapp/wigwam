@@ -9,6 +9,7 @@ type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   withBorder?: boolean;
   withBg?: boolean;
   imageClassName?: string;
+  fallbackClassName?: string;
 };
 
 const Avatar = memo<AvatarProps>(
@@ -18,6 +19,7 @@ const Avatar = memo<AvatarProps>(
     withBg = true,
     className,
     imageClassName,
+    fallbackClassName,
     ...rest
   }) => {
     const [loadingState, setLoadingState] = useState<
@@ -53,7 +55,7 @@ const Avatar = memo<AvatarProps>(
         />
         {loadingState === "error" && (
           <AvatarPrimitive.Fallback className="flex justify-center items-center h-full">
-            <FallbackElement />
+            <FallbackElement className={fallbackClassName} />
           </AvatarPrimitive.Fallback>
         )}
       </AvatarPrimitive.Root>

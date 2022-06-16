@@ -234,10 +234,13 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
           "block",
           "bg-white",
           "rounded-full overflow-hidden",
-          "h-auto",
-          theme === "small" && "w-[1.125rem]",
-          theme === "large" && "w-6",
+          theme === "small" && "w-[1.125rem] h-[1.125rem]",
+          theme === "large" && "w-6 h-6",
           className
+        )}
+        fallbackClassName={classNames(
+          theme === "large" && "!h-3/5",
+          theme === "small" && "!h-3/4"
         )}
       />
     );
