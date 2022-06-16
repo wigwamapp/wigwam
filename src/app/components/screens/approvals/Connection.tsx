@@ -53,7 +53,9 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 
   const { alert } = useDialog();
 
-  const accountsToConnectRef = useRef(new Set<string>());
+  const accountsToConnectRef = useRef(
+    new Set<string>([currentAccount.address])
+  );
   const forceUpdate = useForceUpdate();
 
   const localChainIdRef = useRef(internalChainId);
@@ -319,6 +321,7 @@ const Account: FC<AccountProps> = ({
     <CheckboxPrimitive.Root
       checked={checked}
       onCheckedChange={onToggleAdd}
+      autoFocus={checked}
       className={classNames(
         "w-full",
         "flex items-center",

@@ -115,7 +115,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
       className={classNames(
         "flex flex-col",
         size === "large" && "min-w-[17.75rem]",
-        size === "small" && "min-w-[10.5rem]",
+        size === "small" && "w-[10.5rem]",
         className
       )}
     >
@@ -201,7 +201,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "shadow-xs",
                 "focus-visible:outline-none",
                 size === "large" && "mt-2 min-w-[17.75rem]",
-                size === "small" && "mt-1.5 min-w-[10.5rem]",
+                size === "small" && "mt-1.5 w-[10.5rem]",
                 "w-full",
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
