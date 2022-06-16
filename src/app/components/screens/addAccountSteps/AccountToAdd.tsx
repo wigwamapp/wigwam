@@ -21,7 +21,12 @@ import { AccountSource, AddAccountParams, Network } from "core/types";
 import { ClientProvider } from "core/client";
 
 import { allNetworksAtom } from "app/atoms";
-import { TippySingletonProvider, useNextAccountName } from "app/hooks";
+import {
+  TippySingletonProvider,
+  useLazyAllNetworks,
+  useLazyNetwork,
+  useNextAccountName,
+} from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
 import NetworkSelect from "app/components/elements/NetworkSelectPrimitive";
@@ -62,11 +67,13 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
     () => networks.filter(({ type }) => type === "mainnet"),
     [networks]
   );
+  const allNetworks = useLazyAllNetworks() ?? preparedNetworks;
   const { alert } = useDialog();
 
   useI18NUpdate();
+  const currentNetwork = useLazyNetwork();
 
-  const [network, setNetwork] = useState(INITIAL_NETWORK);
+  const [network, setNetwork] = useState(currentNetwork ?? INITIAL_NETWORK);
   const provider = useMemo(
     () => new ClientProvider(network.chainId),
     [network]
@@ -235,7 +242,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               <TooltipIcon />
             </Tooltip>
             <NetworkSelect
-              networks={preparedNetworks}
+              networks={allNetworks}
               currentNetwork={network}
               onNetworkChange={onNetworkChange}
               withAction={false}
