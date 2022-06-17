@@ -20,6 +20,7 @@ import {
   requestSwitchChain,
   requestAddChain,
 } from "./wallet";
+import { isUnlocked } from "../state";
 
 export async function handleRpc(
   source: ActivitySource,
@@ -30,6 +31,8 @@ export async function handleRpc(
 ) {
   const expandPermission = async () => {
     if (source.type === "page") {
+      if (!isUnlocked()) return;
+
       const origin = getPageOrigin(source);
       const permission = await repo.permissions.get(origin);
 
