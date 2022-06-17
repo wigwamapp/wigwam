@@ -9,7 +9,8 @@ import type { getExtendedKey as getExtendedKeyType } from "lib/ledger";
 import { withHumanDelay } from "app/utils";
 import { LoadingHandler, useDialog } from "app/hooks/dialog";
 
-import LargeSpinner from "app/components/elements/LargeSpinner";
+import { ReactComponent as LedgerConnect } from "app/icons/ledger-connect.svg";
+import { ReactComponent as LedgerApp } from "app/icons/ledger-open-app.svg";
 
 export type LedgerHandler = (
   params: {
@@ -103,11 +104,16 @@ export function useLedger() {
         headerClassName: "mb-3",
         content: (state: "loading" | "connectApp") => (
           <>
-            <span className="mb-5">
-              Please proceed connecting to the ledger.
+            {state === "loading" ? (
+              <LedgerConnect className="h-[3.125rem] w-auto" />
+            ) : (
+              <LedgerApp className="h-[3.125rem] w-auto" />
+            )}
+            <span className="mt-8">
+              {state === "connectApp"
+                ? "Open the Ethereum app on yur device."
+                : "Connect and unlock your device."}
             </span>
-            {state === "loading" && <LargeSpinner />}
-            {state === "connectApp" && "Please connect to Ethereum app"}
           </>
         ),
         loadingHandler,

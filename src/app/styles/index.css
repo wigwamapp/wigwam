@@ -196,6 +196,30 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
 }
 
 /**
+ * Ledger animation
+ */
+
+.ledger-button-action {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: ledgerPulse 2.5s infinite;
+}
+
+@keyframes ledgerPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/**
  * Toast animations
  */
 
