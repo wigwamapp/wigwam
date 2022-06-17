@@ -69,8 +69,9 @@ const Asset: FC = () => {
             title: "Watch-only account",
             content: (
               <span>
-                Cannot create transfer for watch-only wallet. Please change
-                wallet or{" "}
+                Cannot create transfer for watch-only wallet.
+                <br />
+                Please change wallet or{" "}
                 <Link
                   to={{ addAccOpened: true }}
                   merge={["tokens"]}
