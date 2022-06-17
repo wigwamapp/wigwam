@@ -158,13 +158,13 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
  */
 
 .shadow-pulse {
-  animation: pulse 2.5s infinite;
+  animation: brand-shadow-pulse 2.5s infinite;
 }
 .shadow-pulse:hover {
   animation: none;
 }
 
-@keyframes pulse {
+@keyframes brand-shadow-pulse {
   0% {
     box-shadow: 0 5px 25px rgba(255, 0, 45, 0);
   }
