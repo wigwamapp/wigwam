@@ -68,7 +68,9 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
       if (source.type === "page") {
         let exist = false;
         if (source.tabId !== undefined) {
-          exist = Boolean(await browser.tabs.get(source.tabId));
+          exist = Boolean(
+            await browser.tabs.get(source.tabId).catch(() => null)
+          );
         }
         if (exist) {
           await browser.tabs.update(source.tabId, { highlighted: true });
