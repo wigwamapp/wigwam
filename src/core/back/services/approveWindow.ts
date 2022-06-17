@@ -1,11 +1,16 @@
-import browser, { Tabs } from "webextension-polyfill";
+import browser, { Windows } from "webextension-polyfill";
+import memoizeOne from "memoize-one";
 import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
-import { livePromise } from "lib/system/livePromise";
 import { createQueue } from "lib/system/queue";
 
 import { Approval } from "core/types";
 
 import { $approvals, approvalAdded } from "../state";
+
+type ApprovePopupState = {
+  type: "window" | "tab";
+  id: number;
+} | null;
 
 const APPROVE_WINDOW_URL = getPublicURL("approve.html");
 const WINDOW_POSITION =
@@ -14,6 +19,8 @@ const WINDOW_POSITION =
 const enqueueOpenApprove = createQueue();
 
 export function startApproveWindowOpener() {
+  let popupState: ApprovePopupState = null;
+
   browser.runtime.onMessage.addListener((msg) => {
     if (msg === "__OPEN_APPROVE_WINDOW") {
       openApproveWindow();
@@ -27,145 +34,84 @@ export function startApproveWindowOpener() {
 
   approvalAdded.watch(() => openApproveWindow());
 
-  $approvals.watch(async (approvals) => {
+  $approvals.watch((approvals) => {
     if (approvals.length === 0) {
-      try {
-        const currentTab = await loadCurrentApproveTab();
-        if (currentTab) {
-          await browser.tabs.remove(currentTab.id!);
-        }
-      } catch (err) {
-        console.error(err);
+      if (popupState?.type === "window") {
+        browser.windows.remove(popupState.id).catch(console.error);
+      } else if (popupState?.type === "tab") {
+        browser.tabs.remove(popupState.id).catch(console.error);
       }
     } else {
       focusApprovalTab(approvals[0]);
     }
   });
-}
 
-export const openApproveWindow = () =>
-  enqueueOpenApprove(async () => {
-    if ($approvals.getState().length === 0) return;
+  const openApproveWindow = () =>
+    enqueueOpenApprove(async () => {
+      if ($approvals.getState().length === 0) return;
 
-    try {
-      const currentTab = await loadCurrentApproveTab();
+      try {
+        if (popupState?.type === "window") {
+          await browser.windows
+            .update(popupState.id, { focused: true })
+            .catch(console.error);
+        } else if (popupState?.type === "tab") {
+          await browser.tabs
+            .update(popupState.id, { active: true })
+            .catch(console.error);
+        } else {
+          await browser.tabs
+            .query({ url: APPROVE_WINDOW_URL })
+            .then((restApproveTabs) =>
+              restApproveTabs.length > 0
+                ? browser.tabs.remove(restApproveTabs.map(({ id }) => id!))
+                : null
+            )
+            .catch(console.error);
 
-      if (currentTab) {
-        await browser.windows.update(currentTab.windowId!, {
-          focused: true,
-        });
-      } else {
-        await createApproveWindow(WINDOW_POSITION);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  });
-
-const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
-  () => Promise.resolve(undefined),
-  (callback) => {
-    let currentTabId: number | null = null;
-
-    pickCurrentApproveTab()
-      .then((tab) => {
-        if (currentTabId === null) {
-          callback(tab);
-
-          if (tab) {
-            currentTabId = tab.id!;
-          }
+          popupState = await createApproveWindow(WINDOW_POSITION);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
-
-        if (currentTabId === null) {
-          callback(null);
-        }
-      });
-
-    const handleTabCreated = (tab: Tabs.Tab) => {
-      const tabUrl = tab.url || tab.pendingUrl;
-
-      if (tabUrl?.startsWith(APPROVE_WINDOW_URL)) {
-        if (currentTabId !== null && tab.id !== currentTabId) {
-          browser.tabs.remove(currentTabId).catch(console.error);
-        }
-
-        currentTabId = tab.id!;
-        callback(tab);
       }
-    };
-    const handleTabRemoved = (tabId: number) => {
-      if (tabId === currentTabId) {
-        currentTabId = null;
-        callback(null);
+    });
+
+  const focusApprovalTab = (currentApproval: Approval) => {
+    if (popupState?.type === "tab") return;
+
+    if (currentApproval.source.type === "page") {
+      if (currentApproval.source.tabId) {
+        browser.tabs
+          .update(currentApproval.source.tabId, { active: true })
+          .catch(console.error);
       }
-    };
-
-    const handleTabUpdated = (
-      _tabId: number,
-      _changeInfo: Tabs.OnUpdatedChangeInfoType,
-      tab: Tabs.Tab
-    ) => handleTabCreated(tab);
-
-    browser.tabs.onCreated.addListener(handleTabCreated);
-    browser.tabs.onRemoved.addListener(handleTabRemoved);
-
-    if (process.env.TARGET_BROWSER === "firefox") {
-      browser.tabs.onUpdated.addListener(handleTabUpdated);
+    } else {
+      openOrFocusMainTab();
     }
+  };
 
-    return () => {
-      browser.tabs.onCreated.removeListener(handleTabCreated);
-      browser.tabs.onRemoved.removeListener(handleTabRemoved);
-
-      if (process.env.TARGET_BROWSER === "firefox") {
-        browser.tabs.onUpdated.removeListener(handleTabUpdated);
-      }
-    };
-  }
-);
-
-function focusApprovalTab(currentApproval: Approval) {
-  if (currentApproval.source.type === "page") {
-    if (currentApproval.source.tabId) {
-      browser.tabs
-        .update(currentApproval.source.tabId, {
-          highlighted: true,
-        })
-        .catch(console.error);
+  browser.windows.onRemoved.addListener((winId) => {
+    if (popupState?.type === "window" && winId === popupState.id) {
+      popupState = null;
     }
-  } else {
-    openOrFocusMainTab();
-  }
-}
-
-async function pickCurrentApproveTab() {
-  const approveTabs = await browser.tabs.query({
-    url: APPROVE_WINDOW_URL,
   });
 
-  if (approveTabs.length > 1) {
-    try {
-      await browser.tabs.remove(approveTabs.map(({ id }) => id!));
-    } catch {}
-
-    return null;
-  }
-
-  return approveTabs[0] ?? null;
+  browser.tabs.onRemoved.addListener((tabId) => {
+    if (popupState?.type === "tab" && tabId === popupState.id) {
+      popupState = null;
+    }
+  });
 }
 
 async function createApproveWindow(position: "center" | "top-right") {
   const width = 440;
   const height = 660;
 
+  let lastFocused: Windows.Window | undefined;
   let left = 0;
   let top = 0;
   try {
-    const lastFocused = await browser.windows.getLastFocused();
+    lastFocused = await browser.windows.getLastFocused();
 
     if (position === "top-right") {
       left = lastFocused.left! + (lastFocused.width! - width) - 16;
@@ -182,6 +128,14 @@ async function createApproveWindow(position: "center" | "top-right") {
     top = Math.round(screenY + outerHeight / 2 - height / 2);
   }
 
+  if (lastFocused?.state === "fullscreen" && (await isMacOs())) {
+    const tab = await browser.tabs.create({
+      url: getPublicURL("approve.html"),
+      active: true,
+    });
+    return { type: "tab" as const, id: tab.id! };
+  }
+
   const win = await browser.windows.create({
     type: "popup",
     url: getPublicURL("approve.html"),
@@ -196,5 +150,9 @@ async function createApproveWindow(position: "center" | "top-right") {
     await browser.windows.update(win.id, { left, top });
   }
 
-  return win;
+  return { type: "window" as const, id: win.id! };
 }
+
+const isMacOs = memoizeOne(() =>
+  browser.runtime.getPlatformInfo().then((platform) => platform.os === "mac")
+);

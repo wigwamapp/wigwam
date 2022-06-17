@@ -35,21 +35,13 @@ const ApproveRouter: FC = () => {
     .otherwise(() => <Destroy />);
 };
 
-const Destroy: FC = () => {
-  useLayoutEffect(() => {
-    window.close();
-  }, []);
-
-  return null;
-};
-
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
 
   const currentApproval = approvals[0];
   const statusBarDisplayed = approvals.length > 1;
 
-  if (!currentApproval) return null;
+  if (!currentApproval) return <Destroy />;
 
   return (
     <div
@@ -111,3 +103,11 @@ const CurrentApproval = memo<CurrentApprovalProps>(({ approval }) =>
     ))
     .otherwise(() => null)
 );
+
+const Destroy: FC = () => {
+  useLayoutEffect(() => {
+    window.close();
+  }, []);
+
+  return null;
+};
