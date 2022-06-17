@@ -80,3 +80,10 @@ export const validateCurrencySymbol = (value: string) =>
   !value || value.match(currencySymbolRegex)
     ? undefined
     : "Currency symbol is invalid";
+
+const passwordRegex = new RegExp(
+  /^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/
+);
+
+export const validatePassword = (value: string) =>
+  !value || value.match(passwordRegex) ? undefined : "Password is invalid";

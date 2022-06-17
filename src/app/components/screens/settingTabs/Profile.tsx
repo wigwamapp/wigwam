@@ -13,6 +13,7 @@ import {
   required,
   withHumanDelay,
   focusOnErrors,
+  validatePassword,
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -22,6 +23,7 @@ import SettingsHeader from "app/components/elements/SettingsHeader";
 import ProfileGen from "app/components/blocks/ProfileGen";
 import Separator from "app/components/elements/Seperator";
 import PasswordField from "app/components/elements/PasswordField";
+import PasswordValidationField from "app/components/elements/PasswordValidationField";
 
 type FormValues = {
   oldPwd: string;
@@ -112,11 +114,17 @@ const Profile: FC = () => {
                   />
                 )}
               </Field>
-              <Field name="newPwd" validate={required}>
+              <Field
+                name="newPwd"
+                validate={composeValidators(required, validatePassword)}
+              >
                 {({ input, meta }) => (
-                  <PasswordField
-                    error={meta.error && meta.touched}
-                    errorMessage={meta.error}
+                  <PasswordValidationField
+                    error={
+                      meta.error &&
+                      meta.submitFailed &&
+                      !meta.modifiedSinceLastSubmit
+                    }
                     label="New password"
                     placeholder={"*".repeat(8)}
                     className="mb-4"
