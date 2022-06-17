@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 
 import { ActivityType, Approval, WalletStatus } from "core/types";
 
-import { walletStatusAtom, approvalsAtom, approvalStatusAtom } from "app/atoms";
+import { walletStatusAtom, approvalsAtom } from "app/atoms";
 import { ChainIdProvider, TippySingletonProvider } from "app/hooks";
 
 import BaseProvider from "./BaseProvider";
@@ -45,13 +45,11 @@ const Destroy: FC = () => {
 
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
-  const apprivalStatus = useAtomValue(approvalStatusAtom);
 
   const currentApproval = approvals[0];
+  const statusBarDisplayed = approvals.length > 1;
 
   if (!currentApproval) return null;
-
-  const statusBarDisplayed = apprivalStatus.total > 1;
 
   return (
     <div
