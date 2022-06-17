@@ -53,8 +53,10 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 
   const { alert } = useDialog();
 
+  const watchOnlyAcc = currentAccount.source === AccountSource.Address;
+
   const accountsToConnectRef = useRef(
-    new Set<string>([currentAccount.address])
+    new Set<string>(!watchOnlyAcc ? [currentAccount.address] : undefined)
   );
   const forceUpdate = useForceUpdate();
 
@@ -329,6 +331,7 @@ const Account: FC<AccountProps> = ({
         "rounded-[.625rem]",
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+        "outline-none",
         className
       )}
     >
