@@ -2,7 +2,7 @@ import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { profileStateAtom } from "app/atoms";
+import { addAccountModalAtom, profileStateAtom } from "app/atoms";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import Button from "app/components/elements/Button";
@@ -10,13 +10,19 @@ import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 const Welcome: FC = () => {
   const { all } = useAtomValue(profileStateAtom);
+  const addAccOpened = useAtomValue(addAccountModalAtom);
 
   const isInitial = useMemo(() => all.length === 1, [all]);
 
   return (
     <BoardingPageLayout header={!isInitial} isWelcome>
       <div className="flex flex-col items-center -mt-[3vh] relative z-10">
-        <VigvamIcon className={classNames("w-[5rem] h-auto mb-5")} />
+        <VigvamIcon
+          className={classNames(
+            "w-[5rem] h-auto mb-5",
+            addAccOpened && "invisible"
+          )}
+        />
         <h1 className="mb-12 text-5xl font-bold text-brand-light">
           Welcome to Vigvam
         </h1>

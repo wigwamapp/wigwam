@@ -89,13 +89,16 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
         <img
           src={WelcomeTreeLeftImage}
           alt="Vigvam"
-          className={classNames("absolute bottom-0 left-0", "h-[83.5%] w-auto")}
+          className={classNames(
+            "absolute bottom-0 left-[5%]",
+            "h-[82%] w-auto"
+          )}
         />
         <img
           src={WelcomeTreeRightImage}
           alt="Vigvam"
           className={classNames(
-            "absolute bottom-0 right-0",
+            "absolute bottom-0 right-[2%] z-[2]",
             "h-[82.6%] w-auto"
           )}
         />
@@ -104,15 +107,15 @@ const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
           alt="Vigvam"
           className={classNames(
             "absolute bottom-[7.5%] right-[22.7%]",
-            "h-[42.1%] w-auto"
+            "h-[42.22%] w-auto"
           )}
         />
         <img
           src={WelcomeFireImage}
           alt="Vigvam"
           className={classNames(
-            "absolute bottom-[8.5%] right-[42%]",
-            "h-[50.8%] w-auto"
+            "absolute bottom-[4.5%] right-[36%]",
+            "h-[54.5%] w-auto"
           )}
         />
       </>
