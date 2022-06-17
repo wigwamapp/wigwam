@@ -125,6 +125,7 @@ const Profile: FC = () => {
                       meta.submitFailed &&
                       !meta.modifiedSinceLastSubmit
                     }
+                    modified={meta.modified}
                     label="New password"
                     placeholder={"*".repeat(8)}
                     className="mb-4"

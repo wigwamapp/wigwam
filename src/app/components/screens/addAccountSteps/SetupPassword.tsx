@@ -99,8 +99,9 @@ const SetupPassword = memo(() => {
                       meta.submitFailed &&
                       !meta.modifiedSinceLastSubmit
                     }
+                    modified={meta.modified}
+                    label="Create Password"
                     placeholder={"*".repeat(8)}
-                    label="Create password"
                     className="w-full mb-3"
                     {...input}
                   />
