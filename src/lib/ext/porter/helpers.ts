@@ -11,6 +11,17 @@ export interface SerializedError {
   data?: any;
 }
 
+export function sanitizeMessage(msg: any) {
+  if (process.env.TARGET_BROWSER !== "firefox") return msg;
+
+  // Fix firefox bug: The object could not be cloned
+  try {
+    return JSON.parse(JSON.stringify(msg));
+  } catch {
+    return msg;
+  }
+}
+
 export function serializeError(err: any): SerializedError {
   const message = err?.message || DEFAULT_ERROR_MESSAGE;
   return { message, data: err?.data };

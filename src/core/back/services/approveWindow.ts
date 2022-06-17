@@ -89,7 +89,7 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
       const tabUrl = tab.url || tab.pendingUrl;
 
       if (tabUrl?.startsWith(APPROVE_WINDOW_URL)) {
-        if (currentTabId !== null) {
+        if (currentTabId !== null && tab.id !== currentTabId) {
           browser.tabs.remove(currentTabId).catch(console.error);
         }
 
@@ -97,7 +97,6 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
         callback(tab);
       }
     };
-
     const handleTabRemoved = (tabId: number) => {
       if (tabId === currentTabId) {
         currentTabId = null;
@@ -105,12 +104,26 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
       }
     };
 
+    const handleTabUpdated = (
+      _tabId: number,
+      _changeInfo: Tabs.OnUpdatedChangeInfoType,
+      tab: Tabs.Tab
+    ) => handleTabCreated(tab);
+
     browser.tabs.onCreated.addListener(handleTabCreated);
     browser.tabs.onRemoved.addListener(handleTabRemoved);
 
+    if (process.env.TARGET_BROWSER === "firefox") {
+      browser.tabs.onUpdated.addListener(handleTabUpdated);
+    }
+
     return () => {
-      browser.tabs.onCreated.removeListener(handleTabCreated);
+      browser.tabs.onCreated.addListener(handleTabCreated);
       browser.tabs.onRemoved.removeListener(handleTabRemoved);
+
+      if (process.env.TARGET_BROWSER === "firefox") {
+        browser.tabs.onUpdated.removeListener(handleTabUpdated);
+      }
     };
   }
 );
@@ -131,7 +144,7 @@ function focusApprovalTab(currentApproval: Approval) {
 
 async function pickCurrentApproveTab() {
   const approveTabs = await browser.tabs.query({
-    url: `${APPROVE_WINDOW_URL}*`,
+    url: APPROVE_WINDOW_URL,
   });
 
   if (approveTabs.length > 1) {
