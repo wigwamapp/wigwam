@@ -11,6 +11,7 @@ import {
 import classNames from "clsx";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
+import { IS_FIREFOX } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
@@ -206,6 +207,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
+                IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
                 "z-10",
                 contentClassName

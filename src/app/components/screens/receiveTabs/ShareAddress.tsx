@@ -38,7 +38,7 @@ const ShareAddress: FC = () => {
           />
         </div>
         <div className="ml-4 flex flex-col items-start">
-          <p className="text-brand-font">
+          <p className="text-brand-font text-xs">
             This address can be used to receive funds. Share it with someone or
             just use it for withdrawal on exchanges.
           </p>

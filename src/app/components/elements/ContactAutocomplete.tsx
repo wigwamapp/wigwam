@@ -22,6 +22,7 @@ import { Account, Contact } from "core/types";
 
 import {
   ACCOUNTS_SEARCH_OPTIONS,
+  IS_FIREFOX,
   LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END,
 } from "app/defaults";
 import { useContacts } from "app/hooks/contacts";
@@ -197,6 +198,7 @@ const ContactAutocomplete = forwardRef<
               "rounded-[.625rem]",
               "bg-brand-dark/10",
               "backdrop-blur-[30px]",
+              IS_FIREFOX && "!bg-[#111226]",
               "border border-brand-light/5",
               "z-10",
               "w-[23.25rem]"

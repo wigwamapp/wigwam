@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useDialog } from "app/hooks/dialog";
+
 export function useCopyCanvasToClipboard(
   querySelector: string,
   copyDelay: number = 1000 * 2
 ) {
+  const { alert } = useDialog();
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -19,25 +22,34 @@ export function useCopyCanvasToClipboard(
   }, [copied, setCopied, copyDelay]);
 
   const copy = useCallback(async () => {
-    if (copied) return;
+    try {
+      if (copied) return;
 
-    const canvas = document.querySelector(querySelector) as
-      | HTMLCanvasElement
-      | undefined;
+      const canvas = document.querySelector(querySelector) as
+        | HTMLCanvasElement
+        | undefined;
 
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.canvas.toBlob((blob) => {
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const blob: Blob | null = await new Promise((res) => {
+            ctx.canvas.toBlob((blob) => res(blob));
+          });
+
           if (blob) {
             const item = new ClipboardItem({ "image/png": blob });
-            navigator.clipboard.write([item]);
+            await navigator.clipboard.write([item]);
             setCopied(true);
           }
-        });
+        }
       }
+    } catch (e) {
+      alert({
+        title: "Error while copying media",
+        content: "Copy media doesn't work in this environment.",
+      });
     }
-  }, [copied, querySelector]);
+  }, [alert, copied, querySelector]);
 
   return { copy, copied, setCopied };
 }

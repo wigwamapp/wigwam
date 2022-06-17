@@ -3,6 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { DialogProps } from "@radix-ui/react-dialog";
 import classNames from "clsx";
 
+import { IS_FIREFOX } from "app/defaults";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
@@ -42,6 +43,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             "bg-brand-main/[.05]",
             "border border-brand-main/[.15]",
             "backdrop-blur-[40px]",
+            IS_FIREFOX && "brandbg-secondary-modal",
             "rounded-[1.875rem]",
             "overflow-hidden",
             "animate-dialogcontent",

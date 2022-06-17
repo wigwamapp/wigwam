@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import browser from "webextension-polyfill";
 import { useAtom, useAtomValue } from "jotai";
 
+import { IS_FIREFOX } from "app/defaults";
 import { activityModalAtom, approvalStatusAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { openInTab } from "app/helpers";
@@ -51,6 +52,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
         "w-[calc(100%-1.5rem)] max-w-[75rem]",
         "bg-brand-darkblue/20",
         "backdrop-blur-[10px]",
+        IS_FIREFOX && "!bg-[#0D1020]/[.95]",
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
         "flex justify-between",

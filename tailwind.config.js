@@ -1,4 +1,5 @@
 const theme = require("tailwindcss/defaultTheme");
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/**/*.{html,js,mjs}"],
@@ -29,6 +30,7 @@ module.exports = {
           redobject: "#B82D41",
           redtext: "#EA556A",
           greenobject: "#4F9A5E",
+          firefoxactivity: "#0D1020",
         },
       },
       fontFamily: {
@@ -110,8 +112,27 @@ module.exports = {
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",
         radio: "linear-gradient(275.43deg, #FF002D 13.81%, #FF7F44 111.89%)",
         activity: "linear-gradient(220deg, #FF002D 0.11%, #FF7F44 90.88%)",
+        addaccountcontinue:
+          "linear-gradient(90.44deg, rgba(13, 14, 32, 0.95) 2.88%, rgba(15, 16, 34, 0.95) 21.54%, rgba(13, 14, 31, 0.95) 41.08%, rgba(17, 18, 36, 0.95) 81.76%, rgba(16, 17, 35, 0.95) 97.51%)",
       },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    plugin(({ addVariant, e, postcss }) => {
+      addVariant("firefox", ({ container, separator }) => {
+        const isFirefoxRule = postcss.atRule({
+          name: "-moz-document",
+          params: "url-prefix()",
+        });
+        isFirefoxRule.append(container.nodes);
+        container.append(isFirefoxRule);
+        isFirefoxRule.walkRules((rule) => {
+          rule.selector = `.${e(
+            `firefox${separator}${rule.selector.slice(1)}`
+          )}`;
+        });
+      });
+    }),
+  ],
 };

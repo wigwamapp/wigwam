@@ -54,7 +54,17 @@ a {
       rgba(118, 123, 160, 0.2) 0%,
       rgba(13, 14, 32, 0.2) 100%
     ),
-    #0c0d1e;
+    #0c0d1e !important;
+}
+
+.brandbg-secondary-modal {
+  background: radial-gradient(
+      33.62% 91.96% at 64.57% 13.41%,
+      #26273a 0%,
+      rgba(19, 20, 39, 0) 78.62%
+    ),
+    linear-gradient(115.9deg, #1e2133 7.71%, #191b2f 44.05%, #131427 66.44%);
+  border: 1px solid rgba(204, 214, 255, 0.15);
 }
 
 /**
