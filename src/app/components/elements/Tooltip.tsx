@@ -3,6 +3,7 @@ import classNames from "clsx";
 import { match } from "ts-pattern";
 import Tippy, { TippyProps } from "@tippyjs/react";
 
+import { IS_FIREFOX } from "app/defaults";
 import { useOverflowElement, useTippySingletonTarget } from "app/hooks";
 
 type sizeType = "large" | "small";
@@ -38,7 +39,7 @@ const Tooltip: FC<TooltipProps> = ({
         <>
           <div
             className={classNames(
-              "text-white",
+              "text-white text-xs",
               "border border-white/5",
               getSizeClasses(size)
             )}
@@ -89,16 +90,16 @@ const getSizeClasses = (size: sizeType) =>
     .with("large", () =>
       classNames(
         "rounded-[.625rem]",
-        // "bg-brand-main/10 backdrop-blur-[60px]",
-        "!bg-[#1F2134]/[.95]", // TODO: Add firefox:
+        "bg-brand-main/10 backdrop-blur-[60px]",
+        IS_FIREFOX && "!bg-[#3A3C51]/[.98]",
         "py-5 px-5"
       )
     )
     .otherwise(() =>
       classNames(
         "rounded-md",
-        // "bg-brand-main/20 backdrop-blur-[6px]",
-        "!bg-[#1F2134]/[.95]", // TODO: Add firefox:
+        "bg-brand-main/20 backdrop-blur-[6px]",
+        IS_FIREFOX && "!bg-[#414356]/[.98]",
         "py-1 px-3"
       )
     );

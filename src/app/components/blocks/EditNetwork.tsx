@@ -23,6 +23,7 @@ import {
 } from "core/common";
 import { Network } from "core/types";
 
+import { IS_FIREFOX } from "app/defaults";
 import {
   composeValidators,
   isLink,
@@ -516,9 +517,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               "mt-2",
               "w-full min-w-[17.75rem]",
               "rounded-[.625rem]",
-              // "bg-brand-dark/10",
-              // "backdrop-blur-[30px]",
-              "!bg-[#111226]", // TODO: firefox:
+              "bg-brand-dark/10",
+              "backdrop-blur-[30px]",
+              IS_FIREFOX && "!bg-[#111226]",
               "border border-brand-light/5",
               "z-10",
               "w-[21.875rem]"

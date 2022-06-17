@@ -7,6 +7,7 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import { WalletStatus } from "core/types";
 
+import { IS_FIREFOX } from "app/defaults";
 import { AddAccountStep } from "app/nav";
 import {
   addAccountModalAtom,
@@ -58,9 +59,9 @@ const AddAccountModal = memo(() => {
               "flex items-center justify-center",
               "w-[6.5rem] h-[6.5rem]",
               "rounded-full",
-              // "bg-brand-dark/20",
-              // "backdrop-blur-[10px]",
-              "!bg-[#0D1020]", // TODO: add firefox:
+              "bg-brand-dark/20",
+              "backdrop-blur-[10px]",
+              IS_FIREFOX && "!bg-[#0D1020]",
               "border border-brand-light/5",
               "shadow-addaccountmodal",
               "absolute",
@@ -102,8 +103,8 @@ const AddAccountModal = memo(() => {
                   <div
                     className={classNames(
                       "absolute inset-0 z-[-5] rounded-[2.5rem] overflow-hidden",
-                      // "bg-brand-dark/10 backdrop-blur-[30px]",
-                      "brandbg-large-modal" // TODO: add firefox:
+                      "bg-brand-dark/10 backdrop-blur-[30px]",
+                      IS_FIREFOX && "brandbg-large-modal"
                     )}
                   />
                 )}

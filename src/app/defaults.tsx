@@ -48,3 +48,5 @@ export const LOAD_MORE_ON_ASSET_FROM_END = 3;
 export const LOAD_MORE_ON_ACTIVITY_FROM_END = 3;
 export const LOAD_MORE_ON_CONTACTS_FROM_END = 15;
 export const LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END = 5;
+
+export const IS_FIREFOX = process.env.TARGET_BROWSER === "firefox";
