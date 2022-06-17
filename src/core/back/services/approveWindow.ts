@@ -118,7 +118,7 @@ const loadCurrentApproveTab = livePromise<Tabs.Tab | null>(
     }
 
     return () => {
-      browser.tabs.onCreated.addListener(handleTabCreated);
+      browser.tabs.onCreated.removeListener(handleTabCreated);
       browser.tabs.onRemoved.removeListener(handleTabRemoved);
 
       if (process.env.TARGET_BROWSER === "firefox") {
