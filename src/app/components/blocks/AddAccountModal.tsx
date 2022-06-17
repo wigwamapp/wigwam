@@ -14,6 +14,7 @@ import {
   walletStatusAtom,
 } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
+import { useDialog } from "app/hooks/dialog";
 import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -24,13 +25,56 @@ const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
   const walletStatus = useAtomValue(walletStatusAtom);
+  const { confirm } = useDialog();
   const isInitial = walletStatus === WalletStatus.Welcome;
 
+  const handleBackButton = useCallback(
+    async (e) => {
+      if (accountStep === AddAccountStep.VerifySeedPhrase) {
+        const res = await confirm({
+          title: "Secret phrase creation",
+          content: (
+            <p className="mb-4 mx-auto text-center">
+              Are you sure you want to cancel wallet creation? If you go to the
+              previous step, secret phrase will be regenerated.
+            </p>
+          ),
+          yesButtonText: "Back",
+        });
+
+        if (!res) {
+          e.preventDefault();
+        }
+      }
+    },
+    [accountStep, confirm]
+  );
+
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    async (open: boolean) => {
+      if (
+        accountStep === AddAccountStep.VerifySeedPhrase ||
+        accountStep === AddAccountStep.VerifyToAdd ||
+        accountStep === AddAccountStep.SetupPassword
+      ) {
+        const res = await confirm({
+          title: "Cancel wallet creation",
+          content: (
+            <p className="mb-4 mx-auto text-center">
+              Are you sure you want to cancel wallet creation? If you close the
+              window now, all data from previous steps will be lost.
+            </p>
+          ),
+          yesButtonText: "Close",
+        });
+
+        if (!res) {
+          return;
+        }
+      }
       setAccModalOpened([open, "replace"]);
     },
-    [setAccModalOpened]
+    [accountStep, confirm, setAccModalOpened]
   );
 
   const isMounted = useIsMounted();
@@ -109,6 +153,7 @@ const AddAccountModal = memo(() => {
                 <BackButton
                   navAtom={addAccountStepAtom}
                   initialValue={AddAccountStep.ChooseWay}
+                  onClick={handleBackButton}
                   className="absolute top-4 left-4"
                 />
 
