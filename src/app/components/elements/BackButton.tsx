@@ -26,9 +26,9 @@ const BackButton = memo(
     const canBack = !inHome;
 
     const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>(
-      (evt) => {
+      async (evt) => {
         if (onClick) {
-          onClick(evt);
+          await onClick(evt);
           if (evt.defaultPrevented) {
             return;
           }

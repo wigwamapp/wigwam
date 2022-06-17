@@ -15,7 +15,12 @@ import classNames from "clsx";
 import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
 
-import { AccountAsset, TokenStatus, TokenType } from "core/types";
+import {
+  AccountAsset,
+  AccountSource,
+  TokenStatus,
+  TokenType,
+} from "core/types";
 import * as repo from "core/repo";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
@@ -130,6 +135,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
     [permission, currentAccount]
   );
 
+  const watchOnlyAcc = currentAccount.source === AccountSource.Address;
+
   const reallyConnectible = useMemo(() => {
     if (!activeTab?.url) return false;
 
@@ -205,8 +212,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <Tooltip
             content={
               <p>
-                Current wallet is not connected to this website. To connect it -
-                click Connect on the right.
+                Current wallet is not connected to this website.
+                {!watchOnlyAcc &&
+                  " To connect it - click Connect on the right."}
                 <br />
                 If you want to disconnect all wallets - switch to any connected
                 wallet, and then click Disconnect on the right.
@@ -276,7 +284,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           {new URL(tabOrigin).host}
         </span>
       )}
-      {permission && (
+      {permission && !watchOnlyAcc && (
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"

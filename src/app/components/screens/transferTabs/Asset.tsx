@@ -9,8 +9,9 @@ import { ERC20__factory } from "abi-types";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
+import { Link } from "lib/navigation";
 
-import { AccountAsset } from "core/types";
+import { AccountAsset, AccountSource } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { suggestFees } from "core/client";
 
@@ -47,7 +48,7 @@ const Asset: FC = () => {
   const currentNetwork = useLazyNetwork();
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
   const currentToken = useAccountToken(tokenSlug);
-  const { alert } = useDialog();
+  const { alert, closeCurrentDialog } = useDialog();
   const { updateToast } = useToast();
   const isMounted = useIsMounted();
 
@@ -61,6 +62,28 @@ const Asset: FC = () => {
       withHumanDelay(async () => {
         if (!currentToken) {
           return;
+        }
+
+        if (currentAccount.source === AccountSource.Address) {
+          return alert({
+            title: "Watch-only account",
+            content: (
+              <span>
+                Cannot create transfer for watch-only wallet.
+                <br />
+                Please change wallet or{" "}
+                <Link
+                  to={{ addAccOpened: true }}
+                  merge={["tokens"]}
+                  className="underline"
+                  onClick={closeCurrentDialog}
+                >
+                  add new
+                </Link>
+                .
+              </span>
+            ),
+          });
         }
 
         try {
@@ -141,12 +164,14 @@ const Asset: FC = () => {
         }
       }),
     [
-      alert,
       currentToken,
-      updateToast,
-      isMounted,
-      provider,
+      currentAccount.source,
+      alert,
+      closeCurrentDialog,
       signerProvider,
+      updateToast,
+      provider,
+      isMounted,
       explorerUrl,
     ]
   );

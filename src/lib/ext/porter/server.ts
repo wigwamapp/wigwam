@@ -8,7 +8,7 @@ import {
   PorterServerMessage,
   PorterOneWay,
 } from "./types";
-import { MESSAGE_TYPES, serializeError } from "./helpers";
+import { MESSAGE_TYPES, serializeError, sanitizeMessage } from "./helpers";
 
 export type PorterMessageHandler<Data = any, ReplyData = any> = (
   ctx: MessageContext<Data, ReplyData>
@@ -52,13 +52,15 @@ export class PorterServer<OneWayData = any> {
   broadcast(data: OneWayData) {
     const msg: PorterOneWay = { type: PorterMessageType.OneWay, data };
     for (const port of this.ports) {
-      port.postMessage(msg);
+      port.postMessage(sanitizeMessage(msg));
     }
   }
 
   notify(port: Runtime.Port, data: OneWayData) {
     if (this.isConnected(port)) {
-      port.postMessage({ type: PorterMessageType.OneWay, data });
+      port.postMessage(
+        sanitizeMessage({ type: PorterMessageType.OneWay, data })
+      );
     }
   }
 
@@ -158,7 +160,7 @@ export class MessageContext<Data, ReplyData> {
 
   private send(res: PorterServerMessage) {
     if (this.connected) {
-      this.port.postMessage(res);
+      this.port.postMessage(sanitizeMessage(res));
     }
   }
 }

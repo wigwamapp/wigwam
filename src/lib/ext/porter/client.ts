@@ -4,6 +4,7 @@ import { forEachSafe } from "lib/system/forEachSafe";
 import { PorterMessageType } from "./types";
 import {
   deserializeError,
+  sanitizeMessage,
   PorterTimeoutError,
   PorterDisconnectedError,
 } from "./helpers";
@@ -66,7 +67,9 @@ export class PorterClient<ReqData = any, ResData = unknown> {
     const port = this.getCurrentPort();
     const reqId = this.reqId++;
 
-    port.postMessage({ type: PorterMessageType.Req, reqId, data });
+    port.postMessage(
+      sanitizeMessage({ type: PorterMessageType.Req, reqId, data })
+    );
 
     return new Promise((resolve, reject) => {
       const handleMessage = (msg: any) => {
@@ -121,7 +124,7 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
   sendOneWayMessage<T>(data: T) {
     const port = this.getCurrentPort();
-    port.postMessage({ type: PorterMessageType.OneWay, data });
+    port.postMessage(sanitizeMessage({ type: PorterMessageType.OneWay, data }));
   }
 
   /**
