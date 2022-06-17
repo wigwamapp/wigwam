@@ -80,7 +80,9 @@ const Approvals: FC = () => {
                 "w-[calc(100%-2rem)] max-w-[408px]",
                 "h-[2rem]",
                 "rounded-xl border border-brand-main/[.07] shadow-approvestack",
-                "brandbg-popup"
+                "brandbg-popup",
+                "opacity-40",
+                "z-[-1]"
               )}
             />
           </>
