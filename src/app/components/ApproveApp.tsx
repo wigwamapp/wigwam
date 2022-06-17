@@ -1,11 +1,12 @@
 import { FC, memo, Suspense, useLayoutEffect } from "react";
+import classNames from "clsx";
 import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
 import { ActivityType, Approval, WalletStatus } from "core/types";
 
 import { walletStatusAtom, approvalsAtom } from "app/atoms";
-import { ChainIdProvider } from "app/hooks";
+import { ChainIdProvider, TippySingletonProvider } from "app/hooks";
 
 import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
@@ -13,6 +14,7 @@ import ApproveConnection from "./screens/approvals/Connection";
 import ApproveTransaction from "./screens/approvals/Transaction";
 import ApproveSigning from "./screens/approvals/Signing";
 import Dialog from "./blocks/Dialog";
+import ApprovalStatus from "./blocks/ApprovalStatus";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
@@ -43,13 +45,49 @@ const Destroy: FC = () => {
 
 const Approvals: FC = () => {
   const approvals = useAtomValue(approvalsAtom);
+
   const currentApproval = approvals[0];
+  const statusBarDisplayed = approvals.length > 1;
 
   if (!currentApproval) return null;
 
   return (
-    <div className="h-screen">
+    <div
+      className={classNames(
+        "w-full h-screen",
+        "flex flex-col items-center justify-center",
+        statusBarDisplayed && "pt-10"
+      )}
+    >
       <Suspense fallback={null}>
+        {statusBarDisplayed && (
+          <>
+            <TippySingletonProvider>
+              <div
+                className={classNames(
+                  "-mt-10 h-10",
+                  "w-full max-w-[440px]",
+                  "px-4 flex items-center"
+                )}
+              >
+                <ApprovalStatus theme="small" readOnly />
+              </div>
+            </TippySingletonProvider>
+
+            <div
+              className={classNames(
+                "-mb-[1.5rem]",
+                "w-[calc(100%-2rem)] max-w-[408px]",
+                "h-[2rem]",
+                "rounded-xl border border-brand-main/[.07] shadow-approvestack",
+                "brandbg-popup",
+                "opacity-40",
+                "z-[-1]"
+              )}
+            />
+          </>
+        )}
+
         <CurrentApproval key={currentApproval.id} approval={currentApproval} />
       </Suspense>
     </div>

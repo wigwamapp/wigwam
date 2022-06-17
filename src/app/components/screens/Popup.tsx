@@ -33,7 +33,7 @@ import {
   currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useIsSyncing } from "app/hooks";
 import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
@@ -91,6 +91,7 @@ const PreloadAndSync: FC = ({ children }) => {
 
 const PopupNetworkSelect: FC = () => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
+  const isSyncing = useIsSyncing();
 
   const handleChange = useCallback(
     (chainId: number) => {
@@ -110,7 +111,10 @@ const PopupNetworkSelect: FC = () => {
     <NetworkSelect
       className="max-w-auto"
       currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
-      currentItemIconClassName="!w-8 !h-8 !mr-3"
+      currentItemIconClassName={classNames(
+        "!w-8 !h-8 !mr-3",
+        isSyncing && "animate-pulse"
+      )}
       contentClassName="w-[22.25rem]"
       onChange={handleChange}
     />
