@@ -44,6 +44,10 @@ export async function withVault<T>(factory: (vault: Vault) => T) {
   return factory(vault);
 }
 
+export function isUnlocked() {
+  return $walletStatus.getState() === WalletStatus.Unlocked;
+}
+
 async function autoUnlock(password: string) {
   const vault = await Vault.unlock(toProtectedString(password));
   const accounts = vault.getAccounts();

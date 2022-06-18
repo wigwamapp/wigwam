@@ -14,12 +14,23 @@ import {
   Permission,
   CHAIN_ID,
   ACCOUNT_ADDRESS,
+  ActivityType,
 } from "core/types";
 import * as repo from "core/repo";
 import { JSONRPC, VIGVAM_STATE } from "core/common/rpc";
+import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
-import { $accountAddresses, ensureInited } from "../state";
+import {
+  $accountAddresses,
+  $approvals,
+  $walletStatus,
+  approvalResolved,
+  ensureInited,
+  isUnlocked,
+} from "../state";
 import { handleRpc } from "../rpc";
+
+type InternalStateType = "walletStatus" | "chainId" | "accountAddress";
 
 export function startPageServer() {
   const pagePorter = new PorterServer<any>(PorterChannel.Page);
@@ -27,7 +38,10 @@ export function startPageServer() {
   pagePorter.onMessage(handlePageRequest);
 
   const permissionSubs = new Map<Runtime.Port, Subscription>();
-  const accountAddressSubs = new Map<Runtime.Port, () => void>();
+  const internalStateSubs = new Map<
+    Runtime.Port,
+    (type: InternalStateType) => void
+  >();
 
   pagePorter.onConnection(async (action, port) => {
     if (!port.sender?.url) return;
@@ -38,60 +52,33 @@ export function startPageServer() {
     await ensureInited();
 
     if (action === "connect") {
-      const notifyPermission = async (perm?: Permission) => {
-        let params;
-
-        if (perm) {
-          const internalAccountAddress = await loadAccountAddress();
-
-          let accountAddress;
-
-          if (perm.accountAddresses.includes(internalAccountAddress)) {
-            accountAddress = internalAccountAddress;
-          } else {
-            const allAccountAddresses = $accountAddresses.getState();
-
-            accountAddress =
-              perm.accountAddresses.find((address) =>
-                allAccountAddresses.includes(address)
-              ) ?? null;
-          }
-
-          params = {
-            chainId: perm.chainId,
-            accountAddress: accountAddress?.toLowerCase(),
-          };
-        } else {
-          const internalChainId = await loadInternalChainId();
-
-          params = {
-            chainId: internalChainId,
-            accountAddress: null,
-          };
-        }
-
-        pagePorter.notify(port, {
-          jsonrpc: JSONRPC,
-          method: VIGVAM_STATE,
-          params,
-        });
-      };
-
       const permission = await repo.permissions.get(origin);
-      notifyPermission(permission);
+      notifyPermission(port, permission);
 
       const sub = liveQuery(() => repo.permissions.get(origin)).subscribe(
-        notifyPermission
+        (perm) => notifyPermission(port, perm)
       );
 
       permissionSubs.set(port, sub);
 
-      accountAddressSubs.set(port, () =>
-        repo.permissions
-          .get(origin)
-          .then((p) => p && notifyPermission(p))
-          .catch(console.error)
-      );
+      internalStateSubs.set(port, async (type) => {
+        const perm = await repo.permissions.get(origin).catch(() => undefined);
+
+        switch (type) {
+          case "walletStatus":
+            notifyPermission(port, perm);
+            resolveConnectionApproval(perm);
+            break;
+
+          case "chainId":
+            if (!perm) notifyPermission(port);
+            break;
+
+          case "accountAddress":
+            if (perm) notifyPermission(port, perm);
+            break;
+        }
+      });
     } else {
       const permSub = permissionSubs.get(port);
       if (permSub) {
@@ -99,15 +86,58 @@ export function startPageServer() {
         permissionSubs.delete(port);
       }
 
-      accountAddressSubs.delete(port);
+      internalStateSubs.delete(port);
     }
   });
 
-  subscribeAccountAddress(() => {
-    for (const notify of accountAddressSubs.values()) {
-      notify();
+  const handleInternalStateUpdated = (type: InternalStateType) => {
+    for (const notify of internalStateSubs.values()) {
+      notify(type);
     }
-  });
+  };
+
+  $walletStatus.watch(() => handleInternalStateUpdated("walletStatus"));
+  subscribeInternalChainId(() => handleInternalStateUpdated("chainId"));
+  subscribeAccountAddress(() => handleInternalStateUpdated("accountAddress"));
+
+  const notifyPermission = async (port: Runtime.Port, perm?: Permission) => {
+    let params;
+
+    if (isUnlocked() && perm) {
+      const internalAccountAddress = await loadAccountAddress();
+
+      let accountAddress;
+
+      if (perm.accountAddresses.includes(internalAccountAddress)) {
+        accountAddress = internalAccountAddress;
+      } else {
+        const allAccountAddresses = $accountAddresses.getState();
+
+        accountAddress =
+          perm.accountAddresses.find((address) =>
+            allAccountAddresses.includes(address)
+          ) ?? null;
+      }
+
+      params = {
+        chainId: perm.chainId,
+        accountAddress: accountAddress?.toLowerCase(),
+      };
+    } else {
+      const internalChainId = await loadInternalChainId();
+
+      params = {
+        chainId: internalChainId,
+        accountAddress: null,
+      };
+    }
+
+    pagePorter.notify(port, {
+      jsonrpc: JSONRPC,
+      method: VIGVAM_STATE,
+      params,
+    });
+  };
 }
 
 async function handlePageRequest(
@@ -161,13 +191,38 @@ async function handlePageRequest(
   }
 }
 
+async function resolveConnectionApproval(perm?: Permission) {
+  if (!(isUnlocked() && perm)) return;
+
+  try {
+    for (const approval of $approvals.getState()) {
+      if (
+        approval.type === ActivityType.Connection &&
+        getPageOrigin(approval.source) === perm.origin
+      ) {
+        const toReturn = approval.returnSelectedAccount
+          ? perm.accountAddresses[0]
+          : wrapPermission(perm);
+
+        approval.rpcReply?.({ result: [toReturn] });
+        approvalResolved(approval.id);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 const loadInternalChainId = livePromise(
   () => storage.fetch<number>(CHAIN_ID).catch(() => INITIAL_NETWORK.chainId),
-  (callback) =>
-    storage.subscribe<number>(CHAIN_ID, ({ newValue }) =>
-      callback(newValue ?? INITIAL_NETWORK.chainId)
-    )
+  subscribeInternalChainId
 );
+
+function subscribeInternalChainId(callback: (chainId: number) => void) {
+  return storage.subscribe<number>(CHAIN_ID, ({ newValue }) =>
+    callback(newValue ?? INITIAL_NETWORK.chainId)
+  );
+}
 
 const loadAccountAddress = livePromise(
   () => storage.fetch<string>(ACCOUNT_ADDRESS).catch(getDefaultAccountAddress),
@@ -175,7 +230,7 @@ const loadAccountAddress = livePromise(
 );
 
 function subscribeAccountAddress(callback: (address: string) => void) {
-  storage.subscribe<string>(ACCOUNT_ADDRESS, ({ newValue }) =>
+  return storage.subscribe<string>(ACCOUNT_ADDRESS, ({ newValue }) =>
     callback(newValue ?? getDefaultAccountAddress())
   );
 }
