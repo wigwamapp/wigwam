@@ -27,11 +27,11 @@ const ImportPrivateKey = memo(() => {
         try {
           validatePrivateKey(privateKey);
 
-          const generatedWallet = new ethers.Wallet(privateKey);
+          const address = ethers.utils.computeAddress(privateKey);
           stateRef.current.importAddresses = [
             {
               source: AccountSource.PrivateKey,
-              address: generatedWallet.address,
+              address,
               isDisabled: true,
               isDefaultChecked: true,
               privateKey: toProtectedString(add0x(privateKey)),
