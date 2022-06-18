@@ -18,20 +18,20 @@ function inject(key: string) {
     existing ? [vigvam, existing] : [vigvam]
   );
 
-  // Fix: Cannot redefine property
-  if (!existing) {
+  const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
+  if (propertyDescriptor && "set" in propertyDescriptor) {
     (window as any)[key] = universal;
+  } else {
+    Object.defineProperty(window, key, {
+      configurable: true,
+      get() {
+        return universal;
+      },
+      set(value) {
+        universal.addProviders(value);
+      },
+    });
   }
-
-  Object.defineProperty(window, key, {
-    configurable: true,
-    get() {
-      return universal;
-    },
-    set(value) {
-      universal.addProviders(value);
-    },
-  });
 
   if (!existing) {
     window.dispatchEvent(new Event(`${key}#initialized`));

@@ -238,7 +238,9 @@ export class InpageProvider extends Emitter<ProviderEvent> {
           if ("result" in evt) {
             if (
               method === JsonRpcMethod.eth_requestAccounts ||
-              method === JsonRpcMethod.wallet_requestPermissions
+              method === JsonRpcMethod.wallet_requestPermissions ||
+              method == JsonRpcMethod.wallet_switchEthereumChain ||
+              method == JsonRpcMethod.wallet_addEthereumChain
             ) {
               // Await until state updated
               await new Promise<void>((res) => {

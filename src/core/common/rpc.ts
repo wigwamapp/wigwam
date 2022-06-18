@@ -5,15 +5,24 @@ export const VIGVAM_STATE = "vigvam_state";
 export const ETH_SUBSCRIPTION = "eth_subscription";
 
 export const AUTHORIZED_RPC_METHODS = new Set<string>([
+  // Transaction
   JsonRpcMethod.eth_sendTransaction,
-  JsonRpcMethod.eth_sign,
-  JsonRpcMethod.personal_sign,
   JsonRpcMethod.eth_signTransaction,
+  // Signing
+  JsonRpcMethod.eth_sign,
+  JsonRpcMethod.eth_ecRecover,
+  JsonRpcMethod.personal_sign,
+  JsonRpcMethod.personal_ecRecover,
   JsonRpcMethod.eth_signTypedData,
   JsonRpcMethod.eth_signTypedData_v1,
   JsonRpcMethod.eth_signTypedData_v2,
   JsonRpcMethod.eth_signTypedData_v3,
   JsonRpcMethod.eth_signTypedData_v4,
+  // Rest
+  JsonRpcMethod.wallet_switchEthereumChain,
+  JsonRpcMethod.wallet_addEthereumChain,
+  JsonRpcMethod.wallet_watchAsset,
+  JsonRpcMethod.wallet_registerOnboarding,
 ]);
 
 export const DISCONNECT_ERROR = {
