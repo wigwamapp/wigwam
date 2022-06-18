@@ -72,8 +72,8 @@ const ImportPrivateKey = memo(() => {
                     setFromClipboard={(value) =>
                       form.change("privateKey", value)
                     }
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
+                    error={(meta.touched && meta.error) || meta.submitError}
+                    errorMessage={meta.error || meta.submitError}
                     label="Private key"
                     {...input}
                   />
