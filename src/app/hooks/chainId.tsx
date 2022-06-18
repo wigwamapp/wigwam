@@ -63,7 +63,7 @@ export function useTokenActivitiesSync(
     let t: any;
 
     const syncAndDefer = () => {
-      syncTokenActivities(chainId, accountAddress, tokenSlug);
+      tokenSlug && syncTokenActivities(chainId, accountAddress, tokenSlug);
 
       t = setTimeout(syncAndDefer, 3_000);
     };
