@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { fromProtectedString } from "lib/crypto-utils";
+import { getRandomInt } from "lib/system/randomInt";
 
 import {
   AccountSource,
@@ -27,8 +28,6 @@ import Input from "app/components/elements/Input";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 
-const WORDS_TO_FILL = 6;
-
 const VerifySeedPhrase = memo(() => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const { alert } = useDialog();
@@ -49,8 +48,9 @@ const VerifySeedPhrase = memo(() => {
     () => (seedPhrase ? fromProtectedString(seedPhrase.phrase).split(" ") : []),
     [seedPhrase]
   );
+
   const wordsToCheckPositions = useMemo(
-    () => shuffle(range(words.length)),
+    () => generateRandomIndexes(words.length, words.length === 12 ? 3 : 6),
     [words]
   );
 
@@ -170,26 +170,27 @@ const VerifySeedPhrase = memo(() => {
 
 export default VerifySeedPhrase;
 
-const shuffle = (array: any[]) => {
-  const length = array == null ? 0 : array.length;
-  if (!length) {
+const generateRandomIndexes = (
+  originLength: number,
+  toGenerateLegnth: number
+) => {
+  if (toGenerateLegnth === 0 || originLength < toGenerateLegnth * 2 - 1) {
     return [];
   }
-  let index = -1;
-  const lastIndex = length - 1;
-  const result = [];
-  while (++index < WORDS_TO_FILL) {
-    const rand = index + Math.floor(Math.random() * (lastIndex - index + 1));
-    const value = array[rand];
-    array[rand] = array[index];
-    array[index] = value;
-    result.push(value);
-  }
-  return sortNumbers(result);
-};
 
-const range = (size: number) => {
-  return [...Array(size).keys()];
+  const result: number[] = [];
+
+  while (result.length < toGenerateLegnth) {
+    const rand = getRandomInt(0, originLength);
+
+    if ([rand, rand - 1, rand + 1].some((i) => result.includes(i))) {
+      continue;
+    }
+
+    result.push(rand);
+  }
+
+  return sortNumbers(result);
 };
 
 const sortNumbers = (arr: number[]) => {
