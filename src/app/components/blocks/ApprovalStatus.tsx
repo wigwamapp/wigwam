@@ -25,7 +25,7 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
     <div
       className={classNames(
         "flex items-center",
-        !readOnly && "animate-pulse",
+        !readOnly && total > 0 && "animate-pulse",
         className
       )}
     >

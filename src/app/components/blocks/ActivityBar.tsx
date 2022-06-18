@@ -3,9 +3,14 @@ import classNames from "clsx";
 import { match } from "ts-pattern";
 import browser from "webextension-polyfill";
 import { useAtom, useAtomValue } from "jotai";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { IS_FIREFOX } from "app/defaults";
-import { activityModalAtom, approvalStatusAtom } from "app/atoms";
+import {
+  activityModalAtom,
+  approvalStatusAtom,
+  pendingActivityAtom,
+} from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import { openInTab } from "app/helpers";
 
@@ -29,6 +34,9 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const { total } = useAtomValue(approvalStatusAtom);
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
 
+  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
+  const pendingCount = pendingActivities?.length ?? 0;
+
   const [activityHovered, setActivityHovered] = useState(false);
 
   const handleClick = useCallback(async () => {
@@ -47,6 +55,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
     <div
       className={classNames(
         "fixed bottom-3 left-1/2 -translate-x-1/2",
+        theme === "small" && "h-[2.25rem]",
         "transition-transform duration-300",
         activityOpened && "!translate-y-[120%]",
         "w-[calc(100%-1.5rem)] max-w-[75rem]",
@@ -125,8 +134,8 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
             )}
           </span>
         </div>
-        <div className="flex items-center invisible">
-          <StatItem
+        <div className="flex items-center">
+          {/* <StatItem
             count={2}
             ariaLabel="2 successful transactions"
             theme={theme}
@@ -134,23 +143,22 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
               theme === "small" && "mr-2",
               theme === "large" && "mr-6"
             )}
-          />
-          <StatItem
-            count={4}
-            status="pending"
-            ariaLabel="4 pending transactions"
-            theme={theme}
-            className={classNames(
-              theme === "small" && "mr-2",
-              theme === "large" && "mr-6"
-            )}
-          />
-          <StatItem
+          /> */}
+          {pendingCount > 0 && (
+            <StatItem
+              count={pendingCount}
+              status="pending"
+              ariaLabel={`${pendingCount} pending transactions`}
+              theme={theme}
+            />
+          )}
+
+          {/* <StatItem
             count={1}
             status="failed"
             ariaLabel="1 failed transactions"
             theme={theme}
-          />
+          /> */}
         </div>
       </TippySingletonProvider>
     </div>
