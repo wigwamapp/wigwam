@@ -13,12 +13,15 @@ import {
   required,
   withHumanDelay,
   focusOnErrors,
+  composeValidators,
+  validatePassword,
 } from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import PasswordField from "app/components/elements/PasswordField";
+import PasswordValidationField from "app/components/elements/PasswordValidationField";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 type FormValues = {
@@ -85,13 +88,20 @@ const SetupPassword = memo(() => {
             className="flex flex-col max-w-[27.5rem] mx-auto"
           >
             <div className="max-w-[19rem] mx-auto flex flex-col items-center justify-center">
-              <Field name="password" validate={required}>
+              <Field
+                name="password"
+                validate={composeValidators(required, validatePassword)}
+              >
                 {({ input, meta }) => (
-                  <PasswordField
+                  <PasswordValidationField
+                    error={
+                      meta.error &&
+                      meta.submitFailed &&
+                      !meta.modifiedSinceLastSubmit
+                    }
+                    modified={meta.modified}
+                    label="Create Password"
                     placeholder={"*".repeat(8)}
-                    label="New password"
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
                     className="w-full mb-3"
                     {...input}
                   />
