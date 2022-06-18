@@ -10,7 +10,7 @@ import {
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
@@ -30,6 +30,7 @@ import { openInTab } from "app/helpers";
 import {
   activeTabAtom,
   activeTabOriginAtom,
+  chainIdAtom,
   currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
@@ -448,9 +449,11 @@ const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
     ({ asset, isManageMode = false, className }, ref) => {
       const currentAccount = useAtomValue(currentAccountAtom);
+      const setInternalChainId = useSetAtom(chainIdAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
       const {
+        chainId,
         name,
         symbol,
         rawBalance,
@@ -463,9 +466,13 @@ const AssetCard = memo(
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
 
-      const openLink = useCallback((to: Record<string, unknown>) => {
-        openInTab(to);
-      }, []);
+      const openLink = useCallback(
+        (to: Record<string, unknown>) => {
+          setInternalChainId(chainId);
+          openInTab(to);
+        },
+        [setInternalChainId, chainId]
+      );
 
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
