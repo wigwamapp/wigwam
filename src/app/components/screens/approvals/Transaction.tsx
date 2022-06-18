@@ -28,6 +28,7 @@ import { isSmartContractAddress, matchTxAction } from "core/common/transaction";
 import {
   OverflowProvider,
   useChainId,
+  useNativeCurrency,
   useOnBlock,
   useProvider,
   useSync,
@@ -68,6 +69,7 @@ type ApproveTransactionProps = {
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
+  const nativeCurrency = useNativeCurrency();
 
   const [allAccounts, localNonce] = useAtomValue(
     waitForAll([
@@ -112,7 +114,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const preparedTx = prepared?.tx;
   const fees = prepared?.fees;
 
-  const originTx = useMemo(() => {
+  const originTx = useMemo<Tx | null>(() => {
     if (!prepared) return null;
 
     const tx = { ...prepared.tx };
@@ -184,22 +186,34 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         try {
           const { gasLimit, ...rest } = txParams;
 
-          const [tx, feeSuggestions, destinationIsContract] = await Promise.all(
-            [
-              // Prepare transaction with other fields
-              provider.getUncheckedSigner(account.address).populateTransaction({
-                ...rest,
-                type: bnify(rest?.type)?.toNumber(),
-                chainId: bnify(rest?.chainId)?.toNumber(),
-              }),
-              // Fetch fee data
-              suggestFees(provider).catch(() => null),
-              // Check is destination is smart contract
-              txParams.to
-                ? isSmartContractAddress(provider, txParams.to)
-                : false,
-            ]
-          );
+          // detele gas prices
+          delete rest.gasPrice;
+          delete rest.maxFeePerGas;
+          delete rest.maxPriorityFeePerGas;
+
+          // Fetch fee data
+          const feeSuggestions = await suggestFees(provider).catch(() => null);
+
+          const [tx, destinationIsContract] = await Promise.all([
+            // Prepare transaction with other fields
+            provider.getUncheckedSigner(account.address).populateTransaction({
+              ...rest,
+              type: bnify(rest?.type)?.toNumber(),
+              chainId: bnify(rest?.chainId)?.toNumber(),
+              ...(feeSuggestions?.type === "modern"
+                ? {
+                    maxFeePerGas: feeSuggestions.modes.low.max,
+                    maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
+                  }
+                : feeSuggestions?.type === "legacy"
+                ? {
+                    gasPrice: feeSuggestions.modes.low.max,
+                  }
+                : {}),
+            }),
+            // Check is destination is smart contract
+            txParams.to ? isSmartContractAddress(provider, txParams.to) : false,
+          ]);
 
           delete tx.from;
 
@@ -267,29 +281,27 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }
   }, [action, chainId, accountAddress]);
 
-  // TODO: Only for dev mode
-  // START
+  if (process.env.RELEASE_ENV === "false") {
+    // eslint-disable-next-line
+    useEffect(() => {
+      console.info("action", action);
+    }, [action]);
 
-  useEffect(() => {
-    console.info("action", action);
-  }, [action]);
+    // eslint-disable-next-line
+    useEffect(() => {
+      if (preparedTx && finalTx) {
+        console.info({ preparedTx, finalTx });
 
-  useEffect(() => {
-    if (preparedTx && finalTx) {
-      console.info({ preparedTx, finalTx });
-
-      if (fees) {
-        const { low, average, high } = fees.modes;
-        console.info(
-          "f",
-          [low, average, high].map((m) => formatUnits(m.max, "gwei"))
-        );
+        if (fees) {
+          const { low, average, high } = fees.modes;
+          console.info(
+            "f",
+            [low, average, high].map((m) => formatUnits(m.max, "gwei"))
+          );
+        }
       }
-    }
-  }, [preparedTx, fees, finalTx]);
-
-  // TODO: Only for dev mode
-  // END
+    }, [preparedTx, fees, finalTx]);
+  }
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -304,6 +316,21 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           }
 
           if (!finalTx) return;
+
+          const gasBalance = await provider.getBalance(account.address);
+          const totalGas = ethers.BigNumber.from(finalTx.gasLimit)
+            .mul(finalTx.maxFeePerGas ?? finalTx.gasPrice!)
+            .add(finalTx.value ?? 0);
+
+          if (gasBalance.lt(totalGas)) {
+            throw new Error(
+              `Not enough ${
+                nativeCurrency?.symbol
+                  ? `${nativeCurrency.symbol} token balance`
+                  : "funds"
+              } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`
+            );
+          }
 
           const rawTx = serializeTransaction(finalTx);
 
@@ -359,7 +386,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, account, setLastError, setApproving, finalTx, withLedger]
+    [
+      approval,
+      account,
+      setLastError,
+      setApproving,
+      finalTx,
+      provider,
+      withLedger,
+      nativeCurrency,
+    ]
   );
 
   const bootAnimationRef = useRef(true);

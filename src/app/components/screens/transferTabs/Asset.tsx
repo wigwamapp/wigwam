@@ -240,7 +240,7 @@ const Asset: FC = () => {
 
             const fees = await suggestFees(provider);
             if (fees) {
-              const gasPrice = fees.modes.average.max;
+              const gasPrice = fees.modes.high.max;
               const maxGasLimit = gasLimit.mul(3).div(2);
 
               setGas({
