@@ -29,7 +29,7 @@ const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
 );
 
-const WORDS_COUNT = [12, 15, 18, 21, 24];
+const WORDS_COUNT = [12];
 
 const CreateSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
