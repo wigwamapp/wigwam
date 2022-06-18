@@ -438,7 +438,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               scrollBarClassName="pt-5 pb-0"
             >
               <Tabs.Content value="details">
-                {fees && originTx && action && (
+                {fees && originTx && action ? (
                   <div
                     className={classNames(
                       "w-full",
@@ -461,6 +461,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                       onFeeButtonClick={() => setTabValue("fee")}
                     />
                   </div>
+                ) : (
+                  <Loading />
                 )}
               </Tabs.Content>
 
@@ -519,16 +521,26 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
 export default ApproveTransaction;
 
-const Loading: FC = () => (
-  <div
-    className={classNames(
-      "h-full flex items-center justify-center",
-      "text-white text-lg text-semibold"
-    )}
-  >
-    Loading...
-  </div>
-);
+const Loading: FC = () => {
+  const [delayed, setDelayed] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDelayed(true), 150);
+    return () => clearTimeout(t);
+  }, [setDelayed]);
+
+  return (
+    <div
+      className={classNames(
+        !delayed ? "hidden" : "animate-bootfadeinfast",
+        "min-h-[200px] flex items-center justify-center",
+        "text-white text-lg text-semibold"
+      )}
+    >
+      <div className="atom-spinner w-12 h-12" />
+    </div>
+  );
+};
 
 function bnify(v?: ethers.BigNumberish) {
   return v !== undefined ? ethers.BigNumber.from(v) : undefined;
