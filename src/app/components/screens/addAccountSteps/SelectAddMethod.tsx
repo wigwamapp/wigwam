@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, ReactNode, useCallback, useState } from "react";
 import classNames from "clsx";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { RadioGroupItemProps } from "@radix-ui/react-radio-group";
@@ -29,11 +29,16 @@ type FormValues = {
 };
 
 type SelectAddMethodProps = {
+  title: ReactNode;
   methods: MethodsProps;
   onContinue: (method: string, derivationPath: string) => void;
 };
 
-const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
+const SelectAddMethod: FC<SelectAddMethodProps> = ({
+  title,
+  methods,
+  onContinue,
+}) => {
   const [activeMethod, setActiveMethod] = useState(methods[0].value);
 
   const handleContinue = useCallback(
@@ -51,7 +56,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
       onSubmit={handleContinue}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <AddAccountHeader className="mb-8">Add Wallet</AddAccountHeader>
+          <AddAccountHeader className="mb-8">{title}</AddAccountHeader>
           <div className="flex flex-col max-w-[55rem] mx-auto mb-5">
             <RadioGroupPrimitive.Root
               className="grid grid-cols-2 gap-6"
@@ -71,8 +76,8 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({ methods, onContinue }) => {
             <Collapse label="Customize derivation path" className="mt-12">
               <div className="max-w-[17.5rem]">
                 <p className="mb-3 text-sm">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-                  aliquam
+                  A derivation path tells a how to derive the wallets from the
+                  Secret Phrase.
                 </p>
                 <Field
                   name="derivationPath"

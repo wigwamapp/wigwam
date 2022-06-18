@@ -47,12 +47,12 @@ const methodsInitial: MethodsProps = [
 const methodsExisting: MethodsProps = [
   {
     value: "create",
-    title: "Create new account",
-    description: "You can create a new account",
+    title: "Add one wallet",
+    description: "Just add the next wallet.",
   },
   {
     value: "manual",
-    title: "Manual adding account",
+    title: "Select manual",
     description:
       "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
   },
@@ -119,7 +119,11 @@ const SelectAccountsToAddMethod: FC = () => {
 
   return (
     <>
-      <SelectAddMethod methods={methods} onContinue={handleContinue} />
+      <SelectAddMethod
+        title={`Add wallet from ${isHardDevice ? "Ledger" : "Secret Phrase"}`}
+        methods={methods}
+        onContinue={handleContinue}
+      />
       {openedLoadingModal && (
         <LoadingModal onOpenChange={() => setOpenedLoadingModal(false)} />
       )}

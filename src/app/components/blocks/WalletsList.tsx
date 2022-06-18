@@ -161,7 +161,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
           className="ml-5 !py-2"
         >
           <AddWalletIcon className="h-6 w-auto mr-2" />
-          Add Wallet
+          Add wallet
         </Button>
       </div>
       {filteredAccounts.length > 0 ? (

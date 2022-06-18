@@ -298,7 +298,7 @@ const EmptyAccountsToConnect: FC = () => (
       className="ml-5 !py-1 !text-sm !min-w-[8rem] mt-2.5"
     >
       <AddWalletIcon className="h-5 w-auto mr-1.5" />
-      Add Wallet
+      Add wallet
     </Button>
   </div>
 );

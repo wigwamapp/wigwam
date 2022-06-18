@@ -55,11 +55,7 @@ const Collapse: FC<CollapseProps> = ({
             open && "rotate-90"
           )}
         />
-        <span
-          className={
-            "text-xl font-bold capitalize text-brand-inactivelight ml-1.5"
-          }
-        >
+        <span className={"text-xl font-bold text-brand-inactivelight ml-1.5"}>
           {label}
         </span>
       </Collapsible.Trigger>
