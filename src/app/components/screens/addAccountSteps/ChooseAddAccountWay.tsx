@@ -6,6 +6,7 @@ import { toProtectedString } from "lib/crypto-utils";
 import { assert } from "lib/system/assert";
 
 import { AccountSource, SocialProvider } from "core/types";
+import { add0x } from "core/common";
 
 import { hasSeedPhraseAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -195,7 +196,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           if (closed) return false;
 
-          const address = ethers.utils.computeAddress(privKey);
+          const address = ethers.utils.computeAddress(add0x(privKey));
 
           stateRef.current.importAddresses = [
             {

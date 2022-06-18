@@ -27,7 +27,7 @@ const ImportPrivateKey = memo(() => {
         try {
           validatePrivateKey(privateKey);
 
-          const address = ethers.utils.computeAddress(privateKey);
+          const address = ethers.utils.computeAddress(add0x(privateKey));
           stateRef.current.importAddresses = [
             {
               source: AccountSource.PrivateKey,
