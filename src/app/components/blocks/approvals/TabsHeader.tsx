@@ -78,7 +78,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
       })}
       <span
         className={classNames(
-          "h-px",
+          "h-[2px] rounded-[1px]",
           "block",
           "absolute bottom-0 left-0",
           "bg-buttonaccent",
