@@ -1,11 +1,11 @@
 import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
-import browser from "webextension-polyfill";
 
 import { Account, ActivitySource } from "core/types";
 import { getNetworkIconUrl } from "fixtures/networks";
 
 import { useLazyNetwork } from "app/hooks";
+import { openInTabExternal } from "app/utils";
 import { ActivityIcon } from "app/components/blocks/ApprovalStatus";
 import AutoIcon from "app/components/elements/AutoIcon";
 import WalletName from "app/components/elements/WalletName";
@@ -63,23 +63,9 @@ type ActSourceProps = {
 };
 
 const ActSource: FC<ActSourceProps> = ({ source, className }) => {
-  const handleLinkClick = useCallback(async () => {
-    try {
-      if (source.type === "page") {
-        let exist = false;
-        if (source.tabId !== undefined) {
-          exist = Boolean(
-            await browser.tabs.get(source.tabId).catch(() => null)
-          );
-        }
-        if (exist) {
-          await browser.tabs.update(source.tabId, { highlighted: true });
-        } else {
-          await browser.tabs.create({ url: source.url, active: true });
-        }
-      }
-    } catch (e) {
-      console.error(e);
+  const handleLinkClick = useCallback(() => {
+    if (source.type === "page") {
+      openInTabExternal(source.url, source.tabId);
     }
   }, [source]);
 
