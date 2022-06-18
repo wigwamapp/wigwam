@@ -12,8 +12,6 @@ export class UniversalInpageProvider extends Emitter {
   #allProviders: InpageProvider[] = [];
   #currentProvider: InpageProvider;
 
-  autoRefreshOnNetworkChange = false;
-
   get allPoviders() {
     return this.#allProviders;
   }

@@ -18,6 +18,11 @@ function inject(key: string) {
     existing ? [vigvam, existing] : [vigvam]
   );
 
+  // Fix: Cannot redefine property
+  if (!existing) {
+    (window as any)[key] = universal;
+  }
+
   Object.defineProperty(window, key, {
     configurable: true,
     get() {
