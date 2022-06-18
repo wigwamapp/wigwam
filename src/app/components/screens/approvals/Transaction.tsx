@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
@@ -361,6 +362,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, account, setLastError, setApproving, finalTx, withLedger]
   );
 
+  const bootAnimationRef = useRef(true);
+  const handleBootAnimationDone = useCallback(() => {
+    bootAnimationRef.current = false;
+  }, []);
+
   return (
     <ApprovalLayout
       approveText={lastError ? "Retry" : "Approve"}
@@ -397,20 +403,28 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             >
               <Tabs.Content value="details">
                 {fees && originTx && action && (
-                  <DetailsTab
-                    accountAddress={accountAddress}
-                    fees={fees}
-                    averageGasLimit={prepared.estimatedGasLimit}
-                    gasLimit={ethers.BigNumber.from(
-                      txOverrides.gasLimit || originTx.gasLimit!
+                  <div
+                    className={classNames(
+                      "w-full",
+                      bootAnimationRef.current && "animate-bootfadeinfast"
                     )}
-                    feeMode={feeMode}
-                    maxFee={maxFee}
-                    averageFee={averageFee}
-                    action={action}
-                    source={source}
-                    onFeeButtonClick={() => setTabValue("fee")}
-                  />
+                    onAnimationEnd={handleBootAnimationDone}
+                  >
+                    <DetailsTab
+                      accountAddress={accountAddress}
+                      fees={fees}
+                      averageGasLimit={prepared.estimatedGasLimit}
+                      gasLimit={ethers.BigNumber.from(
+                        txOverrides.gasLimit || originTx.gasLimit!
+                      )}
+                      feeMode={feeMode}
+                      maxFee={maxFee}
+                      averageFee={averageFee}
+                      action={action}
+                      source={source}
+                      onFeeButtonClick={() => setTabValue("fee")}
+                    />
+                  </div>
                 )}
               </Tabs.Content>
 

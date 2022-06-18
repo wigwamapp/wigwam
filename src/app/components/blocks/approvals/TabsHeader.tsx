@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import classNames from "clsx";
 import * as Tabs from "@radix-ui/react-tabs";
 
@@ -17,29 +17,10 @@ const TabsHeader: FC<TabsHeaderProps> = ({
   withError = false,
   oneSuccess = true,
 }) => {
-  const buttonsArrayRef = useRef<{ [key: string]: HTMLButtonElement }>({});
-  const [backgroundState, setBackgroundState] = useState({
-    width: 0,
-    transform: 0,
-  });
-
-  const addToRefs = useCallback(
-    (id: string, element: HTMLButtonElement | null) => {
-      if (element) {
-        buttonsArrayRef.current[id] = element;
-      }
-    },
-    []
-  );
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    if (buttonsArrayRef?.current) {
-      const activeElement = buttonsArrayRef.current[currentValue];
-      setBackgroundState({
-        width: activeElement.offsetWidth,
-        transform: activeElement.offsetLeft,
-      });
-    }
+    setActiveIndex(values.findIndex((value) => value === currentValue));
   }, [currentValue, values]);
 
   return (
@@ -66,11 +47,12 @@ const TabsHeader: FC<TabsHeaderProps> = ({
             value={value}
             className={classNames(
               "text-sm",
-              "px-5 py-1",
+              "px-3 py-1",
               "rounded-lg",
               "transition-all",
               "relative",
               "flex flex-col items-center",
+              "w-1/4",
               "before:content-[attr(data-text)]",
               "before:h-0",
               "before:invisible",
@@ -88,10 +70,9 @@ const TabsHeader: FC<TabsHeaderProps> = ({
                 "hover:bg-brand-main/5 hover:after:opacity-100"
             )}
             data-text={names[value]}
-            ref={(el) => addToRefs(value, el)}
             disabled={disabled}
           >
-            {names[value]}
+            <span className="truncate w-full">{names[value]}</span>
           </Tabs.Trigger>
         );
       })}
@@ -101,11 +82,11 @@ const TabsHeader: FC<TabsHeaderProps> = ({
           "block",
           "absolute bottom-0 left-0",
           "bg-buttonaccent",
-          "transition-all"
+          "transition-all",
+          "w-1/4"
         )}
         style={{
-          width: backgroundState.width,
-          transform: `translateX(${backgroundState.transform}px)`,
+          left: `calc(${activeIndex * 25}% + ${activeIndex * 0.25}rem)`,
         }}
       />
     </Tabs.List>
