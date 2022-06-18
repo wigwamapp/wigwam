@@ -25,11 +25,13 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SecretField from "app/components/blocks/SecretField";
 
+const { arrayify, hexDataSlice, keccak256, concat } = ethers.utils;
+
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
   ({ code }) => toWordlistLang(code) in wordlists
 );
 
-const WORDS_COUNT = [12];
+const WORDS_COUNT = [12, 24];
 
 const CreateSeedPhrase = memo(() => {
   const currentLocale = useAtomValue(currentLocaleAtom);
@@ -88,17 +90,29 @@ const CreateSeedPhrase = memo(() => {
   }, [seedPhraseFiled, wordlistLocale, stateRef, navigateToStep, alert]);
 
   const generateNew = useCallback(() => {
-    const extraEntropy = getRandomBytes();
-    const wallet = ethers.Wallet.createRandom({
-      locale: wordlistLocale,
-      extraEntropy,
-    });
-    setSeedPhraseField(wallet.mnemonic.phrase);
-  }, [wordlistLocale]);
+    const entropySize = wordsCount.value === "12" ? 16 : 32;
+    const baseEntropy = getRandomBytes(entropySize);
+    const extraEntropy = getRandomBytes(entropySize);
+
+    const entropy = arrayify(
+      hexDataSlice(
+        keccak256(concat([baseEntropy, extraEntropy])),
+        0,
+        entropySize
+      )
+    );
+
+    const phrase = ethers.utils.entropyToMnemonic(
+      entropy,
+      wordlists[wordlistLocale]
+    );
+
+    setSeedPhraseField(phrase);
+  }, [wordlistLocale, wordsCount]);
 
   useEffect(() => {
     setTimeout(generateNew, 0);
-  }, [generateNew, wordlistLocale, wordsCount]);
+  }, [generateNew]);
 
   return (
     <>
