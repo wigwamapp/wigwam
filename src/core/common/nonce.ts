@@ -27,7 +27,7 @@ export function saveNonce(
       const key = nonceStorageKey(chainId, accountAddress);
       const current = await storage.fetchForce<string>(key);
 
-      if (current && BigNumber.from(current).lt(nonce)) {
+      if (!current || BigNumber.from(current).lt(nonce)) {
         await storage.put(key, nonce.toString());
       }
     } catch (err) {
