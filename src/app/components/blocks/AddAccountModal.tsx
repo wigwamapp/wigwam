@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { FC, memo, useCallback, useEffect, useRef } from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
@@ -79,7 +79,13 @@ const AddAccountModal = memo(() => {
   );
 
   const isMounted = useIsMounted();
-  const bootAnimationDisplayed = !isInitial && accModalOpened && isMounted();
+  const contentRenderedRef = useRef(false);
+  const handleContentMount = useCallback((mounted: boolean) => {
+    contentRenderedRef.current = mounted;
+  }, []);
+
+  const bootAnimationDisplayed =
+    !isInitial && accModalOpened && isMounted() && !contentRenderedRef.current;
 
   return (
     <Dialog.Root open={accModalOpened} onOpenChange={handleOpenChange} modal>
@@ -98,6 +104,8 @@ const AddAccountModal = memo(() => {
             bootAnimationDisplayed && "animate-modalcontent"
           )}
         >
+          <OnMount handle={handleContentMount} />
+
           <div
             className={classNames(
               "flex items-center justify-center",
@@ -186,3 +194,12 @@ const AddAccountModal = memo(() => {
 });
 
 export default AddAccountModal;
+
+const OnMount: FC<{ handle: (mounted: boolean) => void }> = ({ handle }) => {
+  useEffect(() => {
+    handle(true);
+    return () => handle(false);
+  }, [handle]);
+
+  return null;
+};
