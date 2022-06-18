@@ -1,5 +1,6 @@
 import { FC } from "react";
 
+import { useLocked } from "app/hooks";
 import { ToastProvider } from "app/hooks/toast";
 
 import BaseProvider from "./BaseProvider";
@@ -23,12 +24,18 @@ const MainApp: FC = () => (
 export default MainApp;
 
 const Modals: FC = () => {
+  const locked = useLocked();
+
   return (
     <>
       <Dialog />
-      <ContactsDialog />
-      <AddAccountModal />
-      <ActivityModal />
+      {!locked && (
+        <>
+          <ContactsDialog />
+          <AddAccountModal />
+          <ActivityModal />
+        </>
+      )}
     </>
   );
 };

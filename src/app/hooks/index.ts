@@ -1,3 +1,4 @@
+export * from "./wallet";
 export * from "./chainId";
 export * from "./network";
 export * from "./overflow";
