@@ -195,7 +195,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           if (closed) return false;
 
-          const address = new ethers.Wallet(privKey).address;
+          const address = ethers.utils.computeAddress(privKey);
 
           stateRef.current.importAddresses = [
             {
