@@ -149,7 +149,7 @@ const ActivityContent = memo(() => {
           <SectionHeader className="mb-6">Pending</SectionHeader>
 
           {pendingActivities.map((item) => (
-            <ActivityCard key={item.id} item={item} />
+            <ActivityCard key={item.id} item={item} className="mb-4" />
           ))}
         </div>
       )}
