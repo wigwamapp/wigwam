@@ -6,6 +6,10 @@ export const BSC: Network[] = [
     chainId: 56,
     type: "mainnet",
     rpcUrls: [
+      "https://bscrpc.com",
+      "https://rpc-bsc.bnb48.club",
+      "https://binance.nodereal.io",
+      "https://rpc.ankr.com/bsc",
       "https://bsc-dataseed.binance.org",
       "https://bsc-dataseed1.binance.org",
       "https://bsc-dataseed2.binance.org",

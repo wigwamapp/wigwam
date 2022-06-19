@@ -52,13 +52,10 @@ export type Approval =
   | SigningApproval
   | ConnectionApproval;
 
-export type Activity = (
+export type Activity =
   | TransactionActivity
   | SigningActivity
-  | ConnectionActivity
-) & {
-  pending: number;
-};
+  | ConnectionActivity;
 
 export interface ActivityBase {
   id: string;
@@ -76,6 +73,7 @@ export interface TransactionApproval extends ActivityBase {
 }
 
 export interface TransactionActivity extends TransactionApproval {
+  pending: number;
   rawTx: string;
   txHash: string;
   result?: any;
@@ -88,7 +86,9 @@ export interface SigningApproval extends ActivityBase {
   message: any;
 }
 
-export type SigningActivity = SigningApproval; // There are no additional fields
+export interface SigningActivity extends SigningApproval {
+  pending: number;
+}
 
 export interface ConnectionApproval extends ActivityBase {
   type: ActivityType.Connection;
@@ -97,6 +97,7 @@ export interface ConnectionApproval extends ActivityBase {
 }
 
 export interface ConnectionActivity extends ConnectionApproval {
+  pending: number;
   accountAddresses: string[];
 }
 
