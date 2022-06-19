@@ -23,12 +23,12 @@ function inject(key: string) {
     (window as any)[key] = universal;
   } else {
     Object.defineProperty(window, key, {
-      configurable: true,
+      configurable: false,
       get() {
         return universal;
       },
       set(value) {
-        universal.addProviders(value);
+        if (value) universal.addProviders(value);
       },
     });
   }
