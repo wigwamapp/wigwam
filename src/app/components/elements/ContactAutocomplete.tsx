@@ -14,7 +14,7 @@ import * as Popover from "@radix-ui/react-popover";
 import Fuse from "fuse.js";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
-import mergeRefs from "react-merge-refs";
+import { mergeRefs } from "react-merge-refs";
 import { TReplace } from "lib/ext/i18n/react";
 import { useOnScreen } from "lib/react-hooks/useOnScreen";
 

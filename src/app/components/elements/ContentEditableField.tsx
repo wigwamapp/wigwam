@@ -7,7 +7,7 @@ import {
   useRef,
 } from "react";
 import classNames from "clsx";
-import mergeRefs from "react-merge-refs";
+import { mergeRefs } from "react-merge-refs";
 
 export type ContentEditableFieldProps = HTMLAttributes<HTMLDivElement> & {
   value?: string;

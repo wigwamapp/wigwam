@@ -12,7 +12,7 @@ import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
-import mergeRefs from "react-merge-refs";
+import { mergeRefs } from "react-merge-refs";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import * as Checkbox from "@radix-ui/react-checkbox";

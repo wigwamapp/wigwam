@@ -1,6 +1,6 @@
 import { memo, forwardRef, ReactNode, useEffect, useRef } from "react";
 import classNames from "clsx";
-import mergeRefs from "react-merge-refs";
+import { mergeRefs } from "react-merge-refs";
 import canvasTxt from "canvas-txt";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
