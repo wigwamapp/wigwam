@@ -160,7 +160,10 @@ const Asset: FC = () => {
             })
             .catch(console.warn);
         } catch (err: any) {
-          alert({ title: "Error", content: err.message });
+          alert({
+            title: "Error",
+            content: err?.reason || err?.message || "Unknown error.",
+          });
         }
       }),
     [
