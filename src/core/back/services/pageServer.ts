@@ -17,7 +17,7 @@ import {
   ActivityType,
 } from "core/types";
 import * as repo from "core/repo";
-import { JSONRPC, VIGVAM_STATE } from "core/common/rpc";
+import { JSONRPC, VIGVAM_FAVICON, VIGVAM_STATE } from "core/common/rpc";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
 import {
@@ -140,12 +140,22 @@ export function startPageServer() {
   };
 }
 
+const faviconCache = new WeakMap<Runtime.Port, string>();
+
 async function handlePageRequest(
   ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
 ) {
   console.debug("New page request", ctx);
 
   const { id, jsonrpc, method, params } = ctx.data;
+
+  if (method === VIGVAM_FAVICON) {
+    if (Array.isArray(params) && typeof params[0] === "string") {
+      faviconCache.set(ctx.port, params[0]);
+    }
+
+    return;
+  }
 
   try {
     await ensureInited();
@@ -159,7 +169,8 @@ async function handlePageRequest(
       type: "page",
       url: senderUrl,
       tabId: ctx.port.sender?.tab?.id,
-      favIconUrl: ctx.port.sender?.tab?.favIconUrl,
+      favIconUrl:
+        faviconCache.get(ctx.port) || ctx.port.sender?.tab?.favIconUrl,
     };
 
     const chainId = await loadInternalChainId();

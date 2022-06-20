@@ -2,6 +2,7 @@ import { JsonRpcMethod } from "core/types/rpc";
 
 export const JSONRPC = "2.0";
 export const VIGVAM_STATE = "vigvam_state";
+export const VIGVAM_FAVICON = "vigvam_favicon";
 export const ETH_SUBSCRIPTION = "eth_subscription";
 
 export const AUTHORIZED_RPC_METHODS = new Set<string>([
