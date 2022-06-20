@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
 
-import { TransferTab as TransferTabEnum } from "app/nav";
+import { Page, TransferTab as TransferTabEnum } from "app/nav";
 import { transferTabAtom } from "app/atoms";
 
 import Asset from "../transferTabs/Asset";
@@ -17,7 +17,11 @@ function matchTransferTab(transferTab: TransferTabEnum) {
       .with(TransferTabEnum.Nft, () => <Nft />)
       .with(TransferTabEnum.Bridge, () => <Bridge />)
       // Redirect to default
-      .otherwise(() => <Redirect to={{ settingTab: TransferTabEnum.Asset }} />)
+      .otherwise(() => (
+        <Redirect
+          to={{ page: Page.Transfer, transfer: TransferTabEnum.Asset }}
+        />
+      ))
   );
 }
 

@@ -44,4 +44,5 @@ export enum ReceiveTab {
   ShareAddress = "share-address",
   BuyWithCrypto = "buy-with-crypto",
   BuyWithFiat = "buy-with-fiat",
+  Faucet = "faucet",
 }

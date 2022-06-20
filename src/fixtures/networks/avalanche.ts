@@ -30,6 +30,7 @@ export const AVALANCHE: Network[] = [
       name: "Avalanche",
       decimals: 18,
     },
+    explorerUrls: ["https://testnet.snowtrace.io"],
     faucetUrls: ["https://faucet.avax-test.network/"],
     infoUrl: "https://cchain.explorer.avax-test.network",
   },

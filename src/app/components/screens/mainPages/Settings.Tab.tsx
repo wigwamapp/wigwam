@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
 
-import { SettingTab } from "app/nav";
+import { Page, SettingTab } from "app/nav";
 import { settingTabAtom } from "app/atoms";
 
 import General from "../settingTabs/General";
@@ -25,7 +25,9 @@ function matchSettingTab(settingTab: SettingTab) {
       .with(SettingTab.About, () => <About />)
       .with(SettingTab.Advanced, () => <Advanced />)
       // Redirect to default
-      .otherwise(() => <Redirect to={{ settingTab: SettingTab.General }} />)
+      .otherwise(() => (
+        <Redirect to={{ page: Page.Settings, setting: SettingTab.General }} />
+      ))
   );
 }
 

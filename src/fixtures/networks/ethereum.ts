@@ -74,7 +74,7 @@ export const ETHEREUM: Network[] = [
     },
     ensRegistry: "0xe7410170f87102df0055eb195163a03b7f2bff4a",
     explorerUrls: ["https://rinkeby.etherscan.io"],
-    faucetUrls: ["https://faucet.rinkeby.io"],
+    faucetUrls: ["https://rinkebyfaucet.com", "https://faucet.rinkeby.io"],
     infoUrl: "https://www.rinkeby.io",
   },
   {
