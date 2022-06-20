@@ -34,10 +34,18 @@ export const $hasSeedPhrase = createStore(false)
 
 export const $walletState = combine([$walletStatus, $hasSeedPhrase]);
 
-export const $accounts = createStore<Account[]>([])
-  .on(unlocked, (_s, { accounts }) => accounts)
-  .on(accountsUpdated, (_s, accounts) => accounts)
-  .on(locked, () => []);
+export const $accountsState = createStore<{
+  prev: Account[] | null;
+  current: Account[];
+}>({ prev: null, current: [] })
+  .on(unlocked, (_s, { accounts }) => ({ prev: null, current: accounts }))
+  .on(accountsUpdated, ({ current: prev }, accounts) => ({
+    prev,
+    current: accounts,
+  }))
+  .on(locked, () => ({ prev: null, current: [] }));
+
+export const $accounts = $accountsState.map(({ current }) => current);
 
 export const $vault = createStore<Vault | null>(null)
   .on(unlocked, (_s, { vault }) => vault)

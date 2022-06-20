@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
+import { storage } from "lib/ext/storage";
 
 import {
   Request,
@@ -9,11 +10,13 @@ import {
   PorterChannel,
   WalletStatus,
   SelfActivityKind,
+  ACCOUNT_ADDRESS,
 } from "core/types";
 
 import {
   $walletState,
   $approvals,
+  $accountsState,
   ensureInited,
   withStatus,
   withVault,
@@ -53,6 +56,21 @@ export function startWalletServer() {
 
   accountsUpdated.watch((accounts) => {
     walletPorter.broadcast({ type: MessageType.AccountsUpdated, accounts });
+  });
+
+  $accountsState.watch(({ prev, current }) => {
+    if (!prev || prev.length === current.length) return;
+
+    storage
+      .put(
+        ACCOUNT_ADDRESS,
+        prev.length < current.length
+          ? // New account added
+            current[prev.length].address
+          : // Account deleted
+            current[0].address
+      )
+      .catch(console.error);
   });
 
   $approvals.watch((approvals) => {
