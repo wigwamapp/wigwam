@@ -13,10 +13,20 @@ window.addEventListener(
     if (
       evt.source === window &&
       evt.origin === location.origin &&
-      evt.data?.type === "vigvam.openapp" &&
-      evt.data.salt === salt
+      evt.data?.salt === salt
     ) {
-      ext.runtime.sendMessage({ type: "__OPEN_OR_FOCUS_TAB" });
+      switch (evt.data.type) {
+        case "vigvam.reply":
+          ext.runtime.sendMessage({
+            type: "__APPLY_WEBSITE_DATA",
+            data: evt.data.data,
+          });
+          break;
+
+        case "vigvam.openapp":
+          ext.runtime.sendMessage({ type: "__OPEN_OR_FOCUS_TAB" });
+          break;
+      }
     }
   },
   false
