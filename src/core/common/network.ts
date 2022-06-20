@@ -1,6 +1,8 @@
 import { storage } from "lib/ext/storage";
 import { assert } from "lib/system/assert";
 
+import { INITIAL_NETWORK } from "fixtures/networks";
+import { CHAIN_ID } from "core/types";
 import * as Repo from "core/repo";
 
 const rpcUrlsCache = new Map<number, string>();
@@ -42,6 +44,7 @@ export function setRpcUrl(chainId: number, url: string | null) {
 }
 
 export async function cleanupNetwork(chainId: number) {
+  await storage.put(CHAIN_ID, INITIAL_NETWORK.chainId);
   await Repo.networks.delete(chainId);
   await setRpcUrl(chainId, null);
 }

@@ -1,7 +1,6 @@
 import { Describe, define, object, optional, array } from "superstruct";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import memoize from "mem";
 
 import { ActivitySource, TxParams } from "core/types";
 import { getNetwork } from "core/common";
@@ -34,7 +33,12 @@ export function validateAccount(
   }
 }
 
-export const validateNetwork = memoize(getNetwork);
+export const validateNetwork = (chainId: number) =>
+  getNetwork(chainId)
+    .then(() => true)
+    .catch(() => {
+      throw ethErrors.rpc.resourceNotFound("Network not found");
+    });
 
 const stringHex = (length?: number) =>
   define<string>("stringHex", (value) =>
