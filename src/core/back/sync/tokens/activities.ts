@@ -21,7 +21,7 @@ import * as repo from "core/repo";
 import { getRpcProvider } from "../../rpc";
 import { debankApi, getDebankChain } from "../debank";
 
-const GET_LOGS_ENABLED = false;
+const GET_LOGS_ENABLED = true;
 
 const enqueue = createQueue();
 
@@ -193,7 +193,7 @@ export const syncTokenActivities = memoize(
         );
         const approvalTopic = erc20Token.filters.Approval(accountAddress);
 
-        const step = 3_500 - 1;
+        const step = 1_000 - 1;
         const limit = step * 10;
         let range = 0;
 

@@ -4,7 +4,13 @@ import { Provider } from "@ethersproject/abstract-provider";
 import { match, P } from "ts-pattern";
 import { ERC20__factory, ERC721__factory, ERC1155__factory } from "abi-types";
 
-import { TokenStandard, TxAction, TxActionType, TxParams } from "core/types";
+import {
+  ContractInteractionAction,
+  TokenStandard,
+  TxAction,
+  TxActionType,
+  TxParams,
+} from "core/types";
 
 import { createTokenSlug, NATIVE_TOKEN_SLUG } from "./tokens";
 
@@ -28,22 +34,25 @@ export function matchTxAction(txParams: TxParams): TxAction | null {
       tokens: [
         {
           slug: NATIVE_TOKEN_SLUG,
-          amount: ethStringify(txParams.value!),
+          amount: ethStringify(txParams.value ?? 0),
         },
       ],
     };
   }
 
+  const getContractInteractionAction = (): ContractInteractionAction => ({
+    type: TxActionType.ContractInteraction,
+    contractAddress: destination,
+    nativeTokenAmount:
+      txParams.value && !isZeroHex(txParams.value)
+        ? ethStringify(txParams.value)
+        : undefined,
+  });
+
   const parsed = parseStandardTokenTransactionData(txParams.data!);
+
   if (!parsed) {
-    return {
-      type: TxActionType.ContractInteraction,
-      contractAddress: destination,
-      nativeTokenAmount:
-        txParams.value && !isZeroHex(txParams.value)
-          ? ethStringify(txParams.value)
-          : undefined,
-    };
+    return getContractInteractionAction();
   }
 
   return (
@@ -207,7 +216,7 @@ export function matchTxAction(txParams: TxParams): TxAction | null {
         })
       )
       // Etc...
-      .otherwise(() => null)
+      .otherwise(getContractInteractionAction)
   );
 }
 

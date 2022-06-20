@@ -33,7 +33,7 @@ type ProviderEvent = EthSubscription | GatewayPayload<unknown>;
 
 export class InpageProvider extends Emitter<ProviderEvent> {
   isVigvam = true;
-  isMetaMask = false;
+  isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
   /**

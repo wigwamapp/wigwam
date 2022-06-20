@@ -51,7 +51,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
   const [approving, setApproving] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setInitialLoading(false), 1_000);
+    const t = setTimeout(() => setInitialLoading(false), 500);
     return () => clearTimeout(t);
   }, [setInitialLoading]);
 

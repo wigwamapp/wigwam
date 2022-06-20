@@ -26,6 +26,10 @@ export class UniversalInpageProvider extends Emitter {
       : this.#allProviders.some((p) => p.isMetaMask);
   }
 
+  get _metamask() {
+    return (this.#currentProvider as any)._metamask ?? {};
+  }
+
   get isVigvam() {
     return this.selectedAddress
       ? this.#currentProvider.isVigvam
@@ -69,6 +73,8 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   #reshuffle() {
+    if (this.selectedAddress) return;
+
     for (const provider of this.#allProviders) {
       if (provider !== this.#currentProvider && provider.selectedAddress) {
         const prevProvider = this.#currentProvider;
