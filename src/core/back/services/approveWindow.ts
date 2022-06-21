@@ -1,11 +1,12 @@
 import browser, { Windows } from "webextension-polyfill";
 import memoizeOne from "memoize-one";
+import { ethErrors } from "eth-rpc-errors";
 import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
 import { createQueue } from "lib/system/queue";
 
-import { Approval } from "core/types";
+import { ActivityType, Approval } from "core/types";
 
-import { $approvals, approvalAdded } from "../state";
+import { $approvals, approvalAdded, approvalsResolved } from "../state";
 
 type ApprovePopupState = {
   type: "window" | "tab";
@@ -41,7 +42,7 @@ export function startApproveWindowOpener() {
       } else if (popupState?.type === "tab") {
         browser.tabs.remove(popupState.id).catch(console.error);
       }
-    } else {
+    } else if (popupState) {
       focusApprovalTab(approvals[0]);
     }
   });
@@ -90,15 +91,40 @@ export function startApproveWindowOpener() {
     }
   };
 
+  const handleApproveClose = () => {
+    popupState = null;
+
+    const approvalsToReject: Approval[] = [];
+
+    let i = 0;
+    for (const approval of $approvals.getState()) {
+      if (i === 0 || approval.type !== ActivityType.Transaction) {
+        approvalsToReject.push(approval);
+      }
+
+      i++;
+    }
+
+    try {
+      for (const { rpcReply } of approvalsToReject) {
+        rpcReply?.({
+          error: ethErrors.provider.userRejectedRequest(),
+        });
+      }
+    } catch {}
+
+    approvalsResolved(approvalsToReject.map((a) => a.id));
+  };
+
   browser.windows.onRemoved.addListener((winId) => {
     if (popupState?.type === "window" && winId === popupState.id) {
-      popupState = null;
+      handleApproveClose();
     }
   });
 
   browser.tabs.onRemoved.addListener((tabId) => {
     if (popupState?.type === "tab" && tabId === popupState.id) {
-      popupState = null;
+      handleApproveClose();
     }
   });
 }

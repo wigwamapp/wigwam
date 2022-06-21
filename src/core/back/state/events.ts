@@ -22,7 +22,7 @@ export const walletPortsCountUpdated = createEvent<number>();
 
 export const approvalAdded = createEvent<Approval>();
 
-export const approvalResolved = createEvent<string>();
+export const approvalsResolved = createEvent<string[]>();
 
 export const syncStarted = createEvent<number>();
 

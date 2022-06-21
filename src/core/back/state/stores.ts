@@ -13,7 +13,7 @@ import {
   accountsUpdated,
   walletPortsCountUpdated,
   approvalAdded,
-  approvalResolved,
+  approvalsResolved,
   syncStarted,
   synced,
 } from "./events";
@@ -104,16 +104,16 @@ export const $approvals = createStore<Approval[]>([])
 
     return [...approvals, newApproval];
   })
-  .on(approvalResolved, (current, approvalId) =>
-    current.filter((a) => a.id !== approvalId)
+  .on(approvalsResolved, (current, approvalIds) =>
+    current.filter((a) => !approvalIds.includes(a.id))
   )
   .on(locked, (current) => {
     try {
-      current.forEach(({ rpcReply }) =>
+      for (const { rpcReply } of current) {
         rpcReply?.({
           error: ethErrors.provider.userRejectedRequest(),
-        })
-      );
+        });
+      }
     } catch {}
 
     return [];

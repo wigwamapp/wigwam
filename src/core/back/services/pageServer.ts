@@ -24,7 +24,7 @@ import {
   $accountAddresses,
   $approvals,
   $walletStatus,
-  approvalResolved,
+  approvalsResolved,
   ensureInited,
   isUnlocked,
 } from "../state";
@@ -214,7 +214,7 @@ async function resolveConnectionApproval(perm?: Permission) {
           : [wrapPermission(perm)];
 
         approval.rpcReply?.({ result });
-        approvalResolved(approval.id);
+        approvalsResolved([approval.id]);
       }
     }
   } catch (err) {
