@@ -122,11 +122,13 @@ export function startPageServer() {
       params = {
         chainId: perm.chainId,
         accountAddress: accountAddress?.toLowerCase(),
+        sharedPropertyEnabled: true,
       };
     } else {
       params = {
         chainId: perm?.chainId ?? (await loadInternalChainId()),
         accountAddress: null,
+        sharedPropertyEnabled: true,
       };
     }
 

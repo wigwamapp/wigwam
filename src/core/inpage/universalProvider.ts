@@ -12,6 +12,8 @@ export class UniversalInpageProvider extends Emitter {
   #allProviders: InpageProvider[] = [];
   #currentProvider: InpageProvider;
 
+  #sharedProperty: boolean;
+
   get allPoviders() {
     return this.#allProviders;
   }
@@ -48,12 +50,22 @@ export class UniversalInpageProvider extends Emitter {
     return this.#currentProvider.selectedAddress;
   }
 
-  constructor(existingProviders: InpageProvider[]) {
+  get #enabledProviders() {
+    return this.#sharedProperty
+      ? this.#allProviders.filter(
+          (p) => !(p.isVigvam && !p.sharedPropertyEnabled)
+        )
+      : this.#allProviders;
+  }
+
+  constructor(existingProviders: InpageProvider[], sharedProperty = false) {
     super();
 
     if (existingProviders.length === 0) {
       throw new Error("Must have at least one provider");
     }
+
+    this.#sharedProperty = sharedProperty;
 
     this.#currentProvider = existingProviders[0];
     this.#proxyEvents();
@@ -73,24 +85,41 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   #reshuffle() {
+    const changeProvider = (provider: InpageProvider) => {
+      if (provider === this.#currentProvider) return;
+
+      const prevProvider = this.#currentProvider;
+
+      this.#currentProvider = provider;
+      this.#proxyEvents();
+
+      this.emit("accountsChanged", [provider.selectedAddress]);
+
+      if (prevProvider.chainId !== provider.chainId) {
+        this.emit("chainChanged", provider.chainId);
+      }
+      if (prevProvider.networkVersion !== provider.networkVersion) {
+        this.emit("networkChanged", provider.networkVersion);
+      }
+    };
+
+    if (this.#sharedProperty) {
+      const enabledProviders = this.#allProviders.filter(
+        (p) => !(p.isVigvam && !p.sharedPropertyEnabled)
+      );
+      if (enabledProviders.length > 0) {
+        changeProvider(
+          enabledProviders.find((p) => p.selectedAddress) ?? enabledProviders[0]
+        );
+        return;
+      }
+    }
+
     if (this.selectedAddress) return;
 
     for (const provider of this.#allProviders) {
       if (provider !== this.#currentProvider && provider.selectedAddress) {
-        const prevProvider = this.#currentProvider;
-
-        this.#currentProvider = provider;
-        this.#proxyEvents();
-
-        this.emit("accountsChanged", [provider.selectedAddress]);
-
-        if (prevProvider.chainId !== provider.chainId) {
-          this.emit("chainChanged", provider.chainId);
-        }
-        if (prevProvider.networkVersion !== provider.networkVersion) {
-          this.emit("networkChanged", provider.networkVersion);
-        }
-
+        changeProvider(provider);
         break;
       }
     }
@@ -121,10 +150,12 @@ export class UniversalInpageProvider extends Emitter {
     factory: (provider: InpageProvider) => Promise<unknown>
   ) {
     return new Promise((res, rej) => {
+      const providersToRequest = this.#enabledProviders;
+
       let done = false;
       let errors = 0;
 
-      for (const provider of this.#allProviders) {
+      for (const provider of providersToRequest) {
         factory(provider)
           .then((result) => {
             if (done) return;
@@ -140,7 +171,7 @@ export class UniversalInpageProvider extends Emitter {
           .catch((err) => {
             if (done) return;
 
-            if (++errors === this.#allProviders.length) {
+            if (++errors === providersToRequest.length) {
               rej(err);
             }
           });
