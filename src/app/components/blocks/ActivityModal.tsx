@@ -13,6 +13,7 @@ import {
   ActivityType,
   TransactionActivity,
 } from "core/types";
+import { rejectAllApprovals } from "core/client";
 
 import {
   activityModalAtom,
@@ -129,7 +130,8 @@ const ActivityContent = memo(() => {
         <div
           className={classNames(
             "w-full h-20 mb-8",
-            "border border-brand-inactivedark/25 animate-pulse",
+            "border border-brand-inactivedark/25",
+            "animate-pulse hover:animate-none",
             "rounded-2xl",
             "flex items-center",
             "py-3 px-6"
@@ -137,6 +139,21 @@ const ActivityContent = memo(() => {
         >
           <ApprovalStatus readOnly theme="large" />
           <div className="flex-1" />
+
+          <button
+            type="button"
+            className={classNames(
+              "mr-2",
+              "px-2 py-1",
+              "text-sm text-brand-inactivelight hover:text-brand-light",
+              "transition-colors",
+              "font-semibold"
+            )}
+            onClick={() => rejectAllApprovals()}
+          >
+            Reject all
+          </button>
+
           <Button className="!py-2" onClick={handleApprove}>
             Approve
             <LinkIcon className="ml-1 w-4 h-4 min-w-[1rem]" />

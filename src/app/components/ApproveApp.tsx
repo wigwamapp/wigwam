@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
 import { ActivityType, Approval, WalletStatus } from "core/types";
+import { rejectAllApprovals } from "core/client";
 
 import { walletStatusAtom, approvalsAtom } from "app/atoms";
 import { ChainIdProvider, TippySingletonProvider } from "app/hooks";
@@ -63,6 +64,19 @@ const Approvals: FC = () => {
                 )}
               >
                 <ApprovalStatus theme="small" readOnly />
+                <div className="flex-1" />
+                <button
+                  type="button"
+                  className={classNames(
+                    "px-2 py-1",
+                    "text-xs text-brand-inactivelight hover:text-brand-light",
+                    "transition-colors",
+                    "font-semibold"
+                  )}
+                  onClick={() => rejectAllApprovals()}
+                >
+                  Reject all
+                </button>
               </div>
             </TippySingletonProvider>
 

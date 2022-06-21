@@ -36,3 +36,7 @@ export async function approveItem(approvalId: string, result: ApprovalResult) {
   );
   assert(res?.type === type);
 }
+
+export function rejectAllApprovals() {
+  porter.sendOneWayMessage({ type: MessageType.RejectAllApprovals });
+}
