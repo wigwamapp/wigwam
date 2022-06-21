@@ -158,7 +158,11 @@ const Asset: FC = () => {
                 );
               }
             })
-            .catch(console.warn);
+            .catch((err) => {
+              console.warn(err);
+
+              if (isMounted()) updateToast(null);
+            });
         } catch (err: any) {
           alert({
             title: "Error",
