@@ -24,7 +24,7 @@ import {
   OnChange,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useLazyNetwork, useProvider } from "app/hooks";
+import { useExplorerLink, useLazyNetwork, useProvider } from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
@@ -46,6 +46,7 @@ type FormValues = { amount: string; recipient: string };
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
   const currentToken = useAccountToken(tokenSlug);
   const { alert, closeCurrentDialog } = useDialog();
@@ -54,8 +55,6 @@ const Asset: FC = () => {
 
   const provider = useProvider();
   const signerProvider = provider.getUncheckedSigner(currentAccount.address);
-
-  const explorerUrl = currentNetwork?.explorerUrls?.[0];
 
   const handleSubmit = useCallback(
     async ({ recipient, amount }, form) =>
@@ -140,10 +139,10 @@ const Asset: FC = () => {
                       successfully transferred!
                     </p>
 
-                    {explorerUrl && (
+                    {explorerLink && (
                       <div className="mt-1 flex items-center">
                         <a
-                          href={`${explorerUrl}/tx/${txHash}`}
+                          href={explorerLink.tx(txHash)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="underline"
@@ -179,7 +178,7 @@ const Asset: FC = () => {
       updateToast,
       provider,
       isMounted,
-      explorerUrl,
+      explorerLink,
     ]
   );
 

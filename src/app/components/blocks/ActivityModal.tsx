@@ -23,7 +23,7 @@ import {
   getNetworkAtom,
   pendingActivityAtom,
 } from "app/atoms";
-import { OverflowProvider } from "app/hooks";
+import { OverflowProvider, useExplorerLink } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
@@ -397,7 +397,7 @@ type ActivityTxActionsProps = {
 
 const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item }) => {
   const network = useLazyAtomValue(getNetworkAtom(item.chainId));
-  const explorerUrl = network?.explorerUrls?.[0];
+  const explorerLink = useExplorerLink(network);
 
   const { copy, copied } = useCopyToClipboard(item.txHash);
 
@@ -410,13 +410,13 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item }) => {
         iconClassName="!w-[1.125rem]"
         onClick={copy}
       />
-      {explorerUrl && (
+      {explorerLink && (
         <IconedButton
           aria-label="View transaction in Explorer"
           Icon={WalletExplorerIcon}
           className="!w-6 !h-6 min-w-[1.5rem] ml-2"
           iconClassName="!w-[1.125rem]"
-          href={`${explorerUrl}/tx/${item.txHash}`}
+          href={explorerLink.tx(item.txHash)}
         />
       )}
     </div>

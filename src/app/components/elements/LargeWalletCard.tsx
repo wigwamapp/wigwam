@@ -4,7 +4,12 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 import { Account } from "core/types";
 
-import { TippySingletonProvider, useToken, useLazyNetwork } from "app/hooks";
+import {
+  TippySingletonProvider,
+  useToken,
+  useLazyNetwork,
+  useExplorerLink,
+} from "app/hooks";
 import { Page } from "app/nav";
 
 import AutoIcon from "./AutoIcon";
@@ -31,7 +36,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
   const [copied, setCopied] = useState(false);
 
   const currentNetwork = useLazyNetwork();
-  const explorerUrl = currentNetwork?.explorerUrls?.[0];
+  const explorerLink = useExplorerLink(currentNetwork);
   const portfolioBalance = useToken(address)?.portfolioUSD;
 
   const transitionRef = useRef<HTMLDivElement>(null);
@@ -121,9 +126,9 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
               </div>
               <div className="flex mt-2">
                 <div className="flex justify-center h-6 w-18 min-w-[4.5rem] mr-4">
-                  {explorerUrl && (
+                  {explorerLink && (
                     <IconedButton
-                      href={`${explorerUrl}/address/${address}`}
+                      href={explorerLink.address(address)}
                       aria-label="View wallet in Explorer"
                       Icon={WalletExplorerIcon}
                       className="!w-6 !h-6 mr-2"

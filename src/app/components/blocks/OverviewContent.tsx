@@ -50,8 +50,10 @@ import {
   useLazyNetwork,
   useTokenActivitiesSync,
   useTokenActivity,
+  useExplorerLink,
+  useAccountToken,
+  useAllAccountTokens,
 } from "app/hooks";
-import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -540,6 +542,7 @@ const AssetInfo: FC = () => {
   useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
 
   const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
 
   const { standard, address } = useMemo(
@@ -572,8 +575,6 @@ const AssetInfo: FC = () => {
     status === TokenStatus.Native
       ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
       : address;
-
-  const explorerUrl = currentNetwork?.explorerUrls?.[0];
 
   return (
     <OverflowProvider>
@@ -619,13 +620,13 @@ const AssetInfo: FC = () => {
                           onClick={copy}
                         />
                       )}
-                      {explorerUrl && status !== TokenStatus.Native && (
+                      {explorerLink && status !== TokenStatus.Native && (
                         <IconedButton
                           aria-label="View asset in Explorer"
                           Icon={WalletExplorerIcon}
                           className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
-                          href={`${explorerUrl}/address/${address}`}
+                          href={explorerLink.address(address)}
                         />
                       )}
                       {coinGeckoId && (
@@ -881,9 +882,9 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
   ({ activity, className }, ref) => {
     const tokenInfo = useAccountToken(activity.tokenSlug)!;
     const currentNetwork = useLazyNetwork();
+    const explorerLink = useExplorerLink(currentNetwork);
     const { copy, copied } = useCopyToClipboard(activity.txHash);
 
-    const explorerUrl = currentNetwork?.explorerUrls?.[0];
     const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
       getActivityInfo(activity);
 
@@ -960,13 +961,13 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               iconClassName="!w-[1.125rem]"
               onClick={copy}
             />
-            {explorerUrl && (
+            {explorerLink && (
               <IconedButton
                 aria-label="View transaction in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 min-w-[1.5rem] ml-2"
                 iconClassName="!w-[1.125rem]"
-                href={`${explorerUrl}/tx/${activity.txHash}`}
+                href={explorerLink.tx(activity.txHash)}
               />
             )}
           </div>

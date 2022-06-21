@@ -13,7 +13,12 @@ import {
 } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { TippySingletonProvider, useLazyNetwork, useToken } from "app/hooks";
+import {
+  TippySingletonProvider,
+  useExplorerLink,
+  useLazyNetwork,
+  useToken,
+} from "app/hooks";
 import { CUSTOM_FEE_MODE, FEE_MODE_NAMES } from "app/utils/txApprove";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
@@ -236,6 +241,7 @@ type RecipientProps = {
 
 const Recipient: FC<RecipientProps> = ({ action }) => {
   const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
   const label = useMemo(() => getRecipientLabel(action), [action]);
   const address = useMemo(() => getRecipientAddress(action), [action]);
 
@@ -249,9 +255,9 @@ const Recipient: FC<RecipientProps> = ({ action }) => {
         <div className="flex items-center">
           <TippySingletonProvider>
             <HashPreview hash={address} className="text-sm" />
-            {currentNetwork?.explorerUrls && (
+            {explorerLink && (
               <IconedButton
-                href={`${currentNetwork.explorerUrls}/address/${address}`}
+                href={explorerLink.address(address)}
                 aria-label="View in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 ml-2"
@@ -306,6 +312,7 @@ type TokensProps = {
 
 const Tokens: FC<TokensProps> = ({ accountAddress, action }) => {
   const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
   const tokens = useMemo(() => getTokens(action), [action]);
 
   if (!tokens) {
@@ -318,9 +325,9 @@ const Tokens: FC<TokensProps> = ({ accountAddress, action }) => {
         <div className="flex items-center">
           <TippySingletonProvider>
             <HashPreview hash={tokens} className="text-sm" />
-            {currentNetwork?.explorerUrls && (
+            {explorerLink && (
               <IconedButton
-                href={`${currentNetwork.explorerUrls}/address/${tokens}`}
+                href={explorerLink.address(tokens)}
                 aria-label="View in Explorer"
                 Icon={WalletExplorerIcon}
                 className="!w-6 !h-6 ml-2"
