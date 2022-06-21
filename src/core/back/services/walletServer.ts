@@ -26,6 +26,7 @@ import {
   accountsUpdated,
   $syncStatus,
   seedPhraseAdded,
+  approvalsRejected,
 } from "../state";
 import { Vault } from "../vault";
 import { handleRpc } from "../rpc";
@@ -237,6 +238,11 @@ async function handleWalletRequest(
           await processApprove(approvalId, result, vault);
 
           ctx.reply({ type });
+        })
+      )
+      .with({ type: MessageType.RejectAllApprovals }, () =>
+        withStatus(WalletStatus.Unlocked, () => {
+          approvalsRejected(null);
         })
       )
       .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>

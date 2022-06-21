@@ -18,7 +18,7 @@ import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import * as repo from "core/repo";
 
 import { Vault } from "../vault";
-import { $accounts, $approvals, approvalsResolved } from "../state";
+import { $accounts, $approvals, approvalResolved } from "../state";
 import { sendRpc } from "../rpc";
 
 const { serializeTransaction, parseTransaction, keccak256, hexValue } =
@@ -191,7 +191,7 @@ export async function processApprove(
     approval.rpcReply?.({ error: DECLINE_ERROR });
   }
 
-  approvalsResolved([approvalId]);
+  approvalResolved(approvalId);
 }
 
 function getAccountSave(accountAddress: string) {

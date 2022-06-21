@@ -1,12 +1,11 @@
 import browser, { Windows } from "webextension-polyfill";
 import memoizeOne from "memoize-one";
-import { ethErrors } from "eth-rpc-errors";
 import { getPublicURL, openOrFocusMainTab } from "lib/ext/utils";
 import { createQueue } from "lib/system/queue";
 
 import { ActivityType, Approval } from "core/types";
 
-import { $approvals, approvalAdded, approvalsResolved } from "../state";
+import { $approvals, approvalAdded, approvalsRejected } from "../state";
 
 type ApprovePopupState = {
   type: "window" | "tab";
@@ -94,26 +93,18 @@ export function startApproveWindowOpener() {
   const handleApproveClose = () => {
     popupState = null;
 
-    const approvalsToReject: Approval[] = [];
+    const approvalIdsToReject: string[] = [];
 
     let i = 0;
     for (const approval of $approvals.getState()) {
       if (i === 0 || approval.type !== ActivityType.Transaction) {
-        approvalsToReject.push(approval);
+        approvalIdsToReject.push(approval.id);
       }
 
       i++;
     }
 
-    try {
-      for (const { rpcReply } of approvalsToReject) {
-        rpcReply?.({
-          error: ethErrors.provider.userRejectedRequest(),
-        });
-      }
-    } catch {}
-
-    approvalsResolved(approvalsToReject.map((a) => a.id));
+    approvalsRejected(approvalIdsToReject);
   };
 
   browser.windows.onRemoved.addListener((winId) => {

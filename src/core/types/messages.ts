@@ -51,7 +51,8 @@ export type EventMessage =
   | Sync
   | FindToken
   | SyncTokenActivities
-  | SyncStatusUpdated;
+  | SyncStatusUpdated
+  | RejectAllApprovals;
 
 export enum MessageType {
   GetWalletState = "GET_WALLET_STATE",
@@ -79,6 +80,7 @@ export enum MessageType {
   GetApprovals = "GET_APPROVALS",
   ApprovalsUpdated = "APPROVALS_UPDATED",
   Approve = "APPROVE",
+  RejectAllApprovals = "REJECT_ALL_APPROVALS",
 }
 
 export interface MessageBase {
@@ -302,4 +304,8 @@ export interface ApproveRequest extends MessageBase {
 
 export interface ApproveResponse extends MessageBase {
   type: MessageType.Approve;
+}
+
+export interface RejectAllApprovals extends MessageBase {
+  type: MessageType.RejectAllApprovals;
 }

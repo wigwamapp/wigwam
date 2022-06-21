@@ -13,7 +13,8 @@ import {
   accountsUpdated,
   walletPortsCountUpdated,
   approvalAdded,
-  approvalsResolved,
+  approvalResolved,
+  approvalsRejected,
   syncStarted,
   synced,
 } from "./events";
@@ -104,21 +105,44 @@ export const $approvals = createStore<Approval[]>([])
 
     return [...approvals, newApproval];
   })
-  .on(approvalsResolved, (current, approvalIds) =>
-    current.filter((a) => !approvalIds.includes(a.id))
-  )
-  .on(locked, (current) => {
-    try {
-      for (const { rpcReply } of current) {
-        rpcReply?.({
-          error: ethErrors.provider.userRejectedRequest(),
-        });
-      }
-    } catch {}
+  .on(approvalResolved, (current, id) => current.filter((a) => a.id !== id))
+  .on(approvalsRejected, (current, ids) => {
+    let toReject, next;
 
+    if (!ids) {
+      toReject = current;
+      next = [];
+    } else {
+      toReject = [];
+      next = [];
+
+      for (const approval of current) {
+        if (ids.includes(approval.id)) {
+          toReject.push(approval);
+        } else {
+          next.push(approval);
+        }
+      }
+    }
+
+    rejectApprovalsRpc(toReject);
+    return next;
+  })
+  .on(locked, (current) => {
+    rejectApprovalsRpc(current);
     return [];
   });
 
 export const $accountAddresses = $accounts.map((accounts) =>
   accounts.map((acc) => acc.address)
 );
+
+function rejectApprovalsRpc(approvals: Approval[]) {
+  try {
+    for (const { rpcReply } of approvals) {
+      rpcReply?.({
+        error: ethErrors.provider.userRejectedRequest(),
+      });
+    }
+  } catch {}
+}
