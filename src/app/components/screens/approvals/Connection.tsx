@@ -4,6 +4,7 @@ import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { assert } from "lib/system/assert";
 
 import {
   Account as AccountType,
@@ -13,7 +14,12 @@ import {
 import { approveItem } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
-import { allAccountsAtom, chainIdAtom, currentAccountAtom } from "app/atoms";
+import {
+  allAccountsAtom,
+  chainIdAtom,
+  currentAccountAtom,
+  getPermissionAtom,
+} from "app/atoms";
 import { ChainIdProvider, useSync, useToken } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
@@ -44,23 +50,40 @@ type ApproveConnectionProps = {
 };
 
 const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
-  const [internalChainId, currentAccount, allAccounts] = useAtomValue(
-    useMemo(
-      () => waitForAll([chainIdAtom, currentAccountAtom, allAccountsAtom]),
-      []
-    )
-  );
+  const sourceOrigin = useMemo(() => {
+    assert(approval.source.type === "page");
+    return new URL(approval.source.url).origin;
+  }, [approval]);
+
+  const [internalChainId, currentAccount, allAccounts, currentPermission] =
+    useAtomValue(
+      useMemo(
+        () =>
+          waitForAll([
+            chainIdAtom,
+            currentAccountAtom,
+            allAccountsAtom,
+            getPermissionAtom(sourceOrigin),
+          ]),
+        [sourceOrigin]
+      )
+    );
+
+  const defaultAddresses = useMemo(() => {
+    const addresses = currentPermission?.accountAddresses ?? [];
+    if (currentAccount.source !== AccountSource.Address) {
+      addresses.push(currentAccount.address);
+    }
+
+    return addresses;
+  }, [currentPermission, currentAccount]);
 
   const { alert } = useDialog();
 
-  const watchOnlyAcc = currentAccount.source === AccountSource.Address;
-
-  const accountsToConnectRef = useRef(
-    new Set<string>(!watchOnlyAcc ? [currentAccount.address] : undefined)
-  );
+  const accountsToConnectRef = useRef(new Set<string>(defaultAddresses));
   const forceUpdate = useForceUpdate();
 
-  const localChainIdRef = useRef(internalChainId);
+  const localChainIdRef = useRef(currentPermission?.chainId ?? internalChainId);
 
   const localChainId = localChainIdRef.current;
   const setLocalChainId = useCallback(
@@ -74,10 +97,10 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
   useSync(localChainId, currentAccount.address);
 
   useEffect(() => {
-    if (internalChainId !== localChainIdRef.current) {
+    if (!currentPermission && internalChainId !== localChainIdRef.current) {
       setLocalChainId(internalChainId);
     }
-  }, [internalChainId, setLocalChainId]);
+  }, [currentPermission, internalChainId, setLocalChainId]);
 
   const preparedAccounts = useMemo(
     () => allAccounts.filter(({ source }) => source !== AccountSource.Address),
