@@ -15,11 +15,12 @@ export async function openInTab(to?: Destination, merge?: boolean | string[]) {
 
 export async function openInTabStrict(
   to?: Destination,
-  merge?: boolean | string[]
+  merge?: boolean | string[],
+  anotherWindow = false
 ) {
   try {
     const mainTabs = await browser.tabs.query({
-      currentWindow: true,
+      currentWindow: !anotherWindow,
       url: getMainURL("**"),
     });
 
@@ -38,10 +39,12 @@ export async function openInTabStrict(
           : { url: newTabUrl, active: true }
       );
     } else {
-      const currentTabs = await browser.tabs.query({
-        currentWindow: true,
-        active: true,
-      });
+      const currentTabs = !anotherWindow
+        ? await browser.tabs.query({
+            currentWindow: true,
+            active: true,
+          })
+        : [];
 
       const hash = to && toHash(to);
       const url = getMainURL(`#${hash ?? ""}`);
@@ -65,5 +68,7 @@ export async function openInTabStrict(
     console.error(err);
   }
 
-  window.close();
+  if (!anotherWindow) {
+    window.close();
+  }
 }

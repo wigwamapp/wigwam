@@ -238,7 +238,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           <EmptyAccountsToConnect />
         ) : (
           <ScrollAreaContainer
-            className="w-full box-content -mr-5 pr-5 grow"
+            className="w-full h-full box-content -mr-5 pr-5 grow"
             viewPortClassName="py-2.5 viewportBlock"
           >
             {preparedAccounts.map((account, i) => (
@@ -317,7 +317,7 @@ const EmptyAccountsToConnect: FC = () => (
     <div>There no wallets to connect.</div>
     <Button
       theme="secondary"
-      onClick={() => openInTabStrict({ addAccOpened: true }, ["token"])}
+      onClick={() => openInTabStrict({ addAccOpened: true }, ["token"], true)}
       className="ml-5 !py-1 !text-sm !min-w-[8rem] mt-2.5"
     >
       <AddWalletIcon className="h-5 w-auto mr-1.5" />
