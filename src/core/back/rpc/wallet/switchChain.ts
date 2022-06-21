@@ -4,15 +4,20 @@ import { assert } from "lib/system/assert";
 import { RpcReply, ActivitySource } from "core/types";
 import * as repo from "core/repo";
 
-import { validatePermission, validateNetwork } from "./validation";
+import {
+  handleWelcomeState,
+  validateNetwork,
+  createJustNetworkPermission,
+} from "./validation";
 import { getPageOrigin } from "core/common/permissions";
 
 export async function requestSwitchChain(
+  type: "add" | "switch",
   source: ActivitySource,
   params: any[],
   rpcReply: RpcReply
 ) {
-  validatePermission(source);
+  handleWelcomeState();
 
   let chainId: number;
   try {
@@ -25,16 +30,25 @@ export async function requestSwitchChain(
   try {
     await validateNetwork(chainId);
   } catch {
+    if (type === "add") {
+      throw ethErrors.provider.unsupportedMethod();
+    }
+
     const error = ethErrors.rpc.resourceNotFound("Network not been added");
     error.code = 4902;
     throw error;
   }
 
+  assert(source.type === "page");
   const origin = getPageOrigin(source);
 
-  await repo.permissions.where({ origin }).modify((perm) => {
-    perm.chainId = chainId;
-  });
+  if (source.permission || (await repo.permissions.get(origin))) {
+    await repo.permissions.where({ origin }).modify((perm) => {
+      perm.chainId = chainId;
+    });
+  } else {
+    await createJustNetworkPermission(origin, chainId);
+  }
 
   rpcReply({ result: null });
 }

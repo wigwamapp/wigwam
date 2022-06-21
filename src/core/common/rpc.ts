@@ -19,11 +19,6 @@ export const AUTHORIZED_RPC_METHODS = new Set<string>([
   JsonRpcMethod.eth_signTypedData_v2,
   JsonRpcMethod.eth_signTypedData_v3,
   JsonRpcMethod.eth_signTypedData_v4,
-  // Rest
-  JsonRpcMethod.wallet_switchEthereumChain,
-  JsonRpcMethod.wallet_addEthereumChain,
-  JsonRpcMethod.wallet_watchAsset,
-  JsonRpcMethod.wallet_registerOnboarding,
 ]);
 
 export const DISCONNECT_ERROR = {

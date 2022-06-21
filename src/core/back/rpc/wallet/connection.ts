@@ -1,16 +1,11 @@
 import { nanoid } from "nanoid";
-import { ethErrors } from "eth-rpc-errors";
-import { openOrFocusMainTab } from "lib/ext/utils";
 
-import {
-  ActivitySource,
-  RpcReply,
-  ActivityType,
-  WalletStatus,
-} from "core/types";
+import { ActivitySource, RpcReply, ActivityType } from "core/types";
 import * as repo from "core/repo";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
-import { $walletStatus, approvalAdded } from "core/back/state";
+import { approvalAdded } from "core/back/state";
+
+import { handleWelcomeState } from "./validation";
 
 export async function requestConnection(
   source: ActivitySource,
@@ -18,12 +13,7 @@ export async function requestConnection(
   returnSelectedAccount: boolean,
   rpcReply: RpcReply
 ) {
-  const status = $walletStatus.getState();
-  if (status === WalletStatus.Welcome) {
-    openOrFocusMainTab();
-    rpcReply({ error: ethErrors.provider.userRejectedRequest() });
-    return;
-  }
+  handleWelcomeState();
 
   // let preferredChainId = parseChainId(params[0]);
   // if (preferredChainId) {

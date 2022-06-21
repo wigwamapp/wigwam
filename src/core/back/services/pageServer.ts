@@ -124,10 +124,8 @@ export function startPageServer() {
         accountAddress: accountAddress?.toLowerCase(),
       };
     } else {
-      const internalChainId = await loadInternalChainId();
-
       params = {
-        chainId: internalChainId,
+        chainId: perm?.chainId ?? (await loadInternalChainId()),
         accountAddress: null,
       };
     }
@@ -211,11 +209,11 @@ async function resolveConnectionApproval(perm?: Permission) {
         approval.type === ActivityType.Connection &&
         getPageOrigin(approval.source) === perm.origin
       ) {
-        const toReturn = approval.returnSelectedAccount
-          ? perm.accountAddresses[0]
-          : wrapPermission(perm);
+        const result = approval.returnSelectedAccount
+          ? perm.accountAddresses
+          : [wrapPermission(perm)];
 
-        approval.rpcReply?.({ result: [toReturn] });
+        approval.rpcReply?.({ result });
         approvalResolved(approval.id);
       }
     }

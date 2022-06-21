@@ -10,6 +10,8 @@ import {
 import * as repo from "core/repo";
 import { getPageOrigin } from "core/common/permissions";
 
+import { isUnlocked } from "../state";
+
 import { sendRpc } from "./network";
 import {
   fetchPermission,
@@ -18,9 +20,7 @@ import {
   requestSigning,
   recoverPersonalSign,
   requestSwitchChain,
-  requestAddChain,
 } from "./wallet";
-import { isUnlocked } from "../state";
 
 export async function handleRpc(
   source: ActivitySource,
@@ -94,16 +94,14 @@ export async function handleRpc(
         return await recoverPersonalSign(source, params, reply);
       }
 
-      case JsonRpcMethod.wallet_switchEthereumChain: {
-        await expandPermission();
-
-        return await requestSwitchChain(source, params, reply);
-      }
-
+      case JsonRpcMethod.wallet_switchEthereumChain:
       case JsonRpcMethod.wallet_addEthereumChain: {
+        dropForSelf(source);
         await expandPermission();
 
-        return await requestAddChain(source, params, reply);
+        const type =
+          method === JsonRpcMethod.wallet_addEthereumChain ? "add" : "switch";
+        return await requestSwitchChain(type, source, params, reply);
       }
 
       case JsonRpcMethod.eth_sign:

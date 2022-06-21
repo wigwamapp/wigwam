@@ -1,15 +1,26 @@
 import { Describe, define, object, optional, array } from "superstruct";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
+import { nanoid } from "nanoid";
+import { openOrFocusMainTab } from "lib/ext/utils";
 
-import { ActivitySource, TxParams } from "core/types";
+import { ActivitySource, TxParams, WalletStatus } from "core/types";
 import { getNetwork } from "core/common";
+import * as repo from "core/repo";
 
-import { $accountAddresses } from "core/back/state";
+import { $walletStatus, $accountAddresses } from "core/back/state";
 
 export function validatePermission(source: ActivitySource) {
   if (source.type === "page" && !source.permission) {
     throw ethErrors.provider.unauthorized();
+  }
+}
+
+export function handleWelcomeState() {
+  const status = $walletStatus.getState();
+  if (status === WalletStatus.Welcome) {
+    openOrFocusMainTab();
+    throw ethErrors.provider.userRejectedRequest();
   }
 }
 
@@ -31,6 +42,19 @@ export function validateAccount(
   if (!$accountAddresses.getState().includes(accountAddress)) {
     throw ethErrors.rpc.resourceUnavailable();
   }
+}
+
+export async function createJustNetworkPermission(
+  origin: string,
+  chainId: number
+) {
+  await repo.permissions.put({
+    id: nanoid(),
+    origin,
+    chainId,
+    accountAddresses: [],
+    timeAt: Date.now(),
+  });
 }
 
 export const validateNetwork = (chainId: number) =>
