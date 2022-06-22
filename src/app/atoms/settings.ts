@@ -1,4 +1,4 @@
-import { atomWithStorage } from "lib/atom-utils";
+import { atomWithGlobal, atomWithStorage } from "lib/atom-utils";
 
 import { Setting, AnalyticsState } from "core/common";
 
@@ -8,3 +8,7 @@ export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
   { enabled: false }
 );
+
+export const betaTestCodeAtom = atomWithGlobal("betatest_promocode", "");
+
+export const betaTestEnabledAtom = atomWithGlobal("betatest_enabled", "false");
