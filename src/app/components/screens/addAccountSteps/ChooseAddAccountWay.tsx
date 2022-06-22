@@ -167,9 +167,11 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           let closed = false;
           onClose(() => (closed = true));
 
-          const { default: OpenLogin, UX_MODE } = await import(
-            "@toruslabs/openlogin"
-          );
+          const {
+            default: OpenLogin,
+            UX_MODE,
+            storeKey,
+          } = await import("@toruslabs/openlogin");
 
           const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
           assert(clientId, "Client ID was not specified");
@@ -180,8 +182,13 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
             uxMode: UX_MODE.POPUP,
             replaceUrlOnRedirect: false,
           });
+          localStorage.removeItem("loglevel:http-helpers");
+          localStorage.removeItem("loglevel");
 
-          onClose(() => openlogin._cleanup());
+          onClose(() => {
+            openlogin._cleanup();
+            localStorage.setItem(storeKey, JSON.stringify({}));
+          });
 
           await openlogin.init();
           await openlogin.logout().catch(console.warn);
