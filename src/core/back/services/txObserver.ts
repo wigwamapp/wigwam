@@ -6,9 +6,12 @@ import { ActivityType, TransactionActivity } from "core/types";
 import * as repo from "core/repo";
 
 import { sendRpc } from "../rpc";
+import { isUnlocked } from "../state";
 
 export async function startTxObserver() {
   schedule(5_000, async () => {
+    if (!isUnlocked()) return;
+
     const pendingTxs = (await repo.activities
       .where("[type+pending]")
       .equals([ActivityType.Transaction, 1])
