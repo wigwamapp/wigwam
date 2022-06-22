@@ -19,6 +19,9 @@
   },
   "dependencies": {
     "@0xsequence/multicall": "0.39.5",
+    "@amplitude/analytics-core": "0.4.1",
+    "@amplitude/analytics-types": "0.3.0",
+    "@amplitude/ua-parser-js": "0.7.31",
     "@dicebear/avatars": "4.10.3",
     "@dicebear/avatars-avataaars-sprites": "4.10.3",
     "@dicebear/avatars-jdenticon-sprites": "4.10.3",
@@ -164,6 +167,7 @@
   },
   "resolutions": {
     "ethers": "5.6.9",
+    "@amplitude/**/tslib": "2.3.1",
     "minimist": ">=1.2.6"
   },
   "engines": {
