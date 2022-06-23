@@ -3,6 +3,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
 import { nanoid } from "nanoid";
+import classNames from "clsx";
 import { storage } from "lib/ext/storage";
 
 import { AddAccountParams, SeedPharse } from "core/types";
@@ -155,8 +156,7 @@ const SetupPassword = memo(() => {
                       }
                       error={meta.touched && meta.error}
                       errorMessage={meta.error}
-                      containerClassName="w-full"
-                      className="mt-6"
+                      containerClassName="w-full mt-6"
                     />
                   )}
                 </Field>
@@ -193,8 +193,10 @@ const SetupPassword = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    className="mt-6"
-                    containerClassName="mb-6 w-full"
+                    containerClassName={classNames(
+                      "mb-6 w-full",
+                      analyticsFieldDisplayed ? "mt-4" : "mt-6"
+                    )}
                   />
                 )}
               </Field>

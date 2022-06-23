@@ -3,6 +3,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
 import { nanoid } from "nanoid";
+import classNames from "clsx";
 import { storage } from "lib/ext/storage";
 
 import { WalletStatus } from "core/types";
@@ -24,7 +25,9 @@ import { ReactComponent as SuccessIcon } from "app/icons/green-check.svg";
 import ChooseAddAccountWayOrigin from "./ChooseAddAccountWay";
 
 const BETATEST_PROMOCODES =
-  process.env.VIGVAM_BETATEST_PROMOCODES?.split(",") ?? [];
+  process.env.VIGVAM_BETATEST_PROMOCODES?.split(",").map((el) =>
+    el.toLowerCase()
+  ) ?? [];
 
 type FormValues = {
   code: string;
@@ -108,13 +111,16 @@ const ChooseAddAccountWayBeta = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    className="w-full mb-3"
+                    className="w-full"
                     actions={
-                      BETATEST_PROMOCODES.includes(
-                        input.value?.toLowerCase()
-                      ) ? (
-                        <SuccessIcon />
-                      ) : null
+                      <SuccessIcon
+                        className={classNames(
+                          "opacity-0 transition-opacity",
+                          BETATEST_PROMOCODES.includes(
+                            input.value?.toLowerCase()
+                          ) && "opacity-100"
+                        )}
+                      />
                     }
                     {...input}
                   />
@@ -143,8 +149,7 @@ const ChooseAddAccountWayBeta = memo(() => {
                     }
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}
-                    containerClassName="w-full"
-                    className="mt-6"
+                    containerClassName="w-full mt-6"
                   />
                 )}
               </Field>
