@@ -125,8 +125,13 @@ const PopupNetworkSelect: FC = () => {
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const permission = useAtomValue(getPermissionAtom(tabOrigin));
+  const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
   const currentAccount = useAtomValue(currentAccountAtom);
+
+  const permission =
+    purePermission && purePermission.accountAddresses.length > 0
+      ? purePermission
+      : undefined;
 
   const accountConnected = useMemo(
     () =>
