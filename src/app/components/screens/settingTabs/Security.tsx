@@ -41,7 +41,9 @@ const Security: FC = () => {
     <div className="flex flex-col items-start">
       {hasSeedPhrase && (
         <>
-          <SettingsHeader>Reveal Secret Phrase</SettingsHeader>
+          <SettingsHeader className="!mb-3">
+            Reveal Secret Phrase
+          </SettingsHeader>
 
           <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
             Secret Phrase is a 12-word or 24-word phrase that is the “master
