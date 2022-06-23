@@ -194,7 +194,7 @@ export const syncTokenActivities = memoize(
         const approvalTopic = erc20Token.filters.Approval(accountAddress);
 
         const step = 1_000 - 1;
-        const limit = step * 10;
+        const limit = step * 30;
         let range = 0;
 
         const base = {
@@ -268,7 +268,9 @@ export const syncTokenActivities = memoize(
         while (i-- > 0) {
           const item = values[i];
           if (item.timeAt in blocks) {
-            item.timeAt = blocks[item.timeAt].timestamp;
+            item.timeAt = new BigNumber(blocks[item.timeAt].timestamp)
+              .times(1_000)
+              .toNumber();
           } else {
             values.slice(i, 1);
             keys.slice(i, 1);
