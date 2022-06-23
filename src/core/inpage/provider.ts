@@ -23,7 +23,7 @@ import {
 
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
-// import { SubscriptionManager } from "./subscriptionManager";
+import { SubscriptionManager } from "./subscriptionManager";
 
 const gatewayEventType = Symbol();
 const stateUpdatedType = Symbol();
@@ -56,7 +56,7 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
   #inpage = new InpageProtocol("injected", "content");
   #filter = new FilterManager(this);
-  // private subs = new SubscriptionManager(this, this.filter);
+  #subscription = new SubscriptionManager(this, this.#filter);
 
   constructor() {
     super();
@@ -79,24 +79,17 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (!evt?.method) return;
+      if (evt?.method === VIGVAM_STATE) {
+        const { chainId, accountAddress } = evt.params as any;
 
-      switch (evt.method) {
-        case VIGVAM_STATE:
-          const { chainId, accountAddress } = evt.params as any;
-
-          this.#handleNetworkChange(chainId);
-          this.#handleAccountChange(accountAddress || null);
-          this.emit(stateUpdatedType, undefined);
-          return;
-
-        case ETH_SUBSCRIPTION:
-          this.emit("message", {
-            type: ETH_SUBSCRIPTION,
-            data: evt.params,
-          });
-          return;
+        this.#handleNetworkChange(chainId);
+        this.#handleAccountChange(accountAddress || null);
+        this.emit(stateUpdatedType, undefined);
       }
+    });
+
+    this.#subscription.on("message", (event) => {
+      this.emit("message", event);
     });
   }
 
@@ -179,11 +172,16 @@ export class InpageProvider extends Emitter<ProviderEvent> {
 
   async #requestSubscriptionMethods({
     method,
+    params,
   }: RequestArguments): Promise<unknown> {
+    if (!Array.isArray(params)) return;
+
     switch (method) {
       case JsonRpcMethod.eth_subscribe:
+        return this.#subscription.subscribe(params);
+
       case JsonRpcMethod.eth_unsubscribe:
-        throw ethErrors.provider.unsupportedMethod();
+        return this.#subscription.unsubscribe(params);
 
       default:
         return;
@@ -323,6 +321,10 @@ export class InpageProvider extends Emitter<ProviderEvent> {
         message: errorMessages.invalidRequestParams(),
         data: args,
       });
+    }
+
+    if (!params) {
+      args = { method, params: [] };
     }
 
     try {

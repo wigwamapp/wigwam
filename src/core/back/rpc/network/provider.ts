@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
 import { providers as multicallProviders } from "@0xsequence/multicall";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
@@ -85,6 +85,14 @@ class RpcProvider extends JsonRpcProvider {
   getNetwork = memoizeOne(super.getNetwork.bind(this));
 
   getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
+
+  constructor(url: string, network?: Networkish) {
+    super(url, network);
+
+    // To use cache first provider._getBlock(), but without formatting
+    this.formatter.block = (b) => b;
+    this.formatter.blockWithTransactions = (b) => b;
+  }
 }
 
 function numToHex(value: number): string {

@@ -1,54 +1,114 @@
-// import type { InpageProvider } from "./provider";
-// import type { FilterManager } from "./filterManager";
+import { Emitter } from "lib/emitter";
 
-// type Subscription = {};
+import { ETH_SUBSCRIPTION } from "core/common/rpc";
 
-// export class SubscriptionManager {
-//   private subscriptions = new Map<string, Subscription>();
+import type { InpageProvider } from "./provider";
+import type { FilterManager } from "./filterManager";
 
-//   constructor(private provider: InpageProvider, private filter: FilterManager) {
-//     // this.provider.emit("message",)
-//   }
+enum SubType {
+  newHeads = "newHeads",
+  logs = "logs",
+}
 
-//   async subscribe(params: any[]) {
-//     const subscriptionType = params[0];
-//     const subId = unsafeRandomBytes(16);
+type Subscription = { type: SubType; filterId: string };
 
-//     // let sub;
+export class SubscriptionManager extends Emitter {
+  private subscriptions = new Map<string, Subscription>();
 
-//     switch (subscriptionType) {
-//       case "newHeads":
-//         // sub = createSubNewHeads({ subId });
-//         return subId;
-//         break;
+  constructor(private provider: InpageProvider, private filter: FilterManager) {
+    super();
 
-//       case "logs":
-//         const { address, topics } = params[1];
-//         const filter = await this.filter.newFilter({ address, topics });
-//         // sub = createSubFromFilter({ subId, filter });
-//         break;
+    this.checkChangesAndDefer();
+    this.provider.on("networkChanged", () => this.subscriptions.clear());
+  }
 
-//       default:
-//         throw new Error(
-//           `SubscriptionManager - unsupported subscription type "${subscriptionType}"`
-//         );
-//     }
-//   }
+  private checkChangesAndDefer() {
+    for (const [id, { type, filterId }] of this.subscriptions) {
+      const handleEmit = (results: unknown) => {
+        if (Array.isArray(results) && results.length > 0) {
+          for (const result of results) {
+            this.emit("message", {
+              type: ETH_SUBSCRIPTION,
+              data: {
+                subscription: id,
+                result,
+              },
+            });
+          }
+        }
+      };
 
-//   unsubscribe() {}
-// }
+      switch (type) {
+        case SubType.newHeads:
+          this.filter
+            .getFilterChanges(filterId, true)
+            .then(handleEmit)
+            .catch(console.error);
+          break;
 
-// function unsafeRandomBytes(byteCount: number) {
-//   let result = "0x";
-//   for (let i = 0; i < byteCount; i++) {
-//     result += unsafeRandomNibble();
-//     result += unsafeRandomNibble();
-//   }
-//   return result;
-// }
+        case SubType.logs:
+          this.filter
+            .getFilterChanges(filterId)
+            .then(handleEmit)
+            .catch(console.error);
+          break;
 
-// function unsafeRandomNibble() {
-//   return Math.floor(Math.random() * 16).toString(16);
-// }
+        default:
+          break;
+      }
+    }
 
-export {};
+    setTimeout(() => this.checkChangesAndDefer(), 5_000);
+  }
+
+  async subscribe(params: any[]) {
+    const subscriptionType = params[0];
+    const subId = unsafeRandomBytes(16);
+
+    switch (subscriptionType) {
+      case SubType.newHeads: {
+        const filterId = await this.filter.newBlockFilter();
+        this.subscriptions.set(subId, { type: SubType.newHeads, filterId });
+
+        return filterId;
+      }
+
+      case SubType.logs: {
+        const { address, topics } = params[1];
+        const filterId = await this.filter.newFilter({ address, topics });
+        this.subscriptions.set(subId, { type: SubType.logs, filterId });
+
+        return filterId;
+      }
+
+      default:
+        throw new Error(
+          `SubscriptionManager - unsupported subscription type "${subscriptionType}"`
+        );
+    }
+  }
+
+  unsubscribe(params: any[]) {
+    const id = params[0];
+
+    const sub = this.subscriptions.get(id);
+    if (!sub) return false;
+
+    this.subscriptions.delete(id);
+
+    return this.filter.uninstallFilter(sub.filterId);
+  }
+}
+
+function unsafeRandomBytes(byteCount: number) {
+  let result = "0x";
+  for (let i = 0; i < byteCount; i++) {
+    result += unsafeRandomNibble();
+    result += unsafeRandomNibble();
+  }
+  return result;
+}
+
+function unsafeRandomNibble() {
+  return Math.floor(Math.random() * 16).toString(16);
+}

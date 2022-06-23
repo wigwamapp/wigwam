@@ -29,7 +29,9 @@ export class FilterManager {
   private readonly timeouts = new Map<number, ReturnType<typeof setTimeout>>(); // <id, setTimeout id>
   private nextFilterId = 1;
 
-  constructor(private readonly provider: InpageProvider) {}
+  constructor(private readonly provider: InpageProvider) {
+    this.provider.on("networkChanged", () => this.cleanupAll());
+  }
 
   async newFilter(param: FilterParam): Promise<string> {
     const filter = filterFromParam(param);
@@ -70,7 +72,7 @@ export class FilterManager {
     return this.deleteFilter(id);
   }
 
-  getFilterChanges(filterId: string): Promise<unknown> {
+  getFilterChanges(filterId: string, full = false): Promise<unknown> {
     const id = intNumberFromHexString(filterId);
 
     if (this.timeouts.has(id)) {
@@ -82,7 +84,7 @@ export class FilterManager {
         return this.getLogFilterChanges(id);
 
       case this.blockFilters.has(id):
-        return this.getBlockFilterChanges(id);
+        return this.getBlockFilterChanges(id, full);
 
       case this.pendingTransactionFilters.has(id):
         return this.getPendingTransactionFilterChanges();
@@ -127,6 +129,14 @@ export class FilterManager {
     ].some(Boolean);
   }
 
+  private cleanupAll() {
+    this.logFilters.clear();
+    this.blockFilters.clear();
+    this.pendingTransactionFilters.clear();
+    this.cursors.clear();
+    this.timeouts.clear();
+  }
+
   private async getLogFilterChanges(id: number): Promise<unknown> {
     const filter = this.logFilters.get(id);
     const cursorPosition = this.cursors.get(id);
@@ -140,10 +150,10 @@ export class FilterManager {
       filter.toBlock === "latest" ? currentBlockHeight : filter.toBlock;
 
     if (cursorPosition > currentBlockHeight) {
-      return emptyResult();
+      return [];
     }
     if (cursorPosition > filter.toBlock) {
-      return emptyResult();
+      return [];
     }
 
     const result = await this.requestProvider<any[]>({
@@ -172,7 +182,10 @@ export class FilterManager {
     return result;
   }
 
-  private async getBlockFilterChanges(id: number): Promise<unknown> {
+  private async getBlockFilterChanges(
+    id: number,
+    full = false
+  ): Promise<unknown> {
     const cursorPosition = this.cursors.get(id);
     if (!cursorPosition) {
       throw filterNotFoundError();
@@ -180,13 +193,13 @@ export class FilterManager {
 
     const currentBlockHeight = await this.getCurrentBlockHeight();
     if (cursorPosition > currentBlockHeight) {
-      return emptyResult();
+      return [];
     }
 
     const blocks = (
       await Promise.all(
-        range(cursorPosition, currentBlockHeight + 1).map((i) =>
-          this.getBlockHashByNumber(i)
+        range(cursorPosition, currentBlockHeight + 1).map((blockNumber) =>
+          this.getBlockByNumber(blockNumber)
         )
       )
     ).filter(Boolean);
@@ -194,12 +207,22 @@ export class FilterManager {
     const newCursorPosition = cursorPosition + blocks.length;
     this.cursors.set(id, newCursorPosition);
 
-    return blocks;
+    return full
+      ? blocks.map((block) => {
+          block = { ...block };
+          delete block.size;
+          delete block.totalDifficulty;
+          delete block.transactions;
+          delete block.uncles;
+
+          return block;
+        })
+      : blocks.map(({ hash }: any) => ensureHexString(hash));
   }
 
   private async getPendingTransactionFilterChanges(): Promise<unknown> {
     // pending transaction filters are not supported
-    return Promise.resolve(emptyResult());
+    return Promise.resolve([]);
   }
 
   private async setInitialCursorPosition(
@@ -233,17 +256,15 @@ export class FilterManager {
     return intNumberFromHexString(ensureHexString(result));
   }
 
-  private async getBlockHashByNumber(
+  private async getBlockByNumber(
     blockNumber: number
-  ): Promise<string | null> {
-    const result = await this.requestProvider<{ hash: string }>({
+  ): Promise<Record<string, any> | null> {
+    const result = await this.requestProvider<any>({
       method: "eth_getBlockByNumber",
       params: [hexStringFromIntNumber(blockNumber), false],
     });
 
-    return typeof result?.hash === "string"
-      ? ensureHexString(result.hash)
-      : null;
+    return typeof result?.hash === "string" ? result : null;
   }
 }
 
@@ -295,10 +316,6 @@ function filterNotFoundError(): Error {
   const err = new Error("Filter not found");
   Object.assign(err, { code: -32000 });
   return err;
-}
-
-function emptyResult(): [] {
-  return [];
 }
 
 const HEXADECIMAL_STRING_REGEX = /^[a-f0-9]*$/;
