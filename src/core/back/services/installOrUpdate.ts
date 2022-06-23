@@ -76,4 +76,8 @@ export function startInstallOrUpdateListener() {
       }
     }
   });
+
+  browser.runtime.onUpdateAvailable?.addListener(({ version }) => {
+    Global.put("latest_version", version);
+  });
 }
