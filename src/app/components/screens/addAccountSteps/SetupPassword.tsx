@@ -1,11 +1,13 @@
-import { FC, memo, useCallback, useEffect } from "react";
-import { useSetAtom } from "jotai";
-import classNames from "clsx";
-import * as Checkbox from "@radix-ui/react-checkbox";
+import { memo, useCallback, useEffect } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
+import { nanoid } from "nanoid";
+import classNames from "clsx";
+import { storage } from "lib/ext/storage";
 
 import { AddAccountParams, SeedPharse } from "core/types";
+import { Setting } from "core/common";
 import { setupWallet } from "core/client";
 
 import {
@@ -16,22 +18,24 @@ import {
   composeValidators,
   validatePassword,
 } from "app/utils";
-import { addAccountModalAtom } from "app/atoms";
+import { addAccountModalAtom, profileStateAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
+import AcceptCheckbox from "app/components/blocks/AcceptCheckbox";
 import PasswordField from "app/components/elements/PasswordField";
 import PasswordValidationField from "app/components/elements/PasswordValidationField";
-import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 type FormValues = {
   password: string;
   confirm: string;
+  analytics: boolean;
   terms: boolean;
 };
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
+  const profileState = useAtomValue(profileStateAtom);
 
   const { stateRef, reset } = useSteps();
 
@@ -45,11 +49,20 @@ const SetupPassword = memo(() => {
     }
   }, [addAccountsParams, reset]);
 
+  const analyticsFieldDisplayed = profileState.all.length > 1;
+
   const handleFinish = useCallback(
-    async ({ password }) =>
+    async ({ password, analytics }) =>
       withHumanDelay(async () => {
         try {
           if (!addAccountsParams) return;
+
+          if (analyticsFieldDisplayed && analytics) {
+            await storage.put(Setting.Analytics, {
+              enabled: true,
+              userId: nanoid(),
+            });
+          }
 
           await setupWallet(password, addAccountsParams, seedPhrase);
 
@@ -59,7 +72,7 @@ const SetupPassword = memo(() => {
         }
         return;
       }),
-    [addAccountsParams, seedPhrase, setAccModalOpened]
+    [addAccountsParams, seedPhrase, setAccModalOpened, analyticsFieldDisplayed]
   );
 
   if (!addAccountsParams) {
@@ -71,7 +84,7 @@ const SetupPassword = memo(() => {
       <AddAccountHeader className="mb-7">Setup Password</AddAccountHeader>
 
       <Form<FormValues>
-        initialValues={{ terms: false }}
+        initialValues={{ analytics: true, terms: false }}
         onSubmit={handleFinish}
         validate={(values) => ({
           confirm: differentPasswords(values.confirm)(values.password),
@@ -119,14 +132,60 @@ const SetupPassword = memo(() => {
                   />
                 )}
               </Field>
+
+              {analyticsFieldDisplayed && (
+                <Field name="analytics" format={(v: string) => Boolean(v)}>
+                  {({ input, meta }) => (
+                    <AcceptCheckbox
+                      {...input}
+                      title="Analytics"
+                      description={
+                        <>
+                          Help us make Vigvam better.
+                          <br />I agree to the{" "}
+                          <a
+                            href="https://vigvam.app/privacy"
+                            target="_blank"
+                            rel="nofollow noreferrer"
+                            className="text-brand-main underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Anonymous Tracking
+                          </a>
+                        </>
+                      }
+                      error={meta.touched && meta.error}
+                      errorMessage={meta.error}
+                      containerClassName="w-full mt-6"
+                    />
+                  )}
+                </Field>
+              )}
+
               <Field
                 name="terms"
                 format={(v: string) => Boolean(v)}
                 validate={required}
               >
                 {({ input, meta }) => (
-                  <AcceptTermsCheckbox
+                  <AcceptCheckbox
                     {...input}
+                    title="Accept terms"
+                    description={
+                      <>
+                        I have read and agree to the
+                        <br />
+                        <a
+                          href="https://vigvam.app/privacy"
+                          target="_blank"
+                          rel="nofollow noreferrer"
+                          className="text-brand-main underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Terms of Usage
+                        </a>
+                      </>
+                    }
                     error={
                       (!modifiedSinceLastSubmit && submitError) ||
                       (meta.touched && meta.error)
@@ -134,7 +193,10 @@ const SetupPassword = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    className="mt-6"
+                    containerClassName={classNames(
+                      "mb-6 w-full",
+                      analyticsFieldDisplayed ? "mt-4" : "mt-6"
+                    )}
                   />
                 )}
               </Field>
@@ -146,74 +208,5 @@ const SetupPassword = memo(() => {
     </>
   );
 });
-
-type AcceptTermsCheckboxProps = {
-  value: boolean;
-  onChange: (isInputChecked: boolean) => void;
-  error?: boolean;
-  errorMessage?: string;
-  className?: string;
-};
-
-const AcceptTermsCheckbox: FC<AcceptTermsCheckboxProps> = ({
-  value,
-  onChange,
-  error,
-  errorMessage,
-  className,
-}) => (
-  <div className="relative flex flex-col">
-    <Checkbox.Root
-      className={classNames(
-        "w-full px-3 pt-2 pb-3",
-        "rounded-[.625rem]",
-        "bg-brand-main/[.05]",
-        "flex",
-        "transition-colors",
-        "hover:bg-brand-main/[.1]",
-        value && "bg-brand-main/[.1]",
-        "border border-transparent",
-        !!error && "!border-brand-redobject",
-        className
-      )}
-      checked={value}
-      onCheckedChange={(e) => {
-        onChange(e === "indeterminate" ? false : e);
-      }}
-    >
-      <div
-        className={classNames(
-          "w-5 h-5 min-w-[1.25rem] mt-0.5 mr-4",
-          "bg-brand-main/20",
-          "rounded",
-          "flex items-center justify-center",
-          value && "border border-brand-main",
-          !!error && "border !border-brand-redobject"
-        )}
-      >
-        <Checkbox.Indicator>{value && <CheckIcon />}</Checkbox.Indicator>
-      </div>
-      <div className="text-left">
-        <h3 className="text-brand-light text-base font-semibold">
-          Accept terms
-        </h3>
-        <p className="text-brand-inactivedark2 text-sm">
-          I have read and agree to the Terms of Usage and Privacy Policy
-        </p>
-      </div>
-    </Checkbox.Root>
-    <div
-      className={classNames(
-        "flex max-h-0 overflow-hidden",
-        "transition-[max-height] duration-200",
-        error && errorMessage && "max-h-5"
-      )}
-    >
-      <span className="text-brand-redtext pt-1 pl-4 text-xs">
-        {errorMessage}
-      </span>
-    </div>
-  </div>
-);
 
 export default SetupPassword;

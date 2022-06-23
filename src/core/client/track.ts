@@ -4,6 +4,10 @@ import { storage } from "lib/ext/storage";
 
 import { Setting, AnalyticsState } from "core/common/settings";
 
+export enum TEvent {
+  Promocode = "PROMOCODE_USED",
+}
+
 export const trackEvent: AmplitudeClient["track"] = async (
   ...args
 ): Promise<any> => {
