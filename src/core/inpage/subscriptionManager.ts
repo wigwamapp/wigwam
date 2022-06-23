@@ -70,7 +70,7 @@ export class SubscriptionManager extends Emitter {
         const filterId = await this.filter.newBlockFilter();
         this.subscriptions.set(subId, { type: SubType.newHeads, filterId });
 
-        return filterId;
+        return subId;
       }
 
       case SubType.logs: {
@@ -78,7 +78,7 @@ export class SubscriptionManager extends Emitter {
         const filterId = await this.filter.newFilter({ address, topics });
         this.subscriptions.set(subId, { type: SubType.logs, filterId });
 
-        return filterId;
+        return subId;
       }
 
       default:
