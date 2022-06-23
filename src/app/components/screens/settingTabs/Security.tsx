@@ -1,11 +1,14 @@
 import { FC, memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
+import { useAtomValue, useAtom } from "jotai";
+import { nanoid } from "nanoid";
 import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
 
 import { getSeedPhrase } from "core/client";
 
+import { hasSeedPhraseAtom, analyticsAtom } from "app/atoms";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import SecondaryModal, {
   SecondaryModalProps,
@@ -14,28 +17,92 @@ import SecretField from "app/components/blocks/SecretField";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import PasswordField from "app/components/elements/PasswordField";
+import Switcher from "app/components/elements/Switcher";
+import Separator from "app/components/elements/Seperator";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 
 const Security: FC = () => {
+  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  const [analytics, setAnalytics] = useAtom(analyticsAtom);
+
   const [revealModalOpened, setRevealModalOpened] = useState(false);
-  // const [syncData, setSyncData] = useState(false);
-  // const [phishing, setPhishing] = useState(false);
+
+  const hanldeAnalyticsChange = useCallback(
+    (enabled: boolean) => {
+      setAnalytics({
+        enabled,
+        userId: analytics.userId ?? nanoid(),
+      });
+    },
+    [setAnalytics, analytics]
+  );
 
   return (
     <div className="flex flex-col items-start">
-      <SettingsHeader>Reveal Secret Phrase</SettingsHeader>
-      <Button
-        theme="secondary"
-        className={classNames(
-          "flex !justify-start items-center",
-          "text-left",
-          "!px-3 !py-2 mr-auto"
-        )}
-        onClick={() => setRevealModalOpened(true)}
-      >
-        <RevealIcon className="w-[1.625rem] h-auto mr-3" />
-        Reveal
-      </Button>
+      {hasSeedPhrase && (
+        <>
+          <SettingsHeader className="!mb-3">
+            Reveal Secret Phrase
+          </SettingsHeader>
+
+          <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+            Secret Phrase is a 12-word or 24-word phrase that is the “master
+            key” to your wallets and funds.
+            <br />
+            You should always have a backup copy of it.
+            <br />
+            <strong>Never, ever share</strong> your Secret Phrase, not even with
+            Vigvam!
+          </p>
+
+          <Button
+            theme="secondary"
+            className={classNames(
+              "flex !justify-start items-center",
+              "text-left",
+              "!px-3 !py-2 mr-auto"
+            )}
+            onClick={() => setRevealModalOpened(true)}
+          >
+            <RevealIcon className="w-[1.625rem] h-auto mr-3" />
+            Reveal
+          </Button>
+
+          <Separator className="mt-6 mb-8" />
+        </>
+      )}
+
+      <SettingsHeader className="!mb-3">Privacy</SettingsHeader>
+
+      <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+        Read more about our{" "}
+        <a
+          href="https://vigvam.app/privacy"
+          target="_blank"
+          rel="nofollow noreferrer"
+          className="underline"
+        >
+          privacy here
+        </a>
+        .
+      </p>
+
+      <Switcher
+        id="analytics"
+        label={
+          <>
+            Analytics
+            <p className="text-xs text-brand-placeholder max-w-[18.75rem]">
+              Anonymous. Help us make Vigvam better.
+            </p>
+          </>
+        }
+        text={analytics.enabled ? "Enabled" : "Disabled"}
+        checked={analytics.enabled}
+        onCheckedChange={hanldeAnalyticsChange}
+        className="min-w-[17.75rem]"
+      />
+
       {/* <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>
       <Switcher
@@ -54,6 +121,7 @@ const Security: FC = () => {
         onCheckedChange={setPhishing}
         className="mt-3 min-w-[20rem]"
       /> */}
+
       {revealModalOpened && (
         <SeedPhraseModal
           open={true}

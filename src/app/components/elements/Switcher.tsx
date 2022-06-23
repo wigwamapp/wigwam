@@ -1,16 +1,17 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import classNames from "clsx";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 
 interface SwitcherProps {
   id?: string;
-  label?: string;
+  label?: ReactNode;
   text: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   className?: string;
   disabled?: boolean;
 }
+
 const Switcher: FC<SwitcherProps> = ({
   id = "switcher",
   label,
@@ -26,10 +27,8 @@ const Switcher: FC<SwitcherProps> = ({
         className={classNames(
           "mx-4 mb-2",
           "text-base font-normal",
-          "text-brand-gray",
-          "cursor-pointer"
+          "text-brand-gray"
         )}
-        htmlFor={id}
       >
         {label}
       </label>
