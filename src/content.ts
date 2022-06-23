@@ -25,10 +25,27 @@ function initMsgGateway(injected: Promise<void>) {
       return;
     }
 
-    console.error(
+    const msg =
       "Vigvam: Provider disconnected." +
-        " A page reload is required to reestablish the connection."
-    );
+      " A page reload is required to reestablish the connection to Web3.";
+
+    console.error(msg);
+
+    const el = document.createElement("div");
+    Object.assign(el.style, {
+      position: "fixed",
+      right: "16px",
+      bottom: "16px",
+      padding: "8px 16px",
+      fontSize: "14px",
+      color: "#B7BCD0",
+      backgroundColor: "rgba(0, 0, 0,0.9)",
+      borderRadius: "4px",
+      maxWidth: "280px",
+    });
+    el.textContent = msg;
+
+    document.body.appendChild(el);
   };
 
   // Redirect messages: Background --> Injected
