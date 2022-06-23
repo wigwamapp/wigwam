@@ -14,12 +14,7 @@ import {
   EthSubscription,
   SendSyncJsonRpcRequest,
 } from "core/types/rpc";
-import {
-  JSONRPC,
-  VIGVAM_STATE,
-  ETH_SUBSCRIPTION,
-  AUTHORIZED_RPC_METHODS,
-} from "core/common/rpc";
+import { JSONRPC, VIGVAM_STATE, AUTHORIZED_RPC_METHODS } from "core/common/rpc";
 
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
