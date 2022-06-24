@@ -2,6 +2,7 @@ import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
+import { replaceT } from "lib/ext/i18n";
 
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
@@ -133,7 +134,7 @@ type AddProfileDialogProps = SecondaryModalProps & {
 const AddProfileDialog = memo<AddProfileDialogProps>(
   ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
     const defaultNameValue = useMemo(
-      () => `Profile ${profilesLength + 1}`,
+      () => `{{profile}} ${profilesLength + 1}`,
       [profilesLength]
     );
 
@@ -146,7 +147,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
       >
         <ProfileGen
           className="justify-center"
-          defaultProfileName={defaultNameValue}
+          defaultProfileName={replaceT(defaultNameValue)}
           onSubmit={handleAddProfile}
           label="Name"
         />
