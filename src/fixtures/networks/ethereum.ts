@@ -6,6 +6,7 @@ export const ETHEREUM: Network[] = [
     chainId: 1,
     type: "mainnet",
     rpcUrls: [
+      "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
       "https://cloudflare-eth.com",
       "https://eth-mainnet.public.blastapi.io",
       "https://rpc.ankr.com/eth",
@@ -14,7 +15,6 @@ export const ETHEREUM: Network[] = [
       "https://ethereumnodelight.app.runonflux.io",
       "https://main-rpc.linkpool.io",
       "https://api.mycryptoapi.com/eth",
-      "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
     ],
     chainTag: "ethereum",
     name: "Ethereum",
@@ -36,7 +36,7 @@ export const ETHEREUM: Network[] = [
     type: "testnet",
     rpcUrls: [
       "https://kovan.poa.network",
-      "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "https://kovan.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "ethereum",
     name: "Ethereum Testnet Kovan",
@@ -57,7 +57,7 @@ export const ETHEREUM: Network[] = [
   {
     chainId: 3,
     type: "testnet",
-    rpcUrls: ["https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"],
+    rpcUrls: ["https://ropsten.infura.io/v3/${INFURA_API_KEY}"],
     chainTag: "ethereum",
     name: "Ethereum Testnet Ropsten",
     nativeCurrency: {
@@ -74,7 +74,7 @@ export const ETHEREUM: Network[] = [
   {
     chainId: 4,
     type: "testnet",
-    rpcUrls: ["https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"],
+    rpcUrls: ["https://rinkeby.infura.io/v3/${INFURA_API_KEY}"],
     chainTag: "ethereum",
     name: "Ethereum Testnet Rinkeby",
     nativeCurrency: {
@@ -97,7 +97,7 @@ export const ETHEREUM: Network[] = [
     type: "testnet",
     rpcUrls: [
       "https://rpc.goerli.mudit.blog",
-      "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "https://goerli.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "ethereum",
     name: "Ethereum Testnet Goerli",

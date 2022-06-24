@@ -8,7 +8,7 @@ export const ARBITRUM: Network[] = [
     rpcUrls: [
       "https://arb1.arbitrum.io/rpc",
       "https://rpc.ankr.com/arbitrum",
-      "https://arbitrum-mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "https://arbitrum-mainnet.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "arbitrum",
     name: "Arbitrum One",
