@@ -13,6 +13,7 @@ export type TooltipProps = {
   asChild?: boolean;
   missSingleton?: boolean;
   className?: string;
+  tooltipClassName?: string;
 } & Omit<TippyProps, "appendTo">;
 
 const Tooltip: FC<TooltipProps> = ({
@@ -25,6 +26,7 @@ const Tooltip: FC<TooltipProps> = ({
   asChild = false,
   missSingleton,
   className,
+  tooltipClassName,
   children,
   delay = [100, 50],
   duration = [100, 50],
@@ -41,7 +43,8 @@ const Tooltip: FC<TooltipProps> = ({
             className={classNames(
               "text-white text-xs",
               "border border-white/5",
-              getSizeClasses(size)
+              getSizeClasses(size),
+              tooltipClassName
             )}
           >
             {content}

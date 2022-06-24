@@ -43,7 +43,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
 
     return (
       <>
-        <TabHeader tooltip="Advanced settings">Advanced settings</TabHeader>
+        <TabHeader>Advanced settings</TabHeader>
 
         <PlusMinusInput
           label="Gas Limit"
@@ -51,7 +51,12 @@ const AdvancedTab = memo<AdvancedTabProps>(
           thousandSeparator
           decimalScale={0}
           name="gasLimit"
-          tooltip="Gas Limit"
+          tooltip={
+            <>
+              Gas limit is the maximum units of gas you are willing to use.
+              Units of gas are a multiplier to “Max priority fee” and “Max fee”.
+            </>
+          }
           value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
           onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("gasLimit", e.target.value)}
@@ -83,7 +88,12 @@ const AdvancedTab = memo<AdvancedTabProps>(
           thousandSeparator
           decimalScale={0}
           name="nonce"
-          tooltip="Nonce"
+          tooltip={
+            <>
+              The nonce is the number of transactions sent from a given address.
+              Each time you send a transaction, the nonce value increases by 1.
+            </>
+          }
           value={formatUnits(overrides.nonce ?? tx.nonce)}
           onChange={(e) => changeValue("nonce", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("nonce", e.target.value)}
@@ -112,7 +122,12 @@ const AdvancedTab = memo<AdvancedTabProps>(
         <LongTextField
           label="Data"
           readOnly
-          tooltip="Data"
+          tooltip={
+            <>
+              The byte representation of the data that will be sent to a smart
+              contract.
+            </>
+          }
           value={ethers.utils.hexlify(tx.data ?? "0x00")}
           textareaClassName="!h-36 mb-3"
         />
@@ -120,7 +135,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
         <LongTextField
           label="Raw transaction"
           readOnly
-          tooltip="Raw transaction"
+          tooltip={<>The byte representation of the complete transaction.</>}
           value={rawTx}
           textareaClassName="!h-48"
         />

@@ -90,7 +90,7 @@ const FeeTab = memo<FeeTabProps>(
 
     return (
       <>
-        <TabHeader tooltip="Edit network fee">Edit network fee</TabHeader>
+        <TabHeader>Edit network fee</TabHeader>
         {fees && averageGasLimit && maxFee && averageFee && (
           <FeeModeSelect
             accountAddress={accountAddress}
@@ -113,7 +113,14 @@ const FeeTab = memo<FeeTabProps>(
               thousandSeparator
               decimalScale={9}
               currency="GWEI"
-              tooltip="Max base fee"
+              tooltip={
+                <>
+                  When your transaction gets included in the block, any
+                  difference between your max base fee and the actual base fee
+                  will be refunded. Total amount is calculated as max base fee
+                  (in GWEI) * gas limit.
+                </>
+              }
               value={formatUnits(
                 overrides.maxFeePerGas ?? tx.maxFeePerGas,
                 "gwei"
@@ -158,7 +165,12 @@ const FeeTab = memo<FeeTabProps>(
               thousandSeparator
               decimalScale={9}
               currency="GWEI"
-              tooltip="Priority fee"
+              tooltip={
+                <>
+                  Priority fee (aka “miner tip”) goes directly to miners and
+                  incentivizes them to prioritize your transaction.
+                </>
+              }
               value={formatUnits(
                 overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
                 "gwei"
@@ -203,10 +215,17 @@ const FeeTab = memo<FeeTabProps>(
           <PlusMinusInput
             label="Gas Price"
             placeholder="0.00"
+            className="mb-4"
             thousandSeparator
             decimalScale={9}
             currency="GWEI"
-            tooltip="Gas Price"
+            tooltip={
+              <>
+                This network requires a “Gas price” field when submitting a
+                transaction. Gas price is the amount you will pay pay per unit
+                of gas.
+              </>
+            }
             value={formatUnits(overrides.gasPrice ?? tx.gasPrice, "gwei")}
             onChange={(e) =>
               changeValue("gasPrice", parseUnits(e.target.value, "gwei"))

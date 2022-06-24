@@ -129,6 +129,7 @@ const Input = memo(
                       content={tooltip}
                       {...tooltipProps}
                       className="ml-2"
+                      tooltipClassName="max-w-[20rem]"
                     >
                       <TooltipIcon className="!w-4 !h-4" />
                     </Tooltip>
