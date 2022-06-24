@@ -7,17 +7,20 @@ export const ARBITRUM: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://arb1.arbitrum.io/rpc",
+      "https://rpc.ankr.com/arbitrum",
       "https://arbitrum-mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
     ],
     chainTag: "arbitrum",
-    name: "Arbitrum",
+    name: "Arbitrum One",
     nativeCurrency: {
       symbol: "AETH",
       name: "Ether",
       decimals: 18,
     },
     explorerUrls: ["https://arbiscan.io", "https://explorer.arbitrum.io"],
+    explorerApiUrl: "https://api.arbiscan.io/api",
     faucetUrls: [],
+    bridgesUrls: ["https://bridge.arbitrum.io"],
     infoUrl: "https://arbitrum.io",
   },
 
@@ -33,8 +36,13 @@ export const ARBITRUM: Network[] = [
       name: "Arbitrum Rinkeby Ether",
       decimals: 18,
     },
-    explorerUrls: ["https://rinkeby-explorer.arbitrum.io"],
-    faucetUrls: [],
+    explorerUrls: [
+      "https://testnet.arbiscan.io",
+      "https://rinkeby-explorer.arbitrum.io",
+    ],
+    explorerApiUrl: "https://api-testnet.arbiscan.io/api",
+    faucetUrls: ["https://fauceth.komputing.org/?chain=421611"],
+    bridgesUrls: ["https://bridge.arbitrum.io"],
     infoUrl: "https://arbitrum.io",
   },
 ];

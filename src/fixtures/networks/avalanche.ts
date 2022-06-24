@@ -5,7 +5,11 @@ export const AVALANCHE: Network[] = [
   {
     chainId: 43114,
     type: "mainnet",
-    rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+    rpcUrls: [
+      "https://api.avax.network/ext/bc/C/rpc",
+      "https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc",
+      "https://rpc.ankr.com/avalanche",
+    ],
     chainTag: "avalanche",
     name: "Avalanche",
     nativeCurrency: {
@@ -13,8 +17,12 @@ export const AVALANCHE: Network[] = [
       name: "Avalanche",
       decimals: 18,
     },
-    explorerUrls: ["https://cchain.explorer.avax.network"],
-    faucetUrls: ["https://free-online-app.com/faucet-for-eth-evm-chains/"],
+    explorerUrls: [
+      "https://snowtrace.io",
+      "https://cchain.explorer.avax.network",
+    ],
+    explorerApiUrl: "https://api.snowtrace.io/api",
+    faucetUrls: [],
     infoUrl: "https://www.avax.network/",
   },
 
@@ -31,6 +39,7 @@ export const AVALANCHE: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://testnet.snowtrace.io"],
+    explorerApiUrl: "https://api-testnet.snowtrace.io/api",
     faucetUrls: ["https://faucet.avax-test.network/"],
     infoUrl: "https://cchain.explorer.avax-test.network",
   },

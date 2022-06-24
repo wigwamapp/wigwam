@@ -5,7 +5,7 @@ export const CELO: Network[] = [
   {
     chainId: 42220,
     type: "mainnet",
-    rpcUrls: ["https://forno.celo.org"],
+    rpcUrls: ["https://forno.celo.org", "https://rpc.ankr.com/celo"],
     chainTag: "celo",
     name: "Celo",
     nativeCurrency: {
@@ -14,7 +14,8 @@ export const CELO: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://explorer.celo.org"],
-    faucetUrls: ["https://free-online-app.com/faucet-for-eth-evm-chains/"],
+    explorerApiUrl: "https://explorer.celo.org/api",
+    faucetUrls: [],
     infoUrl: "https://docs.celo.org/",
   },
 
@@ -30,27 +31,26 @@ export const CELO: Network[] = [
       name: "CELO",
       decimals: 18,
     },
+    explorerUrls: ["https://alfajores-blockscout.celo-testnet.org"],
+    explorerApiUrl: "https://alfajores-blockscout.celo-testnet.org/api",
     faucetUrls: [
       "https://celo.org/developers/faucet",
       "https://cauldron.pretoriaresearchlab.io/alfajores-faucet",
     ],
     infoUrl: "https://docs.celo.org/",
   },
-  {
-    chainId: 62320,
-    type: "testnet",
-    rpcUrls: ["https://baklava-forno.celo-testnet.org"],
-    chainTag: "celo",
-    name: "Celo Testnet Baklava",
-    nativeCurrency: {
-      symbol: "CELO",
-      name: "CELO",
-      decimals: 18,
-    },
-    faucetUrls: [
-      "https://docs.google.com/forms/d/e/1FAIpQLSdfr1BwUTYepVmmvfVUDRCwALejZ-TUva2YujNpvrEmPAX2pg/viewform",
-      "https://cauldron.pretoriaresearchlab.io/baklava-faucet",
-    ],
-    infoUrl: "https://docs.celo.org/",
-  },
+  // {
+  //   chainId: 62320,
+  //   type: "testnet",
+  //   rpcUrls: ["https://baklava-forno.celo-testnet.org"],
+  //   chainTag: "celo",
+  //   name: "Celo Testnet Baklava",
+  //   nativeCurrency: {
+  //     symbol: "CELO",
+  //     name: "CELO",
+  //     decimals: 18,
+  //   },
+  //   faucetUrls: ["https://cauldron.pretoriaresearchlab.io/baklava-faucet"],
+  //   infoUrl: "https://docs.celo.org/",
+  // },
 ];

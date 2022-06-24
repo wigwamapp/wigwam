@@ -11,8 +11,10 @@ export interface Network {
   };
   ensRegistry?: string;
   explorerUrls?: string[];
+  explorerApiUrl?: string;
   iconUrls?: string[];
   faucetUrls?: string[];
+  bridgesUrls?: string[];
   infoUrl?: string;
   position?: number;
 }

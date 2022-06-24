@@ -5,7 +5,16 @@ export const HARMONY: Network[] = [
   {
     chainId: 1666600000,
     type: "mainnet",
-    rpcUrls: ["https://api.harmony.one"],
+    rpcUrls: [
+      "https://api.harmony.one",
+      "https://harmony-mainnet.chainstacklabs.com",
+      "https://rpc.ankr.com/harmony",
+      "https://harmony-0-rpc.gateway.pokt.network",
+      "https://api.fuzz.fi",
+      "https://rpc.hermesdefi.io",
+      "https://api.s0.t.hmny.io",
+      "https://a.api.s0.t.hmny.io",
+    ],
     chainTag: "harmony",
     name: "Harmony One",
     nativeCurrency: {
@@ -14,7 +23,7 @@ export const HARMONY: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://explorer.harmony.one"],
-    faucetUrls: ["https://free-online-app.com/faucet-for-eth-evm-chains/"],
+    faucetUrls: [],
     infoUrl: "https://www.harmony.one/",
   },
 
@@ -32,20 +41,6 @@ export const HARMONY: Network[] = [
     },
     explorerUrls: ["https://explorer.pops.one"],
     faucetUrls: ["https://faucet.pops.one"],
-    infoUrl: "https://www.harmony.one/",
-  },
-  {
-    chainId: 1666700001,
-    type: "testnet",
-    rpcUrls: ["https://api.s1.b.hmny.io"],
-    chainTag: "harmony",
-    name: "Harmony Testnet Shard 1",
-    nativeCurrency: {
-      symbol: "ONE",
-      name: "ONE",
-      decimals: 18,
-    },
-    faucetUrls: [],
     infoUrl: "https://www.harmony.one/",
   },
 ];
