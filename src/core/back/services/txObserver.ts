@@ -39,7 +39,7 @@ export async function startTxObserver() {
               }
               return res.result;
             },
-            { retries: 3, maxRetryTime: 1_000 }
+            { retries: 3, maxTimeout: 1_000 }
           );
 
           const toUpdate = {

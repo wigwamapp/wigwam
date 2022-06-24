@@ -11,6 +11,7 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
+import retry from "async-retry";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 
@@ -23,7 +24,7 @@ import {
 } from "core/types";
 import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
-import { isSmartContractAddress, matchTxAction } from "core/common/transaction";
+import { matchTxAction } from "core/common/transaction";
 
 import {
   OverflowProvider,
@@ -100,8 +101,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const [tabValue, setTabValue] = useState<TabValue>("details");
   const [feeMode, setFeeMode] = useState<FeeMode>("average");
   const [estimating, setEstimating] = useState(false);
-  const [lastError, setLastError] = useState<any>(null);
+  const [lastError, setLastError] = useState<{
+    from: "estimation" | "submit";
+    error: any;
+  } | null>(null);
   const [approving, setApproving] = useState(false);
+
+  const approvingRef = useRef(approving);
+  if (approvingRef.current !== approving) {
+    approvingRef.current = approving;
+  }
 
   const [prepared, setPrepared] = useState<{
     tx: Tx;
@@ -179,7 +188,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const estimateTx = useCallback(
     () =>
       withThrottle(async () => {
-        if (approving) return;
+        if (approvingRef.current) return;
 
         setEstimating(true);
 
@@ -196,23 +205,34 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           const [tx, destinationIsContract] = await Promise.all([
             // Prepare transaction with other fields
-            provider.getUncheckedSigner(account.address).populateTransaction({
-              ...rest,
-              type: bnify(rest?.type)?.toNumber(),
-              chainId: bnify(rest?.chainId)?.toNumber(),
-              ...(feeSuggestions?.type === "modern"
-                ? {
-                    maxFeePerGas: feeSuggestions.modes.low.max,
-                    maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
-                  }
-                : feeSuggestions?.type === "legacy"
-                ? {
-                    gasPrice: feeSuggestions.modes.low.max,
-                  }
-                : {}),
-            }),
+            retry(
+              () =>
+                provider
+                  .getUncheckedSigner(account.address)
+                  .populateTransaction({
+                    ...rest,
+                    type: bnify(rest?.type)?.toNumber(),
+                    chainId: bnify(rest?.chainId)?.toNumber(),
+                    ...(feeSuggestions?.type === "modern"
+                      ? {
+                          maxFeePerGas: feeSuggestions.modes.low.max,
+                          maxPriorityFeePerGas:
+                            feeSuggestions.modes.low.priority,
+                        }
+                      : feeSuggestions?.type === "legacy"
+                      ? {
+                          gasPrice: feeSuggestions.modes.low.max,
+                        }
+                      : {}),
+                  }),
+              { retries: 2, minTimeout: 0, maxTimeout: 0 }
+            ),
+            false,
+            // TODO: Add logic for this
             // Check is destination is smart contract
-            txParams.to ? isSmartContractAddress(provider, txParams.to) : false,
+            // txParams.to
+            //   ? isSmartContractAddress(provider, txParams.to)
+            //   : false,
           ]);
 
           delete tx.from;
@@ -236,7 +256,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           });
         } catch (err) {
           console.error(err);
-          setLastError(err);
+          setLastError({ from: "estimation", error: err });
         }
 
         setEstimating(false);
@@ -246,7 +266,6 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       setEstimating,
       setPrepared,
       setLastError,
-      approving,
       provider,
       account.address,
       txParams,
@@ -315,7 +334,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             return;
           }
 
-          if (!finalTx) return;
+          if (!finalTx) {
+            if (lastError) throw lastError.error;
+            return;
+          }
 
           const gasBalance = await provider.getBalance(account.address);
           const totalGas = ethers.BigNumber.from(finalTx.gasLimit)
@@ -381,7 +403,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         });
       } catch (err) {
         console.error(err);
-        setLastError(err);
+        setLastError({ from: "submit", error: err });
       } finally {
         setApproving(false);
       }
@@ -389,6 +411,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [
       approval,
       account,
+      lastError,
       setLastError,
       setApproving,
       finalTx,
@@ -405,7 +428,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   return (
     <ApprovalLayout
-      approveText={lastError ? "Retry" : "Approve"}
+      approveText={lastError?.from === "submit" ? "Retry" : "Approve"}
       onApprove={handleApprove}
       disabled={estimating}
       approving={approving}
@@ -425,7 +448,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           values={TAB_VALUES}
           currentValue={tabValue}
           names={TAB_NAMES}
-          withError={lastError}
+          withError={Boolean(lastError)}
           oneSuccess={Boolean(prepared)}
         />
 
@@ -504,8 +527,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     readOnly
                     textareaClassName="!h-48"
                     value={
-                      lastError?.reason ||
-                      lastError?.message ||
+                      lastError?.error.reason ||
+                      lastError?.error.message ||
                       "Unknown error."
                     }
                   />
