@@ -127,5 +127,5 @@ export async function addFindTokenRequest(
     console.error(err);
   }
 
-  synced(chainId);
+  setTimeout(() => synced(chainId), 500);
 }

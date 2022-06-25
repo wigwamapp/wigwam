@@ -633,7 +633,7 @@ const AssetInfo: FC = () => {
                           href={explorerLink.address(address)}
                         />
                       )}
-                      {coinGeckoId && (
+                      {currentNetwork?.type === "mainnet" && coinGeckoId && (
                         <IconedButton
                           aria-label="View asset in CoinGecko"
                           Icon={CoinGeckoIcon}

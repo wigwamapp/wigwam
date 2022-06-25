@@ -12,9 +12,11 @@ import {
 } from "core/types";
 import * as repo from "core/repo";
 import { createAccountTokenKey, NATIVE_TOKEN_SLUG } from "core/common/tokens";
+import { matchTokenTransferEvents } from "core/common/transaction";
 
 import { sendRpc } from "../rpc";
 import { isUnlocked } from "../state";
+import { addFindTokenRequest } from "../sync";
 
 export async function startTxObserver() {
   schedule(5_000, async () => {
@@ -59,6 +61,23 @@ export async function startTxObserver() {
             const skippedHashes = findSkippedTxs(tx, pendingTxs);
             for (const hash of skippedHashes) {
               completeHashes.add(hash);
+            }
+
+            if (!isFailedStatus(result)) {
+              try {
+                const transfers = matchTokenTransferEvents(result.logs);
+                for (const transfer of transfers) {
+                  if (transfer.to === tx.accountAddress) {
+                    addFindTokenRequest(
+                      tx.chainId,
+                      tx.accountAddress,
+                      transfer.tokenSlug
+                    );
+                  }
+                }
+              } catch (err) {
+                console.error(err);
+              }
             }
           }
 
@@ -144,5 +163,9 @@ function unwrapRpcResponse(res: RpcResponse) {
 }
 
 function isFailedOrSkippedTx(tx: TransactionActivity) {
-  return !tx.result || ethers.BigNumber.from(tx.result.status).isZero();
+  return !tx.result || isFailedStatus(tx.result);
+}
+
+function isFailedStatus(result: TxReceipt) {
+  return ethers.BigNumber.from(result.status).isZero();
 }
