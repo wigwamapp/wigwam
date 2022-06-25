@@ -1,4 +1,13 @@
-import { FC, memo, ReactNode, Suspense, useCallback, useMemo } from "react";
+import {
+  FC,
+  forwardRef,
+  memo,
+  ReactNode,
+  Suspense,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
@@ -19,11 +28,15 @@ import {
   activityModalAtom,
   allAccountsAtom,
   approvalStatusAtom,
-  getActivityAtom,
   getNetworkAtom,
   pendingActivityAtom,
 } from "app/atoms";
-import { OverflowProvider, useExplorerLink } from "app/hooks";
+import { LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
+import {
+  OverflowProvider,
+  useCompleteActivity,
+  useExplorerLink,
+} from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
@@ -92,7 +105,7 @@ const ActivityModal = memo(() => {
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",
-                  "pb-28"
+                  "pb-[3.25rem]"
                 )}
                 type="scroll"
               >
@@ -115,17 +128,23 @@ const ActivityModal = memo(() => {
 export default ActivityModal;
 
 const ActivityContent = memo(() => {
-  const approvalStatus = useAtomValue(approvalStatusAtom);
+  return (
+    <div className="w-[59rem] mx-auto h-full pt-16 flex flex-col">
+      <Approve />
+      <History />
+    </div>
+  );
+});
 
-  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
-  const completeActivities = useLazyAtomValue(getActivityAtom({}));
+const Approve = memo(() => {
+  const approvalStatus = useAtomValue(approvalStatusAtom);
 
   const handleApprove = useCallback(() => {
     browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
   }, []);
 
   return (
-    <div className="w-[59rem] mx-auto h-full pt-16 flex flex-col">
+    <>
       {approvalStatus.total > 0 && (
         <div
           className={classNames(
@@ -160,38 +179,82 @@ const ActivityContent = memo(() => {
           </Button>
         </div>
       )}
+    </>
+  );
+});
 
-      {pendingActivities && pendingActivities?.length > 0 && (
+const History = memo(() => {
+  const pendingActivity = useLazyAtomValue(pendingActivityAtom);
+  const {
+    activity: completeActivity,
+    hasMore,
+    loadMore,
+  } = useCompleteActivity();
+
+  const observer = useRef<IntersectionObserver>();
+  const loadMoreTriggerAssetRef = useCallback(
+    (node) => {
+      if (!completeActivity) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [completeActivity, hasMore, loadMore]
+  );
+
+  return (
+    <>
+      {pendingActivity && pendingActivity?.length > 0 && (
         <div className="mb-8">
           <SectionHeader className="mb-6">Pending</SectionHeader>
 
-          {pendingActivities.map((item) => (
+          {pendingActivity.map((item) => (
             <ActivityCard key={item.id} item={item} className="mb-4" />
           ))}
         </div>
       )}
 
-      {completeActivities && completeActivities?.length > 0 && (
+      {completeActivity && completeActivity?.length > 0 && (
         <div className="mb-8">
           <SectionHeader className="mb-6">Complete</SectionHeader>
 
-          {completeActivities.map((item) => (
-            <ActivityCard key={item.id} item={item} className="mb-4" />
+          {completeActivity.map((item, i) => (
+            <ActivityCard
+              key={item.id}
+              ref={
+                i ===
+                completeActivity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
+                  ? loadMoreTriggerAssetRef
+                  : null
+              }
+              item={item}
+              className="mb-4"
+            />
           ))}
         </div>
       )}
 
-      {pendingActivities &&
-        completeActivities &&
-        pendingActivities.length === 0 &&
-        completeActivities.length === 0 && (
+      {pendingActivity &&
+        completeActivity &&
+        pendingActivity.length === 0 &&
+        completeActivity.length === 0 && (
           <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
             <h3 className="text-2xl text-brand-inactivedark">
               No activity yet
             </h3>
           </div>
         )}
-    </div>
+    </>
   );
 });
 
@@ -200,66 +263,69 @@ type ActivityCardProps = {
   className?: string;
 };
 
-const ActivityCard = memo<ActivityCardProps>(({ item, className }) => {
-  return (
-    <div
-      className={classNames(
-        "w-full h-20",
-        "bg-brand-inactivelight/5",
-        "border",
-        item.pending ? "border-[#D99E2E]/50" : "border-brand-inactivedark/25",
-        item.pending && "animate-pulse",
-        "rounded-2xl",
-        "flex items-center",
-        "py-3 px-6",
-        className
-      )}
-    >
-      <ActivityIcon item={item} className="mr-6" />
+const ActivityCard = memo(
+  forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={classNames(
+          "w-full h-20",
+          "bg-brand-inactivelight/5",
+          "border",
+          item.pending ? "border-[#D99E2E]/50" : "border-brand-inactivedark/25",
+          item.pending && "animate-pulse",
+          "rounded-2xl",
+          "flex items-center",
+          "py-3 px-6",
+          className
+        )}
+      >
+        <ActivityIcon item={item} className="mr-6" />
 
-      <ActivityCardCol label="Type" className="w-[6rem] mr-8">
-        <div
-          className={classNames(
-            "text-sm font-semibold text-brand-inactivelight"
-          )}
-        >
-          {capitalize(item.type)}
-        </div>
-      </ActivityCardCol>
-
-      {item.source.type === "page" && (
-        <ActivityCardCol label="Website" className="w-[10rem] mr-8">
-          <ActivityWebsiteLink source={item.source} />
+        <ActivityCardCol label="Type" className="w-[6rem] mr-8">
+          <div
+            className={classNames(
+              "text-sm font-semibold text-brand-inactivelight"
+            )}
+          >
+            {capitalize(item.type)}
+          </div>
         </ActivityCardCol>
-      )}
 
-      {(item.type === ActivityType.Transaction ||
-        item.type === ActivityType.Signing) && (
-        <ActivityCardCol label="Wallet" className="w-[10rem] mr-8">
-          <ActivityWalletCard accountAddress={item.accountAddress} />
-        </ActivityCardCol>
-      )}
+        {item.source.type === "page" && (
+          <ActivityCardCol label="Website" className="w-[10rem] mr-8">
+            <ActivityWebsiteLink source={item.source} />
+          </ActivityCardCol>
+        )}
 
-      {item.type === ActivityType.Transaction && (
-        <ActivityCardCol label="Network" className="w-[10rem] mr-8">
-          <ActivityNetworkCard chainId={item.chainId} />
-        </ActivityCardCol>
-      )}
+        {(item.type === ActivityType.Transaction ||
+          item.type === ActivityType.Signing) && (
+          <ActivityCardCol label="Wallet" className="w-[10rem] mr-8">
+            <ActivityWalletCard accountAddress={item.accountAddress} />
+          </ActivityCardCol>
+        )}
 
-      <div className={classNames("flex-1 h-full", "flex flex-col items-end")}>
-        <div className="flex-1 flex items-center">
-          {item.type === ActivityType.Transaction && (
-            <ActivityTxActions item={item} />
-          )}
-        </div>
+        {item.type === ActivityType.Transaction && (
+          <ActivityCardCol label="Network" className="w-[10rem] mr-8">
+            <ActivityNetworkCard chainId={item.chainId} />
+          </ActivityCardCol>
+        )}
 
-        <div className="text-xs mt-1 text-brand-inactivedark">
-          <PrettyDate date={item.timeAt} />
+        <div className={classNames("flex-1 h-full", "flex flex-col items-end")}>
+          <div className="flex-1 flex items-center">
+            {item.type === ActivityType.Transaction && (
+              <ActivityTxActions item={item} />
+            )}
+          </div>
+
+          <div className="text-xs mt-1 text-brand-inactivedark">
+            <PrettyDate date={item.timeAt} />
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  })
+);
 
 type ActivityIconProps = {
   item: Activity;
