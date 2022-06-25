@@ -253,7 +253,7 @@ export function matchTokenTransferEvents(
           }
         )
         // TODO: Implement for all token standards;
-        .run();
+        .otherwise(() => null);
     }
   }
 
