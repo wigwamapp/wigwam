@@ -75,6 +75,17 @@ export async function startTxObserver() {
     }
 
     await repo.activities.bulkPut(Array.from(txsToUpdate.values()));
+
+    await Promise.all(
+      Array.from(completeHashes).map((txHash) =>
+        repo.tokenActivities
+          .where({ txHash, pending: 1 })
+          .modify((tokenActivity) => {
+            tokenActivity.pending = 0;
+          })
+          .catch(() => undefined)
+      )
+    );
   });
 }
 

@@ -928,7 +928,9 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
                 decimals={tokenInfo?.decimals}
                 currency={tokenInfo?.symbol}
                 prefix={prefix}
-                isMinified={true}
+                isMinified={new BigNumber(10)
+                  .pow(tokenInfo?.decimals ?? 18)
+                  .lt(activity.amount ?? 0)}
                 copiable={true}
                 className={classNames("text-base font-bold", amountClassName)}
               />
@@ -975,9 +977,14 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               />
             )}
           </div>
-          <div className="text-xs mt-1 text-brand-inactivedark">
-            <PrettyDate date={activity.timeAt} />
-            {/*{getPrettyDate(activity.timeAt)}*/}
+          <div
+            className={classNames("text-xs mt-1", "text-brand-inactivedark")}
+          >
+            {activity.pending ? (
+              "Pending"
+            ) : (
+              <PrettyDate date={activity.timeAt} />
+            )}
           </div>
         </div>
       </div>
@@ -1018,11 +1025,13 @@ const ProjectLabel: FC<ProjectLabelProps> = ({ project, className }) => {
 };
 
 const getActivityInfo = (activity: TokenActivityPrimitive) => {
+  const pendingClassName = activity.pending ? "text-[#D99E2E]" : undefined;
+
   if (activity.type === "approve") {
     return {
       Icon: ActivityApproveIcon,
       prefix: null,
-      amountClassName: classNames("text-brand-main"),
+      amountClassName: pendingClassName ?? classNames("text-brand-main"),
       label: "Approve",
       anotherAddressLabel: "Operator",
     };
@@ -1041,7 +1050,7 @@ const getActivityInfo = (activity: TokenActivityPrimitive) => {
   return {
     Icon: ActivitySendIcon,
     prefix: "-",
-    amountClassName: "",
+    amountClassName: classNames(pendingClassName),
     label: activity.project ? "Interaction" : "Transfer",
     anotherAddressLabel: "Recipient",
   };

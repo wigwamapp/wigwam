@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { nanoid } from "nanoid";
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
@@ -12,10 +13,14 @@ import {
   ApprovalResult,
   Permission,
   TxParams,
+  TxActionType,
+  TokenActivity,
 } from "core/types";
+import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
-import * as repo from "core/repo";
+import { matchTxAction } from "core/common/transaction";
+import { createTokenActivityKey } from "core/common/tokens";
 
 import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
@@ -121,6 +126,7 @@ export async function processApprove(
 
           if ("result" in rpcRes) {
             const txHash = rpcRes.result;
+            const timeAt = Date.now();
 
             await Promise.all([
               saveNonce(chainId, accountAddress, tx.nonce),
@@ -133,9 +139,16 @@ export async function processApprove(
                 txParams,
                 rawTx: rawTx!,
                 txHash,
-                timeAt: Date.now(),
+                timeAt,
                 pending: 1,
               }),
+              saveTokenActivity(
+                txParams,
+                chainId,
+                accountAddress,
+                txHash,
+                timeAt
+              ),
             ]);
 
             rpcReply?.({ result: txHash });
@@ -207,6 +220,67 @@ async function saveActivity(activity: Activity) {
   try {
     // TODO: Add specific logic for speed-up or cancel tx
     await repo.activities.put(activity);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function saveTokenActivity(
+  txParams: TxParams,
+  chainId: number,
+  accountAddress: string,
+  txHash: string,
+  timeAt: number
+) {
+  try {
+    const action = matchTxAction(txParams);
+
+    if (action) {
+      const tokenActivities = new Map<string, TokenActivity>();
+      const addToActivities = (activity: TokenActivity) => {
+        const dbKey = createTokenActivityKey(activity);
+        tokenActivities.set(dbKey, activity);
+      };
+
+      const base = {
+        chainId,
+        accountAddress,
+        txHash,
+        pending: 1,
+        timeAt,
+      };
+
+      if (action.type === TxActionType.TokenTransfer) {
+        for (const { slug: tokenSlug, amount } of action.tokens) {
+          addToActivities({
+            ...base,
+            type: "transfer",
+            anotherAddress: action.toAddress,
+            amount: new BigNumber(amount).times(-1).toString(),
+            tokenSlug,
+          });
+        }
+      } else if (
+        action.type === TxActionType.TokenApprove &&
+        action.tokenSlug
+      ) {
+        addToActivities({
+          ...base,
+          type: "approve",
+          anotherAddress: action.toAddress,
+          tokenSlug: action.tokenSlug,
+          amount: action.amount,
+          clears: action.clears,
+        });
+      }
+
+      if (tokenActivities.size > 0) {
+        await repo.tokenActivities.bulkPut(
+          Array.from(tokenActivities.values()),
+          Array.from(tokenActivities.keys())
+        );
+      }
+    }
   } catch (err) {
     console.error(err);
   }

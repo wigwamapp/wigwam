@@ -67,8 +67,8 @@ export const syncTokenActivities = memoize(
 
         const getLatestItem = () =>
           repo.tokenActivities
-            .where("[chainId+accountAddress+tokenSlug]")
-            .equals([chainId, accountAddress, tokenSlug])
+            .where("[chainId+accountAddress+tokenSlug+pending]")
+            .equals([chainId, accountAddress, tokenSlug, 0])
             .reverse()
             .first();
 
@@ -129,6 +129,7 @@ export const syncTokenActivities = memoize(
                 accountAddress,
                 tokenSlug,
                 txHash,
+                pending: 0,
                 timeAt,
               };
 
@@ -220,8 +221,6 @@ export const syncTokenActivities = memoize(
 
         const { explorerApiUrl } = await getNetwork(chainId);
 
-        console.info({ explorerApiUrl });
-
         if (explorerApiUrl) {
           const nativeToken = token.standard === TokenStandard.Native;
           const latestItem = await getLatestItem();
@@ -251,6 +250,7 @@ export const syncTokenActivities = memoize(
             chainId,
             accountAddress,
             tokenSlug,
+            pending: 0,
           };
 
           for (const tx of txs) {
@@ -318,6 +318,7 @@ export const syncTokenActivities = memoize(
           chainId,
           accountAddress,
           tokenSlug,
+          pending: 0,
         };
 
         while (range < limit) {

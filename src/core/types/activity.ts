@@ -172,6 +172,7 @@ export interface TokenActivityBase {
   accountAddress: string;
   tokenSlug: string;
   txHash: string;
+  pending: number;
   timeAt: number;
   type: TokenActivityType;
   project?: TokenActivityProject;
