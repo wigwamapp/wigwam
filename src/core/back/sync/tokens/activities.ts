@@ -265,8 +265,10 @@ export const syncTokenActivities = memoize(
             }
 
             const [fromAddress, toAddress] = [tx.from, tx.to].map(
-              ethers.utils.getAddress
+              (a) => a && ethers.utils.getAddress(a)
             );
+            if (!fromAddress || !toAddress) continue;
+
             const income = accountAddress === toAddress;
 
             addToActivities({
