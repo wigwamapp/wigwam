@@ -238,16 +238,14 @@ export function matchTokenTransferEvents(
     const event = parseStandardTokenEvent(log);
 
     if (event) {
+      const address = ethStringify(log.address);
+
       match(event)
         .with(
           [TokenStandard.ERC20, { name: "Transfer" }],
           ([standard, { args }]) => {
             results.push({
-              tokenSlug: createTokenSlug({
-                standard,
-                address: log.address,
-                id: "0",
-              }),
+              tokenSlug: createTokenSlug({ standard, address, id: "0" }),
               from: ethStringify(args[0]),
               to: ethStringify(args[1]),
               amount: ethStringify(args[2]),
