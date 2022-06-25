@@ -889,6 +889,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
     const explorerLink = useExplorerLink(currentNetwork);
     const { copy, copied } = useCopyToClipboard(activity.txHash);
 
+    const amoutnBN = new BigNumber(activity.amount ?? 0);
     const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
       getActivityInfo(activity);
 
@@ -916,7 +917,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
             <Icon className="w-5 h-5 opacity-75" />
           </div>
           <div className="flex flex-col items-start">
-            {new BigNumber(activity.amount ?? 0).gte(LARGE_AMOUNT) ? (
+            {amoutnBN.gte(LARGE_AMOUNT) ? (
               <span
                 className={classNames("text-base font-bold", amountClassName)}
               >
@@ -924,13 +925,13 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               </span>
             ) : (
               <PrettyAmount
-                amount={new BigNumber(activity.amount ?? 0).abs()}
+                amount={amoutnBN.abs()}
                 decimals={tokenInfo?.decimals}
                 currency={tokenInfo?.symbol}
                 prefix={prefix}
-                isMinified={new BigNumber(10)
+                isDecimalsMinified={new BigNumber(10)
                   .pow(tokenInfo?.decimals ?? 18)
-                  .lt(activity.amount ?? 0)}
+                  .gt(amoutnBN.abs())}
                 copiable={true}
                 className={classNames("text-base font-bold", amountClassName)}
               />
