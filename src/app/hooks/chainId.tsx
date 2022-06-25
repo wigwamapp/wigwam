@@ -1,7 +1,7 @@
 import { FC, createContext, useContext, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
-import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
+import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
 
 import { sync, syncTokenActivities } from "core/client";
 
@@ -33,7 +33,7 @@ export function useIsSyncing() {
 }
 
 export function useSync(chainId: number, accountAddress: string) {
-  const windowFocused = useWindowFocus();
+  const isHidden = useDocumentVisibility();
 
   useEffect(() => {
     let t: any;
@@ -41,23 +41,23 @@ export function useSync(chainId: number, accountAddress: string) {
     const syncAndDefer = () => {
       sync(chainId, accountAddress);
 
-      t = setTimeout(syncAndDefer, 1_500);
+      t = setTimeout(syncAndDefer, 3_000);
     };
 
-    if (windowFocused) {
+    if (!isHidden) {
       t = setTimeout(syncAndDefer);
     }
 
     return () => clearTimeout(t);
-  }, [chainId, windowFocused, accountAddress]);
+  }, [chainId, isHidden, accountAddress]);
 }
 
 export function useTokenActivitiesSync(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug?: string
 ) {
-  const windowFocused = useWindowFocus();
+  const isHidden = useDocumentVisibility();
 
   useEffect(() => {
     let t: any;
@@ -65,13 +65,13 @@ export function useTokenActivitiesSync(
     const syncAndDefer = () => {
       tokenSlug && syncTokenActivities(chainId, accountAddress, tokenSlug);
 
-      t = setTimeout(syncAndDefer, 3_000);
+      t = setTimeout(syncAndDefer, 5_000);
     };
 
-    if (windowFocused) {
-      t = setTimeout(syncAndDefer, 1_500);
+    if (!isHidden) {
+      t = setTimeout(syncAndDefer, 500);
     }
 
     return () => clearTimeout(t);
-  }, [chainId, accountAddress, tokenSlug, windowFocused]);
+  }, [chainId, accountAddress, tokenSlug, isHidden]);
 }

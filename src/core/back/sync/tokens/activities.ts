@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import axios from "axios";
 import memoize from "mem";
 import BigNumber from "bignumber.js";
 import { ERC20__factory } from "abi-types";
@@ -10,6 +11,7 @@ import {
   TokenActivityBase,
   TokenStandard,
 } from "core/types";
+import { getNetwork } from "core/common";
 import {
   createAccountTokenKey,
   createTokenActivityKey,
@@ -41,6 +43,10 @@ export const syncTokenActivities = memoize(
         );
         if (!accountToken) return;
 
+        const decimalsFactor = new BigNumber(10).pow(
+          (accountToken as AccountAsset).decimals
+        );
+
         const tokenActivities = new Map<string, TokenActivity>();
         const blockNumbers = new Set<number>();
 
@@ -59,26 +65,49 @@ export const syncTokenActivities = memoize(
           blockNumbers.add(activity.timeAt);
         };
 
-        const debankChain = await getDebankChain(chainId);
-        if (debankChain) {
-          try {
-            const debankTokenId =
-              tokenSlug === NATIVE_TOKEN_SLUG
-                ? debankChain.native_token_id
-                : token.address.toLowerCase();
+        const getLatestItem = () =>
+          repo.tokenActivities
+            .where("[chainId+accountAddress+tokenSlug]")
+            .equals([chainId, accountAddress, tokenSlug])
+            .reverse()
+            .first();
 
+        /**
+         * Debank sync
+         */
+
+        const debankChain = await getDebankChain(chainId);
+
+        if (debankChain) {
+          const debankTokenId =
+            tokenSlug === NATIVE_TOKEN_SLUG
+              ? debankChain.native_token_id
+              : token.address.toLowerCase();
+
+          const latestItem = await getLatestItem();
+
+          const pageCount = 20;
+          const maxRequests = latestItem ? 10 : 5;
+          let startTime: number | undefined;
+
+          for (let i = 0; i < maxRequests; i++) {
             const { data } = await debankApi.get("/user/history_list", {
               params: {
                 id: accountAddress,
                 chain_id: debankChain.id,
                 token_id: debankTokenId,
-                page_count: 50,
+                page_count: pageCount,
+                start_time: startTime,
               },
             });
 
-            const decimalsFactor = new BigNumber(10).pow(
-              (accountToken as AccountAsset).decimals
-            );
+            const txs = data.history_list;
+
+            if (txs.length === 0) {
+              break;
+            }
+
+            let finished = false;
 
             for (const {
               id: txHash,
@@ -87,8 +116,14 @@ export const syncTokenActivities = memoize(
               token_approve,
               time_at,
               project_id,
-            } of data.history_list) {
+            } of txs) {
               const timeAt = time_at * 1_000;
+
+              if (latestItem && latestItem.timeAt >= timeAt) {
+                finished = true;
+                break;
+              }
+
               const base: Omit<TokenActivityBase, "type"> = {
                 chainId,
                 accountAddress,
@@ -162,21 +197,103 @@ export const syncTokenActivities = memoize(
               }
             }
 
-            if (tokenActivities.size > 0) {
-              await repo.tokenActivities.bulkPut(
-                Array.from(tokenActivities.values()),
-                Array.from(tokenActivities.keys())
-              );
+            if (finished) {
+              break;
+            } else {
+              startTime = txs[txs.length - 1].time_at;
+            }
+          }
+
+          if (tokenActivities.size > 0) {
+            await repo.tokenActivities.bulkPut(
+              Array.from(tokenActivities.values()),
+              Array.from(tokenActivities.keys())
+            );
+          }
+
+          return;
+        }
+
+        /**
+         * Explorer sync
+         */
+
+        const { explorerApiUrl } = await getNetwork(chainId);
+
+        console.info({ explorerApiUrl });
+
+        if (explorerApiUrl) {
+          const nativeToken = token.standard === TokenStandard.Native;
+          const latestItem = await getLatestItem();
+
+          const res = await withExplorerApiRequest(() =>
+            axios({
+              baseURL: explorerApiUrl,
+              params: {
+                module: "account",
+                action: nativeToken ? "txlist" : "tokentx",
+                ...(nativeToken ? {} : { contractaddress: token.address }),
+                address: accountAddress,
+                sort: "desc",
+                page: 1,
+                offset: 200,
+              },
+            })
+          );
+
+          const txs = res.data.result;
+
+          if (txs.length === 0) {
+            return;
+          }
+
+          const base = {
+            chainId,
+            accountAddress,
+            tokenSlug,
+          };
+
+          for (const tx of txs) {
+            const timeAt = new BigNumber(tx.timeStamp).times(1_000).toNumber();
+
+            if (latestItem && latestItem.timeAt >= timeAt) {
+              break;
             }
 
-            return;
-          } catch (err) {
-            console.error(err);
+            if (tx.value === "0" || tx.blockHash === "" || tx.isError === "1") {
+              continue;
+            }
 
-            tokenActivities.clear();
-            blockNumbers.clear();
+            const [fromAddress, toAddress] = [tx.from, tx.to].map(
+              ethers.utils.getAddress
+            );
+            const income = accountAddress === toAddress;
+
+            addToActivities({
+              ...base,
+              timeAt,
+              txHash: tx.hash,
+              type: "transfer",
+              anotherAddress: income ? fromAddress : toAddress,
+              amount: ethers.BigNumber.from(tx.value)
+                .mul(income ? 1 : -1)
+                .toString(),
+            });
           }
+
+          if (tokenActivities.size > 0) {
+            await repo.tokenActivities.bulkPut(
+              Array.from(tokenActivities.values()),
+              Array.from(tokenActivities.keys())
+            );
+          }
+
+          return;
         }
+
+        /**
+         * Chain sync (only for custom tokens)
+         */
 
         if (!GET_LOGS_ENABLED) return;
         if (token.standard !== TokenStandard.ERC20) return;
@@ -285,7 +402,24 @@ export const syncTokenActivities = memoize(
       }
     }),
   {
-    maxAge: 60_000,
+    maxAge: 40_000,
     cacheKey: (args) => args.join("_"),
   }
 );
+
+const enqueueExplorerApiRequest = createQueue();
+let explorerApiLimitTime: number | undefined;
+
+function withExplorerApiRequest<T>(factory: () => Promise<T>) {
+  return enqueueExplorerApiRequest(async () => {
+    if (explorerApiLimitTime) {
+      await new Promise((res) =>
+        setTimeout(res, explorerApiLimitTime! - Date.now())
+      );
+    }
+
+    explorerApiLimitTime = Date.now() + 5_000;
+
+    return factory();
+  });
+}

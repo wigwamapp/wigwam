@@ -539,11 +539,15 @@ const AssetInfo: FC = () => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
 
-  useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
-
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  useTokenActivitiesSync(
+    chainId,
+    currentAccount.address,
+    tokenInfo && tokenSlug
+  );
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
