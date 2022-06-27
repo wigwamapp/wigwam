@@ -17,6 +17,7 @@ export type PrettyAmountProps = {
   currency?: string;
   isFiat?: boolean;
   isMinified?: boolean;
+  isThousandsMinified?: boolean;
   isDecimalsMinified?: boolean;
   copiable?: boolean;
   asSpan?: boolean;
@@ -32,6 +33,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     currency,
     isFiat = false,
     isMinified = false,
+    isThousandsMinified = true,
     isDecimalsMinified = false,
     copiable = false,
     asSpan = false,
@@ -68,7 +70,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
     }
 
     const isShownIntTooltip =
-      integerPart.toString().length > (isMinified ? 3 : 6);
+      integerPart.toString().length >
+      (isMinified && isThousandsMinified ? 3 : 6);
 
     let tooltipContent = getPrettyAmount({
       value: isFiatMinified
@@ -79,7 +82,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: isMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
       locale: currentLocale,
       isFiat,
       currency,
@@ -93,7 +96,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: isMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
       locale: currentLocale,
       useGrouping: false,
       isDecimalsMinified,
@@ -107,7 +110,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: isMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
       locale: currentLocale,
       isFiat,
       currency,
@@ -117,7 +120,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     if (isShownIntTooltip) {
       content = getPrettyAmount({
         value: convertedAmount,
-        dec: isMinified ? 3 : 6,
+        dec: isMinified && isThousandsMinified ? 3 : 6,
         locale: currentLocale,
         isFiat,
         currency,
@@ -151,7 +154,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           isFiatDecimalsMinified ? 2 : decSplit,
           isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN
         ),
-        dec: isMinified ? 3 : undefined,
+        dec: isMinified && isThousandsMinified ? 3 : undefined,
         locale: currentLocale,
         threeDots,
         isFiat,
