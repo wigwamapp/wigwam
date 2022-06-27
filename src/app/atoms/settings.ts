@@ -2,7 +2,7 @@ import { atomWithGlobal, atomWithStorage } from "lib/atom-utils";
 
 import { Setting, AnalyticsState } from "core/common";
 
-export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, false);
+export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, true);
 
 export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
