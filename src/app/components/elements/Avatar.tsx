@@ -38,7 +38,7 @@ const Avatar = memo<AvatarProps>(
     return (
       <AvatarPrimitive.Root
         className={classNames(
-          "block",
+          "flex items-center justify-center",
           withBorder && [
             "rounded-full overflow-hidden",
             bgDisplayed && "bg-brand-main/10",
