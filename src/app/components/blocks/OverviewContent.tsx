@@ -54,6 +54,7 @@ import {
   useAccountToken,
   useAllAccountTokens,
 } from "app/hooks";
+import { ToastOverflowProvider } from "app/hooks/toast";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -85,8 +86,10 @@ import PrettyDate from "../elements/PrettyDate";
 import Avatar from "../elements/Avatar";
 
 const OverviewContent: FC = () => (
-  <div className="flex min-h-0 grow">
-    <TokenExplorer />
+  <div className="flex min-h-0 grow relative">
+    <ToastOverflowProvider>
+      <TokenExplorer />
+    </ToastOverflowProvider>
   </div>
 );
 
