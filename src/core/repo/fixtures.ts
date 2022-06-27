@@ -26,31 +26,17 @@ export async function setupFixtures() {
 }
 
 function mergeNetwork(saved: Network, toMerge: Network): Network {
-  const {
-    name,
-    chainTag,
-    infoUrl,
-    nativeCurrency,
-    rpcUrls,
-    faucetUrls,
-    explorerUrls,
-    position,
-  } = toMerge;
-
   return {
     ...saved,
     // Override
-    name,
-    chainTag,
-    infoUrl,
+    ...toMerge,
     nativeCurrency: {
       ...saved.nativeCurrency,
-      name: nativeCurrency.name,
+      name: toMerge.nativeCurrency.name,
     },
-    position,
+    position: toMerge.position,
     // Merge
-    rpcUrls: mergeNetworkUrls(saved.rpcUrls, rpcUrls)!,
-    faucetUrls: mergeNetworkUrls(saved.faucetUrls, faucetUrls),
-    explorerUrls: mergeNetworkUrls(saved.explorerUrls, explorerUrls),
+    rpcUrls: mergeNetworkUrls(saved.rpcUrls, toMerge.rpcUrls)!,
+    explorerUrls: mergeNetworkUrls(saved.explorerUrls, toMerge.explorerUrls),
   };
 }

@@ -95,8 +95,8 @@ function getFavicon(): string | null {
     document.querySelector('link[rel="icon"]') ||
     document.querySelector('link[rel="shortcut icon"]');
 
-  const { protocol, host } = document.location;
-  const href = el ? el.getAttribute("href") : null;
+  const { protocol, host, pathname } = document.location;
+  let href = el ? el.getAttribute("href") : null;
 
   if (!href || href.startsWith("javascript:")) {
     return null;
@@ -112,6 +112,10 @@ function getFavicon(): string | null {
 
   if (href.startsWith("//")) {
     return protocol + href;
+  }
+
+  if (!href.startsWith("/")) {
+    href = `${pathname.endsWith("/") ? pathname : `${pathname}/`}${href}`;
   }
 
   return `${protocol}//${host}${href}`;

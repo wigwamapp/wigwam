@@ -54,6 +54,7 @@ import {
   useAccountToken,
   useAllAccountTokens,
 } from "app/hooks";
+import { ToastOverflowProvider } from "app/hooks/toast";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -85,8 +86,10 @@ import PrettyDate from "../elements/PrettyDate";
 import Avatar from "../elements/Avatar";
 
 const OverviewContent: FC = () => (
-  <div className="flex min-h-0 grow">
-    <TokenExplorer />
+  <div className="flex min-h-0 grow relative">
+    <ToastOverflowProvider>
+      <TokenExplorer />
+    </ToastOverflowProvider>
   </div>
 );
 
@@ -539,11 +542,15 @@ const AssetInfo: FC = () => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
 
-  useTokenActivitiesSync(chainId, currentAccount.address, tokenSlug);
-
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  useTokenActivitiesSync(
+    chainId,
+    currentAccount.address,
+    tokenInfo && tokenSlug
+  );
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
@@ -629,7 +636,7 @@ const AssetInfo: FC = () => {
                           href={explorerLink.address(address)}
                         />
                       )}
-                      {coinGeckoId && (
+                      {currentNetwork?.type === "mainnet" && coinGeckoId && (
                         <IconedButton
                           aria-label="View asset in CoinGecko"
                           Icon={CoinGeckoIcon}
@@ -885,6 +892,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
     const explorerLink = useExplorerLink(currentNetwork);
     const { copy, copied } = useCopyToClipboard(activity.txHash);
 
+    const amoutnBN = new BigNumber(activity.amount ?? 0);
     const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
       getActivityInfo(activity);
 
@@ -912,7 +920,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
             <Icon className="w-5 h-5 opacity-75" />
           </div>
           <div className="flex flex-col items-start">
-            {new BigNumber(activity.amount ?? 0).gte(LARGE_AMOUNT) ? (
+            {amoutnBN.gte(LARGE_AMOUNT) ? (
               <span
                 className={classNames("text-base font-bold", amountClassName)}
               >
@@ -920,11 +928,13 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               </span>
             ) : (
               <PrettyAmount
-                amount={new BigNumber(activity.amount ?? 0).abs()}
+                amount={amoutnBN.abs()}
                 decimals={tokenInfo?.decimals}
                 currency={tokenInfo?.symbol}
                 prefix={prefix}
-                isMinified={true}
+                isDecimalsMinified={new BigNumber(10)
+                  .pow(tokenInfo?.decimals ?? 18)
+                  .gt(amoutnBN.abs())}
                 copiable={true}
                 className={classNames("text-base font-bold", amountClassName)}
               />
@@ -971,9 +981,14 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               />
             )}
           </div>
-          <div className="text-xs mt-1 text-brand-inactivedark">
-            <PrettyDate date={activity.timeAt} />
-            {/*{getPrettyDate(activity.timeAt)}*/}
+          <div
+            className={classNames("text-xs mt-1", "text-brand-inactivedark")}
+          >
+            {activity.pending ? (
+              "Pending"
+            ) : (
+              <PrettyDate date={activity.timeAt} />
+            )}
           </div>
         </div>
       </div>
@@ -1014,11 +1029,13 @@ const ProjectLabel: FC<ProjectLabelProps> = ({ project, className }) => {
 };
 
 const getActivityInfo = (activity: TokenActivityPrimitive) => {
+  const pendingClassName = activity.pending ? "text-[#D99E2E]" : undefined;
+
   if (activity.type === "approve") {
     return {
       Icon: ActivityApproveIcon,
       prefix: null,
-      amountClassName: classNames("text-brand-main"),
+      amountClassName: pendingClassName ?? classNames("text-brand-main"),
       label: "Approve",
       anotherAddressLabel: "Operator",
     };
@@ -1037,7 +1054,7 @@ const getActivityInfo = (activity: TokenActivityPrimitive) => {
   return {
     Icon: ActivitySendIcon,
     prefix: "-",
-    amountClassName: "",
+    amountClassName: classNames(pendingClassName),
     label: activity.project ? "Interaction" : "Transfer",
     anotherAddressLabel: "Recipient",
   };

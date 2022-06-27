@@ -76,7 +76,8 @@ export interface TransactionActivity extends TransactionApproval {
   pending: number;
   rawTx: string;
   txHash: string;
-  result?: any;
+  result?: TxReceipt;
+  gasTokenPriceUSD?: string;
 }
 
 export interface SigningApproval extends ActivityBase {
@@ -118,6 +119,23 @@ export type TxParams = {
   // eip1559
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
+};
+
+export type TxReceipt = {
+  blockHash: string;
+  blockNumber: string;
+  contractAddress: string | null;
+  cumulativeGasUsed: string;
+  effectiveGasPrice: string;
+  from: string;
+  gasUsed: string;
+  logs: any[];
+  logsBloom: string;
+  status: string;
+  to: string | null;
+  transactionHash: string;
+  transactionIndex: string;
+  type: string;
 };
 
 export enum TxActionType {
@@ -172,6 +190,7 @@ export interface TokenActivityBase {
   accountAddress: string;
   tokenSlug: string;
   txHash: string;
+  pending: number;
   timeAt: number;
   type: TokenActivityType;
   project?: TokenActivityProject;

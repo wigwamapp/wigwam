@@ -1,12 +1,22 @@
 import retry from "async-retry";
+import memoize from "mem";
 import { ethers } from "ethers";
 import { schedule } from "lib/system/schedule";
 
-import { ActivityType, TransactionActivity } from "core/types";
+import {
+  AccountAsset,
+  ActivityType,
+  RpcResponse,
+  TransactionActivity,
+  TxReceipt,
+} from "core/types";
 import * as repo from "core/repo";
+import { createAccountTokenKey, NATIVE_TOKEN_SLUG } from "core/common/tokens";
+import { matchTokenTransferEvents } from "core/common/transaction";
 
 import { sendRpc } from "../rpc";
 import { isUnlocked } from "../state";
+import { addFindTokenRequest } from "../sync";
 
 export async function startTxObserver() {
   schedule(5_000, async () => {
@@ -27,32 +37,24 @@ export async function startTxObserver() {
         if (tx.type !== ActivityType.Transaction) return;
 
         try {
-          const result = await retry(
-            async () => {
-              const res = await sendRpc(
-                tx.chainId,
-                "eth_getTransactionByHash",
-                [tx.txHash]
-              );
-              if ("error" in res) {
-                throw new Error(res.error.message);
-              }
-              return res.result;
-            },
+          const result: TxReceipt = await retry(
+            () =>
+              sendRpc(tx.chainId, "eth_getTransactionReceipt", [
+                tx.txHash,
+              ]).then(unwrapRpcResponse),
             { retries: 3, maxTimeout: 1_000 }
           );
 
-          const toUpdate = {
+          const updatedTx: TransactionActivity = {
             ...tx,
-            result: result || tx.result,
+            result,
           };
 
-          if (
-            result &&
-            result.blockNumber &&
-            ethers.BigNumber.from(result.blockNumber).gt(0)
-          ) {
-            // TODO: Determinate error
+          if (result && result.blockNumber) {
+            updatedTx.gasTokenPriceUSD = await getGasTokenPriceUSD(
+              tx.chainId,
+              tx.accountAddress
+            );
 
             completeHashes.add(tx.txHash);
 
@@ -60,9 +62,26 @@ export async function startTxObserver() {
             for (const hash of skippedHashes) {
               completeHashes.add(hash);
             }
+
+            if (!isFailedStatus(result)) {
+              try {
+                const transfers = matchTokenTransferEvents(result.logs);
+                for (const transfer of transfers) {
+                  if (transfer.to === tx.accountAddress) {
+                    addFindTokenRequest(
+                      tx.chainId,
+                      tx.accountAddress,
+                      transfer.tokenSlug
+                    );
+                  }
+                }
+              } catch (err) {
+                console.error(err);
+              }
+            }
           }
 
-          txsToUpdate.set(tx.txHash, toUpdate);
+          txsToUpdate.set(tx.txHash, updatedTx);
         } catch (err) {
           console.error(err);
         }
@@ -70,13 +89,44 @@ export async function startTxObserver() {
     );
 
     for (const hash of completeHashes) {
-      const tx = txsToUpdate.get(hash);
-      if (tx) tx.pending = 0;
+      txsToUpdate.get(hash)!.pending = 0;
     }
 
     await repo.activities.bulkPut(Array.from(txsToUpdate.values()));
+
+    await Promise.all(
+      Array.from(completeHashes).map(async (txHash) => {
+        try {
+          const tx = txsToUpdate.get(txHash)!;
+          const base = repo.tokenActivities.where({ txHash, pending: 1 });
+
+          return await (isFailedOrSkippedTx(tx)
+            ? base.delete()
+            : base.modify((tokenActivity) => {
+                tokenActivity.pending = 0;
+              }));
+        } catch {
+          return;
+        }
+      })
+    );
   });
 }
+
+const getGasTokenPriceUSD = memoize(
+  (chainId: number, accountAddress: string) =>
+    repo.accountTokens
+      .get(
+        createAccountTokenKey({
+          chainId,
+          accountAddress,
+          tokenSlug: NATIVE_TOKEN_SLUG,
+        })
+      )
+      .then((token) => (token as AccountAsset)?.priceUSD)
+      .catch(() => undefined),
+  { maxAge: 3 * 60_000 }
+);
 
 function findSkippedTxs(
   origin: TransactionActivity,
@@ -102,4 +152,20 @@ function findSkippedTxs(
   }
 
   return skippedHashes;
+}
+
+function unwrapRpcResponse(res: RpcResponse) {
+  if ("error" in res) {
+    throw new Error(res.error.message);
+  }
+
+  return res.result;
+}
+
+function isFailedOrSkippedTx(tx: TransactionActivity) {
+  return !tx.result || isFailedStatus(tx.result);
+}
+
+function isFailedStatus(result: TxReceipt) {
+  return ethers.BigNumber.from(result.status).isZero();
 }

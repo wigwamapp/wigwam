@@ -9,12 +9,13 @@ import { ERC20__factory } from "abi-types";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
-import { Link } from "lib/navigation";
+import { Link, navigate } from "lib/navigation";
 
 import { AccountAsset, AccountSource } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { suggestFees } from "core/client";
 
+import { Page } from "app/nav";
 import {
   composeValidators,
   maxValue,
@@ -127,34 +128,41 @@ const Asset: FC = () => {
           txResPromise
             .then((txHash) => {
               if (isMounted()) {
-                updateToast(
-                  <div className="flex flex-col">
-                    <p>
-                      <strong>
-                        <PrettyAmount
-                          amount={amount}
-                          currency={currentToken.symbol}
-                        />
-                      </strong>{" "}
-                      successfully transferred!
-                    </p>
-
-                    {explorerLink && (
-                      <div className="mt-1 flex items-center">
-                        <a
-                          href={explorerLink.tx(txHash)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline"
-                        >
-                          View transaction in explorer
-                        </a>
-
-                        <ExternalLinkIcon className="h-5 w-auto ml-1" />
-                      </div>
-                    )}
-                  </div>
+                setTimeout(
+                  () => navigate((s) => ({ ...s, page: Page.Default })),
+                  50
                 );
+
+                setTimeout(() => {
+                  updateToast(
+                    <div className="flex flex-col">
+                      <p>
+                        <strong>
+                          <PrettyAmount
+                            amount={amount}
+                            currency={currentToken.symbol}
+                          />
+                        </strong>{" "}
+                        successfully transferred! Confirming...
+                      </p>
+
+                      {explorerLink && (
+                        <div className="mt-1 flex items-center">
+                          <a
+                            href={explorerLink.tx(txHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            View transaction in explorer
+                          </a>
+
+                          <ExternalLinkIcon className="h-5 w-auto ml-1" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                }, 100);
               }
             })
             .catch((err) => {
