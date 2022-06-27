@@ -74,7 +74,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItem={preparedCurrentNetwork}
       setItem={(network) => onNetworkChange(network.key)}
       searchValue={searchValue}
-      onSearch={size === "large" ? setSearchValue : undefined}
+      onSearch={setSearchValue}
       className={className}
       scrollAreaClassName="h-64"
       currentItemClassName={currentItemClassName}
@@ -101,6 +101,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
           <SmartLink
             to={{ page: Page.Settings, setting: SettingTab.Networks }}
             onClick={handleLinkClick}
+            // onClick={size === "small" ? undefined : handleLinkClick}
+            // isApprove={size === "small"}
             className="underline underline-offset-2"
           >
             Settings &gt; Networks
