@@ -27,7 +27,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
     <Tabs.List
       className={classNames(
         "flex items-center",
-        "px-1 pb-1",
+        "pl-1 pb-1",
         "relative",
         "after:h-px after:w-full",
         "after:absolute after:bottom-0 after:left-0",
@@ -47,12 +47,12 @@ const TabsHeader: FC<TabsHeaderProps> = ({
             value={value}
             className={classNames(
               "text-sm",
-              "px-3 py-1",
+              "px-2 py-1",
               "rounded-lg",
               "transition-all",
               "relative",
               "flex flex-col items-center",
-              "w-1/4",
+              "w-[calc(25%-.25rem)]",
               "before:content-[attr(data-text)]",
               "before:h-0",
               "before:invisible",
@@ -83,10 +83,12 @@ const TabsHeader: FC<TabsHeaderProps> = ({
           "absolute bottom-0 left-0",
           "bg-buttonaccent",
           "transition-all",
-          "w-1/4"
+          "w-[calc(25%-.3125rem)]"
         )}
         style={{
-          left: `calc(${activeIndex * 25}% + ${activeIndex * 0.25}rem)`,
+          left: `calc(.25rem + ${activeIndex * 25}% - ${
+            activeIndex * 0.0625
+          }rem)`,
         }}
       />
     </Tabs.List>
