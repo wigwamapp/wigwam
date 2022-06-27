@@ -5,10 +5,10 @@ import { LinkProps } from "lib/navigation/Link";
 
 import { openInTab } from "app/helpers";
 
-type SmartLinkProps = LinkProps; // & { isApprove?: boolean }
+type SmartLinkProps = LinkProps;
 
 const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
-  ({ ...props }, ref) => {
+  (props, ref) => {
     const { to, merge, onClick, children, ...rest } = props;
     const isPopup = isPopupPrimitive();
 
@@ -19,14 +19,12 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
         if (!evt.defaultPrevented) {
           evt.preventDefault();
           openInTab(to, merge);
-          // isApprove ? openInTabStrict(to, merge) : openInTab(to, merge);
         }
       },
       [onClick, to, merge]
     );
 
     if (isPopup) {
-      // || isApprove
       return (
         <a
           ref={ref}

@@ -98,15 +98,17 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       emptySearchText={
         <>
           You can add a new network in{" "}
-          <SmartLink
-            to={{ page: Page.Settings, setting: SettingTab.Networks }}
-            onClick={handleLinkClick}
-            // onClick={size === "small" ? undefined : handleLinkClick}
-            // isApprove={size === "small"}
-            className="underline underline-offset-2"
-          >
-            Settings &gt; Networks
-          </SmartLink>{" "}
+          {withAction ? (
+            <SmartLink
+              to={{ page: Page.Settings, setting: SettingTab.Networks }}
+              onClick={handleLinkClick}
+              className="underline underline-offset-2"
+            >
+              Settings &gt; Networks
+            </SmartLink>
+          ) : (
+            "Settings > Networks"
+          )}{" "}
           tab.
         </>
       }
