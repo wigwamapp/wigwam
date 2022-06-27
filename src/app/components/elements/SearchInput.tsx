@@ -62,6 +62,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               !searchValue && "hidden"
             )}
             iconClassName={classNames(size === "small" ? "!w-4 !h-4" : "")}
+            tooltipProps={{ missSingleton: true }}
           />
         ) : undefined
       }
