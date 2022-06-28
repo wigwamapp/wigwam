@@ -38,7 +38,10 @@ export const OPTIMISM: Network[] = [
     },
     explorerUrls: ["https://kovan-optimistic.etherscan.io"],
     explorerApiUrl: "https://api-kovan-optimistic.etherscan.io/api",
-    faucetUrls: ["http://fauceth.komputing.org?chain=69"],
+    faucetUrls: [
+      "https://kovan.optifaucet.com",
+      "http://fauceth.komputing.org?chain=69",
+    ],
     infoUrl: "https://optimism.io",
   },
   // {
