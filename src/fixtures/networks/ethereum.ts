@@ -110,6 +110,7 @@ export const ETHEREUM: Network[] = [
     explorerUrls: ["https://goerli.etherscan.io"],
     explorerApiUrl: "https://api-goerli.etherscan.io/api",
     faucetUrls: [
+      "https://goerlifaucet.com",
       "https://goerli-faucet.slock.it",
       "https://faucet.goerli.mudit.blog",
       "http://fauceth.komputing.org?chain=5",
