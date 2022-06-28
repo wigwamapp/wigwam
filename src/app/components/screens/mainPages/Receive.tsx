@@ -73,12 +73,14 @@ const getTabsContent = (network?: Network) => [
           title: "Buy with Crypto",
           Icon: CryptoIcon,
           desc: "Top up balance with crypto from other networks using third-party services.",
+          soon: true,
         },
         {
           route: { page: "receive", receive: ReceiveTabEnum.BuyWithFiat },
           title: "Buy with Fiat",
           Icon: FiatIcon,
           desc: "Top up balance with regular credit or debit cards using third-party services.",
+          soon: true,
         },
       ]
     : []),

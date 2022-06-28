@@ -61,11 +61,13 @@ const tabsContent = [
     title: "NFT",
     Icon: NFTIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    soon: true,
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Bridge },
     title: "Bridge",
     Icon: BridgeIcon,
     desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    soon: true,
   },
 ];
