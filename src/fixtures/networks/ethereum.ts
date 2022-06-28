@@ -39,7 +39,7 @@ export const ETHEREUM: Network[] = [
       "https://kovan.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "ethereum",
-    name: "Ethereum Testnet Kovan",
+    name: "Kovan Ethereum Testnet",
     nativeCurrency: {
       symbol: "KOV",
       name: "Kovan Ether",
@@ -59,7 +59,7 @@ export const ETHEREUM: Network[] = [
     type: "testnet",
     rpcUrls: ["https://ropsten.infura.io/v3/${INFURA_API_KEY}"],
     chainTag: "ethereum",
-    name: "Ethereum Testnet Ropsten",
+    name: "Ropsten Ethereum Testnet",
     nativeCurrency: {
       symbol: "ROP",
       name: "Ropsten Ether",
@@ -76,7 +76,7 @@ export const ETHEREUM: Network[] = [
     type: "testnet",
     rpcUrls: ["https://rinkeby.infura.io/v3/${INFURA_API_KEY}"],
     chainTag: "ethereum",
-    name: "Ethereum Testnet Rinkeby",
+    name: "Rinkeby Ethereum Testnet",
     nativeCurrency: {
       symbol: "RIN",
       name: "Rinkeby Ether",
@@ -100,7 +100,7 @@ export const ETHEREUM: Network[] = [
       "https://goerli.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "ethereum",
-    name: "Ethereum Testnet Goerli",
+    name: "Goerli Ethereum Testnet",
     nativeCurrency: {
       symbol: "GOR",
       name: "Goerli Ether",

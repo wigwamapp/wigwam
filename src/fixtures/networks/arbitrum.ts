@@ -30,7 +30,7 @@ export const ARBITRUM: Network[] = [
     type: "testnet",
     rpcUrls: ["https://rinkeby.arbitrum.io/rpc"],
     chainTag: "arbitrum",
-    name: "Arbitrum Testnet Rinkeby",
+    name: "Rinkeby Arbitrum Testnet",
     nativeCurrency: {
       symbol: "ARETH",
       name: "Arbitrum Rinkeby Ether",

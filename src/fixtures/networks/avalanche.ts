@@ -32,7 +32,7 @@ export const AVALANCHE: Network[] = [
     type: "testnet",
     rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
     chainTag: "avalanche",
-    name: "Avalanche Testnet Fuji",
+    name: "Fuji Avalanche Testnet",
     nativeCurrency: {
       symbol: "AVAX",
       name: "Avalanche",

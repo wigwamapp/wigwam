@@ -38,7 +38,7 @@ export const POLYGON: Network[] = [
       "https://matic-testnet-archive-rpc.bwarelabs.com",
     ],
     chainTag: "polygon",
-    name: "Polygon Testnet Mumbai",
+    name: "Mumbai Polygon Testnet",
     nativeCurrency: {
       symbol: "MATIC",
       name: "MATIC",

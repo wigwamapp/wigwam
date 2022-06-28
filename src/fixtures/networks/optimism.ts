@@ -30,7 +30,7 @@ export const OPTIMISM: Network[] = [
     type: "testnet",
     rpcUrls: ["https://kovan.optimism.io"],
     chainTag: "optimism",
-    name: "Optimism Testnet Kovan",
+    name: "Kovan Optimism Testnet",
     nativeCurrency: {
       symbol: "KOR",
       name: "Kovan Ether",
