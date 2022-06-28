@@ -936,9 +936,10 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
                 decimals={tokenInfo?.decimals}
                 currency={tokenInfo?.symbol}
                 prefix={prefix}
-                isDecimalsMinified={new BigNumber(10)
+                isMinified={new BigNumber(10)
                   .pow(tokenInfo?.decimals ?? 18)
-                  .gt(amoutnBN.abs())}
+                  .lte(amoutnBN.abs())}
+                isThousandsMinified={false}
                 copiable={true}
                 className={classNames("text-base font-bold", amountClassName)}
               />

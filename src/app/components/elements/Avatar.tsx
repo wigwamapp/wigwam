@@ -51,7 +51,7 @@ const Avatar = memo<AvatarProps>(
         <AvatarPrimitive.Image
           {...rest}
           onLoadingStatusChange={setLoadingState}
-          className={imageClassName}
+          className={classNames("w-full h-full object-cover", imageClassName)}
         />
         {loadingState === "error" && (
           <AvatarPrimitive.Fallback className="flex justify-center items-center h-full">
