@@ -14,7 +14,9 @@ import {
 
 import { createTokenSlug, NATIVE_TOKEN_SLUG } from "./tokens";
 
-export function matchTxAction(txParams: TxParams): TxAction | null {
+export function matchTxAction(
+  txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish }
+): TxAction | null {
   if (!txParams.to) {
     if (!isZeroHex(txParams.data)) {
       return {

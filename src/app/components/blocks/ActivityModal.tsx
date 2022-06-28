@@ -11,6 +11,7 @@ import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
+import { parseTransaction } from "ethers/lib/utils";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
@@ -23,6 +24,7 @@ import {
   TransactionActivity,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
+import { matchTxAction } from "core/common/transaction";
 
 import {
   activityModalAtom,
@@ -61,7 +63,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import ApprovalStatus from "./ApprovalStatus";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
-import { Dot } from "./approvals/DetailsTab";
+import { Dot, Token } from "./approvals/DetailsTab";
 
 const ActivityModal = memo(() => {
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
@@ -325,33 +327,44 @@ const ActivityCard = memo(
       >
         <ActivityIcon item={item} className="mr-6" />
 
-        <div className="w-[10rem] mr-8">
-          <ActivityTypeLabel type={item.type} status={item.status} />
-        </div>
+        <ActivityTypeLabel
+          type={item.type}
+          status={item.status}
+          className="w-[10rem] mr-8"
+        />
 
         {(item.type === ActivityType.Transaction ||
           item.type === ActivityType.Signing) && (
-          <div className="w-[10rem] mr-8">
-            <ActivityWalletCard accountAddress={item.accountAddress} />
-          </div>
+          <ActivityWalletCard
+            accountAddress={item.accountAddress}
+            className="w-[10rem] mr-8"
+          />
         )}
 
         {item.type === ActivityType.Transaction && (
-          <div className="w-[12rem] mr-8">
-            <ActivityNetworkCard
-              chainId={item.chainId}
-              fee={{
-                native: "1234123412341234",
-                fiat: "2.343",
-              }}
-            />
-          </div>
+          <ActivityNetworkCard
+            chainId={item.chainId}
+            fee={{
+              native: "1234123412341234",
+              fiat: "2.343",
+            }}
+            className="w-[12rem] mr-8"
+          />
         )}
 
         {item.source.type === "page" && (
-          <div className="w-[10rem] mr-8">
-            <ActivityWebsiteLink source={item.source} />
-          </div>
+          <ActivityWebsiteLink
+            source={item.source}
+            className="w-[10rem] mr-8"
+          />
+        )}
+
+        {item.type === ActivityType.Transaction && (
+          <ActivityTokens
+            tx={item.rawTx}
+            accountAddress={item.accountAddress}
+            className="w-[10rem] mr-8"
+          />
         )}
 
         <div className="flex flex-col items-end ml-auto">
@@ -382,7 +395,7 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
         "block",
         "bg-white",
         "rounded-full overflow-hidden",
-        "w-12 h-12",
+        "w-12 h-12 min-w-[3rem]",
         className
       )}
       fallbackClassName="!h-3/5"
@@ -488,10 +501,12 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
 
 type ActivityWalletCardProps = {
   accountAddress: string;
+  className?: string;
 };
 
 const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   accountAddress,
+  className,
 }) => {
   const allAccounts = useAtomValue(allAccountsAtom);
   const account = useMemo(
@@ -500,7 +515,14 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   );
 
   return account ? (
-    <div className={classNames("relative", "flex items-stretch", "text-left")}>
+    <div
+      className={classNames(
+        "relative",
+        "flex items-stretch",
+        "text-left",
+        className
+      )}
+    >
       <AutoIcon
         seed={account.address}
         source="dicebear"
@@ -526,7 +548,12 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
       </span>
     </div>
   ) : (
-    <span className="font-medium text-brand-inactivedark text-base">
+    <span
+      className={classNames(
+        "font-medium text-brand-inactivedark text-base",
+        className
+      )}
+    >
       Deleted
     </span>
   );
@@ -538,16 +565,24 @@ type ActivityNetworkCardProps = {
     native: BigNumber.Value;
     fiat?: BigNumber.Value;
   };
+  className?: string;
 };
 
 const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
   chainId,
   fee,
+  className,
 }) => {
   const network = useLazyAtomValue(getNetworkAtom(chainId));
 
   const label = (
-    <div className="flex items-center min-h-[1.5rem]">
+    <div
+      className={classNames(
+        "flex items-center",
+        "min-h-[1.5rem]",
+        fee ? "" : className
+      )}
+    >
       {network && (
         <Avatar
           src={network && getNetworkIconUrl(network.chainId)}
@@ -566,7 +601,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className={classNames("flex flex-col", className)}>
       {label}
       <span className="ml-auto flex items-center text-brand-inactivedark ml-8 mt-1">
         <PrettyAmount
@@ -634,6 +669,45 @@ const SectionHeader: FC<{ className?: string }> = memo(
     </div>
   )
 );
+
+type ActivityTokensProps = {
+  tx: string;
+  accountAddress: string;
+  className?: string;
+};
+
+const ActivityTokens: FC<ActivityTokensProps> = ({
+  tx,
+  accountAddress,
+  className,
+}) => {
+  const parsedTx = parseTransaction(tx);
+  const action = useMemo(() => {
+    try {
+      return matchTxAction(parsedTx);
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  }, [parsedTx]);
+
+  if (!action || !("tokens" in action)) {
+    return null;
+  }
+
+  return (
+    <div className={classNames("flex flex-col", className)}>
+      {action.tokens.map((token, i) => (
+        <Token
+          key={token.slug}
+          accountAddress={accountAddress}
+          token={token}
+          className={classNames(i !== action.tokens.length - 1 && "mb-1")}
+        />
+      ))}
+    </div>
+  );
+};
 
 function capitalize(word: string) {
   const lower = word.toLowerCase();
