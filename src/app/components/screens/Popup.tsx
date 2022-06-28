@@ -39,6 +39,7 @@ import { useAllAccountTokens } from "app/hooks/tokens";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/receive-small.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
@@ -62,6 +63,10 @@ import PrettyAmount from "../elements/PrettyAmount";
 import PriceArrow from "../elements/PriceArrow";
 import ComingSoon from "../elements/ComingSoon";
 import TooltipIcon from "../elements/TooltipIcon";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "../elements/SecondaryModal";
+import ShareAddress from "./receiveTabs/ShareAddress";
 
 const Popup: FC = () => (
   <PreloadAndSync>
@@ -455,6 +460,7 @@ const AssetCard = memo(
     ({ asset, isManageMode = false, className }, ref) => {
       const currentAccount = useAtomValue(currentAccountAtom);
       const setInternalChainId = useSetAtom(chainIdAtom);
+      const [receivePopupOpened, setReceivePopupOpened] = useState(false);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
       const {
@@ -639,63 +645,78 @@ const AssetCard = memo(
       );
 
       return (
-        <DropdownMenu.Root
-          open={popoverOpened}
-          onOpenChange={setPopoverOpened}
-          modal
-        >
-          {content}
+        <>
+          <DropdownMenu.Root
+            open={popoverOpened}
+            onOpenChange={setPopoverOpened}
+            modal
+          >
+            {content}
 
-          {!isManageMode && (
-            <DropdownMenu.Content
-              side="left"
-              align="start"
-              className={classNames(
-                "bg-brand-dark/10",
-                "backdrop-blur-[30px]",
-                "border border-brand-light/5",
-                "rounded-[.625rem]",
-                "px-1 py-2"
-              )}
-            >
-              <PopoverButton
-                Icon={InfoRoundIcon}
-                onClick={() =>
-                  openLink({ page: Page.Default, token: asset.tokenSlug })
-                }
+            {!isManageMode && (
+              <DropdownMenu.Content
+                side="left"
+                align="start"
+                className={classNames(
+                  "bg-brand-dark/10",
+                  "backdrop-blur-[30px]",
+                  "border border-brand-light/5",
+                  "rounded-[.625rem]",
+                  "px-1 py-2"
+                )}
               >
-                Info
-              </PopoverButton>
-              <PopoverButton
-                Icon={SendIcon}
-                onClick={() =>
-                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
-                }
-              >
-                Transfer
-              </PopoverButton>
-              <PopoverButton
-                Icon={SwapIcon}
-                onClick={() => openLink({ page: Page.Swap })}
-              >
-                Swap
-              </PopoverButton>
-              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
                 <PopoverButton
-                  Icon={BuyIcon}
+                  Icon={InfoRoundIcon}
                   onClick={() =>
-                    openLink({
-                      page: Page.Receive,
-                      receive: ReceiveTabEnum.BuyWithCrypto,
-                    })
+                    openLink({ page: Page.Default, token: asset.tokenSlug })
                   }
                 >
-                  Buy
+                  Info
                 </PopoverButton>
-              )}
-            </DropdownMenu.Content>
-          )}
-        </DropdownMenu.Root>
+                <PopoverButton
+                  Icon={ReceiveIcon}
+                  onClick={() => {
+                    setPopoverOpened(false);
+                    setReceivePopupOpened(true);
+                  }}
+                >
+                  Receive
+                </PopoverButton>
+                <PopoverButton
+                  Icon={SendIcon}
+                  onClick={() =>
+                    openLink({ page: Page.Transfer, token: asset.tokenSlug })
+                  }
+                >
+                  Transfer
+                </PopoverButton>
+                <PopoverButton
+                  Icon={SwapIcon}
+                  onClick={() => openLink({ page: Page.Swap })}
+                >
+                  Swap
+                </PopoverButton>
+                {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
+                  <PopoverButton
+                    Icon={BuyIcon}
+                    onClick={() =>
+                      openLink({
+                        page: Page.Receive,
+                        receive: ReceiveTabEnum.BuyWithCrypto,
+                      })
+                    }
+                  >
+                    Buy
+                  </PopoverButton>
+                )}
+              </DropdownMenu.Content>
+            )}
+          </DropdownMenu.Root>
+          <ReceivePopup
+            open={receivePopupOpened}
+            onOpenChange={setReceivePopupOpened}
+          />
+        </>
       );
     }
   ),
@@ -722,4 +743,12 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
     <Icon className="mr-2" />
     {children}
   </button>
+);
+
+type ReceivePopupProps = Pick<SecondaryModalProps, "open" | "onOpenChange">;
+
+const ReceivePopup: FC<ReceivePopupProps> = (props) => (
+  <SecondaryModal {...props} small>
+    <ShareAddress />
+  </SecondaryModal>
 );
