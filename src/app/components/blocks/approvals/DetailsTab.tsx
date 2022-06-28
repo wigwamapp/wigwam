@@ -453,8 +453,10 @@ const Token = memo<TokenProps>(
   }
 );
 
-const Dot: FC = () => (
-  <span className="flex items-center justify-center p-2">
+export const Dot: FC<{ className?: string }> = ({ className }) => (
+  <span
+    className={classNames("flex items-center justify-center p-2", className)}
+  >
     <span className="w-1 h-1 bg-brand-inactivedark rounded-full" />
   </span>
 );
