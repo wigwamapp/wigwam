@@ -708,6 +708,8 @@ const AssetInfo: FC = () => {
                 to={{ page: Page.Swap }}
                 theme="secondary"
                 className="grow !py-2"
+                disabled
+                title="Coming soon"
               >
                 <SwapIcon className="w-6 h-auto mr-2" />
                 Swap
@@ -720,6 +722,8 @@ const AssetInfo: FC = () => {
                   }}
                   theme="secondary"
                   className="grow !py-2"
+                  disabled
+                  title="Coming soon"
                 >
                   <BuyIcon className="w-6 h-auto mr-2" />
                   Buy

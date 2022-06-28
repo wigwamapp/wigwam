@@ -4,6 +4,7 @@ import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
 import { Page } from "app/nav";
+import { SoonTag } from "app/components/elements/SoonTag";
 import { pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
@@ -48,6 +49,7 @@ type SidebarBlockProps = {
     route: Page;
     label: string;
     Icon: FC<{ className?: string }>;
+    soon?: boolean;
   }[];
   className?: string;
 };
@@ -58,7 +60,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 
   return (
     <div className={classNames("flex flex-col", className)}>
-      {links.map(({ route, label, Icon }) => {
+      {links.map(({ route, label, Icon, soon }) => {
         const isPageActive = route === page;
 
         return (
@@ -76,6 +78,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               "rounded-[.625rem]",
               "flex items-center",
               "transition-colors",
+              "group",
               "hover:text-brand-light",
               "focus:text-brand-light",
               isPageActive && "bg-brand-main/5 !text-brand-light",
@@ -94,6 +97,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               )}
             />
             {label}
+            {soon && <SoonTag />}
           </Link>
         );
       })}

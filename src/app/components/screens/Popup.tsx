@@ -1,12 +1,12 @@
 import {
   FC,
   forwardRef,
-  HTMLAttributes,
   useCallback,
   memo,
   useRef,
   useState,
   useMemo,
+  ButtonHTMLAttributes,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -693,6 +693,8 @@ const AssetCard = memo(
                 <PopoverButton
                   Icon={SwapIcon}
                   onClick={() => openLink({ page: Page.Swap })}
+                  disabled
+                  title="Coming soon"
                 >
                   Swap
                 </PopoverButton>
@@ -705,6 +707,8 @@ const AssetCard = memo(
                         receive: ReceiveTabEnum.BuyWithCrypto,
                       })
                     }
+                    disabled
+                    title="Coming soon"
                   >
                     Buy
                   </PopoverButton>
@@ -723,7 +727,7 @@ const AssetCard = memo(
   dequal
 );
 
-type PopoverButton = HTMLAttributes<HTMLButtonElement> & {
+type PopoverButton = ButtonHTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;
 };
 
@@ -736,7 +740,8 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
       "rounded-[.625rem]",
       "text-sm font-bold",
       "transition-colors",
-      "hover:bg-brand-main/20 focus:bg-brand-main/20"
+      !rest.disabled && "hover:bg-brand-main/20 focus:bg-brand-main/20",
+      "disabled:opacity-40 disabled:cursor-default"
     )}
     {...rest}
   >
