@@ -46,7 +46,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       "rounded",
       "flex justify-center items-center",
       "transition",
-      disabled && "cursor-not-allowed",
+      disabled && "cursor-default",
       !disabled && [
         "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
         "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",

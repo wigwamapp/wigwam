@@ -4,6 +4,7 @@ import { Destination, Link } from "lib/navigation";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
+import { SoonTag } from "app/components/elements/SoonTag";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
 type SecondaryTabsProps = {
@@ -27,13 +28,14 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
     viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
     scrollBarClassName="py-0 pt-5 pb-20 !right-1"
   >
-    {tabs.map(({ title, Icon, route, desc }, i) => (
+    {tabs.map(({ title, Icon, route, desc, soon }, i) => (
       <SecondaryItem
         key={title}
         title={title}
         Icon={Icon}
         route={route}
         desc={desc}
+        soon={soon}
         isActive={route === activeRoute}
         className={classNames(i !== tabs.length - 1 && "mb-2")}
       />
@@ -49,11 +51,12 @@ type SecondaryItemProps = {
   Icon?: FC<{ className?: string }>;
   title: string;
   desc: string;
+  soon?: boolean;
 };
 
 const SecondaryItem: FC<
   SecondaryItemProps & { isActive?: boolean; className?: string }
-> = ({ title, route, Icon, desc, isActive = false, className }) => {
+> = ({ title, route, Icon, desc, soon, isActive = false, className }) => {
   return (
     <Link
       key={title}
@@ -64,6 +67,7 @@ const SecondaryItem: FC<
         "py-3 px-4 pr-[2.625rem]",
         "rounded-[.625rem]",
         "cursor-pointer",
+        "group",
         isActive && "bg-brand-main/10",
         !isActive && "hover:bg-brand-main/5",
         className
@@ -72,6 +76,7 @@ const SecondaryItem: FC<
       <div className="flex items-center">
         {Icon && <Icon className="w-[1.125rem] h-auto mr-2" />}
         <h3 className={"text-base font-bold"}>{title}</h3>
+        {soon && <SoonTag />}
       </div>
       {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
       <ChevronRightIcon

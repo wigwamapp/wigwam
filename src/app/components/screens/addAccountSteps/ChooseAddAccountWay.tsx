@@ -276,7 +276,7 @@ const TileSimple: FC<TileSimpleProps> = ({
       "transition-transform",
       !soon && "hover:scale-110 focus-visible:scale-110",
       !soon && "active:scale-95",
-      soon && "cursor-not-allowed",
+      soon && "cursor-default",
       className
     )}
     disabled={soon}

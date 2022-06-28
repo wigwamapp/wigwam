@@ -28,11 +28,13 @@ export const NavLinksPrimary = [
     route: Page.Swap,
     label: "Swap",
     Icon: SwapIcon,
+    soon: true,
   },
   {
     route: Page.Apps,
     label: "Apps",
     Icon: AppsIcon,
+    soon: true,
   },
   {
     route: Page.Contacts,

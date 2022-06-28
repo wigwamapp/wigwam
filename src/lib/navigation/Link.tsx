@@ -18,10 +18,14 @@ export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   to: Destination;
   replace?: boolean;
   merge?: boolean | string[];
+  disabled?: boolean;
 };
 
 const Link = forwardRef<HTMLAnchorElement, LinkProps>(
-  ({ to, replace, merge, children, onClick, target, ...rest }, ref) => {
+  (
+    { to, replace, merge, children, target, disabled, onClick, ...rest },
+    ref
+  ) => {
     const forceUpdate = useForceUpdate();
 
     to = useMemoCompare(to, dequal);
@@ -59,6 +63,11 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 
     const handleClick = useCallback(
       (evt) => {
+        if (disabled) {
+          evt.preventDefault();
+          return;
+        }
+
         try {
           if (onClick) {
             onClick(evt);
@@ -78,11 +87,18 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
           navigate();
         }
       },
-      [onClick, target, navigate]
+      [onClick, target, disabled, navigate]
     );
 
     return (
-      <a ref={ref} href={url} target={target} onClick={handleClick} {...rest}>
+      <a
+        ref={ref}
+        href={url}
+        target={target}
+        onClick={handleClick}
+        aria-disabled={disabled || undefined}
+        {...rest}
+      >
         {children}
       </a>
     );
