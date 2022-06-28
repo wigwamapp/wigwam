@@ -24,7 +24,7 @@ const About: FC = () => {
 
       <AboutHeader>Version</AboutHeader>
       <div className="mb-8 font-mono text-brand-inactivelight font-bold text-xl">
-        10.4.1
+        {process.env.VERSION}
       </div>
 
       <AboutHeader>Useful links</AboutHeader>
