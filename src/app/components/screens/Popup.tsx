@@ -720,7 +720,7 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
       "text-sm font-bold",
       "transition-colors",
       !rest.disabled && "hover:bg-brand-main/20 focus:bg-brand-main/20",
-      "disabled:opacity-40 disabled:cursor-not-allowed"
+      "disabled:opacity-40 disabled:cursor-default"
     )}
     {...rest}
   >

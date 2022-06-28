@@ -156,7 +156,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
         ],
       theme === "clean" &&
         "font-medium hover:opacity-70 focus-visible:opacity-70",
-      disabled && "opacity-40 cursor-not-allowed",
+      disabled && "opacity-40 cursor-default",
       loading && "pointer-events-none",
       "select-none",
       className
