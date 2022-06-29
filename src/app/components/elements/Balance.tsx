@@ -47,7 +47,12 @@ const Balance: FC<BalanceProps> = ({
   return (
     <PrettyAmount
       amount={
-        nativeToken ? ethers.utils.formatEther(nativeToken.rawBalance) : null
+        nativeToken
+          ? ethers.utils.formatUnits(
+              nativeToken.rawBalance,
+              nativeToken.decimals
+            )
+          : null
       }
       currency={nativeToken?.symbol}
       isMinified={isMinified ?? false}

@@ -394,7 +394,7 @@ type TokenProps = {
   className?: string;
 };
 
-const Token = memo<TokenProps>(
+export const Token = memo<TokenProps>(
   ({ accountAddress, token: { slug, amount }, className }) => {
     const tokenInfo = useToken(accountAddress, slug);
 
@@ -413,7 +413,7 @@ const Token = memo<TokenProps>(
         <AssetLogo
           asset={tokenInfo}
           alt={name}
-          className="w-4 h-4 min-w-[.25rem]"
+          className="w-4 h-4 min-w-[1rem]"
         />
         {amount !== undefined &&
         new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
@@ -453,8 +453,10 @@ const Token = memo<TokenProps>(
   }
 );
 
-const Dot: FC = () => (
-  <span className="flex items-center justify-center p-2">
+export const Dot: FC<{ className?: string }> = ({ className }) => (
+  <span
+    className={classNames("flex items-center justify-center p-2", className)}
+  >
     <span className="w-1 h-1 bg-brand-inactivedark rounded-full" />
   </span>
 );
