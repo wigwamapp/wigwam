@@ -4,8 +4,10 @@ import {
   memo,
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -142,7 +144,7 @@ const ActivityModal = memo(() => {
                 </Dialog.Close>
 
                 <Suspense fallback={null}>
-                  <ActivityContent />
+                  {activityOpened && <ActivityContent />}
                 </Suspense>
               </ScrollAreaContainer>
             )}
@@ -156,8 +158,19 @@ const ActivityModal = memo(() => {
 export default ActivityModal;
 
 const ActivityContent = memo(() => {
+  const [delayFinished, setDelayFinished] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setDelayFinished(true), 300);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
-    <div className="w-[66.25rem] mx-auto h-full pt-16 flex flex-col">
+    <div
+      className={classNames(
+        "w-[66.25rem] mx-auto h-full pt-16 flex flex-col",
+        !delayFinished ? "hidden" : "animate-bootfadeinfast"
+      )}
+    >
       <Approve />
       <History />
     </div>
@@ -603,7 +616,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
   return (
     <div className={classNames("flex flex-col", className)}>
       {label}
-      <span className="ml-auto flex items-center text-brand-inactivedark ml-8 mt-1">
+      <span className="flex items-center text-brand-inactivedark ml-8 mt-1">
         <PrettyAmount
           amount={fee.native}
           currency={network?.nativeCurrency?.symbol}
