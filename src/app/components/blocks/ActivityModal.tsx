@@ -13,7 +13,7 @@ import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
-import { parseTransaction } from "ethers/lib/utils";
+import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
@@ -24,6 +24,7 @@ import {
   ActivitySource,
   ActivityType,
   TransactionActivity,
+  TxActionType,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
 import { matchTxAction } from "core/common/transaction";
@@ -278,17 +279,7 @@ const History = memo(() => {
                   ? loadMoreTriggerAssetRef
                   : null
               }
-              item={{
-                ...item,
-                status:
-                  i % 4 === 2
-                    ? "succeeded"
-                    : i % 4 === 1
-                    ? "failed"
-                    : i % 4 === 3
-                    ? "skipped"
-                    : undefined, // TODO: Replace
-              }}
+              item={item}
               className="mb-4"
             />
           ))}
@@ -312,12 +303,60 @@ const History = memo(() => {
 type StatusType = "succeeded" | "failed" | "skipped";
 
 type ActivityCardProps = {
-  item: Activity & { status?: StatusType };
+  item: Activity;
   className?: string;
 };
 
 const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    const status = useMemo<StatusType | undefined>(() => {
+      if (item.type !== ActivityType.Transaction || item.pending) {
+        return;
+      }
+
+      if (!item.result) {
+        return "skipped";
+      }
+
+      if (
+        item.result.status &&
+        ethers.BigNumber.from(item.result.status).isZero()
+      ) {
+        return "failed";
+      }
+
+      return "succeeded";
+    }, [item]);
+
+    const fee = useMemo(() => {
+      if (
+        item.type !== ActivityType.Transaction ||
+        item.pending ||
+        !item.result?.gasUsed
+      ) {
+        return undefined;
+      }
+
+      const parsedTx = ethers.utils.parseTransaction(item.rawTx);
+
+      const native = ethers.BigNumber.from(item.result.gasUsed)
+        .mul(
+          item.result.effectiveGasPrice ??
+            parsedTx.maxFeePerGas ??
+            parsedTx.gasPrice
+        )
+        .toString();
+
+      return {
+        native,
+        fiat:
+          item.gasTokenPriceUSD &&
+          new BigNumber(ethers.utils.formatEther(native)).times(
+            item.gasTokenPriceUSD
+          ),
+      };
+    }, [item]);
+
     return (
       <div
         ref={ref}
@@ -327,11 +366,11 @@ const ActivityCard = memo(
           "border",
           item.pending && "border-[#D99E2E]/50",
           item.pending && "animate-pulse",
-          (!item.status || item.status === "succeeded") &&
+          (!status || status === "succeeded") &&
             !item.pending &&
             "border-brand-inactivedark/25",
-          item.status === "failed" && "border-brand-redobject/50",
-          item.status === "skipped" && "border-brand-main/50",
+          status === "failed" && "border-brand-redobject/50",
+          status === "skipped" && "border-brand-main/50",
           "rounded-2xl",
           "flex items-center",
           "py-3 px-5",
@@ -341,8 +380,8 @@ const ActivityCard = memo(
         <ActivityIcon item={item} className="mr-6" />
 
         <ActivityTypeLabel
-          type={item.type}
-          status={item.status}
+          item={item}
+          status={status}
           className="w-[10rem] mr-8"
         />
 
@@ -357,10 +396,7 @@ const ActivityCard = memo(
         {item.type === ActivityType.Transaction && (
           <ActivityNetworkCard
             chainId={item.chainId}
-            fee={{
-              native: "1234123412341234",
-              fiat: "2.343",
-            }}
+            fee={fee}
             className="w-[12rem] mr-8"
           />
         )}
@@ -374,6 +410,7 @@ const ActivityCard = memo(
 
         {item.type === ActivityType.Transaction && (
           <ActivityTokens
+            source={item.source}
             tx={item.rawTx}
             accountAddress={item.accountAddress}
             className="w-[10rem] mr-8"
@@ -421,17 +458,22 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
 });
 
 type ActivityTypeLabelProps = {
-  type: ActivityType;
+  item: Activity;
   status?: StatusType;
   className?: string;
 };
 
 const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
-  type,
+  item,
   status,
   className,
 }) => {
-  const Icon = getActivityIcon(type);
+  const name =
+    item.type === ActivityType.Transaction && item.source.type === "self"
+      ? "Transfer"
+      : item.type;
+
+  const Icon = getActivityIcon(item.type);
   const label = (
     <div
       className={classNames(
@@ -441,7 +483,7 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
       )}
     >
       <Icon className="w-5 h-auto mr-2" />
-      {capitalize(type)}
+      {capitalize(name)}
     </div>
   );
   if (!status) {
@@ -460,7 +502,7 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
           status === "skipped" && "text-brand-main"
         )}
       >
-        {capitalize(status)}
+        {capitalize(status === "succeeded" ? "success" : status)}
       </div>
     </div>
   );
@@ -684,17 +726,19 @@ const SectionHeader: FC<{ className?: string }> = memo(
 );
 
 type ActivityTokensProps = {
+  source: ActivitySource;
   tx: string;
   accountAddress: string;
   className?: string;
 };
 
 const ActivityTokens: FC<ActivityTokensProps> = ({
+  source,
   tx,
   accountAddress,
   className,
 }) => {
-  const parsedTx = parseTransaction(tx);
+  const parsedTx = ethers.utils.parseTransaction(tx);
   const action = useMemo(() => {
     try {
       return matchTxAction(parsedTx);
@@ -704,7 +748,12 @@ const ActivityTokens: FC<ActivityTokensProps> = ({
     }
   }, [parsedTx]);
 
-  if (!action || !("tokens" in action)) {
+  if (
+    source.type !== "self" ||
+    !action ||
+    action.type !== TxActionType.TokenTransfer ||
+    action.tokens?.length === 0
+  ) {
     return null;
   }
 

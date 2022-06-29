@@ -14,7 +14,7 @@ import { validatePermission, validateAccount } from "./validation";
 import { approvalAdded } from "core/back/state";
 import { nanoid } from "nanoid";
 
-const { getAddress, isHexString } = ethers.utils;
+const { getAddress, isHexString, toUtf8Bytes, hexlify } = ethers.utils;
 
 export async function requestSigning(
   source: ActivitySource,
@@ -53,7 +53,9 @@ export async function requestSigning(
 
     switch (standard) {
       case SigningStandard.PersonalSign:
-        assert(isHexString(message));
+        message = isHexString(message)
+          ? message
+          : hexlify(toUtf8Bytes(message));
         break;
 
       case SigningStandard.SignTypedDataV1:
