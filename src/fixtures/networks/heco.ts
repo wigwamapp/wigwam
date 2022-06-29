@@ -26,7 +26,7 @@ export const HECO: Network[] = [
     type: "testnet",
     rpcUrls: ["https://http-testnet.hecochain.com"],
     chainTag: "heco",
-    name: "Huobi ECO Chain Testnet",
+    name: "Huobi Testnet",
     nativeCurrency: {
       symbol: "htt",
       name: "Huobi Test Token",

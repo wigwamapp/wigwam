@@ -25,7 +25,7 @@ export const CELO: Network[] = [
     type: "testnet",
     rpcUrls: ["https://alfajores-forno.celo-testnet.org"],
     chainTag: "celo",
-    name: "Celo Testnet Alfajores",
+    name: "Alfajores Celo Testnet",
     nativeCurrency: {
       symbol: "CELO",
       name: "CELO",
