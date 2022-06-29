@@ -31,8 +31,8 @@ import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import TokenSelect from "app/components/elements/TokenSelect";
 import Button from "app/components/elements/Button";
-import TooltipIcon from "app/components/elements/TooltipIcon";
-import Tooltip from "app/components/elements/Tooltip";
+// import TooltipIcon from "app/components/elements/TooltipIcon";
+// import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -474,29 +474,15 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
 
   return (
     <>
-      <Tooltip
-        content={
-          <>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-              aliquam, purus sit amet luctus venenatis, lectus magna fringilla
-              urna, porttitor rhoncus dolor purus non enim praesent elementum
-              facilisis leo
-            </p>
-            <p className="mt-2">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
-              aliquam, purus sit amet luctus venenatis, lectus magna fringilla
-              urna, porttitor rhoncus
-            </p>
-          </>
-        }
+      {/* <Tooltip
+        content={}
         placement="left-start"
         size="large"
         className="mr-2"
       >
         <TooltipIcon />
-      </Tooltip>
-      <div className="flex flex-col w-full">
+      </Tooltip> */}
+      <div className="ml-4 flex flex-col w-full">
         <SummaryRow
           header="Amount"
           value={

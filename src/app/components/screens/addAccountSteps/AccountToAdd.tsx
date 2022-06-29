@@ -233,6 +233,11 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
                 <p>
                   Use this network switcher to preview the balances of the
                   wallets to select them.
+                  <br />
+                  It only switches network for the &#34;Balance&#34; column on
+                  this page.
+                  <br />
+                  You will be able to use these wallets with any network.
                 </p>
               }
               placement="left-start"
