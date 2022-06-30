@@ -14,7 +14,8 @@ import { validatePermission, validateAccount } from "./validation";
 import { approvalAdded } from "core/back/state";
 import { nanoid } from "nanoid";
 
-const { getAddress, isHexString, toUtf8Bytes, hexlify } = ethers.utils;
+const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
+  ethers.utils;
 
 export async function requestSigning(
   source: ActivitySource,
@@ -34,6 +35,11 @@ export async function requestSigning(
     case SigningStandard.PersonalSign:
       accountAddress = params[1];
       message = params[0];
+
+      if (!isAddress(accountAddress)) {
+        accountAddress = params[0];
+        message = params[1];
+      }
       break;
 
     case SigningStandard.SignTypedDataV1:
