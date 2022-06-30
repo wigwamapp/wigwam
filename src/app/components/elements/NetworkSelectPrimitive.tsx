@@ -1,4 +1,5 @@
 import { FC, useCallback, useMemo, useState } from "react";
+import { useAtom } from "jotai";
 import Fuse from "fuse.js";
 
 import {
@@ -9,10 +10,8 @@ import {
 import { Network } from "core/types";
 import { TEvent, trackEvent } from "core/client";
 
-import {
-  ANALYTICS_NETWORKS_LS_KEY,
-  NETWORK_SEARCH_OPTIONS,
-} from "app/defaults";
+import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import { sentAnalyticNetworksAtom } from "app/atoms";
 import { Page, SettingTab } from "app/nav";
 import Select from "./Select";
 import IconedButton from "./IconedButton";
@@ -48,6 +47,10 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentItemIconClassName,
   contentClassName,
 }) => {
+  const [sentAnalyticNetworks, setSentAnalyticNetworks] = useAtom(
+    sentAnalyticNetworksAtom
+  );
+
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -76,31 +79,30 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
   const handleNetworkChange = useCallback(
     (chainId: number) => {
-      const alreadySentNetworks = window.localStorage.getItem(
-        ANALYTICS_NETWORKS_LS_KEY
-      );
-      const alreadySentNetworksArr = alreadySentNetworks
-        ? JSON.parse(alreadySentNetworks)
-        : [];
-      const isAlreadySentSelectedNetwork =
-        alreadySentNetworksArr.findIndex((el: number) => el === chainId) !== -1;
+      const isAlreadySentSelectedNetwork = sentAnalyticNetworks
+        ? sentAnalyticNetworks.findIndex((el: number) => el === chainId) !== -1
+        : false;
+
       if (!isAlreadySentSelectedNetwork) {
         const isDefault = DEFAULT_NETWORKS_CHAIN_IDS_SET.has(chainId);
+
         trackEvent(TEvent.NetworkChange, {
           name: isDefault
             ? DEFAULT_NETWORKS.find((el) => el.chainId === chainId)!.name
             : "unknown",
           chainId: isDefault ? chainId : "unknown", // TODO: Add source
         });
-        const newLSNetworksArr = [...alreadySentNetworksArr, chainId];
-        window.localStorage.setItem(
-          ANALYTICS_NETWORKS_LS_KEY,
-          JSON.stringify(newLSNetworksArr)
-        );
+
+        const finalArr = [chainId];
+        if (sentAnalyticNetworks) {
+          finalArr.push(...sentAnalyticNetworks);
+        }
+        setSentAnalyticNetworks(finalArr);
       }
+
       onNetworkChange(chainId);
     },
-    [onNetworkChange]
+    [onNetworkChange, sentAnalyticNetworks, setSentAnalyticNetworks]
   );
 
   return (
