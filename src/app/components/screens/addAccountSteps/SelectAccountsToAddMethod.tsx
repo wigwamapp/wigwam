@@ -48,7 +48,8 @@ const methodsExisting: MethodsProps = [
   {
     value: "create",
     title: "Add a wallet",
-    description: "Just add a wallet with the next index of derivation path.", // TODO: Not sure
+    description:
+      "Just add a wallet with the next index of the derivation path.",
   },
   {
     value: "manual",
