@@ -4,6 +4,7 @@ import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 
 import * as Repo from "core/repo";
+import { TEvent, trackEvent } from "core/client";
 
 import {
   composeValidators,
@@ -49,6 +50,9 @@ const ContactsDialog: FC = () => {
                 address: newAddress,
                 addedAt: isNew || !addedAt ? new Date().getTime() : addedAt,
               });
+              if (isNew) {
+                trackEvent(TEvent.Contact);
+              }
               if (isChangedAddress && address) {
                 await Repo.contacts.delete(address);
               }

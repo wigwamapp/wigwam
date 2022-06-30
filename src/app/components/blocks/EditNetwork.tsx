@@ -14,6 +14,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { storage } from "lib/ext/storage";
 
+import { DEFAULT_NETWORKS_CHAIN_IDS_SET } from "fixtures/networks";
 import * as Repo from "core/repo";
 import {
   cleanupNetwork,
@@ -22,6 +23,7 @@ import {
   setRpcUrl,
 } from "core/common";
 import { Network } from "core/types";
+import { TEvent, trackEvent } from "core/client";
 
 import { IS_FIREFOX } from "app/defaults";
 import {
@@ -129,6 +131,16 @@ const EditNetwork = memo<EditNetworkProps>(
 
             if (isChangedChainId) {
               await cleanupNetwork(initialChainId);
+            }
+
+            if (isNew) {
+              trackEvent(TEvent.NetworkCreation);
+            } else {
+              const isDefault = DEFAULT_NETWORKS_CHAIN_IDS_SET.has(chainId);
+              trackEvent(TEvent.NetworkEdit, {
+                name: isDefault ? nName : "unknown",
+                chainId: isDefault ? chainId : "unknown",
+              });
             }
 
             if (isNew && onActionFinished) {

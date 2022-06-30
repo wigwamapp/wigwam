@@ -1,10 +1,18 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 
+import {
+  DEFAULT_NETWORKS,
+  DEFAULT_NETWORKS_CHAIN_IDS_SET,
+  getNetworkIconUrl,
+} from "fixtures/networks";
 import { Network } from "core/types";
-import { getNetworkIconUrl } from "fixtures/networks";
+import { TEvent, trackEvent } from "core/client";
 
-import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import {
+  ANALYTICS_NETWORKS_LS_KEY,
+  NETWORK_SEARCH_OPTIONS,
+} from "app/defaults";
 import { Page, SettingTab } from "app/nav";
 import Select from "./Select";
 import IconedButton from "./IconedButton";
@@ -66,13 +74,42 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
     setOpened(false);
   }, []);
 
+  const handleNetworkChange = useCallback(
+    (chainId: number) => {
+      const alreadySentNetworks = window.localStorage.getItem(
+        ANALYTICS_NETWORKS_LS_KEY
+      );
+      const alreadySentNetworksArr = alreadySentNetworks
+        ? JSON.parse(alreadySentNetworks)
+        : [];
+      const isAlreadySentSelectedNetwork =
+        alreadySentNetworksArr.findIndex((el: number) => el === chainId) !== -1;
+      if (!isAlreadySentSelectedNetwork) {
+        const isDefault = DEFAULT_NETWORKS_CHAIN_IDS_SET.has(chainId);
+        trackEvent(TEvent.NetworkChange, {
+          name: isDefault
+            ? DEFAULT_NETWORKS.find((el) => el.chainId === chainId)!.name
+            : "unknown",
+          chainId: isDefault ? chainId : "unknown", // TODO: Add source
+        });
+        const newLSNetworksArr = [...alreadySentNetworksArr, chainId];
+        window.localStorage.setItem(
+          ANALYTICS_NETWORKS_LS_KEY,
+          JSON.stringify(newLSNetworksArr)
+        );
+      }
+      onNetworkChange(chainId);
+    },
+    [onNetworkChange]
+  );
+
   return (
     <Select
       open={opened}
       onOpenChange={setOpened}
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
-      setItem={(network) => onNetworkChange(network.key)}
+      setItem={(network) => handleNetworkChange(network.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
       className={className}
