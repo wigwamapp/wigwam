@@ -129,7 +129,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       showSelectedIcon={false}
       emptySearchText={
         <>
-          You can manage your assets in{" "}
+          You can manage your assets in the{" "}
           <Link
             to={{ page: Page.Default }}
             onClick={() => setOpened(false)}

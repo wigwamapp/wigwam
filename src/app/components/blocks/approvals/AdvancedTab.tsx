@@ -57,6 +57,10 @@ const AdvancedTab = memo<AdvancedTabProps>(
               Units of gas are a multiplier to “Max priority fee” and “Max fee”.
             </>
           }
+          tooltipProps={{
+            size: "large",
+            placement: "top",
+          }}
           value={formatUnits(overrides.gasLimit ?? tx.gasLimit)}
           onChange={(e) => changeValue("gasLimit", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("gasLimit", e.target.value)}
@@ -94,6 +98,10 @@ const AdvancedTab = memo<AdvancedTabProps>(
               Each time you send a transaction, the nonce value increases by 1.
             </>
           }
+          tooltipProps={{
+            size: "large",
+            placement: "top",
+          }}
           value={formatUnits(overrides.nonce ?? tx.nonce)}
           onChange={(e) => changeValue("nonce", parseUnits(e.target.value))}
           onBlur={(e) => fixValue("nonce", e.target.value)}
@@ -128,6 +136,10 @@ const AdvancedTab = memo<AdvancedTabProps>(
               contract.
             </>
           }
+          tooltipProps={{
+            size: "large",
+            placement: "top",
+          }}
           value={ethers.utils.hexlify(tx.data ?? "0x00")}
           textareaClassName="!h-36 mb-3"
         />
@@ -136,6 +148,10 @@ const AdvancedTab = memo<AdvancedTabProps>(
           label="Raw transaction"
           readOnly
           tooltip={<>The byte representation of the complete transaction.</>}
+          tooltipProps={{
+            size: "large",
+            placement: "top",
+          }}
           value={rawTx}
           textareaClassName="!h-48"
         />

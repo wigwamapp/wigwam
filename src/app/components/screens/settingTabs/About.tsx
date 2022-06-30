@@ -18,7 +18,7 @@ const About: FC = () => {
       </div>
 
       <p className="text-brand-font text-sm mt-6 mb-8 max-w-[20rem]">
-        Vigvam lets you to explore DeFi and NFTs in safer, faster and modern
+        Vigvam lets you explore DeFi and NFTs in a safer, faster and more modern
         way.
       </p>
 

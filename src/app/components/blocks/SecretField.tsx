@@ -177,7 +177,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         <HiddenSeedPhraseIcon className="w-full h-auto absolute inset-0" />
         <LockIcon className="w-[2.125rem] h-auto" />
         <span className="text-xs font-bold mt-1">
-          Click here to reveal {label.toLowerCase()}
+          Click here to reveal a {label.toLowerCase()}
         </span>
         {copyButton}
       </div>

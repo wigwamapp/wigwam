@@ -9,12 +9,12 @@ export const required = (value: string) => (value ? undefined : "Required");
 export const minLength = (min: number) => (value: string | number) =>
   value && value.toString().length >= min
     ? undefined
-    : `Minimum length is ${min}`;
+    : `The minimum length is ${min}`;
 
 export const maxLength = (max: number) => (value: string | number) =>
   value && value.toString().length <= max
     ? undefined
-    : `Maximum length is ${max}`;
+    : `The maximum length is ${max}`;
 
 export const composeValidators =
   (...validators: (ValidationType | undefined)[]) =>
@@ -37,7 +37,7 @@ export const maxValue =
       return undefined;
     }
 
-    return `Maximum amount is ${max} ${currencySymbol}`;
+    return `The maximum amount is ${max} ${currencySymbol}`;
   };
 
 export const validateSeedPhrase = (lang: string) => (phrase: string) => {
@@ -63,14 +63,16 @@ export const isLink = (value: string) =>
   !value || value.match(linkRegex) ? undefined : "Link is invalid";
 
 export const validateAddress = (value: string) =>
-  ethers.utils.isAddress(value) ? undefined : "Recipient address is invalid";
+  ethers.utils.isAddress(value)
+    ? undefined
+    : "The recipient address is invalid";
 
 export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+\\/{index}$");
 
 export const validateDerivationPath = (value: string) =>
   !value || value.match(derivationPathRegex)
     ? undefined
-    : "Derivation path is invalid";
+    : "The derivation path is invalid";
 
 export const currencySymbolRegex = new RegExp(
   "^(?=.*[a-zA-Z\\d].*)[a-zA-Z\\d!@#$%&*]+$"
@@ -79,7 +81,7 @@ export const currencySymbolRegex = new RegExp(
 export const validateCurrencySymbol = (value: string) =>
   !value || value.match(currencySymbolRegex)
     ? undefined
-    : "Currency symbol is invalid";
+    : "The currency symbol is invalid";
 
 const passwordRegex = new RegExp(
   /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]{8,}$/

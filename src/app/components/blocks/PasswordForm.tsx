@@ -114,7 +114,7 @@ const PasswordForm = memo<PasswordFormProps>(
                 >
                   <u>Forgot the password?</u>
                   <br />
-                  Want to <u>sign into another profile?</u>
+                  Want to <u>sign in to another profile?</u>
                 </button>
               )}
             </div>

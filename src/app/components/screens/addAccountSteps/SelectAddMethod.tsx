@@ -76,7 +76,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({
             <Collapse label="Customize derivation path" className="mt-12">
               <div className="max-w-[17.5rem]">
                 <p className="mb-3 text-sm">
-                  A derivation path tells a how to derive the wallets from the
+                  A derivation path explains how to derive wallets from the
                   Secret Phrase.
                 </p>
                 <Field

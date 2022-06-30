@@ -78,15 +78,15 @@ const AttentionContent = [
     content: (
       <>
         <p className="mb-2">
-          It is impossible to recover the current profile password. Because
-          Vigvam is <strong>non-custodial</strong> software. Only user knows his
-          password.
+          It is not possible to recover the current profile password. Vigvam is{" "}
+          <strong>non-custodial</strong> software. The user is the only one who
+          knows the password.
         </p>
 
         <p className="mt-2">
           To access the same wallets -{" "}
           <SmartLink to={{ page: Page.Profiles }}>add a new profile</SmartLink>,
-          and restore this wallets. If you used the{" "}
+          and restore these wallets. If you used the{" "}
           <strong>Secret Phrase</strong> to add them,{" "}
           <strong>use the same one again</strong>.
         </p>
@@ -98,8 +98,7 @@ const AttentionContent = [
     header: "Import Secret Phrase",
     content: (
       <p>
-        To restore wallets with the Secret Phrase, or if you want to start from
-        scratch -{" "}
+        To restore wallets with the Secret Phrase, or to start from scratch -{" "}
         <SmartLink to={{ page: Page.Profiles }}>add a new profile</SmartLink>{" "}
         and use this pharse to add new wallets.
       </p>
@@ -114,7 +113,7 @@ const AttentionContent = [
         recommend using{" "}
         <SmartLink to={{ page: Page.Profiles }}>profiles</SmartLink>, but if you
         still want to reset - just reinstall the application (all profiles will
-        be erased).
+        be deleted).
       </p>
     ),
   },

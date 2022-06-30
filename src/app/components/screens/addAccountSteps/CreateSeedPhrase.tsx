@@ -117,7 +117,7 @@ const CreateSeedPhrase = memo(() => {
   return (
     <>
       <AddAccountHeader className="mb-8">
-        Create new Secret Phrase
+        Create a new Secret Phrase
       </AddAccountHeader>
       <div className="flex flex-col max-w-[27.5rem] mx-auto">
         <div className="flex">

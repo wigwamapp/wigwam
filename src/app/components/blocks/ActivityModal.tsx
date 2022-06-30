@@ -708,7 +708,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
       />
       {explorerLink && (
         <IconedButton
-          aria-label="View transaction in Explorer"
+          aria-label="View the transaction in Explorer"
           Icon={WalletExplorerIcon}
           className="!w-6 !h-6 min-w-[1.5rem] ml-2"
           iconClassName="!w-[1.125rem]"

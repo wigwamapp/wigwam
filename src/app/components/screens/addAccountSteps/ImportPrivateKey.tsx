@@ -68,7 +68,7 @@ const ImportPrivateKey = memo(() => {
               >
                 {({ input, meta }) => (
                   <SecretField
-                    placeholder="Paste there your private key"
+                    placeholder="Paste your private key here"
                     setFromClipboard={(value) =>
                       form.change("privateKey", value)
                     }
