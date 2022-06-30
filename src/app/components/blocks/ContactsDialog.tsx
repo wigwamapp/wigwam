@@ -40,7 +40,7 @@ const ContactsDialog: FC = () => {
       withHumanDelay(async () => {
         if (modalData) {
           newAddress = ethers.utils.getAddress(newAddress);
-          const { name, address, addedAt } = modalData;
+          const { name, address, addedAt, fromPage } = modalData;
           const isNew = !name || !address;
           try {
             const isChangedAddress = newAddress !== address;
@@ -51,7 +51,7 @@ const ContactsDialog: FC = () => {
                 addedAt: isNew || !addedAt ? new Date().getTime() : addedAt,
               });
               if (isNew) {
-                trackEvent(TEvent.Contact);
+                trackEvent(TEvent.Contact, { fromPage: fromPage || false });
               }
               if (isChangedAddress && address) {
                 await Repo.contacts.delete(address);

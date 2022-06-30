@@ -11,7 +11,7 @@ import {
   AccountSource,
   ConnectionApproval,
 } from "core/types";
-import { approveItem } from "core/client";
+import { approveItem, TEvent, trackEvent } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
 import {
@@ -183,6 +183,10 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     [approval, setApproving, alert]
   );
 
+  useEffect(() => {
+    trackEvent(TEvent.DappConnect);
+  }, []);
+
   if (approval.source.type !== "page") return null;
 
   return (
@@ -230,6 +234,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
             changeInternalChainId={false}
             withAction={false}
             size="small"
+            source="connection"
           />
         </div>
         <Separator />

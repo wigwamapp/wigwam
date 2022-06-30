@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo, useState } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import Fuse from "fuse.js";
 
 import {
@@ -11,7 +11,7 @@ import { Network } from "core/types";
 import { TEvent, trackEvent } from "core/client";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { sentAnalyticNetworksAtom } from "app/atoms";
+import { pageAtom, sentAnalyticNetworksAtom } from "app/atoms";
 import { Page, SettingTab } from "app/nav";
 import Select from "./Select";
 import IconedButton from "./IconedButton";
@@ -30,6 +30,7 @@ type NetworkSelectProps = {
   onNetworkChange: (chainId: number) => void;
   withAction?: boolean;
   size?: "large" | "small";
+  source?: string;
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -42,6 +43,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   onNetworkChange,
   withAction = true,
   size = "large",
+  source,
   className,
   currentItemClassName,
   currentItemIconClassName,
@@ -50,6 +52,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   const [sentAnalyticNetworks, setSentAnalyticNetworks] = useAtom(
     sentAnalyticNetworksAtom
   );
+  const page = useAtomValue(pageAtom);
 
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
@@ -90,7 +93,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
           name: isDefault
             ? DEFAULT_NETWORKS.find((el) => el.chainId === chainId)!.name
             : "unknown",
-          chainId: isDefault ? chainId : "unknown", // TODO: Add source
+          chainId: isDefault ? chainId : "unknown",
+          source: source ?? `page_${page}`,
         });
 
         const finalArr = [chainId];
@@ -102,7 +106,13 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
       onNetworkChange(chainId);
     },
-    [onNetworkChange, sentAnalyticNetworks, setSentAnalyticNetworks]
+    [
+      onNetworkChange,
+      page,
+      sentAnalyticNetworks,
+      setSentAnalyticNetworks,
+      source,
+    ]
   );
 
   return (

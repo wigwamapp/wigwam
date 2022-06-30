@@ -115,6 +115,7 @@ const PopupNetworkSelect: FC = () => {
 
   return (
     <NetworkSelect
+      source="popup"
       className="max-w-auto"
       currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
       currentItemIconClassName={classNames(
