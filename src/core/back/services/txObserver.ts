@@ -67,7 +67,10 @@ export async function startTxObserver() {
               try {
                 const transfers = matchTokenTransferEvents(result.logs);
                 for (const transfer of transfers) {
-                  if (transfer.to === tx.accountAddress) {
+                  if (
+                    transfer.to === tx.accountAddress ||
+                    transfer.from === tx.accountAddress
+                  ) {
                     addFindTokenRequest(
                       tx.chainId,
                       tx.accountAddress,
@@ -79,6 +82,12 @@ export async function startTxObserver() {
                 console.error(err);
               }
             }
+
+            addFindTokenRequest(
+              tx.chainId,
+              tx.accountAddress,
+              NATIVE_TOKEN_SLUG
+            );
           }
 
           txsToUpdate.set(tx.txHash, updatedTx);

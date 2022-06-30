@@ -10,11 +10,22 @@ import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain, getAccountTokenFromChain } from "../chain";
 import { enqueueTokensSync } from "./queue";
 
+const stack = new Set<string>();
+
 export async function addFindTokenRequest(
   chainId: number,
   accountAddress: string,
   tokenSlug: string
 ) {
+  const dbKey = createAccountTokenKey({
+    chainId,
+    accountAddress,
+    tokenSlug,
+  });
+
+  if (stack.has(dbKey)) return;
+
+  stack.add(dbKey);
   syncStarted(chainId);
 
   try {
@@ -22,14 +33,35 @@ export async function addFindTokenRequest(
       let tokenToAdd: AccountAsset | undefined;
 
       const { address: tokenAddress } = parseTokenSlug(tokenSlug);
-      const dbKey = createAccountTokenKey({
-        chainId,
-        accountAddress,
-        tokenSlug,
-      });
 
       const existing = await repo.accountTokens.get(dbKey);
-      if (existing) return;
+      if (existing) {
+        const balance = await getBalanceFromChain(
+          chainId,
+          tokenSlug,
+          accountAddress
+        );
+
+        const rawBalance = balance?.toString() ?? "0";
+        const balanceUSD =
+          "priceUSD" in existing && existing.priceUSD
+            ? new BigNumber(rawBalance)
+                .div(10 ** existing.decimals)
+                .times(existing.priceUSD)
+                .toNumber()
+            : 0;
+
+        await repo.accountTokens.put(
+          {
+            ...existing,
+            rawBalance,
+            balanceUSD,
+          },
+          dbKey
+        );
+
+        return;
+      }
 
       const [debankChain, coinGeckoPrices] = await Promise.all([
         getDebankChain(chainId),
@@ -127,5 +159,6 @@ export async function addFindTokenRequest(
     console.error(err);
   }
 
+  stack.delete(dbKey);
   setTimeout(() => synced(chainId), 500);
 }
