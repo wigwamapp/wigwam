@@ -81,6 +81,17 @@ const ChooseAddAccountWay = memo(() => {
                 <div
                   className={classNames("flex flex-wrap items-stretch -mb-5")}
                 >
+                  {section.disabled && (
+                    <div
+                      className={classNames(
+                        "-mt-4 mb-4 w-full",
+                        "text-xs text-brand-redtwo"
+                      )}
+                    >
+                      Not yet supported in this browser.
+                    </div>
+                  )}
+
                   {section.tiles.map(
                     ({ title, Icon, action, openLoginMethod, soon }, i) => (
                       <Tile
@@ -90,7 +101,11 @@ const ChooseAddAccountWay = memo(() => {
                         action={action}
                         openLoginMethod={openLoginMethod}
                         soon={soon}
-                        className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                        className={classNames(
+                          "mb-5 select-none",
+                          i % 3 !== 2 && "mr-5",
+                          section.disabled && "opacity-50 pointer-events-none"
+                        )}
                       />
                     )
                   )}

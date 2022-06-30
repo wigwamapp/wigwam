@@ -25,6 +25,7 @@ export type WaysReturnTile = {
 };
 
 type WaysReturn = {
+  disabled?: boolean;
   type: string;
   title: string;
   tooltip?: {
@@ -108,6 +109,7 @@ export const getWays = (
         ],
   },
   {
+    disabled: process.env.TARGET_BROWSER === "firefox",
     type: "social",
     title: "Social",
     tooltip: {
