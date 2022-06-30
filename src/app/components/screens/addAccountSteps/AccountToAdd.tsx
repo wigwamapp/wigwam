@@ -231,8 +231,8 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
             <Tooltip
               content={
                 <p>
-                  Use this network switcher to preview the balances of the
-                  wallets to select them.
+                  Use this network switch to preview balances of your wallets to
+                  select the right one.
                   <br />
                   It only switches network for the &#34;Balance&#34; column on
                   this page.
@@ -275,7 +275,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               </Th>
               <Th />
               <Th className="!pl-7 !text-brand-light align-middle">
-                <Tooltip content="You can edit wallet's name">
+                <Tooltip content="You can edit the wallet’s name">
                   <span className="flex align-center font-semibold">
                     Name
                     <EditIcon className="ml-0.5" />

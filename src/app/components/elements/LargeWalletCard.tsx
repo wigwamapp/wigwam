@@ -157,8 +157,8 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
                 content={
                   <>
                     <p>
-                      This is your current selected wallet. All balances in
-                      sections below related to this wallet.
+                      This is your currently selected wallet. All balances in
+                      sections below are related to this wallet.
                     </p>
 
                     {portfolioBalance && (

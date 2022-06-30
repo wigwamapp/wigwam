@@ -115,7 +115,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       itemClassName="group"
       emptySearchText={
         <>
-          You can manage your wallets in{" "}
+          You can manage your wallets in the{" "}
           <SmartLink
             to={{ page: Page.Wallets }}
             onClick={() => setOpened(false)}

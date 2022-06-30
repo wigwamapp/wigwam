@@ -50,7 +50,7 @@ export const getWays = (
         <>
           <p>
             <strong>Secret Phrase</strong> is a 12-word or 24-word phrase that
-            is the “master key” to your wallets and funds.
+            serves as the “master key” to your wallets and funds.
             <br />
           </p>
 
@@ -62,7 +62,7 @@ export const getWays = (
           <ul className="mt-1 list-disc list-inside">
             <li>Save in a password manager.</li>
             <li>Encrypt manually and save to any cloud.</li>
-            <li>Write down and store in multiple places.</li>
+            <li>Write it down and store in multiple places.</li>
           </ul>
           <p className="mt-2">
             <strong>Never, ever share</strong> your Secret Phrase, not even with
@@ -79,7 +79,7 @@ export const getWays = (
       ? [
           {
             title:
-              "You already have Secret Phrase, and wallets belonging to it.",
+              "You already have a Secret Phrase, and wallets that belong to it.",
           },
           {
             title: "Add new",
@@ -178,8 +178,8 @@ export const getWays = (
         <>
           <p>
             <strong>Connect</strong> your existing hardware wallet directly to
-            Vigvam. And use all the power of the available interfaces from
-            Vigvam and the security of an external crypto device!
+            Vigvam. Use all the power of the available interfaces from Vivgram
+            and the security of an external crypto device!
           </p>
           <p className="mt-2">
             A <strong>Hardware device</strong> is a wallet which stores your

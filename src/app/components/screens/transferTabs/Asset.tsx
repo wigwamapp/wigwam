@@ -154,7 +154,7 @@ const Asset: FC = () => {
                             rel="noopener noreferrer"
                             className="underline"
                           >
-                            View transaction in explorer
+                            View the transaction in explorer
                           </a>
 
                           <ExternalLinkIcon className="h-5 w-auto ml-1" />

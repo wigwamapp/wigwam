@@ -97,7 +97,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       }
       emptySearchText={
         <>
-          You can add a new network in{" "}
+          You can add a new network in the{" "}
           {withAction ? (
             <SmartLink
               to={{ page: Page.Settings, setting: SettingTab.Networks }}

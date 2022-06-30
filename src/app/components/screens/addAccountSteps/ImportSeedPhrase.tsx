@@ -103,7 +103,7 @@ const ImportSeedPhrase = memo(() => {
               >
                 {({ input, meta }) => (
                   <SecretField
-                    placeholder="Paste there your secret phrase"
+                    placeholder="Paste your secret phrase here"
                     setFromClipboard={(value) => form.change("seed", value)}
                     error={meta.touched && meta.error}
                     errorMessage={meta.error}

@@ -195,7 +195,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     >
       <ChainIdProvider chainId={localChainId}>
         <DappLogos dappLogoUrl={approval.source.favIconUrl} />
-        <h1 className="text-2xl font-bold mt-4 mb-1">Connect to website</h1>
+        <h1 className="text-2xl font-bold mt-4 mb-1">Connect to the website</h1>
         <span className="text-base mb-6">
           {new URL(approval.source.url).host}
         </span>
@@ -211,10 +211,9 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           <Tooltip
             content={
               <p>
-                Use this switch to select the preferred network for the
-                connection.
-                <br />
-                Also to preview the balances of the wallets to select them.
+                Use this switch to select a preferred network for the connection
+                and to preview the balances of the wallets to select the right
+                one.
               </p>
             }
             interactive={false}
