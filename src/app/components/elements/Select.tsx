@@ -18,6 +18,8 @@ import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import Tooltip, { TooltipProps } from "./Tooltip";
+import TooltipIcon from "./TooltipIcon";
 
 type ItemProps<T, U> = {
   icon?: string;
@@ -39,6 +41,8 @@ export type SelectProps<T, U> = {
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
   size?: "large" | "small";
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -63,6 +67,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
   emptySearchText,
   onOpenChange,
   size = "large",
+  tooltip,
+  tooltipProps,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -126,11 +132,22 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "ml-4 mb-2",
             "text-base font-normal text-left",
-            "text-brand-gray"
+            "text-brand-gray",
+            "flex items-center"
           )}
           onClick={() => setOpened(!opened)}
         >
           {label}
+          {tooltip && (
+            <Tooltip
+              content={tooltip}
+              {...tooltipProps}
+              className="ml-2"
+              tooltipClassName="max-w-[20rem]"
+            >
+              <TooltipIcon className="!w-4 !h-4" />
+            </Tooltip>
+          )}
         </button>
       )}
       <DropdownMenu.Root

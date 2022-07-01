@@ -1,8 +1,9 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, ReactNode, useCallback, useMemo } from "react";
 
 import { FALLBACK_LOCALE, LocaleMeta } from "fixtures/locales";
 
 import Select from "app/components/elements/Select";
+import { TooltipProps } from "app/components/elements/Tooltip";
 
 const prepareLanguage = (language: LocaleMeta) => ({
   key: language.code,
@@ -13,11 +14,13 @@ type SelectLanguageProps = {
   selected: LocaleMeta;
   items: LocaleMeta[];
   onSelect: (selected: LocaleMeta) => void;
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
   className?: string;
 };
 
 const SelectLanguage = memo<SelectLanguageProps>(
-  ({ className, selected, items, onSelect }) => {
+  ({ className, selected, items, onSelect, ...rest }) => {
     const preparedLanguages = useMemo(
       () => items.map((language) => prepareLanguage(language)),
       [items]
@@ -45,6 +48,7 @@ const SelectLanguage = memo<SelectLanguageProps>(
         label="Language"
         showSelected
         className={className}
+        {...rest}
       />
     );
   }

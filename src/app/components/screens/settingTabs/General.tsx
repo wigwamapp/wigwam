@@ -31,17 +31,21 @@ const General: FC = () => {
     <div className="flex flex-col items-start">
       <SettingsHeader>General</SettingsHeader>
 
-      <p className="mb-6 text-xs text-brand-font max-w-[30rem]">
-        The interface text is still being translated,
-        <br />
-        but you can already use languages to display dates and sums.
-      </p>
-
       <SelectLanguage
         selected={locale}
         items={DEFAULT_LOCALES}
         onSelect={({ code }) => setLocale(code)}
         className="mb-3"
+        tooltip={
+          <>
+            We are still working on interface text translation, but you can
+            already use languages for localized dates and amount formats.
+          </>
+        }
+        tooltipProps={{
+          size: "large",
+          placement: "right",
+        }}
       />
       <SelectCurrency className="mb-3" />
       {/* <Switcher
