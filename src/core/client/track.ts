@@ -28,6 +28,8 @@ export const trackEvent: AmplitudeClient["track"] = async (
   return amplitued?.track(...args);
 };
 
+export const isTrackingEnabled = () => getAmplitude().then(Boolean);
+
 const getAmplitude = memoizeOne(async () => {
   const apiKey = process.env.VIGVAM_ANALYTICS_API_KEY;
   const state = await storage.fetchForce<AnalyticsState>(Setting.Analytics);

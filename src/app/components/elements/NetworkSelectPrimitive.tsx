@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import {
   DEFAULT_NETWORKS,
@@ -8,7 +9,7 @@ import {
   getNetworkIconUrl,
 } from "fixtures/networks";
 import { Network } from "core/types";
-import { TEvent, trackEvent } from "core/client";
+import { isTrackingEnabled, TEvent, trackEvent } from "core/client";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { pageAtom, sentAnalyticNetworksAtom } from "app/atoms";
@@ -49,10 +50,10 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentItemIconClassName,
   contentClassName,
 }) => {
-  const [sentAnalyticNetworks, setSentAnalyticNetworks] = useAtom(
-    sentAnalyticNetworksAtom
-  );
   const page = useAtomValue(pageAtom);
+
+  const sentAnalyticNetworks = useLazyAtomValue(sentAnalyticNetworksAtom);
+  const setSentAnalyticNetworks = useSetAtom(sentAnalyticNetworksAtom);
 
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
@@ -80,13 +81,18 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
     setOpened(false);
   }, []);
 
-  const handleNetworkChange = useCallback(
-    (chainId: number) => {
-      const isAlreadySentSelectedNetwork = sentAnalyticNetworks
-        ? sentAnalyticNetworks.findIndex((el: number) => el === chainId) !== -1
-        : false;
+  const trackNetworkChanged = useCallback(
+    async (chainId: number) => {
+      try {
+        const enabled = await isTrackingEnabled();
+        if (!enabled) return;
 
-      if (!isAlreadySentSelectedNetwork) {
+        const isAlreadySentNetwork = sentAnalyticNetworks
+          ? sentAnalyticNetworks.findIndex((id) => id === chainId) !== -1
+          : false;
+
+        if (isAlreadySentNetwork) return;
+
         const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
 
         trackEvent(TEvent.NetworkChange, {
@@ -97,22 +103,20 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
           source: source ?? `page_${page}`,
         });
 
-        const finalArr = [chainId];
-        if (sentAnalyticNetworks) {
-          finalArr.push(...sentAnalyticNetworks);
-        }
-        setSentAnalyticNetworks(finalArr);
+        setSentAnalyticNetworks((current) => [...current, chainId]);
+      } catch (err) {
+        console.error(err);
       }
-
-      onNetworkChange(chainId);
     },
-    [
-      onNetworkChange,
-      page,
-      sentAnalyticNetworks,
-      setSentAnalyticNetworks,
-      source,
-    ]
+    [source, page, sentAnalyticNetworks, setSentAnalyticNetworks]
+  );
+
+  const handleNetworkChange = useCallback(
+    (chainId: number) => {
+      onNetworkChange(chainId);
+      trackNetworkChanged(chainId);
+    },
+    [onNetworkChange, trackNetworkChanged]
   );
 
   return (

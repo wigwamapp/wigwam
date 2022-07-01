@@ -92,7 +92,7 @@ export const getContactsAtom = atomFamily(
   dequal
 );
 
-export const sentAnalyticNetworksAtom = atomWithStorage<number[] | null>(
+export const sentAnalyticNetworksAtom = atomWithStorage<number[]>(
   SENT_ANALYTIC_NETWORKS,
-  null
+  []
 );
