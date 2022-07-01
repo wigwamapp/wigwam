@@ -6,18 +6,18 @@ import { Setting, AnalyticsState } from "core/common/settings";
 
 export enum TEvent {
   Promocode = "PROMOCODE_USED",
-  SetupWallet = "SETUP_WALLET",
-  SetupVigvam = "SETUP_VIGVAM",
-  ProfileCreation = "PROFILE_CREATION",
-  ProfileUpdate = "PROFILE_UPDATE",
-  NetworkChange = "NETWORK_CHANGE",
-  NetworkCreation = "NETWORK_CREATION",
-  NetworkEdit = "NETWORK_EDIT",
-  Contact = "CONTACT_CREATION",
-  Transfer = "TRANSFER_CREATION",
-  DappConnect = "DAPP_CONNECT",
-  DappSigning = "DAPP_SIGNING",
-  DappTransaction = "DAPP_TRANSACTION",
+  SetupWallet = "WALLET_SETUPED",
+  SetupVigvam = "VIGVAM_SETUPED",
+  ProfileCreation = "PROFILE_CREATED",
+  ProfileUpdate = "PROFILE_UPDATED",
+  NetworkChange = "NETWORK_CHANGED",
+  NetworkCreation = "NETWORK_CREATED",
+  NetworkEdit = "NETWORK_EDITED",
+  Contact = "CONTACT_CREATED",
+  Transfer = "TRANSFER_CREATED",
+  DappConnect = "DAPP_CONNECT_OPENED",
+  DappSigning = "DAPP_SIGNING_OPENED",
+  DappTransaction = "DAPP_TRANSACTION_OPENED",
 }
 
 export const trackEvent: AmplitudeClient["track"] = async (

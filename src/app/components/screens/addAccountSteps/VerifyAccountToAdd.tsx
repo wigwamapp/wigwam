@@ -93,19 +93,20 @@ const VerifyAccountToAdd: FC = () => {
           if (!confirmed) return;
         }
 
+        if (initialSetup) {
+          Object.assign(stateRef.current, { addAccountsParams });
+          navigateToStep(AddAccountStep.SetupPassword);
+        } else {
+          await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
+          setAccModalOpened([false]);
+        }
+
         const trackParams = {
           source: addAccountsParams[0].source,
           walletsAddedAmount: addAccountsParams.length,
         };
-        if (initialSetup) {
-          Object.assign(stateRef.current, { addAccountsParams });
-          trackEvent(TEvent.SetupWallet, trackParams);
-          navigateToStep(AddAccountStep.SetupPassword);
-        } else {
-          await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
-          trackEvent(TEvent.SetupWallet, trackParams);
-          setAccModalOpened([false]);
-        }
+
+        trackEvent(TEvent.SetupWallet, trackParams);
       } catch (err: any) {
         alert({ title: "Error!", content: err.message });
       }
