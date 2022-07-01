@@ -326,14 +326,14 @@ const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
   <div
     className={classNames(
       "relative",
-      "w-full h-18 p-5 mb-[2.4375rem]",
+      "w-full h-18 py-5 px-4 mb-[2.4375rem]",
       "flex items-center",
       "text-xs",
       "z-[25]",
       className
     )}
   >
-    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
+    <VerifiedIcon className="mr-2 min-w-[1.375rem]" />
     {children}
     <BackgroundIcon
       className={classNames(
