@@ -21,6 +21,8 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AcceptCheckbox from "app/components/blocks/AcceptCheckbox";
 import Input from "app/components/elements/Input";
 import { ReactComponent as SuccessIcon } from "app/icons/green-check.svg";
+import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
+import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 
 import ChooseAddAccountWayOrigin from "./ChooseAddAccountWay";
 
@@ -76,7 +78,9 @@ const ChooseAddAccountWayBeta = memo(() => {
 
   return (
     <>
-      <AddAccountHeader className="mb-7">Beta testing</AddAccountHeader>
+      <AddAccountHeader className="mb-5">
+        Beta testing is here! 🏕
+      </AddAccountHeader>
 
       <Form<FormValues>
         initialValues={{ code: betaTestCode, analytics: true }}
@@ -100,7 +104,7 @@ const ChooseAddAccountWayBeta = memo(() => {
               >
                 {({ input, meta }) => (
                   <Input
-                    label="Beta test promocode"
+                    label="It's a private beta. To participate, enter your promo code"
                     placeholder="Type promocode..."
                     error={
                       (!modifiedSinceLastSubmit && submitError) ||
@@ -155,6 +159,43 @@ const ChooseAddAccountWayBeta = memo(() => {
               </Field>
             </div>
 
+            <div className="absolute left-0 right-0 bottom-[7.5rem] flex justify-center">
+              <div className="flex items-stretch">
+                <ul className="flex">
+                  {mediaLinks.map(({ href, label, Icon }, i) => (
+                    <li key={i} className="mr-1">
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={classNames(
+                          "p-1",
+                          "flex justify-center items-center",
+                          "group"
+                        )}
+                        aria-label={label}
+                      >
+                        <Icon
+                          className={classNames(
+                            "w-8 h-8",
+                            "fill-brand-inactivelight group-hover:fill-brand-light",
+                            "group-focus-visible:fill-brand-light",
+                            "transition-colors ease-in-out"
+                          )}
+                        />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="ml-2 flex-1 text-left text-sm text-brand-inactivelight">
+                  Don&#39;t have a promo code?
+                  <br />
+                  Join our communities and ask for invitation.
+                </p>
+              </div>
+            </div>
+
             <AddAccountContinueButton loading={submitting} />
           </form>
         )}
@@ -164,3 +205,16 @@ const ChooseAddAccountWayBeta = memo(() => {
 });
 
 export default ChooseAddAccountWayBeta;
+
+const mediaLinks = [
+  {
+    href: "https://t.me/vigvamapp",
+    label: "Telegram",
+    Icon: TelegramIcon,
+  },
+  {
+    href: "https://twitter.com/vigvamapp",
+    label: "Twitter",
+    Icon: TwitterIcon,
+  },
+];
