@@ -22,7 +22,13 @@ import {
   FeeSuggestions,
   AccountSource,
 } from "core/types";
-import { approveItem, findToken, suggestFees } from "core/client";
+import {
+  approveItem,
+  findToken,
+  suggestFees,
+  TEvent,
+  trackEvent,
+} from "core/client";
 import { getNextNonce } from "core/common/nonce";
 import { matchTxAction } from "core/common/transaction";
 
@@ -429,6 +435,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const handleBootAnimationDone = useCallback(() => {
     bootAnimationRef.current = false;
   }, []);
+
+  useEffect(() => {
+    trackEvent(TEvent.DappTransaction, { source: source.type });
+  }, [source.type]);
 
   return (
     <ApprovalLayout

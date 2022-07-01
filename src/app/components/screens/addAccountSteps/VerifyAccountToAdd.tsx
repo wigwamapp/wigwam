@@ -14,7 +14,7 @@ import {
   getSeedPhraseHDNode,
   toNeuterExtendedKey,
 } from "core/common";
-import { addAccounts } from "core/client";
+import { addAccounts, TEvent, trackEvent } from "core/client";
 
 import { AddAccountStep } from "app/nav";
 import {
@@ -100,6 +100,13 @@ const VerifyAccountToAdd: FC = () => {
           await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
           setAccModalOpened([false]);
         }
+
+        const trackParams = {
+          source: addAccountsParams[0].source,
+          walletsAddedAmount: addAccountsParams.length,
+        };
+
+        trackEvent(TEvent.SetupWallet, trackParams);
       } catch (err: any) {
         alert({ title: "Error!", content: err.message });
       }

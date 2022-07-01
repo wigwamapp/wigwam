@@ -1,10 +1,18 @@
 import { FC, useCallback, useMemo, useState } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
+import { useLazyAtomValue } from "lib/atom-utils";
 
+import {
+  DEFAULT_NETWORKS,
+  DEFAULT_CHAIN_IDS,
+  getNetworkIconUrl,
+} from "fixtures/networks";
 import { Network } from "core/types";
-import { getNetworkIconUrl } from "fixtures/networks";
+import { isTrackingEnabled, TEvent, trackEvent } from "core/client";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
+import { pageAtom, sentAnalyticNetworksAtom } from "app/atoms";
 import { Page, SettingTab } from "app/nav";
 import Select from "./Select";
 import IconedButton from "./IconedButton";
@@ -23,6 +31,7 @@ type NetworkSelectProps = {
   onNetworkChange: (chainId: number) => void;
   withAction?: boolean;
   size?: "large" | "small";
+  source?: string;
   className?: string;
   currentItemClassName?: string;
   currentItemIconClassName?: string;
@@ -35,11 +44,17 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   onNetworkChange,
   withAction = true,
   size = "large",
+  source,
   className,
   currentItemClassName,
   currentItemIconClassName,
   contentClassName,
 }) => {
+  const page = useAtomValue(pageAtom);
+
+  const sentAnalyticNetworks = useLazyAtomValue(sentAnalyticNetworksAtom);
+  const setSentAnalyticNetworks = useSetAtom(sentAnalyticNetworksAtom);
+
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -66,13 +81,51 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
     setOpened(false);
   }, []);
 
+  const trackNetworkChanged = useCallback(
+    async (chainId: number) => {
+      try {
+        const enabled = await isTrackingEnabled();
+        if (!enabled) return;
+
+        const isAlreadySentNetwork = sentAnalyticNetworks
+          ? sentAnalyticNetworks.findIndex((id) => id === chainId) !== -1
+          : false;
+
+        if (isAlreadySentNetwork) return;
+
+        const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
+
+        trackEvent(TEvent.NetworkChange, {
+          name: isDefault
+            ? DEFAULT_NETWORKS.find((el) => el.chainId === chainId)!.name
+            : "unknown",
+          chainId: isDefault ? chainId : "unknown",
+          source: source ?? `page_${page}`,
+        });
+
+        setSentAnalyticNetworks((current) => [...current, chainId]);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [source, page, sentAnalyticNetworks, setSentAnalyticNetworks]
+  );
+
+  const handleNetworkChange = useCallback(
+    (chainId: number) => {
+      onNetworkChange(chainId);
+      trackNetworkChanged(chainId);
+    },
+    [onNetworkChange, trackNetworkChanged]
+  );
+
   return (
     <Select
       open={opened}
       onOpenChange={setOpened}
       items={preparedNetworks}
       currentItem={preparedCurrentNetwork}
-      setItem={(network) => onNetworkChange(network.key)}
+      setItem={(network) => handleNetworkChange(network.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
       className={className}

@@ -6,6 +6,18 @@ import { Setting, AnalyticsState } from "core/common/settings";
 
 export enum TEvent {
   Promocode = "PROMOCODE_USED",
+  SetupWallet = "WALLET_SETUPED",
+  SetupVigvam = "VIGVAM_SETUPED",
+  ProfileCreation = "PROFILE_CREATED",
+  ProfileUpdate = "PROFILE_UPDATED",
+  NetworkChange = "NETWORK_CHANGED",
+  NetworkCreation = "NETWORK_CREATED",
+  NetworkEdit = "NETWORK_EDITED",
+  Contact = "CONTACT_CREATED",
+  Transfer = "TRANSFER_CREATED",
+  DappConnect = "DAPP_CONNECT_OPENED",
+  DappSigning = "DAPP_SIGNING_OPENED",
+  DappTransaction = "DAPP_TRANSACTION_OPENED",
 }
 
 export const trackEvent: AmplitudeClient["track"] = async (
@@ -15,6 +27,8 @@ export const trackEvent: AmplitudeClient["track"] = async (
 
   return amplitued?.track(...args);
 };
+
+export const isTrackingEnabled = () => getAmplitude().then(Boolean);
 
 const getAmplitude = memoizeOne(async () => {
   const apiKey = process.env.VIGVAM_ANALYTICS_API_KEY;

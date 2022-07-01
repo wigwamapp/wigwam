@@ -110,6 +110,7 @@ type ContactDialogParams =
       name?: string;
       address?: string;
       addedAt?: number;
+      fromPage?: boolean;
     } & ModalProps)
   | null;
 

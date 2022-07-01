@@ -251,6 +251,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               currentNetwork={network}
               onNetworkChange={onNetworkChange}
               withAction={false}
+              source="wallet-setup-accounts"
             />
           </div>
         </div>

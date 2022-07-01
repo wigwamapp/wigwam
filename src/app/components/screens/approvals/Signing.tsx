@@ -13,7 +13,7 @@ import { useAtomValue } from "jotai";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountSource, SigningApproval, SigningStandard } from "core/types";
-import { approveItem } from "core/client";
+import { approveItem, TEvent, trackEvent } from "core/client";
 import { useDialog } from "app/hooks/dialog";
 import { useLedger } from "app/hooks/ledger";
 
@@ -209,6 +209,10 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
     },
     [approval, account, setApproving, alert, withLedger, message]
   );
+
+  useEffect(() => {
+    trackEvent(TEvent.DappSigning);
+  }, []);
 
   if (!message) return null;
 

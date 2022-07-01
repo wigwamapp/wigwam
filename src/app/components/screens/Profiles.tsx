@@ -4,6 +4,8 @@ import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
 import { replaceT } from "lib/ext/i18n";
 
+import { TEvent, trackEvent } from "core/client";
+
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import SecondaryModal, {
@@ -30,6 +32,8 @@ const Profiles: FC = () => {
 
     try {
       await addProfile(name, profileSeed);
+
+      trackEvent(TEvent.ProfileCreation);
 
       setAdding(false);
     } catch (err) {

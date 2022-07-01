@@ -10,7 +10,12 @@ import { INITIAL_NETWORK } from "fixtures/networks";
 
 import * as Repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
-import { Account, CHAIN_ID, ACCOUNT_ADDRESS } from "core/types";
+import {
+  Account,
+  CHAIN_ID,
+  ACCOUNT_ADDRESS,
+  SENT_ANALYTIC_NETWORKS,
+} from "core/types";
 import { getRpcUrlKey } from "core/common/network";
 
 import { testNetworksAtom } from "./settings";
@@ -85,4 +90,9 @@ export const getContactsAtom = atomFamily(
   (params: Repo.QueryContactsParams) =>
     atomWithRepoQuery((query) => query(() => Repo.queryContacts(params))),
   dequal
+);
+
+export const sentAnalyticNetworksAtom = atomWithStorage<number[]>(
+  SENT_ANALYTIC_NETWORKS,
+  []
 );

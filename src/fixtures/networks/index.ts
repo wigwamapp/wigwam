@@ -38,6 +38,10 @@ export const DEFAULT_NETWORKS: Network[] = [
   }))
 );
 
+export const DEFAULT_CHAIN_IDS = new Set(
+  DEFAULT_NETWORKS.map((n) => n.chainId)
+);
+
 if (process.env.RELEASE_ENV === "false") {
   assert(
     new Set(DEFAULT_NETWORKS.map((n) => n.chainId)).size ===

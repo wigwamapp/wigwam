@@ -11,9 +11,10 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { Link, navigate } from "lib/navigation";
 
+import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import { AccountAsset, AccountSource } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
-import { suggestFees } from "core/client";
+import { suggestFees, TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
 import {
@@ -114,6 +115,12 @@ const Asset: FC = () => {
             gasLimit,
           });
 
+          const isDefault =
+            currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
+          trackEvent(TEvent.Transfer, {
+            networkName: isDefault ? currentNetwork.name : "unknown",
+            networkChainId: isDefault ? currentNetwork.chainId : "unknown",
+          });
           updateToast(
             <>
               Request for transfer{" "}
@@ -183,6 +190,7 @@ const Asset: FC = () => {
       alert,
       closeCurrentDialog,
       signerProvider,
+      currentNetwork,
       updateToast,
       provider,
       isMounted,
