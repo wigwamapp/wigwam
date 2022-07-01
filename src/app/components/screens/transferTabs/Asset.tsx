@@ -11,7 +11,7 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { Link, navigate } from "lib/navigation";
 
-import { DEFAULT_NETWORKS_CHAIN_IDS_SET } from "fixtures/networks";
+import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import { AccountAsset, AccountSource } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { suggestFees, TEvent, trackEvent } from "core/client";
@@ -116,8 +116,7 @@ const Asset: FC = () => {
           });
 
           const isDefault =
-            currentNetwork &&
-            DEFAULT_NETWORKS_CHAIN_IDS_SET.has(currentNetwork.chainId);
+            currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
           trackEvent(TEvent.Transfer, {
             networkName: isDefault ? currentNetwork.name : "unknown",
             networkChainId: isDefault ? currentNetwork.chainId : "unknown",

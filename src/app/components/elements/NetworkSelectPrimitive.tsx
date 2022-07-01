@@ -4,7 +4,7 @@ import Fuse from "fuse.js";
 
 import {
   DEFAULT_NETWORKS,
-  DEFAULT_NETWORKS_CHAIN_IDS_SET,
+  DEFAULT_CHAIN_IDS,
   getNetworkIconUrl,
 } from "fixtures/networks";
 import { Network } from "core/types";
@@ -87,7 +87,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
         : false;
 
       if (!isAlreadySentSelectedNetwork) {
-        const isDefault = DEFAULT_NETWORKS_CHAIN_IDS_SET.has(chainId);
+        const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
 
         trackEvent(TEvent.NetworkChange, {
           name: isDefault

@@ -14,7 +14,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { storage } from "lib/ext/storage";
 
-import { DEFAULT_NETWORKS_CHAIN_IDS_SET } from "fixtures/networks";
+import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import * as Repo from "core/repo";
 import {
   cleanupNetwork,
@@ -136,7 +136,7 @@ const EditNetwork = memo<EditNetworkProps>(
             if (isNew) {
               trackEvent(TEvent.NetworkCreation);
             } else {
-              const isDefault = DEFAULT_NETWORKS_CHAIN_IDS_SET.has(chainId);
+              const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
               trackEvent(TEvent.NetworkEdit, {
                 name: isDefault ? nName : "unknown",
                 chainId: isDefault ? chainId : "unknown",

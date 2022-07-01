@@ -38,7 +38,7 @@ export const DEFAULT_NETWORKS: Network[] = [
   }))
 );
 
-export const DEFAULT_NETWORKS_CHAIN_IDS_SET = new Set(
+export const DEFAULT_CHAIN_IDS = new Set(
   DEFAULT_NETWORKS.map((n) => n.chainId)
 );
 
