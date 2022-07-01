@@ -177,7 +177,7 @@ const SetupPassword = memo(() => {
                         I have read and agree to the
                         <br />
                         <a
-                          href="https://vigvam.app/privacy"
+                          href="https://vigvam.app/terms"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"
