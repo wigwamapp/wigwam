@@ -236,9 +236,13 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           return true;
         } catch (err: any) {
-          const msg = err?.message ?? "Unknown error";
+          let msg = err?.message ?? "Unknown error";
 
           if (msg === "user closed popup") return false;
+
+          if (msg?.startsWith("could not validate redirect")) {
+            msg = "Allowed only for a production instance of Vigvam.";
+          }
 
           throw new Error(msg);
         }
