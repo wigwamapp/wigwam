@@ -78,9 +78,13 @@ const ChooseAddAccountWayBeta = memo(() => {
 
   return (
     <>
-      <AddAccountHeader className="mb-5">
+      <AddAccountHeader className="mb-0">
         Beta testing is here! 🏕
       </AddAccountHeader>
+
+      <p className="text-center text-brand-gray text-base mb-8">
+        It&apos;s a private beta. To participate, enter your promo code
+      </p>
 
       <Form<FormValues>
         initialValues={{ code: betaTestCode, analytics: true }}
@@ -104,8 +108,7 @@ const ChooseAddAccountWayBeta = memo(() => {
               >
                 {({ input, meta }) => (
                   <Input
-                    label="It's a private beta. To participate, enter your promo code"
-                    placeholder="Type promocode..."
+                    placeholder="Type promo code..."
                     error={
                       (!modifiedSinceLastSubmit && submitError) ||
                       (meta.error &&

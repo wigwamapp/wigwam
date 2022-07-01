@@ -58,13 +58,13 @@ const VerifyAccountToAdd: FC = () => {
               <>
                 Creating a wallet
                 <br />
-                <span className="text-[0.75em]">from a social account</span>
+                <span className="text-[0.75em]">with a social account</span>
               </>
             ),
             content: (
               <div className="text-left">
                 <p>
-                  By clicking &#34;Confirm&#34; you assume all risks associated
+                  By clicking &#34;Confirm&#34; you accept all risks associated
                   with creating a wallet using a social account.
                 </p>
 
