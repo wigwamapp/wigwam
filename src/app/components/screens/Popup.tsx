@@ -26,7 +26,7 @@ import {
 import * as repo from "core/repo";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { IS_FIREFOX, LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
 import {
@@ -672,6 +672,7 @@ const AssetCard = memo(
               className={classNames(
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
+                IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
                 "rounded-[.625rem]",
                 "px-1 py-2"
