@@ -7,6 +7,8 @@ import {
   useState,
   useMemo,
   ButtonHTMLAttributes,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -314,6 +316,7 @@ const AssetsList: FC = () => {
   const [isNftsSelected, setIsNftsSelected] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
+  const [receivePopupOpened, setReceivePopupOpened] = useState(false);
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
     TokenType.Asset,
@@ -441,27 +444,36 @@ const AssetsList: FC = () => {
               }
               asset={asset as AccountAsset}
               isManageMode={manageModeEnabled}
+              setReceivePopupOpened={setReceivePopupOpened}
               className={classNames(i !== tokens.length - 1 && "mb-1")}
             />
           ))}
         </ScrollAreaContainer>
       )}
+
+      <ReceivePopup
+        open={receivePopupOpened}
+        onOpenChange={setReceivePopupOpened}
+      />
     </>
   );
 };
 
 type AssetCardProps = {
   asset: AccountAsset;
+  setReceivePopupOpened: Dispatch<SetStateAction<boolean>>;
   isManageMode?: boolean;
   className?: string;
 };
 
 const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
-    ({ asset, isManageMode = false, className }, ref) => {
+    (
+      { asset, setReceivePopupOpened, isManageMode = false, className },
+      ref
+    ) => {
       const currentAccount = useAtomValue(currentAccountAtom);
       const setInternalChainId = useSetAtom(chainIdAtom);
-      const [receivePopupOpened, setReceivePopupOpened] = useState(false);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
       const {
@@ -646,82 +658,76 @@ const AssetCard = memo(
       );
 
       return (
-        <>
-          <DropdownMenu.Root
-            open={popoverOpened}
-            onOpenChange={setPopoverOpened}
-            modal
-          >
-            {content}
+        <DropdownMenu.Root
+          open={popoverOpened}
+          onOpenChange={setPopoverOpened}
+          modal
+        >
+          {content}
 
-            {!isManageMode && (
-              <DropdownMenu.Content
-                side="left"
-                align="start"
-                className={classNames(
-                  "bg-brand-dark/10",
-                  "backdrop-blur-[30px]",
-                  "border border-brand-light/5",
-                  "rounded-[.625rem]",
-                  "px-1 py-2"
-                )}
+          {!isManageMode && (
+            <DropdownMenu.Content
+              side="left"
+              align="start"
+              className={classNames(
+                "bg-brand-dark/10",
+                "backdrop-blur-[30px]",
+                "border border-brand-light/5",
+                "rounded-[.625rem]",
+                "px-1 py-2"
+              )}
+            >
+              <PopoverButton
+                Icon={InfoRoundIcon}
+                onClick={() =>
+                  openLink({ page: Page.Default, token: asset.tokenSlug })
+                }
               >
+                Info
+              </PopoverButton>
+              <PopoverButton
+                Icon={ReceiveIcon}
+                onClick={() => {
+                  setPopoverOpened(false);
+                  setReceivePopupOpened(true);
+                }}
+              >
+                Receive
+              </PopoverButton>
+              <PopoverButton
+                Icon={SendIcon}
+                onClick={() =>
+                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
+                }
+              >
+                Transfer
+              </PopoverButton>
+              <PopoverButton
+                Icon={SwapIcon}
+                onClick={() => openLink({ page: Page.Swap })}
+                disabled
+                title="Coming soon"
+              >
+                Swap
+              </PopoverButton>
+              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
                 <PopoverButton
-                  Icon={InfoRoundIcon}
+                  Icon={BuyIcon}
                   onClick={() =>
-                    openLink({ page: Page.Default, token: asset.tokenSlug })
+                    openLink({
+                      page: Page.Receive,
+                      receive: ReceiveTabEnum.BuyWithCrypto,
+                    })
                   }
-                >
-                  Info
-                </PopoverButton>
-                <PopoverButton
-                  Icon={ReceiveIcon}
-                  onClick={() => {
-                    setPopoverOpened(false);
-                    setReceivePopupOpened(true);
-                  }}
-                >
-                  Receive
-                </PopoverButton>
-                <PopoverButton
-                  Icon={SendIcon}
-                  onClick={() =>
-                    openLink({ page: Page.Transfer, token: asset.tokenSlug })
-                  }
-                >
-                  Transfer
-                </PopoverButton>
-                <PopoverButton
-                  Icon={SwapIcon}
-                  onClick={() => openLink({ page: Page.Swap })}
                   disabled
                   title="Coming soon"
                 >
-                  Swap
+                  Buy
                 </PopoverButton>
-                {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
-                  <PopoverButton
-                    Icon={BuyIcon}
-                    onClick={() =>
-                      openLink({
-                        page: Page.Receive,
-                        receive: ReceiveTabEnum.BuyWithCrypto,
-                      })
-                    }
-                    disabled
-                    title="Coming soon"
-                  >
-                    Buy
-                  </PopoverButton>
-                )}
-              </DropdownMenu.Content>
-            )}
-          </DropdownMenu.Root>
-          <ReceivePopup
-            open={receivePopupOpened}
-            onOpenChange={setReceivePopupOpened}
-          />
-        </>
+              )}
+            </DropdownMenu.Content>
+          )}
+        </DropdownMenu.Root>
       );
     }
   ),
