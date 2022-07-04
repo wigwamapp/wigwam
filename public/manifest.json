@@ -64,7 +64,8 @@
     },
     {
       "matches": ["{{website}}/*"],
-      "js": ["scripts/version.js"]
+      "js": ["scripts/version.js"],
+      "run_at": "document_start"
     }
   ],
 
