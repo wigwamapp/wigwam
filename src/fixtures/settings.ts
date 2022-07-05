@@ -1,7 +1,14 @@
-export const AUTO_LOCK_VALUES: number[] = [
+const ONE_HOUR = 60 * 60_000;
+const TWO_DAYS = 2 * 24 * ONE_HOUR;
+
+export const AUTO_LOCK_TIMEOUTS: number[] = [
   0, // off
   5 * 60_000, // 5 min
   15 * 60_000, // 15 min
-  60 * 60_000, // 1 hour
-  3 * 60 * 60_000, // 3 hours
+  ONE_HOUR, // 1 hour
+  3 * ONE_HOUR, // 3 hours
+  24 * ONE_HOUR, // 1 day
+  TWO_DAYS, // 2 days
 ];
+
+export const DEFAULT_AUTO_LOCK_TIMEOUT = TWO_DAYS;
