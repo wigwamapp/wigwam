@@ -121,8 +121,13 @@ export function startApproveWindowOpener() {
 }
 
 async function createApproveWindow(position: "center" | "top-right") {
-  const width = 440;
-  const height = 660;
+  let width = 440;
+  let height = 660;
+
+  if (await isWinOs()) {
+    width += 13;
+    height += 17;
+  }
 
   let lastFocused: Windows.Window | undefined;
   let left = 0;
@@ -170,6 +175,9 @@ async function createApproveWindow(position: "center" | "top-right") {
   return { type: "window" as const, id: win.id! };
 }
 
-const isMacOs = memoizeOne(() =>
-  browser.runtime.getPlatformInfo().then((platform) => platform.os === "mac")
-);
+const isMacOs = () =>
+  getPlatformInfo().then((platform) => platform.os === "mac");
+const isWinOs = () =>
+  getPlatformInfo().then((platform) => platform.os === "win");
+
+const getPlatformInfo = memoizeOne(() => browser.runtime.getPlatformInfo());
