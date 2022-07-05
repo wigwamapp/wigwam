@@ -86,7 +86,7 @@ import PrettyDate from "../elements/PrettyDate";
 import Avatar from "../elements/Avatar";
 
 const OverviewContent: FC = () => (
-  <div className="flex min-h-0 grow relative">
+  <div className="flex min-h-0 grow relative overflow-hidden">
     <ToastOverflowProvider>
       <TokenExplorer />
     </ToastOverflowProvider>
