@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { createQueue } from "lib/system/queue";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 import { storage } from "lib/ext/storage";
 
@@ -89,6 +90,8 @@ export function startWalletServer() {
   });
 }
 
+const withQueue = createQueue();
+
 async function handleWalletRequest(
   ctx: MessageContext<Request | EventMessage, Response>
 ) {
@@ -106,12 +109,30 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.SetupWallet },
         ({ type, password, accountsParams, seedPhrase }) =>
-          withStatus([WalletStatus.Welcome, WalletStatus.Locked], async () => {
-            const vault = await Vault.setup(
-              password,
-              accountsParams,
-              seedPhrase
-            );
+          withQueue(() =>
+            withStatus(
+              [WalletStatus.Welcome, WalletStatus.Locked],
+              async () => {
+                const vault = await Vault.setup(
+                  password,
+                  accountsParams,
+                  seedPhrase
+                );
+
+                const accounts = vault.getAccounts();
+                const hasSeedPhrase = vault.isSeedPhraseExists();
+
+                unlocked({ vault, accounts, hasSeedPhrase });
+
+                ctx.reply({ type });
+              }
+            )
+          )
+      )
+      .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
+        withQueue(() =>
+          withStatus(WalletStatus.Locked, async () => {
+            const vault = await Vault.unlock(password);
 
             const accounts = vault.getAccounts();
             const hasSeedPhrase = vault.isSeedPhraseExists();
@@ -120,18 +141,7 @@ async function handleWalletRequest(
 
             ctx.reply({ type });
           })
-      )
-      .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
-        withStatus(WalletStatus.Locked, async () => {
-          const vault = await Vault.unlock(password);
-
-          const accounts = vault.getAccounts();
-          const hasSeedPhrase = vault.isSeedPhraseExists();
-
-          unlocked({ vault, accounts, hasSeedPhrase });
-
-          ctx.reply({ type });
-        })
+        )
       )
       .with({ type: MessageType.LockWallet }, ({ type }) => {
         locked();
@@ -141,11 +151,13 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.ChangePassword },
         ({ type, currentPassword, nextPassword }) =>
-          withVault(async (vault) => {
-            await vault.changePassword(currentPassword, nextPassword);
+          withQueue(() =>
+            withVault(async (vault) => {
+              await vault.changePassword(currentPassword, nextPassword);
 
-            ctx.reply({ type });
-          })
+              ctx.reply({ type });
+            })
+          )
       )
       .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
@@ -157,58 +169,71 @@ async function handleWalletRequest(
       .with(
         { type: MessageType.AddAccounts },
         ({ type, accountsParams, seedPhrase }) =>
-          withVault(async (vault) => {
-            await vault.addAccounts(accountsParams, seedPhrase);
+          withQueue(() =>
+            withVault(async (vault) => {
+              await vault.addAccounts(accountsParams, seedPhrase);
 
-            const accounts = vault.getAccounts();
-            accountsUpdated(accounts);
+              const accounts = vault.getAccounts();
+              accountsUpdated(accounts);
 
-            if (seedPhrase) {
-              seedPhraseAdded();
-            }
+              if (seedPhrase) {
+                seedPhraseAdded();
+              }
 
-            ctx.reply({ type });
-          })
+              ctx.reply({ type });
+            })
+          )
       )
       .with(
         { type: MessageType.DeleteAccounts },
         ({ type, password, accountUuids }) =>
-          withVault(async (vault) => {
-            await vault.deleteAccounts(password, accountUuids);
+          withQueue(() =>
+            withVault(async (vault) => {
+              await vault.deleteAccounts(password, accountUuids);
 
-            const accounts = vault.getAccounts();
-            accountsUpdated(accounts);
+              const accounts = vault.getAccounts();
+              accountsUpdated(accounts);
 
-            ctx.reply({ type });
-          })
+              ctx.reply({ type });
+            })
+          )
       )
       .with(
         { type: MessageType.UpdateAccountName },
         ({ type, accountUuid, name }) =>
-          withVault(async (vault) => {
-            await vault.updateAccountName(accountUuid, name);
+          withQueue(() =>
+            withVault(async (vault) => {
+              await vault.updateAccountName(accountUuid, name);
 
-            const accounts = vault.getAccounts();
-            accountsUpdated(accounts);
+              const accounts = vault.getAccounts();
+              accountsUpdated(accounts);
 
-            ctx.reply({ type });
-          })
+              ctx.reply({ type });
+            })
+          )
       )
       .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
-        withVault(async (vault) => {
-          const seedPhrase = await vault.getSeedPhrase(password);
+        withQueue(() =>
+          withVault(async (vault) => {
+            const seedPhrase = await vault.getSeedPhrase(password);
 
-          ctx.reply({ type, seedPhrase });
-        })
+            ctx.reply({ type, seedPhrase });
+          })
+        )
       )
       .with(
         { type: MessageType.GetPrivateKey },
         ({ type, password, accountUuid }) =>
-          withVault(async (vault) => {
-            const privateKey = await vault.getPrivateKey(password, accountUuid);
+          withQueue(() =>
+            withVault(async (vault) => {
+              const privateKey = await vault.getPrivateKey(
+                password,
+                accountUuid
+              );
 
-            ctx.reply({ type, privateKey });
-          })
+              ctx.reply({ type, privateKey });
+            })
+          )
       )
       .with({ type: MessageType.GetPublicKey }, ({ type, accountUuid }) =>
         withVault(async (vault) => {
@@ -234,11 +259,13 @@ async function handleWalletRequest(
         })
       )
       .with({ type: MessageType.Approve }, ({ type, approvalId, result }) =>
-        withVault(async (vault) => {
-          await processApprove(approvalId, result, vault);
+        withQueue(() =>
+          withVault(async (vault) => {
+            await processApprove(approvalId, result, vault);
 
-          ctx.reply({ type });
-        })
+            ctx.reply({ type });
+          })
+        )
       )
       .with({ type: MessageType.RejectAllApprovals }, () =>
         withStatus(WalletStatus.Unlocked, () => {
