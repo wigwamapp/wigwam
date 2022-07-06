@@ -11,6 +11,7 @@ import {
   startApproveWindowOpener,
   startTxObserver,
   startExtBadge,
+  startAutoLocker,
 } from "core/back/services";
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
@@ -37,3 +38,4 @@ startInstallOrUpdateListener();
 startApproveWindowOpener();
 startTxObserver();
 startExtBadge();
+startAutoLocker();
