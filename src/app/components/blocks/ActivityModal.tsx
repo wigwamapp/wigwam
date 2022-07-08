@@ -53,7 +53,7 @@ import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signin
 import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
-import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
 
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -292,7 +292,7 @@ const History = memo(() => {
         pendingActivity.length === 0 &&
         completeActivity.length === 0 && (
           <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
-            <NoResultsFoundIcon className="w-40 h-auto mb-8" />
+            <NoResultsFoundIcon className="w-[30rem] h-auto mb-8" />
             <h3 className="text-2xl text-brand-inactivedark font-bold">
               No activity yet
             </h3>
