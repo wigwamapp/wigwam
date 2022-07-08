@@ -15,11 +15,13 @@ import Apps from "./mainPages/Apps";
 import Contacts from "./mainPages/Contacts";
 import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
+import OnboardingPopup from "../blocks/OnboardingPopup";
 
 const Main: FC = () => {
   return (
     <MainPageLayout>
       <MainPageRouter />
+      <OnboardingPopup />
     </MainPageLayout>
   );
 };
