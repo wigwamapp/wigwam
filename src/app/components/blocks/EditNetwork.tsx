@@ -301,6 +301,7 @@ const EditNetwork = memo<EditNetworkProps>(
                         label="Chain ID"
                         placeholder="Type chain id"
                         decimalScale={0}
+                        thousandSeparator={false}
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
                         readOnly={isNative}

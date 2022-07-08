@@ -70,7 +70,7 @@ const VerifyAccountToAdd: FC = () => {
 
                 <ul className="mt-2 list-disc list-outside text-sm">
                   <li className="mb-1">
-                    If you lost access to your social account - you can&#34;t
+                    If you lost access to your social account - you can&#39;t
                     restore the linked wallet again using the same way. You can
                     prevent this by exporting a private key (on the
                     &#34;Wallets&#34; page) after creating a wallet.
