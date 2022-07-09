@@ -1,8 +1,8 @@
 import { FC, memo, useCallback, useMemo } from "react";
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
-import browser from "webextension-polyfill";
 import { setLocale } from "lib/ext/i18n";
+import { restartApp } from "lib/ext/utils";
 
 import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
 import {
@@ -148,8 +148,7 @@ const SoftwareUpdate = memo(() => {
       });
 
       if (confirmed) {
-        // TODO: open new tab
-        browser.runtime.reload();
+        await restartApp();
       }
     } catch (err) {
       console.error(err);
