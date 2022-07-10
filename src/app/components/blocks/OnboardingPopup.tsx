@@ -31,15 +31,15 @@ const OnboardingPopup: FC = () => {
             Welcome to Vigvam Beta testing 🏕
           </h1>
           <p className="text-center text-lg">
-            With this release we offer you to try the core functionality of the
-            application and not only!
+            With this release, we offer you to try the core functionality of the
+            application and even more!
             <br />
             Right now with Vigvam you can:
           </p>
           <Wrapper className="mt-[6.875rem]">
             <Item>
-              Create unlimited wallets with Secret Phrase, Ledger Nano device
-              and social media
+              Create an unlimited amount of wallets with Secret Phrase, Ledger
+              Nano device, and social media
             </Item>
             <img
               src={OnboardingOneImage}
@@ -60,8 +60,8 @@ const OnboardingPopup: FC = () => {
           </Wrapper>
           <Wrapper className="mt-[6.625rem]">
             <Item>
-              View your gas and ERC20 tokens are on the balance, and detailed
-              information about them including transaction history
+              View your gas and ERC20 tokens balances, and detailed information
+              about them, including transaction history
             </Item>
             <img
               src={OnboardingThreeImage}
@@ -76,8 +76,8 @@ const OnboardingPopup: FC = () => {
               alt={`Join and fully interact with decentralized applications using the"Connect to Wallet" or "Connect to MetaMask" button`}
             />
             <Item>
-              Join and fully interact with decentralized applications using the
-              &quot;Connect to Wallet&quot; or &quot;Connect to MetaMask&quot;
+              Connect and fully interact with decentralized applications using
+              the &quot;Connect a Wallet&quot; or &quot;Connect MetaMask&quot;
               button
             </Item>
           </Wrapper>
