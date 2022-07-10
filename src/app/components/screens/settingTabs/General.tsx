@@ -132,15 +132,15 @@ const SoftwareUpdate = memo(() => {
         title: "Software Update",
         content: (
           <ul className="text-left list-disc">
-            <li>
+            <li className="mb-2">
               Are you sure you want to restart the app now and update it to the
               newer version?
             </li>
 
             <li>
-              First, make sure that you remember your profile password, and that
-              you have a backup of the Secret Phrases for all profiles and other
-              private keys, if any are used.
+              First of all, make sure that you remember your profile password,
+              and that you have a backup of the Secret Phrases for all profiles
+              and other private keys if any are used.
             </li>
           </ul>
         ),
@@ -165,7 +165,7 @@ const SoftwareUpdate = memo(() => {
       </SettingsHeader>
 
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-        Update are available for your Vigvam.
+        An update is available for your Vigvam.
         <br />
         Version:{" "}
         <span className="font-mono text-brand-inactivelight font-bold">
