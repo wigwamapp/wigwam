@@ -1,7 +1,6 @@
 export type ProfileState = {
   all: Profile[];
   currentId: string;
-  openTab?: boolean;
 };
 
 export interface Profile {

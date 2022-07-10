@@ -13,6 +13,7 @@ export function put(key: string, value: string) {
 
 export function remove(key: string) {
   localStorage.removeItem(key);
+  notifySelf(key);
 }
 
 export function clear() {

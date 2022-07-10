@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
-import { pageAtom, tokenSlugAtom } from "app/atoms";
+import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
 
 import { NavLinksPrimary, NavLinksSecondary } from "./Sidebar.Links";
@@ -57,11 +57,13 @@ type SidebarBlockProps = {
 const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
   const page = useAtomValue(pageAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
+  const updateAvailable = useAtomValue(updateAvailableAtom);
 
   return (
     <div className={classNames("flex flex-col", className)}>
       {links.map(({ route, label, Icon, soon }) => {
         const isPageActive = route === page;
+        const notificationBadge = route === Page.Settings && updateAvailable;
 
         return (
           <Link
@@ -97,6 +99,13 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               )}
             />
             {label}
+            {notificationBadge && (
+              <div className="ml-1.5 h-5">
+                <div
+                  className={classNames("w-2 h-2", "bg-activity rounded-full")}
+                />
+              </div>
+            )}
             {soon && <SoonTag />}
           </Link>
         );
