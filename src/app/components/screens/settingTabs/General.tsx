@@ -138,9 +138,9 @@ const SoftwareUpdate = memo(() => {
             </li>
 
             <li>
-              First of all, make sure that you remember your profile password,
-              and that you have a backup of the Secret Phrases for all profiles
-              and other private keys if any are used.
+              Make sure you remember your profile password, and that you have a
+              backup of the Secret Phrases used in all profiles, as well as
+              other private keys if any are used.
             </li>
           </ul>
         ),
