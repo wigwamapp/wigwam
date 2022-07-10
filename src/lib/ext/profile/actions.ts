@@ -1,4 +1,3 @@
-import browser from "webextension-polyfill";
 import { assert } from "lib/system/assert";
 
 import { Profile } from "./types";
@@ -31,7 +30,6 @@ export async function changeProfile(id: string) {
   await setState({
     ...state,
     currentId: id,
-    openTab: true,
   });
 
   restartApp();

@@ -2,6 +2,8 @@ import browser from "webextension-polyfill";
 
 import * as Global from "./global";
 
+const WAS_RESTARTED = "_was_restarted";
+
 export const getPublicURL = browser.runtime.getURL;
 
 export function getMainURL(path = "") {
@@ -35,7 +37,15 @@ export async function restartApp() {
     }
   } catch {}
 
+  Global.put(WAS_RESTARTED, "true");
   browser.runtime.reload();
+}
+
+export function openIfWasRestarted() {
+  if (Global.get(WAS_RESTARTED) === "true") {
+    Global.remove(WAS_RESTARTED);
+    openMainTab();
+  }
 }
 
 export function isUpdateAvailable(
