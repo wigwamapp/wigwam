@@ -15,6 +15,7 @@ import {
   CHAIN_ID,
   ACCOUNT_ADDRESS,
   SENT_ANALYTIC_NETWORKS,
+  ONBOARDING_POPUP,
 } from "core/types";
 import { getRpcUrlKey } from "core/common/network";
 
@@ -95,4 +96,9 @@ export const getContactsAtom = atomFamily(
 export const sentAnalyticNetworksAtom = atomWithStorage<number[]>(
   SENT_ANALYTIC_NETWORKS,
   []
+);
+
+export const onboardingPopupAtom = atomWithStorage<boolean>(
+  ONBOARDING_POPUP,
+  true
 );
