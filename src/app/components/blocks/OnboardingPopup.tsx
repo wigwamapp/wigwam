@@ -31,7 +31,7 @@ const OnboardingPopup: FC = () => {
             Welcome to Vigvam Beta testing 🏕
           </h1>
           <p className="text-center text-lg">
-            With this release, we offer you to try the core functionality of the
+            This release is offering you to try the core functionality of the
             application and even more!
             <br />
             Right now with Vigvam you can:
@@ -44,36 +44,36 @@ const OnboardingPopup: FC = () => {
             <img
               src={OnboardingOneImage}
               className="w-[26.625rem] h-auto ml-[6.5rem]"
-              alt="Create unlimited wallets with Secret Phrase, Ledger Nano device and social media"
+              alt="Create an unlimited amount of wallets with Secret Phrase, Ledger Nano device, and social media"
             />
           </Wrapper>
           <Wrapper className="mt-[5.875rem]">
             <img
               src={OnboardingTwoImage}
               className="w-[21.625rem] h-auto mr-[5.625rem]"
-              alt="Accept or send tokens to any of the networks that are already pre-installed in Vigvam. As well as add any EVM-compatible network"
+              alt="Send and receive tokens to any of the networks that are already pre-installed in Vigvam. As well as add any EVM-compatible network"
             />
             <Item>
-              Accept or send tokens to any of the networks that are already
+              Send and receive tokens to any of the networks that are already
               pre-installed in Vigvam. As well as add any EVM-compatible network
             </Item>
           </Wrapper>
           <Wrapper className="mt-[6.625rem]">
             <Item>
-              View your gas and ERC20 tokens balances, and detailed information
-              about them, including transaction history
+              View your gas and ERC20 tokens balances, along with detailed
+              information about them, including transaction history
             </Item>
             <img
               src={OnboardingThreeImage}
               className="w-[28.25rem] h-auto ml-[4.875rem]"
-              alt="View your gas and ERC20 tokens are on the balance, and detailed information about them including transaction history"
+              alt="View your gas and ERC20 tokens balances, along with detailed information about them, including transaction history"
             />
           </Wrapper>
           <Wrapper className="mt-[7.25rem]">
             <img
               src={OnboardingFourImage}
               className="w-[23.375rem] h-auto mr-[3.75rem]"
-              alt={`Join and fully interact with decentralized applications using the"Connect to Wallet" or "Connect to MetaMask" button`}
+              alt={`Connect and fully interact with decentralized applications using the "Connect a Wallet" or "Connect MetaMask" button`}
             />
             <Item>
               Connect and fully interact with decentralized applications using
