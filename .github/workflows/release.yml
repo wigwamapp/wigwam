@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  RELEASE_ENV: true
+  VIGVAM_INFURA_API_KEY: ${{ secrets.VIGVAM_INFURA_API_KEY }}
+  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.VIGVAM_ANALYTICS_API_KEY }}
+  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.VIGVAM_OPEN_LOGIN_CLIENT_ID }}
+  VIGVAM_BETATEST_PROMOCODES: ${{ secrets.VIGVAM_BETATEST_PROMOCODES }}
+
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Check TypeScript
+        run: yarn ts
+
+      - name: Check ESLint
+        run: yarn lint
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Create app build
+        run: yarn build:chrome & yarn build:firefox
+
+      - name: Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
+            dist/prod/chrome.zip
+            dist/prod/firefox.xpi
