@@ -1,0 +1,49 @@
+name: New Code
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+env:
+  VIGVAM_INFURA_API_KEY: ${{ secrets.VIGVAM_INFURA_API_KEY }}
+  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.TEST_VIGVAM_ANALYTICS_API_KEY }}
+  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_VIGVAM_OPEN_LOGIN_CLIENT_ID }}
+  VIGVAM_BETATEST_PROMOCODES: ${{ secrets.VIGVAM_BETATEST_PROMOCODES }}
+
+jobs:
+  newcode:
+    name: Check the new code before merging and create a build with it
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Check TypeScript
+        run: yarn ts
+
+      - name: Check ESLint
+        run: yarn lint
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Create application build
+        run: yarn build:chrome && yarn build:firefox
+
+      - name: Export application build
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist/prod/{chrome.zip,firefox.xpi}
+          if-no-files-found: error
+          retention-days: 21
