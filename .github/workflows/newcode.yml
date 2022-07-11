@@ -44,7 +44,7 @@ jobs:
       - name: Export chome build
         uses: actions/upload-artifact@v3
         with:
-          name: chrome-[${{ github.ref }}]
+          name: chrome-[$GITHUB_REF_NAME]
           path: dist/prod/chrome.zip
           if-no-files-found: error
           retention-days: 21
