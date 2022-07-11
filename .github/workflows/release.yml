@@ -1,21 +1,22 @@
-name: New Code
+name: Release
 
 on:
-  pull_request:
-    branches:
-      - main
-      - dev
+  push:
+    tags:
+      - "*"
 
 env:
+  RELEASE_ENV: true
   VIGVAM_INFURA_API_KEY: ${{ secrets.VIGVAM_INFURA_API_KEY }}
-  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.TEST_VIGVAM_ANALYTICS_API_KEY }}
-  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_VIGVAM_OPEN_LOGIN_CLIENT_ID }}
+  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.VIGVAM_ANALYTICS_API_KEY }}
+  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.VIGVAM_OPEN_LOGIN_CLIENT_ID }}
   VIGVAM_BETATEST_PROMOCODES: ${{ secrets.VIGVAM_BETATEST_PROMOCODES }}
 
 jobs:
-  newcode:
-    name: Check the new code before merging and create a build with it
+  release:
+    name: Create release
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -41,12 +42,11 @@ jobs:
       - name: Create app build
         run: yarn build:chrome & yarn build:firefox
 
-      - name: Export app build
-        uses: actions/upload-artifact@v3
+      - name: Release
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          name: ${{ github.event.pull_request.title }}
-          path: |
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
             dist/prod/chrome.zip
             dist/prod/firefox.xpi
-          if-no-files-found: error
-          retention-days: 21
