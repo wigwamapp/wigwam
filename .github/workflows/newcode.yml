@@ -41,11 +41,18 @@ jobs:
       - name: Create application build
         run: yarn build:chrome && yarn build:firefox
 
-      - name: Export application build
+      - name: Export chome build
         uses: actions/upload-artifact@v3
         with:
-          path: |
-            dist/prod/chrome.zip
-            dist/prod/firefox.xpi
+          name: chrome-[${{ github.ref }}]
+          path: dist/prod/chrome.zip
+          if-no-files-found: error
+          retention-days: 21
+
+      - name: Export firefox build
+        uses: actions/upload-artifact@v3
+        with:
+          name: firefox-[${{ github.ref }}]
+          path: dist/prod/firefox.xpi
           if-no-files-found: error
           retention-days: 21
