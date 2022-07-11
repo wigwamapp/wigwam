@@ -44,7 +44,7 @@ jobs:
       - name: Export chome build
         uses: actions/upload-artifact@v3
         with:
-          name: chrome-[${{ github.head_ref }}]
+          name: chrome-[${{ github.event.pull_request.title }}]
           path: dist/prod/chrome.zip
           if-no-files-found: error
           retention-days: 21
@@ -52,7 +52,7 @@ jobs:
       - name: Export firefox build
         uses: actions/upload-artifact@v3
         with:
-          name: firefox-[${{ github.head_ref }}]
+          name: firefox-[${{ github.event.pull_request.title }}]
           path: dist/prod/firefox.xpi
           if-no-files-found: error
           retention-days: 21
