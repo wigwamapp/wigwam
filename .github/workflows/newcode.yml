@@ -44,6 +44,6 @@ jobs:
       - name: Export application build
         uses: actions/upload-artifact@v3
         with:
-          path: dist/prod/{chrome.zip,firefox.xpi}
+          path: dist/prod/*.{zip,xpi}
           if-no-files-found: error
           retention-days: 21
