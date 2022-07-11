@@ -38,21 +38,15 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      - name: Create application build
+      - name: Create app build
         run: yarn build:chrome && yarn build:firefox
 
-      - name: Export chome build
+      - name: Export app build
         uses: actions/upload-artifact@v3
         with:
-          name: chrome-[${{ github.event.pull_request.title }}]
-          path: dist/prod/chrome.zip
-          if-no-files-found: error
-          retention-days: 21
-
-      - name: Export firefox build
-        uses: actions/upload-artifact@v3
-        with:
-          name: firefox-[${{ github.event.pull_request.title }}]
-          path: dist/prod/firefox.xpi
+          name: ${{ github.event.pull_request.title }}
+          path: |
+            dist/prod/chrome.zip
+            dist/prod/firefox.xpi
           if-no-files-found: error
           retention-days: 21
