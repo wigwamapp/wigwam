@@ -14,6 +14,12 @@ import { FANTOM } from "./fantom";
 import { AURORA } from "./aurora";
 import { CELO } from "./celo";
 import { HECO } from "./heco";
+import { CRONOS } from "./cronos";
+import { MOONBEAM } from "./moonbeam";
+import { MOONRIVER } from "./moonriver";
+import { EVMOS } from "./evmos";
+import { SYSCOIN } from "./syscoin";
+import { BOBA } from "./boba";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -29,8 +35,14 @@ export const DEFAULT_NETWORKS: Network[] = [
   ARBITRUM,
   AURORA,
   HARMONY,
+  CRONOS,
+  MOONBEAM,
+  MOONRIVER,
+  EVMOS,
   HECO,
   CELO,
+  SYSCOIN,
+  BOBA,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
     ...n,
@@ -90,4 +102,10 @@ export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
   [1666600000, "harmony"],
   [128, "huobi-token"],
   [42220, "celo"],
+  [288, "boba-network"],
+  [25, "crypto-com-chain"],
+  [9001, "evmos"],
+  [1284, "moonbeam"],
+  [1285, "moonriver"],
+  [57, "syscoin"],
 ]);

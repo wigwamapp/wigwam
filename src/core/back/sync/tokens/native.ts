@@ -60,6 +60,13 @@ export const syncNativeTokens = memoize(
             ? "0"
             : portfolios[i] ?? existing?.portfolioUSD;
 
+        const metadata = {
+          decimals: nativeCurrency.decimals,
+          name: nativeCurrency.name,
+          symbol: nativeCurrency.symbol,
+          logoUrl: getNativeTokenLogoUrl(chainTag),
+        };
+
         if (existing) {
           if (!balance) {
             return {
@@ -80,6 +87,7 @@ export const syncNativeTokens = memoize(
 
           return {
             ...existing,
+            ...metadata,
             rawBalance,
             balanceUSD,
             priceUSD,
@@ -102,10 +110,7 @@ export const syncNativeTokens = memoize(
             tokenType: TokenType.Asset,
             status: TokenStatus.Native,
             tokenSlug: NATIVE_TOKEN_SLUG,
-            decimals: nativeCurrency.decimals,
-            name: nativeCurrency.name,
-            symbol: nativeCurrency.symbol,
-            logoUrl: getNativeTokenLogoUrl(chainTag),
+            ...metadata,
             rawBalance,
             balanceUSD,
             priceUSD,
