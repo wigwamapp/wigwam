@@ -47,6 +47,7 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
@@ -366,49 +367,81 @@ const AssetsList: FC = () => {
 
   return (
     <>
-      <div className="flex items-center mt-5">
-        <TippySingletonProvider>
-          <Tooltip
-            content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-            asChild
-          >
-            <span>
-              <AssetsSwitcher
-                theme="small"
-                checked={isNftsSelected}
-                onCheckedChange={toggleNftSwitcher}
-              />
-            </span>
-          </Tooltip>
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
-            className="ml-2"
-            inputClassName="max-h-9 !pl-9"
-            placeholder="Type to search..."
-            adornmentClassName="!left-3"
-            disabled={isNftsSelected}
-          />
-          <IconedButton
-            Icon={ControlIcon}
-            iconProps={{
-              isActive: manageModeEnabled,
-            }}
-            theme="tertiary"
-            className={classNames(
-              "ml-2 mr-2",
-              manageModeEnabled && "bg-brand-main/30"
-            )}
-            aria-label={
-              manageModeEnabled
-                ? "Finish managing assets list"
-                : "Manage assets list"
-            }
-            disabled={isNftsSelected}
-            onClick={() => setManageModeEnabled(!manageModeEnabled)}
-          />
-        </TippySingletonProvider>
+      <div className="flex flex-col">
+        <div className="flex items-center mt-5">
+          <TippySingletonProvider>
+            <Tooltip
+              content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+              asChild
+            >
+              <span>
+                <AssetsSwitcher
+                  theme="small"
+                  checked={isNftsSelected}
+                  onCheckedChange={toggleNftSwitcher}
+                />
+              </span>
+            </Tooltip>
+            <SearchInput
+              ref={searchInputRef}
+              searchValue={searchValue}
+              toggleSearchValue={setSearchValue}
+              className="ml-2"
+              inputClassName="max-h-9 !pl-9"
+              placeholder="Type to search..."
+              adornmentClassName="!left-3"
+              disabled={isNftsSelected}
+            />
+            <IconedButton
+              Icon={ControlIcon}
+              iconProps={{
+                isActive: manageModeEnabled,
+              }}
+              theme="tertiary"
+              className={classNames(
+                "ml-2 mr-2",
+                manageModeEnabled && "bg-brand-main/30"
+              )}
+              aria-label={
+                manageModeEnabled
+                  ? "Finish managing assets list"
+                  : "Manage assets list"
+              }
+              disabled={isNftsSelected}
+              onClick={() => setManageModeEnabled(!manageModeEnabled)}
+            />
+          </TippySingletonProvider>
+        </div>
+        <div
+          className={classNames(
+            "max-h-0",
+            "overflow-hidden",
+            "transition-[max-height] duration-200",
+            manageModeEnabled && tokens.length > 0 && "max-h-[4.25rem]"
+          )}
+        >
+          <div className="pt-3">
+            <button
+              type="button"
+              className={classNames(
+                "flex items-center",
+                "w-full py-2 px-3",
+                "bg-brand-main/5",
+                "rounded-[.625rem]",
+                "text-sm text-brand-inactivelight text-left",
+                "cursor-pointer",
+                "transition-colors",
+                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+              )}
+              onClick={focusSearchInput}
+            >
+              <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+              To add asset put the address into
+              <br />
+              the search line
+            </button>
+          </div>
+        </div>
       </div>
       {isNftsSelected ? (
         <ComingSoon label="NFTs" size="extra-small" />
@@ -425,7 +458,7 @@ const AssetsList: FC = () => {
           <NoResultsFoundIcon className="mb-4" />
           Can&apos;t find a token?
           <br />
-          Put an address into the search line to find it.
+          Put an address into the search line to add it to your assets list.
         </button>
       ) : (
         <ScrollAreaContainer

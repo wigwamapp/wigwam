@@ -69,6 +69,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg";
 import { ReactComponent as ActivityReceiveIcon } from "app/icons/activity-receive.svg";
 import { ReactComponent as ActivityApproveIcon } from "app/icons/activity-approve.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -297,33 +298,65 @@ const AssetsList: FC<AssetsListProps> = ({
         onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
-      <div className="flex items-center">
-        <TippySingletonProvider>
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
-            disabled={isNftsSelected}
-          />
-          <IconedButton
-            Icon={ControlIcon}
-            iconProps={{
-              isActive: manageModeEnabled,
-            }}
-            theme="tertiary"
-            className={classNames(
-              "ml-2",
-              manageModeEnabled && "bg-brand-main/30"
-            )}
-            aria-label={
-              manageModeEnabled
-                ? "Finish managing assets list"
-                : "Manage assets list"
-            }
-            disabled={isNftsSelected}
-            onClick={toggleManageMode}
-          />
-        </TippySingletonProvider>
+      <div className="flex flex-col">
+        <div className="flex items-center">
+          <TippySingletonProvider>
+            <SearchInput
+              ref={searchInputRef}
+              searchValue={searchValue}
+              toggleSearchValue={setSearchValue}
+              disabled={isNftsSelected}
+            />
+            <IconedButton
+              Icon={ControlIcon}
+              iconProps={{
+                isActive: manageModeEnabled,
+              }}
+              theme="tertiary"
+              className={classNames(
+                "ml-2",
+                manageModeEnabled && "bg-brand-main/30"
+              )}
+              aria-label={
+                manageModeEnabled
+                  ? "Finish managing assets list"
+                  : "Manage assets list"
+              }
+              disabled={isNftsSelected}
+              onClick={toggleManageMode}
+            />
+          </TippySingletonProvider>
+        </div>
+        <div
+          className={classNames(
+            "max-h-0",
+            "overflow-hidden",
+            "transition-[max-height] duration-200",
+            manageModeEnabled && tokens.length > 0 && "max-h-[4.25rem]"
+          )}
+        >
+          <div className="pt-3">
+            <button
+              type="button"
+              className={classNames(
+                "flex items-center",
+                "w-full py-2 px-3",
+                "bg-brand-main/5",
+                "rounded-[.625rem]",
+                "text-sm text-brand-inactivelight text-left",
+                "cursor-pointer",
+                "transition-colors",
+                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+              )}
+              onClick={focusSearchInput}
+            >
+              <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+              To add asset put the address into
+              <br />
+              the search line
+            </button>
+          </div>
+        </div>
       </div>
       {isNftsSelected ? (
         <ComingSoon label="NFTs" size="small" />
@@ -347,7 +380,7 @@ const AssetsList: FC<AssetsListProps> = ({
             <>
               Can&apos;t find a token?
               <br />
-              Put an address into the search line to find it.
+              Put an address into the search line to add it to your assets list.
             </>
           )}
         </button>
@@ -471,7 +504,7 @@ const AssetCard = memo(
                   "text-sm leading-4",
                   !isActive && "text-brand-inactivedark",
                   isActive && "text-brand-light",
-                  "group-hover:text-brand-light",
+                  hoverable && "group-hover:text-brand-light",
                   "transition-colors",
                   "truncate min-w-0",
                   isManageMode && "mr-14"
