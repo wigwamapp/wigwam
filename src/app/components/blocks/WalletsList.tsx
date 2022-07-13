@@ -103,12 +103,7 @@ const EmptyWalletCard: FC = () => (
         )}
       >
         <AddWalletIcon />
-        <span
-          className={classNames(
-            // "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-            "text-base font-bold whitespace-nowrap ml-2"
-          )}
-        >
+        <span className="text-base font-bold whitespace-nowrap ml-2">
           Add wallet
         </span>
       </div>
