@@ -36,7 +36,7 @@ export const BOBA: Network[] = [
     },
     explorerUrls: ["https://blockexplorer.rinkeby.boba.network"],
     explorerApiUrl: "https://blockexplorer.rinkeby.boba.network/api",
-    faucetUrls: [],
+    faucetUrls: ["https://faucet.rinkeby.io"],
     infoUrl: "https://boba.network",
   },
 ];
