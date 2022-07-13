@@ -66,14 +66,14 @@ const EmptyWalletCard: FC = () => (
     <Link
       to={{ addAccOpened: true }}
       merge
-      className={"flex group cursor-pointer"}
+      className={"flex flex-col group cursor-pointer"}
     >
       <div
         className={classNames(
           "w-[14.5rem] min-w-[14.5rem]",
           "flex items-stretch",
           "bg-brand-main/5",
-          "rounded-l-[.625rem]",
+          "rounded-t-[.625rem]",
           "p-3",
           "transition-colors",
           "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
@@ -95,14 +95,22 @@ const EmptyWalletCard: FC = () => (
       <div
         className={classNames(
           "flex justify-center items-center",
-          "px-3.5",
+          "py-1.5",
           "bg-brand-main/10",
-          "rounded-r-[.625rem]",
+          "rounded-b-[.625rem]",
           "transition-colors",
           "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
         )}
       >
         <AddWalletIcon />
+        <span
+          className={classNames(
+            // "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+            "text-base font-bold whitespace-nowrap ml-2"
+          )}
+        >
+          Add wallet
+        </span>
       </div>
     </Link>
   </div>
