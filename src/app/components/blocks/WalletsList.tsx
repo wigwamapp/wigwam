@@ -81,15 +81,14 @@ const EmptyWalletCard: FC = () => (
       >
         <div
           className={classNames(
-            "!h-14 w-14 min-w-[3.5rem] mr-3",
-            "!rounded-[.625rem]",
+            "!h-12 w-12 min-w-[3rem] mr-3",
+            "!rounded-lg",
             emptyClassBg
           )}
         />
         <span className="flex flex-col">
-          <span className={classNames("w-24", emptyClassBg)} />
-          <span className={classNames("mt-2 w-20", emptyClassBg)} />
-          <span className={classNames("mt-auto w-32", emptyClassBg)} />
+          <span className={classNames("w-24 mt-auto", emptyClassBg)} />
+          <span className={classNames("mt-2 w-32 mb-2", emptyClassBg)} />
         </span>
       </div>
       <div
@@ -103,12 +102,7 @@ const EmptyWalletCard: FC = () => (
         )}
       >
         <AddWalletIcon />
-        <span
-          className={classNames(
-            // "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-            "text-base font-bold whitespace-nowrap ml-2"
-          )}
-        >
+        <span className="text-base font-bold whitespace-nowrap ml-2">
           Add wallet
         </span>
       </div>
