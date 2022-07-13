@@ -69,6 +69,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg";
 import { ReactComponent as ActivityReceiveIcon } from "app/icons/activity-receive.svg";
 import { ReactComponent as ActivityApproveIcon } from "app/icons/activity-approve.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -347,7 +348,7 @@ const AssetsList: FC<AssetsListProps> = ({
             <>
               Can&apos;t find a token?
               <br />
-              Put an address into the search line to find it.
+              Put an address into the search line to add it to your assets list.
             </>
           )}
         </button>
@@ -359,6 +360,37 @@ const AssetsList: FC<AssetsListProps> = ({
           viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-20"
         >
+          <div
+            className={classNames(
+              "max-h-0",
+              "overflow-hidden",
+              manageModeEnabled &&
+                tokens.length > 0 &&
+                "transition-[max-height] duration-200 max-h-[4.25rem]"
+            )}
+          >
+            <div className="pb-2">
+              <button
+                type="button"
+                className={classNames(
+                  "flex items-center",
+                  "w-full py-2 px-3",
+                  "bg-brand-main/5",
+                  "rounded-[.625rem]",
+                  "text-sm text-brand-inactivelight text-left",
+                  "cursor-pointer",
+                  "transition-colors",
+                  "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+                )}
+                onClick={focusSearchInput}
+              >
+                <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+                To add an asset, enter the address into
+                <br />
+                the search line
+              </button>
+            </div>
+          </div>
           {tokens.map((asset, i) => (
             <AssetCard
               key={asset.tokenSlug}
@@ -471,7 +503,7 @@ const AssetCard = memo(
                   "text-sm leading-4",
                   !isActive && "text-brand-inactivedark",
                   isActive && "text-brand-light",
-                  "group-hover:text-brand-light",
+                  hoverable && "group-hover:text-brand-light",
                   "transition-colors",
                   "truncate min-w-0",
                   isManageMode && "mr-14"

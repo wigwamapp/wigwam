@@ -47,6 +47,7 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
@@ -425,7 +426,7 @@ const AssetsList: FC = () => {
           <NoResultsFoundIcon className="mb-4" />
           Can&apos;t find a token?
           <br />
-          Put an address into the search line to find it.
+          Put an address into the search line to add it to your assets list.
         </button>
       ) : (
         <ScrollAreaContainer
@@ -434,6 +435,37 @@ const AssetsList: FC = () => {
           viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-16"
         >
+          <div
+            className={classNames(
+              "max-h-0",
+              "overflow-hidden",
+              manageModeEnabled &&
+                tokens.length > 0 &&
+                "transition-[max-height] duration-200 max-h-[4.25rem]"
+            )}
+          >
+            <div className="pb-2">
+              <button
+                type="button"
+                className={classNames(
+                  "flex items-center",
+                  "w-full py-2 px-3",
+                  "bg-brand-main/5",
+                  "rounded-[.625rem]",
+                  "text-sm text-brand-inactivelight text-left",
+                  "cursor-pointer",
+                  "transition-colors",
+                  "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+                )}
+                onClick={focusSearchInput}
+              >
+                <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+                Enter the address into
+                <br />
+                the search line
+              </button>
+            </div>
+          </div>
           {tokens.map((asset, i) => (
             <AssetCard
               key={asset.tokenSlug}
