@@ -1,6 +1,7 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
 import { IS_FIREFOX } from "app/defaults";
 import { onboardingPopupAtom } from "app/atoms";
@@ -26,22 +27,15 @@ const OnboardingPopupContent: FC = () => {
   const [isReady, setIsReady] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomElementRef = useRef<HTMLSpanElement>(null);
+
+  const scrolledBottom = useOnScreen(bottomElementRef);
 
   useEffect(() => {
-    const el = scrollAreaRef.current;
-    if (!el) return;
-
-    const handleScroll = () => {
-      if (el.scrollTop >= el.scrollHeight - el.clientHeight) {
-        if (!isReady) setIsReady(true);
-      } else {
-        if (isReady) setIsReady(false);
-      }
-    };
-
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
-  }, [isReady, setIsReady]);
+    if (scrolledBottom) {
+      setIsReady(true);
+    }
+  }, [setIsReady, scrolledBottom]);
 
   const handleButtonClick = useCallback(() => {
     if (isReady) {
@@ -134,7 +128,7 @@ const OnboardingPopupContent: FC = () => {
               alt="Create an unlimited number of profiles!"
             />
           </Wrapper>
-          <span className="invisible" />
+          <span ref={bottomElementRef} className="invisible" />
         </div>
       </ScrollAreaContainer>
       <div
