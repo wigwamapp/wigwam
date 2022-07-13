@@ -298,66 +298,33 @@ const AssetsList: FC<AssetsListProps> = ({
         onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
-      <div className="flex flex-col">
-        <div className="flex items-center">
-          <TippySingletonProvider>
-            <SearchInput
-              ref={searchInputRef}
-              searchValue={searchValue}
-              toggleSearchValue={setSearchValue}
-              disabled={isNftsSelected}
-            />
-            <IconedButton
-              Icon={ControlIcon}
-              iconProps={{
-                isActive: manageModeEnabled,
-              }}
-              theme="tertiary"
-              className={classNames(
-                "ml-2",
-                manageModeEnabled && "bg-brand-main/30"
-              )}
-              aria-label={
-                manageModeEnabled
-                  ? "Finish managing assets list"
-                  : "Manage assets list"
-              }
-              disabled={isNftsSelected}
-              onClick={toggleManageMode}
-            />
-          </TippySingletonProvider>
-        </div>
-        <div
-          className={classNames(
-            "max-h-0",
-            "overflow-hidden",
-            manageModeEnabled &&
-              tokens.length > 0 &&
-              "transition-[max-height] duration-200 max-h-[4.25rem]"
-          )}
-        >
-          <div className="pt-3">
-            <button
-              type="button"
-              className={classNames(
-                "flex items-center",
-                "w-full py-2 px-3",
-                "bg-brand-main/5",
-                "rounded-[.625rem]",
-                "text-sm text-brand-inactivelight text-left",
-                "cursor-pointer",
-                "transition-colors",
-                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
-              )}
-              onClick={focusSearchInput}
-            >
-              <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
-              To add an asset, enter the address into
-              <br />
-              the search line
-            </button>
-          </div>
-        </div>
+      <div className="flex items-center">
+        <TippySingletonProvider>
+          <SearchInput
+            ref={searchInputRef}
+            searchValue={searchValue}
+            toggleSearchValue={setSearchValue}
+            disabled={isNftsSelected}
+          />
+          <IconedButton
+            Icon={ControlIcon}
+            iconProps={{
+              isActive: manageModeEnabled,
+            }}
+            theme="tertiary"
+            className={classNames(
+              "ml-2",
+              manageModeEnabled && "bg-brand-main/30"
+            )}
+            aria-label={
+              manageModeEnabled
+                ? "Finish managing assets list"
+                : "Manage assets list"
+            }
+            disabled={isNftsSelected}
+            onClick={toggleManageMode}
+          />
+        </TippySingletonProvider>
       </div>
       {isNftsSelected ? (
         <ComingSoon label="NFTs" size="small" />
@@ -393,6 +360,37 @@ const AssetsList: FC<AssetsListProps> = ({
           viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
           scrollBarClassName="py-0 pb-20"
         >
+          <div
+            className={classNames(
+              "max-h-0",
+              "overflow-hidden",
+              manageModeEnabled &&
+                tokens.length > 0 &&
+                "transition-[max-height] duration-200 max-h-[4.25rem]"
+            )}
+          >
+            <div className="pb-2">
+              <button
+                type="button"
+                className={classNames(
+                  "flex items-center",
+                  "w-full py-2 px-3",
+                  "bg-brand-main/5",
+                  "rounded-[.625rem]",
+                  "text-sm text-brand-inactivelight text-left",
+                  "cursor-pointer",
+                  "transition-colors",
+                  "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+                )}
+                onClick={focusSearchInput}
+              >
+                <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+                To add an asset, enter the address into
+                <br />
+                the search line
+              </button>
+            </div>
+          </div>
           {tokens.map((asset, i) => (
             <AssetCard
               key={asset.tokenSlug}
