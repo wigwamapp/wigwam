@@ -30,11 +30,6 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
     ...saved,
     // Override
     ...toMerge,
-    nativeCurrency: {
-      ...saved.nativeCurrency,
-      name: toMerge.nativeCurrency.name,
-    },
-    position: toMerge.position,
     // Merge
     rpcUrls: mergeNetworkUrls(saved.rpcUrls, toMerge.rpcUrls)!,
     explorerUrls: mergeNetworkUrls(saved.explorerUrls, toMerge.explorerUrls),
