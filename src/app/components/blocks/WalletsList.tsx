@@ -82,7 +82,7 @@ const EmptyWalletCard: FC = () => (
         <div
           className={classNames(
             "!h-12 w-12 min-w-[3rem] mr-3",
-            "!rounded-lg",
+            "!rounded-[.625rem]",
             emptyClassBg
           )}
         />
