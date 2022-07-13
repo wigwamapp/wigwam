@@ -142,10 +142,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
             <Tooltip
               content={tooltip}
               {...tooltipProps}
-              className="ml-2"
               tooltipClassName="max-w-[20rem]"
+              asChild
             >
-              <TooltipIcon className="!w-4 !h-4" />
+              <span className="ml-2">
+                <TooltipIcon className="!w-4 !h-4" />
+              </span>
             </Tooltip>
           )}
         </button>
