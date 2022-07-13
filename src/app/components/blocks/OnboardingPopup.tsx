@@ -171,7 +171,7 @@ const OnboardingPopupContent: FC = () => {
       >
         <Button
           type="button"
-          className="!min-w-[14rem]"
+          className="!min-w-[14rem] group"
           onClick={handleButtonClick}
         >
           {isReady ? (
@@ -179,7 +179,7 @@ const OnboardingPopupContent: FC = () => {
           ) : (
             <span className="flex items-center">
               Next
-              <ArrowIcon className="ml-2 rotate-180 w-6 h-auto" />
+              <ArrowIcon className="ml-2 rotate-180 w-6 h-auto transition-transform group-hover:translate-x-1" />
             </span>
           )}
         </Button>
