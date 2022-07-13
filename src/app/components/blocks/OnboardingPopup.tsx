@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
-import { useAtom } from "jotai";
-import { useOnScreen } from "lib/react-hooks/useOnScreen";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import { IS_FIREFOX } from "app/defaults";
 import { onboardingPopupAtom } from "app/atoms";
@@ -15,19 +14,34 @@ import OnboardingFiveImage from "app/images/onboarding-5.png";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-left-long.svg";
 
 const OnboardingPopup: FC = () => {
-  const [visible, setVisible] = useAtom(onboardingPopupAtom);
+  const visible = useAtomValue(onboardingPopupAtom);
+
+  return visible ? <OnboardingPopupContent /> : null;
+};
+
+export default OnboardingPopup;
+
+const OnboardingPopupContent: FC = () => {
+  const setVisible = useSetAtom(onboardingPopupAtom);
   const [isReady, setIsReady] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const bottomElementRef = useRef<HTMLSpanElement>(null);
-
-  const scrolledBottom = useOnScreen(bottomElementRef);
 
   useEffect(() => {
-    if (scrolledBottom) {
-      setIsReady(true);
-    }
-  }, [scrolledBottom]);
+    const el = scrollAreaRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      if (el.scrollTop >= el.scrollHeight - el.clientHeight) {
+        if (!isReady) setIsReady(true);
+      } else {
+        if (isReady) setIsReady(false);
+      }
+    };
+
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [isReady, setIsReady]);
 
   const handleButtonClick = useCallback(() => {
     if (isReady) {
@@ -48,10 +62,6 @@ const OnboardingPopup: FC = () => {
       });
     }
   }, [isReady, setVisible]);
-
-  if (!visible) {
-    return null;
-  }
 
   return (
     <div className="fixed inset-0 z-[999999999999] bg-[#07081B]/[.98] flex flex-col">
@@ -124,7 +134,7 @@ const OnboardingPopup: FC = () => {
               alt="Create an unlimited number of profiles!"
             />
           </Wrapper>
-          <span ref={bottomElementRef} className="invisible" />
+          <span className="invisible" />
         </div>
       </ScrollAreaContainer>
       <div
@@ -160,8 +170,6 @@ const OnboardingPopup: FC = () => {
     </div>
   );
 };
-
-export default OnboardingPopup;
 
 const Wrapper: FC<{ className?: string }> = ({ className, children }) => (
   <div className={classNames("flex items-center w-full", className)}>
