@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
 import { useAtom } from "jotai";
+import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
 import { IS_FIREFOX } from "app/defaults";
 import { onboardingPopupAtom } from "app/atoms";
@@ -11,9 +12,42 @@ import OnboardingTwoImage from "app/images/onboarding-2.png";
 import OnboardingThreeImage from "app/images/onboarding-3.png";
 import OnboardingFourImage from "app/images/onboarding-4.png";
 import OnboardingFiveImage from "app/images/onboarding-5.png";
+import { ReactComponent as ArrowIcon } from "app/icons/arrow-left-long.svg";
 
 const OnboardingPopup: FC = () => {
   const [visible, setVisible] = useAtom(onboardingPopupAtom);
+  const [isReady, setIsReady] = useState(false);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomElementRef = useRef<HTMLSpanElement>(null);
+
+  const scrolledBottom = useOnScreen(bottomElementRef);
+
+  useEffect(() => {
+    if (scrolledBottom) {
+      setIsReady(true);
+    }
+  }, [scrolledBottom]);
+
+  const handleButtonClick = useCallback(() => {
+    if (isReady) {
+      setVisible(false);
+    } else {
+      const html = document.querySelector("html")!;
+      const fontSize = parseFloat(
+        window.getComputedStyle(html, null).getPropertyValue("font-size")
+      );
+
+      scrollAreaRef.current?.scrollTo({
+        behavior: "smooth",
+        top:
+          (scrollAreaRef.current?.scrollTop || 0) +
+          html.offsetHeight -
+          6 * fontSize,
+        left: 0,
+      });
+    }
+  }, [isReady, setVisible]);
 
   if (!visible) {
     return null;
@@ -22,6 +56,7 @@ const OnboardingPopup: FC = () => {
   return (
     <div className="fixed inset-0 z-[999999999999] bg-[#07081B]/[.98] flex flex-col">
       <ScrollAreaContainer
+        ref={scrollAreaRef}
         className={classNames("w-full flex flex-col")}
         viewPortClassName="pb-[12.5rem] rounded-t-[.625rem]"
         scrollBarClassName="pt-2 pb-[6.5rem]"
@@ -89,6 +124,7 @@ const OnboardingPopup: FC = () => {
               alt="Create an unlimited number of profiles!"
             />
           </Wrapper>
+          <span ref={bottomElementRef} className="invisible" />
         </div>
       </ScrollAreaContainer>
       <div
@@ -109,9 +145,16 @@ const OnboardingPopup: FC = () => {
         <Button
           type="button"
           className="!min-w-[14rem]"
-          onClick={() => setVisible(false)}
+          onClick={handleButtonClick}
         >
-          Let&apos;s start!
+          {isReady ? (
+            "Let's start!"
+          ) : (
+            <span className="flex items-center">
+              Next
+              <ArrowIcon className="ml-2 rotate-180 w-6 h-auto" />
+            </span>
+          )}
         </Button>
       </div>
     </div>
