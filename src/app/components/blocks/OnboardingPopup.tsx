@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import classNames from "clsx";
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
 import { IS_FIREFOX } from "app/defaults";
 import { onboardingPopupAtom } from "app/atoms";
@@ -11,17 +12,56 @@ import OnboardingTwoImage from "app/images/onboarding-2.png";
 import OnboardingThreeImage from "app/images/onboarding-3.png";
 import OnboardingFourImage from "app/images/onboarding-4.png";
 import OnboardingFiveImage from "app/images/onboarding-5.png";
+import OnboardingSixImage from "app/images/onboarding-6.png";
+import { ReactComponent as ArrowIcon } from "app/icons/arrow-left-long.svg";
 
 const OnboardingPopup: FC = () => {
-  const [visible, setVisible] = useAtom(onboardingPopupAtom);
+  const visible = useAtomValue(onboardingPopupAtom);
 
-  if (!visible) {
-    return null;
-  }
+  return visible ? <OnboardingPopupContent /> : null;
+};
+
+export default OnboardingPopup;
+
+const OnboardingPopupContent: FC = () => {
+  const setVisible = useSetAtom(onboardingPopupAtom);
+  const [isReady, setIsReady] = useState(false);
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomElementRef = useRef<HTMLSpanElement>(null);
+
+  const scrolledBottom = useOnScreen(bottomElementRef);
+
+  useEffect(() => {
+    if (scrolledBottom) {
+      setIsReady(true);
+    }
+  }, [setIsReady, scrolledBottom]);
+
+  const handleButtonClick = useCallback(() => {
+    if (isReady) {
+      setVisible(false);
+    } else {
+      const html = document.querySelector("html")!;
+      const fontSize = parseFloat(
+        window.getComputedStyle(html, null).getPropertyValue("font-size")
+      );
+
+      scrollAreaRef.current?.scrollTo({
+        behavior: "smooth",
+        top:
+          (scrollAreaRef.current?.scrollTop || 0) +
+          html.offsetHeight -
+          6 * fontSize,
+        left: 0,
+      });
+    }
+  }, [isReady, setVisible]);
 
   return (
     <div className="fixed inset-0 z-[999999999999] bg-[#07081B]/[.98] flex flex-col">
       <ScrollAreaContainer
+        ref={scrollAreaRef}
         className={classNames("w-full flex flex-col")}
         viewPortClassName="pb-[12.5rem] rounded-t-[.625rem]"
         scrollBarClassName="pt-2 pb-[6.5rem]"
@@ -89,6 +129,29 @@ const OnboardingPopup: FC = () => {
               alt="Create an unlimited number of profiles!"
             />
           </Wrapper>
+          <Wrapper className="mt-[3.75rem]">
+            <img
+              src={OnboardingSixImage}
+              className="w-[23.5rem] h-auto mr-[3.75rem]"
+              alt="To help us test the product and get NFT Vigvam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Vigvam Pro and participation rules."
+            />
+            <Item>
+              To help us test the product and get NFT Vigvam Pro, check out the{" "}
+              <Link href="https://vigvamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
+                Beta Testing Workflow
+              </Link>
+              . Then fill in the{" "}
+              <Link href="https://forms.gle/bE5mmn4SGbCmGWG46">
+                Feedback Form
+              </Link>{" "}
+              to leave your feedback or bug report. Also, we suggest you learn{" "}
+              <Link href="https://vigvamapp.medium.com/nft-vigvam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
+                Information about NFT Vigvam Pro and participation rules
+              </Link>
+              .
+            </Item>
+          </Wrapper>
+          <span ref={bottomElementRef} className="invisible" />
         </div>
       </ScrollAreaContainer>
       <div
@@ -108,20 +171,30 @@ const OnboardingPopup: FC = () => {
       >
         <Button
           type="button"
-          className="!min-w-[14rem]"
-          onClick={() => setVisible(false)}
+          className="!min-w-[14rem] group"
+          onClick={handleButtonClick}
         >
-          Let&apos;s start!
+          {isReady ? (
+            "Let's start!"
+          ) : (
+            <span className="flex items-center">
+              Next
+              <ArrowIcon className="ml-2 rotate-180 w-6 h-auto transition-transform group-hover:translate-x-1" />
+            </span>
+          )}
         </Button>
       </div>
     </div>
   );
 };
 
-export default OnboardingPopup;
-
 const Wrapper: FC<{ className?: string }> = ({ className, children }) => (
-  <div className={classNames("flex items-center w-full", className)}>
+  <div
+    className={classNames(
+      "flex items-center w-full text-brand-light",
+      className
+    )}
+  >
     {children}
   </div>
 );
@@ -131,4 +204,17 @@ const Item: FC = ({ children }) => (
     <span className="block w-2 min-w-[.5rem] mt-2.5 h-2 rounded-full bg-buttonaccent mr-2" />
     <p className="text-xl	font-bold">{children}</p>
   </div>
+);
+
+type LinkProps = {
+  href: string;
+};
+
+const Link: FC<LinkProps> = ({ href, children }) => (
+  <a
+    href={href}
+    className="text-brand-font transition-colors hover:text-brand-light"
+  >
+    {children}
+  </a>
 );
