@@ -11,7 +11,6 @@ import {
   JsonRpcError,
   JsonRpcMethod,
   RequestArguments,
-  EthSubscription,
   SendSyncJsonRpcRequest,
 } from "core/types/rpc";
 import { JSONRPC, VIGVAM_STATE, AUTHORIZED_RPC_METHODS } from "core/common/rpc";
@@ -24,9 +23,8 @@ const gatewayEventType = Symbol();
 const stateUpdatedType = Symbol();
 
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
-type ProviderEvent = EthSubscription | GatewayPayload<unknown>;
 
-export class InpageProvider extends Emitter<ProviderEvent> {
+export class InpageProvider extends Emitter {
   isVigvam = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;

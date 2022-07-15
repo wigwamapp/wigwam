@@ -1,70 +1,63 @@
-/**
- * Inspired by https://github.com/developit/mitt
- */
+import { EventEmitter } from "events";
 
-export type EventType = string | symbol;
+type Handler = (...args: any[]) => void;
+interface EventMap {
+  [k: string | symbol]: Handler | Handler[] | undefined;
+}
 
-// An event handler can take an optional event argument
-// and should not return a value
-export type Handler<T = any> = (event?: T) => void;
-
-// An array of all currently registered event handlers for a type
-export type EventHandlerList = Array<Handler>;
-
-// A map of event types and their corresponding event handlers.
-export type EventHandlerMap = Map<EventType, EventHandlerList>;
-
-export class Emitter<Event = any> {
-  #all: EventHandlerMap = new Map();
-
-  /**
-   * Register an event handler for the given type.
-   * @param {string|symbol} type Type of event to listen for
-   * @param {Function} handler Function to call in response to given event
-   * @memberOf Emitter
-   */
-  on<T = Event>(type: EventType, handler: Handler<T>) {
-    const handlers = this.#all.get(type);
-    const added = handlers && handlers.push(handler);
-    if (!added) {
-      this.#all.set(type, [handler]);
+export class Emitter extends EventEmitter {
+  emit(type: string | symbol, ...args: any[]): boolean {
+    let doError = type === "error";
+    const events: EventMap = (this as any)._events;
+    if (events !== undefined) {
+      doError = doError && events.error === undefined;
+    } else if (!doError) {
+      return false;
     }
-  }
-
-  once<T = Event>(type: EventType, handler: Handler<T>) {
-    const handleOnce = (event?: T) => {
-      this.removeListener(type, handleOnce);
-      handler(event);
-    };
-
-    this.on<T>(type, handleOnce);
-  }
-
-  /**
-   * Remove an event handler for the given type.
-   * @param {string|symbol} type Type of event to unregister `handler` from
-   * @param {Function} handler Handler function to remove
-   * @memberOf Emitter
-   */
-  removeListener<T = Event>(type: EventType, handler: Handler<T>) {
-    const handlers = this.#all.get(type);
-    if (handlers) {
-      handlers.splice(handlers.indexOf(handler) >>> 0, 1);
+    // If there is no 'error' event listener then throw.
+    if (doError) {
+      let er;
+      if (args.length > 0) {
+        [er] = args;
+      }
+      if (er instanceof Error) {
+        // Note: The comments on the `throw` lines are intentional, they show
+        // up in Node's output if this results in an unhandled exception.
+        throw er; // Unhandled 'error' event
+      }
+      // At least give some kind of context to the user
+      const err = new Error(`Unhandled error.${er ? ` (${er.message})` : ""}`);
+      (err as any).context = er;
+      throw err; // Unhandled 'error' event
     }
+    const handler = events[type];
+    if (handler === undefined) {
+      return false;
+    }
+    if (typeof handler === "function") {
+      safeApply(handler, this, args);
+    } else {
+      const len = handler.length;
+      const listeners = Array.from(handler);
+      for (let i = 0; i < len; i += 1) {
+        safeApply(listeners[i], this, args);
+      }
+    }
+    return true;
   }
+}
 
-  /**
-   * Invoke all handlers for the given type.
-   *
-   * @param {string|symbol} type The event type to invoke
-   * @param {Event} [evt] Any value (object is recommended and powerful), passed to each handler
-   * @memberOf Emitter
-   */
-  emit<T = Event>(type: EventType, evt: T) {
-    ((this.#all.get(type) || []) as EventHandlerList).slice().map((handler) => {
-      try {
-        handler(evt);
-      } catch {}
+function safeApply<T, A extends any[]>(
+  handler: (this: T, ...args: A) => void,
+  context: T,
+  args: A
+): void {
+  try {
+    Reflect.apply(handler, context, args);
+  } catch (err) {
+    // Throw error after timeout so as not to interrupt the stack
+    setTimeout(() => {
+      throw err;
     });
   }
 }
