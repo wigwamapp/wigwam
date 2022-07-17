@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { recoverPersonalSignature } from "@metamask/eth-sig-util";
+import { recoverPersonalSignature } from "lib/eth-sig-util";
 import { assert } from "lib/system/assert";
 
 import {
