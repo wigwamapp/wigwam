@@ -7,7 +7,7 @@ module.exports = {
     "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
     "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}",
   ],
-  testEnvironment: "jsdom",
+  testEnvironment: "node",
   transform: {
     "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "@swc/jest",
     "^.+\\.css$": "<rootDir>/.jest/cssTransform.js",

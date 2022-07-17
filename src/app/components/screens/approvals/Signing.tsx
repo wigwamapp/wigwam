@@ -11,6 +11,12 @@ import classNames from "clsx";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import {
+  TypedDataUtils,
+  SignTypedDataVersion,
+  recoverPersonalSignature,
+  recoverTypedSignature,
+} from "lib/eth-sig-util";
 
 import { AccountSource, SigningApproval, SigningStandard } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";
@@ -91,13 +97,6 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
 
           await withLedger(async ({ ledgerEth }) => {
             try {
-              const {
-                TypedDataUtils,
-                SignTypedDataVersion,
-                recoverPersonalSignature,
-                recoverTypedSignature,
-              } = await import("@metamask/eth-sig-util");
-
               let sig;
 
               switch (approval.standard) {
