@@ -244,6 +244,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
                 index: wallet.index,
                 isDisabled: true,
                 isDefaultChecked: true,
+                publicKey: toProtectedString(wallet.publicKey),
               });
             }
           }
