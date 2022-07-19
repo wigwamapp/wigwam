@@ -6,6 +6,7 @@ import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
 import { sync, syncTokenActivities } from "core/client";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
+import { TokenType } from "core/types";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -32,14 +33,18 @@ export function useIsSyncing() {
   return status.includes(chainId);
 }
 
-export function useSync(chainId: number, accountAddress: string) {
+export function useSync(
+  chainId: number,
+  accountAddress: string,
+  tokenType = TokenType.Asset
+) {
   const isHidden = useDocumentVisibility();
 
   useEffect(() => {
     let t: any;
 
     const syncAndDefer = () => {
-      sync(chainId, accountAddress);
+      sync(chainId, accountAddress, tokenType);
 
       t = setTimeout(syncAndDefer, 3_000);
     };
@@ -49,7 +54,7 @@ export function useSync(chainId: number, accountAddress: string) {
     }
 
     return () => clearTimeout(t);
-  }, [chainId, isHidden, accountAddress]);
+  }, [isHidden, chainId, accountAddress, tokenType]);
 }
 
 export function useTokenActivitiesSync(

@@ -5,6 +5,7 @@ import memoize from "mem";
 
 import {
   AccountAsset,
+  AccountNFT,
   AccountToken,
   TokenStandard,
   TokenStatus,
@@ -25,18 +26,18 @@ import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
 export const syncAccountTokens = memoize(
-  async (chainId: number, accountAddress: string) => {
+  async (chainId: number, accountAddress: string, tokenType: TokenType) => {
     const [debankChain, existingAccTokens, { nativeCurrency, chainTag }] =
       await Promise.all([
         getDebankChain(chainId),
         repo.accountTokens
           .where("[chainId+tokenType+accountAddress]")
-          .equals([chainId, TokenType.Asset, accountAddress])
+          .equals([chainId, tokenType, accountAddress])
           .toArray(),
         getNetwork(chainId),
       ]);
 
-    const accTokens: AccountAsset[] = [];
+    const accTokens: AccountToken[] = [];
     const dbKeys: IndexableTypeArray = [];
 
     let existingTokensMap: Map<string, AccountToken> | undefined;
@@ -47,82 +48,158 @@ export const syncAccountTokens = memoize(
       );
 
       const { data: debankUserTokens } = await debankApi
-        .get("/user/token_list", {
-          params: {
-            id: accountAddress,
-            chain_id: debankChain.id,
-            is_all: false,
-          },
-        })
+        .get(
+          `/user/${tokenType === TokenType.Asset ? "token_list" : "nft_list"}`,
+          {
+            params: {
+              id: accountAddress,
+              chain_id: debankChain.id,
+              is_all: false,
+            },
+          }
+        )
         .catch(() => ({ data: null }));
 
       if (debankUserTokens) {
         for (const token of debankUserTokens) {
-          const native = token.id === debankChain.native_token_id;
+          let tokenSlug;
 
-          if (native) continue;
+          /**
+           * For assets
+           */
+          if (tokenType === TokenType.Asset) {
+            const native = token.id === debankChain.native_token_id;
 
-          const tokenSlug = createTokenSlug({
-            standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-            address: native ? "0" : ethers.utils.getAddress(token.id),
-            id: "0",
-          });
-          const rawBalanceBN = ethers.BigNumber.from(token.raw_amount_hex_str);
+            if (native) continue;
 
-          const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
+            tokenSlug = createTokenSlug({
+              standard: native ? TokenStandard.Native : TokenStandard.ERC20,
+              address: native ? "0" : ethers.utils.getAddress(token.id),
+              id: "0",
+            });
+            const rawBalanceBN = ethers.BigNumber.from(
+              token.raw_amount_hex_str
+            );
 
-          if (!existing && rawBalanceBN.isZero()) {
-            continue;
-          }
+            const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
-          const metadata = native
-            ? {
-                symbol: nativeCurrency.symbol,
-                name: nativeCurrency.name,
-                logoUrl: getNativeTokenLogoUrl(chainTag),
-              }
-            : {
-                symbol: token.symbol,
-                name: token.name,
-                logoUrl: token.logo_url,
-              };
+            if (!existing && rawBalanceBN.isZero()) {
+              continue;
+            }
 
-          const rawBalance = rawBalanceBN.toString();
-          const priceUSD = token.price
-            ? new BigNumber(token.price).toString()
-            : existing?.priceUSD;
-          const balanceUSD = priceUSD
-            ? new BigNumber(rawBalance)
-                .div(10 ** token.decimals)
-                .times(priceUSD)
-                .toNumber()
-            : existing?.balanceUSD;
-
-          accTokens.push(
-            existing
+            const metadata = native
               ? {
-                  ...existing,
-                  ...metadata,
-                  rawBalance,
-                  balanceUSD,
-                  priceUSD,
+                  symbol: nativeCurrency.symbol,
+                  name: nativeCurrency.name,
+                  logoUrl: getNativeTokenLogoUrl(chainTag),
                 }
               : {
-                  chainId,
-                  accountAddress,
-                  tokenSlug,
-                  tokenType: TokenType.Asset,
-                  status: native ? TokenStatus.Native : TokenStatus.Enabled,
-                  // Metadata
-                  decimals: native ? nativeCurrency.decimals : token.decimals,
-                  ...metadata,
-                  // Volumes
-                  rawBalance,
-                  balanceUSD,
-                  priceUSD,
-                  portfolioUSD: native ? "-1" : undefined,
-                }
-          );
+                  symbol: token.symbol,
+                  name: token.name,
+                  logoUrl: token.logo_url,
+                };
+
+            const rawBalance = rawBalanceBN.toString();
+            const priceUSD = token.price
+              ? new BigNumber(token.price).toString()
+              : existing?.priceUSD;
+            const balanceUSD = priceUSD
+              ? new BigNumber(rawBalance)
+                  .div(10 ** token.decimals)
+                  .times(priceUSD)
+                  .toNumber()
+              : existing?.balanceUSD;
+
+            accTokens.push(
+              existing
+                ? {
+                    ...existing,
+                    ...metadata,
+                    rawBalance,
+                    balanceUSD,
+                    priceUSD,
+                  }
+                : {
+                    chainId,
+                    accountAddress,
+                    tokenSlug,
+                    tokenType: TokenType.Asset,
+                    status: native ? TokenStatus.Native : TokenStatus.Enabled,
+                    // Metadata
+                    decimals: native ? nativeCurrency.decimals : token.decimals,
+                    ...metadata,
+                    // Volumes
+                    rawBalance,
+                    balanceUSD,
+                    priceUSD,
+                    portfolioUSD: native ? "-1" : undefined,
+                  }
+            );
+            /**
+             * For NFTs
+             */
+          } else {
+            const contractAddress = ethers.utils.getAddress(token.contract_id);
+            const tokenId = String(token.inner_id);
+            const rawBalanceBN = ethers.BigNumber.from(token.amount);
+
+            tokenSlug = createTokenSlug({
+              standard: token.is_erc721
+                ? TokenStandard.ERC721
+                : TokenStandard.ERC1155,
+              address: contractAddress,
+              id: tokenId,
+            });
+
+            const existing = existingTokensMap.get(tokenSlug) as AccountNFT;
+
+            if (!existing && rawBalanceBN.isZero()) {
+              continue;
+            }
+
+            const metadata = {
+              contractAddress,
+              tokenId,
+              name: token.name,
+              description: token.description,
+              thumbnailUrl: token.thumbnail_url,
+              detailUrl: token.content,
+              contentType: token.content_type,
+              collectionId: token.collection_id,
+              collectionName: token.contract_name,
+              priceUSD: new BigNumber(token.usd_price).toString(),
+              attributes: token.attributes,
+              tpId: token.id,
+            };
+
+            const rawBalance = rawBalanceBN.toString();
+            const balanceUSD =
+              token.usd_price || token.usd_price === 0
+                ? new BigNumber(token.usd_price).toNumber()
+                : existing?.balanceUSD ?? 0;
+
+            accTokens.push(
+              existing
+                ? {
+                    ...existing,
+                    ...metadata,
+                    rawBalance,
+                    balanceUSD,
+                  }
+                : {
+                    chainId,
+                    accountAddress,
+                    tokenSlug,
+                    tokenType: TokenType.NFT,
+                    status: TokenStatus.Enabled,
+                    // Metadata
+                    ...metadata,
+                    // Volumes
+                    rawBalance,
+                    balanceUSD,
+                  }
+            );
+          }
 
           dbKeys.push(
             createAccountTokenKey({
@@ -155,15 +232,16 @@ export const syncAccountTokens = memoize(
 
         if (!balance) continue;
 
-        const token = restTokens[i] as AccountAsset;
+        const token = restTokens[i];
 
         const rawBalance = balance.toString();
-        const balanceUSD = token.priceUSD
-          ? new BigNumber(rawBalance)
-              .div(10 ** token.decimals)
-              .times(token.priceUSD)
-              .toNumber()
-          : token.balanceUSD;
+        const balanceUSD =
+          token.tokenType === TokenType.Asset && token.priceUSD
+            ? new BigNumber(rawBalance)
+                .div(10 ** token.decimals)
+                .times(token.priceUSD)
+                .toNumber()
+            : token.balanceUSD;
 
         accTokens.push({
           ...token,
@@ -182,34 +260,42 @@ export const syncAccountTokens = memoize(
     }
 
     const tokenAddresses: string[] = [];
-    for (const t of accTokens) {
-      if (t.status !== TokenStatus.Native)
-        tokenAddresses.push(parseTokenSlug(t.tokenSlug).address);
+
+    for (const token of accTokens) {
+      const { standard, address } = parseTokenSlug(token.tokenSlug);
+
+      if (standard === TokenStandard.ERC20) {
+        tokenAddresses.push(address);
+      }
     }
 
     const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
 
-    for (const token of accTokens) {
-      if (token.status === TokenStatus.Native) continue;
+    if (Object.keys(cgPrices).length > 0) {
+      for (let token of accTokens) {
+        if (token.status === TokenStatus.Native) continue;
 
-      const cgTokenAddress = parseTokenSlug(
-        token.tokenSlug
-      ).address.toLowerCase();
-      const price = cgPrices[cgTokenAddress];
+        token = token as AccountAsset;
 
-      if (price && price.usd) {
-        const priceUSD = new BigNumber(price.usd);
+        const cgTokenAddress = parseTokenSlug(
+          token.tokenSlug
+        ).address.toLowerCase();
+        const price = cgPrices[cgTokenAddress];
 
-        token.priceUSD = priceUSD.toString();
-        token.priceUSDChange = price.usd_24h_change?.toString();
-        token.balanceUSD = new BigNumber(token.rawBalance)
-          .div(10 ** token.decimals)
-          .times(priceUSD)
-          .toNumber();
-      } else {
-        delete token.priceUSD;
-        delete token.priceUSDChange;
-        token.balanceUSD = 0;
+        if (price && price.usd) {
+          const priceUSD = new BigNumber(price.usd);
+
+          token.priceUSD = priceUSD.toString();
+          token.priceUSDChange = price.usd_24h_change?.toString();
+          token.balanceUSD = new BigNumber(token.rawBalance)
+            .div(10 ** token.decimals)
+            .times(priceUSD)
+            .toNumber();
+        } else {
+          delete token.priceUSD;
+          delete token.priceUSDChange;
+          token.balanceUSD = 0;
+        }
       }
     }
 

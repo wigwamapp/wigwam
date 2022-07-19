@@ -27,6 +27,7 @@ import {
   TokenType,
   TokenActivity as TokenActivityPrimitive,
   TokenActivityProject,
+  AccountToken,
 } from "core/types";
 import {
   createTokenActivityKey,
@@ -41,7 +42,7 @@ import {
   LOAD_MORE_ON_ASSET_FROM_END,
 } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -98,31 +99,22 @@ export default OverviewContent;
 
 const TokenExplorer: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
-  const [isNftsSelected, setIsNftsSelected] = useState(false);
 
   return (
     <>
-      <AssetsList
-        isNftsSelected={isNftsSelected}
-        setIsNftsSelected={setIsNftsSelected}
-      />
-      {tokenSlug && !isNftsSelected && <AssetInfo />}
+      <AssetsList />
+      {tokenSlug && <AssetInfo />}
     </>
   );
 };
 
-type AssetsListProps = {
-  isNftsSelected: boolean;
-  setIsNftsSelected: (value: boolean) => void;
-};
-
-const AssetsList: FC<AssetsListProps> = ({
-  isNftsSelected,
-  setIsNftsSelected,
-}) => {
+const AssetsList: FC = () => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
+
+  const isNftsSelected = tokenType === TokenType.NFT;
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
@@ -138,7 +130,7 @@ const AssetsList: FC<AssetsListProps> = ({
   }, []);
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
-    TokenType.Asset,
+    tokenType,
     currentAccount.address,
     {
       withDisabled: manageModeEnabled,
@@ -186,26 +178,28 @@ const AssetsList: FC<AssetsListProps> = ({
   }, [setTokenSlug, tokens]);
 
   const handleAssetSelect = useCallback(
-    async (asset: AccountAsset) => {
+    async (token: AccountToken) => {
+      if (token.tokenType === TokenType.NFT) return;
+
       if (manageModeEnabled) {
-        if (asset.status === TokenStatus.Native) return;
+        if (token.status === TokenStatus.Native) return;
 
         try {
           await repo.accountTokens.put(
             {
-              ...asset,
+              ...token,
               status:
-                asset.status === TokenStatus.Enabled
+                token.status === TokenStatus.Enabled
                   ? TokenStatus.Disabled
                   : TokenStatus.Enabled,
             },
-            [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+            [token.chainId, currentAccount.address, token.tokenSlug].join("_")
           );
         } catch (e) {
           console.error(e);
         }
       } else {
-        setTokenSlug([asset.tokenSlug, "replace"]);
+        setTokenSlug([token.tokenSlug, "replace"]);
       }
     },
     [currentAccount.address, manageModeEnabled, setTokenSlug]
@@ -280,9 +274,10 @@ const AssetsList: FC<AssetsListProps> = ({
       } else if (tokens.length > 0) {
         setTokenSlug([tokens[0].tokenSlug, "replace"]);
       }
-      setIsNftsSelected(value);
+
+      setTokenType(value ? TokenType.NFT : TokenType.Asset);
     },
-    [setIsNftsSelected, setTokenSlug, tokens]
+    [setTokenType, setTokenSlug, tokens]
   );
 
   return (

@@ -1,6 +1,11 @@
 import BigNumber from "bignumber.js";
 
-import { AccountAsset, TokenStatus, TokenType } from "core/types";
+import {
+  AccountToken,
+  TokenStandard,
+  TokenStatus,
+  TokenType,
+} from "core/types";
 import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 import * as repo from "core/repo";
 
@@ -30,9 +35,9 @@ export async function addFindTokenRequest(
 
   try {
     await enqueueTokensSync(async () => {
-      let tokenToAdd: AccountAsset | undefined;
+      let tokenToAdd: AccountToken | undefined;
 
-      const { address: tokenAddress } = parseTokenSlug(tokenSlug);
+      const { standard, address: tokenAddress } = parseTokenSlug(tokenSlug);
 
       const existing = await repo.accountTokens.get(dbKey);
       if (existing) {
@@ -44,12 +49,14 @@ export async function addFindTokenRequest(
 
         const rawBalance = balance?.toString() ?? "0";
         const balanceUSD =
-          "priceUSD" in existing && existing.priceUSD
+          existing.tokenType === TokenType.Asset &&
+          "priceUSD" in existing &&
+          existing.priceUSD
             ? new BigNumber(rawBalance)
                 .div(10 ** existing.decimals)
                 .times(existing.priceUSD)
                 .toNumber()
-            : 0;
+            : existing.balanceUSD ?? 0;
 
         await repo.accountTokens.put(
           {
@@ -63,9 +70,13 @@ export async function addFindTokenRequest(
         return;
       }
 
+      if (standard === TokenStandard.Native) return;
+
       const [debankChain, coinGeckoPrices] = await Promise.all([
         getDebankChain(chainId),
-        getCoinGeckoPrices(chainId, [tokenAddress]),
+        standard === TokenStandard.ERC20
+          ? getCoinGeckoPrices(chainId, [tokenAddress])
+          : Promise.resolve({}),
       ]);
 
       const cgTokenAddress = tokenAddress.toLowerCase();
@@ -75,14 +86,16 @@ export async function addFindTokenRequest(
 
       if (debankChain) {
         const [{ data: dbToken }, balance] = await Promise.all([
-          debankApi
-            .get("/token", {
-              params: {
-                chain_id: debankChain.id,
-                id: tokenAddress,
-              },
-            })
-            .catch(() => ({ data: null })),
+          standard === TokenStandard.ERC20
+            ? debankApi
+                .get("/token", {
+                  params: {
+                    chain_id: debankChain.id,
+                    id: tokenAddress,
+                  },
+                })
+                .catch(() => ({ data: null }))
+            : Promise.resolve({ data: null }),
           getBalanceFromChain(chainId, tokenSlug, accountAddress),
         ]);
 
@@ -120,31 +133,30 @@ export async function addFindTokenRequest(
       }
 
       if (!tokenToAdd) {
-        const token = await getAccountTokenFromChain(
-          chainId,
-          accountAddress,
-          tokenSlug
-        );
-        if (!token) return;
+        const [metadata, balance] = await Promise.all([
+          getAccountTokenFromChain(chainId, tokenSlug),
+          getBalanceFromChain(chainId, tokenSlug, accountAddress),
+        ]);
+        if (!metadata || !balance) return;
 
-        const rawBalance = token.balance.toString();
-        const balanceUSD = priceUSD
-          ? new BigNumber(rawBalance)
-              .div(10 ** token.decimals)
-              .times(priceUSD)
-              .toNumber()
-          : 0;
+        const rawBalance = balance.toString();
+        const balanceUSD =
+          priceUSD && "decimals" in metadata
+            ? new BigNumber(rawBalance)
+                .div(10 ** metadata.decimals)
+                .times(priceUSD)
+                .toNumber()
+            : 0;
 
         tokenToAdd = {
-          tokenType: TokenType.Asset,
+          tokenType:
+            standard === TokenStandard.ERC20 ? TokenType.Asset : TokenType.NFT,
           status: TokenStatus.Enabled,
           chainId,
           accountAddress,
           tokenSlug,
           // Metadata
-          decimals: token.decimals,
-          name: token.name,
-          symbol: token.symbol,
+          ...(metadata as any),
           // Volumes
           rawBalance,
           balanceUSD,
@@ -153,7 +165,9 @@ export async function addFindTokenRequest(
         };
       }
 
-      await repo.accountTokens.put(tokenToAdd, dbKey);
+      if (tokenToAdd) {
+        await repo.accountTokens.put(tokenToAdd, dbKey);
+      }
     });
   } catch (err) {
     console.error(err);

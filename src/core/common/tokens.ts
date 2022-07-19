@@ -1,3 +1,6 @@
+import { JsonRpcProvider } from "@ethersproject/providers";
+
+import { ERC1155__factory } from "abi-types";
 import { TokenActivity, TokenStandard } from "core/types";
 
 export const NATIVE_TOKEN_SLUG = createTokenSlug({
@@ -53,4 +56,19 @@ export function createTokenActivityKey({
 
 export function getNativeTokenLogoUrl(chainTag: string) {
   return `{{native}}/${chainTag}`;
+}
+
+export async function detectNFTStandard(
+  provider: JsonRpcProvider,
+  tokenAddress: string,
+  tokenId: string
+) {
+  try {
+    const erc1155Contract = ERC1155__factory.connect(tokenAddress, provider);
+    await erc1155Contract.uri(tokenId);
+
+    return TokenStandard.ERC1155;
+  } catch {}
+
+  return TokenStandard.ERC721;
 }

@@ -1,8 +1,9 @@
-import { atomFamily } from "jotai/utils";
+import { atomFamily, atomWithStorage } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import { atomWithRepoQuery } from "lib/atom-utils";
 
 import * as Repo from "core/repo";
+import { TokenType } from "core/types";
 
 export const getAccountTokensAtom = atomFamily(
   (params: Repo.QueryAccountTokensParams) =>
@@ -24,4 +25,9 @@ export const getTokenAtom = atomFamily(
       )
     ),
   dequal
+);
+
+export const tokenTypeAtom = atomWithStorage<TokenType>(
+  "token_type",
+  TokenType.Asset
 );

@@ -1,4 +1,4 @@
-import { Account } from "core/types";
+import { Account, TokenType } from "core/types";
 
 import { $accounts, syncStarted, synced } from "../state";
 import { syncConversionRates } from "./currencyConversion";
@@ -8,7 +8,11 @@ import {
   enqueueTokensSync,
 } from "./tokens";
 
-export async function addSyncRequest(chainId: number, accountAddress: string) {
+export async function addSyncRequest(
+  chainId: number,
+  accountAddress: string,
+  tokenType: TokenType
+) {
   let syncStartedAt: number | undefined;
 
   setTimeout(() => {
@@ -20,7 +24,7 @@ export async function addSyncRequest(chainId: number, accountAddress: string) {
     await syncConversionRates();
 
     await enqueueTokensSync(async () => {
-      await syncAccountTokens(chainId, accountAddress);
+      await syncAccountTokens(chainId, accountAddress, tokenType);
 
       const allAccounts = $accounts.getState();
 

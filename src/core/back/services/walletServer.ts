@@ -272,10 +272,12 @@ async function handleWalletRequest(
           approvalsRejected(null);
         })
       )
-      .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>
-        withStatus(WalletStatus.Unlocked, () => {
-          addSyncRequest(chainId, accountAddress);
-        })
+      .with(
+        { type: MessageType.Sync },
+        ({ chainId, accountAddress, tokenType }) =>
+          withStatus(WalletStatus.Unlocked, () => {
+            addSyncRequest(chainId, accountAddress, tokenType);
+          })
       )
       .with(
         { type: MessageType.FindToken },

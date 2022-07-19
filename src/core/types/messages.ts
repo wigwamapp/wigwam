@@ -3,6 +3,7 @@ import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
 import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
+import { TokenType } from "./tokens";
 
 export type Request =
   | GetWalletStateRequest
@@ -230,6 +231,7 @@ export interface Sync extends MessageBase {
   type: MessageType.Sync;
   chainId: number;
   accountAddress: string;
+  tokenType: TokenType;
 }
 
 export interface FindToken extends MessageBase {
