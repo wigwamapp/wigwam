@@ -56,12 +56,13 @@ export interface NFT extends TokenBase {
   contractAddress: string;
   tokenId: string;
   name: string;
-  description: string;
+  description?: string;
   thumbnailUrl?: string;
-  detailUrl?: string;
+  contentUrl?: string;
   contentType?: NFTContentType;
   collectionId?: string;
   collectionName?: string;
+  detailUrl?: string;
   priceUSD?: string;
   attributes?: {
     trait_type: string;
