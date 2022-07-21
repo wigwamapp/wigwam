@@ -4,12 +4,15 @@ import classNames from "clsx";
 
 import { ReactComponent as FallbackIconPrimitive } from "app/icons/Fallback.svg";
 
+type LoadingStatus = "idle" | "loading" | "loaded" | "error";
+
 type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   FallbackElement?: FC<{ className?: string }>;
   withBorder?: boolean;
   withBg?: boolean;
   imageClassName?: string;
   fallbackClassName?: string;
+  setLoadingStatus?: (status: LoadingStatus) => void;
 };
 
 const Avatar = memo<AvatarProps>(
@@ -20,11 +23,10 @@ const Avatar = memo<AvatarProps>(
     className,
     imageClassName,
     fallbackClassName,
+    setLoadingStatus,
     ...rest
   }) => {
-    const [loadingState, setLoadingState] = useState<
-      "idle" | "loading" | "loaded" | "error"
-    >("idle");
+    const [loadingState, setLoadingState] = useState<LoadingStatus>("idle");
     const notLoaded = loadingState === "idle" || loadingState === "loading";
 
     const [delayFinished, setDelayFinished] = useState(false);
@@ -50,7 +52,10 @@ const Avatar = memo<AvatarProps>(
       >
         <AvatarPrimitive.Image
           {...rest}
-          onLoadingStatusChange={setLoadingState}
+          onLoadingStatusChange={(state) => {
+            setLoadingState(state);
+            setLoadingStatus?.(state);
+          }}
           className={classNames("w-full h-full object-cover", imageClassName)}
         />
         {loadingState === "error" && (
