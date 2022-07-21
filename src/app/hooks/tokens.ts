@@ -82,6 +82,8 @@ export function useAllAccountTokens(
   const restTokens = useLazyAtomValue(accountTokensAtom, "off");
 
   const pureTokens = useMemo(() => {
+    if (tokenType !== TokenType.Asset) return restTokens;
+
     if (nativeToken && restTokens) {
       return search && !matchNativeToken(nativeToken, search)
         ? restTokens
@@ -93,7 +95,7 @@ export function useAllAccountTokens(
     }
 
     return undefined;
-  }, [nativeToken, restTokens, search]);
+  }, [tokenType, nativeToken, restTokens, search]);
 
   const prevTokens = usePrevious(pureTokens, "when-not-undefined");
   const tokens = pureTokens ?? prevTokens ?? [];

@@ -98,19 +98,23 @@ const OverviewContent: FC = () => (
 export default OverviewContent;
 
 const TokenExplorer: FC = () => {
+  const tokenType = useAtomValue(tokenTypeAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
 
   return (
     <>
-      <AssetsList />
-      {tokenSlug && <AssetInfo />}
+      <TokenList key={tokenType} />
+
+      {tokenSlug &&
+        (tokenType === TokenType.Asset ? <AssetInfo /> : <NFTInfo />)}
     </>
   );
 };
 
-const AssetsList: FC = () => {
+const TokenList: FC = () => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
+
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
   const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
 
@@ -177,10 +181,8 @@ const AssetsList: FC = () => {
     }
   }, [setTokenSlug, tokens]);
 
-  const handleAssetSelect = useCallback(
+  const handleTokenSelect = useCallback(
     async (token: AccountToken) => {
-      if (token.tokenType === TokenType.NFT) return;
-
       if (manageModeEnabled) {
         if (token.status === TokenStatus.Native) return;
 
@@ -267,17 +269,10 @@ const AssetsList: FC = () => {
 
   const toggleNftSwitcher = useCallback(
     (value: boolean) => {
-      if (value) {
-        setTokenSlug([RESET]);
-        setSearchValue(null);
-        setManageModeEnabled(false);
-      } else if (tokens.length > 0) {
-        setTokenSlug([tokens[0].tokenSlug, "replace"]);
-      }
-
+      setTokenSlug([RESET]);
       setTokenType(value ? TokenType.NFT : TokenType.Asset);
     },
-    [setTokenType, setTokenSlug, tokens]
+    [setTokenType, setTokenSlug]
   );
 
   return (
@@ -293,6 +288,7 @@ const AssetsList: FC = () => {
         onCheckedChange={toggleNftSwitcher}
         className="mx-auto mb-3"
       />
+
       <div className="flex items-center">
         <TippySingletonProvider>
           <SearchInput
@@ -386,21 +382,26 @@ const AssetsList: FC = () => {
               </button>
             </div>
           </div>
-          {tokens.map((asset, i) => (
-            <AssetCard
-              key={asset.tokenSlug}
-              ref={
-                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                  ? loadMoreTriggerAssetRef
-                  : null
-              }
-              asset={asset as AccountAsset}
-              isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
-              onAssetSelect={handleAssetSelect}
-              isManageMode={manageModeEnabled}
-              className={classNames(i !== tokens.length - 1 && "mb-2")}
-            />
-          ))}
+
+          {tokenType === TokenType.Asset ? (
+            <>
+              {tokens.map((asset, i) => (
+                <AssetCard
+                  key={asset.tokenSlug}
+                  ref={
+                    i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                      ? loadMoreTriggerAssetRef
+                      : null
+                  }
+                  asset={asset as AccountAsset}
+                  isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
+                  onAssetSelect={handleTokenSelect}
+                  isManageMode={manageModeEnabled}
+                  className={classNames(i !== tokens.length - 1 && "mb-2")}
+                />
+              ))}
+            </>
+          ) : null}
         </ScrollAreaContainer>
       )}
     </div>
@@ -860,6 +861,8 @@ const PriceChange: FC<PriceChangeProps> = ({
     </span>
   );
 };
+
+const NFTInfo: FC = () => null;
 
 const TokenActivity: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
