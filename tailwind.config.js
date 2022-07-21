@@ -119,6 +119,7 @@ module.exports = {
   },
   plugins: [
     require("@tailwindcss/typography"),
+    require("@tailwindcss/line-clamp"),
     plugin(({ addVariant, e, postcss }) => {
       addVariant("firefox", ({ container, separator }) => {
         const isFirefoxRule = postcss.atRule({

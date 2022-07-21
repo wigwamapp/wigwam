@@ -110,6 +110,7 @@
     "@svgr/webpack": "6.2.1",
     "@swc/core": "1.2.213",
     "@swc/jest": "0.2.21",
+    "@tailwindcss/line-clamp": "0.4.0",
     "@tailwindcss/typography": "0.5.4",
     "@testing-library/jest-dom": "5.16.4",
     "@typechain/ethers-v5": "10.1.0",

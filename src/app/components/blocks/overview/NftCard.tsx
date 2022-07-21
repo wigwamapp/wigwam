@@ -9,12 +9,14 @@ type NftCardProps = {
     img: string;
     name?: string;
     id?: string;
-    count: number;
+    amount: number;
   };
 };
 
-const NftCard: FC<NftCardProps> = ({ data: { img, name, id, count } }) => {
+const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
   const [loaded, setLoaded] = useState(false);
+
+  const title = getNFTName("", name, id);
 
   return (
     <button
@@ -31,7 +33,7 @@ const NftCard: FC<NftCardProps> = ({ data: { img, name, id, count } }) => {
       <div className="relative w-full">
         <Avatar
           src={img}
-          alt={name}
+          alt={title.label}
           setLoadingStatus={(status) => {
             console.log(
               "st",
@@ -46,22 +48,39 @@ const NftCard: FC<NftCardProps> = ({ data: { img, name, id, count } }) => {
           className={classNames(
             "block",
             "absolute top-1 left-1",
-            "py-0.5 px-4",
+            "py-px px-2.5",
             "rounded",
             "bg-[#07081B]/[.4]",
+            "border border-[#CCD6FF]/20",
             "text-xs font-bold",
             "backdrop-blur-[8px]",
             IS_FIREFOX && "!bg-[#111226]"
           )}
         >
-          {count}
+          {amount}
         </span>
       </div>
-      <h3 className="text-xs font-bold mt-2">{`${name ?? ""}${
-        name && id ? " " : ""
-      }${id ? `#${id}` : ""}`}</h3>
+      <h3 className="text-xs font-bold line-clamp-2 mt-2">{title.component}</h3>
     </button>
   );
 };
 
 export default NftCard;
+
+const getNFTName = (contractAddress: string, name?: string, id?: string) => {
+  if (!name && !id) {
+    const content = `NFT - ${contractAddress}`;
+    return { component: content, label: content };
+  }
+
+  return {
+    component: (
+      <>
+        {name}
+        {name && id ? " " : ""}
+        {id ? <span className="text-[#ccd6ff]">#{id}</span> : ""}
+      </>
+    ),
+    label: `${name ?? ""}${name && id ? " " : ""}${id ? `#${id}` : ""}`,
+  };
+};
