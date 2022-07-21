@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
@@ -351,17 +359,21 @@ const TokenList: FC = () => {
               ))}
             </>
           ) : (
-            <Masonry gap="0.25rem">
-              {(tokens as AccountNFT[]).map((nft) => (
-                <NftCard key={nft.contractAddress} nft={nft} />
-              ))}
-            </Masonry>
+            <NFTMasonry tokens={tokens as AccountNFT[]} />
           )}
         </ScrollAreaContainer>
       )}
     </div>
   );
 };
+
+const NFTMasonry = memo<{ tokens: AccountNFT[] }>(({ tokens }) => (
+  <Masonry gap="0.25rem">
+    {tokens.map((nft) => (
+      <NftCard key={nft.tokenSlug} nft={nft} />
+    ))}
+  </Masonry>
+));
 
 // const MasonryContainer: FC<{ tokens: AccountNFT[] }> = ({ tokens }) => {
 //   const [isMounted, setIsMounted] = useState(false);

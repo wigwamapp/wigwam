@@ -36,7 +36,7 @@ const calculateColumns = (breakpoints: Breakpoint[], width: number) => {
     containedBp.length < 1 ? first(sortedBp) : last(containedBp);
 
   // ??? OMG THIS IS SO UGLY!
-  return Array.from({ length: columns }, (e) => []) as unknown as [
+  return Array.from({ length: columns }, () => []) as unknown as [
     React.ReactElement[]
   ];
 };
@@ -57,12 +57,12 @@ const Masonry = ({
     const calculated = calculateColumns(breakpoints, width || 0);
 
     React.Children.forEach(children, (child, index) => {
-      const key = uniqueId("plock-item-");
+      // const key = uniqueId("plock-item-");
 
       if (React.isValidElement(child)) {
         const cloned = React.cloneElement(child, {
           ...child.props,
-          key: key,
+          key: `plock-item-${child.key}`,
         });
 
         calculated[index % calculated.length].push(cloned);
@@ -87,20 +87,20 @@ const Masonry = ({
 
 export default Masonry;
 
-const idCounter: { [key: string]: number } = {};
+// const idCounter: { [key: string]: number } = {};
 
-function uniqueId(prefix = "$lodash$") {
-  if (!idCounter[prefix]) {
-    idCounter[prefix] = 0;
-  }
+// function uniqueId(prefix = "$lodash$") {
+//   if (!idCounter[prefix]) {
+//     idCounter[prefix] = 0;
+//   }
 
-  const id = ++idCounter[prefix];
-  if (prefix === "$lodash$") {
-    return `${id}`;
-  }
+//   const id = ++idCounter[prefix];
+//   if (prefix === "$lodash$") {
+//     return `${id}`;
+//   }
 
-  return `${prefix}${id}`;
-}
+//   return `${prefix}${id}`;
+// }
 
 interface MasonryProps extends React.ComponentPropsWithoutRef<"div"> {
   columns: number;
