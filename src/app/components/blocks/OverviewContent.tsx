@@ -352,8 +352,8 @@ const TokenList: FC = () => {
             </>
           ) : (
             <Masonry gap="0.25rem">
-              {tokens.map((nft) => (
-                <NftCard key={nft.address} nft={nft} />
+              {(tokens as AccountNFT[]).map((nft) => (
+                <NftCard key={nft.contractAddress} nft={nft} />
               ))}
             </Masonry>
           )}
