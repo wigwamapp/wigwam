@@ -6,9 +6,9 @@ import Avatar from "app/components/elements/Avatar";
 
 type NftCardProps = {
   data: {
-    img: string;
-    name?: string;
-    id?: string;
+    img?: string;
+    name: string;
+    id: string;
     amount: number;
   };
 };
