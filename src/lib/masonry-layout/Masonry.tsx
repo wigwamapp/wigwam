@@ -104,7 +104,7 @@ const MasonryWrapper = ({ children, columns, gap, ...props }: MasonryProps) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        gridTemplateColumns: `repeat(${columns}, minmax(7rem, 1fr))`, // minmax(7rem, 1fr))
         columnGap: gap,
         alignItems: "start",
       }}
