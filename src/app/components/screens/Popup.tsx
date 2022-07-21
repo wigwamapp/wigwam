@@ -26,7 +26,7 @@ import {
 import * as repo from "core/repo";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { IS_FIREFOX, LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { IS_FIREFOX, LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
 import {
@@ -470,7 +470,7 @@ const AssetsList: FC = () => {
             <AssetCard
               key={asset.tokenSlug}
               ref={
-                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
                   ? loadMoreTriggerAssetRef
                   : null
               }

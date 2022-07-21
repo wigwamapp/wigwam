@@ -1,12 +1,4 @@
-import {
-  FC,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
@@ -26,7 +18,10 @@ import { createTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 import * as repo from "core/repo";
 
-import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import {
+  LOAD_MORE_ON_NFT_FROM_END,
+  LOAD_MORE_ON_TOKEN_FROM_END,
+} from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
   TippySingletonProvider,
@@ -142,8 +137,6 @@ const TokenList: FC = () => {
 
   const handleTokenSelect = useCallback(
     async (token: AccountToken) => {
-      if (token.tokenType === TokenType.NFT) return;
-
       if (manageModeEnabled) {
         if (token.status === TokenStatus.Native) return;
 
@@ -255,7 +248,6 @@ const TokenList: FC = () => {
             ref={searchInputRef}
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
-            disabled={isNftsSelected}
           />
           <IconedButton
             Icon={ControlIcon}
@@ -272,7 +264,6 @@ const TokenList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
-            disabled={isNftsSelected}
             onClick={toggleManageMode}
           />
         </TippySingletonProvider>
@@ -334,8 +325,10 @@ const TokenList: FC = () => {
                 onClick={focusSearchInput}
               >
                 <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
-                To add an asset, enter the address into
+                To add {!isNftsSelected ? "an asset" : "an NFT"}, enter the
+                address {!isNftsSelected ? "into" : "and id"}
                 <br />
+                {!isNftsSelected ? "" : "into "}
                 the search line
               </button>
             </div>
@@ -346,7 +339,7 @@ const TokenList: FC = () => {
                 <AssetCard
                   key={asset.tokenSlug}
                   ref={
-                    i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
+                    i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
                       ? loadMoreTriggerAssetRef
                       : null
                   }
@@ -359,140 +352,25 @@ const TokenList: FC = () => {
               ))}
             </>
           ) : (
-            <NFTMasonry tokens={tokens as AccountNFT[]} />
+            <Masonry gap="0.25rem">
+              {tokens.map((nft, i) => (
+                <NftCard
+                  key={nft.tokenSlug}
+                  ref={
+                    i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
+                      ? loadMoreTriggerAssetRef
+                      : null
+                  }
+                  nft={nft as AccountNFT}
+                  isActive={!manageModeEnabled && tokenSlug === nft.tokenSlug}
+                  onAssetSelect={handleTokenSelect}
+                  isManageMode={manageModeEnabled}
+                />
+              ))}
+            </Masonry>
           )}
         </ScrollAreaContainer>
       )}
     </div>
   );
 };
-
-const NFTMasonry = memo<{ tokens: AccountNFT[] }>(({ tokens }) => (
-  <Masonry gap="0.25rem">
-    {tokens.map((nft) => (
-      <NftCard key={nft.tokenSlug} nft={nft} />
-    ))}
-  </Masonry>
-));
-
-// const MasonryContainer: FC<{ tokens: AccountNFT[] }> = ({ tokens }) => {
-//   const [isMounted, setIsMounted] = useState(false);
-//
-//   useEffect(() => {
-//     const t = setTimeout(() => setIsMounted(true), 150);
-//     return () => clearTimeout(t);
-//   }, []);
-//
-//   return isMounted ? (
-//     <Masonry
-//       columnCount={3}
-//       columnGutter={4}
-//       items={tokens.map((t) => ({
-//         img: t.thumbnailUrl,
-//         name: t.name,
-//         id: t.tokenId,
-//         amount: +t.rawBalance,
-//       }))}
-//       render={NftCard}
-//     />
-//   ) : null;
-// };
-
-// const NFTS_LIST = [
-//   {
-//     img: "https://img.seadn.io/files/bdbc9c2f75ea6a97eedda80b760d79f6.png?fit=max",
-//     name: "YOLO HOLIDAY",
-//     id: "9876",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.rarible.com/prod/image/upload/t_image_big/prod-itemImages/0x223e16c52436cab2ca9fe37087c79986a288fffa:7626/7fc04ccb",
-//     name: "Phoebe Heyerdahl Heyerdahl",
-//     id: "667",
-//     amount: 2,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/1a29a9205147354184d0deed2e02efdd.png?fit=max",
-//     name: "Running Moon",
-//     id: "450",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/9edb664cbd1ed85cb8f039b3384f9255.jpg?fit=max",
-//     id: "65452",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.rarible.com/prod/image/upload/t_image_big/prod-itemImages/0xefbe1c8168f6d8d0e48e3455dcff032a1200635a:59320152187372283102792859480996134837988272352105376460684031696141809614881/f00b1607",
-//     name: "Xanalla",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/f3ac0dc3af54f15b1434ad98d5172190.jpg?fit=max",
-//     id: "51472",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.rarible.com/prod/image/upload/t_image_big/prod-itemImages/0x223e16c52436cab2ca9fe37087c79986a288fffa:3610/ee6d8de3",
-//     name: "Lil Deville",
-//     id: "726",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/a0c8175f5ffa74006ec0fbff8f09a8a3.png?fit=max",
-//     name: "Running Moon",
-//     id: "281",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/9cb068afcbf2b9b56e27bfac14cf33a8.png?fit=max",
-//     name: "CryptoCities",
-//     id: "041",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/48b4bd2c10413cabb29bdb046de296bc.png?fit=max",
-//     name: "CyberKong",
-//     id: "840",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/d5567147379b8ff5f914fd6bc4cfd371.jpg?fit=max",
-//     id: "78351",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/37bc954ad4a48ef80649e25862ad8a7b.png?fit=max",
-//     name: "Running Moon",
-//     id: "287",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/feb325c4e9d8e73110ba8826e0dbbcdc.png?fit=max",
-//     id: "17802",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/407fac2f75454c7b72b3f7cb528f6070.png?fit=max",
-//     name: "Super Cool World",
-//     id: "1118",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/60bdf35e0d34c786de2089d2f5061162.jpg?fit=max",
-//     id: "85913",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/8a512e6435c57561abbc7a60976de667.png?fit=max",
-//     name: "Running Moon",
-//     id: "323",
-//     amount: 1,
-//   },
-//   {
-//     img: "https://img.seadn.io/files/08c928e09375bba4c2af67aab268dcad.png?fit=max",
-//     name: "YOLO HOLIDAY",
-//     id: "4745",
-//     amount: 1,
-//   },
-// ];

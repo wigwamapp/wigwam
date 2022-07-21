@@ -1,8 +1,17 @@
-import React, { useEffect } from "react";
+import React, {
+  Children,
+  cloneElement,
+  ComponentPropsWithoutRef,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useState,
+} from "react";
 
 import { useWindowWidth } from "../react-hooks/useWindowWidth";
 
-export interface PlockProps extends React.ComponentPropsWithoutRef<"div"> {
+export interface PlockProps extends ComponentPropsWithoutRef<"div"> {
   gap?: string;
   debounce?: number;
   breakpoints?: Breakpoint[];
@@ -35,9 +44,8 @@ const calculateColumns = (breakpoints: Breakpoint[], width: number) => {
   const { columns } =
     containedBp.length < 1 ? first(sortedBp) : last(containedBp);
 
-  // ??? OMG THIS IS SO UGLY!
   return Array.from({ length: columns }, () => []) as unknown as [
-    React.ReactElement[]
+    ReactElement[]
   ];
 };
 
@@ -51,16 +59,14 @@ const Masonry = ({
   ...props
 }: PlockProps) => {
   const width = useWindowWidth({ debounceMs: debounce });
-  const [columns, setColumns] = React.useState<[React.ReactElement[]?]>([]);
+  const [columns, setColumns] = useState<[ReactElement[]?]>([]);
 
   useEffect(() => {
     const calculated = calculateColumns(breakpoints, width || 0);
 
-    React.Children.forEach(children, (child, index) => {
-      // const key = uniqueId("plock-item-");
-
-      if (React.isValidElement(child)) {
-        const cloned = React.cloneElement(child, {
+    Children.forEach(children, (child, index) => {
+      if (isValidElement(child)) {
+        const cloned = cloneElement(child, {
           ...child.props,
           key: `plock-item-${child.key}`,
         });
@@ -87,25 +93,10 @@ const Masonry = ({
 
 export default Masonry;
 
-// const idCounter: { [key: string]: number } = {};
-
-// function uniqueId(prefix = "$lodash$") {
-//   if (!idCounter[prefix]) {
-//     idCounter[prefix] = 0;
-//   }
-
-//   const id = ++idCounter[prefix];
-//   if (prefix === "$lodash$") {
-//     return `${id}`;
-//   }
-
-//   return `${prefix}${id}`;
-// }
-
-interface MasonryProps extends React.ComponentPropsWithoutRef<"div"> {
+interface MasonryProps extends ComponentPropsWithoutRef<"div"> {
   columns: number;
   gap: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const MasonryWrapper = ({ children, columns, gap, ...props }: MasonryProps) => {
@@ -124,9 +115,9 @@ const MasonryWrapper = ({ children, columns, gap, ...props }: MasonryProps) => {
   );
 };
 
-interface MasonryColumnProps extends React.ComponentPropsWithoutRef<"div"> {
+interface MasonryColumnProps extends ComponentPropsWithoutRef<"div"> {
   gap: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const MasonryColumn = ({ children, gap, ...props }: MasonryColumnProps) => {

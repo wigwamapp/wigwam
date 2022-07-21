@@ -7,7 +7,7 @@ import { Link } from "lib/navigation";
 import { AccountAsset, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
+import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
 import { Page } from "app/nav";
@@ -124,7 +124,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       onSearch={setSearchValue}
       label="Token"
       itemRef={loadMoreTriggerAssetRef}
-      loadMoreOnItemFromEnd={LOAD_MORE_ON_ASSET_FROM_END}
+      loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
       showSelected
       showSelectedIcon={false}
       emptySearchText={
