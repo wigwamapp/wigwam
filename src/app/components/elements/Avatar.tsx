@@ -12,6 +12,8 @@ type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   withBg?: boolean;
   imageClassName?: string;
   fallbackClassName?: string;
+  errorClassName?: string;
+  notLoadedClassName?: string;
   setLoadingStatus?: (status: LoadingStatus) => void;
 };
 
@@ -23,6 +25,8 @@ const Avatar = memo<AvatarProps>(
     className,
     imageClassName,
     fallbackClassName,
+    errorClassName,
+    notLoadedClassName,
     setLoadingStatus,
     ...rest
   }) => {
@@ -45,8 +49,11 @@ const Avatar = memo<AvatarProps>(
             "rounded-full overflow-hidden",
             bgDisplayed && "bg-brand-main/10",
           ],
-          loadingState === "error" &&
+          notLoaded ? notLoadedClassName : "",
+          loadingState === "error" && [
             "rounded-full bg-brand-main/10 overflow-hidden border border-brand-main/20",
+            errorClassName,
+          ],
           className
         )}
       >

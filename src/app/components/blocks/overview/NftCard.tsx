@@ -6,17 +6,20 @@ import Avatar from "app/components/elements/Avatar";
 
 type NftCardProps = {
   data: {
-    img?: string;
+    thumbnailUrl?: string;
     name: string;
-    id: string;
-    amount: number;
+    contractAddress: string;
+    tokenId: string;
+    rawBalance: string;
   };
 };
 
-const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
+const NftCard: FC<NftCardProps> = ({
+  data: { thumbnailUrl, name, contractAddress, tokenId, rawBalance },
+}) => {
   const [loaded, setLoaded] = useState(false);
 
-  const title = getNFTName("", name, id);
+  const title = getNFTName(contractAddress, tokenId, name);
 
   return (
     <button
@@ -26,23 +29,20 @@ const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
         "text-left",
         "rounded-[.625rem]",
         "transition-colors",
-        "hover:bg-[#33364A]",
-        !loaded && "invisible"
+        "hover:bg-[#33364A]"
+        // !loaded && "invisible"
       )}
     >
       <div className="relative w-full">
         <Avatar
-          src={img}
+          src={thumbnailUrl}
           alt={title.label}
           setLoadingStatus={(status) => {
-            console.log(
-              "st",
-              status,
-              status !== "loading" && status !== "idle"
-            );
             setLoaded(status !== "loading" && status !== "idle");
           }}
           className="w-full h-auto !rounded-md"
+          notLoadedClassName="h-[6.56rem]"
+          errorClassName="h-[6.56rem]"
         />
         <span
           className={classNames(
@@ -57,7 +57,7 @@ const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
             IS_FIREFOX && "!bg-[#111226]"
           )}
         >
-          {amount}
+          {rawBalance}
         </span>
       </div>
       <h3 className="text-xs font-bold line-clamp-2 mt-2">{title.component}</h3>
@@ -67,20 +67,30 @@ const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
 
 export default NftCard;
 
-const getNFTName = (contractAddress: string, name?: string, id?: string) => {
+const getNFTName = (contractAddress: string, id: string, name?: string) => {
   if (!name && !id) {
     const content = `NFT - ${contractAddress}`;
     return { component: content, label: content };
   }
 
+  const preparedName = name ? name.replace(`#${id}`, "") : undefined;
+
+  const isTrulyId =
+    id !== "0" &&
+    id !== preparedName &&
+    `#${id}` !== preparedName &&
+    !preparedName?.includes(id);
+
   return {
     component: (
       <>
-        {name}
-        {name && id ? " " : ""}
-        {id ? <span className="text-[#ccd6ff]">#{id}</span> : ""}
+        {preparedName}
+        {preparedName && id ? " " : ""}
+        {isTrulyId ? <span className="text-[#ccd6ff]">#{id}</span> : ""}
       </>
     ),
-    label: `${name ?? ""}${name && id ? " " : ""}${id ? `#${id}` : ""}`,
+    label: `${preparedName ?? ""}${preparedName && id ? " " : ""}${
+      isTrulyId ? `#${id}` : ""
+    }`,
   };
 };

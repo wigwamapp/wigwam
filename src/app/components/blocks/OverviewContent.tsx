@@ -4,7 +4,7 @@ import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
-import { Masonry } from "masonic";
+import { Masonry, useInfiniteLoader } from "masonic";
 
 import {
   AccountAsset,
@@ -228,6 +228,13 @@ const TokenList: FC = () => {
     [setTokenType, setTokenSlug]
   );
 
+  const loadMoreNFTs = useCallback(() => {
+    console.log("load more");
+    if (hasMore) {
+      loadMore();
+    }
+  }, [hasMore, loadMore]);
+
   return (
     <div
       className={classNames(
@@ -351,7 +358,10 @@ const TokenList: FC = () => {
               ))}
             </>
           ) : (
-            <MasonryContainer tokens={tokens as AccountNFT[]} />
+            <MasonryContainer
+              tokens={tokens as AccountNFT[]}
+              fetchMoreTokens={loadMoreNFTs}
+            />
           )}
         </ScrollAreaContainer>
       )}
@@ -359,25 +369,30 @@ const TokenList: FC = () => {
   );
 };
 
-const MasonryContainer: FC<{ tokens: AccountNFT[] }> = ({ tokens }) => {
+const MasonryContainer: FC<{
+  tokens: AccountNFT[];
+  fetchMoreTokens: () => void;
+}> = ({ tokens, fetchMoreTokens }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    console.log("ue");
     const t = setTimeout(() => setIsMounted(true), 150);
     return () => clearTimeout(t);
   }, []);
+
+  const maybeLoadMore = useInfiniteLoader(fetchMoreTokens, {
+    threshold: 4,
+  });
 
   return isMounted ? (
     <Masonry
       columnCount={3}
       columnGutter={4}
-      items={tokens.map((t) => ({
-        img: t.thumbnailUrl,
-        name: t.name,
-        id: t.tokenId,
-        amount: +t.rawBalance,
-      }))}
+      items={tokens}
       render={NftCard}
+      onRender={maybeLoadMore}
+      itemHeightEstimate={120}
     />
   ) : null;
 };
