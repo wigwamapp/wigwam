@@ -21,7 +21,7 @@ export async function getAlternateContractCall(
 
     return {
       type: "ERC721",
-      uri: zoraMediaContract.tokenMetadataURI(tokenId),
+      uri: await zoraMediaContract.tokenMetadataURI(tokenId),
     };
   }
 

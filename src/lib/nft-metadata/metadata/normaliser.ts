@@ -87,7 +87,6 @@ export function normaliseURIData(
       },
       {}
     );
-    console.log(normalisedData);
   }
 
   if (isAddressMatch(chainId, tokenAddress, SUPERRARE_TOKEN_ADDRESS)) {
