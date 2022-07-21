@@ -149,7 +149,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
         ) : undefined
       }
       emptySearchText={
-        <>
+        <div className="max-w-[14rem]">
           You can add a new network in the{" "}
           {withAction ? (
             <SmartLink
@@ -163,7 +163,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
             "Settings > Networks"
           )}{" "}
           tab.
-        </>
+        </div>
       }
     />
   );
