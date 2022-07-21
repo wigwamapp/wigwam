@@ -5,7 +5,7 @@ import { IS_FIREFOX } from "app/defaults";
 import Avatar from "app/components/elements/Avatar";
 
 type NftCardProps = {
-  data: {
+  nft: {
     img: string;
     name?: string;
     id?: string;
@@ -13,7 +13,7 @@ type NftCardProps = {
   };
 };
 
-const NftCard: FC<NftCardProps> = ({ data: { img, name, id, amount } }) => {
+const NftCard: FC<NftCardProps> = ({ nft: { img, name, id, amount } }) => {
   const [loaded, setLoaded] = useState(false);
 
   const title = getNFTName("", name, id);

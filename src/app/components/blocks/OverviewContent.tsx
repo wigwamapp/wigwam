@@ -4,7 +4,7 @@ import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
-import { Masonry } from "masonic";
+import Masonry from "lib/masonry-layout/Masonry";
 
 import {
   AccountAsset,
@@ -353,7 +353,11 @@ const AssetsList: FC = () => {
               />
             ))
           ) : (
-            <MasonryContainer />
+            <Masonry gap="0.25rem">
+              {NFTS_LIST.map((nft) => (
+                <NftCard key={nft.name ?? nft.id} nft={nft} />
+              ))}
+            </Masonry>
           )}
         </ScrollAreaContainer>
       )}
@@ -361,23 +365,23 @@ const AssetsList: FC = () => {
   );
 };
 
-const MasonryContainer: FC = () => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setIsMounted(true), 150);
-    return () => clearTimeout(t);
-  }, []);
-
-  return isMounted ? (
-    <Masonry
-      columnCount={3}
-      columnGutter={4}
-      items={NFTS_LIST}
-      render={NftCard}
-    />
-  ) : null;
-};
+// const MasonryContainer: FC = () => {
+//   const [isMounted, setIsMounted] = useState(false);
+//
+//   useEffect(() => {
+//     const t = setTimeout(() => setIsMounted(true), 150);
+//     return () => clearTimeout(t);
+//   }, []);
+//
+//   return isMounted ? (
+//     <Masonry
+//       columnCount={3}
+//       columnGutter={4}
+//       items={NFTS_LIST}
+//       render={NftCard}
+//     />
+//   ) : null;
+// };
 
 const NFTS_LIST = [
   {
