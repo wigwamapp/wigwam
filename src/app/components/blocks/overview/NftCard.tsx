@@ -113,7 +113,14 @@ const prepareName = (id: string, name?: string) => {
         {preparedName}
         {preparedName && preparedId ? " " : ""}
         {preparedId ? (
-          <span className="text-brand-main break-words">{preparedId}</span>
+          <span
+            className={classNames(
+              "text-brand-main",
+              preparedId.length > 11 ? "break-all" : "break-words"
+            )}
+          >
+            {preparedId}
+          </span>
         ) : (
           ""
         )}
