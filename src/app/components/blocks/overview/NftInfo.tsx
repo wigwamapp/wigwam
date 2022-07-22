@@ -67,8 +67,14 @@ const NftInfo: FC = () => {
 
   if (!tokenInfo) return null;
 
-  const { thumbnailUrl, name, tokenId, rawBalance, detailUrl, contentType } =
-    tokenInfo;
+  const {
+    thumbnailUrl,
+    name,
+    tokenId,
+    rawBalance,
+    contentUrl: detailUrl,
+    contentType,
+  } = tokenInfo;
   const { name: preparedName, id: preparedId } = prepareNFTLabel(tokenId, name);
 
   return (
