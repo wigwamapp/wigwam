@@ -226,13 +226,15 @@ export function sync(
 export function findToken(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
+  refreshMetadata?: boolean
 ) {
   const msg: FindToken = {
     type: MessageType.FindToken,
     chainId,
     accountAddress,
     tokenSlug,
+    refreshMetadata,
   };
 
   porter.sendOneWayMessage(msg);

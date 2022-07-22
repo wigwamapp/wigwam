@@ -12,6 +12,8 @@ export function isAddressMatch(
   address: string,
   addressByNetwork: { [chainId: number]: string }
 ) {
+  if (!addressByNetwork[chainId]) return false;
+
   return (
     ethers.utils.getAddress(address) ===
     ethers.utils.getAddress(addressByNetwork[chainId])

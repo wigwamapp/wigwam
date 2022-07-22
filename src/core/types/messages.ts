@@ -239,6 +239,7 @@ export interface FindToken extends MessageBase {
   chainId: number;
   accountAddress: string;
   tokenSlug: string;
+  refreshMetadata?: boolean;
 }
 
 export interface SyncTokenActivities extends MessageBase {

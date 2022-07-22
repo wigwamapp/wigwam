@@ -157,27 +157,31 @@ export const syncAccountTokens = memoize(
               continue;
             }
 
+            const priceUSD =
+              token.usd_price || token.usd_price === 0
+                ? new BigNumber(token.usd_price).toString()
+                : existing?.priceUSD;
+
             const metadata = {
               contractAddress,
               tokenId,
-              name: token.name,
-              description: token.description,
-              thumbnailUrl: token.thumbnail_url,
-              contentUrl: token.content,
-              contentType: token.content_type,
-              collectionId: token.collection_id,
-              collectionName: token.contract_name,
-              detailUrl: token.detail_url,
-              priceUSD: new BigNumber(token.usd_price).toString(),
-              attributes: token.attributes,
+              name: existing?.name || token.name,
+              description: existing?.description || token.description,
+              thumbnailUrl: existing?.thumbnailUrl || token.thumbnail_url,
+              contentUrl: existing?.contentUrl || token.content,
+              contentType: existing?.contentType || token.content_type,
+              collectionId: existing?.collectionId || token.collection_id,
+              collectionName: existing?.collectionName || token.contract_name,
+              detailUrl: existing?.detailUrl || token.detail_url,
+              priceUSD,
+              attributes: existing?.attributes ?? token.attributes,
               tpId: token.id,
             };
 
             const rawBalance = rawBalanceBN.toString();
-            const balanceUSD =
-              token.usd_price || token.usd_price === 0
-                ? new BigNumber(token.usd_price).toNumber()
-                : existing?.balanceUSD ?? 0;
+            const balanceUSD = priceUSD
+              ? new BigNumber(priceUSD).toNumber()
+              : existing?.balanceUSD ?? 0;
 
             accTokens.push(
               existing

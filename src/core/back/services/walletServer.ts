@@ -281,9 +281,14 @@ async function handleWalletRequest(
       )
       .with(
         { type: MessageType.FindToken },
-        ({ chainId, accountAddress, tokenSlug }) =>
+        ({ chainId, accountAddress, tokenSlug, refreshMetadata }) =>
           withStatus(WalletStatus.Unlocked, () => {
-            addFindTokenRequest(chainId, accountAddress, tokenSlug);
+            addFindTokenRequest(
+              chainId,
+              accountAddress,
+              tokenSlug,
+              refreshMetadata
+            );
           })
       )
       .with(

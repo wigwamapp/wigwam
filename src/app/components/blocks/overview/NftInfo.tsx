@@ -7,6 +7,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountNFT, NFTContentType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
+import { findToken } from "core/client";
 
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
@@ -32,6 +33,7 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as ShrinkIcon } from "app/icons/shrink.svg";
+import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
@@ -64,6 +66,10 @@ const NftInfo: FC = () => {
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
   }, [tokenSlug]);
+
+  const handleMetadataRefresh = useCallback(() => {
+    findToken(chainId, currentAccount.address, tokenSlug, true);
+  }, [chainId, currentAccount.address, tokenSlug]);
 
   if (!tokenInfo) return null;
 
@@ -142,6 +148,13 @@ const NftInfo: FC = () => {
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                         iconClassName="!w-[1.125rem]"
                         onClick={copy}
+                      />
+                      <IconedButton
+                        aria-label={"Refresh metadata"}
+                        Icon={RefreshIcon}
+                        onClick={handleMetadataRefresh}
+                        className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                        iconClassName="!w-[1.125rem]"
                       />
                       {explorerLink && (
                         <IconedButton

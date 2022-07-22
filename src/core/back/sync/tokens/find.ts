@@ -20,7 +20,8 @@ const stack = new Set<string>();
 export async function addFindTokenRequest(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
+  refreshMetadata = false
 ) {
   const dbKey = createAccountTokenKey({
     chainId,
@@ -41,11 +42,10 @@ export async function addFindTokenRequest(
 
       const existing = await repo.accountTokens.get(dbKey);
       if (existing) {
-        const balance = await getBalanceFromChain(
-          chainId,
-          tokenSlug,
-          accountAddress
-        );
+        const [balance, metadata] = await Promise.all([
+          getBalanceFromChain(chainId, tokenSlug, accountAddress),
+          refreshMetadata ? getTokenMetadata(chainId, tokenSlug) : null,
+        ]);
 
         const rawBalance = balance?.toString() ?? "0";
         const balanceUSD =
@@ -61,6 +61,7 @@ export async function addFindTokenRequest(
         await repo.accountTokens.put(
           {
             ...existing,
+            ...((metadata as any) ?? {}),
             rawBalance,
             balanceUSD,
           },
