@@ -55,12 +55,34 @@ const OverviewContent: FC = () => (
 export default OverviewContent;
 
 const TokenExplorer: FC = () => {
-  const tokenType = useAtomValue(tokenTypeAtom);
-  const tokenSlug = useAtomValue(tokenSlugAtom);
+  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      setTokenSlug([RESET]);
+      setTokenType(value ? TokenType.NFT : TokenType.Asset);
+    },
+    [setTokenType, setTokenSlug]
+  );
 
   return (
     <>
-      <TokenList key={tokenType} />
+      <div
+        className={classNames(
+          "w-[23.25rem] min-w-[23.25rem] pr-6 mt-6",
+          "border-r border-brand-main/[.07]",
+          "flex flex-col"
+        )}
+      >
+        <AssetsSwitcher
+          checked={tokenType === TokenType.NFT}
+          onCheckedChange={toggleNftSwitcher}
+          className="mx-auto mb-3"
+        />
+
+        <TokenList key={tokenType} />
+      </div>
 
       {tokenSlug &&
         (tokenType === TokenType.Asset ? <AssetInfo /> : <NftInfo />)}
@@ -72,7 +94,7 @@ const TokenList: FC = () => {
   const chainId = useChainId();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
-  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
+  const tokenType = useAtomValue(tokenTypeAtom);
 
   const isNftsSelected = tokenType === TokenType.NFT;
 
@@ -223,14 +245,6 @@ const TokenList: FC = () => {
 
   const searching = (willSearch || syncing) && !alreadySearchedRef.current;
 
-  const toggleNftSwitcher = useCallback(
-    (value: boolean) => {
-      setTokenSlug([RESET]);
-      setTokenType(value ? TokenType.NFT : TokenType.Asset);
-    },
-    [setTokenType, setTokenSlug]
-  );
-
   const renderNFTCard = useCallback(
     (nft: AccountNFT, i: number) => (
       <NftCard
@@ -256,18 +270,7 @@ const TokenList: FC = () => {
   );
 
   return (
-    <div
-      className={classNames(
-        "w-[23.25rem] min-w-[23.25rem] pr-6 mt-6",
-        "border-r border-brand-main/[.07]",
-        "flex flex-col"
-      )}
-    >
-      <AssetsSwitcher
-        checked={isNftsSelected}
-        onCheckedChange={toggleNftSwitcher}
-        className="mx-auto mb-3"
-      />
+    <>
       <div className="flex items-center">
         <TippySingletonProvider>
           <SearchInput
@@ -294,6 +297,7 @@ const TokenList: FC = () => {
           />
         </TippySingletonProvider>
       </div>
+
       {tokens.length <= 0 && searchValue ? (
         <button
           type="button"
@@ -382,6 +386,6 @@ const TokenList: FC = () => {
           )}
         </ScrollAreaContainer>
       )}
-    </div>
+    </>
   );
 };
