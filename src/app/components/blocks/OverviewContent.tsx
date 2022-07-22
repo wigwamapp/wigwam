@@ -42,6 +42,7 @@ import ControlIcon from "../elements/ControlIcon";
 import AssetCard from "./overview/AssetCard";
 import AssetInfo from "./overview/AssetInfo";
 import NftCard from "./overview/NftCard";
+import NftInfo from "./overview/NftInfo";
 
 const OverviewContent: FC = () => (
   <div className="flex min-h-0 grow relative overflow-hidden">
@@ -61,7 +62,8 @@ const TokenExplorer: FC = () => {
     <>
       <TokenList key={tokenType} />
 
-      {tokenSlug && (tokenType === TokenType.Asset ? <AssetInfo /> : null)}
+      {tokenSlug &&
+        (tokenType === TokenType.Asset ? <AssetInfo /> : <NftInfo />)}
     </>
   );
 };

@@ -38,7 +38,7 @@ import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import PriceChange from "./PriceChange";
 import TokenActivity from "./TokenActivity";
 
-enum TokenStandardValue {
+export enum TokenStandardValue {
   NATIVE = "Native",
   ERC20 = "ERC-20",
   ERC721 = "ERC-721",

@@ -44,6 +44,8 @@ module.exports = {
           "dialogfadein 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "waving-hand": "wave 2s linear infinite",
         modalcontent: "modalfadein 0.2s ease-out",
+        modalcontentOut: "modalfadeout 0.35s ease-out",
+        modalcontentinnerOut: "modalinnerfadeout 0.35s ease-out",
         activitybar:
           "barclimb 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
       },
@@ -82,6 +84,28 @@ module.exports = {
           to: {
             opacity: "1",
             transform: "scale(1)",
+          },
+        },
+        modalfadeout: {
+          "40%": {
+            opacity: "1",
+          },
+          "100%": {
+            opacity: "0",
+          },
+        },
+        modalinnerfadeout: {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          "60%": {
+            transform: "scale(.9)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "scale(.9)",
+            opacity: "0",
           },
         },
         wave: {
