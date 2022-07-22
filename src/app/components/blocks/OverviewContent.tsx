@@ -4,7 +4,7 @@ import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
-import Masonry from "lib/masonry-layout/Masonry";
+import Masonry from "lib/react-masonry/Masonry";
 
 import {
   AccountAsset,
@@ -231,6 +231,30 @@ const TokenList: FC = () => {
     [setTokenType, setTokenSlug]
   );
 
+  const renderNFTCard = useCallback(
+    (nft: AccountNFT, i: number) => (
+      <NftCard
+        key={nft.tokenSlug}
+        ref={
+          i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
+            ? loadMoreTriggerAssetRef
+            : null
+        }
+        nft={nft}
+        isActive={!manageModeEnabled && tokenSlug === nft.tokenSlug}
+        onAssetSelect={handleTokenSelect}
+        isManageMode={manageModeEnabled}
+      />
+    ),
+    [
+      tokens.length,
+      manageModeEnabled,
+      tokenSlug,
+      handleTokenSelect,
+      loadMoreTriggerAssetRef,
+    ]
+  );
+
   return (
     <div
       className={classNames(
@@ -354,22 +378,7 @@ const TokenList: FC = () => {
               ))}
             </>
           ) : (
-            <Masonry gap="0.25rem">
-              {tokens.map((nft, i) => (
-                <NftCard
-                  key={nft.tokenSlug}
-                  ref={
-                    i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
-                      ? loadMoreTriggerAssetRef
-                      : null
-                  }
-                  nft={nft as AccountNFT}
-                  isActive={!manageModeEnabled && tokenSlug === nft.tokenSlug}
-                  onAssetSelect={handleTokenSelect}
-                  isManageMode={manageModeEnabled}
-                />
-              ))}
-            </Masonry>
+            <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
           )}
         </ScrollAreaContainer>
       )}
