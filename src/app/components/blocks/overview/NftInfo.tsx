@@ -3,6 +3,24 @@ import { mergeRefs } from "react-merge-refs";
 import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import {
+  ClickToPlay,
+  ControlGroup,
+  Controls,
+  ControlSpacer,
+  DefaultUi,
+  IconLibrary,
+  MuteControl,
+  PlaybackControl,
+  Player,
+  Poster,
+  ScrubberControl,
+  Spinner,
+  CurrentTime,
+  Ui,
+  Video,
+  PipControl,
+} from "@vime/react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountNFT, NFTContentType } from "core/types";
@@ -37,6 +55,7 @@ import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
+import * as Dialog from "@radix-ui/react-dialog";
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
@@ -78,10 +97,15 @@ const NftInfo: FC = () => {
     name,
     tokenId,
     rawBalance,
-    contentUrl: detailUrl,
+    contentUrl,
+    detailUrl,
     contentType,
   } = tokenInfo;
   const { name: preparedName, id: preparedId } = prepareNFTLabel(tokenId, name);
+
+  console.log("thumbnailUrl", thumbnailUrl);
+  console.log("contentUrl", contentUrl);
+  console.log("detailUrl", detailUrl);
 
   return (
     <OverflowProvider>
@@ -98,7 +122,7 @@ const NftInfo: FC = () => {
             <div className="flex mb-6">
               <NftPreview
                 thumbnailUrl={thumbnailUrl}
-                detailUrl={detailUrl}
+                contentUrl={contentUrl || thumbnailUrl}
                 contentType={contentType}
                 alt={`${preparedName ?? ""}${
                   preparedName && preparedId ? " " : ""
@@ -112,7 +136,7 @@ const NftInfo: FC = () => {
                       <h2
                         className={classNames(
                           "text-2xl font-bold",
-                          "line-clamp-2",
+                          "line-clamp-3",
                           "mr-4"
                         )}
                       >
@@ -202,7 +226,7 @@ export default NftInfo;
 
 type NftPreviewProps = {
   thumbnailUrl?: string;
-  detailUrl?: string;
+  contentUrl?: string;
   contentType?: NFTContentType;
   alt: string;
   rawBalance: string;
@@ -210,7 +234,7 @@ type NftPreviewProps = {
 
 const NftPreview: FC<NftPreviewProps> = ({
   thumbnailUrl,
-  detailUrl,
+  contentUrl,
   contentType,
   alt,
   rawBalance,
@@ -219,11 +243,12 @@ const NftPreview: FC<NftPreviewProps> = ({
   const [hideAnimation, setHideAnimation] = useState(false);
 
   const handleModalOpen = useCallback(
-    () => detailUrl && setModalOpened(true),
-    [detailUrl]
+    () => contentUrl && setModalOpened(true),
+    [contentUrl]
   );
 
   const handleModalClose = useCallback(() => {
+    console.log("handleModalClose");
     setHideAnimation(true);
 
     const t = setTimeout(() => {
@@ -241,7 +266,7 @@ const NftPreview: FC<NftPreviewProps> = ({
         className={classNames(
           "relative",
           "group",
-          detailUrl ? "cursor-zoom-in" : "cursor-default"
+          contentUrl ? "cursor-zoom-in" : "cursor-default"
         )}
       >
         <Avatar
@@ -265,7 +290,7 @@ const NftPreview: FC<NftPreviewProps> = ({
             {rawBalance}
           </span>
         )}
-        {detailUrl && (
+        {contentUrl && (
           <ShrinkExpandButton
             Icon={ExpandIcon}
             className={classNames(
@@ -276,45 +301,115 @@ const NftPreview: FC<NftPreviewProps> = ({
           />
         )}
       </button>
-      {detailUrl && modalOpened && (
-        <button
-          type="button"
-          className={classNames(
-            "fixed inset-0 z-[999999999999]",
-            "bg-[#07081B]/[.98]",
-            "flex justify-center items-center",
-            "cursor-zoom-out",
-            modalOpened && "animate-modalcontent",
-            hideAnimation && "animate-modalcontentOut"
-          )}
-          onClick={handleModalClose}
-        >
-          <div
+      {contentUrl && (
+        <Dialog.Root open={modalOpened} onOpenChange={handleModalClose}>
+          <Dialog.Trigger />
+          <Dialog.Portal
             className={classNames(
-              "relative",
-              "h-full w-auto max-h-[80%] max-w-[80%]",
-              hideAnimation && "animate-modalcontentinnerOut"
+              modalOpened && "animate-modalcontent",
+              hideAnimation && "animate-modalcontentOut"
             )}
           >
-            {contentType === "image_url" && detailUrl && (
-              <img
-                src={detailUrl}
-                alt={alt}
-                className="h-full w-auto rounded-2xl"
-              />
-            )}
-
-            <ShrinkExpandButton
-              Icon={ShrinkIcon}
-              size="large"
-              className="absolute top-3 right-3"
-            />
-          </div>
-        </button>
+            <Dialog.Overlay
+              className={classNames(
+                "fixed inset-0 z-[999999999999]",
+                "flex justify-center items-center",
+                "bg-[#07081B]/[.98]",
+                "cursor-zoom-out"
+              )}
+            >
+              <Dialog.Content
+                className={classNames(
+                  "relative",
+                  "h-full max-h-[80%] max-w-[80%]",
+                  hideAnimation && "animate-modalcontentinnerOut",
+                  contentType === "image_url"
+                    ? "cursor-zoom-out"
+                    : "cursor-default",
+                  contentType === "image_url" ? "w-auto" : "w-full"
+                )}
+                onClick={() =>
+                  contentType === "image_url" ? handleModalClose() : null
+                }
+              >
+                {contentType === "image_url" && (
+                  <>
+                    <img
+                      src={contentUrl}
+                      alt={alt}
+                      className="h-full w-auto rounded-2xl"
+                    />
+                    <ShrinkExpandButton
+                      Icon={ShrinkIcon}
+                      size="large"
+                      className="absolute top-3 right-3"
+                    />
+                  </>
+                )}
+                {contentType === "video_url" && (
+                  <MediaPlayer
+                    thumbnailUrl={thumbnailUrl}
+                    contentUrl={contentUrl}
+                  />
+                )}
+              </Dialog.Content>
+            </Dialog.Overlay>
+          </Dialog.Portal>
+        </Dialog.Root>
       )}
     </>
   );
 };
+
+const MediaPlayer: FC<{ thumbnailUrl?: string; contentUrl: string }> = ({
+  thumbnailUrl,
+  contentUrl,
+}) => (
+  <Player
+    autoplay
+    muted={true}
+    icons="my-library"
+    class="h-full w-auto rounded-2xl overflow-hidden"
+  >
+    <Video crossOrigin="" poster={thumbnailUrl}>
+      <source data-src={contentUrl} type="video/mp4" />
+    </Video>
+
+    <DefaultUi noControls>
+      <Controls pin="topLeft">
+        <ControlSpacer />
+        <ShrinkExpandButton Icon={ShrinkIcon} size="large" />
+      </Controls>
+      <Controls fullWidth pin="bottomLeft">
+        <ControlGroup>
+          <ScrubberControl />
+        </ControlGroup>
+        <ControlGroup space="top">
+          <PlaybackControl hideTooltip class={controlClassName} />
+          <CurrentTime class={classNames(controlClassName, "px-4")} />
+          <ControlSpacer />
+          <PipControl hideTooltip class={controlClassName} />
+          <MuteControl hideTooltip class={controlClassName} />
+        </ControlGroup>
+      </Controls>
+
+      <Spinner />
+      <IconLibrary
+        name="my-library"
+        resolver={(iconName) => `/icons/media-player/${iconName}.svg`}
+      />
+    </DefaultUi>
+  </Player>
+);
+
+const controlClassName = classNames(
+  "rounded-xl",
+  "bg-brand-darkblue/[.4]",
+  "backdrop-blur-[8px]",
+  "border border-brand-main/20",
+  "transition",
+  "hover:bg-brand-darkblue/[.6]"
+);
 
 type ShrinkExpandButtonProps = { className?: string };
 
@@ -326,14 +421,10 @@ const ShrinkExpandButton: FC<
 > = ({ Icon, size = "small", className }) => (
   <span
     className={classNames(
-      size === "small" && "w-[1.625rem] h-[1.625rem] rounded-md",
-      size === "large" && "w-[2.5rem] h-[2.5rem] rounded-xl",
+      size === "small" && "w-[1.625rem] h-[1.625rem] !rounded-md",
+      size === "large" && "w-[2.5rem] h-[2.5rem]",
       "flex justify-center items-center",
-      "bg-brand-darkblue/[.4]",
-      "backdrop-blur-[8px]",
-      "border border-brand-main/20",
-      "transition",
-      "hover:bg-brand-darkblue/[.6]",
+      controlClassName,
       className
     )}
   >

@@ -327,3 +327,21 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
     box-shadow: 0.2em -0.2em 0 0 currentcolor;
   }
 }
+
+/**
+ * Media player
+ */
+
+/*vm-control[button] {*/
+/*  backdrop-filter: blur(8px);*/
+/*  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;*/
+/*  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);*/
+/*  transition-duration: 150ms;*/
+/*  background-color: rgb(7 8 27 / .4);*/
+/*  border-color: rgb(204 214 255 / 0.2);*/
+/*  border-width: 1px;*/
+/*  border-radius: 0.75rem;*/
+/*}*/
+vm-player {
+  --vm-control-focus-bg: tansparent;
+}
