@@ -165,10 +165,12 @@ export const syncAccountTokens = memoize(
             const metadata = {
               contractAddress,
               tokenId,
-              name: existing?.name || token.name,
+              name: existing?.name || token.name || `#${tokenId}`,
               description: existing?.description || token.description,
-              thumbnailUrl: existing?.thumbnailUrl || token.thumbnail_url,
-              contentUrl: existing?.contentUrl || token.content,
+              thumbnailUrl:
+                existing?.thumbnailUrl || token.thumbnail_url || token.content,
+              contentUrl:
+                existing?.contentUrl || token.content || token.thumbnail_url,
               contentType: existing?.contentType || token.content_type,
               collectionId: existing?.collectionId || token.collection_id,
               collectionName: existing?.collectionName || token.contract_name,
