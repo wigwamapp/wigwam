@@ -3,24 +3,15 @@ import { mergeRefs } from "react-merge-refs";
 import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import * as Dialog from "@radix-ui/react-dialog";
 import {
-  ClickToPlay,
-  ControlGroup,
-  Controls,
-  ControlSpacer,
-  DefaultUi,
-  IconLibrary,
-  MuteControl,
-  PlaybackControl,
-  Player,
-  Poster,
-  ScrubberControl,
-  Spinner,
-  CurrentTime,
-  Ui,
+  Media,
+  MuteButton,
+  PlayButton,
+  Time,
+  TimeSlider,
   Video,
-  PipControl,
-} from "@vime/react";
+} from "@vidstack/player-react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountNFT, NFTContentType } from "core/types";
@@ -48,14 +39,17 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
-import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
-import { ReactComponent as ShrinkIcon } from "app/icons/shrink.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
+import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
+import { ReactComponent as PauseIcon } from "app/icons/media-pause.svg";
+import { ReactComponent as VolumeHighIcon } from "app/icons/media-volume-high.svg";
+import { ReactComponent as VolumeMuteIcon } from "app/icons/media-volume-mute.svg";
+import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
+import { ReactComponent as ShrinkIcon } from "app/icons/media-shrink.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
-import * as Dialog from "@radix-ui/react-dialog";
+import { IS_FIREFOX } from "../../../defaults";
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
@@ -92,20 +86,9 @@ const NftInfo: FC = () => {
 
   if (!tokenInfo) return null;
 
-  const {
-    thumbnailUrl,
-    name,
-    tokenId,
-    rawBalance,
-    contentUrl,
-    detailUrl,
-    contentType,
-  } = tokenInfo;
+  const { thumbnailUrl, name, tokenId, rawBalance, contentUrl, contentType } =
+    tokenInfo;
   const { name: preparedName, id: preparedId } = prepareNFTLabel(tokenId, name);
-
-  console.log("thumbnailUrl", thumbnailUrl);
-  console.log("contentUrl", contentUrl);
-  console.log("detailUrl", detailUrl);
 
   return (
     <OverflowProvider>
@@ -129,39 +112,25 @@ const NftInfo: FC = () => {
                 }${preparedId ?? ""}`}
                 rawBalance={rawBalance}
               />
-              <div className="flex flex-col justify-between grow min-w-0 ml-4">
-                <div className="flex items-start">
-                  <div className="flex flex-col">
-                    {preparedName && (
-                      <h2
-                        className={classNames(
-                          "text-2xl font-bold",
-                          "line-clamp-3",
-                          "mr-4"
-                        )}
-                      >
-                        {preparedName}
-                      </h2>
-                    )}
-                    {preparedId && (
-                      <CopiableTooltip
-                        content={preparedId}
-                        textToCopy={preparedId}
-                        followCursor
-                        plugins={[followCursor]}
-                        className={classNames(
-                          "text-2xl font-bold text-left",
-                          "text-brand-main",
-                          "min-w-0 truncate",
-                          preparedName ? "mt-1" : ""
-                        )}
-                      >
-                        <>{preparedId}</>
-                      </CopiableTooltip>
-                    )}
-                  </div>
+              <div className="flex flex-col grow min-w-0 ml-4">
+                <div className="flex justify-between items-center">
+                  {preparedId && (
+                    <CopiableTooltip
+                      content={preparedId}
+                      textToCopy={preparedId}
+                      followCursor
+                      plugins={[followCursor]}
+                      className={classNames(
+                        "text-2xl font-bold text-left",
+                        "text-brand-main",
+                        "min-w-0 truncate"
+                      )}
+                    >
+                      <>{preparedId}</>
+                    </CopiableTooltip>
+                  )}
                   <TippySingletonProvider>
-                    <div className="ml-auto flex items-center mt-1">
+                    <div className="ml-auto flex items-center ml-4">
                       <IconedButton
                         aria-label={
                           copied
@@ -192,26 +161,27 @@ const NftInfo: FC = () => {
                     </div>
                   </TippySingletonProvider>
                 </div>
-                <div className="mt-6 grid grid-cols-2 gap-2">
-                  <Button
-                    to={{ page: Page.Transfer }}
-                    merge={["token"]}
-                    theme="secondary"
-                    className="grow !py-2 !min-w-0"
+
+                {preparedName && (
+                  <h2
+                    className={classNames(
+                      "text-2xl font-bold",
+                      "line-clamp-3",
+                      preparedId && "mt-1 mb-6"
+                    )}
                   >
-                    <SendIcon className="w-6 h-auto mr-2" />
-                    Transfer
-                  </Button>
-                  <Button
-                    theme="secondary"
-                    className="grow !py-2 !min-w-0"
-                    disabled
-                    title="Coming soon"
-                  >
-                    <BuyIcon className="w-6 h-auto mr-2" />
-                    Sell
-                  </Button>
-                </div>
+                    {preparedName}
+                  </h2>
+                )}
+                <Button
+                  to={{ page: Page.Transfer }}
+                  merge={["token"]}
+                  theme="secondary"
+                  className="!py-2 mt-auto mr-auto"
+                >
+                  <SendIcon className="w-6 h-auto mr-2" />
+                  Transfer
+                </Button>
               </div>
             </div>
             <TokenActivity />
@@ -248,7 +218,6 @@ const NftPreview: FC<NftPreviewProps> = ({
   );
 
   const handleModalClose = useCallback(() => {
-    console.log("handleModalClose");
     setHideAnimation(true);
 
     const t = setTimeout(() => {
@@ -284,21 +253,40 @@ const NftPreview: FC<NftPreviewProps> = ({
               "text-sm font-bold",
               "bg-brand-darkblue/[.8]",
               "backdrop-blur-[8px]",
-              "border border-brand-main/20"
+              "border border-brand-main/20",
+              "color-brand-light"
             )}
           >
             {rawBalance}
           </span>
         )}
-        {contentUrl && (
-          <ShrinkExpandButton
-            Icon={ExpandIcon}
+        {contentType !== "image_url" && (
+          <span
             className={classNames(
+              // !rounded-md
+              controlClassName,
+              "!p-2.5",
+              "!bg-brand-darkblue/[.6]",
+              "group-hover:!bg-brand-darkblue/[.8]",
+              "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            )}
+          >
+            <PlayIcon className="w-6 h-auto" />
+          </span>
+        )}
+        {contentUrl && (
+          <span
+            className={classNames(
+              "w-[1.625rem] h-[1.625rem] !rounded-md",
+              controlClassName,
+              "!bg-brand-darkblue/[.8]",
               "opacity-0",
               "group-hover:opacity-100",
               "absolute top-2 right-2"
             )}
-          />
+          >
+            <ExpandIcon className="w-4 min-w-[1rem] h-auto" />
+          </span>
         )}
       </button>
       {contentUrl && (
@@ -339,17 +327,21 @@ const NftPreview: FC<NftPreviewProps> = ({
                       alt={alt}
                       className="h-full w-auto rounded-2xl"
                     />
-                    <ShrinkExpandButton
-                      Icon={ShrinkIcon}
-                      size="large"
-                      className="absolute top-3 right-3"
-                    />
+                    <span
+                      className={classNames(
+                        controlClassName,
+                        "absolute top-3 right-3"
+                      )}
+                    >
+                      <ShrinkIcon className="w-6 h-auto" />
+                    </span>
                   </>
                 )}
                 {contentType === "video_url" && (
                   <MediaPlayer
                     thumbnailUrl={thumbnailUrl}
                     contentUrl={contentUrl}
+                    onClose={handleModalClose}
                   />
                 )}
               </Dialog.Content>
@@ -361,79 +353,108 @@ const NftPreview: FC<NftPreviewProps> = ({
   );
 };
 
-const MediaPlayer: FC<{ thumbnailUrl?: string; contentUrl: string }> = ({
-  thumbnailUrl,
-  contentUrl,
-}) => (
-  <Player
-    autoplay
-    muted={true}
-    icons="my-library"
-    class="h-full w-auto rounded-2xl overflow-hidden"
-  >
-    <Video crossOrigin="" poster={thumbnailUrl}>
-      <source data-src={contentUrl} type="video/mp4" />
-    </Video>
-
-    <DefaultUi noControls>
-      <Controls pin="topLeft">
-        <ControlSpacer />
-        <ShrinkExpandButton Icon={ShrinkIcon} size="large" />
-      </Controls>
-      <Controls fullWidth pin="bottomLeft">
-        <ControlGroup>
-          <ScrubberControl />
-        </ControlGroup>
-        <ControlGroup space="top">
-          <PlaybackControl hideTooltip class={controlClassName} />
-          <CurrentTime class={classNames(controlClassName, "px-4")} />
-          <ControlSpacer />
-          <PipControl hideTooltip class={controlClassName} />
-          <MuteControl hideTooltip class={controlClassName} />
-        </ControlGroup>
-      </Controls>
-
-      <Spinner />
-      <IconLibrary
-        name="my-library"
-        resolver={(iconName) => `/icons/media-player/${iconName}.svg`}
+const MediaPlayer: FC<{
+  thumbnailUrl?: string;
+  contentUrl: string;
+  onClose?: () => void;
+}> = ({ thumbnailUrl, contentUrl, onClose }) => (
+  <Media className="h-full w-auto rounded-2xl overflow-hidden">
+    <Video poster={thumbnailUrl}>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        poster={thumbnailUrl}
+        src={contentUrl}
+        preload="none"
+        data-video="0"
       />
-    </DefaultUi>
-  </Player>
+    </Video>
+    <button
+      type="button"
+      onClick={onClose}
+      className={classNames(controlClassName, "absolute top-3 right-3")}
+    >
+      <ShrinkIcon className="w-6 h-auto" />
+    </button>
+    <div className="absolute left-0 right-0 bottom-0 p-3 flex flex-col">
+      <TimeSlider className="h-4">
+        <div
+          className={classNames(
+            "w-full h-1",
+            "bg-brand-main/40",
+            !IS_FIREFOX && "backdrop-blur-[10px]",
+            "absolute top-1/2 left-0 -translate-y-1/2",
+            "rounded-[.625rem]",
+            "z-[0]",
+            "cursor-pointer"
+          )}
+        />
+        <div
+          className={classNames(
+            "w-full h-1",
+            "bg-brand-light",
+            "absolute top-1/2 left-0",
+            "origin-left -translate-y-1/2",
+            "w-[var(--vds-fill-percent)] will-change-[width]",
+            "rounded-[.625rem]",
+            "z-[1]",
+            "cursor-pointer"
+          )}
+        />
+        <div
+          className={classNames(
+            "absolute top-0 left-[var(--vds-fill-percent)]",
+            "w-4 h-full",
+            "z-[2]",
+            "will-change-[left] -translate-x-1/2 -translate-y-1/2"
+          )}
+        >
+          <div
+            className={classNames(
+              "absolute top-1/2 left-0",
+              "w-4 h-4",
+              "border border-brand-darkblue/[.4]",
+              "rounded-full",
+              "bg-brand-light",
+              "cursor-pointer"
+            )}
+          />
+        </div>
+      </TimeSlider>
+      <div className="mt-2 flex w-full">
+        <PlayButton className={controlClassName}>
+          <PlayIcon className="w-6 h-auto media-paused:block hidden" />
+          <PauseIcon className="w-6 h-auto media-paused:hidden block" />
+        </PlayButton>
+        <div
+          className={classNames(
+            controlClassName,
+            "ml-2 !px-3",
+            "text-sm font-bold",
+            "hover:!bg-brand-darkblue/[.4]"
+          )}
+        >
+          <div className="flex items-center tabular-nums">
+            <Time type="current" />
+            <span className="mx-0.5">/</span>
+            <Time type="duration" />
+          </div>
+        </div>
+        <MuteButton className={classNames(controlClassName, "ml-auto")}>
+          <VolumeHighIcon className="w-6 h-auto media-muted:hidden block" />
+          <VolumeMuteIcon className="w-6 h-auto media-muted:block hidden" />
+        </MuteButton>
+      </div>
+    </div>
+  </Media>
 );
 
 const controlClassName = classNames(
-  "rounded-xl",
+  "rounded-[.625rem]",
   "bg-brand-darkblue/[.4]",
   "backdrop-blur-[8px]",
   "border border-brand-main/20",
   "transition",
+  "p-2",
+  "flex items-center justify-center",
   "hover:bg-brand-darkblue/[.6]"
-);
-
-type ShrinkExpandButtonProps = { className?: string };
-
-const ShrinkExpandButton: FC<
-  {
-    Icon: FC<ShrinkExpandButtonProps>;
-    size?: "small" | "large";
-  } & ShrinkExpandButtonProps
-> = ({ Icon, size = "small", className }) => (
-  <span
-    className={classNames(
-      size === "small" && "w-[1.625rem] h-[1.625rem] !rounded-md",
-      size === "large" && "w-[2.5rem] h-[2.5rem]",
-      "flex justify-center items-center",
-      controlClassName,
-      className
-    )}
-  >
-    <Icon
-      className={classNames(
-        size === "small" && "w-4",
-        size === "large" && "w-6",
-        "h-auto"
-      )}
-    />
-  </span>
 );
