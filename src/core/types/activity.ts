@@ -106,15 +106,15 @@ export type TxParams = {
   from: string; // '0x0000000000000000000000000000000000000000' - must match user's active address.
   to?: string; // '0x0000000000000000000000000000000000000000' - Required except during contract publications.
   // chainId?: string; // '0x3' - Used to prevent transaction reuse across blockchains.
-  nonce?: string; // '0x00' - ignored
+  nonce?: string | number; // '0x00' - ignored
   gasPrice?: string; // '0x09184e72a000' - customizable by user during confirmation.
   value?: string; // '0x00' - Only required to send ether to the recipient from the initiating external account.
   data?: string; // '0x00' - Optional, but used for defining smart contract creation and interaction.
   // gas?: string; // '0x2710' - customizable by user during confirmation.
   gasLimit?: string; // '0x2710' - gas alias
-  chainId?: string;
+  chainId?: string | number;
   // eip2930
-  type?: string;
+  type?: string | number;
   accessList?: ethers.utils.AccessList;
   // eip1559
   maxPriorityFeePerGas?: string;
