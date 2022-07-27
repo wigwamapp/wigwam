@@ -18,6 +18,7 @@ import { AccountNFT, NFTContentType, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 
+import { IS_FIREFOX } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -49,7 +50,6 @@ import { ReactComponent as ShrinkIcon } from "app/icons/media-shrink.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
-import { IS_FIREFOX } from "../../../defaults";
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
