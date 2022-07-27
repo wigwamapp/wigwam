@@ -81,12 +81,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
   const onNetworkChange = useCallback(
     (chainId: number) => {
-      const netw = preparedNetworks.find(
-        ({ chainId: chi }) => chi === chainId
-      )!;
+      const netw = allNetworks.find(({ chainId: chi }) => chi === chainId)!;
       setNetwork(netw);
     },
-    [preparedNetworks]
+    [allNetworks]
   );
 
   const addressesToAddRef = useRef(new Set<string>());

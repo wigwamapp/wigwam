@@ -13,6 +13,8 @@ export function useExplorerLink(network?: Network) {
             address: (address: string) =>
               joinPath(explorerUrl, `/address/${address}`),
             tx: (hash: string) => joinPath(explorerUrl, `/tx/${hash}`),
+            nft: (address: string, id: string) =>
+              joinPath(explorerUrl, `/nft/${address}/${id}`),
           }
         : null,
     [explorerUrl]

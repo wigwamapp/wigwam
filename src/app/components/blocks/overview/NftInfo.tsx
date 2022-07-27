@@ -14,7 +14,7 @@ import {
 } from "@vidstack/player-react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import { AccountNFT, NFTContentType } from "core/types";
+import { AccountNFT, NFTContentType, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 
@@ -59,7 +59,12 @@ const NftInfo: FC = () => {
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
-  const tokenInfo = useAccountToken(tokenSlug) as AccountNFT | undefined;
+
+  let tokenInfo = useAccountToken(tokenSlug) as AccountNFT | undefined;
+
+  if (tokenInfo?.tokenType !== TokenType.NFT) {
+    tokenInfo = undefined;
+  }
 
   useTokenActivitiesSync(
     chainId,
@@ -143,7 +148,7 @@ const NftInfo: FC = () => {
                         onClick={copy}
                       />
                       <IconedButton
-                        aria-label={"Refresh metadata"}
+                        aria-label={"Refresh NFT metadata"}
                         Icon={RefreshIcon}
                         onClick={handleMetadataRefresh}
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
@@ -151,11 +156,11 @@ const NftInfo: FC = () => {
                       />
                       {explorerLink && (
                         <IconedButton
-                          aria-label="View asset in Explorer"
+                          aria-label="View NFT in Explorer"
                           Icon={WalletExplorerIcon}
                           className="!w-6 !h-6 min-w-[1.5rem]"
                           iconClassName="!w-[1.125rem]"
-                          href={explorerLink.address(address)}
+                          href={explorerLink.nft(address, tokenId)}
                         />
                       )}
                     </div>

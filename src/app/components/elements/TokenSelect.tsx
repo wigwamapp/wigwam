@@ -40,6 +40,10 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
   const setDefaultTokenRef = useRef(!tokenSlug);
 
+  useEffect(() => {
+    setDefaultTokenRef.current = !tokenSlug;
+  }, [tokenSlug]);
+
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerAssetRef = useCallback(
     (node) => {
@@ -102,16 +106,6 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
       handleTokenChanged?.();
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
-
-  useEffect(() => {
-    if (
-      tokens[0] &&
-      (!currentToken ||
-        tokens.every((t) => t.tokenSlug !== currentToken.tokenSlug))
-    ) {
-      setTokenSlug([tokens[0].tokenSlug, "replace"]);
-    }
-  }, [currentAccount, setTokenSlug, tokens, currentToken]);
 
   return (
     <Select

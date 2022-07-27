@@ -1,7 +1,16 @@
-import { FC, memo, ReactNode, useCallback, useEffect, useMemo } from "react";
+import {
+  FC,
+  memo,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { RESET } from "jotai/utils";
 import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
@@ -26,7 +35,12 @@ import {
   OnChange,
 } from "app/utils";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useExplorerLink, useLazyNetwork, useProvider } from "app/hooks";
+import {
+  useChainId,
+  useExplorerLink,
+  useLazyNetwork,
+  useProvider,
+} from "app/hooks";
 import { useAccountToken } from "app/hooks/tokens";
 import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
@@ -47,9 +61,11 @@ type FormValues = { amount: string; recipient: string };
 
 const Asset: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
+  const chainId = useChainId();
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
+  const setTokenSlug = useSetAtom(tokenSlugAtom);
   const currentToken = useAccountToken(tokenSlug);
   const { alert, closeCurrentDialog } = useDialog();
   const { updateToast } = useToast();
@@ -316,14 +332,25 @@ const Asset: FC = () => {
   }, [estimateGas]);
 
   const formKey = useMemo(
-    () => `${currentAccount.address}-${currentNetwork?.chainId}`,
-    [currentAccount.address, currentNetwork?.chainId]
+    () => `${currentAccount.address}-${chainId}`,
+    [currentAccount.address, chainId]
   );
 
   const amountFieldKey = useMemo(
     () => `amount-${currentToken?.tokenSlug}-${maxAmount}`,
     [currentToken, maxAmount]
   );
+
+  const initialRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
+
+    setTokenSlug([RESET, "replace"]);
+  }, [setTokenSlug, formKey]);
 
   return (
     <Form<FormValues>
