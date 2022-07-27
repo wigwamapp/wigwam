@@ -81,6 +81,7 @@
     "inter-ui": "3.19.3",
     "jotai": "1.7.4",
     "kdbxweb": "2.1.1",
+    "lit": "2.2.8",
     "mem": "9.0.2",
     "memoize-one": "6.0.0",
     "multiformats": "9.7.0",

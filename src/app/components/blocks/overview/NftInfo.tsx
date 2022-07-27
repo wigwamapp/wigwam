@@ -135,7 +135,7 @@ const NftInfo: FC = () => {
                     </CopiableTooltip>
                   )}
                   <TippySingletonProvider>
-                    <div className="ml-auto flex items-center ml-4">
+                    <div className="flex items-center ml-4">
                       <IconedButton
                         aria-label={
                           copied
