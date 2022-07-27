@@ -17,6 +17,12 @@ import {
 } from "app/atoms";
 import { useToken } from "app/hooks";
 import { Page } from "app/nav";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+
 import Select from "./Select";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
@@ -25,10 +31,7 @@ import CopiableTooltip from "./CopiableTooltip";
 import WalletName from "./WalletName";
 import SmartLink from "./SmartLink";
 import Avatar from "./Avatar";
-import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
-import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
-import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import IconedButton from "./IconedButton";
 
 type AccountSelectProps = {
   className?: string;
@@ -113,6 +116,17 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       currentItemClassName={classNames("!py-2 !pl-2 pr-3", className)}
       contentClassName="!w-[22.25rem]"
       itemClassName="group"
+      actions={
+        <IconedButton
+          to={{ addAccOpened: true }}
+          merge
+          smartLink
+          theme="tertiary"
+          className="ml-2"
+          Icon={AddWalletIcon}
+          aria-label="Add new wallet"
+        />
+      }
       emptySearchText={
         <>
           You can manage your wallets in the{" "}
