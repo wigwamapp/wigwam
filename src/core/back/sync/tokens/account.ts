@@ -168,7 +168,11 @@ export const syncAccountTokens = memoize(
               name: existing?.name || token.name || `#${tokenId}`,
               description: existing?.description || token.description,
               thumbnailUrl:
-                existing?.thumbnailUrl || token.thumbnail_url || token.content,
+                existing?.thumbnailUrl ||
+                token.thumbnail_url ||
+                (token.content_type === "image_url"
+                  ? token.content
+                  : undefined),
               contentUrl:
                 existing?.contentUrl || token.content || token.thumbnail_url,
               contentType: existing?.contentType || token.content_type,

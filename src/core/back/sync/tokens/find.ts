@@ -13,7 +13,6 @@ import { syncStarted, synced } from "../../state";
 import { getDebankChain, debankApi } from "../debank";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
-import { enqueueTokensSync } from "./queue";
 
 const stack = new Set<string>();
 
@@ -35,130 +34,116 @@ export async function addFindTokenRequest(
   syncStarted(chainId);
 
   try {
-    await enqueueTokensSync(async () => {
-      let tokenToAdd: AccountToken | undefined;
+    await performTokenSync(
+      dbKey,
+      chainId,
+      accountAddress,
+      tokenSlug,
+      refreshMetadata
+    );
+  } catch (err) {
+    console.error(err);
+  }
 
-      const { standard, address: tokenAddress } = parseTokenSlug(tokenSlug);
+  stack.delete(dbKey);
+  setTimeout(() => synced(chainId), 500);
+}
 
-      const existing = await repo.accountTokens.get(dbKey);
-      if (existing) {
-        const [balance, metadata] = await Promise.all([
-          getBalanceFromChain(chainId, tokenSlug, accountAddress),
-          refreshMetadata ? getTokenMetadata(chainId, tokenSlug) : null,
-        ]);
+async function performTokenSync(
+  dbKey: string,
+  chainId: number,
+  accountAddress: string,
+  tokenSlug: string,
+  refreshMetadata = false
+) {
+  let tokenToAdd: AccountToken | undefined;
 
-        const rawBalance = balance?.toString() ?? "0";
-        const balanceUSD =
-          existing.tokenType === TokenType.Asset &&
-          "priceUSD" in existing &&
-          existing.priceUSD
-            ? new BigNumber(rawBalance)
-                .div(10 ** existing.decimals)
-                .times(existing.priceUSD)
-                .toNumber()
-            : existing.balanceUSD ?? 0;
+  const { standard, address: tokenAddress } = parseTokenSlug(tokenSlug);
 
-        await repo.accountTokens.put(
-          {
-            ...existing,
-            ...((metadata as any) ?? {}),
-            rawBalance,
-            balanceUSD,
-          },
-          dbKey
-        );
+  const existing = await repo.accountTokens.get(dbKey);
+  if (existing) {
+    const [balance, metadata] = await Promise.all([
+      getBalanceFromChain(chainId, tokenSlug, accountAddress),
+      refreshMetadata ? getTokenMetadata(chainId, tokenSlug) : null,
+    ]);
 
-        return;
-      }
+    const rawBalance = balance?.toString() ?? "0";
+    const balanceUSD =
+      existing.tokenType === TokenType.Asset &&
+      "priceUSD" in existing &&
+      existing.priceUSD
+        ? new BigNumber(rawBalance)
+            .div(10 ** existing.decimals)
+            .times(existing.priceUSD)
+            .toNumber()
+        : existing.balanceUSD ?? 0;
 
-      if (standard === TokenStandard.Native) return;
+    await repo.accountTokens.put(
+      {
+        ...existing,
+        ...((metadata as any) ?? {}),
+        rawBalance,
+        balanceUSD,
+      },
+      dbKey
+    );
 
-      let priceUSD, priceUSDChange: string | undefined;
+    return;
+  }
 
-      if (standard === TokenStandard.ERC20) {
-        const [debankChain, coinGeckoPrices] = await Promise.all([
-          getDebankChain(chainId),
-          getCoinGeckoPrices(chainId, [tokenAddress]),
-        ]);
+  if (standard === TokenStandard.Native) return;
 
-        const cgTokenAddress = tokenAddress.toLowerCase();
-        const cgPrice = coinGeckoPrices[cgTokenAddress];
+  let priceUSD, priceUSDChange: string | undefined;
 
-        priceUSD = cgPrice?.usd?.toString();
-        priceUSDChange = cgPrice?.usd_24h_change?.toString();
+  if (standard === TokenStandard.ERC20) {
+    const [debankChain, coinGeckoPrices] = await Promise.all([
+      getDebankChain(chainId),
+      getCoinGeckoPrices(chainId, [tokenAddress]),
+    ]);
 
-        if (debankChain) {
-          const [{ data: dbToken }, balance] = await Promise.all([
-            debankApi
-              .get("/token", {
-                params: {
-                  chain_id: debankChain.id,
-                  id: tokenAddress,
-                },
-              })
-              .catch(() => ({ data: null })),
-            getBalanceFromChain(chainId, tokenSlug, accountAddress),
-          ]);
+    const cgTokenAddress = tokenAddress.toLowerCase();
+    const cgPrice = coinGeckoPrices[cgTokenAddress];
 
-          if (dbToken) {
-            if (!priceUSD && dbToken.price) {
-              priceUSD = new BigNumber(dbToken.price).toString();
-            }
+    priceUSD = cgPrice?.usd?.toString();
+    priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
-            const rawBalance = balance?.toString() ?? "0";
-            const balanceUSD = priceUSD
-              ? new BigNumber(rawBalance)
-                  .div(10 ** dbToken.decimals)
-                  .times(priceUSD)
-                  .toNumber()
-              : 0;
+    if (debankChain) {
+      const [{ data: dbToken }, balance] = await Promise.all([
+        debankApi
+          .get("/token", {
+            params: {
+              chain_id: debankChain.id,
+              id: tokenAddress,
+            },
+          })
+          .catch(() => ({ data: null })),
+        getBalanceFromChain(chainId, tokenSlug, accountAddress),
+      ]);
 
-            tokenToAdd = {
-              tokenType: TokenType.Asset,
-              status: TokenStatus.Enabled,
-              chainId,
-              accountAddress,
-              tokenSlug,
-              // Metadata
-              decimals: dbToken.decimals,
-              name: dbToken.name,
-              symbol: dbToken.symbol,
-              logoUrl: dbToken.logo_url,
-              // Volumes
-              rawBalance,
-              balanceUSD,
-              priceUSD,
-              priceUSDChange,
-            };
-          }
+      if (dbToken) {
+        if (!priceUSD && dbToken.price) {
+          priceUSD = new BigNumber(dbToken.price).toString();
         }
-      }
-
-      if (!tokenToAdd) {
-        const [metadata, balance] = await Promise.all([
-          getTokenMetadata(chainId, tokenSlug),
-          getBalanceFromChain(chainId, tokenSlug, accountAddress),
-        ]);
-        if (!metadata) return;
 
         const rawBalance = balance?.toString() ?? "0";
-        const balanceUSD =
-          priceUSD && "decimals" in metadata
-            ? new BigNumber(rawBalance)
-                .div(10 ** metadata.decimals)
-                .times(priceUSD)
-                .toNumber()
-            : 0;
+        const balanceUSD = priceUSD
+          ? new BigNumber(rawBalance)
+              .div(10 ** dbToken.decimals)
+              .times(priceUSD)
+              .toNumber()
+          : 0;
 
         tokenToAdd = {
-          tokenType:
-            standard === TokenStandard.ERC20 ? TokenType.Asset : TokenType.NFT,
+          tokenType: TokenType.Asset,
           status: TokenStatus.Enabled,
           chainId,
           accountAddress,
           tokenSlug,
           // Metadata
-          ...(metadata as any),
+          decimals: dbToken.decimals,
+          name: dbToken.name,
+          symbol: dbToken.symbol,
+          logoUrl: dbToken.logo_url,
           // Volumes
           rawBalance,
           balanceUSD,
@@ -166,15 +151,43 @@ export async function addFindTokenRequest(
           priceUSDChange,
         };
       }
-
-      if (tokenToAdd) {
-        await repo.accountTokens.put(tokenToAdd, dbKey);
-      }
-    });
-  } catch (err) {
-    console.error(err);
+    }
   }
 
-  stack.delete(dbKey);
-  setTimeout(() => synced(chainId), 500);
+  if (!tokenToAdd) {
+    const [metadata, balance] = await Promise.all([
+      getTokenMetadata(chainId, tokenSlug),
+      getBalanceFromChain(chainId, tokenSlug, accountAddress),
+    ]);
+    if (!metadata) return;
+
+    const rawBalance = balance?.toString() ?? "0";
+    const balanceUSD =
+      priceUSD && "decimals" in metadata
+        ? new BigNumber(rawBalance)
+            .div(10 ** metadata.decimals)
+            .times(priceUSD)
+            .toNumber()
+        : 0;
+
+    tokenToAdd = {
+      tokenType:
+        standard === TokenStandard.ERC20 ? TokenType.Asset : TokenType.NFT,
+      status: TokenStatus.Enabled,
+      chainId,
+      accountAddress,
+      tokenSlug,
+      // Metadata
+      ...(metadata as any),
+      // Volumes
+      rawBalance,
+      balanceUSD,
+      priceUSD,
+      priceUSDChange,
+    };
+  }
+
+  if (tokenToAdd) {
+    await repo.accountTokens.put(tokenToAdd, dbKey);
+  }
 }

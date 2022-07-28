@@ -60,7 +60,11 @@ export function queryAccountTokens({
         ? match(parseTokenSlug(token.tokenSlug).address, "strict") ||
           match(token.name) ||
           match(token.symbol)
-        : true
+        : match(token.tokenSlug, "strict") ||
+          match(parseTokenSlug(token.tokenSlug).address, "strict") ||
+          match(token.name) ||
+          match(token.tokenId) ||
+          (token.collectionName ? match(token.collectionName) : false)
     );
   }
 

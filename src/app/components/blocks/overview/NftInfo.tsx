@@ -13,6 +13,7 @@ import {
   Video,
 } from "@vidstack/player-react";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { storage } from "lib/ext/storage";
 
 import { AccountNFT, NFTContentType, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -71,6 +72,26 @@ const NftInfo: FC = () => {
     currentAccount.address,
     tokenInfo && tokenSlug
   );
+
+  useEffect(() => {
+    if (tokenInfo && !tokenInfo.thumbnailUrl) {
+      const { chainId, accountAddress, tokenSlug } = tokenInfo;
+
+      (async () => {
+        const storageKey = [
+          "nft_metadata_refresh_tried",
+          chainId,
+          tokenSlug,
+        ].join("_");
+
+        const tried = await storage.fetchForce<boolean>(storageKey);
+        if (!tried) {
+          await storage.put(storageKey, true);
+          findToken(chainId, accountAddress, tokenSlug, true);
+        }
+      })();
+    }
+  }, [tokenInfo]);
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
