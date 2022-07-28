@@ -91,9 +91,17 @@ const NftInfo: FC = () => {
 
   if (!tokenInfo) return null;
 
-  const { thumbnailUrl, name, tokenId, rawBalance, contentUrl, contentType } =
-    tokenInfo;
-  const { name: preparedName, id: preparedId } = prepareNFTLabel(tokenId, name);
+  const {
+    thumbnailUrl,
+    name,
+    tokenId,
+    rawBalance,
+    contentUrl,
+    contentType,
+    detailUrl,
+  } = tokenInfo;
+  const { name: preparedName } = prepareNFTLabel(tokenId, name);
+  const preparedId = `#${tokenId}`;
 
   return (
     <OverflowProvider>
@@ -156,11 +164,11 @@ const NftInfo: FC = () => {
                       />
                       {explorerLink && (
                         <IconedButton
-                          aria-label="View NFT in Explorer"
+                          aria-label="View NFT details"
                           Icon={WalletExplorerIcon}
                           className="!w-6 !h-6 min-w-[1.5rem]"
                           iconClassName="!w-[1.125rem]"
-                          href={explorerLink.nft(address, tokenId)}
+                          href={detailUrl ?? explorerLink.nft(address, tokenId)}
                         />
                       )}
                     </div>

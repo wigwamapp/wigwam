@@ -30,7 +30,7 @@ import Button from "app/components/elements/Button";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as CoinGeckoIcon } from "app/icons/coint-gecko.svg";
+import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
@@ -143,7 +143,7 @@ const AssetInfo: FC = () => {
                           Icon={WalletExplorerIcon}
                           className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
-                          href={explorerLink.address(address)}
+                          href={explorerLink.token(address)}
                         />
                       )}
                       {currentNetwork?.type === "mainnet" && coinGeckoId && (

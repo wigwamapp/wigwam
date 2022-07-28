@@ -1,4 +1,12 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
@@ -269,8 +277,11 @@ const TokenList: FC = () => {
     ]
   );
 
-  return (
-    <>
+  /**
+   * Contol bar
+   */
+  const controlBar = useMemo(
+    () => (
       <div className="flex items-center">
         <TippySingletonProvider>
           <SearchInput
@@ -297,8 +308,15 @@ const TokenList: FC = () => {
           />
         </TippySingletonProvider>
       </div>
+    ),
+    [searchValue, setSearchValue, manageModeEnabled, toggleManageMode]
+  );
 
-      {tokens.length <= 0 && searchValue ? (
+  let tokensBar: ReactNode = null;
+
+  if (tokens.length === 0) {
+    if (searchValue) {
+      tokensBar = (
         <button
           type="button"
           className={classNames(
@@ -315,77 +333,111 @@ const TokenList: FC = () => {
           {searching ? (
             <>Searching...</>
           ) : (
-            <>
+            <div className="max-w-[16rem]">
               Can&apos;t find a token?
               <br />
               Put an address into the search line to add it to your assets list.
-            </>
+            </div>
           )}
         </button>
-      ) : (
-        <ScrollAreaContainer
-          ref={scrollAreaRef}
-          hiddenScrollbar="horizontal"
-          className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
-        >
-          <div
-            className={classNames(
-              "max-h-0",
-              "overflow-hidden",
-              manageModeEnabled &&
-                tokens.length > 0 &&
-                "transition-[max-height] duration-200 max-h-[4.25rem]"
-            )}
-          >
-            <div className="pb-2">
-              <button
-                type="button"
-                className={classNames(
-                  "flex items-center",
-                  "w-full py-2 px-3",
-                  "bg-brand-main/5",
-                  "rounded-[.625rem]",
-                  "text-sm text-brand-inactivelight text-left",
-                  "cursor-pointer",
-                  "transition-colors",
-                  "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
-                )}
-                onClick={focusSearchInput}
-              >
-                <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
-                To add {!isNftsSelected ? "an asset" : "an NFT"}, enter the
-                address {!isNftsSelected ? "into" : "and id"}
-                <br />
-                {!isNftsSelected ? "" : "into "}
-                the search line
-              </button>
-            </div>
-          </div>
-          {!isNftsSelected ? (
-            <>
-              {tokens.map((asset, i) => (
-                <AssetCard
-                  key={asset.tokenSlug}
-                  ref={
-                    i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
-                      ? loadMoreTriggerAssetRef
-                      : null
-                  }
-                  asset={asset as AccountAsset}
-                  isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
-                  onAssetSelect={handleTokenSelect}
-                  isManageMode={manageModeEnabled}
-                  className={classNames(i !== tokens.length - 1 && "mb-2")}
-                />
-              ))}
-            </>
-          ) : (
-            <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
+      );
+    } else if (isNftsSelected) {
+      tokensBar = (
+        <div
+          className={classNames(
+            "flex flex-col items-center",
+            "h-full w-full py-9",
+            "text-sm text-brand-placeholder text-center"
           )}
-        </ScrollAreaContainer>
-      )}
+        >
+          <Delay ms={500}>
+            <span>{!syncing ? "No NFT yet" : "Syncing..."}</span>
+          </Delay>
+        </div>
+      );
+    }
+  } else {
+    tokensBar = (
+      <ScrollAreaContainer
+        ref={scrollAreaRef}
+        hiddenScrollbar="horizontal"
+        className="pr-5 -mr-5 mt-4"
+        viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
+        scrollBarClassName="py-0 pb-20"
+      >
+        <div
+          className={classNames(
+            "max-h-0",
+            "overflow-hidden",
+            manageModeEnabled &&
+              tokens.length > 0 &&
+              "transition-[max-height] duration-200 max-h-[4.25rem]"
+          )}
+        >
+          <div className="pb-2">
+            <button
+              type="button"
+              className={classNames(
+                "flex items-center",
+                "w-full py-2 px-3",
+                "bg-brand-main/5",
+                "rounded-[.625rem]",
+                "text-sm text-brand-inactivelight text-left",
+                "cursor-pointer",
+                "transition-colors",
+                "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+              )}
+              onClick={focusSearchInput}
+            >
+              <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
+              To add {!isNftsSelected ? "an asset" : "an NFT"}, enter the
+              address {!isNftsSelected ? "into" : "and id"}
+              <br />
+              {!isNftsSelected ? "" : "into "}
+              the search line
+            </button>
+          </div>
+        </div>
+        {!isNftsSelected ? (
+          <>
+            {tokens.map((asset, i) => (
+              <AssetCard
+                key={asset.tokenSlug}
+                ref={
+                  i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
+                    ? loadMoreTriggerAssetRef
+                    : null
+                }
+                asset={asset as AccountAsset}
+                isActive={!manageModeEnabled && tokenSlug === asset.tokenSlug}
+                onAssetSelect={handleTokenSelect}
+                isManageMode={manageModeEnabled}
+                className={classNames(i !== tokens.length - 1 && "mb-2")}
+              />
+            ))}
+          </>
+        ) : (
+          <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
+        )}
+      </ScrollAreaContainer>
+    );
+  }
+
+  return (
+    <>
+      {controlBar}
+      {tokensBar}
     </>
   );
+};
+
+const Delay: FC<{ ms: number }> = ({ ms, children }) => {
+  const [delayed, setDelayed] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDelayed(true), ms);
+    return () => clearTimeout(t);
+  }, [ms, setDelayed]);
+
+  return delayed ? <>{children}</> : null;
 };

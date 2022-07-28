@@ -40,7 +40,8 @@ const NftCard = memo(
             (isManageMode || !isActive) &&
               "hover:bg-brand-main/10 hover:!opacity-100",
             isActive && "bg-brand-main/20",
-            (disabled || rawBalance === "0") && "opacity-60"
+            (disabled || rawBalance === "0") && "opacity-60",
+            !loaded && "invisible"
           )}
         >
           <div className="relative w-full">
@@ -52,7 +53,7 @@ const NftCard = memo(
               }}
               className={classNames(
                 "w-full h-auto !rounded-md",
-                !loaded && "h-[6rem] invisible"
+                !loaded && "h-[6rem]"
               )}
               errorClassName="h-[6rem]"
             />
