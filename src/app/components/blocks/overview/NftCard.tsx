@@ -103,35 +103,42 @@ const NftCard = memo(
 
 export default NftCard;
 
-const prepareName = (id: string, name?: string) => {
-  const { name: preparedName, id: preparedId } = prepareNFTLabel(id, name);
+const prepareName = (originId: string, originName?: string) => {
+  const { name, id } = prepareNFTLabel(originId, originName);
 
   return {
     component: (
       <h3
         className={classNames(
           "line-clamp-2 break-words mt-2",
-          !preparedName ? "text-brand-main" : ""
+          !name ? "text-brand-main" : ""
         )}
       >
-        {preparedName}
-        {preparedName && preparedId ? " " : ""}
-        {preparedId ? (
+        <span
+          className={classNames(
+            name &&
+              name.length > 13 &&
+              !name.slice(0, 13).includes(" ") &&
+              "break-all"
+          )}
+        >
+          {name}
+        </span>
+        {name && id ? " " : ""}
+        {id ? (
           <span
             className={classNames(
               "text-brand-main",
-              preparedId.length > 11 ? "break-all" : "break-words"
+              id.length > 11 ? "break-all" : "break-words"
             )}
           >
-            {preparedId}
+            {id}
           </span>
         ) : (
           ""
         )}
       </h3>
     ),
-    label: `${preparedName ?? ""}${preparedName && preparedId ? " " : ""}${
-      preparedId ?? ""
-    }`,
+    label: `${name ?? ""}${name && id ? " " : ""}${id ?? ""}`,
   };
 };
