@@ -5,7 +5,7 @@ import classNames from "clsx";
 import { AccountNFT, TokenStatus } from "core/types";
 
 import { prepareNFTLabel } from "app/utils";
-import Avatar from "app/components/elements/Avatar";
+import NftAvatar from "app/components/elements/NftAvatar";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 type NftCardProps = {
@@ -45,7 +45,7 @@ const NftCard = memo(
           )}
         >
           <div className="relative w-full">
-            <Avatar
+            <NftAvatar
               src={thumbnailUrl}
               alt={title.label}
               setLoadingStatus={(status) => {

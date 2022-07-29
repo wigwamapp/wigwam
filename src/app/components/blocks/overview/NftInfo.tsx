@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
+  Gesture,
   Media,
   MuteButton,
   PlayButton,
@@ -12,6 +13,7 @@ import {
   TimeSlider,
   Video,
 } from "@vidstack/player-react";
+import { useDebouncedCallback } from "use-debounce";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { storage } from "lib/ext/storage";
 
@@ -35,7 +37,8 @@ import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import IconedButton from "app/components/elements/IconedButton";
 import Button from "app/components/elements/Button";
-import Avatar from "app/components/elements/Avatar";
+import { LoadingStatus } from "app/components/elements/Avatar";
+import NftAvatar from "app/components/elements/NftAvatar";
 import CopiableTooltip from "app/components/elements/CopiableTooltip";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -243,8 +246,31 @@ const NftPreview: FC<NftPreviewProps> = ({
   alt,
   rawBalance,
 }) => {
+  const imageRef = useRef<HTMLElement>(null);
   const [modalOpened, setModalOpened] = useState(false);
   const [hideAnimation, setHideAnimation] = useState(false);
+  const [loadingImageState, setLoadingImageState] =
+    useState<LoadingStatus>("idle");
+  const [squareWidth, setSquareWidth] = useState(0);
+
+  const calculateWidth = useCallback(() => {
+    if (loadingImageState === "loaded") {
+      return;
+    }
+    setSquareWidth(imageRef.current?.offsetHeight || 0);
+  }, [loadingImageState]);
+
+  const debouncedCallback = useDebouncedCallback(calculateWidth, 500);
+
+  useEffect(() => {
+    if (loadingImageState === "loaded") {
+      return;
+    }
+    window.addEventListener("resize", debouncedCallback);
+    return () => window.removeEventListener("resize", debouncedCallback);
+  }, [debouncedCallback, loadingImageState]);
+
+  useEffect(calculateWidth, [calculateWidth]);
 
   const handleModalOpen = useCallback(
     () => contentUrl && setModalOpened(true),
@@ -272,10 +298,13 @@ const NftPreview: FC<NftPreviewProps> = ({
           contentUrl ? "cursor-zoom-in" : "cursor-default"
         )}
       >
-        <Avatar
+        <NftAvatar
           src={thumbnailUrl}
           alt={alt}
-          className="w-[13rem] min-w-[13rem] h-[13rem] !rounded-[.625rem]"
+          className={classNames(
+            "w-[13rem] min-w-[13rem] h-[13rem]",
+            "!rounded-[.625rem]"
+          )}
         />
         {rawBalance !== "1" && (
           <span
@@ -357,10 +386,18 @@ const NftPreview: FC<NftPreviewProps> = ({
               >
                 {contentType === "image_url" && (
                   <>
-                    <img
+                    <NftAvatar
+                      ref={imageRef}
                       src={contentUrl}
                       alt={alt}
-                      className="h-full w-auto rounded-2xl"
+                      setLoadingStatus={setLoadingImageState}
+                      className="!bg-[#141528] h-full w-auto rounded-2xl"
+                      style={{
+                        width:
+                          loadingImageState !== "loaded"
+                            ? `${squareWidth}px`
+                            : "auto",
+                      }}
                     />
                     <span
                       className={classNames(
@@ -392,6 +429,17 @@ const MediaPlayer: FC<{
   onClose?: () => void;
 }> = ({ contentUrl, onClose }) => (
   <Media className="h-full w-auto rounded-2xl overflow-hidden">
+    <Gesture
+      type="click"
+      action="toggle:paused"
+      className={classNames(
+        "absolute top-0 left-0",
+        "w-full h-full",
+        "block",
+        "z-0",
+        "opacity-0 invisible pointer-events-none"
+      )}
+    />
     <Video className="h-full w-auto" autoplay loop>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
@@ -409,7 +457,7 @@ const MediaPlayer: FC<{
       <ShrinkIcon className="w-6 h-auto" />
     </button>
     <div className="absolute left-0 right-0 bottom-0 p-3 flex flex-col">
-      <TimeSlider className="h-4">
+      <TimeSlider className="h-4 group">
         <div
           className={classNames(
             "w-full h-1",
@@ -417,7 +465,7 @@ const MediaPlayer: FC<{
             !IS_FIREFOX && "backdrop-blur-[10px]",
             "absolute top-1/2 left-0 -translate-y-1/2",
             "rounded-[.625rem]",
-            "z-[0]",
+            "z-0",
             "cursor-pointer"
           )}
         />
@@ -450,7 +498,10 @@ const MediaPlayer: FC<{
               "border border-brand-darkblue/[.4]",
               "rounded-full",
               "bg-brand-light",
-              "cursor-pointer"
+              "cursor-pointer",
+              "scale-0",
+              "transition-transform",
+              "group-hover:scale-100 dragging:scale-100"
             )}
           />
         </div>
