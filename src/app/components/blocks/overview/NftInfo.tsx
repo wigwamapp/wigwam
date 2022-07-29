@@ -294,33 +294,34 @@ const NftPreview: FC<NftPreviewProps> = ({
             {rawBalance}
           </span>
         )}
-        {contentType !== "image_url" && (
-          <span
-            className={classNames(
-              // !rounded-md
-              controlClassName,
-              "!p-2.5",
-              "!bg-brand-darkblue/[.6]",
-              "group-hover:!bg-brand-darkblue/[.8]",
-              "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            )}
-          >
-            <PlayIcon className="w-6 h-auto" />
-          </span>
-        )}
         {contentUrl && (
-          <span
-            className={classNames(
-              "w-[1.625rem] h-[1.625rem] !rounded-md",
-              controlClassName,
-              "!bg-brand-darkblue/[.8]",
-              "opacity-0",
-              "group-hover:opacity-100",
-              "absolute top-2 right-2"
+          <>
+            {contentType !== "image_url" && (
+              <span
+                className={classNames(
+                  controlClassName,
+                  "!p-2.5",
+                  "!bg-brand-darkblue/[.6]",
+                  "group-hover:!bg-brand-darkblue/[.8]",
+                  "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                )}
+              >
+                <PlayIcon className="w-6 h-auto" />
+              </span>
             )}
-          >
-            <ExpandIcon className="w-4 min-w-[1rem] h-auto" />
-          </span>
+            <span
+              className={classNames(
+                "w-[1.625rem] h-[1.625rem] !rounded-md",
+                controlClassName,
+                "!bg-brand-darkblue/[.8]",
+                "opacity-0",
+                "group-hover:opacity-100",
+                "absolute top-2 right-2"
+              )}
+            >
+              <ExpandIcon className="w-4 min-w-[1rem] h-auto" />
+            </span>
+          </>
         )}
       </button>
       {contentUrl && (
@@ -348,7 +349,7 @@ const NftPreview: FC<NftPreviewProps> = ({
                   contentType === "image_url"
                     ? "cursor-zoom-out"
                     : "cursor-default",
-                  contentType === "image_url" ? "w-auto" : "w-full"
+                  "w-auto"
                 )}
                 onClick={() =>
                   contentType === "image_url" ? handleModalClose() : null
@@ -373,7 +374,6 @@ const NftPreview: FC<NftPreviewProps> = ({
                 )}
                 {contentType === "video_url" && (
                   <MediaPlayer
-                    thumbnailUrl={thumbnailUrl}
                     contentUrl={contentUrl}
                     onClose={handleModalClose}
                   />
@@ -388,18 +388,17 @@ const NftPreview: FC<NftPreviewProps> = ({
 };
 
 const MediaPlayer: FC<{
-  thumbnailUrl?: string;
   contentUrl: string;
   onClose?: () => void;
-}> = ({ thumbnailUrl, contentUrl, onClose }) => (
+}> = ({ contentUrl, onClose }) => (
   <Media className="h-full w-auto rounded-2xl overflow-hidden">
-    <Video poster={thumbnailUrl}>
+    <Video className="h-full w-auto" autoplay loop>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
-        poster={thumbnailUrl}
         src={contentUrl}
         preload="none"
         data-video="0"
+        className="h-full w-auto"
       />
     </Video>
     <button
@@ -429,6 +428,7 @@ const MediaPlayer: FC<{
             "absolute top-1/2 left-0",
             "origin-left -translate-y-1/2",
             "w-[var(--vds-fill-percent)] will-change-[width]",
+            "dragging:w-[var(--vds-pointer-percent)]",
             "rounded-[.625rem]",
             "z-[1]",
             "cursor-pointer"
@@ -439,7 +439,8 @@ const MediaPlayer: FC<{
             "absolute top-0 left-[var(--vds-fill-percent)]",
             "w-4 h-full",
             "z-[2]",
-            "will-change-[left] -translate-x-1/2 -translate-y-1/2"
+            "will-change-[left] -translate-x-1/2 -translate-y-1/2",
+            "dragging:left-[var(--vds-pointer-percent)]"
           )}
         >
           <div
