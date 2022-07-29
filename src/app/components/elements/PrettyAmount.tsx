@@ -288,10 +288,11 @@ export const getPrettyAmount = ({
       .replace("US$", "$");
   }
 
+  const isInteger = new BigNumber(value).isInteger();
   return `${getIntlNumberFormat(
     locale,
-    2,
-    20,
+    isInteger ? 0 : 2,
+    isInteger ? 0 : 20,
     "standard",
     useGrouping,
     isFiat ? "currency" : undefined,
