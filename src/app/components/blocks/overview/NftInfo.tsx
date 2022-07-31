@@ -1,19 +1,19 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { mergeRefs } from "react-merge-refs";
 import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Gesture,
-  Media,
-  MuteButton,
-  PlayButton,
-  Time,
-  TimeSlider,
-  Video,
-} from "@vidstack/player-react";
 import { useDebouncedCallback } from "use-debounce";
+import { lazyVidstack } from "lib/lazy-vidstack";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { storage } from "lib/ext/storage";
 
@@ -54,6 +54,14 @@ import { ReactComponent as ShrinkIcon } from "app/icons/media-shrink.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
+
+const Gesture = lazyVidstack((m) => m.Gesture);
+const Media = lazyVidstack((m) => m.Media);
+const MuteButton = lazyVidstack((m) => m.MuteButton);
+const PlayButton = lazyVidstack((m) => m.PlayButton);
+const Time = lazyVidstack((m) => m.Time);
+const TimeSlider = lazyVidstack((m) => m.TimeSlider);
+const Video = lazyVidstack((m) => m.Video);
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
@@ -410,10 +418,12 @@ const NftPreview: FC<NftPreviewProps> = ({
                   </>
                 )}
                 {contentType === "video_url" && (
-                  <MediaPlayer
-                    contentUrl={contentUrl}
-                    onClose={handleModalClose}
-                  />
+                  <Suspense fallback={null}>
+                    <MediaPlayer
+                      contentUrl={contentUrl}
+                      onClose={handleModalClose}
+                    />
+                  </Suspense>
                 )}
               </Dialog.Content>
             </Dialog.Overlay>
