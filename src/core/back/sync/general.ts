@@ -23,7 +23,7 @@ export async function addSyncRequest(
   try {
     await syncConversionRates();
 
-    await enqueueTokensSync(async () => {
+    await enqueueTokensSync(chainId, async () => {
       await syncAccountTokens(chainId, accountAddress, tokenType);
 
       const allAccounts = $accounts.getState();
