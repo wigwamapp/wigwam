@@ -55,7 +55,7 @@ export const $vault = createStore<Vault | null>(null)
     return null;
   });
 
-export const $syncPool = createStore<number[]>([])
+export const $syncPool = createStore<(number | string)[]>([])
   .on(syncStarted, (pool, chainId) => [...pool, chainId])
   .on(synced, (pool, chainId) => {
     const i = pool.indexOf(chainId);

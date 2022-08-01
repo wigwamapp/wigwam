@@ -26,6 +26,6 @@ export const approvalResolved = createEvent<string>();
 
 export const approvalsRejected = createEvent<string[] | null>();
 
-export const syncStarted = createEvent<number>();
+export const syncStarted = createEvent<number | string>();
 
-export const synced = createEvent<number>();
+export const synced = createEvent<number | string>();

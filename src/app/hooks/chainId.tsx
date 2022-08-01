@@ -1,12 +1,13 @@
-import { FC, createContext, useContext, useEffect } from "react";
+import { FC, createContext, useContext, useEffect, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
 
+import { TokenType } from "core/types";
 import { sync, syncTokenActivities } from "core/client";
+import { createAccountTokenKey } from "core/common/tokens";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
-import { TokenType } from "core/types";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -28,9 +29,25 @@ export const ChainIdProvider: FC<{ chainId: number }> = ({
 
 export function useIsSyncing() {
   const chainId = useChainId();
-  const status = useLazyAtomValue(syncStatusAtom) ?? [];
+  const status = useSyncStatus();
 
   return status.includes(chainId);
+}
+
+export function useIsTokenActivitySyncing(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug?: string
+) {
+  const status = useSyncStatus();
+  const syncKey = useMemo(
+    () =>
+      tokenSlug &&
+      createAccountTokenKey({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  return syncKey ? status.includes(syncKey) : false;
 }
 
 export function useSync(
@@ -79,4 +96,8 @@ export function useTokenActivitiesSync(
 
     return () => clearTimeout(t);
   }, [chainId, accountAddress, tokenSlug, isHidden]);
+}
+
+function useSyncStatus() {
+  return useLazyAtomValue(syncStatusAtom) ?? [];
 }

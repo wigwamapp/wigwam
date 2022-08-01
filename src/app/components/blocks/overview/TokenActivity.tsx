@@ -1,4 +1,4 @@
-import { FC, forwardRef, useCallback, useRef } from "react";
+import { FC, memo, forwardRef, useCallback, useRef } from "react";
 import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import classNames from "clsx";
@@ -14,9 +14,11 @@ import { LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
   useAccountToken,
+  useChainId,
   useExplorerLink,
   useLazyNetwork,
   useTokenActivity,
+  useIsTokenActivitySyncing,
 } from "app/hooks";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -31,10 +33,17 @@ import { ReactComponent as ActivityApproveIcon } from "app/icons/activity-approv
 import { ReactComponent as ActivityReceiveIcon } from "app/icons/activity-receive.svg";
 import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg";
 
-const TokenActivity: FC = () => {
+const TokenActivity = memo(() => {
+  const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const currentAccount = useAtomValue(currentAccountAtom);
   const { activity, loadMore, hasMore } = useTokenActivity(
+    currentAccount.address,
+    tokenSlug
+  );
+
+  const isSyncing = useIsTokenActivitySyncing(
+    chainId,
     currentAccount.address,
     tokenSlug
   );
@@ -60,10 +69,17 @@ const TokenActivity: FC = () => {
     [activity, hasMore, loadMore]
   );
 
-  if (activity.length === 0) return null;
+  if (activity.length === 0 && !isSyncing) return null;
 
   return (
-    <div className="flex flex-col mt-5 pt-1 border-t border-brand-main/[.07]">
+    <div
+      className={classNames(
+        "relative mt-5 pt-1",
+        "border-t border-brand-main/[.07]",
+        isSyncing && "!border-transparent",
+        "flex flex-col"
+      )}
+    >
       {activity.map((activ, i) => (
         <TokenActivityCard
           ref={
@@ -75,9 +91,19 @@ const TokenActivity: FC = () => {
           activity={activ}
         />
       ))}
+
+      {isSyncing && (
+        <div
+          className={classNames(
+            "absolute top-[-1px] left-0 right-0",
+            "h-px bg-brand-main/[.07]",
+            "animate-ping"
+          )}
+        />
+      )}
     </div>
   );
-};
+});
 
 export default TokenActivity;
 
