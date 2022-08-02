@@ -21,7 +21,7 @@ import { useSafeState } from "lib/react-hooks/useSafeState";
 import { Link, navigate } from "lib/navigation";
 
 import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
-import { AccountAsset, AccountSource } from "core/types";
+import { AccountAsset, AccountSource, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { suggestFees, TEvent, trackEvent } from "core/client";
 
@@ -57,410 +57,434 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
+const TransferAsset: FC = () => {
+  const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
+  const token = useAccountToken<AccountAsset>(tokenSlug);
+
+  const validAsset = !token || token.tokenType === TokenType.Asset;
+
+  useEffect(() => {
+    if (!validAsset) {
+      navigate(
+        ({ token }) => ({ page: Page.Transfer, transfer: "nft", token }),
+        "replace"
+      );
+    }
+  }, [validAsset]);
+
+  return validAsset ? (
+    <TransferAssetContent tokenSlug={tokenSlug} asset={token} />
+  ) : null;
+};
+
+export default TransferAsset;
+
 type FormValues = { amount: string; recipient: string };
 
-const Asset: FC = () => {
-  const currentAccount = useAtomValue(currentAccountAtom);
-  const chainId = useChainId();
-  const currentNetwork = useLazyNetwork();
-  const explorerLink = useExplorerLink(currentNetwork);
-  const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
-  const setTokenSlug = useSetAtom(tokenSlugAtom);
-  const currentToken = useAccountToken(tokenSlug);
-  const { alert, closeCurrentDialog } = useDialog();
-  const { updateToast } = useToast();
-  const isMounted = useIsMounted();
+const TransferAssetContent = memo<{ tokenSlug: string; asset?: AccountAsset }>(
+  ({ tokenSlug, asset }) => {
+    const currentAccount = useAtomValue(currentAccountAtom);
+    const chainId = useChainId();
+    const currentNetwork = useLazyNetwork();
+    const explorerLink = useExplorerLink(currentNetwork);
+    const setTokenSlug = useSetAtom(tokenSlugAtom);
+    const { alert, closeCurrentDialog } = useDialog();
+    const { updateToast } = useToast();
+    const isMounted = useIsMounted();
 
-  const provider = useProvider();
-  const signerProvider = provider.getUncheckedSigner(currentAccount.address);
+    const provider = useProvider();
+    const signerProvider = provider.getUncheckedSigner(currentAccount.address);
 
-  const handleSubmit = useCallback(
-    async ({ recipient, amount }, form) =>
-      withHumanDelay(async () => {
-        if (!currentToken) {
-          return;
-        }
-
-        if (currentAccount.source === AccountSource.Address) {
-          return alert({
-            title: "Watch-only account",
-            content: (
-              <span>
-                Cannot create transfer for watch-only wallet.
-                <br />
-                Please change wallet or{" "}
-                <Link
-                  to={{ addAccOpened: true }}
-                  merge={["tokens"]}
-                  className="underline"
-                  onClick={closeCurrentDialog}
-                >
-                  add new
-                </Link>
-                .
-              </span>
-            ),
-          });
-        }
-
-        try {
-          const { tokenSlug, decimals } = currentToken;
-
-          let txParams;
-
-          if (tokenSlug === NATIVE_TOKEN_SLUG) {
-            txParams = await provider.populateTransaction({
-              to: recipient,
-              value: ethers.utils.parseEther(amount),
-            });
-          } else {
-            const tokenContract = parseTokenSlug(tokenSlug).address;
-            const contract = ERC20__factory.connect(tokenContract, provider);
-            const convertedAmount = ethers.utils.parseUnits(amount, decimals);
-
-            txParams = await contract.populateTransaction.transfer(
-              recipient,
-              convertedAmount
-            );
+    const handleSubmit = useCallback(
+      async ({ recipient, amount }, form) =>
+        withHumanDelay(async () => {
+          if (!asset) {
+            return;
           }
 
-          const gasLimit = await signerProvider.estimateGas(txParams);
-
-          const txResPromise = signerProvider.sendUncheckedTransaction({
-            ...txParams,
-            gasLimit,
-          });
-
-          const isDefault =
-            currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
-          trackEvent(TEvent.Transfer, {
-            networkName: isDefault ? currentNetwork.name : "unknown",
-            networkChainId: isDefault ? currentNetwork.chainId : "unknown",
-          });
-          updateToast(
-            <>
-              Request for transfer{" "}
-              <strong>
-                <PrettyAmount amount={amount} currency={currentToken.symbol} />
-              </strong>{" "}
-              successfully created! Please approve it in the opened window.
-            </>
-          );
-          form.restart();
-
-          txResPromise
-            .then((txHash) => {
-              if (isMounted()) {
-                setTimeout(
-                  () => navigate((s) => ({ ...s, page: Page.Default })),
-                  50
-                );
-
-                setTimeout(() => {
-                  updateToast(
-                    <div className="flex flex-col">
-                      <p>
-                        <strong>
-                          <PrettyAmount
-                            amount={amount}
-                            currency={currentToken.symbol}
-                          />
-                        </strong>{" "}
-                        successfully transferred! Confirming...
-                      </p>
-
-                      {explorerLink && (
-                        <div className="mt-1 flex items-center">
-                          <a
-                            href={explorerLink.tx(txHash)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline"
-                          >
-                            View the transaction in explorer
-                          </a>
-
-                          <ExternalLinkIcon className="h-5 w-auto ml-1" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                }, 100);
-              }
-            })
-            .catch((err) => {
-              console.warn(err);
-
-              if (isMounted()) updateToast(null);
+          if (currentAccount.source === AccountSource.Address) {
+            return alert({
+              title: "Watch-only account",
+              content: (
+                <span>
+                  Cannot create transfer for watch-only wallet.
+                  <br />
+                  Please change wallet or{" "}
+                  <Link
+                    to={{ addAccOpened: true }}
+                    merge={["tokens"]}
+                    className="underline"
+                    onClick={closeCurrentDialog}
+                  >
+                    add new
+                  </Link>
+                  .
+                </span>
+              ),
             });
-        } catch (err: any) {
-          alert({
-            title: "Error",
-            content: err?.reason || err?.message || "Unknown error.",
-          });
-        }
-      }),
-    [
-      currentToken,
-      currentAccount.source,
-      alert,
-      closeCurrentDialog,
-      signerProvider,
-      currentNetwork,
-      updateToast,
-      provider,
-      isMounted,
-      explorerLink,
-    ]
-  );
+          }
 
-  const [recipientAddr, setRecipientAddr] = useSafeState<string>();
-
-  const [estimating, setEstimating] = useSafeState(false);
-  const [gas, setGas] = useSafeState<{
-    max: ethers.BigNumber;
-    average: ethers.BigNumber;
-  }>();
-  const [estimationError, setEstimationError] = useSafeState<string | null>(
-    null
-  );
-
-  const maxAmount = useMemo(() => {
-    if (currentToken?.rawBalance) {
-      let finalValue = new BigNumber(currentToken.rawBalance);
-      if (tokenSlug === NATIVE_TOKEN_SLUG) {
-        finalValue = finalValue.minus(
-          new BigNumber(gas ? gas.max.toString() : 0)
-        );
-      }
-      const convertedValue = finalValue
-        .div(new BigNumber(10).pow(currentToken.decimals))
-        .decimalPlaces(currentToken.decimals, BigNumber.ROUND_DOWN);
-      if (convertedValue.lt(0)) {
-        return "0";
-      }
-      return convertedValue.toString();
-    }
-    return "0";
-  }, [currentToken, gas, tokenSlug]);
-
-  const withThrottle = useMemo(createOrganicThrottle, []);
-
-  const currentTokenExist = Boolean(currentToken);
-  const estimateGas = useCallback(
-    () =>
-      withThrottle(async () => {
-        if (recipientAddr && tokenSlug && currentTokenExist) {
           try {
-            setEstimating(true);
+            const { tokenSlug, decimals } = asset;
 
-            const value = 1;
-            let gasLimit = ethers.BigNumber.from(0);
+            let txParams;
 
             if (tokenSlug === NATIVE_TOKEN_SLUG) {
-              gasLimit = await provider.estimateGas({
-                to: recipientAddr,
-                value,
+              txParams = await provider.populateTransaction({
+                to: recipient,
+                value: ethers.utils.parseEther(amount),
               });
             } else {
               const tokenContract = parseTokenSlug(tokenSlug).address;
+              const contract = ERC20__factory.connect(tokenContract, provider);
+              const convertedAmount = ethers.utils.parseUnits(amount, decimals);
 
-              const signer = provider.getUncheckedSigner(
-                currentAccount.address
-              );
-              const contract = ERC20__factory.connect(tokenContract, signer);
-
-              gasLimit = await contract.estimateGas.transfer(
-                recipientAddr,
-                value
+              txParams = await contract.populateTransaction.transfer(
+                recipient,
+                convertedAmount
               );
             }
 
-            const fees = await suggestFees(provider);
-            if (fees) {
-              const gasPrice = fees.modes.high.max;
-              const maxGasLimit = gasLimit.mul(3).div(2);
+            const gasLimit = await signerProvider.estimateGas(txParams);
 
-              setGas({
-                average: gasLimit.mul(gasPrice),
-                max: maxGasLimit.mul(gasPrice),
-              });
-            }
+            const txResPromise = signerProvider.sendUncheckedTransaction({
+              ...txParams,
+              gasLimit,
+            });
 
-            setEstimationError(null);
-          } catch (err) {
-            setEstimationError(
-              "Estimation failed. Transaction may fail or there network issues"
+            const isDefault =
+              currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
+            trackEvent(TEvent.Transfer, {
+              networkName: isDefault ? currentNetwork.name : "unknown",
+              networkChainId: isDefault ? currentNetwork.chainId : "unknown",
+            });
+            updateToast(
+              <>
+                Request for transfer{" "}
+                <strong>
+                  <PrettyAmount amount={amount} currency={asset.symbol} />
+                </strong>{" "}
+                successfully created! Please approve it in the opened window.
+              </>
             );
-          } finally {
-            setEstimating(false);
+            form.restart();
+
+            txResPromise
+              .then((txHash) => {
+                if (isMounted()) {
+                  setTimeout(
+                    () => navigate((s) => ({ ...s, page: Page.Default })),
+                    50
+                  );
+
+                  setTimeout(() => {
+                    updateToast(
+                      <div className="flex flex-col">
+                        <p>
+                          <strong>
+                            <PrettyAmount
+                              amount={amount}
+                              currency={asset.symbol}
+                            />
+                          </strong>{" "}
+                          successfully transferred! Confirming...
+                        </p>
+
+                        {explorerLink && (
+                          <div className="mt-1 flex items-center">
+                            <a
+                              href={explorerLink.tx(txHash)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline"
+                            >
+                              View the transaction in explorer
+                            </a>
+
+                            <ExternalLinkIcon className="h-5 w-auto ml-1" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }, 100);
+                }
+              })
+              .catch((err) => {
+                console.warn(err);
+
+                if (isMounted()) updateToast(null);
+              });
+          } catch (err: any) {
+            alert({
+              title: "Error",
+              content: err?.reason || err?.message || "Unknown error.",
+            });
           }
-        } else {
-          setEstimationError(null);
+        }),
+      [
+        asset,
+        currentAccount.source,
+        alert,
+        closeCurrentDialog,
+        signerProvider,
+        currentNetwork,
+        updateToast,
+        provider,
+        isMounted,
+        explorerLink,
+      ]
+    );
+
+    const [recipientAddr, setRecipientAddr] = useSafeState<string>();
+
+    const [estimating, setEstimating] = useSafeState(false);
+    const [gas, setGas] = useSafeState<{
+      max: ethers.BigNumber;
+      average: ethers.BigNumber;
+    }>();
+    const [estimationError, setEstimationError] = useSafeState<string | null>(
+      null
+    );
+
+    const maxAmount = useMemo(() => {
+      if (asset?.rawBalance) {
+        let finalValue = new BigNumber(asset.rawBalance);
+        if (tokenSlug === NATIVE_TOKEN_SLUG) {
+          finalValue = finalValue.minus(
+            new BigNumber(gas ? gas.max.toString() : 0)
+          );
         }
-      }),
-    [
-      withThrottle,
-      setEstimating,
-      setEstimationError,
-      setGas,
-      currentAccount.address,
-      currentTokenExist,
-      provider,
-      recipientAddr,
-      tokenSlug,
-    ]
-  );
+        const convertedValue = finalValue
+          .div(new BigNumber(10).pow(asset.decimals))
+          .decimalPlaces(asset.decimals, BigNumber.ROUND_DOWN);
+        if (convertedValue.lt(0)) {
+          return "0";
+        }
+        return convertedValue.toString();
+      }
+      return "0";
+    }, [asset, gas, tokenSlug]);
 
-  const handleRecipientChange = useDebouncedCallback((recipient: string) => {
-    if (recipient && ethers.utils.isAddress(recipient)) {
-      setRecipientAddr(recipient);
+    const withThrottle = useMemo(createOrganicThrottle, []);
+
+    const assetExist = Boolean(asset);
+    const estimateGas = useCallback(
+      () =>
+        withThrottle(async () => {
+          if (recipientAddr && tokenSlug && assetExist) {
+            try {
+              setEstimating(true);
+
+              const value = 1;
+              let gasLimit = ethers.BigNumber.from(0);
+
+              if (tokenSlug === NATIVE_TOKEN_SLUG) {
+                gasLimit = await provider.estimateGas({
+                  to: recipientAddr,
+                  value,
+                });
+              } else {
+                const tokenContract = parseTokenSlug(tokenSlug).address;
+
+                const signer = provider.getUncheckedSigner(
+                  currentAccount.address
+                );
+                const contract = ERC20__factory.connect(tokenContract, signer);
+
+                gasLimit = await contract.estimateGas.transfer(
+                  recipientAddr,
+                  value
+                );
+              }
+
+              const fees = await suggestFees(provider);
+              if (fees) {
+                const gasPrice = fees.modes.high.max;
+                const maxGasLimit = gasLimit.mul(3).div(2);
+
+                setGas({
+                  average: gasLimit.mul(gasPrice),
+                  max: maxGasLimit.mul(gasPrice),
+                });
+              }
+
+              setEstimationError(null);
+            } catch (err) {
+              setEstimationError(
+                "Estimation failed. Transaction may fail or there network issues"
+              );
+            } finally {
+              setEstimating(false);
+            }
+          } else {
+            setEstimationError(null);
+          }
+        }),
+      [
+        withThrottle,
+        setEstimating,
+        setEstimationError,
+        setGas,
+        currentAccount.address,
+        assetExist,
+        provider,
+        recipientAddr,
+        tokenSlug,
+      ]
+    );
+
+    const handleRecipientChange = useDebouncedCallback((recipient: string) => {
+      if (recipient && ethers.utils.isAddress(recipient)) {
+        setRecipientAddr(recipient);
+      }
+    }, 150);
+
+    useEffect(() => {
+      let t: any;
+
+      const performAndDefer = () => {
+        estimateGas();
+        t = setTimeout(performAndDefer, 10_000);
+      };
+
+      performAndDefer();
+
+      return () => clearTimeout(t);
+    }, [estimateGas]);
+
+    const formKey = useMemo(
+      () => `${currentAccount.address}-${chainId}`,
+      [currentAccount.address, chainId]
+    );
+
+    const amountFieldKey = useMemo(
+      () => `amount-${asset?.tokenSlug}-${maxAmount}`,
+      [asset, maxAmount]
+    );
+
+    const initialRenderRef = useRef(true);
+
+    useEffect(() => {
+      if (initialRenderRef.current) {
+        initialRenderRef.current = false;
+        return;
+      }
+
+      setTokenSlug([RESET, "replace"]);
+    }, [setTokenSlug, formKey]);
+
+    if (asset && asset.tokenType !== TokenType.Asset) {
+      return null;
     }
-  }, 150);
 
-  useEffect(() => {
-    let t: any;
-
-    const performAndDefer = () => {
-      estimateGas();
-      t = setTimeout(performAndDefer, 10_000);
-    };
-
-    performAndDefer();
-
-    return () => clearTimeout(t);
-  }, [estimateGas]);
-
-  const formKey = useMemo(
-    () => `${currentAccount.address}-${chainId}`,
-    [currentAccount.address, chainId]
-  );
-
-  const amountFieldKey = useMemo(
-    () => `amount-${currentToken?.tokenSlug}-${maxAmount}`,
-    [currentToken, maxAmount]
-  );
-
-  const initialRenderRef = useRef(true);
-
-  useEffect(() => {
-    if (initialRenderRef.current) {
-      initialRenderRef.current = false;
-      return;
-    }
-
-    setTokenSlug([RESET, "replace"]);
-  }, [setTokenSlug, formKey]);
-
-  return (
-    <Form<FormValues>
-      key={formKey}
-      onSubmit={handleSubmit}
-      render={({ form, handleSubmit, values, submitting }) => (
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col max-w-[23.25rem]"
-        >
-          <OnChange name="recipient" callback={handleRecipientChange} />
-          <TokenSelect
-            handleTokenChanged={() => {
-              form.change("amount", "");
-              setTimeout(() => form.blur("amount"));
-            }}
-          />
-          <Field
-            name="recipient"
-            validate={composeValidators(required, validateAddress)}
+    return (
+      <Form<FormValues>
+        key={formKey}
+        onSubmit={handleSubmit}
+        render={({ form, handleSubmit, values, submitting }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col max-w-[23.25rem]"
           >
-            {({ input, focus, meta }) => (
-              <ContactAutocomplete
-                setValue={(value) => {
-                  form.change("recipient", value);
-                  focus?.();
-                }}
-                error={meta.error && meta.touched && meta.submitFailed}
-                errorMessage={meta.error}
-                meta={meta}
-                className="mt-5"
-                {...input}
-              />
-            )}
-          </Field>
-          <div className="relative mt-5">
+            <OnChange name="recipient" callback={handleRecipientChange} />
+            <TokenSelect
+              handleTokenChanged={() => {
+                form.change("amount", "");
+                setTimeout(() => form.blur("amount"));
+              }}
+            />
             <Field
-              key={amountFieldKey}
-              name="amount"
-              validate={composeValidators(
-                required,
-                maxValue(maxAmount, currentToken?.symbol)
-              )}
+              name="recipient"
+              validate={composeValidators(required, validateAddress)}
             >
-              {({ input, meta }) => (
-                <AssetInput
-                  label="Amount"
-                  placeholder="0.00"
-                  thousandSeparator={true}
-                  assetDecimals={currentToken?.decimals}
-                  labelActions={
-                    estimating ? (
-                      <span className="text-xs text-brand-inactivedark2 self-end">
-                        Estimating...
-                      </span>
-                    ) : (
-                      <InputLabelAction
-                        onClick={() => form.change("amount", maxAmount)}
-                      >
-                        MAX
-                      </InputLabelAction>
-                    )
-                  }
-                  currency={currentToken ? currentToken.symbol : undefined}
-                  error={(meta.modified || meta.submitFailed) && meta.error}
+              {({ input, focus, meta }) => (
+                <ContactAutocomplete
+                  setValue={(value) => {
+                    form.change("recipient", value);
+                    focus?.();
+                  }}
+                  error={meta.error && meta.touched && meta.submitFailed}
                   errorMessage={meta.error}
-                  readOnly={estimating}
+                  meta={meta}
+                  className="mt-5"
                   {...input}
                 />
               )}
             </Field>
-          </div>
-          <div className="mt-6 flex items-start">
-            <TxCheck
-              currentToken={currentToken}
-              values={{ gas: gas?.average, ...values }}
-              error={estimationError}
-            />
-          </div>
-          <Button
-            type="submit"
-            className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
-            loading={submitting}
-          >
-            <SendIcon className="mr-2" />
-            Transfer
-          </Button>
-        </form>
-      )}
-    />
-  );
-};
-
-export default Asset;
+            <div className="relative mt-5">
+              <Field
+                key={amountFieldKey}
+                name="amount"
+                validate={composeValidators(
+                  required,
+                  maxValue(maxAmount, asset?.symbol)
+                )}
+              >
+                {({ input, meta }) => (
+                  <AssetInput
+                    label="Amount"
+                    placeholder="0.00"
+                    thousandSeparator={true}
+                    assetDecimals={asset?.decimals}
+                    labelActions={
+                      estimating ? (
+                        <span className="text-xs text-brand-inactivedark2 self-end">
+                          Estimating...
+                        </span>
+                      ) : (
+                        <InputLabelAction
+                          onClick={() => form.change("amount", maxAmount)}
+                        >
+                          MAX
+                        </InputLabelAction>
+                      )
+                    }
+                    currency={asset ? asset.symbol : undefined}
+                    error={(meta.modified || meta.submitFailed) && meta.error}
+                    errorMessage={meta.error}
+                    readOnly={estimating}
+                    {...input}
+                  />
+                )}
+              </Field>
+            </div>
+            <div className="mt-6 flex items-start">
+              <TxCheck
+                asset={asset}
+                values={{ gas: gas?.average, ...values }}
+                error={estimationError}
+              />
+            </div>
+            <Button
+              type="submit"
+              className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
+              loading={submitting}
+            >
+              <SendIcon className="mr-2" />
+              Transfer
+            </Button>
+          </form>
+        )}
+      />
+    );
+  }
+);
 
 type TxCheckProps = {
-  currentToken?: AccountAsset;
+  asset?: AccountAsset;
   values: FormValues & { gas?: ethers.BigNumber };
   error: string | null;
 };
 
-const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
-  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
+const TxCheck = memo<TxCheckProps>(({ asset, values, error }) => {
+  const nativeToken = useAccountToken<AccountAsset>(NATIVE_TOKEN_SLUG);
 
   const tokenUsdAmount = useMemo(
     () =>
-      values.amount && currentToken
-        ? new BigNumber(values.amount).multipliedBy(currentToken.priceUSD ?? 0)
+      values.amount && asset
+        ? new BigNumber(values.amount).multipliedBy(asset.priceUSD ?? 0)
         : new BigNumber(0),
-    [currentToken, values.amount]
+    [asset, values.amount]
   );
 
   const gas = useMemo(() => {
@@ -523,7 +547,7 @@ const TxCheck = memo<TxCheckProps>(({ currentToken, values, error }) => {
           value={
             <PrettyAmount
               amount={values.amount || 0}
-              currency={currentToken?.symbol}
+              currency={asset?.symbol}
               className="font-semibold"
               copiable
             />

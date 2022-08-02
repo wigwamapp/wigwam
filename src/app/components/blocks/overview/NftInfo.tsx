@@ -219,7 +219,7 @@ const NftInfo: FC = () => {
                   </h2>
                 )}
                 <Button
-                  to={{ page: Page.Transfer }}
+                  to={{ page: Page.Transfer, transfer: "nft" }}
                   merge={["token"]}
                   theme="secondary"
                   className="!py-2 mt-auto mr-auto"
@@ -229,7 +229,7 @@ const NftInfo: FC = () => {
                 </Button>
               </div>
             </div>
-            <TokenActivity />
+            <TokenActivity token={tokenInfo!} />
           </div>
         </ScrollAreaContainer>
       )}

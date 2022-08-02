@@ -5,15 +5,16 @@ import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import {
+  AccountToken,
   TokenActivity as TokenActivityPrimitive,
   TokenActivityProject,
+  TokenType,
 } from "core/types";
 import { createTokenActivityKey } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { currentAccountAtom } from "app/atoms";
 import {
-  useAccountToken,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -33,19 +34,18 @@ import { ReactComponent as ActivityApproveIcon } from "app/icons/activity-approv
 import { ReactComponent as ActivityReceiveIcon } from "app/icons/activity-receive.svg";
 import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg";
 
-const TokenActivity = memo(() => {
+const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
   const chainId = useChainId();
-  const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const currentAccount = useAtomValue(currentAccountAtom);
   const { activity, loadMore, hasMore } = useTokenActivity(
     currentAccount.address,
-    tokenSlug
+    token.tokenSlug
   );
 
   const isSyncing = useIsTokenActivitySyncing(
     chainId,
     currentAccount.address,
-    tokenSlug
+    token.tokenSlug
   );
 
   const observer = useRef<IntersectionObserver>();
@@ -88,6 +88,7 @@ const TokenActivity = memo(() => {
               : null
           }
           key={createTokenActivityKey(activ)}
+          token={token}
           activity={activ}
         />
       ))}
@@ -108,13 +109,13 @@ const TokenActivity = memo(() => {
 export default TokenActivity;
 
 type TokenActivityCardProps = {
+  token: AccountToken;
   activity: TokenActivityPrimitive;
   className?: string;
 };
 
 const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
-  ({ activity, className }, ref) => {
-    const tokenInfo = useAccountToken(activity.tokenSlug)!;
+  ({ token, activity, className }, ref) => {
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);
     const { copy, copied } = useCopyToClipboard(activity.txHash);
@@ -122,6 +123,11 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
     const amoutnBN = new BigNumber(activity.amount ?? 0);
     const { Icon, prefix, amountClassName, label, anotherAddressLabel } =
       getActivityInfo(activity);
+
+    const tokenSymbol =
+      token.tokenType === TokenType.Asset ? token.symbol : undefined;
+    const tokenDecimals =
+      token.tokenType === TokenType.Asset ? token.decimals : undefined;
 
     return (
       <div
@@ -151,17 +157,18 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               <span
                 className={classNames("text-base font-bold", amountClassName)}
               >
-                ∞ {tokenInfo?.symbol}
+                ∞ {tokenSymbol}
               </span>
             ) : (
               <PrettyAmount
                 amount={amoutnBN.abs()}
-                decimals={tokenInfo?.decimals}
-                currency={tokenInfo?.symbol}
+                decimals={tokenDecimals}
+                currency={tokenSymbol}
                 prefix={prefix}
-                isMinified={new BigNumber(10)
-                  .pow(tokenInfo?.decimals ?? 18)
-                  .lte(amoutnBN.abs())}
+                isMinified={
+                  token.tokenType === TokenType.Asset &&
+                  new BigNumber(10).pow(tokenDecimals ?? 18).lte(amoutnBN.abs())
+                }
                 isThousandsMinified={false}
                 copiable={true}
                 className={classNames("text-base font-bold", amountClassName)}

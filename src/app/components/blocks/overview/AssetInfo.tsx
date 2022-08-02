@@ -241,7 +241,7 @@ const AssetInfo: FC = () => {
               )}
             </div>
 
-            <TokenActivity />
+            <TokenActivity token={tokenInfo} />
 
             {/*{status !== TokenStatus.Native && (*/}
             {/*  <div className="mt-6 max-w-[23.25rem]">*/}

@@ -5,7 +5,7 @@ import useForceUpdate from "use-force-update";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
-import { AccountAsset, TokenType } from "core/types";
+import { AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
@@ -116,13 +116,13 @@ export function useAllAccountTokens(
   };
 }
 
-export function useAccountToken(tokenSlug: string) {
+export function useAccountToken<T extends AccountToken>(tokenSlug: string) {
   const acc = useAtomValue(currentAccountAtom);
 
-  return useToken(acc.address, tokenSlug);
+  return useToken<T>(acc.address, tokenSlug);
 }
 
-export function useToken(
+export function useToken<T extends AccountToken>(
   accountAddress: string,
   tokenSlug: string = NATIVE_TOKEN_SLUG
 ) {
@@ -139,9 +139,7 @@ export function useToken(
   const data = value.state === "hasData" ? value.data : undefined;
   const prevData = usePrevious(data, "when-not-undefined");
 
-  const token = (value.state === "loading" ? prevData : data) as
-    | AccountAsset
-    | undefined;
+  const token = (value.state === "loading" ? prevData : data) as T | undefined;
 
   return token?.portfolioUSD !== "-1" ? token : undefined;
 }

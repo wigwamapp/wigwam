@@ -17,6 +17,7 @@ import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
@@ -63,11 +64,12 @@ import WalletName from "../elements/WalletName";
 import HashPreview from "../elements/HashPreview";
 import PrettyDate from "../elements/PrettyDate";
 import IconedButton from "../elements/IconedButton";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-import ApprovalStatus from "./ApprovalStatus";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
-import { Dot, Token } from "./approvals/DetailsTab";
+import Dot from "../elements/Dot";
+import TokenAmount from "../blocks/TokenAmount";
+
+import ApprovalStatus from "./ApprovalStatus";
 
 const ActivityModal = memo(() => {
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
@@ -762,7 +764,7 @@ const ActivityTokens: FC<ActivityTokensProps> = ({
   return (
     <div className={classNames("flex flex-col", className)}>
       {action.tokens.map((token, i) => (
-        <Token
+        <TokenAmount
           key={token.slug}
           accountAddress={accountAddress}
           token={token}
