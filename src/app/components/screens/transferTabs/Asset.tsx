@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useLayoutEffect,
 } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
@@ -63,7 +64,7 @@ const TransferAsset: FC = () => {
 
   const validAsset = !token || token.tokenType === TokenType.Asset;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!validAsset) {
       navigate(
         ({ token }) => ({ page: Page.Transfer, transfer: "nft", token }),
