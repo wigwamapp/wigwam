@@ -254,7 +254,55 @@ export function matchTokenTransferEvents(
             });
           }
         )
-        // TODO: Implement for all token standards;
+        .with(
+          [TokenStandard.ERC721, { name: "Transfer" }],
+          ([standard, { args }]) => {
+            results.push({
+              tokenSlug: createTokenSlug({
+                standard,
+                address,
+                id: ethStringify(args[2]),
+              }),
+              from: ethStringify(args[0]),
+              to: ethStringify(args[1]),
+              amount: "1",
+            });
+          }
+        )
+        .with(
+          [TokenStandard.ERC1155, { name: "TransferSingle" }],
+          ([standard, { args }]) => {
+            results.push({
+              tokenSlug: createTokenSlug({
+                standard,
+                address,
+                id: ethStringify(args[3]),
+              }),
+              from: ethStringify(args[1]),
+              to: ethStringify(args[2]),
+              amount: ethStringify(args[4]),
+            });
+          }
+        )
+        .with(
+          [TokenStandard.ERC1155, { name: "TransferBatch" }],
+          ([standard, { args }]) => {
+            const length = args[3].length;
+
+            for (let i = 0; i < length; i++) {
+              results.push({
+                tokenSlug: createTokenSlug({
+                  standard,
+                  address,
+                  id: ethStringify(args[3][i]),
+                }),
+                from: ethStringify(args[1]),
+                to: ethStringify(args[2]),
+                amount: ethStringify(args[4][i]),
+              });
+            }
+          }
+        )
         .otherwise(() => null);
     }
   }
@@ -305,19 +353,17 @@ export function parseStandardTokenEvent(log: {
     // ignore and next try to parse with erc721 ABI
   }
 
-  // TODO: After NFT added
+  try {
+    return [TokenStandard.ERC721, erc721Interface.parseLog(log)] as const;
+  } catch {
+    // ignore and next try to parse with erc1155 ABI
+  }
 
-  // try {
-  //   return [TokenStandard.ERC721, erc721Interface.parseLog(log)] as const;
-  // } catch {
-  //   // ignore and next try to parse with erc1155 ABI
-  // }
-
-  // try {
-  //   return [TokenStandard.ERC1155, erc1155Interface.parseLog(log)] as const;
-  // } catch {
-  //   // ignore and return null
-  // }
+  try {
+    return [TokenStandard.ERC1155, erc1155Interface.parseLog(log)] as const;
+  } catch {
+    // ignore and return null
+  }
 
   return null;
 }
