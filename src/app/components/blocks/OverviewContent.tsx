@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import classNames from "clsx";
-import useForceUpdate from "use-force-update";
 import { useAtom, useAtomValue } from "jotai";
 import { RESET } from "jotai/utils";
 import { ethers } from "ethers";
@@ -22,7 +21,7 @@ import {
   AccountToken,
   AccountNFT,
 } from "core/types";
-import { createTokenSlug } from "core/common/tokens";
+import { createTokenSlug, detectNFTStandard } from "core/common/tokens";
 import { findToken } from "core/client";
 import * as repo from "core/repo";
 
@@ -36,11 +35,13 @@ import {
   useChainId,
   useIsSyncing,
   useAllAccountTokens,
+  useProvider,
 } from "app/hooks";
 import { ToastOverflowProvider } from "app/hooks/toast";
 
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
+import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
@@ -100,6 +101,7 @@ const TokenExplorer: FC = () => {
 
 const TokenList: FC = () => {
   const chainId = useChainId();
+  const provider = useProvider();
   const currentAccount = useAtomValue(currentAccountAtom);
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
   const tokenType = useAtomValue(tokenTypeAtom);
@@ -107,7 +109,17 @@ const TokenList: FC = () => {
   const isNftsSelected = tokenType === TokenType.NFT;
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [tokenIdSearchValue, setTokenIdSearchValue] = useState<string | null>(
+    null
+  );
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
+
+  const combinedSearchValue = useMemo(() => {
+    if (!searchValue) return undefined;
+    if (!tokenIdSearchValue) return searchValue;
+
+    return `${searchValue}:${tokenIdSearchValue}`;
+  }, [searchValue, tokenIdSearchValue]);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -123,8 +135,9 @@ const TokenList: FC = () => {
     tokenType,
     currentAccount.address,
     {
-      withDisabled: manageModeEnabled,
-      search: searchValue ?? undefined,
+      withDisabled:
+        manageModeEnabled || Boolean(isNftsSelected && combinedSearchValue),
+      search: combinedSearchValue,
       onReset: handleAccountTokensReset,
     }
   );
@@ -202,6 +215,7 @@ const TokenList: FC = () => {
   }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const tokenIdSearchInputRef = useRef<HTMLInputElement>(null);
 
   const focusSearchInput = useCallback(() => {
     if (searchInputRef.current) {
@@ -210,48 +224,81 @@ const TokenList: FC = () => {
   }, []);
 
   const syncing = useIsSyncing();
-  const forceUpdate = useForceUpdate();
 
   const searchValueIsAddress = useMemo(
     () => searchValue && ethers.utils.isAddress(searchValue),
     [searchValue]
   );
 
-  const willSearch = Boolean(searchValueIsAddress && tokens.length === 0);
-  const alreadySearchedRef = useRef(false);
+  const tokenIdSearchDisplayed = Boolean(
+    isNftsSelected && searchValueIsAddress
+  );
+  const willSearch = Boolean(
+    searchValueIsAddress &&
+      tokens.length === 0 &&
+      (tokenIdSearchDisplayed ? tokenIdSearchValue : true)
+  );
+
+  useEffect(() => {
+    if (!tokenIdSearchDisplayed) {
+      setTokenIdSearchValue(null);
+    }
+  }, [tokenIdSearchDisplayed, setTokenIdSearchValue]);
 
   useEffect(() => {
     if (willSearch) {
-      let mounted = true;
+      const t = setTimeout(async () => {
+        const tokenAddress = ethers.utils.getAddress(searchValue!);
 
-      let t = setTimeout(() => {
-        const tokenSlug = createTokenSlug({
-          standard: TokenStandard.ERC20,
-          address: ethers.utils.getAddress(searchValue!),
-          id: "0",
-        });
+        let tokenSlug: string;
+
+        if (isNftsSelected) {
+          if (!tokenIdSearchValue) return;
+
+          try {
+            const tokenId =
+              ethers.BigNumber.from(tokenIdSearchValue).toString();
+            const tokenStandard = await detectNFTStandard(
+              provider,
+              tokenAddress,
+              tokenId
+            );
+
+            tokenSlug = createTokenSlug({
+              standard: tokenStandard,
+              address: tokenAddress,
+              id: tokenId,
+            });
+          } catch (err) {
+            console.warn(err);
+            return;
+          }
+        } else {
+          tokenSlug = createTokenSlug({
+            standard: TokenStandard.ERC20,
+            address: ethers.utils.getAddress(searchValue!),
+            id: "0",
+          });
+        }
 
         findToken(chainId, currentAccount.address, tokenSlug);
+      }, 300);
 
-        t = setTimeout(() => {
-          if (mounted) {
-            alreadySearchedRef.current = true;
-            forceUpdate();
-          }
-        }, 500);
-      }, 500);
-
-      return () => {
-        mounted = false;
-        clearTimeout(t);
-        alreadySearchedRef.current = false;
-      };
+      return () => clearTimeout(t);
     }
 
     return;
-  }, [forceUpdate, willSearch, searchValue, chainId, currentAccount.address]);
+  }, [
+    chainId,
+    provider,
+    currentAccount.address,
+    willSearch,
+    isNftsSelected,
+    searchValue,
+    tokenIdSearchValue,
+  ]);
 
-  const searching = (willSearch || syncing) && !alreadySearchedRef.current;
+  const searching = willSearch && syncing;
 
   const renderNFTCard = useCallback(
     (nft: AccountNFT, i: number) => (
@@ -289,6 +336,18 @@ const TokenList: FC = () => {
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
           />
+
+          {tokenIdSearchDisplayed && (
+            <SearchInput
+              ref={tokenIdSearchInputRef}
+              searchValue={tokenIdSearchValue}
+              toggleSearchValue={setTokenIdSearchValue}
+              StartAdornment={HashTagIcon}
+              className="ml-2 max-w-[8rem]"
+              placeholder="Token ID..."
+            />
+          )}
+
           <IconedButton
             Icon={ControlIcon}
             iconProps={{
@@ -309,7 +368,15 @@ const TokenList: FC = () => {
         </TippySingletonProvider>
       </div>
     ),
-    [searchValue, setSearchValue, manageModeEnabled, toggleManageMode]
+    [
+      searchValue,
+      setSearchValue,
+      tokenIdSearchValue,
+      setTokenIdSearchValue,
+      tokenIdSearchDisplayed,
+      manageModeEnabled,
+      toggleManageMode,
+    ]
   );
 
   let tokensBar: ReactNode = null;

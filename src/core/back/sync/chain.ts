@@ -42,7 +42,9 @@ export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
         const agent = new NFTMetadataAgent(chainId, provider);
         const [contractName, parsed] = await Promise.all([
           standard === TokenStandard.ERC721
-            ? ERC721__factory.connect(tokenAddress, provider).name()
+            ? ERC721__factory.connect(tokenAddress, provider)
+                .name()
+                .catch(() => null)
             : null,
           agent.fetchMetadata(tokenAddress, tokenId).catch(() => null),
         ]);

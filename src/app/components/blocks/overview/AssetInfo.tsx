@@ -7,7 +7,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 
-import { AccountAsset, TokenStatus } from "core/types";
+import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
@@ -54,7 +54,11 @@ const AssetInfo: FC = () => {
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+  let tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  if (tokenInfo?.tokenType !== TokenType.Asset) {
+    tokenInfo = undefined;
+  }
 
   useTokenActivitiesSync(
     chainId,
@@ -107,7 +111,7 @@ const AssetInfo: FC = () => {
           <div className="w-[31.5rem]">
             <div className="flex mb-5">
               <AssetLogo
-                asset={tokenInfo}
+                asset={tokenInfo!}
                 alt={name}
                 className="w-[5.125rem] h-[5.125rem] min-w-[5.125rem] mr-5"
               />
@@ -241,7 +245,7 @@ const AssetInfo: FC = () => {
               )}
             </div>
 
-            <TokenActivity token={tokenInfo} />
+            <TokenActivity token={tokenInfo!} />
 
             {/*{status !== TokenStatus.Native && (*/}
             {/*  <div className="mt-6 max-w-[23.25rem]">*/}

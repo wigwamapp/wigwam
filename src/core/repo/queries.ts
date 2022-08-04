@@ -55,17 +55,17 @@ export function queryAccountTokens({
   if (search) {
     const match = createSearchMatcher(search);
 
-    coll = coll.filter((token) =>
-      token.tokenType === TokenType.Asset
-        ? match(parseTokenSlug(token.tokenSlug).address, "strict") ||
-          match(token.name) ||
-          match(token.symbol)
-        : match(token.tokenSlug, "strict") ||
-          match(parseTokenSlug(token.tokenSlug).address, "strict") ||
-          match(token.name) ||
-          match(token.tokenId) ||
-          (token.collectionName ? match(token.collectionName) : false)
-    );
+    coll = coll.filter((token) => {
+      const { address, id } = parseTokenSlug(token.tokenSlug);
+
+      return token.tokenType === TokenType.Asset
+        ? match(address, "strict") || match(token.name) || match(token.symbol)
+        : match(`${address}:${id}`, "strict") ||
+            match(address, "strict") ||
+            match(token.name) ||
+            match(token.tokenId) ||
+            (token.collectionName ? match(token.collectionName) : false);
+    });
   }
 
   if (offset) {
