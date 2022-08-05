@@ -63,7 +63,7 @@ export async function fetchWithTimeout(
 export async function fetchWithRetriesAndTimeout(
   resource: string,
   options: FetchOptions = {},
-  maxRetries = 3
+  maxRetries = 1
 ) {
   const method = options.method || "get";
 
@@ -74,7 +74,7 @@ export async function fetchWithRetriesAndTimeout(
           timeout: options.timeout,
           method: method,
         }),
-      { retries: maxRetries, minTimeout: 100, maxTimeout: 1_000 }
+      { retries: maxRetries, minTimeout: 0, maxTimeout: 0 }
     );
 
     return response;

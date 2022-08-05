@@ -2,7 +2,10 @@ import { FC, ReactNode } from "react";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
+import { AccountAsset } from "core/types";
+
 import { useToken } from "app/hooks";
+
 import FiatAmount from "./FiatAmount";
 import PrettyAmount from "./PrettyAmount";
 
@@ -25,7 +28,7 @@ const Balance: FC<BalanceProps> = ({
   prefix,
   className,
 }) => {
-  const nativeToken = useToken(address);
+  const nativeToken = useToken<AccountAsset>(address);
 
   const portfolioBalance = nativeToken?.portfolioUSD;
 

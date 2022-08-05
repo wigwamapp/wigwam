@@ -61,7 +61,6 @@ const tabsContent = [
     title: "NFT",
     Icon: NFTIcon,
     desc: "Send NFTs or other non-fungible tokens such as ERC721 or ERC1155.",
-    soon: true,
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Bridge },

@@ -57,9 +57,9 @@ export class NFTMetadataAgent {
     private provider: JsonRpcProvider,
     opts: AgentOptions = {}
   ) {
-    this.ipfsGatewayUrl = opts.ipfsGatewayUrl || IPFS_CLOUDFLARE_GATEWAY;
+    this.ipfsGatewayUrl = opts.ipfsGatewayUrl || IPFS_IO_GATEWAY;
     this.ipfsFallbackGatewayUrl =
-      opts.ipfsFallbackGatewayUrl || IPFS_IO_GATEWAY;
+      opts.ipfsFallbackGatewayUrl || IPFS_CLOUDFLARE_GATEWAY;
     this.timeout = opts.timeout || 40_000;
   }
 

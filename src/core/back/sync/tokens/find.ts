@@ -82,6 +82,12 @@ async function performTokenSync(
       {
         ...existing,
         ...((metadata as any) ?? {}),
+        status:
+          existing.status === TokenStatus.Disabled &&
+          balance &&
+          !balance.isZero()
+            ? TokenStatus.Enabled
+            : existing.status,
         rawBalance,
         balanceUSD,
       },
@@ -159,6 +165,7 @@ async function performTokenSync(
       getTokenMetadata(chainId, tokenSlug),
       getBalanceFromChain(chainId, tokenSlug, accountAddress),
     ]);
+
     if (!metadata) return;
 
     const rawBalance = balance?.toString() ?? "0";
@@ -170,10 +177,20 @@ async function performTokenSync(
             .toNumber()
         : 0;
 
+    const tokenType =
+      standard === TokenStandard.ERC20 ||
+      ("decimals" in metadata && metadata.decimals > 0)
+        ? TokenType.Asset
+        : TokenType.NFT;
+
+    const status =
+      tokenType === TokenType.Asset || (balance && !balance.isZero())
+        ? TokenStatus.Enabled
+        : TokenStatus.Disabled;
+
     tokenToAdd = {
-      tokenType:
-        standard === TokenStandard.ERC20 ? TokenType.Asset : TokenType.NFT,
-      status: TokenStatus.Enabled,
+      tokenType,
+      status,
       chainId,
       accountAddress,
       tokenSlug,
