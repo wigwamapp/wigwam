@@ -4,7 +4,7 @@ import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 import { Link } from "lib/navigation";
 
-import { AccountAsset, TokenType } from "core/types";
+import { AccountAsset, AccountNFT, AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
@@ -16,18 +16,23 @@ import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
 import PrettyAmount from "./PrettyAmount";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import NftAvatar from "./NftAvatar";
 
 type TokenSelectProps = {
+  tokenType: TokenType;
   handleTokenChanged?: () => void;
 };
 
-const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
+const TokenSelect: FC<TokenSelectProps> = ({
+  tokenType,
+  handleTokenChanged,
+}) => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
-    TokenType.Asset,
+    tokenType,
     currentAccount.address,
     {
       search: searchValue ?? undefined,
@@ -36,7 +41,11 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
-  const currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
+  let currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
+
+  if (currentToken && currentToken.tokenType !== tokenType) {
+    currentToken = undefined;
+  }
 
   const setDefaultTokenRef = useRef(!tokenSlug);
 
@@ -143,7 +152,7 @@ const TokenSelect: FC<TokenSelectProps> = ({ handleTokenChanged }) => {
 
 export default TokenSelect;
 
-const Token: FC<{
+const AssetItem: FC<{
   asset: AccountAsset;
   isSelected?: boolean;
   size?: "small" | "large";
@@ -214,11 +223,83 @@ const Token: FC<{
   );
 };
 
+const NFTItem: FC<{
+  token: AccountNFT;
+  isSelected?: boolean;
+  size?: "small" | "large";
+}> = ({ token, isSelected = false, size = "small" }) => {
+  const { name, thumbnailUrl, rawBalance } = token;
+
+  return (
+    <span
+      className={classNames(
+        "flex grow",
+        "min-w-0",
+        size === "large" && "mr-3",
+        size === "small" && "items-center"
+      )}
+    >
+      <span className="flex relative mr-3">
+        <NftAvatar
+          src={thumbnailUrl}
+          alt={name}
+          className={classNames(
+            size === "large" && "w-10 h-10 min-w-[2.5rem]",
+            size === "small" && "w-8 h-8 min-w-[2rem]",
+            "!rounded-[.625rem]",
+            isSelected && "opacity-20"
+          )}
+        />
+
+        {isSelected && (
+          <span
+            className={classNames(
+              "absolute inset-0",
+              "rounded-full",
+              "border border-brand-light",
+              "flex items-center justify-center"
+            )}
+          >
+            <SelectedIcon className="w-6 h-auto fill-brand-light" />
+          </span>
+        )}
+      </span>
+      <span className="flex flex-col justify-between text-left grow min-w-0">
+        <span className="flex justify-between">
+          <PrettyAmount
+            amount={rawBalance ?? 0}
+            decimals={0}
+            threeDots={false}
+            className="ml-2"
+          />
+        </span>
+        <span className="flex justify-between">
+          <span
+            className={classNames(
+              "text-xs text-brand-inactivedark font-normal",
+              "truncate",
+              "transition-colors",
+              size === "small" && "group-hover:text-brand-light"
+            )}
+          >
+            {name}
+          </span>
+        </span>
+      </span>
+    </span>
+  );
+};
+
 const prepareToken = (
-  asset: AccountAsset,
+  token: AccountToken,
   size: "large" | "small" = "small",
   isSelected = false
 ) => ({
-  key: asset.tokenSlug,
-  value: <Token asset={asset} size={size} isSelected={isSelected} />,
+  key: token.tokenSlug,
+  value:
+    token.tokenType === TokenType.Asset ? (
+      <AssetItem asset={token} size={size} isSelected={isSelected} />
+    ) : (
+      <NFTItem token={token} size={size} isSelected={isSelected} />
+    ),
 });
