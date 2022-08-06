@@ -5,6 +5,7 @@ import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 
 import { getIPFSUrl, isIPFS } from "./ipfs";
 import { getARWeaveURI, isArweave } from "./arweave";
+import { sanitizeCustomUrl } from "./custom";
 
 export function isValidHttpUrl(uri: string) {
   try {
@@ -70,11 +71,11 @@ export async function fetchWithRetriesAndTimeout(
   try {
     const response = await retry(
       () =>
-        axios(resource, {
+        axios(sanitizeCustomUrl(resource), {
           timeout: options.timeout,
           method: method,
         }),
-      { retries: maxRetries, minTimeout: 0, maxTimeout: 0 }
+      { retries: maxRetries }
     );
 
     return response;
