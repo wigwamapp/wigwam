@@ -2,7 +2,11 @@ import BigNumber from "bignumber.js";
 import { IndexableTypeArray } from "dexie";
 import { ethers } from "ethers";
 import memoize from "mem";
-import { getIPFSUrl } from "lib/nft-metadata/uri";
+import {
+  isIPFS,
+  convertToDesiredGateway,
+  sanitizeCustomUrl,
+} from "lib/nft-metadata/uri";
 import { IPFS_IO_GATEWAY } from "lib/nft-metadata/defaults/base";
 
 import {
@@ -326,5 +330,7 @@ export const syncAccountTokens = memoize(
 function replaceIpfsUrl(url?: string) {
   if (!url) return url;
 
-  return getIPFSUrl(url, IPFS_IO_GATEWAY);
+  return isIPFS(url)
+    ? convertToDesiredGateway(url, IPFS_IO_GATEWAY)
+    : sanitizeCustomUrl(url);
 }
