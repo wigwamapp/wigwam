@@ -37,7 +37,9 @@ export const maxValue =
       return undefined;
     }
 
-    return `The maximum amount is ${max} ${currencySymbol}`;
+    return `The maximum amount is ${max}${
+      currencySymbol ? ` ${currencySymbol}` : ""
+    }`;
   };
 
 export const validateSeedPhrase = (lang: string) => (phrase: string) => {
