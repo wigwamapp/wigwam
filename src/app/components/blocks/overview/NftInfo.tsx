@@ -11,7 +11,6 @@ import { mergeRefs } from "react-merge-refs";
 import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
-import * as Dialog from "@radix-ui/react-dialog";
 import { useDebouncedCallback } from "use-debounce";
 import { lazyVidstack } from "lib/lazy-vidstack";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -256,7 +255,6 @@ const NftPreview: FC<NftPreviewProps> = ({
 }) => {
   const imageRef = useRef<HTMLElement>(null);
   const [modalOpened, setModalOpened] = useState(false);
-  const [hideAnimation, setHideAnimation] = useState(false);
   const [loadingImageState, setLoadingImageState] =
     useState<LoadingStatus>("idle");
   const [squareWidth, setSquareWidth] = useState(0);
@@ -286,13 +284,7 @@ const NftPreview: FC<NftPreviewProps> = ({
   );
 
   const handleModalClose = useCallback(() => {
-    setHideAnimation(true);
-
-    const t = setTimeout(() => {
-      setModalOpened(false);
-      setHideAnimation(false);
-    }, 350);
-    return () => clearTimeout(t);
+    setModalOpened(false);
   }, []);
 
   return (
@@ -361,74 +353,77 @@ const NftPreview: FC<NftPreviewProps> = ({
           </>
         )}
       </button>
-      {contentUrl && (
-        <Dialog.Root open={modalOpened} onOpenChange={handleModalClose}>
-          <Dialog.Trigger />
-          <Dialog.Portal
+      {contentUrl && modalOpened && (
+        <div
+          className={classNames(
+            "fixed inset-0 z-[999999999999]",
+            "flex justify-center items-center"
+          )}
+        >
+          <div
             className={classNames(
-              modalOpened && "animate-modalcontent",
-              hideAnimation && "animate-modalcontentOut"
+              "absolute inset-0",
+              "bg-[#07081B]/[.98]",
+              "cursor-zoom-out"
             )}
+            role="button"
+            tabIndex={0}
+            onClick={handleModalClose}
+            onKeyDown={handleModalClose}
+          />
+          <div
+            className={classNames(
+              "relative",
+              "h-full max-h-[80%] max-w-[80%]",
+              contentType === "image_url"
+                ? "cursor-zoom-out"
+                : "cursor-default",
+              "w-auto"
+            )}
+            role={contentType === "image_url" ? "button" : undefined}
+            tabIndex={contentType === "image_url" ? 0 : undefined}
+            onClick={() =>
+              contentType === "image_url" ? handleModalClose() : null
+            }
+            onKeyDown={() =>
+              contentType === "image_url" ? handleModalClose() : null
+            }
           >
-            <Dialog.Overlay
-              className={classNames(
-                "fixed inset-0 z-[999999999999]",
-                "flex justify-center items-center",
-                "bg-[#07081B]/[.98]",
-                "cursor-zoom-out"
-              )}
-            >
-              <Dialog.Content
-                className={classNames(
-                  "relative",
-                  "h-full max-h-[80%] max-w-[80%]",
-                  hideAnimation && "animate-modalcontentinnerOut",
-                  contentType === "image_url"
-                    ? "cursor-zoom-out"
-                    : "cursor-default",
-                  "w-auto"
-                )}
-                onClick={() =>
-                  contentType === "image_url" ? handleModalClose() : null
-                }
-              >
-                {contentType === "image_url" && (
-                  <>
-                    <NftAvatar
-                      ref={imageRef}
-                      src={contentUrl}
-                      alt={alt}
-                      setLoadingStatus={setLoadingImageState}
-                      className="!bg-[#141528] h-full w-auto rounded-2xl"
-                      style={{
-                        width:
-                          loadingImageState !== "loaded"
-                            ? `${squareWidth}px`
-                            : "auto",
-                      }}
-                    />
-                    <span
-                      className={classNames(
-                        controlClassName,
-                        "absolute top-3 right-3"
-                      )}
-                    >
-                      <ShrinkIcon className="w-6 h-auto" />
-                    </span>
-                  </>
-                )}
-                {contentType === "video_url" && (
-                  <Suspense fallback={null}>
-                    <MediaPlayer
-                      contentUrl={contentUrl}
-                      onClose={handleModalClose}
-                    />
-                  </Suspense>
-                )}
-              </Dialog.Content>
-            </Dialog.Overlay>
-          </Dialog.Portal>
-        </Dialog.Root>
+            {contentType === "image_url" && (
+              <>
+                <NftAvatar
+                  ref={imageRef}
+                  src={contentUrl}
+                  alt={alt}
+                  setLoadingStatus={setLoadingImageState}
+                  className="!bg-[#141528] h-full w-auto rounded-2xl"
+                  style={{
+                    width:
+                      loadingImageState !== "loaded"
+                        ? `${squareWidth}px`
+                        : "auto",
+                  }}
+                />
+                <span
+                  className={classNames(
+                    controlClassName,
+                    "absolute top-3 right-3"
+                  )}
+                >
+                  <ShrinkIcon className="w-6 h-auto" />
+                </span>
+              </>
+            )}
+            {contentType === "video_url" && (
+              <Suspense fallback={null}>
+                <MediaPlayer
+                  contentUrl={contentUrl}
+                  onClose={handleModalClose}
+                />
+              </Suspense>
+            )}
+          </div>
+        </div>
       )}
     </>
   );
