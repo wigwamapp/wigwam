@@ -53,7 +53,7 @@ const Tooltip: FC<TooltipProps> = ({
       }
       interactive={interactive ?? size === "large"}
       appendTo={overflowElement ?? document.body}
-      maxWidth={maxWidth ?? (size === "large" ? "18rem" : "none")}
+      maxWidth={maxWidth ?? "18rem"}
       placement={placement ?? (size === "large" ? "right-start" : "bottom")}
       hideOnClick={hideOnClick}
       className="pointer-events-auto"
@@ -101,6 +101,7 @@ const getSizeClasses = (size: sizeType) =>
     .otherwise(() =>
       classNames(
         "rounded-md",
+        "overflow-hidden truncate",
         "bg-brand-main/20 backdrop-blur-[6px]",
         IS_FIREFOX && "!bg-[#414356]/[.98]",
         "py-1 px-3"
