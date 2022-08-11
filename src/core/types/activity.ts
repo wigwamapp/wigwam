@@ -76,6 +76,7 @@ export interface TransactionActivity extends TransactionApproval {
   pending: number;
   rawTx: string;
   txHash: string;
+  txAction?: TxAction;
   result?: TxReceipt;
   gasTokenPriceUSD?: string;
 }

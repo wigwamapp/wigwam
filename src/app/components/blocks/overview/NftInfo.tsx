@@ -162,7 +162,7 @@ const NftInfo: FC = () => {
                   {preparedId && (
                     <CopiableTooltip
                       content={preparedId}
-                      textToCopy={preparedId}
+                      textToCopy={tokenId}
                       followCursor
                       plugins={[followCursor]}
                       className={classNames(

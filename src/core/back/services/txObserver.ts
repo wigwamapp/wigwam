@@ -14,8 +14,8 @@ import * as repo from "core/repo";
 import { createAccountTokenKey, NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { matchTokenTransferEvents } from "core/common/transaction";
 
-import { sendRpc } from "../rpc";
-import { isUnlocked } from "../state";
+import { sendRpc, getRpcProvider } from "../rpc";
+import { isUnlocked, $accountAddresses } from "../state";
 import { addFindTokenRequest } from "../sync";
 
 export async function startTxObserver() {
@@ -29,6 +29,7 @@ export async function startTxObserver() {
 
     if (pendingTxs.length === 0) return;
 
+    const accountAddresses = $accountAddresses.getState();
     const txsToUpdate = new Map<string, TransactionActivity>();
     const completeHashes = new Set<string>();
 
@@ -65,17 +66,20 @@ export async function startTxObserver() {
 
             if (!isFailedStatus(result)) {
               try {
-                const transfers = matchTokenTransferEvents(result.logs);
+                const transfers = await matchTokenTransferEvents(
+                  getRpcProvider(tx.chainId),
+                  result.logs
+                );
+
                 for (const transfer of transfers) {
-                  if (
-                    transfer.to === tx.accountAddress ||
-                    transfer.from === tx.accountAddress
-                  ) {
-                    addFindTokenRequest(
-                      tx.chainId,
-                      tx.accountAddress,
-                      transfer.tokenSlug
-                    );
+                  for (const transferAddress of [transfer.to, transfer.from]) {
+                    if (accountAddresses.includes(transferAddress)) {
+                      addFindTokenRequest(
+                        tx.chainId,
+                        transferAddress,
+                        transfer.tokenSlug
+                      );
+                    }
                   }
                 }
               } catch (err) {
