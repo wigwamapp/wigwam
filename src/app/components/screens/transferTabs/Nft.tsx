@@ -1,7 +1,9 @@
 import { FC } from "react";
 
-import ComingSoon from "app/components/elements/ComingSoon";
+import { TokenType } from "core/types";
 
-const Nft: FC = () => <ComingSoon label="Transfer - NFT" size="medium" />;
+import TransferToken from "app/components/blocks/transfer/TokenTransfer";
 
-export default Nft;
+const TransferAsset: FC = () => <TransferToken tokenType={TokenType.NFT} />;
+
+export default TransferAsset;

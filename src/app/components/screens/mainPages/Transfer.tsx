@@ -27,7 +27,7 @@ const Transfer: FC = () => {
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
-        {activeRoute?.transfer === TransferTabEnum.Asset ? (
+        {activeRoute?.transfer !== TransferTabEnum.Bridge ? (
           <ScrollAreaContainer
             className="box-content w-full px-6"
             viewPortClassName="pb-20 pt-5"
