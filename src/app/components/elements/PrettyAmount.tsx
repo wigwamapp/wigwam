@@ -84,7 +84,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: zeroDecimals ? 0 : isMinified && isThousandsMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       isFiat,
       currency,
@@ -98,7 +99,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: zeroDecimals ? 0 : isMinified && isThousandsMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       useGrouping: false,
       isDecimalsMinified,
@@ -112,7 +114,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
               : BigNumber.ROUND_UP
           )
         : convertedAmount,
-      dec: zeroDecimals ? 0 : isMinified && isThousandsMinified ? 3 : undefined,
+      dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       isFiat,
       currency,
@@ -122,7 +125,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
     if (isShownIntTooltip) {
       content = getPrettyAmount({
         value: convertedAmount,
-        dec: zeroDecimals ? 0 : isMinified && isThousandsMinified ? 3 : 6,
+        dec: isMinified && isThousandsMinified ? 3 : 6,
+        zeroDecimals,
         locale: currentLocale,
         isFiat,
         currency,
@@ -133,7 +137,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
         value: isFiatMinified
           ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
           : convertedAmount,
-        dec: zeroDecimals ? 0 : 38,
+        dec: 38,
+        zeroDecimals,
         locale: currentLocale,
         isFiat,
         currency,
@@ -143,7 +148,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
         value: isFiatMinified
           ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
           : convertedAmount,
-        dec: zeroDecimals ? 0 : 38,
+        dec: 38,
+        zeroDecimals,
         locale: currentLocale,
         useGrouping: false,
         isDecimalsMinified,
@@ -156,11 +162,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
           isFiatDecimalsMinified ? 2 : decSplit,
           isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN
         ),
-        dec: zeroDecimals
-          ? 0
-          : isMinified && isThousandsMinified
-          ? 3
-          : undefined,
+        dec: isMinified && isThousandsMinified ? 3 : undefined,
+        zeroDecimals,
         locale: currentLocale,
         threeDots,
         isFiat,
@@ -253,6 +256,7 @@ const AmountWithCurrency: FC<{
 export const getPrettyAmount = ({
   value,
   dec = 6,
+  zeroDecimals,
   locale = "en-US",
   useGrouping = true,
   isFiat = false,
@@ -263,6 +267,7 @@ export const getPrettyAmount = ({
   value: number | BigNumber;
   dec?: number;
   locale?: string;
+  zeroDecimals?: boolean;
   useGrouping?: boolean;
   isFiat?: boolean;
   currency?: string;
@@ -271,9 +276,8 @@ export const getPrettyAmount = ({
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
     const isLargerThenTrillion = new BigNumber(value).gt(1e16);
-    const minFract = isLargerThenTrillion || (!isFiat && dec === 0) ? 0 : 2;
-    const maxFract =
-      isLargerThenTrillion || (!isFiat && dec === 0) ? 0 : dec > 4 ? 3 : 2;
+    const minFract = isLargerThenTrillion || zeroDecimals ? 0 : 2;
+    const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
     let minifiedFractions = new BigNumber(value);
     if (minifiedFractions.gte(1e9)) {
@@ -297,8 +301,8 @@ export const getPrettyAmount = ({
 
   return `${getIntlNumberFormat(
     locale,
-    !isFiat && dec === 0 ? 0 : 2,
-    !isFiat && dec === 0 ? 0 : 20,
+    zeroDecimals ? 0 : 2,
+    20,
     "standard",
     useGrouping,
     isFiat ? "currency" : undefined,
