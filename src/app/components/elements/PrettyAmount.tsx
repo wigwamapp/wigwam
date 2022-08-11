@@ -29,7 +29,7 @@ export type PrettyAmountProps = {
 const PrettyAmount = memo<PrettyAmountProps>(
   ({
     amount,
-    decimals = 0,
+    decimals,
     currency,
     isFiat = false,
     isMinified = false,
@@ -46,7 +46,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const amountExist = amount !== null;
     const bigNumberAmount = new BigNumber(amount ?? 0);
 
-    const convertedAmount = bigNumberAmount.div(10 ** decimals);
+    const convertedAmount = bigNumberAmount.div(10 ** (decimals ?? 0));
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
@@ -73,8 +73,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
       integerPart.toString().length >
       (isMinified && isThousandsMinified ? 3 : 6);
 
-    const zeroDecimals =
-      !isFiat && decimals === 0 && new BigNumber(amount ?? 0).isInteger();
+    const zeroDecimals = !isFiat && decimals === 0;
 
     let tooltipContent = getPrettyAmount({
       value: isFiatMinified
