@@ -2,13 +2,16 @@ import { memo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
-import { AccountAsset, TokenType } from "core/types";
+import { TokenType } from "core/types";
 import { useToken } from "app/hooks";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
+
+import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
 
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
 import AssetLogo from "../elements/AssetLogo";
+import NftAvatar from "../elements/NftAvatar";
 import Dot from "../elements/Dot";
 
 type TokenAmountProps = {
@@ -27,7 +30,7 @@ const TokenAmount = memo<TokenAmountProps>(
     if (!tokenInfo) return null;
 
     if (tokenInfo.tokenType === TokenType.Asset) {
-      const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
+      const { name, symbol, decimals, priceUSD } = tokenInfo;
 
       const usdAmount = amount
         ? new BigNumber(amount)
@@ -78,7 +81,34 @@ const TokenAmount = memo<TokenAmountProps>(
         </div>
       );
     } else {
-      return null;
+      const { name, thumbnailUrl } = tokenInfo;
+
+      return (
+        <div className={classNames("flex items-center", className)}>
+          <div className="flex flex-col items-end justify-around text-brand-light">
+            {amount && +amount > 1 && (
+              <div className="flex items-center text-sm font-bold">
+                <PrettyAmount
+                  amount={amount}
+                  threeDots={false}
+                  className="mr-1"
+                />
+
+                <XSymbolIcon />
+              </div>
+            )}
+
+            <div className="text-sm">{name}</div>
+          </div>
+
+          <NftAvatar
+            src={thumbnailUrl}
+            alt={name}
+            className={classNames("ml-2 w-10 h-10 min-w-[1rem] !rounded-md")}
+            errorClassName="h-[6rem]"
+          />
+        </div>
+      );
     }
   }
 );
