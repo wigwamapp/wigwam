@@ -11,13 +11,13 @@ import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 type NftCardProps = {
   nft: AccountNFT;
   isActive?: boolean;
-  onAssetSelect: (asset: AccountNFT) => void;
+  onSelect: (asset: AccountNFT) => void;
   isManageMode: boolean;
 };
 
 const NftCard = memo(
   forwardRef<HTMLButtonElement, NftCardProps>(
-    ({ nft, isActive = false, onAssetSelect, isManageMode }, ref) => {
+    ({ nft, isActive = false, onSelect, isManageMode }, ref) => {
       const [loaded, setLoaded] = useState(false);
 
       const { thumbnailUrl, name, tokenId, rawBalance, status } = nft;
@@ -29,7 +29,7 @@ const NftCard = memo(
         <button
           ref={ref}
           type="button"
-          onClick={() => onAssetSelect(nft)}
+          onClick={() => onSelect(nft)}
           className={classNames(
             "flex flex-col",
             "pt-1 px-1 pb-2",

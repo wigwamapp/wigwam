@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { QRCodeCanvas } from "qrcode.react";
+import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { useCopyCanvasToClipboard } from "lib/react-hooks/useCopyCanvasToClipboard";
 
 import { currentAccountAtom } from "app/atoms";
@@ -9,7 +10,6 @@ import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import Button from "app/components/elements/Button";
-import { isPopup as isPopupPrimitive } from "../../../../lib/ext/view";
 
 const ShareAddress: FC = () => {
   const { address } = useAtomValue(currentAccountAtom);
