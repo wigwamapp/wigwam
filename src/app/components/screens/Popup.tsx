@@ -3,7 +3,7 @@ import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 import Masonry from "lib/react-masonry/Masonry";
 
-import { AccountAsset, AccountNFT, TokenType } from "core/types";
+import { AccountAsset, AccountNFT, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
 
 import {
@@ -120,6 +120,7 @@ const TokenList: FC = () => {
   }, []);
 
   const {
+    currentAccount,
     isNftsSelected,
     searchValue,
     setSearchValue,
@@ -149,9 +150,29 @@ const TokenList: FC = () => {
     [setSearchValue, setManageModeEnabled, setTokenType]
   );
 
-  const handleNFTSelect = useCallback((nft: AccountNFT) => {
-    console.info({ nft });
-  }, []);
+  const handleNFTSelect = useCallback(
+    async (token: AccountNFT) => {
+      if (manageModeEnabled) {
+        try {
+          await repo.accountTokens.put(
+            {
+              ...token,
+              status:
+                token.status === TokenStatus.Enabled
+                  ? TokenStatus.Disabled
+                  : TokenStatus.Enabled,
+            },
+            [token.chainId, currentAccount.address, token.tokenSlug].join("_")
+          );
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        console.info({ token });
+      }
+    },
+    [manageModeEnabled, currentAccount.address]
+  );
 
   const renderNFTCard = useCallback(
     (nft: AccountNFT, i: number) => (
