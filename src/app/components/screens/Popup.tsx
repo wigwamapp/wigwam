@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useRef, useState, useMemo } from "react";
+import { FC, ReactNode, useCallback, useRef, useState, Fragment } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 import Masonry from "lib/react-masonry/Masonry";
@@ -191,82 +191,6 @@ const TokenList: FC = () => {
     [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerAssetRef]
   );
 
-  /**
-   * Contol bar
-   */
-  const controlBar = useMemo(
-    () => (
-      <div className="flex items-center mt-5">
-        <TippySingletonProvider>
-          <Tooltip
-            content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-            asChild
-          >
-            <span>
-              <AssetsSwitcher
-                theme="small"
-                checked={isNftsSelected}
-                onCheckedChange={toggleNftSwitcher}
-              />
-            </span>
-          </Tooltip>
-
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
-            className="ml-2"
-            inputClassName="max-h-9 !pl-9"
-            placeholder="Type to search..."
-            adornmentClassName="!left-3"
-          />
-
-          {tokenIdSearchDisplayed && (
-            <SearchInput
-              ref={tokenIdSearchInputRef}
-              searchValue={tokenIdSearchValue}
-              toggleSearchValue={setTokenIdSearchValue}
-              StartAdornment={HashTagIcon}
-              className="ml-2 max-w-[5rem]"
-              placeholder="Token ID..."
-            />
-          )}
-
-          <IconedButton
-            Icon={ControlIcon}
-            iconProps={{
-              isActive: manageModeEnabled,
-            }}
-            theme="tertiary"
-            className={classNames(
-              "ml-2 mr-2",
-              manageModeEnabled && "bg-brand-main/30"
-            )}
-            aria-label={
-              manageModeEnabled
-                ? "Finish managing assets list"
-                : "Manage assets list"
-            }
-            onClick={() => setManageModeEnabled(!manageModeEnabled)}
-          />
-        </TippySingletonProvider>
-      </div>
-    ),
-    [
-      isNftsSelected,
-      toggleNftSwitcher,
-      searchValue,
-      setSearchValue,
-      tokenIdSearchValue,
-      setTokenIdSearchValue,
-      tokenIdSearchDisplayed,
-      manageModeEnabled,
-      setManageModeEnabled,
-      searchInputRef,
-      tokenIdSearchInputRef,
-    ]
-  );
-
   let tokensBar: ReactNode = null;
 
   if (tokens.length === 0) {
@@ -294,7 +218,7 @@ const TokenList: FC = () => {
       <ScrollAreaContainer
         ref={scrollAreaRef}
         hiddenScrollbar="horizontal"
-        className="pr-3.5 -mr-3.5 mt-2"
+        className="pr-3.5 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
         viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
         scrollBarClassName="py-0 pb-16"
       >
@@ -335,10 +259,72 @@ const TokenList: FC = () => {
   }
 
   return (
-    <>
-      {controlBar}
-      {tokensBar}
-    </>
+    <div className="flex flex-wrap mt-5 min-h-0">
+      <TippySingletonProvider>
+        <Tooltip
+          content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+          asChild
+        >
+          <span>
+            <AssetsSwitcher
+              theme="small"
+              checked={isNftsSelected}
+              onCheckedChange={toggleNftSwitcher}
+            />
+          </span>
+        </Tooltip>
+
+        <SearchInput
+          ref={searchInputRef}
+          searchValue={searchValue}
+          toggleSearchValue={setSearchValue}
+          className="ml-2 !w-auto grow max-w-[13.875rem]"
+          inputClassName="max-h-[2.375rem] !pl-9"
+          placeholder="Type to search..."
+          adornmentClassName="!left-3"
+        />
+
+        <IconedButton
+          Icon={ControlIcon}
+          iconProps={{
+            isActive: manageModeEnabled,
+          }}
+          theme="tertiary"
+          className={classNames(
+            "ml-2 mr-2 mt-[.4375rem]",
+            manageModeEnabled && "bg-brand-main/30"
+          )}
+          aria-label={
+            manageModeEnabled
+              ? "Finish managing assets list"
+              : "Manage assets list"
+          }
+          onClick={() => setManageModeEnabled(!manageModeEnabled)}
+        />
+      </TippySingletonProvider>
+
+      <Fragment>
+        <div
+          className={classNames(
+            "w-full pt-2",
+            "max-h-0",
+            "overflow-hidden",
+            "transition-[max-height] duration-200",
+            tokenIdSearchDisplayed && "max-h-[3rem]"
+          )}
+        >
+          <SearchInput
+            ref={tokenIdSearchInputRef}
+            searchValue={tokenIdSearchValue}
+            toggleSearchValue={setTokenIdSearchValue}
+            StartAdornment={HashTagIcon}
+            className="w-full"
+            placeholder="Token token ID to search..."
+          />
+        </div>
+        {tokensBar}
+      </Fragment>
+    </div>
   );
 };
 
