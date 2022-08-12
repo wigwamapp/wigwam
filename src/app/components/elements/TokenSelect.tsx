@@ -9,14 +9,16 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
-import { useAllAccountTokens, useAccountToken } from "app/hooks/tokens";
+import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
+import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
 import Select from "./Select";
 import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
 import PrettyAmount from "./PrettyAmount";
-import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import NftAvatar from "./NftAvatar";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
 
 type TokenSelectProps = {
   tokenType: TokenType;
@@ -143,7 +145,10 @@ const TokenSelect: FC<TokenSelectProps> = ({
           tab.
         </>
       }
-      currentItemClassName="h-16 !p-3"
+      currentItemClassName={classNames(
+        tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
+        "!p-3"
+      )}
       contentClassName="w-[23.25rem] flex flex-col"
       itemClassName="group"
     />
@@ -228,24 +233,24 @@ const NFTItem: FC<{
   isSelected?: boolean;
   size?: "small" | "large";
 }> = ({ token, isSelected = false, size = "small" }) => {
-  const { name, thumbnailUrl, rawBalance } = token;
+  const {
+    name: originName,
+    tokenId: originId,
+    thumbnailUrl,
+    rawBalance,
+  } = token;
+  const { name, id } = prepareNFTLabel(originId, originName);
 
   return (
     <span
-      className={classNames(
-        "flex grow",
-        "min-w-0",
-        size === "large" && "mr-3",
-        size === "small" && "items-center"
-      )}
+      className={classNames("flex grow", "min-w-0", size === "large" && "mr-3")}
     >
       <span className="flex relative mr-3">
         <NftAvatar
           src={thumbnailUrl}
           alt={name}
           className={classNames(
-            size === "large" && "w-10 h-10 min-w-[2.5rem]",
-            size === "small" && "w-8 h-8 min-w-[2rem]",
+            "w-[4.625rem] h-[4.625rem] min-w-[4.625rem]",
             "!rounded-[.625rem]",
             isSelected && "opacity-20"
           )}
@@ -255,36 +260,60 @@ const NFTItem: FC<{
           <span
             className={classNames(
               "absolute inset-0",
-              "rounded-full",
+              "rounded-[.625rem]",
               "border border-brand-light",
               "flex items-center justify-center"
             )}
           >
-            <SelectedIcon className="w-6 h-auto fill-brand-light" />
+            <SelectedIcon className="w-10 h-auto fill-brand-light" />
           </span>
         )}
       </span>
       <span className="flex flex-col justify-between text-left grow min-w-0">
-        <span className="flex justify-between">
-          <PrettyAmount
-            amount={rawBalance ?? 0}
-            decimals={0}
-            threeDots={false}
-            className="ml-2"
-          />
-        </span>
-        <span className="flex justify-between">
+        <span
+          className={classNames(
+            "text-xl leading-[1.375rem]",
+            rawBalance && +rawBalance > 1 ? "line-clamp-2" : "line-clamp-3",
+            "break-words",
+            !name ? "text-brand-main" : ""
+          )}
+        >
           <span
             className={classNames(
-              "text-xs text-brand-inactivedark font-normal",
-              "truncate",
-              "transition-colors",
-              size === "small" && "group-hover:text-brand-light"
+              name &&
+                name.length > 23 &&
+                !name.slice(0, 23).includes(" ") &&
+                "break-all"
             )}
           >
             {name}
           </span>
+          {name && id ? " " : ""}
+          {id ? (
+            <span
+              className={classNames(
+                "text-brand-main",
+                id.length > 11 ? "break-all" : "break-words"
+              )}
+            >
+              {id}
+            </span>
+          ) : (
+            ""
+          )}
         </span>
+        {rawBalance && +rawBalance > 1 && (
+          <PrettyAmount
+            prefix={<XSymbolIcon className="w-2.5 h-auto mt-px mr-0.5" />}
+            amount={rawBalance ?? 0}
+            isMinified
+            isThousandsMinified={false}
+            decimals={0}
+            threeDots={false}
+            asSpan
+            className="py-0.5 px-2.5 bg-brand-main/20 rounded mr-auto flex items-center"
+          />
+        )}
       </span>
     </span>
   );

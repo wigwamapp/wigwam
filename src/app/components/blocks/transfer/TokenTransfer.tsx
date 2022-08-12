@@ -531,7 +531,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   {({ input, meta }) => (
                     <AssetInput
                       label="Amount"
-                      placeholder="0.00"
+                      placeholder="0"
                       thousandSeparator={true}
                       assetDecimals={tokenDecimals}
                       labelActions={
