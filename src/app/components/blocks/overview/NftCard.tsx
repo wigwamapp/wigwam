@@ -6,6 +6,7 @@ import { AccountNFT, TokenStatus } from "core/types";
 
 import { prepareNFTLabel } from "app/utils";
 import NftAvatar from "app/components/elements/NftAvatar";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
 
 type NftCardProps = {
@@ -57,22 +58,23 @@ const NftCard = memo(
               )}
               errorClassName="h-[6rem]"
             />
-
             {rawBalance !== "1" && (
-              <span
+              <PrettyAmount
+                amount={rawBalance}
+                isMinified
+                isThousandsMinified={false}
+                decimals={0}
                 className={classNames(
                   "block",
                   "absolute top-1 left-1",
                   "py-px px-2.5",
                   "rounded",
-                  // "bg-brand-darkblue/[.8]",
                   "bg-[#35394D]",
                   "border border-brand-main/20"
                 )}
-              >
-                {rawBalance}
-              </span>
+              />
             )}
+
             {isManageMode && (
               <Checkbox.Root
                 className={classNames(
