@@ -29,7 +29,7 @@ export type PrettyAmountProps = {
 const PrettyAmount = memo<PrettyAmountProps>(
   ({
     amount,
-    decimals = 0,
+    decimals,
     currency,
     isFiat = false,
     isMinified = false,
@@ -46,7 +46,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const amountExist = amount !== null;
     const bigNumberAmount = new BigNumber(amount ?? 0);
 
-    const convertedAmount = bigNumberAmount.div(10 ** decimals);
+    const convertedAmount = bigNumberAmount.div(10 ** (decimals ?? 0));
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
@@ -73,6 +73,8 @@ const PrettyAmount = memo<PrettyAmountProps>(
       integerPart.toString().length >
       (isMinified && isThousandsMinified ? 3 : 6);
 
+    const zeroDecimals = !isFiat && decimals === 0;
+
     let tooltipContent = getPrettyAmount({
       value: isFiatMinified
         ? convertedAmount.decimalPlaces(
@@ -83,6 +85,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       isFiat,
       currency,
@@ -97,6 +100,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       useGrouping: false,
       isDecimalsMinified,
@@ -111,6 +115,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
+      zeroDecimals,
       locale: currentLocale,
       isFiat,
       currency,
@@ -121,6 +126,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
       content = getPrettyAmount({
         value: convertedAmount,
         dec: isMinified && isThousandsMinified ? 3 : 6,
+        zeroDecimals,
         locale: currentLocale,
         isFiat,
         currency,
@@ -132,6 +138,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
           : convertedAmount,
         dec: 38,
+        zeroDecimals,
         locale: currentLocale,
         isFiat,
         currency,
@@ -142,6 +149,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           ? convertedAmount.decimalPlaces(2, BigNumber.ROUND_DOWN)
           : convertedAmount,
         dec: 38,
+        zeroDecimals,
         locale: currentLocale,
         useGrouping: false,
         isDecimalsMinified,
@@ -155,6 +163,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
           isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN
         ),
         dec: isMinified && isThousandsMinified ? 3 : undefined,
+        zeroDecimals,
         locale: currentLocale,
         threeDots,
         isFiat,
@@ -247,6 +256,7 @@ const AmountWithCurrency: FC<{
 export const getPrettyAmount = ({
   value,
   dec = 6,
+  zeroDecimals,
   locale = "en-US",
   useGrouping = true,
   isFiat = false,
@@ -257,6 +267,7 @@ export const getPrettyAmount = ({
   value: number | BigNumber;
   dec?: number;
   locale?: string;
+  zeroDecimals?: boolean;
   useGrouping?: boolean;
   isFiat?: boolean;
   currency?: string;
@@ -265,7 +276,7 @@ export const getPrettyAmount = ({
 }) => {
   if (new BigNumber(value).decimalPlaces(0).toString().length > dec) {
     const isLargerThenTrillion = new BigNumber(value).gt(1e16);
-    const minFract = isLargerThenTrillion ? 0 : 2;
+    const minFract = isLargerThenTrillion || zeroDecimals ? 0 : 2;
     const maxFract = isLargerThenTrillion ? 0 : dec > 4 ? 3 : 2;
 
     let minifiedFractions = new BigNumber(value);
@@ -288,11 +299,10 @@ export const getPrettyAmount = ({
       .replace("US$", "$");
   }
 
-  const isInteger = new BigNumber(value).isInteger();
   return `${getIntlNumberFormat(
     locale,
-    isInteger ? 0 : 2,
-    isInteger ? 0 : 20,
+    zeroDecimals ? 0 : 2,
+    20,
     "standard",
     useGrouping,
     isFiat ? "currency" : undefined,

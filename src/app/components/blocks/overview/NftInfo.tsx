@@ -39,6 +39,7 @@ import Button from "app/components/elements/Button";
 import { LoadingStatus } from "app/components/elements/Avatar";
 import NftAvatar from "app/components/elements/NftAvatar";
 import CopiableTooltip from "app/components/elements/CopiableTooltip";
+import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
@@ -307,7 +308,11 @@ const NftPreview: FC<NftPreviewProps> = ({
           )}
         />
         {rawBalance !== "1" && (
-          <span
+          <PrettyAmount
+            amount={rawBalance}
+            isMinified
+            isThousandsMinified={false}
+            decimals={0}
             className={classNames(
               "block",
               "absolute top-2 left-2",
@@ -319,9 +324,7 @@ const NftPreview: FC<NftPreviewProps> = ({
               "border border-brand-main/20",
               "color-brand-light"
             )}
-          >
-            {rawBalance}
-          </span>
+          />
         )}
         {contentUrl && (
           <>
