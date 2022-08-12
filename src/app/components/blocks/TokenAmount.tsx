@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 
 import { TokenType } from "core/types";
 import { useToken } from "app/hooks";
+import { prepareNFTLabel } from "app/utils";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 
 import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
@@ -81,30 +82,54 @@ const TokenAmount = memo<TokenAmountProps>(
         </div>
       );
     } else {
-      const { name, thumbnailUrl } = tokenInfo;
+      const { name: originName, tokenId: originId, thumbnailUrl } = tokenInfo;
+      const { name, id } = prepareNFTLabel(originId, originName);
+      const isAmountLargerOne = amount && +amount > 1;
 
       return (
-        <div className={classNames("flex items-center", className)}>
-          <div className="flex flex-col items-end justify-around text-brand-light">
-            {amount && +amount > 1 && (
+        <div className={classNames("flex items-center justify-end", className)}>
+          <div className="flex flex-col items-end justify-around text-brand-light min-w-0">
+            {isAmountLargerOne ? (
               <div className="flex items-center text-sm font-bold">
                 <PrettyAmount
                   amount={amount}
+                  isMinified
+                  isThousandsMinified={false}
+                  decimals={0}
                   threeDots={false}
                   className="mr-1"
                 />
 
                 <XSymbolIcon />
               </div>
+            ) : name && id ? (
+              <div className="text-sm text-brand-main font-bold min-w-0 w-full truncate text-right">
+                {id}
+              </div>
+            ) : (
+              ""
             )}
 
-            <div className="text-sm">{name}</div>
+            <div
+              className={classNames(
+                "text-sm min-w-0 w-full truncate text-right",
+                !name ? "text-brand-main" : ""
+              )}
+            >
+              {name}
+              {name && id && isAmountLargerOne ? " " : ""}
+              {id && (isAmountLargerOne || !name) ? (
+                <span className="text-brand-main">{id}</span>
+              ) : (
+                ""
+              )}
+            </div>
           </div>
 
           <NftAvatar
             src={thumbnailUrl}
             alt={name}
-            className={classNames("ml-2 w-10 h-10 min-w-[1rem] !rounded-md")}
+            className="ml-2 w-10 h-10 min-w-[2.5rem] !rounded-md"
             errorClassName="h-[6rem]"
           />
         </div>
