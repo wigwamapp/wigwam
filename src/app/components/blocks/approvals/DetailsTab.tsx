@@ -337,7 +337,7 @@ const Tokens: FC<TokensProps> = ({ accountAddress, action }) => {
           </TippySingletonProvider>
         </div>
       ) : (
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0">
           {tokens.map((token, i) => (
             <TokenAmount
               key={token.slug}
@@ -388,8 +388,8 @@ type InfoRawProps = {
 };
 
 const InfoRaw: FC<InfoRawProps> = ({ label, children }) => (
-  <div className="py-3 pl-4 flex items-start">
-    <h3 className="text-sm mr-auto">{label}</h3>
+  <div className="py-3 pl-4 flex items-start justify-between">
+    <h3 className="text-sm mr-5">{label}</h3>
     {children}
   </div>
 );
