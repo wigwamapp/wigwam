@@ -241,6 +241,9 @@ const NFTItem: FC<{
   } = token;
   const { name, id } = prepareNFTLabel(originId, originName);
 
+  const isAmountLargerOne = rawBalance && +rawBalance > 1;
+  const isId = id !== undefined;
+
   return (
     <span
       className={classNames("flex grow", "min-w-0", size === "large" && "mr-3")}
@@ -273,27 +276,30 @@ const NFTItem: FC<{
         <span
           className={classNames(
             "text-xl leading-[1.375rem]",
-            rawBalance && +rawBalance > 1 ? "line-clamp-2" : "line-clamp-3",
+            isAmountLargerOne ? "line-clamp-2" : "flex flex-col",
             "break-words",
             !name ? "text-brand-main" : ""
           )}
         >
-          <span
-            className={classNames(
-              name &&
+          {name && (
+            <span
+              className={classNames(
                 name.length > 23 &&
-                !name.slice(0, 23).includes(" ") &&
-                "break-all"
-            )}
-          >
-            {name}
-          </span>
-          {name && id ? " " : ""}
-          {id ? (
+                  !name.slice(0, 23).includes(" ") &&
+                  "break-all",
+                !isAmountLargerOne && "line-clamp-2"
+              )}
+            >
+              {name}
+            </span>
+          )}
+          {name && isId ? " " : ""}
+          {isId ? (
             <span
               className={classNames(
                 "text-brand-main",
-                id.length > 11 ? "break-all" : "break-words"
+                id.length > 23 ? "break-all" : "break-words",
+                !isAmountLargerOne && "truncate"
               )}
             >
               {id}
@@ -302,7 +308,7 @@ const NFTItem: FC<{
             ""
           )}
         </span>
-        {rawBalance && +rawBalance > 1 && (
+        {isAmountLargerOne && (
           <PrettyAmount
             prefix={<XSymbolIcon className="w-2.5 h-auto mt-px mr-0.5" />}
             amount={rawBalance ?? 0}
