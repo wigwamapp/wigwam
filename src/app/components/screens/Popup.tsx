@@ -100,17 +100,38 @@ const PopupNetworkSelect: FC = () => {
 };
 
 const TokenExplorer: FC = () => {
-  const tokenType = useAtomValue(tokenTypeAtom);
+  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
+
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      setTokenType(value ? TokenType.NFT : TokenType.Asset);
+    },
+    [setTokenType]
+  );
+
+  const isNftsSelected = tokenType === TokenType.NFT;
 
   return (
-    <>
-      <TokenList key={tokenType} />
-    </>
+    <div className="flex flex-wrap mt-5 min-h-0">
+      <Tooltip
+        content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+        asChild
+      >
+        <span>
+          <AssetsSwitcher
+            theme="small"
+            checked={isNftsSelected}
+            onCheckedChange={toggleNftSwitcher}
+          />
+        </span>
+      </Tooltip>
+
+      <TokenList key={tokenType} tokenType={tokenType} />
+    </div>
   );
 };
 
-const TokenList: FC = () => {
-  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
+const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
   const [receivePopupOpened, setReceivePopupOpened] = useState(false);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -137,18 +158,6 @@ const TokenList: FC = () => {
     tokenIdSearchInputRef,
     loadMoreTriggerAssetRef,
   } = useTokenList(tokenType, handleAccountTokensReset);
-
-  const toggleNftSwitcher = useCallback(
-    (value: boolean) => {
-      if (value) {
-        setSearchValue(null);
-        setManageModeEnabled(false);
-      }
-
-      setTokenType(value ? TokenType.NFT : TokenType.Asset);
-    },
-    [setSearchValue, setManageModeEnabled, setTokenType]
-  );
 
   const handleNFTSelect = useCallback(
     async (token: AccountNFT) => {
@@ -259,21 +268,8 @@ const TokenList: FC = () => {
   }
 
   return (
-    <div className="flex flex-wrap mt-5 min-h-0">
+    <>
       <TippySingletonProvider>
-        <Tooltip
-          content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-          asChild
-        >
-          <span>
-            <AssetsSwitcher
-              theme="small"
-              checked={isNftsSelected}
-              onCheckedChange={toggleNftSwitcher}
-            />
-          </span>
-        </Tooltip>
-
         <SearchInput
           ref={searchInputRef}
           searchValue={searchValue}
@@ -303,28 +299,27 @@ const TokenList: FC = () => {
         />
       </TippySingletonProvider>
 
-      <Fragment>
-        <div
-          className={classNames(
-            "w-full pt-2",
-            "max-h-0",
-            "overflow-hidden",
-            "transition-[max-height] duration-200",
-            tokenIdSearchDisplayed && "max-h-[3rem]"
-          )}
-        >
-          <SearchInput
-            ref={tokenIdSearchInputRef}
-            searchValue={tokenIdSearchValue}
-            toggleSearchValue={setTokenIdSearchValue}
-            StartAdornment={HashTagIcon}
-            className="w-full"
-            placeholder="Token token ID to search..."
-          />
-        </div>
-        {tokensBar}
-      </Fragment>
-    </div>
+      <div
+        className={classNames(
+          "w-full pt-2",
+          "max-h-0",
+          "overflow-hidden",
+          "transition-[max-height] duration-200",
+          tokenIdSearchDisplayed && "max-h-[3rem]"
+        )}
+      >
+        <SearchInput
+          ref={tokenIdSearchInputRef}
+          searchValue={tokenIdSearchValue}
+          toggleSearchValue={setTokenIdSearchValue}
+          StartAdornment={HashTagIcon}
+          className="w-full"
+          placeholder="Type token ID to search..."
+        />
+      </div>
+
+      {tokensBar}
+    </>
   );
 };
 
