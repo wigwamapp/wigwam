@@ -49,7 +49,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
   );
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!activity) return;
 
@@ -84,7 +84,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
         <TokenActivityCard
           ref={
             i === activity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
-              ? loadMoreTriggerAssetRef
+              ? loadMoreTriggerRef
               : null
           }
           key={createTokenActivityKey(activ)}

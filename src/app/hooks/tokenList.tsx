@@ -49,7 +49,7 @@ export function useTokenList(
   );
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -171,6 +171,6 @@ export function useTokenList(
     focusSearchInput,
     searchInputRef,
     tokenIdSearchInputRef,
-    loadMoreTriggerAssetRef,
+    loadMoreTriggerRef,
   };
 }

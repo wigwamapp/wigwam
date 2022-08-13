@@ -1,26 +1,15 @@
-import {
-  FC,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mergeRefs } from "react-merge-refs";
 import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
-import { useDebouncedCallback } from "use-debounce";
-import { lazyVidstack } from "lib/lazy-vidstack";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { storage } from "lib/ext/storage";
 
-import { AccountNFT, NFTContentType, TokenType } from "core/types";
+import { AccountNFT, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 
-import { IS_FIREFOX } from "app/defaults";
 import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -36,7 +25,6 @@ import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import IconedButton from "app/components/elements/IconedButton";
 import Button from "app/components/elements/Button";
-import { LoadingStatus } from "app/components/elements/Avatar";
 import NftAvatar from "app/components/elements/NftAvatar";
 import CopiableTooltip from "app/components/elements/CopiableTooltip";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -46,22 +34,11 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
-import { ReactComponent as PauseIcon } from "app/icons/media-pause.svg";
-import { ReactComponent as VolumeHighIcon } from "app/icons/media-volume-high.svg";
-import { ReactComponent as VolumeMuteIcon } from "app/icons/media-volume-mute.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
-import { ReactComponent as ShrinkIcon } from "app/icons/media-shrink.svg";
 
 import TokenActivity from "./TokenActivity";
 import { TokenStandardValue } from "./AssetInfo";
-
-const Gesture = lazyVidstack((m) => m.Gesture);
-const Media = lazyVidstack((m) => m.Media);
-const MuteButton = lazyVidstack((m) => m.MuteButton);
-const PlayButton = lazyVidstack((m) => m.PlayButton);
-const Time = lazyVidstack((m) => m.Time);
-const TimeSlider = lazyVidstack((m) => m.TimeSlider);
-const Video = lazyVidstack((m) => m.Video);
+import NftOverview from "../nft/NftOverview";
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
@@ -123,15 +100,8 @@ const NftInfo: FC = () => {
 
   if (!tokenInfo) return null;
 
-  const {
-    thumbnailUrl,
-    name,
-    tokenId,
-    rawBalance,
-    contentUrl,
-    contentType,
-    detailUrl,
-  } = tokenInfo;
+  const { name, tokenId, rawBalance, detailUrl } = tokenInfo;
+
   const { name: preparedName } = prepareNFTLabel(tokenId, name);
   const preparedId = `#${tokenId}`;
 
@@ -148,32 +118,24 @@ const NftInfo: FC = () => {
         >
           <div className="w-[31.5rem]">
             <div className="flex mb-6">
-              <NftPreview
-                thumbnailUrl={thumbnailUrl}
-                contentUrl={contentUrl || thumbnailUrl}
-                contentType={contentType}
-                alt={`${preparedName ?? ""}${
-                  preparedName && preparedId ? " " : ""
-                }${preparedId ?? ""}`}
-                rawBalance={rawBalance}
-              />
+              <NftPreview token={tokenInfo!} rawBalance={rawBalance} />
+
               <div className="flex flex-col grow min-w-0 ml-4">
                 <div className="flex justify-between items-center">
-                  {preparedId && (
-                    <CopiableTooltip
-                      content={preparedId}
-                      textToCopy={tokenId}
-                      followCursor
-                      plugins={[followCursor]}
-                      className={classNames(
-                        "text-2xl font-bold text-left",
-                        "text-brand-main",
-                        "min-w-0 truncate"
-                      )}
-                    >
-                      <>{preparedId}</>
-                    </CopiableTooltip>
-                  )}
+                  <CopiableTooltip
+                    content={preparedId}
+                    textToCopy={tokenId}
+                    followCursor
+                    plugins={[followCursor]}
+                    className={classNames(
+                      "text-2xl font-bold text-left",
+                      "text-brand-main",
+                      "min-w-0 truncate"
+                    )}
+                  >
+                    <>{preparedId}</>
+                  </CopiableTooltip>
+
                   <TippySingletonProvider>
                     <div className="flex items-center ml-4">
                       <IconedButton
@@ -240,48 +202,21 @@ const NftInfo: FC = () => {
 export default NftInfo;
 
 type NftPreviewProps = {
-  thumbnailUrl?: string;
-  contentUrl?: string;
-  contentType?: NFTContentType;
-  alt: string;
+  token: AccountNFT;
   rawBalance: string;
 };
 
-const NftPreview: FC<NftPreviewProps> = ({
-  thumbnailUrl,
-  contentUrl,
-  contentType,
-  alt,
-  rawBalance,
-}) => {
-  const imageRef = useRef<HTMLElement>(null);
+const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
   const [modalOpened, setModalOpened] = useState(false);
-  const [loadingImageState, setLoadingImageState] =
-    useState<LoadingStatus>("idle");
-  const [squareWidth, setSquareWidth] = useState(0);
 
-  const calculateWidth = useCallback(() => {
-    if (loadingImageState === "loaded") {
-      return;
-    }
-    setSquareWidth(imageRef.current?.offsetHeight || 0);
-  }, [loadingImageState]);
-
-  const debouncedCallback = useDebouncedCallback(calculateWidth, 500);
-
-  useEffect(() => {
-    if (loadingImageState === "loaded") {
-      return;
-    }
-    window.addEventListener("resize", debouncedCallback);
-    return () => window.removeEventListener("resize", debouncedCallback);
-  }, [debouncedCallback, loadingImageState]);
-
-  useEffect(calculateWidth, [calculateWidth]);
+  const overviewable = Boolean(token.contentUrl || token.thumbnailUrl);
+  const playable = Boolean(
+    token.contentType === "video_url" || token.contentType === "audio_url"
+  );
 
   const handleModalOpen = useCallback(
-    () => contentUrl && setModalOpened(true),
-    [contentUrl]
+    () => overviewable && setModalOpened(true),
+    [overviewable]
   );
 
   const handleModalClose = useCallback(() => {
@@ -296,17 +231,18 @@ const NftPreview: FC<NftPreviewProps> = ({
         className={classNames(
           "relative",
           "group",
-          contentUrl ? "cursor-zoom-in" : "cursor-default"
+          overviewable ? "cursor-zoom-in" : "cursor-default"
         )}
       >
         <NftAvatar
-          src={thumbnailUrl}
-          alt={alt}
+          src={token.thumbnailUrl}
+          alt={token.name}
           className={classNames(
             "w-[13rem] min-w-[13rem] h-[13rem]",
             "!rounded-[.625rem]"
           )}
         />
+
         {rawBalance !== "1" && (
           <PrettyAmount
             amount={rawBalance}
@@ -326,9 +262,10 @@ const NftPreview: FC<NftPreviewProps> = ({
             )}
           />
         )}
-        {contentUrl && (
+
+        {overviewable && (
           <>
-            {contentType !== "image_url" && (
+            {playable && (
               <span
                 className={classNames(
                   controlClassName,
@@ -341,6 +278,7 @@ const NftPreview: FC<NftPreviewProps> = ({
                 <PlayIcon className="w-6 h-auto" />
               </span>
             )}
+
             <span
               className={classNames(
                 "w-[1.625rem] h-[1.625rem] !rounded-md",
@@ -356,191 +294,24 @@ const NftPreview: FC<NftPreviewProps> = ({
           </>
         )}
       </button>
-      {contentUrl && modalOpened && (
+
+      {overviewable && modalOpened && (
         <div
-          className={classNames(
-            "fixed inset-0 z-[999999999999]",
-            "flex justify-center items-center"
-          )}
+          className={classNames("fixed inset-0 z-[999999999999]")}
+          role="button"
+          tabIndex={0}
+          onClick={handleModalClose}
+          onKeyDown={handleModalClose}
         >
-          <div
-            className={classNames(
-              "absolute inset-0",
-              "bg-[#07081B]/[.98]",
-              "cursor-zoom-out"
-            )}
-            role="button"
-            tabIndex={0}
-            onClick={handleModalClose}
-            onKeyDown={handleModalClose}
+          <NftOverview
+            token={token}
+            className="p-4 bg-[#07081B]/[.98] cursor-zoom-out"
           />
-          <div
-            className={classNames(
-              "relative",
-              "h-full max-h-[80%] max-w-[80%]",
-              contentType === "image_url"
-                ? "cursor-zoom-out"
-                : "cursor-default",
-              "w-auto"
-            )}
-            role={contentType === "image_url" ? "button" : undefined}
-            tabIndex={contentType === "image_url" ? 0 : undefined}
-            onClick={() =>
-              contentType === "image_url" ? handleModalClose() : null
-            }
-            onKeyDown={() =>
-              contentType === "image_url" ? handleModalClose() : null
-            }
-          >
-            {contentType === "image_url" && (
-              <>
-                <NftAvatar
-                  ref={imageRef}
-                  src={contentUrl}
-                  alt={alt}
-                  setLoadingStatus={setLoadingImageState}
-                  className="!bg-[#141528] h-full w-auto rounded-2xl"
-                  style={{
-                    width:
-                      loadingImageState !== "loaded"
-                        ? `${squareWidth}px`
-                        : "auto",
-                  }}
-                />
-                <span
-                  className={classNames(
-                    controlClassName,
-                    "absolute top-3 right-3"
-                  )}
-                >
-                  <ShrinkIcon className="w-6 h-auto" />
-                </span>
-              </>
-            )}
-            {contentType === "video_url" && (
-              <Suspense fallback={null}>
-                <MediaPlayer
-                  contentUrl={contentUrl}
-                  onClose={handleModalClose}
-                />
-              </Suspense>
-            )}
-          </div>
         </div>
       )}
     </>
   );
 };
-
-const MediaPlayer: FC<{
-  contentUrl: string;
-  onClose?: () => void;
-}> = ({ contentUrl, onClose }) => (
-  <Media className="h-full w-auto rounded-2xl overflow-hidden">
-    <Gesture
-      type="click"
-      action="toggle:paused"
-      className={classNames(
-        "absolute top-0 left-0",
-        "w-full h-full",
-        "block",
-        "z-0",
-        "opacity-0 invisible pointer-events-none"
-      )}
-    />
-    <Video className="h-full w-auto" autoplay loop>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
-        src={contentUrl}
-        preload="none"
-        data-video="0"
-        className="h-full w-auto"
-      />
-    </Video>
-    <button
-      type="button"
-      onClick={onClose}
-      className={classNames(controlClassName, "absolute top-3 right-3")}
-    >
-      <ShrinkIcon className="w-6 h-auto" />
-    </button>
-    <div className="absolute left-0 right-0 bottom-0 p-3 flex flex-col">
-      <TimeSlider className="h-4 group">
-        <div
-          className={classNames(
-            "w-full h-1",
-            "bg-brand-main/40",
-            !IS_FIREFOX && "backdrop-blur-[10px]",
-            "absolute top-1/2 left-0 -translate-y-1/2",
-            "rounded-[.625rem]",
-            "z-0",
-            "cursor-pointer"
-          )}
-        />
-        <div
-          className={classNames(
-            "w-full h-1",
-            "bg-brand-light",
-            "absolute top-1/2 left-0",
-            "origin-left -translate-y-1/2",
-            "w-[var(--vds-fill-percent)] will-change-[width]",
-            "dragging:w-[var(--vds-pointer-percent)]",
-            "rounded-[.625rem]",
-            "z-[1]",
-            "cursor-pointer"
-          )}
-        />
-        <div
-          className={classNames(
-            "absolute top-0 left-[var(--vds-fill-percent)]",
-            "w-4 h-full",
-            "z-[2]",
-            "will-change-[left] -translate-x-1/2 -translate-y-1/2",
-            "dragging:left-[var(--vds-pointer-percent)]"
-          )}
-        >
-          <div
-            className={classNames(
-              "absolute top-1/2 left-0",
-              "w-4 h-4",
-              "border border-brand-darkblue/[.4]",
-              "rounded-full",
-              "bg-brand-light",
-              "cursor-pointer",
-              "scale-0",
-              "transition-transform",
-              "group-hover:scale-100 dragging:scale-100"
-            )}
-          />
-        </div>
-      </TimeSlider>
-      <div className="mt-2 flex w-full">
-        <PlayButton className={controlClassName}>
-          <PlayIcon className="w-6 h-auto media-paused:block hidden" />
-          <PauseIcon className="w-6 h-auto media-paused:hidden block" />
-        </PlayButton>
-        <div
-          className={classNames(
-            controlClassName,
-            "ml-2 !px-3",
-            "text-sm font-bold",
-            "hover:!bg-brand-darkblue/[.4]"
-          )}
-        >
-          <div className="flex items-center tabular-nums">
-            <Time type="current" />
-            <span className="mx-0.5">/</span>
-            <Time type="duration" />
-          </div>
-        </div>
-        <MuteButton className={classNames(controlClassName, "ml-auto")}>
-          <VolumeHighIcon className="w-6 h-auto media-muted:hidden block" />
-          <VolumeMuteIcon className="w-6 h-auto media-muted:block hidden" />
-        </MuteButton>
-      </div>
-    </div>
-  </Media>
-);
 
 const controlClassName = classNames(
   "rounded-[.625rem]",

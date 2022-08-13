@@ -39,7 +39,7 @@ import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import NullState from "../blocks/tokenList/NullState";
 import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
-import Delay from "../blocks/tokenList/Delay";
+import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
 
 import AssetCard from "./overview/AssetCard";
@@ -133,7 +133,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     focusSearchInput,
     searchInputRef,
     tokenIdSearchInputRef,
-    loadMoreTriggerAssetRef,
+    loadMoreTriggerRef,
   } = useTokenList(tokenType, handleAccountTokensReset);
 
   // A little hack to avoid using `manageModeEnabled` dependency
@@ -199,7 +199,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         key={nft.tokenSlug}
         ref={
           i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
-            ? loadMoreTriggerAssetRef
+            ? loadMoreTriggerRef
             : null
         }
         nft={nft}
@@ -213,7 +213,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       manageModeEnabled,
       tokenSlug,
       handleTokenSelect,
-      loadMoreTriggerAssetRef,
+      loadMoreTriggerRef,
     ]
   );
 
@@ -282,19 +282,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         <NullState searching={searching} focusSearchInput={focusSearchInput} />
       );
     } else if (isNftsSelected) {
-      tokensBar = (
-        <div
-          className={classNames(
-            "flex flex-col items-center",
-            "h-full w-full py-9",
-            "text-sm text-brand-placeholder text-center"
-          )}
-        >
-          <Delay ms={500}>
-            <span>{!syncing ? "No NFT yet" : "Syncing..."}</span>
-          </Delay>
-        </div>
-      );
+      tokensBar = <NoNftState syncing={syncing} />;
     }
   } else {
     tokensBar = (
@@ -319,7 +307,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
                 key={asset.tokenSlug}
                 ref={
                   i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
-                    ? loadMoreTriggerAssetRef
+                    ? loadMoreTriggerRef
                     : null
                 }
                 asset={asset as AccountAsset}

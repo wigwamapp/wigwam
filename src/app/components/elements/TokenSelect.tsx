@@ -56,7 +56,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
   }, [tokenSlug]);
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!tokens) return;
 
@@ -128,7 +128,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
       searchValue={searchValue}
       onSearch={setSearchValue}
       label="Token"
-      itemRef={loadMoreTriggerAssetRef}
+      itemRef={loadMoreTriggerRef}
       loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
       showSelected
       showSelectedIcon={false}
