@@ -204,6 +204,12 @@ function useTokenSearchPersist(
   setSearchValue: Dispatch<React.SetStateAction<string | null>>
 ) {
   useEffect(() => {
+    if (!enabled) {
+      storage.remove(TOKEN_SEARCH_PERSIST).catch(console.error);
+    }
+  }, [enabled]);
+
+  useEffect(() => {
     if (!enabled) return;
 
     (async () => {
