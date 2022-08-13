@@ -297,7 +297,6 @@ const STRICT_TX_PROPS = [
   "to",
   "data",
   "accessList",
-  "type",
   "chainId",
   "value",
 ] as const;
@@ -306,10 +305,6 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
   for (const key of STRICT_TX_PROPS) {
     const txValue = hexValueMaybe(tx[key]);
     const originValue = hexValueMaybe(originTxParams[key]);
-
-    if (key === "type" && originValue === "0x0" && !txValue) {
-      continue;
-    }
 
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");

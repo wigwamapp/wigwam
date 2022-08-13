@@ -192,7 +192,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setEstimating(true);
 
         try {
-          const { type, gasLimit, ...rest } = txParams;
+          const { gasLimit, ...rest } = txParams;
+
+          // detele tx type cause auto-detect
+          delete rest.type;
 
           // detele gas prices
           delete rest.gasPrice;
@@ -210,11 +213,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   .getUncheckedSigner(account.address)
                   .populateTransaction({
                     ...rest,
-                    type: type
-                      ? bnify(type)?.toNumber()
-                      : feeSuggestions?.type === "legacy"
-                      ? 0
-                      : undefined,
+                    type: feeSuggestions?.type === "legacy" ? 0 : undefined,
                     chainId: bnify(rest?.chainId)?.toNumber(),
                     ...(feeSuggestions?.type === "modern"
                       ? {
