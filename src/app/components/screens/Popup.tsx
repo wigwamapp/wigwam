@@ -170,7 +170,10 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
     searchInputRef,
     tokenIdSearchInputRef,
     loadMoreTriggerRef,
-  } = useTokenList(tokenType, handleAccountTokensReset);
+  } = useTokenList(tokenType, {
+    onAccountTokensReset: handleAccountTokensReset,
+    searchPersist: tokenType === TokenType.NFT,
+  });
 
   const controlBar = useMemo(
     () => (

@@ -1,6 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
+import { storage } from "lib/ext/storage";
 
 import { TokenStandard, TokenType } from "core/types";
 import { createTokenSlug, detectNFTStandard } from "core/common/tokens";
@@ -16,7 +24,10 @@ import {
 
 export function useTokenList(
   tokenType: TokenType,
-  onAccountTokensReset?: () => void
+  opts: {
+    onAccountTokensReset?: () => void;
+    searchPersist?: boolean;
+  } = {}
 ) {
   const currentAccount = useAtomValue(currentAccountAtom);
   const chainId = useChainId();
@@ -29,6 +40,12 @@ export function useTokenList(
     null
   );
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
+
+  useTokenSearchPersist(
+    opts.searchPersist ?? false,
+    searchValue,
+    setSearchValue
+  );
 
   const combinedSearchValue = useMemo(() => {
     if (!searchValue) return undefined;
@@ -44,7 +61,7 @@ export function useTokenList(
       withDisabled:
         manageModeEnabled || Boolean(isNftsSelected && combinedSearchValue),
       search: combinedSearchValue,
-      onReset: onAccountTokensReset,
+      onReset: opts.onAccountTokensReset,
     }
   );
 
@@ -173,4 +190,55 @@ export function useTokenList(
     tokenIdSearchInputRef,
     loadMoreTriggerRef,
   };
+}
+
+const TOKEN_SEARCH_PERSIST = "token_search_persist";
+type TokenSearchPersist = {
+  value: string;
+  addedAt: number;
+};
+
+function useTokenSearchPersist(
+  enabled: boolean,
+  searchValue: string | null,
+  setSearchValue: Dispatch<React.SetStateAction<string | null>>
+) {
+  useEffect(() => {
+    if (!enabled) return;
+
+    (async () => {
+      try {
+        const persist = await storage.fetchForce<TokenSearchPersist>(
+          TOKEN_SEARCH_PERSIST
+        );
+        if (!persist) return;
+
+        const { value, addedAt } = persist;
+        if (ethers.utils.isAddress(value) && addedAt > Date.now() - 30_000) {
+          setSearchValue(value);
+        } else {
+          await storage.remove(TOKEN_SEARCH_PERSIST);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [enabled, setSearchValue]);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    (async () => {
+      try {
+        if (!searchValue || !ethers.utils.isAddress(searchValue)) return;
+
+        await storage.put<TokenSearchPersist>(TOKEN_SEARCH_PERSIST, {
+          value: searchValue,
+          addedAt: Date.now(),
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [enabled, searchValue]);
 }

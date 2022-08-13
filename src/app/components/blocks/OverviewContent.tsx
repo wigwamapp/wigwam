@@ -134,7 +134,9 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     searchInputRef,
     tokenIdSearchInputRef,
     loadMoreTriggerRef,
-  } = useTokenList(tokenType, handleAccountTokensReset);
+  } = useTokenList(tokenType, {
+    onAccountTokensReset: handleAccountTokensReset,
+  });
 
   // A little hack to avoid using `manageModeEnabled` dependency
   const manageModeEnabledRef = useRef<boolean>();
