@@ -15,6 +15,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { lazyVidstack } from "lib/lazy-vidstack";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { storage } from "lib/ext/storage";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 import { AccountNFT, NFTContentType, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -36,7 +37,6 @@ import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import IconedButton from "app/components/elements/IconedButton";
 import Button from "app/components/elements/Button";
-import { LoadingStatus } from "app/components/elements/Avatar";
 import NftAvatar from "app/components/elements/NftAvatar";
 import CopiableTooltip from "app/components/elements/CopiableTooltip";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -257,7 +257,7 @@ const NftPreview: FC<NftPreviewProps> = ({
   const imageRef = useRef<HTMLElement>(null);
   const [modalOpened, setModalOpened] = useState(false);
   const [loadingImageState, setLoadingImageState] =
-    useState<LoadingStatus>("idle");
+    useState<AvatarPrimitive.ImageLoadingStatus>("idle");
   const [squareWidth, setSquareWidth] = useState(0);
 
   const calculateWidth = useCallback(() => {
@@ -398,7 +398,9 @@ const NftPreview: FC<NftPreviewProps> = ({
                   ref={imageRef}
                   src={contentUrl}
                   alt={alt}
-                  setLoadingStatus={setLoadingImageState}
+                  setLoadingStatus={({ state }) =>
+                    setLoadingImageState(state as any)
+                  }
                   className="!bg-[#141528] h-full w-auto rounded-2xl"
                   style={{
                     width:

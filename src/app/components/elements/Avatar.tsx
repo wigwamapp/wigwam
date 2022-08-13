@@ -1,10 +1,21 @@
-import { FC, forwardRef, memo, useEffect, useState } from "react";
+import {
+  FC,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import classNames from "clsx";
 
 import { ReactComponent as FallbackIconPrimitive } from "app/icons/Fallback.svg";
 
-export type LoadingStatus = "idle" | "loading" | "loaded" | "error";
+export type LoadingStatus = {
+  state: AvatarPrimitive.ImageLoadingStatus;
+  delayFinished: boolean;
+};
 
 export type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   FallbackElement?: FC<{ className?: string }>;
@@ -14,6 +25,7 @@ export type AvatarProps = AvatarPrimitive.AvatarImageProps & {
   fallbackClassName?: string;
   errorClassName?: string;
   setLoadingStatus?: (status: LoadingStatus) => void;
+  delay?: number;
 };
 
 const Avatar = memo(
@@ -28,19 +40,32 @@ const Avatar = memo(
         fallbackClassName,
         errorClassName,
         setLoadingStatus,
+        delay = 150,
         style,
         ...rest
       },
       ref
     ) => {
-      const [loadingState, setLoadingState] = useState<LoadingStatus>("idle");
+      const [loadingState, setLoadingState] =
+        useState<AvatarPrimitive.ImageLoadingStatus>("idle");
+      const [delayFinished, setDelayFinished] = useState(false);
+
       const notLoaded = loadingState === "idle" || loadingState === "loading";
 
-      const [delayFinished, setDelayFinished] = useState(false);
+      const handleDelayFinised = useCallback(() => {
+        setDelayFinished(true);
+        setLoadingStatus?.({ state: loadingState, delayFinished: true });
+      }, [setDelayFinished, setLoadingStatus, loadingState]);
+
+      const handleDelayFinisedRef = useRef(handleDelayFinised);
       useEffect(() => {
-        const t = setTimeout(() => setDelayFinished(true), 150);
+        handleDelayFinisedRef.current = handleDelayFinised;
+      }, [handleDelayFinised]);
+
+      useEffect(() => {
+        const t = setTimeout(() => handleDelayFinisedRef.current(), delay);
         return () => clearTimeout(t);
-      }, []);
+      }, [delay]);
 
       const bgDisplayed = (notLoaded && delayFinished) || withBg;
 
@@ -65,7 +90,7 @@ const Avatar = memo(
             {...rest}
             onLoadingStatusChange={(state) => {
               setLoadingState(state);
-              setLoadingStatus?.(state);
+              setLoadingStatus?.({ state, delayFinished });
             }}
             className={classNames("w-full h-full object-cover", imageClassName)}
           />

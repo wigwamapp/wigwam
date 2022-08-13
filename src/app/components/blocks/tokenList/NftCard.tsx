@@ -5,9 +5,16 @@ import classNames from "clsx";
 import { AccountNFT, TokenStatus } from "core/types";
 
 import { prepareNFTLabel } from "app/utils";
-import NftAvatar from "app/components/elements/NftAvatar";
+import NftAvatar, {
+  AvatarLoadingStatus,
+} from "app/components/elements/NftAvatar";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+
+const INITIAL_NFT_LOADING_STATUS = {
+  state: "idle" as const,
+  delayFinished: false,
+};
 
 type NftCardProps = {
   nft: AccountNFT;
@@ -19,7 +26,11 @@ type NftCardProps = {
 const NftCard = memo(
   forwardRef<HTMLButtonElement, NftCardProps>(
     ({ nft, isActive = false, onSelect, isManageMode }, ref) => {
-      const [loaded, setLoaded] = useState(false);
+      const [{ state: loadingState, delayFinished }, setLoadingStatus] =
+        useState<AvatarLoadingStatus>(INITIAL_NFT_LOADING_STATUS);
+
+      const loaded = loadingState !== "idle" && loadingState !== "loading";
+      const invisible = !delayFinished && !loaded;
 
       const { thumbnailUrl, name, tokenId, rawBalance, status } = nft;
       const disabled = status === TokenStatus.Disabled;
@@ -42,16 +53,15 @@ const NftCard = memo(
               "hover:bg-brand-main/10 hover:!opacity-100",
             isActive && "bg-brand-main/20",
             (disabled || rawBalance === "0") && "opacity-60",
-            !loaded && "invisible"
+            invisible && "invisible"
           )}
         >
           <div className="relative w-full">
             <NftAvatar
               src={thumbnailUrl}
               alt={title.label}
-              setLoadingStatus={(status) => {
-                setLoaded(status !== "loading" && status !== "idle");
-              }}
+              delay={1_000}
+              setLoadingStatus={setLoadingStatus}
               className={classNames(
                 "w-full h-auto !rounded-md",
                 !loaded && "h-[6rem]"
