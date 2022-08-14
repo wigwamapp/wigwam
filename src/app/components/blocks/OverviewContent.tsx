@@ -20,13 +20,14 @@ import {
   AccountNFT,
 } from "core/types";
 import * as repo from "core/repo";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
   LOAD_MORE_ON_NFT_FROM_END,
   LOAD_MORE_ON_TOKEN_FROM_END,
 } from "app/defaults";
 import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useAccountToken } from "app/hooks";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import { useTokenList } from "app/hooks/tokenList";
 
@@ -138,6 +139,8 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     onAccountTokensReset: handleAccountTokensReset,
   });
 
+  const selectedToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
+
   // A little hack to avoid using `manageModeEnabled` dependency
   const manageModeEnabledRef = useRef<boolean>();
   if (manageModeEnabledRef.current !== manageModeEnabled) {
@@ -149,6 +152,12 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       setDefaultTokenRef.current = true;
     }
   }, [tokenSlug]);
+
+  useEffect(() => {
+    if (selectedToken && selectedToken.tokenType !== tokenType) {
+      setDefaultTokenRef.current = true;
+    }
+  }, [selectedToken, tokenType]);
 
   useEffect(() => {
     if (
