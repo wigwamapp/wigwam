@@ -125,7 +125,7 @@ function appendPlaceholderLists(messages: LocaleMessages) {
     if (val.placeholders) {
       val.placeholderList = [];
       for (const pKey in val.placeholders) {
-        const { content } = val.placeholders[pKey];
+        const { content } = val.placeholders[pKey] as { content: string };
         const index = +content.substring(1) - 1;
         val.placeholderList[index] = pKey;
       }

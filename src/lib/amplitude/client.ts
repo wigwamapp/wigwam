@@ -8,7 +8,7 @@ export class AmplitudeClient extends AmplitudeCore<NodeConfig> {
   async init(apiKey: string, userId?: string) {
     const extOptions = new ExtConfig(apiKey, userId);
 
-    await super.init(undefined, undefined, extOptions);
+    await super._init(extOptions);
 
     await this.add(new ExtContext());
     await this.add(new Destination());
