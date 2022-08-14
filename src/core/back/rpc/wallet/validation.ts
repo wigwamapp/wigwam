@@ -70,20 +70,26 @@ const stringHex = (length?: number) =>
     ethers.utils.isHexString(value, length)
   );
 
+const stringOrNumber = () =>
+  define<string | number>(
+    "stringOrNumber",
+    (value) => typeof value === "string" || typeof value === "number"
+  );
+
 const address = () =>
   define<string>("address", (value: any) => ethers.utils.isAddress(value));
 
 export const TxParamsSchema: Describe<TxParams> = object({
   from: address(),
   to: optional(address()),
-  nonce: optional(stringHex()),
+  nonce: optional(stringOrNumber()),
   gasPrice: optional(stringHex()),
   gasLimit: optional(stringHex()),
   value: optional(stringHex()),
   data: optional(stringHex()),
-  chainId: optional(stringHex()),
+  chainId: optional(stringOrNumber()),
 
-  type: optional(stringHex()),
+  type: optional(stringOrNumber()),
   accessList: optional(
     array(
       object({
