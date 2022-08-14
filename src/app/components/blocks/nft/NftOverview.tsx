@@ -90,7 +90,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
       contentNode = withErrorFallback(
         <video
           ref={imgOrVideoRef as RefObject<HTMLVideoElement>}
-          src={token.contentUrl}
+          src={token.contentUrl ?? ""}
           className={contentClassName}
           onError={handleContentError}
           autoPlay
@@ -103,11 +103,16 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
 
     case "audio_url":
       contentNode = (
-        <div className={classNames(contentClassName, "relative")}>
+        <div
+          className={classNames(
+            !errored ? contentClassName : "h-full",
+            "relative"
+          )}
+        >
           {withErrorFallback(
             <img
               ref={imgOrVideoRef as RefObject<HTMLImageElement>}
-              src={token.thumbnailUrl}
+              src={token.thumbnailUrl ?? ""}
               alt={token.name}
               className={contentClassName}
               onError={handleContentError}
@@ -122,7 +127,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
           >
             <audio
               ref={audioRef}
-              src={token.contentUrl}
+              src={token.contentUrl ?? ""}
               onError={handleContentError}
               className="w-full"
               id="nft-overview-content"
@@ -140,7 +145,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
       contentNode = withErrorFallback(
         <img
           ref={imgOrVideoRef as RefObject<HTMLImageElement>}
-          src={token.contentUrl || token.thumbnailUrl}
+          src={token.contentUrl || token.thumbnailUrl || ""}
           alt={token.name}
           className={contentClassName}
           onError={handleContentError}
