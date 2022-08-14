@@ -20,6 +20,8 @@ function inject(key: string) {
 
   const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
   if (propertyDescriptor && "set" in propertyDescriptor) {
+    if ((existing as any).isRabby) return;
+
     (window as any)[key] = universal;
   } else {
     Object.defineProperty(window, key, {

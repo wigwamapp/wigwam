@@ -104,6 +104,8 @@ export class UniversalInpageProvider extends Emitter {
     const provider = this.#currentProvider;
     const unsubs: (() => void)[] = [];
 
+    if ((provider as any) === this) return;
+
     for (const type of EVENTS_TO_PROXY) {
       const handleEvent = (evt: any) => this.emit(type, evt);
       provider.on(type, handleEvent);
