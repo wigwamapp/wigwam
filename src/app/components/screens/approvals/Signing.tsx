@@ -34,7 +34,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import ApprovalLayout from "./Layout";
 
-const JsonView = lazy(() => import("react-json-view"));
+const JsonView = lazy(() => import("@microlink/react-json-view"));
 
 const { toUtf8String, hexlify, joinSignature, getAddress } = ethers.utils;
 
