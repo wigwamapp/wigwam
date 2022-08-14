@@ -29,7 +29,6 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
 }) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger />
       <Dialog.Portal>
         <Dialog.Overlay
           className={classNames("fixed inset-0 z-20 bg-brand-darkblue/50")}
