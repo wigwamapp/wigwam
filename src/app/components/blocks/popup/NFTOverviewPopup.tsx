@@ -5,7 +5,7 @@ import classNames from "clsx";
 import { AccountNFT } from "core/types";
 
 import { chainIdAtom } from "app/atoms";
-import { useChainId } from "app/hooks";
+import { useChainId, useAutoRefreshNftMetadata } from "app/hooks";
 import { openInTab } from "app/helpers";
 import { Page } from "app/nav";
 
@@ -28,6 +28,8 @@ type NFTOverviewPopupProps = Pick<
 const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
   const chainId = useChainId();
   const setInternalChainId = useSetAtom(chainIdAtom);
+
+  useAutoRefreshNftMetadata(token ?? undefined);
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {

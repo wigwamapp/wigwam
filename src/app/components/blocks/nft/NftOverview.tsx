@@ -160,7 +160,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
     >
       {contentNode}
 
-      {!fitContentBy && (
+      {!fitContentBy && !errored && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="atom-spinner w-16 h-16" />
         </div>

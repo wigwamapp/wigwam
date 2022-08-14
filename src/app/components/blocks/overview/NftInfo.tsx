@@ -4,7 +4,6 @@ import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-import { storage } from "lib/ext/storage";
 
 import { AccountNFT, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -19,6 +18,7 @@ import {
   useExplorerLink,
   useLazyNetwork,
   useTokenActivitiesSync,
+  useAutoRefreshNftMetadata,
 } from "app/hooks";
 import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
@@ -61,25 +61,7 @@ const NftInfo: FC = () => {
     tokenInfo && tokenSlug
   );
 
-  useEffect(() => {
-    if (tokenInfo && !tokenInfo.thumbnailUrl) {
-      const { chainId, accountAddress, tokenSlug } = tokenInfo;
-
-      (async () => {
-        const storageKey = [
-          "nft_metadata_refresh_tried",
-          chainId,
-          tokenSlug,
-        ].join("_");
-
-        const tried = await storage.fetchForce<boolean>(storageKey);
-        if (!tried) {
-          await storage.put(storageKey, true);
-          findToken(chainId, accountAddress, tokenSlug, true);
-        }
-      })();
-    }
-  }, [tokenInfo]);
+  useAutoRefreshNftMetadata(tokenInfo);
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
