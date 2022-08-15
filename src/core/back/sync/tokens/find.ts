@@ -78,6 +78,11 @@ async function performTokenSync(
             .toNumber()
         : existing.balanceUSD ?? 0;
 
+    const balanceChangedToZero =
+      existing.status === TokenStatus.Enabled &&
+      new BigNumber(existing.rawBalance).gt(0) &&
+      new BigNumber(rawBalance).isZero();
+
     await repo.accountTokens.put(
       {
         ...existing,
@@ -87,6 +92,8 @@ async function performTokenSync(
           balance &&
           !balance.isZero()
             ? TokenStatus.Enabled
+            : balanceChangedToZero && existing.tokenType == TokenType.NFT
+            ? TokenStatus.Disabled
             : existing.status,
         rawBalance,
         balanceUSD,

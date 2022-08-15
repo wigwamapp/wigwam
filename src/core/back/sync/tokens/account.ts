@@ -198,6 +198,11 @@ export const syncAccountTokens = memoize(
               ? new BigNumber(priceUSD).toNumber()
               : existing?.balanceUSD ?? 0;
 
+            const balanceChangedToZero =
+              existing &&
+              new BigNumber(existing.rawBalance).gt(0) &&
+              rawBalanceBN.isZero();
+
             accTokens.push(
               existing
                 ? {
@@ -205,6 +210,9 @@ export const syncAccountTokens = memoize(
                     ...metadata,
                     rawBalance,
                     balanceUSD,
+                    status: balanceChangedToZero
+                      ? TokenStatus.Disabled
+                      : existing.status,
                   }
                 : {
                     chainId,

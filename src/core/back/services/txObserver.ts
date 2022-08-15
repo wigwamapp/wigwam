@@ -92,6 +92,10 @@ export async function startTxObserver() {
               tx.accountAddress,
               NATIVE_TOKEN_SLUG
             );
+
+            if (result.to && accountAddresses.includes(result.to)) {
+              addFindTokenRequest(tx.chainId, result.to, NATIVE_TOKEN_SLUG);
+            }
           }
 
           txsToUpdate.set(tx.txHash, updatedTx);

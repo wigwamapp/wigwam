@@ -237,7 +237,7 @@ const History = memo(() => {
   } = useCompleteActivity();
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!completeActivity) return;
 
@@ -279,7 +279,7 @@ const History = memo(() => {
               ref={
                 i ===
                 completeActivity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
-                  ? loadMoreTriggerAssetRef
+                  ? loadMoreTriggerRef
                   : null
               }
               item={item}

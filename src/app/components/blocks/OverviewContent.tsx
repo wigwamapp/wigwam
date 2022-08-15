@@ -20,13 +20,14 @@ import {
   AccountNFT,
 } from "core/types";
 import * as repo from "core/repo";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
   LOAD_MORE_ON_NFT_FROM_END,
   LOAD_MORE_ON_TOKEN_FROM_END,
 } from "app/defaults";
 import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useAccountToken } from "app/hooks";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import { useTokenList } from "app/hooks/tokenList";
 
@@ -39,7 +40,7 @@ import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import NullState from "../blocks/tokenList/NullState";
 import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
-import Delay from "../blocks/tokenList/Delay";
+import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
 
 import AssetCard from "./overview/AssetCard";
@@ -133,8 +134,12 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     focusSearchInput,
     searchInputRef,
     tokenIdSearchInputRef,
-    loadMoreTriggerAssetRef,
-  } = useTokenList(tokenType, handleAccountTokensReset);
+    loadMoreTriggerRef,
+  } = useTokenList(tokenType, {
+    onAccountTokensReset: handleAccountTokensReset,
+  });
+
+  const selectedToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
 
   // A little hack to avoid using `manageModeEnabled` dependency
   const manageModeEnabledRef = useRef<boolean>();
@@ -147,6 +152,12 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       setDefaultTokenRef.current = true;
     }
   }, [tokenSlug]);
+
+  useEffect(() => {
+    if (selectedToken && selectedToken.tokenType !== tokenType) {
+      setDefaultTokenRef.current = true;
+    }
+  }, [selectedToken, tokenType]);
 
   useEffect(() => {
     if (
@@ -199,7 +210,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         key={nft.tokenSlug}
         ref={
           i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
-            ? loadMoreTriggerAssetRef
+            ? loadMoreTriggerRef
             : null
         }
         nft={nft}
@@ -213,7 +224,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       manageModeEnabled,
       tokenSlug,
       handleTokenSelect,
-      loadMoreTriggerAssetRef,
+      loadMoreTriggerRef,
     ]
   );
 
@@ -282,19 +293,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         <NullState searching={searching} focusSearchInput={focusSearchInput} />
       );
     } else if (isNftsSelected) {
-      tokensBar = (
-        <div
-          className={classNames(
-            "flex flex-col items-center",
-            "h-full w-full py-9",
-            "text-sm text-brand-placeholder text-center"
-          )}
-        >
-          <Delay ms={500}>
-            <span>{!syncing ? "No NFT yet" : "Syncing..."}</span>
-          </Delay>
-        </div>
-      );
+      tokensBar = <NoNftState syncing={syncing} />;
     }
   } else {
     tokensBar = (
@@ -319,7 +318,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
                 key={asset.tokenSlug}
                 ref={
                   i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
-                    ? loadMoreTriggerAssetRef
+                    ? loadMoreTriggerRef
                     : null
                 }
                 asset={asset as AccountAsset}
