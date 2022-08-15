@@ -9,7 +9,7 @@ export function useImageOrVideoSize(
     const el = ref.current;
     let t: ReturnType<typeof setTimeout>;
 
-    const checkAndDefer = () => {
+    const checkAndDefer = (attempt = 0) => {
       if (el) {
         if ("naturalWidth" in el && el.naturalWidth) {
           setSize([el.naturalWidth, el.naturalHeight]);
@@ -22,7 +22,8 @@ export function useImageOrVideoSize(
         }
       }
 
-      t = setTimeout(checkAndDefer, 10);
+      if (attempt > 1_000) return;
+      t = setTimeout(checkAndDefer, 10, attempt + 1);
     };
 
     checkAndDefer();
