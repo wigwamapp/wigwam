@@ -8,7 +8,7 @@ import { settingTabAtom } from "app/atoms";
 
 import General from "../settingTabs/General";
 import Security from "../settingTabs/Security";
-// import Web3 from "../settingTabs/Web3";
+import Web3 from "../settingTabs/Web3";
 import Networks from "../settingTabs/Networks";
 import Profile from "../settingTabs/Profile";
 import About from "../settingTabs/About";
@@ -20,7 +20,7 @@ function matchSettingTab(settingTab: SettingTab) {
       .with(SettingTab.General, () => <General />)
       .with(SettingTab.Profile, () => <Profile />)
       .with(SettingTab.Security, () => <Security />)
-      // .with(SettingTab.Web3, () => <Web3 />)
+      .with(SettingTab.Web3, () => <Web3 />)
       .with(SettingTab.Networks, () => <Networks />)
       .with(SettingTab.About, () => <About />)
       .with(SettingTab.Advanced, () => <Advanced />)

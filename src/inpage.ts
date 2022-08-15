@@ -3,19 +3,27 @@ import { UniversalInpageProvider } from "core/inpage/universalProvider";
 
 const vigvam = new InpageProvider();
 
-inject("ethereum");
+inject("ethereum", true);
 inject("vigvamEthereum");
 
-function inject(key: string) {
-  const existing: InpageProvider = (window as any)[key];
+function inject(key: string, sharedProperty = false) {
+  const existing = (window as any)[key];
 
   if (existing?.isVigvam && "addProviders" in existing) {
-    (existing as any).addProviders(vigvam);
+    existing.addProviders(vigvam);
     return;
   }
 
   const universal = new UniversalInpageProvider(
-    existing ? [vigvam, existing] : [vigvam]
+    existing
+      ? [
+          vigvam,
+          ...(Array.isArray(existing.providers)
+            ? new Set([existing, ...existing.providers])
+            : [existing]),
+        ]
+      : [vigvam],
+    sharedProperty
   );
 
   const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
