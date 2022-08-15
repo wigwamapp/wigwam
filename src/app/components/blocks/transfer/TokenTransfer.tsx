@@ -254,18 +254,18 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         </p>
 
                         {explorerLink && (
-                          <div className="mt-1 flex items-center">
-                            <a
-                              href={explorerLink.tx(txHash)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline"
-                            >
-                              View the transaction in explorer
-                            </a>
-
-                            <ExternalLinkIcon className="h-5 w-auto ml-1" />
-                          </div>
+                          <a
+                            href={explorerLink.tx(txHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 underline"
+                          >
+                            View the transaction in{" "}
+                            <span className="whitespace-nowrap">
+                              explorer
+                              <ExternalLinkIcon className="h-5 w-auto ml-1 inline-block" />
+                            </span>
+                          </a>
                         )}
                       </div>
                     );
