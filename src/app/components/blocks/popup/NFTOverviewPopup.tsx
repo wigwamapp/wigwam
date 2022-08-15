@@ -8,6 +8,7 @@ import { chainIdAtom } from "app/atoms";
 import { useChainId, useAutoRefreshNftMetadata } from "app/hooks";
 import { openInTab } from "app/helpers";
 import { Page } from "app/nav";
+import { prepareNFTLabel } from "app/utils";
 
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
@@ -38,12 +39,50 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
     },
     [setInternalChainId, chainId]
   );
+  const tokenInfo = token
+    ? prepareNFTLabel(token?.tokenId, token?.name)
+    : undefined;
 
   return (
     <SecondaryModal {...rest} small>
       <div className={classNames("w-full h-[20rem]", "mt-4 mb-2")}>
         {token && <NftOverview token={token} small />}
       </div>
+
+      {tokenInfo && (
+        <h3
+          className={classNames(
+            "line-clamp-2 break-words mt-2",
+            "text-sm text-left font-bold",
+            "w-full mb-4",
+            !tokenInfo.name ? "text-brand-main" : ""
+          )}
+        >
+          <span
+            className={classNames(
+              tokenInfo.name &&
+                tokenInfo.name.length > 13 &&
+                !tokenInfo.name.slice(0, 13).includes(" ") &&
+                "break-all"
+            )}
+          >
+            {tokenInfo.name}
+          </span>
+          {tokenInfo.name && tokenInfo.id ? " " : ""}
+          {tokenInfo.id ? (
+            <span
+              className={classNames(
+                "text-brand-main",
+                tokenInfo.id.length > 11 ? "break-all" : "break-words"
+              )}
+            >
+              {tokenInfo.id}
+            </span>
+          ) : (
+            ""
+          )}
+        </h3>
+      )}
 
       <div
         className={classNames(

@@ -255,7 +255,8 @@ const AssetCard = memo(
                 IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
                 "rounded-[.625rem]",
-                "px-1 py-2"
+                "px-1 py-2",
+                "z-[1]"
               )}
             >
               <PopoverButton

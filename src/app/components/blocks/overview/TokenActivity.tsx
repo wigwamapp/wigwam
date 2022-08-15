@@ -170,7 +170,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
                   new BigNumber(10).pow(tokenDecimals ?? 18).lte(amoutnBN.abs())
                 }
                 isThousandsMinified={false}
-                copiable={true}
+                copiable={!(tokenDecimals === 0 && amoutnBN.eq(1))}
                 className={classNames("text-base font-bold", amountClassName)}
               />
             )}

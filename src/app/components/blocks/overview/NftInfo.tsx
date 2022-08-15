@@ -20,7 +20,6 @@ import {
   useTokenActivitiesSync,
   useAutoRefreshNftMetadata,
 } from "app/hooks";
-import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import IconedButton from "app/components/elements/IconedButton";
@@ -83,8 +82,6 @@ const NftInfo: FC = () => {
   if (!tokenInfo) return null;
 
   const { name, tokenId, rawBalance, detailUrl } = tokenInfo;
-
-  const { name: preparedName } = prepareNFTLabel(tokenId, name);
   const preparedId = `#${tokenId}`;
 
   return (
@@ -151,7 +148,7 @@ const NftInfo: FC = () => {
                   </TippySingletonProvider>
                 </div>
 
-                {preparedName && (
+                {name && (
                   <h2
                     className={classNames(
                       "text-2xl font-bold",
@@ -159,7 +156,7 @@ const NftInfo: FC = () => {
                       preparedId && "mt-1 mb-6"
                     )}
                   >
-                    {preparedName}
+                    {name}
                   </h2>
                 )}
                 <Button
