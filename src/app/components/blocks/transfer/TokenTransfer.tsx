@@ -40,7 +40,7 @@ import {
   withHumanDelay,
   OnChange,
 } from "app/utils";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
   useChainId,
   useExplorerLink,
@@ -107,6 +107,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
     const chainId = useChainId();
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);
+    const setTokenType = useSetAtom(tokenTypeAtom);
     const setTokenSlug = useSetAtom(tokenSlugAtom);
     const { alert, closeCurrentDialog } = useDialog();
     const { updateToast } = useToast();
@@ -240,6 +241,8 @@ const TransferTokenContent = memo<TransferTokenContent>(
             txResPromise
               .then((txHash) => {
                 if (isMounted()) {
+                  setTokenType(token.tokenType);
+
                   setTimeout(
                     () => navigate((s) => ({ ...s, page: Page.Default })),
                     50
@@ -295,6 +298,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
         updateToast,
         provider,
         isMounted,
+        setTokenType,
         explorerLink,
       ]
     );
