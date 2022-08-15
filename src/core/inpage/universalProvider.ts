@@ -177,12 +177,20 @@ export class UniversalInpageProvider extends Emitter {
         : methodOrPayload.method;
 
     if (isPermissionMethod(method, this.#currentProvider)) {
-      if (typeof methodOrPayload === "string") {
+      if (typeof callbackOrArgs !== "function") {
         return this.#requestPermissionsAll((p) =>
           p.send(methodOrPayload, callbackOrArgs)
         );
       } else {
-        this.#requestPermissionsAll((p) => p.send(methodOrPayload))
+        this.#requestPermissionsAll(
+          (p) =>
+            new Promise((res, rej) => {
+              p.send(methodOrPayload, (err, result) => {
+                if (err) return rej(err);
+                res(result);
+              });
+            })
+        )
           .then((result) => callbackOrArgs(null, result))
           .catch((error) => callbackOrArgs(error));
 
