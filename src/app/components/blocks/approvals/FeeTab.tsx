@@ -11,7 +11,7 @@ import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import classNames from "clsx";
 
-import { FEE_MODES, FeeMode, FeeSuggestions } from "core/types";
+import { FEE_MODES, FeeMode, FeeSuggestions, AccountAsset } from "core/types";
 
 import { useChainId, useToken } from "app/hooks";
 import {
@@ -329,7 +329,7 @@ const FeeModeItem: FC<FeeModeItemProps> = ({
   fee,
   selected,
 }) => {
-  const nativeToken = useToken(accountAddress);
+  const nativeToken = useToken<AccountAsset>(accountAddress);
 
   const usdAmount =
     fee && nativeToken?.priceUSD

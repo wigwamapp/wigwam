@@ -1,53 +1,38 @@
 import {
   FC,
-  forwardRef,
-  useCallback,
+  ReactNode,
   memo,
+  useCallback,
   useRef,
   useState,
   useMemo,
-  ButtonHTMLAttributes,
-  Dispatch,
-  SetStateAction,
 } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import * as Checkbox from "@radix-ui/react-checkbox";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
-import { dequal } from "dequal/lite";
-import BigNumber from "bignumber.js";
+import Masonry from "lib/react-masonry/Masonry";
 
 import {
+  Account,
   AccountAsset,
-  AccountSource,
+  AccountNFT,
   TokenStatus,
   TokenType,
 } from "core/types";
 import * as repo from "core/repo";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { IS_FIREFOX, LOAD_MORE_ON_ASSET_FROM_END } from "app/defaults";
-import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
-import { openInTab } from "app/helpers";
 import {
-  activeTabAtom,
+  LOAD_MORE_ON_TOKEN_FROM_END,
+  LOAD_MORE_ON_NFT_FROM_END,
+} from "app/defaults";
+import {
   activeTabOriginAtom,
-  chainIdAtom,
-  currentAccountAtom,
   getPermissionAtom,
+  tokenTypeAtom,
 } from "app/atoms";
 import { TippySingletonProvider, useIsSyncing } from "app/hooks";
-import { useAllAccountTokens } from "app/hooks/tokens";
+import { useTokenList } from "app/hooks/tokenList";
 
-import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
-import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
-import { ReactComponent as ReceiveIcon } from "app/icons/receive-small.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
-import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
-import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
-import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
-import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
+import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
 
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
@@ -57,30 +42,28 @@ import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import FiatAmount from "../elements/FiatAmount";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
-import Avatar from "../elements/Avatar";
-import AssetLogo from "../elements/AssetLogo";
-import PrettyAmount from "../elements/PrettyAmount";
-import PriceArrow from "../elements/PriceArrow";
-import ComingSoon from "../elements/ComingSoon";
-import TooltipIcon from "../elements/TooltipIcon";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
+import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
+import AssetCard from "../blocks/popup/AssetCard";
+import NullState from "../blocks/tokenList/NullState";
+import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
+import NoNftState from "../blocks/tokenList/NoNftState";
+import NftCard from "../blocks/tokenList/NftCard";
+import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
+
 import ShareAddress from "./receiveTabs/ShareAddress";
 
 const Popup: FC = () => (
   <PreloadAndSync>
     <PopupLayout>
       <PopupNetworkSelect />
-
       <AccountSelect className="mt-2" />
-
       <InteractionWithDapp className="mt-2" />
-
-      <AssetsList />
+      <TokenExplorer />
     </PopupLayout>
   </PreloadAndSync>
 );
@@ -131,266 +114,81 @@ const PopupNetworkSelect: FC = () => {
   );
 };
 
-const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
-  const activeTab = useAtomValue(activeTabAtom);
-  const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
-  const currentAccount = useAtomValue(currentAccountAtom);
+const TokenExplorer: FC = () => {
+  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
 
-  const permission =
-    purePermission && purePermission.accountAddresses.length > 0
-      ? purePermission
-      : undefined;
-
-  const accountConnected = useMemo(
-    () =>
-      permission
-        ? permission.accountAddresses.includes(currentAccount.address)
-        : false,
-    [permission, currentAccount]
+  const toggleNftSwitcher = useCallback(
+    (value: boolean) => {
+      setTokenType(value ? TokenType.NFT : TokenType.Asset);
+    },
+    [setTokenType]
   );
 
-  const watchOnlyAcc = currentAccount.source === AccountSource.Address;
-
-  const reallyConnectible = useMemo(() => {
-    if (!activeTab?.url) return false;
-
-    const { protocol, pathname } = new URL(activeTab.url);
-
-    for (const type of [/\.xml$/u, /\.pdf$/u]) {
-      if (type.test(pathname)) {
-        return false;
-      }
-    }
-
-    return protocol.startsWith("http") || protocol.startsWith("file");
-  }, [activeTab]);
-
-  const state = useMemo(() => {
-    if (!permission) return "disconnected";
-    if (accountConnected) return "connected";
-    return "connectible";
-  }, [permission, accountConnected]);
-
-  const handlePermission = useCallback(async () => {
-    if (!permission) return;
-
-    try {
-      if (accountConnected) {
-        await repo.permissions.delete(permission.origin);
-      } else {
-        await repo.permissions
-          .where({ origin: permission.origin })
-          .modify((perm) => {
-            perm.accountAddresses.push(currentAccount.address);
-          });
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [permission, accountConnected, currentAccount]);
-
-  if (!reallyConnectible) return null;
+  const isNftsSelected = tokenType === TokenType.NFT;
 
   return (
-    <div
-      className={classNames(
-        "flex items-center",
-        "w-full",
-        "min-h-8 py-1 px-3 pr-2",
-        "text-xs leading-none",
-        "border border-brand-main/[.07]",
-        "rounded-[.625rem]",
-        className
-      )}
-    >
-      {permission ? (
-        state === "connected" ? (
-          <span
-            className={classNames(
-              "block",
-              "w-5 h-5 mr-1.5",
-              "rounded-full overflow-hidden",
-              "border border-[#4F9A5E]"
-            )}
-          >
-            <Avatar
-              src={activeTab?.favIconUrl}
-              alt={permission.origin}
-              className={classNames(
-                "w-full h-full object-cover",
-                "!border-none"
-              )}
-            />
-          </span>
-        ) : (
-          <Tooltip
-            content={
-              <p>
-                Current wallet is not connected to this website.
-                {!watchOnlyAcc &&
-                  " To connect it - click Connect on the right."}
-                <br />
-                If you want to disconnect all wallets - switch to any connected
-                wallet, and then click Disconnect on the right.
-              </p>
-            }
-            placement="bottom-end"
-            size="large"
-            interactive={false}
-          >
-            <span
-              className={classNames(
-                "block relative",
-                "w-5 h-5 mr-1.5",
-                "rounded-full overflow-hidden",
-                "border border-[#BCC2DB]/[0.7]"
-              )}
-            >
-              <Avatar
-                src={activeTab?.favIconUrl}
-                alt={permission.origin}
-                className={classNames(
-                  "w-full h-full object-cover",
-                  "!border-none opacity-25"
-                )}
-              />
-
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="absolute top-0 left-0 w-4.5 h-4.5"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
-                  fill="#F8F9FD"
-                />
-              </svg>
-            </span>
-          </Tooltip>
-        )
-      ) : (
-        <Tooltip
-          content={
-            <p>
-              Vigvam is not connected to this site. To connect to a web3 site,
-              find and click the Connect button.
-            </p>
-          }
-          placement="bottom-end"
-          size="large"
-          interactive={false}
-        >
-          <TooltipIcon
-            theme="dark"
-            className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
+    <div className="flex flex-wrap mt-5 min-h-0">
+      <Tooltip
+        content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
+        asChild
+      >
+        <span>
+          <AssetsSwitcher
+            theme="small"
+            checked={isNftsSelected}
+            onCheckedChange={toggleNftSwitcher}
           />
-        </Tooltip>
-      )}
-      {tabOrigin && (
-        <span
-          className={classNames(
-            state !== "connected" && "text-brand-inactivedark"
-          )}
-        >
-          {new URL(tabOrigin).host}
         </span>
-      )}
-      {permission && !watchOnlyAcc && (
-        <button
-          type="button"
-          className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
-          onClick={handlePermission}
-        >
-          {accountConnected ? "Disconnect" : "Connect"}
-        </button>
-      )}
+      </Tooltip>
+
+      <TokenList key={tokenType} tokenType={tokenType} />
     </div>
   );
 };
 
-const AssetsList: FC = () => {
-  const currentAccount = useAtomValue(currentAccountAtom);
-  const [isNftsSelected, setIsNftsSelected] = useState(false);
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-  const [manageModeEnabled, setManageModeEnabled] = useState(false);
-  const [receivePopupOpened, setReceivePopupOpened] = useState(false);
+const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const { tokens, loadMore, hasMore } = useAllAccountTokens(
-    TokenType.Asset,
-    currentAccount.address,
-    {
-      withDisabled: manageModeEnabled,
-      search: searchValue ?? undefined,
-    }
-  );
-
-  const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
-    (node) => {
-      if (!tokens) return;
-
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          loadMore();
-        }
-      });
-
-      if (node) {
-        observer.current.observe(node);
-      }
-    },
-    [hasMore, loadMore, tokens]
-  );
-
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const focusSearchInput = useCallback(() => {
-    if (searchInputRef.current) {
-      searchInputRef.current.select();
-    }
+  const handleAccountTokensReset = useCallback(() => {
+    scrollAreaRef.current?.scrollTo(0, 0);
   }, []);
 
-  const toggleNftSwitcher = useCallback((value: boolean) => {
-    if (value) {
-      setSearchValue(null);
-      setManageModeEnabled(false);
-    }
-    setIsNftsSelected(value);
-  }, []);
+  const {
+    currentAccount,
+    isNftsSelected,
+    searchValue,
+    setSearchValue,
+    tokenIdSearchValue,
+    setTokenIdSearchValue,
+    tokenIdSearchDisplayed,
+    manageModeEnabled,
+    setManageModeEnabled,
+    tokens,
+    syncing,
+    searching,
+    focusSearchInput,
+    searchInputRef,
+    tokenIdSearchInputRef,
+    loadMoreTriggerRef,
+  } = useTokenList(tokenType, {
+    onAccountTokensReset: handleAccountTokensReset,
+    searchPersist: tokenType === TokenType.NFT,
+  });
 
-  return (
-    <>
-      <div className="flex items-center mt-5">
+  const controlBar = useMemo(
+    () => (
+      <>
         <TippySingletonProvider>
-          <Tooltip
-            content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-            asChild
-          >
-            <span>
-              <AssetsSwitcher
-                theme="small"
-                checked={isNftsSelected}
-                onCheckedChange={toggleNftSwitcher}
-              />
-            </span>
-          </Tooltip>
           <SearchInput
             ref={searchInputRef}
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
-            className="ml-2"
-            inputClassName="max-h-9 !pl-9"
+            className="ml-2 !w-auto grow max-w-[13.875rem]"
+            inputClassName="max-h-[2.375rem] !pl-9"
             placeholder="Type to search..."
             adornmentClassName="!left-3"
-            disabled={isNftsSelected}
           />
+
           <IconedButton
             Icon={ControlIcon}
             iconProps={{
@@ -398,7 +196,7 @@ const AssetsList: FC = () => {
             }}
             theme="tertiary"
             className={classNames(
-              "ml-2 mr-2",
+              "ml-2 mr-2 mt-[.4375rem]",
               manageModeEnabled && "bg-brand-main/30"
             )}
             aria-label={
@@ -406,388 +204,199 @@ const AssetsList: FC = () => {
                 ? "Finish managing assets list"
                 : "Manage assets list"
             }
-            disabled={isNftsSelected}
             onClick={() => setManageModeEnabled(!manageModeEnabled)}
           />
         </TippySingletonProvider>
-      </div>
-      {isNftsSelected ? (
-        <ComingSoon label="NFTs" size="extra-small" />
-      ) : tokens.length <= 0 && searchValue ? (
-        <button
-          type="button"
-          className={classNames(
-            "flex flex-col items-center",
-            "h-full w-full py-9",
-            "text-sm text-brand-placeholder text-center"
-          )}
-          onClick={focusSearchInput}
-        >
-          <NoResultsFoundIcon className="mb-4" />
-          Can&apos;t find a token?
-          <br />
-          Put an address into the search line to add it to your assets list.
-        </button>
-      ) : (
-        <ScrollAreaContainer
-          hiddenScrollbar="horizontal"
-          className="pr-3.5 -mr-3.5 mt-2"
-          viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-16"
-        >
-          <div
-            className={classNames(
-              "max-h-0",
-              "overflow-hidden",
-              manageModeEnabled &&
-                tokens.length > 0 &&
-                "transition-[max-height] duration-200 max-h-[4.25rem]"
-            )}
-          >
-            <div className="pb-2">
-              <button
-                type="button"
-                className={classNames(
-                  "flex items-center",
-                  "w-full py-2 px-3",
-                  "bg-brand-main/5",
-                  "rounded-[.625rem]",
-                  "text-sm text-brand-inactivelight text-left",
-                  "cursor-pointer",
-                  "transition-colors",
-                  "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
-                )}
-                onClick={focusSearchInput}
-              >
-                <PlusCircleIcon className="w-6 min-w-[1.5rem] h-auto mr-2 fill-brand-inactivelight" />
-                Enter the address into
-                <br />
-                the search line
-              </button>
-            </div>
-          </div>
-          {tokens.map((asset, i) => (
-            <AssetCard
-              key={asset.tokenSlug}
-              ref={
-                i === tokens.length - LOAD_MORE_ON_ASSET_FROM_END - 1
-                  ? loadMoreTriggerAssetRef
-                  : null
-              }
-              asset={asset as AccountAsset}
-              isManageMode={manageModeEnabled}
-              setReceivePopupOpened={setReceivePopupOpened}
-              className={classNames(i !== tokens.length - 1 && "mb-1")}
-            />
-          ))}
-        </ScrollAreaContainer>
-      )}
 
-      <ReceivePopup
-        open={receivePopupOpened}
-        onOpenChange={setReceivePopupOpened}
-      />
+        <div
+          className={classNames(
+            "w-full pt-2",
+            "max-h-0",
+            "overflow-hidden",
+            "transition-[max-height] duration-200",
+            tokenIdSearchDisplayed && "max-h-[3rem]"
+          )}
+        >
+          <SearchInput
+            ref={tokenIdSearchInputRef}
+            searchValue={tokenIdSearchValue}
+            toggleSearchValue={setTokenIdSearchValue}
+            StartAdornment={HashTagIcon}
+            className="w-full"
+            placeholder="Type token ID to search..."
+          />
+        </div>
+      </>
+    ),
+    [
+      manageModeEnabled,
+      setManageModeEnabled,
+      searchInputRef,
+      searchValue,
+      setSearchValue,
+      tokenIdSearchDisplayed,
+      tokenIdSearchInputRef,
+      tokenIdSearchValue,
+      setTokenIdSearchValue,
+    ]
+  );
+
+  let tokensBar: ReactNode = null;
+
+  if (tokens.length === 0) {
+    if (searchValue) {
+      tokensBar = (
+        <NullState searching={searching} focusSearchInput={focusSearchInput} />
+      );
+    } else if (isNftsSelected) {
+      tokensBar = <NoNftState syncing={syncing} />;
+    }
+  } else {
+    tokensBar = (
+      <ScrollAreaContainer
+        ref={scrollAreaRef}
+        hiddenScrollbar="horizontal"
+        className="pr-3.5 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
+        viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
+        scrollBarClassName="py-0 pb-16"
+      >
+        <AddTokenBanner
+          isNftsSelected={isNftsSelected}
+          manageModeEnabled={manageModeEnabled}
+          tokens={tokens}
+          focusSearchInput={focusSearchInput}
+        />
+
+        {!isNftsSelected ? (
+          <AssetList
+            tokens={tokens as AccountAsset[]}
+            manageModeEnabled={manageModeEnabled}
+            loadMoreTriggerRef={loadMoreTriggerRef}
+          />
+        ) : (
+          <NftList
+            tokens={tokens as AccountNFT[]}
+            currentAccount={currentAccount}
+            manageModeEnabled={manageModeEnabled}
+            loadMoreTriggerRef={loadMoreTriggerRef}
+          />
+        )}
+      </ScrollAreaContainer>
+    );
+  }
+
+  return (
+    <>
+      {controlBar}
+      {tokensBar}
     </>
   );
 };
 
-type AssetCardProps = {
-  asset: AccountAsset;
-  setReceivePopupOpened: Dispatch<SetStateAction<boolean>>;
-  isManageMode?: boolean;
-  className?: string;
+type AssetListProps = {
+  tokens: AccountAsset[];
+  manageModeEnabled: boolean;
+  loadMoreTriggerRef: (node: any) => void;
 };
 
-const AssetCard = memo(
-  forwardRef<HTMLButtonElement, AssetCardProps>(
-    (
-      { asset, setReceivePopupOpened, isManageMode = false, className },
-      ref
-    ) => {
-      const currentAccount = useAtomValue(currentAccountAtom);
-      const setInternalChainId = useSetAtom(chainIdAtom);
+const AssetList = memo<AssetListProps>(
+  ({ tokens, manageModeEnabled, loadMoreTriggerRef }) => {
+    const [receivePopupOpened, setReceivePopupOpened] = useState(false);
 
-      const [popoverOpened, setPopoverOpened] = useState(false);
-      const {
-        chainId,
-        name,
-        symbol,
-        rawBalance,
-        decimals,
-        balanceUSD,
-        status,
-        priceUSDChange,
-      } = asset;
+    return (
+      <>
+        {tokens.map((asset, i) => (
+          <AssetCard
+            key={asset.tokenSlug}
+            ref={
+              i === tokens.length - LOAD_MORE_ON_TOKEN_FROM_END - 1
+                ? loadMoreTriggerRef
+                : null
+            }
+            asset={asset as AccountAsset}
+            isManageMode={manageModeEnabled}
+            setReceivePopupOpened={setReceivePopupOpened}
+            className={classNames(i !== tokens.length - 1 && "mb-1")}
+          />
+        ))}
 
-      const nativeAsset = status === TokenStatus.Native;
-      const disabled = status === TokenStatus.Disabled;
+        <ReceivePopup
+          open={receivePopupOpened}
+          onOpenChange={setReceivePopupOpened}
+        />
+      </>
+    );
+  }
+);
 
-      const openLink = useCallback(
-        (to: Record<string, unknown>) => {
-          setInternalChainId(chainId);
-          openInTab(to);
-        },
-        [setInternalChainId, chainId]
-      );
+type NftListProps = {
+  tokens: AccountNFT[];
+  currentAccount: Account;
+  manageModeEnabled: boolean;
+  loadMoreTriggerRef: (node: any) => void;
+};
 
-      const handleAssetClick = useCallback(async () => {
-        if (isManageMode) {
-          if (asset.status === TokenStatus.Native) return;
+const NftList = memo<NftListProps>(
+  ({ currentAccount, tokens, manageModeEnabled, loadMoreTriggerRef }) => {
+    const [nftTokenOpened, setNftTokenOpened] = useState<AccountNFT | null>(
+      null
+    );
 
+    const handleNFTSelect = useCallback(
+      async (token: AccountNFT) => {
+        if (manageModeEnabled) {
           try {
             await repo.accountTokens.put(
               {
-                ...asset,
+                ...token,
                 status:
-                  asset.status === TokenStatus.Enabled
+                  token.status === TokenStatus.Enabled
                     ? TokenStatus.Disabled
                     : TokenStatus.Enabled,
               },
-              [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+              [token.chainId, currentAccount.address, token.tokenSlug].join("_")
             );
           } catch (e) {
             console.error(e);
           }
+        } else {
+          setNftTokenOpened(token);
         }
-      }, [asset, currentAccount.address, isManageMode]);
+      },
+      [manageModeEnabled, currentAccount.address, setNftTokenOpened]
+    );
 
-      const handleAssetContextMenu = useCallback(
-        async (e) => {
-          if (!isManageMode) {
-            e.preventDefault();
-            if (!popoverOpened) {
-              setPopoverOpened(true);
-            }
+    const renderNFTCard = useCallback(
+      (nft: AccountNFT, i: number) => (
+        <NftCard
+          key={nft.tokenSlug}
+          ref={
+            i === tokens.length - LOAD_MORE_ON_NFT_FROM_END - 1
+              ? loadMoreTriggerRef
+              : null
           }
-        },
-        [isManageMode, popoverOpened]
-      );
+          nft={nft}
+          onSelect={handleNFTSelect}
+          isManageMode={manageModeEnabled}
+        />
+      ),
+      [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerRef]
+    );
 
-      const priceClassName = useMemo(
-        () =>
-          priceUSDChange && +priceUSDChange > 0
-            ? "text-[#6BB77A]"
-            : "text-[#EA556A]",
-        [priceUSDChange]
-      );
+    return (
+      <>
+        <>
+          <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
 
-      const content = (
-        <button
-          ref={ref}
-          type="button"
-          onClick={handleAssetClick}
-          onContextMenu={handleAssetContextMenu}
-          className={classNames(
-            "relative",
-            "flex items-stretch",
-            "w-full p-2",
-            "text-left",
-            "rounded-[.625rem]",
-            "cursor-default",
-            "group",
-            "transition",
-            popoverOpened && "bg-brand-main/10",
-            isManageMode &&
-              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
-            disabled && "opacity-60",
-            "hover:opacity-100",
-            className
-          )}
-          disabled={isManageMode && nativeAsset}
-        >
-          <AssetLogo
-            asset={asset}
-            alt={name}
-            className="w-11 h-11 min-w-[2.75rem] mr-3"
+          <NFTOverviewPopup
+            open={Boolean(nftTokenOpened)}
+            token={nftTokenOpened}
+            onOpenChange={() => setNftTokenOpened(null)}
           />
-          <span className="flex flex-col w-full min-w-0">
-            <span className="flex items-end">
-              <span className="text-sm font-bold leading-5 truncate mr-auto">
-                {name}
-              </span>
-              {!isManageMode && (
-                <FiatAmount
-                  amount={balanceUSD}
-                  copiable
-                  className={"text-sm font-bold leading-5 ml-2"}
-                  threeDots={false}
-                  asSpan
-                  isDecimalsMinified
-                />
-              )}
-            </span>
-            <span className="mt-1 flex justify-between items-end">
-              <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                currency={symbol}
-                className={classNames(
-                  // "text-sm",
-                  "text-xs leading-4",
-                  "text-brand-inactivedark"
-                )}
-                copiable={!isManageMode}
-                asSpan
-                threeDots={false}
-              />
-              {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
-                <span
-                  className={classNames(
-                    "inline-flex items-center",
-                    "opacity-75",
-                    "transition",
-                    "ml-2",
-                    priceClassName
-                  )}
-                >
-                  <PriceArrow
-                    className={classNames(
-                      "w-2 h-2 mr-[0.125rem]",
-                      +priceUSDChange < 0 && "transform rotate-180"
-                    )}
-                  />
-
-                  <span className="text-xs leading-4">
-                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
-                  </span>
-                </span>
-              )}
-            </span>
-          </span>
-          {!isManageMode ? (
-            <DropdownMenu.Trigger asChild>
-              <IconedButton
-                Icon={PopoverIcon}
-                theme="tertiary"
-                className={classNames(
-                  "ml-2",
-                  popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
-                )}
-                tabIndex={-1}
-                asSpan
-              />
-            </DropdownMenu.Trigger>
-          ) : !nativeAsset ? (
-            <Checkbox.Root
-              className={classNames(
-                "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
-                "bg-brand-main/20",
-                "rounded",
-                "flex items-center justify-center",
-                !disabled && "border border-brand-main"
-              )}
-              checked={!disabled}
-              asChild
-            >
-              <span>
-                <Checkbox.Indicator>
-                  {!disabled && <CheckIcon />}
-                </Checkbox.Indicator>
-              </span>
-            </Checkbox.Root>
-          ) : null}
-        </button>
-      );
-
-      return (
-        <DropdownMenu.Root
-          open={popoverOpened}
-          onOpenChange={setPopoverOpened}
-          modal
-        >
-          {content}
-
-          {!isManageMode && (
-            <DropdownMenu.Content
-              side="left"
-              align="start"
-              className={classNames(
-                "bg-brand-dark/10",
-                "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#111226]",
-                "border border-brand-light/5",
-                "rounded-[.625rem]",
-                "px-1 py-2"
-              )}
-            >
-              <PopoverButton
-                Icon={InfoRoundIcon}
-                onClick={() =>
-                  openLink({ page: Page.Default, token: asset.tokenSlug })
-                }
-              >
-                Info
-              </PopoverButton>
-              <PopoverButton
-                Icon={ReceiveIcon}
-                onClick={() => {
-                  setPopoverOpened(false);
-                  setReceivePopupOpened(true);
-                }}
-              >
-                Receive
-              </PopoverButton>
-              <PopoverButton
-                Icon={SendIcon}
-                onClick={() =>
-                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
-                }
-              >
-                Transfer
-              </PopoverButton>
-              <PopoverButton
-                Icon={SwapIcon}
-                onClick={() => openLink({ page: Page.Swap })}
-                disabled
-                title="Coming soon"
-              >
-                Swap
-              </PopoverButton>
-              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
-                <PopoverButton
-                  Icon={BuyIcon}
-                  onClick={() =>
-                    openLink({
-                      page: Page.Receive,
-                      receive: ReceiveTabEnum.BuyWithCrypto,
-                    })
-                  }
-                  disabled
-                  title="Coming soon"
-                >
-                  Buy
-                </PopoverButton>
-              )}
-            </DropdownMenu.Content>
-          )}
-        </DropdownMenu.Root>
-      );
-    }
-  ),
-  dequal
-);
-
-type PopoverButton = ButtonHTMLAttributes<HTMLButtonElement> & {
-  Icon: FC<{ className?: string }>;
-};
-
-const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
-  <button
-    type="button"
-    className={classNames(
-      "flex items-center",
-      "min-w-[7.5rem] w-full px-2 py-1",
-      "rounded-[.625rem]",
-      "text-sm font-bold",
-      "transition-colors",
-      !rest.disabled && "hover:bg-brand-main/20 focus:bg-brand-main/20",
-      "disabled:opacity-40 disabled:cursor-default"
-    )}
-    {...rest}
-  >
-    <Icon className="mr-2" />
-    {children}
-  </button>
+        </>
+      </>
+    );
+  }
 );
 
 type ReceivePopupProps = Pick<SecondaryModalProps, "open" | "onOpenChange">;

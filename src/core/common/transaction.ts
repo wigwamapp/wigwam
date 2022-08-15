@@ -12,11 +12,16 @@ import {
   TxParams,
 } from "core/types";
 
-import { createTokenSlug, NATIVE_TOKEN_SLUG } from "./tokens";
+import {
+  createTokenSlug,
+  isTokenStandardValid,
+  NATIVE_TOKEN_SLUG,
+} from "./tokens";
 
-export function matchTxAction(
+export async function matchTxAction(
+  provider: Provider,
   txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish }
-): TxAction | null {
+): Promise<TxAction | null> {
   if (!txParams.to) {
     if (!isZeroHex(txParams.data)) {
       return {
@@ -51,11 +56,13 @@ export function matchTxAction(
         : undefined,
   });
 
-  const parsed = parseStandardTokenTransactionData(txParams.data!);
+  const parsedAll = parseStandardTokenTransactionData(txParams.data!);
 
-  if (!parsed) {
+  if (parsedAll.length === 0) {
     return getContractInteractionAction();
   }
+
+  const parsed = await pickParsed(provider, destination, parsedAll);
 
   return (
     match<typeof parsed, TxAction | null>(parsed)
@@ -222,7 +229,8 @@ export function matchTxAction(
   );
 }
 
-export function matchTokenTransferEvents(
+export async function matchTokenTransferEvents(
+  provider: Provider,
   logs: {
     address: string;
     data: string;
@@ -236,13 +244,18 @@ export function matchTokenTransferEvents(
     amount: string;
   }[] = [];
 
-  for (const log of logs) {
-    const event = parseStandardTokenEvent(log);
+  await Promise.all(
+    logs.map(async (log) => {
+      const parsedAll = parseStandardTokenEvent(log);
 
-    if (event) {
+      if (parsedAll.length === 0) {
+        return;
+      }
+
       const address = ethStringify(log.address);
+      const parsed = await pickParsed(provider, address, parsedAll);
 
-      match(event)
+      match(parsed)
         .with(
           [TokenStandard.ERC20, { name: "Transfer" }],
           ([standard, { args }]) => {
@@ -254,10 +267,58 @@ export function matchTokenTransferEvents(
             });
           }
         )
-        // TODO: Implement for all token standards;
+        .with(
+          [TokenStandard.ERC721, { name: "Transfer" }],
+          ([standard, { args }]) => {
+            results.push({
+              tokenSlug: createTokenSlug({
+                standard,
+                address,
+                id: ethStringify(args[2]),
+              }),
+              from: ethStringify(args[0]),
+              to: ethStringify(args[1]),
+              amount: "1",
+            });
+          }
+        )
+        .with(
+          [TokenStandard.ERC1155, { name: "TransferSingle" }],
+          ([standard, { args }]) => {
+            results.push({
+              tokenSlug: createTokenSlug({
+                standard,
+                address,
+                id: ethStringify(args[3]),
+              }),
+              from: ethStringify(args[1]),
+              to: ethStringify(args[2]),
+              amount: ethStringify(args[4]),
+            });
+          }
+        )
+        .with(
+          [TokenStandard.ERC1155, { name: "TransferBatch" }],
+          ([standard, { args }]) => {
+            const length = args[3].length;
+
+            for (let i = 0; i < length; i++) {
+              results.push({
+                tokenSlug: createTokenSlug({
+                  standard,
+                  address,
+                  id: ethStringify(args[3][i]),
+                }),
+                from: ethStringify(args[1]),
+                to: ethStringify(args[2]),
+                amount: ethStringify(args[4][i]),
+              });
+            }
+          }
+        )
         .otherwise(() => null);
-    }
-  }
+    })
+  );
 
   return results;
 }
@@ -273,53 +334,66 @@ export type ParsedTokenTxData = [
 
 export function parseStandardTokenTransactionData(
   data: string
-): ParsedTokenTxData | null {
+): ParsedTokenTxData[] {
+  const parsed: ParsedTokenTxData[] = [];
+
   try {
-    return [TokenStandard.ERC20, erc20Interface.parseTransaction({ data })];
+    parsed.push([
+      TokenStandard.ERC20,
+      erc20Interface.parseTransaction({ data }),
+    ]);
   } catch {
     // ignore and next try to parse with erc721 ABI
   }
 
   try {
-    return [TokenStandard.ERC721, erc721Interface.parseTransaction({ data })];
+    parsed.push([
+      TokenStandard.ERC721,
+      erc721Interface.parseTransaction({ data }),
+    ]);
   } catch {
     // ignore and next try to parse with erc1155 ABI
   }
 
   try {
-    return [TokenStandard.ERC1155, erc1155Interface.parseTransaction({ data })];
+    parsed.push([
+      TokenStandard.ERC1155,
+      erc1155Interface.parseTransaction({ data }),
+    ]);
   } catch {
     // ignore and return null
   }
 
-  return null;
+  return parsed;
 }
+
+export type ParsedTokenEvent = [TokenStandard, ethers.utils.LogDescription];
 
 export function parseStandardTokenEvent(log: {
   topics: string[];
   data: string;
-}) {
+}): ParsedTokenEvent[] {
+  const parsed: ParsedTokenEvent[] = [];
+
   try {
-    return [TokenStandard.ERC20, erc20Interface.parseLog(log)] as const;
+    parsed.push([TokenStandard.ERC20, erc20Interface.parseLog(log)]);
   } catch {
     // ignore and next try to parse with erc721 ABI
   }
 
-  // TODO: After NFT added
+  try {
+    parsed.push([TokenStandard.ERC721, erc721Interface.parseLog(log)]);
+  } catch {
+    // ignore and next try to parse with erc1155 ABI
+  }
 
-  // try {
-  //   return [TokenStandard.ERC721, erc721Interface.parseLog(log)] as const;
-  // } catch {
-  //   // ignore and next try to parse with erc1155 ABI
-  // }
+  try {
+    parsed.push([TokenStandard.ERC1155, erc1155Interface.parseLog(log)]);
+  } catch {
+    // ignore and return null
+  }
 
-  // try {
-  //   return [TokenStandard.ERC1155, erc1155Interface.parseLog(log)] as const;
-  // } catch {
-  //   // ignore and return null
-  // }
-
-  return null;
+  return parsed;
 }
 
 export async function isSmartContractAddress(
@@ -336,6 +410,29 @@ export async function isSmartContractAddress(
   return (
     Boolean(contractCode) && contractCode !== "0x" && contractCode !== "0x0"
   );
+}
+
+async function pickParsed<T extends ParsedTokenTxData | ParsedTokenEvent>(
+  provider: Provider,
+  address: string,
+  parsedAll: T[]
+): Promise<T> {
+  if (parsedAll.length > 1) {
+    const valids = await Promise.all(
+      parsedAll.map(([standard]) =>
+        isTokenStandardValid(provider, address, standard)
+      )
+    );
+
+    for (let i = 0; i < parsedAll.length; i++) {
+      const valid = valids[i];
+      if (valid) {
+        return parsedAll[i];
+      }
+    }
+  }
+
+  return parsedAll[0];
 }
 
 function ethStringify(v: ethers.BigNumberish) {

@@ -272,16 +272,23 @@ async function handleWalletRequest(
           approvalsRejected(null);
         })
       )
-      .with({ type: MessageType.Sync }, ({ chainId, accountAddress }) =>
-        withStatus(WalletStatus.Unlocked, () => {
-          addSyncRequest(chainId, accountAddress);
-        })
+      .with(
+        { type: MessageType.Sync },
+        ({ chainId, accountAddress, tokenType }) =>
+          withStatus(WalletStatus.Unlocked, () => {
+            addSyncRequest(chainId, accountAddress, tokenType);
+          })
       )
       .with(
         { type: MessageType.FindToken },
-        ({ chainId, accountAddress, tokenSlug }) =>
+        ({ chainId, accountAddress, tokenSlug, refreshMetadata }) =>
           withStatus(WalletStatus.Unlocked, () => {
-            addFindTokenRequest(chainId, accountAddress, tokenSlug);
+            addFindTokenRequest(
+              chainId,
+              accountAddress,
+              tokenSlug,
+              refreshMetadata
+            );
           })
       )
       .with(

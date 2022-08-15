@@ -1,4 +1,4 @@
-import { FC, memo, useMemo } from "react";
+import { FC, useMemo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
@@ -20,14 +20,14 @@ import {
   useToken,
 } from "app/hooks";
 import { CUSTOM_FEE_MODE, FEE_MODE_NAMES } from "app/utils/txApprove";
-import { LARGE_AMOUNT } from "app/utils/largeAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
 import HashPreview from "app/components/elements/HashPreview";
 import IconedButton from "app/components/elements/IconedButton";
 import SmallContactCard from "app/components/elements/SmallContactCard";
-import AssetLogo from "app/components/elements/AssetLogo";
+import Dot from "app/components/elements/Dot";
+import TokenAmount from "app/components/blocks/TokenAmount";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 
@@ -133,7 +133,7 @@ const FeeButton: FC<FeeButton> = ({
     [averageGasLimit, gasLimit]
   );
 
-  const nativeToken = useToken(accountAddress);
+  const nativeToken = useToken<AccountAsset>(accountAddress);
 
   const averageFeeBN = averageFee && new BigNumber(averageFee.toString());
   const modeFee = gasLimit.mul(fees.modes[feeMode].max).toString();
@@ -337,9 +337,9 @@ const Tokens: FC<TokensProps> = ({ accountAddress, action }) => {
           </TippySingletonProvider>
         </div>
       ) : (
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0">
           {tokens.map((token, i) => (
-            <Token
+            <TokenAmount
               key={token.slug}
               accountAddress={accountAddress}
               token={token}
@@ -383,91 +383,13 @@ const getTokens = (action: TxAction) => {
   return null;
 };
 
-type Token = {
-  slug: string;
-  amount?: string;
-};
-
-type TokenProps = {
-  accountAddress: string;
-  token: Token;
-  className?: string;
-};
-
-export const Token = memo<TokenProps>(
-  ({ accountAddress, token: { slug, amount }, className }) => {
-    const tokenInfo = useToken(accountAddress, slug);
-
-    if (!tokenInfo) return null;
-
-    const { name, symbol, decimals, priceUSD } = tokenInfo as AccountAsset;
-
-    const usdAmount = amount
-      ? new BigNumber(amount)
-          .div(new BigNumber(10).pow(decimals))
-          .multipliedBy(priceUSD ?? 0)
-      : null;
-
-    return (
-      <div className={classNames("flex items-center", className)}>
-        <AssetLogo
-          asset={tokenInfo}
-          alt={name}
-          className="w-4 h-4 min-w-[1rem]"
-        />
-        {amount !== undefined &&
-        new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
-          <>
-            <PrettyAmount
-              amount={amount}
-              decimals={decimals}
-              currency={symbol}
-              threeDots={false}
-              copiable
-              className="text-sm font-bold ml-2"
-            />
-            {usdAmount !== undefined && (
-              <>
-                <Dot />
-                <FiatAmount
-                  amount={usdAmount}
-                  threeDots={false}
-                  copiable
-                  className="text-sm text-brand-inactivedark"
-                />
-              </>
-            )}
-          </>
-        ) : (
-          <span className="text-sm font-bold ml-2">
-            {amount !== undefined && new BigNumber(amount).gte(LARGE_AMOUNT) && (
-              <>
-                <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
-              </>
-            )}
-            {symbol}
-          </span>
-        )}
-      </div>
-    );
-  }
-);
-
-export const Dot: FC<{ className?: string }> = ({ className }) => (
-  <span
-    className={classNames("flex items-center justify-center p-2", className)}
-  >
-    <span className="w-1 h-1 bg-brand-inactivedark rounded-full" />
-  </span>
-);
-
 type InfoRawProps = {
   label: string;
 };
 
 const InfoRaw: FC<InfoRawProps> = ({ label, children }) => (
-  <div className="py-3 pl-4 flex items-start">
-    <h3 className="text-sm mr-auto">{label}</h3>
+  <div className="py-3 pl-4 flex items-start justify-between">
+    <h3 className="text-sm mr-5">{label}</h3>
     {children}
   </div>
 );

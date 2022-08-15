@@ -21,6 +21,7 @@ import {
   FeeMode,
   FeeSuggestions,
   AccountSource,
+  TxAction,
 } from "core/types";
 import {
   approveItem,
@@ -92,15 +93,6 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     [approval, allAccounts]
   );
 
-  const action = useMemo(() => {
-    try {
-      return matchTxAction(txParams);
-    } catch (err) {
-      console.warn(err);
-      return null;
-    }
-  }, [txParams]);
-
   const provider = useProvider();
   const withLedger = useLedger();
 
@@ -118,6 +110,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     approvingRef.current = approving;
   }
 
+  const [action, setAction] = useState<TxAction | null>(null);
   const [prepared, setPrepared] = useState<{
     tx: Tx;
     estimatedGasLimit: ethers.BigNumber;
@@ -199,7 +192,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setEstimating(true);
 
         try {
-          const { type, gasLimit, ...rest } = txParams;
+          const { gasLimit, ...rest } = txParams;
+
+          // detele tx type cause auto-detect
+          delete rest.type;
 
           // detele gas prices
           delete rest.gasPrice;
@@ -217,11 +213,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   .getUncheckedSigner(account.address)
                   .populateTransaction({
                     ...rest,
-                    type: type
-                      ? bnify(type)?.toNumber()
-                      : feeSuggestions?.type === "legacy"
-                      ? 0
-                      : undefined,
+                    type: feeSuggestions?.type === "legacy" ? 0 : undefined,
                     chainId: bnify(rest?.chainId)?.toNumber(),
                     ...(feeSuggestions?.type === "modern"
                       ? {
@@ -281,6 +273,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       txParams,
     ]
   );
+
+  useEffect(() => {
+    matchTxAction(provider, txParams)
+      .then((a) => a && setAction(a))
+      .catch(console.warn);
+  }, [provider, txParams]);
 
   useEffect(() => {
     estimateTx();

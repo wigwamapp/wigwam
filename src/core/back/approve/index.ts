@@ -15,6 +15,7 @@ import {
   TxParams,
   TxActionType,
   TokenActivity,
+  TxAction,
 } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
@@ -24,7 +25,7 @@ import { createTokenActivityKey } from "core/common/tokens";
 
 import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
-import { sendRpc } from "../rpc";
+import { sendRpc, getRpcProvider } from "../rpc";
 
 const { serializeTransaction, parseTransaction, keccak256, hexValue } =
   ethers.utils;
@@ -128,6 +129,11 @@ export async function processApprove(
             const txHash = rpcRes.result;
             const timeAt = Date.now();
 
+            const txAction = await matchTxAction(
+              getRpcProvider(chainId),
+              txParams
+            ).catch(() => null);
+
             await Promise.all([
               saveNonce(chainId, accountAddress, tx.nonce),
               saveActivity({
@@ -138,12 +144,13 @@ export async function processApprove(
                 accountAddress,
                 txParams,
                 rawTx: rawTx!,
+                txAction: txAction ?? undefined,
                 txHash,
                 timeAt,
                 pending: 1,
               }),
               saveTokenActivity(
-                txParams,
+                txAction,
                 chainId,
                 accountAddress,
                 txHash,
@@ -226,15 +233,13 @@ async function saveActivity(activity: Activity) {
 }
 
 async function saveTokenActivity(
-  txParams: TxParams,
+  action: TxAction | null,
   chainId: number,
   accountAddress: string,
   txHash: string,
   timeAt: number
 ) {
   try {
-    const action = matchTxAction(txParams);
-
     if (action) {
       const tokenActivities = new Map<string, TokenActivity>();
       const addToActivities = (activity: TokenActivity) => {
@@ -292,7 +297,6 @@ const STRICT_TX_PROPS = [
   "to",
   "data",
   "accessList",
-  "type",
   "chainId",
   "value",
 ] as const;
@@ -301,10 +305,6 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
   for (const key of STRICT_TX_PROPS) {
     const txValue = hexValueMaybe(tx[key]);
     const originValue = hexValueMaybe(originTxParams[key]);
-
-    if (key === "type" && originValue === "0x0" && !txValue) {
-      continue;
-    }
 
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");

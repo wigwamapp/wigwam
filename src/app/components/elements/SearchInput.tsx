@@ -1,4 +1,4 @@
-import { forwardRef, HTMLProps } from "react";
+import { FC, forwardRef, HTMLProps } from "react";
 import classNames from "clsx";
 
 import Input from "app/components/elements/Input";
@@ -13,6 +13,7 @@ type SearchInputProps = Omit<
   searchValue?: string | null;
   toggleSearchValue: (value: string | null) => void;
   size?: "large" | "small";
+  StartAdornment?: FC<{ className?: string }>;
   inputClassName?: string;
   adornmentClassName?: string;
 };
@@ -24,6 +25,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       toggleSearchValue,
       placeholder = "Type name or address to search...",
       size = "large",
+      StartAdornment = SearchIcon,
       className,
       inputClassName,
       adornmentClassName,
@@ -34,7 +36,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     <Input
       ref={ref}
       placeholder={placeholder}
-      StartAdornment={SearchIcon}
+      StartAdornment={StartAdornment}
       value={searchValue ?? ""}
       onChange={(e) => {
         e.preventDefault();

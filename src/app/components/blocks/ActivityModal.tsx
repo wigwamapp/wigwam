@@ -17,6 +17,7 @@ import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
@@ -24,10 +25,10 @@ import {
   ActivitySource,
   ActivityType,
   TransactionActivity,
+  TxAction,
   TxActionType,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
-import { matchTxAction } from "core/common/transaction";
 
 import {
   activityModalAtom,
@@ -63,11 +64,12 @@ import WalletName from "../elements/WalletName";
 import HashPreview from "../elements/HashPreview";
 import PrettyDate from "../elements/PrettyDate";
 import IconedButton from "../elements/IconedButton";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-import ApprovalStatus from "./ApprovalStatus";
 import PrettyAmount from "../elements/PrettyAmount";
 import FiatAmount from "../elements/FiatAmount";
-import { Dot, Token } from "./approvals/DetailsTab";
+import Dot from "../elements/Dot";
+import TokenAmount from "../blocks/TokenAmount";
+
+import ApprovalStatus from "./ApprovalStatus";
 
 const ActivityModal = memo(() => {
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
@@ -235,7 +237,7 @@ const History = memo(() => {
   } = useCompleteActivity();
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!completeActivity) return;
 
@@ -277,7 +279,7 @@ const History = memo(() => {
               ref={
                 i ===
                 completeActivity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
-                  ? loadMoreTriggerAssetRef
+                  ? loadMoreTriggerRef
                   : null
               }
               item={item}
@@ -413,7 +415,7 @@ const ActivityCard = memo(
         {item.type === ActivityType.Transaction && (
           <ActivityTokens
             source={item.source}
-            tx={item.rawTx}
+            action={item.txAction}
             accountAddress={item.accountAddress}
             className="w-[10rem] mr-8"
           />
@@ -729,49 +731,36 @@ const SectionHeader: FC<{ className?: string }> = memo(
 
 type ActivityTokensProps = {
   source: ActivitySource;
-  tx: string;
+  action?: TxAction;
   accountAddress: string;
   className?: string;
 };
 
-const ActivityTokens: FC<ActivityTokensProps> = ({
-  source,
-  tx,
-  accountAddress,
-  className,
-}) => {
-  const parsedTx = ethers.utils.parseTransaction(tx);
-  const action = useMemo(() => {
-    try {
-      return matchTxAction(parsedTx);
-    } catch (err) {
-      console.warn(err);
+const ActivityTokens = memo<ActivityTokensProps>(
+  ({ source, action, accountAddress, className }) => {
+    if (
+      source.type !== "self" ||
+      !action ||
+      action.type !== TxActionType.TokenTransfer ||
+      action.tokens?.length === 0
+    ) {
       return null;
     }
-  }, [parsedTx]);
 
-  if (
-    source.type !== "self" ||
-    !action ||
-    action.type !== TxActionType.TokenTransfer ||
-    action.tokens?.length === 0
-  ) {
-    return null;
+    return (
+      <div className={classNames("flex flex-col", className)}>
+        {action.tokens.map((token, i) => (
+          <TokenAmount
+            key={token.slug}
+            accountAddress={accountAddress}
+            token={token}
+            className={classNames(i !== action.tokens.length - 1 && "mb-1")}
+          />
+        ))}
+      </div>
+    );
   }
-
-  return (
-    <div className={classNames("flex flex-col", className)}>
-      {action.tokens.map((token, i) => (
-        <Token
-          key={token.slug}
-          accountAddress={accountAddress}
-          token={token}
-          className={classNames(i !== action.tokens.length - 1 && "mb-1")}
-        />
-      ))}
-    </div>
-  );
-};
+);
 
 function capitalize(word: string) {
   const lower = word.toLowerCase();
