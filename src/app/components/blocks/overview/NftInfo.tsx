@@ -287,7 +287,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
         >
           <NftOverview
             token={token}
-            className="p-4 bg-[#07081B]/[.98] cursor-zoom-out"
+            className="p-8 bg-[#07081B]/[.98] cursor-zoom-out"
           />
         </div>
       )}
