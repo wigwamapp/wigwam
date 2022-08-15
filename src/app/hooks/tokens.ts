@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import useForceUpdate from "use-force-update";
+import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
@@ -139,7 +140,18 @@ export function useToken<T extends AccountToken>(
   const data = value.state === "hasData" ? value.data : undefined;
   const prevData = usePrevious(data, "when-not-undefined");
 
-  const token = (value.state === "loading" ? prevData : data) as T | undefined;
+  let token = (value.state === "loading" ? prevData : data) as T | undefined;
 
-  return token?.portfolioUSD !== "-1" ? token : undefined;
+  // For better sync UX
+  token = token?.portfolioUSD !== "-1" ? token : undefined;
+
+  // portfolioUSD needs more time to resync
+  if (token?.portfolioUSD) {
+    token.portfolioUSD = BigNumber.max(
+      token.portfolioUSD,
+      token.balanceUSD
+    ).toString();
+  }
+
+  return token;
 }

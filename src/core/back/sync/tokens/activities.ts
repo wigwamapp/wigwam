@@ -277,7 +277,7 @@ async function performTokenActivitiesSync(
 
     let txs = res.data.result;
 
-    if (txs.length === 0) {
+    if (!txs || txs.length === 0) {
       return;
     }
 
