@@ -236,12 +236,14 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        if (!searchValue || !ethers.utils.isAddress(searchValue)) return;
-
-        await storage.put<TokenSearchPersist>(TOKEN_SEARCH_PERSIST, {
-          value: searchValue,
-          addedAt: Date.now(),
-        });
+        if (searchValue && ethers.utils.isAddress(searchValue)) {
+          await storage.put<TokenSearchPersist>(TOKEN_SEARCH_PERSIST, {
+            value: searchValue,
+            addedAt: Date.now(),
+          });
+        } else {
+          await storage.remove(TOKEN_SEARCH_PERSIST);
+        }
       } catch (err) {
         console.error(err);
       }
