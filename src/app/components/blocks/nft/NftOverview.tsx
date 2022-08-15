@@ -17,10 +17,11 @@ import { ReactComponent as MediaFallbackIcon } from "app/icons/media-fallback.sv
 
 type NftOverviewProps = {
   token: AccountNFT;
+  small?: boolean;
   className?: string;
 };
 
-const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
+const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgOrVideoRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -106,7 +107,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
         <div
           className={classNames(
             !errored ? contentClassName : "h-full",
-            "relative"
+            !small && "relative"
           )}
         >
           {withErrorFallback(
@@ -119,12 +120,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, className }) => {
             />
           )}
 
-          <div
-            className={classNames(
-              "absolute",
-              "bottom-[1rem] left-[1rem] right-[1rem]"
-            )}
-          >
+          <div className={classNames("absolute", "bottom-2 left-2 right-2")}>
             <audio
               ref={audioRef}
               src={token.contentUrl ?? ""}

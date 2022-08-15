@@ -42,7 +42,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
   return (
     <SecondaryModal {...rest} small>
       <div className={classNames("w-full h-[20rem]", "mt-4 mb-2")}>
-        {token && <NftOverview token={token} />}
+        {token && <NftOverview token={token} small />}
       </div>
 
       <div
