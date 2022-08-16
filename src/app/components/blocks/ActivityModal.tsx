@@ -24,17 +24,21 @@ import {
   Activity,
   ActivitySource,
   ActivityType,
+  ConnectionActivity,
   TransactionActivity,
   TxAction,
   TxActionType,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
+import { getPageOrigin } from "core/common/permissions";
+import * as repo from "core/repo";
 
 import {
   activityModalAtom,
   allAccountsAtom,
   approvalStatusAtom,
   getNetworkAtom,
+  getPermissionAtom,
   pendingActivityAtom,
 } from "app/atoms";
 import { IS_FIREFOX, LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
@@ -412,6 +416,10 @@ const ActivityCard = memo(
           />
         )}
 
+        {item.type === ActivityType.Connection && (
+          <DisconnectDApp item={item} className="w-[10rem] mr-8" />
+        )}
+
         {item.type === ActivityType.Transaction && (
           <ActivityTokens
             source={item.source}
@@ -434,6 +442,41 @@ const ActivityCard = memo(
     );
   })
 );
+
+type DisconnectDAppProps = {
+  item: ConnectionActivity;
+  className?: string;
+};
+
+const DisconnectDApp = memo<DisconnectDAppProps>(({ item, className }) => {
+  const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
+  const permission = useAtomValue(getPermissionAtom(origin));
+
+  const handleDisconnect = useCallback(async () => {
+    if (!permission) return;
+
+    try {
+      await repo.permissions.delete(permission.origin);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [permission]);
+
+  if (!permission) return null;
+  if (permission.accountAddresses.length === 0) return null;
+
+  return (
+    <div className={classNames("flex items-center", className)}>
+      <button
+        type="button"
+        className={classNames("hover:underline")}
+        onClick={handleDisconnect}
+      >
+        <span className="min-w-0 truncate text-sm">Disconnect</span>
+      </button>
+    </div>
+  );
+});
 
 type ActivityIconProps = {
   item: Activity;

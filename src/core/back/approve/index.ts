@@ -224,11 +224,21 @@ function getAccountSave(accountAddress: string) {
 }
 
 async function saveActivity(activity: Activity) {
-  try {
-    // TODO: Add specific logic for speed-up or cancel tx
-    await repo.activities.put(activity);
-  } catch (err) {
-    console.error(err);
+  // TODO: Add specific logic for speed-up or cancel tx
+  await repo.activities.put(activity).catch(console.error);
+
+  if (activity.type === ActivityType.Connection) {
+    // Remove all early connections to the same origin
+    repo.activities
+      .where("[type+pending]")
+      .equals([ActivityType.Connection, 0])
+      .filter(
+        (act) =>
+          act.id !== activity.id &&
+          getPageOrigin(act.source) === getPageOrigin(activity.source)
+      )
+      .delete()
+      .catch(console.error);
   }
 }
 
