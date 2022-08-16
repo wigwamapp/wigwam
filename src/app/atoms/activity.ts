@@ -23,3 +23,9 @@ export const getActivityAtom = atomFamily(
     ),
   dequal
 );
+
+export const getAllPermissionsAtom = atomFamily(
+  (params: { search?: string; offset?: number; limit?: number }) =>
+    atomWithRepoQuery((query) => query(() => repo.queryPermissions(params))),
+  dequal
+);

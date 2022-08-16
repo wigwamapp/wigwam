@@ -13,7 +13,12 @@ import {
   RequestArguments,
   SendSyncJsonRpcRequest,
 } from "core/types/rpc";
-import { JSONRPC, VIGVAM_STATE, AUTHORIZED_RPC_METHODS } from "core/common/rpc";
+import {
+  JSONRPC,
+  VIGVAM_STATE,
+  AUTHORIZED_RPC_METHODS,
+  STATE_RPC_METHODS,
+} from "core/common/rpc";
 
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
@@ -28,6 +33,8 @@ export class InpageProvider extends Emitter {
   isVigvam = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
+
+  sharedPropertyEnabled = true;
 
   /**
    * The chain ID of the currently connected Ethereum chain.
@@ -73,7 +80,11 @@ export class InpageProvider extends Emitter {
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
       if (evt?.method === VIGVAM_STATE) {
-        const { chainId, accountAddress } = evt.params as any;
+        const { chainId, accountAddress, sharedPropertyEnabled } =
+          evt.params as any;
+
+        this.sharedPropertyEnabled = sharedPropertyEnabled;
+        this.isMetaMask = sharedPropertyEnabled;
 
         this.#handleNetworkChange(chainId);
         this.#handleAccountChange(accountAddress || null);
@@ -227,12 +238,7 @@ export class InpageProvider extends Emitter {
           this.removeListener(gatewayEventType, handleRpcEvent);
 
           if ("result" in evt) {
-            if (
-              method === JsonRpcMethod.eth_requestAccounts ||
-              method === JsonRpcMethod.wallet_requestPermissions ||
-              method == JsonRpcMethod.wallet_switchEthereumChain ||
-              method == JsonRpcMethod.wallet_addEthereumChain
-            ) {
+            if (STATE_RPC_METHODS.has(method)) {
               // Await until state updated
               await new Promise<void>((res) => {
                 const complete = () => {
