@@ -10,16 +10,22 @@ import {
   activeTabOriginAtom,
   currentAccountAtom,
   getPermissionAtom,
+  web3MetaMaskCompatibleAtom,
 } from "app/atoms";
+import { Page, SettingTab } from "app/nav";
+import { openInTab } from "app/helpers";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
+import IconedButton from "app/components/elements/IconedButton";
+import { ReactComponent as WebOffIcon } from "app/icons/setting-web3-off.svg";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
   const currentAccount = useAtomValue(currentAccountAtom);
+  const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
 
   const permission =
     purePermission && purePermission.accountAddresses.length > 0
@@ -52,9 +58,10 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
   const state = useMemo(() => {
     if (!permission) return "disconnected";
+    if (!metamaskMode && accountConnected) return "connected-disabled";
     if (accountConnected) return "connected";
     return "connectible";
-  }, [permission, accountConnected]);
+  }, [permission, metamaskMode, accountConnected]);
 
   const handlePermission = useCallback(async () => {
     if (!permission) return;
@@ -110,14 +117,24 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         ) : (
           <Tooltip
             content={
-              <p>
-                Current wallet is not connected to this website.
-                {!watchOnlyAcc &&
-                  " To connect it - click Connect on the right."}
-                <br />
-                If you want to disconnect all wallets - switch to any connected
-                wallet, and then click Disconnect on the right.
-              </p>
+              state === "connected-disabled" ? (
+                <p>
+                  Current wallet is connected to this website but you disabled
+                  MetaMask compatible mode.
+                  <br />
+                  If you want to enable it back click the icon on the right and
+                  switch the toggle in the Web3 Settings tab.
+                </p>
+              ) : (
+                <p>
+                  Current wallet is not connected to this website.
+                  {!watchOnlyAcc &&
+                    " To connect it - click Connect on the right."}
+                  <br />
+                  If you want to disconnect all wallets - switch to any
+                  connected wallet, and then click Disconnect on the right.
+                </p>
+              )
             }
             placement="bottom-end"
             size="large"
@@ -183,7 +200,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           {new URL(tabOrigin).host}
         </span>
       )}
-      {permission && !watchOnlyAcc && (
+      {permission && !watchOnlyAcc && metamaskMode && (
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
@@ -191,6 +208,18 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         >
           {accountConnected ? "Disconnect" : "Connect"}
         </button>
+      )}
+      {state === "connected-disabled" && (
+        <IconedButton
+          Icon={WebOffIcon}
+          onClick={() =>
+            openInTab({ page: Page.Settings, setting: SettingTab.Web3 })
+          }
+          aria-label="Web3 settings"
+          theme="secondary"
+          className="ml-auto bg-transparent"
+          iconClassName="transition-all group-hover:fill-brand-light"
+        />
       )}
     </div>
   );
