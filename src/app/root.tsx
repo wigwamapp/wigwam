@@ -1,7 +1,7 @@
 import "./styles/index.css";
 
 import { ReactNode, StrictMode } from "react";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { disableOutlinesForClick } from "lib/outline-on-click";
 
 if (
@@ -15,5 +15,6 @@ if (
 export function mount(app: ReactNode) {
   disableOutlinesForClick();
 
-  render(<StrictMode>{app}</StrictMode>, document.getElementById("root"));
+  const root = createRoot(document.getElementById("root")!);
+  root.render(<StrictMode>{app}</StrictMode>);
 }
