@@ -5,6 +5,7 @@ import {
   accountTokens,
   activities,
   contacts,
+  permissions,
   tokenActivities,
 } from "./helpers";
 
@@ -148,6 +149,38 @@ export function queryTokenActivities({
     .where("[chainId+accountAddress+tokenSlug]")
     .equals([chainId, accountAddress, tokenSlug])
     .reverse();
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryPermissionsParams = {
+  search?: string;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryPermissions({
+  search,
+  offset,
+  limit,
+}: QueryPermissionsParams) {
+  let coll;
+
+  coll = permissions.orderBy("timeAt").reverse();
+
+  if (search) {
+    const match = createSearchMatcher(search);
+
+    coll = coll.filter((perm) => match(perm.origin));
+  }
 
   if (offset) {
     coll = coll.offset(offset);
