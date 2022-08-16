@@ -469,10 +469,15 @@ const DisconnectDApp = memo<DisconnectDAppProps>(({ item, className }) => {
     <div className={classNames("flex items-center", className)}>
       <button
         type="button"
-        className={classNames("hover:underline")}
+        className={classNames(
+          "hover:underline",
+          "border border-brand-inactivedark/20",
+          "rounded-md",
+          "px-2 py-1"
+        )}
         onClick={handleDisconnect}
       >
-        <span className="min-w-0 truncate text-sm">Disconnect</span>
+        <span className="min-w-0 truncate text-xs">Disconnect</span>
       </button>
     </div>
   );
