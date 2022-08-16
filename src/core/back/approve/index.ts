@@ -229,13 +229,14 @@ async function saveActivity(activity: Activity) {
 
   if (activity.type === ActivityType.Connection) {
     // Remove all early connections to the same origin
+    const actOrigin = getPageOrigin(activity.source);
+
     repo.activities
       .where("[type+pending]")
       .equals([ActivityType.Connection, 0])
       .filter(
         (act) =>
-          act.id !== activity.id &&
-          getPageOrigin(act.source) === getPageOrigin(activity.source)
+          act.id !== activity.id && getPageOrigin(act.source) === actOrigin
       )
       .delete()
       .catch(console.error);
