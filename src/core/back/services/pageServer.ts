@@ -6,6 +6,7 @@ import { storage } from "lib/ext/storage";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
+import { DEFAULT_WEB_METAMASK_COMPATIBLE } from "fixtures/settings";
 import {
   PorterChannel,
   JsonRpcResponse,
@@ -17,6 +18,7 @@ import {
   ActivityType,
 } from "core/types";
 import * as repo from "core/repo";
+import { Setting } from "core/common";
 import { JSONRPC, VIGVAM_FAVICON, VIGVAM_STATE } from "core/common/rpc";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
@@ -103,6 +105,8 @@ export function startPageServer() {
   const notifyPermission = async (port: Runtime.Port, perm?: Permission) => {
     let params;
 
+    const sharedPropertyEnabled = await loadSharedPropertyEnabled();
+
     if (isUnlocked() && perm) {
       const internalAccountAddress = await loadAccountAddress();
 
@@ -122,11 +126,13 @@ export function startPageServer() {
       params = {
         chainId: perm.chainId,
         accountAddress: accountAddress?.toLowerCase(),
+        sharedPropertyEnabled,
       };
     } else {
       params = {
         chainId: perm?.chainId ?? (await loadInternalChainId()),
         accountAddress: null,
+        sharedPropertyEnabled,
       };
     }
 
@@ -221,6 +227,17 @@ async function resolveConnectionApproval(perm?: Permission) {
     console.error(err);
   }
 }
+
+const loadSharedPropertyEnabled = livePromise(
+  () =>
+    storage
+      .fetch<boolean>(Setting.Web3MetaMaskCompatible)
+      .catch(() => DEFAULT_WEB_METAMASK_COMPATIBLE),
+  (callback) =>
+    storage.subscribe<boolean>(Setting.Web3MetaMaskCompatible, ({ newValue }) =>
+      callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE)
+    )
+);
 
 const loadInternalChainId = livePromise(
   () => storage.fetch<number>(CHAIN_ID).catch(() => INITIAL_NETWORK.chainId),

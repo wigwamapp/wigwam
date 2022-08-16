@@ -53,7 +53,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
         <h3
           className={classNames(
             "line-clamp-2 break-words mt-2",
-            "text-sm text-left font-bold",
+            "text-sm text-center font-bold",
             "w-full mb-4",
             !tokenInfo.name ? "text-brand-main" : ""
           )}

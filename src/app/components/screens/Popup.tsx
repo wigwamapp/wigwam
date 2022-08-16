@@ -256,7 +256,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
       <ScrollAreaContainer
         ref={scrollAreaRef}
         hiddenScrollbar="horizontal"
-        className="pr-3.5 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
+        className="pr-3.5 pb-16 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
         viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
         scrollBarClassName="py-0 pb-16"
       >
@@ -385,15 +385,13 @@ const NftList = memo<NftListProps>(
 
     return (
       <>
-        <>
-          <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
+        <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
 
-          <NFTOverviewPopup
-            open={Boolean(nftTokenOpened)}
-            token={nftTokenOpened}
-            onOpenChange={() => setNftTokenOpened(null)}
-          />
-        </>
+        <NFTOverviewPopup
+          open={Boolean(nftTokenOpened)}
+          token={nftTokenOpened}
+          onOpenChange={() => setNftTokenOpened(null)}
+        />
       </>
     );
   }
