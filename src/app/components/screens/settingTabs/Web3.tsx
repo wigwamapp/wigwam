@@ -88,6 +88,7 @@ const PermissionsList = memo(() => {
               "mb-4 w-full",
               "bg-brand-inactivelight/5",
               "border border-brand-inactivedark/25",
+              "transition-colors",
               "hover:bg-brand-inactivelight/10",
               "rounded-lg",
               "flex items-center py-2 pl-4 pr-2",
@@ -95,16 +96,18 @@ const PermissionsList = memo(() => {
               "hover:underline"
             )}
           >
-            <span>{perm.origin}</span>
-            <ExternalLinkIcon className="ml-1 h-5 w-auto" />
-
-            <span className="flex-1" />
+            <span className="min-w-0 truncate">
+              {new URL(perm.origin).protocol === "https:"
+                ? new URL(perm.origin).host
+                : perm.origin}
+            </span>
+            <ExternalLinkIcon className="ml-1 w-5 min-w-[1.25rem] h-auto mr-4" />
 
             <IconedButton
               aria-label={`Revoke permission for ${new URL(perm.origin).host}`}
               Icon={CloseIcon}
               theme="tertiary"
-              className="!w-6 !h-6 min-w-[1.5rem]"
+              className="!w-6 !h-6 min-w-[1.5rem] ml-auto"
               iconClassName="!w-[1.125rem]"
               onClick={(evt: MouseEvent<HTMLButtonElement>) =>
                 revokePermission(perm.origin, evt)
