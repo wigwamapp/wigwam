@@ -27,6 +27,7 @@ export async function requestTransaction(
   let accountAddress: string;
 
   try {
+    txParams = omitEmptyProps(txParams);
     accountAddress = ethers.utils.getAddress(txParams.from);
 
     if ("gas" in txParams) {
@@ -36,7 +37,9 @@ export async function requestTransaction(
 
     assertSchema(txParams, TxParamsSchema);
     assert(txParams.to || txParams.data);
-  } catch {
+  } catch (err) {
+    console.warn(err);
+
     throw ethErrors.rpc.invalidParams();
   }
 
@@ -52,4 +55,12 @@ export async function requestTransaction(
     txParams,
     rpcReply,
   });
+}
+
+function omitEmptyProps(obj: Record<string, any>) {
+  obj = { ...obj };
+  for (const prop of Object.keys(obj)) {
+    if (!obj[prop]) delete obj[prop];
+  }
+  return obj;
 }
