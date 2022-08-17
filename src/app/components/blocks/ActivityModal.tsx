@@ -12,29 +12,35 @@ import {
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useSafeState } from "lib/react-hooks/useSafeState";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
   Activity,
   ActivitySource,
   ActivityType,
+  ConnectionActivity,
   TransactionActivity,
   TxAction,
   TxActionType,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
+import { getPageOrigin } from "core/common/permissions";
+import * as repo from "core/repo";
 
 import {
   activityModalAtom,
   allAccountsAtom,
   approvalStatusAtom,
   getNetworkAtom,
+  getPermissionAtom,
   pendingActivityAtom,
 } from "app/atoms";
 import { IS_FIREFOX, LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
@@ -304,7 +310,7 @@ const History = memo(() => {
   );
 });
 
-type StatusType = "succeeded" | "failed" | "skipped";
+type StatusType = "succeeded" | "failed" | "skipped" | "revoked";
 
 type ActivityCardProps = {
   item: Activity;
@@ -313,7 +319,13 @@ type ActivityCardProps = {
 
 const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    const [revokedPermission, setRevokedPermission] = useSafeState(false);
+
     const status = useMemo<StatusType | undefined>(() => {
+      if (item.type === ActivityType.Connection && revokedPermission) {
+        return "revoked";
+      }
+
       if (item.type !== ActivityType.Transaction || item.pending) {
         return;
       }
@@ -330,7 +342,7 @@ const ActivityCard = memo(
       }
 
       return "succeeded";
-    }, [item]);
+    }, [item, revokedPermission]);
 
     const fee = useMemo(() => {
       if (
@@ -370,7 +382,7 @@ const ActivityCard = memo(
           "border",
           item.pending && "border-[#D99E2E]/50",
           item.pending && "animate-pulse",
-          (!status || status === "succeeded") &&
+          (!status || status === "succeeded" || status === "revoked") &&
             !item.pending &&
             "border-brand-inactivedark/25",
           status === "failed" && "border-brand-redobject/50",
@@ -412,6 +424,14 @@ const ActivityCard = memo(
           />
         )}
 
+        {item.type === ActivityType.Connection && (
+          <DisconnectDApp
+            item={item}
+            className="w-[10rem] mr-8"
+            setRevokedPermission={setRevokedPermission}
+          />
+        )}
+
         {item.type === ActivityType.Transaction && (
           <ActivityTokens
             source={item.source}
@@ -433,6 +453,63 @@ const ActivityCard = memo(
       </div>
     );
   })
+);
+
+type DisconnectDAppProps = {
+  item: ConnectionActivity;
+  setRevokedPermission: (r: true) => void;
+  className?: string;
+};
+
+const DisconnectDApp = memo<DisconnectDAppProps>(
+  ({ item, className, setRevokedPermission }) => {
+    const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
+    const lazyPermission = useAtomValue(loadable(getPermissionAtom(origin)));
+    const permission =
+      lazyPermission.state === "hasData" ? lazyPermission.data : undefined;
+
+    useEffect(() => {
+      if (
+        lazyPermission.state === "hasData" &&
+        (!lazyPermission.data ||
+          lazyPermission.data.accountAddresses.length === 0)
+      ) {
+        setRevokedPermission(true);
+      }
+    }, [lazyPermission, setRevokedPermission]);
+
+    const handleDisconnect = useCallback(async () => {
+      if (!permission) return;
+
+      try {
+        await repo.permissions.delete(permission.origin);
+      } catch (err) {
+        console.error(err);
+      }
+    }, [permission]);
+
+    if (!permission) return null;
+    if (permission.accountAddresses.length === 0) return null;
+
+    return (
+      <div className={classNames("flex items-center", className)}>
+        <button
+          type="button"
+          className={classNames(
+            "border border-brand-main/20",
+            "rounded-md",
+            "px-2 py-0.5",
+            "text-xs text-brand-inactivelight",
+            "transition-colors",
+            "hover:bg-brand-main/10"
+          )}
+          onClick={handleDisconnect}
+        >
+          Revoke permission
+        </button>
+      </div>
+    );
+  }
 );
 
 type ActivityIconProps = {
@@ -503,7 +580,8 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
           "text-xs font-medium",
           status === "succeeded" && "text-brand-greenobject",
           status === "failed" && "text-brand-redtext",
-          status === "skipped" && "text-brand-main"
+          status === "skipped" && "text-brand-main",
+          status === "revoked" && "text-brand-inactivedark"
         )}
       >
         {capitalize(status === "succeeded" ? "success" : status)}
