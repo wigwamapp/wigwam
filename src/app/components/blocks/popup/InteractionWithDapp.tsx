@@ -2,7 +2,6 @@ import { FC, useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { AccountSource } from "core/types";
 import * as repo from "core/repo";
 
 import {
@@ -39,8 +38,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         : false,
     [permission, currentAccount]
   );
-
-  const watchOnlyAcc = currentAccount.source === AccountSource.Address;
 
   const reallyConnectible = useMemo(() => {
     if (!activeTab?.url) return false;
@@ -127,9 +124,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 </p>
               ) : (
                 <p>
-                  Current wallet is not connected to this website.
-                  {!watchOnlyAcc &&
-                    " To connect it - click Connect on the right."}
+                  Current wallet is not connected to this website. To connect it
+                  - click Connect on the right.
                   <br />
                   If you want to disconnect all wallets - switch to any
                   connected wallet, and then click Disconnect on the right.
@@ -203,7 +199,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
       <span className="flex-1" />
 
-      {permission && !watchOnlyAcc && (metamaskMode || accountConnected) && (
+      {permission && (metamaskMode || accountConnected) && (
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"

@@ -16,6 +16,7 @@ import {
   TxActionType,
   TokenActivity,
   TxAction,
+  AccountSource,
 } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
@@ -106,7 +107,7 @@ export async function processApprove(
 
           if (!signedRawTx) {
             accountAddress = ethers.utils.getAddress(accountAddress);
-            const account = getAccountSave(accountAddress);
+            const account = getAccountSafe(accountAddress);
 
             const signature = await vault.sign(account.uuid, keccak256(rawTx!));
             signedRawTx = serializeTransaction(tx, signature);
@@ -186,7 +187,7 @@ export async function processApprove(
           }
 
           accountAddress = ethers.utils.getAddress(accountAddress);
-          const account = getAccountSave(accountAddress);
+          const account = getAccountSafe(accountAddress);
 
           const signature = vault.signMessage(account.uuid, standard, message);
 
@@ -214,11 +215,17 @@ export async function processApprove(
   approvalResolved(approvalId);
 }
 
-function getAccountSave(accountAddress: string) {
+function getAccountSafe(accountAddress: string) {
   const account = $accounts
     .getState()
     .find((a) => a.address === accountAddress);
+
   assert(account, "Account not found");
+  assert(
+    account.source !== AccountSource.Address,
+    "This wallet was added as a watch-only account by importing an address." +
+      " It is not possible to perform signing using this type of accounts."
+  );
 
   return account;
 }

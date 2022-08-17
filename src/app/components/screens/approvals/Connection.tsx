@@ -6,11 +6,7 @@ import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { assert } from "lib/system/assert";
 
-import {
-  Account as AccountType,
-  AccountSource,
-  ConnectionApproval,
-} from "core/types";
+import { Account as AccountType, ConnectionApproval } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
@@ -69,14 +65,13 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       )
     );
 
-  const defaultAddresses = useMemo(() => {
-    const addresses = currentPermission?.accountAddresses ?? [];
-    if (currentAccount.source !== AccountSource.Address) {
-      addresses.push(currentAccount.address);
-    }
-
-    return addresses;
-  }, [currentPermission, currentAccount]);
+  const defaultAddresses = useMemo(
+    () => [
+      ...(currentPermission?.accountAddresses ?? []),
+      currentAccount.address,
+    ],
+    [currentPermission, currentAccount]
+  );
 
   const { alert } = useDialog();
 
@@ -102,16 +97,9 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     }
   }, [currentPermission, internalChainId, setLocalChainId]);
 
-  const preparedAccounts = useMemo(
-    () => allAccounts.filter(({ source }) => source !== AccountSource.Address),
-    [allAccounts]
-  );
-
   useEffect(() => {
-    if (currentAccount.source !== AccountSource.Address) {
-      accountsToConnectRef.current.add(currentAccount.address);
-      forceUpdate();
-    }
+    accountsToConnectRef.current.add(currentAccount.address);
+    forceUpdate();
   }, [currentAccount, forceUpdate]);
 
   const toggleAccount = useCallback(
@@ -238,20 +226,20 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
           />
         </div>
         <Separator />
-        {preparedAccounts.length === 0 ? (
+        {allAccounts.length === 0 ? (
           <EmptyAccountsToConnect />
         ) : (
           <ScrollAreaContainer
             className="w-full h-full box-content -mr-5 pr-5 grow"
             viewPortClassName="py-2.5 viewportBlock"
           >
-            {preparedAccounts.map((account, i) => (
+            {allAccounts.map((account, i) => (
               <Account
                 key={account.address}
                 account={account}
                 checked={accountsToConnectRef.current.has(account.address)}
                 onToggleAdd={() => toggleAccount(account.address)}
-                className={i !== preparedAccounts.length - 1 ? "mb-1" : ""}
+                className={i !== allAccounts.length - 1 ? "mb-1" : ""}
               />
             ))}
           </ScrollAreaContainer>
