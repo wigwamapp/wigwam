@@ -12,12 +12,14 @@ import {
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useSafeState } from "lib/react-hooks/useSafeState";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
@@ -317,6 +319,8 @@ type ActivityCardProps = {
 
 const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    const [revokedPermission, setRevokedPermission] = useSafeState(false);
+
     const status = useMemo<StatusType | undefined>(() => {
       if (item.type !== ActivityType.Transaction || item.pending) {
         return;
@@ -417,7 +421,11 @@ const ActivityCard = memo(
         )}
 
         {item.type === ActivityType.Connection && (
-          <DisconnectDApp item={item} className="w-[10rem] mr-8" />
+          <DisconnectDApp
+            item={item}
+            className="w-[10rem] mr-8"
+            setRevokedPermission={setRevokedPermission}
+          />
         )}
 
         {item.type === ActivityType.Transaction && (
@@ -445,45 +453,60 @@ const ActivityCard = memo(
 
 type DisconnectDAppProps = {
   item: ConnectionActivity;
+  setRevokedPermission: (r: true) => void;
   className?: string;
 };
 
-const DisconnectDApp = memo<DisconnectDAppProps>(({ item, className }) => {
-  const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
-  const permission = useAtomValue(getPermissionAtom(origin));
+const DisconnectDApp = memo<DisconnectDAppProps>(
+  ({ item, className, setRevokedPermission }) => {
+    const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
+    const lazyPrmission = useAtomValue(loadable(getPermissionAtom(origin)));
+    const permission =
+      lazyPrmission.state === "hasData" ? lazyPrmission.data : undefined;
 
-  const handleDisconnect = useCallback(async () => {
-    if (!permission) return;
+    useEffect(() => {
+      if (
+        lazyPrmission.state === "hasData" &&
+        (!lazyPrmission.data ||
+          lazyPrmission.data.accountAddresses.length === 0)
+      ) {
+        setRevokedPermission(true);
+      }
+    }, [lazyPrmission, setRevokedPermission]);
 
-    try {
-      await repo.permissions.delete(permission.origin);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [permission]);
+    const handleDisconnect = useCallback(async () => {
+      if (!permission) return;
 
-  if (!permission) return null;
-  if (permission.accountAddresses.length === 0) return null;
+      try {
+        await repo.permissions.delete(permission.origin);
+      } catch (err) {
+        console.error(err);
+      }
+    }, [permission]);
 
-  return (
-    <div className={classNames("flex items-center", className)}>
-      <button
-        type="button"
-        className={classNames(
-          "border border-brand-main/20",
-          "rounded-md",
-          "px-2 py-0.5",
-          "text-xs text-brand-inactivelight",
-          "transition-colors",
-          "hover:bg-brand-main/10"
-        )}
-        onClick={handleDisconnect}
-      >
-        Revoke permission
-      </button>
-    </div>
-  );
-});
+    if (!permission) return null;
+    if (permission.accountAddresses.length === 0) return null;
+
+    return (
+      <div className={classNames("flex items-center", className)}>
+        <button
+          type="button"
+          className={classNames(
+            "border border-brand-main/20",
+            "rounded-md",
+            "px-2 py-0.5",
+            "text-xs text-brand-inactivelight",
+            "transition-colors",
+            "hover:bg-brand-main/10"
+          )}
+          onClick={handleDisconnect}
+        >
+          Revoke permission
+        </button>
+      </div>
+    );
+  }
+);
 
 type ActivityIconProps = {
   item: Activity;
