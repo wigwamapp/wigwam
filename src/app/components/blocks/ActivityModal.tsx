@@ -457,11 +457,10 @@ const DisconnectDApp = memo<DisconnectDAppProps>(({ item, className }) => {
 
     try {
       await repo.permissions.delete(permission.origin);
-      await repo.activities.delete(item.id);
     } catch (err) {
       console.error(err);
     }
-  }, [item.id, permission]);
+  }, [permission]);
 
   if (!permission) return null;
   if (permission.accountAddresses.length === 0) return null;
@@ -473,14 +472,14 @@ const DisconnectDApp = memo<DisconnectDAppProps>(({ item, className }) => {
         className={classNames(
           "border border-brand-main/20",
           "rounded-md",
-          "px-2 py-0.5 w-[7rem]",
-          "text-sm text-brand-inactivelight",
+          "px-2 py-0.5",
+          "text-xs text-brand-inactivelight",
           "transition-colors",
           "hover:bg-brand-main/10"
         )}
         onClick={handleDisconnect}
       >
-        Disconnect
+        Revoke permission
       </button>
     </div>
   );
