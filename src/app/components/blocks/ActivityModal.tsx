@@ -310,7 +310,7 @@ const History = memo(() => {
   );
 });
 
-type StatusType = "succeeded" | "failed" | "skipped";
+type StatusType = "succeeded" | "failed" | "skipped" | "revoked";
 
 type ActivityCardProps = {
   item: Activity;
@@ -322,6 +322,10 @@ const ActivityCard = memo(
     const [revokedPermission, setRevokedPermission] = useSafeState(false);
 
     const status = useMemo<StatusType | undefined>(() => {
+      if (item.type === ActivityType.Connection && revokedPermission) {
+        return "revoked";
+      }
+
       if (item.type !== ActivityType.Transaction || item.pending) {
         return;
       }
@@ -338,7 +342,7 @@ const ActivityCard = memo(
       }
 
       return "succeeded";
-    }, [item]);
+    }, [item, revokedPermission]);
 
     const fee = useMemo(() => {
       if (
@@ -378,7 +382,7 @@ const ActivityCard = memo(
           "border",
           item.pending && "border-[#D99E2E]/50",
           item.pending && "animate-pulse",
-          (!status || status === "succeeded") &&
+          (!status || status === "succeeded" || status === "revoked") &&
             !item.pending &&
             "border-brand-inactivedark/25",
           status === "failed" && "border-brand-redobject/50",
@@ -460,19 +464,19 @@ type DisconnectDAppProps = {
 const DisconnectDApp = memo<DisconnectDAppProps>(
   ({ item, className, setRevokedPermission }) => {
     const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
-    const lazyPrmission = useAtomValue(loadable(getPermissionAtom(origin)));
+    const lazyPermission = useAtomValue(loadable(getPermissionAtom(origin)));
     const permission =
-      lazyPrmission.state === "hasData" ? lazyPrmission.data : undefined;
+      lazyPermission.state === "hasData" ? lazyPermission.data : undefined;
 
     useEffect(() => {
       if (
-        lazyPrmission.state === "hasData" &&
-        (!lazyPrmission.data ||
-          lazyPrmission.data.accountAddresses.length === 0)
+        lazyPermission.state === "hasData" &&
+        (!lazyPermission.data ||
+          lazyPermission.data.accountAddresses.length === 0)
       ) {
         setRevokedPermission(true);
       }
-    }, [lazyPrmission, setRevokedPermission]);
+    }, [lazyPermission, setRevokedPermission]);
 
     const handleDisconnect = useCallback(async () => {
       if (!permission) return;
@@ -576,7 +580,8 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
           "text-xs font-medium",
           status === "succeeded" && "text-brand-greenobject",
           status === "failed" && "text-brand-redtext",
-          status === "skipped" && "text-brand-main"
+          status === "skipped" && "text-brand-main",
+          status === "revoked" && "text-brand-inactivedark"
         )}
       >
         {capitalize(status === "succeeded" ? "success" : status)}
