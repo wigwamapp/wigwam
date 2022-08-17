@@ -87,6 +87,15 @@ export async function isTokenStandardValid(
       {
         try {
           const contract = ERC20__factory.connect(address, provider);
+
+          try {
+            const is721 = await contract.supportsInterface(ERC721_IFACE_ID);
+            if (is721) return false;
+
+            const is1155 = await contract.supportsInterface(ERC721_IFACE_ID);
+            if (is1155) return false;
+          } catch {}
+
           const supply = await contract.totalSupply();
 
           return !supply.isZero();
