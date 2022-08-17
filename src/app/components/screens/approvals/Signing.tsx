@@ -65,7 +65,11 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
     try {
       switch (approval.standard) {
         case SigningStandard.PersonalSign:
-          return toUtf8String(approval.message);
+          try {
+            return toUtf8String(approval.message);
+          } catch {
+            return approval.message;
+          }
 
         case SigningStandard.SignTypedDataV1:
           return approval.message;
