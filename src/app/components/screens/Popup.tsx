@@ -28,6 +28,7 @@ import {
   activeTabOriginAtom,
   getPermissionAtom,
   tokenTypeAtom,
+  web3MetaMaskCompatibleAtom,
 } from "app/atoms";
 import { TippySingletonProvider, useIsSyncing } from "app/hooks";
 import { useTokenList } from "app/hooks/tokenList";
@@ -56,6 +57,7 @@ import NftCard from "../blocks/tokenList/NftCard";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
+import { waitForAll } from "jotai/utils";
 
 const Popup: FC = () => (
   <PreloadAndSync>
@@ -72,7 +74,9 @@ export default Popup;
 
 const PreloadAndSync: FC = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const permission = useAtomValue(getPermissionAtom(tabOrigin));
+  const [permission] = useAtomValue(
+    waitForAll([getPermissionAtom(tabOrigin), web3MetaMaskCompatibleAtom])
+  );
 
   return (
     <PreloadBaseAndSync chainId={permission?.chainId}>

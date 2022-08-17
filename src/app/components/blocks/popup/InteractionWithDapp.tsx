@@ -200,7 +200,10 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           {new URL(tabOrigin).host}
         </span>
       )}
-      {permission && !watchOnlyAcc && metamaskMode && (
+
+      <span className="flex-1" />
+
+      {permission && !watchOnlyAcc && (
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
@@ -209,13 +212,14 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           {accountConnected ? "Disconnect" : "Connect"}
         </button>
       )}
-      {state === "connected-disabled" && (
+      {!metamaskMode && (
         <IconedButton
           Icon={WebOffIcon}
           onClick={() =>
             openInTab({ page: Page.Settings, setting: SettingTab.Web3 })
           }
-          aria-label="Web3 settings"
+          aria-label="MetaMask compatible mode is disabled. Click to go to Web3 settings to enable it back."
+          tooltipProps={{ size: "large", placement: "bottom-end" }}
           theme="secondary"
           className="ml-auto bg-transparent"
           iconClassName="transition-all group-hover:fill-brand-light"
