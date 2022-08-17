@@ -474,7 +474,7 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
         (!lazyPermission.data ||
           lazyPermission.data.accountAddresses.length === 0)
       ) {
-        setRevokedPermission(true);
+        setTimeout(() => setRevokedPermission(true), 0);
       }
     }, [lazyPermission, setRevokedPermission]);
 
