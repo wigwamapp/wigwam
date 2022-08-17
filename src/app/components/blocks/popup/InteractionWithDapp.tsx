@@ -203,7 +203,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
       <span className="flex-1" />
 
-      {permission && !watchOnlyAcc && (
+      {permission && !watchOnlyAcc && (metamaskMode || accountConnected) && (
         <button
           type="button"
           className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
