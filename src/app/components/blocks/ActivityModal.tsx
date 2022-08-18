@@ -45,9 +45,11 @@ import {
 } from "app/atoms";
 import { IS_FIREFOX, LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
 import {
+  ChainIdProvider,
   OverflowProvider,
   useCompleteActivity,
   useExplorerLink,
+  useLazyNetwork,
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
@@ -433,17 +435,21 @@ const ActivityCard = memo(
         )}
 
         {item.type === ActivityType.Transaction && (
-          <ActivityTokens
-            source={item.source}
-            action={item.txAction}
-            accountAddress={item.accountAddress}
-            className="w-[10rem] mr-8"
-          />
+          <ChainIdProvider chainId={item.chainId}>
+            <ActivityTokens
+              source={item.source}
+              action={item.txAction}
+              accountAddress={item.accountAddress}
+              className="w-[10rem] mr-8"
+            />
+          </ChainIdProvider>
         )}
 
         <div className="flex flex-col items-end ml-auto">
           {item.type === ActivityType.Transaction && (
-            <ActivityTxActions item={item} className="mb-1" />
+            <ChainIdProvider chainId={item.chainId}>
+              <ActivityTxActions item={item} className="mb-1" />
+            </ChainIdProvider>
           )}
 
           <div className="text-xs text-brand-inactivedark">
@@ -772,7 +778,7 @@ type ActivityTxActionsProps = {
 };
 
 const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
-  const network = useLazyAtomValue(getNetworkAtom(item.chainId));
+  const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
   const { copy, copied } = useCopyToClipboard(item.txHash);
