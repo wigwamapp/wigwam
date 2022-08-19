@@ -98,9 +98,19 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
           className={classNames(
             "absolute top-[-1px] left-0 right-0",
             "h-px bg-brand-main/[.07]",
-            "animate-ping"
+            "overflow-hidden"
           )}
-        />
+        >
+          <div
+            className={classNames(
+              "w-1/3 h-full",
+              "bg-gradient-to-r from-brand-main/[.0] via-brand-main/[.3] to-brand-main/[0]",
+              "absolute top-0 left-0",
+              "-translate-x-full",
+              "animate-stripeloading"
+            )}
+          />
+        </div>
       )}
     </div>
   );
