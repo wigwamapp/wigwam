@@ -48,6 +48,8 @@ module.exports = {
         modalcontentinnerOut: "modalinnerfadeout 0.35s ease-out",
         activitybar:
           "barclimb 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
+        stripeloading:
+          "stripeloading 3s cubic-bezier(0.16, 1, 0.3, 1) 0.2s infinite",
       },
       keyframes: {
         fadein: {
@@ -117,6 +119,10 @@ module.exports = {
           "50%": { transform: "rotate(10.0deg)" },
           "60%": { transform: "rotate(0.0deg)" },
           "100%": { transform: "rotate(0.0deg)" },
+        },
+        stripeloading: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(300%)" },
         },
       },
       boxShadow: {
