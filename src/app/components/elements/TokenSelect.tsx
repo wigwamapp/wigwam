@@ -19,6 +19,7 @@ import PrettyAmount from "./PrettyAmount";
 import NftAvatar from "./NftAvatar";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
+import { ReactComponent as MediaFallbackIcon } from "app/icons/media-fallback.svg";
 
 type TokenSelectProps = {
   tokenType: TokenType;
@@ -117,6 +118,44 @@ const TokenSelect: FC<TokenSelectProps> = ({
       handleTokenChanged?.();
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
+
+  if (!currentToken && tokenType === TokenType.NFT) {
+    return (
+      <div className="flex flex-col">
+        <div
+          className={classNames(
+            "ml-4 mb-2",
+            "text-base font-normal text-left",
+            "text-brand-gray",
+            "flex items-center"
+          )}
+        >
+          Token
+        </div>
+        <div
+          className={classNames(
+            "h-[6.125rem]",
+            "p-3",
+            "bg-brand-main/5 rounded-[.625rem]",
+            "flex items-center",
+            "text-sm text-brand-inactivelight"
+          )}
+        >
+          <div
+            className={classNames(
+              "w-[4.625rem] h-[4.625rem] min-w-[4.625rem]",
+              "bg-brand-main/5 rounded-[.625rem]",
+              "flex items-center justify-center",
+              "mr-3"
+            )}
+          >
+            <MediaFallbackIcon className="w-full h-auto" />
+          </div>
+          There are no NFTs on this wallet
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Select
