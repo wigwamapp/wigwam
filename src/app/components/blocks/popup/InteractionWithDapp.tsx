@@ -190,6 +190,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       {tabOrigin && (
         <span
           className={classNames(
+            "truncate leading-4",
             state !== "connected" && "text-brand-inactivedark"
           )}
         >
