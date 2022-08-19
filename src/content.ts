@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 import { PorterClient } from "lib/ext/porter/client";
+import { PorterDisconnectedError } from "lib/ext/porter/helpers";
 
 import { PorterChannel } from "core/types/shared";
 import { JSONRPC, DISCONNECT_ERROR, VIGVAM_FAVICON } from "core/common/rpc";
@@ -14,9 +15,13 @@ if (shouldInject()) {
 function initMsgGateway(injected: Promise<void>) {
   const inpage = new InpageProtocol("content", "injected");
 
+  let fullyDisconnected = false;
+
   const porter = new PorterClient();
   porter.connect(PorterChannel.Page);
   porter.onFullyDisconnect = () => {
+    fullyDisconnected = true;
+
     if (
       process.env.NODE_ENV === "development" &&
       process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true"
@@ -25,27 +30,10 @@ function initMsgGateway(injected: Promise<void>) {
       return;
     }
 
-    const msg =
+    console.error(
       "Vigvam: Provider disconnected." +
-      " A page reload is required to reestablish the connection to Web3.";
-
-    console.error(msg);
-
-    const el = document.createElement("div");
-    Object.assign(el.style, {
-      position: "fixed",
-      right: "16px",
-      bottom: "16px",
-      padding: "8px 16px",
-      fontSize: "14px",
-      color: "#B7BCD0",
-      backgroundColor: "rgba(0, 0, 0,0.9)",
-      borderRadius: "4px",
-      maxWidth: "280px",
-    });
-    el.textContent = msg;
-
-    document.body.appendChild(el);
+        " A page reload is required to reestablish the connection to Web3."
+    );
   };
 
   // Redirect messages: Background --> Injected
@@ -66,6 +54,10 @@ function initMsgGateway(injected: Promise<void>) {
           jsonrpc: JSONRPC,
           error: DISCONNECT_ERROR,
         });
+      }
+
+      if (fullyDisconnected && err instanceof PorterDisconnectedError) {
+        notifyRequiresRefresh();
       }
     }
   });
@@ -136,4 +128,47 @@ function getFavicon(): string | null {
   }
 
   return `${protocol}//${host}${href}`;
+}
+
+function notifyRequiresRefresh() {
+  const toast = document.createElement("div");
+  Object.assign(toast.style, {
+    position: "fixed",
+    right: "16px",
+    bottom: "16px",
+    padding: "8px 16px",
+    paddingRight: "24px",
+    fontSize: "14px",
+    color: "#B7BCD0",
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    borderRadius: "4px",
+    maxWidth: "280px",
+  });
+
+  const msg = document.createElement("span");
+  msg.textContent =
+    "A page reload is required to reestablish the connection to Vigvam.";
+
+  const closeButton = document.createElement("button");
+  Object.assign(closeButton.style, {
+    border: "none",
+    background: "none",
+    position: "absolute",
+    right: "4px",
+    top: "4px",
+    padding: "2px 4px",
+    fontSize: "18px",
+    lineHeight: "1",
+    color: "#B7BCD0",
+    cursor: "pointer",
+  });
+  closeButton.textContent = "×";
+  closeButton.onclick = () => {
+    document.body.removeChild(toast);
+  };
+
+  toast.appendChild(msg);
+  toast.appendChild(closeButton);
+
+  document.body.appendChild(toast);
 }
