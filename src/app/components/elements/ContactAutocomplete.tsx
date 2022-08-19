@@ -131,7 +131,7 @@ const ContactAutocomplete = forwardRef<
   );
 
   const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerAssetRef = useCallback(
+  const loadMoreTriggerRef = useCallback(
     (node) => {
       if (!contacts || !hasMore) return;
 
@@ -221,7 +221,7 @@ const ContactAutocomplete = forwardRef<
                       contacts.length -
                         LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END -
                         1
-                        ? loadMoreTriggerAssetRef
+                        ? loadMoreTriggerRef
                         : null
                     }
                     contact={item}

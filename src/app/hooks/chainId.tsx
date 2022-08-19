@@ -1,9 +1,11 @@
-import { FC, createContext, useContext, useEffect } from "react";
+import { FC, createContext, useContext, useEffect, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
-import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
+import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
 
+import { TokenType } from "core/types";
 import { sync, syncTokenActivities } from "core/client";
+import { createAccountTokenKey } from "core/common/tokens";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
 
@@ -27,37 +29,57 @@ export const ChainIdProvider: FC<{ chainId: number }> = ({
 
 export function useIsSyncing() {
   const chainId = useChainId();
-  const status = useLazyAtomValue(syncStatusAtom) ?? [];
+  const status = useSyncStatus();
 
   return status.includes(chainId);
 }
 
-export function useSync(chainId: number, accountAddress: string) {
-  const windowFocused = useWindowFocus();
+export function useIsTokenActivitySyncing(
+  chainId: number,
+  accountAddress: string,
+  tokenSlug?: string
+) {
+  const status = useSyncStatus();
+  const syncKey = useMemo(
+    () =>
+      tokenSlug &&
+      createAccountTokenKey({ chainId, accountAddress, tokenSlug }),
+    [chainId, accountAddress, tokenSlug]
+  );
+
+  return syncKey ? status.includes(syncKey) : false;
+}
+
+export function useSync(
+  chainId: number,
+  accountAddress: string,
+  tokenType = TokenType.Asset
+) {
+  const isHidden = useDocumentVisibility();
 
   useEffect(() => {
     let t: any;
 
     const syncAndDefer = () => {
-      sync(chainId, accountAddress);
+      sync(chainId, accountAddress, tokenType);
 
-      t = setTimeout(syncAndDefer, 1_500);
+      t = setTimeout(syncAndDefer, 3_000);
     };
 
-    if (windowFocused) {
+    if (!isHidden) {
       t = setTimeout(syncAndDefer);
     }
 
     return () => clearTimeout(t);
-  }, [chainId, windowFocused, accountAddress]);
+  }, [isHidden, chainId, accountAddress, tokenType]);
 }
 
 export function useTokenActivitiesSync(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug?: string
 ) {
-  const windowFocused = useWindowFocus();
+  const isHidden = useDocumentVisibility();
 
   useEffect(() => {
     let t: any;
@@ -65,13 +87,17 @@ export function useTokenActivitiesSync(
     const syncAndDefer = () => {
       tokenSlug && syncTokenActivities(chainId, accountAddress, tokenSlug);
 
-      t = setTimeout(syncAndDefer, 3_000);
+      t = setTimeout(syncAndDefer, 5_000);
     };
 
-    if (windowFocused) {
-      t = setTimeout(syncAndDefer, 1_500);
+    if (!isHidden) {
+      t = setTimeout(syncAndDefer, 500);
     }
 
     return () => clearTimeout(t);
-  }, [chainId, accountAddress, tokenSlug, windowFocused]);
+  }, [chainId, accountAddress, tokenSlug, isHidden]);
+}
+
+function useSyncStatus() {
+  return useLazyAtomValue(syncStatusAtom) ?? [];
 }

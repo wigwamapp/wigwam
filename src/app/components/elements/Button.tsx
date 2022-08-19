@@ -148,15 +148,15 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
         "active:bg-opacity-70 active:shadow-none",
       (theme === "secondary" || theme === "tertiary") &&
         !disabled && [
-          "hover:bg-brand-darklight hover:bg-opacity-100 hover:shadow-buttonsecondary",
+          "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary",
           plainFocus &&
-            "focus:bg-brand-darklight focus:bg-opacity-100 focus:shadow-buttonsecondary",
-          "focus-visible:bg-brand-darklight focus-visible:bg-opacity-100 focus-visible:shadow-buttonsecondary",
+            "focus:bg-brand-main focus:bg-opacity-[.15] focus:shadow-buttonsecondary",
+          "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
           "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
         ],
       theme === "clean" &&
         "font-medium hover:opacity-70 focus-visible:opacity-70",
-      disabled && "opacity-40 cursor-not-allowed",
+      disabled && "opacity-40 cursor-default",
       loading && "pointer-events-none",
       "select-none",
       className

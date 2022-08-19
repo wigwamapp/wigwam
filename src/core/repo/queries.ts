@@ -5,6 +5,7 @@ import {
   accountTokens,
   activities,
   contacts,
+  permissions,
   tokenActivities,
 } from "./helpers";
 
@@ -55,13 +56,17 @@ export function queryAccountTokens({
   if (search) {
     const match = createSearchMatcher(search);
 
-    coll = coll.filter((token) =>
-      token.tokenType === TokenType.Asset
-        ? match(parseTokenSlug(token.tokenSlug).address, "strict") ||
-          match(token.name) ||
-          match(token.symbol)
-        : true
-    );
+    coll = coll.filter((token) => {
+      const { address, id } = parseTokenSlug(token.tokenSlug);
+
+      return token.tokenType === TokenType.Asset
+        ? match(address, "strict") || match(token.name) || match(token.symbol)
+        : match(`${address}:${id}`, "strict") ||
+            match(address, "strict") ||
+            match(token.name) ||
+            match(token.tokenId) ||
+            (token.collectionName ? match(token.collectionName) : false);
+    });
   }
 
   if (offset) {
@@ -148,6 +153,38 @@ export function queryTokenActivities({
     .where("[chainId+accountAddress+tokenSlug]")
     .equals([chainId, accountAddress, tokenSlug])
     .reverse();
+
+  if (offset) {
+    coll = coll.offset(offset);
+  }
+
+  if (limit) {
+    coll = coll.limit(limit);
+  }
+
+  return coll.toArray();
+}
+
+export type QueryPermissionsParams = {
+  search?: string;
+  offset?: number;
+  limit?: number;
+};
+
+export function queryPermissions({
+  search,
+  offset,
+  limit,
+}: QueryPermissionsParams) {
+  let coll;
+
+  coll = permissions.orderBy("timeAt").reverse();
+
+  if (search) {
+    const match = createSearchMatcher(search);
+
+    coll = coll.filter((perm) => match(perm.origin));
+  }
 
   if (offset) {
     coll = coll.offset(offset);

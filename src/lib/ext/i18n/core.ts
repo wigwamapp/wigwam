@@ -75,8 +75,14 @@ export function t(messageName: string, substitutions?: Substitutions) {
   }
 }
 
+// TODO: Move this logic directly to replaceT function
+const REPLACE_T_WHITELIST = ["{{profile}}", "{{wallet}}"];
+
 export function replaceT(str: string) {
-  return str.replace(/{{(.*?)}}/g, (substr, key) => t(key) || substr);
+  return str.replace(
+    /{{(.*?)}}/g,
+    (substr, key) => (REPLACE_T_WHITELIST.includes(substr) && t(key)) || substr
+  );
 }
 
 export async function getLocale() {
@@ -119,7 +125,7 @@ function appendPlaceholderLists(messages: LocaleMessages) {
     if (val.placeholders) {
       val.placeholderList = [];
       for (const pKey in val.placeholders) {
-        const { content } = val.placeholders[pKey];
+        const { content } = val.placeholders[pKey] as { content: string };
         const index = +content.substring(1) - 1;
         val.placeholderList[index] = pKey;
       }

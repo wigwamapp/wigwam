@@ -1,9 +1,10 @@
-import browser from "webextension-polyfill";
 import { assert } from "lib/system/assert";
 
 import { Profile } from "./types";
 import { loadState, fetchState, setState } from "./state";
 import { generateProfile } from "./helpers";
+
+import { restartApp } from "../utils";
 
 /**
  * Used to generate keys for other storage entities.
@@ -29,10 +30,9 @@ export async function changeProfile(id: string) {
   await setState({
     ...state,
     currentId: id,
-    openTab: true,
   });
 
-  browser.runtime.reload();
+  restartApp();
 }
 
 export async function addProfile(name: string, profileSeed?: string) {

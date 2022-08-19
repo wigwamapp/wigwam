@@ -28,7 +28,8 @@ db.version(1).stores({
   ].join(),
   [RepoTable.TokenActivities]: [
     "",
-    "[chainId+accountAddress+tokenSlug+timeAt]",
+    "[chainId+accountAddress+tokenSlug+pending+timeAt]",
+    "[txHash+pending]",
   ].join(),
   [RepoTable.Activities]: ["&id", "[pending+timeAt]", "[type+pending]"].join(),
   [RepoTable.Permissions]: "&origin,timeAt",

@@ -40,7 +40,6 @@ export class ExtConfig extends Config {
       transportProvider,
       flushIntervalMillis: 150,
       logLevel,
-      saveEvents: false,
     });
 
     this.userId = userId;

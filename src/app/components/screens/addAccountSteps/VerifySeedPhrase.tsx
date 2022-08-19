@@ -116,7 +116,7 @@ const VerifySeedPhrase = memo(() => {
     <>
       <AddAccountHeader
         className="mb-8"
-        description="Fill in the empty fields with words according to their serial number"
+        description="Fill in empty fields with words according to their serial number"
       >
         Verify Secret Phrase
       </AddAccountHeader>

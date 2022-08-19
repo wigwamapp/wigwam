@@ -67,7 +67,7 @@ const tabsContent = [
   {
     route: { page: "settings", setting: SettingTabEnum.Web3 },
     Icon: WebIcon,
-    title: "Web 3",
+    title: "Web3",
     desc: "Control access and permissions for decentralized applications.",
   },
   {

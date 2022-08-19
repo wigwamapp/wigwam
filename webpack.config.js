@@ -147,12 +147,13 @@ module.exports = {
       "@toruslabs/openlogin": require.resolve(
         "@toruslabs/openlogin/dist/openlogin.umd.min.js"
       ),
+      "@ledgerhq/devices/hid-framing": require.resolve(
+        "@ledgerhq/devices/lib-es/hid-framing.js"
+      ),
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
-      "@metamask/eth-sig-util": "lib/eth-sig-util",
-      // For `react-error-guard`
-      "babel-runtime/regenerator": "regenerator-runtime",
+      "babel-runtime/regenerator": "regenerator-runtime", // For `react-error-guard`
     },
     fallback: {
       process: false,

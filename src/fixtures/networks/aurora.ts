@@ -14,6 +14,7 @@ export const AURORA: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://aurorascan.dev"],
+    explorerApiUrl: "https://api.aurorascan.dev/api",
     iconUrls: [],
     faucetUrls: [],
     infoUrl: "https://aurora.dev",
@@ -31,7 +32,9 @@ export const AURORA: Network[] = [
       symbol: "TETH",
       decimals: 18,
     },
-    faucetUrls: [],
+    explorerUrls: ["https://testnet.aurorascan.dev"],
+    explorerApiUrl: "https://api-testnet.aurorascan.dev/api",
+    faucetUrls: ["https://aurora.dev/faucet"],
     infoUrl: "https://aurora.dev",
   },
 ];

@@ -3,13 +3,18 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { fromProtectedString, toProtectedString } from "lib/crypto-utils";
 
-import { AccountSource, SeedPharse, WalletStatus } from "core/types";
+import {
+  AccountSource,
+  AddAccountParams,
+  SeedPharse,
+  WalletStatus,
+} from "core/types";
 import {
   generatePreviewHDNodes,
   getSeedPhraseHDNode,
   toNeuterExtendedKey,
 } from "core/common";
-import { addAccounts } from "core/client";
+import { addAccounts, TEvent, trackEvent } from "core/client";
 
 import { AddAccountStep } from "app/nav";
 import {
@@ -38,11 +43,56 @@ const VerifyAccountToAdd: FC = () => {
   const { stateRef, navigateToStep } = useSteps();
 
   const { importAddresses: addresses, hardDevice } = stateRef.current;
-  const { alert } = useDialog();
+  const { alert, confirm } = useDialog();
 
   const handleContinue = useCallback(
     async (addAccountsParams) => {
       try {
+        if (
+          (addAccountsParams as AddAccountParams[]).some(
+            (acc) => acc.source === AccountSource.OpenLogin
+          )
+        ) {
+          const confirmed = await confirm({
+            title: (
+              <>
+                Creating a wallet
+                <br />
+                <span className="text-[0.75em]">with a social account</span>
+              </>
+            ),
+            content: (
+              <div className="text-left">
+                <p>
+                  By clicking &#34;Confirm&#34; you accept all risks associated
+                  with creating a wallet using a social account.
+                </p>
+
+                <ul className="mt-2 list-disc list-outside text-sm">
+                  <li className="mb-1">
+                    If you lost access to your social account - you can&#39;t
+                    restore the linked wallet again using the same way. You can
+                    prevent this by exporting a private key (on the
+                    &#34;Wallets&#34; page) after creating a wallet.
+                  </li>
+                  <li className="mb-1">
+                    If someone else gets access to your social account, they can
+                    get full access to the linked wallet.
+                  </li>
+                  <li className="mb-1">
+                    If you connect the same social account to a malicious
+                    website, it has potentially more opportunities to access the
+                    linked wallet.
+                  </li>
+                </ul>
+              </div>
+            ),
+            yesButtonText: "Confirm",
+          });
+
+          if (!confirmed) return;
+        }
+
         if (initialSetup) {
           Object.assign(stateRef.current, { addAccountsParams });
           navigateToStep(AddAccountStep.SetupPassword);
@@ -50,11 +100,18 @@ const VerifyAccountToAdd: FC = () => {
           await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
           setAccModalOpened([false]);
         }
+
+        const trackParams = {
+          source: addAccountsParams[0].source,
+          walletsAddedAmount: addAccountsParams.length,
+        };
+
+        trackEvent(TEvent.SetupWallet, trackParams);
       } catch (err: any) {
         alert({ title: "Error!", content: err.message });
       }
     },
-    [alert, initialSetup, navigateToStep, setAccModalOpened, stateRef]
+    [alert, confirm, initialSetup, navigateToStep, setAccModalOpened, stateRef]
   );
 
   const isAnyLedgerAccounts = useMemo(

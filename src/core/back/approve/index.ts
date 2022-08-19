@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { nanoid } from "nanoid";
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
@@ -12,14 +13,20 @@ import {
   ApprovalResult,
   Permission,
   TxParams,
+  TxActionType,
+  TokenActivity,
+  TxAction,
+  AccountSource,
 } from "core/types";
+import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
-import * as repo from "core/repo";
+import { matchTxAction } from "core/common/transaction";
+import { createTokenActivityKey } from "core/common/tokens";
 
 import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
-import { sendRpc } from "../rpc";
+import { sendRpc, getRpcProvider } from "../rpc";
 
 const { serializeTransaction, parseTransaction, keccak256, hexValue } =
   ethers.utils;
@@ -100,7 +107,7 @@ export async function processApprove(
 
           if (!signedRawTx) {
             accountAddress = ethers.utils.getAddress(accountAddress);
-            const account = getAccountSave(accountAddress);
+            const account = getAccountSafe(accountAddress);
 
             const signature = await vault.sign(account.uuid, keccak256(rawTx!));
             signedRawTx = serializeTransaction(tx, signature);
@@ -121,6 +128,12 @@ export async function processApprove(
 
           if ("result" in rpcRes) {
             const txHash = rpcRes.result;
+            const timeAt = Date.now();
+
+            const txAction = await matchTxAction(
+              getRpcProvider(chainId),
+              txParams
+            ).catch(() => null);
 
             await Promise.all([
               saveNonce(chainId, accountAddress, tx.nonce),
@@ -132,10 +145,18 @@ export async function processApprove(
                 accountAddress,
                 txParams,
                 rawTx: rawTx!,
+                txAction: txAction ?? undefined,
                 txHash,
-                timeAt: Date.now(),
+                timeAt,
                 pending: 1,
               }),
+              saveTokenActivity(
+                txAction,
+                chainId,
+                accountAddress,
+                txHash,
+                timeAt
+              ),
             ]);
 
             rpcReply?.({ result: txHash });
@@ -166,7 +187,7 @@ export async function processApprove(
           }
 
           accountAddress = ethers.utils.getAddress(accountAddress);
-          const account = getAccountSave(accountAddress);
+          const account = getAccountSafe(accountAddress);
 
           const signature = vault.signMessage(account.uuid, standard, message);
 
@@ -194,19 +215,95 @@ export async function processApprove(
   approvalResolved(approvalId);
 }
 
-function getAccountSave(accountAddress: string) {
+function getAccountSafe(accountAddress: string) {
   const account = $accounts
     .getState()
     .find((a) => a.address === accountAddress);
+
   assert(account, "Account not found");
+  assert(
+    account.source !== AccountSource.Address,
+    "This wallet was added as a watch-only account by importing an address." +
+      " It is not possible to perform signing using this type of accounts."
+  );
 
   return account;
 }
 
 async function saveActivity(activity: Activity) {
+  // TODO: Add specific logic for speed-up or cancel tx
+  await repo.activities.put(activity).catch(console.error);
+
+  if (activity.type === ActivityType.Connection) {
+    // Remove all early connections to the same origin
+    const actOrigin = getPageOrigin(activity.source);
+
+    repo.activities
+      .where("[type+pending]")
+      .equals([ActivityType.Connection, 0])
+      .filter(
+        (act) =>
+          act.id !== activity.id && getPageOrigin(act.source) === actOrigin
+      )
+      .delete()
+      .catch(console.error);
+  }
+}
+
+async function saveTokenActivity(
+  action: TxAction | null,
+  chainId: number,
+  accountAddress: string,
+  txHash: string,
+  timeAt: number
+) {
   try {
-    // TODO: Add specific logic for speed-up or cancel tx
-    await repo.activities.put(activity);
+    if (action) {
+      const tokenActivities = new Map<string, TokenActivity>();
+      const addToActivities = (activity: TokenActivity) => {
+        const dbKey = createTokenActivityKey(activity);
+        tokenActivities.set(dbKey, activity);
+      };
+
+      const base = {
+        chainId,
+        accountAddress,
+        txHash,
+        pending: 1,
+        timeAt,
+      };
+
+      if (action.type === TxActionType.TokenTransfer) {
+        for (const { slug: tokenSlug, amount } of action.tokens) {
+          addToActivities({
+            ...base,
+            type: "transfer",
+            anotherAddress: action.toAddress,
+            amount: new BigNumber(amount).times(-1).toString(),
+            tokenSlug,
+          });
+        }
+      } else if (
+        action.type === TxActionType.TokenApprove &&
+        action.tokenSlug
+      ) {
+        addToActivities({
+          ...base,
+          type: "approve",
+          anotherAddress: action.toAddress,
+          tokenSlug: action.tokenSlug,
+          amount: action.amount,
+          clears: action.clears,
+        });
+      }
+
+      if (tokenActivities.size > 0) {
+        await repo.tokenActivities.bulkPut(
+          Array.from(tokenActivities.values()),
+          Array.from(tokenActivities.keys())
+        );
+      }
+    }
   } catch (err) {
     console.error(err);
   }
@@ -218,7 +315,6 @@ const STRICT_TX_PROPS = [
   "to",
   "data",
   "accessList",
-  "type",
   "chainId",
   "value",
 ] as const;
@@ -227,10 +323,6 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
   for (const key of STRICT_TX_PROPS) {
     const txValue = hexValueMaybe(tx[key]);
     const originValue = hexValueMaybe(originTxParams[key]);
-
-    if (key === "type" && originValue === "0x0" && !txValue) {
-      continue;
-    }
 
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");

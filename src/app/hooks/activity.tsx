@@ -5,7 +5,7 @@ import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { getTokenActivityAtom } from "app/atoms";
+import { getActivityAtom, getTokenActivityAtom } from "app/atoms";
 
 import { useChainId } from "./chainId";
 
@@ -68,6 +68,49 @@ export function useTokenActivity(
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
   const hasMore = offsetRef.current <= activity.length;
+
+  const loadMore = useCallback(() => {
+    if (!hasMore) return;
+
+    offsetRef.current += limit;
+    forceUpdate();
+  }, [forceUpdate, hasMore, limit]);
+
+  return {
+    activity,
+    hasMore,
+    loadMore,
+  };
+}
+
+export function useCompleteActivity(limit = 20) {
+  const forceUpdate = useForceUpdate();
+  const offsetRef = useRef(0);
+
+  const offset = offsetRef.current;
+  const queryParams = useMemo(
+    () => ({
+      limit: offset + limit,
+    }),
+    [offset, limit]
+  );
+
+  const tokenActivityAtom = getActivityAtom(queryParams);
+  const prevQueryParamsRef = useRef<typeof queryParams>();
+
+  useEffect(() => {
+    // Cleanup atoms cache
+    if (prevQueryParamsRef.current) {
+      getActivityAtom.remove(prevQueryParamsRef.current);
+    }
+
+    prevQueryParamsRef.current = queryParams;
+  }, [queryParams]);
+
+  const activity = useLazyAtomValue(tokenActivityAtom);
+
+  const hasMore =
+    activity !== undefined && offsetRef.current <= activity.length;
 
   const loadMore = useCallback(() => {
     if (!hasMore) return;

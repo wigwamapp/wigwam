@@ -5,3 +5,4 @@ export * from "./installOrUpdate";
 export * from "./approveWindow";
 export * from "./txObserver";
 export * from "./extBadge";
+export * from "./autoLock";

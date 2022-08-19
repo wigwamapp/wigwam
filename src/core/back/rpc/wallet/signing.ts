@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { recoverPersonalSignature } from "@metamask/eth-sig-util";
+import { recoverPersonalSignature } from "lib/eth-sig-util";
 import { assert } from "lib/system/assert";
 
 import {
@@ -14,7 +14,8 @@ import { validatePermission, validateAccount } from "./validation";
 import { approvalAdded } from "core/back/state";
 import { nanoid } from "nanoid";
 
-const { getAddress, isHexString } = ethers.utils;
+const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
+  ethers.utils;
 
 export async function requestSigning(
   source: ActivitySource,
@@ -34,6 +35,11 @@ export async function requestSigning(
     case SigningStandard.PersonalSign:
       accountAddress = params[1];
       message = params[0];
+
+      if (!isAddress(accountAddress)) {
+        accountAddress = params[0];
+        message = params[1];
+      }
       break;
 
     case SigningStandard.SignTypedDataV1:
@@ -53,7 +59,9 @@ export async function requestSigning(
 
     switch (standard) {
       case SigningStandard.PersonalSign:
-        assert(isHexString(message));
+        message = isHexString(message)
+          ? message
+          : hexlify(toUtf8Bytes(message));
         break;
 
       case SigningStandard.SignTypedDataV1:

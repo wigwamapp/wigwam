@@ -18,6 +18,8 @@ import SearchInput from "app/components/elements/SearchInput";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import Tooltip, { TooltipProps } from "./Tooltip";
+import TooltipIcon from "./TooltipIcon";
 
 type ItemProps<T, U> = {
   icon?: string;
@@ -39,6 +41,8 @@ export type SelectProps<T, U> = {
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
   size?: "large" | "small";
+  tooltip?: ReactNode;
+  tooltipProps?: TooltipProps;
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -63,6 +67,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
   emptySearchText,
   onOpenChange,
   size = "large",
+  tooltip,
+  tooltipProps,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -116,7 +122,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
       className={classNames(
         "flex flex-col",
         size === "large" && "min-w-[17.75rem]",
-        size === "small" && "w-[10.5rem]",
+        size === "small" && "w-[12.5rem]",
         className
       )}
     >
@@ -126,11 +132,24 @@ function Select<T extends string | ReactElement, U extends string | number>({
           className={classNames(
             "ml-4 mb-2",
             "text-base font-normal text-left",
-            "text-brand-gray"
+            "text-brand-gray",
+            "flex items-center"
           )}
           onClick={() => setOpened(!opened)}
         >
           {label}
+          {tooltip && (
+            <Tooltip
+              content={tooltip}
+              {...tooltipProps}
+              tooltipClassName="max-w-[20rem]"
+              asChild
+            >
+              <span className="ml-2">
+                <TooltipIcon className="!w-4 !h-4" />
+              </span>
+            </Tooltip>
+          )}
         </button>
       )}
       <DropdownMenu.Root
@@ -202,7 +221,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "shadow-xs",
                 "focus-visible:outline-none",
                 size === "large" && "mt-2 min-w-[17.75rem]",
-                size === "small" && "mt-1.5 w-[10.5rem]",
+                size === "small" && "mt-1.5 w-[12.5rem]",
                 "w-full",
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
@@ -231,8 +250,15 @@ function Select<T extends string | ReactElement, U extends string | number>({
                       onSearch(value);
                     }}
                     onKeyDown={handleSearchKeyDown}
-                    inputClassName="max-h-9 !pl-9"
-                    adornmentClassName="!left-3"
+                    size={size}
+                    inputClassName={classNames(
+                      size === "large" && "max-h-9 !pl-9",
+                      size === "small" && "max-h-7 !pl-7"
+                    )}
+                    adornmentClassName={classNames(
+                      size === "large" && "!left-3",
+                      size === "small" && "!left-2"
+                    )}
                     autoFocus={true}
                   />
                   {actions}
@@ -336,10 +362,18 @@ function Select<T extends string | ReactElement, U extends string | number>({
                       className={classNames(
                         "flex flex-col items-center justify-center mx-auto",
                         "w-full h-full py-4",
-                        "text-sm text-brand-inactivedark2 text-center"
+                        "text-brand-inactivedark2 text-center",
+                        size === "large" && "text-sm",
+                        size === "small" && "text-xs"
                       )}
                     >
-                      <NoResultsFoundIcon className="mb-4" />
+                      <NoResultsFoundIcon
+                        className={classNames(
+                          "h-auto mb-4",
+                          size === "large" && "w-[3.4375rem]",
+                          size === "small" && "w-[2.875rem]"
+                        )}
+                      />
                       <span>
                         There are no items found.
                         <br />

@@ -49,7 +49,9 @@ const NumberInput = memo(
             }
           }}
           {...rest}
-          thousandSeparator={separators.thousands}
+          thousandSeparator={
+            rest.thousandSeparator !== false && separators.thousands
+          }
           decimalSeparator={separators.decimals}
           allowedDecimalSeparators={[",", "."]}
         />

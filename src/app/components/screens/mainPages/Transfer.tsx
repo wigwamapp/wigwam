@@ -27,7 +27,7 @@ const Transfer: FC = () => {
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
-        {activeRoute?.transfer === TransferTabEnum.Asset ? (
+        {activeRoute?.transfer !== TransferTabEnum.Bridge ? (
           <ScrollAreaContainer
             className="box-content w-full px-6"
             viewPortClassName="pb-20 pt-5"
@@ -54,18 +54,19 @@ const tabsContent = [
     route: { page: "transfer", transfer: TransferTabEnum.Asset },
     title: "Asset",
     Icon: AssetIcon,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Send gas tokens or other fungible coins such as ERC20.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Nft },
     title: "NFT",
     Icon: NFTIcon,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Send NFTs or other non-fungible tokens such as ERC721 or ERC1155.",
   },
   {
     route: { page: "transfer", transfer: TransferTabEnum.Bridge },
     title: "Bridge",
     Icon: BridgeIcon,
-    desc: "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
+    desc: "Send tokens to another network, but to the same wallet.",
+    soon: true,
   },
 ];

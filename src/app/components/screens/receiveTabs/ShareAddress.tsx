@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { QRCodeCanvas } from "qrcode.react";
+import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { useCopyCanvasToClipboard } from "lib/react-hooks/useCopyCanvasToClipboard";
 
 import { currentAccountAtom } from "app/atoms";
@@ -13,6 +14,7 @@ import Button from "app/components/elements/Button";
 const ShareAddress: FC = () => {
   const { address } = useAtomValue(currentAccountAtom);
   const { copy, copied } = useCopyCanvasToClipboard("#receive-canvas canvas");
+  const isPopup = isPopupPrimitive();
 
   return (
     <div className="flex flex-col max-w-[23.25rem]">
@@ -42,23 +44,25 @@ const ShareAddress: FC = () => {
             This address can be used to receive funds. Share it with someone or
             just use it for withdrawal on exchanges.
           </p>
-          <Button
-            theme="tertiary"
-            className={classNames(
-              "text-sm text-brand-light !font-normal",
-              "!p-1 !pr-2 !min-w-0",
-              "-ml-2 mt-auto",
-              "items-center"
-            )}
-            onClick={copy}
-          >
-            {copied ? (
-              <SuccessIcon className="mr-1" />
-            ) : (
-              <CopyIcon className="mr-1" />
-            )}
-            {copied ? "Media copied" : "Copy Media"}
-          </Button>
+          {!isPopup && (
+            <Button
+              theme="tertiary"
+              className={classNames(
+                "text-sm text-brand-light !font-normal",
+                "!p-1 !pr-2 !min-w-0",
+                "-ml-2 mt-auto",
+                "items-center"
+              )}
+              onClick={copy}
+            >
+              {copied ? (
+                <SuccessIcon className="mr-1" />
+              ) : (
+                <CopyIcon className="mr-1" />
+              )}
+              {copied ? "Media copied" : "Copy Media"}
+            </Button>
+          )}
         </div>
       </div>
     </div>

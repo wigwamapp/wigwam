@@ -11,9 +11,15 @@ import classNames from "clsx";
 import { ethers } from "ethers";
 import { useAtomValue } from "jotai";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import {
+  TypedDataUtils,
+  SignTypedDataVersion,
+  recoverPersonalSignature,
+  recoverTypedSignature,
+} from "lib/eth-sig-util";
 
 import { AccountSource, SigningApproval, SigningStandard } from "core/types";
-import { approveItem } from "core/client";
+import { approveItem, TEvent, trackEvent } from "core/client";
 import { useDialog } from "app/hooks/dialog";
 import { useLedger } from "app/hooks/ledger";
 
@@ -28,7 +34,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import ApprovalLayout from "./Layout";
 
-const JsonView = lazy(() => import("react-json-view"));
+const JsonView = lazy(() => import("@microlink/react-json-view"));
 
 const { toUtf8String, hexlify, joinSignature, getAddress } = ethers.utils;
 
@@ -59,7 +65,11 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
     try {
       switch (approval.standard) {
         case SigningStandard.PersonalSign:
-          return toUtf8String(approval.message);
+          try {
+            return toUtf8String(approval.message);
+          } catch {
+            return approval.message;
+          }
 
         case SigningStandard.SignTypedDataV1:
           return approval.message;
@@ -91,13 +101,6 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
 
           await withLedger(async ({ ledgerEth }) => {
             try {
-              const {
-                TypedDataUtils,
-                SignTypedDataVersion,
-                recoverPersonalSignature,
-                recoverTypedSignature,
-              } = await import("@metamask/eth-sig-util");
-
               let sig;
 
               switch (approval.standard) {
@@ -209,6 +212,10 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
     },
     [approval, account, setApproving, alert, withLedger, message]
   );
+
+  useEffect(() => {
+    trackEvent(TEvent.DappSigning);
+  }, []);
 
   if (!message) return null;
 

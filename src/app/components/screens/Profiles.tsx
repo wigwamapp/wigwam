@@ -2,6 +2,9 @@ import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { changeProfile, addProfile } from "lib/ext/profile";
+import { replaceT } from "lib/ext/i18n";
+
+import { TEvent, trackEvent } from "core/client";
 
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
@@ -29,6 +32,8 @@ const Profiles: FC = () => {
 
     try {
       await addProfile(name, profileSeed);
+
+      trackEvent(TEvent.ProfileCreation);
 
       setAdding(false);
     } catch (err) {
@@ -92,8 +97,8 @@ const Profiles: FC = () => {
 
           <ul>
             <li>
-              <strong>Profiles</strong> allows split app usage experience into
-              multiple different sessions and provides more safety for our
+              <strong>The Profiles</strong> allows split app usage experience
+              with multiple different sessions and provides more safety for our
               users. For example, a user can have a work profile and a personal
               profile.
             </li>
@@ -133,7 +138,7 @@ type AddProfileDialogProps = SecondaryModalProps & {
 const AddProfileDialog = memo<AddProfileDialogProps>(
   ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
     const defaultNameValue = useMemo(
-      () => `Profile ${profilesLength + 1}`,
+      () => `{{profile}} ${profilesLength + 1}`,
       [profilesLength]
     );
 
@@ -146,7 +151,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
       >
         <ProfileGen
           className="justify-center"
-          defaultProfileName={defaultNameValue}
+          defaultProfileName={replaceT(defaultNameValue)}
           onSubmit={handleAddProfile}
           label="Name"
         />

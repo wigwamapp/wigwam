@@ -40,6 +40,7 @@ const AddAccountModal = memo(() => {
               previous step, secret phrase will be regenerated.
             </p>
           ),
+          noButtonText: "Stay",
           yesButtonText: "Back",
         });
 
@@ -66,7 +67,8 @@ const AddAccountModal = memo(() => {
               window now, all data from previous steps will be lost.
             </p>
           ),
-          yesButtonText: "Close",
+          noButtonText: "Stay",
+          yesButtonText: "Cancel",
         });
 
         if (!res) {

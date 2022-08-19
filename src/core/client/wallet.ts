@@ -11,6 +11,7 @@ import {
   SyncStatus,
   FindToken,
   SyncTokenActivities,
+  TokenType,
 } from "core/types";
 
 import { porter } from "./base";
@@ -207,8 +208,17 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
   });
 }
 
-export function sync(chainId: number, accountAddress: string) {
-  const msg: Sync = { type: MessageType.Sync, chainId, accountAddress };
+export function sync(
+  chainId: number,
+  accountAddress: string,
+  tokenType: TokenType
+) {
+  const msg: Sync = {
+    type: MessageType.Sync,
+    chainId,
+    accountAddress,
+    tokenType,
+  };
 
   porter.sendOneWayMessage(msg);
 }
@@ -216,13 +226,15 @@ export function sync(chainId: number, accountAddress: string) {
 export function findToken(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
+  refreshMetadata?: boolean
 ) {
   const msg: FindToken = {
     type: MessageType.FindToken,
     chainId,
     accountAddress,
     tokenSlug,
+    refreshMetadata,
   };
 
   porter.sendOneWayMessage(msg);

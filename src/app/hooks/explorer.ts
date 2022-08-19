@@ -13,8 +13,17 @@ export function useExplorerLink(network?: Network) {
             address: (address: string) =>
               joinPath(explorerUrl, `/address/${address}`),
             tx: (hash: string) => joinPath(explorerUrl, `/tx/${hash}`),
+            token: (address: string) =>
+              joinPath(explorerUrl, `/token/${address}`),
+            nft: (address: string, id: string) =>
+              joinPath(
+                explorerUrl,
+                network.chainTag === "ethereum"
+                  ? `/nft/${address}/${id}`
+                  : `/token/${address}`
+              ),
           }
         : null,
-    [explorerUrl]
+    [explorerUrl, network?.chainTag]
   );
 }

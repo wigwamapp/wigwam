@@ -5,16 +5,23 @@ export const FANTOM: Network[] = [
   {
     chainId: 250,
     type: "mainnet",
-    rpcUrls: ["https://rpc.ftm.tools"],
+    rpcUrls: [
+      "https://rpc.ftm.tools",
+      "https://rpc.fantom.network",
+      "https://rpcapi.fantom.network",
+      "https://rpc.ankr.com/fantom",
+      "https://fantom-mainnet.public.blastapi.io",
+    ],
     chainTag: "fantom",
-    name: "Fantom",
+    name: "Fantom Opera",
     nativeCurrency: {
       symbol: "FTM",
       name: "Fantom",
       decimals: 18,
     },
     explorerUrls: ["https://ftmscan.com"],
-    faucetUrls: ["https://free-online-app.com/faucet-for-eth-evm-chains/"],
+    explorerApiUrl: "https://api.ftmscan.com/api",
+    faucetUrls: [],
     infoUrl: "https://fantom.foundation",
   },
 
@@ -30,7 +37,8 @@ export const FANTOM: Network[] = [
       name: "Fantom",
       decimals: 18,
     },
-    explorerUrls: ["https://testnet.ftmscan.com/"],
+    explorerUrls: ["https://testnet.ftmscan.com"],
+    explorerApiUrl: "https://api-testnet.ftmscan.com/api",
     faucetUrls: ["https://faucet.fantom.network"],
     infoUrl:
       "https://docs.fantom.foundation/quick-start/short-guide#fantom-testnet",

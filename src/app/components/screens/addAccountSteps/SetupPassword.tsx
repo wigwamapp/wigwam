@@ -8,7 +8,7 @@ import { storage } from "lib/ext/storage";
 
 import { AddAccountParams, SeedPharse } from "core/types";
 import { Setting } from "core/common";
-import { setupWallet } from "core/client";
+import { setupWallet, TEvent, trackEvent } from "core/client";
 
 import {
   differentPasswords,
@@ -65,6 +65,7 @@ const SetupPassword = memo(() => {
           }
 
           await setupWallet(password, addAccountsParams, seedPhrase);
+          trackEvent(TEvent.SetupVigvam);
 
           setAccModalOpened([false]);
         } catch (err: any) {
@@ -176,7 +177,7 @@ const SetupPassword = memo(() => {
                         I have read and agree to the
                         <br />
                         <a
-                          href="https://vigvam.app/privacy"
+                          href="https://vigvam.app/terms"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"

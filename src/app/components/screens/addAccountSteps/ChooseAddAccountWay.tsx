@@ -90,9 +90,24 @@ const ChooseAddAccountWay = memo(() => {
                         action={action}
                         openLoginMethod={openLoginMethod}
                         soon={soon}
-                        className={classNames("mb-5", i % 3 !== 2 && "mr-5")}
+                        className={classNames(
+                          "mb-5 select-none",
+                          i % 3 !== 2 && "mr-5",
+                          section.disabled && "opacity-50 pointer-events-none"
+                        )}
                       />
                     )
+                  )}
+
+                  {section.disabled && (
+                    <div
+                      className={classNames(
+                        "w-full",
+                        "text-xs text-brand-redtwo"
+                      )}
+                    >
+                      Not yet supported in this browser.
+                    </div>
                   )}
                 </div>
               </div>
@@ -221,9 +236,13 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           return true;
         } catch (err: any) {
-          const msg = err?.message ?? "Unknown error";
+          let msg = err?.message ?? "Unknown error";
 
           if (msg === "user closed popup") return false;
+
+          if (msg?.startsWith("could not validate redirect")) {
+            msg = "Allowed only for a production instance of Vigvam.";
+          }
 
           throw new Error(msg);
         }
@@ -276,7 +295,7 @@ const TileSimple: FC<TileSimpleProps> = ({
       "transition-transform",
       !soon && "hover:scale-110 focus-visible:scale-110",
       !soon && "active:scale-95",
-      soon && "cursor-not-allowed",
+      soon && "cursor-default",
       className
     )}
     disabled={soon}
@@ -311,14 +330,14 @@ const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
   <div
     className={classNames(
       "relative",
-      "w-full h-18 p-5 mb-[2.4375rem]",
+      "w-full h-18 py-5 px-4 mb-[2.4375rem]",
       "flex items-center",
       "text-xs",
       "z-[25]",
       className
     )}
   >
-    <VerifiedIcon className="mr-3 min-w-[1.375rem]" />
+    <VerifiedIcon className="mr-2 min-w-[1.375rem]" />
     {children}
     <BackgroundIcon
       className={classNames(

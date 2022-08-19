@@ -11,7 +11,6 @@ import {
   locked,
   seedPhraseAdded,
   accountsUpdated,
-  walletPortsCountUpdated,
   approvalAdded,
   approvalResolved,
   approvalsRejected,
@@ -56,21 +55,7 @@ export const $vault = createStore<Vault | null>(null)
     return null;
   });
 
-export const $autoLockTimeout = createStore<MaybeTimeout>(null)
-  .on(locked, (t) => {
-    if (t !== null) clearTimeout(t);
-    return null;
-  })
-  .on(walletPortsCountUpdated, (t, count) => {
-    if (t !== null) clearTimeout(t);
-
-    const timeout = count === 0 && 0; /*Global.get(Setting.AutoLockTimeout)*/
-    return timeout ? setTimeout(() => locked(), +timeout) : null;
-  });
-
-type MaybeTimeout = ReturnType<typeof setTimeout> | null;
-
-export const $syncPool = createStore<number[]>([])
+export const $syncPool = createStore<(number | string)[]>([])
   .on(syncStarted, (pool, chainId) => [...pool, chainId])
   .on(synced, (pool, chainId) => {
     const i = pool.indexOf(chainId);

@@ -1,35 +1,68 @@
-import { FC, memo, ReactNode, Suspense, useCallback, useMemo } from "react";
+import {
+  FC,
+  forwardRef,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
+import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useSafeState } from "lib/react-hooks/useSafeState";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
   Activity,
   ActivitySource,
   ActivityType,
+  ConnectionActivity,
   TransactionActivity,
+  TxAction,
+  TxActionType,
 } from "core/types";
 import { rejectAllApprovals } from "core/client";
+import { getPageOrigin } from "core/common/permissions";
+import * as repo from "core/repo";
 
 import {
   activityModalAtom,
   allAccountsAtom,
   approvalStatusAtom,
-  getActivityAtom,
   getNetworkAtom,
+  getPermissionAtom,
   pendingActivityAtom,
 } from "app/atoms";
-import { OverflowProvider, useExplorerLink } from "app/hooks";
+import { IS_FIREFOX, LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
+import {
+  ChainIdProvider,
+  OverflowProvider,
+  useCompleteActivity,
+  useExplorerLink,
+  useLazyNetwork,
+} from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
+import { ReactComponent as ActivityConnectionIcon } from "app/icons/activity-connection.svg";
+import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signing.svg";
+import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
+import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
 
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -39,7 +72,11 @@ import WalletName from "../elements/WalletName";
 import HashPreview from "../elements/HashPreview";
 import PrettyDate from "../elements/PrettyDate";
 import IconedButton from "../elements/IconedButton";
-import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import PrettyAmount from "../elements/PrettyAmount";
+import FiatAmount from "../elements/FiatAmount";
+import Dot from "../elements/Dot";
+import TokenAmount from "../blocks/TokenAmount";
+
 import ApprovalStatus from "./ApprovalStatus";
 
 const ActivityModal = memo(() => {
@@ -72,6 +109,24 @@ const ActivityModal = memo(() => {
             bootAnimationDisplayed && "animate-modalcontent"
           )}
         >
+          <div
+            className={classNames(
+              "flex items-center justify-center",
+              "w-[5.5rem] h-[5.5rem]",
+              "rounded-full",
+              "bg-brand-dark/20",
+              "backdrop-blur-[10px]",
+              IS_FIREFOX && "!bg-[#0D1020]",
+              "border border-brand-light/5",
+              "shadow-addaccountmodal",
+              "absolute",
+              "top-0 left-1/2",
+              "-translate-x-1/2 -translate-y-1/2",
+              "z-30"
+            )}
+          >
+            <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
+          </div>
           <OverflowProvider>
             {(ref) => (
               <ScrollAreaContainer
@@ -92,7 +147,7 @@ const ActivityModal = memo(() => {
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",
-                  "pb-28"
+                  "pb-[3.25rem]"
                 )}
                 type="scroll"
               >
@@ -101,7 +156,7 @@ const ActivityModal = memo(() => {
                 </Dialog.Close>
 
                 <Suspense fallback={null}>
-                  <ActivityContent />
+                  {activityOpened && <ActivityContent />}
                 </Suspense>
               </ScrollAreaContainer>
             )}
@@ -115,26 +170,43 @@ const ActivityModal = memo(() => {
 export default ActivityModal;
 
 const ActivityContent = memo(() => {
-  const approvalStatus = useAtomValue(approvalStatusAtom);
+  const [delayFinished, setDelayFinished] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setDelayFinished(true), 300);
+    return () => clearTimeout(t);
+  }, []);
 
-  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
-  const completeActivities = useLazyAtomValue(getActivityAtom({}));
+  return (
+    <div
+      className={classNames(
+        "w-[66.25rem] mx-auto h-full pt-16 flex flex-col",
+        !delayFinished ? "hidden" : "animate-bootfadeinfast"
+      )}
+    >
+      <Approve />
+      <History />
+    </div>
+  );
+});
+
+const Approve = memo(() => {
+  const approvalStatus = useAtomValue(approvalStatusAtom);
 
   const handleApprove = useCallback(() => {
     browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
   }, []);
 
   return (
-    <div className="w-[59rem] mx-auto h-full pt-16 flex flex-col">
+    <>
       {approvalStatus.total > 0 && (
         <div
           className={classNames(
-            "w-full h-20 mb-8",
+            "w-full h-14 mb-10",
             "border border-brand-inactivedark/25",
             "animate-pulse hover:animate-none",
             "rounded-2xl",
             "flex items-center",
-            "py-3 px-6"
+            "py-2.5 px-5"
           )}
         >
           <ApprovalStatus readOnly theme="large" />
@@ -145,7 +217,7 @@ const ActivityContent = memo(() => {
             className={classNames(
               "mr-2",
               "px-2 py-1",
-              "text-sm text-brand-inactivelight hover:text-brand-light",
+              "!text-sm text-brand-inactivelight hover:text-brand-light",
               "transition-colors",
               "font-semibold"
             )}
@@ -154,112 +226,297 @@ const ActivityContent = memo(() => {
             Reject all
           </button>
 
-          <Button className="!py-2" onClick={handleApprove}>
+          <Button className="!py-2 !text-sm" onClick={handleApprove}>
             Approve
             <LinkIcon className="ml-1 w-4 h-4 min-w-[1rem]" />
           </Button>
         </div>
       )}
+    </>
+  );
+});
 
-      {pendingActivities && pendingActivities?.length > 0 && (
+const History = memo(() => {
+  const pendingActivity = useLazyAtomValue(pendingActivityAtom);
+  const {
+    activity: completeActivity,
+    hasMore,
+    loadMore,
+  } = useCompleteActivity();
+
+  const observer = useRef<IntersectionObserver>();
+  const loadMoreTriggerRef = useCallback(
+    (node) => {
+      if (!completeActivity) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [completeActivity, hasMore, loadMore]
+  );
+
+  return (
+    <>
+      {pendingActivity && pendingActivity?.length > 0 && (
         <div className="mb-8">
           <SectionHeader className="mb-6">Pending</SectionHeader>
 
-          {pendingActivities.map((item) => (
+          {pendingActivity.map((item) => (
             <ActivityCard key={item.id} item={item} className="mb-4" />
           ))}
         </div>
       )}
 
-      {completeActivities && completeActivities?.length > 0 && (
+      {completeActivity && completeActivity?.length > 0 && (
         <div className="mb-8">
-          <SectionHeader className="mb-6">Complete</SectionHeader>
+          <SectionHeader className="mb-6">Completed</SectionHeader>
 
-          {completeActivities.map((item) => (
-            <ActivityCard key={item.id} item={item} className="mb-4" />
+          {completeActivity.map((item, i) => (
+            <ActivityCard
+              key={item.id}
+              ref={
+                i ===
+                completeActivity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
+                  ? loadMoreTriggerRef
+                  : null
+              }
+              item={item}
+              className="mb-4"
+            />
           ))}
         </div>
       )}
 
-      {pendingActivities &&
-        completeActivities &&
-        pendingActivities.length === 0 &&
-        completeActivities.length === 0 && (
+      {pendingActivity &&
+        completeActivity &&
+        pendingActivity.length === 0 &&
+        completeActivity.length === 0 && (
           <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
-            <h3 className="text-2xl text-brand-inactivedark">
+            <NoResultsFoundIcon className="w-[30rem] h-auto mb-8" />
+            <h3 className="text-2xl text-brand-inactivedark font-bold">
               No activity yet
             </h3>
           </div>
         )}
-    </div>
+    </>
   );
 });
+
+type StatusType = "succeeded" | "failed" | "skipped" | "revoked";
 
 type ActivityCardProps = {
   item: Activity;
   className?: string;
 };
 
-const ActivityCard = memo<ActivityCardProps>(({ item, className }) => {
-  return (
-    <div
-      className={classNames(
-        "w-full h-20",
-        "bg-brand-inactivelight/5",
-        "border",
-        item.pending ? "border-[#D99E2E]/50" : "border-brand-inactivedark/25",
-        item.pending && "animate-pulse",
-        "rounded-2xl",
-        "flex items-center",
-        "py-3 px-6",
-        className
-      )}
-    >
-      <ActivityIcon item={item} className="mr-6" />
+const ActivityCard = memo(
+  forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    const [revokedPermission, setRevokedPermission] = useSafeState(false);
 
-      <ActivityCardCol label="Type" className="w-[6rem] mr-8">
-        <div
-          className={classNames(
-            "text-sm font-semibold text-brand-inactivelight"
-          )}
-        >
-          {capitalize(item.type)}
-        </div>
-      </ActivityCardCol>
+    const status = useMemo<StatusType | undefined>(() => {
+      if (item.type === ActivityType.Connection && revokedPermission) {
+        return "revoked";
+      }
 
-      {item.source.type === "page" && (
-        <ActivityCardCol label="Website" className="w-[10rem] mr-8">
-          <ActivityWebsiteLink source={item.source} />
-        </ActivityCardCol>
-      )}
+      if (item.type !== ActivityType.Transaction || item.pending) {
+        return;
+      }
 
-      {(item.type === ActivityType.Transaction ||
-        item.type === ActivityType.Signing) && (
-        <ActivityCardCol label="Wallet" className="w-[10rem] mr-8">
-          <ActivityWalletCard accountAddress={item.accountAddress} />
-        </ActivityCardCol>
-      )}
+      if (!item.result) {
+        return "skipped";
+      }
 
-      {item.type === ActivityType.Transaction && (
-        <ActivityCardCol label="Network" className="w-[10rem] mr-8">
-          <ActivityNetworkCard chainId={item.chainId} />
-        </ActivityCardCol>
-      )}
+      if (
+        item.result.status &&
+        ethers.BigNumber.from(item.result.status).isZero()
+      ) {
+        return "failed";
+      }
 
-      <div className={classNames("flex-1 h-full", "flex flex-col items-end")}>
-        <div className="flex-1 flex items-center">
+      return "succeeded";
+    }, [item, revokedPermission]);
+
+    const fee = useMemo(() => {
+      if (
+        item.type !== ActivityType.Transaction ||
+        item.pending ||
+        !item.result?.gasUsed
+      ) {
+        return undefined;
+      }
+
+      const parsedTx = ethers.utils.parseTransaction(item.rawTx);
+
+      const native = ethers.BigNumber.from(item.result.gasUsed)
+        .mul(
+          item.result.effectiveGasPrice ??
+            parsedTx.maxFeePerGas ??
+            parsedTx.gasPrice
+        )
+        .toString();
+
+      return {
+        native,
+        fiat:
+          item.gasTokenPriceUSD &&
+          new BigNumber(ethers.utils.formatEther(native)).times(
+            item.gasTokenPriceUSD
+          ),
+      };
+    }, [item]);
+
+    return (
+      <div
+        ref={ref}
+        className={classNames(
+          "w-full",
+          "bg-brand-inactivelight/5",
+          "border",
+          item.pending && "border-[#D99E2E]/50",
+          item.pending && "animate-pulse",
+          (!status || status === "succeeded" || status === "revoked") &&
+            !item.pending &&
+            "border-brand-inactivedark/25",
+          status === "failed" && "border-brand-redobject/50",
+          status === "skipped" && "border-brand-main/50",
+          "rounded-2xl",
+          "flex items-center",
+          "py-3 px-5",
+          className
+        )}
+      >
+        <ActivityIcon item={item} className="mr-6" />
+
+        <ActivityTypeLabel
+          item={item}
+          status={status}
+          className="w-[10rem] mr-8"
+        />
+
+        {(item.type === ActivityType.Transaction ||
+          item.type === ActivityType.Signing) && (
+          <ActivityWalletCard
+            accountAddress={item.accountAddress}
+            className="w-[10rem] mr-8"
+          />
+        )}
+
+        {item.type === ActivityType.Transaction && (
+          <ActivityNetworkCard
+            chainId={item.chainId}
+            fee={fee}
+            className="w-[12rem] mr-8"
+          />
+        )}
+
+        {item.source.type === "page" && (
+          <ActivityWebsiteLink
+            source={item.source}
+            className="w-[10rem] mr-8"
+          />
+        )}
+
+        {item.type === ActivityType.Connection && (
+          <DisconnectDApp
+            item={item}
+            className="w-[10rem] mr-8"
+            setRevokedPermission={setRevokedPermission}
+          />
+        )}
+
+        {item.type === ActivityType.Transaction && (
+          <ChainIdProvider chainId={item.chainId}>
+            <ActivityTokens
+              source={item.source}
+              action={item.txAction}
+              accountAddress={item.accountAddress}
+              className="w-[10rem] mr-8"
+            />
+          </ChainIdProvider>
+        )}
+
+        <div className="flex flex-col items-end ml-auto">
           {item.type === ActivityType.Transaction && (
-            <ActivityTxActions item={item} />
+            <ChainIdProvider chainId={item.chainId}>
+              <ActivityTxActions item={item} className="mb-1" />
+            </ChainIdProvider>
           )}
-        </div>
 
-        <div className="text-xs mt-1 text-brand-inactivedark">
-          <PrettyDate date={item.timeAt} />
+          <div className="text-xs text-brand-inactivedark">
+            <PrettyDate date={item.timeAt} />
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  })
+);
+
+type DisconnectDAppProps = {
+  item: ConnectionActivity;
+  setRevokedPermission: (r: true) => void;
+  className?: string;
+};
+
+const DisconnectDApp = memo<DisconnectDAppProps>(
+  ({ item, className, setRevokedPermission }) => {
+    const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
+    const lazyPermission = useAtomValue(loadable(getPermissionAtom(origin)));
+    const permission =
+      lazyPermission.state === "hasData" ? lazyPermission.data : undefined;
+
+    useEffect(() => {
+      if (
+        lazyPermission.state === "hasData" &&
+        (!lazyPermission.data ||
+          lazyPermission.data.accountAddresses.length === 0)
+      ) {
+        setTimeout(() => setRevokedPermission(true), 0);
+      }
+    }, [lazyPermission, setRevokedPermission]);
+
+    const handleDisconnect = useCallback(async () => {
+      if (!permission) return;
+
+      try {
+        await repo.permissions.delete(permission.origin);
+      } catch (err) {
+        console.error(err);
+      }
+    }, [permission]);
+
+    if (!permission) return null;
+    if (permission.accountAddresses.length === 0) return null;
+
+    return (
+      <div className={classNames("flex items-center", className)}>
+        <button
+          type="button"
+          className={classNames(
+            "border border-brand-main/20",
+            "rounded-md",
+            "px-2 py-0.5",
+            "text-xs text-brand-inactivelight",
+            "transition-colors",
+            "hover:bg-brand-main/10"
+          )}
+          onClick={handleDisconnect}
+        >
+          Revoke permission
+        </button>
+      </div>
+    );
+  }
+);
 
 type ActivityIconProps = {
   item: Activity;
@@ -275,17 +532,80 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
         "block",
         "bg-white",
         "rounded-full overflow-hidden",
-        "w-10 h-10",
+        "w-12 h-12 min-w-[3rem]",
         className
       )}
       fallbackClassName="!h-3/5"
     />
   ) : (
     <SendIcon
-      className={classNames("glass-icon--active", "w-10 h-10", className)}
+      className={classNames("glass-icon--active", "w-12 h-12", className)}
     />
   );
 });
+
+type ActivityTypeLabelProps = {
+  item: Activity;
+  status?: StatusType;
+  className?: string;
+};
+
+const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
+  item,
+  status,
+  className,
+}) => {
+  const name =
+    item.type === ActivityType.Transaction && item.source.type === "self"
+      ? "Transfer"
+      : item.type;
+
+  const Icon = getActivityIcon(item.type);
+  const label = (
+    <div
+      className={classNames(
+        "flex items-center",
+        "text-base text-brand-inactivelight font-medium",
+        status ? "" : className
+      )}
+    >
+      <Icon className="w-5 h-auto mr-2" />
+      {capitalize(name)}
+    </div>
+  );
+  if (!status) {
+    return label;
+  }
+
+  return (
+    <div className={classNames("flex flex-col", className)}>
+      {label}
+      <div
+        className={classNames(
+          "mt-0.5 ml-7",
+          "text-xs font-medium",
+          status === "succeeded" && "text-brand-greenobject",
+          status === "failed" && "text-brand-redtext",
+          status === "skipped" && "text-brand-main",
+          status === "revoked" && "text-brand-inactivedark"
+        )}
+      >
+        {capitalize(status === "succeeded" ? "success" : status)}
+      </div>
+    </div>
+  );
+};
+
+const getActivityIcon = (type: ActivityType) => {
+  switch (type) {
+    case ActivityType.Connection:
+      return ActivityConnectionIcon;
+    case ActivityType.Signing:
+      return ActivitySigningIcon;
+    default:
+      return ActivityTransactionIcon;
+  }
+};
 
 type ActivityWebsiteLinkProps = {
   source: ActivitySource;
@@ -314,20 +634,22 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
         className
       )}
     >
-      <span className="min-w-0 truncate text-sm">
+      <span className="min-w-0 truncate text-base">
         {new URL(source.url).host}
       </span>
-      <LinkIcon className="ml-1 w-4 h-4 min-w-[1rem]" />
+      <LinkIcon className="ml-1 w-5 h-5 min-w-[1.25rem]" />
     </button>
   );
 };
 
 type ActivityWalletCardProps = {
   accountAddress: string;
+  className?: string;
 };
 
 const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   accountAddress,
+  className,
 }) => {
   const allAccounts = useAtomValue(allAccountsAtom);
   const account = useMemo(
@@ -336,13 +658,20 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   );
 
   return account ? (
-    <div className={classNames("relative", "flex items-stretch", "text-left")}>
+    <div
+      className={classNames(
+        "relative",
+        "flex items-stretch",
+        "text-left",
+        className
+      )}
+    >
       <AutoIcon
         seed={account.address}
         source="dicebear"
         type="personas"
         className={classNames(
-          "h-8 w-8 min-w-[2rem]",
+          "h-9 w-9 min-w-[2.25rem]",
           "mr-2",
           "bg-black/20",
           "rounded-md"
@@ -351,18 +680,23 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
       <span
         className={classNames(
           "flex flex-col items-start justify-center",
-          "min-w-0 text-xs leading-none"
+          "min-w-0"
         )}
       >
-        <WalletName wallet={account} theme="small" className="mb-1" />
+        <WalletName wallet={account} theme="small" className="text-sm" />
         <HashPreview
           hash={account.address}
-          className="text-xs leading-none text-brand-inactivedark"
+          className="leading-none text-brand-inactivedark text-sm"
         />
       </span>
     </div>
   ) : (
-    <span className="font-medium text-brand-inactivedark text-base">
+    <span
+      className={classNames(
+        "font-medium text-brand-inactivedark text-base",
+        className
+      )}
+    >
       Deleted
     </span>
   );
@@ -370,13 +704,28 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
 
 type ActivityNetworkCardProps = {
   chainId: number;
+  fee?: {
+    native: BigNumber.Value;
+    fiat?: BigNumber.Value;
+  };
+  className?: string;
 };
 
-const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({ chainId }) => {
+const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
+  chainId,
+  fee,
+  className,
+}) => {
   const network = useLazyAtomValue(getNetworkAtom(chainId));
 
-  return (
-    <div className="flex items-center">
+  const label = (
+    <div
+      className={classNames(
+        "flex items-center",
+        "min-h-[1.5rem]",
+        fee ? "" : className
+      )}
+    >
       {network && (
         <Avatar
           src={network && getNetworkIconUrl(network.chainId)}
@@ -386,23 +735,56 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({ chainId }) => {
         />
       )}
 
-      <span className="truncate min-w-0">{network?.name}</span>
+      <span className="truncate min-w-0 text-base">{network?.name}</span>
+    </div>
+  );
+
+  if (!fee) {
+    return label;
+  }
+
+  return (
+    <div className={classNames("flex flex-col", className)}>
+      {label}
+      <span className="flex items-center text-brand-inactivedark ml-8 mt-1">
+        <PrettyAmount
+          amount={fee.native}
+          currency={network?.nativeCurrency?.symbol}
+          decimals={network?.nativeCurrency?.decimals}
+          copiable
+          prefix={<GasIcon className="w-3 h-3 mr-1" />}
+          threeDots={false}
+          className="text-xs font-semibold flex items-center"
+        />
+        {fee.fiat && (
+          <>
+            <Dot className="!p-1" />
+            <FiatAmount
+              amount={fee.fiat}
+              threeDots={false}
+              copiable
+              className="text-xs"
+            />
+          </>
+        )}
+      </span>
     </div>
   );
 };
 
 type ActivityTxActionsProps = {
   item: TransactionActivity;
+  className?: string;
 };
 
-const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item }) => {
-  const network = useLazyAtomValue(getNetworkAtom(item.chainId));
+const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
+  const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
   const { copy, copied } = useCopyToClipboard(item.txHash);
 
   return (
-    <div className="flex items-center">
+    <div className={classNames("flex items-center", className)}>
       <IconedButton
         aria-label={copied ? "Copied" : "Copy transaction hash"}
         Icon={copied ? SuccessIcon : CopyIcon}
@@ -412,7 +794,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item }) => {
       />
       {explorerLink && (
         <IconedButton
-          aria-label="View transaction in Explorer"
+          aria-label="View the transaction in Explorer"
           Icon={WalletExplorerIcon}
           className="!w-6 !h-6 min-w-[1.5rem] ml-2"
           iconClassName="!w-[1.125rem]"
@@ -423,37 +805,45 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item }) => {
   );
 };
 
-type ActivityCardColProps = {
-  className?: string;
-  label: ReactNode;
-};
-
-const ActivityCardCol: FC<ActivityCardColProps> = ({
-  className,
-  label,
-  children,
-}) => (
-  <div
-    className={classNames(
-      "h-full flex flex-col items-start",
-      "overflow-hidden",
-      className
-    )}
-  >
-    <span className="mb-1 text-xs font-medium text-brand-inactivedark/75">
-      {label}
-    </span>
-
-    <div className="flex-1 flex items-center text-brand-light">{children}</div>
-  </div>
-);
-
 const SectionHeader: FC<{ className?: string }> = memo(
   ({ className, children }) => (
     <div className={classNames("w-full", className)}>
       <h1 className={"text-2xl font-bold"}>{children}</h1>
     </div>
   )
+);
+
+type ActivityTokensProps = {
+  source: ActivitySource;
+  action?: TxAction;
+  accountAddress: string;
+  className?: string;
+};
+
+const ActivityTokens = memo<ActivityTokensProps>(
+  ({ source, action, accountAddress, className }) => {
+    if (
+      source.type !== "self" ||
+      !action ||
+      action.type !== TxActionType.TokenTransfer ||
+      action.tokens?.length === 0
+    ) {
+      return null;
+    }
+
+    return (
+      <div className={classNames("flex flex-col", className)}>
+        {action.tokens.map((token, i) => (
+          <TokenAmount
+            key={token.slug}
+            accountAddress={accountAddress}
+            token={token}
+            className={classNames(i !== action.tokens.length - 1 && "mb-1")}
+          />
+        ))}
+      </div>
+    );
+  }
 );
 
 function capitalize(word: string) {

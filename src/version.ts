@@ -32,12 +32,14 @@ window.addEventListener(
   false
 );
 
-window.postMessage(
-  {
-    type: "vigvam.version",
-    extId,
-    version,
-    salt,
-  },
-  location.origin
-);
+window.addEventListener("load", () => {
+  window.postMessage(
+    {
+      type: "vigvam.version",
+      extId,
+      version,
+      salt,
+    },
+    location.origin
+  );
+});

@@ -34,7 +34,7 @@ const methodsInitial: MethodsProps = [
     value: "auto",
     title: "Auto (Recommended)",
     description:
-      "Scanning the first 20 wallets from Secret Phrase for a positive balance. For every known network (mainnet). If you have more wallets - you can also add them later.",
+      "Scanning first 20 wallets from Secret Phrase for a positive balance. For every known network (mainnet). If you have more wallets - you can also add them later.",
   },
   {
     value: "manual",
@@ -47,8 +47,9 @@ const methodsInitial: MethodsProps = [
 const methodsExisting: MethodsProps = [
   {
     value: "create",
-    title: "Add one wallet",
-    description: "Just add the next wallet.",
+    title: "Add a wallet",
+    description:
+      "Just add a wallet with the next index of the derivation path.",
   },
   {
     value: "manual",
@@ -243,6 +244,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
                 index: wallet.index,
                 isDisabled: true,
                 isDefaultChecked: true,
+                publicKey: toProtectedString(wallet.publicKey),
               });
             }
           }
@@ -312,7 +314,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     >
       <div className="text-base text-brand-font text-center w-full break-words">
         When the scanning process is done, you will be redirected to the next
-        step, where you can verify all founded wallets.
+        step, where you can verify all wallets that were found.
       </div>
       <div className="relative mt-5 w-[7.5rem] h-[7.5rem]">
         <CircularProgress percentage={loadingProgress} />

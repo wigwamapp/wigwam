@@ -68,13 +68,14 @@ export async function suggestFees(
   }
 
   const chainGasPrice = await provider.getGasPrice();
+  const step = 10 ** (chainGasPrice.lt(10 ** 9) ? 7 : 8);
 
   return {
     type: "legacy",
     modes: {
-      low: { max: chainGasPrice.sub(10 ** 8) },
+      low: { max: chainGasPrice.sub(step) },
       average: { max: chainGasPrice },
-      high: { max: chainGasPrice.add(10 ** 8) },
+      high: { max: chainGasPrice.add(step) },
     },
   };
 }

@@ -91,7 +91,7 @@ const PasswordForm = memo<PasswordFormProps>(
 
             <div
               className={classNames(
-                "max-w-[13.75rem] w-full center",
+                "max-w-[14rem] w-full center",
                 theme === "large" && "mt-2",
                 theme === "small" && "mt-1.5"
               )}
@@ -114,7 +114,7 @@ const PasswordForm = memo<PasswordFormProps>(
                 >
                   <u>Forgot the password?</u>
                   <br />
-                  Want to <u>sign into another profile?</u>
+                  Want to <u>sign in to another profile?</u>
                 </button>
               )}
             </div>

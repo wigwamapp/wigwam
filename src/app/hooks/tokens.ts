@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import useForceUpdate from "use-force-update";
+import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
-import { AccountAsset, TokenType } from "core/types";
+import { AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
@@ -82,6 +83,8 @@ export function useAllAccountTokens(
   const restTokens = useLazyAtomValue(accountTokensAtom, "off");
 
   const pureTokens = useMemo(() => {
+    if (tokenType !== TokenType.Asset) return restTokens;
+
     if (nativeToken && restTokens) {
       return search && !matchNativeToken(nativeToken, search)
         ? restTokens
@@ -93,7 +96,7 @@ export function useAllAccountTokens(
     }
 
     return undefined;
-  }, [nativeToken, restTokens, search]);
+  }, [tokenType, nativeToken, restTokens, search]);
 
   const prevTokens = usePrevious(pureTokens, "when-not-undefined");
   const tokens = pureTokens ?? prevTokens ?? [];
@@ -114,13 +117,13 @@ export function useAllAccountTokens(
   };
 }
 
-export function useAccountToken(tokenSlug: string) {
+export function useAccountToken<T extends AccountToken>(tokenSlug: string) {
   const acc = useAtomValue(currentAccountAtom);
 
-  return useToken(acc.address, tokenSlug);
+  return useToken<T>(acc.address, tokenSlug);
 }
 
-export function useToken(
+export function useToken<T extends AccountToken>(
   accountAddress: string,
   tokenSlug: string = NATIVE_TOKEN_SLUG
 ) {
@@ -137,9 +140,18 @@ export function useToken(
   const data = value.state === "hasData" ? value.data : undefined;
   const prevData = usePrevious(data, "when-not-undefined");
 
-  const token = (value.state === "loading" ? prevData : data) as
-    | AccountAsset
-    | undefined;
+  let token = (value.state === "loading" ? prevData : data) as T | undefined;
 
-  return token?.portfolioUSD !== "-1" ? token : undefined;
+  // For better sync UX
+  token = token?.portfolioUSD !== "-1" ? token : undefined;
+
+  // portfolioUSD needs more time to resync
+  if (token?.portfolioUSD) {
+    token.portfolioUSD = BigNumber.max(
+      token.portfolioUSD,
+      token.balanceUSD
+    ).toString();
+  }
+
+  return token;
 }

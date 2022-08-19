@@ -9,11 +9,20 @@ import { Account } from "core/types";
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import {
   accountAddressAtom,
+  activeTabAtom,
+  activeTabOriginAtom,
   allAccountsAtom,
   currentAccountAtom,
+  getPermissionAtom,
 } from "app/atoms";
 import { useToken } from "app/hooks";
 import { Page } from "app/nav";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+
 import Select from "./Select";
 import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
@@ -21,10 +30,8 @@ import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
 import WalletName from "./WalletName";
 import SmartLink from "./SmartLink";
-import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
-import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
-import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import Avatar from "./Avatar";
+import IconedButton from "./IconedButton";
 
 type AccountSelectProps = {
   className?: string;
@@ -43,6 +50,16 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
     )
   );
   const setAccountAddress = useSetAtom(accountAddressAtom);
+  const activeTab = useAtomValue(activeTabAtom);
+  const tabOrigin = useAtomValue(activeTabOriginAtom);
+  const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
+  const connectedAccountAddresses = useMemo(
+    () =>
+      purePermission && purePermission.accountAddresses.length > 0
+        ? purePermission.accountAddresses
+        : [],
+    [purePermission]
+  );
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -52,17 +69,33 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
 
   const preparedAccounts = useMemo(() => {
     if (searchValue) {
-      return fuse
-        .search(searchValue)
-        .map(({ item: network }) =>
-          prepareAccount(network, network.address === currentAccount.address)
-        );
+      return fuse.search(searchValue).map(({ item: acc }) => {
+        const isConnected = connectedAccountAddresses.includes(acc.address);
+        return prepareAccount(acc, acc.address === currentAccount.address, {
+          isConnected,
+          icon: activeTab?.favIconUrl,
+          origin: purePermission?.origin,
+        });
+      });
     } else {
-      return allAccounts.map((network) =>
-        prepareAccount(network, network.address === currentAccount.address)
-      );
+      return allAccounts.map((acc) => {
+        const isConnected = connectedAccountAddresses.includes(acc.address);
+        return prepareAccount(acc, acc.address === currentAccount.address, {
+          isConnected,
+          icon: activeTab?.favIconUrl,
+          origin: purePermission?.origin,
+        });
+      });
     }
-  }, [searchValue, fuse, currentAccount.address, allAccounts]);
+  }, [
+    searchValue,
+    fuse,
+    connectedAccountAddresses,
+    currentAccount.address,
+    activeTab,
+    purePermission,
+    allAccounts,
+  ]);
 
   const preparedCurrentAccount = useMemo(
     () => prepareCurrentAccount(currentAccount),
@@ -83,9 +116,20 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       currentItemClassName={classNames("!py-2 !pl-2 pr-3", className)}
       contentClassName="!w-[22.25rem]"
       itemClassName="group"
+      actions={
+        <IconedButton
+          to={{ addAccOpened: true }}
+          merge
+          smartLink
+          theme="tertiary"
+          className="ml-2"
+          Icon={AddWalletIcon}
+          aria-label="Add new wallet"
+        />
+      }
       emptySearchText={
         <>
-          You can manage your wallets in{" "}
+          You can manage your wallets in the{" "}
           <SmartLink
             to={{ page: Page.Wallets }}
             onClick={() => setOpened(false)}
@@ -176,9 +220,15 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
   );
 };
 
+type DappObj = {
+  isConnected: boolean;
+  icon?: string;
+  origin?: string;
+};
+
 const AccountSelectItem: FC<
-  AccountSelectItemProps & { isSelected?: boolean }
-> = ({ account, isSelected = false }) => (
+  AccountSelectItemProps & { isSelected?: boolean; dapp?: DappObj }
+> = ({ account, isSelected = false, dapp }) => (
   <span className="flex items-center text-left w-full min-w-0">
     <span
       className={classNames(
@@ -198,13 +248,44 @@ const AccountSelectItem: FC<
       {isSelected && (
         <span
           className={classNames(
-            "absolute inset-0",
+            "absolute",
+            dapp?.isConnected ? "inset-px" : "inset-0",
             "rounded-[.625rem]",
             "border border-brand-light",
             "flex items-center justify-center"
           )}
         >
           <SelectedIcon className="fill-brand-light" />
+        </span>
+      )}
+      {dapp && dapp.isConnected && (
+        <span
+          className={classNames(
+            "absolute",
+            "inset-0",
+            "rounded-[calc(.625rem+1px)]",
+            "border border-brand-greenobject"
+          )}
+        >
+          <span
+            className={classNames(
+              "absolute",
+              "-top-1.5 -right-1.5",
+              "block",
+              "w-4 h-4",
+              "rounded-full overflow-hidden",
+              "border border-brand-greenobject"
+            )}
+          >
+            <Avatar
+              src={dapp.icon}
+              alt={dapp.origin}
+              className={classNames(
+                "w-full h-full object-cover",
+                "!border-none"
+              )}
+            />
+          </span>
         </span>
       )}
     </span>
@@ -233,7 +314,13 @@ const prepareCurrentAccount = (account: Account) => ({
   value: <CurrentAccount account={account} />,
 });
 
-const prepareAccount = (account: Account, isSelected = false) => ({
+const prepareAccount = (
+  account: Account,
+  isSelected = false,
+  dapp: DappObj
+) => ({
   key: account.address,
-  value: <AccountSelectItem account={account} isSelected={isSelected} />,
+  value: (
+    <AccountSelectItem account={account} isSelected={isSelected} dapp={dapp} />
+  ),
 });

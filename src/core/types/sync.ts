@@ -1,1 +1,1 @@
-export type SyncStatus = number[];
+export type SyncStatus = (number | string)[];

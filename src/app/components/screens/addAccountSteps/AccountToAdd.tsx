@@ -81,12 +81,10 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
   const onNetworkChange = useCallback(
     (chainId: number) => {
-      const netw = preparedNetworks.find(
-        ({ chainId: chi }) => chi === chainId
-      )!;
+      const netw = allNetworks.find(({ chainId: chi }) => chi === chainId)!;
       setNetwork(netw);
     },
-    [preparedNetworks]
+    [allNetworks]
   );
 
   const addressesToAddRef = useRef(new Set<string>());
@@ -231,8 +229,13 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
             <Tooltip
               content={
                 <p>
-                  Use this network switcher to preview the balances of the
-                  wallets to select them.
+                  Use this network switch to preview balances of your wallets to
+                  select the right one.
+                  <br />
+                  It only switches network for the &#34;Balance&#34; column on
+                  this page.
+                  <br />
+                  You will be able to use these wallets with any network.
                 </p>
               }
               placement="left-start"
@@ -246,6 +249,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               currentNetwork={network}
               onNetworkChange={onNetworkChange}
               withAction={false}
+              source="wallet-setup-accounts"
             />
           </div>
         </div>
@@ -270,7 +274,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               </Th>
               <Th />
               <Th className="!pl-7 !text-brand-light align-middle">
-                <Tooltip content="You can edit wallet's name">
+                <Tooltip content="You can edit the wallet’s name">
                   <span className="flex align-center font-semibold">
                     Name
                     <EditIcon className="ml-0.5" />

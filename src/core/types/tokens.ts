@@ -53,5 +53,23 @@ export interface Asset extends TokenBase {
 
 export interface NFT extends TokenBase {
   tokenType: TokenType.NFT;
-  // @TODO
+  contractAddress: string;
+  tokenId: string;
+  name: string;
+  description?: string;
+  thumbnailUrl?: string;
+  contentUrl?: string;
+  contentType?: NFTContentType;
+  collectionId?: string;
+  collectionName?: string;
+  detailUrl?: string;
+  priceUSD?: string;
+  attributes?: {
+    trait_type: string;
+    value: string | number;
+    display_type?: string;
+  }[];
+  tpId?: string;
 }
+
+export type NFTContentType = "image_url" | "video_url" | "audio_url";

@@ -81,9 +81,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   const handleDeleteAccount = useCallback(() => {
     confirm({
       title: "Delete wallet",
-      content: `Are you sure you want to delete the "${replaceT(
-        account.name
-      )}"?`,
+      content: `Are you sure you want to delete "${replaceT(account.name)}"?`,
     }).then((answer) => {
       if (answer) {
         setModalState("delete");
@@ -219,8 +217,8 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             description={
               <>
                 This wallet is created with a Secret Phrase. It is the same for
-                all such wallets in this profile. Only the derivation path is
-                distinctive.
+                all wallets that were created with it in this profile. The only
+                difference is the derivation path.
               </>
             }
             className="mt-6"
@@ -253,7 +251,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           <WalletBlock
             Icon={LedgerIcon}
             title="Ledger"
-            description="This wallet connected with external Ledger hardware device."
+            description="This wallet connected with an external Ledger hardware device."
             className="mt-6"
           >
             <Input

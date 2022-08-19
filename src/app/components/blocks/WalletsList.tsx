@@ -66,14 +66,14 @@ const EmptyWalletCard: FC = () => (
     <Link
       to={{ addAccOpened: true }}
       merge
-      className={"flex group cursor-pointer"}
+      className={"flex flex-col group cursor-pointer"}
     >
       <div
         className={classNames(
           "w-[14.5rem] min-w-[14.5rem]",
           "flex items-stretch",
           "bg-brand-main/5",
-          "rounded-l-[.625rem]",
+          "rounded-t-[.625rem]",
           "p-3",
           "transition-colors",
           "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
@@ -81,28 +81,30 @@ const EmptyWalletCard: FC = () => (
       >
         <div
           className={classNames(
-            "!h-14 w-14 min-w-[3.5rem] mr-3",
+            "!h-12 w-12 min-w-[3rem] mr-3",
             "!rounded-[.625rem]",
             emptyClassBg
           )}
         />
         <span className="flex flex-col">
-          <span className={classNames("w-24", emptyClassBg)} />
-          <span className={classNames("mt-2 w-20", emptyClassBg)} />
-          <span className={classNames("mt-auto w-32", emptyClassBg)} />
+          <span className={classNames("w-24 mt-auto", emptyClassBg)} />
+          <span className={classNames("mt-2 w-32 mb-2", emptyClassBg)} />
         </span>
       </div>
       <div
         className={classNames(
           "flex justify-center items-center",
-          "px-3.5",
+          "py-1.5",
           "bg-brand-main/10",
-          "rounded-r-[.625rem]",
+          "rounded-b-[.625rem]",
           "transition-colors",
           "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
         )}
       >
         <AddWalletIcon />
+        <span className="text-base font-bold whitespace-nowrap ml-2">
+          Add wallet
+        </span>
       </div>
     </Link>
   </div>

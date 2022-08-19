@@ -5,6 +5,9 @@ import { INITIAL_NETWORK } from "fixtures/networks";
 import { CHAIN_ID } from "core/types";
 import * as Repo from "core/repo";
 
+const INFURA_TEMPLATE = "${INFURA_API_KEY}";
+const INFURA_API_KEY = process.env.VIGVAM_INFURA_API_KEY;
+
 const rpcUrlsCache = new Map<number, string>();
 
 export async function getRpcUrl(chainId: number) {
@@ -19,6 +22,16 @@ export async function getRpcUrl(chainId: number) {
   if (!url) {
     const network = await getNetwork(chainId);
     url = network.rpcUrls[0];
+  }
+
+  if (url.includes(INFURA_TEMPLATE)) {
+    if (!INFURA_API_KEY) {
+      throw new Error(
+        "Current rpc url requires INFURA API KEY environment variable"
+      );
+    }
+
+    url = url.replace(INFURA_TEMPLATE, INFURA_API_KEY);
   }
 
   // Avoid double subscription on first load (rare case)

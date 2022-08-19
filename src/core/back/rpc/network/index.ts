@@ -9,10 +9,7 @@ import { getRpcUrl } from "core/common/network";
 import type * as Provider from "./provider";
 
 const { perform } = createWorker<typeof Provider>(
-  () => new Worker(new URL("./worker", import.meta.url)),
-  {
-    idleDelay: 5 * 60 * 60_000, // 5 min
-  }
+  () => new Worker(new URL("./worker", import.meta.url))
 );
 
 export async function sendRpc(

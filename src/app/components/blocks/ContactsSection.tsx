@@ -97,7 +97,9 @@ const ContactsSection: FC = () => {
           >
             <ToastOverflowProvider className="!top-0 !right-5">
               <div className="grid grid-cols-5 gap-5">
-                <NewContactCard onClick={() => upsertContact({})} />
+                <NewContactCard
+                  onClick={() => upsertContact({ fromPage: true })}
+                />
                 {contacts.length === 0 ? (
                   <div
                     className={classNames(
