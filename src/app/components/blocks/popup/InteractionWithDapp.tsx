@@ -11,13 +11,11 @@ import {
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { Page, SettingTab } from "app/nav";
-import { openInTab } from "app/helpers";
+import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
-import IconedButton from "app/components/elements/IconedButton";
-import { ReactComponent as WebOffIcon } from "app/icons/setting-web3-off.svg";
+import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
@@ -25,6 +23,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
   const currentAccount = useAtomValue(currentAccountAtom);
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
+
+  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
 
   const permission =
     purePermission && purePermission.accountAddresses.length > 0
@@ -55,10 +55,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
   const state = useMemo(() => {
     if (!permission) return "disconnected";
-    if (!metamaskMode && accountConnected) return "connected-disabled";
     if (accountConnected) return "connected";
     return "connectible";
-  }, [permission, metamaskMode, accountConnected]);
+  }, [permission, accountConnected]);
 
   const handlePermission = useCallback(async () => {
     if (!permission) return;
@@ -81,67 +80,25 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   if (!reallyConnectible) return null;
 
   return (
-    <div
-      className={classNames(
-        "flex items-center",
-        "w-full",
-        "min-h-8 py-1 px-3 pr-2",
-        "text-xs leading-none",
-        "border border-brand-main/[.07]",
-        "rounded-[.625rem]",
-        className
-      )}
-    >
-      {permission ? (
-        state === "connected" ? (
-          <span
-            className={classNames(
-              "block",
-              "w-5 h-5 mr-1.5",
-              "rounded-full overflow-hidden",
-              "border border-[#4F9A5E]"
-            )}
-          >
-            <Avatar
-              src={activeTab?.favIconUrl}
-              alt={permission.origin}
-              className={classNames(
-                "w-full h-full object-cover",
-                "!border-none"
-              )}
-            />
-          </span>
-        ) : (
-          <Tooltip
-            content={
-              state === "connected-disabled" ? (
-                <p>
-                  Current wallet is connected to this website but you disabled
-                  MetaMask compatible mode.
-                  <br />
-                  If you want to enable it back click the icon on the right and
-                  switch the toggle in the Web3 Settings tab.
-                </p>
-              ) : (
-                <p>
-                  Current wallet is not connected to this website. To connect it
-                  - click Connect on the right.
-                  <br />
-                  If you want to disconnect all wallets - switch to any
-                  connected wallet, and then click Disconnect on the right.
-                </p>
-              )
-            }
-            placement="bottom-end"
-            size="large"
-            interactive={false}
-          >
+    <div className={classNames("flex items-center w-full", className)}>
+      <div
+        className={classNames(
+          "flex items-center",
+          "min-w-0 grow",
+          "min-h-8 py-1 px-3 pr-2",
+          "text-xs leading-none",
+          "border border-brand-main/[.07]",
+          "rounded-[.625rem]"
+        )}
+      >
+        {permission ? (
+          state === "connected" ? (
             <span
               className={classNames(
-                "block relative",
+                "block",
                 "w-5 h-5 mr-1.5",
                 "rounded-full overflow-hidden",
-                "border border-[#BCC2DB]/[0.7]"
+                "border border-[#4F9A5E]"
               )}
             >
               <Avatar
@@ -149,79 +106,160 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 alt={permission.origin}
                 className={classNames(
                   "w-full h-full object-cover",
-                  "!border-none opacity-25"
+                  "!border-none"
                 )}
               />
-
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="absolute top-0 left-0 w-4.5 h-4.5"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
-                  fill="#F8F9FD"
-                />
-              </svg>
             </span>
+          ) : (
+            <Tooltip
+              content={
+                <p>
+                  Current wallet is not connected to this website. To connect it
+                  - click{" "}
+                  {metamaskMode
+                    ? ""
+                    : "the icon on the right to enable MetaMask compatible mode then click "}
+                  the Connect button.
+                  <br />
+                  If you want to disconnect all wallets - switch to any
+                  connected wallet, and then click the Disconnect button on the
+                  right.
+                </p>
+              }
+              placement="bottom-end"
+              size="large"
+              interactive={false}
+            >
+              <span
+                className={classNames(
+                  "block relative",
+                  "w-5 h-5 mr-1.5",
+                  "rounded-full overflow-hidden",
+                  "border border-[#BCC2DB]/[0.7]"
+                )}
+              >
+                <Avatar
+                  src={activeTab?.favIconUrl}
+                  alt={permission.origin}
+                  className={classNames(
+                    "w-full h-full object-cover",
+                    "!border-none opacity-25"
+                  )}
+                />
+
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="absolute top-0 left-0 w-4.5 h-4.5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
+                    fill="#F8F9FD"
+                  />
+                </svg>
+              </span>
+            </Tooltip>
+          )
+        ) : (
+          <Tooltip
+            content={
+              <p>
+                Vigvam is not connected to this site. To connect to a web3 site,
+                find and click the Connect button.
+              </p>
+            }
+            placement="bottom-end"
+            size="large"
+            interactive={false}
+          >
+            <TooltipIcon
+              theme="dark"
+              className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
+            />
           </Tooltip>
-        )
-      ) : (
-        <Tooltip
-          content={
+        )}
+        {tabOrigin && (
+          <span
+            className={classNames(
+              "truncate leading-4",
+              state !== "connected" && "text-brand-inactivedark"
+            )}
+          >
+            {new URL(tabOrigin).host}
+          </span>
+        )}
+
+        <span className="flex-1" />
+
+        {permission && (metamaskMode || accountConnected) && (
+          <button
+            type="button"
+            className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
+            onClick={handlePermission}
+          >
+            {accountConnected ? "Disconnect" : "Connect"}
+          </button>
+        )}
+      </div>
+      <Tooltip
+        content={
+          !metamaskMode && accountConnected ? (
+            <>
+              <p>
+                Current wallet is connected to this website but you disabled
+                MetaMask compatible mode.
+              </p>
+              <p>
+                If you want to enable it back click the icon.
+                <br />
+                If you want to disconnect all wallets - click the Disconnect
+                button on the left.
+              </p>
+            </>
+          ) : (
             <p>
-              Vigvam is not connected to this site. To connect to a web3 site,
-              find and click the Connect button.
+              If you want to {metamaskMode ? "disable" : "enable"} MetaMask
+              compatible mode click the icon.
+              {metamaskMode && (
+                <>
+                  <br /> Please note, you won&apos;t be able to interact with
+                  dApps!
+                </>
+              )}
             </p>
-          }
-          placement="bottom-end"
-          size="large"
-          interactive={false}
-        >
-          <TooltipIcon
-            theme="dark"
-            className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
-          />
-        </Tooltip>
-      )}
-      {tabOrigin && (
-        <span
-          className={classNames(
-            "truncate leading-4",
-            state !== "connected" && "text-brand-inactivedark"
-          )}
-        >
-          {new URL(tabOrigin).host}
-        </span>
-      )}
-
-      <span className="flex-1" />
-
-      {permission && (metamaskMode || accountConnected) && (
+          )
+        }
+        size="large"
+        placement="bottom-end"
+      >
         <button
           type="button"
-          className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
-          onClick={handlePermission}
+          onClick={toggleMetamaskMode}
+          className={classNames(
+            "flex items-center",
+            "min-h-8 py-1 px-2.5",
+            "border border-brand-main/[.07]",
+            "rounded-[.625rem]",
+            "ml-2"
+          )}
         >
-          {accountConnected ? "Disconnect" : "Connect"}
+          <MetamaskIcon
+            className={classNames(
+              "w-[1.125rem] min-w-[1.125rem] h-auto transition-opacity",
+              metamaskMode ? "opacity-80" : "opacity-60"
+            )}
+          />
+          <div
+            className={classNames(
+              "w-1.5 min-w-[.375rem] h-1.5 rounded-full ml-2 transition",
+              metamaskMode ? "bg-brand-greenobject" : "bg-brand-main/60"
+            )}
+          />
         </button>
-      )}
-      {!metamaskMode && (
-        <IconedButton
-          Icon={WebOffIcon}
-          onClick={() =>
-            openInTab({ page: Page.Settings, setting: SettingTab.Web3 })
-          }
-          aria-label="MetaMask compatible mode is disabled. Click to go to Web3 settings to enable it back."
-          tooltipProps={{ size: "large", placement: "bottom-end" }}
-          theme="secondary"
-          className="ml-auto bg-transparent"
-          iconClassName="transition-all group-hover:fill-brand-light"
-        />
-      )}
+      </Tooltip>
     </div>
   );
 };
