@@ -299,7 +299,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <MetamaskIcon
             className={classNames(
               "w-[1.125rem] min-w-[1.125rem] h-auto transition-opacity",
-              metamaskMode ? "opacity-100" : "opacity-60"
+              metamaskMode ? "opacity-80" : "opacity-60"
             )}
           />
           <div
