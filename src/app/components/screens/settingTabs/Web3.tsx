@@ -1,11 +1,12 @@
 import { FC, memo, MouseEvent, useCallback } from "react";
 import classNames from "clsx";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 
 import * as repo from "core/repo";
 
 import { getAllPermissionsAtom, web3MetaMaskCompatibleAtom } from "app/atoms";
+import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
@@ -15,7 +16,8 @@ import Separator from "app/components/elements/Seperator";
 import IconedButton from "app/components/elements/IconedButton";
 
 const Web3: FC = () => {
-  const [metamaskMode, setMetamaskMode] = useAtom(web3MetaMaskCompatibleAtom);
+  const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
+  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
 
   return (
     <div className="flex flex-col items-start">
@@ -41,7 +43,7 @@ const Web3: FC = () => {
         label="MetaMask Compatible Mode"
         text={metamaskMode ? "Enabled" : "Disabled"}
         checked={metamaskMode}
-        onCheckedChange={setMetamaskMode}
+        onCheckedChange={toggleMetamaskMode}
         className="min-w-[17.75rem]"
       />
 

@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import * as repo from "core/repo";
@@ -11,7 +11,7 @@ import {
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { useDialog } from "app/hooks/dialog";
+import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
@@ -22,9 +22,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
   const currentAccount = useAtomValue(currentAccountAtom);
-  const [metamaskMode, setMetamaskMode] = useAtom(web3MetaMaskCompatibleAtom);
+  const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
 
-  const { alert, confirm } = useDialog();
+  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
 
   const permission =
     purePermission && purePermission.accountAddresses.length > 0
@@ -76,56 +76,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       console.error(err);
     }
   }, [permission, accountConnected, currentAccount]);
-
-  const toggleMetamaskMode = useCallback(async () => {
-    if (metamaskMode) {
-      const response = await confirm({
-        title: "MetaMask compatible mode",
-        content: (
-          <p className="mb-4">
-            Are you sure you want to disable MetaMask compatible mode? Please
-            note, you won&apos;t be able to interact with dApps! Also you will
-            have to refresh active browser tabs where dApps are opened. Learn
-            more about{" "}
-            <a
-              href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-              target="_blank"
-              rel="nofollow noreferrer"
-              className="underline"
-            >
-              how it works here
-            </a>
-            .
-          </p>
-        ),
-        yesButtonText: "Disable",
-      });
-
-      if (response) {
-        setMetamaskMode(false);
-      }
-    } else {
-      setMetamaskMode(true);
-      alert({
-        title: "MetaMask compatible mode",
-        content: (
-          <p className="mb-4">
-            MetaMask compatible mode enabled. You will have to refresh active
-            browser tabs where dApps are opened. Learn more about{" "}
-            <a
-              href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-              target="_blank"
-              rel="nofollow noreferrer"
-              className="underline"
-            >
-              how it works here
-            </a>
-            .
-          </p>
-        ),
-      });
-    }
-  }, [alert, confirm, metamaskMode, setMetamaskMode]);
 
   if (!reallyConnectible) return null;
 
