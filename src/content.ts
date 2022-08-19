@@ -32,7 +32,7 @@ function initMsgGateway(injected: Promise<void>) {
 
     console.error(
       "Vigvam: Provider disconnected." +
-        " A page reload is required to reestablish the connection to Web3."
+        " A page reload is required to reestablish the connection."
     );
   };
 
