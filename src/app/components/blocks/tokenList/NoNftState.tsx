@@ -18,8 +18,14 @@ const NoNftState = memo<NoNftStateProps>(({ syncing }) => (
     )}
   >
     <Delay ms={500}>
-      {!syncing && <MediaFallbackIcon className="w-32 h-auto" />}
-      <span>{!syncing ? "There are no NFTs yet" : "Syncing..."}</span>
+      {!syncing ? (
+        <div className="mt-4 flex flex-col items-center animate-bootfadein">
+          <MediaFallbackIcon className="w-32 h-auto" />
+          <span>There are no NFTs yet</span>
+        </div>
+      ) : (
+        "Syncing..."
+      )}
     </Delay>
   </div>
 ));
