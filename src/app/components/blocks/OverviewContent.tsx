@@ -1,11 +1,15 @@
 import {
   FC,
+  forwardRef,
+  HTMLProps,
   memo,
   ReactNode,
+  Ref,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
 import { useAtom } from "jotai";
@@ -32,11 +36,12 @@ import { ToastOverflowProvider } from "app/hooks/toast";
 import { useTokenList } from "app/hooks/tokenList";
 
 import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
+import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
+import { ReactComponent as ClearIcon } from "app/icons/close.svg";
 
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import NullState from "../blocks/tokenList/NullState";
 import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
@@ -235,22 +240,15 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     () => (
       <div className="flex items-center">
         <TippySingletonProvider>
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
+          <ComplexSearchInput
+            contractRef={searchInputRef}
+            contractValue={searchValue}
+            onContractChange={setSearchValue}
+            tokenIdRef={tokenIdSearchInputRef}
+            tokenIdValue={tokenIdSearchValue}
+            onTokenIdChange={setTokenIdSearchValue}
+            tokenIdDisplayed={tokenIdSearchDisplayed}
           />
-
-          {tokenIdSearchDisplayed && (
-            <SearchInput
-              ref={tokenIdSearchInputRef}
-              searchValue={tokenIdSearchValue}
-              toggleSearchValue={setTokenIdSearchValue}
-              StartAdornment={HashTagIcon}
-              className="ml-2 max-w-[8rem]"
-              placeholder="Token ID..."
-            />
-          )}
 
           <IconedButton
             Icon={ControlIcon}
@@ -343,3 +341,171 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     </>
   );
 });
+
+type ComplexSearchInputProps = {
+  contractRef: Ref<HTMLInputElement>;
+  tokenIdRef: Ref<HTMLInputElement>;
+  contractValue: string | null;
+  onContractChange: (value: string | null) => void;
+  tokenIdValue: string | null;
+  onTokenIdChange: (value: string | null) => void;
+  tokenIdDisplayed?: boolean;
+};
+
+const ComplexSearchInput: FC<ComplexSearchInputProps> = ({
+  contractRef,
+  tokenIdRef,
+  contractValue,
+  onContractChange,
+  tokenIdValue,
+  onTokenIdChange,
+  tokenIdDisplayed = false,
+}) => {
+  const [focused, setFocused] = useState<boolean>(false);
+
+  const handleFocus = useCallback(() => {
+    setFocused(true);
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setFocused(false);
+  }, []);
+
+  return (
+    <div
+      className={classNames(
+        "relative",
+        "flex",
+        "w-full",
+        "bg-black/20 border-brand-main/10",
+        "rounded-[.625rem]",
+        "transition-colors",
+        "border",
+        focused && "!bg-brand-main/[.05] border-brand-main/[.15]"
+      )}
+    >
+      <CustomInput
+        ref={contractRef}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        value={contractValue ?? ""}
+        onChange={(e) => {
+          e.preventDefault();
+          onContractChange(e.currentTarget.value);
+        }}
+        StartAdornment={SearchIcon}
+        placeholder="Type name or address to search..."
+        className="grow"
+        inputClassName={classNames(
+          "pl-10",
+          tokenIdDisplayed ? "pr-2" : "pr-10"
+        )}
+      />
+      {tokenIdDisplayed && (
+        <CustomInput
+          ref={tokenIdRef}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          value={tokenIdValue ?? ""}
+          onChange={(e) => {
+            e.preventDefault();
+            onTokenIdChange(e.currentTarget.value);
+          }}
+          StartAdornment={HashTagIcon}
+          inputClassName="pl-6 pr-10"
+          adornmentClassName="!left-0"
+          className="w-[8rem]"
+          placeholder="Token ID..."
+        />
+      )}
+      <IconedButton
+        theme="tertiary"
+        Icon={ClearIcon}
+        aria-label="Clear"
+        onClick={() => {
+          onContractChange(null);
+          onTokenIdChange(null);
+        }}
+        className={classNames(
+          "absolute top-1/2 -translate-y-1/2 right-3",
+          !contractValue && !tokenIdValue && "hidden"
+        )}
+        tooltipProps={{ missSingleton: true }}
+      />
+    </div>
+  );
+};
+
+type CustomInputProps = {
+  StartAdornment: FC<{ className?: string }>;
+  className?: string;
+  inputClassName?: string;
+  adornmentClassName?: string;
+} & Omit<HTMLProps<HTMLInputElement>, "ref">;
+
+const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
+  (
+    {
+      StartAdornment,
+      onFocus,
+      onBlur,
+      inputClassName,
+      adornmentClassName,
+      className,
+      ...rest
+    },
+    ref
+  ) => {
+    const [focused, setFocused] = useState<boolean>(false);
+
+    const handleFocus = useCallback(
+      (evt) => {
+        setFocused(true);
+        onFocus?.(evt);
+      },
+      [onFocus]
+    );
+
+    const handleBlur = useCallback(
+      (evt) => {
+        setFocused(false);
+        onBlur?.(evt);
+      },
+      [onBlur]
+    );
+
+    return (
+      <div className={classNames("group relative", className)}>
+        <StartAdornment
+          className={classNames(
+            "w-5 h-5",
+            "absolute top-1/2 -translate-y-1/2",
+            "pointer-events-none",
+            "transition-colors",
+            focused && "fill-current text-brand-light",
+            "left-4",
+            adornmentClassName
+          )}
+        />
+        <input
+          ref={ref}
+          type="text"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          className={classNames(
+            "py-3 px-4",
+            "box-border",
+            "text-sm text-brand-light leading-none",
+            "outline-none",
+            "placeholder-brand-placeholder",
+            "bg-transparent",
+            "border-none",
+            "w-full h-full",
+            inputClassName
+          )}
+          {...rest}
+        />
+      </div>
+    );
+  }
+);
