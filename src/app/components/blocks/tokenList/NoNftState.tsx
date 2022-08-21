@@ -2,7 +2,8 @@ import { memo } from "react";
 import classNames from "clsx";
 
 import { ReactComponent as MediaFallbackIcon } from "app/icons/media-fallback.svg";
-import Delay from "./Delay";
+
+import Delay from "../misc/Delay";
 
 type NoNftStateProps = {
   syncing: boolean;

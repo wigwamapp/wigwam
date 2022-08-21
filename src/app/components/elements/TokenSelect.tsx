@@ -12,14 +12,17 @@ import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
+import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
+import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
+import { ReactComponent as MediaFallbackIcon } from "app/icons/media-fallback.svg";
+
+import Delay from "../blocks/misc/Delay";
+
 import Select from "./Select";
 import FiatAmount from "./FiatAmount";
 import AssetLogo from "./AssetLogo";
 import PrettyAmount from "./PrettyAmount";
 import NftAvatar from "./NftAvatar";
-import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
-import { ReactComponent as XSymbolIcon } from "app/icons/xsymbol.svg";
-import { ReactComponent as MediaFallbackIcon } from "app/icons/media-fallback.svg";
 
 type TokenSelectProps = {
   tokenType: TokenType;
@@ -54,7 +57,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
 
   useEffect(() => {
     setDefaultTokenRef.current = !tokenSlug;
-  }, [tokenSlug]);
+  }, [tokenSlug, currentAccount.address]);
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
@@ -79,7 +82,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
 
   useEffect(() => {
     if (setDefaultTokenRef.current && tokens.length > 0) {
-      setTokenSlug([tokens[0].tokenSlug, "replace"]);
+      setTimeout(() => setTokenSlug([tokens[0].tokenSlug, "replace"]));
       setDefaultTokenRef.current = false;
     }
   }, [setTokenSlug, tokens]);
@@ -119,7 +122,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
     }
   }, [currentToken, prevTokenSlug, handleTokenChanged]);
 
-  if (!currentToken && tokenType === TokenType.NFT) {
+  if (tokenType === TokenType.NFT && tokens.length === 0) {
     return (
       <div className="flex flex-col">
         <div
@@ -141,17 +144,24 @@ const TokenSelect: FC<TokenSelectProps> = ({
             "text-sm text-brand-inactivelight"
           )}
         >
-          <div
-            className={classNames(
-              "w-[4.625rem] h-[4.625rem] min-w-[4.625rem]",
-              "bg-brand-main/5 rounded-[.625rem]",
-              "flex items-center justify-center",
-              "mr-3"
-            )}
-          >
-            <MediaFallbackIcon className="w-full h-auto" />
-          </div>
-          There are no NFTs on this wallet
+          <Delay ms={300}>
+            <>
+              <div
+                className={classNames(
+                  "w-[4.625rem] h-[4.625rem] min-w-[4.625rem]",
+                  "bg-brand-main/5 rounded-[.625rem]",
+                  "flex items-center justify-center",
+                  "mr-3",
+                  "animate-bootfadein"
+                )}
+              >
+                <MediaFallbackIcon className="w-full h-auto" />
+              </div>
+              <span className="animate-bootfadein">
+                There are no NFTs on this wallet
+              </span>
+            </>
+          </Delay>
         </div>
       </div>
     );
