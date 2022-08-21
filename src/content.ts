@@ -140,8 +140,9 @@ function notifyRequiresRefresh() {
     paddingRight: "24px",
     fontSize: "14px",
     color: "#B7BCD0",
-    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    backgroundColor: "rgba(31, 31, 49, 0.9)",
     borderRadius: "4px",
+    border: "solid 1px #B7BCD0",
     maxWidth: "280px",
   });
 
