@@ -188,7 +188,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       <ChainIdProvider chainId={localChainId}>
         <DappLogos dappLogoUrl={approval.source.favIconUrl} />
         <h1 className="text-2xl font-bold mt-4 mb-1">Connect to the website</h1>
-        <span className="text-base mb-6">
+        <span className="text-base text-center mb-6">
           {new URL(approval.source.url).host}
         </span>
         <div className="w-full flex items-center px-3 pb-1.5">
