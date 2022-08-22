@@ -49,7 +49,7 @@ export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
           agent.fetchMetadata(tokenAddress, tokenId).catch(() => null),
         ]);
 
-        const metadata: Partial<NFT> = {
+        const metadata: Partial<NFT> = omitEmptyFields({
           contractAddress: tokenAddress,
           tokenId: tokenId,
           name:
@@ -63,11 +63,13 @@ export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
           detailUrl: parsed?.externalURL,
           contentType: parseContentType(parsed?.contentURLMimeType),
           attributes: parsed?.attributes as any,
-        };
+        });
 
-        if (metadata.thumbnailUrl) {
-          return metadata;
-        }
+        return metadata;
+
+        // if (metadata.thumbnailUrl || metadata.contentUrl) {
+        //   return metadata;
+        // }
       }
     }
   } catch (err) {
@@ -99,140 +101,11 @@ function parseContentType(contentType?: string): NFTContentType | undefined {
   return;
 }
 
-// async function legacy() {
-//   switch (standard) {
-//     case TokenStandard.ERC721: {
-//       const contract = ERC721__factory.connect(tokenAddress, provider);
-
-//       try {
-//         const { collectionName, tokenUri } = await retry(
-//           () =>
-//             props({
-//               collectionName: contract.name(),
-//               tokenUri: contract.tokenURI(tokenId),
-//             }),
-//           { retries: 2 }
-//         );
-
-//         const base: Partial<NFT> = {
-//           contractAddress: tokenAddress,
-//           tokenId,
-//           name: `${collectionName} #${tokenId}`,
-//           collectionName,
-//           collectionId: slugify(collectionName),
-//         };
-
-//         const meta = await retry(
-//           () =>
-//             axios
-//               .get(tokenUri, { timeout: 30_000 })
-//               .then((r) => r.data)
-//               .catch(() => null),
-//           { retries: 2 }
-//         );
-
-//         if (!meta) return base;
-
-//         const { name, description, image, external_url, attributes } =
-//           meta.properties;
-
-//         let contentType: NFTContentType | undefined;
-//         if (external_url) {
-//           contentType = (await fetchContentType(external_url)) ?? undefined;
-//         }
-
-//         return {
-//           ...base,
-//           name,
-//           description,
-//           thumbnailUrl: image,
-//           detailUrl: external_url,
-//           contentType,
-//           attributes,
-//         };
-//       } catch {
-//         return {
-//           tokenAddress,
-//           tokenId,
-//           name: `#${tokenId}`,
-//         };
-//       }
-//     }
-
-//     case TokenStandard.ERC1155: {
-//       const contract = ERC1155__factory.connect(tokenAddress, provider);
-
-//       try {
-//         let tokenUri = await retry(() => contract.uri(tokenId), {
-//           retries: 2,
-//         });
-
-//         if (tokenUri.includes("{id}")) {
-//           const serealizedTokenId = ethers.utils
-//             .hexZeroPad(ethers.BigNumber.from(tokenId).toHexString(), 32)
-//             .slice(2);
-
-//           tokenUri = tokenUri.replace(/{id}/g, serealizedTokenId);
-//         }
-
-//         const base: Partial<NFT> = {
-//           contractAddress: tokenAddress,
-//           tokenId,
-//           name: `#${tokenId}`,
-//         };
-
-//         const meta = await retry(
-//           () =>
-//             axios
-//               .get(tokenUri, { timeout: 30_000 })
-//               .then((r) => r.data)
-//               .catch(() => null),
-//           { retries: 2 }
-//         );
-
-//         if (!meta) return base;
-
-//         const { name, description, image, external_url, attributes } =
-//           meta.properties;
-
-//         let contentType: NFTContentType | undefined;
-//         if (external_url) {
-//           contentType = (await fetchContentType(external_url)) ?? undefined;
-//         }
-
-//         return {
-//           ...base,
-//           name,
-//           description,
-//           thumbnailUrl: image,
-//           detailUrl: external_url,
-//           contentType,
-//           attributes,
-//         };
-//       } catch {
-//         return {
-//           tokenAddress,
-//           tokenId,
-//           name: `#${tokenId}`,
-//         };
-//       }
-//     }
-//   }
-// }
-
-// function fetchContentType(url: string) {
-//   return new Promise<NFTContentType | null>((res) => {
-//     const xhr = new XMLHttpRequest();
-//     xhr.timeout = 30_000;
-//     xhr.open("HEAD", url, true);
-
-//     xhr.onload = () => {
-//       const contentType = xhr.getResponseHeader("Content-Type");
-//       res(contentType ? parseContentType(contentType) : null);
-//     };
-
-//     xhr.onerror = () => res(null);
-
-//     xhr.send();
-//   });
-// }
+function omitEmptyFields<T extends Record<string, any>>(obj: T): T {
+  const newObj = { ...obj };
+  for (const key in obj) {
+    const val = obj[key];
+    if (val) newObj[key] = val;
+  }
+  return newObj;
+}
