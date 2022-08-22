@@ -235,6 +235,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         }
         size="large"
         placement="bottom-end"
+        asChild
       >
         <button
           type="button"
