@@ -221,8 +221,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             </>
           ) : (
             <p>
-              If you want to {metamaskMode ? "disable" : "enable"} MetaMask
-              compatible mode click the icon.
+              MetaMask compatible mode is{" "}
+              {metamaskMode ? "enabled" : "disabled"}. To{" "}
+              {metamaskMode ? "disable" : "enable"} it, click this icon.
               {metamaskMode && (
                 <>
                   <br /> Please note, you won&apos;t be able to interact with
