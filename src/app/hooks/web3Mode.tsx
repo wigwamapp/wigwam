@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useAtom } from "jotai";
 
 import { web3MetaMaskCompatibleAtom } from "app/atoms";
+import { ReactComponent as SuccessIcon } from "app/icons/check-big.svg";
 
 import { useDialog } from "./dialog";
 
@@ -18,8 +19,8 @@ export function useToggleMetaMaskCompatibleMode() {
             Are you sure you want to disable MetaMask compatible mode?
             <br />
             Please note, that you won&apos;t be able to interact with dApps!
-            Also, you will have to refresh active browser tabs where dApps are
-            opened. Learn more about{" "}
+            Refresh active browser tabs where dApps are opened for the changes
+            to take effect. Learn more about{" "}
             <a
               href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
               target="_blank"
@@ -40,13 +41,19 @@ export function useToggleMetaMaskCompatibleMode() {
     } else {
       setMetamaskMode(true);
       alert({
-        title: "MetaMask compatible mode",
+        title: (
+          <div className="flex flex-col items-center">
+            <SuccessIcon className="mb-4" />
+            MetaMask compatible mode
+          </div>
+        ),
         content: (
           <>
-            <p>MetaMask compatible mode enabled.</p>
-            <p className="mb-4">
-              You will have to refresh active browser tabs where dApps are
-              opened.
+            <p>
+              MetaMask compatible mode enabled.
+              <br />
+              Refresh active browser tabs where dApps are opened for the changes
+              to take effect.
             </p>
           </>
         ),
