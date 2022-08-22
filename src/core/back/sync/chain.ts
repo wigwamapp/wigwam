@@ -12,7 +12,11 @@ import { NFT, NFTContentType, TokenStandard } from "core/types";
 
 import { getRpcProvider } from "../rpc";
 
-export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
+export const getTokenMetadata = async (
+  chainId: number,
+  tokenSlug: string,
+  returnBroken = false
+) => {
   const provider = getRpcProvider(chainId);
 
   const {
@@ -49,6 +53,10 @@ export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
           agent.fetchMetadata(tokenAddress, tokenId).catch(() => null),
         ]);
 
+        if (!returnBroken && !parsed) {
+          return null;
+        }
+
         const metadata: Partial<NFT> = omitEmptyFields({
           contractAddress: tokenAddress,
           tokenId: tokenId,
@@ -66,10 +74,6 @@ export const getTokenMetadata = async (chainId: number, tokenSlug: string) => {
         });
 
         return metadata;
-
-        // if (metadata.thumbnailUrl || metadata.contentUrl) {
-        //   return metadata;
-        // }
       }
     }
   } catch (err) {

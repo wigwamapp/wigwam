@@ -169,7 +169,7 @@ async function performTokenSync(
 
   if (!tokenToAdd) {
     const [metadata, balance] = await Promise.all([
-      getTokenMetadata(chainId, tokenSlug),
+      getTokenMetadata(chainId, tokenSlug, true),
       getBalanceFromChain(chainId, tokenSlug, accountAddress),
     ]);
 
