@@ -21,7 +21,10 @@ export function sanitizeCustomUrl(customUrl: string) {
 
   const url = new URL(process.env.VIGVAM_NFT_METADATA_PROXY);
 
-  const { origin, pathname, search, hash } = new URL(customUrl);
+  const { protocol, origin, pathname, search, hash } = new URL(customUrl);
+
+  if (!protocol.startsWith("http")) return customUrl;
+
   Object.assign(url, { pathname, search, hash });
 
   url.searchParams.set("_xurl", origin);
