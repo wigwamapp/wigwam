@@ -13,6 +13,7 @@ import OnboardingThreeImage from "app/images/onboarding-3.png";
 import OnboardingFourImage from "app/images/onboarding-4.png";
 import OnboardingFiveImage from "app/images/onboarding-5.png";
 import OnboardingSixImage from "app/images/onboarding-6.png";
+import OnboardingSevenImage from "app/images/onboarding-7.png";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-left-long.svg";
 
 const OnboardingPopup: FC = () => {
@@ -129,12 +130,20 @@ const OnboardingPopupContent: FC = () => {
               alt="Create an unlimited number of profiles!"
             />
           </Wrapper>
-          <Wrapper className="mt-[3.75rem]">
+          <Wrapper>
             <img
               src={OnboardingSixImage}
-              className="w-[23.5rem] h-auto mr-[3.75rem]"
-              alt="To help us test the product and get NFT Vigvam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Vigvam Pro and participation rules."
+              className="w-[23.25rem] h-auto mr-[4rem]"
+              alt="Manage NFTs most conveniently: synchronization of all tokens from the start, instant auto-add after getting new ones, quick search and the ability to add a token, token preview with any content type, NFT transaction history."
             />
+            <Item>
+              Manage NFTs most conveniently: synchronization of all tokens from
+              the start, instant auto-add after getting new ones, quick search
+              and the ability to add a token, token preview with any content
+              type (image/video/audio), NFT transaction history.
+            </Item>
+          </Wrapper>
+          <Wrapper className="mt-[3.75rem]">
             <Item>
               To help us test the product and get NFT Vigvam Pro, check out the{" "}
               <Link href="https://vigvamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
@@ -150,6 +159,11 @@ const OnboardingPopupContent: FC = () => {
               </Link>
               .
             </Item>
+            <img
+              src={OnboardingSevenImage}
+              className="w-[23.5rem] h-auto ml-[3.75rem]"
+              alt="To help us test the product and get NFT Vigvam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Vigvam Pro and participation rules."
+            />
           </Wrapper>
           <span ref={bottomElementRef} className="invisible" />
         </div>
