@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import { WalletStatus } from "core/types";
 
 import { openInTab } from "app/helpers";
-import { walletStatusAtom } from "app/atoms";
+import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
 import ActivityBar from "app/components/blocks/ActivityBar";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
@@ -23,6 +23,7 @@ type PopupLayoutProps = {
 
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const updateAvailable = useAtomValue(updateAvailableAtom);
 
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
@@ -55,6 +56,15 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             >
               <FullScreenIcon className="mr-1" />
               Open Full
+              {updateAvailable ? (
+                <div
+                  className={classNames(
+                    "w-2 h-2",
+                    "bg-activity rounded-full",
+                    "absolute top-2 right-2"
+                  )}
+                />
+              ) : null}
             </RoundedButton>
           </div>
 
