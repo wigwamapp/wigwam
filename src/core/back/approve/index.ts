@@ -36,7 +36,7 @@ export async function processApprove(
   {
     approved,
     rawTx,
-    signedRawTx,
+    signature,
     signedMessage,
     accountAddresses,
     overriddenChainId,
@@ -100,20 +100,19 @@ export async function processApprove(
           txParams,
           rpcReply,
         }) => {
-          assert(rawTx || signedRawTx, "Transaction not provided");
+          assert(rawTx, "Transaction not provided");
 
-          const tx = parseTxSafe(rawTx ?? signedRawTx!);
+          const tx = parseTxSafe(rawTx);
           validateTxOrigin(tx, txParams);
 
-          if (!signedRawTx) {
+          if (!signature) {
             accountAddress = ethers.utils.getAddress(accountAddress);
             const account = getAccountSafe(accountAddress);
 
-            const signature = await vault.sign(account.uuid, keccak256(rawTx!));
-            signedRawTx = serializeTransaction(tx, signature);
-          } else {
-            rawTx = serializeTransaction(tx);
+            signature = await vault.sign(account.uuid, keccak256(rawTx!));
           }
+
+          const signedRawTx = serializeTransaction(tx, signature);
 
           if (
             process.env.NODE_ENV === "development" &&
