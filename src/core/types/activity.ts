@@ -41,7 +41,7 @@ export type ActivitySource =
 export interface ApprovalResult {
   approved: boolean;
   rawTx?: string;
-  signedRawTx?: string;
+  signature?: TxSignature;
   signedMessage?: string;
   accountAddresses?: string[];
   overriddenChainId?: number;
@@ -120,6 +120,12 @@ export type TxParams = {
   // eip1559
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
+};
+
+export type TxSignature = {
+  v: number;
+  r: string;
+  s: string;
 };
 
 export type TxReceipt = {

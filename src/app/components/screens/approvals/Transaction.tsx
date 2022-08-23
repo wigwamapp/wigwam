@@ -22,6 +22,7 @@ import {
   FeeSuggestions,
   AccountSource,
   TxAction,
+  TxSignature,
 } from "core/types";
 import {
   approveItem,
@@ -367,7 +368,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           if (account.source !== AccountSource.Ledger) {
             await approveItem(approval.id, { approved, rawTx });
           } else {
-            let signedRawTx: string | undefined;
+            let signature: TxSignature | undefined;
             let ledgerError: any;
 
             await withLedger(async ({ ledgerEth }) => {
@@ -393,14 +394,14 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   );
                 }
 
-                signedRawTx = serializeTransaction(finalTx, formattedSig);
+                signature = formattedSig;
               } catch (err) {
                 ledgerError = err;
               }
             });
 
-            if (signedRawTx) {
-              await approveItem(approval.id, { approved, signedRawTx });
+            if (signature) {
+              await approveItem(approval.id, { approved, rawTx, signature });
             } else {
               throw (
                 ledgerError ??
