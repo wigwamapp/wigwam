@@ -1,18 +1,22 @@
 import {
+  ButtonHTMLAttributes,
   forwardRef,
   memo,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
+import { mergeRefs } from "react-merge-refs";
 import { Field, FieldMetaState, Form } from "react-final-form";
 import { FormApi } from "final-form";
 import { useThrottledCallback } from "use-debounce";
 import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { storage } from "lib/ext/storage";
+import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
 import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import * as Repo from "core/repo";
@@ -399,6 +403,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
     const [opened, setOpened] = useState(false);
     const [activeSuggestion, setActiveSuggestion] = useState<number | null>(0);
     const [savedRpcUrl, setSavedRpcUrl] = useState<string>();
+    const [isAfterArrowClick, setIsAfterArrowClick] = useState(false);
 
     const rpcList = useMemo(() => {
       if (!network) return undefined;
@@ -421,7 +426,14 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
 
     useEffect(() => {
       if (meta.active) {
-        setOpened(true);
+        setTimeout(() => {
+          setOpened((prevState) => {
+            if (!prevState) {
+              setActiveSuggestion(0);
+            }
+            return true;
+          });
+        }, 50);
       } else {
         setOpened(false);
       }
@@ -456,6 +468,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                 ? 0
                 : prevState + 1
             );
+            setIsAfterArrowClick(true);
             e.preventDefault();
           }
           if (e.keyCode === 38) {
@@ -466,6 +479,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                 ? rpcList.length - 1
                 : prevState - 1
             );
+            setIsAfterArrowClick(true);
             e.preventDefault();
           }
           if (e.keyCode === 32 || e.keyCode === 13) {
@@ -544,32 +558,23 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               scrollBarClassName="py-3"
             >
               {rpcList.map((item, index) => (
-                <button
-                  type="button"
+                <NetworkButton
                   key={item}
-                  className={classNames(
-                    "w-full mb-1 last:mb-0",
-                    "flex items-center",
-                    "px-3",
-                    item === rpcList[0] ? "py-1.5" : "py-2",
-                    "rounded-[.625rem]",
-                    "cursor-pointer",
-                    "text-sm",
-                    "outline-none",
-                    "transition-colors",
-                    activeSuggestion === index && "bg-brand-main/20"
-                  )}
-                  onPointerDown={() => setValue(item)}
-                  onMouseOver={() =>
-                    setActiveSuggestion(rpcList?.indexOf(item))
-                  }
+                  network={item}
+                  isSelected={item === rpcList[0]}
+                  isActive={activeSuggestion === index}
+                  isAfterArrowClick={isAfterArrowClick}
+                  onPointerDown={(evt) => {
+                    evt.preventDefault();
+                    setValue(item);
+                    (document.activeElement as any)?.blur();
+                  }}
+                  onMouseOver={() => {
+                    setActiveSuggestion(rpcList?.indexOf(item));
+                    setIsAfterArrowClick(false);
+                  }}
                   onFocus={() => setActiveSuggestion(rpcList?.indexOf(item))}
-                >
-                  <span className="min-w-0 truncate">{item}</span>
-                  {item === rpcList[0] && (
-                    <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
-                  )}
-                </button>
+                />
               ))}
             </ScrollAreaContainer>
           </Popover.Content>
@@ -578,5 +583,51 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
     }
 
     return content;
+  }
+);
+
+type NetworkButtonProps = {
+  network: string;
+  isActive?: boolean;
+  isSelected?: boolean;
+  isAfterArrowClick?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
+const NetworkButton = forwardRef<HTMLButtonElement, NetworkButtonProps>(
+  ({ isActive, isSelected, isAfterArrowClick, network, ...rest }, ref) => {
+    const elementRef = useRef<HTMLButtonElement>(null);
+    const onScreen = useOnScreen(elementRef);
+
+    useEffect(() => {
+      if (isActive && isAfterArrowClick && !onScreen) {
+        elementRef.current?.scrollIntoView();
+      }
+    }, [isActive, isAfterArrowClick, onScreen]);
+
+    return (
+      <button
+        ref={mergeRefs([ref, elementRef])}
+        type="button"
+        key={network}
+        className={classNames(
+          "w-full mb-1 last:mb-0",
+          "flex items-center",
+          "px-3",
+          isSelected ? "py-1.5" : "py-2",
+          "rounded-[.625rem]",
+          "cursor-pointer",
+          "text-sm",
+          "outline-none",
+          "transition-colors",
+          isActive && "bg-brand-main/20"
+        )}
+        {...rest}
+      >
+        <span className="min-w-0 truncate">{network}</span>
+        {isSelected && (
+          <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
+        )}
+      </button>
+    );
   }
 );
