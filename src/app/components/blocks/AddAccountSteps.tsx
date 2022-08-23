@@ -6,7 +6,7 @@ import { AddAccountStep } from "app/nav";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWayBeta";
+import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
 import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
 import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
 import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";

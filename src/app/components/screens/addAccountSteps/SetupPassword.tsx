@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR } from "final-form";
 import { nanoid } from "nanoid";
@@ -18,7 +18,7 @@ import {
   composeValidators,
   validatePassword,
 } from "app/utils";
-import { addAccountModalAtom, profileStateAtom } from "app/atoms";
+import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -35,7 +35,6 @@ type FormValues = {
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
-  const profileState = useAtomValue(profileStateAtom);
 
   const { stateRef, reset } = useSteps();
 
@@ -49,15 +48,13 @@ const SetupPassword = memo(() => {
     }
   }, [addAccountsParams, reset]);
 
-  const analyticsFieldDisplayed = profileState.all.length > 1;
-
   const handleFinish = useCallback(
     async ({ password, analytics }) =>
       withHumanDelay(async () => {
         try {
           if (!addAccountsParams) return;
 
-          if (analyticsFieldDisplayed && analytics) {
+          if (analytics) {
             await storage.put(Setting.Analytics, {
               enabled: true,
               userId: nanoid(),
@@ -73,7 +70,7 @@ const SetupPassword = memo(() => {
         }
         return;
       }),
-    [addAccountsParams, seedPhrase, setAccModalOpened, analyticsFieldDisplayed]
+    [addAccountsParams, seedPhrase, setAccModalOpened]
   );
 
   if (!addAccountsParams) {
@@ -134,34 +131,32 @@ const SetupPassword = memo(() => {
                 )}
               </Field>
 
-              {analyticsFieldDisplayed && (
-                <Field name="analytics" format={(v: string) => Boolean(v)}>
-                  {({ input, meta }) => (
-                    <AcceptCheckbox
-                      {...input}
-                      title="Analytics"
-                      description={
-                        <>
-                          Help us make Vigvam better.
-                          <br />I agree to the{" "}
-                          <a
-                            href="https://vigvam.app/privacy"
-                            target="_blank"
-                            rel="nofollow noreferrer"
-                            className="text-brand-main underline"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Anonymous Tracking
-                          </a>
-                        </>
-                      }
-                      error={meta.touched && meta.error}
-                      errorMessage={meta.error}
-                      containerClassName="w-full mt-6"
-                    />
-                  )}
-                </Field>
-              )}
+              <Field name="analytics" format={(v: string) => Boolean(v)}>
+                {({ input, meta }) => (
+                  <AcceptCheckbox
+                    {...input}
+                    title="Analytics"
+                    description={
+                      <>
+                        Help us make Vigvam better.
+                        <br />I agree to the{" "}
+                        <a
+                          href="https://vigvam.app/privacy"
+                          target="_blank"
+                          rel="nofollow noreferrer"
+                          className="text-brand-main underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Anonymous Tracking
+                        </a>
+                      </>
+                    }
+                    error={meta.touched && meta.error}
+                    errorMessage={meta.error}
+                    containerClassName="w-full mt-6"
+                  />
+                )}
+              </Field>
 
               <Field
                 name="terms"
@@ -194,10 +189,7 @@ const SetupPassword = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    containerClassName={classNames(
-                      "mb-6 w-full",
-                      analyticsFieldDisplayed ? "mt-4" : "mt-6"
-                    )}
+                    containerClassName={classNames("mt-4 mb-6 w-full")}
                   />
                 )}
               </Field>
