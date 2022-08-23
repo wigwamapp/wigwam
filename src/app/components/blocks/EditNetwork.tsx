@@ -486,7 +486,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             if (activeSuggestion !== null) {
               setValue(rpcList[activeSuggestion]);
             }
-            (document.activeElement as any)?.blur();
+            // (document.activeElement as any)?.blur();
             e.preventDefault();
           }
         }
@@ -567,7 +567,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                   onPointerDown={(evt) => {
                     evt.preventDefault();
                     setValue(item);
-                    (document.activeElement as any)?.blur();
+                    // (document.activeElement as any)?.blur();
                   }}
                   onMouseOver={() => {
                     setActiveSuggestion(rpcList?.indexOf(item));
