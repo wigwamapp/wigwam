@@ -2,12 +2,7 @@ import BigNumber from "bignumber.js";
 import { IndexableTypeArray } from "dexie";
 import { ethers } from "ethers";
 import memoize from "mem";
-import {
-  isIPFS,
-  convertToDesiredGateway,
-  sanitizeCustomUrl,
-} from "lib/nft-metadata/uri";
-import { IPFS_IO_GATEWAY } from "lib/nft-metadata/defaults/base";
+import { sanitizeUrl } from "lib/nft-metadata/utils";
 
 import {
   AccountAsset,
@@ -175,7 +170,7 @@ export const syncAccountTokens = memoize(
               description: existing?.description || token.description,
               thumbnailUrl:
                 existing?.thumbnailUrl ||
-                replaceIpfsUrl(
+                sanitizeUrl(
                   token.thumbnail_url ||
                     (token.content_type === "image_url"
                       ? token.content
@@ -183,7 +178,7 @@ export const syncAccountTokens = memoize(
                 ),
               contentUrl:
                 existing?.contentUrl ||
-                replaceIpfsUrl(token.content || token.thumbnail_url),
+                sanitizeUrl(token.content || token.thumbnail_url),
               contentType: existing?.contentType || token.content_type,
               collectionId: existing?.collectionId || token.collection_id,
               collectionName: existing?.collectionName || token.contract_name,
@@ -334,11 +329,3 @@ export const syncAccountTokens = memoize(
     maxAge: 40_000, // 40 sec
   }
 );
-
-function replaceIpfsUrl(url?: string) {
-  if (!url) return url;
-
-  return isIPFS(url)
-    ? convertToDesiredGateway(url, IPFS_IO_GATEWAY)
-    : sanitizeCustomUrl(url);
-}

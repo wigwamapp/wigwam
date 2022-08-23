@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
 import { CID } from "multiformats/cid";
 
+import { sanitizeCustomUrl } from "./uri/custom";
+import { IPFS_IO_GATEWAY } from "./defaults";
+
 export function serealizeTokenId1155(tokenId: string) {
   return ethers.utils
     .hexZeroPad(ethers.BigNumber.from(tokenId).toHexString(), 32)
@@ -18,6 +21,22 @@ export function isAddressMatch(
     ethers.utils.getAddress(address) ===
     ethers.utils.getAddress(addressByNetwork[chainId])
   );
+}
+
+export function sanitizeUrl(url: string, desiredIpfsGateway?: string): string;
+export function sanitizeUrl(
+  url: undefined,
+  desiredIpfsGateway?: string
+): undefined;
+export function sanitizeUrl(
+  url: string | undefined,
+  desiredIpfsGateway = IPFS_IO_GATEWAY
+) {
+  if (!url) return url;
+
+  return Boolean(getCID(url))
+    ? convertToDesiredGateway(url, desiredIpfsGateway)
+    : sanitizeCustomUrl(url);
 }
 
 export function convertToDesiredGateway(

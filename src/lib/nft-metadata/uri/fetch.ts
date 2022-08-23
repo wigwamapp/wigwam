@@ -2,10 +2,10 @@ import axios, { AxiosRequestConfig } from "axios";
 import retry from "async-retry";
 
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
+import { sanitizeUrl } from "../utils";
 
 import { getIPFSUrl, isIPFS } from "./ipfs";
 import { getARWeaveURI, isArweave } from "./arweave";
-import { sanitizeCustomUrl } from "./custom";
 
 export function isValidHttpUrl(uri: string) {
   try {
@@ -71,7 +71,7 @@ export async function fetchWithRetriesAndTimeout(
   try {
     const response = await retry(
       () =>
-        axios(sanitizeCustomUrl(resource), {
+        axios(sanitizeUrl(resource), {
           timeout: options.timeout,
           method: method,
         }),

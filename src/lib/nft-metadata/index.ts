@@ -9,7 +9,7 @@ import {
   IPFS_IO_GATEWAY,
   SVG_IMAGE_MIME_TYPE,
 } from "./defaults";
-import { convertToDesiredGateway, serealizeTokenId1155 } from "./utils";
+import { sanitizeUrl, serealizeTokenId1155 } from "./utils";
 import {
   fetchMimeType,
   fetchURI,
@@ -18,8 +18,6 @@ import {
   getStaticURI,
   getURIData,
   createDataURI,
-  sanitizeCustomUrl,
-  isIPFS,
 } from "./uri";
 import { fetchOnChainData, normaliseURIData } from "./metadata";
 
@@ -166,13 +164,8 @@ export class NFTMetadataAgent {
       }),
     });
 
-    const sanitizeUrl = (url: string) =>
-      isIPFS(url)
-        ? convertToDesiredGateway(url, ipfsGateway)
-        : sanitizeCustomUrl(url);
-
     if (meta.image) {
-      meta.imageURL = sanitizeUrl(meta.image);
+      meta.imageURL = sanitizeUrl(meta.image, ipfsGateway);
     }
 
     if (meta.image_data) {
@@ -181,7 +174,7 @@ export class NFTMetadataAgent {
     }
 
     if (meta.animation_url) {
-      meta.contentURL = sanitizeUrl(meta.animation_url);
+      meta.contentURL = sanitizeUrl(meta.animation_url, ipfsGateway);
     }
 
     if (!meta.contentURL && meta.imageURL) {
