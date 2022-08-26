@@ -38,13 +38,9 @@ export async function getRpcUrl(chainId: number) {
   if (!rpcUrlsCache.has(chainId)) {
     rpcUrlsCache.set(chainId, url);
 
-    const unsub = storage.subscribe(savedKey, ({ newValue }) => {
-      if (newValue) {
-        rpcUrlsCache.set(chainId, newValue);
-      } else {
-        rpcUrlsCache.delete(chainId);
-        unsub();
-      }
+    const unsub = storage.subscribe(savedKey, () => {
+      rpcUrlsCache.delete(chainId);
+      unsub();
     });
   }
 
