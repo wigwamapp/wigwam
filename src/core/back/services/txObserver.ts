@@ -93,8 +93,10 @@ export async function startTxObserver() {
               NATIVE_TOKEN_SLUG
             );
 
-            if (result.to && accountAddresses.includes(result.to)) {
-              addFindTokenRequest(tx.chainId, result.to, NATIVE_TOKEN_SLUG);
+            const destination = result.to && ethers.utils.getAddress(result.to);
+
+            if (destination && accountAddresses.includes(destination)) {
+              addFindTokenRequest(tx.chainId, destination, NATIVE_TOKEN_SLUG);
             }
           }
 
