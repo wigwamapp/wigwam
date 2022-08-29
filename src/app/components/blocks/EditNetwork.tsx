@@ -561,7 +561,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                 <NetworkButton
                   key={item}
                   network={item}
-                  isSelected={item === rpcList[0]}
+                  isSelected={item === rest.value}
                   isActive={activeSuggestion === index}
                   isAfterArrowClick={isAfterArrowClick}
                   onPointerDown={(evt) => {
@@ -610,10 +610,10 @@ const NetworkButton = forwardRef<HTMLButtonElement, NetworkButtonProps>(
         type="button"
         key={network}
         className={classNames(
-          "w-full mb-1 last:mb-0",
+          "w-full",
           "flex items-center",
           "px-3",
-          isSelected ? "py-1.5" : "py-2",
+          isSelected ? "py-2" : "py-2.5",
           "rounded-[.625rem]",
           "cursor-pointer",
           "text-sm",
