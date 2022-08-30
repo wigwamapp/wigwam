@@ -309,7 +309,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
         ref={mergeRefs([ref, elementRef])}
         type="button"
         className={classNames(
-          "w-full mb-1 last:mb-0",
+          "w-full",
           "px-3 py-2",
           "rounded-[.625rem]",
           "cursor-pointer",
