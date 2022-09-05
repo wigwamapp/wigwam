@@ -69,6 +69,14 @@ export class UniversalInpageProvider extends Emitter {
     this.#proxyEvents();
 
     this.addProviders(...existingProviders);
+
+    // Fixes incorrect instance usage by some dApps >_<
+    this.request = this.request.bind(this);
+    this.isConnected = this.isConnected.bind(this);
+    this.sendAsync = this.sendAsync.bind(this);
+    this.enable = this.enable.bind(this);
+    this.send = this.send.bind(this);
+    this.sendSync = this.sendSync.bind(this);
   }
 
   addProviders(...newProviders: InpageProvider[]) {
