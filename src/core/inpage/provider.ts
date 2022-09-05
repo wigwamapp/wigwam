@@ -84,7 +84,6 @@ export class InpageProvider extends Emitter {
           evt.params as any;
 
         this.sharedPropertyEnabled = sharedPropertyEnabled;
-        this.isMetaMask = sharedPropertyEnabled;
 
         this.#handleNetworkChange(chainId);
         this.#handleAccountChange(accountAddress || null);
