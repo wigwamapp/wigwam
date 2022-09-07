@@ -120,5 +120,5 @@ export async function recoverPersonalSign(
 
   const ecRecoverAddr = recoverPersonalSignature({ data, signature });
 
-  rpcReply({ result: ecRecoverAddr });
+  rpcReply({ result: getAddress(ecRecoverAddr) });
 }
