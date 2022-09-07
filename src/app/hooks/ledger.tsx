@@ -54,25 +54,27 @@ export function useLedger() {
                 })
               );
 
-              const { name: currentApp } = await getAppInfo(
-                transportRef.current
-              );
-              if (closed) return false;
+              if (process.env.TARGET_BROWSER === "chrome") {
+                const { name: currentApp } = await getAppInfo(
+                  transportRef.current
+                );
+                if (closed) return false;
 
-              if (currentApp !== "Ethereum") {
-                if (currentApp !== "BOLOS") {
-                  await disconnectFromConnectedApp(transportRef.current);
+                if (currentApp !== "Ethereum") {
+                  if (currentApp !== "BOLOS") {
+                    await disconnectFromConnectedApp(transportRef.current);
+                    transportRef.current = await LedgerTransport.create();
+                    await timeout(500);
+                    if (closed) return false;
+                  }
+
+                  setState("connectApp");
+                  await connectToEthereumApp(transportRef.current);
                   transportRef.current = await LedgerTransport.create();
                   await timeout(500);
                   if (closed) return false;
+                  setState("loading");
                 }
-
-                setState("connectApp");
-                await connectToEthereumApp(transportRef.current);
-                transportRef.current = await LedgerTransport.create();
-                await timeout(500);
-                if (closed) return false;
-                setState("loading");
               }
 
               return true;
@@ -112,7 +114,9 @@ export function useLedger() {
             <span className="mt-8">
               {state === "connectApp"
                 ? "Open the Ethereum app on yur device."
-                : "Connect and unlock your device."}
+                : process.env.TARGET_BROWSER === "chrome"
+                ? "Connect and unlock your device."
+                : "Connect, unlock your device, and open the Ethereum app."}
             </span>
           </>
         ),
