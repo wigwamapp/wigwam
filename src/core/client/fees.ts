@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { suggestFees as suggestFeesPrimitive } from "@rainbow-me/fee-suggestions";
 
-import { FeeSuggestions, FeesByModeModern } from "core/types";
+import { FeeSuggestions, FeesByModeModern, TPGasPrices } from "core/types";
 
 import { ClientProvider } from "./provider";
 import { getThirdPartyGasPrices } from "./wallet";
@@ -55,17 +55,9 @@ export async function suggestFees(
   }
 
   const tpGasPrices = await getThirdPartyGasPrices(provider.chainId);
+  const tpFeeSuggestions = etherifyTPGasPrices(tpGasPrices);
 
-  if (tpGasPrices) {
-    const [low, average, high] = tpGasPrices.map((p) => ({
-      max: ethers.BigNumber.from(p),
-    }));
-
-    return {
-      type: "legacy",
-      modes: { low, average, high },
-    };
-  }
+  if (tpFeeSuggestions) return tpFeeSuggestions;
 
   const chainGasPrice = await provider.getGasPrice();
   const step = 10 ** (chainGasPrice.lt(10 ** 9) ? 7 : 8);
@@ -78,4 +70,23 @@ export async function suggestFees(
       high: { max: chainGasPrice.add(step) },
     },
   };
+}
+
+function etherifyTPGasPrices(tpGasPrices: TPGasPrices): FeeSuggestions | null {
+  if (!tpGasPrices) return null;
+
+  return {
+    type: tpGasPrices.type,
+    modes: Object.fromEntries(
+      Object.entries(tpGasPrices.modes).map(([mode, fees]) => [
+        mode,
+        Object.fromEntries(
+          Object.entries(fees).map(([prop, price]) => [
+            prop,
+            ethers.BigNumber.from(price),
+          ])
+        ),
+      ])
+    ),
+  } as any;
 }

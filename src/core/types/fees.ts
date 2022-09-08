@@ -22,3 +22,14 @@ export type FeeSuggestionsLegacy = {
 };
 
 export type FeeSuggestions = FeeSuggestionsModern | FeeSuggestionsLegacy;
+
+export type TPGasPrices =
+  | {
+      type: "modern";
+      modes: Record<FeeMode, { max: string; priority: string }>;
+    }
+  | {
+      type: "legacy";
+      modes: Record<FeeMode, { max: string }>;
+    }
+  | null;

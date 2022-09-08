@@ -4,6 +4,7 @@ import { RpcResponse } from "./rpc";
 import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
+import { TPGasPrices } from "./fees";
 
 export type Request =
   | GetWalletStateRequest
@@ -256,7 +257,7 @@ export interface GetTPGasPricesRequest extends MessageBase {
 
 export interface GetTPGasPricesResponse extends MessageBase {
   type: MessageType.GetTPGasPrices;
-  gasPrices: readonly [string, string, string] | null;
+  gasPrices: TPGasPrices;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {
