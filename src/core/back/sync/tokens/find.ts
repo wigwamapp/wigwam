@@ -10,7 +10,7 @@ import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
-import { getDebankChain, debankApi } from "../debank";
+import { getDebankChain, debankOpenApi } from "../debank";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
 
@@ -122,7 +122,7 @@ async function performTokenSync(
 
     if (debankChain) {
       const [{ data: dbToken }, balance] = await Promise.all([
-        debankApi
+        debankOpenApi
           .get("/token", {
             params: {
               chain_id: debankChain.id,

@@ -1,8 +1,13 @@
 import axios from "axios";
 import memoize from "mem";
 
-export const debankApi = axios.create({
+export const debankOpenApi = axios.create({
   baseURL: "https://openapi.debank.com/v1",
+  timeout: 60_000,
+});
+
+export const debankApi = axios.create({
+  baseURL: "https://api.debank.com",
   timeout: 60_000,
 });
 
@@ -18,7 +23,7 @@ export const getDebankChain = memoize(async (chainId: number) => {
 
 export const getDebankChainList = memoize(
   async () => {
-    const { data } = await debankApi.get("/chain/list");
+    const { data } = await debankOpenApi.get("/chain/list");
     return data;
   },
   {
@@ -32,7 +37,7 @@ export const getDebankUserChainBalance = memoize(
       const debankChain = await getDebankChain(chainId);
       if (!debankChain) return null;
 
-      const { data } = await debankApi.get("/user/chain_balance", {
+      const { data } = await debankOpenApi.get("/user/chain_balance", {
         params: {
           chain_id: debankChain.id,
           id: accountAddress,

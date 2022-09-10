@@ -21,7 +21,7 @@ import {
 import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
-import { getDebankChain } from "../debank";
+import { debankApi, getDebankChain } from "../debank";
 import { synced, syncStarted } from "core/back/state";
 
 const GET_LOGS_ENABLED = true;
@@ -120,9 +120,8 @@ async function performTokenActivitiesSync(
         let startTime: number | undefined;
 
         for (let i = 0; i < maxRequests; i++) {
-          const { data } = await axios
-            .get("https://api.debank.com/history/list", {
-              timeout: 60_000,
+          const { data } = await debankApi
+            .get("/history/list", {
               params: {
                 user_addr: accountAddress,
                 chain: debankChain.id,

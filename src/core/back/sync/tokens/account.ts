@@ -22,7 +22,7 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-import { getDebankChain, debankApi } from "../debank";
+import { getDebankChain, debankApi, debankOpenApi } from "../debank";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
@@ -48,18 +48,16 @@ export const syncAccountTokens = memoize(
         existingAccTokens.map((t) => [t.tokenSlug, t])
       );
 
-      const { data: debankUserTokens } = await debankApi
-        .get(
-          `/user/${tokenType === TokenType.Asset ? "token_list" : "nft_list"}`,
-          {
+      const { data: debankUserTokens } = await (tokenType === TokenType.Asset
+        ? debankOpenApi.get("/user/token_list", {
             params: {
               id: accountAddress,
               chain_id: debankChain.id,
               is_all: false,
             },
-          }
-        )
-        .catch(() => ({ data: null }));
+          })
+        : getDebankUserNfts(debankChain.id, accountAddress)
+      ).catch(() => ({ data: null }));
 
       if (debankUserTokens) {
         for (const token of debankUserTokens) {
@@ -326,6 +324,32 @@ export const syncAccountTokens = memoize(
   },
   {
     cacheKey: (args) => args.join("_"),
+    maxAge: 40_000, // 40 sec
+  }
+);
+
+const getDebankUserNfts = async (
+  debankChainId: string,
+  accountAddress: string
+) => {
+  const res = await getDebankUserAllNfts(accountAddress).catch(() => null);
+
+  const data = res?.data?.data.token_list.filter(
+    (t: any) => t.chain === debankChainId
+  );
+
+  return { data };
+};
+
+const getDebankUserAllNfts = memoize(
+  (accountAddress: string) =>
+    debankApi.get("/nft/list", {
+      params: {
+        user_addr: accountAddress,
+        is_collection: 1,
+      },
+    }),
+  {
     maxAge: 40_000, // 40 sec
   }
 );
