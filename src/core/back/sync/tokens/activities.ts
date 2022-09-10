@@ -21,7 +21,7 @@ import {
 import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
-import { debankApi, getDebankChain } from "../debank";
+import { getDebankChain } from "../debank";
 import { synced, syncStarted } from "core/back/state";
 
 const GET_LOGS_ENABLED = true;
@@ -112,133 +112,140 @@ async function performTokenActivitiesSync(
     })();
 
     if (debankTokenId) {
-      const latestItem = await getLatestItem();
+      try {
+        const latestItem = await getLatestItem();
 
-      const pageCount = 20;
-      const maxRequests = latestItem ? 10 : 5;
-      let startTime: number | undefined;
+        const pageCount = 20;
+        const maxRequests = latestItem ? 10 : 5;
+        let startTime: number | undefined;
 
-      for (let i = 0; i < maxRequests; i++) {
-        const { data } = await debankApi.get("/user/history_list", {
-          params: {
-            id: accountAddress,
-            chain_id: debankChain.id,
-            token_id: debankTokenId,
-            page_count: pageCount,
-            start_time: startTime,
-          },
-        });
+        for (let i = 0; i < maxRequests; i++) {
+          const { data } = await axios
+            .get("https://api.debank.com/history/list", {
+              timeout: 60_000,
+              params: {
+                user_addr: accountAddress,
+                chain: debankChain.id,
+                token_id: debankTokenId,
+                page_count: pageCount,
+                start_time: startTime,
+              },
+            })
+            .then((res) => res.data);
 
-        const txs = data.history_list;
+          const txs = data.history_list;
 
-        if (txs.length === 0) {
-          break;
-        }
-
-        let finished = false;
-
-        for (const {
-          id: txHash,
-          sends,
-          receives,
-          token_approve,
-          time_at,
-          project_id,
-        } of txs) {
-          const timeAt = time_at * 1_000;
-
-          if (latestItem && latestItem.timeAt >= timeAt) {
-            finished = true;
+          if (txs.length === 0) {
             break;
           }
 
-          const base: Omit<TokenActivityBase, "type"> = {
-            chainId,
-            accountAddress,
-            tokenSlug,
-            txHash,
-            pending: 0,
-            timeAt,
-          };
+          let finished = false;
 
-          if (project_id) {
-            const project = data.project_dict[project_id];
-            if (project) {
-              base.project = {
-                name: project.name,
-                logoUrl: project.logo_url,
-                siteUrl: project.site_url,
-              };
+          for (const {
+            id: txHash,
+            sends,
+            receives,
+            token_approve,
+            time_at,
+            project_id,
+          } of txs) {
+            const timeAt = time_at * 1_000;
+
+            if (latestItem && latestItem.timeAt >= timeAt) {
+              finished = true;
+              break;
             }
-          }
 
-          let sendOrReceiveAdded = false;
+            const base: Omit<TokenActivityBase, "type"> = {
+              chainId,
+              accountAddress,
+              tokenSlug,
+              txHash,
+              pending: 0,
+              timeAt,
+            };
 
-          for (const send of sends) {
-            if (send.token_id === debankTokenId) {
-              sendOrReceiveAdded = true;
+            if (project_id) {
+              const project = data.project_dict[project_id];
+              if (project) {
+                base.project = {
+                  name: project.name,
+                  logoUrl: project.logo_url,
+                  siteUrl: project.site_url,
+                };
+              }
+            }
+
+            let sendOrReceiveAdded = false;
+
+            for (const send of sends) {
+              if (send.token_id === debankTokenId) {
+                sendOrReceiveAdded = true;
+                addToActivities({
+                  ...base,
+                  type: "transfer",
+                  anotherAddress: ethers.utils.getAddress(send.to_addr),
+                  amount: new BigNumber(send.amount)
+                    .times(decimalsFactor)
+                    .integerValue()
+                    .times(-1)
+                    .toString(),
+                });
+              }
+            }
+
+            for (const receive of receives) {
+              if (receive.token_id === debankTokenId) {
+                sendOrReceiveAdded = true;
+                addToActivities({
+                  ...base,
+                  type: "transfer",
+                  anotherAddress: ethers.utils.getAddress(receive.from_addr),
+                  amount: new BigNumber(receive.amount)
+                    .times(decimalsFactor)
+                    .integerValue()
+                    .toString(),
+                });
+              }
+            }
+
+            if (
+              !sendOrReceiveAdded &&
+              token_approve &&
+              token_approve.token_id === debankTokenId
+            ) {
+              const amount = new BigNumber(token_approve.value)
+                .times(decimalsFactor)
+                .integerValue();
+
               addToActivities({
                 ...base,
-                type: "transfer",
-                anotherAddress: ethers.utils.getAddress(send.to_addr),
-                amount: new BigNumber(send.amount)
-                  .times(decimalsFactor)
-                  .integerValue()
-                  .times(-1)
-                  .toString(),
+                type: "approve",
+                anotherAddress: ethers.utils.getAddress(token_approve.spender),
+                amount: amount.toString(),
+                clears: amount.isZero(),
               });
             }
           }
 
-          for (const receive of receives) {
-            if (receive.token_id === debankTokenId) {
-              sendOrReceiveAdded = true;
-              addToActivities({
-                ...base,
-                type: "transfer",
-                anotherAddress: ethers.utils.getAddress(receive.from_addr),
-                amount: new BigNumber(receive.amount)
-                  .times(decimalsFactor)
-                  .integerValue()
-                  .toString(),
-              });
-            }
-          }
-
-          if (
-            !sendOrReceiveAdded &&
-            token_approve &&
-            token_approve.token_id === debankTokenId
-          ) {
-            const amount = new BigNumber(token_approve.value)
-              .times(decimalsFactor)
-              .integerValue();
-
-            addToActivities({
-              ...base,
-              type: "approve",
-              anotherAddress: ethers.utils.getAddress(token_approve.spender),
-              amount: amount.toString(),
-              clears: amount.isZero(),
-            });
+          if (finished) {
+            break;
+          } else {
+            startTime = txs[txs.length - 1].time_at;
           }
         }
 
-        if (finished) {
-          break;
-        } else {
-          startTime = txs[txs.length - 1].time_at;
+        if (tokenActivities.size > 0) {
+          await repo.tokenActivities.bulkPut(
+            Array.from(tokenActivities.values()),
+            Array.from(tokenActivities.keys())
+          );
         }
-      }
 
-      if (tokenActivities.size > 0) {
-        await repo.tokenActivities.bulkPut(
-          Array.from(tokenActivities.values()),
-          Array.from(tokenActivities.keys())
-        );
+        return;
+      } catch (err) {
+        console.error(err);
       }
-
-      return;
     }
   }
 
