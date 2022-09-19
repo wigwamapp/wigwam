@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { TPGasPrices } from "core/types";
 
-import { getDebankChain, debankOpenApi } from "../debank";
+import { getDebankChain, debankApi } from "../debank";
 
 export async function getDebankGasPrices(
   chainId: number
@@ -10,14 +10,18 @@ export async function getDebankGasPrices(
   const debankChain = await getDebankChain(chainId);
   if (!debankChain) return null;
 
-  const res = await debankOpenApi
-    .get<any[]>("/wallet/gas_market", {
-      params: { chain_id: debankChain.id },
+  const res = await debankApi
+    .get("/chain/gas_price_dict_v2", {
+      params: { chain: debankChain.id },
     })
     .catch(() => null);
-  if (!res?.data) return null;
 
-  const [low, average, high] = res.data.map((v) => ({
+  const data = res?.data?.data;
+  if (!data) return null;
+
+  const { slow, normal, fast } = data;
+
+  const [low, average, high] = [slow, normal, fast].map((v) => ({
     max: new BigNumber(v.price).toString(),
   }));
 

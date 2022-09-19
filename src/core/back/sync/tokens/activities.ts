@@ -120,7 +120,7 @@ async function performTokenActivitiesSync(
         let startTime: number | undefined;
 
         for (let i = 0; i < maxRequests; i++) {
-          const { data } = await debankApi
+          const { data }: any = await debankApi
             .get("/history/list", {
               params: {
                 user_addr: accountAddress,

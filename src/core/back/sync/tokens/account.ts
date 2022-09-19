@@ -22,7 +22,11 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-import { getDebankChain, debankApi, debankOpenApi } from "../debank";
+import {
+  getDebankChain,
+  getDebankUserTokens,
+  getDebankUserNfts,
+} from "../debank";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
@@ -48,16 +52,10 @@ export const syncAccountTokens = memoize(
         existingAccTokens.map((t) => [t.tokenSlug, t])
       );
 
-      const { data: debankUserTokens } = await (tokenType === TokenType.Asset
-        ? debankOpenApi.get("/user/token_list", {
-            params: {
-              id: accountAddress,
-              chain_id: debankChain.id,
-              is_all: false,
-            },
-          })
+      const debankUserTokens = await (tokenType === TokenType.Asset
+        ? getDebankUserTokens(debankChain.id, accountAddress)
         : getDebankUserNfts(debankChain.id, accountAddress)
-      ).catch(() => ({ data: null }));
+      ).catch(() => null);
 
       if (debankUserTokens) {
         for (const token of debankUserTokens) {
@@ -77,7 +75,7 @@ export const syncAccountTokens = memoize(
               id: "0",
             });
             const rawBalanceBN = ethers.BigNumber.from(
-              token.raw_amount_hex_str
+              new BigNumber(token.balance).integerValue().toString()
             );
 
             const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
@@ -324,32 +322,6 @@ export const syncAccountTokens = memoize(
   },
   {
     cacheKey: (args) => args.join("_"),
-    maxAge: 40_000, // 40 sec
-  }
-);
-
-const getDebankUserNfts = async (
-  debankChainId: string,
-  accountAddress: string
-) => {
-  const res = await getDebankUserAllNfts(accountAddress).catch(() => null);
-
-  const data = res?.data?.data.token_list.filter(
-    (t: any) => t.chain === debankChainId
-  );
-
-  return { data };
-};
-
-const getDebankUserAllNfts = memoize(
-  (accountAddress: string) =>
-    debankApi.get("/nft/list", {
-      params: {
-        user_addr: accountAddress,
-        is_collection: 1,
-      },
-    }),
-  {
     maxAge: 40_000, // 40 sec
   }
 );
