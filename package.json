@@ -33,7 +33,6 @@
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/providers": "5.7.1",
     "@ethersproject/wordlists": "5.7.0",
-    "@heroicons/react": "1.0.6",
     "@ledgerhq/hw-app-eth": "6.29.9",
     "@ledgerhq/hw-transport": "6.27.6",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
