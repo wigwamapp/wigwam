@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@0xsequence/multicall": "0.41.3",
-    "@amplitude/analytics-core": "0.6.6",
-    "@amplitude/analytics-types": "0.6.2",
+    "@amplitude/analytics-core": "0.9.4",
+    "@amplitude/analytics-types": "0.10.3",
     "@amplitude/ua-parser-js": "0.7.31",
     "@dicebear/avatars": "4.10.5",
     "@dicebear/avatars-avataaars-sprites": "4.10.5",

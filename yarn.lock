@@ -42,18 +42,18 @@
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.0.1.tgz#b38b444ad3aa5fedbb15f2f746dcd934226a12dd"
   integrity sha512-+u76oB43nOHrF4DDWRLWDCtci7f3QJoEBigemIdIeTi1ODqjx6Tad9NCVnPRwewWlKkVab5PlK8DCtPTyX7S8g==
 
-"@amplitude/analytics-core@0.6.6":
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/@amplitude/analytics-core/-/analytics-core-0.6.6.tgz#12bb7a1ed9a9dbd0c14e0b5dfa2d3dcf1c71ab81"
-  integrity sha512-xj1SpK9koaHgqJnrNx8gyfDoFEpMyo/KmgMdx4GBC9ifQh0jntjTbYUTxQYmV9ORuR3znAIR1a4fcnbBaMyGkg==
+"@amplitude/analytics-core@0.9.4":
+  version "0.9.4"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-core/-/analytics-core-0.9.4.tgz#b7f8e0a558291d8347cd7fbe5b19660b1421ceed"
+  integrity sha512-DUtWTIm6b7LMCC5Cde6hSjrye0MV7oz9rNmU5JrwaVepLIfjhVFm8vPdrIlIxkzVhrnvMn/dP7CTCz9EFJozmA==
   dependencies:
-    "@amplitude/analytics-types" "^0.6.2"
+    "@amplitude/analytics-types" "^0.10.3"
     tslib "^2.3.1"
 
-"@amplitude/analytics-types@0.6.2", "@amplitude/analytics-types@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@amplitude/analytics-types/-/analytics-types-0.6.2.tgz#6fd97af97414fa2c6861c30aac3e24ce22152890"
-  integrity sha512-9tCIY5kF6e3nPLUZC7h3rTANK6uZJvMFmF8R59TrkTbmmsT2bpYS869LMEaZBp4AybxAi15oNkAJ4JE+CkPkFg==
+"@amplitude/analytics-types@0.10.3", "@amplitude/analytics-types@^0.10.3":
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/@amplitude/analytics-types/-/analytics-types-0.10.3.tgz#608094a2a9e93d74952200486f9c7fed25cbf851"
+  integrity sha512-ZzMcLk4vM0ZLKfX8Vo1GqTKnyva3lH6EJzZ2pEjoAvoZKvkOM9TUpcn35qRiLyVTsMgiBi7G4SR+1T57gaQP9w==
 
 "@amplitude/ua-parser-js@0.7.31":
   version "0.7.31"
