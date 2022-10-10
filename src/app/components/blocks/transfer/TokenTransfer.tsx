@@ -434,6 +434,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
             } catch (err) {
               console.warn(err);
 
+              setGas(undefined);
               setEstimationError(
                 "Estimation failed. Transaction may fail or there network issues"
               );
