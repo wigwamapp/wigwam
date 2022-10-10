@@ -26,36 +26,19 @@ export const OPTIMISM: Network[] = [
 
   // Testnets
   {
-    chainId: 69,
+    chainId: 420,
     type: "testnet",
-    rpcUrls: ["https://kovan.optimism.io"],
+    rpcUrls: ["https://goerli.optimism.io"],
     chainTag: "optimism",
-    name: "Kovan Optimism Testnet",
+    name: "Optimism Testnet Goerli",
     nativeCurrency: {
-      symbol: "KOR",
-      name: "Kovan Ether",
+      symbol: "GOR",
+      name: "Goerli Ether",
       decimals: 18,
     },
-    explorerUrls: ["https://kovan-optimistic.etherscan.io"],
-    explorerApiUrl: "https://api-kovan-optimistic.etherscan.io/api",
-    faucetUrls: [
-      "https://kovan.optifaucet.com",
-      "http://fauceth.komputing.org?chain=69",
-    ],
+    explorerUrls: ["https://goerli-optimism.etherscan.io/"],
+    explorerApiUrl: "https://api-goerli-optimism.etherscan.io/api",
+    faucetUrls: [],
     infoUrl: "https://optimism.io",
   },
-  // {
-  //   chainId: 420,
-  //   type: "testnet",
-  //   rpcUrls: ["https://goerli.optimism.io"],
-  //   chainTag: "optimism",
-  //   name: "Optimism Testnet Goerli",
-  //   nativeCurrency: {
-  //     symbol: "GOR",
-  //     name: "Goerli Ether",
-  //     decimals: 18,
-  //   },
-  //   faucetUrls: [],
-  //   infoUrl: "https://optimism.io",
-  // },
 ];

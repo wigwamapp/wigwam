@@ -90,9 +90,19 @@ class RpcProvider extends JsonRpcProvider {
     super(url, network);
 
     // To use cache first provider._getBlock(), but without formatting
-    this.formatter.block = (b) => b;
-    this.formatter.blockWithTransactions = (b) => b;
+    this.formatter.block = formatBlockData;
+    this.formatter.blockWithTransactions = formatBlockData;
   }
+}
+
+function formatBlockData(data: any) {
+  // Fix using getBlock() function with Celo,
+  // invalid RPC response from Celo by design
+  // @see https://github.com/ethers-io/ethers.js/issues/1735
+  return {
+    ...data,
+    gasLimit: data.gasLimit ?? "0x0",
+  };
 }
 
 function numToHex(value: number): string {
