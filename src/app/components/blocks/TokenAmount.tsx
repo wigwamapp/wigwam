@@ -138,7 +138,7 @@ const TokenAmount = memo<TokenAmountProps>(
               >
                 <XSymbolIcon className="w-2 min-w-[.5rem] h-auto mr-0.5" />
                 <PrettyAmount
-                  amount={135}
+                  amount={amount}
                   isMinified
                   isThousandsMinified={false}
                   decimals={0}
