@@ -61,6 +61,7 @@ const SecondaryItem: FC<
     <Link
       key={title}
       to={route}
+      onClick={(e) => isActive && e.preventDefault()}
       className={classNames(
         "relative group",
         "flex flex-col",

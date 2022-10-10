@@ -132,9 +132,9 @@ async function performTokenActivitiesSync(
             })
             .then((res) => res.data);
 
-          const txs = data.history_list;
+          const txs = data?.history_list;
 
-          if (txs.length === 0) {
+          if (!Array.isArray(txs) || txs.length === 0) {
             break;
           }
 

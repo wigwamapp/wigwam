@@ -207,7 +207,7 @@ async function handlePageRequest(
 }
 
 async function resolveConnectionApproval(perm?: Permission) {
-  if (!(isUnlocked() && perm)) return;
+  if (!(isUnlocked() && perm && perm.accountAddresses.length > 0)) return;
 
   try {
     for (const approval of $approvals.getState()) {

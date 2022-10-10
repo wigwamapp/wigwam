@@ -21,6 +21,6 @@ export const getTPGasPrices = memoize(
     return null;
   },
   {
-    maxAge: 30_000,
+    maxAge: 20_000,
   }
 );

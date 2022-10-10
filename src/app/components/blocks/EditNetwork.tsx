@@ -199,7 +199,7 @@ const EditNetwork = memo<EditNetworkProps>(
       }
     }, [confirm, initialChainId, network?.name, onActionFinished, updateToast]);
 
-    const isNative = network && network.type !== "unknown";
+    const isNative = network && DEFAULT_CHAIN_IDS.has(network.chainId);
 
     return (
       <section className={classNames("flex flex-col grow")}>

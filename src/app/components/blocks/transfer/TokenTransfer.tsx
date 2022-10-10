@@ -29,6 +29,7 @@ import {
   TokenType,
 } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
+import { requestBalance } from "core/common/balance";
 import { suggestFees, TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
@@ -156,9 +157,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 value: ethers.utils.parseEther(amount),
               });
             } else {
-              if ("decimals" in token && token.decimals > 0) {
-                amount = ethers.utils.parseUnits(amount, token.decimals);
-              }
+              const rawAmount =
+                "decimals" in token && token.decimals > 0
+                  ? ethers.utils.parseUnits(amount, token.decimals)
+                  : amount;
 
               const { standard, address, id } = parseTokenSlug(token.tokenSlug);
 
@@ -169,7 +171,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                     txParams = await contract.populateTransaction.transfer(
                       recipient,
-                      amount
+                      rawAmount
                     );
                   }
                   break;
@@ -198,7 +200,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         currentAccount.address,
                         recipient,
                         id,
-                        amount,
+                        rawAmount,
                         new Uint8Array()
                       );
                   }
@@ -225,7 +227,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
             const tokenPreview =
               token.tokenType === TokenType.Asset ? (
-                <PrettyAmount amount={amount} currency={token.symbol} />
+                <PrettyAmount
+                  amount={amount?.toString()}
+                  currency={token.symbol}
+                />
               ) : (
                 token.name
               );
@@ -309,15 +314,19 @@ const TransferTokenContent = memo<TransferTokenContent>(
     const [gas, setGas] = useSafeState<{
       max: ethers.BigNumber;
       average: ethers.BigNumber;
+      rawBalance: ethers.BigNumber | null;
     }>();
     const [estimationError, setEstimationError] = useSafeState<string | null>(
       null
     );
 
     const maxAmount = useMemo(() => {
-      if (!token?.rawBalance) return "0";
+      if (!token) return "0";
 
-      let value = new BigNumber(token.rawBalance);
+      const rawBalance = gas?.rawBalance?.toString() ?? token.rawBalance;
+      if (!rawBalance) return "0";
+
+      let value = new BigNumber(rawBalance);
 
       if (token.tokenSlug === NATIVE_TOKEN_SLUG) {
         value = value.minus(new BigNumber(gas ? gas.max.toString() : 0));
@@ -408,10 +417,16 @@ const TransferTokenContent = memo<TransferTokenContent>(
               if (fees) {
                 const gasPrice = fees.modes.high.max;
                 const maxGasLimit = gasLimit.mul(3).div(2);
+                const rawBalance = await requestBalance(
+                  provider,
+                  tokenSlug,
+                  currentAccount.address
+                );
 
                 setGas({
                   average: gasLimit.mul(gasPrice),
                   max: maxGasLimit.mul(gasPrice),
+                  rawBalance,
                 });
               }
 
@@ -419,6 +434,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
             } catch (err) {
               console.warn(err);
 
+              setGas(undefined);
               setEstimationError(
                 "Estimation failed. Transaction may fail or there network issues"
               );

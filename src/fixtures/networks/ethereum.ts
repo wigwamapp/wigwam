@@ -32,67 +32,6 @@ export const ETHEREUM: Network[] = [
 
   // Testnets
   {
-    chainId: 42,
-    type: "testnet",
-    rpcUrls: [
-      "https://kovan.poa.network",
-      "https://kovan.infura.io/v3/${INFURA_API_KEY}",
-    ],
-    chainTag: "ethereum",
-    name: "Kovan Ethereum Testnet",
-    nativeCurrency: {
-      symbol: "KOV",
-      name: "Kovan Ether",
-      decimals: 18,
-    },
-    explorerUrls: ["https://kovan.etherscan.io"],
-    explorerApiUrl: "https://api-kovan.etherscan.io/api",
-    faucetUrls: [
-      "https://faucet.kovan.network",
-      "http://fauceth.komputing.org?chain=42",
-      "https://gitter.im/kovan-testnet/faucet",
-    ],
-    infoUrl: "https://kovan-testnet.github.io/website",
-  },
-  {
-    chainId: 3,
-    type: "testnet",
-    rpcUrls: ["https://ropsten.infura.io/v3/${INFURA_API_KEY}"],
-    chainTag: "ethereum",
-    name: "Ropsten Ethereum Testnet",
-    nativeCurrency: {
-      symbol: "ROP",
-      name: "Ropsten Ether",
-      decimals: 18,
-    },
-    ensRegistry: "0x112234455c3a32fd11230c42e7bccd4a84e02010",
-    explorerUrls: ["https://ropsten.etherscan.io"],
-    explorerApiUrl: "https://api-ropsten.etherscan.io/api",
-    faucetUrls: ["http://fauceth.komputing.org?chain=3"],
-    infoUrl: "https://github.com/ethereum/ropsten",
-  },
-  {
-    chainId: 4,
-    type: "testnet",
-    rpcUrls: ["https://rinkeby.infura.io/v3/${INFURA_API_KEY}"],
-    chainTag: "ethereum",
-    name: "Rinkeby Ethereum Testnet",
-    nativeCurrency: {
-      symbol: "RIN",
-      name: "Rinkeby Ether",
-      decimals: 18,
-    },
-    ensRegistry: "0xe7410170f87102df0055eb195163a03b7f2bff4a",
-    explorerUrls: ["https://rinkeby.etherscan.io"],
-    explorerApiUrl: "https://api-rinkeby.etherscan.io/api",
-    faucetUrls: [
-      "https://rinkebyfaucet.com",
-      "https://faucet.rinkeby.io",
-      "http://fauceth.komputing.org?chain=4",
-    ],
-    infoUrl: "https://www.rinkeby.io",
-  },
-  {
     chainId: 5,
     type: "testnet",
     rpcUrls: [
@@ -116,5 +55,27 @@ export const ETHEREUM: Network[] = [
       "http://fauceth.komputing.org?chain=5",
     ],
     infoUrl: "https://goerli.net/#about",
+  },
+  {
+    chainId: 11155111,
+    type: "testnet",
+    rpcUrls: [
+      "https://rpc.sepolia.org",
+      "https://sepolia.infura.io/v3/${INFURA_API_KEY}",
+    ],
+    chainTag: "ethereum",
+    name: "Sepolia Ethereum Testnet",
+    nativeCurrency: {
+      symbol: "SEP",
+      name: "Sepolia Ether",
+      decimals: 18,
+    },
+    explorerUrls: [
+      "https://sepolia.etherscan.io",
+      "https://sepolia.otterscan.io",
+    ],
+    explorerApiUrl: "https://api-sepolia.etherscan.io/api",
+    faucetUrls: ["http://fauceth.komputing.org?chain=11155111"],
+    infoUrl: "https://sepolia.otterscan.io",
   },
 ];
