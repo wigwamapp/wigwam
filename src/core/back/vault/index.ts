@@ -90,6 +90,9 @@ export class Vault {
     seedPhrase?: SeedPharse
   ) {
     return withError(t("failedToSetupWallet"), async (getError) => {
+      // Basic args validation
+      assert(password.length > 0 && accountsParams.length > 0);
+
       // Drop if vault already exists
       if (await Vault.isExist()) {
         throw getError();

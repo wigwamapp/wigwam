@@ -99,8 +99,8 @@ export function getNativeLocale(): string | undefined {
 }
 
 export function getDefaultLocale(): string {
-  const manifest = browser.runtime.getManifest();
-  return manifest.default_locale || "en";
+  const manifest = browser.runtime.getManifest?.();
+  return manifest?.default_locale || "en";
 }
 
 export async function fetchLocaleMessages(locale: string) {

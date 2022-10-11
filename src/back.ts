@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { setupArgon2Impl } from "lib/kdbx";
+import { setupArgon2Impl } from "lib/kdbx/argon";
 import { initProfiles } from "lib/ext/profile";
 import { openIfWasRestarted } from "lib/ext/utils";
 
