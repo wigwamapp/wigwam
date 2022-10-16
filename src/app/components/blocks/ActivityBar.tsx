@@ -12,7 +12,6 @@ import {
   pendingActivityAtom,
 } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import { openInTab } from "app/helpers";
 
 import ApprovalStatus from "app/components/blocks/ApprovalStatus";
 import Tooltip from "app/components/elements/Tooltip";
@@ -42,14 +41,10 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const handleClick = useCallback(async () => {
     if (total > 0) {
       browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
-    } else if (theme === "small") {
-      openInTab({ activityOpened: true }, ["token"]);
     }
 
-    if (theme === "large") {
-      setActivityOpened([true, "replace"]);
-    }
-  }, [theme, total, setActivityOpened]);
+    setActivityOpened([true, "replace"]);
+  }, [total, setActivityOpened]);
 
   return (
     <div
