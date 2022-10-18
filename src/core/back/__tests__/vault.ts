@@ -20,7 +20,7 @@ jest.mock("lib/ext/profile", () => {
   };
 });
 
-// Mock argon2 with sha256
+// Mock argon2 with just sha256
 beforeAll(() => CryptoEngine.setArgon2Impl((p) => CryptoEngine.sha256(p)));
 
 // Clean storage after each test
@@ -286,6 +286,21 @@ describe("Vault setup", () => {
 
     const pubKey = vault.getPublicKey(acc.uuid);
     expect(fromProtectedString(pubKey)).toBe(TEST_WALLET.publicKeyCompressed);
+  });
+
+  it("create vault with open login account", () => {
+    expect(
+      Vault.setup("123qweasd", [
+        {
+          name: TEST_WALLET.name,
+          source: AccountSource.OpenLogin,
+          privateKey: toProtectedString(TEST_WALLET.privateKey),
+          social: "reddit",
+          socialName: "Test Reddit",
+          socialEmail: "test@example.com",
+        },
+      ])
+    ).resolves.not.toThrow();
   });
 
   it("create vault with open login account", () => {
