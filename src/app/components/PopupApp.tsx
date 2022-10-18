@@ -13,17 +13,12 @@ import Popup from "./screens/Popup";
 import Dialog from "./blocks/Dialog";
 import ActivityModal from "./blocks/ActivityModal";
 
-const PopupApp: FC = () => {
-  const locked = useLocked();
-
-  return (
-    <BaseProvider>
-      <PopupRouter />
-      <Dialog small />
-      {!locked && <ActivityModal />}
-    </BaseProvider>
-  );
-};
+const PopupApp: FC = () => (
+  <BaseProvider>
+    <PopupRouter />
+    <PopupModals />
+  </BaseProvider>
+);
 
 export default PopupApp;
 
@@ -34,6 +29,17 @@ const PopupRouter: FC = () => {
     .with(WalletStatus.Unlocked, () => <Popup />)
     .with(WalletStatus.Locked, () => <Unlock />)
     .otherwise(() => <OpenInTab />);
+};
+
+const PopupModals: FC = () => {
+  const locked = useLocked();
+
+  return (
+    <>
+      <Dialog small />
+      {!locked && <ActivityModal />}
+    </>
+  );
 };
 
 const OpenInTab: FC = () => {
