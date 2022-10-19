@@ -244,6 +244,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           const minGasLimit = estimatedGasLimit.mul(5).div(4);
           const averageGasLimit = estimatedGasLimit.mul(3).div(2);
 
+          setLastError((le) => (le?.from === "estimation" ? null : le));
           setPrepared({
             tx: {
               ...tx,
