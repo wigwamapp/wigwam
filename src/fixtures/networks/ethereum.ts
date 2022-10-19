@@ -35,8 +35,8 @@ export const ETHEREUM: Network[] = [
     chainId: 5,
     type: "testnet",
     rpcUrls: [
-      "https://rpc.goerli.mudit.blog",
       "https://goerli.infura.io/v3/${INFURA_API_KEY}",
+      "https://rpc.goerli.mudit.blog",
     ],
     chainTag: "ethereum",
     name: "Goerli Ethereum Testnet",
@@ -60,8 +60,8 @@ export const ETHEREUM: Network[] = [
     chainId: 11155111,
     type: "testnet",
     rpcUrls: [
-      "https://rpc.sepolia.org",
       "https://sepolia.infura.io/v3/${INFURA_API_KEY}",
+      "https://rpc.sepolia.org",
     ],
     chainTag: "ethereum",
     name: "Sepolia Ethereum Testnet",
