@@ -16,6 +16,7 @@ import { TippySingletonProvider } from "app/hooks";
 import ApprovalStatus from "app/components/blocks/ApprovalStatus";
 import Tooltip from "app/components/elements/Tooltip";
 import { ReactComponent as ActivityHoverIcon } from "app/icons/external-link.svg";
+import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/activity-successfull.svg";
 import { ReactComponent as PendingIcon } from "app/icons/activity-pending.svg";
 import { ReactComponent as FailedIcon } from "app/icons/activity-warning.svg";
@@ -119,7 +120,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
             ) : (
               <>
                 Activity
-                <ActivityHoverIcon
+                <ArrowIcon
                   className={classNames(
                     "ml-1",
                     theme === "small" && "w-[1.125rem] h-[1.125rem]"

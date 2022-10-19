@@ -207,7 +207,7 @@ const ActivityContent = memo(() => {
         !delayFinished ? "hidden" : "animate-bootfadeinfast"
       )}
     >
-      <Approve />
+      {!isPopupMode && <Approve />}
       <History />
     </div>
   );
@@ -311,7 +311,9 @@ const History = memo(() => {
       {completeActivity && completeActivity?.length > 0 && (
         <div className={isPopupMode ? "mb-6" : "mb-8"}>
           <SectionHeader className={isPopupMode ? "mb-4" : "mb-6"}>
-            Completed
+            {pendingActivity && pendingActivity?.length > 0
+              ? "Completed"
+              : "Activity"}
           </SectionHeader>
 
           {completeActivity.map((item, i) => (
