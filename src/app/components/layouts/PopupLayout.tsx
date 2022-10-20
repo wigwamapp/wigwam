@@ -6,11 +6,11 @@ import { WalletStatus } from "core/types";
 
 import { openInTab } from "app/helpers";
 import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import ActivityBar from "app/components/blocks/ActivityBar";
+import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
-import { ScrollTopButton } from "app/components/elements/ScrollTopButton";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { OverflowProvider } from "app/hooks";
 
