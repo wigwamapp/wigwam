@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   useMemo,
+  useEffect,
 } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
@@ -342,9 +343,7 @@ type NftListProps = {
 
 const NftList = memo<NftListProps>(
   ({ currentAccount, tokens, manageModeEnabled, loadMoreTriggerRef }) => {
-    const [nftTokenOpened, setNftTokenOpened] = useState<AccountNFT | null>(
-      null
-    );
+    const [nftToken, setNftToken] = useState<AccountNFT | null>(null);
 
     const handleNFTSelect = useCallback(
       async (token: AccountNFT) => {
@@ -364,11 +363,21 @@ const NftList = memo<NftListProps>(
             console.error(e);
           }
         } else {
-          setNftTokenOpened(token);
+          setNftToken(token);
         }
       },
-      [manageModeEnabled, currentAccount.address, setNftTokenOpened]
+      [manageModeEnabled, currentAccount.address, setNftToken]
     );
+
+    useEffect(() => {
+      setNftToken((current) => {
+        if (!current) return current;
+
+        const updated = tokens.find((t) => t.tokenSlug === current.tokenSlug);
+
+        return updated ?? current;
+      });
+    }, [tokens, setNftToken]);
 
     const renderNFTCard = useCallback(
       (nft: AccountNFT, i: number) => (
@@ -392,9 +401,9 @@ const NftList = memo<NftListProps>(
         <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
 
         <NFTOverviewPopup
-          open={Boolean(nftTokenOpened)}
-          token={nftTokenOpened}
-          onOpenChange={() => setNftTokenOpened(null)}
+          open={Boolean(nftToken)}
+          token={nftToken}
+          onOpenChange={() => setNftToken(null)}
         />
       </>
     );
