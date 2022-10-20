@@ -48,7 +48,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
           <ScrollAreaContainer
             ref={scrollAreaRef}
             hiddenScrollbar="horizontal"
-            className="mt-2 h-full min-h-0"
+            className="h-full min-h-0"
             viewPortClassName="viewportBlock"
             scrollBarClassName="pt-[15.375rem] pb-16 pl-0.5 pr-0.5 w-3"
           >
