@@ -20,6 +20,7 @@ import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { useSafeState } from "lib/react-hooks/useSafeState";
+import { isPopup } from "lib/ext/view";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
@@ -53,16 +54,19 @@ import {
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
-import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
+import {
+  ReactComponent as LinkIcon,
+  ReactComponent as WalletExplorerIcon,
+} from "app/icons/external-link.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
-import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ActivityConnectionIcon } from "app/icons/activity-connection.svg";
 import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signing.svg";
 import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
+import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -92,6 +96,8 @@ const ActivityModal = memo(() => {
   const isMounted = useIsMounted();
   const bootAnimationDisplayed = activityOpened && isMounted();
 
+  const isPopupMode = isPopup();
+
   return (
     <Dialog.Root open={activityOpened} onOpenChange={handleOpenChange} modal>
       <Dialog.Portal>
@@ -102,41 +108,44 @@ const ActivityModal = memo(() => {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className={classNames(
             "fixed z-20",
-            "w-full max-w-6xl min-w-[40rem]",
-            "max-h-[41rem]",
-            "m-auto inset-x-0 inset-y-[3.5rem]",
-            "rounded-[2.5rem]",
+            "w-full",
+            !isPopupMode && "max-h-[41rem] min-w-[40rem] max-w-6xl",
+            "m-auto inset-x-0",
+            isPopupMode ? "inset-y-0" : "inset-y-[3.5rem]",
+            !isPopupMode && "rounded-[2.5rem]",
             bootAnimationDisplayed && "animate-modalcontent"
           )}
         >
-          <div
-            className={classNames(
-              "flex items-center justify-center",
-              "w-[5.5rem] h-[5.5rem]",
-              "rounded-full",
-              "bg-brand-dark/20",
-              "backdrop-blur-[10px]",
-              IS_FIREFOX && "!bg-[#0D1020]",
-              "border border-brand-light/5",
-              "shadow-addaccountmodal",
-              "absolute",
-              "top-0 left-1/2",
-              "-translate-x-1/2 -translate-y-1/2",
-              "z-30"
-            )}
-          >
-            <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
-          </div>
+          {!isPopupMode && (
+            <div
+              className={classNames(
+                "flex items-center justify-center",
+                "w-[5.5rem] h-[5.5rem]",
+                "rounded-full",
+                "bg-brand-dark/20",
+                "backdrop-blur-[10px]",
+                IS_FIREFOX && "!bg-[#0D1020]",
+                "border border-brand-light/5",
+                "shadow-addaccountmodal",
+                "absolute",
+                "top-0 left-1/2",
+                "-translate-x-1/2 -translate-y-1/2",
+                "z-30"
+              )}
+            >
+              <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
+            </div>
+          )}
           <OverflowProvider>
             {(ref) => (
               <ScrollAreaContainer
                 ref={ref}
                 className={classNames(
                   "w-full h-full",
-                  "rounded-[2.5rem]",
+                  !isPopupMode && "rounded-[2.5rem]",
                   "border border-brand-light/5",
-                  [
-                    "brandbg-large-modal",
+                  "brandbg-large-modal",
+                  !isPopupMode && [
                     "after:absolute after:inset-0",
                     "after:shadow-addaccountmodal",
                     "after:rounded-[2.5rem]",
@@ -144,15 +153,25 @@ const ActivityModal = memo(() => {
                     "after:z-20",
                   ]
                 )}
+                viewPortClassName="px-4"
                 scrollBarClassName={classNames(
-                  "pt-[4.25rem]",
-                  "!right-1",
-                  "pb-[3.25rem]"
+                  isPopupMode ? "" : "pt-[4.25rem] pb-[3.25rem]",
+                  isPopupMode ? "!right-0" : "!right-1"
                 )}
                 type="scroll"
               >
-                <Dialog.Close className="absolute top-4 right-4" asChild>
-                  <Button theme="clean">Cancel</Button>
+                <Dialog.Close
+                  className={classNames(
+                    isPopupMode ? "top-7" : "top-4",
+                    "absolute right-4"
+                  )}
+                  asChild
+                >
+                  {isPopupMode ? (
+                    <IconedButton Icon={CloseIcon} theme="tertiary" />
+                  ) : (
+                    <Button theme="clean">Cancel</Button>
+                  )}
                 </Dialog.Close>
 
                 <Suspense fallback={null}>
@@ -170,6 +189,8 @@ const ActivityModal = memo(() => {
 export default ActivityModal;
 
 const ActivityContent = memo(() => {
+  const isPopupMode = isPopup();
+
   const [delayFinished, setDelayFinished] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setDelayFinished(true), 300);
@@ -179,11 +200,14 @@ const ActivityContent = memo(() => {
   return (
     <div
       className={classNames(
-        "w-[66.25rem] mx-auto h-full pt-16 flex flex-col",
+        isPopupMode ? "w-full" : "w-[66.25rem]",
+        "mx-auto h-full",
+        isPopupMode ? "pt-6" : "pt-16",
+        "flex flex-col",
         !delayFinished ? "hidden" : "animate-bootfadeinfast"
       )}
     >
-      <Approve />
+      {!isPopupMode && <Approve />}
       <History />
     </div>
   );
@@ -237,6 +261,7 @@ const Approve = memo(() => {
 });
 
 const History = memo(() => {
+  const isPopupMode = isPopup();
   const pendingActivity = useLazyAtomValue(pendingActivityAtom);
   const {
     activity: completeActivity,
@@ -268,18 +293,28 @@ const History = memo(() => {
   return (
     <>
       {pendingActivity && pendingActivity?.length > 0 && (
-        <div className="mb-8">
-          <SectionHeader className="mb-6">Pending</SectionHeader>
+        <div className={isPopupMode ? "mb-6" : "mb-8"}>
+          <SectionHeader className={isPopupMode ? "mb-4" : "mb-6"}>
+            Pending
+          </SectionHeader>
 
           {pendingActivity.map((item) => (
-            <ActivityCard key={item.id} item={item} className="mb-4" />
+            <ActivityCard
+              key={item.id}
+              item={item}
+              className={isPopupMode ? "mb-3" : "mb-4"}
+            />
           ))}
         </div>
       )}
 
       {completeActivity && completeActivity?.length > 0 && (
-        <div className="mb-8">
-          <SectionHeader className="mb-6">Completed</SectionHeader>
+        <div className={isPopupMode ? "mb-6" : "mb-8"}>
+          <SectionHeader className={isPopupMode ? "mb-4" : "mb-6"}>
+            {pendingActivity && pendingActivity?.length > 0
+              ? "Completed"
+              : "Activity"}
+          </SectionHeader>
 
           {completeActivity.map((item, i) => (
             <ActivityCard
@@ -291,7 +326,13 @@ const History = memo(() => {
                   : null
               }
               item={item}
-              className="mb-4"
+              className={
+                isPopupMode
+                  ? i !== completeActivity.length - 1
+                    ? "mb-3"
+                    : ""
+                  : "mb-4"
+              }
             />
           ))}
         </div>
@@ -302,7 +343,9 @@ const History = memo(() => {
         pendingActivity.length === 0 &&
         completeActivity.length === 0 && (
           <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
-            <NoResultsFoundIcon className="w-[30rem] h-auto mb-8" />
+            <NoResultsFoundIcon
+              className={classNames(!isPopupMode && "w-[30rem]", "h-auto mb-8")}
+            />
             <h3 className="text-2xl text-brand-inactivedark font-bold">
               No activity yet
             </h3>
@@ -321,6 +364,7 @@ type ActivityCardProps = {
 
 const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
+    const isPopupMode = isPopup();
     const [revokedPermission, setRevokedPermission] = useSafeState(false);
 
     const status = useMemo<StatusType | undefined>(() => {
@@ -389,73 +433,140 @@ const ActivityCard = memo(
             "border-brand-inactivedark/25",
           status === "failed" && "border-brand-redobject/50",
           status === "skipped" && "border-brand-main/50",
-          "rounded-2xl",
+          isPopupMode ? "rounded-[.875rem]" : "rounded-2xl",
           "flex items-center",
-          "py-3 px-5",
+          isPopupMode ? "py-2 px-3" : "py-3 px-5",
           className
         )}
       >
-        <ActivityIcon item={item} className="mr-6" />
+        {isPopupMode ? (
+          <div className="flex flex-col grow">
+            <div className="flex items-center">
+              <ActivityIcon item={item} className="mr-2" />
+              <div className="flex flex-col grow">
+                <div className="flex items-center justify-between">
+                  <ActivityTypeLabel item={item} className="mr-2" />
 
-        <ActivityTypeLabel
-          item={item}
-          status={status}
-          className="w-[10rem] mr-8"
-        />
+                  {item.type === ActivityType.Transaction && (
+                    <ChainIdProvider chainId={item.chainId}>
+                      <ActivityTxActions item={item} />
+                    </ChainIdProvider>
+                  )}
 
-        {(item.type === ActivityType.Transaction ||
-          item.type === ActivityType.Signing) && (
-          <ActivityWalletCard
-            accountAddress={item.accountAddress}
-            className="w-[10rem] mr-8"
-          />
-        )}
+                  {item.type !== ActivityType.Transaction &&
+                    item.source.type === "page" && (
+                      <ActivityWebsiteLink source={item.source} />
+                    )}
+                </div>
+                <div className="flex items-center justify-between mt-1 min-h-[1.25rem]">
+                  <ActivityTypeStatus status={status} className="mr-2" />
 
-        {item.type === ActivityType.Transaction && (
-          <ActivityNetworkCard
-            chainId={item.chainId}
-            fee={fee}
-            className="w-[12rem] mr-8"
-          />
-        )}
+                  {item.type === ActivityType.Connection && (
+                    <DisconnectDApp
+                      item={item}
+                      className="mr-2"
+                      setRevokedPermission={setRevokedPermission}
+                    />
+                  )}
 
-        {item.source.type === "page" && (
-          <ActivityWebsiteLink
-            source={item.source}
-            className="w-[10rem] mr-8"
-          />
-        )}
+                  <div className="text-xs text-brand-inactivedark ml-auto">
+                    <PrettyDate date={item.timeAt} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {item.type === ActivityType.Transaction && (
+              <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
+                <div className="flex items-center justify-between">
+                  <ActivityWalletCard
+                    accountAddress={item.accountAddress}
+                    className="mr-2"
+                  />
+                  <ChainIdProvider chainId={item.chainId}>
+                    <ActivityTokens
+                      source={item.source}
+                      action={item.txAction}
+                      accountAddress={item.accountAddress}
+                    />
+                  </ChainIdProvider>
+                </div>
 
-        {item.type === ActivityType.Connection && (
-          <DisconnectDApp
-            item={item}
-            className="w-[10rem] mr-8"
-            setRevokedPermission={setRevokedPermission}
-          />
-        )}
-
-        {item.type === ActivityType.Transaction && (
-          <ChainIdProvider chainId={item.chainId}>
-            <ActivityTokens
-              source={item.source}
-              action={item.txAction}
-              accountAddress={item.accountAddress}
-              className="w-[10rem] mr-8"
-            />
-          </ChainIdProvider>
-        )}
-
-        <div className="flex flex-col items-end ml-auto">
-          {item.type === ActivityType.Transaction && (
-            <ChainIdProvider chainId={item.chainId}>
-              <ActivityTxActions item={item} className="mb-1" />
-            </ChainIdProvider>
-          )}
-
-          <div className="text-xs text-brand-inactivedark">
-            <PrettyDate date={item.timeAt} />
+                <ActivityNetworkCard
+                  chainId={item.chainId}
+                  fee={fee}
+                  className="mt-1.5"
+                />
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          <>
+            <ActivityIcon item={item} className="mr-6" />
+
+            {status ? (
+              <div className={classNames("flex flex-col", "w-[10rem] mr-8")}>
+                <ActivityTypeLabel item={item} />
+                <ActivityTypeStatus status={status} className="mt-0.5 ml-7" />
+              </div>
+            ) : (
+              <ActivityTypeLabel item={item} className="w-[10rem] mr-8" />
+            )}
+
+            {(item.type === ActivityType.Transaction ||
+              item.type === ActivityType.Signing) && (
+              <ActivityWalletCard
+                accountAddress={item.accountAddress}
+                className="w-[10rem] mr-8"
+              />
+            )}
+
+            {item.type === ActivityType.Transaction && (
+              <ActivityNetworkCard
+                chainId={item.chainId}
+                fee={fee}
+                className="w-[12rem] mr-8"
+              />
+            )}
+
+            {item.source.type === "page" && (
+              <ActivityWebsiteLink
+                source={item.source}
+                className="w-[10rem] mr-8"
+              />
+            )}
+
+            {item.type === ActivityType.Connection && (
+              <DisconnectDApp
+                item={item}
+                className="w-[10rem] mr-8"
+                setRevokedPermission={setRevokedPermission}
+              />
+            )}
+
+            {item.type === ActivityType.Transaction && (
+              <ChainIdProvider chainId={item.chainId}>
+                <ActivityTokens
+                  source={item.source}
+                  action={item.txAction}
+                  accountAddress={item.accountAddress}
+                  className="w-[10rem] mr-8"
+                />
+              </ChainIdProvider>
+            )}
+
+            <div className="flex flex-col items-end ml-auto">
+              {item.type === ActivityType.Transaction && (
+                <ChainIdProvider chainId={item.chainId}>
+                  <ActivityTxActions item={item} className="mb-1" />
+                </ChainIdProvider>
+              )}
+
+              <div className="text-xs text-brand-inactivedark">
+                <PrettyDate date={item.timeAt} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     );
   })
@@ -469,6 +580,7 @@ type DisconnectDAppProps = {
 
 const DisconnectDApp = memo<DisconnectDAppProps>(
   ({ item, className, setRevokedPermission }) => {
+    const isPopupMode = isPopup();
     const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
     const lazyPermission = useAtomValue(loadable(getPermissionAtom(origin)));
     const permission =
@@ -504,8 +616,9 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
           className={classNames(
             "border border-brand-main/20",
             "rounded-md",
-            "px-2 py-0.5",
-            "text-xs text-brand-inactivelight",
+            "px-2",
+            isPopupMode ? "text-[.625rem] h-5" : "text-xs py-0.5",
+            "text-brand-inactivelight",
             "transition-colors",
             "hover:bg-brand-main/10"
           )}
@@ -524,6 +637,8 @@ type ActivityIconProps = {
 };
 
 const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
+  const isPopupMode = isPopup();
+
   return item.source.type === "page" ? (
     <Avatar
       src={item.source.favIconUrl}
@@ -532,66 +647,78 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
         "block",
         "bg-white",
         "rounded-full overflow-hidden",
-        "w-12 h-12 min-w-[3rem]",
+        isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
         className
       )}
       fallbackClassName="!h-3/5"
     />
   ) : (
     <SendIcon
-      className={classNames("glass-icon--active", "w-12 h-12", className)}
+      className={classNames(
+        "glass-icon--active",
+        isPopupMode ? "w-8 h-8" : "w-12 h-12",
+        className
+      )}
     />
   );
 });
 
 type ActivityTypeLabelProps = {
   item: Activity;
-  status?: StatusType;
   className?: string;
 };
 
-const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({
-  item,
-  status,
-  className,
-}) => {
+const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
+  const isPopupMode = isPopup();
+
   const name =
     item.type === ActivityType.Transaction && item.source.type === "self"
       ? "Transfer"
       : item.type;
 
   const Icon = getActivityIcon(item.type);
-  const label = (
+  return (
     <div
       className={classNames(
         "flex items-center",
-        "text-base text-brand-inactivelight font-medium",
-        status ? "" : className
+        isPopupMode ? "text-sm" : "text-base",
+        "text-brand-inactivelight font-medium",
+        className
       )}
     >
-      <Icon className="w-5 h-auto mr-2" />
+      <Icon
+        className={classNames(isPopupMode ? "w-4 mr-1" : "w-5 mr-2", "h-auto")}
+      />
       {capitalize(name)}
     </div>
   );
+};
+
+type ActivityTypeStatusProps = {
+  status?: StatusType;
+  className?: string;
+};
+
+const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
+  status,
+  className,
+}) => {
   if (!status) {
-    return label;
+    return null;
   }
 
   return (
-    <div className={classNames("flex flex-col", className)}>
-      {label}
-      <div
-        className={classNames(
-          "mt-0.5 ml-7",
-          "text-xs font-medium",
-          status === "succeeded" && "text-brand-greenobject",
-          status === "failed" && "text-brand-redtext",
-          status === "skipped" && "text-brand-main",
-          status === "revoked" && "text-brand-inactivedark"
-        )}
-      >
-        {capitalize(status === "succeeded" ? "success" : status)}
-      </div>
+    <div
+      className={classNames(
+        "text-xs font-medium",
+        status === "succeeded" && "text-brand-greenobject",
+        status === "failed" && "text-brand-redtext",
+        status === "skipped" && "text-brand-main",
+        status === "revoked" && "text-brand-inactivedark",
+        className
+      )}
+    >
+      {capitalize(status === "succeeded" ? "success" : status)}
     </div>
   );
 };
@@ -616,6 +743,7 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
   source,
   className,
 }) => {
+  const isPopupMode = isPopup();
   const handleLinkClick = useCallback(() => {
     if (source.type === "page") {
       openInTabExternal(source.url, source.tabId);
@@ -634,10 +762,21 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
         className
       )}
     >
-      <span className="min-w-0 truncate text-base">
+      <span
+        className={classNames(
+          "min-w-0 truncate",
+          isPopupMode ? "text-xs" : "text-base"
+        )}
+      >
         {new URL(source.url).host}
       </span>
-      <LinkIcon className="ml-1 w-5 h-5 min-w-[1.25rem]" />
+      <LinkIcon
+        className={
+          isPopupMode
+            ? "ml-0.5 w-4 h-4 min-w-[1rem]"
+            : "ml-1 w-5 h-5 min-w-[1.25rem]"
+        }
+      />
     </button>
   );
 };
@@ -651,6 +790,7 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   accountAddress,
   className,
 }) => {
+  const isPopupMode = isPopup();
   const allAccounts = useAtomValue(allAccountsAtom);
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === accountAddress),
@@ -661,7 +801,8 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
     <div
       className={classNames(
         "relative",
-        "flex items-stretch",
+        "flex",
+        isPopupMode ? "items-center" : "items-stretch",
         "text-left",
         className
       )}
@@ -671,10 +812,12 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
         source="dicebear"
         type="personas"
         className={classNames(
-          "h-9 w-9 min-w-[2.25rem]",
-          "mr-2",
+          isPopupMode
+            ? "h-4.5 w-4.5 min-w-[1.125rem]"
+            : "h-9 w-9 min-w-[2.25rem]",
+          isPopupMode ? "mr-1.5" : "mr-2",
           "bg-black/20",
-          "rounded-md"
+          isPopupMode ? "rounded" : "rounded-md"
         )}
       />
       <span
@@ -683,11 +826,17 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
           "min-w-0"
         )}
       >
-        <WalletName wallet={account} theme="small" className="text-sm" />
-        <HashPreview
-          hash={account.address}
-          className="leading-none text-brand-inactivedark text-sm"
+        <WalletName
+          wallet={account}
+          theme="small"
+          className={isPopupMode ? "text-xs" : "text-sm"}
         />
+        {!isPopupMode && (
+          <HashPreview
+            hash={account.address}
+            className="leading-none text-brand-inactivedark text-sm"
+          />
+        )}
       </span>
     </div>
   ) : (
@@ -716,13 +865,14 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
   fee,
   className,
 }) => {
+  const isPopupMode = isPopup();
   const network = useLazyAtomValue(getNetworkAtom(chainId));
 
   const label = (
     <div
       className={classNames(
         "flex items-center",
-        "min-h-[1.5rem]",
+        isPopupMode ? "min-h-[1.125rem]" : "min-h-[1.5rem]",
         fee ? "" : className
       )}
     >
@@ -731,11 +881,22 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
           src={network && getNetworkIconUrl(network.chainId)}
           alt={network?.name}
           withBorder={false}
-          className="w-6 mr-2 min-w-[1.5rem]"
+          className={
+            isPopupMode
+              ? "w-[1.125rem] min-w-[1.125rem] mr-1.5"
+              : "w-6 mr-2 min-w-[1.5rem]"
+          }
         />
       )}
 
-      <span className="truncate min-w-0 text-base">{network?.name}</span>
+      <span
+        className={classNames(
+          "truncate min-w-0",
+          isPopupMode ? "text-xs" : "text-base"
+        )}
+      >
+        {network?.name}
+      </span>
     </div>
   );
 
@@ -744,9 +905,20 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
   }
 
   return (
-    <div className={classNames("flex flex-col", className)}>
+    <div
+      className={classNames(
+        "flex",
+        isPopupMode ? "items-center justify-between" : "flex-col",
+        className
+      )}
+    >
       {label}
-      <span className="flex items-center text-brand-inactivedark ml-8 mt-1">
+      <span
+        className={classNames(
+          "flex items-center text-brand-inactivedark",
+          !isPopupMode && "ml-8 mt-1"
+        )}
+      >
         <PrettyAmount
           amount={fee.native}
           currency={network?.nativeCurrency?.symbol}
@@ -778,6 +950,7 @@ type ActivityTxActionsProps = {
 };
 
 const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
+  const isPopupMode = isPopup();
   const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
@@ -788,16 +961,16 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
       <IconedButton
         aria-label={copied ? "Copied" : "Copy transaction hash"}
         Icon={copied ? SuccessIcon : CopyIcon}
-        className="!w-6 !h-6 min-w-[1.5rem]"
-        iconClassName="!w-[1.125rem]"
+        className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
+        iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
         onClick={copy}
       />
       {explorerLink && (
         <IconedButton
           aria-label="View the transaction in Explorer"
           Icon={WalletExplorerIcon}
-          className="!w-6 !h-6 min-w-[1.5rem] ml-2"
-          iconClassName="!w-[1.125rem]"
+          className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
+          iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
           href={explorerLink.tx(item.txHash)}
         />
       )}
@@ -822,6 +995,8 @@ type ActivityTokensProps = {
 
 const ActivityTokens = memo<ActivityTokensProps>(
   ({ source, action, accountAddress, className }) => {
+    const isPopupMode = isPopup();
+
     if (
       source.type !== "self" ||
       !action ||
@@ -839,6 +1014,7 @@ const ActivityTokens = memo<ActivityTokensProps>(
             accountAddress={accountAddress}
             token={token}
             className={classNames(i !== action.tokens.length - 1 && "mb-1")}
+            isSmall={isPopupMode}
           />
         ))}
       </div>
