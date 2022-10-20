@@ -1,18 +1,17 @@
-import { FC, Suspense, useEffect, useRef, useState } from "react";
+import { FC, Suspense, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 
-import { IS_FIREFOX } from "app/defaults";
 import { openInTab } from "app/helpers";
 import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import ActivityBar from "app/components/blocks/ActivityBar";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
+import { ScrollTopButton } from "app/components/elements/ScrollTopButton";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
-import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 import { OverflowProvider } from "app/hooks";
 
 let bootAnimationDisplayed = true;
@@ -28,19 +27,6 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const walletStatus = useAtomValue(walletStatusAtom);
   const updateAvailable = useAtomValue(updateAvailableAtom);
-  const [isScrollTopShown, setIsScrollTopShown] = useState(false);
-
-  useEffect(() => {
-    const scrollAreaElement = scrollAreaRef.current;
-    if (scrollAreaElement) {
-      scrollAreaElement.addEventListener("scroll", () => {
-        setIsScrollTopShown(scrollAreaElement.scrollTop >= 120);
-      });
-
-      return () => scrollAreaElement.removeEventListener("scroll", () => null);
-    }
-    return;
-  }, []);
 
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
@@ -105,37 +91,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               {children}
             </main>
 
-            {isScrollTopShown && (
-              <button
-                type="button"
-                onClick={() =>
-                  scrollAreaRef.current?.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                  })
-                }
-                className={classNames(
-                  "w-8 h-8",
-                  "rounded-lg",
-                  "bg-brand-darkblue/20",
-                  "backdrop-blur-[10px]",
-                  IS_FIREFOX && "!bg-[#0D1020]/[.95]",
-                  "border border-brand-main/[.05]",
-                  "shadow-addaccountmodal",
-                  "fixed bottom-14 right-3",
-                  "flex items-center justify-center"
-                )}
-              >
-                <ChevronDownIcon
-                  className={classNames(
-                    "w-6 min-w-[1.5rem]",
-                    "h-auto",
-                    "-mt-0.5",
-                    "rotate-180"
-                  )}
-                />
-              </button>
-            )}
+            <ScrollTopButton scrollAreaRef={scrollAreaRef} />
 
             <Suspense fallback={null}>
               {isUnlocked && <ActivityBar theme="small" />}
