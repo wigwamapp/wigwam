@@ -17,6 +17,7 @@ const AddTokenBanner = memo<NullStateProps>(
     <div
       className={classNames(
         "max-h-0",
+        "w-full",
         "overflow-hidden",
         manageModeEnabled &&
           tokens.length > 0 &&
