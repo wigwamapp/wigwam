@@ -47,7 +47,8 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             hiddenScrollbar="horizontal"
             className="mt-2 h-full min-h-0"
             viewPortClassName="viewportBlock"
-            scrollBarClassName="pt-[14.5rem] pb-16"
+            scrollBarClassName="pt-[15.375rem] pb-16 pl-0.5 pr-0.5 w-3"
+            type="always"
           >
             <div className="flex px-3 pt-3">
               {isUnlocked && <LockProfileButton className="mr-2" />}
