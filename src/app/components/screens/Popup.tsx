@@ -43,7 +43,6 @@ import AccountSelect from "../elements/AccountSelect";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
@@ -258,13 +257,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
     }
   } else {
     tokensBar = (
-      <ScrollAreaContainer
-        ref={scrollAreaRef}
-        hiddenScrollbar="horizontal"
-        className="pr-3.5 pb-16 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
-        viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
-        scrollBarClassName="py-0 pb-16"
-      >
+      <>
         <AddTokenBanner
           isNftsSelected={isNftsSelected}
           manageModeEnabled={manageModeEnabled}
@@ -286,7 +279,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
             loadMoreTriggerRef={loadMoreTriggerRef}
           />
         )}
-      </ScrollAreaContainer>
+      </>
     );
   }
 
