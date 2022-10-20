@@ -6,6 +6,7 @@ import { WalletStatus } from "core/types";
 
 import { openInTab } from "app/helpers";
 import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import ActivityBar from "app/components/blocks/ActivityBar";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
@@ -42,48 +43,55 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             bootAnimationDisplayed ? handleBootAnimationEnd : undefined
           }
         >
-          <div className="flex px-3 pt-3">
-            {isUnlocked && <LockProfileButton className="mr-2" />}
+          <ScrollAreaContainer
+            hiddenScrollbar="horizontal"
+            className="mt-2 h-full min-h-0"
+            viewPortClassName="viewportBlock"
+            scrollBarClassName="pt-[14.5rem] pb-16"
+          >
+            <div className="flex px-3 pt-3">
+              {isUnlocked && <LockProfileButton className="mr-2" />}
 
-            <RoundedButton
-              theme={isUnlocked ? "small" : "large"}
-              onClick={() => openInTab(undefined, ["token"])}
+              <RoundedButton
+                theme={isUnlocked ? "small" : "large"}
+                onClick={() => openInTab(undefined, ["token"])}
+                className={classNames(
+                  "w-full",
+                  !isUnlocked && "p-3.5",
+                  isUnlocked && "p-3"
+                )}
+              >
+                <FullScreenIcon className="mr-1" />
+                Open Full
+                {updateAvailable ? (
+                  <div
+                    className={classNames(
+                      "w-2 h-2",
+                      "bg-activity rounded-full",
+                      "absolute top-2 right-2"
+                    )}
+                  />
+                ) : null}
+              </RoundedButton>
+            </div>
+
+            <main
               className={classNames(
-                "w-full",
-                !isUnlocked && "p-3.5",
-                isUnlocked && "p-3"
+                "relative",
+                "flex-1",
+                "pt-3 pb-16 px-3",
+                "overflow-hidden",
+                "flex flex-col",
+                className
               )}
             >
-              <FullScreenIcon className="mr-1" />
-              Open Full
-              {updateAvailable ? (
-                <div
-                  className={classNames(
-                    "w-2 h-2",
-                    "bg-activity rounded-full",
-                    "absolute top-2 right-2"
-                  )}
-                />
-              ) : null}
-            </RoundedButton>
-          </div>
+              {children}
+            </main>
 
-          <main
-            className={classNames(
-              "relative",
-              "flex-1",
-              "pt-3 px-3",
-              "overflow-hidden",
-              "flex flex-col",
-              className
-            )}
-          >
-            {children}
-          </main>
-
-          <Suspense fallback={null}>
-            {isUnlocked && <ActivityBar theme="small" />}
-          </Suspense>
+            <Suspense fallback={null}>
+              {isUnlocked && <ActivityBar theme="small" />}
+            </Suspense>
+          </ScrollAreaContainer>
         </div>
       )}
     </OverflowProvider>
