@@ -6,10 +6,12 @@ import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 
 type ScrollTopButtonProps = {
   scrollAreaRef: MutableRefObject<HTMLDivElement | null>;
+  className?: string;
 };
 
 export const ScrollTopButton: FC<ScrollTopButtonProps> = ({
   scrollAreaRef,
+  className,
 }) => {
   const [isScrollTopShown, setIsScrollTopShown] = useState(false);
 
@@ -46,8 +48,8 @@ export const ScrollTopButton: FC<ScrollTopButtonProps> = ({
         IS_FIREFOX && "!bg-[#0D1020]/[.95]",
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
-        "fixed bottom-14 right-3",
-        "flex items-center justify-center"
+        "flex items-center justify-center",
+        className
       )}
     >
       <ChevronDownIcon

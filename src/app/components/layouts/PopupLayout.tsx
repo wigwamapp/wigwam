@@ -91,7 +91,10 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               {children}
             </main>
 
-            <ScrollTopButton scrollAreaRef={scrollAreaRef} />
+            <ScrollTopButton
+              scrollAreaRef={scrollAreaRef}
+              className="fixed bottom-14 right-3"
+            />
 
             <Suspense fallback={null}>
               {isUnlocked && <ActivityBar theme="small" />}
