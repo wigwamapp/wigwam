@@ -344,7 +344,10 @@ const History = memo(() => {
         completeActivity.length === 0 && (
           <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
             <NoResultsFoundIcon
-              className={classNames(!isPopupMode && "w-[30rem]", "h-auto mb-8")}
+              className={classNames(
+                !isPopupMode ? "w-[30rem]" : "w-[20rem]",
+                "h-auto mb-8"
+              )}
             />
             <h3 className="text-2xl text-brand-inactivedark font-bold">
               No activity yet
