@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, Suspense, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -6,8 +6,9 @@ import { WalletStatus } from "core/types";
 
 import { openInTab } from "app/helpers";
 import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
-import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import ActivityBar from "app/components/blocks/ActivityBar";
+import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
@@ -23,6 +24,7 @@ type PopupLayoutProps = {
 };
 
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const walletStatus = useAtomValue(walletStatusAtom);
   const updateAvailable = useAtomValue(updateAvailableAtom);
 
@@ -44,8 +46,9 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
           }
         >
           <ScrollAreaContainer
+            ref={scrollAreaRef}
             hiddenScrollbar="horizontal"
-            className="mt-2 h-full min-h-0"
+            className="h-full min-h-0"
             viewPortClassName="viewportBlock"
             scrollBarClassName="pt-[15.375rem] pb-16 pl-0.5 pr-0.5 w-3"
           >
@@ -87,6 +90,11 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             >
               {children}
             </main>
+
+            <ScrollTopButton
+              scrollAreaRef={scrollAreaRef}
+              className="fixed bottom-14 right-3"
+            />
 
             <Suspense fallback={null}>
               {isUnlocked && <ActivityBar theme="small" />}
