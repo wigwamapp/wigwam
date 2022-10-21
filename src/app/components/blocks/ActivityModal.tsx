@@ -153,11 +153,12 @@ const ActivityModal = memo(() => {
                     "after:z-20",
                   ]
                 )}
-                viewPortClassName="px-4"
+                viewPortClassName="viewportBlock px-4"
                 scrollBarClassName={classNames(
                   isPopupMode ? "" : "pt-[4.25rem] pb-[3.25rem]",
                   isPopupMode ? "!right-0" : "!right-1"
                 )}
+                hiddenScrollbar="horizontal"
                 type="scroll"
               >
                 <Dialog.Close
