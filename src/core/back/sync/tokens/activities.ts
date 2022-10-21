@@ -108,7 +108,8 @@ async function performTokenActivitiesSync(
       if (accountToken.tokenType === TokenType.Asset)
         return token.address.toLowerCase();
 
-      return accountToken.tpId;
+      // return accountToken.tpId;
+      return null;
     })();
 
     if (debankTokenId) {
@@ -276,8 +277,14 @@ async function performTokenActivitiesSync(
           address: accountAddress,
           sort: "desc",
           page: 1,
-          offset: 200,
+          offset: 500,
         },
+      }).then((res) => {
+        if (res.data?.message === "NOTOK") {
+          throw new Error(res.data.result);
+        }
+
+        return res;
       })
     );
 
@@ -456,8 +463,8 @@ function withExplorerApiRequest<T>(factory: () => Promise<T>) {
       );
     }
 
-    explorerApiLimitTime = Date.now() + 5_000;
-
-    return factory();
+    return factory().finally(() => {
+      explorerApiLimitTime = Date.now() + 5_000;
+    });
   });
 }
