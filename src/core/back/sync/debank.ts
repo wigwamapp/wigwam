@@ -1,6 +1,8 @@
 import axios from "axios";
 import memoize from "mem";
 import BigNumber from "bignumber.js";
+import browser from "webextension-polyfill";
+import { createOrganicThrottle } from "lib/system/organicThrottle";
 
 import { DEBANK_CHAIN_LIST } from "fixtures/debankChainList";
 
@@ -13,6 +15,28 @@ export const debankApi = axios.create({
   baseURL: "https://api.debank.com",
   timeout: 60_000,
 });
+
+debankApi.interceptors.response.use(
+  (res) => {
+    if (res.data?.error_code === 1) {
+      throw new Error(res.data.error_msg ?? "Unknown error");
+    }
+
+    return res;
+  },
+  async (err) => {
+    if (err?.response?.status === 429) {
+      const reallyOpened = await openDebankWebsite();
+
+      if (reallyOpened) {
+        const { method, url, params } = err.config;
+        return debankApi({ method, url, params });
+      }
+    }
+
+    throw err;
+  }
+);
 
 export const getDebankChain = memoize(async (chainId: number) => {
   try {
@@ -122,3 +146,36 @@ const getDebankUserAllNfts = memoize(
     maxAge: 40_000, // 40 sec
   }
 );
+
+const dbwThrottle = createOrganicThrottle();
+let dbwLastOpened: number | undefined;
+
+function openDebankWebsite() {
+  return dbwThrottle(async () => {
+    if (dbwLastOpened && dbwLastOpened > Date.now() - 60_000 * 2) {
+      return false;
+    }
+
+    const win = await browser.windows
+      .create({
+        type: "popup",
+        url: "https://debank.com/",
+        width: 1,
+        height: 1,
+        top: 0,
+        left: 0,
+        focused: false,
+        incognito: true,
+      })
+      .catch(() => null);
+
+    if (win?.id !== undefined) {
+      await new Promise((r) => setTimeout(r, 2_000));
+      await browser.windows.remove(win.id).catch(() => null);
+    }
+
+    dbwLastOpened = Date.now();
+
+    return true;
+  });
+}
