@@ -96,7 +96,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             <span
               className={classNames(
                 "block",
-                "w-5 h-5 mr-1.5",
+                "w-5 h-5 min-w-[1.25rem] mr-1.5",
                 "rounded-full overflow-hidden",
                 "border border-[#4F9A5E]"
               )}

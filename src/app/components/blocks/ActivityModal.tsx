@@ -444,12 +444,12 @@ const ActivityCard = memo(
         )}
       >
         {isPopupMode ? (
-          <div className="flex flex-col grow">
+          <div className="flex flex-col grow min-w-0">
             <div className="flex items-center">
               <ActivityIcon item={item} className="mr-2" />
-              <div className="flex flex-col grow">
+              <div className="flex flex-col grow min-w-0">
                 <div className="flex items-center justify-between">
-                  <ActivityTypeLabel item={item} className="mr-2" />
+                  <ActivityTypeLabel item={item} className="mr-4" />
 
                   {item.type === ActivityType.Transaction && (
                     <ChainIdProvider chainId={item.chainId}>
@@ -463,7 +463,7 @@ const ActivityCard = memo(
                     )}
                 </div>
                 <div className="flex items-center justify-between mt-1 min-h-[1.25rem]">
-                  <ActivityTypeStatus status={status} className="mr-2" />
+                  <ActivityTypeStatus status={status} className="mr-4" />
 
                   {item.type === ActivityType.Connection && (
                     <DisconnectDApp
@@ -481,10 +481,10 @@ const ActivityCard = memo(
             </div>
             {item.type === ActivityType.Transaction && (
               <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between min-w-0">
                   <ActivityWalletCard
                     accountAddress={item.accountAddress}
-                    className="mr-2"
+                    className="mr-4 min-w-0"
                   />
                   <ChainIdProvider chainId={item.chainId}>
                     <ActivityTokens
@@ -498,7 +498,7 @@ const ActivityCard = memo(
                 <ActivityNetworkCard
                   chainId={item.chainId}
                   fee={fee}
-                  className="mt-1.5"
+                  className="mt-1.5 min-w-0"
                 />
               </div>
             )}
@@ -761,6 +761,7 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
       onClick={handleLinkClick}
       className={classNames(
         "cursor-pointer",
+        "min-w-0",
         "hover:underline",
         "inline-flex items-center",
         className
@@ -876,6 +877,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
     <div
       className={classNames(
         "flex items-center",
+        "min-w-0",
         isPopupMode ? "min-h-[1.125rem]" : "min-h-[1.5rem]",
         fee ? "" : className
       )}
@@ -920,7 +922,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
       <span
         className={classNames(
           "flex items-center text-brand-inactivedark",
-          !isPopupMode && "ml-8 mt-1"
+          isPopupMode ? "ml-4" : "ml-8 mt-1"
         )}
       >
         <PrettyAmount
