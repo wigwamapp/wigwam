@@ -83,7 +83,6 @@ export class PorterServer<OneWayData = any> {
   private handleMessage(msg: any, port: Runtime.Port) {
     if (
       port.sender?.id === browser.runtime.id &&
-      [0, undefined].includes(port.sender?.frameId) &&
       MESSAGE_TYPES.includes(msg?.type)
     ) {
       const ctx = new MessageContext(port, msg as PorterClientMessage, this);
