@@ -20,6 +20,7 @@ import { MOONRIVER } from "./moonriver";
 import { EVMOS } from "./evmos";
 import { SYSCOIN } from "./syscoin";
 import { BOBA } from "./boba";
+import { LOCAL } from "./local";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -43,6 +44,7 @@ export const DEFAULT_NETWORKS: Network[] = [
   CELO,
   SYSCOIN,
   BOBA,
+  LOCAL,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
     ...n,

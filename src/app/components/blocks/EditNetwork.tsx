@@ -32,7 +32,7 @@ import { TEvent, trackEvent } from "core/client";
 import { IS_FIREFOX } from "app/defaults";
 import {
   composeValidators,
-  isLink,
+  isUrlLike,
   maxLength,
   minLength,
   required,
@@ -275,7 +275,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="rpcUrl"
-                    validate={composeValidators(required, isLink)}
+                    validate={composeValidators(required, isUrlLike)}
                   >
                     {({ input, meta }) => (
                       <RPCField
@@ -339,10 +339,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(
-                      isLink,
-                      isNative ? required : undefined
-                    )}
+                    validate={composeValidators(isUrlLike)}
                   >
                     {({ input, meta }) => (
                       <Input

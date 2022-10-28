@@ -57,12 +57,8 @@ export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
     ? "Provided secret phrase doesn't match with created one"
     : undefined;
 
-const linkRegexExpression =
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
-const linkRegex = new RegExp(linkRegexExpression);
-
-export const isLink = (value: string) =>
-  !value || value.match(linkRegex) ? undefined : "Link is invalid";
+export const isUrlLike = (value: string) =>
+  !value || value.includes("://") ? undefined : "URL is invalid";
 
 export const validateAddress = (value: string) =>
   ethers.utils.isAddress(value)
