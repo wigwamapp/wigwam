@@ -92,7 +92,7 @@ async function performTokenSync(
           balance &&
           !balance.isZero()
             ? TokenStatus.Enabled
-            : balanceChangedToZero && existing.tokenType == TokenType.NFT
+            : balanceChangedToZero && existing.tokenType === TokenType.NFT
             ? TokenStatus.Disabled
             : existing.status,
         rawBalance,
