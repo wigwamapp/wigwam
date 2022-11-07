@@ -15,6 +15,7 @@ import { ethers } from "ethers";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { replaceT } from "lib/ext/i18n";
 import { useI18NUpdate } from "lib/ext/i18n/react";
+import { useSafeState } from "lib/react-hooks/useSafeState";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { AccountSource, AddAccountParams, Network } from "core/types";
@@ -299,7 +300,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
                   return (
                     <Account
-                      key={address}
+                      key={`${network.chainId}_${address}`}
                       name={addressName}
                       index={index}
                       address={address}
@@ -361,19 +362,13 @@ const Account = memo<AccountProps>(
     onChangeWalletName,
     className,
   }) => {
-    const [balance, setBalance] = useState<ethers.BigNumber | null>(null);
+    const [balance, setBalance] = useSafeState<ethers.BigNumber | null>(null);
 
     useEffect(() => {
-      let mounted = true;
-
       provider
         .getBalance(address)
-        .then((b) => mounted && setBalance(b))
+        .then((b) => setBalance(b))
         .catch(console.error);
-
-      return () => {
-        mounted = false;
-      };
     }, [provider, address, setBalance]);
 
     const baseAsset = useMemo(
@@ -450,15 +445,15 @@ const Account = memo<AccountProps>(
           <HashPreview hash={address} />
         </Td>
         <Td className="font-bold">
-          <PrettyAmount
-            amount={baseAsset ? ethers.utils.formatEther(baseAsset.balance) : 0}
-            currency={
-              baseAsset ? baseAsset.symbol : network.nativeCurrency.symbol
-            }
-            copiable={true}
-            isMinified
-            className="font-bold"
-          />
+          {baseAsset ? (
+            <PrettyAmount
+              amount={ethers.utils.formatEther(baseAsset.balance)}
+              currency={baseAsset.symbol}
+              copiable={true}
+              isMinified
+              className="font-bold"
+            />
+          ) : null}
         </Td>
       </tr>
     );
