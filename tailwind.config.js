@@ -145,6 +145,10 @@ module.exports = {
         addaccountcontinue:
           "linear-gradient(90.44deg, rgba(13, 14, 32, 0.95) 2.88%, rgba(15, 16, 34, 0.95) 21.54%, rgba(13, 14, 31, 0.95) 41.08%, rgba(17, 18, 36, 0.95) 81.76%, rgba(16, 17, 35, 0.95) 97.51%)",
       },
+      screens: {
+        mmd: { max: "767px" },
+        mxs: { max: "420px" },
+      },
     },
   },
   plugins: [
