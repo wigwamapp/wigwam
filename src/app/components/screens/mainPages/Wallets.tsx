@@ -7,12 +7,12 @@ import EditWalletSection from "app/components/blocks/EditWalletSection";
 
 const Wallets: FC = () => {
   const currentAccount = useAtomValue(currentAccountAtom);
-  const curAccount = useRef(currentAccount);
+  const prevAccount = useRef(currentAccount);
   const [selectedAccount, setSelectedAccount] = useState(currentAccount);
 
   useEffect(() => {
-    if (curAccount.current.name !== currentAccount.name) {
-      curAccount.current = currentAccount;
+    if (prevAccount.current.uuid !== currentAccount.uuid) {
+      prevAccount.current = currentAccount;
       setSelectedAccount(currentAccount);
     }
   }, [currentAccount]);
