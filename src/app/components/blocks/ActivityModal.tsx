@@ -153,12 +153,15 @@ const ActivityModal = memo(() => {
                     "after:z-20",
                   ]
                 )}
-                viewPortClassName="viewportBlock px-4"
-                scrollBarClassName={classNames(
+                viewPortClassName="viewportBlock"
+                horizontalScrollBarClassName={classNames(
+                  isPopupMode ? "" : "px-[2.25rem]"
+                )}
+                verticalScrollBarClassName={classNames(
                   isPopupMode ? "" : "pt-[4.25rem] pb-[3.25rem]",
                   isPopupMode ? "!right-0" : "!right-1"
                 )}
-                hiddenScrollbar="horizontal"
+                hiddenScrollbar={isPopupMode ? "horizontal" : undefined}
                 type="scroll"
               >
                 <Dialog.Close
@@ -201,8 +204,9 @@ const ActivityContent = memo(() => {
   return (
     <div
       className={classNames(
-        isPopupMode ? "w-full" : "w-[66.25rem]",
+        isPopupMode ? "w-full" : "w-[68.25rem]",
         "mx-auto h-full",
+        "px-4",
         isPopupMode ? "pt-6" : "pt-16",
         "flex flex-col",
         !delayFinished ? "hidden" : "animate-bootfadeinfast"
