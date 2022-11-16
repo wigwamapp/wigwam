@@ -1,3 +1,5 @@
+import axios from "axios";
+import fetchAdapter from "axios-fetch-adapter";
 import BigNumber from "bignumber.js";
 import { setupArgon2Impl } from "lib/kdbx";
 import { initProfiles } from "lib/ext/profile";
@@ -14,6 +16,8 @@ import {
   startExtBadge,
   startAutoLocker,
 } from "core/back/services";
+
+axios.defaults.adapter = fetchAdapter;
 
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
