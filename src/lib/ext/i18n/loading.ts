@@ -20,18 +20,14 @@ export function isInited() {
   return initialized;
 }
 
-async function refresh() {
-  if (await isBackgroundScript()) {
+function refresh() {
+  if (isBackgroundScript()) {
     init();
   } else {
     window.location.reload();
   }
 }
 
-async function isBackgroundScript() {
-  let backgroundWindow;
-  try {
-    backgroundWindow = await browser.runtime.getBackgroundPage();
-  } catch {}
-  return window === backgroundWindow;
+function isBackgroundScript() {
+  return !("getBackgroundPage" in browser.runtime);
 }

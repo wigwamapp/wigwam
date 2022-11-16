@@ -1,6 +1,8 @@
 // Avoid typescript "isolatedModules" error;
 export {};
 
+declare const allScripts: string[] | undefined;
+
 type FileEntity = {
   file: File;
   insideBackground: boolean;
@@ -22,21 +24,17 @@ const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 const backgroundScripts = getBackgroundScripts();
 const contentScripts = getContentScripts();
 
-// A little hack for dev experience :)
-// Listen custom event "worker_spawned", and add it to script list.
-window.addEventListener<any>("worker_spawned", (evt: CustomEvent<string>) => {
-  const workerScript = evt.detail;
-  backgroundScripts.push(workerScript);
-});
-
-chrome.management.getSelf((self) => {
+chrome.management.getSelf(async (self) => {
   if (self.installType === "development") {
     chrome.runtime.getPackageDirectoryEntry(watchChanges);
 
     // NB: see https://github.com/xpl/crx-hotreload/issues/5
-    const reloadTabURL = localStorage.getItem(RELOAD_TAB_FLAG);
+    const { [RELOAD_TAB_FLAG]: reloadTabURL } = await chrome.storage.local.get(
+      RELOAD_TAB_FLAG
+    );
+
     if (reloadTabURL) {
-      localStorage.removeItem(RELOAD_TAB_FLAG);
+      await chrome.storage.local.remove(RELOAD_TAB_FLAG);
 
       queryTabs({ url: reloadTabURL }).then((tabs) => {
         if (tabs.length > 0) {
@@ -76,7 +74,7 @@ async function watchChanges(
       ) {
         const activeTab = await getActiveMainTab();
         if (activeTab?.url)
-          localStorage.setItem(RELOAD_TAB_FLAG, activeTab.url);
+          await chrome.storage.local.set({ [RELOAD_TAB_FLAG]: activeTab.url });
 
         chrome.runtime.reload();
       } else {
@@ -142,9 +140,7 @@ function isEntryInside(entry: Entry, paths: string[]) {
 }
 
 function getBackgroundScripts() {
-  return Array.from(document.scripts).map(
-    (s) => s.src.split(chrome.runtime.id)[1]
-  );
+  return allScripts ?? [];
 }
 
 function getContentScripts() {
