@@ -13,13 +13,13 @@
   "homepage_url": "{{website}}",
   "short_name": "Vigvam",
 
-  "permissions": [
-    "tabs",
-    "storage",
-    "clipboardWrite",
-    "activeTab",
+  "permissions": ["tabs", "storage", "clipboardWrite", "activeTab", "alarms"],
+
+  "host_permissions": [
     "http://localhost:8545/",
-    "https://*.infura.io/"
+    "file://*/*",
+    "http://*/*",
+    "https://*/*"
   ],
 
   "__chrome__content_security_policy": {
@@ -55,7 +55,7 @@
   },
 
   "background": {
-    "service_worker": "back.js"
+    "service_worker": "sw.js"
   },
 
   "content_scripts": [

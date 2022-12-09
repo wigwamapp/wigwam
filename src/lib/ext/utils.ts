@@ -1,7 +1,5 @@
 import browser from "webextension-polyfill";
 
-import * as Global from "./global";
-
 const WAS_RESTARTED = "_was_restarted";
 
 export const getPublicURL = browser.runtime.getURL;
@@ -37,13 +35,17 @@ export async function restartApp() {
     }
   } catch {}
 
-  Global.put(WAS_RESTARTED, "true");
+  browser.storage.local.set({ [WAS_RESTARTED]: true });
   browser.runtime.reload();
 }
 
-export function openIfWasRestarted() {
-  if (Global.get(WAS_RESTARTED) === "true") {
-    Global.remove(WAS_RESTARTED);
+export async function openIfWasRestarted() {
+  const { [WAS_RESTARTED]: wasRestarted } = await browser.storage.local.get(
+    WAS_RESTARTED
+  );
+
+  if (wasRestarted) {
+    await browser.storage.local.remove(WAS_RESTARTED);
     openMainTab();
   }
 }

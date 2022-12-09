@@ -96,7 +96,7 @@ const CSS_MODULE_REGEX = /\.module\.css$/;
 const HTML_PLUGIN_TEMPLATES = [
   {
     jsWorker: true,
-    path: path.join(PUBLIC_PATH, "back.js"),
+    path: path.join(PUBLIC_PATH, "sw.js"),
     chunks: ["back"],
   },
   {
@@ -372,7 +372,14 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: ["**/*.html", "**/{manifest.json,back.js}", "**/locales"],
+            ignore: [
+              "**/*.html",
+              "**/{manifest.json,sw.js}",
+              "**/locales",
+              NODE_ENV === "development"
+                ? "!**/hotreload.html"
+                : "**/hotreload.*",
+            ].filter(Boolean),
           },
         },
         {

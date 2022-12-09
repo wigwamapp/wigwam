@@ -1,21 +1,19 @@
 document = {};
 
 localStorage = {
-  getItem(k) {
-    return this[k] ?? null;
+  getItem() {
+    return null;
   },
-  setItem(k, v) {
-    this[k] = v;
-  },
+  setItem() {},
+  clear() {},
 };
 
 sessionStorage = {
-  getItem(k) {
-    return this[k] ?? null;
+  getItem() {
+    return null;
   },
-  setItem(k, v) {
-    this[k] = v;
-  },
+  setItem() {},
+  clear() {},
 };
 
 // const importScriptsOriginal = importScripts;
