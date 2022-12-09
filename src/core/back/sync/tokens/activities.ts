@@ -131,7 +131,8 @@ async function performTokenActivitiesSync(
                 start_time: startTime,
               },
             })
-            .then((res) => res.data);
+            .then((res) => res.data)
+            .catch(() => ({ data: null }));
 
           const txs = data?.history_list;
 
