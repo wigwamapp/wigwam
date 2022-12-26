@@ -1,11 +1,3 @@
-sessionStorage = {
-  getItem() {
-    return null;
-  },
-  setItem() {},
-  clear() {},
-};
-
 // const importScriptsOriginal = importScripts;
 // globalThis.allScripts = [];
 
