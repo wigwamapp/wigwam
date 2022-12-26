@@ -1,13 +1,3 @@
-document = {};
-
-localStorage = {
-  getItem() {
-    return null;
-  },
-  setItem() {},
-  clear() {},
-};
-
 sessionStorage = {
   getItem() {
     return null;

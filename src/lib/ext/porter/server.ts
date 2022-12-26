@@ -1,5 +1,4 @@
 import browser, { Runtime } from "webextension-polyfill";
-import { assert } from "lib/system/assert";
 import { forEachSafe } from "lib/system/forEachSafe";
 
 import {
@@ -145,10 +144,11 @@ export class MessageContext<Data, ReplyData> {
   }
 
   replyError(err: any) {
-    assert(
-      this.msg.type === PorterMessageType.Req,
-      "Not allowed for non-request messages"
-    );
+    if (this.msg.type !== PorterMessageType.Req) {
+      console.warn("Not allowed for non-request messages");
+      console.error(err);
+      return;
+    }
 
     this.send({
       type: PorterMessageType.Err,

@@ -4,9 +4,10 @@ import { ethers } from "ethers";
 import { Buffer } from "buffer";
 
 import * as profile from "lib/ext/profile";
-import * as global from "lib/ext/global";
 import * as i18n from "lib/ext/i18n";
 import { storage } from "lib/ext/storage";
+import { globalStorage } from "lib/ext/globalStorage";
+import * as clientStorage from "lib/ext/clientStorage";
 import * as cryptoUtils from "lib/crypto-utils";
 import { downloadFile } from "lib/download";
 
@@ -24,7 +25,8 @@ Object.assign(window, {
   Buffer,
   profile,
   storage,
-  global,
+  globalStorage,
+  clientStorage,
   i18n,
   types,
   common,

@@ -1,3 +1,6 @@
+// A wrapper over native `localStorage`
+// Supports reactivity(subscribe to changes) between different views
+
 export interface LocalStorageEventInit {
   key?: string;
 }
