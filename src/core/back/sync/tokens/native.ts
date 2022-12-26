@@ -10,7 +10,7 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-import { getDebankUserChainBalance } from "../debank";
+// import { getDebankUserChainBalance } from "../debank";
 import { getCoinGeckoNativeTokenPrice } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
@@ -32,7 +32,7 @@ export const syncNativeTokens = memoize(
       { nativeCurrency, chainTag },
       existingTokens,
       balances,
-      portfolios,
+      allAccAssets,
       cgPrice,
     ] = await Promise.all([
       getNetwork(chainId),
@@ -42,8 +42,16 @@ export const syncNativeTokens = memoize(
           getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
         )
       ),
+      // Promise.all(
+      //   accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
+      // ),
       Promise.all(
-        accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
+        accounts.map((acc) =>
+          repo.accountTokens
+            .where("[chainId+tokenType+accountAddress]")
+            .equals([chainId, TokenType.Asset, acc.address])
+            .toArray()
+        )
       ),
       getCoinGeckoNativeTokenPrice(chainId),
     ]);
@@ -55,10 +63,18 @@ export const syncNativeTokens = memoize(
       accounts.map((acc, i) => {
         const existing = existingTokens[i] as AccountAsset;
         const balance = balances[i];
+        const allAssets = allAccAssets[i];
+
+        let allAssetsSum = new BigNumber(0);
+
+        for (const asset of allAssets) {
+          allAssetsSum = allAssetsSum.plus(asset.balanceUSD ?? 0);
+        }
+
         const portfolioUSD =
-          existing?.portfolioUSD === "-1" && !portfolios[i]
+          existing?.portfolioUSD === "-1" && allAssetsSum.isZero()
             ? "0"
-            : portfolios[i] ?? existing?.portfolioUSD;
+            : allAssetsSum.toString();
 
         const metadata = {
           decimals: nativeCurrency.decimals,
