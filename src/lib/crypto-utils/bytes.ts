@@ -29,6 +29,7 @@ export function base64ToBytes(str: string): Uint8Array {
   return arr;
 }
 
-export function zeroBuffer(arr: Uint8Array) {
-  arr.fill(0);
+export function zeroBuffer(arr: Uint8Array | ArrayBuffer) {
+  const intArr = arr instanceof ArrayBuffer ? new Uint8Array(arr) : arr;
+  intArr.fill(0);
 }

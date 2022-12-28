@@ -2,7 +2,9 @@ import { session } from "lib/ext/session";
 import { getRandomInt } from "lib/system/randomInt";
 import { createQueue } from "lib/system/queue";
 
-import { locked } from "../state";
+import { WalletStatus } from "core/types";
+
+import { locked, $walletStatus } from "../state";
 import { Vault } from "../vault";
 
 const PU_ATTEMPS = "password_usage_attempts";
@@ -22,7 +24,10 @@ export function startBruteForceProtection() {
         attempts++;
 
         if (attempts > 5) {
-          locked();
+          if ($walletStatus.getState() !== WalletStatus.Locked) {
+            locked();
+          }
+
           await new Promise((r) => setTimeout(r, getRandomInt(2_000, 3_000)));
         }
       }

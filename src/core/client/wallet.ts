@@ -1,5 +1,5 @@
 import { assert } from "lib/system/assert";
-import { toProtectedString } from "lib/crypto-utils";
+import { toProtectedPassword } from "lib/crypto-utils";
 import {
   EventMessage,
   MessageType,
@@ -49,7 +49,7 @@ export async function setupWallet(
   accountsParams: AddAccountParams[],
   seedPhrase?: SeedPharse
 ) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.SetupWallet;
 
@@ -63,7 +63,7 @@ export async function setupWallet(
 }
 
 export async function unlockWallet(password: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.UnlockWallet;
 
@@ -85,8 +85,8 @@ export async function changePassword(
   currentPassword: string,
   nextPassword: string
 ) {
-  currentPassword = toProtectedString(currentPassword);
-  nextPassword = toProtectedString(nextPassword);
+  currentPassword = await toProtectedPassword(currentPassword);
+  nextPassword = await toProtectedPassword(nextPassword);
 
   const type = MessageType.ChangePassword;
 
@@ -118,7 +118,7 @@ export async function addAccounts(
 }
 
 export async function deleteAccounts(password: string, accountUuids: string[]) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.DeleteAccounts;
 
@@ -142,7 +142,7 @@ export async function updateAccountName(accountUuid: string, name: string) {
 }
 
 export async function getSeedPhrase(password: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.GetSeedPhrase;
 
@@ -156,7 +156,7 @@ export async function getSeedPhrase(password: string) {
 }
 
 export async function getPrivateKey(password: string, accountUuid: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.GetPrivateKey;
 

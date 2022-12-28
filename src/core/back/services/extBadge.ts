@@ -7,7 +7,7 @@ export async function startExtBadge() {
   $approvals.watch(async (approvals) => {
     try {
       await setBadgeBackgroundColor();
-      await browser.browserAction.setBadgeText({
+      await browser.action.setBadgeText({
         text: approvals.length > 0 ? `+${approvals.length}` : "",
       });
     } catch {}
@@ -15,5 +15,5 @@ export async function startExtBadge() {
 }
 
 const setBadgeBackgroundColor = memoizeOne(() =>
-  browser.browserAction.setBadgeBackgroundColor({ color: "#101123" })
+  browser.action.setBadgeBackgroundColor({ color: "#101123" })
 );
