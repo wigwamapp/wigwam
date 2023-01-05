@@ -13,7 +13,14 @@
   "homepage_url": "{{website}}",
   "short_name": "Vigvam",
 
-  "permissions": ["tabs", "storage", "clipboardWrite", "activeTab", "alarms"],
+  "permissions": [
+    "tabs",
+    "storage",
+    "clipboardWrite",
+    "activeTab",
+    "scripting",
+    "alarms"
+  ],
 
   "host_permissions": [
     "http://localhost:8545/",
@@ -69,13 +76,6 @@
       "matches": ["{{website}}/*"],
       "js": ["scripts/version.js"],
       "run_at": "document_start"
-    }
-  ],
-
-  "web_accessible_resources": [
-    {
-      "matches": ["file://*/*", "http://*/*", "https://*/*"],
-      "resources": ["scripts/inpage.js"]
     }
   ]
 }

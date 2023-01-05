@@ -7,6 +7,7 @@ import { openIfWasRestarted } from "lib/ext/utils";
 
 import { setupFixtures } from "core/repo";
 import {
+  startInpageContentScript,
   startWalletServer,
   startPageServer,
   startBruteForceProtection,
@@ -22,6 +23,7 @@ axios.defaults.adapter = fetchAdapter;
 BigNumber.set({ EXPONENTIAL_AT: 38 });
 
 setupArgon2Impl();
+startInpageContentScript();
 
 // Init profiles
 // - Create default profile if it doesn't exist

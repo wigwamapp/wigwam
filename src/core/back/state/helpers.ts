@@ -25,9 +25,6 @@ export async function ensureInited() {
     // to `enqueueInit()`, but this way causes a huge decrease in performance
     if ($walletStatus.getState() !== WalletStatus.Idle) return;
 
-    const vaultExists = await Vault.isExist();
-    inited(vaultExists);
-
     const sessioned = await retrievePasswordSession();
 
     if (sessioned) {
@@ -36,19 +33,28 @@ export async function ensureInited() {
       const autoLockTimeout = await retrieveAutoLockTimeout();
 
       if (autoLockTimeout === 0 || Date.now() - timestamp < autoLockTimeout) {
-        await autoUnlock(passwordHash);
-        return;
-      } else {
-        await cleanupPasswordSession();
+        try {
+          await autoUnlock(passwordHash);
+          return;
+        } catch {}
       }
+
+      await cleanupPasswordSession();
     }
 
     const PLAIN_DEV_PASSWORD = process.env.VIGVAM_DEV_UNLOCK_PASSWORD;
 
     if (process.env.NODE_ENV === "development" && PLAIN_DEV_PASSWORD) {
       const pass = await toProtectedPassword(PLAIN_DEV_PASSWORD);
-      await autoUnlock(pass);
+
+      try {
+        await autoUnlock(pass);
+        return;
+      } catch {}
     }
+
+    const vaultExists = await Vault.isExist();
+    inited(vaultExists);
   });
 }
 
@@ -75,13 +81,9 @@ export function isUnlocked() {
 }
 
 async function autoUnlock(password: string) {
-  try {
-    const vault = await Vault.unlock(password);
-    const accounts = vault.getAccounts();
-    const hasSeedPhrase = vault.isSeedPhraseExists();
+  const vault = await Vault.unlock(password);
+  const accounts = vault.getAccounts();
+  const hasSeedPhrase = vault.isSeedPhraseExists();
 
-    unlocked({ vault, accounts, hasSeedPhrase });
-  } catch (err) {
-    console.warn("Auto unlock failed", err);
-  }
+  unlocked({ vault, accounts, hasSeedPhrase });
 }

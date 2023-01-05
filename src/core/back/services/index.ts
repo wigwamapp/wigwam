@@ -1,3 +1,4 @@
+export * from "./inpageContentScript";
 export * from "./walletServer";
 export * from "./pageServer";
 export * from "./bruteForceProtection";

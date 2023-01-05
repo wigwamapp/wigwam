@@ -5,8 +5,6 @@ export type InpageMessage<T = any> = {
   data: T;
 };
 
-// TODO: BUILD_ID_HASH
-
 const BUILD_ID = process.env.BUILD_ID;
 
 export class InpageProtocol {
