@@ -1,8 +1,7 @@
 import { FC, memo, useCallback, useEffect, useRef } from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useAtom } from "jotai";
-import { useAtomValue } from "jotai/utils";
+import { useAtom, useAtomValue } from "jotai";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import { WalletStatus } from "core/types";

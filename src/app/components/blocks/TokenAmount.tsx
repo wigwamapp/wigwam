@@ -83,11 +83,12 @@ const TokenAmount = memo<TokenAmountProps>(
                 "font-bold ml-2"
               )}
             >
-              {amount !== undefined && new BigNumber(amount).gte(LARGE_AMOUNT) && (
-                <>
-                  <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
-                </>
-              )}
+              {amount !== undefined &&
+                new BigNumber(amount).gte(LARGE_AMOUNT) && (
+                  <>
+                    <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+                  </>
+                )}
               {symbol}
             </span>
           )}

@@ -1,5 +1,7 @@
 import "./styles/index.css";
 
+import "lib/shims/bignumberLimit";
+
 import { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { disableOutlinesForClick } from "lib/outline-on-click";
