@@ -68,7 +68,7 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
   error: "Error",
 };
 
-type TabValue = typeof TAB_VALUES[number];
+type TabValue = (typeof TAB_VALUES)[number];
 type Tx = ethers.utils.UnsignedTransaction;
 
 type ApproveTransactionProps = {

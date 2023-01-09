@@ -3,7 +3,7 @@ import type { suggestFees as suggestFeesPrimitive } from "@rainbow-me/fee-sugges
 
 export const FEE_MODES = ["low", "average", "high"] as const;
 
-export type FeeMode = typeof FEE_MODES[number];
+export type FeeMode = (typeof FEE_MODES)[number];
 
 export type FeesByModeModern = Record<
   FeeMode,
