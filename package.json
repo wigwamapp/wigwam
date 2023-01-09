@@ -172,7 +172,11 @@
     "**/@ethersproject/abi": "5.7.0",
     "**/@ethersproject/providers": "5.7.2",
     "@amplitude/**/tslib": "2.4.1",
-    "minimist": ">=1.2.6"
+    "minimist": ">=1.2.6",
+    "json5": ">=2.2.2",
+    "terser": ">=5.14.2",
+    "loader-utils": ">=2.0.4",
+    "@xmldom/xmldom": ">=0.7.7"
   },
   "engines": {
     "node": ">=16"
