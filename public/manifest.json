@@ -1,5 +1,6 @@
 {
-  "manifest_version": 3,
+  "__chrome__manifest_version": 3,
+  "__firefox__manifest_version": 2,
   "name": "{{envBadge}}Vigvam — Web 3.0 Wallet",
   "version": "{{pkg.version}}",
 
@@ -62,7 +63,9 @@
   },
 
   "background": {
-    "service_worker": "sw.js"
+    "__chrome__service_worker": "sw.js",
+    "__firefox__page": "back.html",
+    "__firefox__persistent": true
   },
 
   "content_scripts": [

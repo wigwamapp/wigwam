@@ -6,7 +6,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     readonly NODE_ENV: "development" | "production" | "test";
     readonly RELEASE_ENV: "true" | "false";
-    readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
+    readonly TARGET_BROWSER: "chrome" | "firefox" | "safari";
     readonly VERSION: string;
     readonly BUILD_ID: string;
     // Vigvam specific

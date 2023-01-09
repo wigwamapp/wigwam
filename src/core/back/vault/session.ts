@@ -11,6 +11,7 @@ import {
 
 import { PASSWORD_SESSION } from "core/types";
 
+const FIREFOX = process.env.TARGET_BROWSER === "firefox";
 const BUILD_ID = process.env.BUILD_ID;
 
 type PasswordSession = {
@@ -19,6 +20,8 @@ type PasswordSession = {
 };
 
 export async function persistPasswordSession(passwordHash: string) {
+  if (FIREFOX) return;
+
   try {
     const timestamp = Date.now();
     const dataToEncrypt: PasswordSession = { passwordHash, timestamp };
@@ -58,6 +61,8 @@ export async function persistPasswordSession(passwordHash: string) {
 }
 
 export async function retrievePasswordSession() {
+  if (FIREFOX) return null;
+
   try {
     const sessioned = await session.fetchForce<string>(PASSWORD_SESSION);
     if (!sessioned) return null;
@@ -101,6 +106,8 @@ export async function retrievePasswordSession() {
 }
 
 export async function cleanupPasswordSession() {
+  if (FIREFOX) return;
+
   await session.remove(PASSWORD_SESSION).catch(console.error);
 }
 
