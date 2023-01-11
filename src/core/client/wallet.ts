@@ -18,7 +18,16 @@ import { porter } from "./base";
 
 export async function getWalletState() {
   const type = MessageType.GetWalletState;
-  const res = await porter.request({ type });
+  const res = await porter.request(
+    { type },
+    {
+      // This request is base, it's called first
+      // If no answer during this time - there is a possibility
+      // that the Service Worker has stalled or smth happen
+      // So, let's not delay the user
+      timeout: 5_000,
+    }
+  );
   assert(res?.type === type);
 
   const { status, hasSeedPhrase } = res;
