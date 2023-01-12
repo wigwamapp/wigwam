@@ -1,4 +1,5 @@
 import { FC, useMemo } from "react";
+import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { settingTabAtom } from "app/atoms";
@@ -25,7 +26,13 @@ const Settings: FC = () => {
   );
 
   return (
-    <div className="flex min-h-0 grow">
+    <div
+      className={classNames(
+        "px-6 -mx-6 min-h-0",
+        "flex grow",
+        "overflow-x-auto scrollbar-hide"
+      )}
+    >
       <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
 
       {activeTabRoute !== SettingTabEnum.Networks ? (

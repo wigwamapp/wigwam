@@ -269,6 +269,10 @@ const EditNetwork = memo<EditNetworkProps>(
                         errorMessage={meta.error}
                         readOnly={isNative}
                         inputClassName="h-11"
+                        // Focus on init
+                        // EditNetwork has 3th depth level of settings
+                        // Required for case when viewport width too small
+                        autoFocus
                         {...input}
                       />
                     )}
