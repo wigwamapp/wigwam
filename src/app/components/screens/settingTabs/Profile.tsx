@@ -48,7 +48,7 @@ const Profile: FC = () => {
       try {
         await updateProfile(currentId, { name, avatarSeed: profileSeed });
         trackEvent(TEvent.ProfileUpdate);
-        updateToast("Profile name successfully updated!");
+        updateToast("Profile info successfully updated!");
       } catch (err) {
         console.error(err);
       }
