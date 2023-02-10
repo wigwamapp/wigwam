@@ -9,8 +9,6 @@ import { currentLocaleAtom } from "app/atoms";
 
 import CopiableTooltip from "./CopiableTooltip";
 
-BigNumber.set({ EXPONENTIAL_AT: 38 });
-
 export type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;

@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "{{envBadge}}Vigvam — Web 3.0 Wallet",
   "version": "{{pkg.version}}",
 
@@ -18,12 +18,23 @@
     "storage",
     "clipboardWrite",
     "activeTab",
-    "http://localhost:8545/",
-    "https://*.infura.io/"
+    "scripting",
+    "alarms"
   ],
 
-  "__chrome__content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
-  "__firefox__content_security_policy": "script-src 'self'; object-src 'self'",
+  "host_permissions": [
+    "http://localhost:8545/",
+    "file://*/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "__chrome__content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
+  },
+  "__firefox__content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
+  },
 
   "author": "{{website}}",
 
@@ -38,7 +49,7 @@
 
   "default_locale": "en",
 
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_title": "Vigvam",
     "default_icon": {
@@ -51,8 +62,7 @@
   },
 
   "background": {
-    "page": "back.html",
-    "persistent": true
+    "service_worker": "sw.js"
   },
 
   "content_scripts": [
@@ -67,7 +77,5 @@
       "js": ["scripts/version.js"],
       "run_at": "document_start"
     }
-  ],
-
-  "web_accessible_resources": ["scripts/inpage.js"]
+  ]
 }

@@ -56,6 +56,8 @@ import {
   add0x,
 } from "core/common";
 
+import { persistPasswordSession, cleanupPasswordSession } from "./session";
+
 const {
   bytesToBase64,
   base64ToBytes,
@@ -85,7 +87,7 @@ export class Vault {
   }
 
   static async setup(
-    password: string,
+    passwordHash: string,
     accountsParams: AddAccountParams[],
     seedPhrase?: SeedPharse
   ) {
@@ -102,7 +104,9 @@ export class Vault {
       accountsParams.forEach(validateAddAccountParams);
 
       const keyFile = await Credentials.createRandomKeyFile();
-      const credentials = new Credentials(importProtected(password), keyFile);
+
+      const credentials = new Credentials(null, keyFile);
+      credentials.passwordHash = importProtected(passwordHash);
 
       const kdbx = createKdbx(credentials, "Vault", KDF_PARAMS);
 
@@ -132,11 +136,14 @@ export class Vault {
         [St.Data, dataB64],
       ]);
 
+      // Persist password hash to session
+      await persistPasswordSession(passwordHash);
+
       return vault;
     });
   }
 
-  static async unlock(password: string) {
+  static async unlock(passwordHash: string) {
     return withError(t("failedToUnlockWallet"), async (getError) => {
       const [keyFileB64, dataB64] = await storage.fetchMany<string>([
         St.KeyFile,
@@ -154,10 +161,8 @@ export class Vault {
         let success = true;
 
         try {
-          const credentials = new Credentials(
-            importProtected(password),
-            keyFile
-          );
+          const credentials = new Credentials(null, keyFile);
+          credentials.passwordHash = importProtected(passwordHash);
 
           return await Kdbx.load(data, credentials);
         } catch (err) {
@@ -169,6 +174,9 @@ export class Vault {
           await Vault.onPasswordUsage?.(success);
         }
       });
+
+      // Persist password hash to session
+      await persistPasswordSession(passwordHash);
 
       return new Vault(kdbx);
     });
@@ -182,17 +190,20 @@ export class Vault {
       customIcons: true,
       binaries: true,
     });
+
+    // Remove password hash from session
+    cleanupPasswordSession();
   }
 
   // ============//
   // Credentials //
   // ============//
 
-  async changePassword(current: string, next: string) {
-    await this.verify(current);
+  async changePassword(currentHash: string, nextHash: string) {
+    await this.verify(currentHash);
 
     return withError(t("failedToChangePassword"), async () => {
-      await this.kdbx.credentials.setPassword(importProtected(next));
+      this.kdbx.credentials.passwordHash = importProtected(nextHash);
 
       const keyFile = await Credentials.createRandomKeyFile();
       await this.kdbx.credentials.setKeyFile(keyFile);
@@ -209,6 +220,9 @@ export class Vault {
         [St.KeyFile, keyFileB64],
         [St.Data, dataB64],
       ]);
+
+      // Persist password hash to session
+      await persistPasswordSession(nextHash);
     });
   }
 
@@ -221,8 +235,8 @@ export class Vault {
     return spGroup.entries[0] instanceof KdbxEntry;
   }
 
-  async getSeedPhrase(password: string) {
-    await this.verify(password);
+  async getSeedPhrase(passwordHash: string) {
+    await this.verify(passwordHash);
 
     return withError(t("failedToFetchSeedPhrase"), () =>
       this.getSeedPhraseForce()
@@ -277,8 +291,8 @@ export class Vault {
     });
   }
 
-  async deleteAccounts(password: string, accUuids: string[]) {
-    await this.verify(password);
+  async deleteAccounts(passwordHash: string, accUuids: string[]) {
+    await this.verify(passwordHash);
 
     return withError(t("failedToDeleteWallets"), async () => {
       const accountsGroup = this.getGroup(Gr.Accounts);
@@ -382,8 +396,8 @@ export class Vault {
     });
   }
 
-  async getPrivateKey(password: string, accUuid: string) {
-    await this.verify(password);
+  async getPrivateKey(passwordHash: string, accUuid: string) {
+    await this.verify(passwordHash);
 
     return withError(t("failedToFetchPrivateKey"), () =>
       exportProtected(this.getKeyForce(accUuid, "privateKey"))
@@ -583,9 +597,9 @@ export class Vault {
     throw new PublicError(t("seedPhraseNotEstablished"));
   }
 
-  private async verify(password: string) {
+  private async verify(passwordHash: string) {
     return withError(t("invalidPassword"), async (getError) => {
-      const hashToCheck = await importProtected(password).getHash();
+      const hashToCheck = importProtected(passwordHash).getBinary();
 
       const localHash = arrayToBuffer(
         this.kdbx.credentials.passwordHash!.getBinary()

@@ -93,9 +93,14 @@ const ADDITIONAL_MODULE_PATHS = [
 const CSS_REGEX = /\.css$/;
 const CSS_MODULE_REGEX = /\.module\.css$/;
 
-const HTML_TEMPLATES = [
+const HTML_PLUGIN_TEMPLATES = [
+  NODE_ENV === "development" && {
+    path: path.join(PUBLIC_PATH, "hotreload.html"),
+    chunks: ["hotreload"],
+  },
   {
-    path: path.join(PUBLIC_PATH, "back.html"),
+    jsWorker: true,
+    path: path.join(PUBLIC_PATH, "sw.js"),
     chunks: ["back"],
   },
   {
@@ -110,7 +115,7 @@ const HTML_TEMPLATES = [
     path: path.join(PUBLIC_PATH, "approve.html"),
     chunks: ["approve"],
   },
-];
+].filter(Boolean);
 const SOLO_ENTRIES = ["content", "inpage", "version"];
 
 const entry = (...files) =>
@@ -124,13 +129,21 @@ module.exports = {
   target: ["web", ES_TARGET],
 
   entry: {
-    back: entry("back.ts", NODE_ENV === "development" && "_dev/hotReload.ts"),
+    back: entry(
+      "back.ts",
+      NODE_ENV === "development" && "_dev/hotReloadObserver.ts"
+    ),
     main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
     approve: entry("approve.tsx"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
     version: entry("version.ts"),
+    ...(NODE_ENV === "development"
+      ? {
+          hotreload: entry("_dev/hotReload.ts"),
+        }
+      : {}),
   },
 
   output: {
@@ -153,7 +166,11 @@ module.exports = {
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
-      "babel-runtime/regenerator": "regenerator-runtime", // For `react-error-guard`
+      // For `react-error-guard`
+      "babel-runtime/regenerator": "regenerator-runtime",
+      // Fix `path is not exported from package exports field`
+      // Used by `.vendor/axios-fetch-adapter`
+      "axios/lib": path.resolve(__dirname, "node_modules/axios/lib"),
     },
     fallback: {
       process: false,
@@ -300,7 +317,6 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
-      cleanStaleWebpackAssets: false,
       verbose: false,
     }),
 
@@ -335,13 +351,41 @@ module.exports = {
       chunkFilename: "styles/[name].chunk.css",
     }),
 
-    ...HTML_TEMPLATES.map(
-      (htmlTemplate) =>
+    ...HTML_PLUGIN_TEMPLATES.map(
+      ({ path: templatePath, chunks, jsWorker }) =>
         new HtmlWebpackPlugin({
-          template: htmlTemplate.path,
-          filename: path.basename(htmlTemplate.path),
-          chunks: htmlTemplate.chunks,
-          inject: "body",
+          ...(jsWorker
+            ? {
+                templateContent: ({ htmlWebpackPlugin }) => {
+                  const scriptList = htmlWebpackPlugin.files.js
+                    .map((p) => `"${p}"`)
+                    .join(",");
+
+                  let content = fs.readFileSync(templatePath, "utf8");
+
+                  content += `importScripts(${scriptList});`;
+
+                  // Hot reload helper
+                  // Notify hot reload tab what the chunks used in bg script
+                  if (NODE_ENV === "development") {
+                    content += `
+                    setTimeout(() => {
+                      chrome.runtime.sendMessage({
+                        type: "__hr_bg_scripts",
+                        scripts: [${scriptList}],
+                      }).catch(console.warn);
+                    }, 1000);`;
+                  }
+
+                  return content;
+                },
+              }
+            : {
+                template: templatePath,
+              }),
+          filename: path.basename(templatePath),
+          chunks,
+          inject: jsWorker ? false : "body",
           minify: false,
         })
     ),
@@ -353,7 +397,7 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: ["**/*.html", "**/manifest.json", "**/locales"],
+            ignore: ["**/*.html", "**/{manifest.json,sw.js}", "**/locales"],
           },
         },
         {

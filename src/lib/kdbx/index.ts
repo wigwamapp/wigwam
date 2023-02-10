@@ -14,7 +14,7 @@ import {
   KdbxEntryField,
   ByteUtils,
 } from "kdbxweb";
-import * as Argon2 from "lib/argon2";
+import * as Argon2 from "argon2-browser";
 
 const { base64ToBytes, bytesToBase64, zeroBuffer } = ByteUtils;
 

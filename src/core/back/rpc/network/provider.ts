@@ -11,7 +11,7 @@ export async function sendRpc(
   method: string,
   params: any[]
 ): Promise<RpcResponse> {
-  console.info("Perform RPC request", { chainId, url, method, params });
+  // console.info("Perform RPC request", { chainId, url, method, params });
 
   const { plainProvider, multicallProvider } = getProvider(url, chainId);
 

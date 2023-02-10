@@ -1,12 +1,14 @@
 import browser from "webextension-polyfill";
 
-import * as global from "lib/ext/global";
 import { storage } from "lib/ext/storage";
 
 import * as repo from "core/repo";
 
 export async function reset() {
-  global.clear();
+  try {
+    localStorage.clear();
+  } catch {}
+
   await storage.clear();
   await repo.clear();
   browser.runtime.reload();

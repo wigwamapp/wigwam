@@ -1,4 +1,3 @@
-import browser from "webextension-polyfill";
 import { PorterClient } from "lib/ext/porter/client";
 
 import { PorterChannel } from "core/types/shared";
@@ -7,11 +6,10 @@ import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
 if (shouldInject()) {
-  const injected = injectScript(browser.runtime.getURL("scripts/inpage.js"));
-  injected && initMsgGateway(injected);
+  initMsgGateway();
 }
 
-function initMsgGateway(injected: Promise<void>) {
+function initMsgGateway() {
   const inpage = new InpageProtocol("content", "injected");
 
   const porter = new PorterClient();
@@ -33,7 +31,7 @@ function initMsgGateway(injected: Promise<void>) {
 
   // Redirect messages: Background --> Injected
   porter.onOneWayMessage((msg) => {
-    injected.then(() => inpage.send(msg));
+    inpage.send(msg);
   });
 
   // Redirect messages: Injected --> Background
@@ -68,24 +66,6 @@ function initMsgGateway(injected: Promise<void>) {
       console.error(err);
     }
   });
-}
-
-function injectScript(src: string) {
-  try {
-    const container = document.head || document.documentElement;
-    const script = document.createElement("script");
-    script.setAttribute("async", "false");
-    script.src = src;
-    container.insertBefore(script, container.children[0]);
-    container.removeChild(script);
-
-    return new Promise<void>((res) =>
-      script.addEventListener("load", () => res(), true)
-    );
-  } catch (err) {
-    console.error("Vigvam: Provider injection failed.", err);
-    return null;
-  }
 }
 
 function getFavicon(): string | null {

@@ -1,6 +1,8 @@
 import browser from "webextension-polyfill";
 import { getMainURL, openOrFocusMainTab } from "lib/ext/utils";
-import * as Global from "lib/ext/global";
+import { globalStorage } from "lib/ext/globalStorage";
+
+import { LATEST_VERSION } from "core/types/storage";
 
 const WEBSITE_URL = process.env.VIGVAM_WEBSITE_ORIGIN;
 
@@ -79,6 +81,6 @@ export function startInstallOrUpdateListener() {
   // });
 
   browser.runtime.onUpdateAvailable?.addListener(({ version }) => {
-    Global.put("latest_version", version);
+    globalStorage.put(LATEST_VERSION, version).catch(console.error);
   });
 }

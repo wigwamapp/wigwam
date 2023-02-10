@@ -1,10 +1,12 @@
 import { atom } from "jotai";
 import { atomWithDefault, selectAtom } from "jotai/utils";
-import { atomWithAutoReset, atomWithGlobal } from "lib/atom-utils";
+import { atomWithAutoReset, atomWithGlobalStorage } from "lib/atom-utils";
 import { loadState, subscribeState } from "lib/ext/profile";
 import { getActiveTab } from "lib/ext/tab";
 import { getLocale } from "lib/ext/i18n";
 import { isUpdateAvailable } from "lib/ext/utils";
+
+import { LATEST_VERSION } from "core/types/storage";
 
 export const currentLocaleAtom = atomWithDefault(getLocale);
 
@@ -25,8 +27,8 @@ export const currentProfileAtom = atom((get) => {
   return all[index === -1 ? 0 : index];
 });
 
-export const latestVersionAtom = atomWithGlobal(
-  "latest_version",
+export const latestVersionAtom = atomWithGlobalStorage(
+  LATEST_VERSION,
   process.env.VERSION
 );
 
