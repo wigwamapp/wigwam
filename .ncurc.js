@@ -8,5 +8,6 @@ module.exports = {
     "final-form",
     "@types/async-retry",
     "nanoid",
+    "@dicebear/personas",
   ],
 };

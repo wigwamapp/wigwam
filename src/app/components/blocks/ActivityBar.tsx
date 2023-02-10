@@ -19,7 +19,7 @@ import { ReactComponent as ActivityHoverIcon } from "app/icons/external-link.svg
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/activity-successfull.svg";
 import { ReactComponent as PendingIcon } from "app/icons/activity-pending.svg";
-import { ReactComponent as FailedIcon } from "app/icons/activity-warning.svg";
+import { ReactComponent as FailedIcon } from "app/icons/warning.svg";
 
 type WithThemeProps = {
   theme?: "small" | "large";

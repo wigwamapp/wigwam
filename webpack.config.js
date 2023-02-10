@@ -95,6 +95,10 @@ const CSS_REGEX = /\.css$/;
 const CSS_MODULE_REGEX = /\.module\.css$/;
 
 const HTML_PLUGIN_TEMPLATES = [
+  NODE_ENV === "development" && {
+    path: path.join(PUBLIC_PATH, "hotreload.html"),
+    chunks: ["hotreload"],
+  },
   {
     jsWorker: !FIREFOX_TARGET,
     path: path.join(PUBLIC_PATH, FIREFOX_TARGET ? "back.html" : "sw.js"),
@@ -112,7 +116,7 @@ const HTML_PLUGIN_TEMPLATES = [
     path: path.join(PUBLIC_PATH, "approve.html"),
     chunks: ["approve"],
   },
-];
+].filter(Boolean);
 const SOLO_ENTRIES = ["content", "inpage", "version"];
 
 const entry = (...files) =>
@@ -127,7 +131,8 @@ module.exports = {
 
   entry: {
     back: entry(
-      "back.ts" /*, NODE_ENV === "development" && "_dev/hotReload.ts"*/
+      "back.ts",
+      NODE_ENV === "development" && "_dev/hotReloadObserver.ts"
     ),
     main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
@@ -135,6 +140,11 @@ module.exports = {
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
     version: entry("version.ts"),
+    ...(NODE_ENV === "development"
+      ? {
+          hotreload: entry("_dev/hotReload.ts"),
+        }
+      : {}),
   },
 
   output: {
@@ -348,12 +358,27 @@ module.exports = {
           ...(jsWorker
             ? {
                 templateContent: ({ htmlWebpackPlugin }) => {
-                  const base = fs.readFileSync(templatePath, "utf8");
-                  const scripts = `
-                  importScripts(
-                    ${htmlWebpackPlugin.files.js.map((p) => `"${p}"`).join(",")}
-                  );`;
-                  return `${base}${scripts}`;
+                  const scriptList = htmlWebpackPlugin.files.js
+                    .map((p) => `"${p}"`)
+                    .join(",");
+
+                  let content = fs.readFileSync(templatePath, "utf8");
+
+                  content += `importScripts(${scriptList});`;
+
+                  // Hot reload helper
+                  // Notify hot reload tab what the chunks used in bg script
+                  if (NODE_ENV === "development") {
+                    content += `
+                    setTimeout(() => {
+                      chrome.runtime.sendMessage({
+                        type: "__hr_bg_scripts",
+                        scripts: [${scriptList}],
+                      }).catch(console.warn);
+                    }, 1000);`;
+                  }
+
+                  return content;
                 },
               }
             : {
@@ -373,14 +398,7 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: [
-              "**/*.html",
-              "**/{manifest.json,sw.js}",
-              "**/locales",
-              NODE_ENV === "development"
-                ? "!**/hotreload.html"
-                : "**/hotreload.*",
-            ].filter(Boolean),
+            ignore: ["**/*.html", "**/{manifest.json,sw.js}", "**/locales"],
           },
         },
         {

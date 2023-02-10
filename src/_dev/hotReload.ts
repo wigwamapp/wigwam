@@ -1,8 +1,6 @@
 // Avoid typescript "isolatedModules" error;
 export {};
 
-declare const allScripts: string[] | undefined;
-
 type FileEntity = {
   file: File;
   insideBackground: boolean;
@@ -21,8 +19,14 @@ type ChecksumSnapshot = {
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
 const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
-const backgroundScripts = getBackgroundScripts();
 const contentScripts = getContentScripts();
+
+let backgroundScripts: string[] = [];
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg?.type === "__hr_bg_scripts") {
+    backgroundScripts = msg.scripts;
+  }
+});
 
 chrome.management.getSelf(async (self) => {
   if (self.installType === "development") {
@@ -84,6 +88,8 @@ async function watchChanges(
 
         // Reload extension tabs
         for (const tab of tabs) {
+          if (tab.url?.includes("hotreload")) continue;
+
           chrome.tabs.reload(tab.id!);
         }
         // Reload popup
@@ -137,10 +143,6 @@ function toChecksum(entities: FileEntity[]) {
 
 function isEntryInside(entry: Entry, paths: string[]) {
   return paths.some((p) => entry.fullPath.endsWith(p));
-}
-
-function getBackgroundScripts() {
-  return allScripts ?? [];
 }
 
 function getContentScripts() {

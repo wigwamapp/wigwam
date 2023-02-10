@@ -220,6 +220,9 @@ export class Vault {
         [St.KeyFile, keyFileB64],
         [St.Data, dataB64],
       ]);
+
+      // Persist password hash to session
+      await persistPasswordSession(nextHash);
     });
   }
 

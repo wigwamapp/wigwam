@@ -228,7 +228,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "backdrop-blur-[30px]",
                 IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
-                "z-10",
+                "z-20",
                 contentClassName
               )}
             >
