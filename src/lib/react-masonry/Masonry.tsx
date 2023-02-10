@@ -26,6 +26,7 @@ const Masonry = memo<MasonryProps>(({ items, renderItem, gap, ...rest }) => {
         gridTemplateColumns: `repeat(${columns.length}, minmax(0.5rem, 1fr))`,
         columnGap: gap,
         alignItems: "start",
+        width: "100%",
       }}
       {...rest}
     >
