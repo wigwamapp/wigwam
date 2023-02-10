@@ -7,6 +7,7 @@ import { WalletStatus } from "core/types";
 import { locked, $walletStatus } from "../state";
 import { Vault } from "../vault";
 
+const FIREFOX = process.env.TARGET_BROWSER === "firefox";
 const PU_ATTEMPS = "password_usage_attempts";
 
 export function startBruteForceProtection() {
@@ -32,15 +33,30 @@ export function startBruteForceProtection() {
         }
       }
 
-      const persistPromise =
-        attempts > 0
-          ? session.put(PU_ATTEMPS, attempts)
-          : session.remove(PU_ATTEMPS);
-
-      await persistPromise.catch(console.error);
+      await persistAttemps(attempts).catch(console.error);
     });
 }
 
 async function retrieveAttemps() {
+  // Remove me after FF MV3 starts supporting Service Workers and storage.session
+  if (FIREFOX) return +sessionStorage[PU_ATTEMPS] ?? 0;
+
   return (await session.fetchForce<number>(PU_ATTEMPS)) ?? 0;
+}
+
+async function persistAttemps(attempts: number) {
+  // Remove me after FF MV3 starts supporting Service Workers and storage.session
+  if (FIREFOX) {
+    if (attempts > 0) {
+      sessionStorage.setItem(PU_ATTEMPS, attempts.toString());
+    } else {
+      sessionStorage.removeItem(PU_ATTEMPS);
+    }
+
+    return;
+  }
+
+  return attempts > 0
+    ? session.put(PU_ATTEMPS, attempts)
+    : session.remove(PU_ATTEMPS);
 }

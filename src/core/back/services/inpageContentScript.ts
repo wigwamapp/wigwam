@@ -6,6 +6,8 @@ import browser from "webextension-polyfill";
  * https://bugs.chromium.org/p/chromium/issues/detail?id=634381
  */
 export async function startInpageContentScript() {
+  if (process.env.TARGET_BROWSER === "firefox") return;
+
   try {
     await browser.scripting.registerContentScripts([
       {

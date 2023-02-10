@@ -64,6 +64,7 @@ const {
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
 } = process.env;
+const FIREFOX_TARGET = TARGET_BROWSER === "firefox";
 const ENV_BADGE = [
   ENV_SHORT === "prod" ? null : ENV_SHORT,
   RELEASE_ENV === "true" ? null : "staging",
@@ -79,7 +80,7 @@ const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
 const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SHORT);
 const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
-const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
+const PACKED_EXTENSION = FIREFOX_TARGET ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
   DEST_PATH,
   `${TARGET_BROWSER}.${PACKED_EXTENSION}`
@@ -99,8 +100,8 @@ const HTML_PLUGIN_TEMPLATES = [
     chunks: ["hotreload"],
   },
   {
-    jsWorker: true,
-    path: path.join(PUBLIC_PATH, "sw.js"),
+    jsWorker: !FIREFOX_TARGET,
+    path: path.join(PUBLIC_PATH, FIREFOX_TARGET ? "back.html" : "sw.js"),
     chunks: ["back"],
   },
   {
@@ -603,7 +604,7 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
 /**
  *  Fork of `wext-manifest`
  */
-const browserVendors = ["chrome", "firefox", "opera", "edge", "safari"];
+const browserVendors = ["chrome", "firefox", "safari"];
 const vendorRegExp = new RegExp(
   `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`
 );
