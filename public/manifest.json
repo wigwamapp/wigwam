@@ -1,6 +1,5 @@
 {
-  "__chrome__manifest_version": 3,
-  "__firefox__manifest_version": 2,
+  "manifest_version": 3,
   "name": "{{envBadge}}Vigvam — Web 3.0 Wallet",
   "version": "{{pkg.version}}",
 
@@ -34,17 +33,10 @@
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
   },
   "__firefox__content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
   },
 
   "author": "{{website}}",
-
-  "__firefox__applications": {
-    "gecko": {
-      "id": "webextension@vigvam.app",
-      "strict_min_version": "68.0"
-    }
-  },
 
   "__chrome__minimum_chrome_version": "73",
 
@@ -64,8 +56,7 @@
 
   "background": {
     "__chrome__service_worker": "sw.js",
-    "__firefox__page": "back.html",
-    "__firefox__persistent": true
+    "__firefox__page": "back.html"
   },
 
   "content_scripts": [
