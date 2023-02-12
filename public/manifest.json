@@ -18,8 +18,7 @@
     "storage",
     "clipboardWrite",
     "activeTab",
-    "scripting",
-    "alarms"
+    "scripting"
   ],
 
   "host_permissions": [
