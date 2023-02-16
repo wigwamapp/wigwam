@@ -19,7 +19,9 @@ function initMsgGateway() {
       process.env.NODE_ENV === "development" &&
       process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true"
     ) {
-      location.reload();
+      // Wait for the fresh content script to be loaded
+      // via browser.scripting.registerContentScripts()
+      setTimeout(() => location.reload(), 300);
       return;
     }
 

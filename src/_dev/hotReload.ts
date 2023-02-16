@@ -19,7 +19,10 @@ type ChecksumSnapshot = {
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
 const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
-const contentScripts = getContentScripts();
+let contentScripts = getStaticContentScripts();
+// Wait for the fresh content script to be loaded
+// via browser.scripting.registerContentScripts()
+setTimeout(scheduleContentScriptsUpdate, 300);
 
 let backgroundScripts: string[] = [];
 chrome.runtime.onMessage.addListener((msg) => {
@@ -145,7 +148,7 @@ function isEntryInside(entry: Entry, paths: string[]) {
   return paths.some((p) => entry.fullPath.endsWith(p));
 }
 
-function getContentScripts() {
+function getStaticContentScripts() {
   const manifest = chrome.runtime.getManifest();
   const scriptSet = new Set<string>();
 
@@ -170,6 +173,22 @@ function getContentScripts() {
   }
 
   return Array.from(scriptSet);
+}
+
+async function scheduleContentScriptsUpdate() {
+  const registered = await chrome.scripting
+    .getRegisteredContentScripts()
+    .catch(() => []);
+
+  const scriptSet = new Set(contentScripts);
+
+  for (const { js } of registered) {
+    js?.forEach((s) => scriptSet.add(s));
+  }
+
+  contentScripts = Array.from(scriptSet);
+
+  setTimeout(scheduleContentScriptsUpdate, 5_000);
 }
 
 async function getActiveMainTab(): Promise<chrome.tabs.Tab | undefined> {
