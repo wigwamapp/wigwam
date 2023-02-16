@@ -17,6 +17,7 @@ function inject(key: string, sharedProperty = false) {
   const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
   const redefineProperty =
     !propertyDescriptor || propertyDescriptor.configurable;
+  const propIsMetaMaskPreferred = sharedProperty && redefineProperty;
 
   const universal = new UniversalInpageProvider(
     existing && redefineProperty
@@ -27,7 +28,8 @@ function inject(key: string, sharedProperty = false) {
             : [existing]),
         ]
       : [vigvam],
-    sharedProperty
+    sharedProperty,
+    propIsMetaMaskPreferred
   );
 
   if (redefineProperty) {

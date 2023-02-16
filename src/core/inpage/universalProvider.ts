@@ -21,9 +21,12 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   get isMetaMask() {
-    return this.selectedAddress
-      ? this.currentProvider.isMetaMask
-      : this.allProviders.some((p) => p.isMetaMask);
+    return (
+      this.propIsMetaMaskPreferred &&
+      (this.selectedAddress
+        ? this.currentProvider.isMetaMask
+        : this.allProviders.some((p) => p.isMetaMask))
+    );
   }
 
   get _metamask() {
@@ -48,7 +51,11 @@ export class UniversalInpageProvider extends Emitter {
     return this.currentProvider.selectedAddress;
   }
 
-  constructor(existingProviders: InpageProvider[], sharedProperty = false) {
+  constructor(
+    existingProviders: InpageProvider[],
+    sharedProperty = false,
+    private propIsMetaMaskPreferred = false
+  ) {
     super();
 
     if (existingProviders.length === 0) {
