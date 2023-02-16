@@ -14,8 +14,12 @@ function inject(key: string, sharedProperty = false) {
     return;
   }
 
+  const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
+  const redefineProperty =
+    !propertyDescriptor || propertyDescriptor.configurable;
+
   const universal = new UniversalInpageProvider(
-    existing
+    existing && redefineProperty
       ? [
           vigvam,
           ...(Array.isArray(existing.providers)
@@ -26,14 +30,9 @@ function inject(key: string, sharedProperty = false) {
     sharedProperty
   );
 
-  const propertyDescriptor = Object.getOwnPropertyDescriptor(window, key);
-  if (propertyDescriptor && "set" in propertyDescriptor) {
-    if ((existing as any).isRabby) return;
-
-    (window as any)[key] = universal;
-  } else {
+  if (redefineProperty) {
     Object.defineProperty(window, key, {
-      configurable: true,
+      configurable: false,
       get() {
         return universal;
       },
@@ -41,6 +40,12 @@ function inject(key: string, sharedProperty = false) {
         if (value) universal.addProviders(value);
       },
     });
+  } else {
+    try {
+      (window as any)[key] = universal;
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
   if (!existing) {
