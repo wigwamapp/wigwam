@@ -9,51 +9,43 @@ import {
 import type { InpageProvider } from "./provider";
 
 export class UniversalInpageProvider extends Emitter {
-  #allProviders: InpageProvider[] = [];
-  #currentProvider: InpageProvider;
+  allProviders: InpageProvider[] = [];
+  currentProvider: InpageProvider;
 
   #sharedProperty: boolean;
 
   get #enabledProviders() {
     return this.#sharedProperty
-      ? this.#allProviders.filter((p) => !p.isVigvam || p.sharedPropertyEnabled)
-      : this.#allProviders;
-  }
-
-  get allProviders() {
-    return this.#allProviders;
-  }
-
-  get currentProvider() {
-    return this.#currentProvider;
+      ? this.allProviders.filter((p) => !p.isVigvam || p.sharedPropertyEnabled)
+      : this.allProviders;
   }
 
   get isMetaMask() {
     return this.selectedAddress
-      ? this.#currentProvider.isMetaMask
-      : this.#allProviders.some((p) => p.isMetaMask);
+      ? this.currentProvider.isMetaMask
+      : this.allProviders.some((p) => p.isMetaMask);
   }
 
   get _metamask() {
-    return (this.#currentProvider as any)._metamask ?? {};
+    return (this.currentProvider as any)._metamask ?? {};
   }
 
   get isVigvam() {
     return this.selectedAddress
-      ? this.#currentProvider.isVigvam
-      : this.#allProviders.some((p) => p.isVigvam);
+      ? this.currentProvider.isVigvam
+      : this.allProviders.some((p) => p.isVigvam);
   }
 
   get chainId() {
-    return this.#currentProvider.chainId;
+    return this.currentProvider.chainId;
   }
 
   get networkVersion() {
-    return this.#currentProvider.networkVersion;
+    return this.currentProvider.networkVersion;
   }
 
   get selectedAddress() {
-    return this.#currentProvider.selectedAddress;
+    return this.currentProvider.selectedAddress;
   }
 
   constructor(existingProviders: InpageProvider[], sharedProperty = false) {
@@ -65,12 +57,13 @@ export class UniversalInpageProvider extends Emitter {
 
     this.#sharedProperty = sharedProperty;
 
-    this.#currentProvider = existingProviders[0];
+    this.currentProvider = existingProviders[0];
     this.#proxyEvents();
 
     this.addProviders(...existingProviders);
 
     // Fixes incorrect instance usage by some dApps >_<
+    this.addProviders = this.addProviders.bind(this);
     this.request = this.request.bind(this);
     this.isConnected = this.isConnected.bind(this);
     this.sendAsync = this.sendAsync.bind(this);
@@ -81,7 +74,7 @@ export class UniversalInpageProvider extends Emitter {
 
   addProviders(...newProviders: InpageProvider[]) {
     for (const provider of newProviders) {
-      this.#allProviders.push(provider);
+      this.allProviders.push(provider);
 
       provider.on("connect", () => setTimeout(() => this.#reshuffle()));
       provider.on("accountsChanged", () => this.#reshuffle());
@@ -92,11 +85,11 @@ export class UniversalInpageProvider extends Emitter {
 
   #reshuffle() {
     const changeProvider = (provider: InpageProvider) => {
-      if (provider === this.#currentProvider) return;
+      if (provider === this.currentProvider) return;
 
-      const prevProvider = this.#currentProvider;
+      const prevProvider = this.currentProvider;
 
-      this.#currentProvider = provider;
+      this.currentProvider = provider;
       this.#proxyEvents();
 
       this.emit("accountsChanged", [provider.selectedAddress]);
@@ -122,8 +115,8 @@ export class UniversalInpageProvider extends Emitter {
 
     if (this.selectedAddress) return;
 
-    for (const provider of this.#allProviders) {
-      if (provider !== this.#currentProvider && provider.selectedAddress) {
+    for (const provider of this.allProviders) {
+      if (provider !== this.currentProvider && provider.selectedAddress) {
         changeProvider(provider);
         break;
       }
@@ -135,7 +128,7 @@ export class UniversalInpageProvider extends Emitter {
   #proxyEvents() {
     this.#unsubEvents?.();
 
-    const provider = this.#currentProvider;
+    const provider = this.currentProvider;
     const unsubs: (() => void)[] = [];
 
     if ((provider as any) === this) return;
@@ -168,9 +161,9 @@ export class UniversalInpageProvider extends Emitter {
             if (done) return;
             done = true;
 
-            this.#allProviders = [
+            this.allProviders = [
               provider,
-              ...this.#allProviders.filter((p) => p !== provider),
+              ...this.allProviders.filter((p) => p !== provider),
             ];
 
             res(result);
@@ -187,15 +180,15 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   request(args: RequestArguments): Promise<unknown> {
-    if (isPermissionMethod(args.method, this.#currentProvider)) {
+    if (isPermissionMethod(args.method, this.currentProvider)) {
       return this.#requestPermissionsAll((p) => p.request(args));
     }
 
-    return this.#currentProvider.request(args);
+    return this.currentProvider.request(args);
   }
 
   isConnected() {
-    return this.#allProviders.some((p) => p.isConnected?.());
+    return this.allProviders.some((p) => p.isConnected?.());
   }
 
   sendAsync(payload: any, callback: any): void {
@@ -212,7 +205,7 @@ export class UniversalInpageProvider extends Emitter {
         ? methodOrPayload
         : methodOrPayload.method;
 
-    if (isPermissionMethod(method, this.#currentProvider)) {
+    if (isPermissionMethod(method, this.currentProvider)) {
       if (typeof callbackOrArgs !== "function") {
         return this.#requestPermissionsAll((p) =>
           p.send(methodOrPayload, callbackOrArgs)
@@ -234,11 +227,11 @@ export class UniversalInpageProvider extends Emitter {
       }
     }
 
-    return this.#currentProvider.send(methodOrPayload, callbackOrArgs);
+    return this.currentProvider.send(methodOrPayload, callbackOrArgs);
   }
 
   sendSync(payload: SendSyncJsonRpcRequest) {
-    return this.#currentProvider.sendSync(payload);
+    return this.currentProvider.sendSync(payload);
   }
 }
 
