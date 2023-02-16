@@ -74,6 +74,10 @@ export class UniversalInpageProvider extends Emitter {
 
   addProviders(...newProviders: InpageProvider[]) {
     for (const provider of newProviders) {
+      if (this === (provider as any) || this.allProviders.includes(provider)) {
+        continue;
+      }
+
       this.allProviders.push(provider);
 
       provider.on("connect", () => setTimeout(() => this.#reshuffle()));
