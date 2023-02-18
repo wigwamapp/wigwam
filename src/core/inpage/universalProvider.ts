@@ -5,6 +5,7 @@ import {
   SendSyncJsonRpcRequest,
   JsonRpcMethod,
 } from "core/types/rpc";
+import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import type { InpageProvider } from "./provider";
 
@@ -15,9 +16,18 @@ export class UniversalInpageProvider extends Emitter {
   #sharedProperty: boolean;
 
   get #enabledProviders() {
-    return this.#sharedProperty
-      ? this.allProviders.filter((p) => !p.isVigvam || p.sharedPropertyEnabled)
-      : this.allProviders;
+    if (!this.#sharedProperty) return this.allProviders;
+
+    const allVigvamStrict = this.allProviders.filter(
+      (p) => p.isVigvam && p.mmCompatible === MetaMaskCompatibleMode.Strict
+    );
+
+    // If we have vigvam providers with strict metamask compatible mode (use as default)
+    if (allVigvamStrict.length > 0) return allVigvamStrict;
+
+    return this.allProviders.filter(
+      (p) => !p.isVigvam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid
+    );
   }
 
   get isMetaMask() {

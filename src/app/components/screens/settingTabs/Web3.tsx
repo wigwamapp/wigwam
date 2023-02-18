@@ -3,10 +3,11 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 
+import { MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
 
 import { getAllPermissionsAtom, web3MetaMaskCompatibleAtom } from "app/atoms";
-import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
+import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
@@ -17,7 +18,9 @@ import IconedButton from "app/components/elements/IconedButton";
 
 const Web3: FC = () => {
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
-  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
+  const setMetamaskMode = useSetMetaMaskCompatibleMode();
+
+  const metamaskModeEnabled = metamaskMode !== MetaMaskCompatibleMode.Off;
 
   return (
     <div className="flex flex-col items-start">
@@ -41,9 +44,13 @@ const Web3: FC = () => {
       <Switcher
         id="web3_metamask_compatible"
         label="MetaMask Compatible Mode"
-        text={metamaskMode ? "Enabled" : "Disabled"}
-        checked={metamaskMode}
-        onCheckedChange={toggleMetamaskMode}
+        text={metamaskModeEnabled ? "Enabled" : "Disabled"}
+        checked={metamaskModeEnabled}
+        onCheckedChange={(checked) =>
+          setMetamaskMode(
+            checked ? MetaMaskCompatibleMode.Strict : MetaMaskCompatibleMode.Off
+          )
+        }
         className="min-w-[17.75rem]"
       />
 

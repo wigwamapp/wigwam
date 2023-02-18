@@ -1,3 +1,5 @@
+import { MetaMaskCompatibleMode } from "core/types/shared";
+
 const ONE_HOUR = 60 * 60_000;
 const TWO_DAYS = 2 * 24 * ONE_HOUR;
 
@@ -13,4 +15,4 @@ export const AUTO_LOCK_TIMEOUTS: number[] = [
 
 export const DEFAULT_AUTO_LOCK_TIMEOUT = TWO_DAYS;
 
-export const DEFAULT_WEB_METAMASK_COMPATIBLE = true;
+export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Off;

@@ -2,6 +2,7 @@ import { ethErrors } from "eth-rpc-errors";
 import { nanoid } from "nanoid";
 import { Emitter } from "lib/emitter";
 
+import { MetaMaskCompatibleMode } from "core/types/shared";
 import {
   JsonRpcResponse,
   JsonRpcRequest,
@@ -34,7 +35,7 @@ export class InpageProvider extends Emitter {
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
-  sharedPropertyEnabled = true;
+  mmCompatible = MetaMaskCompatibleMode.Hybrid;
 
   /**
    * The chain ID of the currently connected Ethereum chain.
@@ -80,10 +81,9 @@ export class InpageProvider extends Emitter {
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
       if (evt?.method === VIGVAM_STATE) {
-        const { chainId, accountAddress, sharedPropertyEnabled } =
-          evt.params as any;
+        const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
-        this.sharedPropertyEnabled = sharedPropertyEnabled;
+        this.mmCompatible = mmCompatible;
 
         this.#handleNetworkChange(chainId);
         this.#handleAccountChange(accountAddress || null);
