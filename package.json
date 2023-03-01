@@ -106,7 +106,7 @@
     "@babel/runtime": "7.20.7",
     "@svgr/webpack": "6.5.1",
     "@swc/core": "1.3.26",
-    "@swc/jest": "0.2.24",
+    "@swc/jest": "./.vendor/swc-jest",
     "@tailwindcss/line-clamp": "0.4.2",
     "@tailwindcss/typography": "0.5.9",
     "@testing-library/jest-dom": "5.16.5",
@@ -176,7 +176,8 @@
     "json5": ">=2.2.2",
     "terser": ">=5.14.2",
     "loader-utils": "2.0.4",
-    "@xmldom/xmldom": ">=0.7.7"
+    "@xmldom/xmldom": ">=0.7.7",
+    "flux": "./.vendor/flux"
   },
   "engines": {
     "node": ">=16"
