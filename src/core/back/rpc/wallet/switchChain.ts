@@ -5,7 +5,7 @@ import { RpcReply, ActivitySource } from "core/types";
 import * as repo from "core/repo";
 
 import {
-  handleWelcomeState,
+  assertWalletSetuped,
   validateNetwork,
   createJustNetworkPermission,
 } from "./validation";
@@ -17,7 +17,7 @@ export async function requestSwitchChain(
   params: any[],
   rpcReply: RpcReply
 ) {
-  handleWelcomeState();
+  assertWalletSetuped();
 
   let chainId: number;
   try {

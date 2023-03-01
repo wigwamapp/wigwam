@@ -2,6 +2,7 @@ import { Describe, define, object, optional, array } from "superstruct";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
 import { nanoid } from "nanoid";
+import { openOrFocusMainTab } from "lib/ext/utils";
 
 import { ActivitySource, TxParams, WalletStatus } from "core/types";
 import { getNetwork } from "core/common";
@@ -15,11 +16,12 @@ export function validatePermission(source: ActivitySource) {
   }
 }
 
-export function handleWelcomeState() {
+export function assertWalletSetuped(opts?: { openIfNotSetuped: true }) {
   const status = $walletStatus.getState();
   if (status === WalletStatus.Welcome) {
-    // TODO: Add it only for Connect to Vigvam
-    // openOrFocusMainTab();
+    if (opts?.openIfNotSetuped) {
+      openOrFocusMainTab();
+    }
 
     throw ethErrors.provider.userRejectedRequest();
   }

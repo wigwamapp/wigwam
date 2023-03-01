@@ -5,7 +5,7 @@ import * as repo from "core/repo";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { approvalAdded } from "core/back/state";
 
-import { handleWelcomeState } from "./validation";
+import { assertWalletSetuped } from "./validation";
 
 export async function requestConnection(
   source: ActivitySource,
@@ -13,8 +13,12 @@ export async function requestConnection(
   returnSelectedAccount: boolean,
   rpcReply: RpcReply
 ) {
-  handleWelcomeState();
+  assertWalletSetuped({ openIfNotSetuped: true });
 
+  // It can be good feature
+  // dApp can set preferred chain id when it starts connection
+  // But this flow doesn't exist in spec
+  // ------
   // let preferredChainId = parseChainId(params[0]);
   // if (preferredChainId) {
   //   try {
