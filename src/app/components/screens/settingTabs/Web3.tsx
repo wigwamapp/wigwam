@@ -1,63 +1,42 @@
 import { FC, memo, MouseEvent, useCallback } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 
-import { MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
 
-import { getAllPermissionsAtom, web3MetaMaskCompatibleAtom } from "app/atoms";
-import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
+import { getAllPermissionsAtom } from "app/atoms";
 
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
-import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
 import IconedButton from "app/components/elements/IconedButton";
+import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
 
-const Web3: FC = () => {
-  const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
-  const setMetamaskMode = useSetMetaMaskCompatibleMode();
+const Web3: FC = () => (
+  <div className="flex flex-col items-start">
+    <SettingsHeader className="!mb-3">Web3</SettingsHeader>
 
-  const metamaskModeEnabled = metamaskMode !== MetaMaskCompatibleMode.Off;
+    <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+      Vigvam is always available to interact with applications using its
+      communication protocol `window.vigvamEthereum`. Vigvam also supports a
+      common communication protocol, like MetaMask. Learn more about{" "}
+      <a
+        href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
+        target="_blank"
+        rel="nofollow noreferrer"
+        className="underline"
+      >
+        how it works here
+      </a>
+      .
+    </p>
 
-  return (
-    <div className="flex flex-col items-start">
-      <SettingsHeader className="!mb-3">Web3</SettingsHeader>
+    <WebThreeCompatible />
 
-      <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-        Vigvam is always available to interact with applications using its
-        communication protocol `window.vigvamEthereum`. Vigvam also supports a
-        common communication protocol, like MetaMask. Learn more about{" "}
-        <a
-          href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-          target="_blank"
-          rel="nofollow noreferrer"
-          className="underline"
-        >
-          how it works here
-        </a>
-        .
-      </p>
-
-      <Switcher
-        id="web3_metamask_compatible"
-        label="MetaMask Compatible Mode"
-        text={metamaskModeEnabled ? "Enabled" : "Disabled"}
-        checked={metamaskModeEnabled}
-        onCheckedChange={(checked) =>
-          setMetamaskMode(
-            checked ? MetaMaskCompatibleMode.Strict : MetaMaskCompatibleMode.Off
-          )
-        }
-        className="min-w-[17.75rem]"
-      />
-
-      <PermissionsList />
-    </div>
-  );
-};
+    <PermissionsList />
+  </div>
+);
 
 export default Web3;
 
