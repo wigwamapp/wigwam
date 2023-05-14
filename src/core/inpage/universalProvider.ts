@@ -8,12 +8,20 @@ import {
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import type { InpageProvider } from "./provider";
+import ICON_SVG_BASE64 from "./iconSvgBase64";
 
 export class UniversalInpageProvider extends Emitter {
   allProviders: InpageProvider[] = [];
   currentProvider: InpageProvider;
 
   #sharedProperty: boolean;
+
+  info = {
+    uuid: "7ad58acf-bad8-4917-9a13-6807bb867eb7",
+    name: "Vigvam",
+    description: "Vigvam — Web 3.0 Wallet",
+    image: ICON_SVG_BASE64,
+  };
 
   get #enabledProviders() {
     if (!this.#sharedProperty) return this.allProviders;

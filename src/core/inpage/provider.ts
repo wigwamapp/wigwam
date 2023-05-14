@@ -55,13 +55,14 @@ export class InpageProvider extends Emitter {
   #reqIdPrefix = nanoid();
   #nextReqId = 0;
 
-  #inpage = new InpageProtocol("injected", "content");
+  #inpage: InpageProtocol;
   #filter = new FilterManager(this);
   #subscription = new SubscriptionManager(this, this.#filter);
 
-  constructor() {
+  constructor(inpageProto: InpageProtocol) {
     super();
 
+    this.#inpage = inpageProto;
     this.#listenInpage();
     this.#listenNotifications();
   }

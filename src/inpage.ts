@@ -1,7 +1,29 @@
+import { InpageProtocol } from "core/inpage/protocol";
 import { InpageProvider } from "core/inpage/provider";
 import { UniversalInpageProvider } from "core/inpage/universalProvider";
+import { JSONRPC, VIGVAM_STATE } from "core/common/rpc";
+import { MetaMaskCompatibleMode } from "core/types/shared";
 
-const vigvam = new InpageProvider();
+const inpageProto = new InpageProtocol("injected", "content");
+const vigvam = new InpageProvider(inpageProto);
+
+const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
+  const unsub = inpageProto.subscribe((payload) => {
+    if (payload?.jsonrpc === JSONRPC && payload?.method === VIGVAM_STATE) {
+      const metamaskModeEnabled =
+        payload.params.mmCompatible !== MetaMaskCompatibleMode.Off;
+
+      res(metamaskModeEnabled);
+      unsub();
+    }
+  });
+
+  // Fallback
+  setTimeout(() => {
+    res(false);
+    unsub();
+  }, 3_000);
+});
 
 inject("ethereum", true);
 inject("vigvamEthereum");
@@ -21,26 +43,25 @@ function inject(key: string, sharedProperty = false) {
 
   const universal = new UniversalInpageProvider(
     existing && redefineProperty
-      ? [
-          vigvam,
-          ...(Array.isArray(existing.providers)
-            ? new Set([existing, ...existing.providers])
-            : [existing]),
-        ]
+      ? [vigvam, ...getProvidersInline(existing)]
       : [vigvam],
     sharedProperty,
     propIsMetaMaskPreferred
   );
 
   if (redefineProperty) {
-    Object.defineProperty(window, key, {
-      configurable: false,
-      get() {
-        return universal;
-      },
-      set(value) {
-        if (value) universal.addProviders(value);
-      },
+    isMetaMaskModeEnabled.then((enabled) => {
+      if (!enabled) return;
+
+      Object.defineProperty(window, key, {
+        configurable: false,
+        get() {
+          return universal;
+        },
+        set(value) {
+          if (value) universal.addProviders(value);
+        },
+      });
     });
   } else {
     try {
@@ -53,4 +74,16 @@ function inject(key: string, sharedProperty = false) {
   if (!existing) {
     window.dispatchEvent(new Event(`${key}#initialized`));
   }
+}
+
+function getProvidersInline(existing: any) {
+  try {
+    if (Array.isArray(existing.providers)) {
+      return new Set([existing, ...existing.providers]);
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+
+  return [existing];
 }
