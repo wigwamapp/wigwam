@@ -15,4 +15,4 @@ export const AUTO_LOCK_TIMEOUTS: number[] = [
 
 export const DEFAULT_AUTO_LOCK_TIMEOUT = TWO_DAYS;
 
-export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Off;
+export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Hybrid;
