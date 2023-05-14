@@ -58,7 +58,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             <h2
               className={classNames(
                 !small && "mb-8",
-                small && "mb-4",
+                small && "mt-3 mb-4",
                 !small && "text-2xl",
                 small && "text-xl",
                 "text-center font-bold",

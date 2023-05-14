@@ -8,7 +8,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/check-big.svg";
 
 import { useDialog } from "./dialog";
 
-export function useSetMetaMaskCompatibleMode() {
+export function useSetMetaMaskCompatibleMode(withDialog = true) {
   const setMetamaskMode = useSetAtom(web3MetaMaskCompatibleAtom);
   const { alert, confirm } = useDialog();
 
@@ -44,27 +44,39 @@ export function useSetMetaMaskCompatibleMode() {
           setMetamaskMode(MetaMaskCompatibleMode.Off);
         }
       } else {
-        setMetamaskMode(MetaMaskCompatibleMode.Strict);
-        alert({
-          title: (
-            <div className="flex flex-col items-center">
-              <SuccessIcon className="mb-4" />
-              MetaMask compatible mode
-            </div>
-          ),
-          content: (
-            <>
-              <p>
-                MetaMask compatible mode <strong>enabled</strong>.
-                <br />
-                Refresh active browser tabs where dApps are opened for the
-                changes to take effect.
-              </p>
-            </>
-          ),
-        });
+        setMetamaskMode(modeToSet);
+        withDialog
+          ? alert({
+              title: (
+                <div className="flex flex-col items-center">
+                  <SuccessIcon className="mb-4" />
+                  MetaMask compatible mode
+                </div>
+              ),
+              content: (
+                <>
+                  <p>
+                    MetaMask compatible mode switched to{" "}
+                    <strong>
+                      {modeToSet === MetaMaskCompatibleMode.Strict
+                        ? "By Default"
+                        : "Hybrid"}
+                    </strong>
+                    .{" "}
+                    {modeToSet === MetaMaskCompatibleMode.Strict
+                      ? "Only Vigvam will be connected to dApps"
+                      : "You will be able to choose any wallet while connecting"}
+                    .
+                    <br />
+                    Refresh active browser tabs where dApps are opened for the
+                    changes to take effect.
+                  </p>
+                </>
+              ),
+            })
+          : null;
       }
     },
-    [alert, confirm, setMetamaskMode]
+    [alert, confirm, setMetamaskMode, withDialog]
   );
 }

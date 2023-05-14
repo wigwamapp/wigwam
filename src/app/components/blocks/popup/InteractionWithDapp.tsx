@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
@@ -12,10 +12,13 @@ import {
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
+import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "app/components/elements/SecondaryModal";
 import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
@@ -25,7 +28,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const currentAccount = useAtomValue(currentAccountAtom);
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
 
-  const setMetamaskMode = useSetMetaMaskCompatibleMode();
+  const [web3DialogOpened, setWeb3DialogOpened] = useState(false);
 
   const metamaskModeEnabled = metamaskMode !== MetaMaskCompatibleMode.Off;
 
@@ -224,15 +227,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             </>
           ) : (
             <p>
-              MetaMask compatible mode is{" "}
-              {metamaskModeEnabled ? "enabled" : "disabled"}. To{" "}
-              {metamaskModeEnabled ? "disable" : "enable"} it, click this icon.
-              {metamaskModeEnabled && (
-                <>
-                  <br /> Please note, you won&apos;t be able to interact with
-                  dApps!
-                </>
-              )}
+              MetaMask compatible mode is {metamaskMode}. To change its state,
+              click this icon.
             </p>
           )
         }
@@ -242,13 +238,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       >
         <button
           type="button"
-          onClick={() =>
-            setMetamaskMode(
-              metamaskModeEnabled
-                ? MetaMaskCompatibleMode.Off
-                : MetaMaskCompatibleMode.Strict
-            )
-          }
+          onClick={() => setWeb3DialogOpened(true)}
           className={classNames(
             "flex items-center",
             "min-h-8 py-1 px-2.5",
@@ -271,7 +261,23 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           />
         </button>
       </Tooltip>
+      <Web3CompatibleModeDialog
+        open={web3DialogOpened}
+        onOpenChange={setWeb3DialogOpened}
+      />
     </div>
+  );
+};
+
+const Web3CompatibleModeDialog: FC<SecondaryModalProps> = ({
+  header = "MetaMask compatible mode",
+  small = true,
+  ...rest
+}) => {
+  return (
+    <SecondaryModal header={header} small={small} {...rest}>
+      <WebThreeCompatible small />
+    </SecondaryModal>
   );
 };
 
