@@ -5,8 +5,10 @@ import {
   SendSyncJsonRpcRequest,
   JsonRpcMethod,
 } from "core/types/rpc";
+import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import type { InpageProvider } from "./provider";
+import ICON_SVG_BASE64 from "./iconSvgBase64";
 
 export class UniversalInpageProvider extends Emitter {
   allProviders: InpageProvider[] = [];
@@ -14,10 +16,26 @@ export class UniversalInpageProvider extends Emitter {
 
   #sharedProperty: boolean;
 
+  info = {
+    uuid: "7ad58acf-bad8-4917-9a13-6807bb867eb7",
+    name: "Vigvam",
+    description: "Vigvam — Web 3.0 Wallet",
+    image: ICON_SVG_BASE64,
+  };
+
   get #enabledProviders() {
-    return this.#sharedProperty
-      ? this.allProviders.filter((p) => !p.isVigvam || p.sharedPropertyEnabled)
-      : this.allProviders;
+    if (!this.#sharedProperty) return this.allProviders;
+
+    const allVigvamStrict = this.allProviders.filter(
+      (p) => p.isVigvam && p.mmCompatible === MetaMaskCompatibleMode.Strict
+    );
+
+    // If we have vigvam providers with strict metamask compatible mode (use as default)
+    if (allVigvamStrict.length > 0) return allVigvamStrict;
+
+    return this.allProviders.filter(
+      (p) => !p.isVigvam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid
+    );
   }
 
   get isMetaMask() {
