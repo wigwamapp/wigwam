@@ -24,6 +24,7 @@ import {
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
 import { SubscriptionManager } from "./subscriptionManager";
+import ICON_SVG_BASE64 from "./iconSvgBase64";
 
 const gatewayEventType = Symbol();
 const stateUpdatedType = Symbol();
@@ -50,6 +51,13 @@ export class InpageProvider extends Emitter {
    * addresses to be viewed.
    */
   selectedAddress: string | null = null;
+
+  info = {
+    uuid: `vigvam-${process.env.BUILD_ID}`,
+    name: "Vigvam",
+    description: "Vigvam — Web 3.0 Wallet",
+    image: ICON_SVG_BASE64,
+  };
 
   #inited = false;
   #reqIdPrefix = nanoid();

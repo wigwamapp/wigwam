@@ -27,6 +27,7 @@ const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
 
 inject("ethereum", true);
 inject("vigvamEthereum");
+injectEIP5749("evmproviders");
 
 function inject(key: string, sharedProperty = false) {
   const existing = (window as any)[key];
@@ -49,20 +50,25 @@ function inject(key: string, sharedProperty = false) {
     propIsMetaMaskPreferred
   );
 
-  if (redefineProperty) {
-    isMetaMaskModeEnabled.then((enabled) => {
-      if (!enabled) return;
-
-      Object.defineProperty(window, key, {
-        configurable: false,
-        get() {
-          return universal;
-        },
-        set(value) {
-          if (value) universal.addProviders(value);
-        },
-      });
+  const defineProperty = () =>
+    Object.defineProperty(window, key, {
+      configurable: false,
+      get() {
+        return universal;
+      },
+      set(value) {
+        if (value) universal.addProviders(value);
+      },
     });
+
+  if (redefineProperty) {
+    if (existing && sharedProperty) {
+      isMetaMaskModeEnabled.then((enabled) => {
+        if (enabled) defineProperty();
+      });
+    } else {
+      defineProperty();
+    }
   } else {
     try {
       (window as any)[key] = universal;
@@ -86,4 +92,11 @@ function getProvidersInline(existing: any) {
   }
 
   return [existing];
+}
+
+function injectEIP5749(key: string) {
+  const evmProviders: Record<string, InpageProvider> =
+    (window as any)[key] || ((window as any)[key] = {});
+
+  evmProviders[vigvam.info.uuid] = vigvam;
 }
