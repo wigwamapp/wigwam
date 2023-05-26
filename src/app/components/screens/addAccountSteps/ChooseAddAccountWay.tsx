@@ -182,11 +182,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           let closed = false;
           onClose(() => (closed = true));
 
-          const {
-            default: OpenLogin,
-            UX_MODE,
-            storeKey,
-          } = await import("@toruslabs/openlogin");
+          const { default: OpenLogin } = await import("@toruslabs/openlogin");
 
           const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
           assert(clientId, "Client ID was not specified");
@@ -194,27 +190,28 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           const openlogin = new OpenLogin({
             clientId,
             network: "mainnet",
-            uxMode: UX_MODE.POPUP,
+            uxMode: "popup",
             replaceUrlOnRedirect: false,
+            storageKey: "session",
           });
-          localStorage.removeItem("loglevel:http-helpers");
-          localStorage.removeItem("loglevel");
+          // https://github.com/torusresearch/OpenLoginSdk/pull/237
+          openlogin.options.replaceUrlOnRedirect = false;
 
-          onClose(() => {
-            openlogin._cleanup();
-            localStorage.setItem(storeKey, JSON.stringify({}));
-          });
+          // onClose(() => {
+          //   openlogin.destroy();
+          //   localStorage.setItem(storeKey, JSON.stringify({}));
+          // });
 
           await openlogin.init();
-          await openlogin.logout().catch(console.warn);
+          // await openlogin.logout().catch(console.warn);
 
           if (closed) return false;
 
           const { privKey } = await openlogin.login({
             loginProvider: openLoginMethod,
           });
-          const { email, name } = await openlogin.getUserInfo();
-          await openlogin.logout().catch(console.warn);
+          const { email, name } = openlogin.getUserInfo();
+          // await openlogin.logout().catch(console.warn);
 
           if (closed) return false;
 
@@ -264,6 +261,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
       ),
       loadingHandler: handleConnect,
     }).then((answer) => {
+      console.info({ answer });
       if (answer) {
         navigateToStep(AddAccountStep.VerifyToAdd);
       }
