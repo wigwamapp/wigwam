@@ -57,7 +57,7 @@
     "@toruslabs/openlogin": "4.4.0",
     "argon2-browser": "1.18.0",
     "async-retry": "1.3.3",
-    "axios": "1.2.2",
+    "axios": "1.4.0",
     "axios-fetch-adapter": "./.vendor/axios-fetch-adapter",
     "bignumber.js": "9.1.1",
     "boring-avatars": "1.7.0",
