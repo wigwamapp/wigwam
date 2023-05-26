@@ -20,12 +20,12 @@ export enum TEvent {
   DappTransaction = "DAPP_TRANSACTION_OPENED",
 }
 
-export const trackEvent: AmplitudeClient["track"] = async (
-  ...args
+export const trackEvent = async (
+  ...args: Parameters<AmplitudeClient["track"]>
 ): Promise<any> => {
   const amplitued = await getAmplitude();
 
-  return amplitued?.track(...args);
+  return amplitued?.track(...args).promise;
 };
 
 export const isTrackingEnabled = () => getAmplitude().then(Boolean);
