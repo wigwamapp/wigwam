@@ -215,10 +215,13 @@ module.exports = {
                         params: {
                           overrides: {
                             removeViewBox: false,
-                            cleanupIDs: {
-                              prefix: `svg-${hash(resource)}`,
-                            },
                           },
+                        },
+                      },
+                      {
+                        name: "prefixIds",
+                        params: {
+                          prefix: `svg-${hash(resource)}`,
                         },
                       },
                     ],
