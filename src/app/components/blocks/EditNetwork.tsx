@@ -539,6 +539,12 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             onOpenAutoFocus={(e) => {
               e.preventDefault();
             }}
+            side="bottom"
+            align="start"
+            avoidCollisions={false}
+            style={{
+              width: "var(--radix-popover-trigger-width)",
+            }}
             className={classNames(
               "shadow-xs",
               "focus-visible:outline-none",
