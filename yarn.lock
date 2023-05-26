@@ -3747,10 +3747,10 @@
   resolved "https://registry.yarnpkg.com/@types/canvas-txt/-/canvas-txt-3.0.0.tgz#5a6b5ad6413fb6940a4f5e98f0ccf395fbc40c11"
   integrity sha512-KfJk5YWbujYQqKzHBzHOsq68dnqg7MwMxPlwwnvgjXG0ViwafIqYveEPpUZK5G7TrlwEEHqEvgE6LAJig+valw==
 
-"@types/chrome@0.0.236":
-  version "0.0.236"
-  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.236.tgz#f967769015c458718d4328a54682fa24f0c62c92"
-  integrity sha512-ArQoxO9WtDY6GWcT2cpo+D+hyASPeFt7PHQEUDXwQhRS00Rbop07rnEOA046yws0HkM83Tcew/hW6Dgvnj4iMQ==
+"@types/chrome@0.0.237":
+  version "0.0.237"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.237.tgz#20a38e1d1134e2725fc7eb43c881e55e1b24ddd7"
+  integrity sha512-krsRmyfMlck5r+H1EapsrrucDRq6iRm0NAi5fapr93CgnpVMDdK+h2+z4x79GegdW7BNH9Vb//gkptORwwwVIQ==
   dependencies:
     "@types/filesystem" "*"
     "@types/har-format" "*"
@@ -10924,10 +10924,10 @@ webpack-sources@3.2.3, webpack-sources@^3.2.3:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.3.tgz#2d4daab8451fd4b240cc27055ff6a0c2ccea0cde"
   integrity sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==
 
-webpack@5.84.0:
-  version "5.84.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.84.0.tgz#011115617668744aece87a9eb68534487d84de1a"
-  integrity sha512-XezNK3kwJq6IyeoZmZ1uEqQs+42nTqIi4jYM/YjLwaJedUC1N3bwnCC0+UcnHJPfqWX0kGrQnMIvZZyWYaIZrA==
+webpack@5.84.1:
+  version "5.84.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.84.1.tgz#d4493acdeca46b26ffc99d86d784cabfeb925a15"
+  integrity sha512-ZP4qaZ7vVn/K8WN/p990SGATmrL1qg4heP/MrVneczYtpDGJWlrgZv55vxaV2ul885Kz+25MP2kSXkPe3LZfmg==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.0"
