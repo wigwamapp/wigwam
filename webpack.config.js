@@ -11,6 +11,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const EslintWebpackPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -461,16 +462,13 @@ module.exports = {
       ],
     }),
 
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: "src/**/*.{js,mjs,jsx,ts,tsx}",
-        options: {
-          cache: true,
-          cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
-          cwd: CWD_PATH,
-          resolvePluginsRelativeTo: __dirname,
-        },
-      },
+    new ForkTsCheckerWebpackPlugin(),
+
+    new EslintWebpackPlugin({
+      files: "src/**/*.{js,mjs,jsx,ts,tsx}",
+      cache: true,
+      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+      context: CWD_PATH,
     }),
 
     new WebpackBar({
