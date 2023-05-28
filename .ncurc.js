@@ -6,6 +6,5 @@ module.exports = {
     "@types/react-dom",
     "@types/async-retry",
     "nanoid",
-    "@dicebear/personas",
   ],
 };
