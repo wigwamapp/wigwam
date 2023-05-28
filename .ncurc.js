@@ -1,9 +1,3 @@
 module.exports = {
-  reject: [
-    "css-loader",
-    "@tippyjs/react",
-    "@types/react",
-    "@types/react-dom",
-    "nanoid",
-  ],
+  reject: ["@tippyjs/react", "@types/react", "@types/react-dom", "nanoid"],
 };

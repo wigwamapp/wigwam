@@ -152,6 +152,7 @@ module.exports = {
     pathinfo: NODE_ENV === "development",
     filename: "scripts/[name].js",
     chunkFilename: "scripts/[name].chunk.js",
+    assetModuleFilename: "media/[hash:8].[ext]",
   },
 
   resolve: {
@@ -201,10 +202,11 @@ module.exports = {
           // A missing `test` is equivalent to a match.
           {
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve("url-loader"),
-            options: {
-              limit: IMAGE_INLINE_SIZE_LIMIT,
-              name: "media/[hash:8].[ext]",
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                maxSize: IMAGE_INLINE_SIZE_LIMIT,
+              },
             },
           },
 
@@ -279,7 +281,9 @@ module.exports = {
             use: getStyleLoaders({
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
-              modules: false,
+              modules: {
+                mode: "icss",
+              },
             }),
             // Don't consider CSS imports dead code even if the
             // containing package claims to have no side effects.
@@ -296,6 +300,7 @@ module.exports = {
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
               modules: {
+                mode: "local",
                 getLocalIdent: getCSSModuleLocalIdent,
               },
             }),
@@ -307,15 +312,12 @@ module.exports = {
           // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
-            loader: require.resolve("file-loader"),
             // Exclude `js` files to keep "css" loader working as it injects
             // its runtime that would otherwise be processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
             exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-            options: {
-              name: "media/[hash:8].[ext]",
-            },
+            type: "asset/resource",
           },
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
