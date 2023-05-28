@@ -67,7 +67,7 @@ export function useTokenList(
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLButtonElement) => {
       if (!tokens) return;
 
       if (observer.current) {

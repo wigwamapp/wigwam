@@ -8,6 +8,7 @@ import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 export type SecondaryModalProps = DialogProps & {
+  children?: React.ReactNode;
   header?: ReactNode;
   disabledClickOutside?: boolean;
   autoFocus?: boolean;

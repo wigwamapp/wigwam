@@ -8,6 +8,7 @@ import {
   ButtonHTMLAttributes,
   Dispatch,
   SetStateAction,
+  MouseEventHandler,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -99,10 +100,12 @@ const AssetCard = memo(
         }
       }, [asset, currentAccount.address, isManageMode]);
 
-      const handleAssetContextMenu = useCallback(
-        async (e) => {
+      const handleAssetContextMenu = useCallback<
+        MouseEventHandler<HTMLButtonElement>
+      >(
+        async (evt) => {
           if (!isManageMode) {
-            e.preventDefault();
+            evt.preventDefault();
             if (!popoverOpened) {
               setPopoverOpened(true);
             }

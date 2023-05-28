@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, PropsWithChildren, Suspense } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
@@ -13,7 +13,7 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const MainPageLayout: FC = ({ children }) => (
+const MainPageLayout: FC<PropsWithChildren> = ({ children }) => (
   <PreloadBaseAndSync>
     <div
       className={classNames(

@@ -1,4 +1,4 @@
-import { FC, Suspense, useRef } from "react";
+import { FC, PropsWithChildren, Suspense, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -19,9 +19,9 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-type PopupLayoutProps = {
+type PopupLayoutProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);

@@ -2,6 +2,7 @@ import {
   FC,
   forwardRef,
   memo,
+  PropsWithChildren,
   Suspense,
   useCallback,
   useEffect,
@@ -276,7 +277,7 @@ const History = memo(() => {
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLDivElement) => {
       if (!completeActivity) return;
 
       if (observer.current) {
@@ -988,7 +989,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
   );
 };
 
-const SectionHeader: FC<{ className?: string }> = memo(
+const SectionHeader: FC<PropsWithChildren<{ className?: string }>> = memo(
   ({ className, children }) => (
     <div className={classNames("w-full", className)}>
       <h1 className={"text-2xl font-bold"}>{children}</h1>

@@ -50,7 +50,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLDivElement) => {
       if (!activity) return;
 
       if (observer.current) {

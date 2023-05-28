@@ -1,4 +1,4 @@
-import { FC, StrictMode, useCallback, useRef } from "react";
+import { FC, PropsWithChildren, StrictMode, useCallback, useRef } from "react";
 import classNames from "clsx";
 import { render } from "react-dom";
 import { ethers } from "ethers";
@@ -109,9 +109,11 @@ const ControlPanel: FC = () => {
   );
 };
 
-const ControlButton: FC<{
-  action: () => Promise<void>;
-}> = ({ action, children }) => {
+const ControlButton: FC<
+  PropsWithChildren<{
+    action: () => Promise<void>;
+  }>
+> = ({ action, children }) => {
   const forceUpdate = useForceUpdate();
   const processesRef = useRef(0);
 

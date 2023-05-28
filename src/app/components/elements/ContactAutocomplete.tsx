@@ -1,6 +1,8 @@
 import {
   ButtonHTMLAttributes,
   FC,
+  PropsWithChildren,
+  KeyboardEventHandler,
   forwardRef,
   useCallback,
   useEffect,
@@ -101,7 +103,7 @@ const ContactAutocomplete = forwardRef<
     }
   }, [contacts, meta.active]);
 
-  const handleKeyClick = useCallback(
+  const handleKeyClick = useCallback<KeyboardEventHandler<HTMLTextAreaElement>>(
     (e) => {
       if (mergedAccounts) {
         if (e.keyCode === 40) {
@@ -132,7 +134,7 @@ const ContactAutocomplete = forwardRef<
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLButtonElement) => {
       if (!contacts || !hasMore) return;
 
       if (observer.current) {
@@ -269,9 +271,9 @@ const ContactAutocomplete = forwardRef<
 
 export default ContactAutocomplete;
 
-type DropdownHeaderProps = {
+type DropdownHeaderProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const DropdownHeader: FC<DropdownHeaderProps> = ({ className, children }) => (
   <span

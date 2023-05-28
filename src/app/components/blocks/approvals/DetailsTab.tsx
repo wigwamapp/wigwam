@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
@@ -383,9 +383,9 @@ const getTokens = (action: TxAction) => {
   return null;
 };
 
-type InfoRawProps = {
+type InfoRawProps = PropsWithChildren<{
   label: string;
-};
+}>;
 
 const InfoRaw: FC<InfoRawProps> = ({ label, children }) => (
   <div className="py-3 pl-4 flex items-start justify-between">

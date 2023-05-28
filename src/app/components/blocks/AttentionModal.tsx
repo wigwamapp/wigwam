@@ -1,4 +1,4 @@
-import { FC, memo, useState } from "react";
+import { FC, PropsWithChildren, memo, useState } from "react";
 import classNames from "clsx";
 import * as Accordion from "@radix-ui/react-accordion";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
@@ -57,7 +57,10 @@ const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
 
 export default AttentionModal;
 
-const HeadingDot: FC<{ active?: boolean }> = ({ children, active }) => (
+const HeadingDot: FC<PropsWithChildren<{ active?: boolean }>> = ({
+  children,
+  active,
+}) => (
   <span className="flex items-center font-bold hover:underline">
     <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full relative">
       {!active && (

@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+
 import { Destination } from "./types";
 
 export function toHash(

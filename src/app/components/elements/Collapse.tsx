@@ -21,7 +21,7 @@ const Collapse: FC<CollapseProps> = ({
   const [open, setOpen] = useState(false);
 
   const handleTriggerClick = useCallback(
-    (state) => {
+    (state: boolean) => {
       if (state && overflowElement) {
         setTimeout(() => {
           overflowElement.scrollTo({

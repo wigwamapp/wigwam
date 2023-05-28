@@ -13,6 +13,7 @@ import BigNumber from "bignumber.js";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { Field, Form } from "react-final-form";
+import type { FormApi } from "final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC20__factory } from "abi-types";
@@ -97,7 +98,10 @@ const TransferAssetContent = memo<{ tokenSlug: string; asset?: AccountAsset }>(
     const signerProvider = provider.getUncheckedSigner(currentAccount.address);
 
     const handleSubmit = useCallback(
-      async ({ recipient, amount }, form) =>
+      async (
+        { recipient, amount }: FormValues,
+        form: FormApi<FormValues, Partial<FormValues>>
+      ) =>
         withHumanDelay(async () => {
           if (!asset) {
             return;

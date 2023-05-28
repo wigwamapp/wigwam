@@ -1,6 +1,7 @@
 import {
   FC,
   lazy,
+  PropsWithChildren,
   ReactNode,
   useCallback,
   useEffect,
@@ -332,7 +333,10 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
   );
 };
 
-const FieldLabel: FC<{ action?: ReactNode }> = ({ children, action }) => (
+const FieldLabel: FC<PropsWithChildren<{ action?: ReactNode }>> = ({
+  children,
+  action,
+}) => (
   <div className="flex items-center justify-between px-4 mb-2 min-h-6">
     <div className="text-base text-brand-gray cursor-pointer flex align-center">
       {children}

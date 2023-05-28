@@ -1,4 +1,11 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "clsx";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useOnScreen } from "lib/react-hooks/useOnScreen";
@@ -202,7 +209,10 @@ const OnboardingPopupContent: FC = () => {
   );
 };
 
-const Wrapper: FC<{ className?: string }> = ({ className, children }) => (
+const Wrapper: FC<PropsWithChildren<{ className?: string }>> = ({
+  className,
+  children,
+}) => (
   <div
     className={classNames(
       "flex items-center w-full text-brand-light",
@@ -213,16 +223,16 @@ const Wrapper: FC<{ className?: string }> = ({ className, children }) => (
   </div>
 );
 
-const Item: FC = ({ children }) => (
+const Item: FC<PropsWithChildren> = ({ children }) => (
   <div className="flex">
     <span className="block w-2 min-w-[.5rem] mt-2.5 h-2 rounded-full bg-buttonaccent mr-2" />
     <p className="text-xl	font-bold">{children}</p>
   </div>
 );
 
-type LinkProps = {
+type LinkProps = PropsWithChildren<{
   href: string;
-};
+}>;
 
 const Link: FC<LinkProps> = ({ href, children }) => (
   <a

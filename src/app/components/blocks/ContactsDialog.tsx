@@ -36,7 +36,7 @@ const ContactsDialog: FC = () => {
   const { modalData, upsertContact } = useContactsDialog();
 
   const handleSubmit = useCallback(
-    async ({ name: newName, address: newAddress }) =>
+    async ({ name: newName, address: newAddress }: FormValues) =>
       withHumanDelay(async () => {
         if (modalData) {
           newAddress = ethers.utils.getAddress(newAddress);

@@ -1,6 +1,6 @@
-import { FC, useState, useEffect, ReactNode } from "react";
+import { FC, PropsWithChildren, useState, useEffect, ReactNode } from "react";
 
-const Delay: FC<{ ms: number; fallback?: ReactNode }> = ({
+const Delay: FC<PropsWithChildren<{ ms: number; fallback?: ReactNode }>> = ({
   ms,
   children,
   fallback = null,

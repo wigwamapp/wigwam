@@ -61,7 +61,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLElement) => {
       if (!tokens) return;
 
       if (observer.current) {

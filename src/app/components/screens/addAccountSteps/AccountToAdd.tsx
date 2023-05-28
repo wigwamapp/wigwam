@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   FC,
+  PropsWithChildren,
   memo,
   useCallback,
   useEffect,
@@ -465,7 +466,7 @@ type TableDate = {
   className?: string;
 };
 
-const Th: FC<TableDate> = ({ className, children }) => (
+const Th: FC<PropsWithChildren<TableDate>> = ({ className, children }) => (
   <th
     className={classNames(
       "py-1.5 px-3",
@@ -477,7 +478,11 @@ const Th: FC<TableDate> = ({ className, children }) => (
   </th>
 );
 
-const Td: FC<TableDate> = ({ widthMaxContent, className, children }) => (
+const Td: FC<PropsWithChildren<TableDate>> = ({
+  widthMaxContent,
+  className,
+  children,
+}) => (
   <td
     className={classNames(
       "py-2.5 px-3 text-base",

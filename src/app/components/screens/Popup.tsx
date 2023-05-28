@@ -7,6 +7,7 @@ import {
   useState,
   useMemo,
   useEffect,
+  PropsWithChildren,
 } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
@@ -72,7 +73,7 @@ const Popup: FC = () => (
 
 export default Popup;
 
-const PreloadAndSync: FC = ({ children }) => {
+const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const [permission] = useAtomValue(
     waitForAll([getPermissionAtom(tabOrigin), web3MetaMaskCompatibleAtom])

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import { useAtomValue } from "jotai";
 import { waitForAll, loadable } from "jotai/utils";
 
@@ -10,7 +10,7 @@ import {
 } from "app/atoms";
 import { ChainIdProvider, useSync, useToken } from "app/hooks";
 
-const PreloadBaseAndSync: FC<{ chainId?: number }> = ({
+const PreloadBaseAndSync: FC<PropsWithChildren<{ chainId?: number }>> = ({
   chainId: overriddenChainId,
   children,
 }) => {

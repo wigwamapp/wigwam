@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, PropsWithChildren, Suspense } from "react";
 import { Provider as JotaiProvider, useAtomValue } from "jotai";
 import { waitForAll } from "jotai/utils";
 
@@ -14,7 +14,7 @@ import { DialogProvider } from "app/hooks/dialog";
 import { ContactsDialogProvider } from "app/hooks/contacts";
 import ErrBond from "app/components/layouts/ErrBond";
 
-const BaseProvider: FC = ({ children }) => (
+const BaseProvider: FC<PropsWithChildren> = ({ children }) => (
   <>
     <ErrBond>
       <JotaiProvider>
