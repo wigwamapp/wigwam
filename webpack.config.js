@@ -172,6 +172,12 @@ module.exports = {
       // Fix `path is not exported from package exports field`
       // Used by `.vendor/axios-fetch-adapter`
       "axios/lib": path.resolve(__dirname, "node_modules/axios/lib"),
+      // Fix `path is not exported from package exports field`
+      // Used by `src/app/components/elements/AutoIcon.tsx`
+      "@dicebear/core/lib": path.resolve(
+        __dirname,
+        "node_modules/@dicebear/core/lib"
+      ),
     },
     fallback: {
       process: false,
