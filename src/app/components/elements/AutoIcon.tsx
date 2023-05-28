@@ -107,7 +107,17 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
     case "avataaars":
       return createAvatar(avataaarsStyle, {
         seed,
-        mouth: ["twinkle"],
+        mouth: [
+          "default",
+          "disbelief",
+          "eating",
+          "grimace",
+          "screamOpen",
+          "serious",
+          "smile",
+          "tongue",
+          "twinkle",
+        ],
       }).toString();
 
     case "personas":
