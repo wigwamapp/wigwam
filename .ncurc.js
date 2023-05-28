@@ -4,7 +4,6 @@ module.exports = {
     "@tippyjs/react",
     "@types/react",
     "@types/react-dom",
-    "@types/async-retry",
     "nanoid",
   ],
 };
