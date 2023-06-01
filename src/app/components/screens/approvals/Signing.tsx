@@ -17,7 +17,7 @@ import {
   SignTypedDataVersion,
   recoverPersonalSignature,
   recoverTypedSignature,
-} from "lib/eth-sig-util";
+} from "@metamask/eth-sig-util";
 
 import { AccountSource, SigningApproval, SigningStandard } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";

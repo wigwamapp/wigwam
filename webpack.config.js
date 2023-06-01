@@ -185,6 +185,11 @@ module.exports = {
       path: false,
       fs: false,
       crypto: false,
+      util: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
     },
   },
 

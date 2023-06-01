@@ -14,7 +14,7 @@ import {
   personalSign,
   signTypedData,
   SignTypedDataVersion,
-} from "lib/eth-sig-util";
+} from "@metamask/eth-sig-util";
 import { Buffer } from "buffer";
 import memoizeOne from "memoize-one";
 import {
