@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 import { Link } from "lib/navigation";
@@ -8,7 +8,8 @@ import { AccountAsset, AccountNFT, AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
@@ -33,7 +34,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
   tokenType,
   handleTokenChanged,
 }) => {
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 

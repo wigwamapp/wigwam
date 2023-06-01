@@ -42,8 +42,9 @@ import {
   withHumanDelay,
   OnChange,
 } from "app/utils";
-import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
+import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
+  useAccounts,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -105,7 +106,7 @@ type TransferTokenContent = {
 
 const TransferTokenContent = memo<TransferTokenContent>(
   ({ tokenType, tokenSlug, token }) => {
-    const currentAccount = useAtomValue(currentAccountAtom);
+    const { currentAccount } = useAccounts();
     const chainId = useChainId();
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);

@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, Suspense, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
@@ -20,8 +20,10 @@ import OnboardingPopup from "../blocks/OnboardingPopup";
 const Main: FC = () => {
   return (
     <MainPageLayout>
-      <MainPageRouter />
-      <OnboardingPopup />
+      <Suspense>
+        <MainPageRouter />
+        <OnboardingPopup />
+      </Suspense>
     </MainPageLayout>
   );
 };

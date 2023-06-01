@@ -14,8 +14,6 @@ import classNames from "clsx";
 import { FieldMetaState } from "react-final-form";
 import * as Popover from "@radix-ui/react-popover";
 import Fuse from "fuse.js";
-import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import { mergeRefs } from "react-merge-refs";
 import { TReplace } from "lib/ext/i18n/react";
 import { useOnScreen } from "lib/react-hooks/useOnScreen";
@@ -28,7 +26,7 @@ import {
   LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END,
 } from "app/defaults";
 import { useContacts } from "app/hooks/contacts";
-import { allAccountsAtom, currentAccountAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
 import AutoIcon from "./AutoIcon";
@@ -50,16 +48,7 @@ const ContactAutocomplete = forwardRef<
     limit: 20,
   });
 
-  const { currentAccount, allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
+  const { currentAccount, allAccounts } = useAccounts();
 
   const [opened, setOpened] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState<number>(0);

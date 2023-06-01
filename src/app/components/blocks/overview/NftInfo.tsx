@@ -9,7 +9,7 @@ import { AccountNFT, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -19,6 +19,7 @@ import {
   useLazyNetwork,
   useTokenActivitiesSync,
   useAutoRefreshNftMetadata,
+  useAccounts,
 } from "app/hooks";
 import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -43,7 +44,7 @@ const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);

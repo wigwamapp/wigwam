@@ -1,22 +1,21 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { assert } from "lib/system/assert";
+import { useAtomsAll } from "lib/atom-utils";
 
 import { Account as AccountType, ConnectionApproval } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
 import {
+  accountAddressAtom,
   allAccountsAtom,
   chainIdAtom,
-  currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { ChainIdProvider, useSync, useToken } from "app/hooks";
+import { ChainIdProvider, useAccounts, useSync, useToken } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
 import Avatar from "app/components/elements/Avatar";
@@ -51,19 +50,14 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     return new URL(approval.source.url).origin;
   }, [approval]);
 
-  const [internalChainId, currentAccount, allAccounts, currentPermission] =
-    useAtomValue(
-      useMemo(
-        () =>
-          waitForAll([
-            chainIdAtom,
-            currentAccountAtom,
-            allAccountsAtom,
-            getPermissionAtom(sourceOrigin),
-          ]),
-        [sourceOrigin]
-      )
-    );
+  const [internalChainId, currentPermission] = useAtomsAll([
+    chainIdAtom,
+    getPermissionAtom(sourceOrigin),
+    allAccountsAtom,
+    accountAddressAtom,
+  ]);
+
+  const { currentAccount, allAccounts } = useAccounts();
 
   const defaultAddresses = useMemo(
     () => [

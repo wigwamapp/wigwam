@@ -1,10 +1,33 @@
 import { useCallback } from "react";
 import { useAtomValue } from "jotai";
 import { replaceT } from "lib/ext/i18n";
-import { useMaybeAtomValue } from "lib/atom-utils";
+import { useAtomsAll, useMaybeAtomValue } from "lib/atom-utils";
 
 import { Account, WalletStatus } from "core/types";
-import { allAccountsAtom, walletStatusAtom } from "app/atoms";
+import {
+  accountAddressAtom,
+  allAccountsAtom,
+  walletStatusAtom,
+} from "app/atoms";
+
+export function useAccounts() {
+  const [allAccounts, address] = useAtomsAll([
+    allAccountsAtom,
+    accountAddressAtom,
+  ]);
+
+  if (allAccounts.length === 0) {
+    throw new Error("There are no accounts");
+  }
+
+  const index = address
+    ? allAccounts.findIndex((acc) => acc.address === address)
+    : 0;
+
+  const currentAccount = allAccounts[index === -1 ? 0 : index];
+
+  return { allAccounts, currentAccount };
+}
 
 export function useNextAccountName() {
   const walletStatus = useAtomValue(walletStatusAtom);

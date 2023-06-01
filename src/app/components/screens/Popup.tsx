@@ -12,6 +12,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 import Masonry from "lib/react-masonry/Masonry";
+import { useAtomsAll } from "lib/atom-utils";
 
 import {
   Account,
@@ -58,7 +59,6 @@ import NftCard from "../blocks/tokenList/NftCard";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import { waitForAll } from "jotai/utils";
 
 const Popup: FC = () => (
   <PreloadAndSync>
@@ -75,9 +75,10 @@ export default Popup;
 
 const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const [permission] = useAtomValue(
-    waitForAll([getPermissionAtom(tabOrigin), web3MetaMaskCompatibleAtom])
-  );
+  const [permission] = useAtomsAll([
+    getPermissionAtom(tabOrigin),
+    web3MetaMaskCompatibleAtom,
+  ]);
 
   return (
     <PreloadBaseAndSync chainId={permission?.chainId}>

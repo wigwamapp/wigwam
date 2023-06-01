@@ -9,7 +9,6 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 import retry from "async-retry";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -80,11 +79,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const chainId = useChainId();
   const nativeCurrency = useNativeCurrency();
 
-  const [allAccounts, localNonce] = useAtomValue(
-    waitForAll([
-      allAccountsAtom,
-      getLocalNonceAtom({ chainId, accountAddress }),
-    ])
+  const allAccounts = useAtomValue(allAccountsAtom);
+  const localNonce = useAtomValue(
+    getLocalNonceAtom({ chainId, accountAddress })
   );
 
   useSync(chainId, accountAddress);

@@ -9,14 +9,11 @@ import { usePrevious } from "lib/react-hooks/usePrevious";
 import { AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import {
-  currentAccountAtom,
-  getTokenAtom,
-  getAccountTokensAtom,
-} from "app/atoms";
+import { getTokenAtom, getAccountTokensAtom } from "app/atoms";
 
 import { useChainId } from "./chainId";
 import { matchNativeToken } from "core/repo";
+import { useAccounts } from "./account";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -118,9 +115,9 @@ export function useAllAccountTokens(
 }
 
 export function useAccountToken<T extends AccountToken>(tokenSlug: string) {
-  const acc = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
-  return useToken<T>(acc.address, tokenSlug);
+  return useToken<T>(currentAccount.address, tokenSlug);
 }
 
 export function useToken<T extends AccountToken>(

@@ -1,22 +1,28 @@
 import { FC, PropsWithChildren } from "react";
 import { useAtomValue } from "jotai";
-import { waitForAll, loadable } from "jotai/utils";
+import { loadable } from "jotai/utils";
+import { useAtomsAll } from "lib/atom-utils";
 
 import {
+  accountAddressAtom,
+  allAccountsAtom,
   chainIdAtom,
-  currentAccountAtom,
   getNetworkAtom,
   tokenTypeAtom,
 } from "app/atoms";
-import { ChainIdProvider, useSync, useToken } from "app/hooks";
+import { ChainIdProvider, useAccounts, useSync, useToken } from "app/hooks";
 
 const PreloadBaseAndSync: FC<PropsWithChildren<{ chainId?: number }>> = ({
   chainId: overriddenChainId,
   children,
 }) => {
-  const [internalChainId, currentAccount, tokenType] = useAtomValue(
-    waitForAll([chainIdAtom, currentAccountAtom, tokenTypeAtom])
-  );
+  const [internalChainId, tokenType] = useAtomsAll([
+    chainIdAtom,
+    tokenTypeAtom,
+    allAccountsAtom,
+    accountAddressAtom,
+  ]);
+  const { currentAccount } = useAccounts();
 
   const chainId = overriddenChainId ?? internalChainId;
 

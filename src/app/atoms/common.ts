@@ -1,5 +1,4 @@
-import { atom } from "jotai";
-import { atomFamily } from "jotai/utils";
+import { atomFamily, unstable_unwrap } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithStorage,
@@ -11,7 +10,6 @@ import { INITIAL_NETWORK } from "fixtures/networks";
 import * as Repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
 import {
-  Account,
   CHAIN_ID,
   ACCOUNT_ADDRESS,
   SENT_ANALYTIC_NETWORKS,
@@ -62,29 +60,14 @@ export const getRpcUrlAtom = atomFamily((chainId: number) =>
 );
 
 export const allNetworksAtom = atomWithRepoQuery((query, get) => {
-  const testnetEnabled = get(testNetworksAtom);
+  const testnetsEnabled = get(unstable_unwrap(testNetworksAtom));
 
-  const netTypes = [
-    "mainnet",
-    "unknown",
-    ...(testnetEnabled ? ["testnet"] : []),
-  ];
-
-  return query(() => Repo.networks.where("type").anyOf(netTypes).toArray());
-});
-
-export const currentAccountAtom = atom<Account>((get) => {
-  const allAccounts = get(allAccountsAtom);
-  if (allAccounts.length === 0) {
-    throw new Error("There are no accounts");
-  }
-
-  const address = get(accountAddressAtom);
-  const index = address
-    ? allAccounts.findIndex((acc) => acc.address === address)
-    : 0;
-
-  return allAccounts[index === -1 ? 0 : index];
+  return query(() =>
+    Repo.networks
+      .where("type")
+      .anyOf(["mainnet", "unknown", ...(testnetsEnabled ? ["testnet"] : [])])
+      .toArray()
+  );
 });
 
 export const getContactsAtom = atomFamily(

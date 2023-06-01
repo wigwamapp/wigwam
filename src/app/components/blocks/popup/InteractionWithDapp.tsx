@@ -8,10 +8,10 @@ import { MetaMaskCompatibleMode } from "core/types/shared";
 import {
   activeTabAtom,
   activeTabOriginAtom,
-  currentAccountAtom,
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
@@ -25,8 +25,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
-  const currentAccount = useAtomValue(currentAccountAtom);
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
+
+  const { currentAccount } = useAccounts();
 
   const [web3DialogOpened, setWeb3DialogOpened] = useState(false);
 

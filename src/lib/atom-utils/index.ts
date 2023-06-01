@@ -5,5 +5,6 @@ export * from "./atomWithGlobalStorage";
 export * from "./atomWithClientStorage";
 export * from "./atomWithRepoQuery";
 
+export * from "./useAtomsAll";
 export * from "./useLazyAtomValue";
 export * from "./useMaybeAtomValue";
