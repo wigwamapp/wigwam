@@ -42,7 +42,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({
   const [activeMethod, setActiveMethod] = useState(methods[0].value);
 
   const handleContinue = useCallback(
-    ({ derivationPath }) =>
+    ({ derivationPath }: FormValues) =>
       withHumanDelay(async () => {
         onContinue(activeMethod, derivationPath.replace("/{index}", ""));
       }),

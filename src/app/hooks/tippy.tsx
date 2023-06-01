@@ -1,4 +1,4 @@
-import { FC, createContext, useContext } from "react";
+import { FC, PropsWithChildren, createContext, useContext } from "react";
 import Tippy, { useSingleton, UseSingletonProps } from "@tippyjs/react";
 
 type SingletonTarget = ReturnType<typeof useSingleton>["1"];
@@ -20,7 +20,7 @@ const singletonParams: UseSingletonProps = {
   ],
 };
 
-export const TippySingletonProvider: FC = ({ children }) => {
+export const TippySingletonProvider: FC<PropsWithChildren> = ({ children }) => {
   const [source, target] = useSingleton(singletonParams);
 
   return (

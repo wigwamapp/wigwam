@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useRef,
+  PropsWithChildren,
 } from "react";
 import useForceUpdate from "use-force-update";
 import memoizeOne from "memoize-one";
@@ -18,6 +19,7 @@ type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
 
 type DialogContextDataProps =
   | (ModalProps & {
+      children: ReactNode | ((state: any) => ReactNode);
       header: ReactNode;
       primaryButtonText?: ReactNode;
       onPrimaryButtonClick?: () => void;
@@ -75,7 +77,7 @@ export const useDialog = () => {
   return value;
 };
 
-export const DialogProvider: FC = ({ children }) => {
+export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
   const forceUpdate = useForceUpdate();
 
   const queueRef = useRef<DialogContextDataProps[]>([]);
@@ -184,9 +186,9 @@ export const DialogProvider: FC = ({ children }) => {
           res(confirmed);
         });
 
-        const dialogParams = {
+        const dialogParams: DialogContextDataProps = {
           header: title,
-          children: content,
+          children: content as any,
           onClose: () => handleConfirm(false),
           disabledClickOutside: true,
           ...rest,

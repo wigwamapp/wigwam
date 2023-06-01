@@ -36,7 +36,7 @@ const ContactsSection: FC = () => {
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerCardRef = useCallback(
-    (node) => {
+    (node: HTMLDivElement) => {
       if (!contacts) return;
 
       if (observer.current) {

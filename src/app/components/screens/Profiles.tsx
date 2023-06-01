@@ -1,7 +1,7 @@
 import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { changeProfile, addProfile } from "lib/ext/profile";
+import { changeProfile, addProfile, Profile } from "lib/ext/profile";
 import { replaceT } from "lib/ext/i18n";
 
 import { TEvent, trackEvent } from "core/client";
@@ -43,7 +43,7 @@ const Profiles: FC = () => {
     processingRef.current = false;
   }, []);
 
-  const handleSelect = useCallback((profile) => {
+  const handleSelect = useCallback((profile: Profile) => {
     changeProfile(profile.id);
   }, []);
 

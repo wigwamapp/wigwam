@@ -1,5 +1,4 @@
 import { FC, memo, forwardRef, useCallback, useRef } from "react";
-import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -13,13 +12,13 @@ import {
 import { createTokenActivityKey } from "core/common/tokens";
 
 import { LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
-import { currentAccountAtom } from "app/atoms";
 import {
   useChainId,
   useExplorerLink,
   useLazyNetwork,
   useTokenActivity,
   useIsTokenActivitySyncing,
+  useAccounts,
 } from "app/hooks";
 import { LARGE_AMOUNT } from "app/utils/largeAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -36,7 +35,7 @@ import { ReactComponent as ActivitySendIcon } from "app/icons/activity-send.svg"
 
 const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
   const { activity, loadMore, hasMore } = useTokenActivity(
     currentAccount.address,
     token.tokenSlug
@@ -50,7 +49,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLDivElement) => {
       if (!activity) return;
 
       if (observer.current) {

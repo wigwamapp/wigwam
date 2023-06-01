@@ -88,7 +88,7 @@ const WebThreeCompatible: FC<{ small?: boolean }> = ({ small = false }) => {
             }
             disabled={value === metamaskMode}
             value={value}
-            content={content}
+            content={content as any}
             aria-label={content.label}
             small={small}
             className={

@@ -31,7 +31,7 @@ const PasswordForm = memo<PasswordFormProps>(
     const [attention, setAttention] = useState(false);
 
     const handleSubmit = useCallback(
-      ({ password }) =>
+      ({ password }: FormValues) =>
         withHumanDelay(async () => {
           try {
             if (unlockCallback) {

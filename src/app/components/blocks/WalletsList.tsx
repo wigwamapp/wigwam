@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
-import { waitForAll } from "jotai/utils";
+import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import Link from "lib/navigation/Link";
@@ -8,11 +7,8 @@ import Link from "lib/navigation/Link";
 import { Account } from "core/types";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import {
-  accountAddressAtom,
-  allAccountsAtom,
-  currentAccountAtom,
-} from "app/atoms";
+import { accountAddressAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import LargeWalletCard from "app/components/elements/LargeWalletCard";
 import Button from "app/components/elements/Button";
 import WalletCard from "app/components/elements/WalletCard";
@@ -22,16 +18,7 @@ import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const WalletsList: FC = () => {
-  const { currentAccount, allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
+  const { currentAccount, allAccounts } = useAccounts();
 
   const accountsWithoutCurrent = useMemo(
     () =>

@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { storage } from "lib/ext/storage";
 
@@ -14,12 +13,12 @@ import { TokenStandard, TokenType } from "core/types";
 import { createTokenSlug, detectNFTStandard } from "core/common/tokens";
 import { findToken } from "core/client";
 
-import { currentAccountAtom } from "app/atoms";
 import {
   useChainId,
   useIsSyncing,
   useAllAccountTokens,
   useProvider,
+  useAccounts,
 } from "app/hooks";
 
 export function useTokenList(
@@ -29,9 +28,9 @@ export function useTokenList(
     searchPersist?: boolean;
   } = {}
 ) {
-  const currentAccount = useAtomValue(currentAccountAtom);
   const chainId = useChainId();
   const provider = useProvider();
+  const { currentAccount } = useAccounts();
 
   const isNftsSelected = tokenType === TokenType.NFT;
 
@@ -67,7 +66,7 @@ export function useTokenList(
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLButtonElement) => {
       if (!tokens) return;
 
       if (observer.current) {

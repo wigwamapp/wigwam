@@ -32,7 +32,7 @@ const SelectLanguage = memo<SelectLanguageProps>(
     );
 
     const selectLanguage = useCallback(
-      ({ key }) => {
+      ({ key }: { key: string }) => {
         const locale =
           items.find(({ code }) => key === code) ?? FALLBACK_LOCALE;
         onSelect(locale);

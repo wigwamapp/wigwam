@@ -10,11 +10,12 @@ import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
   useAccountToken,
+  useAccounts,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -50,7 +51,7 @@ const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);

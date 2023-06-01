@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  FormEventHandler,
 } from "react";
 import classNames from "clsx";
 import { mergeRefs } from "react-merge-refs";
@@ -54,7 +55,7 @@ const ContentEditableField = forwardRef<
       };
     }, []);
 
-    const handleInput = useCallback(
+    const handleInput = useCallback<FormEventHandler<HTMLDivElement>>(
       (evt) => {
         const value = evt.currentTarget.textContent || null;
 

@@ -1,4 +1,11 @@
-import { FC, memo, useCallback, useEffect, useMemo } from "react";
+import {
+  FC,
+  memo,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
@@ -320,9 +327,9 @@ const TileSimple: FC<TileSimpleProps> = ({
   </button>
 );
 
-type WarningMessageProps = {
+type WarningMessageProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
   <div

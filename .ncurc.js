@@ -1,9 +1,3 @@
 module.exports = {
-  reject: [
-    "@ethereumjs/util",
-    "@tippyjs/react",
-    "@types/react",
-    "@types/react-dom",
-    "nanoid",
-  ],
+  reject: ["ethers", "@ethereumjs/util", "@tippyjs/react", "nanoid"],
 };

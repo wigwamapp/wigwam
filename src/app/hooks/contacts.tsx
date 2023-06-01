@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -129,7 +130,7 @@ export const useContactsDialog = () => {
   return value;
 };
 
-export const ContactsDialogProvider: FC = ({ children }) => {
+export const ContactsDialogProvider: FC<PropsWithChildren> = ({ children }) => {
   const [modalData, setModalData] = useState<ContactDialogParams>(null);
 
   return (

@@ -2,18 +2,20 @@ import { atom, SetStateAction } from "jotai";
 import { atomWithDefault, RESET } from "jotai/utils";
 import * as ClientStorage from "lib/ext/clientStorage";
 
-export function atomWithClientStorage(
+export function atomWithClientStorage<T extends string>(
   key: string,
-  fallback: string | (() => string)
+  fallback: T | (() => T)
 ) {
-  const getData = (): string =>
+  const getData = (): T =>
     ClientStorage.get(key) ??
     (typeof fallback === "function" ? (fallback as any)() : fallback);
 
   const baseAtom = atomWithDefault(getData);
 
   baseAtom.onMount = (setAtom) => {
-    const unsub = ClientStorage.subscribe(key, () => setAtom(getData()));
+    const unsub = ClientStorage.subscribe(key, () =>
+      setAtom(getData() as Awaited<T>)
+    );
     return () => {
       unsub();
       setAtom((v) => v);
@@ -23,10 +25,10 @@ export function atomWithClientStorage(
 
   const anAtom = atom(
     (get) => get(baseAtom),
-    (get, _set, update: SetStateAction<string>) => {
+    (get, _set, update: SetStateAction<T>) => {
       const newValue =
         typeof update === "function"
-          ? (update as (prev: string) => string)(get(baseAtom))
+          ? (update as (prev: T) => T)(get(baseAtom))
           : update;
       ClientStorage.put(key, newValue);
     }
