@@ -1,3 +1,9 @@
 module.exports = {
-  reject: ["ethers", "@tippyjs/react", "nanoid", "@toruslabs/openlogin"],
+  reject: [
+    "typescript",
+    "ethers",
+    "@tippyjs/react",
+    "nanoid",
+    "@toruslabs/openlogin",
+  ],
 };
