@@ -1,4 +1,4 @@
-import { atomFamily, unstable_unwrap } from "jotai/utils";
+import { atomFamily } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithStorage,
@@ -59,16 +59,16 @@ export const getRpcUrlAtom = atomFamily((chainId: number) =>
   atomWithStorage<string | null>(getRpcUrlKey(chainId), null)
 );
 
-export const allNetworksAtom = atomWithRepoQuery((query, get) => {
-  const testnetsEnabled = get(unstable_unwrap(testNetworksAtom));
+export const allNetworksAtom = atomWithRepoQuery((query, get) =>
+  query(async () => {
+    const testnetsEnabled = await get(testNetworksAtom);
 
-  return query(() =>
-    Repo.networks
+    return Repo.networks
       .where("type")
       .anyOf(["mainnet", "unknown", ...(testnetsEnabled ? ["testnet"] : [])])
-      .toArray()
-  );
-});
+      .toArray();
+  })
+);
 
 export const getContactsAtom = atomFamily(
   (params: Repo.QueryContactsParams) =>
