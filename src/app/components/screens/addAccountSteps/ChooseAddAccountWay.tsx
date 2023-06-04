@@ -268,7 +268,6 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
       ),
       loadingHandler: handleConnect,
     }).then((answer) => {
-      console.info({ answer });
       if (answer) {
         navigateToStep(AddAccountStep.VerifyToAdd);
       }

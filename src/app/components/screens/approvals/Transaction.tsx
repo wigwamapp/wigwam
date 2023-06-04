@@ -35,6 +35,7 @@ import { matchTxAction } from "core/common/transaction";
 
 import {
   OverflowProvider,
+  useAccounts,
   useChainId,
   useNativeCurrency,
   useOnBlock,
@@ -42,7 +43,7 @@ import {
   useSync,
 } from "app/hooks";
 import { useLedger } from "app/hooks/ledger";
-import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
+import { getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
 import { formatUnits } from "app/utils/txApprove";
 import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
@@ -77,9 +78,9 @@ type ApproveTransactionProps = {
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
+  const { allAccounts } = useAccounts();
   const nativeCurrency = useNativeCurrency();
 
-  const allAccounts = useAtomValue(allAccountsAtom);
   const localNonce = useAtomValue(
     getLocalNonceAtom({ chainId, accountAddress })
   );
