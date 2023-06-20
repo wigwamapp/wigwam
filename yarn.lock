@@ -2979,7 +2979,7 @@
     ethereum-cryptography "^2.0.0"
     json-stable-stringify "^1.0.2"
 
-"@toruslabs/openlogin-session-manager@^1.0.0":
+"@toruslabs/openlogin-session-manager@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-session-manager/-/openlogin-session-manager-1.1.0.tgz#81d26b97b502e5aec25f07a93515f1553a7da30b"
   integrity sha512-S4Wad1VRrfcCVvJ/vRAPOUuwOa1h7N/QZIvd/NgJe5o29YgEFxF2pHw+ZaPFMNjyvPJiX+hUEl548qbEkY9NsQ==
@@ -2988,23 +2988,23 @@
     "@toruslabs/eccrypto" "^3.0.0"
     "@toruslabs/metadata-helpers" "4.0.0"
 
-"@toruslabs/openlogin-utils@^4.4.0":
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-utils/-/openlogin-utils-4.5.0.tgz#e9433b47b1de08314beeffda7d4d32f1499e6fe0"
-  integrity sha512-lZoiRSiuQImlV1yqb6EgJgqsZQv4dSeso8nnrljkWvb5XmHZvrqi4/U0t0Qy7+dcVqJoO3TxhfsswOHAz+tdkw==
+"@toruslabs/openlogin-utils@^4.5.1":
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin-utils/-/openlogin-utils-4.5.1.tgz#01b53f50e33d96cf29cc45d9e8aa6b085c311870"
+  integrity sha512-LaPQkgUS7qVltNkOAakUvKs5BigO3k2AIXGzNw7MQjAMV50qax8T9fCAboBwo9jX45lP5cmR5HL1ZTbFjPgfcw==
   dependencies:
     base64url "^3.0.1"
 
-"@toruslabs/openlogin@4.4.0":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin/-/openlogin-4.4.0.tgz#0e19d7623db8d9d7c77d06830e2c9ef41817cc76"
-  integrity sha512-1MyrRBCecJoPazsxN+MoFqtdohf/rcUul7eUsaASGgiEefAPxnWC9zaEw+khmTVpn0iLPLM/A0fGFgsO8NOiyQ==
+"@toruslabs/openlogin@4.5.4":
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/@toruslabs/openlogin/-/openlogin-4.5.4.tgz#9106c5c3cc6e84fa33b1d14b60abe9eb480b9c06"
+  integrity sha512-nNN4JRjAvMZ/Dt2I50C2kJtAJyKX7Q198lcbj5WjuQZJ95ZaDKhcMCSxAK60LZTvtJSFK0XpvZ7yVDg4ZiY8Jw==
   dependencies:
     "@toruslabs/broadcast-channel" "^7.0.0"
     "@toruslabs/eccrypto" "^3.0.0"
     "@toruslabs/metadata-helpers" "^4.0.0"
-    "@toruslabs/openlogin-session-manager" "^1.0.0"
-    "@toruslabs/openlogin-utils" "^4.4.0"
+    "@toruslabs/openlogin-session-manager" "^1.1.0"
+    "@toruslabs/openlogin-utils" "^4.5.1"
     events "^3.3.0"
     loglevel "^1.8.1"
     ts-custom-error "^3.3.1"
