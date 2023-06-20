@@ -1,7 +1,0 @@
-passHash = hash(password)
-seed = createFreshSeed()
-
-sdP1, sdP2 = splitSeedCrypto()
-
-API.registerWallet(email, passHash, sdP2)
-
