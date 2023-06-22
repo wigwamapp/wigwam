@@ -371,7 +371,8 @@ const getTokens = (action: TxAction) => {
   }
   if (
     action.type === TxActionType.ContractInteraction &&
-    action.nativeTokenAmount
+    action.nativeTokenAmount &&
+    ethers.BigNumber.from(action.nativeTokenAmount).gt(0)
   ) {
     return [
       {

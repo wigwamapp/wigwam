@@ -176,7 +176,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           address: newAccounts[0].address,
           index: newAccounts[0].index.toString(),
           publicKey: toProtectedString(newAccounts[0].publicKey),
-          isDisabled: true,
+          isDisabled: false,
           isDefaultChecked: true,
         };
       }
@@ -242,7 +242,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
                   : AccountSource.SeedPhrase,
                 address: wallet.address,
                 index: wallet.index,
-                isDisabled: true,
+                isDisabled: false,
                 isDefaultChecked: true,
                 publicKey: toProtectedString(wallet.publicKey),
               });

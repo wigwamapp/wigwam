@@ -74,7 +74,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
           updateToast(
             <>
               Wallet {`"`}
-              <TReplace msg={account.name} />
+              <TReplace msg={name} />
               {`"`} successfully updated!
             </>
           );
@@ -83,7 +83,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         }
         return;
       }),
-    [account.name, account.uuid, updateToast]
+    [account.uuid, updateToast]
   );
 
   const handleDeleteAccount = useCallback(() => {

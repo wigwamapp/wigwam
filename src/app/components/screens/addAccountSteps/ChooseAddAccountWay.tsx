@@ -201,16 +201,8 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
             replaceUrlOnRedirect: false,
             storageKey: "session",
           });
-          // https://github.com/torusresearch/OpenLoginSdk/pull/237
-          openlogin.options.replaceUrlOnRedirect = false;
-
-          // onClose(() => {
-          //   openlogin.destroy();
-          //   localStorage.setItem(storeKey, JSON.stringify({}));
-          // });
 
           await openlogin.init();
-          // await openlogin.logout().catch(console.warn);
 
           if (closed) return false;
 
@@ -218,7 +210,6 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
             loginProvider: openLoginMethod,
           });
           const { email, name } = openlogin.getUserInfo();
-          // await openlogin.logout().catch(console.warn);
 
           if (closed) return false;
 
