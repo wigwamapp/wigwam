@@ -30,6 +30,7 @@ import { withHumanDelay } from "app/utils";
 import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
@@ -283,53 +284,61 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
 
   const heightClassName = "!h-[20rem]";
 
-  return typeof message === "string" ? (
-    <LongTextField
-      label="Message"
-      readOnly
-      textareaClassName={heightClassName}
-      value={message}
-      actions={copyButton}
-      labelActions={standardLabel}
-      hoverStyles={false}
-    />
-  ) : (
-    <>
-      <FieldLabel action={standardLabel}>Message</FieldLabel>
+  return (
+    <ScrollAreaContainer
+      className="w-full box-content -mr-5 pr-5"
+      viewPortClassName="viewportBlock pt-5"
+      scrollBarClassName="pt-5 pb-0"
+    >
+      {typeof message === "string" ? (
+        <LongTextField
+          label="Message"
+          readOnly
+          textareaClassName={heightClassName}
+          value={message}
+          actions={copyButton}
+          labelActions={standardLabel}
+          hoverStyles={false}
+        />
+      ) : (
+        <>
+          <FieldLabel action={standardLabel}>Message</FieldLabel>
 
-      <div className="relative w-full">
-        <div
-          className={classNames(
-            "w-full",
-            heightClassName,
-            "py-3 px-4",
-            "box-border",
-            "text-sm text-brand-light",
-            "bg-black/20",
-            "border border-brand-main/10",
-            "rounded-[.625rem]",
-            "overflow-auto"
-          )}
-        >
-          <JsonView
-            src={message}
-            theme="harmonic"
-            iconStyle="triangle"
-            name={null}
-            indentWidth={3}
-            collapsed={false}
-            collapseStringsAfterLength={42}
-            enableClipboard={false}
-            displayObjectSize={false}
-            displayDataTypes={false}
-            style={{ backgroundColor: "none" }}
-            sortKeys
-          />
-        </div>
+          <div className="relative w-full">
+            <div
+              className={classNames(
+                "w-full",
+                heightClassName,
+                "py-3 px-4",
+                "box-border",
+                "text-sm text-brand-light",
+                "bg-black/20",
+                "border border-brand-main/10",
+                "rounded-[.625rem]",
+                "overflow-auto"
+              )}
+            >
+              <JsonView
+                src={message}
+                theme="harmonic"
+                iconStyle="triangle"
+                name={null}
+                indentWidth={3}
+                collapsed={false}
+                collapseStringsAfterLength={42}
+                enableClipboard={false}
+                displayObjectSize={false}
+                displayDataTypes={false}
+                style={{ backgroundColor: "none" }}
+                sortKeys
+              />
+            </div>
 
-        {copyButton}
-      </div>
-    </>
+            {copyButton}
+          </div>
+        </>
+      )}
+    </ScrollAreaContainer>
   );
 };
 
