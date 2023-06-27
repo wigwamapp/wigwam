@@ -19,7 +19,7 @@ export function atomWithAutoReset<Value>(
   opts: AutoResetAtomOptions<Value> = {}
 ) {
   const triggerAtom = atom(false);
-  const originAtom = atomWithDefault((get, opts) => {
+  const originAtom = atomWithDefault<Value>((get, opts) => {
     get(triggerAtom); // Rerender trigger for force update (FULL RESET case)
     return getDefault(get, opts);
   });
@@ -36,7 +36,7 @@ export function atomWithAutoReset<Value>(
 
   anAtom.onMount = (setAtom) => {
     if (resetTimeout === null) {
-      unsub = opts?.onMount?.(setAtom);
+      unsub = opts?.onMount?.(setAtom as any);
     } else {
       clearTimeout(resetTimeout);
       resetTimeout = null;
