@@ -1,16 +1,14 @@
 import axios from "axios";
 import BigNumber from "bignumber.js";
 
-import { TPGasPrices } from "core/types";
+import { GasPrices } from "core/types";
 
 const GAS_STATION_ENDPOINTS = new Map([
-  [137, "https://gasstation-mainnet.matic.network/v2"],
-  [80001, "https://gasstation-mumbai.matic.today/v2"],
+  [137, "https://gasstation.polygon.technology/v2"],
+  [80001, "https://gasstation-testnet.polygon.technology/v2"],
 ]);
 
-export async function getPolygonGasPrices(
-  chainId: number
-): Promise<TPGasPrices> {
+export async function getPolygonGasPrices(chainId: number): Promise<GasPrices> {
   const url = GAS_STATION_ENDPOINTS.get(chainId);
   if (!url) return null;
 

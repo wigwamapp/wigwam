@@ -264,8 +264,8 @@ export function syncTokenActivities(
   porter.sendOneWayMessage(msg);
 }
 
-export async function getThirdPartyGasPrices(chainId: number) {
-  const type = MessageType.GetTPGasPrices;
+export async function getGasPrices(chainId: number) {
+  const type = MessageType.GetGasPrices;
 
   const res = await porter.request({ type, chainId });
   assert(res?.type === type);

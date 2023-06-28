@@ -362,6 +362,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             );
           }
 
+          console.info({ finalTx });
+
           const rawTx = serializeTransaction(finalTx);
 
           if (account.source !== AccountSource.Ledger) {

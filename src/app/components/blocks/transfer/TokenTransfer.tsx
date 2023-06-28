@@ -419,21 +419,20 @@ const TransferTokenContent = memo<TransferTokenContent>(
               }
 
               const fees = await suggestFees(provider);
-              if (fees) {
-                const gasPrice = fees.modes.high.max;
-                const maxGasLimit = gasLimit.mul(3).div(2);
-                const rawBalance = await requestBalance(
-                  provider,
-                  tokenSlug,
-                  currentAccount.address
-                );
 
-                setGas({
-                  average: gasLimit.mul(gasPrice),
-                  max: maxGasLimit.mul(gasPrice),
-                  rawBalance,
-                });
-              }
+              const gasPrice = fees.modes.high.max;
+              const maxGasLimit = gasLimit.mul(3).div(2);
+              const rawBalance = await requestBalance(
+                provider,
+                tokenSlug,
+                currentAccount.address
+              );
+
+              setGas({
+                average: gasLimit.mul(gasPrice),
+                max: maxGasLimit.mul(gasPrice),
+                rawBalance,
+              });
 
               setEstimationError(null);
             } catch (err) {
