@@ -152,7 +152,7 @@ export class FilterManager {
     if (cursorPosition > currentBlockHeight) {
       return [];
     }
-    if (cursorPosition > filter.toBlock) {
+    if (cursorPosition > +filter.toBlock) {
       return [];
     }
 

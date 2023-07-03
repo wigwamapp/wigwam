@@ -1,4 +1,12 @@
-import { FC, memo, ReactNode, useCallback, useEffect, useState } from "react";
+import {
+  FC,
+  memo,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { replaceT } from "lib/ext/i18n";
@@ -59,14 +67,14 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   >(null);
 
   const handleNameUpdate = useCallback(
-    async ({ name }) =>
+    async ({ name }: { name: string }) =>
       withHumanDelay(async () => {
         try {
           await updateAccountName(account.uuid, name);
           updateToast(
             <>
               Wallet {`"`}
-              <TReplace msg={account.name} />
+              <TReplace msg={name} />
               {`"`} successfully updated!
             </>
           );
@@ -75,7 +83,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
         }
         return;
       }),
-    [account.name, account.uuid, updateToast]
+    [account.uuid, updateToast]
   );
 
   const handleDeleteAccount = useCallback(() => {
@@ -292,12 +300,12 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
 
 export default EditWalletSection;
 
-type WalletBlockProps = {
+type WalletBlockProps = PropsWithChildren<{
   Icon: FC<{ className?: string }>;
   title: string;
   description: ReactNode;
   className?: string;
-};
+}>;
 
 const WalletBlock: FC<WalletBlockProps> = ({
   Icon,
@@ -342,7 +350,7 @@ const SensetiveActionModal = memo<
   }, [cause, onOpenChange, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }) =>
+    async ({ password }: { password: string }) =>
       withHumanDelay(async () => {
         try {
           if (cause !== "delete") {

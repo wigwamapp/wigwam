@@ -26,16 +26,20 @@ export function createAtomWithStorageArea(storageArea: StorageArea) {
 
     const storageAtom = atom(
       (get) => get(readAtom),
-      (get, _set, update: SetStateAction<T> | typeof RESET) => {
-        if (update === RESET) {
-          storageArea.remove(key).catch(console.error);
-        } else {
-          const newValue =
-            typeof update === "function"
-              ? (update as (prev: T) => T)(get(storageAtom))
-              : update;
+      async (get, _set, update: SetStateAction<T> | typeof RESET) => {
+        try {
+          if (update === RESET) {
+            await storageArea.remove(key);
+          } else {
+            const newValue =
+              typeof update === "function"
+                ? (update as (prev: T) => T)(await get(storageAtom))
+                : update;
 
-          storageArea.put(key, newValue).catch(console.error);
+            await storageArea.put(key, newValue);
+          }
+        } catch (err) {
+          console.error(err);
         }
       }
     );

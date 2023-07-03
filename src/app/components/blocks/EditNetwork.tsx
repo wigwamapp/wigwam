@@ -1,5 +1,6 @@
 import {
   ButtonHTMLAttributes,
+  KeyboardEventHandler,
   forwardRef,
   memo,
   useCallback,
@@ -81,7 +82,13 @@ const EditNetwork = memo<EditNetworkProps>(
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
 
     const handleSubmit = useCallback(
-      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
+      async ({
+        nName,
+        rpcUrl,
+        chainId,
+        currencySymbol,
+        blockExplorer,
+      }: FormValues) =>
         withHumanDelay(async () => {
           chainId = Number(chainId);
 
@@ -458,7 +465,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
       }
     }, [rest.value, rpcList]);
 
-    const handleKeyClick = useCallback(
+    const handleKeyClick = useCallback<
+      KeyboardEventHandler<HTMLTextAreaElement>
+    >(
       (e) => {
         if (rpcList) {
           if (e.keyCode === 40) {
@@ -538,6 +547,12 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
           <Popover.Content
             onOpenAutoFocus={(e) => {
               e.preventDefault();
+            }}
+            side="bottom"
+            align="start"
+            avoidCollisions={false}
+            style={{
+              width: "var(--radix-popover-trigger-width)",
             }}
             className={classNames(
               "shadow-xs",

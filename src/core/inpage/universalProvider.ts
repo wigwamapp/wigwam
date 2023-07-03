@@ -151,7 +151,7 @@ export class UniversalInpageProvider extends Emitter {
   #unsubEvents?: () => void;
 
   #proxyEvents() {
-    this.#unsubEvents?.();
+    if (this.#unsubEvents) this.#unsubEvents?.();
 
     const provider = this.currentProvider;
     const unsubs: (() => void)[] = [];

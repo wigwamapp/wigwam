@@ -9,7 +9,6 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import { ethers } from "ethers";
 import retry from "async-retry";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -36,6 +35,7 @@ import { matchTxAction } from "core/common/transaction";
 
 import {
   OverflowProvider,
+  useAccounts,
   useChainId,
   useNativeCurrency,
   useOnBlock,
@@ -43,7 +43,7 @@ import {
   useSync,
 } from "app/hooks";
 import { useLedger } from "app/hooks/ledger";
-import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
+import { getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
 import { formatUnits } from "app/utils/txApprove";
 import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
@@ -78,13 +78,11 @@ type ApproveTransactionProps = {
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
+  const { allAccounts } = useAccounts();
   const nativeCurrency = useNativeCurrency();
 
-  const [allAccounts, localNonce] = useAtomValue(
-    waitForAll([
-      allAccountsAtom,
-      getLocalNonceAtom({ chainId, accountAddress }),
-    ])
+  const localNonce = useAtomValue(
+    getLocalNonceAtom({ chainId, accountAddress })
   );
 
   useSync(chainId, accountAddress);
@@ -363,6 +361,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`
             );
           }
+
+          console.info({ finalTx });
 
           const rawTx = serializeTransaction(finalTx);
 

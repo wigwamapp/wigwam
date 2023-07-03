@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  PropsWithChildren,
   ReactNode,
   useContext,
   useEffect,
@@ -27,7 +28,7 @@ export const useToast = () => {
   return value;
 };
 
-export const ToastProvider: FC = ({ children }) => {
+export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
   const [toastData, updateToast] = useState<ReactNode>(null);
 
   return (
@@ -42,11 +43,9 @@ type ToastOverflowProviderProps = {
   className?: string;
 };
 
-export const ToastOverflowProvider: FC<ToastOverflowProviderProps> = ({
-  isCorner = false,
-  className,
-  children,
-}) => {
+export const ToastOverflowProvider: FC<
+  PropsWithChildren<ToastOverflowProviderProps>
+> = ({ isCorner = false, className, children }) => {
   const { toastData, updateToast } = useToast();
   const prevToastData = usePrevious(toastData);
 

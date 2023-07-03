@@ -1,4 +1,4 @@
-import { FC, Suspense, useRef } from "react";
+import { FC, PropsWithChildren, Suspense, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -19,9 +19,9 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-type PopupLayoutProps = {
+type PopupLayoutProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
@@ -50,7 +50,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             hiddenScrollbar="horizontal"
             className="h-full min-h-0"
             viewPortClassName="viewportBlock"
-            scrollBarClassName="pt-[15.375rem] pb-16 pl-0.5 pr-0.5 w-3"
+            scrollBarClassName="pt-[15.375rem] pb-16 pl-1.5 pr-0.5 w-3"
           >
             <div className="flex px-3 pt-3">
               {isUnlocked && <LockProfileButton className="mr-2" />}

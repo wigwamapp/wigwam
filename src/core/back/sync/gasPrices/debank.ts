@@ -1,12 +1,10 @@
 import BigNumber from "bignumber.js";
 
-import { TPGasPrices } from "core/types";
+import { GasPrices } from "core/types";
 
 import { getDebankChain, debankApi } from "../debank";
 
-export async function getDebankGasPrices(
-  chainId: number
-): Promise<TPGasPrices> {
+export async function getDebankGasPrices(chainId: number): Promise<GasPrices> {
   const debankChain = await getDebankChain(chainId);
   if (!debankChain) return null;
 

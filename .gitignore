@@ -18,6 +18,7 @@
 .env.*
 
 # misc
+.swc
 .DS_Store
 /.idea
 

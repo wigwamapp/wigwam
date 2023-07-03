@@ -1,6 +1,6 @@
-import { atomFamily, atomWithStorage } from "jotai/utils";
+import { atomFamily } from "jotai/utils";
 import { dequal } from "dequal/lite";
-import { atomWithRepoQuery } from "lib/atom-utils";
+import { atomWithRepoQuery, atomWithStorage } from "lib/atom-utils";
 
 import * as repo from "core/repo";
 import { TokenType } from "core/types";

@@ -1,12 +1,12 @@
 import { UUID } from "@amplitude/analytics-core";
-import { BeforePlugin, Event, PluginType } from "@amplitude/analytics-types";
+import { BeforePlugin, Event } from "@amplitude/analytics-types";
 import UAParser from "@amplitude/ua-parser-js";
 
 import { IExtConfig } from "./config";
 
 export class ExtContext implements BeforePlugin {
   name = "context";
-  type = PluginType.BEFORE as const;
+  type = "before" as const;
 
   // this.config is defined in setup() which will always be called first
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

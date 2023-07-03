@@ -1,6 +1,5 @@
 import { FC, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
@@ -11,11 +10,9 @@ import {
   accountAddressAtom,
   activeTabAtom,
   activeTabOriginAtom,
-  allAccountsAtom,
-  currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { useToken } from "app/hooks";
+import { useAccounts, useToken } from "app/hooks";
 import { Page } from "app/nav";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -38,21 +35,15 @@ type AccountSelectProps = {
 };
 
 const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
-  const [opened, setOpened] = useState(false);
-  const { currentAccount, allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
+  const { currentAccount, allAccounts } = useAccounts();
   const setAccountAddress = useSetAtom(accountAddressAtom);
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
+
+  const [opened, setOpened] = useState(false);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
   const connectedAccountAddresses = useMemo(
     () =>
       purePermission && purePermission.accountAddresses.length > 0
@@ -61,7 +52,6 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
     [purePermission]
   );
 
-  const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(allAccounts, ACCOUNTS_SEARCH_OPTIONS),
     [allAccounts]

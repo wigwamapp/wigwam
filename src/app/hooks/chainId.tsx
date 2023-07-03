@@ -1,4 +1,11 @@
-import { FC, createContext, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
@@ -18,7 +25,7 @@ export function useChainId() {
   return scopedChainId === null ? globalChainId : scopedChainId;
 }
 
-export const ChainIdProvider: FC<{ chainId: number }> = ({
+export const ChainIdProvider: FC<PropsWithChildren<{ chainId: number }>> = ({
   chainId,
   children,
 }) => (

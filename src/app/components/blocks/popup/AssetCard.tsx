@@ -8,10 +8,11 @@ import {
   ButtonHTMLAttributes,
   Dispatch,
   SetStateAction,
+  MouseEventHandler,
 } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
@@ -23,7 +24,8 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { IS_FIREFOX } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
-import { chainIdAtom, currentAccountAtom } from "app/atoms";
+import { chainIdAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
@@ -52,7 +54,7 @@ const AssetCard = memo(
       { asset, setReceivePopupOpened, isManageMode = false, className },
       ref
     ) => {
-      const currentAccount = useAtomValue(currentAccountAtom);
+      const { currentAccount } = useAccounts();
       const setInternalChainId = useSetAtom(chainIdAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
@@ -99,10 +101,12 @@ const AssetCard = memo(
         }
       }, [asset, currentAccount.address, isManageMode]);
 
-      const handleAssetContextMenu = useCallback(
-        async (e) => {
+      const handleAssetContextMenu = useCallback<
+        MouseEventHandler<HTMLButtonElement>
+      >(
+        async (evt) => {
           if (!isManageMode) {
-            e.preventDefault();
+            evt.preventDefault();
             if (!popoverOpened) {
               setPopoverOpened(true);
             }

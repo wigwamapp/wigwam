@@ -49,7 +49,7 @@ const SetupPassword = memo(() => {
   }, [addAccountsParams, reset]);
 
   const handleFinish = useCallback(
-    async ({ password, analytics }) =>
+    async ({ password, analytics }: FormValues) =>
       withHumanDelay(async () => {
         try {
           if (!addAccountsParams) return;

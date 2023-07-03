@@ -21,7 +21,11 @@ export const ARBITRUM: Network[] = [
     explorerUrls: ["https://arbiscan.io", "https://explorer.arbitrum.io"],
     explorerApiUrl: "https://api.arbiscan.io/api",
     faucetUrls: [],
-    bridgesUrls: ["https://bridge.arbitrum.io"],
+    parent: {
+      type: "L2",
+      chain: "eip155-1",
+      bridges: [{ url: "https://bridge.arbitrum.io" }],
+    },
     infoUrl: "https://arbitrum.io",
   },
 
@@ -43,7 +47,11 @@ export const ARBITRUM: Network[] = [
     ],
     explorerApiUrl: "https://api-testnet.arbiscan.io/api",
     faucetUrls: ["https://fauceth.komputing.org/?chain=421611"],
-    bridgesUrls: ["https://bridge.arbitrum.io"],
+    parent: {
+      type: "L2",
+      chain: "eip155-4",
+      bridges: [{ url: "https://bridge.arbitrum.io" }],
+    },
     infoUrl: "https://arbitrum.io",
   },
 ];

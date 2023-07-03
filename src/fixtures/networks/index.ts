@@ -21,6 +21,8 @@ import { EVMOS } from "./evmos";
 import { SYSCOIN } from "./syscoin";
 import { BOBA } from "./boba";
 import { LOCAL } from "./local";
+import { ZKSYNCERA } from "./zksyncera";
+import { ARBITRUMNOVA } from "./arbitrumnova";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -37,6 +39,8 @@ export const DEFAULT_NETWORKS: Network[] = [
   AURORA,
   HARMONY,
   CRONOS,
+  ZKSYNCERA,
+  ARBITRUMNOVA,
   MOONBEAM,
   MOONRIVER,
   EVMOS,
@@ -110,4 +114,6 @@ export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
   [1284, "moonbeam"],
   [1285, "moonriver"],
   [57, "syscoin"],
+  [324, "ethereum"],
+  [42170, "ethereum"],
 ]);

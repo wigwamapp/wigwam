@@ -2,7 +2,7 @@ import { FC, useEffect, useRef } from "react";
 import { useField } from "react-final-form";
 import createDecorator from "final-form-focus";
 
-export const focusOnErrors = createDecorator<any>();
+export const focusOnErrors = createDecorator() as any;
 
 export type OnChangeProps = {
   name: string;

@@ -14,7 +14,7 @@ import {
   personalSign,
   signTypedData,
   SignTypedDataVersion,
-} from "lib/eth-sig-util";
+} from "@metamask/eth-sig-util";
 import { Buffer } from "buffer";
 import memoizeOne from "memoize-one";
 import {
@@ -679,14 +679,12 @@ async function signDigest(
 ): Promise<Signature> {
   const privKey = stripZeros(privateKey.getText());
 
-  const [sigHex, recoveryParam] = await secp256k1
-    .sign(ethers.utils.arrayify(digest), privKey, { recovered: true })
+  const signature = await secp256k1
+    .signAsync(ethers.utils.arrayify(digest), privKey)
     .finally(() => zeroBuffer(privKey));
 
-  const signature = secp256k1.Signature.fromHex(sigHex);
-
   return splitSignature({
-    recoveryParam,
+    recoveryParam: signature.recovery,
     r: hexZeroPad("0x" + signature.r.toString(16), 32),
     s: hexZeroPad("0x" + signature.s.toString(16), 32),
   });

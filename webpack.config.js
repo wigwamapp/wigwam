@@ -11,6 +11,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const EslintWebpackPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -151,6 +152,7 @@ module.exports = {
     pathinfo: NODE_ENV === "development",
     filename: "scripts/[name].js",
     chunkFilename: "scripts/[name].chunk.js",
+    assetModuleFilename: "media/[hash:8].[ext]",
   },
 
   resolve: {
@@ -171,12 +173,23 @@ module.exports = {
       // Fix `path is not exported from package exports field`
       // Used by `.vendor/axios-fetch-adapter`
       "axios/lib": path.resolve(__dirname, "node_modules/axios/lib"),
+      // Fix `path is not exported from package exports field`
+      // Used by `src/app/components/elements/AutoIcon.tsx`
+      "@dicebear/core/lib": path.resolve(
+        __dirname,
+        "node_modules/@dicebear/core/lib"
+      ),
     },
     fallback: {
       process: false,
       path: false,
       fs: false,
       crypto: false,
+      util: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
     },
   },
 
@@ -194,10 +207,11 @@ module.exports = {
           // A missing `test` is equivalent to a match.
           {
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve("url-loader"),
-            options: {
-              limit: IMAGE_INLINE_SIZE_LIMIT,
-              name: "media/[hash:8].[ext]",
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                maxSize: IMAGE_INLINE_SIZE_LIMIT,
+              },
             },
           },
 
@@ -215,10 +229,13 @@ module.exports = {
                         params: {
                           overrides: {
                             removeViewBox: false,
-                            cleanupIDs: {
-                              prefix: `svg-${hash(resource)}`,
-                            },
                           },
+                        },
+                      },
+                      {
+                        name: "prefixIds",
+                        params: {
+                          prefix: `svg-${hash(resource)}`,
                         },
                       },
                     ],
@@ -269,7 +286,9 @@ module.exports = {
             use: getStyleLoaders({
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
-              modules: false,
+              modules: {
+                mode: "icss",
+              },
             }),
             // Don't consider CSS imports dead code even if the
             // containing package claims to have no side effects.
@@ -286,6 +305,7 @@ module.exports = {
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
               modules: {
+                mode: "local",
                 getLocalIdent: getCSSModuleLocalIdent,
               },
             }),
@@ -297,15 +317,12 @@ module.exports = {
           // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
-            loader: require.resolve("file-loader"),
             // Exclude `js` files to keep "css" loader working as it injects
             // its runtime that would otherwise be processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
             exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-            options: {
-              name: "media/[hash:8].[ext]",
-            },
+            type: "asset/resource",
           },
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
@@ -458,16 +475,13 @@ module.exports = {
       ],
     }),
 
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: "src/**/*.{js,mjs,jsx,ts,tsx}",
-        options: {
-          cache: true,
-          cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
-          cwd: CWD_PATH,
-          resolvePluginsRelativeTo: __dirname,
-        },
-      },
+    new ForkTsCheckerWebpackPlugin(),
+
+    new EslintWebpackPlugin({
+      files: "src/**/*.{js,mjs,jsx,ts,tsx}",
+      cache: true,
+      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+      context: CWD_PATH,
     }),
 
     new WebpackBar({

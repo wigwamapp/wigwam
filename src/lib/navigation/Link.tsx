@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   forwardRef,
+  MouseEventHandler,
 } from "react";
 import useForceUpdate from "use-force-update";
 import { dequal } from "dequal/lite";
@@ -61,7 +62,7 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
       [url, replace]
     );
 
-    const handleClick = useCallback(
+    const handleClick = useCallback<MouseEventHandler<HTMLAnchorElement>>(
       (evt) => {
         if (disabled) {
           evt.preventDefault();

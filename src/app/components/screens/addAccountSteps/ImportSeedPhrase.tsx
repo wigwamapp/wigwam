@@ -54,7 +54,7 @@ const ImportSeedPhrase = memo(() => {
   );
 
   const handleContinue = useCallback(
-    async (values) =>
+    async (values: FormValues) =>
       withHumanDelay(async () => {
         try {
           const seedPhrase: SeedPharse = {

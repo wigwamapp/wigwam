@@ -1,4 +1,8 @@
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
+import {
+  Formatter,
+  JsonRpcProvider,
+  Networkish,
+} from "@ethersproject/providers";
 import { providers as multicallProviders } from "@0xsequence/multicall";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
@@ -90,10 +94,17 @@ class RpcProvider extends JsonRpcProvider {
     super(url, network);
 
     // To use cache first provider._getBlock(), but without formatting
-    this.formatter.block = formatBlockData;
-    this.formatter.blockWithTransactions = formatBlockData;
+    this.formatter = getRpcFormatter();
   }
 }
+
+const getRpcFormatter = memoizeOne(() => {
+  const formatter = new Formatter();
+  formatter.block = formatBlockData;
+  formatter.blockWithTransactions = formatBlockData;
+
+  return formatter;
+});
 
 function formatBlockData(data: any) {
   // Fix using getBlock() function with Celo,

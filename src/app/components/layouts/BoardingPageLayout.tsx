@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { Page } from "app/nav";
@@ -24,7 +24,7 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const BoardingPageLayout: FC<BoardingPageLayoutProps> = ({
+const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
   header = true,
   isWelcome = false,
   children,

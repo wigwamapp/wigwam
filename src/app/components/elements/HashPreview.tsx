@@ -28,7 +28,7 @@ export const HashPreview = memo<HashPreviewProps>(
 
       if (withTooltip) {
         return (
-          <CopiableTooltip content={hash} textToCopy={hash}>
+          <CopiableTooltip content={hash} textToCopy={hash} maxWidth="22rem">
             {content}
           </CopiableTooltip>
         );

@@ -35,7 +35,7 @@ import { processApprove } from "../approve";
 import {
   addFindTokenRequest,
   addSyncRequest,
-  getTPGasPrices,
+  estimateGasPrices,
   syncTokenActivities,
 } from "../sync";
 
@@ -298,9 +298,9 @@ async function handleWalletRequest(
             syncTokenActivities(chainId, accountAddress, tokenSlug);
           })
       )
-      .with({ type: MessageType.GetTPGasPrices }, ({ type, chainId }) =>
+      .with({ type: MessageType.GetGasPrices }, ({ type, chainId }) =>
         withStatus(WalletStatus.Unlocked, async () => {
-          const gasPrices = await getTPGasPrices(chainId);
+          const gasPrices = await estimateGasPrices(chainId);
 
           ctx.reply({ type, gasPrices });
         })
