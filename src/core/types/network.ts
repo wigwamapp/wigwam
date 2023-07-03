@@ -14,7 +14,11 @@ export interface Network {
   explorerApiUrl?: string;
   iconUrls?: string[];
   faucetUrls?: string[];
-  bridgesUrls?: string[];
+  parent?: {
+    type: "L2" | "shard";
+    chain: string;
+    bridges?: { url: string }[];
+  };
   infoUrl?: string;
   position?: number;
 }
