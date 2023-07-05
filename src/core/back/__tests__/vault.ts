@@ -1,10 +1,23 @@
 import { CryptoEngine } from "kdbxweb";
-import { toProtectedString, fromProtectedString } from "lib/crypto-utils";
+import {
+  SignTypedDataVersion,
+  TypedDataUtils,
+  recoverPersonalSignature,
+} from "@metamask/eth-sig-util";
+import { ethers } from "ethers";
+import {
+  toProtectedString,
+  fromProtectedString,
+  toProtectedPassword,
+} from "lib/crypto-utils";
+import { importProtected } from "lib/kdbx";
 import { storage } from "lib/ext/storage";
+import { session } from "lib/ext/session";
 
-import { AccountSource } from "core/types";
+import { AccountSource, PASSWORD_SESSION, SigningStandard } from "core/types";
 
 import { Vault } from "../vault";
+import { retrievePasswordSession } from "../vault/session";
 
 // Mock profile prefix for storage usage
 // It can work on its own, but web-extension-polyfill
@@ -27,13 +40,18 @@ beforeAll(() => CryptoEngine.setArgon2Impl((p) => CryptoEngine.sha256(p)));
 afterEach(() => storage.clear());
 
 const TEST_ADDRESS = "0x7efae4CDB551cD5cdd3715361e195eA7963E6738";
+const TEST_PASSWORD = "123qweasd";
+const ROOT_PATH = "m/44'/60'/0'/0";
 
 const TEST_WALLET = {
   name: "Test wallet",
   phrase:
     "kiwi opinion escape sea crop potato picture fiction onion social excess vital",
-  path: "m/44'/60'/0'/0/0",
+  path: `${ROOT_PATH}/0`,
+  rootXpub:
+    "xpub6ECj87ryBkA2LB3hAzt53KLed7qybT5SYM18C6V1edgeATHzAUrEbCn2S363vYUPRSKisEVYZf6JhRQpizKsURvfot4uuhYSRqtxT2NRqAQ",
   address: "0xa37a58ED255089D9204125A0f3313826537759D9",
+  secondAddress: "0x5418382DaAf09Cfc4cFA5F65CEE2A0b6815B8e77",
   privateKey:
     "0x91c90e34a6699a9b12272a18745b34533ecbbe94f7383524436a99bccd324619",
   publicKey:
@@ -42,7 +60,27 @@ const TEST_WALLET = {
     "0x030a9e012d5937956ca22110626e09ac8a058ae49b167eee94aaf5475f8dfd23e7",
 };
 
-describe("Vault setup", () => {
+const getPasswordHash = (password = TEST_PASSWORD) =>
+  toProtectedPassword(password);
+
+const createTestVault = async () => {
+  const passHash = await getPasswordHash();
+  const vault = await Vault.setup(
+    passHash,
+    [
+      {
+        name: TEST_WALLET.name,
+        source: AccountSource.SeedPhrase,
+        derivationPath: TEST_WALLET.path,
+      },
+    ],
+    { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+  );
+
+  return { vault, passHash };
+};
+
+describe("Vault", () => {
   it("not exist by default", async () => {
     const isVaultExist = await Vault.isExist();
 
@@ -50,7 +88,7 @@ describe("Vault setup", () => {
   });
 
   it("validate args basic", () => {
-    expect(Vault.setup("123qweasd", [])).rejects.toThrowError(
+    expect(Vault.setup(TEST_PASSWORD, [])).rejects.toThrowError(
       "Translated<failedToSetupWallet>"
     );
 
@@ -65,9 +103,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<failedToSetupWallet>");
   });
 
-  it("validate account name", () => {
+  it("validate account name", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: "",
           source: AccountSource.Address,
@@ -77,9 +115,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidName>");
   });
 
-  it("validate address", () => {
+  it("validate address", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Address,
@@ -89,9 +127,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidAddress>");
   });
 
-  it("validate address", () => {
+  it("validate address", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Address,
@@ -101,7 +139,7 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidAddress>");
 
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Address,
@@ -111,9 +149,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidAddress>");
   });
 
-  it("create vault with watch-only account", () => {
+  it("create vault with watch-only account", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Address,
@@ -123,9 +161,9 @@ describe("Vault setup", () => {
     ).resolves.not.toThrow();
   });
 
-  it("validate derivation path", () => {
+  it("validate derivation path", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.SeedPhrase,
@@ -135,9 +173,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidDerivationPath>");
   });
 
-  it("validate seed phrase existence", () => {
+  it("validate seed phrase existence", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.SeedPhrase,
@@ -147,10 +185,10 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<seedPhraseNotEstablished>");
   });
 
-  it("validate seed phrase empty", () => {
+  it("validate seed phrase empty", async () => {
     expect(
       Vault.setup(
-        "123qweasd",
+        await getPasswordHash(),
         [
           {
             name: TEST_WALLET.name,
@@ -163,10 +201,10 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<seedPhraseIsNotValid>");
   });
 
-  it("validate seed phrase protected", () => {
+  it("validate seed phrase protected", async () => {
     expect(
       Vault.setup(
-        "123qweasd",
+        await getPasswordHash(),
         [
           {
             name: TEST_WALLET.name,
@@ -179,10 +217,10 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<seedPhraseIsNotValid>");
   });
 
-  it("validate seed phrase language", () => {
+  it("validate seed phrase language", async () => {
     expect(
       Vault.setup(
-        "123qweasd",
+        await getPasswordHash(),
         [
           {
             name: TEST_WALLET.name,
@@ -195,10 +233,10 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<seedPhraseLanguageNotSupported>");
   });
 
-  it("create vault with secret phrase", () => {
+  it("create vault with secret phrase", async () => {
     expect(
       Vault.setup(
-        "123qweasd",
+        await getPasswordHash(),
         [
           {
             name: TEST_WALLET.name,
@@ -213,7 +251,7 @@ describe("Vault setup", () => {
 
   it("create valid account with secret phrase", async () => {
     const vault = await Vault.setup(
-      "123qweasd",
+      await getPasswordHash(),
       [
         {
           name: TEST_WALLET.name,
@@ -224,17 +262,23 @@ describe("Vault setup", () => {
       { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
     );
 
+    expect(vault.isSeedPhraseExists()).toBe(true);
+
     const [acc] = vault.getAccounts();
 
     expect(acc.name).toBe(TEST_WALLET.name);
     expect(acc.source).toBe(AccountSource.SeedPhrase);
     expect(acc.derivationPath).toBe(TEST_WALLET.path);
     expect(acc.address).toBe(TEST_WALLET.address);
+
+    expect(
+      importProtected(vault.getNeuterExtendedKey(ROOT_PATH)).getText()
+    ).toBe(TEST_WALLET.rootXpub);
   });
 
-  it("validate public key empty", () => {
+  it("validate public key empty", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Ledger,
@@ -245,9 +289,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidPublicKey>");
   });
 
-  it("validate public key protected", () => {
+  it("validate public key protected", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Ledger,
@@ -258,9 +302,9 @@ describe("Vault setup", () => {
     ).rejects.toThrowError("Translated<invalidPublicKey>");
   });
 
-  it("create vault with ledger account", () => {
+  it("create vault with ledger account", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.Ledger,
@@ -272,7 +316,7 @@ describe("Vault setup", () => {
   });
 
   it("create valid ledger account", async () => {
-    const vault = await Vault.setup("123qweasd", [
+    const vault = await Vault.setup(await getPasswordHash(), [
       {
         name: TEST_WALLET.name,
         source: AccountSource.Ledger,
@@ -288,9 +332,9 @@ describe("Vault setup", () => {
     expect(fromProtectedString(pubKey)).toBe(TEST_WALLET.publicKeyCompressed);
   });
 
-  it("create vault with open login account", () => {
+  it("create vault with open login account", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.OpenLogin,
@@ -303,9 +347,9 @@ describe("Vault setup", () => {
     ).resolves.not.toThrow();
   });
 
-  it("create vault with open login account", () => {
+  it("create vault with open login account", async () => {
     expect(
-      Vault.setup("123qweasd", [
+      Vault.setup(await getPasswordHash(), [
         {
           name: TEST_WALLET.name,
           source: AccountSource.OpenLogin,
@@ -316,5 +360,450 @@ describe("Vault setup", () => {
         },
       ])
     ).resolves.not.toThrow();
+  });
+
+  it("password session", async () => {
+    const { vault, passHash } = await createTestVault();
+
+    const sessionValue = await session.fetchForce(PASSWORD_SESSION);
+
+    expect(sessionValue).not.toBeUndefined();
+    expect(typeof sessionValue).toBe("string");
+    expect(sessionValue).not.toBe(passHash);
+
+    const passSession = await retrievePasswordSession();
+    expect(passSession).not.toBeNull();
+
+    expect(passSession!.passwordHash).toBe(passHash);
+
+    await vault.cleanup();
+    expect(session.isStored(PASSWORD_SESSION)).resolves.toBe(false);
+  });
+
+  it("unlock", async () => {
+    const { vault: vault1, passHash } = await createTestVault();
+
+    await vault1.cleanup();
+
+    const vault2 = await Vault.unlock(passHash);
+
+    expect(vault1.getAccounts()).toStrictEqual(vault2.getAccounts());
+
+    // Password session
+    const sessionValue = await session.fetchForce(PASSWORD_SESSION);
+
+    expect(sessionValue).not.toBeUndefined();
+    expect(typeof sessionValue).toBe("string");
+    expect(sessionValue).not.toBe(passHash);
+
+    const passSession = await retrievePasswordSession();
+    expect(passSession).not.toBeNull();
+
+    expect(passSession!.passwordHash).toBe(passHash);
+  });
+
+  it("changePassword", async () => {
+    const passHashOld = await getPasswordHash();
+    const passHashNew = await getPasswordHash("ghjtyu567");
+
+    const vault1 = await Vault.setup(
+      passHashOld,
+      [
+        {
+          name: TEST_WALLET.name,
+          source: AccountSource.SeedPhrase,
+          derivationPath: TEST_WALLET.path,
+        },
+      ],
+      { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+    );
+
+    const accounts = vault1.getAccounts();
+
+    await vault1.changePassword(passHashOld, passHashNew);
+    await vault1.cleanup();
+
+    expect(Vault.unlock(passHashOld)).rejects.toThrowError(
+      "Translated<invalidPassword>"
+    );
+
+    const vault2 = await Vault.unlock(passHashNew);
+    expect(vault2.getAccounts()).toStrictEqual(accounts);
+
+    // Password session
+    const sessionValue = await session.fetchForce(PASSWORD_SESSION);
+
+    expect(sessionValue).not.toBeUndefined();
+    expect(typeof sessionValue).toBe("string");
+    expect(sessionValue).not.toBe(passHashNew);
+
+    const passSession = await retrievePasswordSession();
+    expect(passSession).not.toBeNull();
+
+    expect(passSession!.passwordHash).toBe(passHashNew);
+  });
+
+  it("deleteAccounts", async () => {
+    const { vault, passHash } = await createTestVault();
+
+    expect(vault.deleteAccounts("invalid_password", [])).rejects.toThrowError(
+      "Translated<invalidPassword>"
+    );
+
+    const [acc] = vault.getAccounts();
+
+    // Cannot delete all accounts
+    await expect(
+      vault.deleteAccounts(passHash, [acc.uuid])
+    ).rejects.toThrowError("Translated<failedToDeleteWallets>");
+
+    expect(vault.getAccounts()).not.toStrictEqual([]);
+
+    await vault.addAccounts([
+      {
+        name: "Test Wallet 2",
+        source: AccountSource.SeedPhrase,
+        derivationPath: `${ROOT_PATH}/1`,
+      },
+    ]);
+    const [acc1, acc2] = vault.getAccounts();
+
+    expect(acc2.address).toBe(TEST_WALLET.secondAddress);
+
+    await expect(vault.deleteAccounts(passHash, [acc1.uuid])).resolves.toBe(
+      undefined
+    );
+
+    expect(vault.getAccounts()).toStrictEqual([acc2]);
+  });
+
+  it("updateAccountName", async () => {
+    const { vault } = await createTestVault();
+    const [acc] = vault.getAccounts();
+
+    // Empty name
+    await expect(vault.updateAccountName(acc.uuid, "")).rejects.toThrowError(
+      "Translated<failedToUpdateWalletName>"
+    );
+
+    // Unknown account
+    await expect(
+      vault.updateAccountName("123123", "test name")
+    ).rejects.toThrowError("Translated<failedToUpdateWalletName>");
+
+    // The same name
+    await vault.addAccounts([
+      {
+        name: "Test Wallet 2",
+        source: AccountSource.SeedPhrase,
+        derivationPath: `${ROOT_PATH}/1`,
+      },
+    ]);
+    await expect(
+      vault.updateAccountName(acc.uuid, "Test Wallet 2")
+    ).rejects.toThrowError("Translated<walletNameAlreadyExists>");
+
+    // Just works
+    await expect(
+      vault.updateAccountName(acc.uuid, "Test Wallet 1")
+    ).resolves.toBe(undefined);
+
+    const [acc1, acc2] = vault.getAccounts();
+    expect([acc1.name, acc2.name]).toStrictEqual([
+      "Test Wallet 1",
+      "Test Wallet 2",
+    ]);
+  });
+
+  it("getPublicKey", async () => {
+    const { vault } = await createTestVault();
+
+    // Unknown account
+    expect(() => vault.getPublicKey("123123")).toThrowError(
+      "Translated<failedToFetchPublicKey>"
+    );
+
+    const [acc] = vault.getAccounts();
+    expect(
+      importProtected(vault.getPublicKey(acc.uuid)).getText()
+    ).toStrictEqual(TEST_WALLET.publicKeyCompressed);
+  });
+
+  it("getPrivateKey", async () => {
+    const { vault, passHash } = await createTestVault();
+
+    const [acc] = vault.getAccounts();
+
+    // Invalid password
+    expect(vault.getPrivateKey("asdasd", acc.uuid)).rejects.toThrowError(
+      "Translated<invalidPassword>"
+    );
+
+    // Unknown account
+    expect(vault.getPrivateKey(passHash, "123123")).rejects.toThrowError(
+      "Translated<failedToFetchPrivateKey>"
+    );
+
+    const privKeyProtected = await vault.getPrivateKey(passHash, acc.uuid);
+
+    expect(importProtected(privKeyProtected).getText()).toStrictEqual(
+      TEST_WALLET.privateKey
+    );
+  });
+
+  it("signDigest", async () => {
+    const { vault } = await createTestVault();
+
+    // Unknown account
+    expect(vault.sign("123123", "0x1234")).rejects.toThrowError(
+      "Translated<failedToSign>"
+    );
+
+    const [acc] = vault.getAccounts();
+
+    expect(await vault.sign(acc.uuid, "0x1234")).toMatchSnapshot();
+    expect(
+      await vault.sign(
+        acc.uuid,
+        "0xda8080049401234567890123456789012345678901234567898006"
+      )
+    ).toMatchSnapshot();
+    expect(
+      await vault.sign(
+        acc.uuid,
+        "0xda8080809401234567890123456789012345678901234567890506"
+      )
+    ).toMatchSnapshot();
+    expect(
+      await vault.sign(
+        acc.uuid,
+        "0xed83b61b5c861b414e22695685050dcd5a5094e489ebbaae8af88372e63fd33c5eb16c0743883881a184ae3182b3"
+      )
+    ).toMatchSnapshot();
+    expect(
+      await vault.sign(
+        acc.uuid,
+        "0xf4819c8914f08e2118c60c523d8421ddd357940ba817b4709474c2b6470bb5282c662d20129a468813accb157a345a5a8490416c91"
+      )
+    ).toMatchSnapshot();
+    expect(
+      await vault.sign(
+        acc.uuid,
+        "0xf17a8922ebeeec58c8115214835a75dd94626288dd182c51cfb9b3c877b0ae28e8c82f6ad6848fed02238702e0e839e7add3"
+      )
+    ).toMatchSnapshot();
+  });
+
+  it("signMessage basic", async () => {
+    const { vault } = await createTestVault();
+
+    // Unknown account
+    expect(() =>
+      vault.signMessage("123123", SigningStandard.PersonalSign, "0x1234")
+    ).toThrowError("Translated<failedToSign>");
+
+    const [acc] = vault.getAccounts();
+
+    // Unsupported standard
+    expect(() =>
+      vault.signMessage(acc.uuid, SigningStandard.EthSign, "0x1234")
+    ).toThrowError("Translated<failedToSign>");
+
+    const psData = `0x${Buffer.from("Hello, world!").toString("hex")}`;
+    const psSignature = vault.signMessage(
+      acc.uuid,
+      SigningStandard.PersonalSign,
+      psData
+    );
+
+    expect(psSignature).toMatchSnapshot();
+
+    expect(
+      ethers.utils.getAddress(
+        recoverPersonalSignature({ signature: psSignature, data: psData })
+      )
+    ).toStrictEqual(acc.address);
+  });
+
+  it("signTypedMessage", async () => {
+    const { vault } = await createTestVault();
+
+    const [acc] = vault.getAccounts();
+
+    expect(
+      vault.signMessage(acc.uuid, SigningStandard.SignTypedDataV1, [
+        {
+          type: "string",
+          name: "Message",
+          value: "Hi, Alice!",
+        },
+        {
+          type: "uint32",
+          name: "A number",
+          value: "1337",
+        },
+      ])
+    ).toMatchSnapshot();
+
+    expect(
+      vault.signMessage(
+        acc.uuid,
+        SigningStandard.SignTypedDataV3,
+        JSON.stringify({
+          types: {
+            EIP712Domain: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "version",
+                type: "string",
+              },
+              {
+                name: "chainId",
+                type: "uint256",
+              },
+              {
+                name: "verifyingContract",
+                type: "address",
+              },
+            ],
+            Person: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "wallet",
+                type: "address",
+              },
+            ],
+            Mail: [
+              {
+                name: "from",
+                type: "Person",
+              },
+              {
+                name: "to",
+                type: "Person",
+              },
+              {
+                name: "contents",
+                type: "string",
+              },
+            ],
+          },
+          primaryType: "Mail",
+          domain: {
+            name: "Ether Mail",
+            version: "1",
+            chainId: 1,
+            verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+          },
+          message: {
+            from: {
+              name: "Cow",
+              wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+            },
+            to: {
+              name: "Bob",
+              wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+            },
+            contents: "Hello, Bob!",
+          },
+        })
+      )
+    ).toMatchSnapshot();
+
+    expect(
+      vault.signMessage(
+        acc.uuid,
+        SigningStandard.SignTypedDataV4,
+        JSON.stringify({
+          domain: {
+            chainId: "1",
+            name: "Ether Mail",
+            verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+            version: "1",
+          },
+          message: {
+            contents: "Hello, Bob!",
+            from: {
+              name: "Cow",
+              wallets: [
+                "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+                "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
+              ],
+            },
+            to: [
+              {
+                name: "Bob",
+                wallets: [
+                  "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+                  "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
+                  "0xB0B0b0b0b0b0B000000000000000000000000000",
+                ],
+              },
+            ],
+          },
+          primaryType: "Mail",
+          types: {
+            EIP712Domain: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "version",
+                type: "string",
+              },
+              {
+                name: "chainId",
+                type: "uint256",
+              },
+              {
+                name: "verifyingContract",
+                type: "address",
+              },
+            ],
+            Group: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "members",
+                type: "Person[]",
+              },
+            ],
+            Mail: [
+              {
+                name: "from",
+                type: "Person",
+              },
+              {
+                name: "to",
+                type: "Person[]",
+              },
+              {
+                name: "contents",
+                type: "string",
+              },
+            ],
+            Person: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "wallets",
+                type: "address[]",
+              },
+            ],
+          },
+        })
+      )
+    ).toMatchSnapshot();
   });
 });

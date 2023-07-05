@@ -93,7 +93,7 @@ export class Vault {
   ) {
     return withError(t("failedToSetupWallet"), async (getError) => {
       // Basic args validation
-      assert(password.length > 0 && accountsParams.length > 0);
+      assert(passwordHash.length > 0 && accountsParams.length > 0);
 
       // Drop if vault already exists
       if (await Vault.isExist()) {
@@ -195,7 +195,7 @@ export class Vault {
     });
 
     // Remove password hash from session
-    cleanupPasswordSession();
+    return cleanupPasswordSession();
   }
 
   // ============//
@@ -298,6 +298,8 @@ export class Vault {
     await this.verify(passwordHash);
 
     return withError(t("failedToDeleteWallets"), async () => {
+      if (accUuids.length === 0) return;
+
       const accountsGroup = this.getGroup(Gr.Accounts);
 
       if (accUuids.length >= accountsGroup.entries.length) {
@@ -318,6 +320,8 @@ export class Vault {
 
   updateAccountName(accUuid: string, name: string) {
     return withError(t("failedToUpdateWalletName"), async () => {
+      assert(name.length > 0);
+
       const accountsGroup = this.getGroup(Gr.Accounts);
 
       let accEntry: KdbxEntry | undefined;
@@ -351,7 +355,7 @@ export class Vault {
   }
 
   sign(accUuid: string, digest: string) {
-    return withError(t("failedToSign"), () => {
+    return withError(t("failedToSign"), async () => {
       const privKey = this.getKeyForce(accUuid, "privateKey");
 
       return signDigest(digest, privKey);
