@@ -14,7 +14,6 @@ import {
   KdbxEntryField,
   ByteUtils,
 } from "kdbxweb";
-import * as Argon2 from "argon2-browser";
 
 const { base64ToBytes, bytesToBase64, zeroBuffer } = ByteUtils;
 
@@ -29,21 +28,6 @@ export type KdfParams =
       iterations: number;
       parallelism: number;
     };
-
-export function setupArgon2Impl() {
-  CryptoEngine.setArgon2Impl(
-    (pass, salt, mem, time, hashLen, parallelism, type) =>
-      Argon2.hash({
-        pass: new Uint8Array(pass),
-        salt: new Uint8Array(salt),
-        mem,
-        time,
-        hashLen,
-        parallelism,
-        type,
-      }).then(({ hash }) => hash)
-  );
-}
 
 // The copy of https://github.com/keeweb/kdbxweb/blob/master/lib/format/kdbx.ts#L49
 // But:

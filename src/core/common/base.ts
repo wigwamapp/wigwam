@@ -10,7 +10,10 @@ export function withError<T>(
     if (err instanceof PublicError) {
       return err;
     } else {
-      err && console.warn(errMessage, err);
+      if (process.env.NODE_ENV !== "test" && err) {
+        console.warn(errMessage, err);
+      }
+
       return new PublicError(errMessage);
     }
   };

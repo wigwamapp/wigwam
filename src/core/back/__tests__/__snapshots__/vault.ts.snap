@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Vault signDigest 1`] = `
+{
+  "_vs": "0xe6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
+  "compact": "0xd7ea4ba2c02309db756d17b5cf02334f5b9fff7330d3a8ad1ffb2694e1843313e6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
+  "r": "0xd7ea4ba2c02309db756d17b5cf02334f5b9fff7330d3a8ad1ffb2694e1843313",
+  "recoveryParam": 1,
+  "s": "0x66b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
+  "v": 28,
+  "yParityAndS": "0xe6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
+}
+`;
+
+exports[`Vault signDigest 2`] = `
+{
+  "_vs": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
+  "compact": "0x949d4e6ddb97d23bf8d2ea67e9d9ab1009a9de306823079bff48a83695f6e37b0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
+  "r": "0x949d4e6ddb97d23bf8d2ea67e9d9ab1009a9de306823079bff48a83695f6e37b",
+  "recoveryParam": 0,
+  "s": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
+  "v": 27,
+  "yParityAndS": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
+}
+`;
+
+exports[`Vault signDigest 3`] = `
+{
+  "_vs": "0xad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
+  "compact": "0x78d93965018516a7367edcccdc218f6b927d6bb1d4baf2555c87bcfdb78bb52dad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
+  "r": "0x78d93965018516a7367edcccdc218f6b927d6bb1d4baf2555c87bcfdb78bb52d",
+  "recoveryParam": 1,
+  "s": "0x2d2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
+  "v": 28,
+  "yParityAndS": "0xad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
+}
+`;
+
+exports[`Vault signDigest 4`] = `
+{
+  "_vs": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
+  "compact": "0xf10d438c8f2efdabe8a471750921571317872dd6b9b1b0a983664a9ecdf9dfe2454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
+  "r": "0xf10d438c8f2efdabe8a471750921571317872dd6b9b1b0a983664a9ecdf9dfe2",
+  "recoveryParam": 0,
+  "s": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
+  "v": 27,
+  "yParityAndS": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
+}
+`;
+
+exports[`Vault signDigest 5`] = `
+{
+  "_vs": "0x89a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
+  "compact": "0x7e9e3996a4a470200237b6043dcee49be0ce3ccf8834ee72004d730d8513b23789a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
+  "r": "0x7e9e3996a4a470200237b6043dcee49be0ce3ccf8834ee72004d730d8513b237",
+  "recoveryParam": 1,
+  "s": "0x09a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
+  "v": 28,
+  "yParityAndS": "0x89a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
+}
+`;
+
+exports[`Vault signDigest 6`] = `
+{
+  "_vs": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
+  "compact": "0x6a6f29aeb2d17cb987902d49c682ace14eff57f7a14c201a90e98af31a18bb4f558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
+  "r": "0x6a6f29aeb2d17cb987902d49c682ace14eff57f7a14c201a90e98af31a18bb4f",
+  "recoveryParam": 0,
+  "s": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
+  "v": 27,
+  "yParityAndS": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
+}
+`;
+
+exports[`Vault signMessage basic 1`] = `"0x134e4740d0814f3cb6f3c24d2ee8b007c189311b07c9f822124173d82865093d6c38b7543db3505440a7e108ea830256de7cdce785b15e3ba464cd7337f408831b"`;
+
+exports[`Vault signTypedMessage 1`] = `"0xb6c957d6af9300979098cf5ddf83a2ddcadf2ab518ee28c73a5bca2f90c824980436224417df4932e3b7aa915420721a96bba72a644a139d988003eb3763bb751b"`;
+
+exports[`Vault signTypedMessage 2`] = `"0x06a36b81a3c474b8a7624b6514d84e8b4fac5cf321493473afb90d9a63c697e17d30c423a843f0944ee98fb7f963d5c25af4342cd7882582711abb94d408c73e1c"`;
+
+exports[`Vault signTypedMessage 3`] = `"0xae59d546381583849b7e62ec5b2c1e252f281a6ef465c2d7e5658b5cd9ebc6c85784de3264c4db05acc82ebbc37f4c839a7ed6b212a81c7ce231f446509c8bb41c"`;

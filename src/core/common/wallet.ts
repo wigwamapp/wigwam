@@ -55,7 +55,7 @@ export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
 
 export function validateDerivationPath(path: string) {
   if (!derivationPathRegex.test(path)) {
-    throw new PublicError(t("derivationPathIsInvalid"));
+    throw new PublicError(t("invalidDerivationPath"));
   }
 }
 
@@ -77,6 +77,14 @@ export function validatePublicKey(pubKey: string) {
     );
   } catch {
     throw new PublicError(t("invalidPublicKey"));
+  }
+}
+
+export function validateAddress(value: string) {
+  try {
+    assert(ethers.utils.isAddress(value));
+  } catch {
+    throw new PublicError(t("invalidAddress"));
   }
 }
 
