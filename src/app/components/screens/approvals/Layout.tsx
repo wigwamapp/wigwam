@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, PropsWithChildren, ReactNode } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -6,14 +6,14 @@ import { approvalStatusAtom } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import Button from "app/components/elements/Button";
 
-type ApprovalLayoutProps = {
+type ApprovalLayoutProps = PropsWithChildren<{
   className?: string;
   approveText?: ReactNode;
   declineText?: ReactNode;
   disabled?: boolean;
   approving?: boolean;
   onApprove?: (approved: boolean) => void;
-};
+}>;
 
 const ApprovalLayout: FC<ApprovalLayoutProps> = ({
   className,

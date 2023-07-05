@@ -1,16 +1,11 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
-import { createWorker } from "lib/web-worker";
 
 import { RpcResponse } from "core/types";
 import { getRpcUrl } from "core/common/network";
 
-import type * as Provider from "./provider";
-
-const { perform } = createWorker<typeof Provider>(
-  () => new Worker(new URL("./worker", import.meta.url))
-);
+import * as Provider from "./provider";
 
 export async function sendRpc(
   chainId: number,
@@ -19,7 +14,7 @@ export async function sendRpc(
 ): Promise<RpcResponse> {
   const rpcUrl = await getRpcUrl(chainId);
 
-  return perform((worker) => worker.sendRpc(chainId, rpcUrl, method, params));
+  return Provider.sendRpc(chainId, rpcUrl, method, params);
 }
 
 export const getRpcProvider = memoize(

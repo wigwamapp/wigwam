@@ -12,6 +12,7 @@ import BigNumber from "bignumber.js";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { Field, Form } from "react-final-form";
+import type { FormApi } from "final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC1155__factory, ERC20__factory, ERC721__factory } from "abi-types";
@@ -41,8 +42,9 @@ import {
   withHumanDelay,
   OnChange,
 } from "app/utils";
-import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
+import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
+  useAccounts,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -104,7 +106,7 @@ type TransferTokenContent = {
 
 const TransferTokenContent = memo<TransferTokenContent>(
   ({ tokenType, tokenSlug, token }) => {
-    const currentAccount = useAtomValue(currentAccountAtom);
+    const { currentAccount } = useAccounts();
     const chainId = useChainId();
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);
@@ -120,7 +122,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
     useSync(chainId, currentAccount.address, tokenType);
 
     const handleSubmit = useCallback(
-      async ({ recipient, amount }, form) =>
+      async (
+        { recipient, amount }: FormValues,
+        form: FormApi<FormValues, Partial<FormValues>>
+      ) =>
         withHumanDelay(async () => {
           if (!token) {
             return;
@@ -414,21 +419,20 @@ const TransferTokenContent = memo<TransferTokenContent>(
               }
 
               const fees = await suggestFees(provider);
-              if (fees) {
-                const gasPrice = fees.modes.high.max;
-                const maxGasLimit = gasLimit.mul(3).div(2);
-                const rawBalance = await requestBalance(
-                  provider,
-                  tokenSlug,
-                  currentAccount.address
-                );
 
-                setGas({
-                  average: gasLimit.mul(gasPrice),
-                  max: maxGasLimit.mul(gasPrice),
-                  rawBalance,
-                });
-              }
+              const gasPrice = fees.modes.high.max;
+              const maxGasLimit = gasLimit.mul(3).div(2);
+              const rawBalance = await requestBalance(
+                provider,
+                tokenSlug,
+                currentAccount.address
+              );
+
+              setGas({
+                average: gasLimit.mul(gasPrice),
+                max: maxGasLimit.mul(gasPrice),
+                rawBalance,
+              });
 
               setEstimationError(null);
             } catch (err) {

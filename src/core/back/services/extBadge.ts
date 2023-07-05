@@ -4,16 +4,21 @@ import memoizeOne from "memoize-one";
 import { $approvals } from "../state";
 
 export async function startExtBadge() {
+  // Reset after init
+  browser.action.setBadgeText({ text: "" }).catch(console.warn);
+
   $approvals.watch(async (approvals) => {
     try {
       await setBadgeBackgroundColor();
-      await browser.browserAction.setBadgeText({
+      await browser.action.setBadgeText({
         text: approvals.length > 0 ? `+${approvals.length}` : "",
       });
-    } catch {}
+    } catch (err) {
+      console.warn(err);
+    }
   });
 }
 
 const setBadgeBackgroundColor = memoizeOne(() =>
-  browser.browserAction.setBadgeBackgroundColor({ color: "#101123" })
+  browser.action.setBadgeBackgroundColor({ color: "#101123" })
 );

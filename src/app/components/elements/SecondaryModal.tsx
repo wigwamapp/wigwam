@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, PropsWithChildren, ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { DialogProps } from "@radix-ui/react-dialog";
 import classNames from "clsx";
@@ -7,14 +7,15 @@ import { IS_FIREFOX } from "app/defaults";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
-export type SecondaryModalProps = DialogProps & {
-  header?: ReactNode;
-  disabledClickOutside?: boolean;
-  autoFocus?: boolean;
-  className?: string;
-  headerClassName?: string;
-  small?: boolean;
-};
+export type SecondaryModalProps = DialogProps &
+  PropsWithChildren<{
+    header?: ReactNode;
+    disabledClickOutside?: boolean;
+    autoFocus?: boolean;
+    className?: string;
+    headerClassName?: string;
+    small?: boolean;
+  }>;
 
 const SecondaryModal: FC<SecondaryModalProps> = ({
   header,
@@ -58,7 +59,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             <h2
               className={classNames(
                 !small && "mb-8",
-                small && "mb-4",
+                small && "mt-3 mb-4",
                 !small && "text-2xl",
                 small && "text-xl",
                 "text-center font-bold",

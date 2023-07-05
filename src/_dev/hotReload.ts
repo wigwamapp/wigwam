@@ -19,24 +19,29 @@ type ChecksumSnapshot = {
 const RELOAD_TAB_FLAG = "__hr_reload_tab";
 const SLOW_DOWN_AFTER = 5 * 60_000; // 5 min
 
-const backgroundScripts = getBackgroundScripts();
-const contentScripts = getContentScripts();
+let contentScripts = getStaticContentScripts();
+// Wait for the fresh content script to be loaded
+// via browser.scripting.registerContentScripts()
+setTimeout(scheduleContentScriptsUpdate, 300);
 
-// A little hack for dev experience :)
-// Listen custom event "worker_spawned", and add it to script list.
-window.addEventListener<any>("worker_spawned", (evt: CustomEvent<string>) => {
-  const workerScript = evt.detail;
-  backgroundScripts.push(workerScript);
+let backgroundScripts: string[] = [];
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg?.type === "__hr_bg_scripts") {
+    backgroundScripts = msg.scripts;
+  }
 });
 
-chrome.management.getSelf((self) => {
+chrome.management.getSelf(async (self) => {
   if (self.installType === "development") {
     chrome.runtime.getPackageDirectoryEntry(watchChanges);
 
     // NB: see https://github.com/xpl/crx-hotreload/issues/5
-    const reloadTabURL = localStorage.getItem(RELOAD_TAB_FLAG);
+    const { [RELOAD_TAB_FLAG]: reloadTabURL } = await chrome.storage.local.get(
+      RELOAD_TAB_FLAG
+    );
+
     if (reloadTabURL) {
-      localStorage.removeItem(RELOAD_TAB_FLAG);
+      await chrome.storage.local.remove(RELOAD_TAB_FLAG);
 
       queryTabs({ url: reloadTabURL }).then((tabs) => {
         if (tabs.length > 0) {
@@ -76,7 +81,7 @@ async function watchChanges(
       ) {
         const activeTab = await getActiveMainTab();
         if (activeTab?.url)
-          localStorage.setItem(RELOAD_TAB_FLAG, activeTab.url);
+          await chrome.storage.local.set({ [RELOAD_TAB_FLAG]: activeTab.url });
 
         chrome.runtime.reload();
       } else {
@@ -86,6 +91,8 @@ async function watchChanges(
 
         // Reload extension tabs
         for (const tab of tabs) {
+          if (tab.url?.includes("hotreload")) continue;
+
           chrome.tabs.reload(tab.id!);
         }
         // Reload popup
@@ -141,13 +148,7 @@ function isEntryInside(entry: Entry, paths: string[]) {
   return paths.some((p) => entry.fullPath.endsWith(p));
 }
 
-function getBackgroundScripts() {
-  return Array.from(document.scripts).map(
-    (s) => s.src.split(chrome.runtime.id)[1]
-  );
-}
-
-function getContentScripts() {
+function getStaticContentScripts() {
   const manifest = chrome.runtime.getManifest();
   const scriptSet = new Set<string>();
 
@@ -172,6 +173,22 @@ function getContentScripts() {
   }
 
   return Array.from(scriptSet);
+}
+
+async function scheduleContentScriptsUpdate() {
+  const registered = await chrome.scripting
+    .getRegisteredContentScripts()
+    .catch(() => []);
+
+  const scriptSet = new Set(contentScripts);
+
+  for (const { js } of registered) {
+    js?.forEach((s) => scriptSet.add(s));
+  }
+
+  contentScripts = Array.from(scriptSet);
+
+  setTimeout(scheduleContentScriptsUpdate, 5_000);
 }
 
 async function getActiveMainTab(): Promise<chrome.tabs.Tab | undefined> {

@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react";
+import { FC, PropsWithChildren, Suspense, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -7,6 +7,8 @@ import { WalletStatus } from "core/types";
 import { openInTab } from "app/helpers";
 import { updateAvailableAtom, walletStatusAtom } from "app/atoms";
 import ActivityBar from "app/components/blocks/ActivityBar";
+import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import RoundedButton from "app/components/elements/RoundedButton";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
@@ -17,11 +19,12 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-type PopupLayoutProps = {
+type PopupLayoutProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const walletStatus = useAtomValue(walletStatusAtom);
   const updateAvailable = useAtomValue(updateAvailableAtom);
 
@@ -42,48 +45,61 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             bootAnimationDisplayed ? handleBootAnimationEnd : undefined
           }
         >
-          <div className="flex px-3 pt-3">
-            {isUnlocked && <LockProfileButton className="mr-2" />}
+          <ScrollAreaContainer
+            ref={scrollAreaRef}
+            hiddenScrollbar="horizontal"
+            className="h-full min-h-0"
+            viewPortClassName="viewportBlock"
+            scrollBarClassName="pt-[15.375rem] pb-16 pl-1.5 pr-0.5 w-3"
+          >
+            <div className="flex px-3 pt-3">
+              {isUnlocked && <LockProfileButton className="mr-2" />}
 
-            <RoundedButton
-              theme={isUnlocked ? "small" : "large"}
-              onClick={() => openInTab(undefined, ["token"])}
+              <RoundedButton
+                theme={isUnlocked ? "small" : "large"}
+                onClick={() => openInTab(undefined, ["token"])}
+                className={classNames(
+                  "w-full",
+                  !isUnlocked && "p-3.5",
+                  isUnlocked && "p-3"
+                )}
+              >
+                <FullScreenIcon className="mr-1" />
+                Open Full
+                {updateAvailable ? (
+                  <div
+                    className={classNames(
+                      "w-2 h-2",
+                      "bg-activity rounded-full",
+                      "absolute top-2 right-2"
+                    )}
+                  />
+                ) : null}
+              </RoundedButton>
+            </div>
+
+            <main
               className={classNames(
-                "w-full",
-                !isUnlocked && "p-3.5",
-                isUnlocked && "p-3"
+                "relative",
+                "flex-1",
+                "pt-3 pb-16 px-3",
+                "overflow-hidden",
+                "flex flex-col",
+                className
               )}
             >
-              <FullScreenIcon className="mr-1" />
-              Open Full
-              {updateAvailable ? (
-                <div
-                  className={classNames(
-                    "w-2 h-2",
-                    "bg-activity rounded-full",
-                    "absolute top-2 right-2"
-                  )}
-                />
-              ) : null}
-            </RoundedButton>
-          </div>
+              {children}
+            </main>
 
-          <main
-            className={classNames(
-              "relative",
-              "flex-1",
-              "pt-3 px-3",
-              "overflow-hidden",
-              "flex flex-col",
-              className
-            )}
-          >
-            {children}
-          </main>
+            <ScrollTopButton
+              scrollAreaRef={scrollAreaRef}
+              className="fixed bottom-14 right-3"
+            />
 
-          <Suspense fallback={null}>
-            {isUnlocked && <ActivityBar theme="small" />}
-          </Suspense>
+            <Suspense fallback={null}>
+              {isUnlocked && <ActivityBar theme="small" />}
+            </Suspense>
+          </ScrollAreaContainer>
         </div>
       )}
     </OverflowProvider>

@@ -1,10 +1,10 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
-type AddAccountHeaderProps = {
+type AddAccountHeaderProps = PropsWithChildren<{
   description?: string;
   className?: string;
-};
+}>;
 
 const AddAccountHeader: FC<AddAccountHeaderProps> = ({
   description,

@@ -1,13 +1,13 @@
-import { FC, ReactNode } from "react";
+import { FC, PropsWithChildren, ReactNode } from "react";
 import classNames from "clsx";
 
 import TooltipIcon from "../TooltipIcon";
 import Tooltip from "../Tooltip";
 
-type TabHeaderProps = {
+type TabHeaderProps = PropsWithChildren<{
   tooltip?: ReactNode;
   className?: string;
-};
+}>;
 
 const TabHeader: FC<TabHeaderProps> = ({ tooltip, children, className }) => {
   const content = (

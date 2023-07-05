@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { ReactComponent as GithubIcon } from "app/icons/github.svg";
@@ -64,7 +64,7 @@ const About: FC = () => {
 
 export default About;
 
-const AboutHeader: FC = ({ children }) => (
+const AboutHeader: FC<PropsWithChildren> = ({ children }) => (
   <h3 className="font-bold leading-none text-base mb-3">{children}</h3>
 );
 

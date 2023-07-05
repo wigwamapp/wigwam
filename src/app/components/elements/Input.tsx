@@ -8,6 +8,7 @@ import {
   useEffect,
   useRef,
   useState,
+  FocusEventHandler,
 } from "react";
 import classNames from "clsx";
 import { CSSTransition } from "react-transition-group";
@@ -82,7 +83,7 @@ const Input = memo(
         adornmentClassName
       );
 
-      const handleFocus = useCallback(
+      const handleFocus = useCallback<FocusEventHandler<HTMLInputElement>>(
         (evt) => {
           setFocused(true);
           onFocus?.(evt);
@@ -90,7 +91,7 @@ const Input = memo(
         [onFocus]
       );
 
-      const handleBlur = useCallback(
+      const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
         (evt) => {
           setFocused(false);
           onBlur?.(evt);

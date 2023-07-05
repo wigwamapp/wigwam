@@ -6,6 +6,11 @@ interface EventMap {
 }
 
 export class Emitter extends EventEmitter {
+  constructor() {
+    super();
+    this.setMaxListeners(150);
+  }
+
   emit(type: string | symbol, ...args: any[]): boolean {
     let doError = type === "error";
     const events: EventMap = (this as any)._events;

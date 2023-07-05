@@ -1,4 +1,11 @@
-import { FC, memo, useCallback, useEffect, useMemo } from "react";
+import {
+  FC,
+  memo,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
@@ -182,11 +189,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           let closed = false;
           onClose(() => (closed = true));
 
-          const {
-            default: OpenLogin,
-            UX_MODE,
-            storeKey,
-          } = await import("@toruslabs/openlogin");
+          const { default: OpenLogin } = await import("@toruslabs/openlogin");
 
           const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
           assert(clientId, "Client ID was not specified");
@@ -194,27 +197,19 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           const openlogin = new OpenLogin({
             clientId,
             network: "mainnet",
-            uxMode: UX_MODE.POPUP,
+            uxMode: "popup",
             replaceUrlOnRedirect: false,
-          });
-          localStorage.removeItem("loglevel:http-helpers");
-          localStorage.removeItem("loglevel");
-
-          onClose(() => {
-            openlogin._cleanup();
-            localStorage.setItem(storeKey, JSON.stringify({}));
+            storageKey: "session",
           });
 
           await openlogin.init();
-          await openlogin.logout().catch(console.warn);
 
           if (closed) return false;
 
           const { privKey } = await openlogin.login({
             loginProvider: openLoginMethod,
           });
-          const { email, name } = await openlogin.getUserInfo();
-          await openlogin.logout().catch(console.warn);
+          const { email, name } = openlogin.getUserInfo();
 
           if (closed) return false;
 
@@ -322,9 +317,9 @@ const TileSimple: FC<TileSimpleProps> = ({
   </button>
 );
 
-type WarningMessageProps = {
+type WarningMessageProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
   <div

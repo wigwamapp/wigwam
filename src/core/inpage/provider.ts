@@ -2,6 +2,7 @@ import { ethErrors } from "eth-rpc-errors";
 import { nanoid } from "nanoid";
 import { Emitter } from "lib/emitter";
 
+import { MetaMaskCompatibleMode } from "core/types/shared";
 import {
   JsonRpcResponse,
   JsonRpcRequest,
@@ -23,6 +24,7 @@ import {
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
 import { SubscriptionManager } from "./subscriptionManager";
+import ICON_SVG_BASE64 from "./iconSvgBase64";
 
 const gatewayEventType = Symbol();
 const stateUpdatedType = Symbol();
@@ -34,7 +36,7 @@ export class InpageProvider extends Emitter {
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
-  sharedPropertyEnabled = true;
+  mmCompatible = MetaMaskCompatibleMode.Hybrid;
 
   /**
    * The chain ID of the currently connected Ethereum chain.
@@ -50,17 +52,25 @@ export class InpageProvider extends Emitter {
    */
   selectedAddress: string | null = null;
 
+  info = {
+    uuid: `vigvam-${process.env.BUILD_ID}`,
+    name: "Vigvam",
+    description: "Vigvam — Web 3.0 Wallet",
+    image: ICON_SVG_BASE64,
+  };
+
   #inited = false;
   #reqIdPrefix = nanoid();
   #nextReqId = 0;
 
-  #inpage = new InpageProtocol("injected", "content");
+  #inpage: InpageProtocol;
   #filter = new FilterManager(this);
   #subscription = new SubscriptionManager(this, this.#filter);
 
-  constructor() {
+  constructor(inpageProto: InpageProtocol) {
     super();
 
+    this.#inpage = inpageProto;
     this.#listenInpage();
     this.#listenNotifications();
   }
@@ -80,10 +90,9 @@ export class InpageProvider extends Emitter {
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
       if (evt?.method === VIGVAM_STATE) {
-        const { chainId, accountAddress, sharedPropertyEnabled } =
-          evt.params as any;
+        const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
-        this.sharedPropertyEnabled = sharedPropertyEnabled;
+        this.mmCompatible = mmCompatible;
 
         this.#handleNetworkChange(chainId);
         this.#handleAccountChange(accountAddress || null);

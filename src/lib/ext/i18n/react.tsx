@@ -1,4 +1,11 @@
-import { memo, Fragment, ReactNode, useMemo, useEffect } from "react";
+import {
+  memo,
+  Fragment,
+  ReactNode,
+  PropsWithChildren,
+  useMemo,
+  useEffect,
+} from "react";
 import useForceUpdate from "use-force-update";
 
 import { t, replaceT } from "./core";
@@ -14,10 +21,12 @@ export type TProps = {
   values?: ReactSubstitutions;
 };
 
-export const T = memo<TProps>(({ i18nKey, values, children }) => {
-  useI18NUpdate();
-  return tReact(i18nKey, values) || (children ?? null);
-});
+export const T = memo<PropsWithChildren<TProps>>(
+  ({ i18nKey, values, children }) => {
+    useI18NUpdate();
+    return tReact(i18nKey, values) || (children ?? null);
+  }
+);
 
 export type TReplaceProps = {
   msg: string;

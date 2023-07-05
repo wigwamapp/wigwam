@@ -1,30 +1,37 @@
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import * as repo from "core/repo";
+import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import {
   activeTabAtom,
   activeTabOriginAtom,
-  currentAccountAtom,
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
+import { useAccounts } from "app/hooks";
+import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
+import SecondaryModal, {
+  SecondaryModalProps,
+} from "app/components/elements/SecondaryModal";
 import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
-  const currentAccount = useAtomValue(currentAccountAtom);
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
 
-  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
+  const { currentAccount } = useAccounts();
+
+  const [web3DialogOpened, setWeb3DialogOpened] = useState(false);
+
+  const metamaskModeEnabled = metamaskMode !== MetaMaskCompatibleMode.Off;
 
   const permission =
     purePermission && purePermission.accountAddresses.length > 0
@@ -96,7 +103,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             <span
               className={classNames(
                 "block",
-                "w-5 h-5 mr-1.5",
+                "w-5 h-5 min-w-[1.25rem] mr-1.5",
                 "rounded-full overflow-hidden",
                 "border border-[#4F9A5E]"
               )}
@@ -116,7 +123,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 <p>
                   Current wallet is not connected to this website. To connect it
                   - click{" "}
-                  {metamaskMode
+                  {metamaskMode === MetaMaskCompatibleMode.Strict
                     ? ""
                     : "the icon on the right to enable MetaMask compatible mode then click "}
                   the Connect button.
@@ -194,7 +201,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
         <span className="flex-1" />
 
-        {permission && (metamaskMode || accountConnected) && (
+        {permission && (metamaskModeEnabled || accountConnected) && (
           <button
             type="button"
             className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
@@ -206,7 +213,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       </div>
       <Tooltip
         content={
-          !metamaskMode && accountConnected ? (
+          !metamaskModeEnabled && accountConnected ? (
             <>
               <p>
                 Current wallet is connected to this website but you disabled
@@ -221,15 +228,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             </>
           ) : (
             <p>
-              MetaMask compatible mode is{" "}
-              {metamaskMode ? "enabled" : "disabled"}. To{" "}
-              {metamaskMode ? "disable" : "enable"} it, click this icon.
-              {metamaskMode && (
-                <>
-                  <br /> Please note, you won&apos;t be able to interact with
-                  dApps!
-                </>
-              )}
+              MetaMask compatible mode is {metamaskMode}. To change its state,
+              click this icon.
             </p>
           )
         }
@@ -239,7 +239,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       >
         <button
           type="button"
-          onClick={toggleMetamaskMode}
+          onClick={() => setWeb3DialogOpened(true)}
           className={classNames(
             "flex items-center",
             "min-h-8 py-1 px-2.5",
@@ -251,18 +251,34 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <MetamaskIcon
             className={classNames(
               "w-[1.125rem] min-w-[1.125rem] h-auto transition-opacity",
-              metamaskMode ? "opacity-80" : "opacity-60"
+              metamaskModeEnabled ? "opacity-80" : "opacity-60"
             )}
           />
           <div
             className={classNames(
               "w-1.5 min-w-[.375rem] h-1.5 rounded-full ml-2 transition",
-              metamaskMode ? "bg-brand-greenobject" : "bg-brand-main/60"
+              metamaskModeEnabled ? "bg-brand-greenobject" : "bg-brand-main/60"
             )}
           />
         </button>
       </Tooltip>
+      <Web3CompatibleModeDialog
+        open={web3DialogOpened}
+        onOpenChange={setWeb3DialogOpened}
+      />
     </div>
+  );
+};
+
+const Web3CompatibleModeDialog: FC<SecondaryModalProps> = ({
+  header = "MetaMask compatible mode",
+  small = true,
+  ...rest
+}) => {
+  return (
+    <SecondaryModal header={header} small={small} {...rest}>
+      <WebThreeCompatible small />
+    </SecondaryModal>
   );
 };
 

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 import * as Switch from "@radix-ui/react-switch";
 
@@ -83,10 +83,10 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
   );
 };
 
-type SwitchOptionProps = {
+type SwitchOptionProps = PropsWithChildren<{
   theme?: ThemeType;
   className?: string;
-};
+}>;
 
 const SwitchOption: FC<SwitchOptionProps> = ({
   theme,

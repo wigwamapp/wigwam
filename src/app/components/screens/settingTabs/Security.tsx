@@ -149,7 +149,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   }, [onOpenChange, seedPhrase, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }) =>
+    async ({ password }: FormValues) =>
       withHumanDelay(async () => {
         try {
           const seed = await getSeedPhrase(password);

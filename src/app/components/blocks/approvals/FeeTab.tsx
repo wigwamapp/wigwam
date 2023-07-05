@@ -121,6 +121,10 @@ const FeeTab = memo<FeeTabProps>(
                   (in GWEI) * gas limit.
                 </>
               }
+              tooltipProps={{
+                size: "large",
+                placement: "top",
+              }}
               value={formatUnits(
                 overrides.maxFeePerGas ?? tx.maxFeePerGas,
                 "gwei"
@@ -171,6 +175,10 @@ const FeeTab = memo<FeeTabProps>(
                   incentivizes them to prioritize your transaction.
                 </>
               }
+              tooltipProps={{
+                size: "large",
+                placement: "top",
+              }}
               value={formatUnits(
                 overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
                 "gwei"

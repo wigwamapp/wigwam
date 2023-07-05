@@ -217,6 +217,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {(ref) => (
             <DropdownMenu.Content
               ref={ref}
+              style={{
+                width: "var(--radix-dropdown-menu-trigger-width)",
+              }}
               className={classNames(
                 "shadow-xs",
                 "focus-visible:outline-none",
@@ -228,7 +231,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "backdrop-blur-[30px]",
                 IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
-                "z-10",
+                "z-20",
                 contentClassName
               )}
             >

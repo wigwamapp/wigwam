@@ -6,10 +6,13 @@ import {
   useRef,
   useState,
   useMemo,
+  useEffect,
+  PropsWithChildren,
 } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
 import Masonry from "lib/react-masonry/Masonry";
+import { useAtomsAll } from "lib/atom-utils";
 
 import {
   Account,
@@ -42,7 +45,6 @@ import AccountSelect from "../elements/AccountSelect";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
@@ -57,7 +59,6 @@ import NftCard from "../blocks/tokenList/NftCard";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import { waitForAll } from "jotai/utils";
 
 const Popup: FC = () => (
   <PreloadAndSync>
@@ -72,11 +73,12 @@ const Popup: FC = () => (
 
 export default Popup;
 
-const PreloadAndSync: FC = ({ children }) => {
+const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const [permission] = useAtomValue(
-    waitForAll([getPermissionAtom(tabOrigin), web3MetaMaskCompatibleAtom])
-  );
+  const [permission] = useAtomsAll([
+    getPermissionAtom(tabOrigin),
+    web3MetaMaskCompatibleAtom,
+  ]);
 
   return (
     <PreloadBaseAndSync chainId={permission?.chainId}>
@@ -257,13 +259,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
     }
   } else {
     tokensBar = (
-      <ScrollAreaContainer
-        ref={scrollAreaRef}
-        hiddenScrollbar="horizontal"
-        className="pr-3.5 pb-16 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
-        viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
-        scrollBarClassName="py-0 pb-16"
-      >
+      <>
         <AddTokenBanner
           isNftsSelected={isNftsSelected}
           manageModeEnabled={manageModeEnabled}
@@ -285,7 +281,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
             loadMoreTriggerRef={loadMoreTriggerRef}
           />
         )}
-      </ScrollAreaContainer>
+      </>
     );
   }
 
@@ -342,9 +338,7 @@ type NftListProps = {
 
 const NftList = memo<NftListProps>(
   ({ currentAccount, tokens, manageModeEnabled, loadMoreTriggerRef }) => {
-    const [nftTokenOpened, setNftTokenOpened] = useState<AccountNFT | null>(
-      null
-    );
+    const [nftToken, setNftToken] = useState<AccountNFT | null>(null);
 
     const handleNFTSelect = useCallback(
       async (token: AccountNFT) => {
@@ -364,11 +358,21 @@ const NftList = memo<NftListProps>(
             console.error(e);
           }
         } else {
-          setNftTokenOpened(token);
+          setNftToken(token);
         }
       },
-      [manageModeEnabled, currentAccount.address, setNftTokenOpened]
+      [manageModeEnabled, currentAccount.address, setNftToken]
     );
+
+    useEffect(() => {
+      setNftToken((current) => {
+        if (!current) return current;
+
+        const updated = tokens.find((t) => t.tokenSlug === current.tokenSlug);
+
+        return updated ?? current;
+      });
+    }, [tokens, setNftToken]);
 
     const renderNFTCard = useCallback(
       (nft: AccountNFT, i: number) => (
@@ -392,9 +396,9 @@ const NftList = memo<NftListProps>(
         <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
 
         <NFTOverviewPopup
-          open={Boolean(nftTokenOpened)}
-          token={nftTokenOpened}
-          onOpenChange={() => setNftTokenOpened(null)}
+          open={Boolean(nftToken)}
+          token={nftToken}
+          onOpenChange={() => setNftToken(null)}
         />
       </>
     );

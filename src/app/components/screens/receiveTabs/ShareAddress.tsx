@@ -1,24 +1,28 @@
 import { FC } from "react";
-import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { QRCodeCanvas } from "qrcode.react";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { useCopyCanvasToClipboard } from "lib/react-hooks/useCopyCanvasToClipboard";
 
-import { currentAccountAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import Button from "app/components/elements/Button";
 
 const ShareAddress: FC = () => {
-  const { address } = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
   const { copy, copied } = useCopyCanvasToClipboard("#receive-canvas canvas");
   const isPopup = isPopupPrimitive();
 
   return (
     <div className="flex flex-col max-w-[23.25rem]">
-      <AddressField value={address} label="Wallet address" readOnly />
+      <AddressField
+        value={currentAccount.address}
+        label="Wallet address"
+        readOnly
+      />
+
       <div className="mt-6 flex">
         <div
           className={classNames(
@@ -36,7 +40,7 @@ const ShareAddress: FC = () => {
             includeMargin={false}
             size={80}
             level="L"
-            value={address}
+            value={currentAccount.address}
           />
         </div>
         <div className="ml-4 flex flex-col items-start">

@@ -39,7 +39,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
   }, []);
 
   const handleAdd = useCallback(
-    async ({ profileName }) =>
+    async ({ profileName }: FormValues) =>
       withHumanDelay(async () => {
         await onSubmit(profileName, profileSeed);
       }),

@@ -10,11 +10,12 @@ import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
   useAccountToken,
+  useAccounts,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -50,7 +51,7 @@ const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
@@ -103,8 +104,8 @@ const AssetInfo: FC = () => {
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="ml-6 pr-5 -mr-5 flex flex-col"
-          viewPortClassName="pb-20 pt-6 viewportBlock"
+          className="pr-5 -mr-5 flex flex-col"
+          viewPortClassName="pb-20 pl-6 pt-6 viewportBlock"
           scrollBarClassName="py-0 pt-[18.75rem] pb-20"
           type="scroll"
         >

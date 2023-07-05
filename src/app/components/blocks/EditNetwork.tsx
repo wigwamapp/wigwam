@@ -1,5 +1,6 @@
 import {
   ButtonHTMLAttributes,
+  KeyboardEventHandler,
   forwardRef,
   memo,
   useCallback,
@@ -32,7 +33,7 @@ import { TEvent, trackEvent } from "core/client";
 import { IS_FIREFOX } from "app/defaults";
 import {
   composeValidators,
-  isLink,
+  isUrlLike,
   maxLength,
   minLength,
   required,
@@ -81,7 +82,13 @@ const EditNetwork = memo<EditNetworkProps>(
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
 
     const handleSubmit = useCallback(
-      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
+      async ({
+        nName,
+        rpcUrl,
+        chainId,
+        currencySymbol,
+        blockExplorer,
+      }: FormValues) =>
         withHumanDelay(async () => {
           chainId = Number(chainId);
 
@@ -269,13 +276,17 @@ const EditNetwork = memo<EditNetworkProps>(
                         errorMessage={meta.error}
                         readOnly={isNative}
                         inputClassName="h-11"
+                        // Focus on init
+                        // EditNetwork has 3th depth level of settings
+                        // Required for case when viewport width too small
+                        autoFocus
                         {...input}
                       />
                     )}
                   </Field>
                   <Field
                     name="rpcUrl"
-                    validate={composeValidators(required, isLink)}
+                    validate={composeValidators(required, isUrlLike)}
                   >
                     {({ input, meta }) => (
                       <RPCField
@@ -339,10 +350,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(
-                      isLink,
-                      isNative ? required : undefined
-                    )}
+                    validate={composeValidators(isUrlLike)}
                   >
                     {({ input, meta }) => (
                       <Input
@@ -457,7 +465,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
       }
     }, [rest.value, rpcList]);
 
-    const handleKeyClick = useCallback(
+    const handleKeyClick = useCallback<
+      KeyboardEventHandler<HTMLTextAreaElement>
+    >(
       (e) => {
         if (rpcList) {
           if (e.keyCode === 40) {
@@ -537,6 +547,12 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
           <Popover.Content
             onOpenAutoFocus={(e) => {
               e.preventDefault();
+            }}
+            side="bottom"
+            align="start"
+            avoidCollisions={false}
+            style={{
+              width: "var(--radix-popover-trigger-width)",
             }}
             className={classNames(
               "shadow-xs",

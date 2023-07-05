@@ -4,7 +4,7 @@ import { RpcResponse } from "./rpc";
 import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
-import { TPGasPrices } from "./fees";
+import { GasPrices } from "./fees";
 
 export type Request =
   | GetWalletStateRequest
@@ -23,7 +23,7 @@ export type Request =
   | SendRpcRequest
   | GetApprovalsRequest
   | ApproveRequest
-  | GetTPGasPricesRequest
+  | GetGasPricesRequest
   | GetSyncStatusRequest;
 
 export type Response =
@@ -40,7 +40,7 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
-  | GetTPGasPricesResponse
+  | GetGasPricesResponse
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
@@ -75,7 +75,7 @@ export enum MessageType {
   Sync = "SYNC",
   FindToken = "FIND_TOKEN",
   SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
-  GetTPGasPrices = "GET_TP_GAS_PRICES",
+  GetGasPrices = "GET_GAS_PRICES",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
@@ -250,14 +250,14 @@ export interface SyncTokenActivities extends MessageBase {
   tokenSlug: string;
 }
 
-export interface GetTPGasPricesRequest extends MessageBase {
-  type: MessageType.GetTPGasPrices;
+export interface GetGasPricesRequest extends MessageBase {
+  type: MessageType.GetGasPrices;
   chainId: number;
 }
 
-export interface GetTPGasPricesResponse extends MessageBase {
-  type: MessageType.GetTPGasPrices;
-  gasPrices: TPGasPrices;
+export interface GetGasPricesResponse extends MessageBase {
+  type: MessageType.GetGasPrices;
+  gasPrices: GasPrices;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {

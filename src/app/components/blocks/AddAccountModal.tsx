@@ -1,8 +1,14 @@
-import { FC, memo, useCallback, useEffect, useRef } from "react";
+import {
+  FC,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  MouseEventHandler,
+} from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useAtom } from "jotai";
-import { useAtomValue } from "jotai/utils";
+import { useAtom, useAtomValue } from "jotai";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import { WalletStatus } from "core/types";
@@ -29,7 +35,7 @@ const AddAccountModal = memo(() => {
   const { confirm } = useDialog();
   const isInitial = walletStatus === WalletStatus.Welcome;
 
-  const handleBackButton = useCallback(
+  const handleBackButton = useCallback<MouseEventHandler<HTMLButtonElement>>(
     async (e) => {
       if (accountStep === AddAccountStep.VerifySeedPhrase) {
         const res = await confirm({

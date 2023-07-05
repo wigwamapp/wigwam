@@ -1,5 +1,5 @@
 import { CryptoEngine } from "kdbxweb";
-import * as Argon2 from "lib/argon2";
+import * as Argon2 from "argon2-browser";
 
 export function setupArgon2Impl() {
   return CryptoEngine.setArgon2Impl(

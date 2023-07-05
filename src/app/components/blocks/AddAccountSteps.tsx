@@ -1,5 +1,5 @@
 import { memo, Suspense, useRef } from "react";
-import { useAtomValue } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AddAccountStep } from "app/nav";

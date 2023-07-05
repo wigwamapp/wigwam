@@ -46,10 +46,10 @@ const VerifyAccountToAdd: FC = () => {
   const { alert, confirm } = useDialog();
 
   const handleContinue = useCallback(
-    async (addAccountsParams) => {
+    async (addAccountsParams: AddAccountParams[]) => {
       try {
         if (
-          (addAccountsParams as AddAccountParams[]).some(
+          addAccountsParams.some(
             (acc) => acc.source === AccountSource.OpenLogin
           )
         ) {

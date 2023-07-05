@@ -189,10 +189,27 @@ export const syncAccountTokens = memoize(
               ? new BigNumber(priceUSD).toNumber()
               : existing?.balanceUSD ?? 0;
 
-            const balanceChangedToZero =
-              existing &&
+            let status: TokenStatus;
+
+            if (!existing) {
+              // The new token, just add it
+              status = TokenStatus.Enabled;
+            } else if (
               new BigNumber(existing.rawBalance).gt(0) &&
-              rawBalanceBN.isZero();
+              rawBalanceBN.isZero()
+            ) {
+              // Balance changed from positive to zero
+              status = TokenStatus.Disabled;
+            } else if (
+              new BigNumber(existing.rawBalance).isZero() &&
+              rawBalanceBN.gt(0)
+            ) {
+              // Balance changed from zero to positive
+              status = TokenStatus.Enabled;
+            } else {
+              // Existing token, rest cases
+              status = existing.status;
+            }
 
             accTokens.push(
               existing
@@ -201,16 +218,14 @@ export const syncAccountTokens = memoize(
                     ...metadata,
                     rawBalance,
                     balanceUSD,
-                    status: balanceChangedToZero
-                      ? TokenStatus.Disabled
-                      : existing.status,
+                    status,
                   }
                 : {
                     chainId,
                     accountAddress,
                     tokenSlug,
                     tokenType: TokenType.NFT,
-                    status: TokenStatus.Enabled,
+                    status,
                     // Metadata
                     ...metadata,
                     // Volumes

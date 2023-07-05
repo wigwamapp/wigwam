@@ -49,8 +49,8 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
           "font-bold",
           readOnly ? "text-brand-inactivelight" : "text-brand-light",
           "ml-2",
-          theme === "small" && "text-xs",
-          theme === "large" && "text-base"
+          theme === "large" && "text-base mmd:text-sm mxs:text-xs",
+          theme === "small" && "text-xs"
         )}
       >
         {total > 0 ? (
@@ -58,19 +58,20 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
             +{total}
             {(theme === "large" || readOnly) && (
               <>
-                {" "}
-                waiting for approval
-                {!readOnly && <ArrowIcon className="ml-1" />}
+                <span className="flex items-center mmd:hidden">
+                  &nbsp; waiting for approval
+                  {!readOnly && <ArrowIcon className="ml-1" />}
+                </span>
               </>
             )}
           </>
         ) : (
           !readOnly &&
           theme === "large" && (
-            <>
+            <span className="flex items-center mmd:hidden">
               Activity
               <ArrowIcon className="ml-1" />
-            </>
+            </span>
           )
         )}
       </span>
@@ -103,12 +104,13 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
           "block",
           "bg-white",
           "rounded-full overflow-hidden",
+          theme === "large" &&
+            "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
-          theme === "large" && "w-6 h-6",
           className
         )}
         fallbackClassName={classNames(
-          theme === "large" && "!h-3/5",
+          theme === "large" && "!h-3/5 mmd:!h-3/4",
           theme === "small" && "!h-3/4"
         )}
       />
@@ -118,8 +120,9 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
       <Icon
         className={classNames(
           "glass-icon--active",
+          theme === "large" &&
+            "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
-          theme === "large" && "w-6 h-6",
           className
         )}
       />
@@ -133,8 +136,9 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
   return (
     <Icon
       className={classNames(
+        theme === "large" &&
+          "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
         theme === "small" && "w-[1.125rem] h-[1.125rem]",
-        theme === "large" && "w-6 h-6",
         className
       )}
     />

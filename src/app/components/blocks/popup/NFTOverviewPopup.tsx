@@ -46,7 +46,9 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
   return (
     <SecondaryModal {...rest} small>
       <div className={classNames("w-full h-[20rem]", "mt-4 mb-2")}>
-        {token && <NftOverview token={token} small />}
+        {token && (
+          <NftOverview key={getNftOverviewKey(token)} token={token} small />
+        )}
       </div>
 
       {tokenInfo && (
@@ -118,3 +120,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
 };
 
 export default NFTOverviewPopup;
+
+function getNftOverviewKey(token: AccountNFT) {
+  return `${token.contentType}_${token.thumbnailUrl}_${token.contentUrl}`;
+}

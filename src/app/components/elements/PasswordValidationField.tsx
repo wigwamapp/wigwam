@@ -1,4 +1,10 @@
-import { FC, forwardRef, useCallback, useState } from "react";
+import {
+  FC,
+  forwardRef,
+  useCallback,
+  useState,
+  ChangeEventHandler,
+} from "react";
 import classNames from "clsx";
 
 import { InputProps } from "./Input";
@@ -27,19 +33,19 @@ const PasswordValidationField = forwardRef<
     characters: false,
   });
 
-  const handleInputChange = useCallback(
-    (e) => {
-      const { value } = e.target;
+  const handleInputChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (evt) => {
+      const { value } = evt.target;
 
       setPasswordRequirements({
-        bigLetter: value.match(/(?=.*[A-Z])/),
-        smallLetter: value.match(/(?=.*[a-z])/),
-        numbers: value.match(/(?=.*[0-9])/),
+        bigLetter: /(?=.*[A-Z])/.test(value),
+        smallLetter: /(?=.*[a-z])/.test(value),
+        numbers: /(?=.*[0-9])/.test(value),
         length: value.length >= 8,
-        characters: value.match(/[`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]/),
+        characters: /[`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]/.test(value),
       });
 
-      onChange?.(e);
+      onChange?.(evt);
     },
     [onChange]
   );

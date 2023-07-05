@@ -1,9 +1,6 @@
-import { Setting } from "core/common";
-import { storage } from "lib/ext/storage";
-
-import { DEFAULT_AUTO_LOCK_TIMEOUT } from "fixtures/settings";
-
 import { locked, walletPortsCountUpdated } from "../state";
+
+import { retrieveAutoLockTimeout } from "core/common/settings";
 
 export function startAutoLocker() {
   let t: ReturnType<typeof setTimeout>;
@@ -14,9 +11,7 @@ export function startAutoLocker() {
     clearTimeout(t);
 
     if (count === 0) {
-      const timeout =
-        (await storage.fetchForce<number>(Setting.AutoLockTimeout)) ??
-        DEFAULT_AUTO_LOCK_TIMEOUT;
+      const timeout = await retrieveAutoLockTimeout();
 
       if (timeout !== 0) {
         t = setTimeout(locked, timeout);

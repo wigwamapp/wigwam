@@ -16,6 +16,7 @@ import {
   CHAIN_ID,
   ACCOUNT_ADDRESS,
   ActivityType,
+  MetaMaskCompatibleMode,
 } from "core/types";
 import * as repo from "core/repo";
 import { Setting } from "core/common";
@@ -105,7 +106,7 @@ export function startPageServer() {
   const notifyPermission = async (port: Runtime.Port, perm?: Permission) => {
     let params;
 
-    const sharedPropertyEnabled = await loadSharedPropertyEnabled();
+    const metamaskMode = await loadMetaMaskCompatibleMode();
 
     if (isUnlocked() && perm) {
       const internalAccountAddress = await loadAccountAddress();
@@ -126,13 +127,13 @@ export function startPageServer() {
       params = {
         chainId: perm.chainId,
         accountAddress: accountAddress?.toLowerCase(),
-        sharedPropertyEnabled,
+        mmCompatible: metamaskMode,
       };
     } else {
       params = {
         chainId: perm?.chainId ?? (await loadInternalChainId()),
         accountAddress: null,
-        sharedPropertyEnabled,
+        mmCompatible: metamaskMode,
       };
     }
 
@@ -228,14 +229,15 @@ async function resolveConnectionApproval(perm?: Permission) {
   }
 }
 
-const loadSharedPropertyEnabled = livePromise(
+const loadMetaMaskCompatibleMode = livePromise(
   () =>
     storage
-      .fetch<boolean>(Setting.Web3MetaMaskCompatible)
+      .fetch<MetaMaskCompatibleMode>(Setting.Web3MetaMaskCompatible)
       .catch(() => DEFAULT_WEB_METAMASK_COMPATIBLE),
   (callback) =>
-    storage.subscribe<boolean>(Setting.Web3MetaMaskCompatible, ({ newValue }) =>
-      callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE)
+    storage.subscribe<MetaMaskCompatibleMode>(
+      Setting.Web3MetaMaskCompatible,
+      ({ newValue }) => callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE)
     )
 );
 

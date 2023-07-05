@@ -1,6 +1,6 @@
 // Organic Throttle
 // The difference from the plain throttle is the lack of delay.
-// Tt simply doesn't allow the original function to be executed in parallel.
+// It simply doesn't allow the original function to be executed in parallel.
 export function createOrganicThrottle() {
   let worker: Promise<unknown> | null = null;
 

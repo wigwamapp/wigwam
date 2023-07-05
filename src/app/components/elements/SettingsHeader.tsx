@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
-type SettingsHeaderProps = {
+type SettingsHeaderProps = PropsWithChildren<{
   className?: string;
-};
+}>;
 
 const SettingsHeader: FC<SettingsHeaderProps> = ({ className, children }) => (
   <h3
