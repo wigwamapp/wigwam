@@ -1,9 +1,5 @@
 import { CryptoEngine } from "kdbxweb";
-import {
-  SignTypedDataVersion,
-  TypedDataUtils,
-  recoverPersonalSignature,
-} from "@metamask/eth-sig-util";
+import { recoverPersonalSignature } from "@metamask/eth-sig-util";
 import { ethers } from "ethers";
 import {
   toProtectedString,
