@@ -22,6 +22,26 @@ import {
   requestSwitchChain,
 } from "./wallet";
 
+/**
+ * The `handleRpc` function handles various RPC methods and performs corresponding
+ * actions based on the method type.
+ * @param {ActivitySource} source - The `source` parameter represents the source of
+ * the activity, such as a page or an extension.
+ * @param {number} chainId - The `chainId` parameter represents the ID of the
+ * blockchain network that the RPC request is being made to. It is used to specify
+ * the network on which the requested operation should be performed.
+ * @param {string} method - The `method` parameter in the `handleRpc` function is a
+ * string that represents the JSON-RPC method being called. It is used to determine
+ * the specific logic to execute based on the method being called.
+ * @param {any[]} params - The `params` parameter is an array that contains the
+ * arguments passed to the RPC method. The specific contents of the `params` array
+ * depend on the method being called. Each RPC method has its own set of parameters
+ * that need to be passed in the `params` array.
+ * @param {RpcReply} reply - The `reply` parameter is a function that is used to
+ * send the response of the RPC method back to the caller. It takes a single
+ * argument, which is an object containing the response data.
+ * @returns The function `handleRpc` returns a Promise
+ */
 export async function handleRpc(
   source: ActivitySource,
   chainId: number,
@@ -29,6 +49,11 @@ export async function handleRpc(
   params: any[],
   reply: RpcReply
 ) {
+  /**
+   * The function `expandPermission` checks if the source type is "page", and if
+   * so, retrieves the permission for the page's origin and updates the source
+   * object with the permission and chainId
+   */
   const expandPermission = async () => {
     if (source.type === "page") {
       if (!isUnlocked()) return;
