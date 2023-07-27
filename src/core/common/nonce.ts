@@ -6,7 +6,7 @@ import { createQueue } from "lib/system/queue";
 const enqueueSaveNonce = createQueue();
 
 export function getNextNonce(
-  tx: UnsignedTransaction,
+  tx: Pick<UnsignedTransaction, "nonce">,
   localNonce?: string | null
 ) {
   assert(tx.nonce !== undefined, "Nonce not found in transaction");

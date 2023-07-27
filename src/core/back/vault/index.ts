@@ -79,6 +79,8 @@ enum Gr {
   AccountKeys = "aaovObw95bFaxfkNRBpM6w==",
 }
 
+// Password-protected vault that stores
+// accounts, seed phrases, and account keys.
 export class Vault {
   static onPasswordUsage?: (success: boolean) => void | Promise<void>;
 
