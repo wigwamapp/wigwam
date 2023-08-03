@@ -76,13 +76,17 @@ export const $approvals = createStore<Approval[]>([])
   .on(approvalAdded, (approvals, newApproval) => {
     if (newApproval.type === ActivityType.Connection) {
       const newApprovalOrigin = getPageOrigin(newApproval.source);
+
+      let index = 0;
       for (const approval of approvals) {
         if (
           approval.type === ActivityType.Connection &&
           getPageOrigin(approval.source) === newApprovalOrigin
         ) {
-          return approvals;
+          return approvals.filter((a, i) => (i === index ? newApproval : a));
         }
+
+        index++;
       }
 
       return [newApproval, ...approvals];
