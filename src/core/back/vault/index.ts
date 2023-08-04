@@ -56,7 +56,10 @@ import {
   add0x,
 } from "core/common";
 
-import { persistPasswordSession, cleanupPasswordSession } from "./session";
+import {
+  persistPasswordSession,
+  cleanupPasswordSession,
+} from "./passwordSession";
 
 const {
   bytesToBase64,

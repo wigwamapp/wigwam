@@ -2,7 +2,7 @@ import { ethErrors } from "eth-rpc-errors";
 
 import {
   ActivitySource,
-  RpcReply,
+  RpcMessageContext,
   JsonRpcMethod,
   SigningStandard,
   JsonRpcError,
@@ -13,6 +13,7 @@ import { getPageOrigin } from "core/common/permissions";
 import { isUnlocked } from "../state";
 
 import { sendRpc } from "./network";
+import { RpcCtx } from "./context";
 import {
   fetchPermission,
   requestConnection,
@@ -23,12 +24,14 @@ import {
 } from "./wallet";
 
 export async function handleRpc(
+  msgCtx: RpcMessageContext,
   source: ActivitySource,
   chainId: number,
   method: string,
-  params: any[],
-  reply: RpcReply
+  params: any[]
 ) {
+  const rpcCtx = new RpcCtx(msgCtx);
+
   const expandPermission = async () => {
     if (source.type === "page") {
       if (!isUnlocked()) return;
@@ -52,7 +55,7 @@ export async function handleRpc(
       case JsonRpcMethod.wallet_getPermissions: {
         dropForSelf(source);
 
-        return await fetchPermission(source, reply);
+        return await fetchPermission(rpcCtx, source);
       }
 
       case JsonRpcMethod.wallet_requestPermissions:
@@ -63,17 +66,17 @@ export async function handleRpc(
           method === JsonRpcMethod.eth_requestAccounts;
 
         return await requestConnection(
+          rpcCtx,
           source,
           params,
-          returnSelectedAccount,
-          reply
+          returnSelectedAccount
         );
       }
 
       case JsonRpcMethod.eth_sendTransaction: {
         await expandPermission();
 
-        return await requestTransaction(source, chainId, params, reply);
+        return await requestTransaction(rpcCtx, source, chainId, params);
       }
 
       case JsonRpcMethod.personal_sign:
@@ -85,13 +88,13 @@ export async function handleRpc(
         await expandPermission();
 
         const standard = getSigningStandard(method);
-        return await requestSigning(source, standard, params, reply);
+        return await requestSigning(rpcCtx, source, standard, params);
       }
 
       case JsonRpcMethod.personal_ecRecover: {
         await expandPermission();
 
-        return await recoverPersonalSign(source, params, reply);
+        return await recoverPersonalSign(rpcCtx, source, params);
       }
 
       case JsonRpcMethod.wallet_switchEthereumChain:
@@ -101,7 +104,7 @@ export async function handleRpc(
 
         const type =
           method === JsonRpcMethod.wallet_addEthereumChain ? "add" : "switch";
-        return await requestSwitchChain(type, source, params, reply);
+        return await requestSwitchChain(rpcCtx, type, source, params);
       }
 
       case JsonRpcMethod.eth_sign:
@@ -116,7 +119,7 @@ export async function handleRpc(
       default: {
         await expandPermission();
 
-        reply(await sendRpc(chainId, method, params));
+        rpcCtx.reply(await sendRpc(chainId, method, params));
       }
     }
   } catch (err: any) {
@@ -130,7 +133,7 @@ export async function handleRpc(
       error = ethErrors.rpc.internal();
     }
 
-    reply({ error });
+    rpcCtx.reply({ error });
   }
 }
 

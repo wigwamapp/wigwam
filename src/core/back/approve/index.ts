@@ -51,11 +51,11 @@ export async function processApprove(
       .with(
         { type: ActivityType.Connection },
         async ({
+          rpcCtx,
           type,
           source,
           returnSelectedAccount,
           preferredChainId,
-          rpcReply,
         }) => {
           assert(accountAddresses?.length, "Accounts not provided");
 
@@ -87,19 +87,12 @@ export async function processApprove(
             pending: 0,
           });
 
-          rpcReply?.({ result: [toReturn] });
+          rpcCtx?.reply({ result: [toReturn] });
         }
       )
       .with(
         { type: ActivityType.Transaction },
-        async ({
-          type,
-          source,
-          chainId,
-          accountAddress,
-          txParams,
-          rpcReply,
-        }) => {
+        async ({ rpcCtx, type, source, chainId, accountAddress, txParams }) => {
           assert(rawTx, "Transaction not provided");
 
           const tx = parseTxSafe(rawTx);
@@ -158,7 +151,7 @@ export async function processApprove(
               ),
             ]);
 
-            rpcReply?.({ result: txHash });
+            rpcCtx?.reply({ result: txHash });
           } else {
             console.warn(rpcRes.error);
 
@@ -172,16 +165,9 @@ export async function processApprove(
       )
       .with(
         { type: ActivityType.Signing },
-        async ({
-          type,
-          source,
-          standard,
-          accountAddress,
-          message,
-          rpcReply,
-        }) => {
+        async ({ rpcCtx, type, source, standard, accountAddress, message }) => {
           if (signedMessage) {
-            rpcReply?.({ result: signedMessage });
+            rpcCtx?.reply({ result: signedMessage });
             return;
           }
 
@@ -201,14 +187,14 @@ export async function processApprove(
             pending: 0,
           });
 
-          rpcReply?.({ result: signature });
+          rpcCtx?.reply({ result: signature });
         }
       )
       .otherwise(() => {
         throw new Error("Not Found");
       });
   } else {
-    approval.rpcReply?.({ error: DECLINE_ERROR });
+    approval.rpcCtx?.reply({ error: DECLINE_ERROR });
   }
 
   approvalResolved(approvalId);

@@ -10,6 +10,7 @@ import {
   MessageType,
   PorterChannel,
   WalletStatus,
+  WalletRpcMsgContext,
   SelfActivityKind,
   ACCOUNT_ADDRESS,
 } from "core/types";
@@ -312,14 +313,15 @@ async function handleWalletRequest(
           ctx.reply({ type, status });
         })
       )
-      .with(
-        { type: MessageType.SendRpc },
-        ({ type, chainId, method, params }) => {
-          handleRpc(UNKNOWN_SELF_SOURCE, chainId, method, params, (response) =>
-            ctx.reply({ type, response })
-          );
-        }
-      )
+      .with({ type: MessageType.SendRpc }, ({ chainId, method, params }) => {
+        handleRpc(
+          ctx as WalletRpcMsgContext,
+          UNKNOWN_SELF_SOURCE,
+          chainId,
+          method,
+          params
+        );
+      })
       .otherwise(() => {
         throw new Error("Not Found");
       });

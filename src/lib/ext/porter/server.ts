@@ -7,7 +7,12 @@ import {
   PorterServerMessage,
   PorterOneWay,
 } from "./types";
-import { MESSAGE_TYPES, serializeError, sanitizeMessage } from "./helpers";
+import {
+  MESSAGE_TYPES,
+  serializeError,
+  sanitizeMessage,
+  getPortId,
+} from "./helpers";
 
 export type PorterMessageHandler<Data = any, ReplyData = any> = (
   ctx: MessageContext<Data, ReplyData>
@@ -18,8 +23,14 @@ export type PorterConnectionHandler = (
   port: Runtime.Port
 ) => void;
 
+// Required to recreate MessageContext
+// This is necessary to send an RPC response for those requests
+// that were recovered after the Service Worker's restart
+// (as it has the capability to sleep)
+const ALL_PORTS = new Map<string, Runtime.Port>();
+
 export class PorterServer<OneWayData = any> {
-  private ports = new Set<Runtime.Port>();
+  private ports = new Map<string, Runtime.Port>();
   private messageHandlers = new Set<PorterMessageHandler>();
   private connectionHandlers = new Set<PorterConnectionHandler>();
 
@@ -45,12 +56,12 @@ export class PorterServer<OneWayData = any> {
   }
 
   isConnected(port: Runtime.Port) {
-    return this.ports.has(port);
+    return this.ports.has(getPortId(port));
   }
 
   broadcast(data: OneWayData) {
     const msg: PorterOneWay = { type: PorterMessageType.OneWay, data };
-    for (const port of this.ports) {
+    for (const port of this.ports.values()) {
       port.postMessage(sanitizeMessage(msg));
     }
   }
@@ -64,12 +75,16 @@ export class PorterServer<OneWayData = any> {
   }
 
   private handleConnect(port: Runtime.Port) {
-    if (port.name === this.name) {
+    ALL_PORTS.set(getPortId(port), port);
+
+    if (port.name.startsWith(this.name)) {
       this.addPort(port);
 
       forEachSafe(this.connectionHandlers, (handle) => handle("connect", port));
 
       port.onDisconnect.addListener(() => {
+        ALL_PORTS.delete(getPortId(port));
+
         this.removePort(port);
 
         forEachSafe(this.connectionHandlers, (handle) =>
@@ -84,7 +99,10 @@ export class PorterServer<OneWayData = any> {
       port.sender?.id === browser.runtime.id &&
       MESSAGE_TYPES.includes(msg?.type)
     ) {
-      const ctx = new MessageContext(port, msg as PorterClientMessage, this);
+      const ctx = new MessageContext(
+        getPortId(port),
+        msg as PorterClientMessage
+      );
 
       forEachSafe(this.messageHandlers, (handle) => handle(ctx));
     }
@@ -92,12 +110,12 @@ export class PorterServer<OneWayData = any> {
 
   private addPort(port: Runtime.Port) {
     port.onMessage.addListener(this.handleMessage);
-    this.ports.add(port);
+    this.ports.set(getPortId(port), port);
   }
 
   private removePort(port: Runtime.Port) {
     port.onMessage.removeListener(this.handleMessage);
-    this.ports.delete(port);
+    this.ports.delete(getPortId(port));
   }
 
   private addMessageHandler(handler: PorterMessageHandler) {
@@ -110,22 +128,18 @@ export class PorterServer<OneWayData = any> {
 }
 
 export class MessageContext<Data, ReplyData> {
-  public data: Data;
+  constructor(public portId: string, public msg: PorterClientMessage) {}
 
-  constructor(
-    public port: Runtime.Port,
-    private msg: PorterClientMessage,
-    private server: PorterServer
-  ) {
-    this.data = msg.data;
-  }
-
-  get connected() {
-    return this.server.isConnected(this.port);
+  get port() {
+    return ALL_PORTS.get(this.portId);
   }
 
   get request() {
     return this.msg.type === PorterMessageType.Req;
+  }
+
+  get data(): Data {
+    return this.msg.data;
   }
 
   reply(data: ReplyData) {
@@ -158,8 +172,6 @@ export class MessageContext<Data, ReplyData> {
   }
 
   private send(res: PorterServerMessage) {
-    if (this.connected) {
-      this.port.postMessage(sanitizeMessage(res));
-    }
+    this.port?.postMessage(sanitizeMessage(res));
   }
 }

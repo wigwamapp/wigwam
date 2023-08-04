@@ -1,3 +1,8 @@
+import { MessageContext } from "lib/ext/porter/server";
+import { PorterClientMessage } from "lib/ext/porter/types";
+
+import { SendRpcRequest, SendRpcResponse } from "./messages";
+
 export enum JsonRpcMethod {
   // Simple
   eth_chainId = "eth_chainId",
@@ -127,4 +132,20 @@ export interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
 
 export type RpcResponse = { result: any } | { error: JsonRpcError };
 
-export type RpcReply = (res: RpcResponse) => void;
+export type SerializedRpcContext = {
+  portId: string;
+  msg: PorterClientMessage;
+};
+
+export interface RpcContext {
+  serialize(): SerializedRpcContext;
+  reply(response: RpcResponse): void;
+}
+
+export type RpcMessageContext = WalletRpcMsgContext | PageRpcMsgContext;
+
+export type WalletRpcMsgContext = MessageContext<
+  SendRpcRequest,
+  SendRpcResponse
+>;
+export type PageRpcMsgContext = MessageContext<JsonRpcRequest, JsonRpcResponse>;

@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 
-import { ActivitySource, RpcReply, ActivityType } from "core/types";
+import { ActivitySource, ActivityType, RpcContext } from "core/types";
 import * as repo from "core/repo";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { approvalAdded } from "core/back/state";
@@ -8,10 +8,10 @@ import { approvalAdded } from "core/back/state";
 import { assertWalletSetuped } from "./validation";
 
 export async function requestConnection(
+  rpcCtx: RpcContext,
   source: ActivitySource,
-  params: any[],
-  returnSelectedAccount: boolean,
-  rpcReply: RpcReply
+  _params: any[],
+  returnSelectedAccount: boolean
 ) {
   assertWalletSetuped({ openIfNotSetuped: true });
 
@@ -34,16 +34,19 @@ export async function requestConnection(
     source,
     timeAt: Date.now(),
     returnSelectedAccount,
-    rpcReply,
+    rpcCtx,
   });
 }
 
-export async function fetchPermission(source: ActivitySource, reply: RpcReply) {
+export async function fetchPermission(
+  rpcCtx: RpcContext,
+  source: ActivitySource
+) {
   const origin = getPageOrigin(source);
   const permission = await repo.permissions.get(origin);
   const result = (permission ? [permission] : []).map(wrapPermission);
 
-  reply({ result });
+  rpcCtx.reply({ result });
 }
 
 // function parseChainId(val: any): number | undefined {
