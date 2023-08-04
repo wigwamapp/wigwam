@@ -15,20 +15,6 @@ import { AccountSource, PASSWORD_SESSION, SigningStandard } from "core/types";
 import { Vault } from "../vault";
 import { retrievePasswordSession } from "../vault/session";
 
-// Mock profile prefix for storage usage
-// It can work on its own, but web-extension-polyfill
-// storage mock doesn't work in this scenario
-jest.mock("lib/ext/profile", () => {
-  const originalModule = jest.requireActual("lib/ext/profile");
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    underProfile: async (key: string) => `test_${key}`,
-    getProfileId: async () => "test",
-  };
-});
-
 // Mock argon2 with just sha256
 beforeAll(() => CryptoEngine.setArgon2Impl((p) => CryptoEngine.sha256(p)));
 
