@@ -128,11 +128,11 @@ export const $accountAddresses = $accounts.map((accounts) =>
 );
 
 function rejectApprovalsRpc(approvals: Approval[]) {
-  try {
-    for (const { rpcCtx } of approvals) {
+  for (const { rpcCtx } of approvals) {
+    try {
       rpcCtx?.reply({
         error: ethErrors.provider.userRejectedRequest(),
       });
-    }
-  } catch {}
+    } catch {}
+  }
 }

@@ -46,11 +46,14 @@ export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
   assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
-  assert(
-    ethers.utils.isValidMnemonic(fromProtectedString(phrase), wordlists[lang]),
-    t("seedPhraseIsNotValid"),
-    PublicError
-  );
+
+  try {
+    assert(
+      ethers.utils.isValidMnemonic(fromProtectedString(phrase), wordlists[lang])
+    );
+  } catch {
+    throw new PublicError(t("seedPhraseIsNotValid"));
+  }
 }
 
 export function validateDerivationPath(path: string) {

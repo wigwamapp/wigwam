@@ -23,6 +23,24 @@ import {
   requestSwitchChain,
 } from "./wallet";
 
+/**
+ * The `handleRpc` function handles various RPC methods and performs different
+ * actions based on the method type.
+ * @param {RpcMessageContext} msgCtx - The `msgCtx` parameter is of type
+ * `RpcMessageContext` and represents the context of the RPC message being handled.
+ * @param {ActivitySource} source - The `source` parameter represents the source of
+ * the activity that triggered the RPC call. It contains information about the type
+ * of source (e.g., "page") and any associated permissions or chain ID.
+ * @param {number} chainId - The `chainId` parameter represents the ID of the
+ * blockchain network that the RPC request is targeting. It is a number that
+ * uniquely identifies a specific blockchain network.
+ * @param {string} method - The `method` parameter in the `handleRpc` function is a
+ * string that represents the JSON-RPC method being called. It is used to determine
+ * the specific logic to execute based on the method being called.
+ * @param {any[]} params - The `params` parameter is an array that contains the
+ * arguments passed to the RPC method. The specific arguments depend on the method
+ * being called.
+ */
 export async function handleRpc(
   msgCtx: RpcMessageContext,
   source: ActivitySource,
@@ -32,6 +50,11 @@ export async function handleRpc(
 ) {
   const rpcCtx = new RpcCtx(msgCtx);
 
+  /**
+   * The function `expandPermission` checks if the source type is "page", and if
+   * so, retrieves the permission for the page's origin and updates the source
+   * object with the permission and chainId
+   */
   const expandPermission = async () => {
     if (source.type === "page") {
       if (!isUnlocked()) return;
