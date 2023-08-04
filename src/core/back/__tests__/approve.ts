@@ -79,7 +79,7 @@ describe("Approve", () => {
     const { vault } = await createTestVault();
 
     const id = nanoid();
-    const rpcReply = jest.fn();
+    const rpcCtx: any = { reply: jest.fn() };
 
     approvalAdded({
       id,
@@ -90,7 +90,7 @@ describe("Approve", () => {
       },
       timeAt: Date.now(),
       returnSelectedAccount: true,
-      rpcReply,
+      rpcCtx,
     });
 
     await processApprove(
@@ -99,6 +99,6 @@ describe("Approve", () => {
       vault
     );
 
-    expect(rpcReply).toBeCalledWith({ result: [TEST_WALLET.address] });
+    expect(rpcCtx.reply).toBeCalledWith({ result: [TEST_WALLET.address] });
   });
 });
