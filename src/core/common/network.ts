@@ -1,9 +1,8 @@
 import { storage } from "lib/ext/storage";
-import { assert } from "lib/system/assert";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
 import { CHAIN_ID } from "core/types";
-import * as Repo from "core/repo";
+import * as repo from "core/repo";
 
 const INFURA_TEMPLATE = "${INFURA_API_KEY}";
 const INFURA_API_KEY = process.env.VIGVAM_INFURA_API_KEY;
@@ -24,7 +23,7 @@ export async function getRpcUrl(chainId: number) {
     url = network.rpcUrls[0];
   }
 
-  if (url.includes(INFURA_TEMPLATE)) {
+  if (process.env.NODE_ENV !== "test" && url.includes(INFURA_TEMPLATE)) {
     if (!INFURA_API_KEY) {
       throw new Error(
         "Current rpc url requires INFURA API KEY environment variable"
@@ -54,13 +53,14 @@ export function setRpcUrl(chainId: number, url: string | null) {
 
 export async function cleanupNetwork(chainId: number) {
   await storage.put(CHAIN_ID, INITIAL_NETWORK.chainId);
-  await Repo.networks.delete(chainId);
+  await repo.networks.delete(chainId);
   await setRpcUrl(chainId, null);
+  rpcUrlsCache.delete(chainId);
 }
 
 export async function getNetwork(chainId: number) {
-  const net = await Repo.networks.get(chainId);
-  assert(net, undefined, NetworkNotFoundError);
+  const net = await repo.networks.get(chainId);
+  if (!net) throw new NetworkNotFoundError();
   return net;
 }
 
@@ -76,7 +76,7 @@ export function formatRpcUrl(url: string) {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
-export class NetworkNotFoundError implements Error {
+export class NetworkNotFoundError extends Error {
   name = "NetworkNotFoundError";
   message = "Network Not Found";
 }

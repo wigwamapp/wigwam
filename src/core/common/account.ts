@@ -38,9 +38,9 @@ export function validateAddAccountParams(params: AddAccountParams) {
 export function validateNoAccountDuplicates(accounts: Account[]) {
   const uniques = new Set<string>();
 
-  for (const { address } of accounts) {
-    if (!uniques.has(address)) {
-      uniques.add(address);
+  for (const { uuid, address } of accounts) {
+    if (!uniques.has(uuid) && !uniques.has(address)) {
+      uniques.add(uuid).add(address);
     } else {
       throw new PublicError(t("walletAlreadyExists"));
     }

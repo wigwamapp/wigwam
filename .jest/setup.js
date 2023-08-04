@@ -14,3 +14,17 @@ global.crypto = webcrypto;
 
 jest.mock("webextension-polyfill", () => global.browser);
 jest.mock("mem", () => (fn) => fn);
+
+// Mock profile prefix for storage usage
+// It can work on its own, but web-extension-polyfill
+// storage mock doesn't work in this scenario
+jest.mock("lib/ext/profile", () => {
+  const originalModule = jest.requireActual("lib/ext/profile");
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    underProfile: async (key) => `test_${key}`,
+    getProfileId: async () => "test",
+  };
+});
