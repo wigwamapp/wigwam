@@ -4,8 +4,8 @@ import { nanoid } from "nanoid";
 import { assert as assertSchema } from "superstruct";
 import { assert } from "lib/system/assert";
 
+import { RpcContext, ActivitySource, ActivityType } from "core/types";
 import { approvalAdded } from "core/back/state";
-import { ActivitySource, ActivityType, RpcReply } from "core/types";
 
 import {
   validatePermission,
@@ -15,10 +15,10 @@ import {
 } from "./validation";
 
 export async function requestTransaction(
+  rpcCtx: RpcContext,
   source: ActivitySource,
   chainId: number,
-  params: any[],
-  rpcReply: RpcReply
+  params: any[]
 ) {
   validatePermission(source);
   await validateNetwork(chainId);
@@ -53,7 +53,7 @@ export async function requestTransaction(
     chainId,
     accountAddress,
     txParams,
-    rpcReply,
+    rpcCtx,
   });
 }
 

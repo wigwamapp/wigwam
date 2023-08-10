@@ -1,21 +1,21 @@
 import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
 
-import { RpcReply, ActivitySource } from "core/types";
+import { RpcContext, ActivitySource } from "core/types";
 import * as repo from "core/repo";
+import { getPageOrigin } from "core/common/permissions";
 
 import {
   assertWalletSetuped,
   validateNetwork,
   createJustNetworkPermission,
 } from "./validation";
-import { getPageOrigin } from "core/common/permissions";
 
 export async function requestSwitchChain(
+  rpcCtx: RpcContext,
   type: "add" | "switch",
   source: ActivitySource,
-  params: any[],
-  rpcReply: RpcReply
+  params: any[]
 ) {
   assertWalletSetuped();
 
@@ -50,5 +50,5 @@ export async function requestSwitchChain(
     await createJustNetworkPermission(origin, chainId);
   }
 
-  rpcReply({ result: null });
+  rpcCtx.reply({ result: null });
 }

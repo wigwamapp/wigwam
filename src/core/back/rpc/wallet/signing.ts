@@ -1,27 +1,27 @@
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
 import { recoverPersonalSignature } from "@metamask/eth-sig-util";
+import { nanoid } from "nanoid";
 import { assert } from "lib/system/assert";
 
 import {
   SigningStandard,
-  RpcReply,
+  RpcContext,
   ActivitySource,
   ActivityType,
 } from "core/types";
+import { approvalAdded } from "core/back/state";
 
 import { validatePermission, validateAccount } from "./validation";
-import { approvalAdded } from "core/back/state";
-import { nanoid } from "nanoid";
 
 const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
   ethers.utils;
 
 export async function requestSigning(
+  rpcCtx: RpcContext,
   source: ActivitySource,
   standard: SigningStandard,
-  params: any[],
-  rpcReply: RpcReply
+  params: any[]
 ) {
   validatePermission(source);
 
@@ -99,14 +99,14 @@ export async function requestSigning(
     accountAddress,
     standard,
     message,
-    rpcReply,
+    rpcCtx,
   });
 }
 
 export async function recoverPersonalSign(
+  rpcCtx: RpcContext,
   source: ActivitySource,
-  params: any[],
-  rpcReply: RpcReply
+  params: any[]
 ) {
   validatePermission(source);
 
@@ -120,5 +120,5 @@ export async function recoverPersonalSign(
 
   const ecRecoverAddr = recoverPersonalSignature({ data, signature });
 
-  rpcReply({ result: getAddress(ecRecoverAddr) });
+  rpcCtx.reply({ result: getAddress(ecRecoverAddr) });
 }
