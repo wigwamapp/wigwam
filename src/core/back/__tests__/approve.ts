@@ -1,13 +1,13 @@
 import { CryptoEngine } from "kdbxweb";
+import { nanoid } from "nanoid";
 import { toProtectedString, toProtectedPassword } from "lib/crypto-utils";
 import { storage } from "lib/ext/storage";
 
-import { AccountSource, ActivityType } from "core/types";
+import { AccountSource, ActivityType, RpcContext } from "core/types";
 
 import { processApprove } from "../approve";
 import { Vault } from "../vault";
 import { approvalAdded } from "../state";
-import { nanoid } from "nanoid";
 
 // Mock argon2 with just sha256
 beforeAll(() => CryptoEngine.setArgon2Impl((p) => CryptoEngine.sha256(p)));
@@ -65,7 +65,10 @@ describe("Approve", () => {
     const { vault } = await createTestVault();
 
     const id = nanoid();
-    const rpcCtx: any = { reply: jest.fn() };
+    const rpcCtx: RpcContext = {
+      reply: jest.fn(),
+      serialize: jest.fn(),
+    };
 
     approvalAdded({
       id,
