@@ -44,7 +44,7 @@ const BackButton = memo(
             break;
         }
       },
-      [onClick, historyPosition, initialValue, inHome, setCurrentValue]
+      [onClick, historyPosition, initialValue, inHome, setCurrentValue],
     );
 
     return canBack ? (
@@ -58,13 +58,13 @@ const BackButton = memo(
           className={classNames(
             "mr-2",
             "transition-transform",
-            "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
+            "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5",
           )}
         />
         Back
       </Button>
     ) : null;
-  }
+  },
 );
 
 export default BackButton;

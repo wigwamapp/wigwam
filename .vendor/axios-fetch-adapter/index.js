@@ -24,7 +24,7 @@ export default async function fetchAdapter(config) {
             : "timeout of " + config.timeout + "ms exceeded";
           res(createError(message, config, "ECONNABORTED", request));
         }, config.timeout);
-      })
+      }),
     );
   }
 
@@ -165,7 +165,7 @@ function createError(message, config, code, request, response) {
       axios.AxiosError[code],
       config,
       request,
-      response
+      response,
     );
   }
 

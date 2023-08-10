@@ -26,9 +26,9 @@ const NumberInput = memo(
       const separators = useMemo(
         () =>
           DEFAULT_LOCALES_SEPARATORS.find(
-            ({ code }) => currentLocale === code
+            ({ code }) => currentLocale === code,
           ) ?? FALLBACK_LOCALE_SEPARATORS,
-        [currentLocale]
+        [currentLocale],
       );
 
       value = value?.toString()?.replace(".", separators.decimals);
@@ -56,8 +56,8 @@ const NumberInput = memo(
           allowedDecimalSeparators={[",", "."]}
         />
       );
-    }
-  )
+    },
+  ),
 );
 
 export default NumberInput;

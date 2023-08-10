@@ -34,7 +34,7 @@ const Unlock: FC<UnlockProps> = ({ isApproval }) => {
                 "absolute top-1/2 -translate-y-1/2",
                 isPopup
                   ? "right-[calc(100%+0.5rem)]"
-                  : "right-[calc(100%+2.5rem)]"
+                  : "right-[calc(100%+2.5rem)]",
               )}
             />
           )}
@@ -59,7 +59,7 @@ const Unlock: FC<UnlockProps> = ({ isApproval }) => {
             "bottom-4",
             "text-xl",
             "font-black",
-            "flex items-center"
+            "flex items-center",
           )}
         >
           <VigvamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
@@ -102,7 +102,7 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
           "transition-colors",
           "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           "active:bg-brand-main/[.05]",
-          className
+          className,
         )}
       >
         <span
@@ -111,13 +111,13 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
             "flex items-center justify-center",
             "bg-brand-main/10",
             theme === "large" && "w-16 h-16 mb-3",
-            theme === "small" && "w-12 h-12 mb-1"
+            theme === "small" && "w-12 h-12 mb-1",
           )}
         >
           <ChangeProfileIcon
             className={classNames(
               theme === "large" && "w-6 h-6",
-              theme === "small" && "w-[1.125rem] h-[1.125rem]"
+              theme === "small" && "w-[1.125rem] h-[1.125rem]",
             )}
           />
         </span>
@@ -125,12 +125,12 @@ const ChangeProfileButton = memo<ChangeProfileButtonProps>(
           className={classNames(
             theme === "large" && "text-lg",
             theme === "small" && "text-xs",
-            "font-bold text-brand-light"
+            "font-bold text-brand-light",
           )}
         >
           Change profile
         </span>
       </button>
     );
-  }
+  },
 );

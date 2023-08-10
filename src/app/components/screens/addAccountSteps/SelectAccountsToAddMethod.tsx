@@ -70,7 +70,7 @@ const SelectAccountsToAddMethod: FC = () => {
 
   const methods = useMemo(
     () => (!hasSeedPhrase || isHardDevice ? methodsInitial : methodsExisting),
-    [isHardDevice, hasSeedPhrase]
+    [isHardDevice, hasSeedPhrase],
   );
 
   const handleContinue = useCallback(
@@ -88,10 +88,10 @@ const SelectAccountsToAddMethod: FC = () => {
             const { publicKey, chainCode } = await ledgerEth.getAddress(
               derivationPath,
               false,
-              true
+              true,
             );
             result = getExtendedKey(publicKey, chainCode!);
-          }
+          },
         );
         stateRef.current.extendedKey = result;
 
@@ -115,7 +115,7 @@ const SelectAccountsToAddMethod: FC = () => {
 
       navigateToStep(AddAccountStep.VerifyToAdd);
     },
-    [stateRef, hasSeedPhrase, isHardDevice, navigateToStep, withLedger]
+    [stateRef, hasSeedPhrase, isHardDevice, navigateToStep, withLedger],
   );
 
   return (
@@ -135,7 +135,7 @@ const SelectAccountsToAddMethod: FC = () => {
 export default SelectAccountsToAddMethod;
 
 const preparedNetworks = DEFAULT_NETWORKS.filter(
-  ({ type }) => type === "mainnet"
+  ({ type }) => type === "mainnet",
 );
 
 const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
@@ -159,7 +159,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     if (seedPhrase && derivationPath) {
       return toNeuterExtendedKey(
         getSeedPhraseHDNode(seedPhrase),
-        derivationPath
+        derivationPath,
       );
     }
 
@@ -184,8 +184,8 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
       const filteredAccounts = newAccounts.filter(
         ({ address }) =>
           !importedAccounts.some(
-            ({ address: imported }) => imported === address
-          )
+            ({ address: imported }) => imported === address,
+          ),
       );
 
       if (filteredAccounts.length <= 0) {
@@ -202,7 +202,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, getNextAccountName, importedAccounts]
+    [extendedKey, getNextAccountName, importedAccounts],
   );
 
   const loadActiveWallets = useCallback(async () => {
@@ -230,10 +230,10 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           if (balance?.gt(0)) {
             if (
               !resultAddresses.some(
-                ({ address: extAdd }) => extAdd === wallet.address
+                ({ address: extAdd }) => extAdd === wallet.address,
               ) &&
               !importedAccounts?.some(
-                ({ address: imported }) => imported === wallet.address
+                ({ address: imported }) => imported === wallet.address,
               )
             ) {
               resultAddresses.push({
@@ -248,7 +248,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
               });
             }
           }
-        })
+        }),
       );
 
       setLoadingProgress(((index + 1) / preparedNetworks.length) * 100);
@@ -322,7 +322,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           className={classNames(
             "absolute inset-0",
             "flex items-center justify-center",
-            "text-2xl font-bold"
+            "text-2xl font-bold",
           )}
         >
           {preparePercentString(loadingProgress)}

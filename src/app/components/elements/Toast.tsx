@@ -22,7 +22,7 @@ const Toast: FC<ToastProps> = ({ description, ...rest }) => {
         "text-brand-light text-sm",
         "flex items-start",
         "relative",
-        "z-10"
+        "z-10",
       )}
       {...rest}
     >

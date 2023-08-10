@@ -94,7 +94,7 @@ export class Vault {
   static async setup(
     passwordHash: string,
     accountsParams: AddAccountParams[],
-    seedPhrase?: SeedPharse
+    seedPhrase?: SeedPharse,
   ) {
     return withError(t("failedToSetupWallet"), async (getError) => {
       // Basic args validation
@@ -247,7 +247,7 @@ export class Vault {
     await this.verify(passwordHash);
 
     return withError(t("failedToFetchSeedPhrase"), () =>
-      this.getSeedPhraseForce()
+      this.getSeedPhraseForce(),
     );
   }
 
@@ -259,7 +259,7 @@ export class Vault {
 
       const neuterExtendedKey = toNeuterExtendedKey(
         getSeedPhraseHDNode(seedPhrase),
-        derivationPath
+        derivationPath,
       );
 
       return exportProtected(ProtectedValue.fromString(neuterExtendedKey));
@@ -274,13 +274,13 @@ export class Vault {
     const accGroup = this.getGroup(Gr.Accounts);
 
     return accGroup.entries.map((entry) =>
-      exportFields<Account>(entry, { uuid: true })
+      exportFields<Account>(entry, { uuid: true }),
     );
   }
 
   async addAccounts(
     accountParams: AddAccountParams[],
-    seedPhrase?: SeedPharse
+    seedPhrase?: SeedPharse,
   ) {
     return withError(t("failedToAddWallets"), async () => {
       if (seedPhrase) {
@@ -355,7 +355,7 @@ export class Vault {
 
   getPublicKey(accUuid: string) {
     return withError(t("failedToFetchPublicKey"), () =>
-      exportProtected(this.getKeyForce(accUuid, "publicKey"))
+      exportProtected(this.getKeyForce(accUuid, "publicKey")),
     );
   }
 
@@ -412,7 +412,7 @@ export class Vault {
     await this.verify(passwordHash);
 
     return withError(t("failedToFetchPrivateKey"), () =>
-      exportProtected(this.getKeyForce(accUuid, "privateKey"))
+      exportProtected(this.getKeyForce(accUuid, "privateKey")),
     );
   }
 
@@ -464,7 +464,7 @@ export class Vault {
 
           case AccountSource.PrivateKey: {
             const privateKey = add0x(
-              importProtected(params.privateKey).getText()
+              importProtected(params.privateKey).getText(),
             );
             const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
@@ -485,7 +485,7 @@ export class Vault {
 
           case AccountSource.OpenLogin: {
             const privateKey = add0x(
-              importProtected(params.privateKey).getText()
+              importProtected(params.privateKey).getText(),
             );
             const publicKey = ethers.utils.computePublicKey(privateKey, true);
             const address = ethers.utils.computeAddress(publicKey);
@@ -513,7 +513,7 @@ export class Vault {
             const derivationPath = params.derivationPath;
             const publicKey = ethers.utils.computePublicKey(
               add0x(importProtected(params.publicKey).getText()),
-              true
+              true,
             );
             const address = ethers.utils.computeAddress(publicKey);
 
@@ -614,7 +614,7 @@ export class Vault {
       const hashToCheck = importProtected(passwordHash).getBinary();
 
       const localHash = arrayToBuffer(
-        this.kdbx.credentials.passwordHash!.getBinary()
+        this.kdbx.credentials.passwordHash!.getBinary(),
       );
 
       try {
@@ -643,7 +643,7 @@ export class Vault {
 
   private createEntry(
     groupUuid: Gr,
-    uuid: KdbxUuid | string = KdbxUuid.random()
+    uuid: KdbxUuid | string = KdbxUuid.random(),
   ) {
     const parentGroup = this.getGroup(groupUuid);
 
@@ -687,7 +687,7 @@ export class Vault {
 
 async function signDigest(
   digest: BytesLike,
-  privateKey: ProtectedValue
+  privateKey: ProtectedValue,
 ): Promise<Signature> {
   const privKey = stripZeros(privateKey.getText());
 

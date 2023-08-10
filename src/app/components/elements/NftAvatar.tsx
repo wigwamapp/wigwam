@@ -15,7 +15,7 @@ const NftAvatar = forwardRef<HTMLElement, AvatarProps>(
       errorClassName={classNames("!border-brand-main/10", errorClassName)}
       {...rest}
     />
-  )
+  ),
 );
 
 export default NftAvatar;

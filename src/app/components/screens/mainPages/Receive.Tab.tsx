@@ -40,7 +40,7 @@ const ReceiveTab: FC<{ tabs: ReceiveTabEnum[] }> = ({ tabs }) => {
     () => (
       <Suspense fallback={null}>{matchReceiveTab(receiveTab, tabs)}</Suspense>
     ),
-    [receiveTab, tabs]
+    [receiveTab, tabs],
   );
 };
 

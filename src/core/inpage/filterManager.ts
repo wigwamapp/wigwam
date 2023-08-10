@@ -113,7 +113,7 @@ export class FilterManager {
   }
 
   private async requestProvider<T = unknown>(
-    args: RequestArguments
+    args: RequestArguments,
   ): Promise<T> {
     const result = await this.provider.request(args);
     return result as T;
@@ -169,7 +169,7 @@ export class FilterManager {
 
     if (Array.isArray(result) && result.length > 0) {
       const blocks = result.map((log) =>
-        intNumberFromHexString(log.blockNumber || "0x0")
+        intNumberFromHexString(log.blockNumber || "0x0"),
       );
 
       const highestBlock = Math.max(...blocks);
@@ -184,7 +184,7 @@ export class FilterManager {
 
   private async getBlockFilterChanges(
     id: number,
-    full = false
+    full = false,
   ): Promise<unknown> {
     const cursorPosition = this.cursors.get(id);
     if (!cursorPosition) {
@@ -199,8 +199,8 @@ export class FilterManager {
     const blocks = (
       await Promise.all(
         range(cursorPosition, currentBlockHeight + 1).map((blockNumber) =>
-          this.getBlockByNumber(blockNumber)
-        )
+          this.getBlockByNumber(blockNumber),
+        ),
       )
     ).filter(Boolean);
 
@@ -227,7 +227,7 @@ export class FilterManager {
 
   private async setInitialCursorPosition(
     id: number,
-    startBlock: BlockHeight
+    startBlock: BlockHeight,
   ): Promise<number> {
     const currentBlockHeight = await this.getCurrentBlockHeight();
     const initialCursorPosition =
@@ -257,7 +257,7 @@ export class FilterManager {
   }
 
   private async getBlockByNumber(
-    blockNumber: number
+    blockNumber: number,
   ): Promise<Record<string, any> | null> {
     const result = await this.requestProvider<any>({
       method: "eth_getBlockByNumber",

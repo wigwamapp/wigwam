@@ -44,7 +44,7 @@ const Tooltip: FC<TooltipProps> = ({
               "text-white text-xs",
               "border border-white/5",
               getSizeClasses(size),
-              tooltipClassName
+              tooltipClassName,
             )}
           >
             {content}
@@ -95,8 +95,8 @@ const getSizeClasses = (size: sizeType) =>
         "rounded-[.625rem]",
         "bg-brand-main/10 backdrop-blur-[60px]",
         IS_FIREFOX && "!bg-[#3A3C51]/[.98]",
-        "py-5 px-5"
-      )
+        "py-5 px-5",
+      ),
     )
     .otherwise(() =>
       classNames(
@@ -104,6 +104,6 @@ const getSizeClasses = (size: sizeType) =>
         "overflow-hidden truncate",
         "bg-brand-main/20 backdrop-blur-[6px]",
         IS_FIREFOX && "!bg-[#414356]/[.98]",
-        "py-1 px-3"
-      )
+        "py-1 px-3",
+      ),
     );

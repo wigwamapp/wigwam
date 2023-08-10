@@ -9,7 +9,7 @@ import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "./tokens";
 export async function requestBalance(
   provider: Provider | Signer,
   tokenSlug: string,
-  accountAddress: string
+  accountAddress: string,
 ) {
   if (tokenSlug === NATIVE_TOKEN_SLUG) {
     return await provider.getBalance(accountAddress);
@@ -28,7 +28,7 @@ export async function requestBalance(
         const owner = await contract.ownerOf(id);
 
         return ethers.BigNumber.from(
-          ethers.utils.getAddress(owner) === accountAddress ? 1 : 0
+          ethers.utils.getAddress(owner) === accountAddress ? 1 : 0,
         );
       }
 

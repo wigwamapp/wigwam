@@ -32,7 +32,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
       plainFocus,
       ...rest
     },
-    ref
+    ref,
   ) => {
     const { disabled = false, children } = rest;
 
@@ -71,7 +71,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
               className={classNames(
                 "inline-flex items-center",
                 "transition transform duration-300",
-                loading && "opacity-0 -translate-y-[calc(100%+0.75rem)]"
+                loading && "opacity-0 -translate-y-[calc(100%+0.75rem)]",
               )}
             >
               {children}
@@ -98,7 +98,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
                   "absolute inline-flex",
                   "top-1/2 left-1/2",
                   "-translate-x-1/2",
-                  "transition duration-300"
+                  "transition duration-300",
                 )}
               >
                 <Spinner />
@@ -106,7 +106,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
             </CSSTransition>
           </>
         ),
-        [loading, children]
+        [loading, children],
       ),
     };
 
@@ -115,7 +115,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
         !className?.includes("absolute") &&
         !className?.includes("fixed") &&
         "relative",
-      [className]
+      [className],
     );
 
     const classNamesList = classNames(
@@ -159,7 +159,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
       disabled && "opacity-40 cursor-default",
       loading && "pointer-events-none",
       "select-none",
-      className
+      className,
     );
 
     if ("href" in rest) {
@@ -194,7 +194,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
         }
       />
     );
-  }
+  },
 );
 
 export default Button;

@@ -37,7 +37,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
       setInternalChainId(chainId);
       openInTab(to);
     },
-    [setInternalChainId, chainId]
+    [setInternalChainId, chainId],
   );
   const tokenInfo = token
     ? prepareNFTLabel(token?.tokenId, token?.name)
@@ -57,7 +57,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
             "line-clamp-2 break-words mt-2",
             "text-sm text-center font-bold",
             "w-full mb-4",
-            !tokenInfo.name ? "text-brand-main" : ""
+            !tokenInfo.name ? "text-brand-main" : "",
           )}
         >
           <span
@@ -65,7 +65,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
               tokenInfo.name &&
                 tokenInfo.name.length > 13 &&
                 !tokenInfo.name.slice(0, 13).includes(" ") &&
-                "break-all"
+                "break-all",
             )}
           >
             {tokenInfo.name}
@@ -75,7 +75,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
             <span
               className={classNames(
                 "text-brand-main",
-                tokenInfo.id.length > 11 ? "break-all" : "break-words"
+                tokenInfo.id.length > 11 ? "break-all" : "break-words",
               )}
             >
               {tokenInfo.id}
@@ -90,7 +90,7 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
         className={classNames(
           "w-full pt-4",
           "border-t border-brand-main/[.07]",
-          "grid grid-cols-2 gap-2"
+          "grid grid-cols-2 gap-2",
         )}
       >
         <Button

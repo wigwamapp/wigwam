@@ -17,7 +17,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
   ({ label = "Recipient", setFromClipboard, className, ...rest }, ref) => {
     const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
     const { copy, copied } = useCopyToClipboard(
-      rest.value ?? rest.defaultValue
+      rest.value ?? rest.defaultValue,
     );
 
     return (
@@ -42,7 +42,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              "items-center"
+              "items-center",
             )}
           >
             {setFromClipboard ? (
@@ -70,7 +70,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default AddressField;

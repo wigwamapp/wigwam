@@ -20,7 +20,7 @@ export async function addFindTokenRequest(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata = false
+  refreshMetadata = false,
 ) {
   const dbKey = createAccountTokenKey({
     chainId,
@@ -39,7 +39,7 @@ export async function addFindTokenRequest(
       chainId,
       accountAddress,
       tokenSlug,
-      refreshMetadata
+      refreshMetadata,
     );
   } catch (err) {
     console.error(err);
@@ -54,7 +54,7 @@ async function performTokenSync(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata = false
+  refreshMetadata = false,
 ) {
   let tokenToAdd: AccountToken | undefined;
 
@@ -98,7 +98,7 @@ async function performTokenSync(
         rawBalance,
         balanceUSD,
       },
-      dbKey
+      dbKey,
     );
 
     return;

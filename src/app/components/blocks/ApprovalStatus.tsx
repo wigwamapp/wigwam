@@ -26,7 +26,7 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
       className={classNames(
         "flex items-center",
         !readOnly && total > 0 && "animate-pulse",
-        className
+        className,
       )}
     >
       {total > 0 && (
@@ -50,7 +50,7 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
           readOnly ? "text-brand-inactivelight" : "text-brand-light",
           "ml-2",
           theme === "large" && "text-base mmd:text-sm mxs:text-xs",
-          theme === "small" && "text-xs"
+          theme === "small" && "text-xs",
         )}
       >
         {total > 0 ? (
@@ -107,11 +107,11 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
           theme === "large" &&
             "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
-          className
+          className,
         )}
         fallbackClassName={classNames(
           theme === "large" && "!h-3/5 mmd:!h-3/4",
-          theme === "small" && "!h-3/4"
+          theme === "small" && "!h-3/4",
         )}
       />
     );
@@ -123,7 +123,7 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
           theme === "large" &&
             "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
-          className
+          className,
         )}
       />
     );
@@ -139,7 +139,7 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
         theme === "large" &&
           "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
         theme === "small" && "w-[1.125rem] h-[1.125rem]",
-        className
+        className,
       )}
     />
   );

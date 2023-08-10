@@ -58,7 +58,7 @@ const TokenAmount = memo<TokenAmountProps>(
                 copiable
                 className={classNames(
                   isSmall ? "text-xs ml-1.5" : "text-sm ml-2",
-                  "font-bold"
+                  "font-bold",
                 )}
               />
               {usdAmount !== undefined && (
@@ -70,7 +70,7 @@ const TokenAmount = memo<TokenAmountProps>(
                     copiable
                     className={classNames(
                       isSmall ? "text-xs" : "text-sm",
-                      "text-brand-inactivedark"
+                      "text-brand-inactivedark",
                     )}
                   />
                 </>
@@ -80,7 +80,7 @@ const TokenAmount = memo<TokenAmountProps>(
             <span
               className={classNames(
                 isSmall ? "text-xs" : "text-sm",
-                "font-bold ml-2"
+                "font-bold ml-2",
               )}
             >
               {amount !== undefined &&
@@ -108,7 +108,7 @@ const TokenAmount = memo<TokenAmountProps>(
                 isSmall ? "text-xs" : "text-sm",
                 "min-w-0 w-full text-right",
                 !name && isId ? "text-brand-main" : "",
-                !(name && isId) ? "line-clamp-2" : "truncate"
+                !(name && isId) ? "line-clamp-2" : "truncate",
               )}
             >
               {name ? name : ""}
@@ -124,7 +124,7 @@ const TokenAmount = memo<TokenAmountProps>(
               <div
                 className={classNames(
                   isSmall ? "text-xs" : "text-sm",
-                  "text-brand-main font-bold min-w-0 w-full truncate text-right"
+                  "text-brand-main font-bold min-w-0 w-full truncate text-right",
                 )}
               >
                 {id}
@@ -138,7 +138,7 @@ const TokenAmount = memo<TokenAmountProps>(
             className={classNames(
               isSmall ? "ml-1.5" : "ml-2",
               isSmall ? "w-8 h-8 min-w-[2rem]" : "w-11 h-11 min-w-[2.75rem]",
-              "relative group"
+              "relative group",
             )}
           >
             <NftAvatar
@@ -148,7 +148,7 @@ const TokenAmount = memo<TokenAmountProps>(
                 "w-full h-full",
                 isSmall ? "!rounded" : "!rounded-md",
                 isAmountLargerOne &&
-                  "opacity-20 transition-opacity group-hover:opacity-100"
+                  "opacity-20 transition-opacity group-hover:opacity-100",
               )}
               errorClassName={isSmall ? "h-[2rem]" : "h-[2.75rem]"}
             />
@@ -159,7 +159,7 @@ const TokenAmount = memo<TokenAmountProps>(
                   "text-xs font-bold",
                   "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                   "transition-opacity group-hover:opacity-0",
-                  "min-w-0 w-full"
+                  "min-w-0 w-full",
                 )}
               >
                 <XSymbolIcon className="w-2 min-w-[.5rem] h-auto mr-0.5" />
@@ -177,7 +177,7 @@ const TokenAmount = memo<TokenAmountProps>(
         </div>
       );
     }
-  }
+  },
 );
 
 export default TokenAmount;

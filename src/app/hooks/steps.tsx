@@ -63,7 +63,7 @@ export const StepsProvider = <T,>({
     (toSet: string, replace = false) => {
       setStep(replace ? [toSet as T, "replace"] : [toSet as T]);
     },
-    [setStep]
+    [setStep],
   );
 
   const reset = useCallback(() => {
@@ -79,7 +79,7 @@ export const StepsProvider = <T,>({
       navigateToStep,
       reset,
     }),
-    [navigateToStep, reset]
+    [navigateToStep, reset],
   );
 
   return (

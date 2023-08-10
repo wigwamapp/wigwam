@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, StrictMode, useCallback, useRef } from "react";
 import classNames from "clsx";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { ethers } from "ethers";
 import { ERC20__factory } from "abi-types";
 import { getRandomName } from "lib/random-name";
@@ -97,7 +97,7 @@ const ControlPanel: FC = () => {
         "flex flex-col",
         "bg-white/20 backdrop-blur-[10px]",
         "border border-brand-main/[.05]",
-        "shadow-addaccountmodal rounded-[.625rem]"
+        "shadow-addaccountmodal rounded-[.625rem]",
       )}
     >
       {Object.keys(actions).map((key) => (
@@ -141,7 +141,7 @@ const ControlButton: FC<
         "bg-black/40 hover:bg-black/20",
         "text-xs text-left",
         "transition ease-in-out duration-300",
-        processing && "animate-bounce"
+        processing && "animate-bounce",
       )}
       onClick={handleClick}
     >
@@ -153,9 +153,8 @@ const ControlButton: FC<
 const el = document.createElement("div");
 document.body.appendChild(el);
 
-render(
+createRoot(el).render(
   <StrictMode>
     <ControlPanel />
   </StrictMode>,
-  el
 );

@@ -30,7 +30,7 @@ const CopiableTooltip: FC<CopiableTooltipProps> = ({
       setCopied(false);
       onHidden?.(instance);
     },
-    [onHidden, setCopied]
+    [onHidden, setCopied],
   );
 
   useEffect(() => {

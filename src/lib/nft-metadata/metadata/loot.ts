@@ -4,7 +4,7 @@ import { Contract } from "@ethersproject/contracts";
 export async function fetchLootMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   const { default: lootAbi } = await import("../abi/loot.json");
 

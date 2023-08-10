@@ -30,7 +30,7 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
       setTimeout(
         () => this.connect(name, attempts + 1),
-        attempts < 10 ? 100 : 1_000
+        attempts < 10 ? 100 : 1_000,
       );
     };
 
@@ -64,13 +64,13 @@ export class PorterClient<ReqData = any, ResData = unknown> {
    */
   async request(
     data: ReqData,
-    opts: { timeout?: number; signal?: AbortSignal } = {}
+    opts: { timeout?: number; signal?: AbortSignal } = {},
   ): Promise<ResData> {
     const port = this.getCurrentPort();
     const reqId = this.reqId++;
 
     port.postMessage(
-      sanitizeMessage({ type: PorterMessageType.Req, reqId, data })
+      sanitizeMessage({ type: PorterMessageType.Req, reqId, data }),
     );
 
     return new Promise((resolve, reject) => {

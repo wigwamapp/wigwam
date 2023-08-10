@@ -77,12 +77,12 @@ export interface JsonRpcNotification<T> {
 
 export type JsonRpcCallback<T> = (
   error: Error | null,
-  result?: JsonRpcResponse<T>
+  result?: JsonRpcResponse<T>,
 ) => void;
 
 export type JsonRpcCallbackBatch = (
   error: Error | null,
-  result?: JsonRpcResponse<unknown>[]
+  result?: JsonRpcResponse<unknown>[],
 ) => void;
 
 interface JsonRpcResponseBase {

@@ -46,7 +46,7 @@ export async function handleRpc(
   source: ActivitySource,
   chainId: number,
   method: string,
-  params: any[]
+  params: any[],
 ) {
   const rpcCtx = new RpcCtx(msgCtx);
 
@@ -92,7 +92,7 @@ export async function handleRpc(
           rpcCtx,
           source,
           params,
-          returnSelectedAccount
+          returnSelectedAccount,
         );
       }
 

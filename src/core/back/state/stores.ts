@@ -20,11 +20,11 @@ import {
 
 export const $walletStatus = createStore(WalletStatus.Idle)
   .on(inited, (_s, vaultExists) =>
-    vaultExists ? WalletStatus.Locked : WalletStatus.Welcome
+    vaultExists ? WalletStatus.Locked : WalletStatus.Welcome,
   )
   .on(unlocked, () => WalletStatus.Unlocked)
   .on(locked, (state) =>
-    state === WalletStatus.Unlocked ? WalletStatus.Locked : state
+    state === WalletStatus.Unlocked ? WalletStatus.Locked : state,
   );
 
 export const $hasSeedPhrase = createStore(false)
@@ -124,7 +124,7 @@ export const $approvals = createStore<Approval[]>([])
   });
 
 export const $accountAddresses = $accounts.map((accounts) =>
-  accounts.map((acc) => acc.address)
+  accounts.map((acc) => acc.address),
 );
 
 function rejectApprovalsRpc(approvals: Approval[]) {

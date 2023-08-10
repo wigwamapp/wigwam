@@ -15,7 +15,7 @@ export function startPersistingApprovals() {
 
     await persistSession(
       APPROVALS_SESSION,
-      approvals.map((a) => ({ ...a, rpcCtx: a.rpcCtx?.serialize() }))
+      approvals.map((a) => ({ ...a, rpcCtx: a.rpcCtx?.serialize() })),
     );
   });
 }

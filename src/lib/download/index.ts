@@ -5,7 +5,7 @@ const enqueue = createQueue();
 export function downloadFile(
   data: Blob | string,
   name: string,
-  type = "text/plain"
+  type = "text/plain",
 ) {
   return enqueue(
     () =>
@@ -31,6 +31,6 @@ export function downloadFile(
             res();
           }, 250);
         }, 66);
-      })
+      }),
   );
 }

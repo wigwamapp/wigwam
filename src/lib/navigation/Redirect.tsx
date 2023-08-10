@@ -19,7 +19,7 @@ const Redirect: FC<RedirectProps> = ({
 }) => {
   useLayoutEffect(
     () => changeState(toURL(toHash(to, merge)), !push),
-    [to, merge, push]
+    [to, merge, push],
   );
 
   return fallback;

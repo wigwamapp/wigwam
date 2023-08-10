@@ -59,7 +59,7 @@ export function startPageServer() {
       notifyPermission(port, permission);
 
       const sub = liveQuery(() => repo.permissions.get(origin)).subscribe(
-        (perm) => notifyPermission(port, perm)
+        (perm) => notifyPermission(port, perm),
       );
 
       permissionSubs.set(port, sub);
@@ -120,7 +120,7 @@ export function startPageServer() {
 
         accountAddress =
           perm.accountAddresses.find((address) =>
-            allAccountAddresses.includes(address)
+            allAccountAddresses.includes(address),
           ) ?? null;
       }
 
@@ -148,7 +148,7 @@ export function startPageServer() {
 const faviconCache = new Map<string, string>();
 
 async function handlePageRequest(
-  ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
+  ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>,
 ) {
   console.debug("New page request", ctx);
 
@@ -222,29 +222,29 @@ const loadMetaMaskCompatibleMode = livePromise(
   (callback) =>
     storage.subscribe<MetaMaskCompatibleMode>(
       Setting.Web3MetaMaskCompatible,
-      ({ newValue }) => callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE)
-    )
+      ({ newValue }) => callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE),
+    ),
 );
 
 const loadInternalChainId = livePromise(
   () => storage.fetch<number>(CHAIN_ID).catch(() => INITIAL_NETWORK.chainId),
-  subscribeInternalChainId
+  subscribeInternalChainId,
 );
 
 function subscribeInternalChainId(callback: (chainId: number) => void) {
   return storage.subscribe<number>(CHAIN_ID, ({ newValue }) =>
-    callback(newValue ?? INITIAL_NETWORK.chainId)
+    callback(newValue ?? INITIAL_NETWORK.chainId),
   );
 }
 
 const loadAccountAddress = livePromise(
   () => storage.fetch<string>(ACCOUNT_ADDRESS).catch(getDefaultAccountAddress),
-  subscribeAccountAddress
+  subscribeAccountAddress,
 );
 
 function subscribeAccountAddress(callback: (address: string) => void) {
   return storage.subscribe<string>(ACCOUNT_ADDRESS, ({ newValue }) =>
-    callback(newValue ?? getDefaultAccountAddress())
+    callback(newValue ?? getDefaultAccountAddress()),
   );
 }
 

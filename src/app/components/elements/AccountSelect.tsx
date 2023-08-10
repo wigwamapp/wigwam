@@ -49,12 +49,12 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
       purePermission && purePermission.accountAddresses.length > 0
         ? purePermission.accountAddresses
         : [],
-    [purePermission]
+    [purePermission],
   );
 
   const fuse = useMemo(
     () => new Fuse(allAccounts, ACCOUNTS_SEARCH_OPTIONS),
-    [allAccounts]
+    [allAccounts],
   );
 
   const preparedAccounts = useMemo(() => {
@@ -89,7 +89,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
 
   const preparedCurrentAccount = useMemo(
     () => prepareCurrentAccount(currentAccount),
-    [currentAccount]
+    [currentAccount],
   );
 
   return (
@@ -155,7 +155,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           "h-10 w-10 min-w-[2.5rem]",
           "mr-1",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
       <CopiableTooltip
@@ -171,7 +171,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           "max-w-full",
           "inline-flex flex-col",
           "transition-colors",
-          "hover:bg-brand-main/40 focus-visible:bg-brand-main/40"
+          "hover:bg-brand-main/40 focus-visible:bg-brand-main/40",
         )}
       >
         <>
@@ -226,7 +226,7 @@ const AccountSelectItem: FC<
         "h-8 w-8 min-w-[2rem]",
         "mr-3",
         "bg-black/20",
-        "rounded-[.625rem]"
+        "rounded-[.625rem]",
       )}
     >
       <AutoIcon
@@ -242,7 +242,7 @@ const AccountSelectItem: FC<
             dapp?.isConnected ? "inset-px" : "inset-0",
             "rounded-[.625rem]",
             "border border-brand-light",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
         >
           <SelectedIcon className="fill-brand-light" />
@@ -254,7 +254,7 @@ const AccountSelectItem: FC<
             "absolute",
             "inset-0",
             "rounded-[calc(.625rem+1px)]",
-            "border border-brand-greenobject"
+            "border border-brand-greenobject",
           )}
         >
           <span
@@ -264,7 +264,7 @@ const AccountSelectItem: FC<
               "block",
               "w-4 h-4",
               "rounded-full overflow-hidden",
-              "border border-brand-greenobject"
+              "border border-brand-greenobject",
             )}
           >
             <Avatar
@@ -272,7 +272,7 @@ const AccountSelectItem: FC<
               alt={dapp.origin}
               className={classNames(
                 "w-full h-full object-cover",
-                "!border-none"
+                "!border-none",
               )}
             />
           </span>
@@ -287,7 +287,7 @@ const AccountSelectItem: FC<
           "text-xs text-brand-inactivedark font-normal",
           "mt-px",
           "transition-colors",
-          "group-hover:text-brand-light"
+          "group-hover:text-brand-light",
         )}
         withTooltip={false}
       />
@@ -307,7 +307,7 @@ const prepareCurrentAccount = (account: Account) => ({
 const prepareAccount = (
   account: Account,
   isSelected = false,
-  dapp: DappObj
+  dapp: DappObj,
 ) => ({
   key: account.address,
   value: (

@@ -16,7 +16,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
               paddingRight: `${(currency.length * 10 + 12 + 16) / 16}rem`,
             }
           : undefined,
-      [currency]
+      [currency],
     );
 
     return (
@@ -29,7 +29,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default AssetInput;

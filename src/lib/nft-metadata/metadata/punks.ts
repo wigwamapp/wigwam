@@ -14,7 +14,7 @@ function encodeUriData(dataUri: string): string {
 export async function fetchPunkAttributes(
   punksDataContract: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   const PunksDataContract = new Contract(
     punksDataContract,
@@ -22,7 +22,7 @@ export async function fetchPunkAttributes(
       "function punkAttributes(uint16 index) public view returns (string memory)",
       "function punkImageSvg(uint16 index) public view returns (string memory)",
     ],
-    provider
+    provider,
   );
   const [type, ...accessories] = (
     await PunksDataContract.punkAttributes(tokenId)

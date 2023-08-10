@@ -9,7 +9,7 @@ import { createAccountTokenKey } from "core/common/tokens";
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
     atomWithRepoQuery((query) => query(() => repo.queryAccountTokens(params))),
-  dequal
+  dequal,
 );
 
 export type GetTokenAtomParams = {
@@ -23,14 +23,14 @@ export const getTokenAtom = atomFamily(
     atomWithRepoQuery((query) =>
       query(() =>
         repo.accountTokens.get(
-          createAccountTokenKey({ chainId, accountAddress, tokenSlug })
-        )
-      )
+          createAccountTokenKey({ chainId, accountAddress, tokenSlug }),
+        ),
+      ),
     ),
-  dequal
+  dequal,
 );
 
 export const tokenTypeAtom = atomWithStorage<TokenType>(
   "token_type",
-  TokenType.Asset
+  TokenType.Asset,
 );

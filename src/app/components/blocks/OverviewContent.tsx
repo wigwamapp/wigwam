@@ -70,7 +70,7 @@ const TokenExplorer: FC = () => {
       setTokenSlug([RESET, "replace"]);
       setTokenType(value ? TokenType.NFT : TokenType.Asset);
     },
-    [setTokenType, setTokenSlug]
+    [setTokenType, setTokenSlug],
   );
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const TokenExplorer: FC = () => {
         className={classNames(
           "w-[23.25rem] min-w-[23.25rem] pr-6 mt-6",
           "border-r border-brand-main/[.07]",
-          "flex flex-col"
+          "flex flex-col",
         )}
       >
         <AssetsSwitcher
@@ -184,7 +184,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
                   ? TokenStatus.Disabled
                   : TokenStatus.Enabled,
             },
-            [token.chainId, currentAccount.address, token.tokenSlug].join("_")
+            [token.chainId, currentAccount.address, token.tokenSlug].join("_"),
           );
         } catch (e) {
           console.error(e);
@@ -193,7 +193,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         setTokenSlug([token.tokenSlug, "replace"]);
       }
     },
-    [currentAccount.address, manageModeEnabled, setTokenSlug]
+    [currentAccount.address, manageModeEnabled, setTokenSlug],
   );
 
   const toggleManageMode = useCallback(() => {
@@ -225,7 +225,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       tokenSlug,
       handleTokenSelect,
       loadMoreTriggerRef,
-    ]
+    ],
   );
 
   /**
@@ -260,7 +260,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
             theme="tertiary"
             className={classNames(
               "ml-2",
-              manageModeEnabled && "bg-brand-main/30"
+              manageModeEnabled && "bg-brand-main/30",
             )}
             aria-label={
               manageModeEnabled
@@ -282,7 +282,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
       toggleManageMode,
       searchInputRef,
       tokenIdSearchInputRef,
-    ]
+    ],
   );
 
   let tokensBar: ReactNode = null;

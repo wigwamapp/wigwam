@@ -6,7 +6,7 @@ import CopiableTooltip from "app/components/elements/CopiableTooltip";
 export const getHashPreview = (hash: string, startLength = 6, endLength = 4) =>
   `${hash.slice(0, startLength)}...${hash.slice(
     hash.length - endLength,
-    hash.length
+    hash.length,
   )}`;
 
 type HashPreviewProps = {
@@ -38,7 +38,7 @@ export const HashPreview = memo<HashPreviewProps>(
     }
 
     return <span className={className}>{hash}</span>;
-  }
+  },
 );
 
 export default HashPreview;

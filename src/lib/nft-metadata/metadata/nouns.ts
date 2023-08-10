@@ -11,7 +11,7 @@ function cleanupValue(value: string) {
 export async function fetchNounAttributes(
   nounsContract: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   const { default: data } = await import("../defaults/nounsData");
 
@@ -20,7 +20,7 @@ export async function fetchNounAttributes(
     [
       "function seeds(uint256 tokenId) public view returns (uint48,uint48,uint48,uint48,uint48)",
     ],
-    provider
+    provider,
   );
 
   const [background, body, accessory, head, glasses] =

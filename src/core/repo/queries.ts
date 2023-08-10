@@ -43,7 +43,7 @@ export function queryAccountTokens({
       .where("[chainId+tokenType+accountAddress+status+balanceUSD]")
       .between(
         [...baseArgs, TokenStatus.Enabled, 0],
-        [...baseArgs, TokenStatus.Native, Infinity]
+        [...baseArgs, TokenStatus.Native, Infinity],
       );
   }
 
@@ -95,7 +95,7 @@ export function queryContacts({ search, offset, limit }: QueryContactsParams) {
     const match = createSearchMatcher(search);
 
     coll = coll.filter(
-      (contact) => match(contact.name) || match(contact.address)
+      (contact) => match(contact.name) || match(contact.address),
     );
   }
 

@@ -8,7 +8,7 @@ export async function getAlternateContractCall(
   chainId: number,
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   if (isAddressMatch(chainId, tokenAddress, ZORA_TOKEN_ADDRESS)) {
     const { default: zoraMediaAbi } = await import("../abi/zoraMedia.json");
@@ -16,7 +16,7 @@ export async function getAlternateContractCall(
     const zoraMediaContract = new Contract(
       tokenAddress,
       zoraMediaAbi,
-      provider
+      provider,
     );
 
     return {

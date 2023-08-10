@@ -21,7 +21,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
         size === "extra-small" && "pb-16",
         (size === "small" || size === "medium") && "pb-20",
         size === "large" && "pb-28",
-        className
+        className,
       )}
     >
       <img
@@ -32,7 +32,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
           size === "medium" && "w-[29rem] h-[12.3358rem]",
           size === "small" && "w-[18.9675rem] h-[8.068125rem]",
           size === "extra-small" && "w-[18rem] h-[7.6567rem]",
-          "h-auto"
+          "h-auto",
         )}
       />
       <h2
@@ -41,7 +41,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
           size === "extra-small" && "text-lg mt-4",
           size === "small" && "text-xl mt-6",
           size === "medium" && "text-2xl mt-7",
-          size === "large" && "text-3xl mt-10"
+          size === "large" && "text-3xl mt-10",
         )}
       >
         We are on the way...
@@ -52,7 +52,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
           size === "extra-small" && "text-xs mt-0.5",
           size === "small" && "text-sm mt-0.5",
           size === "medium" && "text-base mt-1",
-          size === "large" && "text-lg mt-1.5"
+          size === "large" && "text-lg mt-1.5",
         )}
       >
         The {label} section is under development

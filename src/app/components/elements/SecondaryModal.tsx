@@ -48,7 +48,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             "overflow-hidden",
             "animate-dialogcontent",
             "flex flex-col justify-center items-center",
-            className
+            className,
           )}
           onOpenAutoFocus={!autoFocus ? (e) => e.preventDefault() : undefined}
           onPointerDownOutside={
@@ -63,7 +63,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
                 !small && "text-2xl",
                 small && "text-xl",
                 "text-center font-bold",
-                headerClassName
+                headerClassName,
               )}
             >
               {header}

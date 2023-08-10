@@ -14,7 +14,7 @@ export type CreateWorkerOptions = Partial<{
 
 export function createWorker<T extends ModuleMethods>(
   workerFactory: () => Worker,
-  opts: CreateWorkerOptions = {}
+  opts: CreateWorkerOptions = {},
 ) {
   const terminateAfterIdle = opts.terminateAfterIdle !== false;
   const idleDelay = opts.idleDelay ?? 60_000; // 1 min
@@ -23,7 +23,7 @@ export function createWorker<T extends ModuleMethods>(
   let queue = 0;
 
   const perform = async (
-    factory: (worker: ModuleThread<T>) => Promise<any>
+    factory: (worker: ModuleThread<T>) => Promise<any>,
   ) => {
     if (terminateAfterIdle) {
       clearTimeout(terminateTimeout);

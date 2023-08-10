@@ -17,7 +17,7 @@ export const CUSTOM_FEE_MODE = { icon: "⚙️", name: "Custom" };
 
 export function formatUnits(
   v?: ethers.BigNumberish,
-  unit: ethers.BigNumberish = 0
+  unit: ethers.BigNumberish = 0,
 ) {
   if (!v && v !== 0) return "";
   return ethers.utils.formatUnits(v, unit);
@@ -42,7 +42,7 @@ export const prepareAmountOnChange = ({
 }) => {
   const preparedValue = new BigNumber(value);
   const valueToChange = new BigNumber(1).multipliedBy(
-    new BigNumber(10).pow(decimals)
+    new BigNumber(10).pow(decimals),
   );
   const finalValue = preparedValue[operator](valueToChange);
 

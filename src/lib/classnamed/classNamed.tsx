@@ -12,7 +12,7 @@ export const classNamed: ClassNamedFactory =
           ? Object.entries(props).reduce(
               (sum, [key, val]) =>
                 isPropValid(key) ? { ...sum, [key]: val } : sum,
-              {}
+              {},
             )
           : props;
 
@@ -22,7 +22,7 @@ export const classNamed: ClassNamedFactory =
           {...propsToPass}
           className={parseClassNames(
             cleanTemplate(tag, props.className),
-            ...tagItems.map((t) => (typeof t === "function" ? t(props) : t))
+            ...tagItems.map((t) => (typeof t === "function" ? t(props) : t)),
           )}
         />
       );
@@ -43,7 +43,7 @@ function parseClassNames(template: string[], ...templateElements: any[]) {
 
 function cleanTemplate(
   template: string | TemplateStringsArray,
-  inheritedClasses = ""
+  inheritedClasses = "",
 ) {
   const newClasses: string[] = template
     .toString()
@@ -60,6 +60,6 @@ function cleanTemplate(
     ...inheritedClassesArray
       .concat(newClasses) // add new classes
       .filter((c: string) => c !== " ") // remove empty classes
-      .filter((v: string, i: number, arr: string[]) => arr.indexOf(v) === i) // remove duplicate
+      .filter((v: string, i: number, arr: string[]) => arr.indexOf(v) === i), // remove duplicate
   ).split(" ");
 }

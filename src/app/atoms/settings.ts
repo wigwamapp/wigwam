@@ -8,17 +8,17 @@ import { Setting, AnalyticsState } from "core/common";
 
 export const autoLockTimeout = atomWithStorage(
   Setting.AutoLockTimeout,
-  DEFAULT_AUTO_LOCK_TIMEOUT
+  DEFAULT_AUTO_LOCK_TIMEOUT,
 );
 
 export const web3MetaMaskCompatibleAtom = atomWithStorage(
   Setting.Web3MetaMaskCompatible,
-  DEFAULT_WEB_METAMASK_COMPATIBLE
+  DEFAULT_WEB_METAMASK_COMPATIBLE,
 );
 
 export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, true);
 
 export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
-  { enabled: false }
+  { enabled: false },
 );

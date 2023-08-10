@@ -52,7 +52,7 @@ export async function openIfWasRestarted() {
 
 export function isUpdateAvailable(
   currentVersion: string,
-  latestVersion: string
+  latestVersion: string,
 ) {
   if (currentVersion === latestVersion) return false;
 

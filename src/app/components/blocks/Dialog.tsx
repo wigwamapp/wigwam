@@ -38,7 +38,7 @@ const Dialog: FC<{ small?: boolean }> = ({ small }) => {
         className={classNames(
           !small && "text-base",
           small && "text-sm",
-          "text-brand-font text-center w-full break-words flex flex-col items-center"
+          "text-brand-font text-center w-full break-words flex flex-col items-center",
         )}
       >
         {children}
@@ -48,7 +48,7 @@ const Dialog: FC<{ small?: boolean }> = ({ small }) => {
           className={classNames(
             "flex flex-row-reverse",
             !small && "mt-5",
-            small && "mt-3"
+            small && "mt-3",
           )}
         >
           {primaryButtonText && (

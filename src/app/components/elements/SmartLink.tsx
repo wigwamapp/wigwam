@@ -21,7 +21,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
           openInTab(to, merge);
         }
       },
-      [onClick, to, merge]
+      [onClick, to, merge],
     );
 
     if (isPopup) {
@@ -42,7 +42,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
     }
 
     return <Link ref={ref} {...props} />;
-  }
+  },
 );
 
 export default SmartLink;

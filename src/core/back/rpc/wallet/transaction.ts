@@ -18,7 +18,7 @@ export async function requestTransaction(
   rpcCtx: RpcContext,
   source: ActivitySource,
   chainId: number,
-  params: any[]
+  params: any[],
 ) {
   validatePermission(source);
   await validateNetwork(chainId);

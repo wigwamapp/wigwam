@@ -19,14 +19,14 @@ export class UniversalInpageProvider extends Emitter {
     if (!this.#sharedProperty) return this.allProviders;
 
     const allVigvamStrict = this.allProviders.filter(
-      (p) => p.isVigvam && p.mmCompatible === MetaMaskCompatibleMode.Strict
+      (p) => p.isVigvam && p.mmCompatible === MetaMaskCompatibleMode.Strict,
     );
 
     // If we have vigvam providers with strict metamask compatible mode (use as default)
     if (allVigvamStrict.length > 0) return allVigvamStrict;
 
     return this.allProviders.filter(
-      (p) => !p.isVigvam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid
+      (p) => !p.isVigvam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid,
     );
   }
 
@@ -68,7 +68,7 @@ export class UniversalInpageProvider extends Emitter {
   constructor(
     existingProviders: InpageProvider[],
     sharedProperty = false,
-    private propIsMetaMaskPreferred = false
+    private propIsMetaMaskPreferred = false,
   ) {
     super();
 
@@ -132,7 +132,8 @@ export class UniversalInpageProvider extends Emitter {
 
       if (enabledProviders.length > 0) {
         changeProvider(
-          enabledProviders.find((p) => p.selectedAddress) ?? enabledProviders[0]
+          enabledProviders.find((p) => p.selectedAddress) ??
+            enabledProviders[0],
         );
         return;
       }
@@ -172,7 +173,7 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   #requestPermissionsAll(
-    factory: (provider: InpageProvider) => Promise<unknown>
+    factory: (provider: InpageProvider) => Promise<unknown>,
   ) {
     return new Promise((res, rej) => {
       const providersToRequest = this.#enabledProviders;
@@ -233,7 +234,7 @@ export class UniversalInpageProvider extends Emitter {
     if (isPermissionMethod(method, this.currentProvider)) {
       if (typeof callbackOrArgs !== "function") {
         return this.#requestPermissionsAll((p) =>
-          p.send(methodOrPayload, callbackOrArgs)
+          p.send(methodOrPayload, callbackOrArgs),
         );
       } else {
         this.#requestPermissionsAll(
@@ -243,7 +244,7 @@ export class UniversalInpageProvider extends Emitter {
                 if (err) return rej(err);
                 res(result);
               });
-            })
+            }),
         )
           .then((result) => callbackOrArgs(null, result))
           .catch((error) => callbackOrArgs(error));

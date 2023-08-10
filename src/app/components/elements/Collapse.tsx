@@ -33,7 +33,7 @@ const Collapse: FC<CollapseProps> = ({
       }
       setOpen(state);
     },
-    [overflowElement]
+    [overflowElement],
   );
 
   return (
@@ -46,13 +46,13 @@ const Collapse: FC<CollapseProps> = ({
       <Collapsible.Trigger
         className={classNames(
           "w-full flex items-center mb-3",
-          triggerClassName
+          triggerClassName,
         )}
       >
         <CollapseIcon
           className={classNames(
             "w-[1.25rem] h-auto transition-transform",
-            open && "rotate-90"
+            open && "rotate-90",
           )}
         />
         <span className={"text-xl font-bold text-brand-inactivelight ml-1.5"}>

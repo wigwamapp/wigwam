@@ -21,12 +21,12 @@ import { testNetworksAtom } from "./settings";
 
 export const chainIdAtom = atomWithStorage<number>(
   CHAIN_ID,
-  INITIAL_NETWORK.chainId
+  INITIAL_NETWORK.chainId,
 );
 
 export const accountAddressAtom = atomWithStorage<string | null>(
   ACCOUNT_ADDRESS,
-  null
+  null,
 );
 
 export const allAccountsAtom = atomWithAutoReset(getAccounts, {
@@ -36,27 +36,27 @@ export const allAccountsAtom = atomWithAutoReset(getAccounts, {
 
 export const tokensWithoutBalanceAtom = atomWithStorage<boolean>(
   "without_balance",
-  true
+  true,
 );
 
 export const currenciesRateAtom = atomWithStorage<Record<string, number>>(
   "currencies_rate",
-  { USD: 1 }
+  { USD: 1 },
 );
 
 export const selectedCurrencyAtom = atomWithStorage(
   "preferred_currency",
-  "USD"
+  "USD",
 );
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
     return query(() => Repo.networks.get(chainId));
-  })
+  }),
 );
 
 export const getRpcUrlAtom = atomFamily((chainId: number) =>
-  atomWithStorage<string | null>(getRpcUrlKey(chainId), null)
+  atomWithStorage<string | null>(getRpcUrlKey(chainId), null),
 );
 
 export const allNetworksAtom = atomWithRepoQuery((query, get) =>
@@ -67,21 +67,21 @@ export const allNetworksAtom = atomWithRepoQuery((query, get) =>
       .where("type")
       .anyOf(["mainnet", "unknown", ...(testnetsEnabled ? ["testnet"] : [])])
       .toArray();
-  })
+  }),
 );
 
 export const getContactsAtom = atomFamily(
   (params: Repo.QueryContactsParams) =>
     atomWithRepoQuery((query) => query(() => Repo.queryContacts(params))),
-  dequal
+  dequal,
 );
 
 export const sentAnalyticNetworksAtom = atomWithStorage<number[]>(
   SENT_ANALYTIC_NETWORKS,
-  []
+  [],
 );
 
 export const onboardingPopupAtom = atomWithStorage<boolean>(
   ONBOARDING_POPUP,
-  true
+  true,
 );

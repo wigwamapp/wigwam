@@ -19,7 +19,7 @@ const ErrBond: FC<ErrBondProps> = (props) => (
           <div
             className={classNames(
               "prose prose-invert",
-              isPopup() && "prose-sm"
+              isPopup() && "prose-sm",
             )}
           >
             <h2 className="flex items-center">

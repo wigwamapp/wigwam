@@ -54,7 +54,7 @@ const cardClassName = classNames(
   "py-1 px-3",
   "text-xs font-bold",
   "bg-brand-main/5",
-  "rounded-[.625rem]"
+  "rounded-[.625rem]",
 );
 
 type ActSourceProps = {
@@ -91,7 +91,7 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
         "cursor-pointer",
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-        className
+        className,
       )}
     >
       <Avatar
@@ -99,7 +99,7 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
         alt={source.url}
         className={classNames(
           "w-6 min-w-[1.5rem] h-6 mr-2 object-cover",
-          "!border-none"
+          "!border-none",
         )}
         fallbackClassName="!h-3/5"
       />
@@ -123,7 +123,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
       "bg-brand-main/5",
       "rounded-[.625rem]",
       "flex items-stretch",
-      "text-left"
+      "text-left",
     )}
   >
     <AutoIcon
@@ -134,13 +134,13 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
         "h-12 w-12 min-w-[3rem]",
         "mr-2",
         "bg-black/20",
-        "rounded-[.625rem]"
+        "rounded-[.625rem]",
       )}
     />
     <span
       className={classNames(
         "flex flex-col items-start min-w-0 text-sm leading-none",
-        signing && "justify-center"
+        signing && "justify-center",
       )}
     >
       <WalletName

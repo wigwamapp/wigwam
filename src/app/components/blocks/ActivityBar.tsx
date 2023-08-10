@@ -67,7 +67,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
           "animate-activitybar translate-y-[120%]",
         theme === "large" &&
           "px-8 py-4 mmd:px-6 mmd:py-3 mmd:h-[3rem] mxs:px-3 mxs:py-2 mxs:h-[2.25rem]",
-        theme === "small" && "h-[2.25rem] px-3 py-2"
+        theme === "small" && "h-[2.25rem] px-3 py-2",
       )}
       onAnimationEnd={handleAnimationEnd}
       onMouseOver={() => setActivityHovered(true)}
@@ -89,7 +89,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
               theme === "large" && "w-52 h-2 mmd:w-40 mxs:w-20 mxs:h-1.5",
               theme === "small" && "w-20 h-1.5",
               activityHovered && "!h-0",
-              centeredClassNames
+              centeredClassNames,
             )}
           />
           <span
@@ -101,7 +101,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
               theme === "large" && "text-base mmd:text-sm mxs:text-xs",
               theme === "small" && "text-xs",
               !activityHovered && "opacity-0",
-              centeredClassNames
+              centeredClassNames,
             )}
           >
             {total > 0 ? (
@@ -120,7 +120,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
                     "ml-1",
                     theme === "large" &&
                       "w-5 h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
-                    theme === "small" && "w-[1.125rem] h-[1.125rem]"
+                    theme === "small" && "w-[1.125rem] h-[1.125rem]",
                   )}
                 />
               </>
@@ -143,7 +143,7 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
                     "w-6 h-6",
                     "mmd:w-5 mmd:h-5",
                     "mxs:w-[1.125rem] mxs:h-[1.125rem]",
-                    theme === "small" && "w-[1.125rem] h-[1.125rem]"
+                    theme === "small" && "w-[1.125rem] h-[1.125rem]",
                   )}
                 />
               </>
@@ -186,7 +186,7 @@ export default ActivityBar;
 const centeredClassNames = classNames(
   "absolute",
   "top-1/2 left-1/2",
-  "-translate-x-1/2 -translate-y-1/2"
+  "-translate-x-1/2 -translate-y-1/2",
 );
 
 type StatusType = "successful" | "pending" | "failed";
@@ -220,7 +220,7 @@ const StatItem: FC<StatItemProps> = ({
         theme === "large" && "text-base mmd:text-sm mxs:text-xs",
         theme === "small" && "text-xs",
         color,
-        className
+        className,
       )}
     >
       <>
@@ -228,7 +228,7 @@ const StatItem: FC<StatItemProps> = ({
           className={classNames(
             theme === "large" &&
               "w-5 h-auto mr-2 mxs:w-[1.125rem] mxs:h-[1.125rem] mxs:mr-1",
-            theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1"
+            theme === "small" && "w-[1.125rem] h-[1.125rem] mr-1",
           )}
         />
         {count}

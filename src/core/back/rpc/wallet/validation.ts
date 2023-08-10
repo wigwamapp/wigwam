@@ -29,7 +29,7 @@ export function assertWalletSetuped(opts?: { openIfNotSetuped: true }) {
 
 export function validateAccount(
   source: ActivitySource,
-  accountAddress: string
+  accountAddress: string,
 ) {
   if (!(accountAddress && ethers.utils.isAddress(accountAddress))) {
     throw ethErrors.rpc.invalidParams();
@@ -49,7 +49,7 @@ export function validateAccount(
 
 export async function createJustNetworkPermission(
   origin: string,
-  chainId: number
+  chainId: number,
 ) {
   await repo.permissions.put({
     id: nanoid(),
@@ -69,13 +69,13 @@ export const validateNetwork = (chainId: number) =>
 
 const stringHex = (length?: number) =>
   define<string>("stringHex", (value) =>
-    ethers.utils.isHexString(value, length)
+    ethers.utils.isHexString(value, length),
   );
 
 const stringOrNumber = () =>
   define<string | number>(
     "stringOrNumber",
-    (value) => typeof value === "string" || typeof value === "number"
+    (value) => typeof value === "string" || typeof value === "number",
   );
 
 const address = () =>
@@ -97,8 +97,8 @@ export const TxParamsSchema: Describe<TxParams> = object({
       object({
         address: address(),
         storageKeys: array(stringHex()),
-      })
-    )
+      }),
+    ),
   ),
 
   maxPriorityFeePerGas: optional(stringHex()),

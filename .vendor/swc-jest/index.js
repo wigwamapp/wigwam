@@ -14,7 +14,7 @@ function createTransformer(swcTransformOpts) {
 
   const cacheKeyFunction = getCacheKeyFunction(
     [],
-    [swcVersion, version, JSON.stringify(computedSwcOptions)]
+    [swcVersion, version, JSON.stringify(computedSwcOptions)],
   );
   const { enabled: canInstrument, ...instrumentOptions } =
     swcTransformOpts?.experimental?.customCoverageInstrumentation ?? {};
@@ -27,7 +27,7 @@ function createTransformer(swcTransformOpts) {
         jestOptions,
         !!canInstrument,
         computedSwcOptions,
-        instrumentOptions
+        instrumentOptions,
       );
 
       return transformSync(src, {
@@ -44,7 +44,7 @@ function createTransformer(swcTransformOpts) {
         jestOptions,
         !!canInstrument,
         computedSwcOptions,
-        instrumentOptions
+        instrumentOptions,
       );
 
       return transform(src, {
@@ -70,7 +70,7 @@ function createTransformer(swcTransformOpts) {
         .update(baseCacheKey)
         .update("\0", "utf8")
         .update(
-          JSON.stringify({ supportsStaticESM: options.supportsStaticESM })
+          JSON.stringify({ supportsStaticESM: options.supportsStaticESM }),
         )
         .digest("hex");
     },
@@ -113,7 +113,7 @@ function buildSwcTransformOpts(swcOptions) {
       computedSwcOptions,
       "jsc.target",
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      nodeTargetDefaults.get(process.version.match(/v(\d+)/)[1]) || "es2018"
+      nodeTargetDefaults.get(process.version.match(/v(\d+)/)[1]) || "es2018",
     );
   }
 
@@ -130,7 +130,7 @@ function insertInstrumentationOptions(
   jestOptions,
   canInstrument,
   swcTransformOpts,
-  instrumentOptions
+  instrumentOptions,
 ) {
   const shouldInstrument = jestOptions.instrument && canInstrument;
 
@@ -140,7 +140,7 @@ function insertInstrumentationOptions(
 
   if (
     swcTransformOpts?.jsc?.experimental?.plugins?.some(
-      (x) => x[0] === "swc-plugin-coverage-instrument"
+      (x) => x[0] === "swc-plugin-coverage-instrument",
     )
   ) {
     return;

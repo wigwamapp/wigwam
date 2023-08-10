@@ -14,7 +14,7 @@ const TooltipIcon: FC<TooltipIconProps> = ({ theme = "light", className }) => (
       "flex items-center w-5 h-5 rounded-full",
       theme === "light" && "bg-brand-main/[.15]",
       theme === "dark" && "bg-black/25",
-      className
+      className,
     )}
   >
     <InfoIcon className="w-full h-auto" />

@@ -31,7 +31,7 @@ const WalletName: FC<WalletNameProps> = ({
       "min-w-0 w-full",
       "font-bold",
       theme === "large" && "leading-[1.125rem]",
-      className
+      className,
     )}
   >
     <Icon
@@ -40,7 +40,7 @@ const WalletName: FC<WalletNameProps> = ({
         "h-auto",
         theme === "large" && "w-[1.125rem] min-w-[1.125rem] mr-1",
         theme === "small" && "w-4 min-w-[1rem] mr-0.5",
-        iconClassName
+        iconClassName,
       )}
     />
     <span className="truncate min-w-0">

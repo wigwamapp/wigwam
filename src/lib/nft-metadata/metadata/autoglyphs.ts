@@ -17,12 +17,12 @@ const SCHEME_MAP: Record<number, string> = {
 export async function fetchAutoglyphsMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   const GlyphsContract = new Contract(
     tokenAddress,
     ["function symbolScheme(uint256 index) public view returns (uint8)"],
-    provider
+    provider,
   );
   const scheme = await GlyphsContract.symbolScheme(tokenId);
 

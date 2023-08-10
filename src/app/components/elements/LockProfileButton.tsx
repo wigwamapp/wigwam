@@ -36,7 +36,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
                   className={classNames(
                     !isPopup && "mb-4",
                     isPopup && "mb-2",
-                    "mx-auto text-center"
+                    "mx-auto text-center",
                   )}
                 >
                   Are you sure you want to lock the wallet? You have{" "}
@@ -68,7 +68,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
         className={classNames(
           !isPopup && "w-[1.875rem] h-[1.875rem]",
           isPopup && "w-8 h-8",
-          "mr-3"
+          "mr-3",
         )}
       />
       Lock
@@ -94,7 +94,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
         "h-full !py-2 !px-4 !min-w-0 w-[8.5rem]",
         "!rounded-[.625rem]",
         "!justify-start items-center",
-        className
+        className,
       )}
     >
       {content}

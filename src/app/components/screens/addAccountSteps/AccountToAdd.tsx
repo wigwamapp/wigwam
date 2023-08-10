@@ -67,7 +67,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
   const preparedNetworks = useMemo(
     () => networks.filter(({ type }) => type === "mainnet"),
-    [networks]
+    [networks],
   );
   const allNetworks = useLazyAllNetworks() ?? preparedNetworks;
   const { alert } = useDialog();
@@ -78,7 +78,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   const [network, setNetwork] = useState(currentNetwork ?? INITIAL_NETWORK);
   const provider = useMemo(
     () => new ClientProvider(network.chainId),
-    [network]
+    [network],
   );
 
   const onNetworkChange = useCallback(
@@ -86,7 +86,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
       const netw = allNetworks.find(({ chainId: chi }) => chi === chainId)!;
       setNetwork(netw);
     },
-    [allNetworks]
+    [allNetworks],
   );
 
   const addressesToAddRef = useRef(new Set<string>());
@@ -112,7 +112,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
       setThToggleChecked(
         addressesToAdd.size ===
-          accountsToVerify.filter(({ isAdded }) => !isAdded).length
+          accountsToVerify.filter(({ isAdded }) => !isAdded).length,
       );
     });
 
@@ -130,12 +130,12 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
 
       setThToggleChecked(
         addressesToAdd.size ===
-          accountsToVerify.filter(({ isAdded }) => !isAdded).length
+          accountsToVerify.filter(({ isAdded }) => !isAdded).length,
       );
 
       forceUpdate();
     },
-    [accountsToVerify, forceUpdate]
+    [accountsToVerify, forceUpdate],
   );
 
   const [thToggleChecked, setThToggleChecked] = useState(false);
@@ -159,7 +159,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
       setThToggleChecked((prevState) => !prevState);
       forceUpdate();
     },
-    [accountsToVerify, forceUpdate]
+    [accountsToVerify, forceUpdate],
   );
 
   const changeWalletName = useCallback(
@@ -171,7 +171,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
       }
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate],
   );
 
   const handleContinue = useCallback(async () => {
@@ -213,9 +213,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   const isIndexExisting = useMemo(
     () =>
       !!accountsToVerify.find(
-        ({ index }) => index !== undefined && index !== null && index !== ""
+        ({ index }) => index !== undefined && index !== null && index !== "",
       ),
-    [accountsToVerify]
+    [accountsToVerify],
   );
 
   if (!accountsToVerify) {
@@ -296,7 +296,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
                     addressesToAddRef.current.has(address) || isAdded;
                   const addressName = replaceT(
                     addressesNamesRef.current.get(address) ??
-                      getNextAccountName(i)
+                      getNextAccountName(i),
                   );
 
                   return (
@@ -320,7 +320,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
                       }
                     />
                   );
-                }
+                },
               )}
             </TippySingletonProvider>
           </tbody>
@@ -381,7 +381,7 @@ const Account = memo<AccountProps>(
               balance,
             }
           : undefined,
-      [network, balance]
+      [network, balance],
     );
 
     return (
@@ -405,7 +405,7 @@ const Account = memo<AccountProps>(
             className={classNames(
               "h-10 w-10",
               "rounded-[.625rem]",
-              "bg-black/20"
+              "bg-black/20",
             )}
           />
         </Td>
@@ -432,7 +432,7 @@ const Account = memo<AccountProps>(
                     "border border-brand-main/50",
                     "shadow-addaccountmodal",
                     "text-xs font-medium",
-                    "ml-3"
+                    "ml-3",
                   )}
                 >
                   Added
@@ -458,7 +458,7 @@ const Account = memo<AccountProps>(
         </Td>
       </tr>
     );
-  }
+  },
 );
 
 type TableDate = {
@@ -471,7 +471,7 @@ const Th: FC<PropsWithChildren<TableDate>> = ({ className, children }) => (
     className={classNames(
       "py-1.5 px-3",
       "text-sm text-left text-brand-gray font-semibold",
-      className
+      className,
     )}
   >
     {children}
@@ -487,7 +487,7 @@ const Td: FC<PropsWithChildren<TableDate>> = ({
     className={classNames(
       "py-2.5 px-3 text-base",
       widthMaxContent && "w-[1%] whitespace-nowrap",
-      className
+      className,
     )}
   >
     {children}

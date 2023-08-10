@@ -52,7 +52,7 @@ const ContactsSection: FC = () => {
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, contacts]
+    [hasMore, loadMore, contacts],
   );
 
   const handleDelete = useCallback(
@@ -73,7 +73,7 @@ const ContactsSection: FC = () => {
         updateToast(`Contact "${name}" successfully deleted!`);
       }
     },
-    [confirm, updateToast]
+    [confirm, updateToast],
   );
 
   return (
@@ -108,7 +108,7 @@ const ContactsSection: FC = () => {
                       "border border-brand-light/[.05]",
                       "rounded-[.625rem]",
                       "text-sm text-brand-placeholder",
-                      "col-span-4"
+                      "col-span-4",
                     )}
                   >
                     <NoResultsFoundIcon className="mb-4" />
@@ -145,7 +145,7 @@ export default ContactsSection;
 const emptyClassBg = classNames(
   "rounded bg-brand-main/10",
   "transition-colors",
-  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
 );
 
 const NewContactCard = forwardRef<
@@ -164,7 +164,7 @@ const NewContactCard = forwardRef<
       "overflow-hidden",
       "group",
       "transition-colors",
-      "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
+      "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10",
     )}
   >
     <span
@@ -172,7 +172,7 @@ const NewContactCard = forwardRef<
         emptyClassBg,
         "h-[4.625rem] w-[4.625rem]",
         "mb-[1.375rem]",
-        "!rounded-[.625rem]"
+        "!rounded-[.625rem]",
       )}
     />
     <span className={classNames(emptyClassBg, "block w-28 h-5 mb-2")} />
@@ -183,7 +183,7 @@ const NewContactCard = forwardRef<
         "flex items-center justify-center",
         "bg-brand-main/[.05]",
         "transition-colors",
-        "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+        "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
       )}
     >
       <AddWalletIcon className="w-6 h-auto" />
@@ -208,7 +208,7 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
           "flex flex-col items-center",
           "bg-brand-main/[.05] rounded-[.625rem]",
           "overflow-hidden",
-          "min-h-[14.375rem]"
+          "min-h-[14.375rem]",
         )}
       >
         <div className="flex flex-col items-center pt-8 pb-4 px-3 w-full">
@@ -220,7 +220,7 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
               "h-[4.625rem] w-[4.625rem]",
               "mb-5",
               "bg-black/20",
-              "rounded-[.625rem]"
+              "rounded-[.625rem]",
             )}
           />
           <h2 className="text-base font-bold mb-1 truncate w-full text-center">
@@ -238,7 +238,7 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 type ActionButtonProps = {
@@ -254,7 +254,7 @@ const ActionButton: FC<ActionButtonProps> = ({ Icon, className, ...rest }) => (
       "bg-brand-main/[.05]",
       "transition-colors",
       "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
-      className
+      className,
     )}
     {...rest}
   >

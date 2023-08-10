@@ -11,5 +11,5 @@ export function generateProfile(name: string, profileSeed?: string): Profile {
 
 export const generateProfileId = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-  11
+  11,
 );

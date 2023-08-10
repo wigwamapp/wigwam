@@ -58,7 +58,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
         className={classNames(
           "inline-flex items-center justify-center relative",
           "overflow-hidden",
-          className
+          className,
         )}
         {...rest}
         {...(source === "boring"
@@ -93,7 +93,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
             })}
       />
     );
-  }
+  },
 );
 
 export default AutoIcon;
@@ -175,7 +175,7 @@ const Initials: FC<InitialsProps> = ({
         className={classNames(
           "absolute top-1/2 left-1/2",
           "-translate-x-1/2 -translate-y-1/2",
-          "uppercase leading-[0px] font-bold drop-shadow-profileinitial"
+          "uppercase leading-[0px] font-bold drop-shadow-profileinitial",
         )}
         style={{
           fontSize: Math.floor(size * scale),

@@ -49,7 +49,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
 
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === approval.accountAddress)!,
-    [approval, allAccounts]
+    [approval, allAccounts],
   );
 
   const { alert } = useDialog();
@@ -109,14 +109,14 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                 case SigningStandard.PersonalSign:
                   sig = await ledgerEth.signPersonalMessage(
                     account.derivationPath,
-                    hexlify(approval.message).substring(2)
+                    hexlify(approval.message).substring(2),
                   );
                   break;
 
                 case SigningStandard.SignTypedDataV1:
                 case SigningStandard.SignTypedDataV3:
                   throw new Error(
-                    "Ledger: Only version 4 of typed data signing is supported"
+                    "Ledger: Only version 4 of typed data signing is supported",
                   );
 
                 case SigningStandard.SignTypedDataV4:
@@ -129,20 +129,20 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                       primaryType,
                       message: sanitizedMessage,
                     } = TypedDataUtils.sanitizeData(
-                      JSON.parse(approval.message)
+                      JSON.parse(approval.message),
                     );
 
                     domainSeparatorHex = TypedDataUtils.hashStruct(
                       "EIP712Domain",
                       domain,
                       types,
-                      SignTypedDataVersion.V4
+                      SignTypedDataVersion.V4,
                     ).toString("hex");
                     hashStructMessageHex = TypedDataUtils.hashStruct(
                       primaryType as any,
                       sanitizedMessage,
                       types,
-                      SignTypedDataVersion.V4
+                      SignTypedDataVersion.V4,
                     ).toString("hex");
                   } catch {
                     throw new Error("Invalid message");
@@ -151,7 +151,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                   sig = await ledgerEth.signEIP712HashedMessage(
                     account.derivationPath,
                     domainSeparatorHex,
-                    hashStructMessageHex
+                    hashStructMessageHex,
                   );
                   break;
               }
@@ -186,7 +186,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                   getAddress(addressSignedWith!) !== getAddress(account.address)
                 ) {
                   throw new Error(
-                    "Ledger: The signature doesnt match the right address"
+                    "Ledger: The signature doesnt match the right address",
                   );
                 }
               }
@@ -212,7 +212,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, account, setApproving, alert, withLedger, message]
+    [approval, account, setApproving, alert, withLedger, message],
   );
 
   useEffect(() => {
@@ -252,7 +252,7 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
   message,
 }) => {
   const { copy, copied } = useCopyToClipboard(
-    typeof message === "string" ? message : JSON.stringify(message, null, 2)
+    typeof message === "string" ? message : JSON.stringify(message, null, 2),
   );
 
   const standardLabel = (
@@ -270,7 +270,7 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
         "text-sm text-brand-light",
         "!p-0 !pr-1 !min-w-0",
         "!font-normal",
-        "items-center"
+        "items-center",
       )}
     >
       {copied ? (
@@ -315,7 +315,7 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
                 "bg-black/20",
                 "border border-brand-main/10",
                 "rounded-[.625rem]",
-                "overflow-auto"
+                "overflow-auto",
               )}
             >
               <JsonView

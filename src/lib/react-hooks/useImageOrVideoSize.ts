@@ -1,7 +1,7 @@
 import { RefObject, useState, useEffect } from "react";
 
 export function useImageOrVideoSize(
-  ref: RefObject<HTMLImageElement | HTMLVideoElement>
+  ref: RefObject<HTMLImageElement | HTMLVideoElement>,
 ) {
   const [size, setSize] = useState<[number, number]>();
 

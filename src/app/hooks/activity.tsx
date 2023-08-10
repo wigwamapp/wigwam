@@ -17,7 +17,7 @@ export type UseTokenActivityOptions = {
 export function useTokenActivity(
   accountAddress: string,
   tokenSlug: string = NATIVE_TOKEN_SLUG,
-  { limit = 20 }: UseTokenActivityOptions = {}
+  { limit = 20 }: UseTokenActivityOptions = {},
 ) {
   const chainId = useChainId();
   const forceUpdate = useForceUpdate();
@@ -28,7 +28,7 @@ export function useTokenActivity(
       accountAddress,
       tokenSlug,
     }),
-    [chainId, accountAddress, tokenSlug]
+    [chainId, accountAddress, tokenSlug],
   );
   const prevBaseParams = usePrevious(baseParams);
 
@@ -44,7 +44,7 @@ export function useTokenActivity(
       ...baseParams,
       limit: offset + limit,
     }),
-    [baseParams, offset, limit]
+    [baseParams, offset, limit],
   );
 
   const tokenActivityAtom = getTokenActivityAtom(queryParams);
@@ -63,7 +63,7 @@ export function useTokenActivity(
 
   const prevTokenActivity = usePrevious(
     pureTokenActivity,
-    "when-not-undefined"
+    "when-not-undefined",
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
@@ -92,7 +92,7 @@ export function useCompleteActivity(limit = 20) {
     () => ({
       limit: offset + limit,
     }),
-    [offset, limit]
+    [offset, limit],
   );
 
   const tokenActivityAtom = getActivityAtom(queryParams);

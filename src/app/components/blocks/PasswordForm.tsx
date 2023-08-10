@@ -45,7 +45,7 @@ const PasswordForm = memo<PasswordFormProps>(
             return { password: err?.message };
           }
         }),
-      [unlockCallback]
+      [unlockCallback],
     );
 
     const passwordFieldRef = useRef<HTMLInputElement>(null);
@@ -64,7 +64,7 @@ const PasswordForm = memo<PasswordFormProps>(
           <form
             className={classNames(
               "w-full flex flex-col items-center",
-              className
+              className,
             )}
             onSubmit={handleSubmit}
           >
@@ -93,7 +93,7 @@ const PasswordForm = memo<PasswordFormProps>(
               className={classNames(
                 "max-w-[14rem] w-full center",
                 theme === "large" && "mt-2",
-                theme === "small" && "mt-1.5"
+                theme === "small" && "mt-1.5",
               )}
             >
               <Button type="submit" className="w-full" loading={submitting}>
@@ -106,7 +106,7 @@ const PasswordForm = memo<PasswordFormProps>(
                   className={classNames(
                     "w-full text-brand-inactivelight",
                     theme === "large" && "text-sm mt-6",
-                    theme === "small" && "text-xs mt-4"
+                    theme === "small" && "text-xs mt-4",
                   )}
                   onClick={() => {
                     setAttention(true);
@@ -130,7 +130,7 @@ const PasswordForm = memo<PasswordFormProps>(
         )}
       />
     );
-  }
+  },
 );
 
 export default PasswordForm;

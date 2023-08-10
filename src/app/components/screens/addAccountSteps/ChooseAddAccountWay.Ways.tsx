@@ -40,7 +40,7 @@ type WaysReturn = {
 
 export const getWays = (
   hasSeedPhrase: boolean,
-  { stateRef, navigateToStep }: StepsContext
+  { stateRef, navigateToStep }: StepsContext,
 ): WaysReturn => [
   {
     type: "seed_phrase",

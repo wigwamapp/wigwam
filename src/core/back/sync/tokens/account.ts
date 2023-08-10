@@ -49,7 +49,7 @@ export const syncAccountTokens = memoize(
 
     if (debankChain) {
       existingTokensMap = new Map(
-        existingAccTokens.map((t) => [t.tokenSlug, t])
+        existingAccTokens.map((t) => [t.tokenSlug, t]),
       );
 
       const debankUserTokens = await (tokenType === TokenType.Asset
@@ -75,7 +75,7 @@ export const syncAccountTokens = memoize(
               id: "0",
             });
             const rawBalanceBN = ethers.BigNumber.from(
-              new BigNumber(token.balance).integerValue().toString()
+              new BigNumber(token.balance).integerValue().toString(),
             );
 
             const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
@@ -130,7 +130,7 @@ export const syncAccountTokens = memoize(
                     balanceUSD,
                     priceUSD,
                     portfolioUSD: native ? "-1" : undefined,
-                  }
+                  },
             );
             /**
              * For NFTs
@@ -170,7 +170,7 @@ export const syncAccountTokens = memoize(
                   token.thumbnail_url ||
                     (token.content_type === "image_url"
                       ? token.content
-                      : undefined)
+                      : undefined),
                 ),
               contentUrl:
                 existing?.contentUrl ||
@@ -231,7 +231,7 @@ export const syncAccountTokens = memoize(
                     // Volumes
                     rawBalance,
                     balanceUSD,
-                  }
+                  },
             );
           }
 
@@ -240,7 +240,7 @@ export const syncAccountTokens = memoize(
               chainId,
               accountAddress,
               tokenSlug,
-            })
+            }),
           );
 
           existingTokensMap.delete(tokenSlug);
@@ -257,8 +257,8 @@ export const syncAccountTokens = memoize(
         restTokens.map(({ tokenSlug }) =>
           tokenSlug !== NATIVE_TOKEN_SLUG
             ? getBalanceFromChain(chainId, tokenSlug, accountAddress)
-            : null
-        )
+            : null,
+        ),
       );
 
       for (let i = 0; i < restTokens.length; i++) {
@@ -288,7 +288,7 @@ export const syncAccountTokens = memoize(
             chainId,
             accountAddress,
             tokenSlug: token.tokenSlug,
-          })
+          }),
         );
       }
     }
@@ -312,7 +312,7 @@ export const syncAccountTokens = memoize(
         token = token as AccountAsset;
 
         const cgTokenAddress = parseTokenSlug(
-          token.tokenSlug
+          token.tokenSlug,
         ).address.toLowerCase();
         const price = cgPrices[cgTokenAddress];
 
@@ -338,5 +338,5 @@ export const syncAccountTokens = memoize(
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 40_000, // 40 sec
-  }
+  },
 );

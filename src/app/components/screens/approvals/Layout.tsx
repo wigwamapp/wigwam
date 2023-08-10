@@ -41,7 +41,7 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
             "brandbg-popup",
             "flex flex-col",
             "pt-8 pb-5 px-6",
-            className
+            className,
           )}
         >
           {children}

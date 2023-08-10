@@ -17,7 +17,7 @@ export type LedgerHandler = (
     ledgerEth: LedgerEthType;
     getExtendedKey: typeof getExtendedKeyType;
   },
-  onClose: (callback: () => void) => void
+  onClose: (callback: () => void) => void,
 ) => Promise<any>;
 
 export function useLedger() {
@@ -51,12 +51,12 @@ export function useLedger() {
                 setTimeout(() => {
                   transportRef.current?.close();
                   transportRef.current = undefined;
-                })
+                }),
               );
 
               if (process.env.TARGET_BROWSER === "chrome") {
                 const { name: currentApp } = await getAppInfo(
-                  transportRef.current
+                  transportRef.current,
                 );
                 if (closed) return false;
 
@@ -79,7 +79,7 @@ export function useLedger() {
 
               return true;
             },
-            { retries: 5, maxTimeout: 2_000 }
+            { retries: 5, maxTimeout: 2_000 },
           );
 
           if (!connected || !transportRef.current) return false;
@@ -96,7 +96,7 @@ export function useLedger() {
           throw new Error(msg);
         }
       }),
-    []
+    [],
   );
 
   return useCallback(
@@ -125,12 +125,12 @@ export function useLedger() {
         state: "loading",
       });
     },
-    [loadingHandler, waitLoading]
+    [loadingHandler, waitLoading],
   );
 }
 
 const getAppInfo = async (
-  transport: Transport
+  transport: Transport,
 ): Promise<{
   name: string;
   version: string;
@@ -163,12 +163,12 @@ const connectToEthereumApp = async (transport: Transport): Promise<void> => {
     0xd8,
     0x00,
     0x00,
-    Buffer.from("Ethereum", "ascii")
+    Buffer.from("Ethereum", "ascii"),
   );
 };
 
 const disconnectFromConnectedApp = async (
-  transport: Transport
+  transport: Transport,
 ): Promise<void> => {
   await transport.send(0xb0, 0xa7, 0x00, 0x00);
 };

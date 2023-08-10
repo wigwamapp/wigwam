@@ -11,7 +11,7 @@ import {
 export async function addSyncRequest(
   chainId: number,
   accountAddress: string,
-  tokenType: TokenType
+  tokenType: TokenType,
 ) {
   let syncStartedAt: number | undefined;
 
@@ -44,13 +44,13 @@ export async function addSyncRequest(
       await syncNativeTokens(
         chainId,
         `current_${accountAddress}`,
-        currentAccount
+        currentAccount,
       );
 
       await syncNativeTokens(
         chainId,
         `rest_${allAccounts.length}`,
-        restAccounts
+        restAccounts,
       );
     });
   } catch (err) {
@@ -59,7 +59,7 @@ export async function addSyncRequest(
     if (syncStartedAt)
       setTimeout(
         () => synced(chainId),
-        Math.max(0, syncStartedAt + 1_000 - Date.now())
+        Math.max(0, syncStartedAt + 1_000 - Date.now()),
       );
     else syncStartedAt = 1;
   }

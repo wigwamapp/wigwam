@@ -43,7 +43,7 @@ const AddAccountSteps = memo(() => {
         "h-full",
         "pt-24",
         "flex flex-col",
-        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24"
+        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24",
       )}
     >
       <StepsProvider

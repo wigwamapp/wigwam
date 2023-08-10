@@ -29,7 +29,7 @@ const ScrollAreaContainer = forwardRef<
       children,
       ...rest
     },
-    ref
+    ref,
   ) => (
     <ScrollArea.Root
       className={classNames("overflow-hidden", className)}
@@ -40,7 +40,7 @@ const ScrollAreaContainer = forwardRef<
         ref={ref}
         className={classNames(
           "w-full h-full overscroll-y-contain",
-          viewPortClassName
+          viewPortClassName,
         )}
         asChild={viewportAsChild}
       >
@@ -57,13 +57,13 @@ const ScrollAreaContainer = forwardRef<
           orientation="horizontal"
           className={classNames(
             horizontalScrollBarClassName,
-            scrollBarClassName
+            scrollBarClassName,
           )}
         />
       )}
       <ScrollArea.Corner />
     </ScrollArea.Root>
-  )
+  ),
 );
 
 export default ScrollAreaContainer;
@@ -82,7 +82,7 @@ const Scrollbar: FC<ScrollArea.ScrollAreaScrollbarProps> = ({
       },
       "p-1",
       "transition",
-      className
+      className,
     )}
     {...rest}
   >
@@ -96,7 +96,7 @@ const Scrollbar: FC<ScrollArea.ScrollAreaScrollbarProps> = ({
         {
           "w-2": orientation === "vertical",
           "h-2 min-h-[.5rem]": orientation === "horizontal", // TODO: replace min height if we can
-        }
+        },
       )}
     />
   </ScrollArea.Scrollbar>

@@ -21,7 +21,7 @@ const AddTokenBanner = memo<NullStateProps>(
         "overflow-hidden",
         manageModeEnabled &&
           tokens.length > 0 &&
-          "transition-[max-height] duration-200 max-h-[4.25rem]"
+          "transition-[max-height] duration-200 max-h-[4.25rem]",
       )}
     >
       <div className="pb-2">
@@ -35,7 +35,7 @@ const AddTokenBanner = memo<NullStateProps>(
             "text-sm text-brand-inactivelight text-left",
             "cursor-pointer",
             "transition-colors",
-            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+            "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           )}
           onClick={focusSearchInput}
         >
@@ -48,7 +48,7 @@ const AddTokenBanner = memo<NullStateProps>(
         </button>
       </div>
     </div>
-  )
+  ),
 );
 
 export default AddTokenBanner;

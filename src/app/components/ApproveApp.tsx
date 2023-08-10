@@ -49,7 +49,7 @@ const Approvals: FC = () => {
       className={classNames(
         "w-full h-screen",
         "flex flex-col items-center justify-center",
-        statusBarDisplayed && "pt-10"
+        statusBarDisplayed && "pt-10",
       )}
     >
       <Suspense fallback={null}>
@@ -60,7 +60,7 @@ const Approvals: FC = () => {
                 className={classNames(
                   "-mt-10 h-10",
                   "w-full max-w-[440px]",
-                  "px-4 flex items-center"
+                  "px-4 flex items-center",
                 )}
               >
                 <ApprovalStatus theme="small" readOnly />
@@ -71,7 +71,7 @@ const Approvals: FC = () => {
                     "px-2 py-1",
                     "text-xs text-brand-inactivelight hover:text-brand-light",
                     "transition-colors",
-                    "font-semibold"
+                    "font-semibold",
                   )}
                   onClick={() => rejectAllApprovals()}
                 >
@@ -88,7 +88,7 @@ const Approvals: FC = () => {
                 "rounded-xl border border-brand-main/[.07] shadow-approvestack",
                 "brandbg-popup",
                 "opacity-40",
-                "z-[-1]"
+                "z-[-1]",
               )}
             />
           </>
@@ -117,7 +117,7 @@ const CurrentApproval = memo<CurrentApprovalProps>(({ approval }) =>
     .with({ type: ActivityType.Signing }, (sigApproval) => (
       <ApproveSigning approval={sigApproval} />
     ))
-    .otherwise(() => null)
+    .otherwise(() => null),
 );
 
 const Destroy: FC = () => {

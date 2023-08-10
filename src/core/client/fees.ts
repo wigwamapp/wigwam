@@ -6,7 +6,7 @@ import { getGasPrices } from "./wallet";
 import { ClientProvider } from "./provider";
 
 export async function suggestFees(
-  provider: ClientProvider
+  provider: ClientProvider,
 ): Promise<FeeSuggestions> {
   const gasPrices = await getGasPrices(provider.chainId);
 
@@ -23,9 +23,9 @@ export async function suggestFees(
           Object.entries(fees).map(([prop, price]) => [
             prop,
             ethers.BigNumber.from(price),
-          ])
+          ]),
         ),
-      ])
+      ]),
     ),
   } as any;
 }

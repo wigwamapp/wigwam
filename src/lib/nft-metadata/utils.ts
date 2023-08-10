@@ -13,7 +13,7 @@ export function serealizeTokenId1155(tokenId: string) {
 export function isAddressMatch(
   chainId: number,
   address: string,
-  addressByNetwork: { [chainId: number]: string }
+  addressByNetwork: { [chainId: number]: string },
 ) {
   if (!addressByNetwork[chainId]) return false;
 
@@ -26,11 +26,11 @@ export function isAddressMatch(
 export function sanitizeUrl(url: string, desiredIpfsGateway?: string): string;
 export function sanitizeUrl(
   url: undefined,
-  desiredIpfsGateway?: string
+  desiredIpfsGateway?: string,
 ): undefined;
 export function sanitizeUrl(
   url: string | undefined,
-  desiredIpfsGateway = IPFS_IO_GATEWAY
+  desiredIpfsGateway = IPFS_IO_GATEWAY,
 ) {
   if (!url) return url;
 
@@ -41,7 +41,7 @@ export function sanitizeUrl(
 
 export function convertToDesiredGateway(
   sourceUrl: string,
-  desiredGatewayPrefix: string
+  desiredGatewayPrefix: string,
 ) {
   const cid = getCID(sourceUrl);
   if (!cid) {

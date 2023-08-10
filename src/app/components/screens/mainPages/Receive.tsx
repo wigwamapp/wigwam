@@ -23,13 +23,13 @@ const Receive: FC = () => {
   const tabsContent = useMemo(() => getTabsContent(network), [network]);
   const tabs = useMemo(
     () => tabsContent.map((t) => t.route.receive),
-    [tabsContent]
+    [tabsContent],
   );
 
   const activeRoute = useMemo(
     () =>
       tabsContent.find(({ route }) => route.receive === activeTabRoute)?.route,
-    [tabsContent, activeTabRoute]
+    [tabsContent, activeTabRoute],
   );
 
   return (

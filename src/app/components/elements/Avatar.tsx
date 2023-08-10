@@ -44,7 +44,7 @@ const Avatar = memo(
         style,
         ...rest
       },
-      ref
+      ref,
     ) => {
       const [loadingState, setLoadingState] =
         useState<AvatarPrimitive.ImageLoadingStatus>("idle");
@@ -82,7 +82,7 @@ const Avatar = memo(
               "rounded-full bg-brand-main/10 overflow-hidden border border-brand-main/20",
               errorClassName,
             ],
-            className
+            className,
           )}
           style={style}
         >
@@ -103,8 +103,8 @@ const Avatar = memo(
           )}
         </AvatarPrimitive.Root>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default Avatar;

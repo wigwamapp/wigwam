@@ -20,10 +20,10 @@ export function useExplorerLink(network?: Network) {
                 explorerUrl,
                 network.chainTag === "ethereum"
                   ? `/nft/${address}/${id}`
-                  : `/token/${address}`
+                  : `/token/${address}`,
               ),
           }
         : null,
-    [explorerUrl, network?.chainTag]
+    [explorerUrl, network?.chainTag],
   );
 }

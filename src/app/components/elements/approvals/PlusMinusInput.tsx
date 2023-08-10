@@ -34,7 +34,7 @@ const PlusMinusInput = forwardRef<HTMLInputElement, PlusMinusInputProps>(
       }
       {...rest}
     />
-  )
+  ),
 );
 
 export default PlusMinusInput;

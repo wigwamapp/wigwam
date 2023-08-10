@@ -28,7 +28,7 @@ import SecretField from "app/components/blocks/SecretField";
 const { arrayify, hexDataSlice, keccak256, concat } = ethers.utils;
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists
+  ({ code }) => toWordlistLang(code) in wordlists,
 );
 
 const WORDS_COUNT = [12, 24];
@@ -44,14 +44,14 @@ const CreateSeedPhrase = memo(() => {
     () =>
       SUPPORTED_LOCALES.find(({ code }) => currentLocale === code) ??
       FALLBACK_LOCALE,
-    [currentLocale]
+    [currentLocale],
   );
 
   const [locale, setLocale] = useState(defaultLocale);
 
   const wordlistLocale = useMemo(
     () => toWordlistLang(locale.code),
-    [locale.code]
+    [locale.code],
   );
 
   const wordsCountList = useMemo(
@@ -60,7 +60,7 @@ const CreateSeedPhrase = memo(() => {
         key: count,
         value: count.toString(),
       })),
-    []
+    [],
   );
 
   const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
@@ -98,13 +98,13 @@ const CreateSeedPhrase = memo(() => {
       hexDataSlice(
         keccak256(concat([baseEntropy, extraEntropy])),
         0,
-        entropySize
-      )
+        entropySize,
+      ),
     );
 
     const phrase = ethers.utils.entropyToMnemonic(
       entropy,
-      wordlists[wordlistLocale]
+      wordlists[wordlistLocale],
     );
 
     setSeedPhraseField(phrase);
@@ -145,7 +145,7 @@ const CreateSeedPhrase = memo(() => {
           className="mt-8"
           value={seedPhraseFiled}
           onChange={(
-            evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
           ) => {
             const { value } = evt.target;
             setSeedPhraseField(value);

@@ -76,7 +76,7 @@ function persist(action: HistoryAction) {
         ? 1
         : action === HistoryAction.Pop
         ? -1
-        : 0)
+        : 0),
   );
 
   Object.assign(sessionStorage, {

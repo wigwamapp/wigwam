@@ -46,12 +46,12 @@ const VerifySeedPhrase = memo(() => {
 
   const words = useMemo(
     () => (seedPhrase ? fromProtectedString(seedPhrase.phrase).split(" ") : []),
-    [seedPhrase]
+    [seedPhrase],
   );
 
   const wordsToCheckPositions = useMemo(
     () => generateRandomIndexes(words.length, words.length === 12 ? 3 : 6),
-    [words]
+    [words],
   );
 
   const handleContinue = useCallback(
@@ -105,7 +105,7 @@ const VerifySeedPhrase = memo(() => {
       navigateToStep,
       getNextAccountName,
       alert,
-    ]
+    ],
   );
 
   if (!seedPhrase) {
@@ -137,7 +137,7 @@ const VerifySeedPhrase = memo(() => {
                   name={`word-${indexToFill}`}
                   validate={composeValidators(
                     required,
-                    validateWord(words[indexToFill])
+                    validateWord(words[indexToFill]),
                   )}
                 >
                   {({ input, meta }) => (
@@ -172,7 +172,7 @@ export default VerifySeedPhrase;
 
 const generateRandomIndexes = (
   originLength: number,
-  toGenerateLegnth: number
+  toGenerateLegnth: number,
 ) => {
   if (toGenerateLegnth === 0 || originLength < toGenerateLegnth * 2 - 1) {
     return [];

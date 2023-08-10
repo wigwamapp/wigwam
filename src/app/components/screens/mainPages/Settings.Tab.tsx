@@ -36,7 +36,7 @@ const SettingsTab: FC = () => {
 
   return useMemo(
     () => <Suspense fallback={null}>{matchSettingTab(settingTab)}</Suspense>,
-    [settingTab]
+    [settingTab],
   );
 };
 

@@ -70,7 +70,7 @@ const SetupPassword = memo(() => {
         }
         return;
       }),
-    [addAccountsParams, seedPhrase, setAccModalOpened]
+    [addAccountsParams, seedPhrase, setAccModalOpened],
   );
 
   if (!addAccountsParams) {

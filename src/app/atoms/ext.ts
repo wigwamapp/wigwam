@@ -14,7 +14,7 @@ export const activeTabAtom = atom(getActiveTab);
 
 export const activeTabOriginAtom = selectAtom(
   activeTabAtom,
-  (tab) => tab?.url && new URL(tab.url).origin
+  (tab) => tab?.url && new URL(tab.url).origin,
 );
 
 export const profileStateAtom = atomWithAutoReset(loadState, {
@@ -29,10 +29,10 @@ export const currentProfileAtom = atom(async (get) => {
 
 export const latestVersionAtom = atomWithGlobalStorage(
   LATEST_VERSION,
-  process.env.VERSION
+  process.env.VERSION,
 );
 
 export const updateAvailableAtom = selectAtom(
   latestVersionAtom,
-  (latestVersion) => isUpdateAvailable(process.env.VERSION, latestVersion)
+  (latestVersion) => isUpdateAvailable(process.env.VERSION, latestVersion),
 );

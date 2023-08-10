@@ -72,7 +72,7 @@ const ContactsDialog: FC = () => {
           }
         }
       }),
-    [modalData, upsertContact, updateToast, alert]
+    [modalData, upsertContact, updateToast, alert],
   );
 
   if (modalData === null) {
@@ -106,7 +106,7 @@ const ContactsDialog: FC = () => {
                 "mr-16",
                 "bg-black/20",
                 "rounded-[.625rem]",
-                "overflow-hidden"
+                "overflow-hidden",
               )}
             >
               {address || values.address ? (
@@ -129,7 +129,7 @@ const ContactsDialog: FC = () => {
                 validate={composeValidators(
                   required,
                   minLength(3),
-                  maxLength(40)
+                  maxLength(40),
                 )}
               >
                 {({ input, meta }) => (

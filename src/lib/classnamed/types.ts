@@ -3,13 +3,13 @@ import { ForwardRefExoticComponent } from "react";
 export interface ClassNamedFactory {
   // Used when creating a classNamed component from a native HTML element
   <T extends keyof JSX.IntrinsicElements, P extends PropsLike>(
-    Component: T
+    Component: T,
   ): Tagged<JSX.LibraryManagedAttributes<T, JSX.IntrinsicElements[T]> & P>;
 
   // Used to extend other classNamed components.
   // Inherits props from the extended component
   <PP extends PropsLike, P extends PropsLike>(
-    Component: ClassNamedComponent<PP>
+    Component: ClassNamedComponent<PP>,
   ): Tagged<PP & P>;
 }
 

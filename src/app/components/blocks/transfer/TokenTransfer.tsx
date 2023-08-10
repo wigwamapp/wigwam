@@ -124,7 +124,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
     const handleSubmit = useCallback(
       async (
         { recipient, amount }: FormValues,
-        form: FormApi<FormValues, Partial<FormValues>>
+        form: FormApi<FormValues, Partial<FormValues>>,
       ) =>
         withHumanDelay(async () => {
           if (!token) {
@@ -176,7 +176,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                     txParams = await contract.populateTransaction.transfer(
                       recipient,
-                      rawAmount
+                      rawAmount,
                     );
                   }
                   break;
@@ -188,7 +188,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     txParams = await contract.populateTransaction.transferFrom(
                       currentAccount.address,
                       recipient,
-                      id
+                      id,
                     );
                   }
                   break;
@@ -197,7 +197,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   {
                     const contract = ERC1155__factory.connect(
                       address,
-                      provider
+                      provider,
                     );
 
                     txParams =
@@ -206,7 +206,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         recipient,
                         id,
                         rawAmount,
-                        new Uint8Array()
+                        new Uint8Array(),
                       );
                   }
                   break;
@@ -244,7 +244,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               <>
                 Request for transfer <strong>{tokenPreview}</strong>{" "}
                 successfully created! Please approve it in the opened window.
-              </>
+              </>,
             );
             form.restart();
 
@@ -255,7 +255,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                   setTimeout(
                     () => navigate((s) => ({ ...s, page: Page.Default })),
-                    50
+                    50,
                   );
 
                   setTimeout(() => {
@@ -280,7 +280,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                             </span>
                           </a>
                         )}
-                      </div>
+                      </div>,
                     );
                   }, 100);
                 }
@@ -310,7 +310,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
         isMounted,
         setTokenType,
         explorerLink,
-      ]
+      ],
     );
 
     const [recipientAddr, setRecipientAddr] = useSafeState<string>();
@@ -322,7 +322,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
       rawBalance: ethers.BigNumber | null;
     }>();
     const [estimationError, setEstimationError] = useSafeState<string | null>(
-      null
+      null,
     );
 
     const maxAmount = useMemo(() => {
@@ -372,7 +372,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
 
                 const signer = provider.getUncheckedSigner(
-                  currentAccount.address
+                  currentAccount.address,
                 );
 
                 switch (standard) {
@@ -382,7 +382,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                       gasLimit = await contract.estimateGas.transfer(
                         recipientAddr,
-                        value
+                        value,
                       );
                     }
                     break;
@@ -394,7 +394,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                       gasLimit = await contract.estimateGas.transferFrom(
                         currentAccount.address,
                         recipientAddr,
-                        id
+                        id,
                       );
                     }
                     break;
@@ -403,7 +403,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC1155__factory.connect(
                         address,
-                        signer
+                        signer,
                       );
 
                       gasLimit = await contract.estimateGas.safeTransferFrom(
@@ -411,7 +411,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         recipientAddr,
                         id,
                         value,
-                        new Uint8Array()
+                        new Uint8Array(),
                       );
                     }
                     break;
@@ -425,7 +425,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               const rawBalance = await requestBalance(
                 provider,
                 tokenSlug,
-                currentAccount.address
+                currentAccount.address,
               );
 
               setGas({
@@ -440,7 +440,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
               setGas(undefined);
               setEstimationError(
-                "Estimation failed. Transaction may fail or there network issues"
+                "Estimation failed. Transaction may fail or there network issues",
               );
             } finally {
               setEstimating(false);
@@ -459,7 +459,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
         provider,
         recipientAddr,
         tokenSlug,
-      ]
+      ],
     );
 
     const handleRecipientChange = useDebouncedCallback((recipient: string) => {
@@ -483,12 +483,12 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
     const formKey = useMemo(
       () => `${currentAccount.address}-${chainId}`,
-      [currentAccount.address, chainId]
+      [currentAccount.address, chainId],
     );
 
     const amountFieldKey = useMemo(
       () => `amount-${token?.tokenSlug}-${maxAmount}`,
-      [token, maxAmount]
+      [token, maxAmount],
     );
 
     const initialRenderRef = useRef(true);
@@ -549,7 +549,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   name="amount"
                   validate={composeValidators(
                     required,
-                    maxValue(maxAmount, tokenSymbol)
+                    maxValue(maxAmount, tokenSymbol),
                   )}
                 >
                   {({ input, meta }) => (
@@ -601,7 +601,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
         )}
       />
     );
-  }
+  },
 );
 
 type TxCheckProps = {
@@ -619,7 +619,7 @@ const TxCheck = memo<TxCheckProps>(({ tokenType, token, values, error }) => {
       values.amount && token?.tokenType === TokenType.Asset
         ? new BigNumber(values.amount).multipliedBy(token.priceUSD ?? 0)
         : new BigNumber(0),
-    [token, values.amount]
+    [token, values.amount],
   );
 
   const gas = useMemo(() => {
@@ -657,7 +657,7 @@ const TxCheck = memo<TxCheckProps>(({ tokenType, token, values, error }) => {
           "bg-brand-redobject/[.05]",
           "border border-brand-redobject/[.8]",
           "rounded-[.625rem]",
-          "text-sm"
+          "text-sm",
         )}
       >
         <WarningIcon className="mr-2 w-6 h-auto" />
@@ -752,13 +752,13 @@ const SummaryRow: FC<SummaryRowProps> = ({
     className={classNames(
       "flex items-center justify-between",
       "text-sm",
-      className
+      className,
     )}
   >
     <h4
       className={classNames(
         "flex-nowrap font-semibold",
-        lightHeader ? "text-brand-light" : "text-brand-inactivedark"
+        lightHeader ? "text-brand-light" : "text-brand-inactivedark",
       )}
     >
       {header}

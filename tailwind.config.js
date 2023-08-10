@@ -163,7 +163,7 @@ module.exports = {
         container.append(isFirefoxRule);
         isFirefoxRule.walkRules((rule) => {
           rule.selector = `.${e(
-            `firefox${separator}${rule.selector.slice(1)}`
+            `firefox${separator}${rule.selector.slice(1)}`,
           )}`;
         });
       });

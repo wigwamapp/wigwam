@@ -1,6 +1,6 @@
 export async function schedule(
   notMoreOftenThan: number,
-  factory: () => Promise<void>
+  factory: () => Promise<void>,
 ) {
   const startedAt = Date.now();
   try {
@@ -10,7 +10,7 @@ export async function schedule(
   } finally {
     const scheduleThrough = Math.max(
       notMoreOftenThan - (Date.now() - startedAt),
-      0
+      0,
     );
     setTimeout(schedule, scheduleThrough, notMoreOftenThan, factory);
   }

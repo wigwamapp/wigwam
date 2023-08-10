@@ -2,7 +2,7 @@ type Unsubscribe = (() => void) | void;
 
 export function livePromise<T>(
   pick: () => Promise<T | undefined>,
-  subscribe: (callback: (newValue: T) => void) => Unsubscribe
+  subscribe: (callback: (newValue: T) => void) => Unsubscribe,
 ) {
   let promise: Promise<T> | undefined;
   let unsub: Unsubscribe;

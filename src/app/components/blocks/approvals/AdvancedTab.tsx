@@ -24,21 +24,21 @@ const AdvancedTab = memo<AdvancedTabProps>(
   ({ originTx: tx, finalTx, overrides, onOverridesChange }) => {
     const rawTx = useMemo(
       () => ethers.utils.serializeTransaction(finalTx),
-      [finalTx]
+      [finalTx],
     );
 
     const changeValue = useCallback(
       (name: string, value: ethers.BigNumberish | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value }));
       },
-      [onOverridesChange]
+      [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
         if (!value) changeValue(name, null);
       },
-      [changeValue]
+      [changeValue],
     );
 
     return (
@@ -72,7 +72,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
                 value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
                 decimals: 3,
                 operator: "minus",
-              })
+              }),
             )
           }
           onPlusClick={() =>
@@ -81,7 +81,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
               prepareAmountOnChange({
                 value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
                 decimals: 3,
-              })
+              }),
             )
           }
         />
@@ -113,7 +113,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
                 value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
                 decimals: 0,
                 operator: "minus",
-              })
+              }),
             )
           }
           onPlusClick={() =>
@@ -122,7 +122,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
               prepareAmountOnChange({
                 value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
                 decimals: 0,
-              })
+              }),
             )
           }
         />
@@ -157,7 +157,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
         />
       </>
     );
-  }
+  },
 );
 
 export default AdvancedTab;

@@ -58,14 +58,14 @@ const NftInfo: FC = () => {
   useTokenActivitiesSync(
     chainId,
     currentAccount.address,
-    tokenInfo && tokenSlug
+    tokenInfo && tokenSlug,
   );
 
   useAutoRefreshNftMetadata(tokenInfo);
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
-    [tokenSlug]
+    [tokenSlug],
   );
 
   const { copy, copied } = useCopyToClipboard(address);
@@ -110,7 +110,7 @@ const NftInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold text-left",
                       "text-brand-main",
-                      "min-w-0 truncate"
+                      "min-w-0 truncate",
                     )}
                   >
                     <>{preparedId}</>
@@ -154,7 +154,7 @@ const NftInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold",
                       "line-clamp-3",
-                      preparedId && "mt-1 mb-6"
+                      preparedId && "mt-1 mb-6",
                     )}
                   >
                     {name}
@@ -191,12 +191,12 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
 
   const overviewable = Boolean(token.contentUrl || token.thumbnailUrl);
   const playable = Boolean(
-    token.contentType === "video_url" || token.contentType === "audio_url"
+    token.contentType === "video_url" || token.contentType === "audio_url",
   );
 
   const handleModalOpen = useCallback(
     () => overviewable && setModalOpened(true),
-    [overviewable]
+    [overviewable],
   );
 
   const handleModalClose = useCallback(() => {
@@ -211,7 +211,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
         className={classNames(
           "relative",
           "group",
-          overviewable ? "cursor-zoom-in" : "cursor-default"
+          overviewable ? "cursor-zoom-in" : "cursor-default",
         )}
       >
         <NftAvatar
@@ -219,7 +219,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
           alt={token.name}
           className={classNames(
             "w-[13rem] min-w-[13rem] h-[13rem]",
-            "!rounded-[.625rem]"
+            "!rounded-[.625rem]",
           )}
         />
 
@@ -238,7 +238,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
               "bg-brand-darkblue/[.8]",
               "backdrop-blur-[8px]",
               "border border-brand-main/20",
-              "color-brand-light"
+              "color-brand-light",
             )}
           />
         )}
@@ -252,7 +252,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
                   "!p-2.5",
                   "!bg-brand-darkblue/[.6]",
                   "group-hover:!bg-brand-darkblue/[.8]",
-                  "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                 )}
               >
                 <PlayIcon className="w-6 h-auto" />
@@ -266,7 +266,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
                 "!bg-brand-darkblue/[.8]",
                 "opacity-0",
                 "group-hover:opacity-100",
-                "absolute top-2 right-2"
+                "absolute top-2 right-2",
               )}
             >
               <ExpandIcon className="w-4 min-w-[1rem] h-auto" />
@@ -301,5 +301,5 @@ const controlClassName = classNames(
   "transition",
   "p-2",
   "flex items-center justify-center",
-  "hover:bg-brand-darkblue/[.6]"
+  "hover:bg-brand-darkblue/[.6]",
 );

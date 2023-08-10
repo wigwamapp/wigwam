@@ -12,6 +12,6 @@ export function setupArgon2Impl() {
         hashLen,
         parallelism,
         type,
-      }).then(({ hash }) => hash)
+      }).then(({ hash }) => hash),
   );
 }

@@ -14,7 +14,7 @@ const TabHeader: FC<TabHeaderProps> = ({ tooltip, children, className }) => {
     <h2
       className={classNames(
         "text-xl font-bold",
-        tooltip ? undefined : classNames("mb-4", className)
+        tooltip ? undefined : classNames("mb-4", className),
       )}
     >
       {children}

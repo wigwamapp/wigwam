@@ -35,7 +35,7 @@ const General: FC = () => {
     () =>
       DEFAULT_LOCALES.find(({ code }) => currentLocale === code) ??
       FALLBACK_LOCALE,
-    [currentLocale]
+    [currentLocale],
   );
 
   return (
@@ -82,31 +82,29 @@ const SelectCurrency: FC<{ className?: string }> = ({ className }) => {
         key: currency.code,
         value: `${currency.code} - ${currency.name}`,
       })),
-    []
+    [],
   );
 
   const currentItem = useMemo(
     () => ({
       key: selectedCurrency,
-      value: `${selectedCurrency} - ${
-        CONVERSION_CURRENCIES.find(
-          (currency) => currency.code === selectedCurrency
-        )?.name
-      }`,
+      value: `${selectedCurrency} - ${CONVERSION_CURRENCIES.find(
+        (currency) => currency.code === selectedCurrency,
+      )?.name}`,
     }),
-    [selectedCurrency]
+    [selectedCurrency],
   );
 
   const handleSelectCurrency = useCallback(
     (item: { icon?: string; key: string; value: string }) => {
       const newCurrency = CONVERSION_CURRENCIES.find(
-        (currency) => currency.code === item.key
+        (currency) => currency.code === item.key,
       );
       if (newCurrency) {
         updateCurrency(item.key);
       }
     },
-    [updateCurrency]
+    [updateCurrency],
   );
 
   return (
@@ -178,7 +176,7 @@ const SoftwareUpdate = memo(() => {
         className={classNames(
           "mb-6 flex !justify-start items-center",
           "text-left",
-          "!px-3 !py-2 mr-auto"
+          "!px-3 !py-2 mr-auto",
         )}
         onClick={handleUpdate}
       >

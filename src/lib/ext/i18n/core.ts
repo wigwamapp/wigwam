@@ -28,14 +28,14 @@ export async function init() {
     promises.push(
       fetchLocaleMessages(target).then((messages) => {
         refetched.target = messages;
-      })
+      }),
     );
 
     if (target !== fallback) {
       promises.push(
         fetchLocaleMessages(fallback).then((messages) => {
           refetched.fallback = messages;
-        })
+        }),
       );
     }
 
@@ -81,7 +81,7 @@ const REPLACE_T_WHITELIST = ["{{profile}}", "{{wallet}}"];
 export function replaceT(str: string) {
   return str.replace(
     /{{(.*?)}}/g,
-    (substr, key) => (REPLACE_T_WHITELIST.includes(substr) && t(key)) || substr
+    (substr, key) => (REPLACE_T_WHITELIST.includes(substr) && t(key)) || substr,
   );
 }
 

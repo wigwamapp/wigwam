@@ -57,7 +57,7 @@ export const ToastOverflowProvider: FC<
         className={classNames(
           "absolute",
           isCorner ? "top-0 right-0" : "top-5 right-6",
-          className
+          className,
         )}
       />
       {children}

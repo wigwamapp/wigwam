@@ -38,7 +38,7 @@ export const AccountPreview = memo<AccountPreviewProps>(
         </div>
       </div>
     </div>
-  )
+  ),
 );
 
 export default AccountPreview;

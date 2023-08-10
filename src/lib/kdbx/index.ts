@@ -36,7 +36,7 @@ export type KdfParams =
 export function createKdbx(
   credentials: Credentials,
   name: string,
-  kdfParams: KdfParams
+  kdfParams: KdfParams,
 ) {
   const kdbx = new Kdbx();
 
@@ -84,7 +84,7 @@ export function applyKdfParams(kdbx: Kdbx, params: KdfParams) {
 
 export function createGroup(
   parentGroup: KdbxGroup,
-  uuid: string | KdbxUuid = KdbxUuid.random()
+  uuid: string | KdbxUuid = KdbxUuid.random(),
 ) {
   const group = new KdbxGroup();
   group.uuid = toUuid(uuid);
@@ -97,7 +97,7 @@ export function createGroup(
 
 export function setFields(
   entry: KdbxEntry,
-  toSet: Record<string, KdbxEntryField>
+  toSet: Record<string, KdbxEntryField>,
 ) {
   for (const [key, value] of Object.entries(toSet)) {
     entry.fields.set(key, value);
@@ -106,7 +106,7 @@ export function setFields(
 
 export function exportFields<T extends { [k: string]: KdbxEntryField }>(
   entry: KdbxEntry,
-  opts: { uuid?: boolean } = {}
+  opts: { uuid?: boolean } = {},
 ) {
   const base: Record<string, string> = {};
 

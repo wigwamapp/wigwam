@@ -17,7 +17,7 @@ export const SoonTag: FC<SoonTagProps> = ({ className }) => (
       "opacity-75",
       "transition-opacity",
       "group-hover:opacity-100",
-      className
+      className,
     )}
   >
     Soon

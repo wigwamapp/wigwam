@@ -6,7 +6,7 @@ const TEST_ADDRESS = "0xa37a58ED255089D9204125A0f3313826537759D9";
 describe("Common > Nonce", () => {
   it("getNextNonce", () => {
     expect(() => getNextNonce({}, "5")).toThrowError(
-      "Nonce not found in transaction"
+      "Nonce not found in transaction",
     );
 
     expect(getNextNonce({ nonce: 0 })).toBe(0);

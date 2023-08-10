@@ -14,11 +14,13 @@ export function notifyWorkerSpawned(worker?: Worker) {
         (evt) => {
           if (evt.data?.type === type) {
             window.dispatchEvent(
-              new CustomEvent<string>(type, { detail: evt.data.scriptPathname })
+              new CustomEvent<string>(type, {
+                detail: evt.data.scriptPathname,
+              }),
             );
           }
         },
-        { once: true }
+        { once: true },
       );
     }
   }

@@ -46,7 +46,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
       className={classNames(
         "w-[23.25rem] min-w-[23.25rem]",
         "relative",
-        className
+        className,
       )}
       style={{ perspective: 1000 }}
     >
@@ -65,7 +65,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
               "bg-brand-main/10",
               "rounded-[.625rem]",
               "flex flex-col",
-              "relative"
+              "relative",
             )}
             style={{ transformStyle: "preserve-3d" }}
           >
@@ -78,14 +78,14 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
                   className={classNames(
                     "h-[4.5rem] w-[4.5rem] min-w-[4.5rem] mr-4",
                     "bg-black/40",
-                    "rounded-[.625rem]"
+                    "rounded-[.625rem]",
                   )}
                 />
                 <div
                   className={classNames(
                     "flex flex-col items-start",
                     "text-base text-brand-light leading-none",
-                    "w-full min-w-0"
+                    "w-full min-w-0",
                   )}
                 >
                   <CopiableTooltip
@@ -98,7 +98,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
                       "rounded",
                       "max-w-full",
                       "transition-colors",
-                      "hover:bg-brand-main/40"
+                      "hover:bg-brand-main/40",
                     )}
                   >
                     <>

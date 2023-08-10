@@ -23,7 +23,7 @@ debankApi.interceptors.response.use(
     }
 
     return res;
-  }
+  },
   // async (err) => {
   //   if (err?.response?.status === 429) {
   //     const reallyOpened = await openDebankWebsite();
@@ -56,7 +56,7 @@ export const getDebankChainList = memoize(
   },
   {
     maxAge: 60 * 60_000, // 1 hour
-  }
+  },
 );
 
 export const getDebankUserTokens = memoize(
@@ -73,7 +73,7 @@ export const getDebankUserTokens = memoize(
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 30_000, // 30 sec
-  }
+  },
 );
 
 export const getDebankUserChainBalance = memoize(
@@ -84,7 +84,7 @@ export const getDebankUserChainBalance = memoize(
 
       const userTokens = await getDebankUserTokens(
         debankChain.id,
-        accountAddress
+        accountAddress,
       );
 
       let totalUSD = new BigNumber(0);
@@ -120,17 +120,17 @@ export const getDebankUserChainBalance = memoize(
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 60_000, // 60 sec
-  }
+  },
 );
 
 export const getDebankUserNfts = async (
   debankChainId: string,
-  accountAddress: string
+  accountAddress: string,
 ) => {
   const res = await getDebankUserAllNfts(accountAddress).catch(() => null);
 
   return res?.data?.data.token_list.filter(
-    (t: any) => t.chain === debankChainId
+    (t: any) => t.chain === debankChainId,
   );
 };
 
@@ -144,7 +144,7 @@ const getDebankUserAllNfts = memoize(
     }),
   {
     maxAge: 40_000, // 40 sec
-  }
+  },
 );
 
 // const dbwThrottle = createOrganicThrottle();

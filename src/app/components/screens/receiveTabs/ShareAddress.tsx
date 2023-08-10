@@ -30,7 +30,7 @@ const ShareAddress: FC = () => {
             "min-w-[6.25rem] h-[6.25rem]",
             "bg-white/[.08]",
             "rounded-[0.625rem]",
-            "shadow-receiveqrcode"
+            "shadow-receiveqrcode",
           )}
           id="receive-canvas"
         >
@@ -55,7 +55,7 @@ const ShareAddress: FC = () => {
                 "text-sm text-brand-light !font-normal",
                 "!p-1 !pr-2 !min-w-0",
                 "-ml-2 mt-auto",
-                "items-center"
+                "items-center",
               )}
               onClick={copy}
             >

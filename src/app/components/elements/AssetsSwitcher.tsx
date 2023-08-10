@@ -30,7 +30,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
         "p-1",
         "transition-colors",
         "hover:bg-brand-main/[.05] focus-visible:bg-brand-main/[.05]",
-        className
+        className,
       )}
     >
       <SwitchOption
@@ -38,14 +38,14 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
         className={classNames(
           theme === "small" && "mr-1",
           theme === "large" && "mr-2",
-          !checked && "font-bold"
+          !checked && "font-bold",
         )}
       >
         {theme === "small" ? (
           <AssetsIcon
             className={classNames(
               "transition-all",
-              !checked && "fill-brand-light"
+              !checked && "fill-brand-light",
             )}
           />
         ) : (
@@ -60,7 +60,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
           <NftsIcon
             className={classNames(
               "transition-all",
-              checked && "fill-brand-light"
+              checked && "fill-brand-light",
             )}
           />
         ) : (
@@ -76,7 +76,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
           "rounded-[.625rem]",
           "transition-transform",
           theme === "small" && checked && "translate-x-10",
-          theme === "large" && checked && "translate-x-[9rem]"
+          theme === "large" && checked && "translate-x-[9rem]",
         )}
       />
     </Switch.Root>
@@ -100,7 +100,7 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "text-base color-brand-light",
       theme === "small" && "w-9 h-7",
       theme === "large" && "w-[8.5rem] py-2",
-      className
+      className,
     )}
   >
     {children}

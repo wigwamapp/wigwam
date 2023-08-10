@@ -139,7 +139,7 @@ describe("Common > Wallet", () => {
           uuid: "uuid2",
           address: TEST_WALLET.address,
         },
-      ])
+      ]),
     ).toThrowError("Translated<walletAlreadyExists>");
 
     expect(() =>
@@ -158,7 +158,7 @@ describe("Common > Wallet", () => {
           uuid: "uuid1",
           address: TEST_WALLET.secondAddress,
         },
-      ])
+      ]),
     ).toThrowError("Translated<walletAlreadyExists>");
 
     expect(() =>
@@ -177,7 +177,7 @@ describe("Common > Wallet", () => {
           uuid: "uuid2",
           address: TEST_WALLET.secondAddress,
         },
-      ])
+      ]),
     ).not.toThrow();
   });
 

@@ -43,7 +43,7 @@ export async function startTxObserver() {
               sendRpc(tx.chainId, "eth_getTransactionReceipt", [
                 tx.txHash,
               ]).then(unwrapRpcResponse),
-            { retries: 3, maxTimeout: 1_000 }
+            { retries: 3, maxTimeout: 1_000 },
           );
 
           const updatedTx: TransactionActivity = {
@@ -54,7 +54,7 @@ export async function startTxObserver() {
           if (result && result.blockNumber) {
             updatedTx.gasTokenPriceUSD = await getGasTokenPriceUSD(
               tx.chainId,
-              tx.accountAddress
+              tx.accountAddress,
             );
 
             completeHashes.add(tx.txHash);
@@ -68,7 +68,7 @@ export async function startTxObserver() {
               try {
                 const transfers = await matchTokenTransferEvents(
                   getRpcProvider(tx.chainId),
-                  result.logs
+                  result.logs,
                 );
 
                 for (const transfer of transfers) {
@@ -77,7 +77,7 @@ export async function startTxObserver() {
                       addFindTokenRequest(
                         tx.chainId,
                         transferAddress,
-                        transfer.tokenSlug
+                        transfer.tokenSlug,
                       );
                     }
                   }
@@ -90,7 +90,7 @@ export async function startTxObserver() {
             addFindTokenRequest(
               tx.chainId,
               tx.accountAddress,
-              NATIVE_TOKEN_SLUG
+              NATIVE_TOKEN_SLUG,
             );
 
             const destination = result.to && ethers.utils.getAddress(result.to);
@@ -104,7 +104,7 @@ export async function startTxObserver() {
         } catch (err) {
           console.error(err);
         }
-      })
+      }),
     );
 
     for (const hash of completeHashes) {
@@ -127,7 +127,7 @@ export async function startTxObserver() {
         } catch {
           return;
         }
-      })
+      }),
     );
   });
 }
@@ -140,16 +140,16 @@ const getGasTokenPriceUSD = memoize(
           chainId,
           accountAddress,
           tokenSlug: NATIVE_TOKEN_SLUG,
-        })
+        }),
       )
       .then((token) => (token as AccountAsset)?.priceUSD)
       .catch(() => undefined),
-  { maxAge: 3 * 60_000 }
+  { maxAge: 3 * 60_000 },
 );
 
 function findSkippedTxs(
   origin: TransactionActivity,
-  allPending: TransactionActivity[]
+  allPending: TransactionActivity[],
 ) {
   const skippedHashes: string[] = [];
 
@@ -160,7 +160,7 @@ function findSkippedTxs(
       tx.accountAddress == origin.accountAddress
     ) {
       const { nonce: originNonce } = ethers.utils.parseTransaction(
-        origin.rawTx
+        origin.rawTx,
       );
       const { nonce: txNonce } = ethers.utils.parseTransaction(tx.rawTx);
 

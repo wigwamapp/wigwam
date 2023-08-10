@@ -10,7 +10,10 @@ export type StorageAreaOptions = Partial<{
 }>;
 
 export class StorageArea {
-  constructor(private name: string, private opts: StorageAreaOptions = {}) {}
+  constructor(
+    private name: string,
+    private opts: StorageAreaOptions = {},
+  ) {}
 
   private get area(): Storage.StorageArea {
     return (browser.storage as any)[this.name];
@@ -57,8 +60,8 @@ export class StorageArea {
 
     items = Object.fromEntries(
       await Promise.all(
-        items.map(async ([k, v]) => [await this.wrapKeys(k), v])
-      )
+        items.map(async ([k, v]) => [await this.wrapKeys(k), v]),
+      ),
     );
 
     return this.area.set(items);
@@ -76,11 +79,11 @@ export class StorageArea {
 
   subscribe<T = any>(
     key: string,
-    callback: (change: { newValue?: T; oldValue?: T }) => void
+    callback: (change: { newValue?: T; oldValue?: T }) => void,
   ) {
     let listener: (
       changes: { [s: string]: Storage.StorageChange },
-      areaName: string
+      areaName: string,
     ) => void;
 
     this.wrapKeys(key)

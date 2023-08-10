@@ -10,7 +10,7 @@ export async function setupFixtures() {
   try {
     await db.transaction("rw", networks, async () => {
       const existingNetworks = await networks.bulkGet(
-        DEFAULT_NETWORKS.map((net) => net.chainId)
+        DEFAULT_NETWORKS.map((net) => net.chainId),
       );
 
       const toPut = DEFAULT_NETWORKS.map((net, i) => {

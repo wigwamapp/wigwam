@@ -50,7 +50,7 @@ const VerifyAccountToAdd: FC = () => {
       try {
         if (
           addAccountsParams.some(
-            (acc) => acc.source === AccountSource.OpenLogin
+            (acc) => acc.source === AccountSource.OpenLogin,
           )
         ) {
           const confirmed = await confirm({
@@ -111,13 +111,13 @@ const VerifyAccountToAdd: FC = () => {
         alert({ title: "Error!", content: err.message });
       }
     },
-    [alert, confirm, initialSetup, navigateToStep, setAccModalOpened, stateRef]
+    [alert, confirm, initialSetup, navigateToStep, setAccModalOpened, stateRef],
   );
 
   const isAnyLedgerAccounts = useMemo(
     () =>
       importedAccounts?.filter(({ source }) => source === AccountSource.Ledger),
-    [importedAccounts]
+    [importedAccounts],
   );
 
   if (addresses && addresses.length > 0) {
@@ -158,7 +158,7 @@ const VerifyAccountToAddInitial: FC<VerifyAccountToAddProps> = ({
     if (seedPhrase && derivationPath) {
       return toNeuterExtendedKey(
         getSeedPhraseHDNode(seedPhrase),
-        derivationPath
+        derivationPath,
       );
     }
 
@@ -182,10 +182,10 @@ const VerifyAccountToAddInitial: FC<VerifyAccountToAddProps> = ({
               address,
               index: index.toString(),
               publicKey: toProtectedString(publicKey),
-            })
+            }),
           )
         : null,
-    [extendedKey, neuterExtendedKey]
+    [extendedKey, neuterExtendedKey],
   );
 
   if (!addresses) {
@@ -208,7 +208,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
   const rootNeuterExtendedKey = useMaybeAtomValue(
     hasSeedPhrase && derivationPath
       ? getNeuterExtendedKeyAtom(derivationPath)
-      : null
+      : null,
   );
 
   const importedAccounts = useMaybeAtomValue(allAccountsAtom);
@@ -248,8 +248,8 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
       const filteredAccounts = newAccounts.filter(
         ({ address }) =>
           !importedAccounts.some(
-            ({ address: imported }) => imported === address
-          )
+            ({ address: imported }) => imported === address,
+          ),
       );
 
       if (filteredAccounts.length <= 0) {
@@ -266,7 +266,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, getNextAccountName, importedAccounts]
+    [extendedKey, getNextAccountName, importedAccounts],
   );
 
   const addresses = useMemo(() => {
@@ -281,7 +281,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
           address,
           index: index.toString(),
           publicKey: toProtectedString(publicKey),
-        })
+        }),
       );
 
       if (!importedAccounts || importedAccounts.length <= 0) {
@@ -292,7 +292,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
         const isAddressImported = importedAccounts.find(
           ({ address: imported }) => {
             return imported === address;
-          }
+          },
         );
 
         return {

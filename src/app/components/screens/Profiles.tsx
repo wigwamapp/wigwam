@@ -65,7 +65,7 @@ const Profiles: FC = () => {
                   "flex items-center justify-center",
                   "transition-colors",
                   active ? "bg-brand-main/20" : "hover:bg-brand-main/10",
-                  !isLastInRow && "mr-2"
+                  !isLastInRow && "mr-2",
                 )}
                 onClick={active ? undefined : () => handleSelect(p)}
               >
@@ -83,7 +83,7 @@ const Profiles: FC = () => {
               "rounded-[.625rem]",
               "transition-colors",
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-              "active:bg-brand-main/[.05]"
+              "active:bg-brand-main/[.05]",
             )}
           >
             <span className="rounded-full flex items-center justify-center bg-brand-main/10 w-24 h-24 mb-4">
@@ -139,7 +139,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
   ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
     const defaultNameValue = useMemo(
       () => `{{profile}} ${profilesLength + 1}`,
-      [profilesLength]
+      [profilesLength],
     );
 
     return (
@@ -157,5 +157,5 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
         />
       </SecondaryModal>
     );
-  }
+  },
 );

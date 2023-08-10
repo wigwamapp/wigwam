@@ -27,7 +27,7 @@ const Switcher: FC<SwitcherProps> = ({
         className={classNames(
           "mx-4 mb-2",
           "text-base font-normal",
-          "text-brand-gray"
+          "text-brand-gray",
         )}
       >
         {label}
@@ -43,7 +43,7 @@ const Switcher: FC<SwitcherProps> = ({
         "bg-brand-main/[.05]",
         "rounded-[.625rem]",
         "transition-colors",
-        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
       )}
       disabled={disabled}
     >
@@ -55,7 +55,7 @@ const Switcher: FC<SwitcherProps> = ({
           "rounded-full",
           "border border-brand-light",
           "transition-colors",
-          !checked ? "bg-brand-main/[.05]" : "bg-[#21AF3D]/40"
+          !checked ? "bg-brand-main/[.05]" : "bg-[#21AF3D]/40",
         )}
       >
         <SwitchPrimitive.SwitchThumb
@@ -65,7 +65,7 @@ const Switcher: FC<SwitcherProps> = ({
             "rounded-full",
             "bg-brand-light",
             "transition-transform",
-            checked && "translate-x-[1.125rem]"
+            checked && "translate-x-[1.125rem]",
           )}
         />
       </span>

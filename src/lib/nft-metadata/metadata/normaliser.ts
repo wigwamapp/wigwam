@@ -29,7 +29,7 @@ export function translateZoraMetadataSchema(schema: any) {
 }
 
 function normaliseAttributes(
-  attributes: Record<string, any> | Record<string, any>[]
+  attributes: Record<string, any> | Record<string, any>[],
 ) {
   if (Array.isArray(attributes)) {
     return attributes;
@@ -48,7 +48,7 @@ function normaliseAttributes(
 export function normaliseURIData(
   chainId: number,
   tokenAddress: string,
-  data: Record<string, any>
+  data: Record<string, any>,
 ) {
   let normalisedData = data;
 
@@ -85,7 +85,7 @@ export function normaliseURIData(
         last[key] = value.description;
         return last;
       },
-      {}
+      {},
     );
   }
 

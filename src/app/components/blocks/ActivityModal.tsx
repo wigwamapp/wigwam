@@ -91,7 +91,7 @@ const ActivityModal = memo(() => {
     (open: boolean) => {
       setActivityOpened([open, "replace"]);
     },
-    [setActivityOpened]
+    [setActivityOpened],
   );
 
   const isMounted = useIsMounted();
@@ -114,7 +114,7 @@ const ActivityModal = memo(() => {
             "m-auto inset-x-0",
             isPopupMode ? "inset-y-0" : "inset-y-[3.5rem]",
             !isPopupMode && "rounded-[2.5rem]",
-            bootAnimationDisplayed && "animate-modalcontent"
+            bootAnimationDisplayed && "animate-modalcontent",
           )}
         >
           {!isPopupMode && (
@@ -131,7 +131,7 @@ const ActivityModal = memo(() => {
                 "absolute",
                 "top-0 left-1/2",
                 "-translate-x-1/2 -translate-y-1/2",
-                "z-30"
+                "z-30",
               )}
             >
               <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
@@ -152,15 +152,15 @@ const ActivityModal = memo(() => {
                     "after:rounded-[2.5rem]",
                     "after:pointer-events-none",
                     "after:z-20",
-                  ]
+                  ],
                 )}
                 viewPortClassName="viewportBlock"
                 horizontalScrollBarClassName={classNames(
-                  isPopupMode ? "" : "px-[2.25rem]"
+                  isPopupMode ? "" : "px-[2.25rem]",
                 )}
                 verticalScrollBarClassName={classNames(
                   isPopupMode ? "" : "pt-[4.25rem] pb-[3.25rem]",
-                  isPopupMode ? "!right-0" : "!right-1"
+                  isPopupMode ? "!right-0" : "!right-1",
                 )}
                 hiddenScrollbar={isPopupMode ? "horizontal" : undefined}
                 type="scroll"
@@ -168,7 +168,7 @@ const ActivityModal = memo(() => {
                 <Dialog.Close
                   className={classNames(
                     isPopupMode ? "top-7" : "top-4",
-                    "absolute right-4"
+                    "absolute right-4",
                   )}
                   asChild
                 >
@@ -210,7 +210,7 @@ const ActivityContent = memo(() => {
         "px-4",
         isPopupMode ? "pt-6" : "pt-16",
         "flex flex-col",
-        !delayFinished ? "hidden" : "animate-bootfadeinfast"
+        !delayFinished ? "hidden" : "animate-bootfadeinfast",
       )}
     >
       {!isPopupMode && <Approve />}
@@ -236,7 +236,7 @@ const Approve = memo(() => {
             "animate-pulse hover:animate-none",
             "rounded-2xl",
             "flex items-center",
-            "py-2.5 px-5"
+            "py-2.5 px-5",
           )}
         >
           <ApprovalStatus readOnly theme="large" />
@@ -249,7 +249,7 @@ const Approve = memo(() => {
               "px-2 py-1",
               "!text-sm text-brand-inactivelight hover:text-brand-light",
               "transition-colors",
-              "font-semibold"
+              "font-semibold",
             )}
             onClick={() => rejectAllApprovals()}
           >
@@ -293,7 +293,7 @@ const History = memo(() => {
         observer.current.observe(node);
       }
     },
-    [completeActivity, hasMore, loadMore]
+    [completeActivity, hasMore, loadMore],
   );
 
   return (
@@ -352,7 +352,7 @@ const History = memo(() => {
             <NoResultsFoundIcon
               className={classNames(
                 !isPopupMode ? "w-[30rem]" : "w-[20rem]",
-                "h-auto mb-8"
+                "h-auto mb-8",
               )}
             />
             <h3 className="text-2xl text-brand-inactivedark font-bold">
@@ -414,7 +414,7 @@ const ActivityCard = memo(
         .mul(
           item.result.effectiveGasPrice ??
             parsedTx.maxFeePerGas ??
-            parsedTx.gasPrice
+            parsedTx.gasPrice,
         )
         .toString();
 
@@ -423,7 +423,7 @@ const ActivityCard = memo(
         fiat:
           item.gasTokenPriceUSD &&
           new BigNumber(ethers.utils.formatEther(native)).times(
-            item.gasTokenPriceUSD
+            item.gasTokenPriceUSD,
           ),
       };
     }, [item]);
@@ -445,7 +445,7 @@ const ActivityCard = memo(
           isPopupMode ? "rounded-[.875rem]" : "rounded-2xl",
           "flex items-center",
           isPopupMode ? "py-2 px-3" : "py-3 px-5",
-          className
+          className,
         )}
       >
         {isPopupMode ? (
@@ -578,7 +578,7 @@ const ActivityCard = memo(
         )}
       </div>
     );
-  })
+  }),
 );
 
 type DisconnectDAppProps = {
@@ -629,7 +629,7 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
             isPopupMode ? "text-[.625rem] h-5" : "text-xs py-0.5",
             "text-brand-inactivelight",
             "transition-colors",
-            "hover:bg-brand-main/10"
+            "hover:bg-brand-main/10",
           )}
           onClick={handleDisconnect}
         >
@@ -637,7 +637,7 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
         </button>
       </div>
     );
-  }
+  },
 );
 
 type ActivityIconProps = {
@@ -657,7 +657,7 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
         "bg-white",
         "rounded-full overflow-hidden",
         isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
-        className
+        className,
       )}
       fallbackClassName="!h-3/5"
     />
@@ -666,7 +666,7 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
       className={classNames(
         "glass-icon--active",
         isPopupMode ? "w-8 h-8" : "w-12 h-12",
-        className
+        className,
       )}
     />
   );
@@ -692,7 +692,7 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
         "flex items-center",
         isPopupMode ? "text-sm" : "text-base",
         "text-brand-inactivelight font-medium",
-        className
+        className,
       )}
     >
       <Icon
@@ -724,7 +724,7 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
         status === "failed" && "text-brand-redtext",
         status === "skipped" && "text-brand-main",
         status === "revoked" && "text-brand-inactivedark",
-        className
+        className,
       )}
     >
       {capitalize(status === "succeeded" ? "success" : status)}
@@ -769,13 +769,13 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
         "min-w-0",
         "hover:underline",
         "inline-flex items-center",
-        className
+        className,
       )}
     >
       <span
         className={classNames(
           "min-w-0 truncate",
-          isPopupMode ? "text-xs" : "text-base"
+          isPopupMode ? "text-xs" : "text-base",
         )}
       >
         {new URL(source.url).host}
@@ -804,7 +804,7 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
   const allAccounts = useAtomValue(allAccountsAtom);
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === accountAddress),
-    [allAccounts, accountAddress]
+    [allAccounts, accountAddress],
   );
 
   return account ? (
@@ -814,7 +814,7 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
         "flex",
         isPopupMode ? "items-center" : "items-stretch",
         "text-left",
-        className
+        className,
       )}
     >
       <AutoIcon
@@ -827,13 +827,13 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
             : "h-9 w-9 min-w-[2.25rem]",
           isPopupMode ? "mr-1.5" : "mr-2",
           "bg-black/20",
-          isPopupMode ? "rounded" : "rounded-md"
+          isPopupMode ? "rounded" : "rounded-md",
         )}
       />
       <span
         className={classNames(
           "flex flex-col items-start justify-center",
-          "min-w-0"
+          "min-w-0",
         )}
       >
         <WalletName
@@ -853,7 +853,7 @@ const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
     <span
       className={classNames(
         "font-medium text-brand-inactivedark text-base",
-        className
+        className,
       )}
     >
       Deleted
@@ -884,7 +884,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
         "flex items-center",
         "min-w-0",
         isPopupMode ? "min-h-[1.125rem]" : "min-h-[1.5rem]",
-        fee ? "" : className
+        fee ? "" : className,
       )}
     >
       {network && (
@@ -903,7 +903,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
       <span
         className={classNames(
           "truncate min-w-0",
-          isPopupMode ? "text-xs" : "text-base"
+          isPopupMode ? "text-xs" : "text-base",
         )}
       >
         {network?.name}
@@ -920,14 +920,14 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
       className={classNames(
         "flex",
         isPopupMode ? "items-center justify-between" : "flex-col",
-        className
+        className,
       )}
     >
       {label}
       <span
         className={classNames(
           "flex items-center text-brand-inactivedark",
-          isPopupMode ? "ml-4" : "ml-8 mt-1"
+          isPopupMode ? "ml-4" : "ml-8 mt-1",
         )}
       >
         <PrettyAmount
@@ -994,7 +994,7 @@ const SectionHeader: FC<PropsWithChildren<{ className?: string }>> = memo(
     <div className={classNames("w-full", className)}>
       <h1 className={"text-2xl font-bold"}>{children}</h1>
     </div>
-  )
+  ),
 );
 
 type ActivityTokensProps = {
@@ -1030,7 +1030,7 @@ const ActivityTokens = memo<ActivityTokensProps>(
         ))}
       </div>
     );
-  }
+  },
 );
 
 function capitalize(word: string) {

@@ -30,13 +30,13 @@ export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
   const highBaseFee = averageBaseFee.mul(21).div(20); // x 1.05
 
   const lowPriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.normal
+    maxPriorityFeeSuggestions.normal,
   );
   const averagePriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.fast
+    maxPriorityFeeSuggestions.fast,
   );
   const highPriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.urgent
+    maxPriorityFeeSuggestions.urgent,
   );
 
   return {
@@ -75,5 +75,5 @@ const supportsEIP1559 = memoize(
   },
   {
     cacheKey: ([p]) => p.network.chainId,
-  }
+  },
 );

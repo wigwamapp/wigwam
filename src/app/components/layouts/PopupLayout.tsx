@@ -39,7 +39,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             "w-full",
             "flex flex-col items-stretch",
             "h-screen",
-            bootAnimationDisplayed && "animate-bootfadeinfast"
+            bootAnimationDisplayed && "animate-bootfadeinfast",
           )}
           onAnimationEnd={
             bootAnimationDisplayed ? handleBootAnimationEnd : undefined
@@ -61,7 +61,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 className={classNames(
                   "w-full",
                   !isUnlocked && "p-3.5",
-                  isUnlocked && "p-3"
+                  isUnlocked && "p-3",
                 )}
               >
                 <FullScreenIcon className="mr-1" />
@@ -71,7 +71,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                     className={classNames(
                       "w-2 h-2",
                       "bg-activity rounded-full",
-                      "absolute top-2 right-2"
+                      "absolute top-2 right-2",
                     )}
                   />
                 ) : null}
@@ -85,7 +85,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 "pt-3 pb-16 px-3",
                 "overflow-hidden",
                 "flex flex-col",
-                className
+                className,
               )}
             >
               {children}

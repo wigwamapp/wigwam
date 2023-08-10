@@ -15,7 +15,7 @@ const FiatAmount: FC<FiatAmountProps> = ({ amount, ...rest }) => {
   ]);
 
   const value = new BigNumber(amount ?? 0).multipliedBy(
-    currenciesRate[selectedCurrency]
+    currenciesRate[selectedCurrency],
   );
 
   return (

@@ -93,7 +93,7 @@ export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
 
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate],
   );
 
   const closeCurrentDialog = useCallback(() => {
@@ -138,7 +138,7 @@ export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
           ...rest,
         });
       }),
-    [addDialog, closeCurrentDialog]
+    [addDialog, closeCurrentDialog],
   );
 
   const confirm = useCallback(
@@ -166,7 +166,7 @@ export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
           ...rest,
         });
       }),
-    [addDialog, closeCurrentDialog]
+    [addDialog, closeCurrentDialog],
   );
 
   const waitLoading = useCallback(
@@ -219,7 +219,7 @@ export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
           });
         }
       }),
-    [forceUpdate, addDialog, alert, closeCurrentDialog]
+    [forceUpdate, addDialog, alert, closeCurrentDialog],
   );
 
   return (

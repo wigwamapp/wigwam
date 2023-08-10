@@ -15,7 +15,7 @@ import { getRpcProvider } from "../rpc";
 export const getTokenMetadata = async (
   chainId: number,
   tokenSlug: string,
-  returnBroken = false
+  returnBroken = false,
 ) => {
   const provider = getRpcProvider(chainId);
 
@@ -37,7 +37,7 @@ export const getTokenMetadata = async (
               symbol: contract.symbol(),
               name: contract.name(),
             }),
-          { retries: 2 }
+          { retries: 2 },
         );
       }
 
@@ -88,13 +88,13 @@ export const getBalanceFromChain = memoize(
     const provider = getRpcProvider(chainId);
 
     return requestBalance(provider, tokenSlug, accountAddress).catch(
-      () => null
+      () => null,
     );
   },
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 3_000,
-  }
+  },
 );
 
 function parseContentType(contentType?: string): NFTContentType | undefined {

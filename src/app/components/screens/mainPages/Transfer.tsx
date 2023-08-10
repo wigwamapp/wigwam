@@ -18,7 +18,7 @@ const Transfer: FC = () => {
   const activeRoute = useMemo(
     () =>
       tabsContent.find(({ route }) => route.transfer === activeTabRoute)?.route,
-    [activeTabRoute]
+    [activeTabRoute],
   );
 
   return (

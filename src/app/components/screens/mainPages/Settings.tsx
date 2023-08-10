@@ -22,7 +22,7 @@ const Settings: FC = () => {
   const activeRoute = useMemo(
     () =>
       tabsContent.find(({ route }) => route.setting === activeTabRoute)?.route,
-    [activeTabRoute]
+    [activeTabRoute],
   );
 
   return (
@@ -30,7 +30,7 @@ const Settings: FC = () => {
       className={classNames(
         "px-6 -mx-6 min-h-0",
         "flex grow",
-        "overflow-x-auto scrollbar-hide"
+        "overflow-x-auto scrollbar-hide",
       )}
     >
       <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />

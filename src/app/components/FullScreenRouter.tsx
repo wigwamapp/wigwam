@@ -31,7 +31,7 @@ const FullScreenRouter: FC = () => {
 
   return useMemo(
     () => matchFullScreen({ page, walletStatus }),
-    [page, walletStatus]
+    [page, walletStatus],
   );
 };
 
@@ -45,10 +45,10 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
         {
           page: Page.Profiles,
           walletStatus: P.when((s) =>
-            [WalletStatus.Welcome, WalletStatus.Locked].includes(s)
+            [WalletStatus.Welcome, WalletStatus.Locked].includes(s),
           ),
         },
-        () => <Profiles />
+        () => <Profiles />,
       )
       // Unlock when wallet locked
       .with({ walletStatus: WalletStatus.Locked }, () => <Unlock />)
@@ -57,7 +57,7 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
           page: Page.Default,
           walletStatus: WalletStatus.Welcome,
         },
-        () => <Welcome />
+        () => <Welcome />,
       )
       // Only ready below
       .with({ walletStatus: P.not(WalletStatus.Unlocked) }, () => (

@@ -82,14 +82,14 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const nativeCurrency = useNativeCurrency();
 
   const localNonce = useAtomValue(
-    getLocalNonceAtom({ chainId, accountAddress })
+    getLocalNonceAtom({ chainId, accountAddress }),
   );
 
   useSync(chainId, accountAddress);
 
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === approval.accountAddress)!,
-    [approval, allAccounts]
+    [approval, allAccounts],
   );
 
   const provider = useProvider();
@@ -226,7 +226,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                         }
                       : {}),
                   }),
-              { retries: 2, minTimeout: 0, maxTimeout: 0 }
+              { retries: 2, minTimeout: 0, maxTimeout: 0 },
             ),
             false,
             // TODO: Add logic for this
@@ -271,7 +271,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       provider,
       account.address,
       txParams,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -323,7 +323,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           const { low, average, high } = fees.modes;
           console.info(
             "f",
-            [low, average, high].map((m) => formatUnits(m.max, "gwei"))
+            [low, average, high].map((m) => formatUnits(m.max, "gwei")),
           );
         }
       }
@@ -358,7 +358,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                 nativeCurrency?.symbol
                   ? `${nativeCurrency.symbol} token balance`
                   : "funds"
-              } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`
+              } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`,
             );
           }
 
@@ -376,7 +376,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               try {
                 const sig = await ledgerEth.signTransaction(
                   account.derivationPath,
-                  rawTx.substring(2)
+                  rawTx.substring(2),
                 );
 
                 const formattedSig = {
@@ -391,7 +391,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   getAddress(addressSignedWith) !== getAddress(account.address)
                 ) {
                   throw new Error(
-                    "Ledger: The signature doesnt match the right address"
+                    "Ledger: The signature doesnt match the right address",
                   );
                 }
 
@@ -428,7 +428,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       provider,
       withLedger,
       nativeCurrency,
-    ]
+    ],
   );
 
   const bootAnimationRef = useRef(true);
@@ -479,7 +479,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   <div
                     className={classNames(
                       "w-full",
-                      bootAnimationRef.current && "animate-bootfadeinfast"
+                      bootAnimationRef.current && "animate-bootfadeinfast",
                     )}
                     onAnimationEnd={handleBootAnimationDone}
                   >
@@ -488,7 +488,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                       fees={fees}
                       averageGasLimit={prepared.estimatedGasLimit}
                       gasLimit={ethers.BigNumber.from(
-                        txOverrides.gasLimit || originTx.gasLimit!
+                        txOverrides.gasLimit || originTx.gasLimit!,
                       )}
                       feeMode={feeMode}
                       maxFee={maxFee}
@@ -571,7 +571,7 @@ const Loading: FC = () => {
       className={classNames(
         !delayed ? "hidden" : "animate-bootfadeinfast",
         "min-h-[200px] flex items-center justify-center",
-        "text-white text-lg text-semibold"
+        "text-white text-lg text-semibold",
       )}
     >
       <div className="atom-spinner w-12 h-12" />

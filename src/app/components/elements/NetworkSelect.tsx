@@ -39,7 +39,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       changeInternalChainId && setChainId(chainId);
       onChange?.(chainId);
     },
-    [changeInternalChainId, setChainId, onChange]
+    [changeInternalChainId, setChainId, onChange],
   );
 
   return (
@@ -53,7 +53,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       source={source}
       currentItemClassName={classNames(
         size === "small" ? "h-[1.75rem]" : "h-12",
-        currentItemClassName
+        currentItemClassName,
       )}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}

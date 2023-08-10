@@ -26,7 +26,7 @@ export async function getWalletState() {
       // that the Service Worker has stalled or smth happen
       // So, let's not delay the user
       timeout: 5_000,
-    }
+    },
   );
   assert(res?.type === type);
 
@@ -35,7 +35,7 @@ export async function getWalletState() {
 }
 
 export function onWalletStateUpdated(
-  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void
+  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void,
 ) {
   return porter.onOneWayMessage<EventMessage>((msg) => {
     if (msg?.type === MessageType.WalletStateUpdated) {
@@ -56,7 +56,7 @@ export function onAccountsUpdated(callback: (newAccounts: Account[]) => void) {
 export async function setupWallet(
   password: string,
   accountsParams: AddAccountParams[],
-  seedPhrase?: SeedPharse
+  seedPhrase?: SeedPharse,
 ) {
   password = await toProtectedPassword(password);
 
@@ -92,7 +92,7 @@ export async function lockWallet() {
 
 export async function changePassword(
   currentPassword: string,
-  nextPassword: string
+  nextPassword: string,
 ) {
   currentPassword = await toProtectedPassword(currentPassword);
   nextPassword = await toProtectedPassword(nextPassword);
@@ -114,7 +114,7 @@ export async function getAccounts() {
 
 export async function addAccounts(
   accountsParams: AddAccountParams[],
-  seedPhrase?: SeedPharse
+  seedPhrase?: SeedPharse,
 ) {
   const type = MessageType.AddAccounts;
 
@@ -220,7 +220,7 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
 export function sync(
   chainId: number,
   accountAddress: string,
-  tokenType: TokenType
+  tokenType: TokenType,
 ) {
   const msg: Sync = {
     type: MessageType.Sync,
@@ -236,7 +236,7 @@ export function findToken(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata?: boolean
+  refreshMetadata?: boolean,
 ) {
   const msg: FindToken = {
     type: MessageType.FindToken,
@@ -252,7 +252,7 @@ export function findToken(
 export function syncTokenActivities(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
 ) {
   const msg: SyncTokenActivities = {
     type: MessageType.SyncTokenActivities,

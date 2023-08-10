@@ -1,7 +1,7 @@
 import { memo, forwardRef, ReactNode, useEffect, useRef } from "react";
 import classNames from "clsx";
 import { mergeRefs } from "react-merge-refs";
-import canvasTxt from "canvas-txt";
+import * as canvasTxt from "canvas-txt";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 const canvasMultiplier = 3;
@@ -29,7 +29,7 @@ const CanvasTextField = memo(
         canvasClassName,
         ...rest
       },
-      ref
+      ref,
     ) => {
       const canvasRef = useRef<HTMLCanvasElement>();
       const prevValue = usePrevious(value ?? defaultValue);
@@ -50,14 +50,20 @@ const CanvasTextField = memo(
             }
 
             const txt = value ?? defaultValue ?? "";
-            canvasTxt.font = `Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`;
-            canvasTxt.fontSize = 16;
-            canvasTxt.align = "left";
-            canvasTxt.vAlign = "top";
-            canvasTxt.justify = false;
-            canvasTxt.debug = false;
-            canvasTxt.lineHeight = 20;
-            canvasTxt.drawText(ctx, txt, 16, 12, 406, 86);
+
+            canvasTxt.drawText(ctx, txt, {
+              x: 16,
+              y: 12,
+              width: 406,
+              height: 86,
+              font: `Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+              fontSize: 16,
+              align: "left",
+              vAlign: "top",
+              justify: false,
+              debug: false,
+              lineHeight: 20,
+            });
           }
         }
       }, [defaultValue, prevValue, value]);
@@ -84,7 +90,7 @@ const CanvasTextField = memo(
               "rounded-[.625rem]",
               "transition-colors",
               "group-hover:bg-brand-main/5",
-              "group-hover:border-brand-main/5"
+              "group-hover:border-brand-main/5",
             )}
           >
             <canvas
@@ -98,8 +104,8 @@ const CanvasTextField = memo(
           </div>
         </div>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default CanvasTextField;

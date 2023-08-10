@@ -37,7 +37,7 @@ const LongTextField = memo(
         hoverStyles = true,
         ...rest
       },
-      ref
+      ref,
     ) => {
       return (
         <div className={classNames("flex flex-col", className)}>
@@ -95,7 +95,7 @@ const LongTextField = memo(
                   "border-brand-main/5",
                   "text-brand-disabledcolor placeholder-brand-disabledcolor",
                 ],
-                textareaClassName
+                textareaClassName,
               )}
               autoComplete={autoComplete}
               {...rest}
@@ -106,7 +106,7 @@ const LongTextField = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && !readOnly && "max-h-5"
+              error && errorMessage && !readOnly && "max-h-5",
             )}
           >
             <span className="block text-brand-redtext text-left pt-1 pl-4 text-xs">
@@ -115,8 +115,8 @@ const LongTextField = memo(
           </div>
         </div>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default LongTextField;

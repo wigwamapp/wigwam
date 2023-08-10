@@ -53,7 +53,7 @@ const NftCard = memo(
               "hover:bg-brand-main/10 hover:!opacity-100",
             isActive && "bg-brand-main/20",
             (disabled || rawBalance === "0") && "opacity-60",
-            invisible && "invisible"
+            invisible && "invisible",
           )}
         >
           <div className="relative w-full">
@@ -64,7 +64,7 @@ const NftCard = memo(
               setLoadingStatus={setLoadingStatus}
               className={classNames(
                 "w-full h-auto !rounded-md",
-                !loaded && "h-[6rem]"
+                !loaded && "h-[6rem]",
               )}
               errorClassName="h-[6rem]"
             />
@@ -80,7 +80,7 @@ const NftCard = memo(
                   "py-px px-2.5",
                   "rounded",
                   "bg-[#35394D]",
-                  "border border-brand-main/20"
+                  "border border-brand-main/20",
                 )}
               />
             )}
@@ -93,7 +93,7 @@ const NftCard = memo(
                   "bg-[#35394D]",
                   "rounded",
                   "flex items-center justify-center",
-                  !disabled && "border border-brand-main"
+                  !disabled && "border border-brand-main",
                 )}
                 checked={!disabled}
                 asChild
@@ -109,8 +109,8 @@ const NftCard = memo(
           {title.component}
         </button>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default NftCard;
@@ -123,7 +123,7 @@ const prepareName = (originId: string, originName?: string) => {
       <h3
         className={classNames(
           "line-clamp-2 break-words mt-2",
-          !name ? "text-brand-main" : ""
+          !name ? "text-brand-main" : "",
         )}
       >
         <span
@@ -131,7 +131,7 @@ const prepareName = (originId: string, originName?: string) => {
             name &&
               name.length > 13 &&
               !name.slice(0, 13).includes(" ") &&
-              "break-all"
+              "break-all",
           )}
         >
           {name}
@@ -141,7 +141,7 @@ const prepareName = (originId: string, originName?: string) => {
           <span
             className={classNames(
               "text-brand-main",
-              id.length > 11 ? "break-all" : "break-words"
+              id.length > 11 ? "break-all" : "break-words",
             )}
           >
             {id}

@@ -29,5 +29,5 @@ export const estimateGasPrices = memoize(
   },
   {
     maxAge: 5_000,
-  }
+  },
 );

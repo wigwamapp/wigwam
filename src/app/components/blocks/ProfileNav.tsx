@@ -13,7 +13,7 @@ const ProfileNav = memo(() => {
   const profilesLength = all.length;
   const currentProfile = useMemo(
     () => all.find(({ id }) => id === currentId)!,
-    [all, currentId]
+    [all, currentId],
   );
 
   return profilesLength > 1 ? (
