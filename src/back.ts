@@ -13,6 +13,7 @@ import {
   startBruteForceProtection,
   startInstallOrUpdateListener,
   startApproveWindowOpener,
+  startPersistingApprovals,
   startTxObserver,
   startExtBadge,
   startAutoLocker,
@@ -40,6 +41,7 @@ startBruteForceProtection();
 
 startInstallOrUpdateListener();
 startApproveWindowOpener();
+startPersistingApprovals();
 startTxObserver();
 startExtBadge();
 startAutoLocker();

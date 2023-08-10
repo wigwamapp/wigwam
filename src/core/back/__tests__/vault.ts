@@ -1,4 +1,5 @@
 import { CryptoEngine } from "kdbxweb";
+import { retrieveSession } from "lib/ext/safeSession";
 import { recoverPersonalSignature } from "@metamask/eth-sig-util";
 import { ethers } from "ethers";
 import {
@@ -13,7 +14,6 @@ import { session } from "lib/ext/session";
 import { AccountSource, PASSWORD_SESSION, SigningStandard } from "core/types";
 
 import { Vault } from "../vault";
-import { retrievePasswordSession } from "../vault/session";
 
 // Mock argon2 with just sha256
 beforeAll(() => CryptoEngine.setArgon2Impl((p) => CryptoEngine.sha256(p)));
@@ -353,7 +353,7 @@ describe("Vault", () => {
     expect(typeof sessionValue).toBe("string");
     expect(sessionValue).not.toBe(passHash);
 
-    const passSession = await retrievePasswordSession();
+    const passSession = await retrieveSession(PASSWORD_SESSION);
     expect(passSession).not.toBeNull();
 
     expect(passSession!.passwordHash).toBe(passHash);
@@ -378,7 +378,7 @@ describe("Vault", () => {
     expect(typeof sessionValue).toBe("string");
     expect(sessionValue).not.toBe(passHash);
 
-    const passSession = await retrievePasswordSession();
+    const passSession = await retrieveSession(PASSWORD_SESSION);
     expect(passSession).not.toBeNull();
 
     expect(passSession!.passwordHash).toBe(passHash);
@@ -419,7 +419,7 @@ describe("Vault", () => {
     expect(typeof sessionValue).toBe("string");
     expect(sessionValue).not.toBe(passHashNew);
 
-    const passSession = await retrievePasswordSession();
+    const passSession = await retrieveSession(PASSWORD_SESSION);
     expect(passSession).not.toBeNull();
 
     expect(passSession!.passwordHash).toBe(passHashNew);

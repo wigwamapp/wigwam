@@ -1,6 +1,6 @@
 import type { ethers } from "ethers";
 
-import { RpcReply } from "./rpc";
+import { RpcContext } from "./rpc";
 import { Permission } from "./permissions";
 
 export enum ActivityType {
@@ -62,7 +62,7 @@ export interface ActivityBase {
   type: ActivityType;
   source: ActivitySource;
   timeAt: number;
-  rpcReply?: RpcReply; // only exists on approval & on back side
+  rpcCtx?: RpcContext; // only exists on approval & on back side
 }
 
 export interface TransactionApproval extends ActivityBase {

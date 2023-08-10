@@ -1,3 +1,4 @@
+import { Runtime } from "webextension-polyfill";
 import { PorterMessageType } from "./types";
 
 export const MESSAGE_TYPES = Object.values(PorterMessageType);
@@ -20,6 +21,10 @@ export function sanitizeMessage(msg: any) {
   } catch {
     return msg;
   }
+}
+
+export function getPortId(port: Runtime.Port) {
+  return port.name.split("_")[1];
 }
 
 export function serializeError(err: any): SerializedError {

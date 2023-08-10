@@ -9,20 +9,10 @@ import {
   bytesToUtf8,
 } from "lib/crypto-utils";
 
-import { PASSWORD_SESSION } from "core/types";
-
 const BUILD_ID = process.env.BUILD_ID;
 
-type PasswordSession = {
-  passwordHash: string;
-  timestamp: number;
-};
-
-export async function persistPasswordSession(passwordHash: string) {
+export async function persistSession(sessionKey: string, data: any) {
   try {
-    const timestamp = Date.now();
-    const dataToEncrypt: PasswordSession = { passwordHash, timestamp };
-
     // Generate crypto key for encryption
     const salt = getRandomBytes(32);
     const encKey = await getEncryptionKey(salt);
@@ -36,7 +26,7 @@ export async function persistPasswordSession(passwordHash: string) {
           iv,
         },
         encKey,
-        utf8ToBytes(JSON.stringify(dataToEncrypt))
+        utf8ToBytes(JSON.stringify(data))
       )
     );
 
@@ -51,18 +41,18 @@ export async function persistPasswordSession(passwordHash: string) {
     zeroBuffer(payload);
 
     // Persist
-    await session.put(PASSWORD_SESSION, payloadB64);
+    await session.put(sessionKey, payloadB64);
   } catch (err) {
-    console.error("Failed to persist password session", err);
+    console.error("Failed to persist session", err);
   }
 }
 
-export async function retrievePasswordSession() {
+export async function retrieveSession<T = any>(sessionKey: string) {
   try {
-    const sessioned = await session.fetchForce<string>(PASSWORD_SESSION);
-    if (!sessioned) return null;
+    const payloadB64 = await session.fetchForce<string>(sessionKey);
+    if (!payloadB64) return null;
 
-    const payload = base64ToBytes(sessioned);
+    const payload = base64ToBytes(payloadB64);
 
     // Decompose payload to parts
     let index = 0;
@@ -88,20 +78,18 @@ export async function retrievePasswordSession() {
     zeroBuffer(iv);
     zeroBuffer(cipher);
 
-    const data: PasswordSession = JSON.parse(
-      bytesToUtf8(new Uint8Array(dataBuf))
-    );
+    const data: T = JSON.parse(bytesToUtf8(new Uint8Array(dataBuf)));
     zeroBuffer(dataBuf);
 
     return data;
   } catch (err) {
-    console.error("Failed to retrieve password session", err);
+    console.error("Failed to retrieve session", err);
     return null;
   }
 }
 
-export async function cleanupPasswordSession() {
-  await session.remove(PASSWORD_SESSION).catch(console.error);
+export async function cleanupSession(sessionKey: string) {
+  await session.remove(sessionKey).catch(console.error);
 }
 
 async function getEncryptionKey(salt: Uint8Array) {

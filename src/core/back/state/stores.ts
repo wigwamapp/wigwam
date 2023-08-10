@@ -73,6 +73,7 @@ export const $syncPool = createStore<(number | string)[]>([])
 export const $syncStatus = $syncPool.map((pool) => Array.from(new Set(pool)));
 
 export const $approvals = createStore<Approval[]>([])
+  .on(unlocked, (_, { approvals }) => approvals ?? [])
   .on(approvalAdded, (approvals, newApproval) => {
     if (newApproval.type === ActivityType.Connection) {
       const newApprovalOrigin = getPageOrigin(newApproval.source);
@@ -127,9 +128,9 @@ export const $accountAddresses = $accounts.map((accounts) =>
 );
 
 function rejectApprovalsRpc(approvals: Approval[]) {
-  for (const { rpcReply } of approvals) {
+  for (const { rpcCtx } of approvals) {
     try {
-      rpcReply?.({
+      rpcCtx?.reply({
         error: ethErrors.provider.userRejectedRequest(),
       });
     } catch {}

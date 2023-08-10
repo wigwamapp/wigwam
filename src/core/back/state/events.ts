@@ -1,4 +1,4 @@
-import { createEvent } from "effector";
+import { createEvent, merge } from "effector";
 
 import { Approval, Account } from "core/types";
 
@@ -10,6 +10,7 @@ export const unlocked = createEvent<{
   vault: Vault;
   accounts: Account[];
   hasSeedPhrase: boolean;
+  approvals?: Approval[];
 }>();
 
 export const locked = createEvent();
@@ -25,6 +26,12 @@ export const approvalAdded = createEvent<Approval>();
 export const approvalResolved = createEvent<string>();
 
 export const approvalsRejected = createEvent<string[] | null>();
+
+export const approvalsChanged = merge([
+  approvalAdded,
+  approvalResolved,
+  approvalsRejected,
+]);
 
 export const syncStarted = createEvent<number | string>();
 

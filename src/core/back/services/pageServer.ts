@@ -145,7 +145,7 @@ export function startPageServer() {
   };
 }
 
-const faviconCache = new WeakMap<Runtime.Port, string>();
+const faviconCache = new Map<string, string>();
 
 async function handlePageRequest(
   ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
@@ -156,7 +156,7 @@ async function handlePageRequest(
 
   if (method === VIGVAM_FAVICON) {
     if (Array.isArray(params) && typeof params[0] === "string") {
-      faviconCache.set(ctx.port, params[0]);
+      faviconCache.set(ctx.portId, params[0]);
     }
 
     return;
@@ -165,7 +165,7 @@ async function handlePageRequest(
   try {
     await ensureInited();
 
-    const senderUrl = ctx.port.sender?.url;
+    const senderUrl = ctx.port?.sender?.url;
     if (!senderUrl) {
       throw ethErrors.rpc.resourceNotFound();
     }
@@ -175,27 +175,12 @@ async function handlePageRequest(
       url: senderUrl,
       tabId: ctx.port.sender?.tab?.id,
       favIconUrl:
-        faviconCache.get(ctx.port) || ctx.port.sender?.tab?.favIconUrl,
+        faviconCache.get(ctx.portId) || ctx.port.sender?.tab?.favIconUrl,
     };
 
     const chainId = await loadInternalChainId();
 
-    handleRpc(source, chainId, method, (params as any[]) ?? [], (response) => {
-      if ("error" in response) {
-        // Send plain object, not an Error instance
-        // Also remove error stack
-        const { message, code, data } = response.error;
-        response = {
-          error: { message, code, data },
-        };
-      }
-
-      ctx.reply({
-        id,
-        jsonrpc,
-        ...response,
-      });
-    });
+    handleRpc(ctx, source, chainId, method, (params as any[]) ?? []);
   } catch (err) {
     console.error(err);
 
@@ -220,7 +205,7 @@ async function resolveConnectionApproval(perm?: Permission) {
           ? perm.accountAddresses
           : [wrapPermission(perm)];
 
-        approval.rpcReply?.({ result });
+        approval.rpcCtx?.reply({ result });
         approvalResolved(approval.id);
       }
     }

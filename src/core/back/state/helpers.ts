@@ -1,18 +1,22 @@
 import { t } from "lib/ext/i18n";
+import { retrieveSession, cleanupSession } from "lib/ext/safeSession";
 import { toProtectedPassword } from "lib/crypto-utils";
 import { createQueue } from "lib/system/queue";
 import { assert } from "lib/system/assert";
 
-import { WalletStatus } from "core/types";
+import {
+  APPROVALS_SESSION,
+  Approval,
+  PASSWORD_SESSION,
+  WalletStatus,
+} from "core/types";
 import { retrieveAutoLockTimeout } from "core/common/settings";
 
 import { $walletStatus, $vault } from "./stores";
 import { inited, unlocked } from "./events";
+import { RpcCtx } from "../rpc/context";
 import { Vault } from "../vault";
-import {
-  retrievePasswordSession,
-  cleanupPasswordSession,
-} from "../vault/session";
+import type { PasswordSession } from "../vault/passwordSession";
 
 const enqueueInit = createQueue();
 
@@ -25,21 +29,29 @@ export async function ensureInited() {
     // to `enqueueInit()`, but this way causes a huge decrease in performance
     if ($walletStatus.getState() !== WalletStatus.Idle) return;
 
-    const sessioned = await retrievePasswordSession();
+    const [passwordSession, approvalsSession] = await Promise.all([
+      retrieveSession<PasswordSession>(PASSWORD_SESSION),
+      retrieveSession<Approval[]>(APPROVALS_SESSION),
+    ]);
 
-    if (sessioned) {
-      const { passwordHash, timestamp } = sessioned;
+    const approvals = approvalsSession?.map((approval) => ({
+      ...approval,
+      rpcCtx: RpcCtx.from(approval.rpcCtx as any),
+    }));
+
+    if (passwordSession) {
+      const { passwordHash, timestamp } = passwordSession;
 
       const autoLockTimeout = await retrieveAutoLockTimeout();
 
       if (autoLockTimeout === 0 || Date.now() - timestamp < autoLockTimeout) {
         try {
-          await autoUnlock(passwordHash);
+          await autoUnlock(passwordHash, approvals);
           return;
         } catch {}
       }
 
-      await cleanupPasswordSession();
+      await cleanupSession(PASSWORD_SESSION);
     }
 
     const PLAIN_DEV_PASSWORD = process.env.VIGVAM_DEV_UNLOCK_PASSWORD;
@@ -48,7 +60,7 @@ export async function ensureInited() {
       const pass = await toProtectedPassword(PLAIN_DEV_PASSWORD);
 
       try {
-        await autoUnlock(pass);
+        await autoUnlock(pass, approvals);
         return;
       } catch {}
     }
@@ -80,10 +92,10 @@ export function isUnlocked() {
   return $walletStatus.getState() === WalletStatus.Unlocked;
 }
 
-async function autoUnlock(password: string) {
+async function autoUnlock(password: string, approvals?: Approval[]) {
   const vault = await Vault.unlock(password);
   const accounts = vault.getAccounts();
   const hasSeedPhrase = vault.isSeedPhraseExists();
 
-  unlocked({ vault, accounts, hasSeedPhrase });
+  unlocked({ vault, accounts, hasSeedPhrase, approvals });
 }
