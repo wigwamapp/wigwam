@@ -15,12 +15,12 @@ import {
 } from "./helpers";
 
 export type PorterMessageHandler<Data = any, ReplyData = any> = (
-  ctx: MessageContext<Data, ReplyData>
+  ctx: MessageContext<Data, ReplyData>,
 ) => void;
 
 export type PorterConnectionHandler = (
   action: "connect" | "disconnect",
-  port: Runtime.Port
+  port: Runtime.Port,
 ) => void;
 
 // Required to recreate MessageContext
@@ -44,7 +44,7 @@ export class PorterServer<OneWayData = any> {
   }
 
   onMessage<Data = unknown, ReplyData = any>(
-    handler: PorterMessageHandler<Data, ReplyData>
+    handler: PorterMessageHandler<Data, ReplyData>,
   ) {
     this.addMessageHandler(handler);
     return () => this.removeMessageHandler(handler);
@@ -69,7 +69,7 @@ export class PorterServer<OneWayData = any> {
   notify(port: Runtime.Port, data: OneWayData) {
     if (this.isConnected(port)) {
       port.postMessage(
-        sanitizeMessage({ type: PorterMessageType.OneWay, data })
+        sanitizeMessage({ type: PorterMessageType.OneWay, data }),
       );
     }
   }
@@ -88,7 +88,7 @@ export class PorterServer<OneWayData = any> {
         this.removePort(port);
 
         forEachSafe(this.connectionHandlers, (handle) =>
-          handle("disconnect", port)
+          handle("disconnect", port),
         );
       });
     }
@@ -101,7 +101,7 @@ export class PorterServer<OneWayData = any> {
     ) {
       const ctx = new MessageContext(
         getPortId(port),
-        msg as PorterClientMessage
+        msg as PorterClientMessage,
       );
 
       forEachSafe(this.messageHandlers, (handle) => handle(ctx));
@@ -128,7 +128,10 @@ export class PorterServer<OneWayData = any> {
 }
 
 export class MessageContext<Data, ReplyData> {
-  constructor(public portId: string, public msg: PorterClientMessage) {}
+  constructor(
+    public portId: string,
+    public msg: PorterClientMessage,
+  ) {}
 
   get port() {
     return ALL_PORTS.get(this.portId);
@@ -153,7 +156,7 @@ export class MessageContext<Data, ReplyData> {
         : {
             type: PorterMessageType.OneWay,
             data,
-          }
+          },
     );
   }
 

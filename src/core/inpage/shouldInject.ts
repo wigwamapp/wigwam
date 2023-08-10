@@ -62,7 +62,7 @@ function blockedDomainCheck() {
     const blockedDomain = blockedDomains[i].replace(".", "\\.");
     currentRegex = new RegExp(
       `(?:https?:\\/\\/)(?:(?!${blockedDomain}).)*$`,
-      "u"
+      "u",
     );
     if (!currentRegex.test(currentUrl)) {
       return true;

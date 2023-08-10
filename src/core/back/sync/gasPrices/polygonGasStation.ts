@@ -20,7 +20,7 @@ export async function getPolygonGasPrices(chainId: number): Promise<GasPrices> {
     ({ maxFee, maxPriorityFee }) => ({
       max: toGweiString(maxFee),
       priority: toGweiString(maxPriorityFee),
-    })
+    }),
   );
 
   return {

@@ -47,7 +47,7 @@ const PasswordValidationField = forwardRef<
 
       onChange?.(evt);
     },
-    [onChange]
+    [onChange],
   );
 
   return (
@@ -59,7 +59,7 @@ const PasswordValidationField = forwardRef<
           "mt-2 pl-2 -mb-2",
           "max-h-0 overflow-hidden",
           "transition-[max-height] duration-200",
-          (modified || rest.error) && "max-h-[4rem]"
+          (modified || rest.error) && "max-h-[4rem]",
         )}
       >
         {Object.keys(passwordRequirements).map((key) => (
@@ -69,7 +69,7 @@ const PasswordValidationField = forwardRef<
             isActive={passwordRequirements[key as RequirementsType]}
             isOptional={key === "characters"}
             isError={Boolean(
-              !passwordRequirements[key as RequirementsType] && rest.error
+              !passwordRequirements[key as RequirementsType] && rest.error,
             )}
           />
         ))}
@@ -115,7 +115,7 @@ const Tag: FC<TagProps> = ({
         (isOptional
           ? ""
           : "border-brand-redtext/20 bg-brand-redtext/20 text-brand-redtext"),
-      className
+      className,
     )}
   >
     {getLabel(type)}

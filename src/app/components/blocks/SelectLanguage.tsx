@@ -23,12 +23,12 @@ const SelectLanguage = memo<SelectLanguageProps>(
   ({ className, selected, items, onSelect, ...rest }) => {
     const preparedLanguages = useMemo(
       () => items.map((language) => prepareLanguage(language)),
-      [items]
+      [items],
     );
 
     const preparedCurrentLanguage = useMemo(
       () => prepareLanguage(selected),
-      [selected]
+      [selected],
     );
 
     const selectLanguage = useCallback(
@@ -37,7 +37,7 @@ const SelectLanguage = memo<SelectLanguageProps>(
           items.find(({ code }) => key === code) ?? FALLBACK_LOCALE;
         onSelect(locale);
       },
-      [items, onSelect]
+      [items, onSelect],
     );
 
     return (
@@ -51,7 +51,7 @@ const SelectLanguage = memo<SelectLanguageProps>(
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default SelectLanguage;

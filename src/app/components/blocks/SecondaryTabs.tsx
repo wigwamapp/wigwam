@@ -23,7 +23,7 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
       "relative",
       "flex flex-col",
       "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
-      className
+      className,
     )}
     viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
     scrollBarClassName="py-0 pt-5 pb-20 !right-1"
@@ -71,7 +71,7 @@ const SecondaryItem: FC<
         "group",
         isActive && "bg-brand-main/10",
         !isActive && "hover:bg-brand-main/5",
-        className
+        className,
       )}
     >
       <div className="flex items-center">
@@ -87,7 +87,7 @@ const SecondaryItem: FC<
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           !isActive && "-translate-x-1.5 opacity-0",
-          isActive && "translate-x-0 opacity-100"
+          isActive && "translate-x-0 opacity-100",
         )}
       />
     </Link>

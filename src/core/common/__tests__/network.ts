@@ -22,19 +22,19 @@ describe("Common > Network", () => {
 
   it("getRpcUrl", async () => {
     expect(getRpcUrl(INITIAL_NETWORK.chainId)).resolves.toBe(
-      INITIAL_NETWORK.rpcUrls[0]
+      INITIAL_NETWORK.rpcUrls[0],
     );
   });
 
   it("setRpcUrl", async () => {
     expect(getRpcUrl(INITIAL_NETWORK.chainId)).resolves.toBe(
-      INITIAL_NETWORK.rpcUrls[0]
+      INITIAL_NETWORK.rpcUrls[0],
     );
 
     await setRpcUrl(INITIAL_NETWORK.chainId, INITIAL_NETWORK.rpcUrls[1]);
 
     expect(getRpcUrl(INITIAL_NETWORK.chainId)).resolves.toBe(
-      INITIAL_NETWORK.rpcUrls[1]
+      INITIAL_NETWORK.rpcUrls[1],
     );
   });
 
@@ -46,7 +46,7 @@ describe("Common > Network", () => {
     await cleanupNetwork(network.chainId);
 
     expect(getRpcUrl(network.chainId)).rejects.toThrowError(
-      "Network Not Found"
+      "Network Not Found",
     );
   });
 });

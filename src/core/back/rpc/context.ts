@@ -63,7 +63,7 @@ export class RpcCtx implements RpcContext {
 }
 
 function isWalletRpc(
-  rpcCtx: MessageContext<any, any>
+  rpcCtx: MessageContext<any, any>,
 ): rpcCtx is WalletRpcMsgContext {
   return rpcCtx.port?.name.startsWith(PorterChannel.Wallet) ?? false;
 }

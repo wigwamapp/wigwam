@@ -22,7 +22,7 @@ const Networks: FC = () => {
 
   const fuse = useMemo(
     () => new Fuse(allNetworks ?? [], NETWORK_SEARCH_OPTIONS),
-    [allNetworks]
+    [allNetworks],
   );
 
   const preparedNetworks = useMemo(() => {
@@ -38,7 +38,7 @@ const Networks: FC = () => {
 
   const selectedNetwork = useMemo(
     () => allNetworks?.find((n) => n.chainId === tab),
-    [tab, allNetworks]
+    [tab, allNetworks],
   );
 
   const cancelEditing = useCallback(() => setTab(null), []);
@@ -53,7 +53,7 @@ const Networks: FC = () => {
         });
       }, 300);
     },
-    [scrollAreaRef]
+    [scrollAreaRef],
   );
 
   return (
@@ -62,7 +62,7 @@ const Networks: FC = () => {
         className={classNames(
           "flex flex-col",
           "w-[calc(19.875rem+1px)] px-6",
-          "border-r border-brand-main/[.07]"
+          "border-r border-brand-main/[.07]",
         )}
       >
         <SearchInput
@@ -143,7 +143,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
         "transition-colors",
         !isActive && "hover:bg-brand-main/[.05]",
         isActive && "bg-brand-main/10",
-        className
+        className,
       )}
       onClick={onClick}
     >
@@ -160,7 +160,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           isActive && "translate-x-0 opacity-100",
-          !isActive && "-translate-x-1.5 opacity-0"
+          !isActive && "-translate-x-1.5 opacity-0",
         )}
       />
     </button>

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export function useCopyToClipboard(
   text?: string | number | readonly string[],
-  copyDelay: number = 1000 * 2
+  copyDelay: number = 1000 * 2,
 ) {
   const [copied, setCopied] = useState(false);
 

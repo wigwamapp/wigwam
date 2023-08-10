@@ -44,7 +44,7 @@ const AddWatchOnlyAccount = memo(() => {
           return { address: err?.message };
         }
       }),
-    [navigateToStep, stateRef]
+    [navigateToStep, stateRef],
   );
 
   return (

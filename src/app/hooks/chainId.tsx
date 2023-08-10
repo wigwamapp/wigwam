@@ -44,14 +44,14 @@ export function useIsSyncing() {
 export function useIsTokenActivitySyncing(
   chainId: number,
   accountAddress: string,
-  tokenSlug?: string
+  tokenSlug?: string,
 ) {
   const status = useSyncStatus();
   const syncKey = useMemo(
     () =>
       tokenSlug &&
       createAccountTokenKey({ chainId, accountAddress, tokenSlug }),
-    [chainId, accountAddress, tokenSlug]
+    [chainId, accountAddress, tokenSlug],
   );
 
   return syncKey ? status.includes(syncKey) : false;
@@ -60,7 +60,7 @@ export function useIsTokenActivitySyncing(
 export function useSync(
   chainId: number,
   accountAddress: string,
-  tokenType = TokenType.Asset
+  tokenType = TokenType.Asset,
 ) {
   const isHidden = useDocumentVisibility();
 
@@ -84,7 +84,7 @@ export function useSync(
 export function useTokenActivitiesSync(
   chainId: number,
   accountAddress: string,
-  tokenSlug?: string
+  tokenSlug?: string,
 ) {
   const isHidden = useDocumentVisibility();
 

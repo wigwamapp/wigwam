@@ -10,7 +10,7 @@ const BUILD_ID = process.env.BUILD_ID;
 export class InpageProtocol {
   constructor(
     public self: InpageMessageTarget,
-    public recipient: InpageMessageTarget
+    public recipient: InpageMessageTarget,
   ) {}
 
   send(data: any) {
@@ -24,7 +24,7 @@ export class InpageProtocol {
   }
 
   subscribe<T = any>(
-    callback: (payload: T, evt: MessageEvent<InpageMessage<T>>) => void
+    callback: (payload: T, evt: MessageEvent<InpageMessage<T>>) => void,
   ) {
     const handleMessage = (evt: MessageEvent<InpageMessage<T>>) => {
       if (

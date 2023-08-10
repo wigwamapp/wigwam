@@ -14,22 +14,22 @@ export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
 
 export const addAccountStepAtom = atomWithURLHash(
   "addAccStep",
-  AddAccountStep.ChooseWay
+  AddAccountStep.ChooseWay,
 );
 
 export const settingTabAtom = atomWithURLHash<SettingTab>(
   "setting",
-  SettingTab.General
+  SettingTab.General,
 );
 
 export const transferTabAtom = atomWithURLHash<TransferTab>(
   "transfer",
-  TransferTab.Asset
+  TransferTab.Asset,
 );
 
 export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
   "receive",
-  ReceiveTab.ShareAddress
+  ReceiveTab.ShareAddress,
 );
 
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);

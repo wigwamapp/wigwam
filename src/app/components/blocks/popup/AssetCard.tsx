@@ -52,7 +52,7 @@ const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
     (
       { asset, setReceivePopupOpened, isManageMode = false, className },
-      ref
+      ref,
     ) => {
       const { currentAccount } = useAccounts();
       const setInternalChainId = useSetAtom(chainIdAtom);
@@ -77,7 +77,7 @@ const AssetCard = memo(
           setInternalChainId(chainId);
           openInTab(to);
         },
-        [setInternalChainId, chainId]
+        [setInternalChainId, chainId],
       );
 
       const handleAssetClick = useCallback(async () => {
@@ -93,7 +93,9 @@ const AssetCard = memo(
                     ? TokenStatus.Disabled
                     : TokenStatus.Enabled,
               },
-              [asset.chainId, currentAccount.address, asset.tokenSlug].join("_")
+              [asset.chainId, currentAccount.address, asset.tokenSlug].join(
+                "_",
+              ),
             );
           } catch (e) {
             console.error(e);
@@ -112,7 +114,7 @@ const AssetCard = memo(
             }
           }
         },
-        [isManageMode, popoverOpened]
+        [isManageMode, popoverOpened],
       );
 
       const priceClassName = useMemo(
@@ -120,7 +122,7 @@ const AssetCard = memo(
           priceUSDChange && +priceUSDChange > 0
             ? "text-[#6BB77A]"
             : "text-[#EA556A]",
-        [priceUSDChange]
+        [priceUSDChange],
       );
 
       const content = (
@@ -143,7 +145,7 @@ const AssetCard = memo(
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
             disabled && "opacity-60",
             "hover:opacity-100",
-            className
+            className,
           )}
           disabled={isManageMode && nativeAsset}
         >
@@ -176,7 +178,7 @@ const AssetCard = memo(
                 className={classNames(
                   // "text-sm",
                   "text-xs leading-4",
-                  "text-brand-inactivedark"
+                  "text-brand-inactivedark",
                 )}
                 copiable={!isManageMode}
                 asSpan
@@ -189,13 +191,13 @@ const AssetCard = memo(
                     "opacity-75",
                     "transition",
                     "ml-2",
-                    priceClassName
+                    priceClassName,
                   )}
                 >
                   <PriceArrow
                     className={classNames(
                       "w-2 h-2 mr-[0.125rem]",
-                      +priceUSDChange < 0 && "transform rotate-180"
+                      +priceUSDChange < 0 && "transform rotate-180",
                     )}
                   />
 
@@ -213,7 +215,7 @@ const AssetCard = memo(
                 theme="tertiary"
                 className={classNames(
                   "ml-2",
-                  popoverOpened && "bg-brand-main/30 shadow-buttonsecondary"
+                  popoverOpened && "bg-brand-main/30 shadow-buttonsecondary",
                 )}
                 tabIndex={-1}
                 asSpan
@@ -226,7 +228,7 @@ const AssetCard = memo(
                 "bg-brand-main/20",
                 "rounded",
                 "flex items-center justify-center",
-                !disabled && "border border-brand-main"
+                !disabled && "border border-brand-main",
               )}
               checked={!disabled}
               asChild
@@ -260,7 +262,7 @@ const AssetCard = memo(
                 "border border-brand-light/5",
                 "rounded-[.625rem]",
                 "px-1 py-2",
-                "z-[1]"
+                "z-[1]",
               )}
             >
               <PopoverButton
@@ -315,9 +317,9 @@ const AssetCard = memo(
           )}
         </DropdownMenu.Root>
       );
-    }
+    },
   ),
-  dequal
+  dequal,
 );
 
 export default AssetCard;
@@ -336,7 +338,7 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
       "text-sm font-bold",
       "transition-colors",
       !rest.disabled && "hover:bg-brand-main/20 focus:bg-brand-main/20",
-      "disabled:opacity-40 disabled:cursor-default"
+      "disabled:opacity-40 disabled:cursor-default",
     )}
     {...rest}
   >

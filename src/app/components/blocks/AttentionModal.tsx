@@ -12,7 +12,7 @@ import SmartLink from "../elements/SmartLink";
 
 const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   const [accordionValue, setAccordionValue] = useState(
-    AttentionContent[0].value
+    AttentionContent[0].value,
   );
 
   const isPopup = isPopupPrimitive();
@@ -27,7 +27,7 @@ const AttentionModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
         isPopup && "max-w-[92vw] max-h-[70vh]",
         "prose prose-invert",
         isPopup && "prose-sm",
-        "!block"
+        "!block",
       )}
     >
       <Accordion.Root

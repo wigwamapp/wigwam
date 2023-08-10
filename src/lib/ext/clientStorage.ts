@@ -27,7 +27,7 @@ export function clear() {
 export function subscribe(
   key: string,
   callback: () => void,
-  opts?: AddEventListenerOptions
+  opts?: AddEventListenerOptions,
 ) {
   const handleChange = (evt: StorageEvent | CustomEvent<string | null>) => {
     const evtKey = evt instanceof StorageEvent ? evt.key : evt.detail;
@@ -48,6 +48,6 @@ export function subscribe(
 function notifySelf(key: string | null) {
   // We dispatch a custom event for current document
   window.dispatchEvent(
-    new CustomEvent<string | null>("local-storage", { detail: key })
+    new CustomEvent<string | null>("local-storage", { detail: key }),
   );
 }

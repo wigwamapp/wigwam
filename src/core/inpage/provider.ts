@@ -360,11 +360,11 @@ export class InpageProvider extends Emitter {
 
   sendAsync<T>(
     payload: JsonRpcRequest<unknown>,
-    callback: JsonRpcCallback<T>
+    callback: JsonRpcCallback<T>,
   ): void;
   sendAsync(
     payload: JsonRpcRequest<unknown>[],
-    callback: JsonRpcCallback<unknown>[]
+    callback: JsonRpcCallback<unknown>[],
   ): void;
   sendAsync(payload: any, callback: any): void {
     this.send(payload, callback);
@@ -388,7 +388,7 @@ export class InpageProvider extends Emitter {
   send<T>(payload: JsonRpcRequest<unknown>, callback: JsonRpcCallback<T>): void;
   send(
     payload: JsonRpcRequest<unknown>[],
-    callback: JsonRpcCallbackBatch
+    callback: JsonRpcCallbackBatch,
   ): void;
   send<T>(payload: SendSyncJsonRpcRequest): JsonRpcResponse<T>;
   send(methodOrPayload: unknown, callbackOrArgs?: unknown): unknown {
@@ -410,8 +410,8 @@ export class InpageProvider extends Emitter {
           methodOrPayload.map((payload: JsonRpcRequest<any>) =>
             this.request(payload)
               .then((result) => wrapRpcResponse({ result }, payload))
-              .catch((error) => wrapRpcResponse({ error }, payload))
-          )
+              .catch((error) => wrapRpcResponse({ error }, payload)),
+          ),
         ).then((result) => callbackOrArgs(null, result));
 
         return;
@@ -421,10 +421,10 @@ export class InpageProvider extends Emitter {
 
       this.request(payload)
         .then((result) =>
-          callbackOrArgs(null, wrapRpcResponse({ result }, payload))
+          callbackOrArgs(null, wrapRpcResponse({ result }, payload)),
         )
         .catch((error) =>
-          callbackOrArgs(error, wrapRpcResponse({ error }, payload))
+          callbackOrArgs(error, wrapRpcResponse({ error }, payload)),
         );
 
       return;
@@ -468,7 +468,7 @@ export class InpageProvider extends Emitter {
 
 function wrapRpcResponse<T>(
   res: { result: T } | { error: JsonRpcError },
-  req?: JsonRpcRequest<unknown>
+  req?: JsonRpcRequest<unknown>,
 ): JsonRpcResponse<T> {
   return {
     id: req?.id ?? null,

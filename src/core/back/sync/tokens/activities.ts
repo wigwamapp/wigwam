@@ -41,7 +41,7 @@ export const syncTokenActivities = memoize(
         accTokenKey,
         chainId,
         accountAddress,
-        tokenSlug
+        tokenSlug,
       );
     } catch (err) {
       console.error(err);
@@ -52,14 +52,14 @@ export const syncTokenActivities = memoize(
   {
     maxAge: 40_000,
     cacheKey: (args) => args.join("_"),
-  }
+  },
 );
 
 async function performTokenActivitiesSync(
   accTokenKey: string,
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
 ) {
   const token = parseTokenSlug(tokenSlug);
 
@@ -67,7 +67,7 @@ async function performTokenActivitiesSync(
   if (!accountToken) return;
 
   const decimalsFactor = new BigNumber(10).pow(
-    accountToken.tokenType === TokenType.Asset ? accountToken.decimals : 0
+    accountToken.tokenType === TokenType.Asset ? accountToken.decimals : 0,
   );
 
   const tokenActivities = new Map<string, TokenActivity>();
@@ -239,7 +239,7 @@ async function performTokenActivitiesSync(
         if (tokenActivities.size > 0) {
           await repo.tokenActivities.bulkPut(
             Array.from(tokenActivities.values()),
-            Array.from(tokenActivities.keys())
+            Array.from(tokenActivities.keys()),
           );
         }
 
@@ -286,7 +286,7 @@ async function performTokenActivitiesSync(
         }
 
         return res;
-      })
+      }),
     );
 
     let txs = res.data.result;
@@ -318,7 +318,7 @@ async function performTokenActivitiesSync(
       }
 
       const [fromAddress, toAddress] = [tx.from, tx.to].map(
-        (a) => a && ethers.utils.getAddress(a)
+        (a) => a && ethers.utils.getAddress(a),
       );
       if (!fromAddress || !toAddress) continue;
 
@@ -340,7 +340,7 @@ async function performTokenActivitiesSync(
     if (tokenActivities.size > 0) {
       await repo.tokenActivities.bulkPut(
         Array.from(tokenActivities.values()),
-        Array.from(tokenActivities.keys())
+        Array.from(tokenActivities.keys()),
       );
     }
 
@@ -429,7 +429,7 @@ async function performTokenActivitiesSync(
       try {
         blocks[number] = await provider.getBlock(number);
       } catch {}
-    })
+    }),
   );
 
   const values = Array.from(tokenActivities.values());
@@ -460,7 +460,7 @@ function withExplorerApiRequest<T>(factory: () => Promise<T>) {
   return enqueueExplorerApiRequest(async () => {
     if (explorerApiLimitTime) {
       await new Promise((res) =>
-        setTimeout(res, explorerApiLimitTime! - Date.now())
+        setTimeout(res, explorerApiLimitTime! - Date.now()),
       );
     }
 

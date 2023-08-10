@@ -21,7 +21,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "translate-x-1"
+          isActive && "translate-x-1",
         )}
       />
       <path
@@ -29,7 +29,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "translate-x-[.3125rem]"
+          isActive && "translate-x-[.3125rem]",
         )}
       />
       <path
@@ -39,7 +39,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "translate-x-[.4rem]"
+          isActive && "translate-x-[.4rem]",
         )}
       />
       <path
@@ -47,7 +47,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "-translate-x-1"
+          isActive && "-translate-x-1",
         )}
       />
       <path
@@ -55,7 +55,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "-translate-x-1"
+          isActive && "-translate-x-1",
         )}
       />
       <path
@@ -65,7 +65,7 @@ const ControlIcon: FC<ControlIconProps> = ({ isActive = false, className }) => (
         fill="#F8F9FD"
         className={classNames(
           "transition-transform",
-          isActive && "-translate-x-[.175rem]"
+          isActive && "-translate-x-[.175rem]",
         )}
       />
     </g>

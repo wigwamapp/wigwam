@@ -23,7 +23,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, className, onClick }) => {
     "bg-brand-main/5",
     "rounded-[.625rem]",
     "flex items-stretch",
-    "text-left"
+    "text-left",
   );
 
   const content = (
@@ -36,7 +36,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, className, onClick }) => {
           "h-14 w-14 min-w-[3.5rem]",
           "mr-3",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
       <span
@@ -46,7 +46,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, className, onClick }) => {
           "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
-          "group-focus-visible:text-brand-light"
+          "group-focus-visible:text-brand-light",
         )}
       >
         <WalletName wallet={account} className="-mt-px" />
@@ -70,7 +70,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, className, onClick }) => {
           "cursor-pointer",
           "transition-colors",
           "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-          className
+          className,
         )}
         onClick={onClick}
       >

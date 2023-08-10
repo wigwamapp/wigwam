@@ -5,16 +5,16 @@ import { Destination } from "./types";
 export function toHash(
   dest: Destination,
   merge?: boolean | string[],
-  currentUsp?: URLSearchParams
+  currentUsp?: URLSearchParams,
 ) {
   dest =
     typeof dest === "function"
       ? dest(
           Object.fromEntries(
             Array.from(currentUsp ?? getHashSearchParams()).map(
-              ([key, value]) => [key, deserialize(value)]
-            )
-          )
+              ([key, value]) => [key, deserialize(value)],
+            ),
+          ),
         )
       : dest;
 

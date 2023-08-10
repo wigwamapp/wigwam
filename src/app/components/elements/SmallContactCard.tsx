@@ -41,14 +41,14 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   const accounts = useMemo(
     () =>
       (allAccounts ?? []).filter(
-        ({ address: accAddress }) => accAddress === address
+        ({ address: accAddress }) => accAddress === address,
       ),
-    [allAccounts, address]
+    [allAccounts, address],
   );
 
   const mergedAccounts = useMemo(
     () => [...contacts, ...accounts],
-    [contacts, accounts]
+    [contacts, accounts],
   );
 
   if (!address) {
@@ -97,7 +97,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
         !isSmall && "py-0.5 pl-0.5 text-sm",
         isSmall && "py-[0.1875rem] pl-[0.1875rem] text-xs",
         "flex items-center",
-        className
+        className,
       )}
     >
       <AutoIcon
@@ -108,7 +108,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
           !isSmall && "h-6 w-6 min-w-[1.5rem] mr-2",
           isSmall && "h-4 w-4 min-w-[1rem] mr-1",
           "bg-black/40",
-          "rounded"
+          "rounded",
         )}
       />
       {"source" in contact ? (

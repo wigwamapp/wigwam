@@ -31,7 +31,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       adornmentClassName,
       ...rest
     },
-    ref
+    ref,
   ) => (
     <Input
       ref={ref}
@@ -46,11 +46,11 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       inputClassName={classNames(
         size === "large" && "max-h-10 text-sm",
         size === "small" && "max-h-7 !pr-5 !py-2 text-xs !rounded-md",
-        inputClassName
+        inputClassName,
       )}
       adornmentClassName={classNames(
         size === "small" && "!w-4 !h-4",
-        adornmentClassName
+        adornmentClassName,
       )}
       actions={
         searchValue ? (
@@ -61,7 +61,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             onClick={() => toggleSearchValue(null)}
             className={classNames(
               size === "small" ? "!w-4 !h-4" : "",
-              !searchValue && "hidden"
+              !searchValue && "hidden",
             )}
             iconClassName={classNames(size === "small" ? "!w-4 !h-4" : "")}
             tooltipProps={{ missSingleton: true }}
@@ -71,7 +71,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       actionsClassName={classNames(size === "small" ? "!right-1.5" : "")}
       {...rest}
     />
-  )
+  ),
 );
 
 export default SearchInput;

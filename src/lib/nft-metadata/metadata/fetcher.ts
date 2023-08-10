@@ -23,7 +23,7 @@ export function fetchOnChainData(
   chainId: number,
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   if (isAddressMatch(chainId, tokenAddress, AUTOGLYPHS_TOKEN_ADDRESS)) {
     return fetchAutoglyphsMeta(tokenAddress, tokenId, provider);

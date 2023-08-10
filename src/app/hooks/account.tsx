@@ -44,7 +44,7 @@ export function useNextAccountName() {
       }
       return name;
     },
-    []
+    [],
   );
 
   const getNextAccountName = useCallback(
@@ -63,7 +63,7 @@ export function useNextAccountName() {
 
       return `{{wallet}} ${indx + 1}`;
     },
-    [createName, existingAccounts]
+    [createName, existingAccounts],
   );
 
   return { getNextAccountName };

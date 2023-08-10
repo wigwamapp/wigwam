@@ -38,7 +38,7 @@ const Profile: FC = () => {
 
   const currentProfile = useMemo(
     () => all.find((profile) => profile.id === currentId)!,
-    [all, currentId]
+    [all, currentId],
   );
   const currentName = replaceT(currentProfile.name);
   const currentSeed = currentProfile.avatarSeed;
@@ -53,7 +53,7 @@ const Profile: FC = () => {
         console.error(err);
       }
     },
-    [currentId, updateToast]
+    [currentId, updateToast],
   );
 
   const handlePasswordChange = useCallback(
@@ -68,7 +68,7 @@ const Profile: FC = () => {
           return { oldPwd: error.message };
         }
       }),
-    [updateToast]
+    [updateToast],
   );
 
   return (
@@ -138,7 +138,7 @@ const Profile: FC = () => {
                 name="confirmNewPwd"
                 validate={composeValidators(
                   required,
-                  differentPasswords(values.newPwd)
+                  differentPasswords(values.newPwd),
                 )}
               >
                 {({ input, meta }) => (

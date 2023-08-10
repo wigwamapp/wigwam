@@ -11,7 +11,7 @@ export async function requestConnection(
   rpcCtx: RpcContext,
   source: ActivitySource,
   _params: any[],
-  returnSelectedAccount: boolean
+  returnSelectedAccount: boolean,
 ) {
   assertWalletSetuped({ openIfNotSetuped: true });
 
@@ -40,7 +40,7 @@ export async function requestConnection(
 
 export async function fetchPermission(
   rpcCtx: RpcContext,
-  source: ActivitySource
+  source: ActivitySource,
 ) {
   const origin = getPageOrigin(source);
   const permission = await repo.permissions.get(origin);

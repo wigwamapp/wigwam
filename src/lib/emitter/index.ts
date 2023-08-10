@@ -55,7 +55,7 @@ export class Emitter extends EventEmitter {
 function safeApply<T, A extends any[]>(
   handler: (this: T, ...args: A) => void,
   context: T,
-  args: A
+  args: A,
 ): void {
   try {
     Reflect.apply(handler, context, args);

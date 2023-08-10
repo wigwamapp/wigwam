@@ -37,7 +37,7 @@ const ChooseAddAccountWay = memo(() => {
   const stepsCtx = useSteps();
   const sections = useMemo(
     () => getWays(hasSeedPhrase, stepsCtx),
-    [hasSeedPhrase, stepsCtx]
+    [hasSeedPhrase, stepsCtx],
   );
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const ChooseAddAccountWay = memo(() => {
                 className={classNames(
                   "w-1/3",
                   "px-[1.75rem]",
-                  index % 3 !== 2 && "border-r border-brand-light/[.03]"
+                  index % 3 !== 2 && "border-r border-brand-light/[.03]",
                 )}
               >
                 <div className="flex items-center mb-5">
@@ -100,17 +100,17 @@ const ChooseAddAccountWay = memo(() => {
                         className={classNames(
                           "mb-5 select-none",
                           i % 3 !== 2 && "mr-5",
-                          section.disabled && "opacity-50 pointer-events-none"
+                          section.disabled && "opacity-50 pointer-events-none",
                         )}
                       />
-                    )
+                    ),
                   )}
 
                   {section.disabled && (
                     <div
                       className={classNames(
                         "w-full",
-                        "text-xs text-brand-redtwo"
+                        "text-xs text-brand-redtwo",
                       )}
                     >
                       Not yet supported in this browser.
@@ -143,7 +143,7 @@ const ChooseAddAccountWay = memo(() => {
                     soon={soon}
                     className="mr-5"
                   />
-                )
+                ),
               )}
             </div>
           </Collapse>
@@ -242,7 +242,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           throw new Error(msg);
         }
       }),
-    [openLoginMethod, stateRef]
+    [openLoginMethod, stateRef],
   );
 
   const handleTileClick = useCallback(() => {
@@ -291,7 +291,7 @@ const TileSimple: FC<TileSimpleProps> = ({
       !soon && "hover:scale-110 focus-visible:scale-110",
       !soon && "active:scale-95",
       soon && "cursor-default",
-      className
+      className,
     )}
     disabled={soon}
     onClick={() => action()}
@@ -307,7 +307,7 @@ const TileSimple: FC<TileSimpleProps> = ({
           "shadow-addaccountmodal",
           "text-xs font-medium",
           "absolute",
-          "-top-3 -right-2"
+          "-top-3 -right-2",
         )}
       >
         Soon
@@ -329,7 +329,7 @@ const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
       "flex items-center",
       "text-xs",
       "z-[25]",
-      className
+      className,
     )}
   >
     <VerifiedIcon className="mr-2 min-w-[1.375rem]" />
@@ -338,7 +338,7 @@ const WarningMessage: FC<WarningMessageProps> = ({ children, className }) => (
       className={classNames(
         "absolute top-0 left-0 w-full h-full",
         "bg-opacity-5",
-        "-z-10"
+        "-z-10",
       )}
     />
   </div>
@@ -356,7 +356,7 @@ const Point: FC<PointProps> = ({ filled, style }) => (
       className={classNames(
         "absolute t-0",
         style === "green" ? "bg-[color:#4f9a5e]" : "bg-[#83819a]",
-        "h-2"
+        "h-2",
       )}
       style={{ width: `${filled}%` }}
     />
@@ -378,7 +378,7 @@ const Points: FC<PointsProps> = ({ security, adoption }) => (
         className={classNames(
           "w-[56px] ml-5",
           "overflow-hidden whitespace-nowrap",
-          "flex justify-between"
+          "flex justify-between",
         )}
       >
         <Point filled={calcWidth(security, 0)} style="gray" />
@@ -397,7 +397,7 @@ const Points: FC<PointsProps> = ({ security, adoption }) => (
         className={classNames(
           "w-[56px] ml-5",
           "overflow-hidden whitespace-nowrap",
-          "flex justify-between"
+          "flex justify-between",
         )}
       >
         <Point filled={calcWidth(adoption, 0)} style="green" />

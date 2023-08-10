@@ -12,7 +12,7 @@ type OverflowProviderProps = {
 
 export const OverflowProvider: FC<OverflowProviderProps> = ({ children }) => {
   const [overflowElement, setOverflowElement] = useState<HTMLElement | null>(
-    null
+    null,
   );
 
   return (

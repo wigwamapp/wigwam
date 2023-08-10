@@ -15,7 +15,7 @@ const Sidebar: FC = () => (
     className={classNames(
       "pr-8",
       "border-r border-brand-main/[.07]",
-      "flex flex-col"
+      "flex flex-col",
     )}
   >
     <Link
@@ -25,7 +25,7 @@ const Sidebar: FC = () => (
         "mb-5 py-5",
         "border-b border-brand-main/[.07]",
         "flex items-center",
-        "text-2xl font-black"
+        "text-2xl font-black",
       )}
     >
       <VigvamIcon className={classNames("h-10 w-auto", "mr-5")} />
@@ -36,7 +36,7 @@ const Sidebar: FC = () => (
       links={NavLinksSecondary}
       className={classNames(
         "mt-[6.25rem] pt-8",
-        "border-t border-brand-main/[.07]"
+        "border-t border-brand-main/[.07]",
       )}
     />
   </nav>
@@ -84,7 +84,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               "hover:text-brand-light",
               "focus:text-brand-light",
               isPageActive && "bg-brand-main/5 !text-brand-light",
-              "last:mb-0"
+              "last:mb-0",
             )}
           >
             <Icon
@@ -95,7 +95,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
                 "glass-icon",
                 isPageActive && "glass-icon--active",
                 "group-hover:glass-icon--hover",
-                "group-focus:glass-icon--hover"
+                "group-focus:glass-icon--hover",
               )}
             />
             {label}

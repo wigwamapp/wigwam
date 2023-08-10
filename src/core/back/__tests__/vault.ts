@@ -56,7 +56,7 @@ const createTestVault = async () => {
         derivationPath: TEST_WALLET.path,
       },
     ],
-    { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+    { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) },
   );
 
   return { vault, passHash };
@@ -71,7 +71,7 @@ describe("Vault", () => {
 
   it("validate args basic", () => {
     expect(Vault.setup(TEST_PASSWORD, [])).rejects.toThrowError(
-      "Translated<failedToSetupWallet>"
+      "Translated<failedToSetupWallet>",
     );
 
     expect(
@@ -81,7 +81,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: TEST_ADDRESS,
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<failedToSetupWallet>");
   });
 
@@ -93,7 +93,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: TEST_ADDRESS,
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidName>");
   });
 
@@ -105,7 +105,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: "",
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidAddress>");
   });
 
@@ -117,7 +117,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: "",
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidAddress>");
 
     expect(
@@ -127,7 +127,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: "asdasdasd",
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidAddress>");
   });
 
@@ -139,7 +139,7 @@ describe("Vault", () => {
           source: AccountSource.Address,
           address: TEST_ADDRESS,
         },
-      ])
+      ]),
     ).resolves.not.toThrow();
   });
 
@@ -151,7 +151,7 @@ describe("Vault", () => {
           source: AccountSource.SeedPhrase,
           derivationPath: "",
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidDerivationPath>");
   });
 
@@ -163,7 +163,7 @@ describe("Vault", () => {
           source: AccountSource.SeedPhrase,
           derivationPath: TEST_WALLET.path,
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<seedPhraseNotEstablished>");
   });
 
@@ -178,8 +178,8 @@ describe("Vault", () => {
             derivationPath: TEST_WALLET.path,
           },
         ],
-        { lang: "en", phrase: "" }
-      )
+        { lang: "en", phrase: "" },
+      ),
     ).rejects.toThrowError("Translated<seedPhraseIsNotValid>");
   });
 
@@ -194,8 +194,8 @@ describe("Vault", () => {
             derivationPath: TEST_WALLET.path,
           },
         ],
-        { lang: "en", phrase: TEST_WALLET.phrase }
-      )
+        { lang: "en", phrase: TEST_WALLET.phrase },
+      ),
     ).rejects.toThrowError("Translated<seedPhraseIsNotValid>");
   });
 
@@ -210,8 +210,8 @@ describe("Vault", () => {
             derivationPath: TEST_WALLET.path,
           },
         ],
-        { lang: "asd", phrase: TEST_WALLET.phrase }
-      )
+        { lang: "asd", phrase: TEST_WALLET.phrase },
+      ),
     ).rejects.toThrowError("Translated<seedPhraseLanguageNotSupported>");
   });
 
@@ -226,8 +226,8 @@ describe("Vault", () => {
             derivationPath: TEST_WALLET.path,
           },
         ],
-        { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
-      )
+        { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) },
+      ),
     ).resolves.not.toThrow();
   });
 
@@ -241,7 +241,7 @@ describe("Vault", () => {
           derivationPath: TEST_WALLET.path,
         },
       ],
-      { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+      { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) },
     );
 
     expect(vault.isSeedPhraseExists()).toBe(true);
@@ -254,7 +254,7 @@ describe("Vault", () => {
     expect(acc.address).toBe(TEST_WALLET.address);
 
     expect(
-      importProtected(vault.getNeuterExtendedKey(ROOT_PATH)).getText()
+      importProtected(vault.getNeuterExtendedKey(ROOT_PATH)).getText(),
     ).toBe(TEST_WALLET.rootXpub);
   });
 
@@ -267,7 +267,7 @@ describe("Vault", () => {
           derivationPath: TEST_WALLET.path,
           publicKey: "",
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidPublicKey>");
   });
 
@@ -280,7 +280,7 @@ describe("Vault", () => {
           derivationPath: TEST_WALLET.path,
           publicKey: TEST_WALLET.publicKey,
         },
-      ])
+      ]),
     ).rejects.toThrowError("Translated<invalidPublicKey>");
   });
 
@@ -293,7 +293,7 @@ describe("Vault", () => {
           derivationPath: TEST_WALLET.path,
           publicKey: toProtectedString(TEST_WALLET.publicKey),
         },
-      ])
+      ]),
     ).resolves.not.toThrow();
   });
 
@@ -325,7 +325,7 @@ describe("Vault", () => {
           socialName: "Test Reddit",
           socialEmail: "test@example.com",
         },
-      ])
+      ]),
     ).resolves.not.toThrow();
   });
 
@@ -340,7 +340,7 @@ describe("Vault", () => {
           socialName: "Test Reddit",
           socialEmail: "test@example.com",
         },
-      ])
+      ]),
     ).resolves.not.toThrow();
   });
 
@@ -397,7 +397,7 @@ describe("Vault", () => {
           derivationPath: TEST_WALLET.path,
         },
       ],
-      { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+      { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) },
     );
 
     const accounts = vault1.getAccounts();
@@ -406,7 +406,7 @@ describe("Vault", () => {
     await vault1.cleanup();
 
     expect(Vault.unlock(passHashOld)).rejects.toThrowError(
-      "Translated<invalidPassword>"
+      "Translated<invalidPassword>",
     );
 
     const vault2 = await Vault.unlock(passHashNew);
@@ -429,14 +429,14 @@ describe("Vault", () => {
     const { vault, passHash } = await createTestVault();
 
     expect(vault.deleteAccounts("invalid_password", [])).rejects.toThrowError(
-      "Translated<invalidPassword>"
+      "Translated<invalidPassword>",
     );
 
     const [acc] = vault.getAccounts();
 
     // Cannot delete all accounts
     await expect(
-      vault.deleteAccounts(passHash, [acc.uuid])
+      vault.deleteAccounts(passHash, [acc.uuid]),
     ).rejects.toThrowError("Translated<failedToDeleteWallets>");
 
     expect(vault.getAccounts()).not.toStrictEqual([]);
@@ -453,7 +453,7 @@ describe("Vault", () => {
     expect(acc2.address).toBe(TEST_WALLET.secondAddress);
 
     await expect(vault.deleteAccounts(passHash, [acc1.uuid])).resolves.toBe(
-      undefined
+      undefined,
     );
 
     expect(vault.getAccounts()).toStrictEqual([acc2]);
@@ -465,12 +465,12 @@ describe("Vault", () => {
 
     // Empty name
     await expect(vault.updateAccountName(acc.uuid, "")).rejects.toThrowError(
-      "Translated<failedToUpdateWalletName>"
+      "Translated<failedToUpdateWalletName>",
     );
 
     // Unknown account
     await expect(
-      vault.updateAccountName("123123", "test name")
+      vault.updateAccountName("123123", "test name"),
     ).rejects.toThrowError("Translated<failedToUpdateWalletName>");
 
     // The same name
@@ -482,12 +482,12 @@ describe("Vault", () => {
       },
     ]);
     await expect(
-      vault.updateAccountName(acc.uuid, "Test Wallet 2")
+      vault.updateAccountName(acc.uuid, "Test Wallet 2"),
     ).rejects.toThrowError("Translated<walletNameAlreadyExists>");
 
     // Just works
     await expect(
-      vault.updateAccountName(acc.uuid, "Test Wallet 1")
+      vault.updateAccountName(acc.uuid, "Test Wallet 1"),
     ).resolves.toBe(undefined);
 
     const [acc1, acc2] = vault.getAccounts();
@@ -502,12 +502,12 @@ describe("Vault", () => {
 
     // Unknown account
     expect(() => vault.getPublicKey("123123")).toThrowError(
-      "Translated<failedToFetchPublicKey>"
+      "Translated<failedToFetchPublicKey>",
     );
 
     const [acc] = vault.getAccounts();
     expect(
-      importProtected(vault.getPublicKey(acc.uuid)).getText()
+      importProtected(vault.getPublicKey(acc.uuid)).getText(),
     ).toStrictEqual(TEST_WALLET.publicKeyCompressed);
   });
 
@@ -518,18 +518,18 @@ describe("Vault", () => {
 
     // Invalid password
     expect(vault.getPrivateKey("asdasd", acc.uuid)).rejects.toThrowError(
-      "Translated<invalidPassword>"
+      "Translated<invalidPassword>",
     );
 
     // Unknown account
     expect(vault.getPrivateKey(passHash, "123123")).rejects.toThrowError(
-      "Translated<failedToFetchPrivateKey>"
+      "Translated<failedToFetchPrivateKey>",
     );
 
     const privKeyProtected = await vault.getPrivateKey(passHash, acc.uuid);
 
     expect(importProtected(privKeyProtected).getText()).toStrictEqual(
-      TEST_WALLET.privateKey
+      TEST_WALLET.privateKey,
     );
   });
 
@@ -538,7 +538,7 @@ describe("Vault", () => {
 
     // Unknown account
     expect(vault.sign("123123", "0x1234")).rejects.toThrowError(
-      "Translated<failedToSign>"
+      "Translated<failedToSign>",
     );
 
     const [acc] = vault.getAccounts();
@@ -547,32 +547,32 @@ describe("Vault", () => {
     expect(
       await vault.sign(
         acc.uuid,
-        "0xda8080049401234567890123456789012345678901234567898006"
-      )
+        "0xda8080049401234567890123456789012345678901234567898006",
+      ),
     ).toMatchSnapshot();
     expect(
       await vault.sign(
         acc.uuid,
-        "0xda8080809401234567890123456789012345678901234567890506"
-      )
+        "0xda8080809401234567890123456789012345678901234567890506",
+      ),
     ).toMatchSnapshot();
     expect(
       await vault.sign(
         acc.uuid,
-        "0xed83b61b5c861b414e22695685050dcd5a5094e489ebbaae8af88372e63fd33c5eb16c0743883881a184ae3182b3"
-      )
+        "0xed83b61b5c861b414e22695685050dcd5a5094e489ebbaae8af88372e63fd33c5eb16c0743883881a184ae3182b3",
+      ),
     ).toMatchSnapshot();
     expect(
       await vault.sign(
         acc.uuid,
-        "0xf4819c8914f08e2118c60c523d8421ddd357940ba817b4709474c2b6470bb5282c662d20129a468813accb157a345a5a8490416c91"
-      )
+        "0xf4819c8914f08e2118c60c523d8421ddd357940ba817b4709474c2b6470bb5282c662d20129a468813accb157a345a5a8490416c91",
+      ),
     ).toMatchSnapshot();
     expect(
       await vault.sign(
         acc.uuid,
-        "0xf17a8922ebeeec58c8115214835a75dd94626288dd182c51cfb9b3c877b0ae28e8c82f6ad6848fed02238702e0e839e7add3"
-      )
+        "0xf17a8922ebeeec58c8115214835a75dd94626288dd182c51cfb9b3c877b0ae28e8c82f6ad6848fed02238702e0e839e7add3",
+      ),
     ).toMatchSnapshot();
   });
 
@@ -581,29 +581,29 @@ describe("Vault", () => {
 
     // Unknown account
     expect(() =>
-      vault.signMessage("123123", SigningStandard.PersonalSign, "0x1234")
+      vault.signMessage("123123", SigningStandard.PersonalSign, "0x1234"),
     ).toThrowError("Translated<failedToSign>");
 
     const [acc] = vault.getAccounts();
 
     // Unsupported standard
     expect(() =>
-      vault.signMessage(acc.uuid, SigningStandard.EthSign, "0x1234")
+      vault.signMessage(acc.uuid, SigningStandard.EthSign, "0x1234"),
     ).toThrowError("Translated<failedToSign>");
 
     const psData = `0x${Buffer.from("Hello, world!").toString("hex")}`;
     const psSignature = vault.signMessage(
       acc.uuid,
       SigningStandard.PersonalSign,
-      psData
+      psData,
     );
 
     expect(psSignature).toMatchSnapshot();
 
     expect(
       ethers.utils.getAddress(
-        recoverPersonalSignature({ signature: psSignature, data: psData })
-      )
+        recoverPersonalSignature({ signature: psSignature, data: psData }),
+      ),
     ).toStrictEqual(acc.address);
   });
 
@@ -624,7 +624,7 @@ describe("Vault", () => {
           name: "A number",
           value: "1337",
         },
-      ])
+      ]),
     ).toMatchSnapshot();
 
     expect(
@@ -694,8 +694,8 @@ describe("Vault", () => {
             },
             contents: "Hello, Bob!",
           },
-        })
-      )
+        }),
+      ),
     ).toMatchSnapshot();
 
     expect(
@@ -784,8 +784,8 @@ describe("Vault", () => {
               },
             ],
           },
-        })
-      )
+        }),
+      ),
     ).toMatchSnapshot();
   });
 });

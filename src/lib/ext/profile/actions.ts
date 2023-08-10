@@ -24,7 +24,7 @@ export async function changeProfile(id: string) {
 
   assert(
     state.all.some((p) => p.id === id),
-    "Profile not found"
+    "Profile not found",
   );
 
   await setState({
@@ -71,6 +71,6 @@ export async function assertProfileNotExist(id: string) {
 
   assert(
     state.all.every((p) => p.id !== id),
-    "Profile already exists"
+    "Profile already exists",
   );
 }

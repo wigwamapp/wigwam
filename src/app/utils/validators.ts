@@ -22,7 +22,7 @@ export const composeValidators =
     validators.reduce(
       (error: string | undefined, validator?: ValidationType) =>
         error || validator?.(value),
-      undefined
+      undefined,
     );
 
 export const differentPasswords = (password1: string) => (password2: string) =>
@@ -73,7 +73,7 @@ export const validateDerivationPath = (value: string) =>
     : "The derivation path is invalid";
 
 export const currencySymbolRegex = new RegExp(
-  "^(?=.*[a-zA-Z\\d].*)[a-zA-Z\\d!@#$%&*]+$"
+  "^(?=.*[a-zA-Z\\d].*)[a-zA-Z\\d!@#$%&*]+$",
 );
 
 export const validateCurrencySymbol = (value: string) =>
@@ -82,7 +82,7 @@ export const validateCurrencySymbol = (value: string) =>
     : "The currency symbol is invalid";
 
 const passwordRegex = new RegExp(
-  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]{8,}$/
+  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]{8,}$/,
 );
 
 export const validatePassword = (value: string) =>

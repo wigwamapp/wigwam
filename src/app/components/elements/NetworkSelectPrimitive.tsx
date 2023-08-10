@@ -59,7 +59,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(networks, NETWORK_SEARCH_OPTIONS),
-    [networks]
+    [networks],
   );
 
   const preparedNetworks = useMemo(() => {
@@ -74,7 +74,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
 
   const preparedCurrentNetwork = useMemo(
     () => (currentNetwork ? prepareNetwork(currentNetwork) : undefined),
-    [currentNetwork]
+    [currentNetwork],
   );
 
   const handleLinkClick = useCallback(() => {
@@ -108,7 +108,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
         console.error(err);
       }
     },
-    [source, page, sentAnalyticNetworks, setSentAnalyticNetworks]
+    [source, page, sentAnalyticNetworks, setSentAnalyticNetworks],
   );
 
   const handleNetworkChange = useCallback(
@@ -116,7 +116,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       onNetworkChange(chainId);
       trackNetworkChanged(chainId);
     },
-    [onNetworkChange, trackNetworkChanged]
+    [onNetworkChange, trackNetworkChanged],
   );
 
   return (

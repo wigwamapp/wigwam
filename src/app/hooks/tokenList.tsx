@@ -26,7 +26,7 @@ export function useTokenList(
   opts: {
     onAccountTokensReset?: () => void;
     searchPersist?: boolean;
-  } = {}
+  } = {},
 ) {
   const chainId = useChainId();
   const provider = useProvider();
@@ -36,14 +36,14 @@ export function useTokenList(
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [tokenIdSearchValue, setTokenIdSearchValue] = useState<string | null>(
-    null
+    null,
   );
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
   useTokenSearchPersist(
     opts.searchPersist ?? false,
     searchValue,
-    setSearchValue
+    setSearchValue,
   );
 
   const combinedSearchValue = useMemo(() => {
@@ -61,7 +61,7 @@ export function useTokenList(
         manageModeEnabled || Boolean(isNftsSelected && combinedSearchValue),
       search: combinedSearchValue,
       onReset: opts.onAccountTokensReset,
-    }
+    },
   );
 
   const observer = useRef<IntersectionObserver>();
@@ -82,7 +82,7 @@ export function useTokenList(
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, tokens]
+    [hasMore, loadMore, tokens],
   );
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -98,16 +98,16 @@ export function useTokenList(
 
   const searchValueIsAddress = useMemo(
     () => searchValue && ethers.utils.isAddress(searchValue),
-    [searchValue]
+    [searchValue],
   );
 
   const tokenIdSearchDisplayed = Boolean(
-    isNftsSelected && searchValueIsAddress
+    isNftsSelected && searchValueIsAddress,
   );
   const willSearch = Boolean(
     searchValueIsAddress &&
       tokens.length === 0 &&
-      (tokenIdSearchDisplayed ? tokenIdSearchValue : true)
+      (tokenIdSearchDisplayed ? tokenIdSearchValue : true),
   );
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export function useTokenList(
             const tokenStandard = await detectNFTStandard(
               provider,
               tokenAddress,
-              tokenId
+              tokenId,
             );
 
             tokenSlug = createTokenSlug({
@@ -200,7 +200,7 @@ type TokenSearchPersist = {
 function useTokenSearchPersist(
   enabled: boolean,
   searchValue: string | null,
-  setSearchValue: Dispatch<React.SetStateAction<string | null>>
+  setSearchValue: Dispatch<React.SetStateAction<string | null>>,
 ) {
   useEffect(() => {
     if (!enabled) {
@@ -214,7 +214,7 @@ function useTokenSearchPersist(
     (async () => {
       try {
         const persist = await storage.fetchForce<TokenSearchPersist>(
-          TOKEN_SEARCH_PERSIST
+          TOKEN_SEARCH_PERSIST,
         );
         if (!persist) return;
 

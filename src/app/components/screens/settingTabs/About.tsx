@@ -42,7 +42,7 @@ const About: FC = () => {
               className={classNames(
                 "p-1",
                 "flex justify-center items-center",
-                "group"
+                "group",
               )}
               aria-label={label}
             >
@@ -51,7 +51,7 @@ const About: FC = () => {
                   "w-8 h-8",
                   "fill-brand-inactivelight group-hover:fill-brand-light",
                   "group-focus-visible:fill-brand-light",
-                  "transition-colors ease-in-out"
+                  "transition-colors ease-in-out",
                 )}
               />
             </a>
@@ -104,7 +104,7 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
       "text-sm",
       "transition-colors ease-in-out",
       "text-brand-inactivelight hover:text-brand-light focus-visible:text-brand-light",
-      className
+      className,
     )}
   >
     {label}

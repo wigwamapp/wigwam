@@ -23,7 +23,7 @@ export type URLHashAtom<T> = WritableAtom<
 
 export function atomWithURLHash<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): URLHashAtom<T> {
   const getValue = (params: URLSearchParams) => {
     const value = params.get(key);
@@ -51,7 +51,7 @@ export function atomWithURLHash<T>(
       }
 
       changeState(toURL(searchParams.toString()), action === "replace");
-    }
+    },
   );
 
   return urlHashAtom;

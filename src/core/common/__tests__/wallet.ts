@@ -19,7 +19,7 @@ describe("Common > Wallet", () => {
 
     expect(() => {
       validatePrivateKey(
-        "18dd1dcd752466afa3d1fac1424333c6461c3a0f1d6702e9c45bc9254ec74e5f"
+        "18dd1dcd752466afa3d1fac1424333c6461c3a0f1d6702e9c45bc9254ec74e5f",
       );
     }).not.toThrow();
   });
@@ -31,7 +31,7 @@ describe("Common > Wallet", () => {
 
     expect(() => {
       validatePublicKey(
-        "0x04bdfb71e2d953406c45279ac434667a6a1ea9fae608af91e7f6bfb0792011df760895a528e8b83622886039b4803b6182d708fb40a16919bddaef84493ef1d4cf"
+        "0x04bdfb71e2d953406c45279ac434667a6a1ea9fae608af91e7f6bfb0792011df760895a528e8b83622886039b4803b6182d708fb40a16919bddaef84493ef1d4cf",
       );
     }).not.toThrow();
   });
@@ -63,11 +63,11 @@ describe("Common > Wallet", () => {
 
   it("add0x", () => {
     expect(add0x("0xa37a58ed255089d9204125a0f3313826537759d9")).toEqual(
-      "0xa37a58ed255089d9204125a0f3313826537759d9"
+      "0xa37a58ed255089d9204125a0f3313826537759d9",
     );
 
     expect(add0x("a37a58ed255089d9204125a0f3313826537759d9")).toEqual(
-      "0xa37a58ed255089d9204125a0f3313826537759d9"
+      "0xa37a58ed255089d9204125a0f3313826537759d9",
     );
   });
 
@@ -94,13 +94,13 @@ describe("Common > Wallet", () => {
       "elephant orange brave noodle blanket cupcake chimney kangaroo doctor syrup timber galaxy",
       "jazz enrich vivid axis depth cigar box unaware carpet throw horse regular",
       toProtectedString(
-        "elephant orange brave noodle blanket cupcake chimney kangaroo doctor syrup timber galaxy"
+        "elephant orange brave noodle blanket cupcake chimney kangaroo doctor syrup timber galaxy",
       ),
       toProtectedString(
-        "jazz enrich vivid axis depth cigar box unaware carpet throw horse regular"
+        "jazz enrich vivid axis depth cigar box unaware carpet throw horse regular",
       ),
       toProtectedString(
-        "kiwi opinion escape sea crop potato picture fiction onion social excess vital jazz"
+        "kiwi opinion escape sea crop potato picture fiction onion social excess vital jazz",
       ),
     ];
 
@@ -113,10 +113,10 @@ describe("Common > Wallet", () => {
     expect(() =>
       validateSeedPhrase({
         phrase: toProtectedString(
-          "kiwi opinion escape sea crop potato picture fiction onion social excess vital"
+          "kiwi opinion escape sea crop potato picture fiction onion social excess vital",
         ),
         lang: "en",
-      })
+      }),
     ).not.toThrow();
   });
 
@@ -124,12 +124,12 @@ describe("Common > Wallet", () => {
     expect(
       getSeedPhraseHDNode({
         phrase: toProtectedString(
-          "kiwi opinion escape sea crop potato picture fiction onion social excess vital"
+          "kiwi opinion escape sea crop potato picture fiction onion social excess vital",
         ),
         lang: "en",
-      }).extendedKey
+      }).extendedKey,
     ).toEqual(
-      "xprv9s21ZrQH143K4Vn7iQi6Bcamj1vec9piEW3CWPQPoX42vxUVgHRNqabHGuk9aSkCGjQpdSPkvZbcGGUX29x1sjohJRUbxt9rX59DmSfmhtf"
+      "xprv9s21ZrQH143K4Vn7iQi6Bcamj1vec9piEW3CWPQPoX42vxUVgHRNqabHGuk9aSkCGjQpdSPkvZbcGGUX29x1sjohJRUbxt9rX59DmSfmhtf",
     );
   });
 
@@ -138,13 +138,13 @@ describe("Common > Wallet", () => {
       toNeuterExtendedKey(
         getSeedPhraseHDNode({
           phrase: toProtectedString(
-            "kiwi opinion escape sea crop potato picture fiction onion social excess vital"
+            "kiwi opinion escape sea crop potato picture fiction onion social excess vital",
           ),
           lang: "en",
-        })
-      )
+        }),
+      ),
     ).toEqual(
-      "xpub661MyMwAqRbcGyrapSF6YkXWH3m91cYZbixoJmp1Mrb1okoeDpjdPNum8AtP7Q3wqbyKVKzchHcYzeT5CnXsGFjoSNVbYE6K6XHhN5siavY"
+      "xpub661MyMwAqRbcGyrapSF6YkXWH3m91cYZbixoJmp1Mrb1okoeDpjdPNum8AtP7Q3wqbyKVKzchHcYzeT5CnXsGFjoSNVbYE6K6XHhN5siavY",
     );
   });
 
@@ -152,14 +152,14 @@ describe("Common > Wallet", () => {
     const extendedKey = toNeuterExtendedKey(
       getSeedPhraseHDNode({
         phrase: toProtectedString(
-          "kiwi opinion escape sea crop potato picture fiction onion social excess vital"
+          "kiwi opinion escape sea crop potato picture fiction onion social excess vital",
         ),
         lang: "en",
-      })
+      }),
     );
 
     expect(
-      generatePreviewHDNodes(extendedKey).map((n) => n.address)
+      generatePreviewHDNodes(extendedKey).map((n) => n.address),
     ).toStrictEqual([
       "0x94D96AcdeA5ff1128213A28daD25fdfbC6331450",
       "0x342C0EBD95986bfB44e424bD367f88C64214fB13",

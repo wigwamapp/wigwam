@@ -16,7 +16,7 @@ export async function openInTab(to?: Destination, merge?: boolean | string[]) {
 export async function openInTabStrict(
   to?: Destination,
   merge?: boolean | string[],
-  anotherWindow = false
+  anotherWindow = false,
 ) {
   try {
     const mainTabs = await browser.tabs.query({
@@ -36,7 +36,7 @@ export async function openInTabStrict(
         tab.id,
         tab.url === newTabUrl
           ? { active: true }
-          : { url: newTabUrl, active: true }
+          : { url: newTabUrl, active: true },
       );
     } else {
       const currentTabs = !anotherWindow
@@ -58,7 +58,7 @@ export async function openInTabStrict(
         const tab = currentTabs[0];
         browser.tabs.update(
           tab.id,
-          tab.url === url ? { active: true } : { url, active: true }
+          tab.url === url ? { active: true } : { url, active: true },
         );
       } else {
         browser.tabs.create({ url, active: true });

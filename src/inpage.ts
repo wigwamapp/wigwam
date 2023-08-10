@@ -47,7 +47,7 @@ function inject(key: string, sharedProperty = false) {
       ? [vigvam, ...getProvidersInline(existing)]
       : [vigvam],
     sharedProperty,
-    propIsMetaMaskPreferred
+    propIsMetaMaskPreferred,
   );
 
   const defineProperty = () =>

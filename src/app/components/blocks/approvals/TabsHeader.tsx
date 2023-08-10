@@ -31,7 +31,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
         "relative",
         "after:h-px after:w-full",
         "after:absolute after:bottom-0 after:left-0",
-        "after:border-b after:border-brand-main/[.07]"
+        "after:border-b after:border-brand-main/[.07]",
       )}
     >
       {values.map((value, i, arr) => {
@@ -67,7 +67,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
               active && "font-bold",
               !active &&
                 !disabled &&
-                "hover:bg-brand-main/5 hover:after:opacity-100"
+                "hover:bg-brand-main/5 hover:after:opacity-100",
             )}
             data-text={names[value]}
             disabled={disabled}
@@ -83,7 +83,7 @@ const TabsHeader: FC<TabsHeaderProps> = ({
           "absolute bottom-0 left-0",
           "bg-buttonaccent",
           "transition-all",
-          "w-[calc(25%-.3125rem)]"
+          "w-[calc(25%-.3125rem)]",
         )}
         style={{
           left: `calc(.25rem + ${activeIndex * 25}% - ${

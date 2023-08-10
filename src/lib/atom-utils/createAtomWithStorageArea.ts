@@ -41,7 +41,7 @@ export function createAtomWithStorageArea(storageArea: StorageArea) {
         } catch (err) {
           console.error(err);
         }
-      }
+      },
     );
 
     return storageAtom;

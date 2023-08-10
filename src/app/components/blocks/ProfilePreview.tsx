@@ -19,7 +19,7 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           "flex flex-col justify-center items-center",
           "w-full",
           theme === "extrasmall" && "max-w-20",
-          className
+          className,
         )}
       >
         <AutoIcon
@@ -34,7 +34,7 @@ const ProfilePreview = memo<ProfilePreviewProps>(
             theme === "extrasmall" ? "text-3xl" : "text-4xl",
             theme === "large" && "mb-5",
             theme === "small" && "mb-3",
-            theme === "extrasmall" && "mb-2"
+            theme === "extrasmall" && "mb-2",
           )}
         />
 
@@ -42,14 +42,14 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           className={classNames(
             "w-full",
             "font-bold text-center truncate",
-            theme === "large" ? "text-3xl" : "text-lg"
+            theme === "large" ? "text-3xl" : "text-lg",
           )}
         >
           <TReplace msg={profile.name} />
         </h3>
       </div>
     );
-  }
+  },
 );
 
 export default ProfilePreview;

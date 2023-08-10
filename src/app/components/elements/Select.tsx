@@ -103,9 +103,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
   const filteredItems = useMemo(
     () =>
       items.filter((item) =>
-        showSelected ? item.key : item.key !== currentItem?.key
+        showSelected ? item.key : item.key !== currentItem?.key,
       ),
-    [currentItem?.key, items, showSelected]
+    [currentItem?.key, items, showSelected],
   );
 
   const handleOpenChange = useCallback(
@@ -114,7 +114,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
       onSearch?.(null);
       onOpenChange?.(opn);
     },
-    [onOpenChange, onSearch]
+    [onOpenChange, onSearch],
   );
 
   return (
@@ -123,7 +123,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
         "flex flex-col",
         size === "large" && "min-w-[17.75rem]",
         size === "small" && "w-[12.5rem]",
-        className
+        className,
       )}
     >
       {!!label && (
@@ -133,7 +133,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
             "ml-4 mb-2",
             "text-base font-normal text-left",
             "text-brand-gray",
-            "flex items-center"
+            "flex items-center",
           )}
           onClick={() => setOpened(!opened)}
         >
@@ -173,7 +173,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
               "bg-brand-main/10": opened,
             },
             "transition-colors",
-            currentItemClassName
+            currentItemClassName,
           )}
         >
           {currentItem && (
@@ -189,7 +189,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                   className={classNames(
                     size === "large" && "w-7 mr-2",
                     size === "small" && "w-4 mr-1",
-                    currentItemIconClassName
+                    currentItemIconClassName,
                   )}
                 />
               )}
@@ -207,7 +207,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                   "transition-transform",
                   {
                     "rotate-180": opened,
-                  }
+                  },
                 )}
               />
             </>
@@ -232,7 +232,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 IS_FIREFOX && "!bg-[#111226]",
                 "border border-brand-light/5",
                 "z-20",
-                contentClassName
+                contentClassName,
               )}
             >
               {!!onSearch && (
@@ -243,7 +243,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     "p-3",
                     "after:absolute after:bottom-0 after:left-3",
                     "after:w-[calc(100%-1.5rem)] after:h-[1px]",
-                    "after:bg-brand-main/[.07]"
+                    "after:bg-brand-main/[.07]",
                   )}
                 >
                   <SearchInput
@@ -256,11 +256,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     size={size}
                     inputClassName={classNames(
                       size === "large" && "max-h-9 !pl-9",
-                      size === "small" && "max-h-7 !pl-7"
+                      size === "small" && "max-h-7 !pl-7",
                     )}
                     adornmentClassName={classNames(
                       size === "large" && "!left-3",
-                      size === "small" && "!left-2"
+                      size === "small" && "!left-2",
                     )}
                     autoFocus={true}
                   />
@@ -272,16 +272,16 @@ function Select<T extends string | ReactElement, U extends string | number>({
                   size === "large" && "max-h-64 pl-3 pr-4",
                   size === "small" && "max-h-44 pl-1 pr-[.875rem]",
                   "flex flex-col",
-                  scrollAreaClassName
+                  scrollAreaClassName,
                 )}
                 viewPortClassName={classNames(
                   size === "large" && "py-3",
                   size === "small" && "py-2",
-                  "viewportBlock"
+                  "viewportBlock",
                 )}
                 scrollBarClassName={classNames(
                   size === "small" && "w-3.5 py-2 !px-.5",
-                  size === "large" && "py-3"
+                  size === "large" && "py-3",
                 )}
               >
                 <div ref={itemsRef}>
@@ -318,7 +318,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "outline-none",
                           "transition-colors",
                           "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
-                          itemClassName
+                          itemClassName,
                         )}
                         onSelect={() => {
                           setOpened(false);
@@ -341,7 +341,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               }
                               className={classNames(
                                 size === "large" && "w-6 h-6 mr-3",
-                                size === "small" && "w-4 h-4 mr-2"
+                                size === "small" && "w-4 h-4 mr-2",
                               )}
                             />
                           )}
@@ -367,14 +367,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
                         "w-full h-full py-4",
                         "text-brand-inactivedark2 text-center",
                         size === "large" && "text-sm",
-                        size === "small" && "text-xs"
+                        size === "small" && "text-xs",
                       )}
                     >
                       <NoResultsFoundIcon
                         className={classNames(
                           "h-auto mb-4",
                           size === "large" && "w-[3.4375rem]",
-                          size === "small" && "w-[2.875rem]"
+                          size === "small" && "w-[2.875rem]",
                         )}
                       />
                       <span>

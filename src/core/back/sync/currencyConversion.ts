@@ -41,5 +41,5 @@ export const syncConversionRates = memoize(
       console.error(err);
     }
   },
-  { maxAge: 5 * 60_000 }
+  { maxAge: 5 * 60_000 },
 );

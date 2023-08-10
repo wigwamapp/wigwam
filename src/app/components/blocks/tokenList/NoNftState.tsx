@@ -15,7 +15,7 @@ const NoNftState = memo<NoNftStateProps>(({ syncing }) => (
       "flex flex-col items-center",
       "h-full w-full py-9",
       !syncing && "pt-2",
-      "text-sm text-brand-placeholder text-center"
+      "text-sm text-brand-placeholder text-center",
     )}
   >
     <Delay ms={500}>

@@ -40,7 +40,7 @@ const PriceChange: FC<PriceChangeProps> = ({
         !isPositive && isPercent && "bg-[#B82D41]",
         isPositive && !isPercent && "text-[#6BB77A]",
         !isPositive && !isPercent && "text-[#EA556A]",
-        className
+        className,
       )}
     >
       {isPercent ? (
@@ -49,7 +49,7 @@ const PriceChange: FC<PriceChangeProps> = ({
             <PriceArrow
               className={classNames(
                 "w-2.5 h-2.5 mr-[0.2rem]",
-                !isPositive && "transform rotate-180"
+                !isPositive && "transform rotate-180",
               )}
             />
           }

@@ -53,18 +53,18 @@ export const DEFAULT_NETWORKS: Network[] = [
   chainNets.map((n) => ({
     ...n,
     position: i,
-  }))
+  })),
 );
 
 export const DEFAULT_CHAIN_IDS = new Set(
-  DEFAULT_NETWORKS.map((n) => n.chainId)
+  DEFAULT_NETWORKS.map((n) => n.chainId),
 );
 
 if (process.env.RELEASE_ENV === "false") {
   assert(
     new Set(DEFAULT_NETWORKS.map((n) => n.chainId)).size ===
       DEFAULT_NETWORKS.length,
-    "Duplicate chain id found in DEFAULT_NETWORKS"
+    "Duplicate chain id found in DEFAULT_NETWORKS",
   );
 }
 
@@ -74,9 +74,11 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   DEFAULT_NETWORKS.map((n) => [
     n.chainId,
     getPublicURL(
-      `icons/network/${n.chainTag}${n.type === "mainnet" ? "" : "-testnet"}.png`
+      `icons/network/${n.chainTag}${
+        n.type === "mainnet" ? "" : "-testnet"
+      }.png`,
     ),
-  ])
+  ]),
 );
 
 export function getNetworkIconUrl(chainId: number) {

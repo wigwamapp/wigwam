@@ -1,6 +1,6 @@
 export async function withHumanDelay<T>(
   factory: () => Promise<T>,
-  delay = 500
+  delay = 500,
 ) {
   const srartedAt = Date.now();
 

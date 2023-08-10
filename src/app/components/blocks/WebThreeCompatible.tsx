@@ -52,7 +52,7 @@ const WebThreeCompatible: FC<{ small?: boolean }> = ({ small = false }) => {
       <p
         className={classNames(
           "text-sm text-brand-font max-w-[30rem] mb-3",
-          small ? "text-center" : ""
+          small ? "text-center" : "",
         )}
       >
         What wallets do you want to see when you connect to Web3 apps?
@@ -64,7 +64,7 @@ const WebThreeCompatible: FC<{ small?: boolean }> = ({ small = false }) => {
           "bg-black/10",
           "border border-brand-main/5",
           "rounded-[.625rem]",
-          small ? "px-1 py-1" : "px-2 py-1.5"
+          small ? "px-1 py-1" : "px-2 py-1.5",
         )}
         type="single"
         defaultValue={MetaMaskCompatibleMode.Strict}
@@ -134,7 +134,7 @@ const ToggleItem: FC<ToggleItemProps> = ({
       "transition",
       isActive && "bg-brand-main/5",
       !isActive && "hover:opacity-70",
-      className
+      className,
     )}
   >
     <span
@@ -142,13 +142,13 @@ const ToggleItem: FC<ToggleItemProps> = ({
         "flex items-center",
         small ? "text-xs" : "text-sm",
         "text-brand-light font-bold leading-none",
-        "mb-1"
+        "mb-1",
       )}
     >
       <Icon
         className={classNames(
           small ? "w-4 h-4 min-w-4 mr-1.5" : "w-5 h-5 min-w-5 mr-2",
-          "fill-brand-light"
+          "fill-brand-light",
         )}
       />
       {label}
@@ -160,7 +160,7 @@ const ToggleItem: FC<ToggleItemProps> = ({
           "absolute top-3",
           "h-[calc(100%-1.5rem)] w-px",
           "bg-brand-main/5",
-          withBorder === "left" ? "-left-[.15625rem]" : "-right-[.15625rem]"
+          withBorder === "left" ? "-left-[.15625rem]" : "-right-[.15625rem]",
         )}
       />
     ) : null}

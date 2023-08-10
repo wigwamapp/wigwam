@@ -67,7 +67,7 @@ const Input = memo(
         autoComplete = "off",
         ...rest
       },
-      ref
+      ref,
     ) => {
       const [focused, setFocused] = useState<boolean>(false);
 
@@ -80,7 +80,7 @@ const Input = memo(
         disabled &&
           theme !== "clean" &&
           "fill-current text-brand-disabledcolor",
-        adornmentClassName
+        adornmentClassName,
       );
 
       const handleFocus = useCallback<FocusEventHandler<HTMLInputElement>>(
@@ -88,7 +88,7 @@ const Input = memo(
           setFocused(true);
           onFocus?.(evt);
         },
-        [onFocus]
+        [onFocus],
       );
 
       const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
@@ -96,7 +96,7 @@ const Input = memo(
           setFocused(false);
           onBlur?.(evt);
         },
-        [onBlur]
+        [onBlur],
       );
 
       const successIconRef = useRef(null);
@@ -107,7 +107,7 @@ const Input = memo(
         if (successWithIcon) {
           const timeout = setTimeout(
             () => setIsHiddenWithSuccess(Boolean(success)),
-            500
+            500,
           );
           return () => clearTimeout(timeout);
         }
@@ -189,7 +189,7 @@ const Input = memo(
                   ],
                 error && !readOnly && "!border-brand-redobject",
                 success && "!border-brand-greenobject",
-                inputClassName
+                inputClassName,
               )}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -207,7 +207,7 @@ const Input = memo(
               <span
                 className={classNames(
                   "absolute top-1/2 -translate-y-1/2 right-3",
-                  actionsClassName
+                  actionsClassName,
                 )}
               >
                 {actions}
@@ -227,7 +227,7 @@ const Input = memo(
                     "bg-[#0a0a19]",
                     "rounded-[.625rem]",
                     "flex items-center justify-center",
-                    "opacity-0"
+                    "opacity-0",
                   )}
                 >
                   <SuccessIcon />
@@ -239,7 +239,7 @@ const Input = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && !readOnly && "max-h-5"
+              error && errorMessage && !readOnly && "max-h-5",
             )}
           >
             <span className="block text-brand-redtext pt-1 pl-4 text-xs">
@@ -248,8 +248,8 @@ const Input = memo(
           </div>
         </div>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default Input;

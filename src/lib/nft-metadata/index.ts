@@ -54,7 +54,7 @@ export class NFTMetadataAgent {
   constructor(
     private chainId: number,
     private provider: JsonRpcProvider,
-    opts: AgentOptions = {}
+    opts: AgentOptions = {},
   ) {
     this.ipfsGatewayUrl = opts.ipfsGatewayUrl || IPFS_IO_GATEWAY;
     this.ipfsFallbackGatewayUrl =
@@ -73,7 +73,7 @@ export class NFTMetadataAgent {
       this.chainId,
       tokenAddress,
       tokenId,
-      this.provider
+      this.provider,
     );
 
     if (alternateMethod) {
@@ -83,7 +83,7 @@ export class NFTMetadataAgent {
     try {
       const erc721Contract = ERC721__factory.connect(
         tokenAddress,
-        this.provider
+        this.provider,
       );
       const uri = await erc721Contract.tokenURI(tokenId);
 
@@ -99,7 +99,7 @@ export class NFTMetadataAgent {
       const erc1155Contract = new Contract(
         tokenAddress,
         ["function uri(uint256 index) public view returns (string memory)"],
-        this.provider
+        this.provider,
       );
 
       let uri = await erc1155Contract.uri(tokenId);
@@ -120,7 +120,7 @@ export class NFTMetadataAgent {
     tokenAddress: string,
     tokenId: string,
     tokenURI: string,
-    ipfsGateway: string
+    ipfsGateway: string,
   ) {
     const alternateMethod = getURIData(this.chainId, tokenAddress, tokenId);
 
@@ -132,7 +132,7 @@ export class NFTMetadataAgent {
       tokenURI,
       { timeout: this.timeout },
       ipfsGateway,
-      this.ipfsFallbackGatewayUrl
+      this.ipfsFallbackGatewayUrl,
     );
 
     if (!resp) {
@@ -147,13 +147,13 @@ export class NFTMetadataAgent {
     tokenId: string,
     tokenURI: string,
     uriData: any = {},
-    ipfsGateway: string
+    ipfsGateway: string,
   ) {
     const onChainData = await fetchOnChainData(
       this.chainId,
       tokenAddress,
       tokenId,
-      this.provider
+      this.provider,
     );
 
     const meta = normaliseURIData(this.chainId, tokenAddress, {
@@ -220,7 +220,7 @@ export class NFTMetadataAgent {
 
   public async fetchMetadata(
     rawAddress: string,
-    tokenId: string
+    tokenId: string,
   ): Promise<NftMetadata> {
     const tokenAddress = getAddress(rawAddress);
     try {
@@ -235,7 +235,7 @@ export class NFTMetadataAgent {
         tokenAddress,
         tokenId,
         tokenURI,
-        ipfsGateway
+        ipfsGateway,
       );
 
       const metadata = await this.parseURIData(
@@ -243,7 +243,7 @@ export class NFTMetadataAgent {
         tokenId,
         tokenURI,
         URIData,
-        ipfsGateway
+        ipfsGateway,
       );
 
       return {
@@ -258,7 +258,7 @@ export class NFTMetadataAgent {
       if (err instanceof ChainFetchError) {
         console.error(err);
         throw new Error(
-          `Failed to get tokenURI token: ${tokenAddress} is unsupported`
+          `Failed to get tokenURI token: ${tokenAddress} is unsupported`,
         );
       }
 

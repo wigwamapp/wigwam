@@ -39,7 +39,10 @@ export function deserializeError({ message, data }: SerializedError) {
 export class PorterError extends Error {
   name = "PorterError";
 
-  constructor(message: string, public data?: any) {
+  constructor(
+    message: string,
+    public data?: any,
+  ) {
     super(message);
   }
 }

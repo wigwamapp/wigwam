@@ -102,7 +102,7 @@ const PopupNetworkSelect: FC = () => {
         })
         .catch(console.error);
     },
-    [tabOrigin]
+    [tabOrigin],
   );
 
   return (
@@ -112,7 +112,7 @@ const PopupNetworkSelect: FC = () => {
       currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
       currentItemIconClassName={classNames(
         "!w-8 !h-8 !mr-3",
-        isSyncing && "animate-pulse"
+        isSyncing && "animate-pulse",
       )}
       contentClassName="w-[22.25rem]"
       onChange={handleChange}
@@ -127,7 +127,7 @@ const TokenExplorer: FC = () => {
     (value: boolean) => {
       setTokenType(value ? TokenType.NFT : TokenType.Asset);
     },
-    [setTokenType]
+    [setTokenType],
   );
 
   const isNftsSelected = tokenType === TokenType.NFT;
@@ -203,7 +203,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
             theme="tertiary"
             className={classNames(
               "ml-2 mr-2 mt-[.4375rem]",
-              manageModeEnabled && "bg-brand-main/30"
+              manageModeEnabled && "bg-brand-main/30",
             )}
             aria-label={
               manageModeEnabled
@@ -220,7 +220,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
             "max-h-0",
             "overflow-hidden",
             "transition-[max-height] duration-200",
-            tokenIdSearchDisplayed && "max-h-[3rem]"
+            tokenIdSearchDisplayed && "max-h-[3rem]",
           )}
         >
           <SearchInput
@@ -244,7 +244,7 @@ const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
       tokenIdSearchInputRef,
       tokenIdSearchValue,
       setTokenIdSearchValue,
-    ]
+    ],
   );
 
   let tokensBar: ReactNode = null;
@@ -326,7 +326,7 @@ const AssetList = memo<AssetListProps>(
         />
       </>
     );
-  }
+  },
 );
 
 type NftListProps = {
@@ -352,7 +352,9 @@ const NftList = memo<NftListProps>(
                     ? TokenStatus.Disabled
                     : TokenStatus.Enabled,
               },
-              [token.chainId, currentAccount.address, token.tokenSlug].join("_")
+              [token.chainId, currentAccount.address, token.tokenSlug].join(
+                "_",
+              ),
             );
           } catch (e) {
             console.error(e);
@@ -361,7 +363,7 @@ const NftList = memo<NftListProps>(
           setNftToken(token);
         }
       },
-      [manageModeEnabled, currentAccount.address, setNftToken]
+      [manageModeEnabled, currentAccount.address, setNftToken],
     );
 
     useEffect(() => {
@@ -388,7 +390,7 @@ const NftList = memo<NftListProps>(
           isManageMode={manageModeEnabled}
         />
       ),
-      [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerRef]
+      [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerRef],
     );
 
     return (
@@ -402,7 +404,7 @@ const NftList = memo<NftListProps>(
         />
       </>
     );
-  }
+  },
 );
 
 type ReceivePopupProps = Pick<SecondaryModalProps, "open" | "onOpenChange">;

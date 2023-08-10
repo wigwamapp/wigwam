@@ -26,7 +26,7 @@ export async function getRpcUrl(chainId: number) {
   if (process.env.NODE_ENV !== "test" && url.includes(INFURA_TEMPLATE)) {
     if (!INFURA_API_KEY) {
       throw new Error(
-        "Current rpc url requires INFURA API KEY environment variable"
+        "Current rpc url requires INFURA API KEY environment variable",
       );
     }
 

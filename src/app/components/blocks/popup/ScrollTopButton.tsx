@@ -20,7 +20,7 @@ const ScrollTopButton: FC<ScrollTopButtonProps> = ({
     const scrollAreaElement = scrollAreaRef.current;
 
     setIsScrollTopShown(
-      scrollAreaElement ? scrollAreaElement.scrollTop >= 120 : false
+      scrollAreaElement ? scrollAreaElement.scrollTop >= 120 : false,
     );
   }, [scrollAreaRef]);
 
@@ -62,7 +62,7 @@ const ScrollTopButton: FC<ScrollTopButtonProps> = ({
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
         "flex items-center justify-center",
-        className
+        className,
       )}
     >
       <ChevronDownIcon
@@ -70,7 +70,7 @@ const ScrollTopButton: FC<ScrollTopButtonProps> = ({
           "w-6 min-w-[1.5rem]",
           "h-auto",
           "-mt-0.5",
-          "rotate-180"
+          "rotate-180",
         )}
       />
     </button>

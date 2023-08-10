@@ -13,12 +13,12 @@ const getAtomsAll = atomFamily(
         ? Promise.all(values)
         : values;
     }),
-  isAtomsEqual
+  isAtomsEqual,
 );
 
 export function useAtomsAll<Atoms extends Atom<unknown>[]>(
   atoms: [...Atoms],
-  delay = 30
+  delay = 30,
 ): {
   [K in keyof Atoms]: AwaitedAtom<Atoms[K]>;
 } {

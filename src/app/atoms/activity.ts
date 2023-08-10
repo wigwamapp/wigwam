@@ -7,25 +7,25 @@ import * as repo from "core/repo";
 export const getTokenActivityAtom = atomFamily(
   (params: repo.QueryTokenActivitiesParams) =>
     atomWithRepoQuery((query) =>
-      query(() => repo.queryTokenActivities(params))
+      query(() => repo.queryTokenActivities(params)),
     ),
-  dequal
+  dequal,
 );
 
 export const pendingActivityAtom = atomWithRepoQuery((query) =>
-  query(() => repo.queryActivities({ pending: true }))
+  query(() => repo.queryActivities({ pending: true })),
 );
 
 export const getActivityAtom = atomFamily(
   (params: { offset?: number; limit?: number }) =>
     atomWithRepoQuery((query) =>
-      query(() => repo.queryActivities({ pending: false, ...params }))
+      query(() => repo.queryActivities({ pending: false, ...params })),
     ),
-  dequal
+  dequal,
 );
 
 export const getAllPermissionsAtom = atomFamily(
   (params: { search?: string; offset?: number; limit?: number }) =>
     atomWithRepoQuery((query) => query(() => repo.queryPermissions(params))),
-  dequal
+  dequal,
 );

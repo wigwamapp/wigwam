@@ -38,13 +38,13 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
   const { currentAccount } = useAccounts();
   const { activity, loadMore, hasMore } = useTokenActivity(
     currentAccount.address,
-    token.tokenSlug
+    token.tokenSlug,
   );
 
   const isSyncing = useIsTokenActivitySyncing(
     chainId,
     currentAccount.address,
-    token.tokenSlug
+    token.tokenSlug,
   );
 
   const observer = useRef<IntersectionObserver>();
@@ -65,7 +65,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
         observer.current.observe(node);
       }
     },
-    [activity, hasMore, loadMore]
+    [activity, hasMore, loadMore],
   );
 
   if (activity.length === 0 && !isSyncing) return null;
@@ -76,7 +76,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
         "relative mt-5 pt-1",
         "border-t border-brand-main/[.07]",
         isSyncing && "!border-transparent",
-        "flex flex-col"
+        "flex flex-col",
       )}
     >
       {activity.map((activ, i) => (
@@ -97,7 +97,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
           className={classNames(
             "absolute top-[-1px] left-0 right-0",
             "h-px bg-brand-main/[.07]",
-            "overflow-hidden"
+            "overflow-hidden",
           )}
         >
           <div
@@ -106,7 +106,7 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
               "bg-gradient-to-r from-brand-main/[.0] via-brand-main/[.3] to-brand-main/[0]",
               "absolute top-0 left-0",
               "-translate-x-full",
-              "animate-stripeloading"
+              "animate-stripeloading",
             )}
           />
         </div>
@@ -146,7 +146,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
           "h-[4.875rem]",
           "py-4",
           "border-brand-main/[.07]",
-          className
+          className,
         )}
       >
         <div className="flex items-center w-[47%]">
@@ -156,7 +156,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               "w-9 h-9 min-w-[2.25rem]",
               "bg-brand-main/5",
               "rounded-full",
-              "mr-3"
+              "mr-3",
             )}
           >
             <Icon className="w-5 h-5 opacity-75" />
@@ -237,7 +237,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 type ProjectLabelProps = {

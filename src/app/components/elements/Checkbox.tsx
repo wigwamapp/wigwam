@@ -23,7 +23,7 @@ const Checkbox: FC<CheckboxProps> = ({
       "flex items-center justify-center",
       checked && "border border-brand-main",
       disabled && "border border-brand-main/30",
-      className
+      className,
     )}
   >
     <CheckboxPrimitive.Indicator>

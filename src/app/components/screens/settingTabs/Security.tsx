@@ -34,7 +34,7 @@ const Security: FC = () => {
         userId: analytics.userId ?? nanoid(),
       });
     },
-    [setAnalytics, analytics]
+    [setAnalytics, analytics],
   );
 
   return (
@@ -60,7 +60,7 @@ const Security: FC = () => {
             className={classNames(
               "flex !justify-start items-center",
               "text-left",
-              "!px-3 !py-2 mr-auto"
+              "!px-3 !py-2 mr-auto",
             )}
             onClick={() => setRevealModalOpened(true)}
           >
@@ -159,7 +159,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
         }
         return;
       }),
-    []
+    [],
   );
 
   return (
@@ -184,7 +184,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               "bg-brand-redobject/[.05]",
               "border border-brand-redobject/[.8]",
               "rounded-[.625rem]",
-              "text-sm"
+              "text-sm",
             )}
           >
             <span>

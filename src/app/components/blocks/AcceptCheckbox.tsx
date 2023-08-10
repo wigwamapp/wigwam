@@ -37,7 +37,7 @@ const AcceptCheckbox: FC<AcceptCheckboxProps> = ({
         value && "bg-brand-main/[.1]",
         "border border-transparent",
         !!error && "!border-brand-redobject",
-        className
+        className,
       )}
       checked={value}
       onCheckedChange={(e) => {
@@ -51,7 +51,7 @@ const AcceptCheckbox: FC<AcceptCheckboxProps> = ({
           "rounded",
           "flex items-center justify-center",
           value && "border border-brand-main",
-          !!error && "border !border-brand-redobject"
+          !!error && "border !border-brand-redobject",
         )}
       >
         <Checkbox.Indicator>{value && <CheckIcon />}</Checkbox.Indicator>
@@ -65,7 +65,7 @@ const AcceptCheckbox: FC<AcceptCheckboxProps> = ({
       className={classNames(
         "flex max-h-0 overflow-hidden",
         "transition-[max-height] duration-200",
-        error && errorMessage && "max-h-5"
+        error && errorMessage && "max-h-5",
       )}
     >
       <span className="text-brand-redtext pt-1 pl-4 text-xs">

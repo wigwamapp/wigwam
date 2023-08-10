@@ -25,7 +25,7 @@ export const syncNativeTokens = memoize(
         chainId,
         accountAddress: acc.address,
         tokenSlug: NATIVE_TOKEN_SLUG,
-      })
+      }),
     );
 
     const [
@@ -39,8 +39,8 @@ export const syncNativeTokens = memoize(
       repo.accountTokens.bulkGet(dbKeys),
       Promise.all(
         accounts.map((acc) =>
-          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address)
-        )
+          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address),
+        ),
       ),
       // Promise.all(
       //   accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
@@ -50,8 +50,8 @@ export const syncNativeTokens = memoize(
           repo.accountTokens
             .where("[chainId+tokenType+accountAddress]")
             .equals([chainId, TokenType.Asset, acc.address])
-            .toArray()
-        )
+            .toArray(),
+        ),
       ),
       getCoinGeckoNativeTokenPrice(chainId),
     ]);
@@ -135,11 +135,11 @@ export const syncNativeTokens = memoize(
           };
         }
       }),
-      dbKeys
+      dbKeys,
     );
   },
   {
     cacheKey: ([chainId, buster]) => `${chainId}${buster}`,
     maxAge: 20_000, // 20 sec
-  }
+  },
 );

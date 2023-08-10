@@ -53,7 +53,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
   const tabHeader = useMemo(() => getTabHeader(action), [action]);
   const withDescription = useMemo(
     () => action.type === TxActionType.TokenApprove && !action.clears,
-    [action]
+    [action],
   );
 
   return (
@@ -130,7 +130,7 @@ const FeeButton: FC<FeeButton> = ({
 }) => {
   gasLimit = useMemo(
     () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
-    [averageGasLimit, gasLimit]
+    [averageGasLimit, gasLimit],
   );
 
   const nativeToken = useToken<AccountAsset>(accountAddress);
@@ -157,7 +157,7 @@ const FeeButton: FC<FeeButton> = ({
         "py-3 pr-2 pl-4 mb-3",
         "bg-brand-main/5",
         "transition-colors",
-        "hover:bg-brand-main/10"
+        "hover:bg-brand-main/10",
       )}
       onClick={onClick}
     >
@@ -166,7 +166,7 @@ const FeeButton: FC<FeeButton> = ({
           className={classNames(
             "flex items-center justify-between",
             "mb-0.5",
-            "text-sm"
+            "text-sm",
           )}
         >
           Network fee
@@ -226,7 +226,7 @@ const FeeModeLabel: FC<FeeModeLabelProps> = ({ feeMode }) => {
         "py-0.5 pl-1.5 pr-2.5",
         "rounded-md",
         "border border-brand-main/[.07] text-sm",
-        "flex items-center"
+        "flex items-center",
       )}
     >
       <span className="mr-1.5 text-xs">{icon}</span>

@@ -22,7 +22,7 @@ const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
     (
       { asset, isActive = false, onAssetSelect, isManageMode, className },
-      ref
+      ref,
     ) => {
       const {
         name,
@@ -42,7 +42,7 @@ const AssetCard = memo(
           priceUSDChange && +priceUSDChange > 0
             ? "text-[#6BB77A]"
             : "text-[#EA556A]",
-        [priceUSDChange]
+        [priceUSDChange],
       );
 
       return (
@@ -62,7 +62,7 @@ const AssetCard = memo(
             isActive && "bg-brand-main/20",
             disabled && "opacity-60",
             "hover:opacity-100",
-            className
+            className,
           )}
           disabled={isManageMode && nativeAsset}
         >
@@ -76,7 +76,7 @@ const AssetCard = memo(
               <span
                 className={classNames(
                   "text-base font-bold leading-4 truncate mr-auto pb-1 -mb-1",
-                  isManageMode && "mr-14"
+                  isManageMode && "mr-14",
                 )}
               >
                 {name}
@@ -104,7 +104,7 @@ const AssetCard = memo(
                   hoverable && "group-hover:text-brand-light",
                   "transition-colors",
                   "truncate min-w-0",
-                  isManageMode && "mr-14"
+                  isManageMode && "mr-14",
                 )}
               />
               {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
@@ -115,13 +115,13 @@ const AssetCard = memo(
                     "group-hover:opacity-100",
                     "transition",
                     "ml-2",
-                    priceClassName
+                    priceClassName,
                   )}
                 >
                   <PriceArrow
                     className={classNames(
                       "w-2 h-2 mr-[0.125rem]",
-                      +priceUSDChange < 0 && "transform rotate-180"
+                      +priceUSDChange < 0 && "transform rotate-180",
                     )}
                   />
 
@@ -138,7 +138,7 @@ const AssetCard = memo(
                     "bg-brand-main/20",
                     "rounded",
                     "flex items-center justify-center",
-                    !disabled && "border border-brand-main"
+                    !disabled && "border border-brand-main",
                   )}
                   checked={!disabled}
                   asChild
@@ -154,8 +154,8 @@ const AssetCard = memo(
           </span>
         </button>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default AssetCard;

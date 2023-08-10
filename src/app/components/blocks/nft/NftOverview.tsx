@@ -73,7 +73,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
   const contentClassName = classNames(
     !fitContentBy && "invisible",
     fitContentBy === "height" && "h-full w-auto",
-    fitContentBy === "width" && "w-full h-auto"
+    fitContentBy === "width" && "w-full h-auto",
   );
 
   const handleContentError = useCallback(() => setErrored(true), [setErrored]);
@@ -81,7 +81,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
   const withErrorFallback = useCallback(
     (node: ReactNode) =>
       errored ? <MediaFallbackIcon className="h-full w-auto" /> : node,
-    [errored]
+    [errored],
   );
 
   let contentNode: ReactNode;
@@ -98,7 +98,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
           controls
         >
           <track kind="captions" />
-        </video>
+        </video>,
       );
       break;
 
@@ -107,7 +107,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
         <div
           className={classNames(
             !errored ? contentClassName : "h-full",
-            !small && "relative"
+            !small && "relative",
           )}
         >
           {withErrorFallback(
@@ -117,7 +117,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
               alt={token.name}
               className={contentClassName}
               onError={handleContentError}
-            />
+            />,
           )}
 
           <div className={classNames("absolute", "bottom-2 left-2 right-2")}>
@@ -145,7 +145,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
           alt={token.name}
           className={contentClassName}
           onError={handleContentError}
-        />
+        />,
       );
   }
 
@@ -156,7 +156,7 @@ const NftOverview = memo<NftOverviewProps>(({ token, small, className }) => {
         "w-full h-full",
         "flex items-center justify-center",
         "relative",
-        className
+        className,
       )}
     >
       {contentNode}

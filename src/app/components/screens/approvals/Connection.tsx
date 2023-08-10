@@ -64,7 +64,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       ...(currentPermission?.accountAddresses ?? []),
       currentAccount.address,
     ],
-    [currentPermission, currentAccount]
+    [currentPermission, currentAccount],
   );
 
   const { alert } = useDialog();
@@ -80,7 +80,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       localChainIdRef.current = chainId;
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate],
   );
 
   useSync(localChainId, currentAccount.address);
@@ -109,7 +109,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 
       forceUpdate();
     },
-    [allAccounts.length, forceUpdate]
+    [allAccounts.length, forceUpdate],
   );
 
   const [allAccountsChecked, setAllAccountsChecked] = useState(false);
@@ -131,7 +131,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       setAllAccountsChecked((prevState) => !prevState);
       forceUpdate();
     },
-    [allAccounts, forceUpdate]
+    [allAccounts, forceUpdate],
   );
 
   const [approving, setApproving] = useState(false);
@@ -162,7 +162,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, setApproving, alert]
+    [approval, setApproving, alert],
   );
 
   useEffect(() => {
@@ -248,7 +248,7 @@ export default ApproveConnection;
 
 const iconsClassNames = classNames(
   "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
-  "border border-brand-main/60"
+  "border border-brand-main/60",
 );
 
 const DappLogos: FC<{ dappLogoUrl?: string }> = ({ dappLogoUrl }) => (
@@ -296,7 +296,7 @@ const EmptyAccountsToConnect: FC = () => (
     className={classNames(
       "flex flex-col items-center justify-center mx-auto",
       "w-full h-full py-4",
-      "text-sm text-brand-inactivedark2 text-center"
+      "text-sm text-brand-inactivedark2 text-center",
     )}
   >
     <NoResultsFoundIcon className="mb-4" />
@@ -341,7 +341,7 @@ const Account: FC<AccountProps> = ({
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
         "outline-none",
-        className
+        className,
       )}
     >
       <Checkbox checked={checked} className="mr-4 min-w-[1.25rem]" />
@@ -354,7 +354,7 @@ const Account: FC<AccountProps> = ({
           "h-8 w-8 min-w-[2rem]",
           "mr-3",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
 

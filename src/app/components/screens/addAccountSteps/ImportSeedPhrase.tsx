@@ -30,7 +30,7 @@ type FormValues = {
 };
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists
+  ({ code }) => toWordlistLang(code) in wordlists,
 );
 
 const ImportSeedPhrase = memo(() => {
@@ -43,14 +43,14 @@ const ImportSeedPhrase = memo(() => {
     () =>
       SUPPORTED_LOCALES.find(({ code }) => currentLocale === code) ??
       FALLBACK_LOCALE,
-    [currentLocale]
+    [currentLocale],
   );
 
   const [locale, setLocale] = useState(defaultLocale);
 
   const wordlistLocale = useMemo(
     () => toWordlistLang(locale.code),
-    [locale.code]
+    [locale.code],
   );
 
   const handleContinue = useCallback(
@@ -69,7 +69,7 @@ const ImportSeedPhrase = memo(() => {
           alert(err?.message);
         }
       }),
-    [wordlistLocale, navigateToStep, stateRef, alert]
+    [wordlistLocale, navigateToStep, stateRef, alert],
   );
 
   return (
@@ -96,7 +96,7 @@ const ImportSeedPhrase = memo(() => {
                 name="seed"
                 validate={composeValidators(
                   required,
-                  validateSeedPhrase(wordlistLocale)
+                  validateSeedPhrase(wordlistLocale),
                 )}
                 format={formatSeedPhrase}
                 formatOnBlur

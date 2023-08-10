@@ -57,12 +57,12 @@ const ContactAutocomplete = forwardRef<
   const accounts = useMemo(
     () =>
       allAccounts.filter(({ address }) => address !== currentAccount.address),
-    [allAccounts, currentAccount.address]
+    [allAccounts, currentAccount.address],
   );
 
   const fuse = useMemo(
     () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
+    [accounts],
   );
 
   const filteredAccounts = useMemo(() => {
@@ -74,7 +74,7 @@ const ContactAutocomplete = forwardRef<
 
   const mergedAccounts = useMemo(
     () => [...contacts, ...filteredAccounts],
-    [contacts, filteredAccounts]
+    [contacts, filteredAccounts],
   );
 
   useEffect(() => {
@@ -97,14 +97,14 @@ const ContactAutocomplete = forwardRef<
       if (mergedAccounts) {
         if (e.keyCode === 40) {
           setActiveSuggestion((prevState) =>
-            prevState + 1 > mergedAccounts.length - 1 ? 0 : prevState + 1
+            prevState + 1 > mergedAccounts.length - 1 ? 0 : prevState + 1,
           );
           setIsAfterArrowClick(true);
           e.preventDefault();
         }
         if (e.keyCode === 38) {
           setActiveSuggestion((prevState) =>
-            prevState - 1 < 0 ? mergedAccounts.length - 1 : prevState - 1
+            prevState - 1 < 0 ? mergedAccounts.length - 1 : prevState - 1,
           );
           setIsAfterArrowClick(true);
           e.preventDefault();
@@ -118,7 +118,7 @@ const ContactAutocomplete = forwardRef<
       }
       rest.onKeyDown?.(e);
     },
-    [mergedAccounts, rest, activeSuggestion, setValue]
+    [mergedAccounts, rest, activeSuggestion, setValue],
   );
 
   const observer = useRef<IntersectionObserver>();
@@ -139,7 +139,7 @@ const ContactAutocomplete = forwardRef<
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, contacts]
+    [hasMore, loadMore, contacts],
   );
 
   const labelAction = useMemo(() => {
@@ -147,7 +147,7 @@ const ContactAutocomplete = forwardRef<
       !meta.error &&
       mergedAccounts.filter(
         (value, index, self) =>
-          index === self.findIndex((t) => t.address === value.address)
+          index === self.findIndex((t) => t.address === value.address),
       ).length <= 1
     ) {
       return <SmallContactCard address={value as string} />;
@@ -172,7 +172,7 @@ const ContactAutocomplete = forwardRef<
         !(
           mergedAccounts.filter(
             (value, index, self) =>
-              index === self.findIndex((t) => t.address === value.address)
+              index === self.findIndex((t) => t.address === value.address),
           ).length === 1 && !meta.error
         ) && (
           <Popover.Content
@@ -196,7 +196,7 @@ const ContactAutocomplete = forwardRef<
               IS_FIREFOX && "!bg-[#111226]",
               "border border-brand-light/5",
               "z-10",
-              "w-[23.25rem]"
+              "w-[23.25rem]",
             )}
           >
             <ScrollAreaContainer
@@ -288,7 +288,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
       className,
       ...rest
     },
-    ref
+    ref,
   ) => {
     const elementRef = useRef<HTMLButtonElement>(null);
     const onScreen = useOnScreen(elementRef);
@@ -312,7 +312,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
           "transition-colors",
           "flex items-center text-left w-full min-w-0",
           isActive && "bg-brand-main/20",
-          className
+          className,
         )}
         {...rest}
       >
@@ -325,7 +325,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
             "h-8 w-8 min-w-[2rem]",
             "mr-3",
             "bg-black/20",
-            "rounded-[.625rem]"
+            "rounded-[.625rem]",
           )}
         />
         <span className="flex flex-col min-w-0">
@@ -342,12 +342,12 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
               "text-xs text-brand-inactivedark font-normal",
               "mt-px",
               "transition-colors",
-              isActive && "!text-brand-light"
+              isActive && "!text-brand-light",
             )}
             withTooltip={false}
           />
         </span>
       </button>
     );
-  }
+  },
 );

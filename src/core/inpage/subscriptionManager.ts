@@ -15,7 +15,10 @@ type Subscription = { type: SubType; filterId: string };
 export class SubscriptionManager extends Emitter {
   private subscriptions = new Map<string, Subscription>();
 
-  constructor(private provider: InpageProvider, private filter: FilterManager) {
+  constructor(
+    private provider: InpageProvider,
+    private filter: FilterManager,
+  ) {
     super();
 
     this.checkChangesAndDefer();
@@ -83,7 +86,7 @@ export class SubscriptionManager extends Emitter {
 
       default:
         throw new Error(
-          `SubscriptionManager - unsupported subscription type "${subscriptionType}"`
+          `SubscriptionManager - unsupported subscription type "${subscriptionType}"`,
         );
     }
   }

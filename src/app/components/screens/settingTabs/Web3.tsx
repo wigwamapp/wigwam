@@ -54,7 +54,7 @@ const PermissionsList = memo(() => {
         console.error(err);
       }
     },
-    []
+    [],
   );
 
   if (!allPermissions || allPermissions.length === 0) return null;
@@ -81,7 +81,7 @@ const PermissionsList = memo(() => {
               "rounded-lg",
               "flex items-center py-2 pl-4 pr-2",
               "text-base text-brand-light font-medium",
-              "hover:underline"
+              "hover:underline",
             )}
           >
             <span className="min-w-0 truncate">

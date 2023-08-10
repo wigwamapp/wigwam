@@ -21,7 +21,7 @@ export async function requestSigning(
   rpcCtx: RpcContext,
   source: ActivitySource,
   standard: SigningStandard,
-  params: any[]
+  params: any[],
 ) {
   validatePermission(source);
 
@@ -71,8 +71,8 @@ export async function requestSigning(
               (item: any) =>
                 typeof item.type === "string" &&
                 typeof item.name === "string" &&
-                typeof item.value === "string"
-            )
+                typeof item.value === "string",
+            ),
         );
         break;
 
@@ -81,7 +81,7 @@ export async function requestSigning(
         assert(
           message &&
             typeof message === "string" &&
-            typeof JSON.parse(message) === "object"
+            typeof JSON.parse(message) === "object",
         );
         break;
     }
@@ -106,7 +106,7 @@ export async function requestSigning(
 export async function recoverPersonalSign(
   rpcCtx: RpcContext,
   source: ActivitySource,
-  params: any[]
+  params: any[],
 ) {
   validatePermission(source);
 

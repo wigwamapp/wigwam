@@ -21,7 +21,7 @@ const Welcome: FC = () => {
           "flex flex-col items-center -mt-[3vh] relative z-10",
           addAccOpened
             ? "opacity-0"
-            : "opacity-100 transition-opacity duration-500"
+            : "opacity-100 transition-opacity duration-500",
         )}
       >
         <VigvamIcon className={classNames("w-[5rem] h-auto mb-5")} />

@@ -4,7 +4,7 @@ import { useDialog } from "app/hooks/dialog";
 
 export function usePasteFromClipboard(
   setValue?: (value: string) => void,
-  copyDelay: number = 1000 * 2
+  copyDelay: number = 1000 * 2,
 ) {
   const { alert } = useDialog();
   const [pasted, setPasted] = useState(false);

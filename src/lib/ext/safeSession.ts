@@ -26,8 +26,8 @@ export async function persistSession(sessionKey: string, data: any) {
           iv,
         },
         encKey,
-        utf8ToBytes(JSON.stringify(data))
-      )
+        utf8ToBytes(JSON.stringify(data)),
+      ),
     );
 
     // Combine payload
@@ -73,7 +73,7 @@ export async function retrieveSession<T = any>(sessionKey: string) {
     const dataBuf = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       encKey,
-      cipher
+      cipher,
     );
     zeroBuffer(iv);
     zeroBuffer(cipher);
@@ -101,7 +101,7 @@ async function getEncryptionKey(salt: Uint8Array) {
     encEntropy,
     "PBKDF2",
     false,
-    ["deriveBits", "deriveKey"]
+    ["deriveBits", "deriveKey"],
   );
   zeroBuffer(encEntropy);
 
@@ -116,7 +116,7 @@ async function getEncryptionKey(salt: Uint8Array) {
     encKey,
     { name: "AES-GCM", length: 256 },
     false,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   return derivedEncKey;

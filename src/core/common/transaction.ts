@@ -20,7 +20,7 @@ import {
 
 export async function matchTxAction(
   provider: Provider,
-  txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish }
+  txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish },
 ): Promise<TxAction | null> {
   if (!txParams.to) {
     if (!isZeroHex(txParams.data)) {
@@ -82,7 +82,7 @@ export async function matchTxAction(
               amount: ethStringify(args[1]),
             },
           ],
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC20, { name: "approve" }],
@@ -96,7 +96,7 @@ export async function matchTxAction(
           }),
           amount: ethStringify(args[1]),
           clears: isZeroHex(args[1]),
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC20, { name: "transferFrom" }],
@@ -114,7 +114,7 @@ export async function matchTxAction(
             },
           ],
           fromAddress: ethStringify(args[0]),
-        })
+        }),
       )
       // ERC721
       .with(
@@ -133,7 +133,7 @@ export async function matchTxAction(
             },
           ],
           fromAddress: ethStringify(args[0]),
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC721, { name: "transferFrom" }],
@@ -151,7 +151,7 @@ export async function matchTxAction(
             },
           ],
           fromAddress: ethStringify(args[0]),
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC721, { name: "approve" }],
@@ -164,7 +164,7 @@ export async function matchTxAction(
             id: ethStringify(args[1]),
           }),
           clears: isZeroHex(args[0]),
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC721, { name: "setApprovalForAll", args: P.select() }],
@@ -173,7 +173,7 @@ export async function matchTxAction(
           toAddress: ethStringify(args[0]),
           clears: Boolean(args[1]),
           allTokensContract: txParams.to!,
-        })
+        }),
       )
       // ERC1155
       .with(
@@ -186,7 +186,7 @@ export async function matchTxAction(
           toAddress: ethStringify(args[0]),
           clears: Boolean(args[1]),
           allTokensContract: txParams.to!,
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC1155, { name: "safeTransferFrom" }],
@@ -205,7 +205,7 @@ export async function matchTxAction(
           ],
           fromAddress: ethStringify(args[0]),
           data: !isZeroHex(args[4]) ? ethStringify(args[4]) : undefined,
-        })
+        }),
       )
       .with(
         [TokenStandard.ERC1155, { name: "safeBatchTransferFrom" }],
@@ -222,7 +222,7 @@ export async function matchTxAction(
           })),
           fromAddress: ethStringify(args[0]),
           data: !isZeroHex(args[4]) ? ethStringify(args[4]) : undefined,
-        })
+        }),
       )
       // Etc...
       .otherwise(getContractInteractionAction)
@@ -235,7 +235,7 @@ export async function matchTokenTransferEvents(
     address: string;
     data: string;
     topics: string[];
-  }[]
+  }[],
 ) {
   const results: {
     tokenSlug: string;
@@ -265,7 +265,7 @@ export async function matchTokenTransferEvents(
               to: ethStringify(args[1]),
               amount: ethStringify(args[2]),
             });
-          }
+          },
         )
         .with(
           [TokenStandard.ERC721, { name: "Transfer" }],
@@ -280,7 +280,7 @@ export async function matchTokenTransferEvents(
               to: ethStringify(args[1]),
               amount: "1",
             });
-          }
+          },
         )
         .with(
           [TokenStandard.ERC1155, { name: "TransferSingle" }],
@@ -295,7 +295,7 @@ export async function matchTokenTransferEvents(
               to: ethStringify(args[2]),
               amount: ethStringify(args[4]),
             });
-          }
+          },
         )
         .with(
           [TokenStandard.ERC1155, { name: "TransferBatch" }],
@@ -314,10 +314,10 @@ export async function matchTokenTransferEvents(
                 amount: ethStringify(args[4][i]),
               });
             }
-          }
+          },
         )
         .otherwise(() => null);
-    })
+    }),
   );
 
   return results;
@@ -329,11 +329,11 @@ const erc1155Interface = ERC1155__factory.createInterface();
 
 export type ParsedTokenTxData = [
   TokenStandard.ERC20 | TokenStandard.ERC721 | TokenStandard.ERC1155,
-  TransactionDescription
+  TransactionDescription,
 ];
 
 export function parseStandardTokenTransactionData(
-  data: string
+  data: string,
 ): ParsedTokenTxData[] {
   const parsed: ParsedTokenTxData[] = [];
 
@@ -398,7 +398,7 @@ export function parseStandardTokenEvent(log: {
 
 export async function isSmartContractAddress(
   provider: Provider,
-  address: string
+  address: string,
 ) {
   let contractCode;
   try {
@@ -415,13 +415,13 @@ export async function isSmartContractAddress(
 async function pickParsed<T extends ParsedTokenTxData | ParsedTokenEvent>(
   provider: Provider,
   address: string,
-  parsedAll: T[]
+  parsedAll: T[],
 ): Promise<T> {
   if (parsedAll.length > 1) {
     const valids = await Promise.all(
       parsedAll.map(([standard]) =>
-        isTokenStandardValid(provider, address, standard)
-      )
+        isTokenStandardValid(provider, address, standard),
+      ),
     );
 
     for (let i = 0; i < parsedAll.length; i++) {

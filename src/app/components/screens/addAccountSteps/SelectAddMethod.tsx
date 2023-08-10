@@ -46,7 +46,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({
       withHumanDelay(async () => {
         onContinue(activeMethod, derivationPath.replace("/{index}", ""));
       }),
-    [activeMethod, onContinue]
+    [activeMethod, onContinue],
   );
 
   return (
@@ -128,7 +128,7 @@ const RadioGroup: FC<RadioGroupProps> = ({
       "transition-colors",
       "hover:bg-brand-main/10",
       activeValue === value && "bg-brand-main/10",
-      className
+      className,
     )}
   >
     <span
@@ -137,7 +137,7 @@ const RadioGroup: FC<RadioGroupProps> = ({
         "w-6 min-w-[1.5rem] h-6 mt-1 mr-3",
         "bg-brand-main/10",
         "rounded-full",
-        "flex justify-center items-center"
+        "flex justify-center items-center",
       )}
     >
       <RadioGroupPrimitive.Indicator className="bg-radio w-3 h-3 rounded-full" />

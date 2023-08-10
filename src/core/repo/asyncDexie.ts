@@ -13,7 +13,7 @@ export class AsyncDexie extends Dexie {
         })
         .then(() => super.open())
         .then(res)
-        .catch(rej)
+        .catch(rej),
     );
   }
 }

@@ -130,13 +130,13 @@ const EditNetwork = memo<EditNetworkProps>(
                     },
                     explorerUrls: [blockExplorer],
                     position: 0,
-                  }
+                  },
             );
 
             if (network) {
               await setRpcUrl(
                 chainId,
-                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null
+                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null,
               );
             }
 
@@ -165,7 +165,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   } successfully created!`
                 : `Network ${
                     network?.name ? `"${network?.name}"` : ""
-                  } successfully updated!`
+                  } successfully updated!`,
             );
             onCancelHandler();
           } catch (err: any) {
@@ -180,7 +180,7 @@ const EditNetwork = memo<EditNetworkProps>(
         updateToast,
         onCancelHandler,
         alert,
-      ]
+      ],
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -201,7 +201,7 @@ const EditNetwork = memo<EditNetworkProps>(
         updateToast(
           `Network ${
             network?.name ? `"${network?.name}"` : ""
-          } successfully deleted!`
+          } successfully deleted!`,
         );
       }
     }, [confirm, initialChainId, network?.name, onActionFinished, updateToast]);
@@ -265,7 +265,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(
                       required,
                       minLength(3),
-                      maxLength(256)
+                      maxLength(256),
                     )}
                   >
                     {({ input, meta }) => (
@@ -308,7 +308,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(
                       required,
                       minLength(1),
-                      maxLength(16)
+                      maxLength(16),
                     )}
                   >
                     {({ input, meta }) => (
@@ -332,7 +332,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       required,
                       minLength(2),
                       maxLength(8),
-                      validateCurrencySymbol
+                      validateCurrencySymbol,
                     )}
                   >
                     {({ input, meta }) => (
@@ -389,7 +389,7 @@ const EditNetwork = memo<EditNetworkProps>(
         </ScrollAreaContainer>
       </section>
     );
-  }
+  },
 );
 
 export default EditNetwork;
@@ -404,7 +404,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
   ({ formApi, meta, network, ...rest }, ref) => {
     const setValue = useThrottledCallback(
       (value) => formApi.change("rpcUrl", value),
-      300
+      300,
     );
 
     const { paste, pasted } = usePasteFromClipboard(setValue);
@@ -476,7 +476,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                 ? 0
                 : prevState + 1 > rpcList.length - 1
                 ? 0
-                : prevState + 1
+                : prevState + 1,
             );
             setIsAfterArrowClick(true);
             e.preventDefault();
@@ -487,7 +487,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
                 ? 0
                 : prevState - 1 < 0
                 ? rpcList.length - 1
-                : prevState - 1
+                : prevState - 1,
             );
             setIsAfterArrowClick(true);
             e.preventDefault();
@@ -502,7 +502,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
         }
         rest.onKeyDown?.(e);
       },
-      [activeSuggestion, rest, rpcList, setValue]
+      [activeSuggestion, rest, rpcList, setValue],
     );
 
     const content = (
@@ -518,7 +518,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              "items-center"
+              "items-center",
             )}
           >
             {pasted ? (
@@ -565,7 +565,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               IS_FIREFOX && "!bg-[#111226]",
               "border border-brand-light/5",
               "z-10",
-              "w-[21.875rem]"
+              "w-[21.875rem]",
             )}
           >
             <ScrollAreaContainer
@@ -599,7 +599,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
     }
 
     return content;
-  }
+  },
 );
 
 type NetworkButtonProps = {
@@ -635,7 +635,7 @@ const NetworkButton = forwardRef<HTMLButtonElement, NetworkButtonProps>(
           "text-sm",
           "outline-none",
           "transition-colors",
-          isActive && "bg-brand-main/20"
+          isActive && "bg-brand-main/20",
         )}
         {...rest}
       >
@@ -645,5 +645,5 @@ const NetworkButton = forwardRef<HTMLButtonElement, NetworkButtonProps>(
         )}
       </button>
     );
-  }
+  },
 );

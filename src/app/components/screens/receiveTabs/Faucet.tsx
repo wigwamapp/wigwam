@@ -42,7 +42,7 @@ const Faucet: FC = () => {
                   "rounded-lg",
                   "flex items-center py-2 px-4",
                   "text-base text-brand-light font-medium",
-                  "hover:underline"
+                  "hover:underline",
                 )}
               >
                 {new URL(faucetUrl).host}

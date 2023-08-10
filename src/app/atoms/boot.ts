@@ -8,5 +8,5 @@ export const i18nAtom = atom(() => initPromise);
 
 export const fontsAtom = atomFamily(
   (fonts: Font[]) => atom(() => awaitFonts(fonts)),
-  dequal
+  dequal,
 );

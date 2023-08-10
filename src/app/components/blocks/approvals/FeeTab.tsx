@@ -59,14 +59,14 @@ const FeeTab = memo<FeeTabProps>(
       (name: string, value: ethers.BigNumberish | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value }));
       },
-      [onOverridesChange]
+      [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
         if (!value) changeValue(name, null);
       },
-      [changeValue]
+      [changeValue],
     );
 
     const handleFeeModeChange = useCallback(
@@ -82,10 +82,10 @@ const FeeTab = memo<FeeTabProps>(
               gasPrice: null,
               maxFeePerGas: null,
               maxPriorityFeePerGas: null,
-            } as any)
+            }) as any,
         );
       },
-      [setFeeMode, onOverridesChange]
+      [setFeeMode, onOverridesChange],
     );
 
     return (
@@ -127,7 +127,7 @@ const FeeTab = memo<FeeTabProps>(
               }}
               value={formatUnits(
                 overrides.maxFeePerGas ?? tx.maxFeePerGas,
-                "gwei"
+                "gwei",
               )}
               onChange={(e) =>
                 changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
@@ -145,7 +145,7 @@ const FeeTab = memo<FeeTabProps>(
                     ).toString(),
                     decimals: changeStepDecimals,
                     operator: "minus",
-                  })
+                  }),
                 )
               }
               onPlusClick={() =>
@@ -158,7 +158,7 @@ const FeeTab = memo<FeeTabProps>(
                       0
                     ).toString(),
                     decimals: changeStepDecimals,
-                  })
+                  }),
                 )
               }
             />
@@ -181,12 +181,12 @@ const FeeTab = memo<FeeTabProps>(
               }}
               value={formatUnits(
                 overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
-                "gwei"
+                "gwei",
               )}
               onChange={(e) =>
                 changeValue(
                   "maxPriorityFeePerGas",
-                  parseUnits(e.target.value, "gwei")
+                  parseUnits(e.target.value, "gwei"),
                 )
               }
               onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
@@ -201,7 +201,7 @@ const FeeTab = memo<FeeTabProps>(
                     ).toString(),
                     decimals: changeStepDecimals,
                     operator: "minus",
-                  })
+                  }),
                 )
               }
               onPlusClick={() =>
@@ -214,7 +214,7 @@ const FeeTab = memo<FeeTabProps>(
                       0
                     ).toString(),
                     decimals: changeStepDecimals,
-                  })
+                  }),
                 )
               }
             />
@@ -246,7 +246,7 @@ const FeeTab = memo<FeeTabProps>(
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
                   decimals: changeStepDecimals,
                   operator: "minus",
-                })
+                }),
               )
             }
             onPlusClick={() =>
@@ -255,14 +255,14 @@ const FeeTab = memo<FeeTabProps>(
                 prepareAmountOnChange({
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
                   decimals: changeStepDecimals,
-                })
+                }),
               )
             }
           />
         )}
       </>
     );
-  }
+  },
 );
 
 export default FeeTab;
@@ -293,7 +293,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
   }) => {
     gasLimit = useMemo(
       () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
-      [averageGasLimit, gasLimit]
+      [averageGasLimit, gasLimit],
     );
 
     return (
@@ -321,7 +321,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
         })}
       </ToggleGroup.Root>
     );
-  }
+  },
 );
 
 type FeeModeItemProps = {
@@ -358,7 +358,7 @@ const FeeModeItem: FC<FeeModeItemProps> = ({
         "transition-colors",
         "group",
         !selected && "hover:bg-brand-main/10",
-        selected && "bg-brand-main/[.2]"
+        selected && "bg-brand-main/[.2]",
       )}
     >
       <span className="mb-1.5 text-sm items-center">
@@ -381,7 +381,7 @@ const FeeModeItem: FC<FeeModeItemProps> = ({
           className={classNames(
             "text-xs text-brand-inactivedark truncate",
             "transition-colors",
-            selected && "!text-brand-light"
+            selected && "!text-brand-light",
           )}
         />
       )}

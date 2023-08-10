@@ -68,7 +68,7 @@ type CreateSecretFieldProps = SecretFieldBaseProps &
 const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
   ({ label = "Secret phrase", isDownloadable, onRegenerate, ...rest }, ref) => {
     const { copy, copied } = useCopyToClipboard(
-      rest.value ?? rest.defaultValue
+      rest.value ?? rest.defaultValue,
     );
     const [isShown, setIsShown] = useState(false);
 
@@ -146,7 +146,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "items-center",
           isShown
             ? "bottom-3 right-3"
-            : "bottom-[calc(.75rem-1px)] right-[calc(.75rem-1px)]"
+            : "bottom-[calc(.75rem-1px)] right-[calc(.75rem-1px)]",
         )}
       >
         {copied ? (
@@ -169,7 +169,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "bg-[#1e2031] border border-brand-main/10",
           "flex flex-col items-center justify-center",
           "transition-opacity",
-          isShown ? "opacity-0 pointer-events-none" : "cursor-pointer"
+          isShown ? "opacity-0 pointer-events-none" : "cursor-pointer",
         )}
         onClick={isShown ? undefined : () => setIsShown(true)}
         onKeyDown={isShown ? undefined : () => setIsShown(true)}
@@ -194,7 +194,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         value={isShown ? (rest.value as string) : ""}
       />
     );
-  }
+  },
 );
 
 type ImportSecretFieldProps = SecretFieldBaseProps &
@@ -237,7 +237,7 @@ const ImportSecretField = forwardRef<
         "text-sm text-brand-light",
         "!p-0 !pr-1 !min-w-0",
         "!font-normal",
-        "items-center"
+        "items-center",
       )}
     >
       {pasted ? (

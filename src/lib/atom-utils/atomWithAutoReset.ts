@@ -9,14 +9,14 @@ type SetAtom<Args extends unknown[], Result> = <A extends Args>(
 type Unsubscribe = (() => void) | void;
 type AutoResetAtomOptions<Value> = Partial<{
   onMount: (
-    setAtom: SetAtom<[typeof RESET | SetStateAction<Awaited<Value>>], void>
+    setAtom: SetAtom<[typeof RESET | SetStateAction<Awaited<Value>>], void>,
   ) => Unsubscribe;
   resetDelay: number;
 }>;
 
 export function atomWithAutoReset<Value>(
   getDefault: Parameters<typeof atomWithDefault<Value>>[0],
-  opts: AutoResetAtomOptions<Value> = {}
+  opts: AutoResetAtomOptions<Value> = {},
 ) {
   const triggerAtom = atom(false);
   const originAtom = atomWithDefault<Value>((get, opts) => {
@@ -43,13 +43,16 @@ export function atomWithAutoReset<Value>(
     }
 
     return () => {
-      resetTimeout = setTimeout(() => {
-        resetTimeout = null;
+      resetTimeout = setTimeout(
+        () => {
+          resetTimeout = null;
 
-        unsub?.();
+          unsub?.();
 
-        setAtom(RESET);
-      }, opts?.resetDelay ?? DEFAULT_RESET_DELAY);
+          setAtom(RESET);
+        },
+        opts?.resetDelay ?? DEFAULT_RESET_DELAY,
+      );
     };
   };
 

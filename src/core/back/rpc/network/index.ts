@@ -10,7 +10,7 @@ import * as Provider from "./provider";
 export async function sendRpc(
   chainId: number,
   method: string,
-  params: any[]
+  params: any[],
 ): Promise<RpcResponse> {
   const rpcUrl = await getRpcUrl(chainId);
 
@@ -18,7 +18,7 @@ export async function sendRpc(
 }
 
 export const getRpcProvider = memoize(
-  (chainId: number) => new RpcProvider(chainId)
+  (chainId: number) => new RpcProvider(chainId),
 );
 
 export class RpcProvider extends JsonRpcProvider {

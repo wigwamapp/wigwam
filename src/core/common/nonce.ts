@@ -7,7 +7,7 @@ const enqueueSaveNonce = createQueue();
 
 export function getNextNonce(
   tx: Pick<UnsignedTransaction, "nonce">,
-  localNonce?: string | null
+  localNonce?: string | null,
 ) {
   assert(tx.nonce !== undefined, "Nonce not found in transaction");
 
@@ -20,7 +20,7 @@ export function getNextNonce(
 export function saveNonce(
   chainId: number,
   accountAddress: string,
-  nonce: BigNumberish
+  nonce: BigNumberish,
 ) {
   return enqueueSaveNonce(async () => {
     try {

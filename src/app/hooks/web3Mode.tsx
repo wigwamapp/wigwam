@@ -77,6 +77,6 @@ export function useSetMetaMaskCompatibleMode(withDialog = true) {
           : null;
       }
     },
-    [alert, confirm, setMetamaskMode, withDialog]
+    [alert, confirm, setMetamaskMode, withDialog],
   );
 }

@@ -13,7 +13,7 @@ export async function sendRpc(
   chainId: number,
   url: string,
   method: string,
-  params: any[]
+  params: any[],
 ): Promise<RpcResponse> {
   // console.info("Perform RPC request", { chainId, url, method, params });
 
@@ -79,7 +79,7 @@ export async function sendRpc(
 const getProvider = memoize((url: string, chainId: number) => {
   const plainProvider = new RpcProvider(url, chainId);
   const multicallProvider = new multicallProviders.MulticallProvider(
-    plainProvider
+    plainProvider,
   );
 
   return { plainProvider, multicallProvider };

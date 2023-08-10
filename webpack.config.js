@@ -83,7 +83,7 @@ const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
 const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
   DEST_PATH,
-  `${TARGET_BROWSER}.${PACKED_EXTENSION}`
+  `${TARGET_BROWSER}.${PACKED_EXTENSION}`,
 );
 
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
@@ -132,7 +132,7 @@ module.exports = {
   entry: {
     back: entry(
       "back.ts",
-      NODE_ENV === "development" && "_dev/hotReloadObserver.ts"
+      NODE_ENV === "development" && "_dev/hotReloadObserver.ts",
     ),
     main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
@@ -160,10 +160,10 @@ module.exports = {
     extensions: MODULE_FILE_EXTENSIONS,
     alias: {
       "@toruslabs/openlogin": require.resolve(
-        "@toruslabs/openlogin/dist/openlogin.umd.min.js"
+        "@toruslabs/openlogin/dist/openlogin.umd.min.js",
       ),
       "@ledgerhq/devices/hid-framing": require.resolve(
-        "@ledgerhq/devices/lib-es/hid-framing.js"
+        "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
       "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
@@ -177,7 +177,7 @@ module.exports = {
       // Used by `src/app/components/elements/AutoIcon.tsx`
       "@dicebear/core/lib": path.resolve(
         __dirname,
-        "node_modules/@dicebear/core/lib"
+        "node_modules/@dicebear/core/lib",
       ),
     },
     fallback: {
@@ -404,7 +404,7 @@ module.exports = {
           chunks,
           inject: jsWorker ? false : "body",
           minify: false,
-        })
+        }),
     ),
 
     new CopyWebpackPlugin({
@@ -430,7 +430,7 @@ module.exports = {
                   env: ENV_SHORT,
                   envBadge: ENV_BADGE ? `[${ENV_BADGE.toUpperCase()}] ` : "",
                   website: VIGVAM_WEBSITE_ORIGIN,
-                })
+                }),
               );
               const manifest = transformManifestKeys(json, TARGET_BROWSER);
               return JSON.stringify(manifest, null, 2);
@@ -461,12 +461,12 @@ module.exports = {
                       Array.from(keySet).map((key, i) => [
                         key,
                         { content: `$${i + 1}` },
-                      ])
+                      ]),
                     );
                   }
 
                   return [name, extVal];
-                })
+                }),
               );
               return JSON.stringify(extJson, null, 2);
             },
@@ -593,7 +593,7 @@ function getStyleLoaders(cssOptions = {}) {
 function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
   // Use the filename or folder name, based on some uses the index.js / index.module.(css|scss|sass) project style
   const fileNameOrFolder = context.resourcePath.match(
-    /index\.module\.(css|scss|sass)$/
+    /index\.module\.(css|scss|sass)$/,
   )
     ? "[folder]"
     : "[name]";
@@ -602,13 +602,13 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
     path.posix.relative(context.rootContext, context.resourcePath) + localName,
     "md5",
     "base64",
-    5
+    5,
   );
   // Use loaderUtils to find the file or folder name
   const className = loaderUtils.interpolateName(
     context,
     fileNameOrFolder + "_" + localName + "__" + hash,
-    options
+    options,
   );
   // Remove the .module that appears in every classname when based on the file and replace all "." with "_".
   return className.replace(".module_", "_").replace(/\./g, "_");
@@ -619,7 +619,7 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
  */
 const browserVendors = ["chrome", "firefox", "opera", "edge", "safari"];
 const vendorRegExp = new RegExp(
-  `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`
+  `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`,
 );
 
 const transformManifestKeys = (manifest, vendor) => {

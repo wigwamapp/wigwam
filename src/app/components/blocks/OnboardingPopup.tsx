@@ -52,7 +52,7 @@ const OnboardingPopupContent: FC = () => {
     } else {
       const html = document.querySelector("html")!;
       const fontSize = parseFloat(
-        window.getComputedStyle(html, null).getPropertyValue("font-size")
+        window.getComputedStyle(html, null).getPropertyValue("font-size"),
       );
 
       scrollAreaRef.current?.scrollTo({
@@ -187,7 +187,7 @@ const OnboardingPopupContent: FC = () => {
           IS_FIREFOX && "!bg-addaccountcontinue",
           "before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2",
           "before:w-full before:max-w-[56.25rem] before:h-px",
-          "before:bg-brand-main/[.07]"
+          "before:bg-brand-main/[.07]",
         )}
       >
         <Button
@@ -216,7 +216,7 @@ const Wrapper: FC<PropsWithChildren<{ className?: string }>> = ({
   <div
     className={classNames(
       "flex items-center w-full text-brand-light",
-      className
+      className,
     )}
   >
     {children}

@@ -13,7 +13,7 @@ export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+$");
 export function generatePreviewHDNodes(
   extendedKey: string,
   offset = 0,
-  limit = 9
+  limit = 9,
 ) {
   const root = ethers.utils.HDNode.fromExtendedKey(extendedKey);
 
@@ -27,7 +27,7 @@ export function generatePreviewHDNodes(
 
 export function toNeuterExtendedKey(
   hdNode: ethers.utils.HDNode,
-  derivationPath?: string
+  derivationPath?: string,
 ) {
   if (derivationPath) {
     hdNode = hdNode.derivePath(derivationPath);
@@ -40,7 +40,7 @@ export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
   return ethers.utils.HDNode.fromMnemonic(
     fromProtectedString(phrase),
     undefined,
-    wordlists[lang]
+    wordlists[lang],
   );
 }
 
@@ -49,7 +49,10 @@ export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
 
   try {
     assert(
-      ethers.utils.isValidMnemonic(fromProtectedString(phrase), wordlists[lang])
+      ethers.utils.isValidMnemonic(
+        fromProtectedString(phrase),
+        wordlists[lang],
+      ),
     );
   } catch {
     throw new PublicError(t("seedPhraseIsNotValid"));
@@ -76,7 +79,7 @@ export function validatePublicKey(pubKey: string) {
     pubKey = add0x(pubKey);
     assert(
       ethers.utils.isHexString(pubKey, 33) ||
-        ethers.utils.isHexString(pubKey, 65)
+        ethers.utils.isHexString(pubKey, 65),
     );
   } catch {
     throw new PublicError(t("invalidPublicKey"));

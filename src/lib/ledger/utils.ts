@@ -16,7 +16,7 @@ export function getExtendedKey(ledgerPublicKey: string, chainCode: string) {
       ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 4),
       `0x${chainCode}`,
       publicKey,
-    ])
+    ]),
   );
 }
 
@@ -44,6 +44,6 @@ export function getParentFingerprint(publicKey: string) {
 
 export function base58check(data: Uint8Array): string {
   return base58.encode(
-    concat([data, hexDataSlice(sha256(sha256(data)), 0, 4)])
+    concat([data, hexDataSlice(sha256(sha256(data)), 0, 4)]),
   );
 }

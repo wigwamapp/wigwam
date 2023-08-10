@@ -76,14 +76,14 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
               Wallet {`"`}
               <TReplace msg={name} />
               {`"`} successfully updated!
-            </>
+            </>,
           );
         } catch (err: any) {
           return { name: err?.message };
         }
         return;
       }),
-    [account.uuid, updateToast]
+    [account.uuid, updateToast],
   );
 
   const handleDeleteAccount = useCallback(() => {
@@ -122,7 +122,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 validate={composeValidators(
                   required,
                   minLength(3),
-                  maxLength(32)
+                  maxLength(32),
                 )}
               >
                 {({ input, meta }) => (
@@ -168,7 +168,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                   "max-h-[2.625rem]",
                   "flex !justify-start items-center",
                   "text-left",
-                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                  "mt-2 !px-3 min-w-[12rem] mr-auto",
                 )}
                 onClick={() => setModalState("private-key")}
               >
@@ -238,7 +238,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                   "max-h-[2.625rem]",
                   "flex !justify-start items-center",
                   "text-left",
-                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                  "mt-2 !px-3 min-w-[12rem] mr-auto",
                 )}
                 onClick={() => setModalState("phrase")}
               >
@@ -278,7 +278,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             "mt-6 mb-8 w-48",
             "!py-2",
             "flex items-center",
-            "text-brand-light"
+            "text-brand-light",
           )}
         >
           <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
@@ -318,7 +318,7 @@ const WalletBlock: FC<WalletBlockProps> = ({
     className={classNames(
       "pb-7",
       "border-b border-brand-main/[.07]",
-      className
+      className,
     )}
   >
     <h2 className="flex text-lg font-bold text-brand-light items-center">
@@ -369,7 +369,7 @@ const SensetiveActionModal = memo<
                   Wallet {`"`}
                   <TReplace msg={account.name} />
                   {`"`} successfully deleted!
-                </>
+                </>,
               );
               onOpenChange?.(false);
             } catch (err: any) {
@@ -381,7 +381,7 @@ const SensetiveActionModal = memo<
         }
         return;
       }),
-    [cause, account.uuid, account.name, updateToast, onOpenChange]
+    [cause, account.uuid, account.name, updateToast, onOpenChange],
   );
 
   return (
@@ -419,7 +419,7 @@ const SensetiveActionModal = memo<
               "bg-brand-redobject/[.05]",
               "border border-brand-redobject/[.8]",
               "rounded-[.625rem]",
-              "text-sm"
+              "text-sm",
             )}
           >
             <span>
@@ -495,7 +495,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         "bg-brand-main/[.05]",
         "max-w-[23.188rem]",
         "rounded-[0.625rem]",
-        className
+        className,
       )}
     >
       <AutoIcon
@@ -505,7 +505,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         className={classNames(
           "h-24 w-24 min-w-[6rem] m-0.5",
           "bg-black/40",
-          "rounded-l-[.5625rem]"
+          "rounded-l-[.5625rem]",
         )}
       />
       <div
@@ -513,7 +513,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
           "flex relative",
           "text-brand-light text-sm",
           "min-w-0",
-          "p-4"
+          "p-4",
         )}
       >
         <span className="w-full font-medium break-words">{address}</span>
@@ -525,7 +525,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
             "text-sm text-brand-light",
             "!p-0 !pr-1 !min-w-0",
             "!font-normal",
-            "items-center"
+            "items-center",
           )}
         >
           {copied ? (

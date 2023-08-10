@@ -4,7 +4,7 @@ import { useDialog } from "app/hooks/dialog";
 
 export function useCopyCanvasToClipboard(
   querySelector: string,
-  copyDelay: number = 1000 * 2
+  copyDelay: number = 1000 * 2,
 ) {
   const { alert } = useDialog();
   const [copied, setCopied] = useState(false);

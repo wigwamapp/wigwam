@@ -64,12 +64,12 @@ const AssetInfo: FC = () => {
   useTokenActivitiesSync(
     chainId,
     currentAccount.address,
-    tokenInfo && tokenSlug
+    tokenInfo && tokenSlug,
   );
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
-    [tokenSlug]
+    [tokenSlug],
   );
 
   const { copy, copied } = useCopyToClipboard(address);
@@ -122,7 +122,7 @@ const AssetInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold",
                       "mr-4",
-                      "truncate"
+                      "truncate",
                     )}
                   >
                     {name}

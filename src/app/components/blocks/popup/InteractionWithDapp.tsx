@@ -43,7 +43,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
       permission
         ? permission.accountAddresses.includes(currentAccount.address)
         : false,
-    [permission, currentAccount]
+    [permission, currentAccount],
   );
 
   const reallyConnectible = useMemo(() => {
@@ -95,7 +95,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           "min-h-8 py-1 px-3 pr-2",
           "text-xs leading-none",
           "border border-brand-main/[.07]",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       >
         {permission ? (
@@ -105,7 +105,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 "block",
                 "w-5 h-5 min-w-[1.25rem] mr-1.5",
                 "rounded-full overflow-hidden",
-                "border border-[#4F9A5E]"
+                "border border-[#4F9A5E]",
               )}
             >
               <Avatar
@@ -113,7 +113,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 alt={permission.origin}
                 className={classNames(
                   "w-full h-full object-cover",
-                  "!border-none"
+                  "!border-none",
                 )}
               />
             </span>
@@ -142,7 +142,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   "block relative",
                   "w-5 h-5 mr-1.5",
                   "rounded-full overflow-hidden",
-                  "border border-[#BCC2DB]/[0.7]"
+                  "border border-[#BCC2DB]/[0.7]",
                 )}
               >
                 <Avatar
@@ -150,7 +150,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   alt={permission.origin}
                   className={classNames(
                     "w-full h-full object-cover",
-                    "!border-none opacity-25"
+                    "!border-none opacity-25",
                   )}
                 />
 
@@ -192,7 +192,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <span
             className={classNames(
               "truncate leading-4",
-              state !== "connected" && "text-brand-inactivedark"
+              state !== "connected" && "text-brand-inactivedark",
             )}
           >
             {new URL(tabOrigin).host}
@@ -245,19 +245,19 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             "min-h-8 py-1 px-2.5",
             "border border-brand-main/[.07]",
             "rounded-[.625rem]",
-            "ml-2"
+            "ml-2",
           )}
         >
           <MetamaskIcon
             className={classNames(
               "w-[1.125rem] min-w-[1.125rem] h-auto transition-opacity",
-              metamaskModeEnabled ? "opacity-80" : "opacity-60"
+              metamaskModeEnabled ? "opacity-80" : "opacity-60",
             )}
           />
           <div
             className={classNames(
               "w-1.5 min-w-[.375rem] h-1.5 rounded-full ml-2 transition",
-              metamaskModeEnabled ? "bg-brand-greenobject" : "bg-brand-main/60"
+              metamaskModeEnabled ? "bg-brand-greenobject" : "bg-brand-main/60",
             )}
           />
         </button>

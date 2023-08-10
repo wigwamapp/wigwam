@@ -55,7 +55,7 @@ const AddAccountModal = memo(() => {
         }
       }
     },
-    [accountStep, confirm]
+    [accountStep, confirm],
   );
 
   const handleOpenChange = useCallback(
@@ -83,7 +83,7 @@ const AddAccountModal = memo(() => {
       }
       setAccModalOpened([open, "replace"]);
     },
-    [accountStep, confirm, setAccModalOpened]
+    [accountStep, confirm, setAccModalOpened],
   );
 
   const isMounted = useIsMounted();
@@ -109,7 +109,7 @@ const AddAccountModal = memo(() => {
             "max-h-[41rem]",
             "m-auto inset-x-0 inset-y-[3.5rem]",
             "rounded-[2.5rem]",
-            bootAnimationDisplayed && "animate-modalcontent"
+            bootAnimationDisplayed && "animate-modalcontent",
           )}
         >
           <OnMount handle={handleContentMount} />
@@ -127,7 +127,7 @@ const AddAccountModal = memo(() => {
               "absolute",
               "top-0 left-1/2",
               "-translate-x-1/2 -translate-y-1/2",
-              "z-30"
+              "z-30",
             )}
           >
             <VigvamIcon className="w-16 mt-2" />
@@ -148,14 +148,14 @@ const AddAccountModal = memo(() => {
                     "after:rounded-[2.5rem]",
                     "after:pointer-events-none",
                     "after:z-20",
-                  ]
+                  ],
                 )}
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",
                   accountStep === AddAccountStep.ChooseWay
                     ? "pb-[3.25rem]"
-                    : "pb-28"
+                    : "pb-28",
                 )}
                 type="scroll"
               >
@@ -164,7 +164,7 @@ const AddAccountModal = memo(() => {
                     className={classNames(
                       "absolute inset-0 z-[-5] rounded-[2.5rem] overflow-hidden",
                       "bg-brand-dark/10 backdrop-blur-[30px]",
-                      IS_FIREFOX && "brandbg-large-modal"
+                      IS_FIREFOX && "brandbg-large-modal",
                     )}
                   />
                 )}
@@ -188,7 +188,7 @@ const AddAccountModal = memo(() => {
                       "shadow-addaccountmodal",
                       "rounded-[2.5rem]",
                       "pointer-events-none",
-                      "z-20"
+                      "z-20",
                     )}
                   />
                 )}

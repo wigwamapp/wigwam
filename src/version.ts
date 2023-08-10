@@ -29,7 +29,7 @@ window.addEventListener(
       }
     }
   },
-  false
+  false,
 );
 
 window.addEventListener("load", () => {
@@ -40,6 +40,6 @@ window.addEventListener("load", () => {
       version,
       salt,
     },
-    location.origin
+    location.origin,
   );
 });

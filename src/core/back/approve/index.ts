@@ -41,7 +41,7 @@ export async function processApprove(
     accountAddresses,
     overriddenChainId,
   }: ApprovalResult,
-  vault: Vault
+  vault: Vault,
 ) {
   const approval = $approvals.getState().find((a) => a.id === approvalId);
   assert(approval, "Not Found");
@@ -88,7 +88,7 @@ export async function processApprove(
           });
 
           rpcCtx?.reply({ result: [toReturn] });
-        }
+        },
       )
       .with(
         { type: ActivityType.Transaction },
@@ -124,7 +124,7 @@ export async function processApprove(
 
             const txAction = await matchTxAction(
               getRpcProvider(chainId),
-              txParams
+              txParams,
             ).catch(() => null);
 
             await Promise.all([
@@ -147,7 +147,7 @@ export async function processApprove(
                 chainId,
                 accountAddress,
                 txHash,
-                timeAt
+                timeAt,
               ),
             ]);
 
@@ -161,7 +161,7 @@ export async function processApprove(
 
             throw err;
           }
-        }
+        },
       )
       .with(
         { type: ActivityType.Signing },
@@ -188,7 +188,7 @@ export async function processApprove(
           });
 
           rpcCtx?.reply({ result: signature });
-        }
+        },
       )
       .otherwise(() => {
         throw new Error("Not Found");
@@ -209,7 +209,7 @@ function getAccountSafe(accountAddress: string) {
   assert(
     account.source !== AccountSource.Address,
     "This wallet was added as a watch-only account by importing an address." +
-      " It is not possible to perform signing using this type of accounts."
+      " It is not possible to perform signing using this type of accounts.",
   );
 
   return account;
@@ -228,7 +228,7 @@ async function saveActivity(activity: Activity) {
       .equals([ActivityType.Connection, 0])
       .filter(
         (act) =>
-          act.id !== activity.id && getPageOrigin(act.source) === actOrigin
+          act.id !== activity.id && getPageOrigin(act.source) === actOrigin,
       )
       .delete()
       .catch(console.error);
@@ -240,7 +240,7 @@ async function saveTokenActivity(
   chainId: number,
   accountAddress: string,
   txHash: string,
-  timeAt: number
+  timeAt: number,
 ) {
   try {
     if (action) {
@@ -285,7 +285,7 @@ async function saveTokenActivity(
       if (tokenActivities.size > 0) {
         await repo.tokenActivities.bulkPut(
           Array.from(tokenActivities.values()),
-          Array.from(tokenActivities.keys())
+          Array.from(tokenActivities.keys()),
         );
       }
     }

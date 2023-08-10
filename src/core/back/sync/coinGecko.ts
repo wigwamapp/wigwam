@@ -16,7 +16,7 @@ const tokenPricesCache = new ExpiryMap<string, CGPriceRecord>(3 * 60_000);
 
 export async function getCoinGeckoPrices(
   chainId: number,
-  tokenAddresses: string[]
+  tokenAddresses: string[],
 ) {
   try {
     if (tokenAddresses.length === 0) return {};
@@ -54,7 +54,7 @@ export async function getCoinGeckoPrices(
           vs_currencies: "USD",
           include_24hr_change: true,
         },
-      }
+      },
     );
 
     for (const [tokenAddress, price] of Object.entries(freshData)) {
@@ -85,7 +85,7 @@ export const getCoinGeckoPlatformIds = memoize(
   },
   {
     maxAge: 24 * 60 * 60_000, // 1 day
-  }
+  },
 );
 
 export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
@@ -117,5 +117,5 @@ export const getCoinGeckoPlatformPrices = memoize(
   },
   {
     maxAge: 3 * 60_000, // 3 min
-  }
+  },
 );

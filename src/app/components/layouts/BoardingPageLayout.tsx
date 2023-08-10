@@ -35,7 +35,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
         (isWelcome ? "animate-bootfadeinslow" : "animate-bootfadein"),
       "relative",
       "min-h-screen flex flex-col",
-      "bg-center bg-cover"
+      "bg-center bg-cover",
     )}
     style={{
       backgroundImage: isWelcome ? `url('${WelcomeBgImage}')` : "none",
@@ -55,7 +55,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
                 className={classNames(
                   "mr-2",
                   "transition-transform",
-                  "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5"
+                  "group-hover:-translate-x-1.5 group-focus:-translate-x-1.5",
                 )}
               />
               Profiles
@@ -78,7 +78,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           "mt-auto mb-6",
           "text-2xl",
           "font-black",
-          "w-full flex justify-center items-center"
+          "w-full flex justify-center items-center",
         )}
       >
         <VigvamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
@@ -91,7 +91,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           alt="Vigvam"
           className={classNames(
             "absolute bottom-0 left-[5%]",
-            "h-[82%] w-auto"
+            "h-[82%] w-auto",
           )}
         />
         <img
@@ -99,7 +99,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           alt="Vigvam"
           className={classNames(
             "absolute bottom-0 right-[2%] z-[2]",
-            "h-[82.6%] w-auto"
+            "h-[82.6%] w-auto",
           )}
         />
         <img
@@ -107,7 +107,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           alt="Vigvam"
           className={classNames(
             "absolute bottom-[7.5%] right-[22.7%]",
-            "h-[42.22%] w-auto"
+            "h-[42.22%] w-auto",
           )}
         />
         <img
@@ -115,7 +115,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           alt="Vigvam"
           className={classNames(
             "absolute bottom-[4.5%] right-[36%]",
-            "h-[54.5%] w-auto"
+            "h-[54.5%] w-auto",
           )}
         />
       </>

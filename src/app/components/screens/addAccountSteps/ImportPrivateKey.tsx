@@ -45,7 +45,7 @@ const ImportPrivateKey = memo(() => {
           return { privateKey: err?.message };
         }
       }),
-    [navigateToStep, stateRef]
+    [navigateToStep, stateRef],
   );
 
   return (

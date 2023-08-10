@@ -35,7 +35,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
 
   const fuse = useMemo(
     () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
+    [accounts],
   );
 
   const filteredAccounts = useMemo(() => {
@@ -51,7 +51,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
         "w-[23.25rem] min-w-[23.25rem] pr-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col",
-        className
+        className,
       )}
     >
       <div className="flex items-center">
@@ -82,7 +82,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
               key={acc.address}
               active={acc.address === selectedAccount.address}
               className={classNames(
-                i !== filteredAccounts.length - 1 && "mb-2"
+                i !== filteredAccounts.length - 1 && "mb-2",
               )}
               account={acc}
               onClick={() => onAccountChange(acc)}
@@ -94,7 +94,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
           className={classNames(
             "flex flex-col items-center",
             "h-full w-full py-9",
-            "text-sm text-brand-placeholder text-center"
+            "text-sm text-brand-placeholder text-center",
           )}
         >
           <NoResultsFoundIcon className="mb-4" />
@@ -135,7 +135,7 @@ const WalletTab: FC<WalletTabProps> = ({
         "transition-colors",
         active && "bg-brand-main/10",
         !active && "hover:bg-brand-main/5",
-        className
+        className,
       )}
       onClick={onClick}
       autoFocus={active}
@@ -148,7 +148,7 @@ const WalletTab: FC<WalletTabProps> = ({
           "h-14 w-14 min-w-[3.5rem]",
           "mr-3",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
       <span
@@ -158,7 +158,7 @@ const WalletTab: FC<WalletTabProps> = ({
           "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
-          "group-focus-visible:text-brand-light"
+          "group-focus-visible:text-brand-light",
         )}
       >
         <WalletName wallet={account} />
@@ -175,7 +175,7 @@ const WalletTab: FC<WalletTabProps> = ({
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           active && "translate-x-0 opacity-100",
-          !active && "-translate-x-1.5 opacity-0"
+          !active && "-translate-x-1.5 opacity-0",
         )}
       />
     </button>

@@ -8,7 +8,7 @@ import { MessageType, RpcResponse } from "core/types";
 import { porter } from "./base";
 
 export const getClientProvider = memoize(
-  (chainId: number) => new ClientProvider(chainId)
+  (chainId: number) => new ClientProvider(chainId),
 );
 
 export class ClientProvider extends JsonRpcProvider {
@@ -27,7 +27,7 @@ export class ClientProvider extends JsonRpcProvider {
 
     const res = await porter.request(
       { type, chainId, method, params },
-      { timeout: 0 }
+      { timeout: 0 },
     );
     assert(res?.type === type);
 

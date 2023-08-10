@@ -4,7 +4,7 @@ import * as ClientStorage from "lib/ext/clientStorage";
 
 export function atomWithClientStorage<T extends string>(
   key: string,
-  fallback: T | (() => T)
+  fallback: T | (() => T),
 ) {
   const getData = (): T =>
     ClientStorage.get(key) ??
@@ -14,7 +14,7 @@ export function atomWithClientStorage<T extends string>(
 
   baseAtom.onMount = (setAtom) => {
     const unsub = ClientStorage.subscribe(key, () =>
-      setAtom(getData() as Awaited<T>)
+      setAtom(getData() as Awaited<T>),
     );
     return () => {
       unsub();
@@ -31,7 +31,7 @@ export function atomWithClientStorage<T extends string>(
           ? (update as (prev: T) => T)(get(baseAtom))
           : update;
       ClientStorage.put(key, newValue);
-    }
+    },
   );
 
   return anAtom;

@@ -40,7 +40,7 @@ export default PrettyDate;
 
 export const getPrettyDate = (
   date: string | number,
-  currentLocaleCode: string
+  currentLocaleCode: string,
 ) => {
   const preparedDate = new Date(date);
 

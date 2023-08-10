@@ -23,7 +23,7 @@ const WalletsList: FC = () => {
   const accountsWithoutCurrent = useMemo(
     () =>
       allAccounts.filter(({ address }) => address !== currentAccount.address),
-    [allAccounts, currentAccount.address]
+    [allAccounts, currentAccount.address],
   );
 
   return (
@@ -45,7 +45,7 @@ const emptyClassBg = classNames(
   "h-3",
   "rounded bg-brand-main/10",
   "transition-colors",
-  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
 );
 
 const EmptyWalletCard: FC = () => (
@@ -63,14 +63,14 @@ const EmptyWalletCard: FC = () => (
           "rounded-t-[.625rem]",
           "p-3",
           "transition-colors",
-          "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
+          "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10",
         )}
       >
         <div
           className={classNames(
             "!h-12 w-12 min-w-[3rem] mr-3",
             "!rounded-[.625rem]",
-            emptyClassBg
+            emptyClassBg,
           )}
         />
         <span className="flex flex-col">
@@ -85,7 +85,7 @@ const EmptyWalletCard: FC = () => (
           "bg-brand-main/10",
           "rounded-b-[.625rem]",
           "transition-colors",
-          "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+          "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
         )}
       >
         <AddWalletIcon />
@@ -110,7 +110,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
 
   const fuse = useMemo(
     () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
+    [accounts],
   );
 
   const filteredAccounts = useMemo(() => {
@@ -133,7 +133,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
         left: 0,
       });
     },
-    [setAccountAddress, setSearchValue]
+    [setAccountAddress, setSearchValue],
   );
 
   return (
@@ -177,7 +177,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
             "h-full mr-[11.25rem]",
             "border border-brand-light/[.05]",
             "rounded-[.625rem]",
-            "text-sm text-brand-placeholder"
+            "text-sm text-brand-placeholder",
           )}
         >
           <NoResultsFoundIcon className="mr-5" />

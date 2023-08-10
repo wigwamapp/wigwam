@@ -46,7 +46,7 @@ const createTestVault = async () => {
         derivationPath: TEST_WALLET.path,
       },
     ],
-    { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) }
+    { lang: "en", phrase: toProtectedString(TEST_WALLET.phrase) },
   );
 
   return { vault, passHash };
@@ -57,7 +57,7 @@ describe("Approve", () => {
     const { vault } = await createTestVault();
 
     expect(
-      processApprove("123", { approved: true }, vault)
+      processApprove("123", { approved: true }, vault),
     ).rejects.toThrowError("Not Found");
   });
 
@@ -85,7 +85,7 @@ describe("Approve", () => {
     await processApprove(
       id,
       { approved: true, accountAddresses: [TEST_WALLET.address] },
-      vault
+      vault,
     );
 
     expect(rpcCtx.reply).toBeCalledWith({ result: [TEST_WALLET.address] });

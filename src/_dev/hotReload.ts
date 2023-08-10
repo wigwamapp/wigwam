@@ -37,7 +37,7 @@ chrome.management.getSelf(async (self) => {
 
     // NB: see https://github.com/xpl/crx-hotreload/issues/5
     const { [RELOAD_TAB_FLAG]: reloadTabURL } = await chrome.storage.local.get(
-      RELOAD_TAB_FLAG
+      RELOAD_TAB_FLAG,
     );
 
     if (reloadTabURL) {
@@ -57,7 +57,7 @@ chrome.management.getSelf(async (self) => {
 async function watchChanges(
   dir: DirectoryEntry,
   lastChecksum?: ChecksumSnapshot,
-  lastChangedAt = Date.now()
+  lastChangedAt = Date.now(),
 ) {
   const entities = await findFiles(dir);
 
@@ -67,7 +67,7 @@ async function watchChanges(
     content: toChecksum(entities.filter((e) => e.insideContent)),
     locales: toChecksum(entities.filter((e) => e.locale)),
     manifest: toChecksum(
-      entities.filter((e) => e.file.name === "manifest.json")
+      entities.filter((e) => e.file.name === "manifest.json"),
     ),
   };
 
@@ -125,14 +125,14 @@ function findFiles(dir: DirectoryEntry) {
                   (entry as FileEntry).file((file) => {
                     const insideBackground = isEntryInside(
                       entry,
-                      backgroundScripts
+                      backgroundScripts,
                     );
                     const insideContent = isEntryInside(entry, contentScripts);
                     const locale = /.*\_locales.*\.json/.test(entry.fullPath);
                     res({ file, insideBackground, insideContent, locale });
-                  })
-                )
-          )
+                  }),
+                ),
+          ),
       )
         .then((entities: any[]) => [].concat(...entities))
         .then(resolve);
@@ -202,7 +202,7 @@ async function getActiveMainTab(): Promise<chrome.tabs.Tab | undefined> {
 
 function queryTabs(params: chrome.tabs.QueryInfo) {
   return new Promise<chrome.tabs.Tab[]>((res) =>
-    chrome.tabs.query(params, res)
+    chrome.tabs.query(params, res),
   );
 }
 

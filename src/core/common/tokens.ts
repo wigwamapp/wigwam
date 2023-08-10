@@ -61,7 +61,7 @@ export function getNativeTokenLogoUrl(chainTag: string) {
 export async function detectNFTStandard(
   provider: Provider,
   tokenAddress: string,
-  tokenId: string
+  tokenId: string,
 ) {
   try {
     const erc1155Contract = ERC1155__factory.connect(tokenAddress, provider);
@@ -80,7 +80,7 @@ const ERC1155_IFACE_ID = "0xd9b67a26";
 export async function isTokenStandardValid(
   provider: Provider,
   address: string,
-  standard: TokenStandard
+  standard: TokenStandard,
 ) {
   switch (standard) {
     case TokenStandard.ERC20:

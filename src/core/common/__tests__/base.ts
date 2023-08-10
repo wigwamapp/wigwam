@@ -37,7 +37,7 @@ describe("Common > Base", () => {
     });
 
     expect(() => withError("Test Error", kek)).toThrowError(
-      "Public Test Error"
+      "Public Test Error",
     );
   });
 
@@ -47,7 +47,7 @@ describe("Common > Base", () => {
     });
 
     expect(withError("Test Error", kek)).rejects.toThrowError(
-      "Public Test Error"
+      "Public Test Error",
     );
   });
 });

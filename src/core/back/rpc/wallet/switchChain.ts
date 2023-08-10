@@ -15,7 +15,7 @@ export async function requestSwitchChain(
   rpcCtx: RpcContext,
   type: "add" | "switch",
   source: ActivitySource,
-  params: any[]
+  params: any[],
 ) {
   assertWalletSetuped();
 

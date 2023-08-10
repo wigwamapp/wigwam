@@ -9,7 +9,7 @@ const Dot: FC<{ isSmall?: boolean; className?: string }> = ({
     className={classNames(
       "flex items-center justify-center",
       isSmall ? "p-1" : "p-2",
-      className
+      className,
     )}
   >
     <span className="w-1 h-1 bg-brand-inactivedark rounded-full" />

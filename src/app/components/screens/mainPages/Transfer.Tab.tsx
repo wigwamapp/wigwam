@@ -30,7 +30,7 @@ const TransferTab: FC = () => {
 
   return useMemo(
     () => <Suspense fallback={null}>{matchTransferTab(transferTab)}</Suspense>,
-    [transferTab]
+    [transferTab],
   );
 };
 

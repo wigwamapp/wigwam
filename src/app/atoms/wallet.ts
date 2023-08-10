@@ -22,16 +22,16 @@ export const walletStateAtom = atomWithAutoReset(getWalletState, {
 
 export const walletStatusAtom = selectAtom(
   walletStateAtom,
-  ({ status }) => status
+  ({ status }) => status,
 );
 
 export const hasSeedPhraseAtom = selectAtom(
   walletStateAtom,
-  ({ hasSeedPhrase }) => hasSeedPhrase
+  ({ hasSeedPhrase }) => hasSeedPhrase,
 );
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
-  atomWithAutoReset(() => getNeuterExtendedKey(derivationPath))
+  atomWithAutoReset(() => getNeuterExtendedKey(derivationPath)),
 );
 
 export const syncStatusAtom = atomWithAutoReset(getSyncStatus, {
@@ -42,13 +42,13 @@ export const getLocalNonceAtom = atomFamily(
   ({ chainId, accountAddress }: { chainId: number; accountAddress: string }) =>
     atomWithStorage<string | null>(
       nonceStorageKey(chainId, accountAddress),
-      null
+      null,
     ),
-  dequal
+  dequal,
 );
 
 export const getPermissionAtom = atomFamily((origin?: string) =>
   atomWithRepoQuery((query) =>
-    query(() => repo.permissions.get(origin || "<stub>"))
-  )
+    query(() => repo.permissions.get(origin || "<stub>")),
+  ),
 );

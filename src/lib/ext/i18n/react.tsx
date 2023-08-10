@@ -25,7 +25,7 @@ export const T = memo<PropsWithChildren<TProps>>(
   ({ i18nKey, values, children }) => {
     useI18NUpdate();
     return tReact(i18nKey, values) || (children ?? null);
-  }
+  },
 );
 
 export type TReplaceProps = {
@@ -53,7 +53,7 @@ function tReact(messageName: string, substitutions?: ReactSubstitutions) {
   const subList = toList(substitutions);
   const tmp = t(
     messageName,
-    subList.map(() => TMP_SEPARATOR)
+    subList.map(() => TMP_SEPARATOR),
   );
 
   return (

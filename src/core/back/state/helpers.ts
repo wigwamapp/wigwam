@@ -72,12 +72,12 @@ export async function ensureInited() {
 
 export async function withStatus<T>(
   status: WalletStatus | WalletStatus[],
-  factory: () => T
+  factory: () => T,
 ) {
   const state = $walletStatus.getState();
   assert(
     Array.isArray(status) ? status.includes(state) : state === status,
-    t("notAllowed")
+    t("notAllowed"),
   );
   return factory();
 }

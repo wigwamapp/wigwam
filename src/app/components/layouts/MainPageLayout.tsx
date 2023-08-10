@@ -18,7 +18,7 @@ const MainPageLayout: FC<PropsWithChildren> = ({ children }) => (
     <div
       className={classNames(
         "h-screen flex flex-col",
-        bootAnimationDisplayed && "animate-bootfadein"
+        bootAnimationDisplayed && "animate-bootfadein",
       )}
       onAnimationEnd={
         bootAnimationDisplayed ? handleBootAnimationEnd : undefined

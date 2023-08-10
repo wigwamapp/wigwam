@@ -34,7 +34,7 @@ export function useContacts({
     () => ({
       search,
     }),
-    [search]
+    [search],
   );
   const prevBaseParams = usePrevious(baseParams);
 
@@ -56,7 +56,7 @@ export function useContacts({
       ...baseParams,
       limit: offset + limit,
     }),
-    [baseParams, offset, limit]
+    [baseParams, offset, limit],
   );
 
   const contactsAtom = getContactsAtom(queryParams);

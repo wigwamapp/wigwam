@@ -4,7 +4,7 @@ import { Contract } from "@ethersproject/contracts";
 export async function fetchZoraMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: JsonRpcProvider,
 ) {
   const { default: zoraMediaAbi } = await import("../abi/zoraMedia.json");
 

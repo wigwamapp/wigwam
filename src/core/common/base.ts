@@ -4,7 +4,7 @@ export function toWordlistLang(localeCode: string) {
 
 export function withError<T>(
   errMessage: string,
-  factory: (getError: () => void) => T
+  factory: (getError: () => void) => T,
 ): T {
   const getError = (err?: unknown) => {
     if (err instanceof PublicError) {

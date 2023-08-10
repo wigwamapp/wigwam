@@ -20,7 +20,7 @@ const InputLabelAction: FC<InputLabelAction> = ({
       "hover:bg-brand-main/30 hover:shadow-buttonsecondary",
       "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
       "active:bg-brand-main/20 active:shadow-none",
-      className
+      className,
     )}
     {...rest}
   >
