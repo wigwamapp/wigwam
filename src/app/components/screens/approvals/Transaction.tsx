@@ -372,11 +372,20 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             let signature: TxSignature | undefined;
             let ledgerError: any;
 
-            await withLedger(async ({ ledgerEth }) => {
+            await withLedger(async ({ ledgerEth, ledgerService }) => {
               try {
+                const rawTxLedger = rawTx.substring(2);
+
+                const resolution = await ledgerService.resolveTransaction(
+                  rawTxLedger,
+                  {},
+                  {}
+                );
+
                 const sig = await ledgerEth.signTransaction(
                   account.derivationPath,
-                  rawTx.substring(2)
+                  rawTxLedger,
+                  resolution
                 );
 
                 const formattedSig = {

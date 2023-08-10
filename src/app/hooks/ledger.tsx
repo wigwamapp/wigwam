@@ -4,6 +4,7 @@ import retry from "async-retry";
 import { Buffer } from "buffer";
 
 import type LedgerEthType from "@ledgerhq/hw-app-eth";
+import type { ledgerService as LedgerServiceType } from "@ledgerhq/hw-app-eth";
 import type { getExtendedKey as getExtendedKeyType } from "lib/ledger";
 
 import { withHumanDelay } from "app/utils";
@@ -15,6 +16,7 @@ import { ReactComponent as LedgerApp } from "app/icons/ledger-open-app.svg";
 export type LedgerHandler = (
   params: {
     ledgerEth: LedgerEthType;
+    ledgerService: typeof LedgerServiceType;
     getExtendedKey: typeof getExtendedKeyType;
   },
   onClose: (callback: () => void) => void
@@ -34,11 +36,13 @@ export function useLedger() {
           let closed = false;
           onClose(() => (closed = true));
 
-          const [{ default: LedgerEth }, { LedgerTransport, getExtendedKey }] =
-            await Promise.all([
-              import("@ledgerhq/hw-app-eth"),
-              import("lib/ledger"),
-            ]);
+          const [
+            { default: LedgerEth, ledgerService },
+            { LedgerTransport, getExtendedKey },
+          ] = await Promise.all([
+            import("@ledgerhq/hw-app-eth"),
+            import("lib/ledger"),
+          ]);
 
           const connected = await retry(
             async () => {
@@ -85,7 +89,10 @@ export function useLedger() {
           if (!connected || !transportRef.current) return false;
 
           const ledgerEth = new LedgerEth(transportRef.current!);
-          await ledgerHandler({ ledgerEth, getExtendedKey }, onClose);
+          await ledgerHandler(
+            { ledgerEth, ledgerService, getExtendedKey },
+            onClose
+          );
 
           return !closed;
         } catch (err: any) {
