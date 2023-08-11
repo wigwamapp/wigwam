@@ -190,6 +190,15 @@ export async function processApprove(
           rpcCtx?.reply({ result: signature });
         },
       )
+      .with(
+        { type: ActivityType.AddNetwork },
+        async ({ rpcCtx, source, chainId }) => {
+          const origin = getPageOrigin(source);
+          await repo.createOrUpdateNetworkPermission(origin, chainId);
+
+          rpcCtx?.reply({ result: null });
+        },
+      )
       .otherwise(() => {
         throw new Error("Not Found");
       });
