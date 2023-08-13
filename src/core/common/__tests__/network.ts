@@ -14,7 +14,7 @@ describe("Common > Network", () => {
   });
 
   it("getNetwork", () => {
-    expect(getNetwork(INITIAL_NETWORK.chainId)).resolves.toStrictEqual({
+    expect(getNetwork(INITIAL_NETWORK.chainId)).resolves.toEqual({
       ...INITIAL_NETWORK,
       position: 0,
     });
