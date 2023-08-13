@@ -27,7 +27,6 @@
     "@dicebear/core": "6.0.4",
     "@dicebear/personas": "6.0.4",
     "@emotion/is-prop-valid": "1.2.1",
-    "@ethereumjs/util": "9.0.0",
     "@ethersproject/abi": "5.7.0",
     "@ethersproject/abstract-provider": "5.7.0",
     "@ethersproject/bytes": "5.7.0",
