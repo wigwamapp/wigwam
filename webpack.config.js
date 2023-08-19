@@ -339,6 +339,11 @@ module.exports = {
 
     new CaseSensitivePathsPlugin(),
 
+    new webpack.NormalModuleReplacementPlugin(
+      /@ledgerhq\/live-network\/lib-es\/network\.js/,
+      path.resolve(__dirname, ".vendor/ledgerhq-live-network/network.js"),
+    ),
+
     new webpack.DefinePlugin({
       // for web extensions
       SharedArrayBuffer: "_SharedArrayBuffer",
@@ -482,6 +487,7 @@ module.exports = {
       cache: true,
       cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
       context: CWD_PATH,
+      failOnError: false,
     }),
 
     new WebpackBar({

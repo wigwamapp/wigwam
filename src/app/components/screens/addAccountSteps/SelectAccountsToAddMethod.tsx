@@ -73,6 +73,12 @@ const SelectAccountsToAddMethod: FC = () => {
     [isHardDevice, hasSeedPhrase],
   );
 
+  useEffect(() => {
+    if (isHardDevice) {
+      Promise.all([import("@ledgerhq/hw-app-eth"), import("lib/ledger")]);
+    }
+  }, [isHardDevice]);
+
   const handleContinue = useCallback(
     async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
