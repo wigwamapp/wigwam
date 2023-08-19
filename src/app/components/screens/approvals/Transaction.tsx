@@ -222,7 +222,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                         }
                       : feeSuggestions?.type === "legacy"
                       ? {
-                          gasPrice: feeSuggestions.modes.low.max,
+                          gasPrice: feeSuggestions.modes.average.max,
                         }
                       : {}),
                   }),
