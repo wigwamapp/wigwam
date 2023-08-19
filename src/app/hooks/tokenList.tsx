@@ -213,9 +213,8 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        const persist = await storage.fetchForce<TokenSearchPersist>(
-          TOKEN_SEARCH_PERSIST,
-        );
+        const persist =
+          await storage.fetchForce<TokenSearchPersist>(TOKEN_SEARCH_PERSIST);
         if (!persist) return;
 
         const { value, addedAt } = persist;
