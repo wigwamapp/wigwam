@@ -8,6 +8,10 @@ import { GasPrices } from "core/types";
 import { RpcProvider, getRpcProvider } from "../../rpc";
 
 export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
+  // Skip Arbitrum
+  // TODO: Add other mechanic for this issue.
+  if (chainId === 42161) return null;
+
   const provider = getRpcProvider(chainId);
 
   const eip1559 = await supportsEIP1559(provider);

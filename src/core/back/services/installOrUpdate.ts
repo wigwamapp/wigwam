@@ -80,6 +80,8 @@ export function startInstallOrUpdateListener() {
   //   }
   // });
 
+  browser.runtime.requestUpdateCheck().catch(console.error);
+
   browser.runtime.onUpdateAvailable?.addListener(({ version }) => {
     globalStorage.put(LATEST_VERSION, version).catch(console.error);
   });

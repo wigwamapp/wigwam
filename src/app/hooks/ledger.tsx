@@ -100,8 +100,8 @@ export function useLedger() {
   );
 
   return useCallback(
-    async (handler: LedgerHandler) => {
-      return await waitLoading({
+    (handler: LedgerHandler) =>
+      waitLoading({
         title: "Loading...",
         headerClassName: "mb-3",
         content: (state: "loading" | "connectApp") => (
@@ -123,8 +123,7 @@ export function useLedger() {
         loadingHandler,
         handlerParams: handler,
         state: "loading",
-      });
-    },
+      }),
     [loadingHandler, waitLoading],
   );
 }

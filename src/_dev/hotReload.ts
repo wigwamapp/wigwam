@@ -36,9 +36,8 @@ chrome.management.getSelf(async (self) => {
     chrome.runtime.getPackageDirectoryEntry(watchChanges);
 
     // NB: see https://github.com/xpl/crx-hotreload/issues/5
-    const { [RELOAD_TAB_FLAG]: reloadTabURL } = await chrome.storage.local.get(
-      RELOAD_TAB_FLAG,
-    );
+    const { [RELOAD_TAB_FLAG]: reloadTabURL } =
+      await chrome.storage.local.get(RELOAD_TAB_FLAG);
 
     if (reloadTabURL) {
       await chrome.storage.local.remove(RELOAD_TAB_FLAG);
