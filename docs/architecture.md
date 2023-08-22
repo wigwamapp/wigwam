@@ -1,5 +1,7 @@
 # Architecture
 
+![architecture](./architecture.png)
+
 ## Terms
 
 ### Account
