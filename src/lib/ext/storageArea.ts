@@ -9,6 +9,10 @@ export type StorageAreaOptions = Partial<{
   obfuscate: boolean;
 }>;
 
+/**
+ * The `StorageArea` class is a wrapper over browser storage areas.
+ * It allows to customize the storage keys with async formatter + obfuscate them
+ */
 export class StorageArea {
   constructor(
     private name: string,

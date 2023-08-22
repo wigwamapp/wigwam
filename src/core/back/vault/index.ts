@@ -91,6 +91,11 @@ export class Vault {
     return storage.isStored(St.KeyFile);
   }
 
+  /**
+   * Set up a vault by creating a new key file, creating a KDBX database,
+   * adding seed phrases and accounts, encrypting and saving the data,
+   * and persisting the password hash to session (encrypted).
+   */
   static async setup(
     passwordHash: string,
     accountsParams: AddAccountParams[],
@@ -118,6 +123,7 @@ export class Vault {
 
       const kdbx = createKdbx(credentials, "Vault", KDF_PARAMS);
 
+      // Create kdbx groups for seed phrase, accounts, keys
       const rootGroup = kdbx.getDefaultGroup();
       for (const groupUuid of Object.values(Gr)) {
         createGroup(rootGroup, groupUuid);
@@ -131,6 +137,7 @@ export class Vault {
 
       vault.addAccountsForce(accountsParams);
 
+      // export (encrypted)
       const data = await kdbx.save();
 
       const keyFileB64 = bytesToBase64(keyFile);

@@ -37,6 +37,7 @@
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "6.27.19",
     "@metamask/eth-sig-util": "6.0.0",
+    "@metamask/safe-event-emitter": "3.0.0",
     "@microlink/react-json-view": "1.22.2",
     "@noble/secp256k1": "2.0.0",
     "@radix-ui/react-accordion": "1.1.2",

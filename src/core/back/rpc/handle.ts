@@ -183,6 +183,7 @@ function getSigningStandard(method: string) {
   }
 }
 
+// Drop if request source is wallet internal page
 function dropForSelf(source: ActivitySource) {
   if (source.type === "self") {
     throw ethErrors.provider.unsupportedMethod();

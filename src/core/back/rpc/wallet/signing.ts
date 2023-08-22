@@ -110,15 +110,15 @@ export async function recoverPersonalSign(
 ) {
   validatePermission(source);
 
-  let data, signature;
+  let data, signature, ecRecoverAddr;
   try {
     [data, signature] = params;
     assert(isHexString(data) && isHexString(signature));
+
+    ecRecoverAddr = recoverPersonalSignature({ data, signature });
   } catch {
     throw ethErrors.rpc.invalidParams();
   }
-
-  const ecRecoverAddr = recoverPersonalSignature({ data, signature });
 
   rpcCtx.reply({ result: getAddress(ecRecoverAddr) });
 }

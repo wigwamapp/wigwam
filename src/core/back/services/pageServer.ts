@@ -55,17 +55,22 @@ export function startPageServer() {
     await ensureInited();
 
     if (action === "connect") {
-      const permission = await repo.permissions.get(origin);
-      notifyPermission(port, permission);
+      // Obtain current permission
+      let currentPermission = await repo.permissions.get(origin);
+      notifyPermission(port, currentPermission);
 
+      // Subscribe to permission updates
       const sub = liveQuery(() => repo.permissions.get(origin)).subscribe(
-        (perm) => notifyPermission(port, perm),
+        (perm) => {
+          currentPermission = perm;
+          notifyPermission(port, perm);
+        },
       );
-
       permissionSubs.set(port, sub);
 
-      internalStateSubs.set(port, async (type) => {
-        const perm = await repo.permissions.get(origin).catch(() => undefined);
+      // Subscribe to internal wallet state updates
+      internalStateSubs.set(port, (type) => {
+        const perm = currentPermission;
 
         switch (type) {
           case "walletStatus":
@@ -83,6 +88,7 @@ export function startPageServer() {
         }
       });
     } else {
+      // Disconnect -> Clean up
       const permSub = permissionSubs.get(port);
       if (permSub) {
         permSub.unsubscribe();
