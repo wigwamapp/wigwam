@@ -1,10 +1,21 @@
-import classNamed from "lib/classnamed";
+import { HTMLAttributes } from "react";
+import classNames from "clsx";
 
-const ContentContainer = classNamed("div")<{ narrow?: boolean }>`
-  w-full
-  ${(p) => (p.narrow ? "max-w-6xl" : "max-w-[90rem]")}
-  mx-auto
-  ${(p) => (p.narrow ? "px-4" : "px-8")}
-`;
+const ContentContainer = ({
+  narrow,
+  className,
+  ...rest
+}: HTMLAttributes<HTMLDivElement> & { narrow?: boolean }) => (
+  <div
+    className={classNames(
+      "w-full",
+      narrow ? "max-w-6xl" : "max-w-[90rem]",
+      "mx-auto",
+      narrow ? "px-4" : "px-8",
+      className,
+    )}
+    {...rest}
+  />
+);
 
 export default ContentContainer;
