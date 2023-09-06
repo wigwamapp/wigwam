@@ -68,8 +68,6 @@ The `Vault` class prioritizes security and isolation:
 
 - Sensitive operations, such as private key management and password validation, are performed securely.
 
-- Content script isolation prevents unauthorized access to web page content.
-
 - User data and private keys are encrypted and stored securely.
 
 - Permission requests are limited to only essential functionalities.
