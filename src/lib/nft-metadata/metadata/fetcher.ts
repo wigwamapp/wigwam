@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 import {
   AUTOGLYPHS_TOKEN_ADDRESS,
@@ -23,7 +23,7 @@ export function fetchOnChainData(
   chainId: number,
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
   if (isAddressMatch(chainId, tokenAddress, AUTOGLYPHS_TOKEN_ADDRESS)) {
     return fetchAutoglyphsMeta(tokenAddress, tokenId, provider);

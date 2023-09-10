@@ -15,7 +15,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom, useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
+import { ethers, Transaction } from "ethers";
 import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
@@ -389,10 +389,7 @@ const ActivityCard = memo(
         return "skipped";
       }
 
-      if (
-        item.result.status &&
-        ethers.BigNumber.from(item.result.status).isZero()
-      ) {
+      if (item.result.status && BigInt(item.result.status) === 0n) {
         return "failed";
       }
 
@@ -408,10 +405,10 @@ const ActivityCard = memo(
         return undefined;
       }
 
-      const parsedTx = ethers.utils.parseTransaction(item.rawTx);
+      const parsedTx = Transaction.from(item.rawTx);
 
-      const native = ethers.BigNumber.from(item.result.gasUsed)
-        .mul(
+      const native = new BigNumber(item.result.gasUsed)
+        .times(
           item.result.effectiveGasPrice ??
             parsedTx.maxFeePerGas ??
             parsedTx.gasPrice,
@@ -422,7 +419,7 @@ const ActivityCard = memo(
         native,
         fiat:
           item.gasTokenPriceUSD &&
-          new BigNumber(ethers.utils.formatEther(native)).times(
+          new BigNumber(ethers.formatEther(native)).times(
             item.gasTokenPriceUSD,
           ),
       };

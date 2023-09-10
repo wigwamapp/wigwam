@@ -31,7 +31,7 @@ export function validateAccount(
   source: ActivitySource,
   accountAddress: string,
 ) {
-  if (!(accountAddress && ethers.utils.isAddress(accountAddress))) {
+  if (!(accountAddress && ethers.isAddress(accountAddress))) {
     throw ethErrors.rpc.invalidParams();
   }
 
@@ -68,9 +68,7 @@ export const validateNetwork = (chainId: number) =>
     });
 
 const stringHex = (length?: number) =>
-  define<string>("stringHex", (value) =>
-    ethers.utils.isHexString(value, length),
-  );
+  define<string>("stringHex", (value) => ethers.isHexString(value, length));
 
 const stringOrNumber = () =>
   define<string | number>(
@@ -79,7 +77,7 @@ const stringOrNumber = () =>
   );
 
 const address = () =>
-  define<string>("address", (value: any) => ethers.utils.isAddress(value));
+  define<string>("address", (value: any) => ethers.isAddress(value));
 
 export const TxParamsSchema: Describe<TxParams> = object({
   from: address(),

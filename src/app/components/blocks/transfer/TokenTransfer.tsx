@@ -154,17 +154,17 @@ const TransferTokenContent = memo<TransferTokenContent>(
           }
 
           try {
-            let txParams;
+            let txParams: ethers.TransactionRequest;
 
             if (token.tokenSlug === NATIVE_TOKEN_SLUG) {
               txParams = await provider.populateTransaction({
                 to: recipient,
-                value: ethers.utils.parseEther(amount),
+                value: ethers.parseEther(amount),
               });
             } else {
               const rawAmount =
                 "decimals" in token && token.decimals > 0
-                  ? ethers.utils.parseUnits(amount, token.decimals)
+                  ? ethers.parseUnits(amount, token.decimals)
                   : amount;
 
               const { standard, address, id } = parseTokenSlug(token.tokenSlug);
@@ -174,7 +174,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   {
                     const contract = ERC20__factory.connect(address, provider);
 
-                    txParams = await contract.populateTransaction.transfer(
+                    txParams = await contract.transfer.populateTransaction(
                       recipient,
                       rawAmount,
                     );
@@ -185,7 +185,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   {
                     const contract = ERC721__factory.connect(address, provider);
 
-                    txParams = await contract.populateTransaction.transferFrom(
+                    txParams = await contract.transferFrom.populateTransaction(
                       currentAccount.address,
                       recipient,
                       id,
@@ -201,7 +201,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     );
 
                     txParams =
-                      await contract.populateTransaction.safeTransferFrom(
+                      await contract.safeTransferFrom.populateTransaction(
                         currentAccount.address,
                         recipient,
                         id,
@@ -217,11 +217,14 @@ const TransferTokenContent = memo<TransferTokenContent>(
             }
 
             const gasLimit = await signerProvider.estimateGas(txParams);
-
-            const txResPromise = signerProvider.sendUncheckedTransaction({
+            const rpcTx = provider.getRpcTransaction({
               ...txParams,
+              from: currentAccount.address,
               gasLimit,
             });
+            console.info({ rpcTx });
+
+            const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
 
             const isDefault =
               currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
@@ -317,9 +320,9 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
     const [estimating, setEstimating] = useSafeState(false);
     const [gas, setGas] = useSafeState<{
-      max: ethers.BigNumber;
-      average: ethers.BigNumber;
-      rawBalance: ethers.BigNumber | null;
+      max: bigint;
+      average: bigint;
+      rawBalance: bigint | null;
     }>();
     const [estimationError, setEstimationError] = useSafeState<string | null>(
       null,
@@ -361,7 +364,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               setEstimating(true);
 
               const value = 1;
-              let gasLimit = ethers.BigNumber.from(0);
+              let gasLimit = 0n;
 
               if (tokenSlug === NATIVE_TOKEN_SLUG) {
                 gasLimit = await provider.estimateGas({
@@ -380,7 +383,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC20__factory.connect(address, signer);
 
-                      gasLimit = await contract.estimateGas.transfer(
+                      gasLimit = await contract.transfer.estimateGas(
                         recipientAddr,
                         value,
                       );
@@ -391,7 +394,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC721__factory.connect(address, signer);
 
-                      gasLimit = await contract.estimateGas.transferFrom(
+                      gasLimit = await contract.transferFrom.estimateGas(
                         currentAccount.address,
                         recipientAddr,
                         id,
@@ -406,7 +409,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         signer,
                       );
 
-                      gasLimit = await contract.estimateGas.safeTransferFrom(
+                      gasLimit = await contract.safeTransferFrom.estimateGas(
                         currentAccount.address,
                         recipientAddr,
                         id,
@@ -421,7 +424,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               const fees = await suggestFees(provider);
 
               const gasPrice = fees.modes.high.max;
-              const maxGasLimit = gasLimit.mul(3).div(2);
+              const maxGasLimit = (gasLimit * 3n) / 2n;
               const rawBalance = await requestBalance(
                 provider,
                 tokenSlug,
@@ -429,8 +432,8 @@ const TransferTokenContent = memo<TransferTokenContent>(
               );
 
               setGas({
-                average: gasLimit.mul(gasPrice),
-                max: maxGasLimit.mul(gasPrice),
+                average: gasLimit * gasPrice,
+                max: maxGasLimit * gasPrice,
                 rawBalance,
               });
 
@@ -463,7 +466,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
     );
 
     const handleRecipientChange = useDebouncedCallback((recipient: string) => {
-      if (recipient && ethers.utils.isAddress(recipient)) {
+      if (recipient && ethers.isAddress(recipient)) {
         setRecipientAddr(recipient);
       }
     }, 150);
@@ -607,7 +610,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 type TxCheckProps = {
   tokenType: TokenType;
   token?: AccountToken;
-  values: FormValues & { gas?: ethers.BigNumber };
+  values: FormValues & { gas?: bigint };
   error: string | null;
 };
 

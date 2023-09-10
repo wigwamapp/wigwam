@@ -14,8 +14,7 @@ import { approvalAdded } from "core/back/state";
 
 import { validatePermission, validateAccount } from "./validation";
 
-const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
-  ethers.utils;
+const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } = ethers;
 
 export async function requestSigning(
   rpcCtx: RpcContext,

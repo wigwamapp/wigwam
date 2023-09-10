@@ -7,9 +7,7 @@ import {
   KdbxEntry,
   KdbxGroup,
 } from "kdbxweb";
-import { BytesLike, ethers, Signature } from "ethers";
-import { hexZeroPad, splitSignature, stripZeros } from "@ethersproject/bytes";
-import * as secp256k1 from "@noble/secp256k1";
+import { ethers } from "ethers";
 import {
   personalSign,
   signTypedData,
@@ -368,9 +366,10 @@ export class Vault {
 
   sign(accUuid: string, digest: string) {
     return withError(t("failedToSign"), async () => {
-      const privKey = this.getKeyForce(accUuid, "privateKey");
+      const privKeyPlain = this.getKeyForce(accUuid, "privateKey").getText();
+      const sig = new ethers.SigningKey(privKeyPlain).sign(digest);
 
-      return signDigest(digest, privKey);
+      return sig;
     });
   }
 
@@ -378,7 +377,9 @@ export class Vault {
     return withError(t("failedToSign"), () => {
       const privKeyProtected = this.getKeyForce(accUuid, "privateKey");
 
-      const privateKey = Buffer.from(stripZeros(privKeyProtected.getText()));
+      const privateKey = Buffer.from(
+        ethers.getBytes(privKeyProtected.getText()),
+      );
 
       try {
         switch (standard) {
@@ -473,8 +474,11 @@ export class Vault {
             const privateKey = add0x(
               importProtected(params.privateKey).getText(),
             );
-            const publicKey = ethers.utils.computePublicKey(privateKey, true);
-            const address = ethers.utils.computeAddress(publicKey);
+            const publicKey = ethers.SigningKey.computePublicKey(
+              privateKey,
+              true,
+            );
+            const address = ethers.computeAddress(publicKey);
 
             const account: PrivateKeyAccount = {
               ...base,
@@ -494,8 +498,11 @@ export class Vault {
             const privateKey = add0x(
               importProtected(params.privateKey).getText(),
             );
-            const publicKey = ethers.utils.computePublicKey(privateKey, true);
-            const address = ethers.utils.computeAddress(publicKey);
+            const publicKey = ethers.SigningKey.computePublicKey(
+              privateKey,
+              true,
+            );
+            const address = ethers.computeAddress(publicKey);
 
             const { social, socialName, socialEmail } = params;
 
@@ -518,11 +525,11 @@ export class Vault {
 
           case AccountSource.Ledger: {
             const derivationPath = params.derivationPath;
-            const publicKey = ethers.utils.computePublicKey(
+            const publicKey = ethers.SigningKey.computePublicKey(
               add0x(importProtected(params.publicKey).getText()),
               true,
             );
-            const address = ethers.utils.computeAddress(publicKey);
+            const address = ethers.computeAddress(publicKey);
 
             const account: LedgerAccount = {
               ...base,
@@ -541,7 +548,7 @@ export class Vault {
           case AccountSource.Address: {
             let { address } = params;
 
-            address = ethers.utils.getAddress(address);
+            address = ethers.getAddress(address);
 
             const account: WatchOnlyAccount = {
               ...base,
@@ -690,21 +697,4 @@ export class Vault {
 
     throw new Error("Group not found");
   }
-}
-
-async function signDigest(
-  digest: BytesLike,
-  privateKey: ProtectedValue,
-): Promise<Signature> {
-  const privKey = stripZeros(privateKey.getText());
-
-  const signature = await secp256k1
-    .signAsync(ethers.utils.arrayify(digest), privKey)
-    .finally(() => zeroBuffer(privKey));
-
-  return splitSignature({
-    recoveryParam: signature.recovery,
-    r: hexZeroPad("0x" + signature.r.toString(16), 32),
-    s: hexZeroPad("0x" + signature.s.toString(16), 32),
-  });
 }

@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { wordlists } from "@ethersproject/wordlists";
 import BigNumber from "bignumber.js";
 
 type ValidationType = (value: string) => string | undefined;
@@ -43,11 +42,11 @@ export const maxValue =
   };
 
 export const validateSeedPhrase = (lang: string) => (phrase: string) => {
-  if (!(lang in wordlists)) {
+  if (!(lang in ethers.wordlists)) {
     return "Secret phrase language not supported";
   }
 
-  return ethers.utils.isValidMnemonic(phrase, wordlists[lang])
+  return ethers.Mnemonic.isValidMnemonic(phrase, ethers.wordlists[lang])
     ? undefined
     : "Invalid phrase";
 };
@@ -61,9 +60,7 @@ export const isUrlLike = (value: string) =>
   !value || value.includes("://") ? undefined : "URL is invalid";
 
 export const validateAddress = (value: string) =>
-  ethers.utils.isAddress(value)
-    ? undefined
-    : "The recipient address is invalid";
+  ethers.isAddress(value) ? undefined : "The recipient address is invalid";
 
 export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+\\/{index}$");
 

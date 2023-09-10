@@ -80,9 +80,9 @@ async function performTokenActivitiesSync(
     if (!existing) {
       tokenActivities.set(dbKey, activity);
     } else if (activity.type === "transfer") {
-      existing.amount = ethers.BigNumber.from(existing.amount)
-        .add(activity.amount)
-        .toString();
+      existing.amount =
+        existing.amount &&
+        (BigInt(existing.amount) + BigInt(activity.amount)).toString();
     }
 
     blockNumbers.add(activity.timeAt);
@@ -185,7 +185,7 @@ async function performTokenActivitiesSync(
                 addToActivities({
                   ...base,
                   type: "transfer",
-                  anotherAddress: ethers.utils.getAddress(send.to_addr),
+                  anotherAddress: ethers.getAddress(send.to_addr),
                   amount: new BigNumber(send.amount)
                     .times(decimalsFactor)
                     .integerValue()
@@ -201,7 +201,7 @@ async function performTokenActivitiesSync(
                 addToActivities({
                   ...base,
                   type: "transfer",
-                  anotherAddress: ethers.utils.getAddress(receive.from_addr),
+                  anotherAddress: ethers.getAddress(receive.from_addr),
                   amount: new BigNumber(receive.amount)
                     .times(decimalsFactor)
                     .integerValue()
@@ -222,7 +222,7 @@ async function performTokenActivitiesSync(
               addToActivities({
                 ...base,
                 type: "approve",
-                anotherAddress: ethers.utils.getAddress(token_approve.spender),
+                anotherAddress: ethers.getAddress(token_approve.spender),
                 amount: amount.toString(),
                 clears: amount.isZero(),
               });
@@ -318,7 +318,7 @@ async function performTokenActivitiesSync(
       }
 
       const [fromAddress, toAddress] = [tx.from, tx.to].map(
-        (a) => a && ethers.utils.getAddress(a),
+        (a) => a && ethers.getAddress(a),
       );
       if (!fromAddress || !toAddress) continue;
 
@@ -331,9 +331,7 @@ async function performTokenActivitiesSync(
         txHash: tx.hash,
         type: "transfer",
         anotherAddress: income ? fromAddress : toAddress,
-        amount: ethers.BigNumber.from(value)
-          .mul(income ? 1 : -1)
-          .toString(),
+        amount: (BigInt(value) * (income ? 1n : -1n)).toString(),
       });
     }
 
@@ -360,7 +358,10 @@ async function performTokenActivitiesSync(
   const currentBlock = await provider.getBlockNumber();
 
   const transferOutTopic = erc20Token.filters.Transfer(accountAddress);
-  const transferInTopic = erc20Token.filters.Transfer(null, accountAddress);
+  const transferInTopic = erc20Token.filters.Transfer(
+    undefined,
+    accountAddress,
+  );
   const approvalTopic = erc20Token.filters.Approval(accountAddress);
 
   const step = 1_000 - 1;
@@ -390,8 +391,8 @@ async function performTokenActivitiesSync(
         txHash: tOut.transactionHash,
         timeAt: tOut.blockNumber,
         type: "transfer",
-        anotherAddress: ethers.utils.getAddress(tOut.args[1]),
-        amount: ethers.BigNumber.from(tOut.args[2]).mul(-1).toString(),
+        anotherAddress: ethers.getAddress(tOut.args[1]),
+        amount: (BigInt(tOut.args[2]) * -1n).toString(),
       });
     }
 
@@ -401,29 +402,29 @@ async function performTokenActivitiesSync(
         txHash: tIn.transactionHash,
         timeAt: tIn.blockNumber,
         type: "transfer",
-        anotherAddress: ethers.utils.getAddress(tIn.args[0]),
-        amount: ethers.BigNumber.from(tIn.args[2]).toString(),
+        anotherAddress: ethers.getAddress(tIn.args[0]),
+        amount: BigInt(tIn.args[2]).toString(),
       });
     }
 
     for (const approval of approvals) {
-      const amount = ethers.BigNumber.from(approval.args[2]);
+      const amount = BigInt(approval.args[2]);
 
       addToActivities({
         ...base,
         txHash: approval.transactionHash,
         timeAt: approval.blockNumber,
         type: "approve",
-        anotherAddress: ethers.utils.getAddress(approval.args[1]),
+        anotherAddress: ethers.getAddress(approval.args[1]),
         amount: amount.toString(),
-        clears: amount.isZero(),
+        clears: amount === 0n,
       });
     }
 
     range += step;
   }
 
-  const blocks: Record<number, ethers.providers.Block> = {};
+  const blocks: Record<number, ethers.Block | null> = {};
   await Promise.all(
     Array.from(blockNumbers).map(async (number) => {
       try {
@@ -438,8 +439,8 @@ async function performTokenActivitiesSync(
   let i = tokenActivities.size;
   while (i-- > 0) {
     const item = values[i];
-    if (item.timeAt in blocks) {
-      item.timeAt = new BigNumber(blocks[item.timeAt].timestamp)
+    if (blocks[item.timeAt]) {
+      item.timeAt = new BigNumber(blocks[item.timeAt]!.timestamp)
         .times(1_000)
         .toNumber();
     } else {

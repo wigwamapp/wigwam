@@ -8,7 +8,7 @@ import {
 } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
+import { Transaction } from "ethers";
 import classNames from "clsx";
 
 import { FEE_MODES, FeeMode, FeeSuggestions, AccountAsset } from "core/types";
@@ -25,19 +25,17 @@ import FiatAmount from "app/components/elements/FiatAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
 
-type Tx = ethers.utils.UnsignedTransaction;
-
 type FeeTabProps = {
   accountAddress: string;
-  originTx: Tx;
+  originTx: Transaction;
   fees: FeeSuggestions | null;
-  averageGasLimit: ethers.BigNumber | null;
-  maxFee: ethers.BigNumber | null;
-  averageFee: ethers.BigNumber | null;
+  averageGasLimit: bigint | null;
+  maxFee: bigint | null;
+  averageFee: bigint | null;
   feeMode: FeeMode;
   setFeeMode: Dispatch<FeeMode>;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
+  overrides: Partial<Transaction>;
+  onOverridesChange: Dispatch<SetStateAction<Partial<Transaction>>>;
 };
 
 const FeeTab = memo<FeeTabProps>(
@@ -56,7 +54,7 @@ const FeeTab = memo<FeeTabProps>(
     const chainId = useChainId();
     const changeStepDecimals = chainId === 1 ? 9 : 8;
     const changeValue = useCallback(
-      (name: string, value: ethers.BigNumberish | null) => {
+      (name: string, value: bigint | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value }));
       },
       [onOverridesChange],
@@ -94,7 +92,7 @@ const FeeTab = memo<FeeTabProps>(
         {fees && averageGasLimit && maxFee && averageFee && (
           <FeeModeSelect
             accountAddress={accountAddress}
-            gasLimit={ethers.BigNumber.from(overrides.gasLimit ?? tx.gasLimit!)}
+            gasLimit={overrides.gasLimit ?? tx.gasLimit!}
             averageGasLimit={averageGasLimit}
             fees={fees}
             maxFee={maxFee}
@@ -269,11 +267,11 @@ export default FeeTab;
 
 type FeeModeSelectProps = {
   accountAddress: string;
-  gasLimit: ethers.BigNumber;
-  averageGasLimit: ethers.BigNumber;
+  gasLimit: bigint;
+  averageGasLimit: bigint;
   fees: FeeSuggestions;
-  maxFee: ethers.BigNumber;
-  averageFee: ethers.BigNumber;
+  maxFee: bigint;
+  averageFee: bigint;
   value: FeeMode;
   onValueChange: (value: FeeMode) => void;
   className?: string;
@@ -292,7 +290,8 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
     className,
   }) => {
     gasLimit = useMemo(
-      () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
+      () =>
+        BigInt(gasLimit) > BigInt(averageGasLimit) ? averageGasLimit : gasLimit,
       [averageGasLimit, gasLimit],
     );
 
@@ -301,13 +300,13 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
         type="single"
         orientation="horizontal"
         value={
-          gasLimit.mul(fees.modes[value].max).eq(averageFee) ? value : undefined
+          gasLimit * fees.modes[value].max === averageFee ? value : undefined
         }
         onValueChange={onValueChange}
         className={classNames("grid grid-cols-3 gap-2.5", className)}
       >
         {FEE_MODES.map((mode) => {
-          const modeMaxFee = gasLimit.mul(fees.modes[mode].max);
+          const modeMaxFee = gasLimit * fees.modes[mode].max;
 
           return (
             <FeeModeItem
@@ -315,7 +314,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
               accountAddress={accountAddress}
               value={mode}
               fee={modeMaxFee}
-              selected={modeMaxFee.eq(averageFee)}
+              selected={modeMaxFee === averageFee}
             />
           );
         })}
@@ -327,7 +326,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
 type FeeModeItemProps = {
   accountAddress: string;
   value: FeeMode;
-  fee: ethers.BigNumber;
+  fee: bigint;
   selected: boolean;
 };
 

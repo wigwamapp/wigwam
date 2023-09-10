@@ -1,8 +1,8 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
-import { wordlists } from "@ethersproject/wordlists";
-import { toProtectedString } from "lib/crypto-utils";
+import { ethers } from "ethers";
 import { Field, Form } from "react-final-form";
+import { toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
 import { toWordlistLang } from "core/common";
@@ -30,7 +30,7 @@ type FormValues = {
 };
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists,
+  ({ code }) => toWordlistLang(code) in ethers.wordlists,
 );
 
 const ImportSeedPhrase = memo(() => {

@@ -1,5 +1,3 @@
-import { ethers } from "ethers";
-
 import { FeeSuggestions } from "core/types";
 
 import { getGasPrices } from "./wallet";
@@ -20,10 +18,7 @@ export async function suggestFees(
       Object.entries(gasPrices.modes).map(([mode, fees]) => [
         mode,
         Object.fromEntries(
-          Object.entries(fees).map(([prop, price]) => [
-            prop,
-            ethers.BigNumber.from(price),
-          ]),
+          Object.entries(fees).map(([prop, price]) => [prop, BigInt(price)]),
         ),
       ]),
     ),

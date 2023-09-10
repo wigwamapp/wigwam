@@ -88,9 +88,7 @@ async function performTokenSync(
         ...existing,
         ...((metadata as any) ?? {}),
         status:
-          existing.status === TokenStatus.Disabled &&
-          balance &&
-          !balance.isZero()
+          existing.status === TokenStatus.Disabled && balance
             ? TokenStatus.Enabled
             : balanceChangedToZero && existing.tokenType === TokenType.NFT
             ? TokenStatus.Disabled
@@ -191,7 +189,7 @@ async function performTokenSync(
     const balanceUSD =
       priceUSD && "decimals" in metadata
         ? new BigNumber(rawBalance)
-            .div(10 ** metadata.decimals)
+            .div((10n ** metadata.decimals).toString())
             .times(priceUSD)
             .toNumber()
         : 0;
@@ -203,7 +201,7 @@ async function performTokenSync(
         : TokenType.NFT;
 
     const status =
-      tokenType === TokenType.Asset || (balance && !balance.isZero())
+      tokenType === TokenType.Asset || balance
         ? TokenStatus.Enabled
         : TokenStatus.Disabled;
 

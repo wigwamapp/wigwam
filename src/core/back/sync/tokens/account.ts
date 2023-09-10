@@ -71,16 +71,16 @@ export const syncAccountTokens = memoize(
 
             tokenSlug = createTokenSlug({
               standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-              address: native ? "0" : ethers.utils.getAddress(token.id),
+              address: native ? "0" : ethers.getAddress(token.id),
               id: "0",
             });
-            const rawBalanceBN = ethers.BigNumber.from(
+            const rawBalanceBN = BigInt(
               new BigNumber(token.balance).integerValue().toString(),
             );
 
             const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
-            if (!existing && rawBalanceBN.isZero()) {
+            if (!existing && rawBalanceBN === 0n) {
               continue;
             }
 
@@ -136,9 +136,9 @@ export const syncAccountTokens = memoize(
              * For NFTs
              */
           } else {
-            const contractAddress = ethers.utils.getAddress(token.contract_id);
+            const contractAddress = ethers.getAddress(token.contract_id);
             const tokenId = String(token.inner_id);
-            const rawBalanceBN = ethers.BigNumber.from(token.amount);
+            const rawBalanceBN = BigInt(token.amount);
 
             tokenSlug = createTokenSlug({
               standard: token.is_erc721
@@ -150,7 +150,7 @@ export const syncAccountTokens = memoize(
 
             const existing = existingTokensMap.get(tokenSlug) as AccountNFT;
 
-            if (!existing && rawBalanceBN.isZero()) {
+            if (!existing && rawBalanceBN === 0n) {
               continue;
             }
 
@@ -196,13 +196,13 @@ export const syncAccountTokens = memoize(
               status = TokenStatus.Enabled;
             } else if (
               new BigNumber(existing.rawBalance).gt(0) &&
-              rawBalanceBN.isZero()
+              rawBalanceBN === 0n
             ) {
               // Balance changed from positive to zero
               status = TokenStatus.Disabled;
             } else if (
               new BigNumber(existing.rawBalance).isZero() &&
-              rawBalanceBN.gt(0)
+              rawBalanceBN > 0n
             ) {
               // Balance changed from zero to positive
               status = TokenStatus.Enabled;

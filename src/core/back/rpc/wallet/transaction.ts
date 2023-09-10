@@ -28,7 +28,7 @@ export async function requestTransaction(
 
   try {
     txParams = omitEmptyProps(txParams);
-    accountAddress = ethers.utils.getAddress(txParams.from);
+    accountAddress = ethers.getAddress(txParams.from);
 
     if ("gas" in txParams) {
       const { gas, ...rest } = txParams;

@@ -2,73 +2,61 @@
 
 exports[`Vault signDigest 1`] = `
 {
-  "_vs": "0xe6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
-  "compact": "0xd7ea4ba2c02309db756d17b5cf02334f5b9fff7330d3a8ad1ffb2694e1843313e6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
-  "r": "0xd7ea4ba2c02309db756d17b5cf02334f5b9fff7330d3a8ad1ffb2694e1843313",
-  "recoveryParam": 1,
-  "s": "0x66b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
-  "v": 28,
-  "yParityAndS": "0xe6b1a025c865bb21fb49a7048d5ac204485c6f462da7faecc1c4a836c8413daf",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0xff7ba4aad6ef31c93e13eae86c353a27a50ec898737eb06112cdef3f4fcf1ff7",
+  "s": "0x47e9d61e1761592d79e936fd77c609ddacc3b3cb971e809c1b07ee8c413e5d50",
+  "v": 27,
 }
 `;
 
 exports[`Vault signDigest 2`] = `
 {
-  "_vs": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
-  "compact": "0x949d4e6ddb97d23bf8d2ea67e9d9ab1009a9de306823079bff48a83695f6e37b0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
-  "r": "0x949d4e6ddb97d23bf8d2ea67e9d9ab1009a9de306823079bff48a83695f6e37b",
-  "recoveryParam": 0,
-  "s": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
-  "v": 27,
-  "yParityAndS": "0x0c0bae277be81e944cc60ccba2e18c093a19c8d5bd3e6cc702e93a877dae720f",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x70dff536ec5f278f846050519745149ac99bbc375bc048285c60b5a2befd08b2",
+  "s": "0x17f90d7d1f5fdd866db4de2d2f72285195fd7dd41ed3d115a93e9edf2a8ab723",
+  "v": 28,
 }
 `;
 
 exports[`Vault signDigest 3`] = `
 {
-  "_vs": "0xad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
-  "compact": "0x78d93965018516a7367edcccdc218f6b927d6bb1d4baf2555c87bcfdb78bb52dad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
-  "r": "0x78d93965018516a7367edcccdc218f6b927d6bb1d4baf2555c87bcfdb78bb52d",
-  "recoveryParam": 1,
-  "s": "0x2d2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0xe86e1433449e1a2e326a7e4eeec3f638af8045d12d570d54c390dc83ca3998bb",
+  "s": "0x14cb3e75bb1c5bca45ff374257bfe273d7eca601def2828419a7fa422a5ab731",
   "v": 28,
-  "yParityAndS": "0xad2cbf68f26e1742b24d1c67ee3572638ca725ca8bffd430420c3b887fedb291",
 }
 `;
 
 exports[`Vault signDigest 4`] = `
 {
-  "_vs": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
-  "compact": "0xf10d438c8f2efdabe8a471750921571317872dd6b9b1b0a983664a9ecdf9dfe2454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
-  "r": "0xf10d438c8f2efdabe8a471750921571317872dd6b9b1b0a983664a9ecdf9dfe2",
-  "recoveryParam": 0,
-  "s": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
-  "v": 27,
-  "yParityAndS": "0x454697f30c50a63c70a4b03bae537c0f851f5e7f94cd6451a663eab68ddfc52a",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x9c09e7e02e6445e805b1ae515da4903aed89a87c6e4ba261cdfd06b15bee6229",
+  "s": "0x41d495aef6840c0ce0092c1094eccf8b3128c6912e24da4c50241986ddca43a0",
+  "v": 28,
 }
 `;
 
 exports[`Vault signDigest 5`] = `
 {
-  "_vs": "0x89a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
-  "compact": "0x7e9e3996a4a470200237b6043dcee49be0ce3ccf8834ee72004d730d8513b23789a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
-  "r": "0x7e9e3996a4a470200237b6043dcee49be0ce3ccf8834ee72004d730d8513b237",
-  "recoveryParam": 1,
-  "s": "0x09a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
-  "v": 28,
-  "yParityAndS": "0x89a61d1b6f6aeac8f376d73121511ca0cf995a54895458ed8680c250320ca0a0",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x73f1ee82e3e09d2c1d6c8d571555fd16d76362b17980154ccd5954cbfc70b031",
+  "s": "0x2bff2621e998fbd1bb70c3912d0747d629c59cb8dbb64ef93a02e7d7b3905300",
+  "v": 27,
 }
 `;
 
 exports[`Vault signDigest 6`] = `
 {
-  "_vs": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
-  "compact": "0x6a6f29aeb2d17cb987902d49c682ace14eff57f7a14c201a90e98af31a18bb4f558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
-  "r": "0x6a6f29aeb2d17cb987902d49c682ace14eff57f7a14c201a90e98af31a18bb4f",
-  "recoveryParam": 0,
-  "s": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
-  "v": 27,
-  "yParityAndS": "0x558d83b940312e29b98f6f6ee772f080ac894460424e2ccb59894919141fd12b",
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x956328b488517c80389e1ec4e352299bb700db40410d468a641b5f5b43154af3",
+  "s": "0x15c67cd4f80913890fc139eb36ef92ab23ebc829497c7df3ea4e523c7888976d",
+  "v": 28,
 }
 `;
 
