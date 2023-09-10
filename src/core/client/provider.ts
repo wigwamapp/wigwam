@@ -23,7 +23,6 @@ export class ClientProvider extends JsonRpcApiProvider {
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
-  getSigner = memoize(super.getSigner.bind(this));
   getCode = memoize(super.getCode.bind(this));
 
   getUncheckedSigner = memoize(

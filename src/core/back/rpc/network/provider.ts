@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-// import { providers as multicallProviders } from "@0xsequence/multicall";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 
@@ -13,7 +12,7 @@ export async function sendRpc(
 ): Promise<RpcResponse> {
   // console.info("Perform RPC request", { chainId, url, method, params });
 
-  const { plainProvider } = getProvider(url, chainId);
+  const rpcProvider = getRpcProvider(url, chainId);
 
   const getResult = async () => {
     switch (method) {
@@ -21,37 +20,24 @@ export async function sendRpc(
        * Cached
        */
       case "eth_chainId":
-        return plainProvider.getChainId().then(numToHex);
+        return rpcProvider.getChainId().then(numToHex);
 
       case "net_version":
-        return plainProvider.getChainId();
+        return rpcProvider.getChainId();
 
       case "eth_blockNumber":
-        return plainProvider.getBlockNumber().then(numToHex);
+        return rpcProvider.getBlockNumber().then(numToHex);
 
       // case "eth_getBlockByHash":
       // case "eth_getBlockByNumber":
-      //   return plainProvider.getBlock(params[0], params[1]);
-
-      /**
-       * Multicall
-       */
-      // case "eth_getBalance":
-      //   return multicallProvider
-      //     .getBalance(params[0], params[1])
-      //     .then((b) => b.toHexString());
-
-      // case "eth_getCode":
-      //   return multicallProvider.getCode(params[0], params[1]);
-
-      // case "eth_call":
-      //   return multicallProvider.call(params[0], params[1]);
+      //   TODO: Implement or suggest non-formatted version of this method
+      //   return rpcProvider.getBlock(params[0], params[1]);
 
       /**
        * Rest
        */
       default:
-        return plainProvider.send(method, params);
+        return rpcProvider.send(method, params);
     }
   };
 
@@ -72,14 +58,9 @@ export async function sendRpc(
   }
 }
 
-const getProvider = memoize((url: string, chainId: number) => {
-  const plainProvider = new RpcProvider(url, chainId);
-  // const multicallProvider = new multicallProviders.MulticallProvider(
-  //   plainProvider,
-  // );
-
-  return { plainProvider };
-});
+const getRpcProvider = memoize(
+  (url: string, chainId: number) => new RpcProvider(url, chainId),
+);
 
 class RpcProvider extends ethers.JsonRpcProvider {
   getNetwork = memoizeOne(super.getNetwork.bind(this));

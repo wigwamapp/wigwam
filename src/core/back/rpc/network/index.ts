@@ -27,7 +27,6 @@ export class RpcProvider extends ethers.JsonRpcApiProvider {
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
-  getSigner = memoize(super.getSigner.bind(this));
 
   async send(method: string, params: Array<any>): Promise<any> {
     const res = await sendRpc(this.chainId, method, params);
