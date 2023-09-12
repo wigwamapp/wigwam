@@ -1,3 +1,3 @@
 module.exports = {
-  reject: ["@tippyjs/react", "nanoid", "@0xsequence/multicall"],
+  reject: ["@tippyjs/react", "nanoid"],
 };
