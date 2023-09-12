@@ -222,7 +222,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
               from: currentAccount.address,
               gasLimit,
             });
-            console.info({ rpcTx });
 
             const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
 
