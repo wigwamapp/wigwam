@@ -286,6 +286,10 @@ export class InpageProvider extends Emitter {
     return this.#inited;
   }
 
+  _metamask = {
+    isUnlocked: async () => true,
+  };
+
   /**
    * Submits an RPC request for the given method, with the given params.
    * Resolves with the result of the method call, or rejects on error.
