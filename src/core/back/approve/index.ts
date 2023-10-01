@@ -318,7 +318,7 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
 function hexValueMaybe<T>(smth: T) {
   if (smth === undefined) return;
 
-  if (typeof smth === "bigint" || ["string", "number"].includes(typeof smth)) {
+  if (["string", "number", "bigint"].includes(typeof smth)) {
     return toQuantity(smth as any);
   }
 
