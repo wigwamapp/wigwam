@@ -1,5 +1,4 @@
-import { Contract } from "@ethersproject/contracts";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 const SCHEME_MAP: Record<number, string> = {
   1: " X/\\",
@@ -17,9 +16,9 @@ const SCHEME_MAP: Record<number, string> = {
 export async function fetchAutoglyphsMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
-  const GlyphsContract = new Contract(
+  const GlyphsContract = new ethers.Contract(
     tokenAddress,
     ["function symbolScheme(uint256 index) public view returns (uint8)"],
     provider,

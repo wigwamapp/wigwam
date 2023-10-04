@@ -24,12 +24,6 @@ export enum JsonRpcMethod {
   eth_signTypedData_v2 = "eth_signTypedData_v2",
   eth_signTypedData_v3 = "eth_signTypedData_v3",
   eth_signTypedData_v4 = "eth_signTypedData_v4",
-  wallet_getPermissions = "wallet_getPermissions",
-  wallet_requestPermissions = "wallet_requestPermissions",
-  wallet_addEthereumChain = "wallet_addEthereumChain",
-  wallet_switchEthereumChain = "wallet_switchEthereumChain",
-  wallet_watchAsset = "wallet_watchAsset",
-  wallet_registerOnboarding = "wallet_registerOnboarding",
   // Subscribtion
   eth_subscribe = "eth_subscribe",
   eth_unsubscribe = "eth_unsubscribe",
@@ -39,6 +33,16 @@ export enum JsonRpcMethod {
   eth_newPendingTransactionFilter = "eth_newPendingTransactionFilter",
   eth_getFilterChanges = "eth_getFilterChanges",
   eth_getFilterLogs = "eth_getFilterLogs",
+  // Wallet
+  wallet_getPermissions = "wallet_getPermissions",
+  wallet_requestPermissions = "wallet_requestPermissions",
+  wallet_addEthereumChain = "wallet_addEthereumChain",
+  wallet_switchEthereumChain = "wallet_switchEthereumChain",
+  wallet_watchAsset = "wallet_watchAsset",
+  wallet_registerOnboarding = "wallet_registerOnboarding",
+  // Snaps
+  wallet_getSnaps = "wallet_getSnaps",
+  wallet_requestSnaps = "wallet_requestSnaps",
 }
 
 /**

@@ -206,14 +206,17 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           if (closed) return false;
 
-          const { privKey } = await openlogin.login({
+          const result = await openlogin.login({
             loginProvider: openLoginMethod,
           });
+          if (!result) throw new Error("Failed to auth");
+
+          const { privKey } = result;
           const { email, name } = openlogin.getUserInfo();
 
           if (closed) return false;
 
-          const address = ethers.utils.computeAddress(add0x(privKey));
+          const address = ethers.computeAddress(add0x(privKey));
 
           stateRef.current.importAddresses = [
             {

@@ -1,4 +1,10 @@
-import { JsonRpcProvider, TransactionRequest } from "@ethersproject/providers";
+import {
+  JsonRpcApiProvider,
+  JsonRpcPayload,
+  JsonRpcResult,
+  VoidSigner,
+  TransactionRequest,
+} from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 import { assert } from "lib/system/assert";
@@ -11,19 +17,48 @@ export const getClientProvider = memoize(
   (chainId: number) => new ClientProvider(chainId),
 );
 
-export class ClientProvider extends JsonRpcProvider {
+export class ClientProvider extends JsonRpcApiProvider {
   constructor(public chainId: number) {
-    super("", chainId);
+    super(chainId);
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
-  getSigner = memoize(super.getSigner.bind(this));
   getCode = memoize(super.getCode.bind(this));
-  getUncheckedSigner = memoize(super.getUncheckedSigner.bind(this));
+
+  getUncheckedSigner = memoize(
+    (address: string) => new VoidSigner(address, this),
+  );
 
   async send(method: string, params: Array<any>): Promise<any> {
+    const res = await this.sendRpc(method, params);
+
+    return getResult(res.response);
+  }
+
+  async _send(
+    payload: JsonRpcPayload | Array<JsonRpcPayload>,
+  ): Promise<Array<JsonRpcResult>> {
+    const payloadArr = Array.isArray(payload) ? payload : [payload];
+
+    const responses = await Promise.all(
+      payloadArr.map(async ({ jsonrpc, id, method, params }) => {
+        // TODO: Check JSONRPC params types
+        const res = await this.sendRpc(method, params as any);
+
+        return { jsonrpc, id, ...res.response };
+      }),
+    );
+
+    return responses as any;
+  }
+
+  async populateTransaction(transaction: Partial<TransactionRequest>) {
+    return transaction;
+  }
+
+  private async sendRpc(method: string, params: Array<any>) {
     const type = MessageType.SendRpc;
-    const { chainId } = this.network;
+    const chainId = this.chainId;
 
     const res = await porter.request(
       { type, chainId, method, params },
@@ -31,11 +66,7 @@ export class ClientProvider extends JsonRpcProvider {
     );
     assert(res?.type === type);
 
-    return getResult(res.response);
-  }
-
-  async populateTransaction(transaction: Partial<TransactionRequest>) {
-    return transaction;
+    return res;
   }
 }
 

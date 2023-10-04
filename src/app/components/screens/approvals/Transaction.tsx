@@ -9,7 +9,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { ethers } from "ethers";
+import { Transaction, ethers } from "ethers";
 import retry from "async-retry";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
@@ -56,8 +56,7 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 import ApprovalLayout from "./Layout";
 
-const { serializeTransaction, keccak256, recoverAddress, getAddress } =
-  ethers.utils;
+const { keccak256, recoverAddress, getAddress } = ethers;
 
 const TAB_VALUES = ["details", "fee", "advanced", "error"] as const;
 
@@ -69,7 +68,6 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
 };
 
 type TabValue = (typeof TAB_VALUES)[number];
-type Tx = ethers.utils.UnsignedTransaction;
 
 type ApproveTransactionProps = {
   approval: TransactionApproval;
@@ -111,20 +109,20 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const [action, setAction] = useState<TxAction | null>(null);
   const [prepared, setPrepared] = useState<{
-    tx: Tx;
-    estimatedGasLimit: ethers.BigNumber;
+    tx: Transaction;
+    estimatedGasLimit: bigint;
     fees: FeeSuggestions | null;
     destinationIsContract: boolean;
   }>();
-  const [txOverrides, setTxOverrides] = useState<Partial<Tx>>({});
+  const [txOverrides, setTxOverrides] = useState<Partial<Transaction>>({});
 
   const preparedTx = prepared?.tx;
   const fees = prepared?.fees;
 
-  const originTx = useMemo<Tx | null>(() => {
+  const originTx = useMemo<Transaction | null>(() => {
     if (!prepared) return null;
 
-    const tx = { ...prepared.tx };
+    const tx: Transaction = prepared.tx.clone();
     tx.nonce = getNextNonce(tx, localNonce);
 
     const feeSug = prepared.fees?.modes[feeMode];
@@ -145,7 +143,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const finalTx = useMemo<typeof originTx>(() => {
     if (!originTx) return originTx;
 
-    const tx = { ...originTx };
+    const tx = originTx.clone();
 
     for (const [key, value] of Object.entries(txOverrides)) {
       if (value || value === 0) {
@@ -161,7 +159,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
     try {
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return ethers.BigNumber.from(finalTx.gasLimit).mul(gasPrice!);
+      return finalTx.gasLimit * gasPrice!;
     } catch {
       return null;
     }
@@ -171,11 +169,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     if (!finalTx || !prepared?.estimatedGasLimit) return null;
 
     try {
-      const gasLimit = prepared.estimatedGasLimit.lt(finalTx.gasLimit!)
-        ? prepared.estimatedGasLimit
-        : finalTx.gasLimit;
+      const gasLimit =
+        prepared.estimatedGasLimit < finalTx.gasLimit!
+          ? prepared.estimatedGasLimit
+          : finalTx.gasLimit;
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return ethers.BigNumber.from(gasLimit).mul(gasPrice!);
+      return gasLimit * gasPrice!;
     } catch {
       return null;
     }
@@ -212,8 +211,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   .getUncheckedSigner(account.address)
                   .populateTransaction({
                     ...rest,
+                    nonce: rest.nonce ? +rest.nonce : undefined,
                     type: feeSuggestions?.type === "legacy" ? 0 : undefined,
-                    chainId: bnify(rest?.chainId)?.toNumber(),
+                    chainId: rest.chainId ? +rest.chainId : undefined,
                     ...(feeSuggestions?.type === "modern"
                       ? {
                           maxFeePerGas: feeSuggestions.modes.low.max,
@@ -222,7 +222,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                         }
                       : feeSuggestions?.type === "legacy"
                       ? {
-                          gasPrice: feeSuggestions.modes.low.max,
+                          gasPrice: feeSuggestions.modes.average.max,
                         }
                       : {}),
                   }),
@@ -238,20 +238,22 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           delete tx.from;
 
-          const estimatedGasLimit = ethers.BigNumber.from(tx.gasLimit);
-          const minGasLimit = estimatedGasLimit.mul(5).div(4);
-          const averageGasLimit = estimatedGasLimit.mul(3).div(2);
+          const estimatedGasLimit = BigInt(tx.gasLimit!);
+          const minGasLimit = (estimatedGasLimit * 5n) / 4n;
+          const averageGasLimit = (estimatedGasLimit * 3n) / 2n;
+
+          const preparedTx = Transaction.from({
+            ...tx,
+            nonce: tx.nonce ? +tx.nonce : undefined,
+            gasLimit:
+              gasLimit && minGasLimit <= BigInt(gasLimit)
+                ? BigInt(gasLimit)
+                : averageGasLimit,
+          });
 
           setLastError((le) => (le?.from === "estimation" ? null : le));
           setPrepared({
-            tx: {
-              ...tx,
-              nonce: bnify(tx.nonce)?.toNumber(),
-              gasLimit:
-                gasLimit && minGasLimit.lte(gasLimit)
-                  ? ethers.BigNumber.from(gasLimit)
-                  : averageGasLimit,
-            },
+            tx: preparedTx,
             estimatedGasLimit,
             fees: feeSuggestions,
             destinationIsContract,
@@ -348,11 +350,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           }
 
           const gasBalance = await provider.getBalance(account.address);
-          const totalGas = ethers.BigNumber.from(finalTx.gasLimit)
-            .mul(finalTx.maxFeePerGas ?? finalTx.gasPrice!)
-            .add(finalTx.value ?? 0);
+          const totalGas =
+            finalTx.gasLimit * (finalTx.maxFeePerGas ?? finalTx.gasPrice!) +
+              finalTx.value ?? 0n;
 
-          if (gasBalance.lt(totalGas)) {
+          if (gasBalance < totalGas) {
             throw new Error(
               `Not enough ${
                 nativeCurrency?.symbol
@@ -364,7 +366,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           console.info({ finalTx });
 
-          const rawTx = serializeTransaction(finalTx);
+          const rawTx = Transaction.from(finalTx).unsignedSerialized;
 
           if (account.source !== AccountSource.Ledger) {
             await approveItem(approval.id, { approved, rawTx });
@@ -380,7 +382,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                 );
 
                 const formattedSig = {
-                  v: ethers.BigNumber.from("0x" + sig.v).toNumber(),
+                  v: Number("0x" + sig.v),
                   r: "0x" + sig.r,
                   s: "0x" + sig.s,
                 };
@@ -487,9 +489,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                       accountAddress={accountAddress}
                       fees={fees}
                       averageGasLimit={prepared.estimatedGasLimit}
-                      gasLimit={ethers.BigNumber.from(
-                        txOverrides.gasLimit || originTx.gasLimit!,
-                      )}
+                      gasLimit={txOverrides.gasLimit || originTx.gasLimit!}
                       feeMode={feeMode}
                       maxFee={maxFee}
                       averageFee={averageFee}
@@ -578,7 +578,3 @@ const Loading: FC = () => {
     </div>
   );
 };
-
-function bnify(v?: ethers.BigNumberish) {
-  return v !== undefined ? ethers.BigNumber.from(v) : undefined;
-}

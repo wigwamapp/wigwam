@@ -73,6 +73,12 @@ const SelectAccountsToAddMethod: FC = () => {
     [isHardDevice, hasSeedPhrase],
   );
 
+  useEffect(() => {
+    if (isHardDevice) {
+      Promise.all([import("@ledgerhq/hw-app-eth"), import("lib/ledger")]);
+    }
+  }, [isHardDevice]);
+
   const handleContinue = useCallback(
     async (method: string, derivationPath: string) => {
       stateRef.current.addAccounts = `${
@@ -227,7 +233,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
             .getBalance(wallet.address)
             .catch(() => null);
 
-          if (balance?.gt(0)) {
+          if (balance) {
             if (
               !resultAddresses.some(
                 ({ address: extAdd }) => extAdd === wallet.address,

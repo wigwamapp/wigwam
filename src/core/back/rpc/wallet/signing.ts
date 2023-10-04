@@ -14,8 +14,7 @@ import { approvalAdded } from "core/back/state";
 
 import { validatePermission, validateAccount } from "./validation";
 
-const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
-  ethers.utils;
+const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } = ethers;
 
 export async function requestSigning(
   rpcCtx: RpcContext,
@@ -110,15 +109,15 @@ export async function recoverPersonalSign(
 ) {
   validatePermission(source);
 
-  let data, signature;
+  let data, signature, ecRecoverAddr;
   try {
     [data, signature] = params;
     assert(isHexString(data) && isHexString(signature));
+
+    ecRecoverAddr = recoverPersonalSignature({ data, signature });
   } catch {
     throw ethErrors.rpc.invalidParams();
   }
-
-  const ecRecoverAddr = recoverPersonalSignature({ data, signature });
 
   rpcCtx.reply({ result: getAddress(ecRecoverAddr) });
 }

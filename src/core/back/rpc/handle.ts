@@ -130,6 +130,17 @@ export async function handleRpc(
         return await requestNetwork(rpcCtx, type, source, params);
       }
 
+      case JsonRpcMethod.wallet_getSnaps:
+      case JsonRpcMethod.wallet_requestSnaps: {
+        dropForSelf(source);
+        await expandPermission();
+
+        rpcCtx.reply({
+          // Just a stub
+          result: {},
+        });
+      }
+
       case JsonRpcMethod.eth_sign:
       case JsonRpcMethod.eth_signTransaction:
       case JsonRpcMethod.eth_ecRecover:
@@ -140,6 +151,10 @@ export async function handleRpc(
       }
 
       default: {
+        if (method.startsWith("wallet")) {
+          throw ethErrors.provider.unsupportedMethod();
+        }
+
         await expandPermission();
 
         rpcCtx.reply(await sendRpc(chainId, method, params));
@@ -183,6 +198,7 @@ function getSigningStandard(method: string) {
   }
 }
 
+// Drop if request source is wallet internal page
 function dropForSelf(source: ActivitySource) {
   if (source.type === "self") {
     throw ethErrors.provider.unsupportedMethod();

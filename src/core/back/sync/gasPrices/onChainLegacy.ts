@@ -7,20 +7,22 @@ import { getRpcProvider } from "../../rpc";
 export async function getOnChainLegacy(chainId: number): Promise<GasPrices> {
   const provider = getRpcProvider(chainId);
 
-  const chainGasPrice = await retry(() => provider.getGasPrice(), {
+  const { gasPrice } = await retry(() => provider.getFeeData(), {
     retries: 2,
     minTimeout: 0,
     maxTimeout: 0,
   });
 
-  const step = 10 ** (chainGasPrice.lt(10 ** 9) ? 7 : 8);
+  if (!gasPrice) return null;
+
+  const step = 10n ** (gasPrice < 10n ** 9n ? 7n : 8n);
 
   return {
     type: "legacy",
     modes: {
-      low: { max: chainGasPrice.sub(step).toString() },
-      average: { max: chainGasPrice.toString() },
-      high: { max: chainGasPrice.add(step).toString() },
+      low: { max: (gasPrice - step).toString() },
+      average: { max: gasPrice.toString() },
+      high: { max: (gasPrice + step).toString() },
     },
   };
 }

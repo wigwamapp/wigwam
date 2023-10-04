@@ -336,7 +336,7 @@ export default AccountsToAdd;
 type AccountProps = {
   name: string;
   address: string;
-  provider: ethers.providers.Provider;
+  provider: ethers.Provider;
   index?: string;
   network: Network;
   isAdded: boolean;
@@ -363,7 +363,7 @@ const Account = memo<AccountProps>(
     onChangeWalletName,
     className,
   }) => {
-    const [balance, setBalance] = useSafeState<ethers.BigNumber | null>(null);
+    const [balance, setBalance] = useSafeState<bigint | null>(null);
 
     useEffect(() => {
       provider
@@ -448,7 +448,7 @@ const Account = memo<AccountProps>(
         <Td className="font-bold">
           {baseAsset ? (
             <PrettyAmount
-              amount={ethers.utils.formatEther(baseAsset.balance)}
+              amount={ethers.formatEther(baseAsset.balance)}
               currency={baseAsset.symbol}
               copiable={true}
               isMinified

@@ -1,5 +1,5 @@
 import { Dispatch, memo, SetStateAction, useCallback, useMemo } from "react";
-import { ethers } from "ethers";
+import { ethers, Transaction } from "ethers";
 
 import {
   formatUnits,
@@ -11,19 +11,17 @@ import LongTextField from "app/components/elements/LongTextField";
 import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 
-type Tx = ethers.utils.UnsignedTransaction;
-
 type AdvancedTabProps = {
-  originTx: Tx;
-  finalTx: Tx;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
+  originTx: Transaction;
+  finalTx: Transaction;
+  overrides: Partial<Transaction>;
+  onOverridesChange: Dispatch<SetStateAction<Partial<Transaction>>>;
 };
 
 const AdvancedTab = memo<AdvancedTabProps>(
   ({ originTx: tx, finalTx, overrides, onOverridesChange }) => {
     const rawTx = useMemo(
-      () => ethers.utils.serializeTransaction(finalTx),
+      () => Transaction.from(finalTx).unsignedSerialized,
       [finalTx],
     );
 
@@ -140,7 +138,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
             size: "large",
             placement: "top",
           }}
-          value={ethers.utils.hexlify(tx.data ?? "0x00")}
+          value={ethers.hexlify(tx.data ?? "0x00")}
           textareaClassName="!h-36 mb-3"
         />
 

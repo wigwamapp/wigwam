@@ -165,7 +165,6 @@ module.exports = {
       "@ledgerhq/devices/hid-framing": require.resolve(
         "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
-      "@ethersproject/random": "lib/ethers-random",
       "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
       // For `react-error-guard`
@@ -339,6 +338,16 @@ module.exports = {
 
     new CaseSensitivePathsPlugin(),
 
+    new webpack.NormalModuleReplacementPlugin(
+      /@ledgerhq\/live-network\/lib-es\/network\.js/,
+      path.resolve(__dirname, ".vendor/ledgerhq-live-network/network.js"),
+    ),
+
+    new webpack.NormalModuleReplacementPlugin(
+      /@ledgerhq\/evm-tools\/lib-es\/message\/EIP712\/index\.js/,
+      path.resolve(__dirname, ".vendor/ledgerhq-evm-tools/message-eip712.js"),
+    ),
+
     new webpack.DefinePlugin({
       // for web extensions
       SharedArrayBuffer: "_SharedArrayBuffer",
@@ -482,6 +491,7 @@ module.exports = {
       cache: true,
       cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
       context: CWD_PATH,
+      failOnError: false,
     }),
 
     new WebpackBar({

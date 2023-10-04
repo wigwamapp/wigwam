@@ -8,7 +8,6 @@ import {
   composeValidators,
   required,
   validateDerivationPath,
-  withHumanDelay,
   focusOnErrors,
 } from "app/utils";
 import Collapse from "app/components/elements/Collapse";
@@ -43,9 +42,7 @@ const SelectAddMethod: FC<SelectAddMethodProps> = ({
 
   const handleContinue = useCallback(
     ({ derivationPath }: FormValues) =>
-      withHumanDelay(async () => {
-        onContinue(activeMethod, derivationPath.replace("/{index}", ""));
-      }),
+      onContinue(activeMethod, derivationPath.replace("/{index}", "")),
     [activeMethod, onContinue],
   );
 

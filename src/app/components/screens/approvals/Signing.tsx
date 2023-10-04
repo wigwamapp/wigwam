@@ -38,7 +38,7 @@ import ApprovalLayout from "./Layout";
 
 const JsonView = lazy(() => import("@microlink/react-json-view"));
 
-const { toUtf8String, hexlify, joinSignature, getAddress } = ethers.utils;
+const { toUtf8String, hexlify, getAddress } = ethers;
 
 type ApproveSigningProps = {
   approval: SigningApproval;
@@ -157,11 +157,11 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
               }
 
               if (sig) {
-                signedMessage = joinSignature({
+                signedMessage = ethers.Signature.from({
                   v: sig.v,
                   r: "0x" + sig.r,
                   s: "0x" + sig.s,
-                });
+                }).serialized;
 
                 let addressSignedWith: string | undefined;
 

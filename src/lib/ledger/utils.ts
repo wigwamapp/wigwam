@@ -1,7 +1,15 @@
 import { ethers } from "ethers";
 
-const { concat, base58, toUtf8Bytes, hexDataSlice, ripemd160, sha256 } =
-  ethers.utils;
+const {
+  concat,
+  toUtf8Bytes,
+  encodeBase58,
+  dataSlice,
+  toBeHex,
+  zeroPadValue,
+  ripemd160,
+  sha256,
+} = ethers;
 
 export function getExtendedKey(ledgerPublicKey: string, chainCode: string) {
   const publicKey = compressPublicKey(ledgerPublicKey);
@@ -9,11 +17,11 @@ export function getExtendedKey(ledgerPublicKey: string, chainCode: string) {
   const depth = 0;
 
   return base58check(
-    ethers.utils.concat([
+    concat([
       "0x0488B21E",
-      ethers.utils.hexlify(depth),
-      ethers.utils.hexlify(fingerprint),
-      ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 4),
+      toBeHex(depth),
+      toBeHex(fingerprint),
+      zeroPadValue(toBeHex(0), 4),
       `0x${chainCode}`,
       publicKey,
     ]),
@@ -42,8 +50,6 @@ export function getParentFingerprint(publicKey: string) {
   );
 }
 
-export function base58check(data: Uint8Array): string {
-  return base58.encode(
-    concat([data, hexDataSlice(sha256(sha256(data)), 0, 4)]),
-  );
+export function base58check(data: ethers.BytesLike): string {
+  return encodeBase58(concat([data, dataSlice(sha256(sha256(data)), 0, 4)]));
 }

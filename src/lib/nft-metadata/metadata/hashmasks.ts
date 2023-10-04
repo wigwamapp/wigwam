@@ -1,12 +1,11 @@
-import { Contract } from "@ethersproject/contracts";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 export async function fetchHashmaskMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
-  const HMContract = new Contract(
+  const HMContract = new ethers.Contract(
     tokenAddress,
     [
       "function tokenNameByIndex(uint256 index) public view returns (string memory)",

@@ -1,6 +1,5 @@
 import { FC, PropsWithChildren, useMemo } from "react";
 import classNames from "clsx";
-import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
 import {
@@ -110,10 +109,10 @@ const getTabHeader = (action: TxAction) => {
 type FeeButton = {
   accountAddress: string;
   fees: FeeSuggestions;
-  gasLimit: ethers.BigNumber;
-  averageGasLimit: ethers.BigNumber;
-  maxFee: ethers.BigNumber | null;
-  averageFee: ethers.BigNumber | null;
+  gasLimit: bigint;
+  averageGasLimit: bigint;
+  maxFee: bigint | null;
+  averageFee: bigint | null;
   feeMode: FeeMode;
   onClick: () => void;
 };
@@ -129,14 +128,14 @@ const FeeButton: FC<FeeButton> = ({
   onClick,
 }) => {
   gasLimit = useMemo(
-    () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
+    () => (gasLimit > averageGasLimit ? averageGasLimit : gasLimit),
     [averageGasLimit, gasLimit],
   );
 
   const nativeToken = useToken<AccountAsset>(accountAddress);
 
-  const averageFeeBN = averageFee && new BigNumber(averageFee.toString());
-  const modeFee = gasLimit.mul(fees.modes[feeMode].max).toString();
+  const averageFeeBN = averageFee ? new BigNumber(averageFee.toString()) : null;
+  const modeFee = (gasLimit * fees.modes[feeMode].max).toString();
 
   const isCustomMode = !averageFeeBN?.eq(modeFee);
 
@@ -170,7 +169,7 @@ const FeeButton: FC<FeeButton> = ({
           )}
         >
           Network fee
-          {averageFeeBN && (
+          {averageFeeBN ? (
             <span className="ml-auto flex items-center">
               <PrettyAmount
                 amount={averageFeeBN}
@@ -186,14 +185,14 @@ const FeeButton: FC<FeeButton> = ({
                 className="font-bold"
               />
             </span>
-          )}
+          ) : null}
         </span>
         <span
           className={classNames("flex items-center justify-between", "text-xs")}
         >
           <FeeModeLabel feeMode={isCustomMode ? "custom" : feeMode} />
 
-          {maxFee && nativeToken && (
+          {maxFee && nativeToken ? (
             <span className="">
               <span className="font-semibold">Max fee:</span>
               <PrettyAmount
@@ -204,7 +203,7 @@ const FeeButton: FC<FeeButton> = ({
                 className="ml-2 mb-0"
               />
             </span>
-          )}
+          ) : null}
         </span>
       </span>
       <ChevronRightIcon className="w-6 h-auto ml-2" />
@@ -372,7 +371,7 @@ const getTokens = (action: TxAction) => {
   if (
     action.type === TxActionType.ContractInteraction &&
     action.nativeTokenAmount &&
-    ethers.BigNumber.from(action.nativeTokenAmount).gt(0)
+    BigInt(action.nativeTokenAmount) > 0n
   ) {
     return [
       {

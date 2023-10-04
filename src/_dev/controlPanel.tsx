@@ -17,11 +17,11 @@ async function sendPolygonTokens() {
 
   const linkTokenAddress = "0x326c977e6efc84e512bb9c30f76e30c160ed06fb";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(linkTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
+  const convertedAmount = ethers.parseUnits("0.0001", 18);
 
   const txResult = await contract.transfer(recipient, convertedAmount);
   console.info({ txResult });
@@ -35,11 +35,11 @@ async function sendBscTokens() {
 
   const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(daiTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
+  const convertedAmount = ethers.parseUnits("0.0001", 18);
 
   const txResult = await contract.transfer(recipient, convertedAmount);
   console.info({ txResult });
@@ -53,11 +53,11 @@ async function approveBscTokens() {
 
   const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(daiTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0", 18);
+  const convertedAmount = ethers.parseUnits("0", 18);
 
   const txResult = await contract.approve(recipient, convertedAmount);
   console.info({ txResult });
@@ -66,8 +66,8 @@ async function approveBscTokens() {
 async function generateRandomContacts() {
   const contractsToAdd: any[] = [];
 
-  const seedPhrase = ethers.Wallet.createRandom().mnemonic.phrase;
-  const hdNode = ethers.utils.HDNode.fromMnemonic(seedPhrase);
+  const seedPhrase = ethers.Wallet.createRandom().mnemonic;
+  const hdNode = ethers.HDNodeWallet.fromMnemonic(seedPhrase!);
 
   for (let i = 0; i < 99; i++) {
     const { address } = hdNode.derivePath(`m/44'/60'/0'/0/${i}`);

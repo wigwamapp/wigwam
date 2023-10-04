@@ -93,7 +93,7 @@ export async function startTxObserver() {
               NATIVE_TOKEN_SLUG,
             );
 
-            const destination = result.to && ethers.utils.getAddress(result.to);
+            const destination = result.to && ethers.getAddress(result.to);
 
             if (destination && accountAddresses.includes(destination)) {
               addFindTokenRequest(tx.chainId, destination, NATIVE_TOKEN_SLUG);
@@ -159,10 +159,8 @@ function findSkippedTxs(
       tx.chainId === origin.chainId &&
       tx.accountAddress == origin.accountAddress
     ) {
-      const { nonce: originNonce } = ethers.utils.parseTransaction(
-        origin.rawTx,
-      );
-      const { nonce: txNonce } = ethers.utils.parseTransaction(tx.rawTx);
+      const { nonce: originNonce } = ethers.Transaction.from(origin.rawTx);
+      const { nonce: txNonce } = ethers.Transaction.from(tx.rawTx);
 
       if (originNonce >= txNonce) {
         skippedHashes.push(tx.txHash);
@@ -186,5 +184,5 @@ function isFailedOrSkippedTx(tx: TransactionActivity) {
 }
 
 function isFailedStatus(result: TxReceipt) {
-  return ethers.BigNumber.from(result.status).isZero();
+  return BigInt(result.status) === 0n;
 }

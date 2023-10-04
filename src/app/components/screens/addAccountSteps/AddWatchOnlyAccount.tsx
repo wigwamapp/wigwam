@@ -31,7 +31,7 @@ const AddWatchOnlyAccount = memo(() => {
           stateRef.current.importAddresses = [
             {
               source: AccountSource.Address,
-              address: ethers.utils.getAddress(address),
+              address: ethers.getAddress(address),
               isDisabled: true,
               isDefaultChecked: true,
             },

@@ -1,4 +1,4 @@
-import { Provider } from "@ethersproject/abstract-provider";
+import { ethers } from "ethers";
 
 import { ERC20__factory, ERC1155__factory, ERC721__factory } from "abi-types";
 import { TokenActivity, TokenStandard } from "core/types";
@@ -59,7 +59,7 @@ export function getNativeTokenLogoUrl(chainTag: string) {
 }
 
 export async function detectNFTStandard(
-  provider: Provider,
+  provider: ethers.Provider,
   tokenAddress: string,
   tokenId: string,
 ) {
@@ -78,7 +78,7 @@ const ERC721_IFACE_ID = "0x80ac58cd";
 const ERC1155_IFACE_ID = "0xd9b67a26";
 
 export async function isTokenStandardValid(
-  provider: Provider,
+  provider: ethers.Provider,
   address: string,
   standard: TokenStandard,
 ) {
@@ -98,7 +98,7 @@ export async function isTokenStandardValid(
 
           const supply = await contract.totalSupply();
 
-          return !supply.isZero();
+          return supply !== 0n;
         } catch {}
       }
       break;

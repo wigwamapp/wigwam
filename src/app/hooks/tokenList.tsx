@@ -97,7 +97,7 @@ export function useTokenList(
   const syncing = useIsSyncing();
 
   const searchValueIsAddress = useMemo(
-    () => searchValue && ethers.utils.isAddress(searchValue),
+    () => searchValue && ethers.isAddress(searchValue),
     [searchValue],
   );
 
@@ -119,7 +119,7 @@ export function useTokenList(
   useEffect(() => {
     if (willSearch) {
       const t = setTimeout(async () => {
-        const tokenAddress = ethers.utils.getAddress(searchValue!);
+        const tokenAddress = ethers.getAddress(searchValue!);
 
         let tokenSlug: string;
 
@@ -127,8 +127,7 @@ export function useTokenList(
           if (!tokenIdSearchValue) return;
 
           try {
-            const tokenId =
-              ethers.BigNumber.from(tokenIdSearchValue).toString();
+            const tokenId = BigInt(tokenIdSearchValue).toString();
             const tokenStandard = await detectNFTStandard(
               provider,
               tokenAddress,
@@ -147,7 +146,7 @@ export function useTokenList(
         } else {
           tokenSlug = createTokenSlug({
             standard: TokenStandard.ERC20,
-            address: ethers.utils.getAddress(searchValue!),
+            address: ethers.getAddress(searchValue!),
             id: "0",
           });
         }
@@ -213,13 +212,12 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        const persist = await storage.fetchForce<TokenSearchPersist>(
-          TOKEN_SEARCH_PERSIST,
-        );
+        const persist =
+          await storage.fetchForce<TokenSearchPersist>(TOKEN_SEARCH_PERSIST);
         if (!persist) return;
 
         const { value, addedAt } = persist;
-        if (ethers.utils.isAddress(value) && addedAt > Date.now() - 30_000) {
+        if (ethers.isAddress(value) && addedAt > Date.now() - 30_000) {
           setSearchValue(value);
         } else {
           await storage.remove(TOKEN_SEARCH_PERSIST);
@@ -235,7 +233,7 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        if (searchValue && ethers.utils.isAddress(searchValue)) {
+        if (searchValue && ethers.isAddress(searchValue)) {
           await storage.put<TokenSearchPersist>(TOKEN_SEARCH_PERSIST, {
             value: searchValue,
             addedAt: Date.now(),

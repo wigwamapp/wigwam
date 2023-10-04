@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-import { suggestFees as suggestFeesPrimitive } from "@rainbow-me/fee-suggestions";
+import { suggestFees as suggestFeesPrimitive } from "lib/eip1559-fee";
 import memoize from "mem";
 import retry from "async-retry";
 
@@ -8,6 +7,10 @@ import { GasPrices } from "core/types";
 import { RpcProvider, getRpcProvider } from "../../rpc";
 
 export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
+  // Skip Arbitrum
+  // TODO: Add other mechanic for this issue.
+  if (chainId === 42161) return null;
+
   const provider = getRpcProvider(chainId);
 
   const eip1559 = await supportsEIP1559(provider);
@@ -25,33 +28,27 @@ export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
     maxPriorityFeeSuggestions,
   } = base;
 
-  const lowBaseFee = ethers.BigNumber.from(blocksToConfirmationByBaseFee[8]);
-  const averageBaseFee = ethers.BigNumber.from(baseFeeSuggestion);
-  const highBaseFee = averageBaseFee.mul(21).div(20); // x 1.05
+  const lowBaseFee = BigInt(blocksToConfirmationByBaseFee[8]);
+  const averageBaseFee = BigInt(baseFeeSuggestion);
+  const highBaseFee = (averageBaseFee * 21n) / 20n; // x 1.05
 
-  const lowPriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.normal,
-  );
-  const averagePriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.fast,
-  );
-  const highPriorityFee = ethers.BigNumber.from(
-    maxPriorityFeeSuggestions.urgent,
-  );
+  const lowPriorityFee = BigInt(maxPriorityFeeSuggestions.normal);
+  const averagePriorityFee = BigInt(maxPriorityFeeSuggestions.fast);
+  const highPriorityFee = BigInt(maxPriorityFeeSuggestions.urgent);
 
   return {
     type: "modern",
     modes: {
       low: {
-        max: lowBaseFee.add(lowPriorityFee).toString(),
+        max: (lowBaseFee + lowPriorityFee).toString(),
         priority: lowPriorityFee.toString(),
       },
       average: {
-        max: averageBaseFee.add(averagePriorityFee).toString(),
+        max: (averageBaseFee + averagePriorityFee).toString(),
         priority: averagePriorityFee.toString(),
       },
       high: {
-        max: highBaseFee.add(highPriorityFee).toString(),
+        max: (highBaseFee + highPriorityFee).toString(),
         priority: highPriorityFee.toString(),
       },
     },
@@ -67,13 +64,13 @@ const supportsEIP1559 = memoize(
         maxTimeout: 0,
       });
 
-      return ethers.BigNumber.isBigNumber(feeData.maxPriorityFeePerGas);
+      return typeof feeData.maxPriorityFeePerGas === "bigint";
     } catch (err) {
       console.warn(err);
       return null;
     }
   },
   {
-    cacheKey: ([p]) => p.network.chainId,
+    cacheKey: ([p]) => p.chainId,
   },
 );

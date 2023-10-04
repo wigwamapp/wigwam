@@ -136,7 +136,7 @@ export type TxParams = {
   chainId?: string | number;
   // eip2930
   type?: string | number;
-  accessList?: ethers.utils.AccessList;
+  accessList?: ethers.AccessList;
   // eip1559
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
