@@ -1,5 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { Contract } from "@ethersproject/contracts";
+import { ethers } from "ethers";
 
 import { isAddressMatch } from "../utils";
 import { ZORA_TOKEN_ADDRESS } from "../defaults";
@@ -8,12 +7,12 @@ export async function getAlternateContractCall(
   chainId: number,
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
   if (isAddressMatch(chainId, tokenAddress, ZORA_TOKEN_ADDRESS)) {
     const { default: zoraMediaAbi } = await import("../abi/zoraMedia.json");
 
-    const zoraMediaContract = new Contract(
+    const zoraMediaContract = new ethers.Contract(
       tokenAddress,
       zoraMediaAbi,
       provider,

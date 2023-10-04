@@ -1,5 +1,5 @@
 import browser, { Storage } from "webextension-polyfill";
-import { utils } from "ethers";
+import { ethers } from "ethers";
 import { utf8ToBytes } from "lib/crypto-utils/bytes";
 
 export type StorageItems = { [key: string]: unknown } | [string, unknown][];
@@ -119,7 +119,7 @@ export class StorageArea {
     // Obfuscate with hashing
     key =
       this.opts.obfuscate !== false
-        ? utils.ripemd160(utf8ToBytes(key)).slice(2)
+        ? ethers.ripemd160(utf8ToBytes(key)).slice(2)
         : key;
 
     return key;

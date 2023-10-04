@@ -213,7 +213,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           if (closed) return false;
 
-          const address = ethers.utils.computeAddress(add0x(privKey));
+          const address = ethers.computeAddress(add0x(privKey));
 
           stateRef.current.importAddresses = [
             {

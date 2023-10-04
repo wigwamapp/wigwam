@@ -233,7 +233,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
             .getBalance(wallet.address)
             .catch(() => null);
 
-          if (balance?.gt(0)) {
+          if (balance) {
             if (
               !resultAddresses.some(
                 ({ address: extAdd }) => extAdd === wallet.address,

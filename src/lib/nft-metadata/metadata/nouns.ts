@@ -1,5 +1,4 @@
-import { Contract } from "@ethersproject/contracts";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 import { LIL_NOUNS_TOKEN_ADDRESS } from "../defaults";
 
@@ -11,11 +10,11 @@ function cleanupValue(value: string) {
 export async function fetchNounAttributes(
   nounsContract: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
   const { default: data } = await import("../defaults/nounsData");
 
-  const NounsTokenContract = new Contract(
+  const NounsTokenContract = new ethers.Contract(
     nounsContract,
     [
       "function seeds(uint256 tokenId) public view returns (uint48,uint48,uint48,uint48,uint48)",

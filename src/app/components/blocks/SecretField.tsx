@@ -1,6 +1,6 @@
 import { forwardRef, RefObject, useEffect, useState } from "react";
 import classNames from "clsx";
-import { ethers } from "ethers";
+import { encodeBase58 } from "ethers";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
@@ -92,7 +92,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         Download this Secret Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
         }).then((answer) => {
           if (answer) {
-            const name = ethers.utils.base58.encode(getRandomBytes(10));
+            const name = encodeBase58(getRandomBytes(10));
             downloadFile(value, name, "text/richtext");
           }
         });

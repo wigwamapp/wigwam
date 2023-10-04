@@ -39,7 +39,7 @@ const ContactsDialog: FC = () => {
     async ({ name: newName, address: newAddress }: FormValues) =>
       withHumanDelay(async () => {
         if (modalData) {
-          newAddress = ethers.utils.getAddress(newAddress);
+          newAddress = ethers.getAddress(newAddress);
           const { name, address, addedAt, fromPage } = modalData;
           const isNew = !name || !address;
           try {

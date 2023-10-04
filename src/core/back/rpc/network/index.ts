@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { JsonRpcPayload, JsonRpcResult, ethers } from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 
@@ -21,19 +21,34 @@ export const getRpcProvider = memoize(
   (chainId: number) => new RpcProvider(chainId),
 );
 
-export class RpcProvider extends JsonRpcProvider {
-  constructor(chainId: number) {
-    super("", chainId);
+export class RpcProvider extends ethers.JsonRpcApiProvider {
+  constructor(public chainId: number) {
+    super(chainId);
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
 
-  getSigner = memoize(super.getSigner.bind(this));
-
   async send(method: string, params: Array<any>): Promise<any> {
-    const res = await sendRpc(this.network.chainId, method, params);
+    const res = await sendRpc(this.chainId, method, params);
 
     return getResult(res);
+  }
+
+  async _send(
+    payload: JsonRpcPayload | Array<JsonRpcPayload>,
+  ): Promise<Array<JsonRpcResult>> {
+    const payloadArr = Array.isArray(payload) ? payload : [payload];
+
+    const responses = await Promise.all(
+      payloadArr.map(async ({ jsonrpc, id, method, params }) => {
+        // TODO: Check JSONRPC params types
+        const res = await sendRpc(this.chainId, method, params as any);
+
+        return { jsonrpc, id, ...res };
+      }),
+    );
+
+    return responses as any;
   }
 }
 

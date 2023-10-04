@@ -8,7 +8,7 @@ import HashPreview from "./HashPreview";
 type AssetBalance = {
   symbol: string;
   name: string;
-  balance: ethers.BigNumber;
+  balance: bigint;
 };
 
 type AccountPreviewProps = {
@@ -53,9 +53,7 @@ const AssetBalancePreivew: FC<AssetBalancePreivewProps> = ({
   className,
 }) => (
   <div className={classNames("inline-flex text-base", className)}>
-    <span className="font-medium mr-1">
-      {ethers.utils.formatEther(balance)}
-    </span>
+    <span className="font-medium mr-1">{ethers.formatEther(balance)}</span>
     <span>{symbol}</span>
   </div>
 );

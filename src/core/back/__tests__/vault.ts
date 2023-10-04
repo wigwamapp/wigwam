@@ -24,6 +24,14 @@ afterEach(() => storage.clear());
 const TEST_ADDRESS = "0x7efae4CDB551cD5cdd3715361e195eA7963E6738";
 const TEST_PASSWORD = "123qweasd";
 const ROOT_PATH = "m/44'/60'/0'/0";
+const DIGESTS = [
+  "0x164d2415e9ecb4cd123922612782f4baf65d382ef91c5f55ced5350a1ac02c35",
+  "0x3982297279e970d69eeac68883dcb9167bf5b06ac70b53cff126cda47c9e9f0e",
+  "0x52b3f03e33296d318bac267bd7fba4523f1d574a550f36babcbebaaaa4823bab",
+  "0x66a1b231aa5d9bf7cff8e44ca706d9200aed0bd8a571bc1e5e71f95652bfbd90",
+  "0x0e1993b495d504606ee65f8a69c73fca457572865d256631b206d815b9abc28e",
+  "0x38c480a243adfca3ddae6690cab9ac9d4138eee46d350d17f72d18fa331331c9",
+];
 
 const TEST_WALLET = {
   name: "Test wallet",
@@ -537,43 +545,23 @@ describe("Vault", () => {
     const { vault } = await createTestVault();
 
     // Unknown account
-    expect(vault.sign("123123", "0x1234")).rejects.toThrowError(
+    expect(vault.sign("123123", DIGESTS[0])).rejects.toThrowError(
       "Translated<failedToSign>",
     );
 
     const [acc] = vault.getAccounts();
 
-    expect(await vault.sign(acc.uuid, "0x1234")).toMatchSnapshot();
-    expect(
-      await vault.sign(
-        acc.uuid,
-        "0xda8080049401234567890123456789012345678901234567898006",
-      ),
-    ).toMatchSnapshot();
-    expect(
-      await vault.sign(
-        acc.uuid,
-        "0xda8080809401234567890123456789012345678901234567890506",
-      ),
-    ).toMatchSnapshot();
-    expect(
-      await vault.sign(
-        acc.uuid,
-        "0xed83b61b5c861b414e22695685050dcd5a5094e489ebbaae8af88372e63fd33c5eb16c0743883881a184ae3182b3",
-      ),
-    ).toMatchSnapshot();
-    expect(
-      await vault.sign(
-        acc.uuid,
-        "0xf4819c8914f08e2118c60c523d8421ddd357940ba817b4709474c2b6470bb5282c662d20129a468813accb157a345a5a8490416c91",
-      ),
-    ).toMatchSnapshot();
-    expect(
-      await vault.sign(
-        acc.uuid,
-        "0xf17a8922ebeeec58c8115214835a75dd94626288dd182c51cfb9b3c877b0ae28e8c82f6ad6848fed02238702e0e839e7add3",
-      ),
-    ).toMatchSnapshot();
+    expect(vault.sign(acc.uuid, "0x1234")).rejects.toThrowError(
+      "Translated<failedToSign>",
+    );
+
+    expect(await vault.sign(acc.uuid, DIGESTS[0])).toMatchSnapshot();
+
+    expect(await vault.sign(acc.uuid, DIGESTS[1])).toMatchSnapshot();
+    expect(await vault.sign(acc.uuid, DIGESTS[2])).toMatchSnapshot();
+    expect(await vault.sign(acc.uuid, DIGESTS[3])).toMatchSnapshot();
+    expect(await vault.sign(acc.uuid, DIGESTS[4])).toMatchSnapshot();
+    expect(await vault.sign(acc.uuid, DIGESTS[5])).toMatchSnapshot();
   });
 
   it("signMessage basic", async () => {
@@ -601,7 +589,7 @@ describe("Vault", () => {
     expect(psSignature).toMatchSnapshot();
 
     expect(
-      ethers.utils.getAddress(
+      ethers.getAddress(
         recoverPersonalSignature({ signature: psSignature, data: psData }),
       ),
     ).toStrictEqual(acc.address);

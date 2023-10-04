@@ -8,7 +8,6 @@ import {
 } from "react";
 import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
-import { wordlists } from "@ethersproject/wordlists";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
@@ -25,10 +24,10 @@ import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import SecretField from "app/components/blocks/SecretField";
 
-const { arrayify, hexDataSlice, keccak256, concat } = ethers.utils;
+const { toBeArray, dataSlice, keccak256, concat } = ethers;
 
 const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists,
+  ({ code }) => toWordlistLang(code) in ethers.wordlists,
 );
 
 const WORDS_COUNT = [12, 24];
@@ -94,17 +93,14 @@ const CreateSeedPhrase = memo(() => {
     const baseEntropy = getRandomBytes(entropySize);
     const extraEntropy = getRandomBytes(entropySize);
 
-    const entropy = arrayify(
-      hexDataSlice(
-        keccak256(concat([baseEntropy, extraEntropy])),
-        0,
-        entropySize,
-      ),
+    const entropy = toBeArray(
+      dataSlice(keccak256(concat([baseEntropy, extraEntropy])), 0, entropySize),
     );
 
-    const phrase = ethers.utils.entropyToMnemonic(
+    const { phrase } = ethers.Mnemonic.fromEntropy(
       entropy,
-      wordlists[wordlistLocale],
+      null,
+      ethers.wordlists[wordlistLocale],
     );
 
     setSeedPhraseField(phrase);

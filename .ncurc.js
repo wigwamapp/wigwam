@@ -1,3 +1,3 @@
 module.exports = {
-  reject: ["ethers", "@tippyjs/react", "nanoid"],
+  reject: ["@tippyjs/react", "nanoid"],
 };

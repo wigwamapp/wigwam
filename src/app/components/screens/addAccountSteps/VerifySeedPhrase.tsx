@@ -65,7 +65,7 @@ const VerifySeedPhrase = memo(() => {
               {
                 source: AccountSource.SeedPhrase,
                 name: getNextAccountName(),
-                derivationPath: ethers.utils.defaultPath,
+                derivationPath: ethers.defaultPath,
               },
             ];
 
@@ -73,7 +73,7 @@ const VerifySeedPhrase = memo(() => {
 
             navigateToStep(AddAccountStep.SetupPassword);
           } else {
-            const derivationPath = ethers.utils.defaultPath;
+            const derivationPath = ethers.defaultPath;
             const importAddresses = [
               {
                 // Base

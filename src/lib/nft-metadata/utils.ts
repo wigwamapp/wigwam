@@ -5,9 +5,7 @@ import { sanitizeCustomUrl } from "./uri/custom";
 import { IPFS_IO_GATEWAY } from "./defaults";
 
 export function serealizeTokenId1155(tokenId: string) {
-  return ethers.utils
-    .hexZeroPad(ethers.BigNumber.from(tokenId).toHexString(), 32)
-    .slice(2);
+  return ethers.zeroPadValue(ethers.toBeHex(tokenId), 32).slice(2);
 }
 
 export function isAddressMatch(
@@ -18,8 +16,7 @@ export function isAddressMatch(
   if (!addressByNetwork[chainId]) return false;
 
   return (
-    ethers.utils.getAddress(address) ===
-    ethers.utils.getAddress(addressByNetwork[chainId])
+    ethers.getAddress(address) === ethers.getAddress(addressByNetwork[chainId])
   );
 }
 

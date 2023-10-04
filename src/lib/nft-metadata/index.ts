@@ -1,6 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { getAddress } from "@ethersproject/address";
-import { Contract } from "ethers";
+import { ethers } from "ethers";
 
 import { ERC721__factory } from "abi-types";
 
@@ -53,7 +51,7 @@ export class NFTMetadataAgent {
 
   constructor(
     private chainId: number,
-    private provider: JsonRpcProvider,
+    private provider: ethers.JsonRpcApiProvider,
     opts: AgentOptions = {},
   ) {
     this.ipfsGatewayUrl = opts.ipfsGatewayUrl || IPFS_IO_GATEWAY;
@@ -96,7 +94,7 @@ export class NFTMetadataAgent {
     }
 
     try {
-      const erc1155Contract = new Contract(
+      const erc1155Contract = new ethers.Contract(
         tokenAddress,
         ["function uri(uint256 index) public view returns (string memory)"],
         this.provider,
@@ -222,7 +220,7 @@ export class NFTMetadataAgent {
     rawAddress: string,
     tokenId: string,
   ): Promise<NftMetadata> {
-    const tokenAddress = getAddress(rawAddress);
+    const tokenAddress = ethers.getAddress(rawAddress);
     try {
       const uriFetchResult = await this.fetchTokenURI(tokenAddress, tokenId);
 

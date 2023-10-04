@@ -1,14 +1,13 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { Contract } from "@ethersproject/contracts";
+import { ethers } from "ethers";
 
 export async function fetchLootMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
   const { default: lootAbi } = await import("../abi/loot.json");
 
-  const lootContract = new Contract(tokenAddress, lootAbi, provider);
+  const lootContract = new ethers.Contract(tokenAddress, lootAbi, provider);
 
   const [chest, foot, hand, neck, ring, waist, weapon] = await Promise.all([
     lootContract.getChest(tokenId),

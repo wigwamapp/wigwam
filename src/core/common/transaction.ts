@@ -1,6 +1,4 @@
 import { ethers } from "ethers";
-import { TransactionDescription } from "@ethersproject/abi";
-import { Provider } from "@ethersproject/abstract-provider";
 import { match, P } from "ts-pattern";
 import { ERC20__factory, ERC721__factory, ERC1155__factory } from "abi-types";
 
@@ -19,7 +17,7 @@ import {
 } from "./tokens";
 
 export async function matchTxAction(
-  provider: Provider,
+  provider: ethers.Provider,
   txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish },
 ): Promise<TxAction | null> {
   if (!txParams.to) {
@@ -230,7 +228,7 @@ export async function matchTxAction(
 }
 
 export async function matchTokenTransferEvents(
-  provider: Provider,
+  provider: ethers.Provider,
   logs: {
     address: string;
     data: string;
@@ -329,7 +327,7 @@ const erc1155Interface = ERC1155__factory.createInterface();
 
 export type ParsedTokenTxData = [
   TokenStandard.ERC20 | TokenStandard.ERC721 | TokenStandard.ERC1155,
-  TransactionDescription,
+  ethers.TransactionDescription | null,
 ];
 
 export function parseStandardTokenTransactionData(
@@ -367,7 +365,7 @@ export function parseStandardTokenTransactionData(
   return parsed;
 }
 
-export type ParsedTokenEvent = [TokenStandard, ethers.utils.LogDescription];
+export type ParsedTokenEvent = [TokenStandard, ethers.LogDescription | null];
 
 export function parseStandardTokenEvent(log: {
   topics: string[];
@@ -397,7 +395,7 @@ export function parseStandardTokenEvent(log: {
 }
 
 export async function isSmartContractAddress(
-  provider: Provider,
+  provider: ethers.Provider,
   address: string,
 ) {
   let contractCode;
@@ -413,7 +411,7 @@ export async function isSmartContractAddress(
 }
 
 async function pickParsed<T extends ParsedTokenTxData | ParsedTokenEvent>(
-  provider: Provider,
+  provider: ethers.Provider,
   address: string,
   parsedAll: T[],
 ): Promise<T> {
@@ -436,17 +434,12 @@ async function pickParsed<T extends ParsedTokenTxData | ParsedTokenEvent>(
 }
 
 function ethStringify(v: ethers.BigNumberish) {
-  return typeof v === "string" && ethers.utils.isAddress(v)
-    ? ethers.utils.getAddress(v)
+  return typeof v === "string" && ethers.isAddress(v)
+    ? ethers.getAddress(v)
     : v.toString();
 }
 
 function isZeroHex(val?: any) {
   val = val?.toHexString?.() ?? val?.toString?.();
-  return (
-    !val ||
-    val === "0x" ||
-    val === "0x00" ||
-    val === ethers.constants.AddressZero
-  );
+  return !val || val === "0x" || val === "0x00" || val === ethers.ZeroAddress;
 }

@@ -28,8 +28,7 @@ import { Vault } from "../vault";
 import { $accounts, $approvals, approvalResolved } from "../state";
 import { sendRpc, getRpcProvider } from "../rpc";
 
-const { serializeTransaction, parseTransaction, keccak256, hexValue } =
-  ethers.utils;
+const { keccak256, toQuantity } = ethers;
 
 export async function processApprove(
   approvalId: string,
@@ -99,13 +98,14 @@ export async function processApprove(
           validateTxOrigin(tx, txParams);
 
           if (!signature) {
-            accountAddress = ethers.utils.getAddress(accountAddress);
+            accountAddress = ethers.getAddress(accountAddress);
             const account = getAccountSafe(accountAddress);
 
             signature = await vault.sign(account.uuid, keccak256(rawTx!));
           }
 
-          const signedRawTx = serializeTransaction(tx, signature);
+          const signedTx = tx.clone();
+          signedTx.signature = signature;
 
           if (
             process.env.NODE_ENV !== "production" &&
@@ -115,7 +115,7 @@ export async function processApprove(
           }
 
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
-            signedRawTx,
+            signedTx.serialized,
           ]);
 
           if ("result" in rpcRes) {
@@ -171,7 +171,7 @@ export async function processApprove(
             return;
           }
 
-          accountAddress = ethers.utils.getAddress(accountAddress);
+          accountAddress = ethers.getAddress(accountAddress);
           const account = getAccountSafe(accountAddress);
 
           const signature = vault.signMessage(account.uuid, standard, message);
@@ -318,23 +318,17 @@ function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
 function hexValueMaybe<T>(smth: T) {
   if (smth === undefined) return;
 
-  if (
-    ethers.BigNumber.isBigNumber(smth) ||
-    ["string", "number"].includes(typeof smth)
-  ) {
-    return hexValue(smth as any);
+  if (["string", "number", "bigint"].includes(typeof smth)) {
+    return toQuantity(smth as any);
   }
 
   return smth;
 }
 
-function parseTxSafe(rawTx: ethers.BytesLike): ethers.Transaction {
-  const tx = parseTransaction(rawTx);
-
+function parseTxSafe(rawTx: string): ethers.Transaction {
+  const tx = ethers.Transaction.from(rawTx);
   // Remove signature props
-  delete tx.r;
-  delete tx.v;
-  delete tx.s;
+  tx.signature = null;
 
   return tx;
 }

@@ -1,14 +1,17 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { Contract } from "@ethersproject/contracts";
+import { ethers } from "ethers";
 
 export async function fetchZoraMeta(
   tokenAddress: string,
   tokenId: string,
-  provider: JsonRpcProvider,
+  provider: ethers.JsonRpcApiProvider,
 ) {
   const { default: zoraMediaAbi } = await import("../abi/zoraMedia.json");
 
-  const zoraMediaContract = new Contract(tokenAddress, zoraMediaAbi, provider);
+  const zoraMediaContract = new ethers.Contract(
+    tokenAddress,
+    zoraMediaAbi,
+    provider,
+  );
 
   const contentURL = await zoraMediaContract.tokenURI(tokenId);
 
