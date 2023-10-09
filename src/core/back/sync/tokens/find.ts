@@ -10,7 +10,7 @@ import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
-import { getDebankChain, debankApi } from "../debank";
+import { getIndexerChain, indexerApi } from "../indexerApi";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
 
@@ -107,8 +107,8 @@ async function performTokenSync(
   let priceUSD, priceUSDChange: string | undefined;
 
   if (standard === TokenStandard.ERC20) {
-    const [debankChain, coinGeckoPrices] = await Promise.all([
-      getDebankChain(chainId),
+    const [indexerChain, coinGeckoPrices] = await Promise.all([
+      getIndexerChain(chainId),
       getCoinGeckoPrices(chainId, [tokenAddress]),
     ]);
 
@@ -118,27 +118,16 @@ async function performTokenSync(
     priceUSD = cgPrice?.usd?.toString();
     priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
-    if (debankChain) {
+    if (indexerChain) {
       const [dbToken, balance] = await Promise.all([
-        debankApi
-          .get("/token/custom", {
+        indexerApi
+          .get("/v1/token", {
             params: {
+              chain_id: indexerChain.id,
               token_id: tokenAddress,
             },
           })
-          .then((res) => {
-            const items = res.data?.data;
-
-            if (Array.isArray(items)) {
-              for (const item of items) {
-                if (item.chain === debankChain.id) {
-                  return item;
-                }
-              }
-            }
-
-            return null;
-          })
+          .then((res) => res.data || null)
           .catch(() => null),
         getBalanceFromChain(chainId, tokenSlug, accountAddress),
       ]);

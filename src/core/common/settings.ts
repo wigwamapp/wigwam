@@ -7,6 +7,7 @@ export enum Setting {
   TestNetworks = "test_networks",
   Analytics = "analytics",
   Web3MetaMaskCompatible = "web3_mm_compatible",
+  RequiredAuthSig = "required_authsig",
 }
 
 export async function retrieveAutoLockTimeout() {

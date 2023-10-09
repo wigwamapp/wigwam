@@ -10,7 +10,7 @@ import {
 import * as repo from "core/repo";
 import { getPageOrigin } from "core/common/permissions";
 
-import { isUnlocked } from "../state";
+import { $accountAddresses, isUnlocked } from "../state";
 
 import { sendRpc } from "./network";
 import { RpcCtx } from "./context";
@@ -75,6 +75,20 @@ export async function handleRpc(
 
   try {
     switch (method) {
+      case JsonRpcMethod.eth_accounts: {
+        let result;
+        if (source.type === "page") {
+          const origin = getPageOrigin(source);
+          const permission = await repo.permissions.get(origin);
+
+          result = permission?.accountAddresses ?? [];
+        } else {
+          result = $accountAddresses.getState();
+        }
+
+        return rpcCtx.reply({ result });
+      }
+
       case JsonRpcMethod.wallet_getPermissions: {
         dropForSelf(source);
 

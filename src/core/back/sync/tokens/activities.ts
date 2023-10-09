@@ -21,7 +21,7 @@ import {
 import * as repo from "core/repo";
 
 import { getRpcProvider } from "../../rpc";
-import { debankApi, getDebankChain } from "../debank";
+import { indexerApi, getIndexerChain } from "../indexerApi";
 import { synced, syncStarted } from "core/back/state";
 
 const GET_LOGS_ENABLED = true;
@@ -96,14 +96,14 @@ async function performTokenActivitiesSync(
       .first();
 
   /**
-   * Debank sync
+   * Explorer API sync
    */
 
-  const debankChain = await getDebankChain(chainId);
+  const indexerChain = await getIndexerChain(chainId);
 
-  if (debankChain) {
-    const debankTokenId = (() => {
-      if (tokenSlug === NATIVE_TOKEN_SLUG) return debankChain.native_token_id;
+  if (indexerChain) {
+    const indexerTokenId = (() => {
+      if (tokenSlug === NATIVE_TOKEN_SLUG) return indexerChain.native_token_id;
 
       if (accountToken.tokenType === TokenType.Asset)
         return token.address.toLowerCase();
@@ -112,7 +112,7 @@ async function performTokenActivitiesSync(
       return null;
     })();
 
-    if (debankTokenId) {
+    if (indexerTokenId) {
       try {
         const latestItem = await getLatestItem();
 
@@ -121,17 +121,16 @@ async function performTokenActivitiesSync(
         let startTime: number | undefined;
 
         for (let i = 0; i < maxRequests; i++) {
-          const { data }: any = await debankApi
-            .get("/history/list", {
+          const { data }: any = await indexerApi
+            .get("/v1/user/history_list", {
               params: {
-                user_addr: accountAddress,
-                chain: debankChain.id,
-                token_id: debankTokenId,
+                id: accountAddress,
+                chain_id: indexerChain.id,
+                token_id: indexerTokenId,
                 page_count: pageCount,
                 start_time: startTime,
               },
             })
-            .then((res) => res.data)
             .catch(() => ({ data: null }));
 
           const txs = data?.history_list;
@@ -180,7 +179,7 @@ async function performTokenActivitiesSync(
             let sendOrReceiveAdded = false;
 
             for (const send of sends) {
-              if (send.token_id === debankTokenId) {
+              if (send.token_id === indexerTokenId) {
                 sendOrReceiveAdded = true;
                 addToActivities({
                   ...base,
@@ -196,7 +195,7 @@ async function performTokenActivitiesSync(
             }
 
             for (const receive of receives) {
-              if (receive.token_id === debankTokenId) {
+              if (receive.token_id === indexerTokenId) {
                 sendOrReceiveAdded = true;
                 addToActivities({
                   ...base,
@@ -213,7 +212,7 @@ async function performTokenActivitiesSync(
             if (
               !sendOrReceiveAdded &&
               token_approve &&
-              token_approve.token_id === debankTokenId
+              token_approve.token_id === indexerTokenId
             ) {
               const amount = new BigNumber(token_approve.value)
                 .times(decimalsFactor)

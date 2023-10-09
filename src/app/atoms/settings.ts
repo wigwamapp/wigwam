@@ -22,3 +22,8 @@ export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
   { enabled: false },
 );
+
+export const requiredAuthSigAtom = atomWithStorage<string[]>(
+  Setting.RequiredAuthSig,
+  [],
+);

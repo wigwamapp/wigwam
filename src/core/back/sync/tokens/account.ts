@@ -23,18 +23,18 @@ import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
 import {
-  getDebankChain,
-  getDebankUserTokens,
-  getDebankUserNfts,
-} from "../debank";
+  getIndexerChain,
+  getIndexerUserNfts,
+  getIndexerUserTokens,
+} from "../indexerApi";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
 export const syncAccountTokens = memoize(
   async (chainId: number, accountAddress: string, tokenType: TokenType) => {
-    const [debankChain, existingAccTokens, { nativeCurrency, chainTag }] =
+    const [indexerChain, existingAccTokens, { nativeCurrency, chainTag }] =
       await Promise.all([
-        getDebankChain(chainId),
+        getIndexerChain(chainId),
         repo.accountTokens
           .where("[chainId+tokenType+accountAddress]")
           .equals([chainId, tokenType, accountAddress])
@@ -47,25 +47,25 @@ export const syncAccountTokens = memoize(
 
     let existingTokensMap: Map<string, AccountToken> | undefined;
 
-    if (debankChain) {
+    if (indexerChain) {
       existingTokensMap = new Map(
         existingAccTokens.map((t) => [t.tokenSlug, t]),
       );
 
-      const debankUserTokens = await (tokenType === TokenType.Asset
-        ? getDebankUserTokens(debankChain.id, accountAddress)
-        : getDebankUserNfts(debankChain.id, accountAddress)
+      const indexerUserTokens = await (tokenType === TokenType.Asset
+        ? getIndexerUserTokens(indexerChain.id, accountAddress)
+        : getIndexerUserNfts(indexerChain.id, accountAddress)
       ).catch(() => null);
 
-      if (debankUserTokens) {
-        for (const token of debankUserTokens) {
+      if (indexerUserTokens) {
+        for (const token of indexerUserTokens) {
           let tokenSlug;
 
           /**
            * For assets
            */
           if (tokenType === TokenType.Asset) {
-            const native = token.id === debankChain.native_token_id;
+            const native = token.id === indexerChain.native_token_id;
 
             if (native) continue;
 
@@ -75,7 +75,7 @@ export const syncAccountTokens = memoize(
               id: "0",
             });
             const rawBalanceBN = BigInt(
-              new BigNumber(token.balance).integerValue().toString(),
+              new BigNumber(token.raw_amount).integerValue().toString(),
             );
 
             const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
