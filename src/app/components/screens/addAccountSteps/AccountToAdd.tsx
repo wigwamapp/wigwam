@@ -374,7 +374,7 @@ const Account = memo<AccountProps>(
 
     const baseAsset = useMemo(
       () =>
-        balance
+        balance !== null
           ? {
               symbol: network.nativeCurrency.symbol,
               name: network.nativeCurrency.name,
