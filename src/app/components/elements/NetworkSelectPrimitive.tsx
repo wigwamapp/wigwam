@@ -22,7 +22,7 @@ import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
-  icon: getNetworkIconUrl(network.chainId),
+  icon: getNetworkIconUrl(network),
 });
 
 type NetworkSelectProps = {

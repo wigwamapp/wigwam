@@ -83,13 +83,13 @@ const Networks: FC = () => {
             isCreateNew
             className="bg-brand-main/[.05]"
           />
-          {preparedNetworks?.map(({ chainId, name }) => (
+          {preparedNetworks?.map((net) => (
             <NetworkBtn
-              key={chainId}
-              icon={getNetworkIconUrl(chainId)}
-              name={name}
-              onClick={() => setTab(chainId)}
-              isActive={tab === chainId}
+              key={net.chainId}
+              icon={getNetworkIconUrl(net)}
+              name={net.name}
+              onClick={() => setTab(net.chainId)}
+              isActive={tab === net.chainId}
               className="mt-2"
             />
           ))}

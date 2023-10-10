@@ -171,7 +171,7 @@ const NetworkPreview = memo<{ className?: string }>(({ className }) => {
     <div className={classNames(cardClassName, className)}>
       {network && (
         <Avatar
-          src={network && getNetworkIconUrl(network.chainId)}
+          src={getNetworkIconUrl(network)}
           alt={network?.name}
           withBorder={false}
           className="w-6 mr-2 min-w-[1.5rem]"
