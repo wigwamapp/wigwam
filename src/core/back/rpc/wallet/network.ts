@@ -32,7 +32,7 @@ export async function requestNetwork(
   try {
     await validateNetwork(chainId);
     // If network already exists - it will be `switch` for both cases
-    type === "switch";
+    type = "switch";
   } catch {
     if (type === "switch") {
       const error = ethErrors.rpc.resourceNotFound("Network not been added");
