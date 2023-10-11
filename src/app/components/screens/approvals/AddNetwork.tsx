@@ -75,10 +75,11 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
             chainId,
             name: params.chainName,
             type: "unknown",
-            chainTag: params.chainName.toLowerCase(),
+            chainTag: "",
             nativeCurrency: params.nativeCurrency,
             rpcUrls: params.rpcUrls,
             explorerUrls: params.blockExplorerUrls,
+            position: 0,
           });
 
           await approveItem(approval.id, {
