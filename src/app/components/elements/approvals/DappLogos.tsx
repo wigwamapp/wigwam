@@ -9,11 +9,14 @@ const iconsClassNames = classNames(
   "border border-brand-main/60",
 );
 
-const DappLogos: FC<{ dappLogoUrl?: string }> = ({ dappLogoUrl }) => (
+const DappLogos: FC<{ firstLogoUrl?: string; dappLogoUrl?: string }> = ({
+  firstLogoUrl = vigvamLogoUrl,
+  dappLogoUrl,
+}) => (
   <div className="flex items-center">
     <Avatar
       className={classNames(iconsClassNames, "z-10")}
-      src={vigvamLogoUrl}
+      src={firstLogoUrl}
     />
     <Avatar
       className={classNames(iconsClassNames, "-ml-7")}

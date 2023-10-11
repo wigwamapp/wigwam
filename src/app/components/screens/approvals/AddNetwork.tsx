@@ -2,9 +2,11 @@ import { FC, useCallback, useState } from "react";
 import classNames from "clsx";
 import retry from "async-retry";
 import { assert } from "lib/system/assert";
+import { getPublicURL } from "lib/ext/utils";
 
 import { AddEthereumChainParameter, AddNetworkApproval } from "core/types";
 import { approveItem } from "core/client";
+import * as Repo from "core/repo";
 
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
@@ -60,8 +62,24 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
       try {
         await withHumanDelay(async () => {
           await validateRpc();
+          const params = approval.networkParams;
+          const chainId = parseInt(params.chainId);
 
-          // TODO: Add network to Database(repo)
+          const networkExists = await Repo.networks.get(chainId);
+          if (networkExists) {
+            setApproving(false);
+            return;
+          }
+
+          await Repo.networks.add({
+            chainId,
+            name: params.chainName,
+            type: "unknown",
+            chainTag: params.chainName.toLowerCase(),
+            nativeCurrency: params.nativeCurrency,
+            rpcUrls: params.rpcUrls,
+            explorerUrls: params.blockExplorerUrls,
+          });
 
           await approveItem(approval.id, {
             approved,
@@ -88,7 +106,13 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
       approving={approving}
       onApprove={handleApprove}
     >
-      <DappLogos dappLogoUrl={approval.source.favIconUrl} />
+      <DappLogos
+        firstLogoUrl={
+          approval.networkParams.iconUrls?.[0] ??
+          getPublicURL(`icons/network/unknown.png`)
+        }
+        dappLogoUrl={approval.source.favIconUrl}
+      />
       <h1 className="text-2xl font-bold mt-4 mb-1">Add custom network</h1>
       <span className="text-base text-center mb-6">
         requested by <strong>{new URL(approval.source.url).host}</strong>
@@ -113,7 +137,7 @@ const NetworkInfo: FC<{ info: AddEthereumChainParameter }> = ({ info }) => {
     },
     {
       label: "Chain ID",
-      value: info.chainId,
+      value: parseInt(info.chainId),
     },
     {
       label: "Currency symbol",
@@ -134,13 +158,13 @@ const NetworkInfo: FC<{ info: AddEthereumChainParameter }> = ({ info }) => {
         <div
           key={label}
           className={classNames(
-            "px-3 py-2.5 text-sm w-full flex items-center border-b border-brand-main/[.07]",
+            "px-3 py-2.5 text-sm w-full flex border-b border-brand-main/[.07]",
             index === 0 ? "pt-0" : "",
             index === infoArray.length - 1 ? "border-none" : "",
           )}
         >
-          <span className="w-2/5 text-brand-gray">{label}</span>
-          <span className="w-3/5 text-brand-light font-bold text-right">
+          <span className="w-[45%] text-brand-gray">{label}</span>
+          <span className="w-[55%] text-brand-light font-medium text-right break-words">
             {value ?? "N/A"}
           </span>
         </div>

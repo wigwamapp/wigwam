@@ -14,9 +14,9 @@ import Unlock from "./screens/Unlock";
 import ApproveConnection from "./screens/approvals/Connection";
 import ApproveTransaction from "./screens/approvals/Transaction";
 import ApproveSigning from "./screens/approvals/Signing";
+import ApproveAddNetwork from "./screens/approvals/AddNetwork";
 import Dialog from "./blocks/Dialog";
 import ApprovalStatus from "./blocks/ApprovalStatus";
-import ApproveAddNetwork from "./screens/approvals/AddNetwork";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
