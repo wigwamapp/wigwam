@@ -16,6 +16,7 @@ import ApproveTransaction from "./screens/approvals/Transaction";
 import ApproveSigning from "./screens/approvals/Signing";
 import Dialog from "./blocks/Dialog";
 import ApprovalStatus from "./blocks/ApprovalStatus";
+import ApproveAddNetwork from "./screens/approvals/AddNetwork";
 
 const ApproveApp: FC = () => (
   <BaseProvider>
@@ -116,6 +117,9 @@ const CurrentApproval = memo<CurrentApprovalProps>(({ approval }) =>
     ))
     .with({ type: ActivityType.Signing }, (sigApproval) => (
       <ApproveSigning approval={sigApproval} />
+    ))
+    .with({ type: ActivityType.AddNetwork }, (addNetApproval) => (
+      <ApproveAddNetwork approval={addNetApproval} />
     ))
     .otherwise(() => null),
 );

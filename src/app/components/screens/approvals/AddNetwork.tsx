@@ -3,13 +3,14 @@ import classNames from "clsx";
 import retry from "async-retry";
 import { assert } from "lib/system/assert";
 
-import { AddNetworkApproval } from "core/types";
+import { AddEthereumChainParameter, AddNetworkApproval } from "core/types";
 import { approveItem } from "core/client";
 
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
-import Avatar from "app/components/elements/Avatar";
-import vigvamLogoUrl from "app/images/vigvam.png";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
+import DappLogos from "app/components/elements/approvals/DappLogos";
+import { ReactComponent as AlertIcon } from "app/icons/add-network-alert.svg";
 
 import ApprovalLayout from "./Layout";
 
@@ -81,38 +82,76 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
 
   return (
     <ApprovalLayout
-      approveText="Connect"
+      approveText="Add network"
       declineText="Deny"
       className="items-center"
       approving={approving}
       onApprove={handleApprove}
     >
       <DappLogos dappLogoUrl={approval.source.favIconUrl} />
-      <h1 className="text-2xl font-bold mt-4 mb-1">Add new network</h1>
+      <h1 className="text-2xl font-bold mt-4 mb-1">Add custom network</h1>
       <span className="text-base text-center mb-6">
-        {new URL(approval.source.url).host}
+        requested by <strong>{new URL(approval.source.url).host}</strong>
       </span>
+      <NetworkInfo info={approval.networkParams} />
+      <AddNetworkWarnings />
     </ApprovalLayout>
   );
 };
 
 export default ApproveAddNetwork;
 
-const iconsClassNames = classNames(
-  "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
-  "border border-brand-main/60",
-);
+const NetworkInfo: FC<{ info: AddEthereumChainParameter }> = ({ info }) => {
+  const infoArray = [
+    {
+      label: "Name",
+      value: info.chainName,
+    },
+    {
+      label: "RPC URL",
+      value: info.rpcUrls[0],
+    },
+    {
+      label: "Chain ID",
+      value: info.chainId,
+    },
+    {
+      label: "Currency symbol",
+      value: info.nativeCurrency.symbol,
+    },
+    {
+      label: "Block explorer",
+      value: info.blockExplorerUrls?.[0],
+    },
+  ];
 
-const DappLogos: FC<{ dappLogoUrl?: string }> = ({ dappLogoUrl }) => (
-  <div className="flex items-center">
-    <Avatar
-      className={classNames(iconsClassNames, "z-10")}
-      src={vigvamLogoUrl}
-    />
-    <Avatar
-      className={classNames(iconsClassNames, "-ml-7")}
-      src={dappLogoUrl}
-      imageClassName="min-h-[calc(100%+1px)] min-w-[calc(100%+1px)]"
-    />
+  return (
+    <ScrollAreaContainer
+      className="w-full h-full box-content -mr-5 pr-5 grow"
+      viewPortClassName="viewportBlock"
+    >
+      {infoArray.map(({ label, value }, index) => (
+        <div
+          key={label}
+          className={classNames(
+            "px-3 py-2.5 text-sm w-full flex items-center border-b border-brand-main/[.07]",
+            index === 0 ? "pt-0" : "",
+            index === infoArray.length - 1 ? "border-none" : "",
+          )}
+        >
+          <span className="w-2/5 text-brand-gray">{label}</span>
+          <span className="w-3/5 text-brand-light font-bold text-right">
+            {value ?? "N/A"}
+          </span>
+        </div>
+      ))}
+    </ScrollAreaContainer>
+  );
+};
+
+const AddNetworkWarnings: FC = () => (
+  <div className="flex items-center py-3 border-y border-brand-main/[.07] mt-auto text-brand-inactivedark text-sm px-3">
+    <AlertIcon className="w-[1.375rem] min-w-[1.375rem] h-auto mr-4" />
+    Be careful switching to unknown networks, verify details before switching
   </div>
 );
