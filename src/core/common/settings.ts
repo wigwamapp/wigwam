@@ -7,6 +7,8 @@ export enum Setting {
   TestNetworks = "test_networks",
   Analytics = "analytics",
   Web3MetaMaskCompatible = "web3_mm_compatible",
+  ProfileBlockedUntil = "profile_blocked_until",
+  PasswordUsageAttempts = "password_usage_attempts",
 }
 
 export async function retrieveAutoLockTimeout() {

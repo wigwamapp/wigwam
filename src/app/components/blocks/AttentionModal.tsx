@@ -63,7 +63,7 @@ const HeadingDot: FC<PropsWithChildren<{ active?: boolean }>> = ({
 }) => (
   <span className="flex items-center font-bold hover:underline">
     <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full relative">
-      {!active && (
+      {active && (
         <span className="absolute inset-0 flex items-center justify-center">
           <span className="w-1.5 h-1.5 bg-brand-darklight rounded-full" />
         </span>

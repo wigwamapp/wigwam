@@ -22,3 +22,8 @@ export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
   { enabled: false },
 );
+
+export const profileBlockedUntilAtom = atomWithStorage<number>(
+  Setting.ProfileBlockedUntil,
+  0,
+);
