@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parseTxSafe parseTx 1`] = `
+{
+  "accessList": null,
+  "chainId": "2214903583",
+  "data": "0x889e365e59664fb881554ba1175519b5195b1d20390beb806d8f2cda7893e6f79848195dba4c905db6d7257ffb5eefea35f18ae33c",
+  "gasLimit": "157",
+  "gasPrice": "9086",
+  "maxFeePerGas": null,
+  "maxPriorityFeePerGas": null,
+  "nonce": 648,
+  "sig": null,
+  "to": "0x6Eb893e3466931517a04a17D153a6330c3f2f1dD",
+  "type": 0,
+  "value": "51284",
+}
+`;
+
+exports[`parseTxSafe remove sig 1`] = `
+{
+  "accessList": [],
+  "chainId": "2214903583",
+  "data": "0x889e365e59664fb881554ba1175519b5195b1d20390beb806d8f2cda7893e6f79848195dba4c905db6d7257ffb5eefea35f18ae33c",
+  "gasLimit": "157",
+  "gasPrice": null,
+  "maxFeePerGas": "879596102",
+  "maxPriorityFeePerGas": "2915939",
+  "nonce": 648,
+  "sig": null,
+  "to": "0x6Eb893e3466931517a04a17D153a6330c3f2f1dD",
+  "type": 2,
+  "value": "51284",
+}
+`;
