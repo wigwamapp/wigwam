@@ -52,12 +52,15 @@ export class InpageProvider extends Emitter {
    */
   selectedAddress: string | null = null;
 
-  info = {
-    uuid: `vigvam-${process.env.BUILD_ID}`,
+  // https://eips.ethereum.org/EIPS/eip-6963
+  // https://eips.ethereum.org/EIPS/eip-5749
+  info: EIP6963ProviderInfo = Object.freeze({
     name: "Vigvam",
+    uuid: `vigvam-${process.env.BUILD_ID}`,
+    rdns: "com.vigvam.wallet",
+    icon: ICON_SVG_BASE64,
     description: "Vigvam — Web 3.0 Wallet",
-    image: ICON_SVG_BASE64,
-  };
+  });
 
   #inited = false;
   #reqIdPrefix = nanoid();
@@ -493,3 +496,11 @@ const errorMessages = {
   unsupportedSync: (method: string) =>
     `The provider does not support synchronous methods like ${method} without a callback parameter.`,
 };
+
+interface EIP6963ProviderInfo {
+  uuid: string;
+  name: string;
+  icon: string;
+  rdns: string;
+  description?: string;
+}

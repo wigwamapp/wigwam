@@ -25,11 +25,13 @@ const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   }, 3_000);
 });
 
-inject("ethereum", true);
-inject("vigvamEthereum");
+inject1193("ethereum", true);
+inject1193("vigvamEthereum");
 injectEIP5749("evmproviders");
+injectEIP6963();
 
-function inject(key: string, sharedProperty = false) {
+// https://eips.ethereum.org/EIPS/eip-1193
+function inject1193(key: string, sharedProperty = false) {
   const existing = (window as any)[key];
 
   if (existing?.isVigvam && "addProviders" in existing) {
@@ -82,6 +84,29 @@ function inject(key: string, sharedProperty = false) {
   }
 }
 
+// https://eips.ethereum.org/EIPS/eip-5749
+function injectEIP5749(key: string) {
+  const evmProviders: Record<string, InpageProvider> =
+    (window as any)[key] || ((window as any)[key] = {});
+
+  evmProviders[vigvam.info.uuid] = vigvam;
+}
+
+// https://eips.ethereum.org/EIPS/eip-6963
+function injectEIP6963() {
+  const announceProvider = () => {
+    window.dispatchEvent(
+      new CustomEvent("eip6963:announceProvider", {
+        detail: Object.freeze({ info: vigvam.info, provider: vigvam }),
+      }),
+    );
+  };
+
+  window.addEventListener("eip6963:requestProvider", announceProvider);
+
+  announceProvider();
+}
+
 function getProvidersInline(existing: any) {
   try {
     if (Array.isArray(existing.providers)) {
@@ -92,11 +117,4 @@ function getProvidersInline(existing: any) {
   }
 
   return [existing];
-}
-
-function injectEIP5749(key: string) {
-  const evmProviders: Record<string, InpageProvider> =
-    (window as any)[key] || ((window as any)[key] = {});
-
-  evmProviders[vigvam.info.uuid] = vigvam;
 }
