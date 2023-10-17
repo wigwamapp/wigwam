@@ -2,6 +2,7 @@ import { Runtime } from "webextension-polyfill";
 import { ethErrors } from "eth-rpc-errors";
 import { liveQuery, Subscription } from "dexie";
 import { livePromise } from "lib/system/livePromise";
+import { isPhishingWebsite } from "lib/phishing-detect";
 import { storage } from "lib/ext/storage";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 
@@ -20,7 +21,12 @@ import {
 } from "core/types";
 import * as repo from "core/repo";
 import { Setting } from "core/common";
-import { JSONRPC, VIGVAM_FAVICON, VIGVAM_STATE } from "core/common/rpc";
+import {
+  JSONRPC,
+  VIGVAM_FAVICON,
+  VIGVAM_PHISHING_WARNING,
+  VIGVAM_STATE,
+} from "core/common/rpc";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
 import {
@@ -49,8 +55,15 @@ export function startPageServer() {
   pagePorter.onConnection(async (action, port) => {
     if (!port.sender?.url) return;
 
-    const { origin } = new URL(port.sender.url);
+    const { origin, hostname } = new URL(port.sender.url);
     if (!origin) return;
+
+    checkForPhishing(hostname, () => {
+      pagePorter.notify(port, {
+        jsonrpc: JSONRPC,
+        method: VIGVAM_PHISHING_WARNING,
+      });
+    });
 
     await ensureInited();
 
@@ -256,4 +269,14 @@ function subscribeAccountAddress(callback: (address: string) => void) {
 
 function getDefaultAccountAddress() {
   return $accountAddresses.getState()[0];
+}
+
+async function checkForPhishing(hostname: string, callback: () => void) {
+  const phishing = isPhishingWebsite(hostname);
+
+  // TODO: Add checker - is user already allowed this website
+
+  if (phishing) {
+    callback();
+  }
 }
