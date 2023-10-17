@@ -61,26 +61,27 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
 
       try {
         await withHumanDelay(async () => {
-          await validateRpc();
-          const params = approval.networkParams;
-          const chainId = parseInt(params.chainId);
+          if (approved) {
+            await validateRpc();
+            const params = approval.networkParams;
+            const chainId = parseInt(params.chainId);
 
-          const networkExists = await Repo.networks.get(chainId);
-          if (networkExists) {
-            setApproving(false);
-            return;
+            const networkExists = await Repo.networks.get(chainId);
+            if (networkExists) {
+              return;
+            }
+
+            await Repo.networks.add({
+              chainId,
+              name: params.chainName,
+              type: "unknown",
+              chainTag: "",
+              nativeCurrency: params.nativeCurrency,
+              rpcUrls: params.rpcUrls,
+              explorerUrls: params.blockExplorerUrls,
+              position: 0,
+            });
           }
-
-          await Repo.networks.add({
-            chainId,
-            name: params.chainName,
-            type: "unknown",
-            chainTag: "",
-            nativeCurrency: params.nativeCurrency,
-            rpcUrls: params.rpcUrls,
-            explorerUrls: params.blockExplorerUrls,
-            position: 0,
-          });
 
           await approveItem(approval.id, {
             approved,
@@ -91,6 +92,7 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
           title: "Error",
           content: err?.message ?? "Unknown error occurred",
         });
+      } finally {
         setApproving(false);
       }
     },
