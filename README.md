@@ -2,9 +2,7 @@
 
 ### https://vigvam.app
 
-A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks.
-
-Offers a robust and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
+A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
 [![Vigvam](https://github.com/vigvamapp/vigvam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://vigvam.app/)
 
