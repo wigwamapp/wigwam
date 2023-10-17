@@ -1,7 +1,11 @@
 import { InpageProtocol } from "core/inpage/protocol";
 import { InpageProvider } from "core/inpage/provider";
 import { UniversalInpageProvider } from "core/inpage/universalProvider";
-import { JSONRPC, VIGVAM_STATE } from "core/common/rpc";
+import {
+  JSONRPC,
+  VIGVAM_PHISHING_WARNING,
+  VIGVAM_STATE,
+} from "core/common/rpc";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 const inpageProto = new InpageProtocol("injected", "content");
@@ -29,6 +33,8 @@ inject1193("ethereum", true);
 inject1193("vigvamEthereum");
 injectEIP5749("evmproviders");
 injectEIP6963();
+
+warnIfPhishing();
 
 // https://eips.ethereum.org/EIPS/eip-1193
 function inject1193(key: string, sharedProperty = false) {
@@ -117,4 +123,22 @@ function getProvidersInline(existing: any) {
   }
 
   return [existing];
+}
+
+function warnIfPhishing() {
+  const unsub = inpageProto.subscribe((payload) => {
+    if (
+      payload?.jsonrpc === JSONRPC &&
+      payload?.method === VIGVAM_PHISHING_WARNING
+    ) {
+      unsub();
+
+      // TODO: Add own warning page
+      setTimeout(() => {
+        location.replace(
+          `https://metamask.github.io/phishing-warning/v2.1.0/#hostname=${location.hostname}&href=${location.href}`,
+        );
+      }, 50);
+    }
+  });
 }

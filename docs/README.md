@@ -1,4 +1,4 @@
-# Vigvam Docs
+# Vigvam Web Extension Wallet - General Documentation
 
 ## Architecture
 

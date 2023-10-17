@@ -1,32 +1,83 @@
-# Vigvam
+# Vigvam - Web3 Wallet for EVM Networks
 
 ### https://vigvam.app
 
-An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br />Ethereum, BSC, Polygon, Optimism and others.
+A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks.
 
-[![Vigvam](https://user-images.githubusercontent.com/11996139/146784241-7082320b-50f8-46c9-b4e4-b6dfad004824.png)](https://vigvam.app/)
+Offers a robust and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
+
+[![Vigvam](https://github.com/vigvamapp/vigvam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://vigvam.app/)
+
+**Table of Contents**
+
+- [Features](#features)
+- [Documentation](#documentation)
+- [Build from Source](#build-from-source)
+- [Useful Scripts](#useful-scripts)
+- [Contributions](#contributions)
+- [Support](#support)
 
 ## Features
 
-- 🧩 A classic browser extension.
+### Self-Custodial
 
-- 🌐 Fast and simple interaction with Web 3.0 world.
+- 🤲 User-centric approach - the keys belong to the user and are securely stored on their device, encrypted and inaccessible to anyone else.
+- 🗝 Compatible with hardware wallets like [Ledger](https://www.ledger.com/) for an extra layer of security.
 
-- 🤲 Non-custodial. We don't have a server or a central hub. The keys belong to the user and are stored on his device in encrypted form.
+### Security First
 
-- 📖 Open source.
+- 🛡 Utilizes battle-proof techniques for encrypting and storing sensitive data, which are commonly used in password managers, to protect user data.
 
-- 🔐 Uses the best Security approaches.
+### Dapp Integration
 
-- 🔌 Support for [Ledger](https://www.ledger.com/) devices.
+- 🌐 Seamlessly connects with decentralized applications (dApps) across various EVM networks.
+- 💼 Supports all the latest Web3 standards.
 
-- 👥 Support for Social Auth with [Open Login](https://openlogin.com/).
+### Full-Page Dashboard
 
-- ⚡️ Lightweight.
+- 📊 Features a comprehensive full-page dashboard within the app, providing detailed information about accounts, transactions, and assets.
+- 📈 Stay updated on your portfolio and activities within the Web3 ecosystem.
+
+### Multi-Network Support
+
+- 🔗 Designed to be multi-network, allowing to switch between networks effortlessly.
+- 🌐 Easily manage assets and explore the diverse opportunities offered by different networks.
+
+### Open Source
+
+- 📖 Committed to transparency and community-driven development. The project is open source, allowing developers to review and contribute to the codebase.
+
+### Social Authentication
+
+- 👥 Integrates with [Open Login](https://openlogin.com/) for seamless social authentication, making the onboarding process user-friendly and accessible.
+
+### User-Friendly Interface
+
+- 🖥️ The user interface is intuitive and user-friendly, making it easy for both newcomers and experienced users to navigate and utilize the wallet's features.
+
+### Offline-first
+
+- 🔌 Adopts an offline-first approach by utilizing a local database as the primary source of data. The app syncs with third-party indexer APIs for enhanced functionality but can operate independently, directly interacting with the blockchain if needed.
+
+### Manifest V3 Compatibility
+
+- ✅ Fully adapted to the latest browser extension ManifestV3 API, ensuring compatibility with modern standards.
+- 🌙 "Sleep well" feature allows the extension to save resources when not in active use, improving overall performance.
+
+### Lightweight
+
+- ⚡️ Designed with efficiency in mind to ensure a lightweight and responsive user experience.
+
+## Documentation
+
+- [**General documentation**](docs/README.md)
+- [**Security documentation**](docs/SECURITY.md)
+
+You can also find documentation for specific modules within the source code.
 
 ## Build from source
 
-> Requires: [`Node.js ^14`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
+> Requires: [`Node.js ^16`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
 
 ### Get the source code
 
@@ -57,7 +108,7 @@ yarn build:firefox
 3. Tap on "Load unpacked"
 4. Select `<your_local_vigvam_repository_dir>/dist/prod/chrome_unpacked`
 
-## Misc scripts
+## Useful scripts
 
 ### Test
 
@@ -68,6 +119,7 @@ yarn build:firefox
 ### Audit NPM dependencies
 
 ```bash
+  yarn audit
   yarn npm-audit
 ```
 
@@ -76,3 +128,11 @@ yarn build:firefox
 ```bash
   yarn analyze
 ```
+
+## Contributions
+
+We welcome contributions from the community to make this project even better.
+
+## Support
+
+For any questions, issues, or assistance, please contact our support team or open an issue on GitHub.

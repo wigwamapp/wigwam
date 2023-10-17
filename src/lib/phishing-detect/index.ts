@@ -1,15 +1,12 @@
-let detector: any;
+import memoize from "mem";
+import memoizeOne from "memoize-one";
+import PhishingDetector from "eth-phishing-detect/src/detector";
+import { PHISHING_DETECT_CONFIG } from "fixtures/phishingDetect";
 
-export async function isNotPhishing(origin: string): Promise<boolean> {
-  if (!detector) {
-    const [{ default: PhishingDetector }, { PHISHING_DETECT_CONFIG }] =
-      await Promise.all([
-        import("eth-phishing-detect/src/detector"),
-        import("fixtures/phishingDetect"),
-      ]);
+export const isPhishingWebsite = memoize(
+  (hostname: string): boolean => getDetector().check(hostname).result,
+);
 
-    detector = new PhishingDetector(PHISHING_DETECT_CONFIG);
-  }
-
-  return detector.check(origin).result;
-}
+const getDetector = memoizeOne(
+  () => new PhishingDetector(PHISHING_DETECT_CONFIG),
+);
