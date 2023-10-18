@@ -100,9 +100,9 @@ export async function processApprove(
 
           if (
             process.env.NODE_ENV !== "production" &&
-            process.env.VIGVAM_DEV_BLOCK_TX_SEND === "true"
+            process.env.WIGWAM_DEV_BLOCK_TX_SEND === "true"
           ) {
-            throw new Error("Blocked by VIGVAM_DEV_BLOCK_TX_SEND env variable");
+            throw new Error("Blocked by WIGWAM_DEV_BLOCK_TX_SEND env variable");
           }
 
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [

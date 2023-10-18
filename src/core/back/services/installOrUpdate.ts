@@ -4,7 +4,7 @@ import { globalStorage } from "lib/ext/globalStorage";
 
 import { LATEST_VERSION } from "core/types/storage";
 
-const WEBSITE_URL = process.env.VIGVAM_WEBSITE_ORIGIN;
+const WEBSITE_URL = process.env.WIGWAM_WEBSITE_ORIGIN;
 
 export function startInstallOrUpdateListener() {
   // let websiteTabId: number | undefined;

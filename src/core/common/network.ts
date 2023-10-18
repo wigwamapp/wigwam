@@ -5,7 +5,7 @@ import { CHAIN_ID } from "core/types";
 import * as repo from "core/repo";
 
 const INFURA_TEMPLATE = "${INFURA_API_KEY}";
-const INFURA_API_KEY = process.env.VIGVAM_INFURA_API_KEY;
+const INFURA_API_KEY = process.env.WIGWAM_INFURA_API_KEY;
 
 const rpcUrlsCache = new Map<number, string>();
 

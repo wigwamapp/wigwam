@@ -3,8 +3,8 @@ import { InpageProvider } from "core/inpage/provider";
 import { UniversalInpageProvider } from "core/inpage/universalProvider";
 import {
   JSONRPC,
-  VIGVAM_PHISHING_WARNING,
-  VIGVAM_STATE,
+  WIGWAM_PHISHING_WARNING,
+  WIGWAM_STATE,
 } from "core/common/rpc";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
@@ -13,7 +13,7 @@ const vigvam = new InpageProvider(inpageProto);
 
 const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   const unsub = inpageProto.subscribe((payload) => {
-    if (payload?.jsonrpc === JSONRPC && payload?.method === VIGVAM_STATE) {
+    if (payload?.jsonrpc === JSONRPC && payload?.method === WIGWAM_STATE) {
       const metamaskModeEnabled =
         payload.params.mmCompatible !== MetaMaskCompatibleMode.Off;
 
@@ -129,7 +129,7 @@ function warnIfPhishing() {
   const unsub = inpageProto.subscribe((payload) => {
     if (
       payload?.jsonrpc === JSONRPC &&
-      payload?.method === VIGVAM_PHISHING_WARNING
+      payload?.method === WIGWAM_PHISHING_WARNING
     ) {
       unsub();
 

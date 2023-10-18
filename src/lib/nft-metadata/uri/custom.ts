@@ -1,6 +1,6 @@
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 
-const NFT_METADATA_PROXY = process.env.VIGVAM_NFT_METADATA_PROXY;
+const NFT_METADATA_PROXY = process.env.WIGWAM_NFT_METADATA_PROXY;
 const WHITELIST = [
   IPFS_CLOUDFLARE_GATEWAY,
   IPFS_IO_GATEWAY,
@@ -11,7 +11,7 @@ if (NFT_METADATA_PROXY) {
 }
 
 export function sanitizeCustomUrl(customUrl: string) {
-  if (!process.env.VIGVAM_NFT_METADATA_PROXY) {
+  if (!process.env.WIGWAM_NFT_METADATA_PROXY) {
     return customUrl;
   }
 
@@ -19,7 +19,7 @@ export function sanitizeCustomUrl(customUrl: string) {
     return customUrl;
   }
 
-  const url = new URL(process.env.VIGVAM_NFT_METADATA_PROXY);
+  const url = new URL(process.env.WIGWAM_NFT_METADATA_PROXY);
 
   const { protocol, origin, pathname, search, hash } = new URL(customUrl);
 

@@ -191,7 +191,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           const { default: OpenLogin } = await import("@toruslabs/openlogin");
 
-          const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+          const clientId = process.env.WIGWAM_OPEN_LOGIN_CLIENT_ID;
           assert(clientId, "Client ID was not specified");
 
           const openlogin = new OpenLogin({
