@@ -136,22 +136,22 @@ const usefulLinks = [
 
 const mediaLinks = [
   {
-    href: "https://t.me/wigwamapp",
+    href: "https://t.me/vigvamapp",
     label: "Telegram",
     Icon: TelegramIcon,
   },
   {
-    href: "https://twitter.com/wigwamapp",
+    href: "https://twitter.com/vigvamapp",
     label: "Twitter",
     Icon: TwitterIcon,
   },
   {
-    href: "https://wigwamapp.medium.com",
+    href: "https://vigvamapp.medium.com",
     label: "Medium",
     Icon: MediumIcon,
   },
   {
-    href: "https://github.com/wigwamapp",
+    href: "https://github.com/vigvamapp",
     label: "Github",
     Icon: GithubIcon,
   },
