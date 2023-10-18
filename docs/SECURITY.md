@@ -32,7 +32,7 @@ At Vigvam, we prioritize the security and privacy of our users' digital assets a
 
 - During the creation process, a [secure cryptographic random number generator](../src/app/components/screens/addAccountSteps/CreateSeedPhrase.tsx#L91) is employed to generate the seed phrase.
 
-- To import the existing phrase, multiple password-type fields are used, which also prevent browser cache issues.
+- [TODO] To import the existing phrase, multiple password-type fields are used, which also prevent browser cache issues.
 
 - To display the entire phrase to the user, the web canvas is utilized, which helps avoid potential issues related to browser caching.
 
