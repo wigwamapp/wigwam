@@ -68,8 +68,8 @@ A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain,
 
 ## Documentation
 
-- [**General documentation**](docs/README.md)
-- [**Security documentation**](docs/SECURITY.md)
+- [**General Tech Documentation**](docs/README.md)
+- [**Security Documentation**](docs/SECURITY.md)
 
 You can also find documentation for specific modules within the source code.
 
