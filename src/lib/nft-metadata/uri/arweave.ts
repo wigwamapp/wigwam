@@ -1,6 +1,6 @@
-import { ARWEAVE_DEFAULT } from "../defaults";
+import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
 
-import { isValidHttpUrl } from "./fetch";
+import { ARWEAVE_DEFAULT } from "../defaults";
 
 export function isArweave(uri: string) {
   const hasPrefix = uri.startsWith("ar://");

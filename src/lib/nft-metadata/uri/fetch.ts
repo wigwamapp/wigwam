@@ -1,21 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
 import retry from "async-retry";
+import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
 
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 import { sanitizeUrl } from "../utils";
 
 import { getIPFSUrl, isIPFS } from "./ipfs";
 import { getARWeaveURI, isArweave } from "./arweave";
-
-export function isValidHttpUrl(uri: string) {
-  try {
-    const url = new URL(uri);
-
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch (_) {
-    return false;
-  }
-}
 
 export function forceHttps(source: string) {
   return source.replace("http://", "https://");

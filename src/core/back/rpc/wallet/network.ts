@@ -1,8 +1,14 @@
 import { nanoid } from "nanoid";
 import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
+import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
 
-import { RpcContext, ActivitySource, ActivityType } from "core/types";
+import {
+  RpcContext,
+  ActivitySource,
+  ActivityType,
+  AddEthereumChainParameter,
+} from "core/types";
 import * as repo from "core/repo";
 import { getPageOrigin } from "core/common/permissions";
 import { approvalAdded } from "core/back/state";
@@ -51,6 +57,8 @@ export async function requestNetwork(
     rpcCtx.reply({ result: null });
   } else {
     const networkParams = params[0];
+    formatUrls(networkParams);
+
     await validateAddNetworkParams(networkParams);
 
     approvalAdded({
@@ -62,5 +70,15 @@ export async function requestNetwork(
       networkParams,
       rpcCtx,
     });
+  }
+}
+
+function formatUrls(params: AddEthereumChainParameter) {
+  try {
+    params.rpcUrls = params.rpcUrls.filter(isValidHttpUrl);
+    params.blockExplorerUrls = params.blockExplorerUrls?.filter(isValidHttpUrl);
+    params.iconUrls = params.iconUrls?.filter(isValidHttpUrl);
+  } catch (err) {
+    console.error(err);
   }
 }
