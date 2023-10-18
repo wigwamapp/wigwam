@@ -57,22 +57,11 @@ export function startInstallOrUpdateListener() {
   //     typeof msg.data === "object"
   //   ) {
   //     try {
-  //       const { betatestPromocode } = msg.data;
-
-  //       if (betatestPromocode && typeof betatestPromocode === "string") {
-  //         const code = betatestPromocode.toLowerCase();
-
-  //         if (
-  //           BETATEST_PROMOCODES.includes(code) &&
-  //           !Global.get("betatest_promocode")
-  //         ) {
-  //           Global.put("betatest_promocode", code);
-  //         }
-  //       }
+  //       const {} = msg.data;
   //     } catch (err) {
   //       console.error(err);
   //     }
-
+  //
   //     if (websiteTabId) {
   //       browser.tabs.remove(websiteTabId).catch(console.error);
   //       websiteTabId = undefined;
