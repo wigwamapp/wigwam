@@ -77,7 +77,7 @@ const Security: FC = () => {
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
         Read more about our{" "}
         <a
-          href="https://vigvam.app/privacy"
+          href="https://wigwam.app/privacy"
           target="_blank"
           rel="nofollow noreferrer"
           className="underline"

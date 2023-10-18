@@ -114,44 +114,44 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
 const usefulLinks = [
   {
     label: "Website",
-    href: "https://vigvam.app/",
+    href: "https://wigwam.app/",
   },
   {
     label: "Contact us",
-    href: "https://vigvam.app/contact",
+    href: "https://wigwam.app/contact",
   },
   {
     label: "Help",
-    href: "https://vigvam.app/help",
+    href: "https://wigwam.app/help",
   },
   {
     label: "Terms of Use",
-    href: "https://vigvam.app/terms",
+    href: "https://wigwam.app/terms",
   },
   {
     label: "Privacy policy",
-    href: "https://vigvam.app/privacy",
+    href: "https://wigwam.app/privacy",
   },
 ];
 
 const mediaLinks = [
   {
-    href: "https://t.me/vigvamapp",
+    href: "https://t.me/wigwamapp",
     label: "Telegram",
     Icon: TelegramIcon,
   },
   {
-    href: "https://twitter.com/vigvamapp",
+    href: "https://twitter.com/wigwamapp",
     label: "Twitter",
     Icon: TwitterIcon,
   },
   {
-    href: "https://vigvamapp.medium.com",
+    href: "https://wigwamapp.medium.com",
     label: "Medium",
     Icon: MediumIcon,
   },
   {
-    href: "https://github.com/vigvamapp",
+    href: "https://github.com/wigwamapp",
     label: "Github",
     Icon: GithubIcon,
   },

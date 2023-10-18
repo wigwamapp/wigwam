@@ -2,7 +2,7 @@ import { FC } from "react";
 import classNames from "clsx";
 
 import Avatar from "app/components/elements/Avatar";
-import vigvamLogoUrl from "app/images/vigvam.png";
+import wigwamLogoUrl from "app/images/wigwam.png";
 
 const iconsClassNames = classNames(
   "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
@@ -10,7 +10,7 @@ const iconsClassNames = classNames(
 );
 
 const DappLogos: FC<{ firstLogoUrl?: string; dappLogoUrl?: string }> = ({
-  firstLogoUrl = vigvamLogoUrl,
+  firstLogoUrl = wigwamLogoUrl,
   dappLogoUrl,
 }) => (
   <div className="flex items-center">

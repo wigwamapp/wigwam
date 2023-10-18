@@ -39,7 +39,7 @@
 
   "__firefox__applications": {
     "gecko": {
-      "id": "webextension@vigvam.app",
+      "id": "webextension@wigwam.app",
       "strict_min_version": "68.0"
     }
   },

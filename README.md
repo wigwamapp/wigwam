@@ -1,10 +1,10 @@
 # Vigvam - Web3 Wallet for EVM Networks
 
-### https://vigvam.app
+### https://wigwam.app
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
-[![Vigvam](https://github.com/vigvamapp/vigvam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://vigvam.app/)
+[![Vigvam](https://github.com/wigwamapp/wigwam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://wigwam.app/)
 
 **Table of Contents**
 
@@ -80,7 +80,7 @@ You can also find documentation for specific modules within the source code.
 ### Get the source code
 
 ```bash
-git clone git@github.com:vigvamapp/vigvam.git && cd vigvam
+git clone git@github.com:wigwamapp/wigwam.git && cd wigwam
 ```
 
 ### Install app dependencies
@@ -104,7 +104,7 @@ yarn build:firefox
 1. Open `chrome://extensions/` in your browser
 2. Enable "Developer mode"
 3. Tap on "Load unpacked"
-4. Select `<your_local_vigvam_repository_dir>/dist/prod/chrome_unpacked`
+4. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
 
 ## Useful scripts
 

@@ -19,10 +19,10 @@ const Web3: FC = () => (
 
     <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
       Vigvam is always available to interact with applications using its
-      communication protocol `window.vigvamEthereum`. Vigvam also supports a
+      communication protocol `window.wigwamEthereum`. Vigvam also supports a
       common communication protocol, like MetaMask. Learn more about{" "}
       <a
-        href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
+        href="https://wigwamapp.medium.com/how-wigwam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
         target="_blank"
         rel="nofollow noreferrer"
         className="underline"
