@@ -67,20 +67,18 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
             const chainId = parseInt(params.chainId);
 
             const networkExists = await Repo.networks.get(chainId);
-            if (networkExists) {
-              return;
+            if (!networkExists) {
+              await Repo.networks.add({
+                chainId,
+                name: params.chainName,
+                type: "unknown",
+                chainTag: "",
+                nativeCurrency: params.nativeCurrency,
+                rpcUrls: params.rpcUrls,
+                explorerUrls: params.blockExplorerUrls,
+                position: 0,
+              });
             }
-
-            await Repo.networks.add({
-              chainId,
-              name: params.chainName,
-              type: "unknown",
-              chainTag: "",
-              nativeCurrency: params.nativeCurrency,
-              rpcUrls: params.rpcUrls,
-              explorerUrls: params.blockExplorerUrls,
-              position: 0,
-            });
           }
 
           await approveItem(approval.id, {
