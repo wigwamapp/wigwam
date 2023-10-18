@@ -5,7 +5,11 @@ export const ZKSYNCERA: Network[] = [
   {
     chainId: 324,
     type: "mainnet",
-    rpcUrls: ["https://mainnet.era.zksync.io"],
+    rpcUrls: [
+      "https://mainnet.era.zksync.io",
+      "https://zksync.meowrpc.com",
+      "https://zksync.drpc.org",
+    ],
     chainTag: "zksyncera",
     name: "zkSync Era",
     nativeCurrency: {

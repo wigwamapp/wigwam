@@ -5,7 +5,11 @@ export const CRONOS: Network[] = [
   {
     chainId: 25,
     type: "mainnet",
-    rpcUrls: ["https://evm.cronos.org", "https://cronosrpc-1.xstaking.sg"],
+    rpcUrls: [
+      "https://cronos-evm.publicnode.com",
+      "https://evm.cronos.org",
+      "https://1rpc.io/cro",
+    ],
     chainTag: "cronos",
     name: "Cronos",
     nativeCurrency: {
