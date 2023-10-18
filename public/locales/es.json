@@ -1,7 +1,7 @@
 {
   "add": "Agregar",
   "addWallet": "Agregar billetera",
-  "appDesc": "Una aplicación que administra sus billeteras y claves criptográficas. Explore DeFi y NFT. Ethereum, BSC, Polygon, Optimism, Avalanche y otros.",
+  "appDesc": "Cartera criptográfica de autocustodia confiable y segura para Ethereum y todas las cadenas de bloques EVM",
   "back": "atrás",
   "cancel": "Cancelar",
   "cannotSignForWallet": "No se puede iniciar sesión para esta cuenta",

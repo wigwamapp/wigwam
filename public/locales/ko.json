@@ -1,7 +1,7 @@
 {
   "add": "더하다",
   "addWallet": "지갑 추가",
-  "appDesc": "지갑과 암호화 키를 관리하는 앱. DeFi와 NFT를 살펴보세요. Ethereum, BSC, Polygon, Optimism, Avalanche 등.",
+  "appDesc": "이더리움 및 모든 EVM 블록체인을 위한 신뢰할 수 있고 안전한 자체 보관 암호화폐 지갑",
   "back": "뒤",
   "cancel": "취소",
   "cannotSignForWallet": "이 계정에 서명할 수 없습니다.",

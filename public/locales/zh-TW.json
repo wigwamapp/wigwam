@@ -1,7 +1,7 @@
 {
   "add": "添加",
   "addWallet": "添加錢包",
-  "appDesc": "管理您的錢包和加密密鑰的應用程序。探索 DeFi 和 NFT。以太坊、BSC、多邊形、樂觀主義、雪崩等。",
+  "appDesc": "適用於以太坊和所有 EVM 區塊鏈的可靠且安全的自我託管加密錢包",
   "back": "後退",
   "cancel": "取消",
   "cannotSignForWallet": "無法登錄此帳戶",

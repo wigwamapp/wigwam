@@ -1,7 +1,7 @@
 {
   "add": "Add",
   "addWallet": "Add Wallet",
-  "appDesc": "An app that manages your wallets and crypto keys. Explore DeFi and NFTs. Ethereum, BSC, Polygon, Optimism, Avalanche and others.",
+  "appDesc": "Reliable and secure self-custody crypto wallet for Ethereum and all EVM blockchains",
   "back": "Back",
   "cancel": "Cancel",
   "cannotSignForWallet": "Cannot sign for this account",

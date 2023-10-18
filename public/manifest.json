@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "{{envBadge}}Wigwam — Web 3.0 Wallet",
+  "name": "{{envBadge}}Wigwam — Web3 Wallet",
   "version": "{{pkg.version}}",
 
   "icons": {
