@@ -119,8 +119,8 @@ export interface AddEthereumChainParameter {
     decimals: number;
   };
   rpcUrls: string[];
-  blockExplorerUrls?: string[];
-  iconUrls?: string[]; // Currently ignored.
+  blockExplorerUrls?: string[] | null;
+  iconUrls?: string[] | null; // Currently ignored.
 }
 
 export type TxParams = {

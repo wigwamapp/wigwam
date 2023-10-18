@@ -6,6 +6,8 @@ import {
   array,
   number,
   string,
+  nullable,
+  nonempty,
   assert as assertSchema,
 } from "superstruct";
 import { ethers } from "ethers";
@@ -120,8 +122,8 @@ export const AddChainParamsSchema: Describe<AddEthereumChainParameter> = object(
       symbol: string(),
       decimals: number(),
     }),
-    rpcUrls: array(string()),
-    blockExplorerUrls: optional(array(string())),
-    iconUrls: optional(array(string())),
+    rpcUrls: nonempty(array(string())),
+    blockExplorerUrls: optional(nullable(array(string()))),
+    iconUrls: optional(nullable(array(string()))),
   },
 );

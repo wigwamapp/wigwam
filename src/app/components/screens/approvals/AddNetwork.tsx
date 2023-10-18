@@ -75,7 +75,7 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
                 chainTag: "",
                 nativeCurrency: params.nativeCurrency,
                 rpcUrls: params.rpcUrls,
-                explorerUrls: params.blockExplorerUrls,
+                explorerUrls: params.blockExplorerUrls ?? undefined,
                 position: 0,
               });
             }
