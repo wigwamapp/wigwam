@@ -18,7 +18,6 @@ import {
 import { ChainIdProvider, useAccounts, useSync, useToken } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
-import Avatar from "app/components/elements/Avatar";
 import Checkbox from "app/components/elements/Checkbox";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -30,13 +29,13 @@ import Balance from "app/components/elements/Balance";
 import WalletName from "app/components/elements/WalletName";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import Button from "app/components/elements/Button";
+import DappLogos from "app/components/elements/approvals/DappLogos";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
-import vigvamLogoUrl from "app/images/vigvam.png";
 
 import ApprovalLayout from "./Layout";
 
@@ -245,25 +244,6 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 };
 
 export default ApproveConnection;
-
-const iconsClassNames = classNames(
-  "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
-  "border border-brand-main/60",
-);
-
-const DappLogos: FC<{ dappLogoUrl?: string }> = ({ dappLogoUrl }) => (
-  <div className="flex items-center">
-    <Avatar
-      className={classNames(iconsClassNames, "z-10")}
-      src={vigvamLogoUrl}
-    />
-    <Avatar
-      className={classNames(iconsClassNames, "-ml-7")}
-      src={dappLogoUrl}
-      imageClassName="min-h-[calc(100%+1px)] min-w-[calc(100%+1px)]"
-    />
-  </div>
-);
 
 const warnings = [
   {

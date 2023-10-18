@@ -886,7 +886,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
     >
       {network && (
         <Avatar
-          src={network && getNetworkIconUrl(network.chainId)}
+          src={getNetworkIconUrl(network)}
           alt={network?.name}
           withBorder={false}
           className={

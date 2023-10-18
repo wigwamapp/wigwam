@@ -50,7 +50,8 @@ export interface ApprovalResult {
 export type Approval =
   | TransactionApproval
   | SigningApproval
-  | ConnectionApproval;
+  | ConnectionApproval
+  | AddNetworkApproval;
 
 export type Activity =
   | TransactionActivity
@@ -101,6 +102,25 @@ export interface ConnectionApproval extends ActivityBase {
 export interface ConnectionActivity extends ConnectionApproval {
   pending: number;
   accountAddresses: string[];
+}
+
+export interface AddNetworkApproval extends ActivityBase {
+  type: ActivityType.AddNetwork;
+  chainId: number;
+  networkParams: AddEthereumChainParameter;
+}
+
+export interface AddEthereumChainParameter {
+  chainId: string; // A 0x-prefixed hexadecimal string
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: number;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[];
+  iconUrls?: string[]; // Currently ignored.
 }
 
 export type TxParams = {

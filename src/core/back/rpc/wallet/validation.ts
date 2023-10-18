@@ -1,12 +1,24 @@
-import { Describe, define, object, optional, array } from "superstruct";
+import {
+  Describe,
+  define,
+  object,
+  optional,
+  array,
+  number,
+  string,
+  assert as assertSchema,
+} from "superstruct";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { nanoid } from "nanoid";
 import { openOrFocusMainTab } from "lib/ext/utils";
 
-import { ActivitySource, TxParams, WalletStatus } from "core/types";
+import {
+  ActivitySource,
+  AddEthereumChainParameter,
+  TxParams,
+  WalletStatus,
+} from "core/types";
 import { getNetwork } from "core/common";
-import * as repo from "core/repo";
 
 import { $walletStatus, $accountAddresses } from "core/back/state";
 
@@ -47,25 +59,21 @@ export function validateAccount(
   }
 }
 
-export async function createJustNetworkPermission(
-  origin: string,
-  chainId: number,
-) {
-  await repo.permissions.put({
-    id: nanoid(),
-    origin,
-    chainId,
-    accountAddresses: [],
-    timeAt: Date.now(),
-  });
-}
-
 export const validateNetwork = (chainId: number) =>
   getNetwork(chainId)
     .then(() => true)
     .catch(() => {
       throw ethErrors.rpc.resourceNotFound("Network not found");
     });
+
+export async function validateAddNetworkParams(params: unknown) {
+  try {
+    assertSchema(params, AddChainParamsSchema);
+  } catch (err) {
+    console.warn(err);
+    throw ethErrors.rpc.invalidParams("Network params invalid");
+  }
+}
 
 const stringHex = (length?: number) =>
   define<string>("stringHex", (value) => ethers.isHexString(value, length));
@@ -102,3 +110,18 @@ export const TxParamsSchema: Describe<TxParams> = object({
   maxPriorityFeePerGas: optional(stringHex()),
   maxFeePerGas: optional(stringHex()),
 });
+
+export const AddChainParamsSchema: Describe<AddEthereumChainParameter> = object(
+  {
+    chainId: stringHex(),
+    chainName: string(),
+    nativeCurrency: object({
+      name: string(),
+      symbol: string(),
+      decimals: number(),
+    }),
+    rpcUrls: array(string()),
+    blockExplorerUrls: optional(array(string())),
+    iconUrls: optional(array(string())),
+  },
+);
