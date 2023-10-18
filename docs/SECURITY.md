@@ -8,7 +8,7 @@ At Vigvam, we prioritize the security and privacy of our users' digital assets a
 
 - Primarily uses the Advanced Encryption Standard (AES) as the encryption algorithm. AES is a widely accepted and secure symmetric encryption algorithm. It is known for its resistance to various cryptographic attacks and is considered one of the most secure encryption standards available.
 
-- Employs key derivation functions (KDFs) to derive encryption keys from the user's master password. The default KDF used is Argon2, a memory-hard function designed to thwart brute force and dictionary attacks. It's computationally intensive and ensures that attackers cannot easily guess the master password even if they have access to the encrypted data.
+- Uses key derivation functions (KDFs) to derive encryption keys from the user's master password. The default KDF used is Argon2, a memory-hard function designed to thwart brute force and dictionary attacks. It's computationally intensive and ensures that attackers cannot easily guess the master password even if they have access to the encrypted data.
 
 - Includes mechanisms to verify the integrity of the database file. Any unauthorized changes to the database are detected, preventing tampering.
 
@@ -30,7 +30,7 @@ At Vigvam, we prioritize the security and privacy of our users' digital assets a
 
 - When the seed phrase is stored in-memory, [obfuscation with a one-time salt](../src/app/components/screens/addAccountSteps/CreateSeedPhrase.tsx#L76) is applied.
 
-- During the creation process, a [secure cryptographic random number generator](../src/app/components/screens/addAccountSteps/CreateSeedPhrase.tsx#L91) is employed to generate the seed phrase.
+- During the creation process, a [secure cryptographic random number generator](../src/app/components/screens/addAccountSteps/CreateSeedPhrase.tsx#L91) is used to generate the seed phrase.
 
 - [TODO] To import the existing phrase, multiple password-type fields are used, which also prevent browser cache issues.
 
@@ -72,7 +72,7 @@ With a "Contacts" feature - users can specify trusted and untrusted addresses to
 
 ### 9. Permission System
 
-We employ a permission system that restricts what websites and applications can access to the account addresses, ensuring that user data and actions remain secure.
+Vigvam uses a permission system that restricts what websites and applications can access to the account addresses, ensuring that user data and actions remain secure.
 
 ### 10. Session Timeout
 
