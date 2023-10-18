@@ -7,7 +7,7 @@ import { Setting, AnalyticsState } from "core/common/settings";
 export enum TEvent {
   Promocode = "PROMOCODE_USED",
   SetupWallet = "WALLET_SETUPED",
-  SetupVigvam = "WIGWAM_SETUPED",
+  SetupWigwam = "WIGWAM_SETUPED",
   ProfileCreation = "PROFILE_CREATED",
   ProfileUpdate = "PROFILE_UPDATED",
   NetworkChange = "NETWORK_CHANGED",

@@ -64,7 +64,7 @@ export function useSetMetaMaskCompatibleMode(withDialog = true) {
                     </strong>
                     .{" "}
                     {modeToSet === MetaMaskCompatibleMode.Strict
-                      ? "Only Vigvam will be connected to dApps"
+                      ? "Only Wigwam will be connected to dApps"
                       : "You will be able to choose any wallet while connecting"}
                     .
                     <br />

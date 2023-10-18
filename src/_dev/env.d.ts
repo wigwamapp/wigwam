@@ -9,7 +9,7 @@ declare namespace NodeJS {
     readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
     readonly VERSION: string;
     readonly BUILD_ID: string;
-    // Vigvam specific
+    // Wigwam specific
     readonly WIGWAM_WEBSITE_ORIGIN: string;
     // Dev
     readonly WIGWAM_DEV_UNLOCK_PASSWORD: string;

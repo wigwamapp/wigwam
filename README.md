@@ -1,10 +1,10 @@
-# Vigvam - Web3 Wallet for EVM Networks
+# Wigwam - Web3 Wallet for EVM Networks
 
 ### https://wigwam.app
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
-[![Vigvam](https://github.com/wigwamapp/wigwam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://wigwam.app/)
+[![Wigwam](https://github.com/wigwamapp/wigwam/assets/11996139/3c6729ae-7ca9-413d-bd63-10ccc9a4dc09)](https://wigwam.app/)
 
 **Table of Contents**
 

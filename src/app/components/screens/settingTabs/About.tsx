@@ -7,18 +7,18 @@ import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as MediumIcon } from "app/icons/medium.svg";
 
 import Separator from "app/components/elements/Seperator";
-import { ReactComponent as VigvamLogo } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamLogo } from "app/icons/Wigwam.svg";
 
 const About: FC = () => {
   return (
     <div className="flex flex-col items-start pt-3">
       <div className="flex items-center">
-        <VigvamLogo className="w-[3.25rem] h-auto" />
-        <span className="text-2xl font-black ml-4">Vigvam</span>
+        <WigwamLogo className="w-[3.25rem] h-auto" />
+        <span className="text-2xl font-black ml-4">Wigwam</span>
       </div>
 
       <p className="text-brand-font text-sm mt-6 mb-8 max-w-[20rem]">
-        Vigvam lets you explore DeFi and NFTs in a safer, faster and more modern
+        Wigwam lets you explore DeFi and NFTs in a safer, faster and more modern
         way.
       </p>
 

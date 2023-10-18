@@ -6,7 +6,7 @@ import { addAccountModalAtom, profileStateAtom } from "app/atoms";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import Button from "app/components/elements/Button";
-import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 const Welcome: FC = () => {
   const { all } = useAtomValue(profileStateAtom);
@@ -24,9 +24,9 @@ const Welcome: FC = () => {
             : "opacity-100 transition-opacity duration-500",
         )}
       >
-        <VigvamIcon className={classNames("w-[5rem] h-auto mb-5")} />
+        <WigwamIcon className={classNames("w-[5rem] h-auto mb-5")} />
         <h1 className={classNames("mb-12 text-5xl font-bold text-brand-light")}>
-          Welcome to Vigvam
+          Welcome to Wigwam
         </h1>
 
         <Button

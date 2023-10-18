@@ -62,7 +62,7 @@ const SetupPassword = memo(() => {
           }
 
           await setupWallet(password, addAccountsParams, seedPhrase);
-          trackEvent(TEvent.SetupVigvam);
+          trackEvent(TEvent.SetupWigwam);
 
           setAccModalOpened([false]);
         } catch (err: any) {
@@ -138,7 +138,7 @@ const SetupPassword = memo(() => {
                     title="Analytics"
                     description={
                       <>
-                        Help us make Vigvam better.
+                        Help us make Wigwam better.
                         <br />I agree to the{" "}
                         <a
                           href="https://wigwam.app/privacy"

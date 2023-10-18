@@ -495,7 +495,7 @@ module.exports = {
     }),
 
     new WebpackBar({
-      name: "Vigvam",
+      name: "Wigwam",
       color: "#ffffff",
     }),
 

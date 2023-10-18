@@ -239,7 +239,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           if (msg === "user closed popup") return false;
 
           if (msg?.startsWith("could not validate redirect")) {
-            msg = "Allowed only for a production instance of Vigvam.";
+            msg = "Allowed only for a production instance of Wigwam.";
           }
 
           throw new Error(msg);

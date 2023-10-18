@@ -81,7 +81,7 @@ const AttentionContent = [
     content: (
       <>
         <p className="mb-2">
-          It is not possible to recover the current profile password. Vigvam is{" "}
+          It is not possible to recover the current profile password. Wigwam is{" "}
           <strong>non-custodial</strong> software. The user is the only one who
           knows the password.
         </p>
@@ -112,7 +112,7 @@ const AttentionContent = [
     header: "Reset the app",
     content: (
       <p>
-        Vigvam does not have a built-in function to reset the application. We
+        Wigwam does not have a built-in function to reset the application. We
         recommend using{" "}
         <SmartLink to={{ page: Page.Profiles }}>profiles</SmartLink>, but if you
         still want to reset - just reinstall the application (all profiles will

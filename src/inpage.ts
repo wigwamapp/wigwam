@@ -40,7 +40,7 @@ warnIfPhishing();
 function inject1193(key: string, sharedProperty = false) {
   const existing = (window as any)[key];
 
-  if (existing?.isVigvam && "addProviders" in existing) {
+  if (existing?.isWigwam && "addProviders" in existing) {
     existing.addProviders(wigwam);
     return;
   }

@@ -7,7 +7,7 @@ import { Page } from "app/nav";
 import { currentProfileAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
-import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 import BoardingPageLayout from "../layouts/BoardingPageLayout";
 import PopupLayout from "../layouts/PopupLayout";
@@ -62,8 +62,8 @@ const Unlock: FC<UnlockProps> = ({ isApproval }) => {
             "flex items-center",
           )}
         >
-          <VigvamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
-          Vigvam
+          <WigwamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
+          Wigwam
         </div>
       )}
     </>

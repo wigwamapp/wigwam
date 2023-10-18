@@ -6,7 +6,7 @@ import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
-import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 import { NavLinksPrimary, NavLinksSecondary } from "./Sidebar.Links";
 
@@ -28,8 +28,8 @@ const Sidebar: FC = () => (
         "text-2xl font-black",
       )}
     >
-      <VigvamIcon className={classNames("h-10 w-auto", "mr-5")} />
-      Vigvam
+      <WigwamIcon className={classNames("h-10 w-auto", "mr-5")} />
+      Wigwam
     </Link>
     <SidebarBlock links={NavLinksPrimary} />
     <SidebarBlock
