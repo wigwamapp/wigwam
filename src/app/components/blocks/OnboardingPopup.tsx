@@ -153,7 +153,7 @@ const OnboardingPopupContent: FC = () => {
           <Wrapper className="mt-[3.75rem]">
             <Item>
               To help us test the product and get NFT Wigwam Pro, check out the{" "}
-              <Link href="https://vigvamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-wigwam-pro-4058fa702d09">
+              <Link href="https://vigvamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
                 Beta Testing Workflow
               </Link>
               . Then fill in the{" "}
@@ -161,7 +161,7 @@ const OnboardingPopupContent: FC = () => {
                 Feedback Form
               </Link>{" "}
               to leave your feedback or bug report. Also, we suggest you learn{" "}
-              <Link href="https://vigvamapp.medium.com/nft-wigwam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
+              <Link href="https://vigvamapp.medium.com/nft-vigvam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
                 Information about NFT Wigwam Pro and participation rules
               </Link>
               .
