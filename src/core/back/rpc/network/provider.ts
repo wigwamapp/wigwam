@@ -67,8 +67,8 @@ class RpcProvider extends ethers.JsonRpcProvider {
 
   getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
 
-  constructor(url: string, network?: ethers.Networkish) {
-    super(url, network);
+  constructor(url: string, chainId: number) {
+    super(url, chainId, { staticNetwork: ethers.Network.from(chainId) });
 
     // To use cache first provider._getBlock(), but without formatting
     // this.formatter = getRpcFormatter();
