@@ -5,7 +5,11 @@ export const CELO: Network[] = [
   {
     chainId: 42220,
     type: "mainnet",
-    rpcUrls: ["https://forno.celo.org", "https://rpc.ankr.com/celo"],
+    rpcUrls: [
+      "https://forno.celo.org",
+      "https://rpc.ankr.com/celo",
+      "https://1rpc.io/celo",
+    ],
     chainTag: "celo",
     name: "Celo",
     nativeCurrency: {

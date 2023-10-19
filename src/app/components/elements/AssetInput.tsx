@@ -22,7 +22,7 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
     return (
       <NumberInput
         ref={ref}
-        decimalScale={assetDecimals}
+        decimalScale={Number(assetDecimals)}
         style={{ ...assetInputStyle, ...style }}
         actions={currency}
         actionsClassName="text-sm font-bold pointer-events-none !right-4"

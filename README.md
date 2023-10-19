@@ -75,7 +75,7 @@ You can also find documentation for specific modules within the source code.
 
 ## Build from source
 
-> Requires: [`Node.js ^16`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
+> Requires: [`Node.js >=18.12.0`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
 
 ### Get the source code
 

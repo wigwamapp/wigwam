@@ -44,7 +44,9 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const amountExist = amount !== null;
     const bigNumberAmount = new BigNumber(amount ?? 0);
 
-    const convertedAmount = bigNumberAmount.div(10 ** (decimals ?? 0));
+    const convertedAmount = bigNumberAmount.div(
+      new BigNumber(10).pow(decimals ?? 0),
+    );
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
