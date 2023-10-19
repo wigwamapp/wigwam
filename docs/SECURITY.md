@@ -1,6 +1,6 @@
-# Vigvam Web Extension Wallet - Security Guidelines
+# Wigwam Web Extension Wallet - Security Guidelines
 
-At Vigvam, we prioritize the security and privacy of our users' digital assets and personal information. This document outlines the security measures and features we have implemented to ensure a secure web3 wallet experience.
+At Wigwam, we prioritize the security and privacy of our users' digital assets and personal information. This document outlines the security measures and features we have implemented to ensure a secure web3 wallet experience.
 
 ### 1. Encryption
 
@@ -72,11 +72,11 @@ With a "Contacts" feature - users can specify trusted and untrusted addresses to
 
 ### 9. Permission System
 
-Vigvam uses a permission system that restricts what websites and applications can access to the account addresses, ensuring that user data and actions remain secure.
+Wigwam uses a permission system that restricts what websites and applications can access to the account addresses, ensuring that user data and actions remain secure.
 
 ### 10. Session Timeout
 
-Vigvam implements session timeouts to automatically log out users after a period of inactivity, reducing the risk of unauthorized access.
+Wigwam implements session timeouts to automatically log out users after a period of inactivity, reducing the risk of unauthorized access.
 
 ### 11. Error Management
 
@@ -86,7 +86,7 @@ Vigvam implements session timeouts to automatically log out users after a period
 
 ### 12. Regular Updates
 
-- To address potential security vulnerabilities, Vigvam keeps the app updated with the latest security patches and enhancements.
+- To address potential security vulnerabilities, Wigwam keeps the app updated with the latest security patches and enhancements.
 
 - Fully adapted to the latest browser extension ManifestV3 API, ensuring compatibility with modern standards.
 
@@ -94,9 +94,9 @@ Vigvam implements session timeouts to automatically log out users after a period
 
 ### 13. Anti-Phishing Measures
 
-- Vigvam implements anti-phishing protection to protect users about suspicious websites. Powered by [eth-phishing-detect](https://github.com/MetaMask/eth-phishing-detect).
+- Wigwam implements anti-phishing protection to protect users about suspicious websites. Powered by [eth-phishing-detect](https://github.com/MetaMask/eth-phishing-detect).
 
-- Vigvam uses unique profile avatars. This feature allows you to determine whether the Vigvam you are seeing is real or fake.
+- Wigwam uses unique profile avatars. This feature allows you to determine whether the Wigwam you are seeing is real or fake.
 
 ### 14. User Education
 
@@ -104,11 +104,11 @@ Within the extension, we provide educational resources to help users understand 
 
 ### 15. Data Minimization
 
-Vigvam collects and stores only the minimum amount of user data necessary for the operation of the application UI, respecting user privacy.
+Wigwam collects and stores only the minimum amount of user data necessary for the operation of the application UI, respecting user privacy.
 
 ### 16. Open Source Transparency
 
-Vigvam is committed to transparency and is open source, allowing the community to review and contribute to security improvements.
+Wigwam is committed to transparency and is open source, allowing the community to review and contribute to security improvements.
 
 ### 17. Security Audits
 
@@ -116,10 +116,10 @@ TODO
 
 ### 18. User Support
 
-Vigvam offers responsive customer support to assist users in case of security concerns or issues.
+Wigwam offers responsive customer support to assist users in case of security concerns or issues.
 
 ### 19. Regular Penetration Testing
 
-Vigvam conducts regular penetration testing to proactively identify vulnerabilities before malicious actors can exploit them.
+Wigwam conducts regular penetration testing to proactively identify vulnerabilities before malicious actors can exploit them.
 
-Security is an ongoing process, and we remain committed to continuously monitoring and updating Vigvam to stay ahead of potential risks and protect our users' assets and data.
+Security is an ongoing process, and we remain committed to continuously monitoring and updating Wigwam to stay ahead of potential risks and protect our users' assets and data.

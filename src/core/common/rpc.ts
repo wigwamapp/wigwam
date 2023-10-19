@@ -1,9 +1,9 @@
 import { JsonRpcMethod } from "core/types/rpc";
 
 export const JSONRPC = "2.0";
-export const VIGVAM_STATE = "vigvam_state";
-export const VIGVAM_FAVICON = "vigvam_favicon";
-export const VIGVAM_PHISHING_WARNING = "vigvam_phishing_warning";
+export const WIGWAM_STATE = "wigwam_state";
+export const WIGWAM_FAVICON = "wigwam_favicon";
+export const WIGWAM_PHISHING_WARNING = "wigwam_phishing_warning";
 export const ETH_SUBSCRIPTION = "eth_subscription";
 
 export const AUTHORIZED_RPC_METHODS = new Set<string>([

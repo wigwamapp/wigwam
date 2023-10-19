@@ -16,7 +16,7 @@ import {
 } from "core/types/rpc";
 import {
   JSONRPC,
-  VIGVAM_STATE,
+  WIGWAM_STATE,
   AUTHORIZED_RPC_METHODS,
   STATE_RPC_METHODS,
 } from "core/common/rpc";
@@ -32,7 +32,7 @@ const stateUpdatedType = Symbol();
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 
 export class InpageProvider extends Emitter {
-  isVigvam = true;
+  isWigwam = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
@@ -55,11 +55,11 @@ export class InpageProvider extends Emitter {
   // https://eips.ethereum.org/EIPS/eip-6963
   // https://eips.ethereum.org/EIPS/eip-5749
   info: EIP6963ProviderInfo = Object.freeze({
-    name: "Vigvam",
-    uuid: `vigvam-${process.env.BUILD_ID}`,
-    rdns: "com.vigvam.wallet",
+    name: "Wigwam",
+    uuid: `wigwam-${process.env.BUILD_ID}`,
+    rdns: "com.wigwam.wallet",
     icon: ICON_SVG_BASE64,
-    description: "Vigvam — Web 3.0 Wallet",
+    description: "Wigwam — Web 3.0 Wallet",
   });
 
   #inited = false;
@@ -92,7 +92,7 @@ export class InpageProvider extends Emitter {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (evt?.method === VIGVAM_STATE) {
+      if (evt?.method === WIGWAM_STATE) {
         const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
         this.mmCompatible = mmCompatible;

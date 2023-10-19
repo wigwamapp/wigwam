@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "{{envBadge}}Vigvam — Web 3.0 Wallet",
+  "name": "{{envBadge}}Wigwam — Web3 Wallet",
   "version": "{{pkg.version}}",
 
   "icons": {
@@ -11,7 +11,7 @@
 
   "description": "__MSG_appDesc__",
   "homepage_url": "{{website}}",
-  "short_name": "Vigvam",
+  "short_name": "Wigwam",
 
   "permissions": [
     "tabs",
@@ -39,7 +39,7 @@
 
   "__firefox__applications": {
     "gecko": {
-      "id": "webextension@vigvam.app",
+      "id": "webextension@wigwam.app",
       "strict_min_version": "68.0"
     }
   },
@@ -50,7 +50,7 @@
 
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Vigvam",
+    "default_title": "Wigwam",
     "default_icon": {
       "16": "icons/16.png",
       "48": "icons/128.png",

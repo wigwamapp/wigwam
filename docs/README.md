@@ -1,4 +1,4 @@
-# Vigvam Web Extension Wallet - General Tech Documentation
+# Wigwam Web Extension Wallet - General Tech Documentation
 
 ## Architecture
 

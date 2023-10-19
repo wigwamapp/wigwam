@@ -41,7 +41,7 @@ Object.assign(window, {
 if (process.env.RELEASE_ENV === "false") {
   const imports = [
     import("./importExport"),
-    process.env.VIGVAM_DEV_CONTROL_PANEL === "true" && import("./controlPanel"),
+    process.env.WIGWAM_DEV_CONTROL_PANEL === "true" && import("./controlPanel"),
   ].filter(Boolean);
 
   Promise.all(imports)

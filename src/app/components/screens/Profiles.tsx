@@ -105,8 +105,8 @@ const Profiles: FC = () => {
 
             <li>
               You will always see your <strong>profile avatar</strong>, on all
-              Vigvam pages. <strong>It is unique!</strong> This feature allows
-              you to <strong>determine</strong> whether the Vigvam you are
+              Wigwam pages. <strong>It is unique!</strong> This feature allows
+              you to <strong>determine</strong> whether the Wigwam you are
               seeing is <strong>real</strong> or fake.
             </li>
 

@@ -6,7 +6,7 @@ import { exportCurrentProfile, importProfile } from "core/common/importExport";
 export async function downloadCurrentProfile() {
   const { name, blob } = await exportCurrentProfile();
 
-  await downloadFile(blob, `${name}.vigvam`);
+  await downloadFile(blob, `${name}.wigwam`);
 }
 
 export async function uploadProfile() {
@@ -31,7 +31,7 @@ export async function uploadProfile() {
 
   const uploadField = document.createElement("input");
   uploadField.type = "file";
-  uploadField.accept = ".vigvam";
+  uploadField.accept = ".wigwam";
   uploadField.className = `mb-6 text-sm text-slate-500
   p-4 border border-white rounded-md cursor-pointer
   file:mr-4 file:py-2 file:px-4

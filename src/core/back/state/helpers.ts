@@ -54,7 +54,7 @@ export async function ensureInited() {
       await cleanupSession(PASSWORD_SESSION);
     }
 
-    const PLAIN_DEV_PASSWORD = process.env.VIGVAM_DEV_UNLOCK_PASSWORD;
+    const PLAIN_DEV_PASSWORD = process.env.WIGWAM_DEV_UNLOCK_PASSWORD;
 
     if (process.env.NODE_ENV === "development" && PLAIN_DEV_PASSWORD) {
       const pass = await toProtectedPassword(PLAIN_DEV_PASSWORD);

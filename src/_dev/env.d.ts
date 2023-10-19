@@ -9,13 +9,13 @@ declare namespace NodeJS {
     readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
     readonly VERSION: string;
     readonly BUILD_ID: string;
-    // Vigvam specific
-    readonly VIGVAM_WEBSITE_ORIGIN: string;
+    // Wigwam specific
+    readonly WIGWAM_WEBSITE_ORIGIN: string;
     // Dev
-    readonly VIGVAM_DEV_UNLOCK_PASSWORD: string;
-    readonly VIGVAM_DEV_ACTIVE_TAB_RELOAD: string;
-    readonly VIGVAM_DEV_ELEMENTS_SPACING: string;
-    readonly VIGVAM_DEV_BLOCK_TX_SEND: string;
+    readonly WIGWAM_DEV_UNLOCK_PASSWORD: string;
+    readonly WIGWAM_DEV_ACTIVE_TAB_RELOAD: string;
+    readonly WIGWAM_DEV_ELEMENTS_SPACING: string;
+    readonly WIGWAM_DEV_BLOCK_TX_SEND: string;
   }
 }
 

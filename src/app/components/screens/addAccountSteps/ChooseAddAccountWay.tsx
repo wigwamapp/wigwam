@@ -191,7 +191,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
 
           const { default: OpenLogin } = await import("@toruslabs/openlogin");
 
-          const clientId = process.env.VIGVAM_OPEN_LOGIN_CLIENT_ID;
+          const clientId = process.env.WIGWAM_OPEN_LOGIN_CLIENT_ID;
           assert(clientId, "Client ID was not specified");
 
           const openlogin = new OpenLogin({
@@ -239,7 +239,7 @@ const TileOpenLogin: FC<TileOpenLoginProps> = ({
           if (msg === "user closed popup") return false;
 
           if (msg?.startsWith("could not validate redirect")) {
-            msg = "Allowed only for a production instance of Vigvam.";
+            msg = "Allowed only for a production instance of Wigwam.";
           }
 
           throw new Error(msg);

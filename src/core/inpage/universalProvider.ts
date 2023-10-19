@@ -18,15 +18,15 @@ export class UniversalInpageProvider extends Emitter {
   get #enabledProviders() {
     if (!this.#sharedProperty) return this.allProviders;
 
-    const allVigvamStrict = this.allProviders.filter(
-      (p) => p.isVigvam && p.mmCompatible === MetaMaskCompatibleMode.Strict,
+    const allWigwamStrict = this.allProviders.filter(
+      (p) => p.isWigwam && p.mmCompatible === MetaMaskCompatibleMode.Strict,
     );
 
-    // If we have vigvam providers with strict metamask compatible mode (use as default)
-    if (allVigvamStrict.length > 0) return allVigvamStrict;
+    // If we have wigwam providers with strict metamask compatible mode (use as default)
+    if (allWigwamStrict.length > 0) return allWigwamStrict;
 
     return this.allProviders.filter(
-      (p) => !p.isVigvam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid,
+      (p) => !p.isWigwam || p.mmCompatible === MetaMaskCompatibleMode.Hybrid,
     );
   }
 
@@ -47,10 +47,10 @@ export class UniversalInpageProvider extends Emitter {
     return (this.currentProvider as any)._metamask ?? {};
   }
 
-  get isVigvam() {
+  get isWigwam() {
     return this.selectedAddress
-      ? this.currentProvider.isVigvam
-      : this.allProviders.some((p) => p.isVigvam);
+      ? this.currentProvider.isWigwam
+      : this.allProviders.some((p) => p.isWigwam);
   }
 
   get chainId() {

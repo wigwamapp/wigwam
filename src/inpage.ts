@@ -3,17 +3,17 @@ import { InpageProvider } from "core/inpage/provider";
 import { UniversalInpageProvider } from "core/inpage/universalProvider";
 import {
   JSONRPC,
-  VIGVAM_PHISHING_WARNING,
-  VIGVAM_STATE,
+  WIGWAM_PHISHING_WARNING,
+  WIGWAM_STATE,
 } from "core/common/rpc";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 const inpageProto = new InpageProtocol("injected", "content");
-const vigvam = new InpageProvider(inpageProto);
+const wigwam = new InpageProvider(inpageProto);
 
 const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   const unsub = inpageProto.subscribe((payload) => {
-    if (payload?.jsonrpc === JSONRPC && payload?.method === VIGVAM_STATE) {
+    if (payload?.jsonrpc === JSONRPC && payload?.method === WIGWAM_STATE) {
       const metamaskModeEnabled =
         payload.params.mmCompatible !== MetaMaskCompatibleMode.Off;
 
@@ -30,7 +30,7 @@ const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
 });
 
 inject1193("ethereum", true);
-inject1193("vigvamEthereum");
+inject1193("wigwamEthereum");
 injectEIP5749("evmproviders");
 injectEIP6963();
 
@@ -40,8 +40,8 @@ warnIfPhishing();
 function inject1193(key: string, sharedProperty = false) {
   const existing = (window as any)[key];
 
-  if (existing?.isVigvam && "addProviders" in existing) {
-    existing.addProviders(vigvam);
+  if (existing?.isWigwam && "addProviders" in existing) {
+    existing.addProviders(wigwam);
     return;
   }
 
@@ -52,8 +52,8 @@ function inject1193(key: string, sharedProperty = false) {
 
   const universal = new UniversalInpageProvider(
     existing && redefineProperty
-      ? [vigvam, ...getProvidersInline(existing)]
-      : [vigvam],
+      ? [wigwam, ...getProvidersInline(existing)]
+      : [wigwam],
     sharedProperty,
     propIsMetaMaskPreferred,
   );
@@ -95,7 +95,7 @@ function injectEIP5749(key: string) {
   const evmProviders: Record<string, InpageProvider> =
     (window as any)[key] || ((window as any)[key] = {});
 
-  evmProviders[vigvam.info.uuid] = vigvam;
+  evmProviders[wigwam.info.uuid] = wigwam;
 }
 
 // https://eips.ethereum.org/EIPS/eip-6963
@@ -103,7 +103,7 @@ function injectEIP6963() {
   const announceProvider = () => {
     window.dispatchEvent(
       new CustomEvent("eip6963:announceProvider", {
-        detail: Object.freeze({ info: vigvam.info, provider: vigvam }),
+        detail: Object.freeze({ info: wigwam.info, provider: wigwam }),
       }),
     );
   };
@@ -129,7 +129,7 @@ function warnIfPhishing() {
   const unsub = inpageProto.subscribe((payload) => {
     if (
       payload?.jsonrpc === JSONRPC &&
-      payload?.method === VIGVAM_PHISHING_WARNING
+      payload?.method === WIGWAM_PHISHING_WARNING
     ) {
       unsub();
 

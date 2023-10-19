@@ -1,7 +1,7 @@
 {
   "add": "Ajouter",
   "addWallet": "Ajouter un portefeuille",
-  "appDesc": "Une application qui gère vos portefeuilles et vos clés cryptographiques. Explorez DeFi et NFT. Ethereum, BSC, Polygone, Optimisme, Avalanche et autres.",
+  "appDesc": "Portefeuille cryptographique d'auto-garde fiable et sécurisé pour Ethereum et toutes les blockchains EVM",
   "back": "Dos",
   "cancel": "Annuler",
   "cannotSignForWallet": "Impossible de signer pour ce compte",
