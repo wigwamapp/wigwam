@@ -341,8 +341,8 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
       if (token?.tokenType === TokenType.Asset) {
         value = value
-          .div(new BigNumber(10).pow(token.decimals))
-          .decimalPlaces(token.decimals, BigNumber.ROUND_DOWN);
+          .div(new BigNumber(10).pow(token.decimals.toString()))
+          .decimalPlaces(Number(token.decimals), BigNumber.ROUND_DOWN);
       }
 
       if (value.lt(0)) {

@@ -102,7 +102,7 @@ export const syncAccountTokens = memoize(
               : existing?.priceUSD;
             const balanceUSD = priceUSD
               ? new BigNumber(rawBalance)
-                  .div(10 ** token.decimals)
+                  .div(new BigNumber(10).pow(token.decimals))
                   .times(priceUSD)
                   .toNumber()
               : existing?.balanceUSD;
@@ -272,7 +272,7 @@ export const syncAccountTokens = memoize(
         const balanceUSD =
           token.tokenType === TokenType.Asset && token.priceUSD
             ? new BigNumber(rawBalance)
-                .div(10 ** token.decimals)
+                .div(new BigNumber(10).pow(token.decimals))
                 .times(token.priceUSD)
                 .toNumber()
             : token.balanceUSD;
@@ -322,7 +322,7 @@ export const syncAccountTokens = memoize(
           token.priceUSD = priceUSD.toString();
           token.priceUSDChange = price.usd_24h_change?.toString();
           token.balanceUSD = new BigNumber(token.rawBalance)
-            .div(10 ** token.decimals)
+            .div(new BigNumber(10).pow(token.decimals))
             .times(priceUSD)
             .toNumber();
         } else {
