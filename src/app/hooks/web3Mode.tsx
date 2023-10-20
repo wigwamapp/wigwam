@@ -27,7 +27,7 @@ export function useSetMetaMaskCompatibleMode(withDialog = true) {
               <br />
               Learn more about{" "}
               <a
-                href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
+                href="https://wigwamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
                 target="_blank"
                 rel="nofollow noreferrer"
                 className="underline"

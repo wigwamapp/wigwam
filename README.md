@@ -4,7 +4,7 @@
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
-![Wigwam](https://github.com/vigvamapp/vigvam/assets/11996139/d5d966dd-fba9-472f-afd9-c9911a106827/)
+![Wigwam](https://github.com/wigwamapp/wigwam/assets/11996139/3ed8e808-5357-41f7-88f2-91bb655d9f07/)
 
 **Table of Contents**
 
@@ -80,7 +80,7 @@ You can also find documentation for specific modules within the source code.
 ### Get the source code
 
 ```bash
-git clone git@github.com:vigvamapp/local-vigvam.git wigwam && cd wigwam
+git clone git@github.com:wigwamapp/local-wigwam.git wigwam
 ```
 
 ### Install app dependencies
