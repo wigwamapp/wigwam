@@ -27,3 +27,8 @@ export const requiredAuthSigAtom = atomWithStorage<string[]>(
   Setting.RequiredAuthSig,
   [],
 );
+
+export const profileBlockedUntilAtom = atomWithStorage<number>(
+  Setting.ProfileBlockedUntil,
+  0,
+);

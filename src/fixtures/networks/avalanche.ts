@@ -7,8 +7,11 @@ export const AVALANCHE: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://api.avax.network/ext/bc/C/rpc",
-      "https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc",
-      "https://rpc.ankr.com/avalanche",
+      "https://avalanche-c-chain.publicnode.com	",
+      "https://1rpc.io/avax/c",
+      "https://endpoints.omniatech.io/v1/avax/mainnet/public",
+      "https://avax.meowrpc.com",
+      "https://avalanche.drpc.org",
     ],
     chainTag: "avalanche",
     name: "Avalanche",
@@ -30,7 +33,11 @@ export const AVALANCHE: Network[] = [
   {
     chainId: 43113,
     type: "testnet",
-    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
+    rpcUrls: [
+      "https://api.avax-test.network/ext/bc/C/rpc",
+      "https://endpoints.omniatech.io/v1/avax/fuji/public",
+      "https://avalanche-fuji-c-chain.publicnode.com",
+    ],
     chainTag: "avalanche",
     name: "Fuji Avalanche Testnet",
     nativeCurrency: {

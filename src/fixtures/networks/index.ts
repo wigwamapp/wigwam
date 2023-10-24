@@ -81,9 +81,11 @@ export const NETWORK_ICON_MAP = new Map<number, string>(
   ]),
 );
 
-export function getNetworkIconUrl(chainId: number) {
+export function getNetworkIconUrl(network: Network) {
   return (
-    NETWORK_ICON_MAP.get(chainId) ?? getPublicURL(`icons/network/unknown.png`)
+    NETWORK_ICON_MAP.get(network.chainId) ??
+    network.iconUrls?.[0] ??
+    getPublicURL(`icons/network/unknown.png`)
   );
 }
 

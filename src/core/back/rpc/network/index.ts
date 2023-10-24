@@ -1,4 +1,4 @@
-import { JsonRpcPayload, JsonRpcResult, ethers } from "ethers";
+import { ethers } from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 
@@ -23,7 +23,7 @@ export const getRpcProvider = memoize(
 
 export class RpcProvider extends ethers.JsonRpcApiProvider {
   constructor(public chainId: number) {
-    super(chainId);
+    super(chainId, { staticNetwork: ethers.Network.from(chainId) });
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
@@ -35,8 +35,8 @@ export class RpcProvider extends ethers.JsonRpcApiProvider {
   }
 
   async _send(
-    payload: JsonRpcPayload | Array<JsonRpcPayload>,
-  ): Promise<Array<JsonRpcResult>> {
+    payload: ethers.JsonRpcPayload | Array<ethers.JsonRpcPayload>,
+  ): Promise<Array<ethers.JsonRpcResult>> {
     const payloadArr = Array.isArray(payload) ? payload : [payload];
 
     const responses = await Promise.all(

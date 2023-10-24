@@ -96,7 +96,7 @@ export const syncNativeTokens = memoize(
           const rawBalance = balance.toString();
           const balanceUSD = priceUSD
             ? new BigNumber(rawBalance)
-                .div(10 ** nativeCurrency.decimals)
+                .div(new BigNumber(10).pow(nativeCurrency.decimals))
                 .times(priceUSD)
                 .toNumber()
             : existing.balanceUSD;
@@ -115,7 +115,7 @@ export const syncNativeTokens = memoize(
           const balanceUSD =
             balance && priceUSD
               ? new BigNumber(rawBalance)
-                  .div(10 ** nativeCurrency.decimals)
+                  .div(new BigNumber(10).pow(nativeCurrency.decimals))
                   .times(priceUSD)
                   .toNumber()
               : 0;

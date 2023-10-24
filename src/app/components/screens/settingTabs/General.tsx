@@ -163,7 +163,7 @@ const SoftwareUpdate = memo(() => {
       </SettingsHeader>
 
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-        An update is available for your Vigvam.
+        An update is available for your Wigwam.
         <br />
         Version:{" "}
         <span className="font-mono text-brand-inactivelight font-bold">

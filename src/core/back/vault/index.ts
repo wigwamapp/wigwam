@@ -83,6 +83,7 @@ enum Gr {
 // Password-protected vault that stores
 // accounts, seed phrases, and account keys.
 export class Vault {
+  static ensureNotBlocked?: () => void | Promise<void>;
   static onPasswordUsage?: (success: boolean) => void | Promise<void>;
 
   static isExist() {
@@ -158,6 +159,8 @@ export class Vault {
 
   static async unlock(passwordHash: string) {
     return withError(t("failedToUnlockWallet"), async (getError) => {
+      await Vault.ensureNotBlocked?.();
+
       const [keyFileB64, dataB64] = await storage.fetchMany<string>([
         St.KeyFile,
         St.Data,
@@ -625,6 +628,8 @@ export class Vault {
 
   private async verify(passwordHash: string) {
     return withError(t("invalidPassword"), async (getError) => {
+      await Vault.ensureNotBlocked?.();
+
       const hashToCheck = importProtected(passwordHash).getBinary();
 
       const localHash = arrayToBuffer(

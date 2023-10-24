@@ -5,7 +5,11 @@ export const ARBITRUMNOVA: Network[] = [
   {
     chainId: 42170,
     type: "mainnet",
-    rpcUrls: ["https://nova.arbitrum.io/rpc"],
+    rpcUrls: [
+      "https://nova.arbitrum.io/rpc",
+      "https://arbitrum-nova.publicnode.com",
+      "https://arbitrum-nova.drpc.org",
+    ],
     chainTag: "arbitrumnova",
     name: "Arbitrum Nova",
     nativeCurrency: {
@@ -13,7 +17,11 @@ export const ARBITRUMNOVA: Network[] = [
       name: "Ether",
       decimals: 18,
     },
-    explorerUrls: ["https://nova-explorer.arbitrum.io"],
+    explorerUrls: [
+      "https://nova.arbiscan.io/",
+      "https://nova-explorer.arbitrum.io",
+    ],
+    explorerApiUrl: "https://api-nova.arbiscan.io/api",
     iconUrls: [],
     faucetUrls: [],
     parent: {

@@ -66,7 +66,7 @@ export const getWays = (
           </ul>
           <p className="mt-2">
             <strong>Never, ever share</strong> your Secret Phrase, not even with
-            Vigvam!
+            Wigwam!
           </p>
         </>
       ),
@@ -178,7 +178,7 @@ export const getWays = (
         <>
           <p>
             <strong>Connect</strong> your existing hardware wallet directly to
-            Vigvam. Use all the power of the available interfaces from Vivgram
+            Wigwam. Use all the power of the available interfaces from Vivgram
             and the security of an external crypto device!
           </p>
           <p className="mt-2">

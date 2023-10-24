@@ -6,7 +6,7 @@ import { storage } from "lib/ext/storage";
 import { Setting } from "core/common/settings";
 
 export const indexerApi = axios.create({
-  baseURL: process.env.VIGVAM_INDEXER_API,
+  baseURL: process.env.WIGWAM_INDEXER_API,
   timeout: 60_000,
 });
 

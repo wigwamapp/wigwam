@@ -25,7 +25,7 @@ export type InputProps = {
   theme?: "primary" | "clean";
   optional?: boolean;
   error?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   success?: boolean;
   successWithIcon?: boolean;
   labelActions?: ReactNode;

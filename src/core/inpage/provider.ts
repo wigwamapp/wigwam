@@ -16,7 +16,7 @@ import {
 } from "core/types/rpc";
 import {
   JSONRPC,
-  VIGVAM_STATE,
+  WIGWAM_STATE,
   AUTHORIZED_RPC_METHODS,
   STATE_RPC_METHODS,
 } from "core/common/rpc";
@@ -32,7 +32,7 @@ const stateUpdatedType = Symbol();
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 
 export class InpageProvider extends Emitter {
-  isVigvam = true;
+  isWigwam = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
@@ -52,12 +52,15 @@ export class InpageProvider extends Emitter {
    */
   selectedAddress: string | null = null;
 
-  info = {
-    uuid: `vigvam-${process.env.BUILD_ID}`,
-    name: "Vigvam",
-    description: "Vigvam — Web 3.0 Wallet",
-    image: ICON_SVG_BASE64,
-  };
+  // https://eips.ethereum.org/EIPS/eip-6963
+  // https://eips.ethereum.org/EIPS/eip-5749
+  info: EIP6963ProviderInfo = Object.freeze({
+    name: "Wigwam",
+    uuid: `wigwam-${process.env.BUILD_ID}`,
+    rdns: "com.wigwam.wallet",
+    icon: ICON_SVG_BASE64,
+    description: "Wigwam — Web 3.0 Wallet",
+  });
 
   #inited = false;
   #reqIdPrefix = nanoid();
@@ -89,7 +92,7 @@ export class InpageProvider extends Emitter {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (evt?.method === VIGVAM_STATE) {
+      if (evt?.method === WIGWAM_STATE) {
         const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
         this.mmCompatible = mmCompatible;
@@ -493,3 +496,11 @@ const errorMessages = {
   unsupportedSync: (method: string) =>
     `The provider does not support synchronous methods like ${method} without a callback parameter.`,
 };
+
+interface EIP6963ProviderInfo {
+  uuid: string;
+  name: string;
+  icon: string;
+  rdns: string;
+  description?: string;
+}

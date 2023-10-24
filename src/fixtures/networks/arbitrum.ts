@@ -7,8 +7,10 @@ export const ARBITRUM: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://arb1.arbitrum.io/rpc",
-      "https://rpc.ankr.com/arbitrum",
+      "https://endpoints.omniatech.io/v1/arbitrum/one/public",
       "https://1rpc.io/arb",
+      "https://arbitrum.llamarpc.com",
+      "https://arbitrum.meowrpc.com",
       "https://arbitrum-mainnet.infura.io/v3/${INFURA_API_KEY}",
     ],
     chainTag: "arbitrum",
@@ -31,22 +33,49 @@ export const ARBITRUM: Network[] = [
 
   // Testnets
   {
-    chainId: 421611,
+    chainId: 421613,
     type: "testnet",
-    rpcUrls: ["https://rinkeby.arbitrum.io/rpc"],
+    rpcUrls: [
+      "https://arbitrum-goerli.publicnode.com",
+      "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
+    ],
     chainTag: "arbitrum",
-    name: "Rinkeby Arbitrum Testnet",
+    name: "Goerli Arbitrum Testnet",
     nativeCurrency: {
       symbol: "ARETH",
-      name: "Arbitrum Rinkeby Ether",
+      name: "Arbitrum Goerli Ether",
+      decimals: 18,
+    },
+    explorerUrls: ["https://goerli.arbiscan.io"],
+    explorerApiUrl: "https://api-goerli.arbiscan.io/api",
+    faucetUrls: ["https://faucet.quicknode.com/arbitrum/goerli"],
+    parent: {
+      type: "L2",
+      chain: "eip155-4",
+      bridges: [{ url: "https://bridge.arbitrum.io" }],
+    },
+    infoUrl: "https://arbitrum.io",
+  },
+
+  {
+    chainId: 421614,
+    type: "testnet",
+    rpcUrls: [
+      "https://sepolia-rollup.arbitrum.io/rpc",
+      "https://arbitrum-sepolia.blockpi.network/v1/rpc/public",
+    ],
+    chainTag: "arbitrum",
+    name: "Sepolia Arbitrum Testnet",
+    nativeCurrency: {
+      symbol: "ARETH",
+      name: "Arbitrum Sepolia Ether",
       decimals: 18,
     },
     explorerUrls: [
-      "https://testnet.arbiscan.io",
-      "https://rinkeby-explorer.arbitrum.io",
+      "https://sepolia.arbiscan.io",
+      "https://sepolia-explorer.arbitrum.io",
     ],
-    explorerApiUrl: "https://api-testnet.arbiscan.io/api",
-    faucetUrls: ["https://fauceth.komputing.org/?chain=421611"],
+    faucetUrls: ["https://faucet.quicknode.com/arbitrum/sepolia"],
     parent: {
       type: "L2",
       chain: "eip155-4",

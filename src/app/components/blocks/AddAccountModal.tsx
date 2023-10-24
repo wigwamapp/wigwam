@@ -26,7 +26,7 @@ import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AddAccountSteps from "app/components/blocks/AddAccountSteps";
-import { ReactComponent as VigvamIcon } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
@@ -130,7 +130,7 @@ const AddAccountModal = memo(() => {
               "z-30",
             )}
           >
-            <VigvamIcon className="w-16 mt-2" />
+            <WigwamIcon className="w-16 mt-2" />
           </div>
 
           <OverflowProvider>

@@ -27,7 +27,7 @@ export async function openOrFocusMainTab() {
 }
 
 export async function restartApp() {
-  // Open empty tab if there are only one tab and this tab is Vigvam
+  // Open empty tab if there are only one tab and this tab is Wigwam
   // because after reload this tab will be removed
   try {
     const tabs = await browser.tabs.query({ url: getMainURL() });

@@ -28,7 +28,7 @@ startInpageContentScript();
 initProfiles();
 openIfWasRestarted();
 
-// Setup fixtures
+// Merge default data to the device storage
 setupFixtures();
 
 // Start background server
@@ -36,12 +36,12 @@ setupFixtures();
 startWalletServer();
 startPageServer();
 
-// Start brute force protection
-startBruteForceProtection();
-
-startInstallOrUpdateListener();
 startApproveWindowOpener();
 startPersistingApprovals();
 startTxObserver();
 startExtBadge();
+
+startInstallOrUpdateListener();
+
 startAutoLocker();
+startBruteForceProtection();

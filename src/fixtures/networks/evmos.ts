@@ -7,7 +7,7 @@ export const EVMOS: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://eth.bd.evmos.org:8545",
-      "https://evmos-mainnet.gateway.pokt.network/v1/lb/627586ddea1b320039c95205",
+      "https://evmos-evm.publicnode.com",
     ],
     chainTag: "evmos",
     name: "Evmos",

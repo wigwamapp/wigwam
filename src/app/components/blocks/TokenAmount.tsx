@@ -48,7 +48,9 @@ const TokenAmount = memo<TokenAmountProps>(
             className="w-4 h-4 min-w-[1rem]"
           />
           {amount !== undefined &&
-          new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
+          new BigNumber(amount).lt(
+            new BigNumber(10).pow(new BigNumber(decimals).plus(12)),
+          ) ? (
             <>
               <PrettyAmount
                 amount={amount}

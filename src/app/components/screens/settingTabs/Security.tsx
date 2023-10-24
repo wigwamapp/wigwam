@@ -52,7 +52,7 @@ const Security: FC = () => {
             You should always have a backup copy of it.
             <br />
             <strong>Never, ever share</strong> your Secret Phrase, not even with
-            Vigvam!
+            Wigwam!
           </p>
 
           <Button
@@ -77,7 +77,7 @@ const Security: FC = () => {
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
         Read more about our{" "}
         <a
-          href="https://vigvam.app/privacy"
+          href="https://wigwam.app/privacy"
           target="_blank"
           rel="nofollow noreferrer"
           className="underline"
@@ -93,7 +93,7 @@ const Security: FC = () => {
           <>
             Analytics
             <p className="text-xs text-brand-placeholder max-w-[18.75rem]">
-              Anonymous. Help us make Vigvam better.
+              Anonymous. Help us make Wigwam better.
             </p>
           </>
         }

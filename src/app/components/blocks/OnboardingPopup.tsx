@@ -76,13 +76,13 @@ const OnboardingPopupContent: FC = () => {
       >
         <div className="w-full max-w-[56.25rem] pt-[6.5rem] flex flex-col mx-auto">
           <h1 className="text-center text-[2.5rem] mb-4 font-bold">
-            Welcome to Vigvam Beta testing 🏕
+            Welcome to Wigwam Beta testing 🏕
           </h1>
           <p className="text-center text-lg">
             This release is offering you to try the core functionality of the
             application and even more!
             <br />
-            Right now with Vigvam you can:
+            Right now with Wigwam you can:
           </p>
           <Wrapper className="mt-[6.875rem]">
             <Item>
@@ -99,11 +99,11 @@ const OnboardingPopupContent: FC = () => {
             <img
               src={OnboardingTwoImage}
               className="w-[21.625rem] h-auto mr-[5.625rem]"
-              alt="Send and receive tokens to any of the networks that are already pre-installed in Vigvam. As well as add any EVM-compatible network"
+              alt="Send and receive tokens to any of the networks that are already pre-installed in Wigwam. As well as add any EVM-compatible network"
             />
             <Item>
               Send and receive tokens to any of the networks that are already
-              pre-installed in Vigvam. As well as add any EVM-compatible network
+              pre-installed in Wigwam. As well as add any EVM-compatible network
             </Item>
           </Wrapper>
           <Wrapper className="mt-[6.625rem]">
@@ -152,8 +152,8 @@ const OnboardingPopupContent: FC = () => {
           </Wrapper>
           <Wrapper className="mt-[3.75rem]">
             <Item>
-              To help us test the product and get NFT Vigvam Pro, check out the{" "}
-              <Link href="https://vigvamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
+              To help us test the product and get NFT Wigwam Pro, check out the{" "}
+              <Link href="https://wigwamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
                 Beta Testing Workflow
               </Link>
               . Then fill in the{" "}
@@ -161,15 +161,15 @@ const OnboardingPopupContent: FC = () => {
                 Feedback Form
               </Link>{" "}
               to leave your feedback or bug report. Also, we suggest you learn{" "}
-              <Link href="https://vigvamapp.medium.com/nft-vigvam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
-                Information about NFT Vigvam Pro and participation rules
+              <Link href="https://wigwamapp.medium.com/nft-vigvam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
+                Information about NFT Wigwam Pro and participation rules
               </Link>
               .
             </Item>
             <img
               src={OnboardingSevenImage}
               className="w-[23.5rem] h-auto ml-[3.75rem]"
-              alt="To help us test the product and get NFT Vigvam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Vigvam Pro and participation rules."
+              alt="To help us test the product and get NFT Wigwam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Wigwam Pro and participation rules."
             />
           </Wrapper>
           <span ref={bottomElementRef} className="invisible" />

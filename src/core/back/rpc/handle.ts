@@ -20,7 +20,7 @@ import {
   requestTransaction,
   requestSigning,
   recoverPersonalSign,
-  requestSwitchChain,
+  requestNetwork,
 } from "./wallet";
 
 /**
@@ -141,7 +141,7 @@ export async function handleRpc(
 
         const type =
           method === JsonRpcMethod.wallet_addEthereumChain ? "add" : "switch";
-        return await requestSwitchChain(rpcCtx, type, source, params);
+        return await requestNetwork(rpcCtx, type, source, params);
       }
 
       case JsonRpcMethod.wallet_getSnaps:

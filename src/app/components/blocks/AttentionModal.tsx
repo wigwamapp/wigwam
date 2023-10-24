@@ -63,7 +63,7 @@ const HeadingDot: FC<PropsWithChildren<{ active?: boolean }>> = ({
 }) => (
   <span className="flex items-center font-bold hover:underline">
     <span className="mr-3 w-2.5 h-2.5 bg-radio rounded-full relative">
-      {!active && (
+      {active && (
         <span className="absolute inset-0 flex items-center justify-center">
           <span className="w-1.5 h-1.5 bg-brand-darklight rounded-full" />
         </span>
@@ -81,7 +81,7 @@ const AttentionContent = [
     content: (
       <>
         <p className="mb-2">
-          It is not possible to recover the current profile password. Vigvam is{" "}
+          It is not possible to recover the current profile password. Wigwam is{" "}
           <strong>non-custodial</strong> software. The user is the only one who
           knows the password.
         </p>
@@ -112,7 +112,7 @@ const AttentionContent = [
     header: "Reset the app",
     content: (
       <p>
-        Vigvam does not have a built-in function to reset the application. We
+        Wigwam does not have a built-in function to reset the application. We
         recommend using{" "}
         <SmartLink to={{ page: Page.Profiles }}>profiles</SmartLink>, but if you
         still want to reset - just reinstall the application (all profiles will

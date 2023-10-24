@@ -93,6 +93,6 @@ const tabsContent = [
     route: { page: "settings", setting: SettingTabEnum.About },
     Icon: AboutIcon,
     title: "About",
-    desc: "Check current Vigvam version. Find us elsewhere.",
+    desc: "Check current Wigwam version. Find us elsewhere.",
   },
 ];

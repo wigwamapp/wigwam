@@ -1,34 +1,22 @@
-import BigNumber from "bignumber.js";
 import { nanoid } from "nanoid";
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import {
-  Activity,
-  ActivityType,
-  ApprovalResult,
-  Permission,
-  TxParams,
-  TxActionType,
-  TokenActivity,
-  TxAction,
-  AccountSource,
-} from "core/types";
+import { ActivityType, ApprovalResult, Permission } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { matchTxAction } from "core/common/transaction";
-import { createTokenActivityKey } from "core/common/tokens";
 
 import { Vault } from "../vault";
-import { $accounts, $approvals, approvalResolved } from "../state";
+import { $approvals, approvalResolved } from "../state";
 import { sendRpc, getRpcProvider } from "../rpc";
 
-const { keccak256, toQuantity } = ethers;
+import { saveActivity, saveTokenActivity } from "./saveActivity";
+import { parseTxSafe, validateTxOrigin, getAccountSafe } from "./utils";
 
 export async function processApprove(
   approvalId: string,
@@ -101,7 +89,10 @@ export async function processApprove(
             accountAddress = ethers.getAddress(accountAddress);
             const account = getAccountSafe(accountAddress);
 
-            signature = await vault.sign(account.uuid, keccak256(rawTx!));
+            signature = await vault.sign(
+              account.uuid,
+              ethers.keccak256(rawTx!),
+            );
           }
 
           const signedTx = tx.clone();
@@ -109,9 +100,9 @@ export async function processApprove(
 
           if (
             process.env.NODE_ENV !== "production" &&
-            process.env.VIGVAM_DEV_BLOCK_TX_SEND === "true"
+            process.env.WIGWAM_DEV_BLOCK_TX_SEND === "true"
           ) {
-            throw new Error("Blocked by VIGVAM_DEV_BLOCK_TX_SEND env variable");
+            throw new Error("Blocked by WIGWAM_DEV_BLOCK_TX_SEND env variable");
           }
 
           const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
@@ -190,145 +181,23 @@ export async function processApprove(
           rpcCtx?.reply({ result: signature });
         },
       )
+      .with(
+        { type: ActivityType.AddNetwork },
+        async ({ rpcCtx, source, chainId }) => {
+          const origin = getPageOrigin(source);
+          await repo.createOrUpdateNetworkPermission(origin, chainId);
+
+          rpcCtx?.reply({ result: null });
+        },
+      )
       .otherwise(() => {
         throw new Error("Not Found");
       });
   } else {
-    approval.rpcCtx?.reply({ error: DECLINE_ERROR });
+    approval.rpcCtx?.reply({
+      error: ethErrors.provider.userRejectedRequest(),
+    });
   }
 
   approvalResolved(approvalId);
-}
-
-function getAccountSafe(accountAddress: string) {
-  const account = $accounts
-    .getState()
-    .find((a) => a.address === accountAddress);
-
-  assert(account, "Account not found");
-  assert(
-    account.source !== AccountSource.Address,
-    "This wallet was added as a watch-only account by importing an address." +
-      " It is not possible to perform signing using this type of accounts.",
-  );
-
-  return account;
-}
-
-async function saveActivity(activity: Activity) {
-  // TODO: Add specific logic for speed-up or cancel tx
-  await repo.activities.put(activity).catch(console.error);
-
-  if (activity.type === ActivityType.Connection) {
-    // Remove all early connections to the same origin
-    const actOrigin = getPageOrigin(activity.source);
-
-    repo.activities
-      .where("[type+pending]")
-      .equals([ActivityType.Connection, 0])
-      .filter(
-        (act) =>
-          act.id !== activity.id && getPageOrigin(act.source) === actOrigin,
-      )
-      .delete()
-      .catch(console.error);
-  }
-}
-
-async function saveTokenActivity(
-  action: TxAction | null,
-  chainId: number,
-  accountAddress: string,
-  txHash: string,
-  timeAt: number,
-) {
-  try {
-    if (action) {
-      const tokenActivities = new Map<string, TokenActivity>();
-      const addToActivities = (activity: TokenActivity) => {
-        const dbKey = createTokenActivityKey(activity);
-        tokenActivities.set(dbKey, activity);
-      };
-
-      const base = {
-        chainId,
-        accountAddress,
-        txHash,
-        pending: 1,
-        timeAt,
-      };
-
-      if (action.type === TxActionType.TokenTransfer) {
-        for (const { slug: tokenSlug, amount } of action.tokens) {
-          addToActivities({
-            ...base,
-            type: "transfer",
-            anotherAddress: action.toAddress,
-            amount: new BigNumber(amount).times(-1).toString(),
-            tokenSlug,
-          });
-        }
-      } else if (
-        action.type === TxActionType.TokenApprove &&
-        action.tokenSlug
-      ) {
-        addToActivities({
-          ...base,
-          type: "approve",
-          anotherAddress: action.toAddress,
-          tokenSlug: action.tokenSlug,
-          amount: action.amount,
-          clears: action.clears,
-        });
-      }
-
-      if (tokenActivities.size > 0) {
-        await repo.tokenActivities.bulkPut(
-          Array.from(tokenActivities.values()),
-          Array.from(tokenActivities.keys()),
-        );
-      }
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-const DECLINE_ERROR = ethErrors.provider.userRejectedRequest();
-
-const STRICT_TX_PROPS = [
-  "to",
-  "data",
-  "accessList",
-  "chainId",
-  "value",
-] as const;
-
-function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
-  for (const key of STRICT_TX_PROPS) {
-    const txValue = hexValueMaybe(tx[key]);
-    const originValue = hexValueMaybe(originTxParams[key]);
-
-    if (originValue) {
-      assert(dequal(txValue, originValue), "Invalid transaction");
-    }
-  }
-}
-
-function hexValueMaybe<T>(smth: T) {
-  if (smth === undefined) return;
-
-  if (["string", "number", "bigint"].includes(typeof smth)) {
-    return toQuantity(smth as any);
-  }
-
-  return smth;
-}
-
-function parseTxSafe(rawTx: string): ethers.Transaction {
-  const tx = ethers.Transaction.from(rawTx);
-  // Remove signature props
-  tx.signature = null;
-
-  return tx;
 }

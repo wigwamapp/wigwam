@@ -73,7 +73,7 @@ async function performTokenSync(
       "priceUSD" in existing &&
       existing.priceUSD
         ? new BigNumber(rawBalance)
-            .div(10 ** existing.decimals)
+            .div(new BigNumber(10).pow(existing.decimals))
             .times(existing.priceUSD)
             .toNumber()
         : existing.balanceUSD ?? 0;
@@ -140,7 +140,7 @@ async function performTokenSync(
         const rawBalance = balance?.toString() ?? "0";
         const balanceUSD = priceUSD
           ? new BigNumber(rawBalance)
-              .div(10 ** dbToken.decimals)
+              .div(new BigNumber(10).pow(dbToken.decimals))
               .times(priceUSD)
               .toNumber()
           : 0;
@@ -178,7 +178,7 @@ async function performTokenSync(
     const balanceUSD =
       priceUSD && "decimals" in metadata
         ? new BigNumber(rawBalance)
-            .div((10n ** metadata.decimals).toString())
+            .div(new BigNumber(10).pow(Number(metadata.decimals)))
             .times(priceUSD)
             .toNumber()
         : 0;

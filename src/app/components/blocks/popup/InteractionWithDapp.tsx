@@ -174,7 +174,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <Tooltip
             content={
               <p>
-                Vigvam is not connected to this site. To connect to a web3 site,
+                Wigwam is not connected to this site. To connect to a web3 site,
                 find and click the Connect button.
               </p>
             }
