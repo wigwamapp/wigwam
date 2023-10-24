@@ -43,14 +43,9 @@ const AuthSignatureModal: FC = () => {
           addressesToSign.map(async (address) => {
             try {
               const sig = await provider
-                .getSigner(address)
-                .then((s) =>
-                  s.signMessage(
-                    authMessage.replace(
-                      /{address}/g,
-                      ethers.getAddress(address),
-                    ),
-                  ),
+                .getUncheckedSigner(address)
+                .signMessage(
+                  authMessage.replace(/{address}/g, ethers.getAddress(address)),
                 );
 
               await storage.put(`authsig_${address}`, sig);

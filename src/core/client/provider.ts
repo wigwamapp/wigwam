@@ -1,10 +1,4 @@
-import {
-  JsonRpcApiProvider,
-  JsonRpcPayload,
-  JsonRpcResult,
-  VoidSigner,
-  TransactionRequest,
-} from "ethers";
+import { ethers } from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 import { assert } from "lib/system/assert";
@@ -17,7 +11,7 @@ export const getClientProvider = memoize(
   (chainId: number) => new ClientProvider(chainId),
 );
 
-export class ClientProvider extends JsonRpcApiProvider {
+export class ClientProvider extends ethers.JsonRpcApiProvider {
   constructor(public chainId: number) {
     super(chainId);
   }
@@ -26,7 +20,10 @@ export class ClientProvider extends JsonRpcApiProvider {
   getCode = memoize(super.getCode.bind(this));
 
   getUncheckedSigner = memoize(
-    (address: string) => new VoidSigner(address, this),
+    (address: string) => new ethers.JsonRpcSigner(this, address),
+  );
+  getVoidSigner = memoize(
+    (address: string) => new ethers.VoidSigner(address, this),
   );
 
   async send(method: string, params: Array<any>): Promise<any> {
@@ -36,8 +33,8 @@ export class ClientProvider extends JsonRpcApiProvider {
   }
 
   async _send(
-    payload: JsonRpcPayload | Array<JsonRpcPayload>,
-  ): Promise<Array<JsonRpcResult>> {
+    payload: ethers.JsonRpcPayload | Array<ethers.JsonRpcPayload>,
+  ): Promise<Array<ethers.JsonRpcResult>> {
     const payloadArr = Array.isArray(payload) ? payload : [payload];
 
     const responses = await Promise.all(
@@ -52,7 +49,7 @@ export class ClientProvider extends JsonRpcApiProvider {
     return responses as any;
   }
 
-  async populateTransaction(transaction: Partial<TransactionRequest>) {
+  async populateTransaction(transaction: Partial<ethers.TransactionRequest>) {
     return transaction;
   }
 

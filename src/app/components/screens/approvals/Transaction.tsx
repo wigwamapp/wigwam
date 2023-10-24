@@ -207,25 +207,22 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             // Prepare transaction with other fields
             retry(
               () =>
-                provider
-                  .getUncheckedSigner(account.address)
-                  .populateTransaction({
-                    ...rest,
-                    nonce: rest.nonce ? +rest.nonce : undefined,
-                    type: feeSuggestions?.type === "legacy" ? 0 : undefined,
-                    chainId: rest.chainId ? +rest.chainId : undefined,
-                    ...(feeSuggestions?.type === "modern"
-                      ? {
-                          maxFeePerGas: feeSuggestions.modes.low.max,
-                          maxPriorityFeePerGas:
-                            feeSuggestions.modes.low.priority,
-                        }
-                      : feeSuggestions?.type === "legacy"
-                      ? {
-                          gasPrice: feeSuggestions.modes.average.max,
-                        }
-                      : {}),
-                  }),
+                provider.getVoidSigner(account.address).populateTransaction({
+                  ...rest,
+                  nonce: rest.nonce ? +rest.nonce : undefined,
+                  type: feeSuggestions?.type === "legacy" ? 0 : undefined,
+                  chainId: rest.chainId ? +rest.chainId : undefined,
+                  ...(feeSuggestions?.type === "modern"
+                    ? {
+                        maxFeePerGas: feeSuggestions.modes.low.max,
+                        maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
+                      }
+                    : feeSuggestions?.type === "legacy"
+                    ? {
+                        gasPrice: feeSuggestions.modes.average.max,
+                      }
+                    : {}),
+                }),
               { retries: 2, minTimeout: 0, maxTimeout: 0 },
             ),
             false,
