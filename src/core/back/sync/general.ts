@@ -44,13 +44,13 @@ export async function addSyncRequest(
       await syncNativeTokens(
         chainId,
         `current_${accountAddress}`,
-        currentAccount,
+        currentAccount.address,
       );
 
       await syncNativeTokens(
         chainId,
         `rest_${allAccounts.length}`,
-        restAccounts,
+        restAccounts.map((acc) => acc.address),
       );
     });
   } catch (err) {

@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import memoize from "mem";
 
-import { Account, AccountAsset, TokenStatus, TokenType } from "core/types";
+import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import {
   createAccountTokenKey,
   getNativeTokenLogoUrl,
@@ -10,20 +10,19 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-// import { getDebankUserChainBalance } from "../debank";
 import { getCoinGeckoNativeTokenPrice } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
 
 export const syncNativeTokens = memoize(
-  async (chainId: number, _buster: string, accounts: Account | Account[]) => {
-    if (!Array.isArray(accounts)) {
-      accounts = [accounts];
+  async (chainId: number, _buster: string, addresses: string | string[]) => {
+    if (!Array.isArray(addresses)) {
+      addresses = [addresses];
     }
 
-    const dbKeys = accounts.map((acc) =>
+    const dbKeys = addresses.map((address) =>
       createAccountTokenKey({
         chainId,
-        accountAddress: acc.address,
+        accountAddress: address,
         tokenSlug: NATIVE_TOKEN_SLUG,
       }),
     );
@@ -38,18 +37,15 @@ export const syncNativeTokens = memoize(
       getNetwork(chainId),
       repo.accountTokens.bulkGet(dbKeys),
       Promise.all(
-        accounts.map((acc) =>
-          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, acc.address),
+        addresses.map((address) =>
+          getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, address),
         ),
       ),
-      // Promise.all(
-      //   accounts.map((acc) => getDebankUserChainBalance(chainId, acc.address))
-      // ),
       Promise.all(
-        accounts.map((acc) =>
+        addresses.map((address) =>
           repo.accountTokens
             .where("[chainId+tokenType+accountAddress]")
-            .equals([chainId, TokenType.Asset, acc.address])
+            .equals([chainId, TokenType.Asset, address])
             .toArray(),
         ),
       ),
@@ -60,7 +56,7 @@ export const syncNativeTokens = memoize(
     const priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
     await repo.accountTokens.bulkPut(
-      accounts.map((acc, i) => {
+      addresses.map((address, i) => {
         const existing = existingTokens[i] as AccountAsset;
         const balance = balances[i];
         const allAssets = allAccAssets[i];
@@ -122,7 +118,7 @@ export const syncNativeTokens = memoize(
 
           return {
             chainId,
-            accountAddress: acc.address,
+            accountAddress: address,
             tokenType: TokenType.Asset,
             status: TokenStatus.Native,
             tokenSlug: NATIVE_TOKEN_SLUG,

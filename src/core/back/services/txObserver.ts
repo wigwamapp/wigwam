@@ -16,7 +16,7 @@ import { matchTokenTransferEvents } from "core/common/transaction";
 
 import { sendRpc, getRpcProvider } from "../rpc";
 import { isUnlocked, $accountAddresses } from "../state";
-import { addFindTokenRequest } from "../sync";
+import { addFindTokenRequest, syncNativeTokens } from "../sync";
 
 export async function startTxObserver() {
   schedule(5_000, async () => {
@@ -98,6 +98,10 @@ export async function startTxObserver() {
             if (destination && accountAddresses.includes(destination)) {
               addFindTokenRequest(tx.chainId, destination, NATIVE_TOKEN_SLUG);
             }
+
+            syncNativeTokens(tx.chainId, `current_${tx.accountAddress}`, [
+              tx.accountAddress,
+            ]);
           }
 
           txsToUpdate.set(tx.txHash, updatedTx);
