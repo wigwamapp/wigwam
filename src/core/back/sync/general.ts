@@ -56,11 +56,13 @@ export async function addSyncRequest(
   } catch (err) {
     console.error(err);
   } finally {
-    if (syncStartedAt)
+    if (syncStartedAt) {
       setTimeout(
         () => synced(chainId),
         Math.max(0, syncStartedAt + 1_000 - Date.now()),
       );
-    else syncStartedAt = 1;
+    } else {
+      syncStartedAt = 1;
+    }
   }
 }

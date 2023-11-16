@@ -1,22 +1,31 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { ethers } from "ethers";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { storage } from "lib/ext/storage";
 
 import { Setting } from "core/common";
 
-import { useProvider } from "app/hooks";
-import { requiredAuthSigAtom } from "app/atoms";
+import { useAccounts, useProvider } from "app/hooks";
 import { withHumanDelay } from "app/utils";
+import { requiredAuthSigAtom } from "app/atoms";
 
 import SecondaryModal from "app/components/elements/SecondaryModal";
 import Button from "app/components/elements/Button";
-import { ethers } from "ethers";
 
 const AuthSignatureModal: FC = () => {
-  const addressesToSign = useLazyAtomValue(requiredAuthSigAtom);
+  const { allAccounts } = useAccounts();
+  let addressesToSign = useLazyAtomValue(requiredAuthSigAtom);
   const provider = useProvider();
 
   const [modalOpened, setModalOpened] = useState(false);
+
+  addressesToSign = useMemo(
+    () =>
+      addressesToSign?.filter((a) =>
+        allAccounts.find((acc) => acc.address === a),
+      ),
+    [addressesToSign, allAccounts],
+  );
 
   useEffect(() => {
     if (!modalOpened && addressesToSign?.length) {
@@ -75,6 +84,8 @@ const AuthSignatureModal: FC = () => {
     <SecondaryModal
       open={modalOpened}
       onOpenChange={() => setModalOpened(false)}
+      disabledClickOutside
+      closeButton={false}
       header={"Required auth signature"}
       className="max-w-[43.75rem]"
       headerClassName="!text-[2rem] !mb-6"

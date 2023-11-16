@@ -10,7 +10,7 @@ import Dialog from "./blocks/Dialog";
 import ContactsDialog from "./blocks/ContactsDialog";
 import AddAccountModal from "./blocks/AddAccountModal";
 import ActivityModal from "./blocks/ActivityModal";
-import AuthSignatureModal from "./blocks/AuthSignatureModal";
+// import AuthSignatureModal from "./blocks/AuthSignatureModal";
 
 const MainApp: FC = () => (
   <BaseProvider>
@@ -35,7 +35,7 @@ const Modals: FC = () => {
           <ContactsDialog />
           <AddAccountModal />
           <ActivityModal />
-          <AuthSignatureModal />
+          {/* <AuthSignatureModal /> */}
         </>
       )}
     </>

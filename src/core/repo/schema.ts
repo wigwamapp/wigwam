@@ -34,3 +34,17 @@ db.version(1).stores({
   [RepoTable.Activities]: ["&id", "[pending+timeAt]", "[type+pending]"].join(),
   [RepoTable.Permissions]: "&origin,timeAt",
 });
+
+/**
+ * 2
+ */
+
+db.version(2).stores({
+  [RepoTable.AccountTokens]: [
+    "",
+    "[chainId+tokenSlug]",
+    "[accountAddress+tokenSlug]",
+    "[chainId+tokenType+accountAddress+balanceUSD]",
+    "[chainId+tokenType+accountAddress+status+balanceUSD]",
+  ].join(),
+});

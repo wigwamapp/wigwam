@@ -3,23 +3,26 @@ import memoize from "mem";
 import BigNumber from "bignumber.js";
 import { storage } from "lib/ext/storage";
 
-import { Setting } from "core/common/settings";
+import { Setting } from "core/common";
+import { U_INDEXER_CHAINS } from "fixtures/networks";
 
 export const indexerApi = axios.create({
-  baseURL: process.env.WIGWAM_INDEXER_API,
-  timeout: 60_000,
+  baseURL: process.env.WIGWAM_INDEXER_API!,
+  timeout: 120_000,
 });
 
 indexerApi.interceptors.request.use(async (config) => {
-  if (config.params?.id) {
+  if (config.params?._authAddress) {
     const authSig = await storage.fetchForce<string>(
-      `authsig_${config.params.id}`,
+      `authsig_${config.params._authAddress}`,
     );
 
-    if (authSig) config.headers["AuthSignature"] = authSig;
+    (config as any)._authAddress = config.params._authAddress;
+    delete config.params._authAddress;
+
+    if (authSig) config.headers["Auth-Signature"] = authSig;
   }
 
-  // Do something before request is sent
   return config;
 });
 
@@ -30,11 +33,11 @@ indexerApi.interceptors.response.use(
 
     const res = err.response;
 
-    if (res?.status === 401 && res.config.params?.id) {
+    if (res?.status === 401 && (res.config as any)._authAddress) {
       // TODO: enqueue
       const existing = await storage.fetchForce(Setting.RequiredAuthSig);
       const next = Array.from(
-        new Set([...(existing ?? []), res.config.params.id]),
+        new Set([...(existing ?? []), (res.config as any)._authAddress]),
       );
       await storage.put(Setting.RequiredAuthSig, next);
     }
@@ -43,9 +46,34 @@ indexerApi.interceptors.response.use(
   },
 );
 
-export const getIndexerChain = memoize(async (chainId: number) => {
+/**
+ * C-Indexer = "Cx"
+ */
+
+export const getCxChain = memoize(async (chainId: number) => {
   try {
-    const chainList = await getAllIndexerChains();
+    const chainList = await fetchCxChainList();
+
+    return chainList.find((c: any) => +c.chain_id === chainId);
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+});
+
+export const fetchCxChainList = memoize(
+  () => indexerApi.get("/c/v1/chains/").then((r) => r.data?.data?.items ?? []),
+  {
+    maxAge: 60 * 60_000, // 1 hour
+  },
+);
+
+/**
+ * D-Indexer = "Dx"
+ */
+export const getDxChain = memoize(async (chainId: number) => {
+  try {
+    const chainList = await fetchDxChainList();
 
     return chainList.find((c: any) => c.community_id === chainId);
   } catch (err) {
@@ -54,27 +82,30 @@ export const getIndexerChain = memoize(async (chainId: number) => {
   }
 });
 
-export const getAllIndexerChains = memoize(
-  async () => {
-    const { data } = await indexerApi.get("/v1/chain/list");
-    return data;
-  },
+export const fetchDxChainList = memoize(
+  () => indexerApi.get("/d/v1/chain/list").then((r) => r.data),
   {
     maxAge: 60 * 60_000, // 1 hour
   },
 );
 
-export const getIndexerUserTokens = memoize(
-  async (chainName: string, accountAddress: string) =>
+/**
+ * U-Indexer = "Ux"
+ */
+
+export const getUxChainName = (chainId: number) =>
+  U_INDEXER_CHAINS.get(chainId);
+
+export const getUserTokens = memoize(
+  async (cChainName: string, accountAddress: string) =>
     indexerApi
-      .get("/v1/user/token_list", {
+      .get(`/c/v1/${cChainName}/address/${accountAddress}/balances_v2/`, {
         params: {
-          id: accountAddress,
-          chain_id: chainName,
-          is_all: false,
+          _authAddress: accountAddress,
+          "no-spam": true,
         },
       })
-      .then(({ data }) => data || []),
+      .then(({ data }) => data?.data?.items || []),
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 30_000, // 30 sec
@@ -84,21 +115,16 @@ export const getIndexerUserTokens = memoize(
 export const getUserChainBalance = memoize(
   async (chainId: number, accountAddress: string) => {
     try {
-      const chainData = await getIndexerChain(chainId);
-      if (!chainData) return null;
+      const cChainData = await getCxChain(chainId);
+      if (!cChainData) return null;
 
-      const userTokens = await getIndexerUserTokens(
-        chainData.id,
-        accountAddress,
-      );
+      const userTokens = await getUserTokens(cChainData.name, accountAddress);
 
       let totalUSD = new BigNumber(0);
 
       for (const token of userTokens) {
         try {
-          const balUSD = new BigNumber(token.balance)
-            .div(new BigNumber(10).pow(token.decimals))
-            .times(token.price);
+          const balUSD = new BigNumber(token.quote);
           if (!balUSD.isNaN() && balUSD.isFinite()) {
             totalUSD = totalUSD.plus(balUSD);
           }
@@ -128,16 +154,24 @@ export const getUserChainBalance = memoize(
   },
 );
 
-export const getIndexerUserNfts = async (
+export const getUserNfts = async (
   chainName: string,
   accountAddress: string,
 ) => {
-  const { data } = await indexerApi.get("/v1/user/nft_list", {
-    params: {
-      chain_id: chainName,
-      id: accountAddress,
+  const { data } = await indexerApi.get(
+    `/c/v1/${chainName}/address/${accountAddress}/balances_nft/`,
+    {
+      params: {
+        _authAddress: accountAddress,
+        "no-spam": true,
+      },
     },
-  });
+  );
 
-  return data;
+  return (data?.data?.items ?? []).flatMap((item: any) =>
+    item.nft_data.map((nftData: any) => ({
+      ...item,
+      nft_data: nftData,
+    })),
+  );
 };

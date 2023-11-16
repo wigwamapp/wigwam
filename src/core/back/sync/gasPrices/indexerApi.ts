@@ -2,15 +2,15 @@ import BigNumber from "bignumber.js";
 
 import { GasPrices } from "core/types";
 
-import { getIndexerChain, indexerApi } from "../indexerApi";
+import { getDxChain, indexerApi } from "../indexerApi";
 
 export async function getIndexerGasPrices(chainId: number): Promise<GasPrices> {
-  const indexerChain = await getIndexerChain(chainId);
-  if (!indexerChain) return null;
+  const dxChain = await getDxChain(chainId);
+  if (!dxChain) return null;
 
   const res = await indexerApi
-    .get("/chain/gas_price_dict_v2", {
-      params: { chain: indexerChain.id },
+    .get("/d/v1/wallet/gas_market", {
+      params: { chain_id: dxChain.id },
     })
     .catch(() => null);
 

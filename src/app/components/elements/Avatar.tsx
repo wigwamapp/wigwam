@@ -1,5 +1,6 @@
 import {
   FC,
+  ReactNode,
   forwardRef,
   memo,
   useCallback,
@@ -18,13 +19,14 @@ export type LoadingStatus = {
 };
 
 export type AvatarProps = AvatarPrimitive.AvatarImageProps & {
+  fallbackNode?: ReactNode;
   FallbackElement?: FC<{ className?: string }>;
   withBorder?: boolean;
   withBg?: boolean;
   imageClassName?: string;
   fallbackClassName?: string;
   errorClassName?: string;
-  setLoadingStatus?: (status: LoadingStatus) => void;
+  onLoadingStateChange?: (status: LoadingStatus) => void;
   delay?: number;
 };
 
@@ -32,6 +34,7 @@ const Avatar = memo(
   forwardRef<HTMLElement, AvatarProps>(
     (
       {
+        fallbackNode,
         FallbackElement = FallbackIcon,
         withBorder = true,
         withBg = true,
@@ -39,7 +42,7 @@ const Avatar = memo(
         imageClassName,
         fallbackClassName,
         errorClassName,
-        setLoadingStatus,
+        onLoadingStateChange,
         delay = 150,
         style,
         ...rest
@@ -54,8 +57,8 @@ const Avatar = memo(
 
       const handleDelayFinised = useCallback(() => {
         setDelayFinished(true);
-        setLoadingStatus?.({ state: loadingState, delayFinished: true });
-      }, [setDelayFinished, setLoadingStatus, loadingState]);
+        onLoadingStateChange?.({ state: loadingState, delayFinished: true });
+      }, [setDelayFinished, onLoadingStateChange, loadingState]);
 
       const handleDelayFinisedRef = useRef(handleDelayFinised);
       useEffect(() => {
@@ -79,7 +82,8 @@ const Avatar = memo(
               bgDisplayed && "bg-brand-main/10",
             ],
             loadingState === "error" && [
-              "rounded-full bg-brand-main/10 overflow-hidden border border-brand-main/20",
+              "rounded-full bg-brand-main/10 overflow-hidden",
+              !fallbackNode && "border border-brand-main/20",
               errorClassName,
             ],
             className,
@@ -90,15 +94,29 @@ const Avatar = memo(
             {...rest}
             onLoadingStatusChange={(state) => {
               setLoadingState(state);
-              setLoadingStatus?.({ state, delayFinished });
+              onLoadingStateChange?.({ state, delayFinished });
             }}
             className={classNames("w-full h-full object-cover", imageClassName)}
           />
           {loadingState === "error" && (
-            <AvatarPrimitive.Fallback className="flex justify-center items-center h-full after:pr-full">
-              <FallbackElement
-                className={classNames("h-1/2 w-auto m-auto", fallbackClassName)}
-              />
+            <AvatarPrimitive.Fallback
+              {...(fallbackNode
+                ? {
+                    asChild: true,
+                  }
+                : {
+                    className:
+                      "flex justify-center items-center h-full after:pr-full",
+                  })}
+            >
+              {fallbackNode ?? (
+                <FallbackElement
+                  className={classNames(
+                    "h-1/2 w-auto m-auto",
+                    fallbackClassName,
+                  )}
+                />
+              )}
             </AvatarPrimitive.Fallback>
           )}
         </AvatarPrimitive.Root>

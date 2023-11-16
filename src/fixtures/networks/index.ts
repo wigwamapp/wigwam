@@ -1,7 +1,9 @@
 import { assert } from "lib/system/assert";
 import { getPublicURL } from "lib/ext/utils";
+import { getERC20IconUrl } from "lib/wigwam-static";
 
-import { Network } from "core/types";
+import { Network, Asset } from "core/types";
+import { parseTokenSlug } from "core/common/tokens";
 
 import { ETHEREUM } from "./ethereum";
 import { OPTIMISM } from "./optimism";
@@ -60,6 +62,10 @@ export const DEFAULT_CHAIN_IDS = new Set(
   DEFAULT_NETWORKS.map((n) => n.chainId),
 );
 
+export const MAINNET_CHAIN_IDS = new Set(
+  DEFAULT_NETWORKS.filter((n) => n.type === "mainnet").map((n) => n.chainId),
+);
+
 if (process.env.RELEASE_ENV === "false") {
   assert(
     new Set(DEFAULT_NETWORKS.map((n) => n.chainId)).size ===
@@ -89,15 +95,19 @@ export function getNetworkIconUrl(network: Network) {
   );
 }
 
-export function getTokenLogoUrl(logoUrl?: string) {
-  if (logoUrl?.startsWith("{{native}}")) {
-    const [, chainTag] = logoUrl.split("/");
+export function getAssetLogoUrl(asset: Asset) {
+  const { address } = parseTokenSlug(asset.tokenSlug);
+
+  if (asset.logoUrl?.startsWith("{{native}}")) {
+    const [, chainTag] = asset.logoUrl.split("/");
     return chainTag
       ? getPublicURL(`icons/nativeToken/${chainTag}.png`)
       : undefined;
   }
 
-  return logoUrl;
+  return MAINNET_CHAIN_IDS.has(asset.chainId)
+    ? getERC20IconUrl(asset.chainId, address.toLowerCase())
+    : asset.logoUrl;
 }
 
 export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
@@ -120,4 +130,27 @@ export const COINGECKO_NATIVE_TOKEN_IDS = new Map([
   [57, "syscoin"],
   [324, "ethereum"],
   [42170, "ethereum"],
+]);
+
+export const U_INDEXER_CHAINS = new Map([
+  [1, "ethereum"],
+  [56, "bsc"],
+  [137, "matic"],
+  [42220, "celo"],
+  [8217, "klaytn"],
+  [25, "cronos"],
+  [106, "velas"],
+  [42161, "arbitrum"],
+  [43114, "avalanche"],
+  [50, "xinfin"],
+  [32769, "zilliqa"],
+  [250, "fantom"],
+  [122, "fuse"],
+  [1313161554, "aurora"],
+  [1088, "metis"],
+  [5000, "mantle"],
+  [1101, "zkevm"],
+  [1284, "moonbeam"],
+  [10, "optimism"],
+  [8453, "base"],
 ]);

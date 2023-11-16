@@ -9,7 +9,7 @@ export type CoinGeckoPrices = Record<string, CGPriceRecord>;
 
 export const coinGeckoApi = axios.create({
   baseURL: "https://api.coingecko.com/api/v3",
-  timeout: 60_000,
+  timeout: 90_000,
 });
 
 const tokenPricesCache = new ExpiryMap<string, CGPriceRecord>(3 * 60_000);
@@ -46,16 +46,24 @@ export async function getCoinGeckoPrices(
       return data;
     }
 
-    const { data: freshData } = await coinGeckoApi.get<CoinGeckoPrices>(
-      `/simple/token_price/${platform}`,
-      {
-        params: {
-          contract_addresses: tokenAddressesToRefresh.join(),
-          vs_currencies: "USD",
-          include_24hr_change: true,
+    const freshData: CoinGeckoPrices = {};
+
+    while (tokenAddressesToRefresh.length > 0) {
+      const contractAddresses = tokenAddressesToRefresh.splice(0, 100);
+
+      const { data: nextFreshData } = await coinGeckoApi.get<CoinGeckoPrices>(
+        `/simple/token_price/${platform}`,
+        {
+          params: {
+            contract_addresses: contractAddresses.join(),
+            vs_currencies: "USD",
+            include_24hr_change: true,
+          },
         },
-      },
-    );
+      );
+
+      Object.assign(freshData, nextFreshData);
+    }
 
     for (const [tokenAddress, price] of Object.entries(freshData)) {
       tokenPricesCache.set(getCacheKey(tokenAddress), price);

@@ -22,39 +22,39 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-import {
-  getIndexerChain,
-  getIndexerUserNfts,
-  getIndexerUserTokens,
-} from "../indexerApi";
+import { getCxChain, getUserTokens, getUserNfts } from "../indexerApi";
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain } from "../chain";
+import { parseContentType } from "../utils";
 
 export const syncAccountTokens = memoize(
   async (chainId: number, accountAddress: string, tokenType: TokenType) => {
-    const [indexerChain, existingAccTokens, { nativeCurrency, chainTag }] =
-      await Promise.all([
-        getIndexerChain(chainId),
-        repo.accountTokens
-          .where("[chainId+tokenType+accountAddress]")
-          .equals([chainId, tokenType, accountAddress])
-          .toArray(),
-        getNetwork(chainId),
-      ]);
+    const [
+      cxChain,
+      existingAccTokens,
+      { nativeCurrency, chainTag, type: netType },
+    ] = await Promise.all([
+      getCxChain(chainId),
+      repo.accountTokens
+        .where("[chainId+tokenType+accountAddress]")
+        .equals([chainId, tokenType, accountAddress])
+        .toArray(),
+      getNetwork(chainId),
+    ]);
 
     const accTokens: AccountToken[] = [];
     const dbKeys: IndexableTypeArray = [];
 
     let existingTokensMap: Map<string, AccountToken> | undefined;
 
-    if (indexerChain) {
+    if (cxChain) {
       existingTokensMap = new Map(
         existingAccTokens.map((t) => [t.tokenSlug, t]),
       );
 
       const indexerUserTokens = await (tokenType === TokenType.Asset
-        ? getIndexerUserTokens(indexerChain.id, accountAddress)
-        : getIndexerUserNfts(indexerChain.id, accountAddress)
+        ? getUserTokens(cxChain.name, accountAddress)
+        : getUserNfts(cxChain.id, accountAddress)
       ).catch(() => null);
 
       if (indexerUserTokens) {
@@ -65,22 +65,25 @@ export const syncAccountTokens = memoize(
            * For assets
            */
           if (tokenType === TokenType.Asset) {
-            const native = token.id === indexerChain.native_token_id;
+            const native = token.native_token;
 
             if (native) continue;
 
             tokenSlug = createTokenSlug({
               standard: native ? TokenStandard.Native : TokenStandard.ERC20,
-              address: native ? "0" : ethers.getAddress(token.id),
+              address: native ? "0" : ethers.getAddress(token.contract_address),
               id: "0",
             });
             const rawBalanceBN = BigInt(
-              new BigNumber(token.raw_amount).integerValue().toString(),
+              new BigNumber(token.balance).integerValue().toString(),
             );
 
             const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
-            if (!existing && rawBalanceBN === 0n) {
+            if (
+              (!existing && rawBalanceBN === 0n) ||
+              (netType === "mainnet" && !token.quote)
+            ) {
               continue;
             }
 
@@ -91,21 +94,23 @@ export const syncAccountTokens = memoize(
                   logoUrl: getNativeTokenLogoUrl(chainTag),
                 }
               : {
-                  symbol: token.symbol,
-                  name: token.name,
-                  logoUrl: token.logo_url,
+                  symbol: token.contract_ticker_symbol?.slice(0, 8) || "NONAME",
+                  name: token.contract_name || "Unknown",
+                  logoUrl: netType === "mainnet" ? token.logo_url : undefined,
                 };
 
             const rawBalance = rawBalanceBN.toString();
-            const priceUSD = token.price
-              ? new BigNumber(token.price).toString()
+            const priceUSD = token.quote_rate
+              ? new BigNumber(token.quote_rate).toString()
               : existing?.priceUSD;
-            const balanceUSD = priceUSD
-              ? new BigNumber(rawBalance)
-                  .div(new BigNumber(10).pow(token.decimals))
-                  .times(priceUSD)
-                  .toNumber()
-              : existing?.balanceUSD;
+            const balanceUSD =
+              token.quote ||
+              (priceUSD
+                ? new BigNumber(rawBalance)
+                    .div(new BigNumber(10).pow(token.contract_decimals))
+                    .times(priceUSD)
+                    .toNumber()
+                : existing?.balanceUSD ?? 0);
 
             accTokens.push(
               existing
@@ -123,7 +128,9 @@ export const syncAccountTokens = memoize(
                     tokenType: TokenType.Asset,
                     status: native ? TokenStatus.Native : TokenStatus.Enabled,
                     // Metadata
-                    decimals: native ? nativeCurrency.decimals : token.decimals,
+                    decimals: native
+                      ? nativeCurrency.decimals
+                      : token.contract_decimals,
                     ...metadata,
                     // Volumes
                     rawBalance,
@@ -136,14 +143,16 @@ export const syncAccountTokens = memoize(
              * For NFTs
              */
           } else {
-            const contractAddress = ethers.getAddress(token.contract_id);
-            const tokenId = String(token.inner_id);
-            const rawBalanceBN = BigInt(token.amount);
+            if (!token.nft_data) continue;
+
+            const contractAddress = ethers.getAddress(token.contract_address);
+            const tokenId = String(token.nft_data.token_id);
+            const rawBalanceBN = BigInt(1); // TODO: token.amount
 
             tokenSlug = createTokenSlug({
-              standard: token.is_erc721
-                ? TokenStandard.ERC721
-                : TokenStandard.ERC1155,
+              standard: token.supports_erc?.includes("erc1155")
+                ? TokenStandard.ERC1155
+                : TokenStandard.ERC721,
               address: contractAddress,
               id: tokenId,
             });
@@ -159,29 +168,34 @@ export const syncAccountTokens = memoize(
                 ? new BigNumber(token.usd_price).toString()
                 : existing?.priceUSD;
 
+            const external = token.nft_data.external_data;
+            const contentType =
+              existing?.contentType ||
+              parseContentType(external?.asset_mime_type);
+
             const metadata = {
               contractAddress,
               tokenId,
-              name: existing?.name || token.name || `#${tokenId}`,
-              description: existing?.description || token.description,
+              name: existing?.name || external?.name || `#${tokenId}`,
+              description: existing?.description || external?.description,
               thumbnailUrl:
                 existing?.thumbnailUrl ||
                 sanitizeUrl(
-                  token.thumbnail_url ||
-                    (token.content_type === "image_url"
-                      ? token.content
+                  external?.image ||
+                    (contentType === "image_url"
+                      ? external?.asset_url
                       : undefined),
                 ),
               contentUrl:
                 existing?.contentUrl ||
-                sanitizeUrl(token.content || token.thumbnail_url),
-              contentType: existing?.contentType || token.content_type,
-              collectionId: existing?.collectionId || token.collection_id,
+                sanitizeUrl(external?.asset_url || external?.image),
+              contentType,
+              collectionId: existing?.collectionId,
               collectionName: existing?.collectionName || token.contract_name,
-              detailUrl: existing?.detailUrl || token.detail_url,
+              detailUrl: existing?.detailUrl || token.nft_data.token_url,
               priceUSD,
-              attributes: existing?.attributes ?? token.attributes,
-              tpId: token.id,
+              attributes: existing?.attributes ?? external?.attributes,
+              tpId: undefined,
             };
 
             const rawBalance = rawBalanceBN.toString();
@@ -248,6 +262,9 @@ export const syncAccountTokens = memoize(
       }
     }
 
+    // Fetch data from the chain for tokens
+    // that were not retrieved from the indexer
+
     const restTokens = existingTokensMap
       ? Array.from(existingTokensMap.values())
       : existingAccTokens;
@@ -292,6 +309,8 @@ export const syncAccountTokens = memoize(
         );
       }
     }
+
+    // Fetch coingecko prices
 
     const tokenAddresses: string[] = [];
 
