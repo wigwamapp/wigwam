@@ -26,6 +26,10 @@ export function sanitizeUrl(
   desiredIpfsGateway?: string,
 ): undefined;
 export function sanitizeUrl(
+  url?: string,
+  desiredIpfsGateway?: string,
+): string | undefined;
+export function sanitizeUrl(
   url: string | undefined,
   desiredIpfsGateway = IPFS_IO_GATEWAY,
 ) {

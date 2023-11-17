@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { AccountToken, TokenActivityBase, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 
-import { indexerApi, getUxChainName } from "../../indexerApi";
+import { indexerApi, getUxChainName } from "../../indexer";
 import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
 
 /**
@@ -38,8 +38,7 @@ export async function syncUxTokenActivities(token: AccountToken) {
     },
   );
 
-  if (!data?.transactions) throw new Error("No data");
-  if (!data.transactions.length) return true;
+  if (!data?.transactions?.length) return true;
 
   const { addToActivities, releaseToRepo } = prepareTokenActivitiesRepo();
 

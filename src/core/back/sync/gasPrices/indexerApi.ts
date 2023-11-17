@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 import { GasPrices } from "core/types";
 
-import { getDxChain, indexerApi } from "../indexerApi";
+import { getDxChain, indexerApi } from "../indexer";
 
 export async function getIndexerGasPrices(chainId: number): Promise<GasPrices> {
   const dxChain = await getDxChain(chainId);

@@ -19,24 +19,26 @@ export const syncTokenActivities = memoize(
 
     syncStarted(accTokenKey);
 
-    const token = await repo.accountTokens.get(accTokenKey);
-    if (!token) return;
+    try {
+      const token = await repo.accountTokens.get(accTokenKey);
+      if (!token) return;
 
-    for (const sync of [
-      syncDxTokenActivities,
-      syncUxTokenActivities,
-      syncExplorerTokenActivities,
-      syncChainTokenActivities,
-    ]) {
-      try {
-        const success = await sync(token);
-        if (success) break;
-      } catch (err) {
-        console.error(err);
+      for (const sync of [
+        syncDxTokenActivities,
+        syncUxTokenActivities,
+        syncExplorerTokenActivities,
+        syncChainTokenActivities,
+      ]) {
+        try {
+          const success = await sync(token);
+          if (success) break;
+        } catch (err) {
+          console.error(err);
+        }
       }
+    } finally {
+      synced(accTokenKey);
     }
-
-    synced(accTokenKey);
   },
   {
     maxAge: 40_000,

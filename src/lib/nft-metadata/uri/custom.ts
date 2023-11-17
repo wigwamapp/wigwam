@@ -5,7 +5,7 @@ import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 const WHITELIST = new Set([
   IPFS_CLOUDFLARE_GATEWAY,
   IPFS_IO_GATEWAY,
-  "https://static.debank.com",
+  "https://nftassets.covalenthq.com",
 ]);
 
 export function sanitizeCustomUrl(customUrl: string) {

@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { AccountToken, TokenActivityBase, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { indexerApi, getDxChain } from "../../indexerApi";
+import { indexerApi, getDxChain } from "../../indexer";
 import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
 
 /**
