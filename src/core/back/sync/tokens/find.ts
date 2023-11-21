@@ -5,6 +5,7 @@ import {
   TokenStandard,
   TokenStatus,
   TokenType,
+  NFT,
 } from "core/types";
 import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
 import * as repo from "core/repo";
@@ -83,8 +84,7 @@ async function performTokenSync(
 
     await repo.accountTokens.put(
       {
-        ...existing,
-        ...((metadata as any) ?? {}),
+        ...mergeMetadataSafe(existing, metadata),
         status:
           existing.status === TokenStatus.Disabled && balance
             ? TokenStatus.Enabled
@@ -157,4 +157,27 @@ async function performTokenSync(
   };
 
   await repo.accountTokens.put(tokenToAdd, dbKey);
+}
+
+function mergeMetadataSafe(
+  existing: AccountToken,
+  metadata:
+    | {
+        decimals: bigint;
+        symbol: string;
+        name: string;
+      }
+    | Partial<NFT>
+    | null,
+) {
+  if (!metadata) return existing;
+
+  const next: AccountToken = { ...existing };
+
+  for (const key of Object.keys(metadata)) {
+    const value = (metadata as any)[key];
+    if (value || value === 0n) (next as any)[key] = value;
+  }
+
+  return next;
 }

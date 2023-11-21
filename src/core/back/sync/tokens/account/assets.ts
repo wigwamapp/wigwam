@@ -13,27 +13,31 @@ import {
   NATIVE_TOKEN_SLUG,
   parseTokenSlug,
 } from "core/common/tokens";
+import { getNetwork } from "core/common/network";
 
 import { getCoinGeckoPrices } from "../../coinGecko";
 import { getBalanceFromChain } from "../../chain";
 import { prepareAccountTokensSync } from "./utils";
+import { fetchCxAccountTokens } from "../../indexer";
 
 export const syncAccountAssets = memoize(
   async (chainId: number, accountAddress: string) => {
-    const {
+    const [
       network,
-      cxAccountTokens,
-      existingTokensMap,
-      accTokens,
-      addToken,
-      releaseToRepo,
-    } = await prepareAccountTokensSync(
-      chainId,
-      accountAddress,
-      TokenType.Asset,
-    );
+      freshAccTokensData,
+      { existingTokensMap, accTokens, addToken, releaseToRepo },
+    ] = await Promise.all([
+      getNetwork(chainId),
+      fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset).catch(
+        (err) => {
+          console.error(err);
+          return [];
+        },
+      ),
+      prepareAccountTokensSync(chainId, accountAddress, TokenType.Asset),
+    ]);
 
-    for (const token of cxAccountTokens) {
+    for (const token of freshAccTokensData) {
       const native = token.native_token;
 
       // Skip for native token, we sync native tokens in separate module

@@ -9,12 +9,9 @@ const WHITELIST = new Set([
 ]);
 
 export function sanitizeCustomUrl(customUrl: string) {
-  const url = new URL(customUrl);
-
+  if (!customUrl.startsWith("http")) return customUrl;
   // Whitelisted
-  if (WHITELIST.has(url.origin)) return customUrl;
-
-  if (!url.protocol.startsWith("http")) return customUrl;
+  if (WHITELIST.has(new URL(customUrl).origin)) return customUrl;
 
   return wrapStaticUrl(customUrl);
 }

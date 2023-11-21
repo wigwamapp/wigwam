@@ -52,7 +52,7 @@ export function convertToDesiredGateway(
   const splitUrl = sourceUrl.split(cid);
 
   if (isCID(cid)) {
-    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1]}`;
+    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1] ?? ""}`;
   }
 
   // Case 1 - the ipfs://cid path
