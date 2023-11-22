@@ -224,13 +224,18 @@ export const getWays = (
           navigateToStep(AddAccountStep.ImportPrivateKey);
         },
       },
-      {
-        title: "Watch-only account",
-        Icon: WatchOnlyIcon,
-        action: () => {
-          navigateToStep(AddAccountStep.AddWatchOnlyAccount);
-        },
-      },
+      // Disable watch only accounts for prod env
+      ...(process.env.RELEASE_ENV === "true"
+        ? []
+        : [
+            {
+              title: "Watch-only account",
+              Icon: WatchOnlyIcon,
+              action: () => {
+                navigateToStep(AddAccountStep.AddWatchOnlyAccount);
+              },
+            },
+          ]),
     ],
   },
 ];
