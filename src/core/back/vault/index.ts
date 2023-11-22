@@ -281,9 +281,16 @@ export class Vault {
   getAccounts() {
     const accGroup = this.getGroup(Gr.Accounts);
 
-    return accGroup.entries.map((entry) =>
+    let accounts = accGroup.entries.map((entry) =>
       exportFields<Account>(entry, { uuid: true }),
     );
+
+    // Disable watch only accounts for prod env
+    if (process.env.RELEASE_ENV === "true") {
+      accounts = accounts.filter((acc) => acc.source !== AccountSource.Address);
+    }
+
+    return accounts;
   }
 
   async addAccounts(
