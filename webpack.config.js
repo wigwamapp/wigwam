@@ -156,7 +156,7 @@ module.exports = {
   },
 
   resolve: {
-    modules: [NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
+    modules: ["node_modules", NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
     extensions: MODULE_FILE_EXTENSIONS,
     alias: {
       "@toruslabs/openlogin": require.resolve(
