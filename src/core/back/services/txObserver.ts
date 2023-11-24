@@ -1,6 +1,6 @@
 import retry from "async-retry";
 import memoize from "mem";
-import { ethers } from "ethers";
+import { ethers, getAddress } from "ethers";
 import { schedule } from "lib/system/schedule";
 
 import {
@@ -16,7 +16,7 @@ import { matchTokenTransferEvents } from "core/common/transaction";
 
 import { sendRpc, getRpcProvider } from "../rpc";
 import { isUnlocked, $accountAddresses } from "../state";
-import { addFindTokenRequest, syncNativeTokens } from "../sync";
+import { addFindTokenRequest } from "../sync";
 
 export async function startTxObserver() {
   schedule(5_000, async () => {
@@ -73,10 +73,12 @@ export async function startTxObserver() {
 
                 for (const transfer of transfers) {
                   for (const transferAddress of [transfer.to, transfer.from]) {
-                    if (accountAddresses.includes(transferAddress)) {
+                    const formatedAddress = getAddress(transferAddress);
+
+                    if (accountAddresses.includes(formatedAddress)) {
                       addFindTokenRequest(
                         tx.chainId,
-                        transferAddress,
+                        formatedAddress,
                         transfer.tokenSlug,
                       );
                     }
@@ -93,15 +95,11 @@ export async function startTxObserver() {
               NATIVE_TOKEN_SLUG,
             );
 
-            const destination = result.to && ethers.getAddress(result.to);
+            const destination = result.to && getAddress(result.to);
 
             if (destination && accountAddresses.includes(destination)) {
               addFindTokenRequest(tx.chainId, destination, NATIVE_TOKEN_SLUG);
             }
-
-            syncNativeTokens(tx.chainId, `current_${tx.accountAddress}`, [
-              tx.accountAddress,
-            ]);
           }
 
           txsToUpdate.set(tx.txHash, updatedTx);

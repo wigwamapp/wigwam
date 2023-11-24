@@ -7,7 +7,11 @@ import {
   TokenType,
   NFT,
 } from "core/types";
-import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
+import {
+  NATIVE_TOKEN_SLUG,
+  createAccountTokenKey,
+  parseTokenSlug,
+} from "core/common/tokens";
 import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
@@ -60,6 +64,40 @@ async function performTokenSync(
   const { standard, address: tokenAddress } = parseTokenSlug(tokenSlug);
 
   const existing = await repo.accountTokens.get(dbKey);
+
+  const releaseToRepo = async (
+    tokenToAdd: AccountToken,
+    prevBalanceUSD = 0,
+  ) => {
+    await repo.accountTokens.put(tokenToAdd, dbKey);
+
+    // Update portfolioUSD
+    if (tokenToAdd.tokenType === TokenType.Asset) {
+      const nativeTokenDbKey = createAccountTokenKey({
+        chainId,
+        accountAddress,
+        tokenSlug: NATIVE_TOKEN_SLUG,
+      });
+
+      const nativeToken =
+        tokenToAdd.tokenSlug === NATIVE_TOKEN_SLUG
+          ? tokenToAdd
+          : await repo.accountTokens.get(nativeTokenDbKey);
+
+      if (nativeToken?.portfolioUSD) {
+        const portfolioUSD = new BigNumber(nativeToken.portfolioUSD)
+          .minus(prevBalanceUSD)
+          .plus(tokenToAdd.balanceUSD)
+          .toString();
+
+        await repo.accountTokens.put(
+          { ...nativeToken, portfolioUSD },
+          nativeTokenDbKey,
+        );
+      }
+    }
+  };
+
   if (existing) {
     const [balance, metadata] = await Promise.all([
       getBalanceFromChain(chainId, tokenSlug, accountAddress),
@@ -75,14 +113,14 @@ async function performTokenSync(
             .div(new BigNumber(10).pow(existing.decimals))
             .times(existing.priceUSD)
             .toNumber()
-        : existing.balanceUSD ?? 0;
+        : existing.balanceUSD;
 
     const balanceChangedToZero =
       existing.status === TokenStatus.Enabled &&
       new BigNumber(existing.rawBalance).gt(0) &&
       new BigNumber(rawBalance).isZero();
 
-    await repo.accountTokens.put(
+    await releaseToRepo(
       {
         ...mergeMetadataSafe(existing, metadata),
         status:
@@ -94,7 +132,7 @@ async function performTokenSync(
         rawBalance,
         balanceUSD,
       },
-      dbKey,
+      existing.balanceUSD,
     );
 
     return;
@@ -156,7 +194,7 @@ async function performTokenSync(
     priceUSDChange,
   };
 
-  await repo.accountTokens.put(tokenToAdd, dbKey);
+  await releaseToRepo(tokenToAdd);
 }
 
 function mergeMetadataSafe(
