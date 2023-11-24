@@ -64,10 +64,11 @@ export const syncNativeTokens = memoize(
         let allAssetsSum = new BigNumber(0);
 
         for (const asset of allAssets) {
+          if (asset.tokenSlug === NATIVE_TOKEN_SLUG) continue;
           allAssetsSum = allAssetsSum.plus(asset.balanceUSD ?? 0);
         }
 
-        const portfolioUSD =
+        let portfolioUSD =
           existing?.portfolioUSD === "-1" && allAssetsSum.isZero()
             ? "0"
             : allAssetsSum.toString();
@@ -97,6 +98,10 @@ export const syncNativeTokens = memoize(
                 .toNumber()
             : existing.balanceUSD;
 
+          portfolioUSD = new BigNumber(portfolioUSD)
+            .plus(balanceUSD)
+            .toString();
+
           return {
             ...existing,
             ...metadata,
@@ -115,6 +120,10 @@ export const syncNativeTokens = memoize(
                   .times(priceUSD)
                   .toNumber()
               : 0;
+
+          portfolioUSD = new BigNumber(portfolioUSD)
+            .plus(balanceUSD)
+            .toString();
 
           return {
             chainId,

@@ -2,7 +2,7 @@ import { IndexableTypeArray } from "dexie";
 
 import * as repo from "core/repo";
 import { AccountToken, TokenType } from "core/types";
-import { createAccountTokenKey } from "core/common/tokens";
+import { NATIVE_TOKEN_SLUG, createAccountTokenKey } from "core/common/tokens";
 
 export async function prepareAccountTokensSync(
   chainId: number,
@@ -15,7 +15,9 @@ export async function prepareAccountTokensSync(
     .toArray();
 
   const existingTokensMap = new Map(
-    existingAccTokens.map((t) => [t.tokenSlug, t]),
+    existingAccTokens
+      .filter((t) => t.tokenSlug !== NATIVE_TOKEN_SLUG)
+      .map((t) => [t.tokenSlug, t]),
   );
 
   const accTokens: AccountToken[] = [];

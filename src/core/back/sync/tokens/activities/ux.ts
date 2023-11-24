@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { AccountToken, TokenActivityBase, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 
-import { indexerApi, getUxChainName } from "../../indexer";
+import { indexerApi } from "../../indexer";
 import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
 
 /**
@@ -16,14 +16,11 @@ export async function syncUxTokenActivities(token: AccountToken) {
 
   if (tokenType !== TokenType.Asset || tokenSlug === NATIVE_TOKEN_SLUG) return;
 
-  const uxChainName = getUxChainName(chainId);
-  if (!uxChainName) return;
-
   const latestItem = await getLatestTokenActivity(token);
   const { address: tokenAddress } = parseTokenSlug(tokenSlug);
 
   const { data } = await indexerApi.get(
-    `/u/v3/${uxChainName}/address/${accountAddress}/transactions`,
+    `/u/v3/${chainId}/address/${accountAddress}/transactions`,
     {
       params: {
         _authAddress: accountAddress,

@@ -8,11 +8,7 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import {
-  createTokenSlug,
-  NATIVE_TOKEN_SLUG,
-  parseTokenSlug,
-} from "core/common/tokens";
+import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 
 import { getCoinGeckoPrices } from "../../coinGecko";
@@ -112,65 +108,44 @@ export const syncAccountAssets = memoize(
     // Fetch data from the chain for tokens
     // that were not retrieved from the indexer
 
-    const restTokens = Array.from(existingTokensMap.values());
+    const restTokens = Array.from(existingTokensMap.values()) as AccountAsset[];
 
     if (restTokens.length > 0) {
       const balances = await Promise.all(
         restTokens.map(({ tokenSlug }) =>
-          tokenSlug !== NATIVE_TOKEN_SLUG
-            ? getBalanceFromChain(chainId, tokenSlug, accountAddress)
-            : null,
+          getBalanceFromChain(chainId, tokenSlug, accountAddress),
         ),
       );
 
       for (let i = 0; i < restTokens.length; i++) {
         const balance = balances[i];
-
         if (!balance) continue;
 
         const token = restTokens[i];
-
         const rawBalance = balance.toString();
-        const balanceUSD =
-          token.tokenType === TokenType.Asset && token.priceUSD
-            ? new BigNumber(rawBalance)
-                .div(new BigNumber(10).pow(token.decimals))
-                .times(token.priceUSD)
-                .toNumber()
-            : token.balanceUSD;
 
         addToken({
           ...token,
           rawBalance,
-          balanceUSD,
         });
       }
     }
 
     // Fetch coingecko prices
 
-    const tokenAddresses: string[] = [];
+    const tokenAddresses = accTokens.map(
+      (t) => parseTokenSlug(t.tokenSlug).address,
+    );
+    const restTokenSlugs = new Set(restTokens.map((t) => t.tokenSlug));
 
-    for (const token of accTokens) {
-      const { standard, address } = parseTokenSlug(token.tokenSlug);
-
-      if (standard === TokenStandard.ERC20) {
-        tokenAddresses.push(address);
-      }
-    }
-
-    const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
+    const cgPrices = await getCoinGeckoPrices(tokenAddresses);
 
     if (Object.keys(cgPrices).length > 0) {
-      for (let token of accTokens) {
-        if (token.status === TokenStatus.Native) continue;
+      for (let i = 0; i < accTokens.length; i++) {
+        const token = accTokens[i] as AccountAsset;
+        const tokenAddress = tokenAddresses[i];
 
-        token = token as AccountAsset;
-
-        const cgTokenAddress = parseTokenSlug(
-          token.tokenSlug,
-        ).address.toLowerCase();
-        const price = cgPrices[cgTokenAddress];
+        const price = cgPrices[tokenAddress];
 
         if (price && price.usd) {
           const priceUSD = new BigNumber(price.usd);
@@ -182,9 +157,11 @@ export const syncAccountAssets = memoize(
             .times(priceUSD)
             .toNumber();
         } else {
-          delete token.priceUSD;
-          delete token.priceUSDChange;
-          token.balanceUSD = 0;
+          if (restTokenSlugs.has(token.tokenSlug)) {
+            token.balanceUSD = 0;
+            delete token.priceUSD;
+            delete token.priceUSDChange;
+          }
         }
       }
     }
@@ -193,6 +170,6 @@ export const syncAccountAssets = memoize(
   },
   {
     cacheKey: (args) => args.join("_"),
-    maxAge: 30_000, // 30 sec
+    maxAge: 40_000, // 40 sec
   },
 );

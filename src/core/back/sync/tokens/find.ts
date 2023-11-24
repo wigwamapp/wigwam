@@ -105,7 +105,7 @@ async function performTokenSync(
   let priceUSD, priceUSDChange: string | undefined;
 
   if (standard === TokenStandard.ERC20) {
-    const coinGeckoPrices = await getCoinGeckoPrices(chainId, [tokenAddress]);
+    const coinGeckoPrices = await getCoinGeckoPrices([tokenAddress]);
 
     const cgTokenAddress = tokenAddress.toLowerCase();
     const cgPrice = coinGeckoPrices[cgTokenAddress];
