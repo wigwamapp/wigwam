@@ -88,10 +88,14 @@ const AssetCard = memo(
             await repo.accountTokens.put(
               {
                 ...asset,
-                status:
-                  asset.status === TokenStatus.Enabled
-                    ? TokenStatus.Disabled
-                    : TokenStatus.Enabled,
+                ...(asset.status === TokenStatus.Enabled
+                  ? {
+                      status: TokenStatus.Disabled,
+                    }
+                  : {
+                      status: TokenStatus.Enabled,
+                      manuallyEnabled: true,
+                    }),
               },
               [asset.chainId, currentAccount.address, asset.tokenSlug].join(
                 "_",
