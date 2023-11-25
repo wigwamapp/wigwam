@@ -309,12 +309,9 @@ async function handleWalletRequest(
       )
       .with({ type: MessageType.GetCgPlatformIds }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, async () => {
-          const cgPlatformIdsMap = await getCoinGeckoPlatformIds().catch(
-            () => null,
+          const cgPlatformIds = await getCoinGeckoPlatformIds().catch(
+            () => ({}),
           );
-          const cgPlatformIds = cgPlatformIdsMap
-            ? Object.fromEntries(cgPlatformIdsMap)
-            : {};
 
           ctx.reply({ type, cgPlatformIds });
         }),
