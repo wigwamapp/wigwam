@@ -100,7 +100,7 @@ const ChooseAddAccountWay = memo(() => {
                         className={classNames(
                           "mb-5 select-none",
                           i % 3 !== 2 && "mr-5",
-                          section.disabled && "opacity-50 pointer-events-none",
+                          section.disabled && "opacity-10 pointer-events-none",
                         )}
                       />
                     ),
@@ -113,7 +113,7 @@ const ChooseAddAccountWay = memo(() => {
                         "text-xs text-brand-redtwo",
                       )}
                     >
-                      Not yet supported in this browser.
+                      Temporarily suspended.
                     </div>
                   )}
                 </div>
