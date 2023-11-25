@@ -221,6 +221,7 @@ export interface TokenActivityBase {
   timeAt: number;
   type: TokenActivityType;
   project?: TokenActivityProject;
+  blockNumber?: number;
 }
 
 export type TokenActivity = TransferTokenActivity | ApproveTokenActivity;

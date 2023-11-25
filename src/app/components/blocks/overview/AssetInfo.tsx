@@ -5,12 +5,10 @@ import BigNumber from "bignumber.js";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
-import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
-
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 
-import { tokenSlugAtom } from "app/atoms";
+import { coinGeckoPlatformIds, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -49,6 +47,7 @@ export enum TokenStandardValue {
 
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
+  const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
 
   const chainId = useChainId();
   const { currentAccount } = useAccounts();
@@ -95,7 +94,7 @@ const AssetInfo: FC = () => {
 
   const coinGeckoId =
     status === TokenStatus.Native
-      ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
+      ? cgPlatfromIds[chainId]?.native_coin_id
       : address;
 
   return (

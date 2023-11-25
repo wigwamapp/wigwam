@@ -109,7 +109,7 @@ export const getWays = (
         ],
   },
   {
-    disabled: process.env.TARGET_BROWSER === "firefox",
+    disabled: process.env.RELEASE_ENV === "true",
     type: "social",
     title: "Social",
     tooltip: {

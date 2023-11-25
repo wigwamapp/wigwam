@@ -26,6 +26,10 @@ export function sanitizeUrl(
   desiredIpfsGateway?: string,
 ): undefined;
 export function sanitizeUrl(
+  url?: string,
+  desiredIpfsGateway?: string,
+): string | undefined;
+export function sanitizeUrl(
   url: string | undefined,
   desiredIpfsGateway = IPFS_IO_GATEWAY,
 ) {
@@ -48,7 +52,7 @@ export function convertToDesiredGateway(
   const splitUrl = sourceUrl.split(cid);
 
   if (isCID(cid)) {
-    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1]}`;
+    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1] ?? ""}`;
   }
 
   // Case 1 - the ipfs://cid path

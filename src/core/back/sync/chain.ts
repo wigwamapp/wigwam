@@ -8,8 +8,9 @@ import { ERC20__factory, ERC721__factory } from "abi-types";
 import { parseTokenSlug } from "core/common/tokens";
 import { requestBalance } from "core/common/balance";
 
-import { NFT, NFTContentType, TokenStandard } from "core/types";
+import { NFT, TokenStandard } from "core/types";
 
+import { parseContentType } from "./utils";
 import { getRpcProvider } from "../rpc";
 
 export const getTokenMetadata = async (
@@ -96,14 +97,6 @@ export const getBalanceFromChain = memoize(
     maxAge: 3_000,
   },
 );
-
-function parseContentType(contentType?: string): NFTContentType | undefined {
-  if (contentType?.includes("image")) return "image_url";
-  if (contentType?.includes("video")) return "video_url";
-  if (contentType?.includes("audio")) return "audio_url";
-
-  return;
-}
 
 function omitEmptyFields<T extends Record<string, any>>(obj: T): T {
   const newObj = { ...obj };

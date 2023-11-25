@@ -61,10 +61,10 @@ const NftCard = memo(
               src={thumbnailUrl}
               alt={title.label}
               delay={1_000}
-              setLoadingStatus={setLoadingStatus}
+              onLoadingStateChange={setLoadingStatus}
               className={classNames(
                 "w-full h-auto !rounded-md",
-                !loaded && "h-[6rem]",
+                !loaded && "aspect-square h-[6rem]",
               )}
               errorClassName="h-[6rem]"
             />

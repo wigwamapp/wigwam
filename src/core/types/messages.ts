@@ -24,6 +24,7 @@ export type Request =
   | GetApprovalsRequest
   | ApproveRequest
   | GetGasPricesRequest
+  | GetCgPlatformIdsRequest
   | GetSyncStatusRequest;
 
 export type Response =
@@ -41,6 +42,7 @@ export type Response =
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
   | GetGasPricesResponse
+  | GetCgPlatformIdsResponse
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
@@ -76,6 +78,7 @@ export enum MessageType {
   FindToken = "FIND_TOKEN",
   SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
   GetGasPrices = "GET_GAS_PRICES",
+  GetCgPlatformIds = "GET_CG_PLATFORM_IDS",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
@@ -258,6 +261,15 @@ export interface GetGasPricesRequest extends MessageBase {
 export interface GetGasPricesResponse extends MessageBase {
   type: MessageType.GetGasPrices;
   gasPrices: GasPrices;
+}
+
+export interface GetCgPlatformIdsRequest extends MessageBase {
+  type: MessageType.GetCgPlatformIds;
+}
+
+export interface GetCgPlatformIdsResponse extends MessageBase {
+  type: MessageType.GetCgPlatformIds;
+  cgPlatformIds: Record<number, { id: string; native_coin_id: string }>;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {

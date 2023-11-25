@@ -16,11 +16,16 @@ export const web3MetaMaskCompatibleAtom = atomWithStorage(
   DEFAULT_WEB_METAMASK_COMPATIBLE,
 );
 
-export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, true);
+export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, false);
 
 export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
   { enabled: false },
+);
+
+export const requiredAuthSigAtom = atomWithStorage<string[]>(
+  Setting.RequiredAuthSig,
+  [],
 );
 
 export const profileBlockedUntilAtom = atomWithStorage<number>(

@@ -18,7 +18,7 @@ export function startInstallOrUpdateListener() {
       });
     }
 
-    if (reason === "install" || reason === "update") {
+    if (WEBSITE_URL && ["install", "update"].includes(reason)) {
       browser.tabs
         .query({ url: `${WEBSITE_URL}/**` })
         .then((tabs) => {
