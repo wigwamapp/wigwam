@@ -14,17 +14,19 @@ import { AVALANCHE } from "./avalanche";
 import { HARMONY } from "./harmony";
 import { FANTOM } from "./fantom";
 import { AURORA } from "./aurora";
-import { CELO } from "./celo";
 import { HECO } from "./heco";
 import { CRONOS } from "./cronos";
 import { MOONBEAM } from "./moonbeam";
 import { MOONRIVER } from "./moonriver";
 import { EVMOS } from "./evmos";
-import { SYSCOIN } from "./syscoin";
-import { BOBA } from "./boba";
 import { LOCAL } from "./local";
 import { ZKSYNCERA } from "./zksyncera";
 import { ARBITRUMNOVA } from "./arbitrumnova";
+import { BASE } from "./base";
+import { SCROLL } from "./scroll";
+import { LINEA } from "./linea";
+import { GNOSIS } from "./gnosis";
+import { MANTLE } from "./mantle";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -32,24 +34,26 @@ import { ARBITRUMNOVA } from "./arbitrumnova";
 
 export const DEFAULT_NETWORKS: Network[] = [
   ETHEREUM,
-  AVALANCHE,
-  BSC,
   POLYGON,
-  FANTOM,
+  BSC,
   OPTIMISM,
   ARBITRUM,
-  AURORA,
-  HARMONY,
-  CRONOS,
+  AVALANCHE,
   ZKSYNCERA,
-  ARBITRUMNOVA,
+  GNOSIS,
+  BASE,
+  CRONOS,
+  FANTOM,
+  MANTLE,
+  LINEA,
+  SCROLL,
   MOONBEAM,
+  AURORA,
   MOONRIVER,
+  ARBITRUMNOVA,
   EVMOS,
   HECO,
-  CELO,
-  SYSCOIN,
-  BOBA,
+  HARMONY,
   LOCAL,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
