@@ -47,15 +47,13 @@ export const syncAccountAssets = memoize(
 
       const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
-      const rawBalanceBN = BigInt(
-        new BigNumber(token.balance).integerValue().toString(),
-      );
+      const rawBalanceBN = new BigNumber(token.balance).integerValue();
 
       // Skip if alreaady exist and balance is zero
       // Skip if mainnet token without price
       if (
-        (!existing && rawBalanceBN === 0n) ||
-        (network.type === "mainnet" && !token.quote)
+        (!existing && rawBalanceBN.isZero()) ||
+        (network.type === "mainnet" && !token.quote_rate)
       ) {
         continue;
       }
@@ -82,7 +80,7 @@ export const syncAccountAssets = memoize(
       const balanceUSD =
         token.quote ||
         (priceUSD
-          ? new BigNumber(rawBalance)
+          ? rawBalanceBN
               .div(new BigNumber(10).pow(metadata.decimals))
               .times(priceUSD)
               .toNumber()
@@ -119,7 +117,7 @@ export const syncAccountAssets = memoize(
 
       for (let i = 0; i < restTokens.length; i++) {
         const balance = balances[i];
-        if (!balance) continue;
+        if (balance === null) continue;
 
         const token = restTokens[i];
         const rawBalance = balance.toString();
