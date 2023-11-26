@@ -6,8 +6,9 @@ export const BASE: Network[] = [
     chainId: 8453,
     type: "mainnet",
     rpcUrls: [
-      "https://mainnet.base.org",
       "https://base.llamarpc.com",
+      "https://mainnet.base.org",
+      "https://1rpc.io/base",
       "https://base.meowrpc.com",
       "https://base.drpc.org",
       "https://base.publicnode.com",

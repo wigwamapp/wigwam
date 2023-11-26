@@ -6,8 +6,8 @@ export const POLYGON: Network[] = [
     chainId: 137,
     type: "mainnet",
     rpcUrls: [
-      "https://polygon-rpc.com",
       "https://polygon.llamarpc.com",
+      "https://polygon-rpc.com",
       "https://endpoints.omniatech.io/v1/matic/mainnet/public",
       "https://1rpc.io/matic",
       "https://polygon.drpc.org",
