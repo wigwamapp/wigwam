@@ -152,19 +152,14 @@ const OnboardingPopupContent: FC = () => {
           </Wrapper>
           <Wrapper className="mt-[3.75rem]">
             <Item>
-              To help us test the product and get NFT Wigwam Pro, check out the{" "}
-              <Link href="https://wigwamapp.medium.com/private-beta-learn-about-our-wallet-via-testing-and-earn-a-valuable-nft-vigvam-pro-4058fa702d09">
-                Beta Testing Workflow
-              </Link>
-              . Then fill in the{" "}
-              <Link href="https://forms.gle/bE5mmn4SGbCmGWG46">
-                Feedback Form
+              Join the Wigwam Testers Club and earn an Exclusive NFT!
+              <br />
+              We need your insights!{" "}
+              <Link href="https://forms.gle/LU91YfBdqR6f29th9">
+                Share your thoughts about Wigwam in our feedback form
               </Link>{" "}
-              to leave your feedback or bug report. Also, we suggest you learn{" "}
-              <Link href="https://wigwamapp.medium.com/nft-vigvam-pro-why-do-you-need-this-nft-and-how-to-get-it-for-free-dd7125715f43">
-                Information about NFT Wigwam Pro and participation rules
-              </Link>
-              .
+              and stand a chance to win our unique Beta User NFT. Your feedback
+              is valuable in shaping our product.
             </Item>
             <img
               src={OnboardingSevenImage}
@@ -237,7 +232,9 @@ type LinkProps = PropsWithChildren<{
 const Link: FC<LinkProps> = ({ href, children }) => (
   <a
     href={href}
-    className="text-brand-font transition-colors hover:text-brand-light"
+    className="text-brand-font transition-colors hover:text-brand-light underline"
+    target="_blank"
+    rel="nofollow noreferrer"
   >
     {children}
   </a>

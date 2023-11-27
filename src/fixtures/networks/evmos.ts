@@ -6,6 +6,7 @@ export const EVMOS: Network[] = [
     chainId: 9001,
     type: "mainnet",
     rpcUrls: [
+      "https://evmos-pokt.nodies.app",
       "https://eth.bd.evmos.org:8545",
       "https://evmos-evm.publicnode.com",
     ],
