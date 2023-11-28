@@ -34,4 +34,9 @@ export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
 
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
+export const tokenSlugOutputAtom = atomWithURLHash<string | null>(
+  "tokenOut",
+  null,
+);
+
 export const activityModalAtom = atomWithURLHash("activityOpened", false);
