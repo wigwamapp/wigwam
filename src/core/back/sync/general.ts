@@ -24,7 +24,7 @@ export async function addSyncRequest(
     await syncConversionRates();
 
     await enqueueTokensSync(chainId, async () => {
-      await syncAccountTokens(chainId, accountAddress, tokenType);
+      await syncAccountTokens(tokenType, chainId, accountAddress);
 
       const allAccounts = $accounts.getState();
 
@@ -44,23 +44,25 @@ export async function addSyncRequest(
       await syncNativeTokens(
         chainId,
         `current_${accountAddress}`,
-        currentAccount,
+        currentAccount.address,
       );
 
       await syncNativeTokens(
         chainId,
         `rest_${allAccounts.length}`,
-        restAccounts,
+        restAccounts.map((acc) => acc.address),
       );
     });
   } catch (err) {
     console.error(err);
   } finally {
-    if (syncStartedAt)
+    if (syncStartedAt) {
       setTimeout(
         () => synced(chainId),
         Math.max(0, syncStartedAt + 1_000 - Date.now()),
       );
-    else syncStartedAt = 1;
+    } else {
+      syncStartedAt = 1;
+    }
   }
 }

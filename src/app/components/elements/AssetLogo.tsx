@@ -1,6 +1,6 @@
 import { ComponentProps, FC, useMemo } from "react";
 
-import { getTokenLogoUrl } from "fixtures/networks";
+import { getAssetLogoUrl } from "fixtures/networks";
 import { Asset } from "core/types";
 
 import Avatar from "./Avatar";
@@ -11,21 +11,25 @@ type AssetLogoProps = Omit<ComponentProps<typeof Avatar>, "src"> & {
 };
 
 const AssetLogo: FC<AssetLogoProps> = ({ asset, ...rest }) => {
-  const src = useMemo(() => getTokenLogoUrl(asset.logoUrl), [asset.logoUrl]);
+  const src = useMemo(() => getAssetLogoUrl(asset), [asset]);
 
-  return src ? (
-    <Avatar src={src} withBg={false} {...rest} />
-  ) : (
+  const fallback = (
     <AutoIcon
       seed={`${asset.chainId}_${asset.tokenSlug}`}
       source="boring"
       variant="ring"
-      initialsSource={asset.symbol[0]}
+      initialsSource={asset.symbol?.[0] ?? "NO"}
       initialsScale={0.35}
       initialsPlaceholder
       autoColors
       {...rest}
     />
+  );
+
+  return src ? (
+    <Avatar src={src} fallbackNode={fallback} withBg={false} {...rest} />
+  ) : (
+    fallback
   );
 };
 

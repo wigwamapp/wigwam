@@ -117,7 +117,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
     const isMounted = useIsMounted();
 
     const provider = useProvider();
-    const signerProvider = provider.getUncheckedSigner(currentAccount.address);
+    const signerProvider = provider.getVoidSigner(currentAccount.address);
 
     useSync(chainId, currentAccount.address, tokenType);
 
@@ -373,9 +373,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               } else {
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
 
-                const signer = provider.getUncheckedSigner(
-                  currentAccount.address,
-                );
+                const signer = provider.getVoidSigner(currentAccount.address);
 
                 switch (standard) {
                   case TokenStandard.ERC20:

@@ -5,12 +5,12 @@ import { GasPrices } from "core/types";
 import { getOnChainEIP1559 } from "./onChainEIP1559";
 import { getOnChainLegacy } from "./onChainLegacy";
 import { getPolygonGasPrices } from "./polygonGasStation";
-import { getDebankGasPrices } from "./debank";
+import { getIndexerGasPrices } from "./indexerApi";
 
 const GAS_PRICES_WAYS = [
   getPolygonGasPrices,
   getOnChainEIP1559,
-  getDebankGasPrices,
+  getIndexerGasPrices,
   getOnChainLegacy,
 ];
 

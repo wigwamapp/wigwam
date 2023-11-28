@@ -37,6 +37,7 @@ import {
   addFindTokenRequest,
   addSyncRequest,
   estimateGasPrices,
+  getCoinGeckoPlatformIds,
   syncTokenActivities,
 } from "../sync";
 
@@ -304,6 +305,15 @@ async function handleWalletRequest(
           const gasPrices = await estimateGasPrices(chainId);
 
           ctx.reply({ type, gasPrices });
+        }),
+      )
+      .with({ type: MessageType.GetCgPlatformIds }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, async () => {
+          const cgPlatformIds = await getCoinGeckoPlatformIds().catch(
+            () => ({}),
+          );
+
+          ctx.reply({ type, cgPlatformIds });
         }),
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

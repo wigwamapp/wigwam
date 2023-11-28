@@ -272,3 +272,12 @@ export async function getGasPrices(chainId: number) {
 
   return res.gasPrices;
 }
+
+export async function getCgPlatformIds() {
+  const type = MessageType.GetCgPlatformIds;
+
+  const res = await porter.request({ type });
+  assert(res?.type === type);
+
+  return res.cgPlatformIds;
+}

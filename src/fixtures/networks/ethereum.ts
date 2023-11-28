@@ -7,6 +7,8 @@ export const ETHEREUM: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://mainnet.infura.io/v3/${INFURA_API_KEY}",
+      "https://eth.llamarpc.com",
+      "https://rpc.ankr.com/eth",
       "https://cloudflare-eth.com",
       "https://endpoints.omniatech.io/v1/eth/mainnet/public",
       "https://ethereum.publicnode.com",
