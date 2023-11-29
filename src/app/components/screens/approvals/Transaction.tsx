@@ -218,10 +218,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                         maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
                       }
                     : feeSuggestions?.type === "legacy"
-                    ? {
-                        gasPrice: feeSuggestions.modes.average.max,
-                      }
-                    : {}),
+                      ? {
+                          gasPrice: feeSuggestions.modes.average.max,
+                        }
+                      : {}),
                 }),
               { retries: 2, minTimeout: 0, maxTimeout: 0 },
             ),

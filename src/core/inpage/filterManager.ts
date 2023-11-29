@@ -276,8 +276,8 @@ export function filterFromParam(param: FilterParam): Filter {
       param.address === undefined
         ? null
         : Array.isArray(param.address)
-        ? param.address
-        : [param.address],
+          ? param.address
+          : [param.address],
     topics: param.topics || [],
   };
 }

@@ -127,8 +127,8 @@ async function performTokenSync(
           existing.status === TokenStatus.Disabled && balance
             ? TokenStatus.Enabled
             : balanceChangedToZero && existing.tokenType === TokenType.NFT
-            ? TokenStatus.Disabled
-            : existing.status,
+              ? TokenStatus.Disabled
+              : existing.status,
         rawBalance,
         balanceUSD,
       },
