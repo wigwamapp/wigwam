@@ -21,3 +21,5 @@ export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Hybrid;
 
 export const MAX_PASSWORD_ATTEMPTS_BEFORE_BLOCK = 7;
 export const BLOCK_PROFILE_FOR = 60_000 * 1.5; // 1.5 min
+
+export const PUSHTX_ADDITIONAL_BROADCAST = 3;
