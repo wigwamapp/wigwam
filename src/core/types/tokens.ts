@@ -31,6 +31,7 @@ type AccountTokenFields = {
   balanceUSD: number;
   portfolioUSD?: string;
   manuallyEnabled?: boolean;
+  syncedByChainAt?: number;
 };
 
 export interface TokenBase {

@@ -69,7 +69,13 @@ async function performTokenSync(
     tokenToAdd: AccountToken,
     prevBalanceUSD = 0,
   ) => {
-    await repo.accountTokens.put(tokenToAdd, dbKey);
+    await repo.accountTokens.put(
+      {
+        ...tokenToAdd,
+        syncedByChainAt: Date.now(),
+      },
+      dbKey,
+    );
 
     // Update portfolioUSD
     if (tokenToAdd.tokenType === TokenType.Asset) {
