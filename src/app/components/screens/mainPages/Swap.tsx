@@ -1,9 +1,11 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LiFi, RouteOptions, Route } from "@lifi/sdk";
+import { LiFi, RouteOptions, Route, SwitchChainHook } from "@lifi/sdk";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { useAccounts, useChainId } from "app/hooks";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { Field, Form } from "react-final-form";
+import { ERC20__factory } from "abi-types";
+import { getClientProvider } from "core/client";
 
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -16,11 +18,12 @@ import { Link } from "lib/navigation";
 
 import { composeValidators, maxValue, required } from "app/utils";
 
-import { AccountAsset, AccountToken, TokenType } from "core/types";
+import { AccountAsset, AccountToken, TokenType, Network } from "core/types";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
 import { tokenSlugAtom, tokenSlugOutputAtom } from "app/atoms";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
+import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
 import { Page } from "app/nav";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 
@@ -30,12 +33,9 @@ import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
 import AssetInput from "app/components/elements/AssetInput";
 import InputLabelAction from "app/components/elements/InputLabelAction";
+import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
-// import FiatAmount from "./FiatAmount";
-// import AssetLogo from "./AssetLogo";
-// import PrettyAmount from "./PrettyAmount";
-// import NftAvatar from "./NftAvatar";
-// import TokenSelect from "app/components/elements/TokenSelect";
+const LIFI_CONTRACT = "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae";
 
 const Swap: FC = () => {
   const [opened, setOpened] = useState(false);
@@ -46,8 +46,9 @@ const Swap: FC = () => {
     null,
   );
 
-  const [inputAmount, setInputAmount] = useState<number>(0);
+  const [inputAmount, setInputAmount] = useState<string>("0");
   const [bestRoute, setBestRoute] = useState<Route | null>(null);
+  const [isApproved, setIsApproved] = useState(false);
 
   const [outputTokensList, setOutputTokensList] = useState<
     AccountAsset[] | null
@@ -84,8 +85,6 @@ const Swap: FC = () => {
 
   const { currentAccount } = useAccounts();
 
-  // const provider = useProvider();
-
   const chainId = useChainId();
 
   const lifi = new LiFi({
@@ -96,15 +95,16 @@ const Swap: FC = () => {
     if (!currentToken || !currentTokenOutput) return;
 
     const routeOptions = {
-      slippage: 3 / 100, // 3%
+      slippage: 5 / 100, // 3%
       order: "RECOMMENDED",
+      infiniteApproval: true,
     } as RouteOptions;
-
-    console.log(typeof tokenDecimals);
 
     const routesRequest = {
       fromChainId: currentToken.chainId,
-      fromAmount: String(inputAmount * 10 ** Number(tokenDecimals)), // 1USDT
+      fromAmount: new BigNumber(inputAmount)
+        .multipliedBy(new BigNumber(10).pow(tokenDecimals))
+        .toString(), // 1USDT
       fromTokenAddress: currentToken.tokenSlug.includes("NATIVE")
         ? "0x0000000000000000000000000000000000000000"
         : currentToken.tokenSlug.replace("ERC20_", "").replace("_0", ""),
@@ -115,15 +115,14 @@ const Swap: FC = () => {
       options: routeOptions,
     };
 
-    console.log("routesRequest", routesRequest);
+    console.log(routesRequest.fromAmount);
 
     const result = await lifi.getRoutes(routesRequest);
     const routes = result.routes;
+
     console.log(routes);
 
     setBestRoute(routes[0]);
-    console.log(currentToken);
-    console.log(currentTokenOutput);
 
     setCurrentTokenOutput({
       ...currentTokenOutput,
@@ -132,6 +131,8 @@ const Swap: FC = () => {
       priceUSD: routes[0].toToken.priceUSD,
       rawBalance: routes[0].toAmountMin,
     });
+
+    return routes[1];
 
     // console.log(route)
   };
@@ -155,9 +156,43 @@ const Swap: FC = () => {
     }
   }, [tokenSlugOutput]);
 
+  const checkIsApproved = async () => {
+    if (currentToken && !currentToken.tokenSlug.includes("NATIVE")) {
+      const tokenAddress = currentToken?.tokenSlug
+        .replace("ERC20_", "")
+        .replace("_0", "");
+
+      const provider = getClientProvider(chainId).getUncheckedSigner(
+        currentAccount.address,
+      );
+
+      const contract = ERC20__factory.connect(tokenAddress, provider);
+
+      const txResult = await contract.allowance(
+        currentAccount.address,
+        LIFI_CONTRACT,
+      );
+      const formatedInputAmount = new BigNumber(inputAmount).multipliedBy(
+        new BigNumber(10).pow(tokenDecimals),
+      );
+      if (Number(txResult) < formatedInputAmount.toNumber()) {
+        setIsApproved(false);
+      } else {
+        setIsApproved(true);
+      }
+    } else {
+      setIsApproved(true);
+    }
+  };
+
+  useEffect(() => {
+    checkIsApproved();
+  }, [currentToken, inputAmount]);
+
   // let currentTokenOutput = useAccountToken(tokenSlugOutput ?? NATIVE_TOKEN_SLUG);
 
   const getTokens = async () => {
+    if (!selectedOutputNetwork) return;
     // const optionalFilter = [56] // Both numeric and mnemonic can be used
     /// chainTypes can be of type SVM and EVM. By default, only EVM tokens will be returned
     const optionalChainTypes = "EVM";
@@ -170,7 +205,10 @@ const Swap: FC = () => {
       },
     });
 
+    const networks: string[] = [];
+
     for (const key in outputTokens) {
+      networks.push(key);
       if (outputTokens.hasOwnProperty(key)) {
         const array = outputTokens[key];
 
@@ -200,7 +238,15 @@ const Swap: FC = () => {
       }
     }
 
-    setOutputTokensList(outputTokens[56]);
+    const filteredNetworks = allNetworks.filter((item) =>
+      networks.includes(item.chainId.toString()),
+    );
+
+    console.log(outputTokens[56].filter((item: any) => item.symbol === "SNX"));
+
+    setAllowedNetworks(filteredNetworks);
+
+    setOutputTokensList(outputTokens[selectedOutputNetwork.chainId]);
   };
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
@@ -231,10 +277,6 @@ const Swap: FC = () => {
   //     ),
   //   [tokenSlug, outputTokensList],
   // );
-
-  useEffect(() => {
-    getTokens();
-  }, []);
 
   // useEffect(() => {
   //   console.log(preparedTokens)
@@ -277,51 +319,95 @@ const Swap: FC = () => {
     }
   }, [outputTokensList]);
 
-  const intervalRef = useRef<any>(0);
-
   useEffect(() => {
-    const fetchData = () => {
-      console.log(inputAmount);
-      if (currentToken && currentTokenOutput && inputAmount > 0) {
-        getRoutes();
-      }
-    };
-
-    // Call fetchData initially
-    fetchData();
-
-    // Set up the interval only if all required parameters are present
-    if (currentToken && currentTokenOutput?.tokenSlug && inputAmount > 0) {
-      intervalRef.current = setInterval(fetchData, 5000);
+    if (currentToken && currentTokenOutput && Number(inputAmount) > 0) {
+      getRoutes();
     }
-
-    // Clear the interval if any of the required parameters are missing
-    return () => {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
-    };
   }, [currentToken, currentTokenOutput?.tokenSlug, inputAmount]);
 
+  const switchChainHook: SwitchChainHook = async (requiredChainId: number) => {
+    console.log("switchChainHook", requiredChainId);
+
+    const newSigner = getLiFiProvider(requiredChainId).getSigner(
+      currentAccount.address,
+    );
+
+    return newSigner;
+  };
+
+  const acceptExchangeRateUpdateHook = async () => {
+    return true;
+  };
+
   const doSwap = async () => {
-    if (bestRoute) {
+    if (!currentToken || !currentTokenOutput) return;
+
+    const routeOptions = {
+      slippage: 5 / 100, // 3%
+      order: "RECOMMENDED",
+      infiniteApproval: true,
+    } as RouteOptions;
+
+    const routesRequest = {
+      fromChainId: currentToken.chainId,
+      fromAmount: new BigNumber(inputAmount)
+        .multipliedBy(new BigNumber(10).pow(tokenDecimals))
+        .toString(), // 1USDT
+      fromTokenAddress: currentToken.tokenSlug.includes("NATIVE")
+        ? "0x0000000000000000000000000000000000000000"
+        : currentToken.tokenSlug.replace("ERC20_", "").replace("_0", ""),
+      toChainId: currentTokenOutput.chainId,
+      toTokenAddress: currentTokenOutput.tokenSlug
+        .replace("ERC20_", "")
+        .replace("_0", ""),
+      options: routeOptions,
+    };
+
+    console.log(routesRequest.fromAmount);
+
+    const result = await lifi.getRoutes(routesRequest);
+    const latestRoute = result.routes[0];
+
+    if (latestRoute) {
       const signerProvider = getLiFiProvider(chainId).getSigner(
         currentAccount.address,
       );
-      const route = await lifi.executeRoute(signerProvider, bestRoute);
+      const route = await lifi.executeRoute(signerProvider, latestRoute, {
+        switchChainHook: switchChainHook,
+        acceptExchangeRateUpdateHook: acceptExchangeRateUpdateHook,
+      });
       console.log("route", route);
     }
   };
 
-  // useEffect(() => {
-  //   preparedCurrentTokenOutput = useMemo(
-  //     () =>
-  //     outputTokensList.length
-  //         ? prepareToken(outputTokensList[0] as AccountAsset, "large")
-  //         : undefined,
-  //     [outputTokensList],
-  //   );
-  // }, [outputTokensList.length])
+  const doApprove = async () => {
+    console.log("chec");
+    if (currentToken) {
+      console.log("chec2");
+      const tokenAddress = currentToken?.tokenSlug
+        .replace("ERC20_", "")
+        .replace("_0", "");
+
+      const provider = getClientProvider(chainId).getUncheckedSigner(
+        currentAccount.address,
+      );
+
+      const contract = ERC20__factory.connect(tokenAddress, provider);
+      const formatedInputAmount = new BigNumber(inputAmount).multipliedBy(
+        new BigNumber(10).pow(tokenDecimals),
+      );
+
+      await contract.approve(LIFI_CONTRACT, formatedInputAmount.toString());
+    }
+  };
+
+  const handleSubmitAction = () => {
+    if (isApproved) {
+      doSwap();
+    } else {
+      doApprove();
+    }
+  };
 
   const onTokenSelect = useCallback(
     (tSlug: string) => {
@@ -403,6 +489,37 @@ const Swap: FC = () => {
 
   type FormValues = { amount: string };
 
+  const currentNetwork = useLazyNetwork();
+  const allNetworks = useLazyAllNetworks() ?? [];
+
+  const [allowedNetworks, setAllowedNetworks] =
+    useState<Network[]>(allNetworks);
+
+  const [selectedOutputNetwork, setSelectedOutputNetwork] = useState<
+    Network | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (currentNetwork) {
+      setSelectedOutputNetwork(currentNetwork);
+    }
+  }, [currentNetwork]);
+
+  useEffect(() => {
+    if (allNetworks.length > 0) {
+      getTokens();
+    }
+  }, [selectedOutputNetwork, allNetworks]);
+
+  const handleNetworkChange = (selectedChain: number) => {
+    setSelectedOutputNetwork(
+      allNetworks.find((item) => item.chainId === selectedChain),
+    );
+    console.log(allNetworks);
+    console.log(currentNetwork);
+    console.log(selectedChain);
+  };
+
   return (
     <div className="mt-[1rem]">
       <div className="flex mb-[1rem]">
@@ -467,7 +584,11 @@ const Swap: FC = () => {
                         assetDecimals={tokenDecimals}
                         onInput={(e: any) =>
                           setInputAmount(
-                            Number(e.target.value.replace(",", ".")),
+                            new BigNumber(
+                              e.target.value
+                                .replace(",", ".")
+                                .replaceAll(" ", ""),
+                            ).toString(),
                           )
                         }
                         labelActions={
@@ -479,7 +600,8 @@ const Swap: FC = () => {
                           <InputLabelAction
                             onClick={() => {
                               form.change("amount", maxAmount);
-                              setInputAmount(Number(maxAmount));
+                              console.log("maxAmount", maxAmount);
+                              setInputAmount(maxAmount);
                             }}
                           >
                             MAX
@@ -519,42 +641,54 @@ const Swap: FC = () => {
         </div>
       </div>
       <div className="flex items-center">
-        <div className="w-[20rem]">
-          {filteredOutputTokensList && (
-            <Select
-              open={openedOutput}
-              onOpenChange={setOpenedOutput}
-              items={filteredOutputTokensList}
-              currentItem={preparedCurrentTokenOutput}
-              setItem={(asset) => onTokenSelectOutput(asset.key)}
-              searchValue={outputSearchValue}
-              onSearch={setOutputSearchValue}
-              label="Token Output"
-              itemRef={loadMoreTriggerRef}
-              loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
-              showSelected
-              showSelectedIcon={false}
-              emptySearchText={
-                <>
-                  You can manage your assets in the{" "}
-                  <Link
-                    to={{ page: Page.Default }}
-                    onClick={() => setOpened(false)}
-                    className="underline underline-offset-2"
-                  >
-                    Overview
-                  </Link>{" "}
-                  tab.
-                </>
-              }
-              currentItemClassName={classNames(
-                tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
-                "!p-3",
-              )}
-              contentClassName="w-[23.25rem] flex flex-col"
-              itemClassName="group"
-            />
-          )}
+        <div className="flex flex-col">
+          <NetworkSelectPrimitive
+            networks={allowedNetworks}
+            currentNetwork={selectedOutputNetwork || currentNetwork}
+            onNetworkChange={handleNetworkChange}
+            className="max-w-auto"
+            size={"small"}
+            currentItemClassName={classNames("h-[1.75rem]")}
+            currentItemIconClassName={classNames("!w-8 !h-8 !mr-3")}
+            contentClassName="w-[22.25rem]"
+          />
+          <div className="w-[20rem]">
+            {filteredOutputTokensList && (
+              <Select
+                open={openedOutput}
+                onOpenChange={setOpenedOutput}
+                items={filteredOutputTokensList}
+                currentItem={preparedCurrentTokenOutput}
+                setItem={(asset) => onTokenSelectOutput(asset.key)}
+                searchValue={outputSearchValue}
+                onSearch={setOutputSearchValue}
+                label="Token Output"
+                itemRef={loadMoreTriggerRef}
+                loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
+                showSelected
+                showSelectedIcon={false}
+                emptySearchText={
+                  <>
+                    You can manage your assets in the{" "}
+                    <Link
+                      to={{ page: Page.Default }}
+                      onClick={() => setOpened(false)}
+                      className="underline underline-offset-2"
+                    >
+                      Overview
+                    </Link>{" "}
+                    tab.
+                  </>
+                }
+                currentItemClassName={classNames(
+                  tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
+                  "!p-3",
+                )}
+                contentClassName="w-[23.25rem] flex flex-col"
+                itemClassName="group"
+              />
+            )}
+          </div>
         </div>
         <div className="ml-[1rem]">
           {bestRoute && (
@@ -570,10 +704,9 @@ const Swap: FC = () => {
       </div>
       <button
         className="relative overflow-hidden py-3 px-4 min-w-[10rem] text-brand-light text-base font-bold bg-buttonaccent bg-opacity-90 rounded-[.375rem] inline-flex justify-center transition hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none select-none flex items-center min-w-[13.75rem] mt-8 mx-auto"
-        disabled={!bestRoute}
-        onClick={doSwap}
+        onClick={handleSubmitAction}
       >
-        Swap
+        {isApproved ? "Swap" : "Approve"}
       </button>
     </div>
   );
