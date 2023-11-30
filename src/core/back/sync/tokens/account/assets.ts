@@ -47,6 +47,14 @@ export const syncAccountAssets = memoize(
 
       const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
 
+      // Skip tokens that recently synced by chain
+      if (
+        existing?.syncedByChainAt &&
+        existing.syncedByChainAt > Date.now() - 3 * 60_000
+      ) {
+        continue;
+      }
+
       const rawBalanceBN = new BigNumber(token.balance).integerValue();
 
       // Skip if alreaady exist and balance is zero
@@ -125,6 +133,7 @@ export const syncAccountAssets = memoize(
         addToken({
           ...token,
           rawBalance,
+          syncedByChainAt: Date.now(),
         });
       }
     }
