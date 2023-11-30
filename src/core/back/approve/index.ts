@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
 
-import { INITIAL_NETWORK } from "fixtures/networks";
+import { DEFAULT_NETWORKS, INITIAL_NETWORK } from "fixtures/networks";
 import { ActivityType, ApprovalResult, Permission } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
@@ -105,9 +105,7 @@ export async function processApprove(
             throw new Error("Blocked by WIGWAM_DEV_BLOCK_TX_SEND env variable");
           }
 
-          const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
-            signedTx.serialized,
-          ]);
+          const rpcRes = await pushTransaction(chainId, signedTx);
 
           if ("result" in rpcRes) {
             const txHash = rpcRes.result;
@@ -200,4 +198,42 @@ export async function processApprove(
   }
 
   approvalResolved(approvalId);
+}
+
+async function pushTransaction(chainId: number, signedTx: ethers.Transaction) {
+  const res = await sendRpc(chainId, "eth_sendRawTransaction", [
+    signedTx.serialized,
+  ]);
+
+  if ("result" in res) {
+    try {
+      const defNet = DEFAULT_NETWORKS.find((n) => n.chainId === chainId);
+      const restToPush = defNet?.rpcUrls.slice(1, 4);
+
+      if (restToPush) {
+        for (const rpcUrl of restToPush) {
+          fetch(rpcUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              method: "eth_sendRawTransaction",
+              params: [signedTx.serialized],
+            }),
+          }).then((res) => {
+            if (!res.ok) {
+              console.error("Failed to push tx to another rpc", res);
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  return res;
 }
