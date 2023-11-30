@@ -5,6 +5,7 @@ import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
 
 import { DEFAULT_NETWORKS, INITIAL_NETWORK } from "fixtures/networks";
+import { PUSHTX_ADDITIONAL_BROADCAST } from "fixtures/settings";
 import { ActivityType, ApprovalResult, Permission } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
@@ -207,8 +208,13 @@ async function pushTransaction(chainId: number, signedTx: ethers.Transaction) {
 
   if ("result" in res) {
     try {
+      // Pick additional rpcs to broadcast tx
+      // Avoid the first one because it's the default, and it's already been sent before
       const defNet = DEFAULT_NETWORKS.find((n) => n.chainId === chainId);
-      const restToPush = defNet?.rpcUrls.slice(1, 4);
+      const restToPush = defNet?.rpcUrls.slice(
+        1,
+        1 + PUSHTX_ADDITIONAL_BROADCAST,
+      );
 
       if (restToPush) {
         for (const rpcUrl of restToPush) {
