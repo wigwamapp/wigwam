@@ -110,7 +110,9 @@ export async function startTxObserver() {
     );
 
     for (const hash of completeHashes) {
-      txsToUpdate.get(hash)!.pending = 0;
+      if (txsToUpdate.has(hash)) {
+        txsToUpdate.get(hash)!.pending = 0;
+      }
     }
 
     await repo.activities.bulkPut(Array.from(txsToUpdate.values()));
