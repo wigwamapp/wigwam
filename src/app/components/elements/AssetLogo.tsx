@@ -29,6 +29,8 @@ const AssetLogo: FC<AssetLogoProps> = ({ asset, ...rest }) => {
 
 export default AssetLogo;
 
+const srcCache = new Map<string, string>();
+
 const AssetLogoAvatar: FC<
   Omit<ComponentProps<typeof Avatar>, "src"> & {
     srcs: string[];
@@ -54,12 +56,16 @@ const AssetLogoAvatar: FC<
 
   return srcs.length > 0 ? (
     <Avatar
-      src={srcs[srcIndex]}
+      src={srcCache.get(seed) ?? srcs[srcIndex]}
       fallbackNode={fallback}
       withBg={false}
       onLoadingStateChange={({ state }) => {
         if (state === "error") {
           setSrcIndex((i) => (srcs[i + 1] ? i + 1 : i));
+        }
+
+        if (state === "loaded" && !srcCache.has(seed)) {
+          srcCache.set(seed, srcs[srcIndex]);
         }
       }}
       className={className}
