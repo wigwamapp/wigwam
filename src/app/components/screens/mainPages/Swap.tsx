@@ -32,6 +32,7 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
 import AssetInput from "app/components/elements/AssetInput";
+import SwapRouterList from "app/components/elements/SwapRouterList";
 import InputLabelAction from "app/components/elements/InputLabelAction";
 import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
@@ -49,6 +50,7 @@ const Swap: FC = () => {
   const [inputAmount, setInputAmount] = useState<string>("0");
   const [bestRoute, setBestRoute] = useState<Route | null>(null);
   const [isApproved, setIsApproved] = useState(false);
+  const [routes, setRoutes] = useState<Route[] | null>(null);
 
   const [outputTokensList, setOutputTokensList] = useState<
     AccountAsset[] | null
@@ -121,7 +123,7 @@ const Swap: FC = () => {
     const routes = result.routes;
 
     console.log(routes);
-
+    setRoutes(routes);
     setBestRoute(routes[0]);
 
     setCurrentTokenOutput({
@@ -129,7 +131,7 @@ const Swap: FC = () => {
       balanceUSD: Number(routes[0].toAmountUSD),
       portfolioUSD: routes[0].toAmountUSD,
       priceUSD: routes[0].toToken.priceUSD,
-      rawBalance: routes[0].toAmountMin,
+      rawBalance: routes[0].toAmount,
     });
 
     return routes[1];
@@ -381,9 +383,7 @@ const Swap: FC = () => {
   };
 
   const doApprove = async () => {
-    console.log("chec");
     if (currentToken) {
-      console.log("chec2");
       const tokenAddress = currentToken?.tokenSlug
         .replace("ERC20_", "")
         .replace("_0", "");
@@ -521,105 +521,106 @@ const Swap: FC = () => {
   };
 
   return (
-    <div className="mt-[1rem]">
-      <div className="flex mb-[1rem]">
-        <div className="w-[20rem]">
-          <Select
-            open={opened}
-            onOpenChange={setOpened}
-            items={preparedTokens}
-            currentItem={preparedCurrentToken}
-            setItem={(asset) => onTokenSelect(asset.key)}
-            searchValue={searchValue}
-            onSearch={setSearchValue}
-            label="Token"
-            itemRef={loadMoreTriggerRef}
-            loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
-            showSelected
-            showSelectedIcon={false}
-            emptySearchText={
-              <>
-                You can manage your assets in the{" "}
-                <Link
-                  to={{ page: Page.Default }}
-                  onClick={() => setOpened(false)}
-                  className="underline underline-offset-2"
-                >
-                  Overview
-                </Link>{" "}
-                tab.
-              </>
-            }
-            currentItemClassName={classNames(
-              tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
-              "!p-3",
-            )}
-            contentClassName="w-[23.25rem] flex flex-col"
-            itemClassName="group"
-          />
-        </div>
-        <div className="ml-[1rem]">
-          <Form<FormValues>
-            key={"formKey"}
-            onSubmit={handleSubmit}
-            render={({ form, handleSubmit }) => (
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col max-w-[23.25rem]"
-              >
-                <div className="relative mt-5">
-                  <Field
-                    key={"amountFieldKey"}
-                    name="amount"
-                    validate={composeValidators(
-                      required,
-                      maxValue(maxAmount, tokenSymbol),
-                    )}
+    <div className="flex mt-[1rem]">
+      <div>
+        <div className="flex flex-col mb-[1rem]">
+          <div className="w-[20rem]">
+            <Select
+              open={opened}
+              onOpenChange={setOpened}
+              items={preparedTokens}
+              currentItem={preparedCurrentToken}
+              setItem={(asset) => onTokenSelect(asset.key)}
+              searchValue={searchValue}
+              onSearch={setSearchValue}
+              label="Token"
+              itemRef={loadMoreTriggerRef}
+              loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
+              showSelected
+              showSelectedIcon={false}
+              emptySearchText={
+                <>
+                  You can manage your assets in the{" "}
+                  <Link
+                    to={{ page: Page.Default }}
+                    onClick={() => setOpened(false)}
+                    className="underline underline-offset-2"
                   >
-                    {({ input, meta }) => (
-                      <AssetInput
-                        label="Amount"
-                        placeholder="0"
-                        thousandSeparator={true}
-                        assetDecimals={tokenDecimals}
-                        onInput={(e: any) =>
-                          setInputAmount(
-                            new BigNumber(
-                              e.target.value
-                                .replace(",", ".")
-                                .replaceAll(" ", ""),
-                            ).toString(),
-                          )
-                        }
-                        labelActions={
-                          // estimating ? (
-                          //   <span className="text-xs text-brand-inactivedark2 self-end">
-                          //     Estimating...
-                          //   </span>
-                          // ) : (
-                          <InputLabelAction
-                            onClick={() => {
-                              form.change("amount", maxAmount);
-                              console.log("maxAmount", maxAmount);
-                              setInputAmount(maxAmount);
-                            }}
-                          >
-                            MAX
-                          </InputLabelAction>
-                          // )
-                        }
-                        currency={tokenSymbol}
-                        error={
-                          (meta.modified || meta.submitFailed) && meta.error
-                        }
-                        errorMessage={meta.error}
-                        readOnly={false}
-                        {...input}
-                      />
-                    )}
-                  </Field>
-                </div>
-                {/* <div className="mt-6 flex items-start">
+                    Overview
+                  </Link>{" "}
+                  tab.
+                </>
+              }
+              currentItemClassName={classNames(
+                tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
+                "!p-3",
+              )}
+              contentClassName="w-[23.25rem] flex flex-col"
+              itemClassName="group"
+            />
+          </div>
+          <div className="w-[20rem]">
+            <Form<FormValues>
+              key={"formKey"}
+              onSubmit={handleSubmit}
+              render={({ form, handleSubmit }) => (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col max-w-[23.25rem]"
+                >
+                  <div className="relative mt-5">
+                    <Field
+                      key={"amountFieldKey"}
+                      name="amount"
+                      validate={composeValidators(
+                        required,
+                        maxValue(maxAmount, tokenSymbol),
+                      )}
+                    >
+                      {({ input, meta }) => (
+                        <AssetInput
+                          label="Amount"
+                          placeholder="0"
+                          thousandSeparator={true}
+                          assetDecimals={tokenDecimals}
+                          onInput={(e: any) =>
+                            setInputAmount(
+                              new BigNumber(
+                                e.target.value
+                                  .replace(",", ".")
+                                  .replaceAll(" ", ""),
+                              ).toString(),
+                            )
+                          }
+                          labelActions={
+                            // estimating ? (
+                            //   <span className="text-xs text-brand-inactivedark2 self-end">
+                            //     Estimating...
+                            //   </span>
+                            // ) : (
+                            <InputLabelAction
+                              onClick={() => {
+                                form.change("amount", maxAmount);
+                                console.log("maxAmount", maxAmount);
+                                setInputAmount(maxAmount);
+                              }}
+                            >
+                              MAX
+                            </InputLabelAction>
+                            // )
+                          }
+                          currency={tokenSymbol}
+                          error={
+                            (meta.modified || meta.submitFailed) && meta.error
+                          }
+                          errorMessage={meta.error}
+                          readOnly={false}
+                          {...input}
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  {/* <div className="mt-6 flex items-start">
               <TxCheck
                 tokenType={tokenType}
                 token={token}
@@ -627,7 +628,7 @@ const Swap: FC = () => {
                 error={estimationError}
               />
             </div> */}
-                {/* <Button
+                  {/* <Button
               type="submit"
               className="flex items-center min-w-[13.75rem] mt-8 mx-auto"
               loading={submitting}
@@ -635,79 +636,88 @@ const Swap: FC = () => {
               <SendIcon className="mr-2" />
               Transfer
             </Button> */}
-              </form>
-            )}
-          />
+                </form>
+              )}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex items-center">
         <div className="flex flex-col">
-          <NetworkSelectPrimitive
-            networks={allowedNetworks}
-            currentNetwork={selectedOutputNetwork || currentNetwork}
-            onNetworkChange={handleNetworkChange}
-            className="max-w-auto"
-            size={"small"}
-            currentItemClassName={classNames("h-[1.75rem]")}
-            currentItemIconClassName={classNames("!w-8 !h-8 !mr-3")}
-            contentClassName="w-[22.25rem]"
-          />
-          <div className="w-[20rem]">
-            {filteredOutputTokensList && (
-              <Select
-                open={openedOutput}
-                onOpenChange={setOpenedOutput}
-                items={filteredOutputTokensList}
-                currentItem={preparedCurrentTokenOutput}
-                setItem={(asset) => onTokenSelectOutput(asset.key)}
-                searchValue={outputSearchValue}
-                onSearch={setOutputSearchValue}
-                label="Token Output"
-                itemRef={loadMoreTriggerRef}
-                loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
-                showSelected
-                showSelectedIcon={false}
-                emptySearchText={
-                  <>
-                    You can manage your assets in the{" "}
-                    <Link
-                      to={{ page: Page.Default }}
-                      onClick={() => setOpened(false)}
-                      className="underline underline-offset-2"
-                    >
-                      Overview
-                    </Link>{" "}
-                    tab.
-                  </>
-                }
-                currentItemClassName={classNames(
-                  tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
-                  "!p-3",
-                )}
-                contentClassName="w-[23.25rem] flex flex-col"
-                itemClassName="group"
-              />
+          <div className="flex flex-col">
+            <NetworkSelectPrimitive
+              networks={allowedNetworks}
+              currentNetwork={selectedOutputNetwork || currentNetwork}
+              onNetworkChange={handleNetworkChange}
+              className="max-w-auto"
+              size={"small"}
+              currentItemClassName={classNames("h-[1.75rem]")}
+              currentItemIconClassName={classNames("!w-8 !h-8 !mr-3")}
+              contentClassName="w-[22.25rem]"
+            />
+            <div className="w-[20rem]">
+              {filteredOutputTokensList && (
+                <Select
+                  open={openedOutput}
+                  onOpenChange={setOpenedOutput}
+                  items={filteredOutputTokensList}
+                  currentItem={preparedCurrentTokenOutput}
+                  setItem={(asset) => onTokenSelectOutput(asset.key)}
+                  searchValue={outputSearchValue}
+                  onSearch={setOutputSearchValue}
+                  label="Token Output"
+                  itemRef={loadMoreTriggerRef}
+                  loadMoreOnItemFromEnd={LOAD_MORE_ON_TOKEN_FROM_END}
+                  showSelected
+                  showSelectedIcon={false}
+                  emptySearchText={
+                    <>
+                      You can manage your assets in the{" "}
+                      <Link
+                        to={{ page: Page.Default }}
+                        onClick={() => setOpened(false)}
+                        className="underline underline-offset-2"
+                      >
+                        Overview
+                      </Link>{" "}
+                      tab.
+                    </>
+                  }
+                  currentItemClassName={classNames(
+                    tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
+                    "!p-3",
+                  )}
+                  contentClassName="w-[23.25rem] flex flex-col"
+                  itemClassName="group"
+                />
+              )}
+            </div>
+          </div>
+          <div className="ml-[1rem]">
+            {bestRoute && (
+              <ul className="font-sans text-base text-white-800 leading-6">
+                <li>You pay: {bestRoute.fromAmountUSD} $</li>
+                <li>
+                  Chain: ({bestRoute.fromChainId}) {`=>`} ({bestRoute.toChainId}
+                  )
+                </li>
+                <li>Estimated fee: {bestRoute.gasCostUSD} $</li>
+              </ul>
             )}
           </div>
         </div>
-        <div className="ml-[1rem]">
-          {bestRoute && (
-            <ul className="font-sans text-base text-white-800 leading-6">
-              <li>You pay: {bestRoute.fromAmountUSD} $</li>
-              <li>
-                Chain: ({bestRoute.fromChainId}) {`=>`} ({bestRoute.toChainId})
-              </li>
-              <li>Estimated fee: {bestRoute.gasCostUSD} $</li>
-            </ul>
-          )}
-        </div>
+        <button
+          className="relative overflow-hidden py-3 px-4 min-w-[10rem] text-brand-light text-base font-bold bg-buttonaccent bg-opacity-90 rounded-[.375rem] inline-flex justify-center transition hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none select-none flex items-center min-w-[13.75rem] mt-8 mx-auto"
+          onClick={handleSubmitAction}
+        >
+          {isApproved ? "Swap" : "Approve"}
+        </button>
       </div>
-      <button
-        className="relative overflow-hidden py-3 px-4 min-w-[10rem] text-brand-light text-base font-bold bg-buttonaccent bg-opacity-90 rounded-[.375rem] inline-flex justify-center transition hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none select-none flex items-center min-w-[13.75rem] mt-8 mx-auto"
-        onClick={handleSubmitAction}
-      >
-        {isApproved ? "Swap" : "Approve"}
-      </button>
+      {routes && (
+        <SwapRouterList
+          routes={routes}
+          toTokenLogoUrl={currentTokenOutput?.logoUrl}
+          outputChainName={selectedOutputNetwork?.name}
+        />
+      )}
     </div>
   );
 };
