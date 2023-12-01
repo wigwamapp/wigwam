@@ -99,17 +99,29 @@ export function getNetworkIconUrl(network: Network) {
   );
 }
 
-export function getAssetLogoUrl(asset: Asset) {
+export function getAssetLogoUrls(
+  asset: Pick<Asset, "chainId" | "tokenSlug" | "logoUrl">,
+) {
   const { address } = parseTokenSlug(asset.tokenSlug);
+
+  const urls = [];
 
   if (asset.logoUrl?.startsWith("{{native}}")) {
     const [, chainTag] = asset.logoUrl.split("/");
-    return chainTag
-      ? getPublicURL(`icons/nativeToken/${chainTag}.png`)
-      : undefined;
+
+    if (chainTag) {
+      urls.push(getPublicURL(`icons/nativeToken/${chainTag}.png`));
+    }
+  } else {
+    if (MAINNET_CHAIN_IDS.has(asset.chainId)) {
+      const erc20Url = getERC20IconUrl(asset.chainId, address.toLowerCase());
+      if (erc20Url) urls.push(erc20Url);
+    }
+
+    if (asset.logoUrl) {
+      urls.push(asset.logoUrl);
+    }
   }
 
-  return MAINNET_CHAIN_IDS.has(asset.chainId)
-    ? getERC20IconUrl(asset.chainId, address.toLowerCase())
-    : asset.logoUrl;
+  return urls;
 }
