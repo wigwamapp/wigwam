@@ -1,9 +1,9 @@
-import Fuse from "fuse.js";
+import type { IFuseOptions } from "fuse.js";
 import { Font } from "lib/web-fonts";
 
 import { Account, Network } from "core/types";
 
-export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
+export const NETWORK_SEARCH_OPTIONS: IFuseOptions<Network> = {
   includeScore: true,
   threshold: 0.3,
   fieldNormWeight: 1,
@@ -27,7 +27,7 @@ export const NETWORK_SEARCH_OPTIONS: Fuse.IFuseOptions<Network> = {
   ],
 };
 
-export const ACCOUNTS_SEARCH_OPTIONS: Fuse.IFuseOptions<Account> = {
+export const ACCOUNTS_SEARCH_OPTIONS: IFuseOptions<Account> = {
   includeScore: true,
   shouldSort: true,
   threshold: 0.45,

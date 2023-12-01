@@ -115,8 +115,8 @@ export function useLedger() {
               {state === "connectApp"
                 ? "Open the Ethereum app on yur device."
                 : process.env.TARGET_BROWSER === "chrome"
-                ? "Connect and unlock your device."
-                : "Connect, unlock your device, and open the Ethereum app."}
+                  ? "Connect and unlock your device."
+                  : "Connect, unlock your device, and open the Ethereum app."}
             </span>
           </>
         ),

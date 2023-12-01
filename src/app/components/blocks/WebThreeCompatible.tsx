@@ -82,8 +82,8 @@ const WebThreeCompatible: FC<{ small?: boolean }> = ({ small = false }) => {
                 ? index === 0
                   ? "right"
                   : index === 2
-                  ? "left"
-                  : undefined
+                    ? "left"
+                    : undefined
                 : undefined
             }
             disabled={value === metamaskMode}

@@ -306,8 +306,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               ? "py-1.5"
                               : "py-1"
                             : size === "large"
-                            ? "py-2"
-                            : "py-1.5",
+                              ? "py-2"
+                              : "py-1.5",
                           // showSelected &&
                           //   item.key === currentItem.key &&
                           //   "!bg-brand-main/10", // Test this variant

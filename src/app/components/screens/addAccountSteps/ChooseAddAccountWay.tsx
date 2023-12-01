@@ -418,5 +418,5 @@ const calcWidth = (n: number, idx: number) =>
   absToZero(n - idx * 0.2) > 0.2
     ? 100
     : absToZero(n - idx * 0.2) > 0
-    ? (n - idx * 0.2) * 500
-    : 0;
+      ? (n - idx * 0.2) * 500
+      : 0;

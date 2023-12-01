@@ -475,8 +475,8 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               prevState === null
                 ? 0
                 : prevState + 1 > rpcList.length - 1
-                ? 0
-                : prevState + 1,
+                  ? 0
+                  : prevState + 1,
             );
             setIsAfterArrowClick(true);
             e.preventDefault();
@@ -486,8 +486,8 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               prevState === null
                 ? 0
                 : prevState - 1 < 0
-                ? rpcList.length - 1
-                : prevState - 1,
+                  ? rpcList.length - 1
+                  : prevState - 1,
             );
             setIsAfterArrowClick(true);
             e.preventDefault();

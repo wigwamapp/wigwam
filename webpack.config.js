@@ -29,8 +29,8 @@ const ENV_SHORT =
   NODE_ENV === "development"
     ? "dev"
     : NODE_ENV === "production"
-    ? "prod"
-    : NODE_ENV;
+      ? "prod"
+      : NODE_ENV;
 
 // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
 const dotenvFiles = [
@@ -165,7 +165,6 @@ module.exports = {
       "@ledgerhq/devices/hid-framing": require.resolve(
         "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
-      "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
       "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
       // For `react-error-guard`
       "babel-runtime/regenerator": "regenerator-runtime",
