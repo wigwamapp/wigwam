@@ -145,7 +145,7 @@ export const syncAccountAssets = memoize(
     );
     const restTokenSlugs = new Set(restTokens.map((t) => t.tokenSlug));
 
-    const cgPrices = await getCoinGeckoPrices(tokenAddresses);
+    const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
 
     if (Object.keys(cgPrices).length > 0) {
       for (let i = 0; i < accTokens.length; i++) {
