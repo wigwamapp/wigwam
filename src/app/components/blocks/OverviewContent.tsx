@@ -12,15 +12,8 @@ import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import Masonry from "lib/react-masonry/Masonry";
 
-import {
-  AccountAsset,
-  TokenStatus,
-  TokenType,
-  AccountToken,
-  AccountNFT,
-} from "core/types";
-import * as repo from "core/repo";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
+import { AccountAsset, TokenType, AccountToken, AccountNFT } from "core/types";
+import { NATIVE_TOKEN_SLUG, toggleTokenStatus } from "core/common/tokens";
 
 import {
   LOAD_MORE_ON_NFT_FROM_END,
@@ -119,7 +112,6 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
   }, []);
 
   const {
-    currentAccount,
     isNftsSelected,
     searchValue,
     setSearchValue,
@@ -173,27 +165,12 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
   const handleTokenSelect = useCallback(
     async (token: AccountToken) => {
       if (manageModeEnabled) {
-        if (token.status === TokenStatus.Native) return;
-
-        try {
-          await repo.accountTokens.put(
-            {
-              ...token,
-              status:
-                token.status === TokenStatus.Enabled
-                  ? TokenStatus.Disabled
-                  : TokenStatus.Enabled,
-            },
-            [token.chainId, currentAccount.address, token.tokenSlug].join("_"),
-          );
-        } catch (e) {
-          console.error(e);
-        }
+        await toggleTokenStatus(token);
       } else {
         setTokenSlug([token.tokenSlug, "replace"]);
       }
     },
-    [currentAccount.address, manageModeEnabled, setTokenSlug],
+    [manageModeEnabled, setTokenSlug],
   );
 
   const toggleManageMode = useCallback(() => {

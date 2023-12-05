@@ -18,14 +18,12 @@ import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus } from "core/types";
-import * as repo from "core/repo";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
+import { NATIVE_TOKEN_SLUG, toggleTokenStatus } from "core/common/tokens";
 
 import { IS_FIREFOX } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
 import { chainIdAtom } from "app/atoms";
-import { useAccounts } from "app/hooks";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
@@ -54,7 +52,6 @@ const AssetCard = memo(
       { asset, setReceivePopupOpened, isManageMode = false, className },
       ref,
     ) => {
-      const { currentAccount } = useAccounts();
       const setInternalChainId = useSetAtom(chainIdAtom);
 
       const [popoverOpened, setPopoverOpened] = useState(false);
@@ -82,30 +79,9 @@ const AssetCard = memo(
 
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
-          if (asset.status === TokenStatus.Native) return;
-
-          try {
-            await repo.accountTokens.put(
-              {
-                ...asset,
-                ...(asset.status === TokenStatus.Enabled
-                  ? {
-                      status: TokenStatus.Disabled,
-                    }
-                  : {
-                      status: TokenStatus.Enabled,
-                      manuallyEnabled: true,
-                    }),
-              },
-              [asset.chainId, currentAccount.address, asset.tokenSlug].join(
-                "_",
-              ),
-            );
-          } catch (e) {
-            console.error(e);
-          }
+          await toggleTokenStatus(asset);
         }
-      }, [asset, currentAccount.address, isManageMode]);
+      }, [isManageMode, asset]);
 
       const handleAssetContextMenu = useCallback<
         MouseEventHandler<HTMLButtonElement>
