@@ -6,6 +6,7 @@ import { getLiFiProvider } from "core/client/lifi-provider";
 import { Field, Form } from "react-final-form";
 import { ERC20__factory } from "abi-types";
 import { getClientProvider } from "core/client";
+import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
 
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -18,7 +19,13 @@ import { Link } from "lib/navigation";
 
 import { composeValidators, maxValue, required } from "app/utils";
 
-import { AccountAsset, AccountToken, TokenType, Network } from "core/types";
+import {
+  AccountAsset,
+  AccountToken,
+  TokenType,
+  Network,
+  TokenStandard,
+} from "core/types";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
 import { tokenSlugAtom, tokenSlugOutputAtom } from "app/atoms";
@@ -35,22 +42,32 @@ import AssetInput from "app/components/elements/AssetInput";
 import SwapRouterList from "app/components/elements/SwapRouterList";
 import InputLabelAction from "app/components/elements/InputLabelAction";
 import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
+import { ZeroAddress } from "ethers";
 
 const LIFI_CONTRACT = "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae";
+
+const lifi = new LiFi({
+  integrator: "Wigwam",
+});
 
 const Swap: FC = () => {
   const [opened, setOpened] = useState(false);
   const [openedOutput, setOpenedOutput] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [outputSearchValue, setOutputSearchValue] = useState<string | null>(
     null,
   );
 
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+
   const [inputAmount, setInputAmount] = useState<string>("0");
-  const [bestRoute, setBestRoute] = useState<Route | null>(null);
+  // const [bestRoute, setBestRoute] = useState<Route | null>(null);
   const [isApproved, setIsApproved] = useState(false);
   const [routes, setRoutes] = useState<Route[] | null>(null);
+  const [currentTokenOutput, setCurrentTokenOutput] =
+    useState<AccountAsset | null>(null);
 
   const [outputTokensList, setOutputTokensList] = useState<
     AccountAsset[] | null
@@ -58,6 +75,16 @@ const Swap: FC = () => {
   const [filteredOutputTokensList, setFilteredOutputTokensList] = useState<
     any | null
   >();
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Decrease the countdown value by 1 every second
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    // Clear the interval when the component unmounts or when countdown reaches 0
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
     if (!outputTokensList) return;
@@ -89,10 +116,6 @@ const Swap: FC = () => {
 
   const chainId = useChainId();
 
-  const lifi = new LiFi({
-    integrator: "Wigwam",
-  });
-
   const getRoutes = async () => {
     if (!currentToken || !currentTokenOutput) return;
 
@@ -107,13 +130,12 @@ const Swap: FC = () => {
       fromAmount: new BigNumber(inputAmount)
         .multipliedBy(new BigNumber(10).pow(tokenDecimals))
         .toString(), // 1USDT
-      fromTokenAddress: currentToken.tokenSlug.includes("NATIVE")
-        ? "0x0000000000000000000000000000000000000000"
-        : currentToken.tokenSlug.replace("ERC20_", "").replace("_0", ""),
+      fromTokenAddress:
+        currentToken.tokenSlug === NATIVE_TOKEN_SLUG
+          ? ZeroAddress
+          : inputTokenAddress,
       toChainId: currentTokenOutput.chainId,
-      toTokenAddress: currentTokenOutput.tokenSlug
-        .replace("ERC20_", "")
-        .replace("_0", ""),
+      toTokenAddress: outputTokenAddress,
       options: routeOptions,
     };
 
@@ -124,28 +146,37 @@ const Swap: FC = () => {
 
     console.log(routes);
     setRoutes(routes);
-    setBestRoute(routes[0]);
+    // setBestRoute(routes[0]);
+    setSelectedRouteId(routes[0].id);
 
-    setCurrentTokenOutput({
-      ...currentTokenOutput,
-      balanceUSD: Number(routes[0].toAmountUSD),
-      portfolioUSD: routes[0].toAmountUSD,
-      priceUSD: routes[0].toToken.priceUSD,
-      rawBalance: routes[0].toAmount,
-    });
-
-    return routes[1];
+    return routes[0];
 
     // console.log(route)
   };
+
+  useEffect(() => {
+    if (selectedRouteId) {
+      const route = routes?.find((item) => item.id === selectedRouteId);
+
+      if (route) {
+        const payload = {
+          ...currentTokenOutput,
+          balanceUSD: Number(route.toAmountUSD),
+          portfolioUSD: route.toAmountUSD,
+          priceUSD: route.toToken.priceUSD,
+          rawBalance: route.toAmount,
+        } as AccountAsset;
+
+        setCurrentTokenOutput(payload);
+      }
+    }
+  }, [selectedRouteId]);
 
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
 
   const [tokenSlugOutput, setTokenSlugOutput] = useAtom(tokenSlugOutputAtom);
 
   const currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
-  const [currentTokenOutput, setCurrentTokenOutput] =
-    useState<AccountAsset | null>(null);
 
   useEffect(() => {
     if (tokenSlugOutput && outputTokensList) {
@@ -159,16 +190,12 @@ const Swap: FC = () => {
   }, [tokenSlugOutput]);
 
   const checkIsApproved = async () => {
-    if (currentToken && !currentToken.tokenSlug.includes("NATIVE")) {
-      const tokenAddress = currentToken?.tokenSlug
-        .replace("ERC20_", "")
-        .replace("_0", "");
-
+    if (currentToken && currentToken.tokenSlug !== NATIVE_TOKEN_SLUG) {
       const provider = getClientProvider(chainId).getUncheckedSigner(
         currentAccount.address,
       );
 
-      const contract = ERC20__factory.connect(tokenAddress, provider);
+      const contract = ERC20__factory.connect(inputTokenAddress, provider);
 
       const txResult = await contract.allowance(
         currentAccount.address,
@@ -202,7 +229,7 @@ const Swap: FC = () => {
       data: { tokens: outputTokens },
     } = await axios.get("https://li.quest/v1/tokens", {
       params: {
-        // chains: optionalFilter.join(','),
+        // chains: allNetworks.map(item => item.chainId).join(','),
         chainTypes: optionalChainTypes,
       },
     });
@@ -224,7 +251,11 @@ const Swap: FC = () => {
             accountAddress: currentAccount.address,
             tokenType: TokenType.Asset,
             status: 2,
-            tokenSlug: `ERC20_${item.address}_0`,
+            tokenSlug: createTokenSlug({
+              standard: TokenStandard.ERC20,
+              address: item.address,
+              id: "0",
+            }),
             decimals: item.decimals,
             name: item.name,
             symbol: item.symbol,
@@ -258,6 +289,16 @@ const Swap: FC = () => {
       search: searchValue ?? undefined,
     },
   );
+
+  const inputTokenAddress = useMemo(() => {
+    return tokenSlug ? parseTokenSlug(tokenSlug).address : ZeroAddress;
+  }, [tokenSlug]);
+
+  const outputTokenAddress = useMemo(() => {
+    return tokenSlugOutput
+      ? parseTokenSlug(tokenSlugOutput).address
+      : ZeroAddress;
+  }, [tokenSlugOutput]);
 
   const preparedTokens = useMemo(
     () =>
@@ -303,14 +344,14 @@ const Swap: FC = () => {
     }
   }, [currentTokenOutput, outputTokensList]);
 
-  useEffect(() => {
-    if (currentTokenOutput) {
-      preparedCurrentTokenOutput = prepareToken(
-        currentTokenOutput as AccountAsset,
-        "large",
-      );
-    }
-  }, [currentTokenOutput]);
+  // useEffect(() => {
+  //   if (currentTokenOutput) {
+  //     preparedCurrentTokenOutput = prepareToken(
+  //       currentTokenOutput as AccountAsset,
+  //       "large",
+  //     );
+  //   }
+  // }, [currentTokenOutput]);
 
   useEffect(() => {
     if (outputTokensList) {
@@ -326,10 +367,9 @@ const Swap: FC = () => {
       getRoutes();
     }
   }, [currentToken, currentTokenOutput?.tokenSlug, inputAmount]);
-
+  //@ts-expect-error: expect Signer but got RpcSigner
   const switchChainHook: SwitchChainHook = async (requiredChainId: number) => {
     console.log("switchChainHook", requiredChainId);
-
     const newSigner = getLiFiProvider(requiredChainId).getSigner(
       currentAccount.address,
     );
@@ -344,36 +384,38 @@ const Swap: FC = () => {
   const doSwap = async () => {
     if (!currentToken || !currentTokenOutput) return;
 
-    const routeOptions = {
-      slippage: 5 / 100, // 3%
-      order: "RECOMMENDED",
-      infiniteApproval: true,
-    } as RouteOptions;
+    // const routeOptions = {
+    //   slippage: 5 / 100, // 3%
+    //   order: "RECOMMENDED",
+    //   infiniteApproval: true,
+    // } as RouteOptions;
 
-    const routesRequest = {
-      fromChainId: currentToken.chainId,
-      fromAmount: new BigNumber(inputAmount)
-        .multipliedBy(new BigNumber(10).pow(tokenDecimals))
-        .toString(), // 1USDT
-      fromTokenAddress: currentToken.tokenSlug.includes("NATIVE")
-        ? "0x0000000000000000000000000000000000000000"
-        : currentToken.tokenSlug.replace("ERC20_", "").replace("_0", ""),
-      toChainId: currentTokenOutput.chainId,
-      toTokenAddress: currentTokenOutput.tokenSlug
-        .replace("ERC20_", "")
-        .replace("_0", ""),
-      options: routeOptions,
-    };
+    // const routesRequest = {
+    //   fromChainId: currentToken.chainId,
+    //   fromAmount: new BigNumber(inputAmount)
+    //     .multipliedBy(new BigNumber(10).pow(tokenDecimals))
+    //     .toString(), // 1USDT
+    //   fromTokenAddress: currentToken.tokenSlug === NATIVE_TOKEN_SLUG
+    //     ? ZeroAddress
+    //     : inputTokenAddress,
+    //   toChainId: currentTokenOutput.chainId,
+    //   toTokenAddress: outputTokenAddress,
+    //   options: routeOptions,
+    // };
 
-    console.log(routesRequest.fromAmount);
+    // console.log(routesRequest.fromAmount);
 
-    const result = await lifi.getRoutes(routesRequest);
-    const latestRoute = result.routes[0];
+    // const result = await lifi.getRoutes(routesRequest);
+    // const latestRoute = result.routes[0];
+
+    const latestRoute = routes?.find((item) => item.id === selectedRouteId);
 
     if (latestRoute) {
       const signerProvider = getLiFiProvider(chainId).getSigner(
         currentAccount.address,
       );
+
+      //@ts-expect-error: expect Signer but got RpcSigner
       const route = await lifi.executeRoute(signerProvider, latestRoute, {
         switchChainHook: switchChainHook,
         acceptExchangeRateUpdateHook: acceptExchangeRateUpdateHook,
@@ -384,15 +426,11 @@ const Swap: FC = () => {
 
   const doApprove = async () => {
     if (currentToken) {
-      const tokenAddress = currentToken?.tokenSlug
-        .replace("ERC20_", "")
-        .replace("_0", "");
-
       const provider = getClientProvider(chainId).getUncheckedSigner(
         currentAccount.address,
       );
 
-      const contract = ERC20__factory.connect(tokenAddress, provider);
+      const contract = ERC20__factory.connect(inputTokenAddress, provider);
       const formatedInputAmount = new BigNumber(inputAmount).multipliedBy(
         new BigNumber(10).pow(tokenDecimals),
       );
@@ -515,9 +553,10 @@ const Swap: FC = () => {
     setSelectedOutputNetwork(
       allNetworks.find((item) => item.chainId === selectedChain),
     );
-    console.log(allNetworks);
-    console.log(currentNetwork);
-    console.log(selectedChain);
+  };
+
+  const onRouteSelect = (route: Route) => {
+    setSelectedRouteId(route.id);
   };
 
   return (
@@ -691,7 +730,7 @@ const Swap: FC = () => {
               )}
             </div>
           </div>
-          <div className="ml-[1rem]">
+          {/* <div className="ml-[1rem]">
             {bestRoute && (
               <ul className="font-sans text-base text-white-800 leading-6">
                 <li>You pay: {bestRoute.fromAmountUSD} $</li>
@@ -702,7 +741,7 @@ const Swap: FC = () => {
                 <li>Estimated fee: {bestRoute.gasCostUSD} $</li>
               </ul>
             )}
-          </div>
+          </div> */}
         </div>
         <button
           className="relative overflow-hidden py-3 px-4 min-w-[10rem] text-brand-light text-base font-bold bg-buttonaccent bg-opacity-90 rounded-[.375rem] inline-flex justify-center transition hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none select-none flex items-center min-w-[13.75rem] mt-8 mx-auto"
@@ -711,11 +750,16 @@ const Swap: FC = () => {
           {isApproved ? "Swap" : "Approve"}
         </button>
       </div>
+      <div>
+        <p>Countdown: {countdown} seconds</p>
+      </div>
       {routes && (
         <SwapRouterList
           routes={routes}
           toTokenLogoUrl={currentTokenOutput?.logoUrl}
           outputChainName={selectedOutputNetwork?.name}
+          onRouteSelect={onRouteSelect}
+          selectedRouteId={selectedRouteId}
         />
       )}
     </div>

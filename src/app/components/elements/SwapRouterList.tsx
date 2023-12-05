@@ -1,24 +1,39 @@
 import { FC } from "react";
 import { Route } from "@lifi/sdk";
-import BigNumber from "bignumber.js";
+import PrettyAmount from "./PrettyAmount";
+import classNames from "clsx";
 
 type SwapRouterListProps = {
   routes: Route[];
   toTokenLogoUrl?: string;
   outputChainName?: string;
+  onRouteSelect: (route: Route) => void;
+  selectedRouteId: string | null;
 };
 
 const SwapRouterList: FC<SwapRouterListProps> = ({
   routes,
   toTokenLogoUrl,
   outputChainName,
+  onRouteSelect,
+  selectedRouteId,
 }) => (
   <div className="flex flex-col">
     {routes.map((route: Route) => {
       return (
-        <div
+        <button
           key={route.id}
-          className="bg-[rgba(245,181,255,0.12)] max-w-md w-full flex flex-col mb-4 p-4 border border-gray-300 rounded-md"
+          onClick={() => onRouteSelect(route)}
+          className={classNames(`bg-[rgba(245,181,255,0.12)] max-w-md
+            w-full cursor-pointer
+            flex flex-col mb-4 p-4
+            border  rounded-md
+            ${
+              selectedRouteId === route.id
+                ? "border-lime-600"
+                : "border-gray-300"
+            }
+          `)}
         >
           <div className="flex">
             <img
@@ -27,14 +42,21 @@ const SwapRouterList: FC<SwapRouterListProps> = ({
               className="max-w-[32px] max-h-[32px] rounded-full"
             />
             <div className="flex flex-col ml-[1rem]">
-              <div className="text-lg font-bold">
-                {new BigNumber(route.toAmount)
+              <div>
+                <PrettyAmount
+                  amount={route.toAmount}
+                  decimals={route.toToken.decimals}
+                  copiable
+                  threeDots={false}
+                  className="text-lg font-bold flex items-center"
+                />
+                {/* {new BigNumber(route.toAmount)
                   .dividedBy(new BigNumber(10).pow(route.toToken.decimals))
                   .toNumber() // Convert to a JavaScript number
                   .toLocaleString("en-US", {
                     minimumFractionDigits: 1,
                     maximumFractionDigits: 4,
-                  })}
+                  })} */}
               </div>
               <div className="flex mt-1 font-small color-[rgba(255, 255, 255, 0.7)]">
                 ${route.toAmountUSD} • {route.toToken.symbol} on{" "}
@@ -61,32 +83,24 @@ const SwapRouterList: FC<SwapRouterListProps> = ({
                       </div>
                       <div>
                         <span>
-                          {new BigNumber(includedStep.action.fromAmount)
-                            .dividedBy(
-                              new BigNumber(10).pow(
-                                includedStep.action.fromToken.decimals,
-                              ),
-                            )
-                            .toNumber() // Convert to a JavaScript number
-                            .toLocaleString("en-US", {
-                              minimumFractionDigits: 1,
-                              maximumFractionDigits: 4,
-                            })}{" "}
+                          <PrettyAmount
+                            amount={includedStep.action.fromAmount}
+                            decimals={includedStep.action.fromToken.decimals}
+                            copiable
+                            threeDots={false}
+                            className="!inline text-xs font-bold flex items-center"
+                          />
                           {includedStep.action.fromToken.symbol}
                         </span>
                         &rarr;
                         <span>
-                          {new BigNumber(includedStep.estimate.toAmount)
-                            .dividedBy(
-                              new BigNumber(10).pow(
-                                includedStep.action.toToken.decimals,
-                              ),
-                            )
-                            .toNumber() // Convert to a JavaScript number
-                            .toLocaleString("en-US", {
-                              minimumFractionDigits: 1,
-                              maximumFractionDigits: 4,
-                            })}{" "}
+                          <PrettyAmount
+                            amount={includedStep.estimate.toAmount}
+                            decimals={includedStep.action.toToken.decimals}
+                            copiable
+                            threeDots={false}
+                            className="!inline text-xs font-bold flex items-center"
+                          />
                           {includedStep.action.toToken.symbol}
                         </span>
                       </div>
@@ -111,7 +125,7 @@ const SwapRouterList: FC<SwapRouterListProps> = ({
               <span className="ml-1 font-bold">{route.gasCostUSD}$</span>
             </div>
           </div>
-        </div>
+        </button>
       );
     })}
   </div>
