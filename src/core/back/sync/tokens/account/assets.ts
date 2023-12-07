@@ -58,10 +58,11 @@ export const syncAccountAssets = memoize(
       const rawBalanceBN = new BigNumber(token.balance).integerValue();
 
       // Skip if alreaady exist and balance is zero
-      // Skip if mainnet token without price
+      // Skip if mainnet token without metadata
       if (
         (!existing && rawBalanceBN.isZero()) ||
-        (network.type === "mainnet" && !token.quote_rate)
+        (network.type === "mainnet" &&
+          (!token.contract_ticker_symbol || !token.contract_decimals))
       ) {
         continue;
       }
@@ -69,14 +70,14 @@ export const syncAccountAssets = memoize(
       const metadata = {
         symbol:
           token.contract_ticker_symbol?.slice(0, 8) ||
-          existing.symbol ||
+          existing?.symbol ||
           "NONAME",
-        name: token.contract_name || existing.name || "Unknown",
-        decimals: token.contract_decimals ?? existing.decimals ?? 18,
+        name: token.contract_name || existing?.name || "Unknown",
+        decimals: token.contract_decimals ?? existing?.decimals ?? 18,
         logoUrl:
           network.type === "mainnet"
-            ? token.logo_url ?? undefined
-            : existing.logoUrl,
+            ? token.logo_url || undefined
+            : existing?.logoUrl,
       };
 
       const rawBalance = rawBalanceBN.toString();
@@ -143,7 +144,6 @@ export const syncAccountAssets = memoize(
     const tokenAddresses = accTokens.map(
       (t) => parseTokenSlug(t.tokenSlug).address,
     );
-    const restTokenSlugs = new Set(restTokens.map((t) => t.tokenSlug));
 
     const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
 
@@ -164,10 +164,13 @@ export const syncAccountAssets = memoize(
             .times(priceUSD)
             .toNumber();
         } else {
-          if (restTokenSlugs.has(token.tokenSlug)) {
-            token.balanceUSD = 0;
-            delete token.priceUSD;
-            delete token.priceUSDChange;
+          token.balanceUSD = 0;
+          delete token.priceUSD;
+          delete token.priceUSDChange;
+
+          // Remove token from the list if no price
+          if (!token.manuallyEnabled) {
+            token.status = TokenStatus.Disabled;
           }
         }
       }
