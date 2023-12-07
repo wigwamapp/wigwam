@@ -21,8 +21,11 @@ const SwapRouterList: FC<SwapRouterListProps> = ({
   <div className="flex flex-col">
     {routes.map((route: Route) => {
       return (
-        <button
+        <div
           key={route.id}
+          role="button"
+          tabIndex={0}
+          onKeyDown={() => onRouteSelect(route)}
           onClick={() => onRouteSelect(route)}
           className={classNames(`bg-[rgba(245,181,255,0.12)] max-w-md
             w-full cursor-pointer
@@ -125,7 +128,7 @@ const SwapRouterList: FC<SwapRouterListProps> = ({
               <span className="ml-1 font-bold">{route.gasCostUSD}$</span>
             </div>
           </div>
-        </button>
+        </div>
       );
     })}
   </div>

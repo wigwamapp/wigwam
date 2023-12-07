@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LiFi, RouteOptions, Route, SwitchChainHook } from "@lifi/sdk";
+import { LiFi, RouteOptions, Route, SwitchChainHook, Process } from "@lifi/sdk";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { useAccounts, useChainId } from "app/hooks";
 import { getLiFiProvider } from "core/client/lifi-provider";
@@ -28,7 +28,11 @@ import {
 } from "core/types";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
-import { tokenSlugAtom, tokenSlugOutputAtom } from "app/atoms";
+import {
+  tokenSlugInputAtom,
+  tokenSlugOutputAtom,
+  chainOutputAtom,
+} from "app/atoms";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
 import { Page } from "app/nav";
@@ -53,12 +57,17 @@ const lifi = new LiFi({
 const Swap: FC = () => {
   const [opened, setOpened] = useState(false);
   const [openedOutput, setOpenedOutput] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const initialCountdown = 50;
+  const [countdown, setCountdown] = useState(initialCountdown);
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [outputSearchValue, setOutputSearchValue] = useState<string | null>(
     null,
   );
+
+  const [executionProcess, setExecutionProcess] = useState<
+    Process[] | null | undefined
+  >(null);
 
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
@@ -77,14 +86,26 @@ const Swap: FC = () => {
   >();
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Decrease the countdown value by 1 every second
-      setCountdown((prevCountdown) => prevCountdown - 1);
-    }, 1000);
+    if (routes) {
+      const intervalId = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          // If countdown reaches 0, reset it to the initial value
+          if (prevCountdown === 0) {
+            getRoutes();
+            return initialCountdown;
+          } else {
+            // Decrease the countdown value by 1 every second
+            return prevCountdown - 1;
+          }
+        });
+      }, 1000);
 
-    // Clear the interval when the component unmounts or when countdown reaches 0
-    return () => clearInterval(intervalId);
-  }, []); // Empty dependency array ensures the effect runs only once
+      // Clear the interval when the component unmounts
+      return () => clearInterval(intervalId);
+    } else {
+      return undefined;
+    }
+  }, [routes?.length]); // Empty dependency array ensures the effect runs only once
 
   useEffect(() => {
     if (!outputTokensList) return;
@@ -118,6 +139,8 @@ const Swap: FC = () => {
 
   const getRoutes = async () => {
     if (!currentToken || !currentTokenOutput) return;
+
+    console.log("get routes");
 
     const routeOptions = {
       slippage: 5 / 100, // 3%
@@ -172,9 +195,11 @@ const Swap: FC = () => {
     }
   }, [selectedRouteId]);
 
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
+  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugInputAtom);
 
   const [tokenSlugOutput, setTokenSlugOutput] = useAtom(tokenSlugOutputAtom);
+
+  const [chainOutput, setChainOutput] = useAtom(chainOutputAtom);
 
   const currentToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
 
@@ -187,7 +212,7 @@ const Swap: FC = () => {
         setCurrentTokenOutput(neededToken);
       }
     }
-  }, [tokenSlugOutput]);
+  }, [tokenSlugOutput, outputTokensList]);
 
   const checkIsApproved = async () => {
     if (currentToken && currentToken.tokenSlug !== NATIVE_TOKEN_SLUG) {
@@ -292,13 +317,13 @@ const Swap: FC = () => {
 
   const inputTokenAddress = useMemo(() => {
     return tokenSlug ? parseTokenSlug(tokenSlug).address : ZeroAddress;
-  }, [tokenSlug]);
+  }, [tokenSlug, tokenSlugOutput, inputAmount]);
 
   const outputTokenAddress = useMemo(() => {
     return tokenSlugOutput
       ? parseTokenSlug(tokenSlugOutput).address
       : ZeroAddress;
-  }, [tokenSlugOutput]);
+  }, [tokenSlugOutput, tokenSlug, inputAmount]);
 
   const preparedTokens = useMemo(
     () =>
@@ -344,15 +369,6 @@ const Swap: FC = () => {
     }
   }, [currentTokenOutput, outputTokensList]);
 
-  // useEffect(() => {
-  //   if (currentTokenOutput) {
-  //     preparedCurrentTokenOutput = prepareToken(
-  //       currentTokenOutput as AccountAsset,
-  //       "large",
-  //     );
-  //   }
-  // }, [currentTokenOutput]);
-
   useEffect(() => {
     if (outputTokensList) {
       preparedCurrentTokenOutput = prepareToken(
@@ -363,11 +379,15 @@ const Swap: FC = () => {
   }, [outputTokensList]);
 
   useEffect(() => {
-    if (currentToken && currentTokenOutput && Number(inputAmount) > 0) {
+    if (
+      currentToken?.tokenSlug &&
+      currentTokenOutput?.tokenSlug &&
+      Number(inputAmount) > 0
+    ) {
       getRoutes();
     }
-  }, [currentToken, currentTokenOutput?.tokenSlug, inputAmount]);
-  //@ts-expect-error: expect Signer but got RpcSigner
+  }, [currentToken?.tokenSlug, currentTokenOutput?.tokenSlug, inputAmount]);
+
   const switchChainHook: SwitchChainHook = async (requiredChainId: number) => {
     console.log("switchChainHook", requiredChainId);
     const newSigner = getLiFiProvider(requiredChainId).getSigner(
@@ -379,6 +399,15 @@ const Swap: FC = () => {
 
   const acceptExchangeRateUpdateHook = async () => {
     return true;
+  };
+
+  const routeUpdateCallback = async (route: Route) => {
+    const processes = route?.steps.map(
+      (step) => step?.execution?.process.map((process) => process),
+    );
+    console.log("routeUpdateCallback", processes[0]);
+    setExecutionProcess(processes[0]);
+    console.log(executionProcess);
   };
 
   const doSwap = async () => {
@@ -415,10 +444,10 @@ const Swap: FC = () => {
         currentAccount.address,
       );
 
-      //@ts-expect-error: expect Signer but got RpcSigner
       const route = await lifi.executeRoute(signerProvider, latestRoute, {
         switchChainHook: switchChainHook,
         acceptExchangeRateUpdateHook: acceptExchangeRateUpdateHook,
+        updateRouteHook: routeUpdateCallback,
       });
       console.log("route", route);
     }
@@ -435,7 +464,13 @@ const Swap: FC = () => {
         new BigNumber(10).pow(tokenDecimals),
       );
 
-      await contract.approve(LIFI_CONTRACT, formatedInputAmount.toString());
+      const tx = await contract.approve(
+        LIFI_CONTRACT,
+        formatedInputAmount.toString(),
+      );
+      if (tx) {
+        setIsApproved(true);
+      }
     }
   };
 
@@ -538,10 +573,21 @@ const Swap: FC = () => {
   >(undefined);
 
   useEffect(() => {
-    if (currentNetwork) {
-      setSelectedOutputNetwork(currentNetwork);
+    if (allNetworks) {
+      if (chainOutput) {
+        console.log(chainOutput);
+        const netw = allNetworks.find(
+          (item) => item.chainId == Number(chainOutput),
+        );
+        console.log(netw);
+        setSelectedOutputNetwork(
+          allNetworks.find((item) => item.chainId === Number(chainOutput)),
+        );
+      } else if (currentNetwork) {
+        setSelectedOutputNetwork(currentNetwork);
+      }
     }
-  }, [currentNetwork]);
+  }, [currentNetwork, chainOutput, allNetworks]);
 
   useEffect(() => {
     if (allNetworks.length > 0) {
@@ -553,6 +599,7 @@ const Swap: FC = () => {
     setSelectedOutputNetwork(
       allNetworks.find((item) => item.chainId === selectedChain),
     );
+    setChainOutput([String(selectedChain), "replace"]);
   };
 
   const onRouteSelect = (route: Route) => {
@@ -750,17 +797,20 @@ const Swap: FC = () => {
           {isApproved ? "Swap" : "Approve"}
         </button>
       </div>
-      <div>
-        <p>Countdown: {countdown} seconds</p>
-      </div>
+      <div></div>
       {routes && (
-        <SwapRouterList
-          routes={routes}
-          toTokenLogoUrl={currentTokenOutput?.logoUrl}
-          outputChainName={selectedOutputNetwork?.name}
-          onRouteSelect={onRouteSelect}
-          selectedRouteId={selectedRouteId}
-        />
+        <div className="flex flex-col mb-4">
+          <p>
+            Refresh in <b>{countdown}</b> seconds
+          </p>
+          <SwapRouterList
+            routes={routes}
+            toTokenLogoUrl={currentTokenOutput?.logoUrl}
+            outputChainName={selectedOutputNetwork?.name}
+            onRouteSelect={onRouteSelect}
+            selectedRouteId={selectedRouteId}
+          />
+        </div>
       )}
     </div>
   );
