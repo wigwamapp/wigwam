@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { LiFiWidget, WidgetConfig } from "@wigwam/lifi-widget";
+import { LiFiWidget, WidgetConfig } from "../../../../../packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { useAccounts, useChainId } from "app/hooks";
 import { tokenSlugAtom } from "app/atoms";

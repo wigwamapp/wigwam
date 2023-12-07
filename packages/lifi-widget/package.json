@@ -1,42 +1,7 @@
 {
+  "private": true,
   "name": "@wigwam/lifi-widget",
   "version": "2.9.4",
-  "description": "LI.FI Widget for cross-chain bridging and swapping. It will drive your multi-chain strategy and attract new users from everywhere.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist",
-  "scripts": {
-    "postinstall": "tsc",
-    "watch": "tsc -w -p ./tsconfig.json",
-    "build-all": "tsc --build --clean && yarn build:version && tsc --build && tsc --build tsconfig.cjs.json && yarn build:copy-files",
-    "build:copy-files": "node ../../scripts/copy-files.js && cpy 'src/**/*' '!src/**/*.ts*' build && cpy 'src/**/*' '!src/**/*.ts*' build/cjs",
-    "build:version": "node ../../scripts/version.js",
-    "lint": "eslint --ext .tsx --ext .ts ./src",
-    "lint:fix": "eslint --ext .tsx --ext .ts ./src --fix",
-    "prettier:fix": "prettier --write ./src/."
-  },
-  "author": "Eugene Chybisov <eugene@li.finance>",
-  "homepage": "https://github.com/lifinance/widget",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/lifinance/widget.git"
-  },
-  "bugs": {
-    "url": "https://github.com/lifinance/widget/issues"
-  },
-  "license": "Apache-2.0",
-  "keywords": [
-    "widget",
-    "lifi-widget",
-    "bridge",
-    "swap",
-    "cross-chain",
-    "multi-chain",
-    "metamask",
-    "ethereum",
-    "web3",
-    "lifi"
-  ],
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -69,22 +34,11 @@
   "devDependencies": {
     "@types/big.js": "6.2.2",
     "@types/node": "20.10.4",
-    "@types/uuid": "9.0.7",
-    "cpy-cli": "^5.0.0",
-    "typescript": "^5.2.2"
+    "@types/uuid": "9.0.7"
   },
   "peerDependencies": {
     "@types/react": "^18.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/react": {
-      "optional": true
-    }
-  },
-  "eslintConfig": {
-    "extends": "../../.eslintrc"
-  },
-  "sideEffects": false
+  }
 }
