@@ -18,6 +18,7 @@ import { syncStarted, synced } from "../../state";
 
 import { getCoinGeckoPrices } from "../coinGecko";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
+import { indexerApi } from "../indexer";
 
 const stack = new Set<string>();
 
@@ -162,6 +163,24 @@ async function performTokenSync(
   ]);
 
   if (!metadata) return;
+
+  // Logo URL
+  if (standard === TokenStandard.ERC20) {
+    const res = await indexerApi
+      .get("/cmc/v2/cryptocurrency/info", {
+        params: { address: tokenAddress },
+      })
+      .catch(() => null);
+
+    const items = res?.data?.data;
+    if (items) {
+      const token = items[Object.keys(items)[0]];
+
+      if (token?.logo) {
+        Object.assign(metadata, { logoUrl: token.logo });
+      }
+    }
+  }
 
   const rawBalance = balance?.toString() ?? "0";
   const balanceUSD =
