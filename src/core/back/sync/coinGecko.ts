@@ -1,6 +1,7 @@
 import axios from "axios";
 import memoize from "mem";
 import ExpiryMap from "expiry-map";
+import BigNumber from "bignumber.js";
 import { getAddress, isAddress } from "ethers";
 import { withOfflineCache } from "lib/ext/offlineCache";
 
@@ -102,16 +103,20 @@ export async function getCoinGeckoPrices(
 
           const res = await coinGeckoTerminalApi
             .get(
-              `/simple/networks/${networkName}/token_price/${nextAddresses.join()}`,
+              `/networks/${networkName}/tokens/multi/${nextAddresses.join()}`,
             )
             .catch(() => null);
 
-          const cgtTokenPrices = res?.data?.data?.attributes?.token_prices;
-          if (!cgtTokenPrices) continue;
+          const cgtTokenInfos = res?.data?.data;
+          if (!cgtTokenInfos) continue;
 
-          for (const tokenAddressLowerCased in cgtTokenPrices) {
-            const tokenAddress = getAddress(tokenAddressLowerCased);
-            const usdPrice = +cgtTokenPrices[tokenAddressLowerCased];
+          for (const { attributes: atrs } of cgtTokenInfos) {
+            if (new BigNumber(atrs.total_reserve_in_usd).isLessThan(1000)) {
+              continue;
+            }
+
+            const tokenAddress = getAddress(atrs.address);
+            const usdPrice = new BigNumber(atrs.price_usd).toNumber();
             if (!usdPrice) continue;
 
             const prices = { usd: usdPrice };
