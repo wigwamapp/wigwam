@@ -1,7 +1,13 @@
 import { ethers } from "ethers";
 
 import { ERC20__factory, ERC1155__factory, ERC721__factory } from "abi-types";
-import { TokenActivity, TokenStandard } from "core/types";
+import {
+  AccountToken,
+  TokenActivity,
+  TokenStandard,
+  TokenStatus,
+} from "core/types";
+import * as repo from "core/repo";
 
 export const NATIVE_TOKEN_SLUG = createTokenSlug({
   standard: TokenStandard.Native,
@@ -131,4 +137,27 @@ export async function isTokenStandardValid(
   }
 
   return false;
+}
+
+export async function toggleTokenStatus(token: AccountToken) {
+  try {
+    if (token.status === TokenStatus.Native) return;
+
+    await repo.accountTokens.put(
+      {
+        ...token,
+        ...(token.status === TokenStatus.Enabled
+          ? {
+              status: TokenStatus.Disabled,
+            }
+          : {
+              status: TokenStatus.Enabled,
+              manuallyEnabled: true,
+            }),
+      },
+      createAccountTokenKey(token),
+    );
+  } catch (e) {
+    console.error(e);
+  }
 }

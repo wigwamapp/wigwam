@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "src",
     "module": "esnext",
-    "target": "es2020",
+    "target": "es2022",
     "moduleResolution": "node",
     "jsx": "react-jsx",
     "noEmit": true,
@@ -14,8 +14,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "remove",
-    "noImplicitReturns": true,
     "noImplicitAny": true
   },
-  "include": ["src"]
+  "include": ["src", "packages"]
 }

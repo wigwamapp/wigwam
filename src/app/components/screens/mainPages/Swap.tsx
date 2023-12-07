@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { LiFiWidget, WidgetConfig } from "@lifi/widget";
+import { LiFiWidget, WidgetConfig } from "../../../../../packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { useAccounts, useChainId } from "app/hooks";
 import { tokenSlugAtom } from "app/atoms";
@@ -68,7 +68,7 @@ const Swap: FC = () => {
         },
       },
     };
-  }, [chainId, currentAccount.address]);
+  }, [chainId, currentAccount.address, tokenSlug]);
 
   return (
     <div className="flex mt-[1rem]">

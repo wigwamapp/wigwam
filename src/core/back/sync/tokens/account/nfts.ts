@@ -128,13 +128,14 @@ export const syncAccountNFTs = memoize(
     // Fetch data from the chain for tokens
     // that were not retrieved from the indexer
 
-    const restTokens = Array.from(existingTokensMap.values());
-
     if (
-      restTokens.length > 0 &&
+      existingTokensMap.size > 0 &&
       // Avoid fetch balance from chain for huge amount of NFTs
-      (restTokens.length !== existingAccTokens.length || restTokens.length < 50)
+      (existingTokensMap.size !== existingAccTokens.length ||
+        existingTokensMap.size < 50)
     ) {
+      const restTokens = Array.from(existingTokensMap.values());
+
       const balances = await Promise.all(
         restTokens.map(({ tokenSlug }) =>
           getBalanceFromChain(chainId, tokenSlug, accountAddress),
