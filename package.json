@@ -13,7 +13,7 @@
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
     "ts": "tsc --pretty",
     "generate-types": "typechain --target=ethers-v6 --out-dir src/abi-types src/abi/*.json > /dev/null 2>&1",
-    "postinstall": "husky install; yarn generate-types",
+    "postinstall": "husky install; yarn generate-types; cd packages/lifi-widget && yarn postinstall",
     "format-all": "prettier --write .",
     "npm-audit": "npx synp --source-file yarn.lock && npm audit; rm package-lock.json",
     "check-updates": "npx npm-check-updates"
@@ -30,7 +30,6 @@
     "@ledgerhq/hw-transport": "6.30.0",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "6.28.0",
-    "@lifi/widget": "2.9.4",
     "@metamask/eth-sig-util": "7.0.1",
     "@metamask/safe-event-emitter": "3.0.0",
     "@microlink/react-json-view": "1.23.0",
@@ -164,6 +163,9 @@
     "webpackbar": "5.0.2",
     "zip-webpack-plugin": "4.0.1"
   },
+  "workspaces": [
+    "packages/lifi-widget"
+  ],
   "resolutions": {
     "flux": "./.vendor/flux",
     "axios": ">=1.6.0"
