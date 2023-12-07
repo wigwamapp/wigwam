@@ -1,4 +1,4 @@
-import { FC, Suspense, useMemo } from "react";
+import { FC, Suspense, useMemo, lazy } from "react";
 import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
@@ -10,12 +10,13 @@ import MainPageLayout from "app/components/layouts/MainPageLayout";
 import Overview from "./mainPages/Overview";
 import Receive from "./mainPages/Receive";
 import Transfer from "./mainPages/Transfer";
-import Swap from "./mainPages/Swap";
 import Apps from "./mainPages/Apps";
 import Contacts from "./mainPages/Contacts";
 import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
 import OnboardingPopup from "../blocks/OnboardingPopup";
+
+const SwapDynamic = lazy(() => import("./mainPages/Swap"));
 
 const Main: FC = () => {
   return (
@@ -41,7 +42,7 @@ function matchMainPage(page: Page) {
     .with(Page.Default, () => <Overview />)
     .with(Page.Receive, () => <Receive />)
     .with(Page.Transfer, () => <Transfer />)
-    .with(Page.Swap, () => <Swap />)
+    .with(Page.Swap, () => <SwapDynamic />)
     .with(Page.Apps, () => <Apps />)
     .with(Page.Contacts, () => <Contacts />)
     .with(Page.Wallets, () => <Wallets />)
