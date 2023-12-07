@@ -30,7 +30,7 @@
     "@ledgerhq/hw-transport": "6.30.0",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webhid": "6.28.0",
-    "@lifi/sdk": "2.5.0",
+    "@lifi/widget": "2.9.4",
     "@metamask/eth-sig-util": "7.0.1",
     "@metamask/safe-event-emitter": "3.0.0",
     "@microlink/react-json-view": "1.23.0",

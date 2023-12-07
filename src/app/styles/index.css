@@ -337,3 +337,12 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
     box-shadow: 0.2em -0.2em 0 0 currentcolor;
   }
 }
+
+/**
+ * LiFi
+ */
+
+a[href="https://li.fi"]
+{
+  display: none !important;
+}

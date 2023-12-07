@@ -34,16 +34,6 @@ export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
 
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
-export const tokenSlugInputAtom = atomWithURLHash<string | null>(
-  "tokenIn",
-  null,
-);
-
-export const tokenSlugOutputAtom = atomWithURLHash<string | null>(
-  "tokenOut",
-  null,
-);
-
 export const chainOutputAtom = atomWithURLHash<string | null>(
   "chainOutput",
   null,
