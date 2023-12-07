@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { useLiFi, useWallet } from '../providers';
-import type { TokenAmount } from '../types';
-import { useFeaturedTokens } from './useFeaturedTokens';
-import { useTokens } from './useTokens';
+import { useQuery } from "@tanstack/react-query";
+import { useLiFi, useWallet } from "../providers";
+import type { TokenAmount } from "../types";
+import { useFeaturedTokens } from "./useFeaturedTokens";
+import { useTokens } from "./useTokens";
 
 const defaultRefetchInterval = 32_000;
 
@@ -22,7 +22,7 @@ export const useTokenBalances = (selectedChainId?: number) => {
     isLoading: isBalanceLoading,
     refetch,
   } = useQuery(
-    ['token-balances', account.address, selectedChainId, tokens?.length],
+    ["token-balances", account.address, selectedChainId, tokens?.length],
     async ({ queryKey: [, accountAddress] }) => {
       const tokenBalances = await lifi.getTokenBalances(
         accountAddress as string,
@@ -34,8 +34,8 @@ export const useTokenBalances = (selectedChainId?: number) => {
       );
 
       const sortFn = (a: TokenAmount, b: TokenAmount) =>
-        parseFloat(b.amount ?? '0') * parseFloat(b.priceUSD ?? '0') -
-        parseFloat(a.amount ?? '0') * parseFloat(a.priceUSD ?? '0');
+        parseFloat(b.amount ?? "0") * parseFloat(b.priceUSD ?? "0") -
+        parseFloat(a.amount ?? "0") * parseFloat(a.priceUSD ?? "0");
 
       const formattedTokens = (
         tokenBalances.length === 0 ? tokens : tokenBalances
@@ -45,23 +45,23 @@ export const useTokenBalances = (selectedChainId?: number) => {
         ...formattedTokens
           .filter(
             (token) =>
-              token.amount !== '0' && featuredTokenAddresses.has(token.address),
+              token.amount !== "0" && featuredTokenAddresses.has(token.address),
           )
           .sort(sortFn),
         ...formattedTokens.filter(
           (token) =>
-            token.amount === '0' && featuredTokenAddresses.has(token.address),
+            token.amount === "0" && featuredTokenAddresses.has(token.address),
         ),
         ...formattedTokens
           .filter(
             (token) =>
-              token.amount !== '0' &&
+              token.amount !== "0" &&
               !featuredTokenAddresses.has(token.address),
           )
           .sort(sortFn),
         ...formattedTokens.filter(
           (token) =>
-            token.amount === '0' && !featuredTokenAddresses.has(token.address),
+            token.amount === "0" && !featuredTokenAddresses.has(token.address),
         ),
       ];
       return result;

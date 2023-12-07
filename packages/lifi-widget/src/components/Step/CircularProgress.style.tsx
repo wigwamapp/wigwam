@@ -1,8 +1,8 @@
-import type { Status, Substatus } from '@lifi/sdk';
-import type { Theme } from '@mui/material';
-import { Box, CircularProgress as MuiCircularProgress } from '@mui/material';
-import { circularProgressClasses } from '@mui/material/CircularProgress';
-import { alpha, keyframes, styled } from '@mui/material/styles';
+import type { Status, Substatus } from "@lifi/sdk";
+import type { Theme } from "@mui/material";
+import { Box, CircularProgress as MuiCircularProgress } from "@mui/material";
+import { circularProgressClasses } from "@mui/material/CircularProgress";
+import { alpha, keyframes, styled } from "@mui/material/styles";
 
 const getStatusColor = (
   theme: Theme,
@@ -10,38 +10,38 @@ const getStatusColor = (
   substatus?: Substatus,
 ) => {
   switch (status) {
-    case 'ACTION_REQUIRED':
+    case "ACTION_REQUIRED":
       return alpha(theme.palette.info.main, 0.12);
-    case 'DONE':
-      if (substatus === 'PARTIAL' || substatus === 'REFUNDED') {
+    case "DONE":
+      if (substatus === "PARTIAL" || substatus === "REFUNDED") {
         return alpha(theme.palette.warning.main, 0.48);
       }
       return alpha(theme.palette.success.main, 0.12);
-    case 'FAILED':
+    case "FAILED":
       return alpha(theme.palette.error.main, 0.12);
     default:
-      return theme.palette.grey[theme.palette.mode === 'light' ? 300 : 800];
+      return theme.palette.grey[theme.palette.mode === "light" ? 300 : 800];
   }
 };
 
 export const CircularIcon = styled(Box, {
-  shouldForwardProp: (prop: string) => !['status', 'substatus'].includes(prop),
+  shouldForwardProp: (prop: string) => !["status", "substatus"].includes(prop),
 })<{ status: Status; substatus?: Substatus }>(
   ({ theme, status, substatus }) => ({
-    backgroundColor: ['ACTION_REQUIRED', 'DONE', 'FAILED'].includes(status)
+    backgroundColor: ["ACTION_REQUIRED", "DONE", "FAILED"].includes(status)
       ? getStatusColor(theme, status, substatus)
       : theme.palette.background.paper,
-    borderStyle: 'solid',
+    borderStyle: "solid",
     borderColor: getStatusColor(theme, status, substatus),
-    borderWidth: !['ACTION_REQUIRED', 'DONE', 'FAILED'].includes(status)
+    borderWidth: !["ACTION_REQUIRED", "DONE", "FAILED"].includes(status)
       ? 2
       : 0,
-    display: 'grid',
-    position: 'relative',
-    placeItems: 'center',
+    display: "grid",
+    position: "relative",
+    placeItems: "center",
     width: 32,
     height: 32,
-    borderRadius: '50%',
+    borderRadius: "50%",
   }),
 );
 
@@ -64,7 +64,7 @@ const circleAnimation = keyframes`
 // in string templates. Do not convert these styles in JS object as it will break.
 export const CircularProgressPending = styled(MuiCircularProgress)`
   color: ${({ theme }) =>
-    theme.palette.mode === 'light'
+    theme.palette.mode === "light"
       ? theme.palette.primary.main
       : theme.palette.primary.light};
   animation-duration: 3s;

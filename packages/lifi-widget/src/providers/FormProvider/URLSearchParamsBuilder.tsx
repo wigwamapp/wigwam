@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useFormState, useWatch } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
-import { FormKey } from './types';
+import { useEffect } from "react";
+import { useFormState, useWatch } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import { FormKey } from "./types";
 
 const formValueKeys = [
   FormKey.FromAmount,
@@ -30,7 +30,7 @@ export const URLSearchParamsBuilder = () => {
       }
     });
     url.searchParams.sort();
-    window.history.replaceState(window.history.state, '', url);
+    window.history.replaceState(window.history.state, "", url);
   }, [pathname, touchedFields, values]);
 
   return null;

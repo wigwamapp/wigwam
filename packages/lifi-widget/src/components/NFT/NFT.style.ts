@@ -1,5 +1,5 @@
-import { Avatar } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Avatar } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 export const PreviewAvatar = styled(Avatar)(({ theme }) => ({
   background: theme.palette.background.paper,

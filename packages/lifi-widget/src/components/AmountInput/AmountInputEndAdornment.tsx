@@ -1,16 +1,16 @@
-import { InputAdornment, Skeleton } from '@mui/material';
-import Big from 'big.js';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { InputAdornment, Skeleton } from "@mui/material";
+import Big from "big.js";
+import { useFormContext, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   useChains,
   useGasRecommendation,
   useTokenAddressBalance,
-} from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
-import { formatTokenAmount } from '../../utils';
-import { Button } from './AmountInputAdornment.style';
+} from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper } from "../../providers";
+import { formatTokenAmount } from "../../utils";
+import { Button } from "./AmountInputAdornment.style";
 
 export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
       }
     }
 
-    setValue(FormKeyHelper.getAmountKey(formType), maxAmount || '', {
+    setValue(FormKeyHelper.getAmountKey(formType), maxAmount || "", {
       shouldTouch: true,
     });
   };
@@ -59,8 +59,8 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
           height={24}
           sx={{ borderRadius: 0.5 }}
         />
-      ) : formType === 'from' && token?.amount ? (
-        <Button onClick={handleMax}>{t('button.max')}</Button>
+      ) : formType === "from" && token?.amount ? (
+        <Button onClick={handleMax}>{t("button.max")}</Button>
       ) : null}
     </InputAdornment>
   );

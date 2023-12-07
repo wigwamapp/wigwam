@@ -1,8 +1,8 @@
-import { useTheme } from '@mui/material/styles';
-import type { PropsWithChildren } from 'react';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import type { TextFitterProps } from './types';
+import { useTheme } from "@mui/material/styles";
+import type { PropsWithChildren } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import type { TextFitterProps } from "./types";
 
 const initialState = {
   x: 0,
@@ -13,10 +13,10 @@ const initialState = {
 
 export const TextFitter: React.FC<PropsWithChildren<TextFitterProps>> = ({
   children,
-  width = '100%',
+  width = "100%",
   height,
   maxHeight,
-  preserveAspectRatio = 'xMinYMid meet',
+  preserveAspectRatio = "xMinYMid meet",
   textStyle,
   svgStyle,
   cropTop,

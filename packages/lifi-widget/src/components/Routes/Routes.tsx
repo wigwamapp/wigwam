@@ -1,14 +1,14 @@
-import type { BoxProps } from '@mui/material';
-import { Box, Button, Collapse } from '@mui/material';
-import { useFormState } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useRoutes } from '../../hooks';
-import { useWidgetConfig } from '../../providers';
-import { navigationRoutes } from '../../utils';
-import { Card, CardTitle } from '../Card';
-import { ProgressToNextUpdate } from '../ProgressToNextUpdate';
-import { RouteCard, RouteCardSkeleton, RouteNotFoundCard } from '../RouteCard';
+import type { BoxProps } from "@mui/material";
+import { Box, Button, Collapse } from "@mui/material";
+import { useFormState } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useRoutes } from "../../hooks";
+import { useWidgetConfig } from "../../providers";
+import { navigationRoutes } from "../../utils";
+import { Card, CardTitle } from "../Card";
+import { ProgressToNextUpdate } from "../ProgressToNextUpdate";
+import { RouteCard, RouteCardSkeleton, RouteNotFoundCard } from "../RouteCard";
 
 export const Routes: React.FC<BoxProps> = (props) => {
   const { t } = useTranslation();
@@ -36,14 +36,14 @@ export const Routes: React.FC<BoxProps> = (props) => {
   };
 
   const routeNotFound = !currentRoute && !isLoading && !isFetching;
-  const onlyRecommendedRoute = subvariant === 'refuel' || useRecommendedRoute;
+  const onlyRecommendedRoute = subvariant === "refuel" || useRecommendedRoute;
   const showAll =
     !onlyRecommendedRoute && !routeNotFound && (routes?.length ?? 0) > 1;
 
   return (
     <Card {...props}>
       <CardTitle>
-        {subvariant === 'nft' ? t('main.fromAmount') : t('header.youGet')}
+        {subvariant === "nft" ? t("main.fromAmount") : t("header.youGet")}
       </CardTitle>
       <ProgressToNextUpdate
         updatedAt={dataUpdatedAt || new Date().getTime()}
@@ -51,7 +51,7 @@ export const Routes: React.FC<BoxProps> = (props) => {
         isLoading={isFetching}
         onClick={() => refetch()}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 8,
           right: 8,
         }}
@@ -72,7 +72,7 @@ export const Routes: React.FC<BoxProps> = (props) => {
               disabled={isValidating || !isValid}
               fullWidth
             >
-              {t('button.showAll')}
+              {t("button.showAll")}
             </Button>
           </Box>
         </Collapse>

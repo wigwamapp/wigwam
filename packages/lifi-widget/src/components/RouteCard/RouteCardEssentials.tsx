@@ -1,12 +1,12 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTimeFilled';
-import EvStationIcon from '@mui/icons-material/EvStation';
-import LayersIcon from '@mui/icons-material/Layers';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import { Box, Tooltip, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { IconTypography } from './RouteCard.style';
-import type { RouteCardEssentialsProps } from './types';
-import { getFeeCostsBreakdown, getGasCostsBreakdown } from './utils';
+import AccessTimeIcon from "@mui/icons-material/AccessTimeFilled";
+import EvStationIcon from "@mui/icons-material/EvStation";
+import LayersIcon from "@mui/icons-material/Layers";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import { Box, Tooltip, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { IconTypography } from "./RouteCard.style";
+import type { RouteCardEssentialsProps } from "./types";
+import { getFeeCostsBreakdown, getGasCostsBreakdown } from "./utils";
 
 export const RouteCardEssentials: React.FC<RouteCardEssentialsProps> = ({
   route,
@@ -18,11 +18,11 @@ export const RouteCardEssentials: React.FC<RouteCardEssentialsProps> = ({
       .map((step) => step.estimate.executionDuration)
       .reduce((duration, x) => duration + x, 0) / 60,
   );
-  const gasCostUSD = parseFloat(route.gasCostUSD ?? '') || 0.01;
+  const gasCostUSD = parseFloat(route.gasCostUSD ?? "") || 0.01;
   const gasCosts = getGasCostsBreakdown(route);
   const feeCosts = getFeeCostsBreakdown(route, false);
   return (
-    <Box display="flex" justifyContent={'space-between'} flex={1} mt={2}>
+    <Box display="flex" justifyContent={"space-between"} flex={1} mt={2}>
       <Tooltip
         title={
           <Box component="span">
@@ -112,7 +112,7 @@ export const RouteCardEssentials: React.FC<RouteCardEssentialsProps> = ({
             fontWeight="500"
             lineHeight={1}
           >
-            {t('main.estimatedTime', {
+            {t("main.estimatedTime", {
               value: executionTimeMinutes,
             })}
           </Typography>

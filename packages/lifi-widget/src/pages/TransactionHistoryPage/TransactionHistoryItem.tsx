@@ -1,11 +1,11 @@
 /* eslint-disable react/no-array-index-key */
-import type { Route } from '@lifi/sdk';
-import { Box, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Card } from '../../components/Card';
-import { Token, TokenDivider } from '../../components/Token';
-import { navigationRoutes } from '../../utils';
+import type { Route } from "@lifi/sdk";
+import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { Card } from "../../components/Card";
+import { Token, TokenDivider } from "../../components/Token";
+import { navigationRoutes } from "../../utils";
 
 export const TransactionHistoryItem: React.FC<{
   route: Route;
@@ -31,21 +31,21 @@ export const TransactionHistoryItem: React.FC<{
     <Card onClick={handleClick}>
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           flex: 1,
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
         }}
         pt={1.75}
         px={2}
       >
         <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(
+          {new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }).format(
             startedAt,
           )}
         </Typography>
         <Typography fontSize={12}>
           {new Intl.DateTimeFormat(i18n.language, {
-            timeStyle: 'short',
+            timeStyle: "short",
           }).format(startedAt)}
         </Typography>
       </Box>

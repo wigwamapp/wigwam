@@ -1,17 +1,17 @@
 /* eslint-disable react/no-array-index-key */
-import type { Route } from '@lifi/sdk';
-import type { BoxProps } from '@mui/material';
-import { useEffect } from 'react';
-import { ProgressToNextUpdate } from '../../components/ProgressToNextUpdate';
+import type { Route } from "@lifi/sdk";
+import type { BoxProps } from "@mui/material";
+import { useEffect } from "react";
+import { ProgressToNextUpdate } from "../../components/ProgressToNextUpdate";
 import {
   RouteCard,
   RouteCardSkeleton,
   RouteNotFoundCard,
-} from '../../components/RouteCard';
-import { useNavigateBack, useRoutes } from '../../hooks';
-import { useHeaderStoreContext, useSetExecutableRoute } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { Stack } from './RoutesPage.style';
+} from "../../components/RouteCard";
+import { useNavigateBack, useRoutes } from "../../hooks";
+import { useHeaderStoreContext, useSetExecutableRoute } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { Stack } from "./RoutesPage.style";
 
 export const RoutesPage: React.FC<BoxProps> = () => {
   const { navigateBack, navigate } = useNavigateBack();

@@ -1,14 +1,14 @@
-import { isAddress } from '@ethersproject/address';
-import type { BoxProps } from '@mui/material';
-import { Collapse, FormHelperText } from '@mui/material';
-import { forwardRef, useEffect, useRef } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { FormKey, useWallet, useWidgetConfig } from '../../providers';
-import { useSendToWalletStore, useSettings } from '../../stores';
-import { DisabledUI, HiddenUI, RequiredUI } from '../../types';
-import { Card, CardTitle } from '../Card';
-import { FormControl, Input } from './SendToWallet.style';
+import { isAddress } from "@ethersproject/address";
+import type { BoxProps } from "@mui/material";
+import { Collapse, FormHelperText } from "@mui/material";
+import { forwardRef, useEffect, useRef } from "react";
+import { useController, useFormContext, useFormState } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { FormKey, useWallet, useWidgetConfig } from "../../providers";
+import { useSendToWalletStore, useSettings } from "../../stores";
+import { DisabledUI, HiddenUI, RequiredUI } from "../../types";
+import { Card, CardTitle } from "../Card";
+import { FormControl, Input } from "./SendToWallet.style";
 
 export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
   const { disabledUI, hiddenUI, requiredUI, toAddress } = useWidgetConfig();
   const { showSendToWallet, showSendToWalletDirty, setSendToWallet } =
     useSendToWalletStore();
-  const { showDestinationWallet } = useSettings(['showDestinationWallet']);
+  const { showDestinationWallet } = useSettings(["showDestinationWallet"]);
 
   const hiddenToAddress = hiddenUI?.includes(HiddenUI.ToAddress);
   const disabledToAddress = disabledUI?.includes(DisabledUI.ToAddress);
@@ -30,7 +30,7 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
     name: FormKey.ToAddress,
     rules: {
       required:
-        requiredToAddress && (t('error.title.walletAddressRequired') as string),
+        requiredToAddress && (t("error.title.walletAddressRequired") as string),
       onChange: (e) => {
         setValue(FormKey.ToAddress, e.target.value.trim());
       },
@@ -42,10 +42,10 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
           const address = await account.signer?.provider?.resolveName(value);
           return (
             isAddress(address || value) ||
-            (t('error.title.walletAddressInvalid') as string)
+            (t("error.title.walletAddressInvalid") as string)
           );
         } catch {
-          return t('error.title.walletEnsAddressInvalid') as string;
+          return t("error.title.walletEnsAddressInvalid") as string;
         }
       },
       onBlur: () => trigger(FormKey.ToAddress),
@@ -91,9 +91,9 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
     >
       <Card {...props} ref={ref}>
         <CardTitle required={requiredToAddress}>
-          {t('main.sendToWallet')}
+          {t("main.sendToWallet")}
         </CardTitle>
-        <FormControl fullWidth sx={{ paddingTop: '6px', paddingBottom: '5px' }}>
+        <FormControl fullWidth sx={{ paddingTop: "6px", paddingBottom: "5px" }}>
           <Input
             size="small"
             autoComplete="off"
@@ -104,7 +104,7 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
             onBlur={onBlur}
             name={name}
             value={value}
-            placeholder={t('main.walletAddressOrEns') as string}
+            placeholder={t("main.walletAddressOrEns") as string}
             disabled={Boolean(toAddress && disabledToAddress)}
           />
           <SendToWalletFormHelperText />

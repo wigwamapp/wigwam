@@ -1,5 +1,5 @@
-import mitt from 'mitt';
-import type { WidgetEvents } from '../types';
+import mitt from "mitt";
+import type { WidgetEvents } from "../types";
 
 export const widgetEvents = mitt<WidgetEvents>();
 

@@ -1,6 +1,6 @@
-import { useCallback, useLayoutEffect, useState } from 'react';
-import { createElementId, ElementId } from '../utils';
-import { useDefaultElementId } from './useDefaultElementId';
+import { useCallback, useLayoutEffect, useState } from "react";
+import { createElementId, ElementId } from "../utils";
+import { useDefaultElementId } from "./useDefaultElementId";
 
 export const getScrollableContainer = (elementId: string) =>
   document.getElementById(
@@ -36,11 +36,11 @@ export const useScrollableOverflowHidden = () => {
   useLayoutEffect(() => {
     const element = getScrollableContainer(elementId);
     if (element) {
-      element.style.overflowY = 'hidden';
+      element.style.overflowY = "hidden";
     }
     return () => {
       if (element) {
-        element.style.overflowY = 'auto';
+        element.style.overflowY = "auto";
       }
     };
   }, [elementId]);

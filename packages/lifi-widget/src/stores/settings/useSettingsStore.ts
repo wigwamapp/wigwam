@@ -1,22 +1,22 @@
-import type { StateCreator } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createWithEqualityFn } from 'zustand/traditional';
-import type { WidgetConfig } from '../../types';
-import type { SettingsProps, SettingsState } from './types';
-import { SettingsToolTypes } from './types';
+import type { StateCreator } from "zustand";
+import { persist } from "zustand/middleware";
+import { createWithEqualityFn } from "zustand/traditional";
+import type { WidgetConfig } from "../../types";
+import type { SettingsProps, SettingsState } from "./types";
+import { SettingsToolTypes } from "./types";
 
 export const defaultConfigurableSettings: Pick<
   SettingsState,
-  'routePriority' | 'slippage' | 'gasPrice'
+  "routePriority" | "slippage" | "gasPrice"
 > = {
-  routePriority: 'RECOMMENDED',
-  slippage: '0.5',
-  gasPrice: 'normal',
+  routePriority: "RECOMMENDED",
+  slippage: "0.5",
+  gasPrice: "normal",
 };
 
 export const defaultSettings: SettingsProps = {
-  appearance: 'auto',
-  gasPrice: 'normal',
+  appearance: "auto",
+  gasPrice: "normal",
   enabledAutoRefuel: true,
   showDestinationWallet: true,
   enabledBridges: [],
@@ -105,8 +105,8 @@ export const useSettingsStore = createWithEqualityFn<SettingsState>(
           ...restDefaultSettings,
           ...defaultConfigurableSettings,
         }));
-        get().initializeTools('Bridges', bridges, true);
-        get().initializeTools('Exchanges', exchanges, true);
+        get().initializeTools("Bridges", bridges, true);
+        get().initializeTools("Exchanges", exchanges, true);
       },
     }),
     {
@@ -128,7 +128,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsState>(
         return state;
       },
       migrate: (persistedState: any, version) => {
-        if (version === 0 && persistedState.appearance === 'system') {
+        if (version === 0 && persistedState.appearance === "system") {
           persistedState.appearance = defaultSettings.appearance;
         }
         if (version === 1) {
@@ -156,12 +156,12 @@ export const setDefaultSettings = (config?: WidgetConfig) => {
   defaultConfigurableSettings.routePriority =
     defaultRoutePriority || defaultConfigurableSettings.routePriority;
   if (!slippage) {
-    setValue('slippage', defaultConfigurableSettings.slippage);
+    setValue("slippage", defaultConfigurableSettings.slippage);
   }
   if (!routePriority) {
-    setValue('routePriority', defaultConfigurableSettings.routePriority);
+    setValue("routePriority", defaultConfigurableSettings.routePriority);
   }
   if (!gasPrice) {
-    setValue('gasPrice', defaultConfigurableSettings.gasPrice);
+    setValue("gasPrice", defaultConfigurableSettings.gasPrice);
   }
 };

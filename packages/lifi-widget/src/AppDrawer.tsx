@@ -1,7 +1,7 @@
-import CloseIcon from '@mui/icons-material/CloseRounded';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Drawer } from '@mui/material';
+import CloseIcon from "@mui/icons-material/CloseRounded";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Drawer } from "@mui/material";
 import {
   forwardRef,
   useCallback,
@@ -9,17 +9,17 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { useTranslation } from 'react-i18next';
-import { AppDefault } from './App';
+} from "react";
+import { useTranslation } from "react-i18next";
+import { AppDefault } from "./App";
 import {
   CloseButtonLayout,
   DrawerButton,
   DrawerButtonTypography,
-} from './AppDrawer.style';
-import { AppProvider } from './AppProvider';
-import type { WidgetConfig, WidgetProps, WidgetSubvariant } from './types';
-import { HiddenUI } from './types';
+} from "./AppDrawer.style";
+import { AppProvider } from "./AppProvider";
+import type { WidgetConfig, WidgetProps, WidgetSubvariant } from "./types";
+import { HiddenUI } from "./types";
 
 export interface WidgetDrawer {
   isOpen(): void;
@@ -62,7 +62,7 @@ export const AppDrawer = forwardRef<WidgetDrawer, WidgetProps>(
         integrator,
         containerStyle: {
           ...config?.containerStyle,
-          height: '100%',
+          height: "100%",
         },
       }),
       [config, integrator],
@@ -95,13 +95,13 @@ export const AppDrawer = forwardRef<WidgetDrawer, WidgetProps>(
           onClose={closeDrawer}
           BackdropProps={{
             sx: {
-              backgroundColor: 'rgb(0 0 0 / 48%)',
-              backdropFilter: 'blur(3px)',
+              backgroundColor: "rgb(0 0 0 / 48%)",
+              backdropFilter: "blur(3px)",
             },
           }}
           PaperProps={{
             sx: {
-              width: config?.containerStyle?.width ?? '100%',
+              width: config?.containerStyle?.width ?? "100%",
               minWidth: config?.containerStyle?.minWidth ?? 360,
               maxWidth: config?.containerStyle?.maxWidth ?? 392,
             },
@@ -130,10 +130,10 @@ export const DrawerButtonText = ({
   return (
     <DrawerButtonTypography>
       {open
-        ? t('button.hide')
-        : subvariant === 'nft'
-        ? t('button.lifiCheckout')
-        : t('button.lifiExchange')}
+        ? t("button.hide")
+        : subvariant === "nft"
+          ? t("button.lifiCheckout")
+          : t("button.lifiExchange")}
     </DrawerButtonTypography>
   );
 };

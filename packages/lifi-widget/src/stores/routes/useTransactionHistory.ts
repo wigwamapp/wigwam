@@ -1,8 +1,8 @@
-import { shallow } from 'zustand/shallow';
-import { hasEnumFlag } from '../../utils';
-import { useRouteExecutionStore } from './RouteExecutionStore';
-import type { RouteExecution } from './types';
-import { RouteExecutionStatus } from './types';
+import { shallow } from "zustand/shallow";
+import { hasEnumFlag } from "../../utils";
+import { useRouteExecutionStore } from "./RouteExecutionStore";
+import type { RouteExecution } from "./types";
+import { RouteExecutionStatus } from "./types";
 
 export const useTransactionHistory = (address?: string) => {
   return useRouteExecutionStore(

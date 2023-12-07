@@ -1,24 +1,24 @@
-import type { Token } from '@lifi/sdk';
-import type { BoxProps } from '@mui/material';
-import type { ChangeEvent, ReactNode } from 'react';
-import { useLayoutEffect, useRef } from 'react';
-import { useController, useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useToken } from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper, useWidgetConfig } from '../../providers';
-import { DisabledUI } from '../../types';
-import { fitInputText, formatInputAmount } from '../../utils';
-import { Card, CardTitle } from '../Card';
+import type { Token } from "@lifi/sdk";
+import type { BoxProps } from "@mui/material";
+import type { ChangeEvent, ReactNode } from "react";
+import { useLayoutEffect, useRef } from "react";
+import { useController, useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useToken } from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper, useWidgetConfig } from "../../providers";
+import { DisabledUI } from "../../types";
+import { fitInputText, formatInputAmount } from "../../utils";
+import { Card, CardTitle } from "../Card";
 import {
   FormControl,
   Input,
   maxInputFontSize,
   minInputFontSize,
-} from './AmountInput.style';
-import { AmountInputEndAdornment } from './AmountInputEndAdornment';
-import { AmountInputStartAdornment } from './AmountInputStartAdornment';
-import { FormPriceHelperText } from './FormPriceHelperText';
+} from "./AmountInput.style";
+import { AmountInputEndAdornment } from "./AmountInputEndAdornment";
+import { AmountInputStartAdornment } from "./AmountInputStartAdornment";
+import { FormPriceHelperText } from "./FormPriceHelperText";
 
 export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
   formType,
@@ -100,7 +100,7 @@ export const AmountInputBase: React.FC<
 
   return (
     <Card {...props}>
-      <CardTitle>{t('main.fromAmount')}</CardTitle>
+      <CardTitle>{t("main.fromAmount")}</CardTitle>
       <FormControl fullWidth>
         <Input
           inputRef={ref}
@@ -110,7 +110,7 @@ export const AmountInputBase: React.FC<
           startAdornment={startAdornment}
           endAdornment={endAdornment}
           inputProps={{
-            inputMode: 'decimal',
+            inputMode: "decimal",
           }}
           onChange={handleChange}
           onBlur={handleBlur}

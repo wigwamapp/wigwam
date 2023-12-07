@@ -1,12 +1,12 @@
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import { Box, ToggleButtonGroup } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useWidgetConfig } from '../../providers';
-import { useAppearance } from '../../stores';
-import { HiddenUI } from '../../types';
-import { ToggleButton } from './ColorSchemeButtonGroup.style';
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import { Box, ToggleButtonGroup } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useWidgetConfig } from "../../providers";
+import { useAppearance } from "../../stores";
+import { HiddenUI } from "../../types";
+import { ToggleButton } from "./ColorSchemeButtonGroup.style";
 
 export const ColorSchemeButtonGroup: React.FC = () => {
   const { t } = useTranslation();
@@ -32,15 +32,15 @@ export const ColorSchemeButtonGroup: React.FC = () => {
       >
         <ToggleButton value="light">
           <LightModeIcon sx={{ marginRight: 1 }} />
-          {t('button.light')}
+          {t("button.light")}
         </ToggleButton>
         <ToggleButton value="dark">
           <DarkModeIcon sx={{ marginRight: 1 }} />
-          {t('button.dark')}
+          {t("button.dark")}
         </ToggleButton>
         <ToggleButton value="auto">
           <Brightness4Icon sx={{ marginRight: 1 }} />
-          {t('button.auto')}
+          {t("button.auto")}
         </ToggleButton>
       </ToggleButtonGroup>
     </Box>

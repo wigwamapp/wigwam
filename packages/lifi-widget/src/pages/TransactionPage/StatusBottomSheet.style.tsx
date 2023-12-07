@@ -1,9 +1,9 @@
-import type { Theme } from '@mui/material';
-import { Box } from '@mui/material';
-import { alpha, darken, styled } from '@mui/material/styles';
-import { RouteExecutionStatus } from '../../stores';
+import type { Theme } from "@mui/material";
+import { Box } from "@mui/material";
+import { alpha, darken, styled } from "@mui/material/styles";
+import { RouteExecutionStatus } from "../../stores";
 
-type StatusColor = RouteExecutionStatus | 'warning';
+type StatusColor = RouteExecutionStatus | "warning";
 
 const getStatusColor = (status: StatusColor, theme: Theme) => {
   switch (status) {
@@ -13,11 +13,11 @@ const getStatusColor = (status: StatusColor, theme: Theme) => {
       return { color: theme.palette.error.main, alpha: 0.12, darken: 0 };
     case RouteExecutionStatus.Done | RouteExecutionStatus.Partial:
     case RouteExecutionStatus.Done | RouteExecutionStatus.Refunded:
-    case 'warning':
+    case "warning":
       return {
         color: theme.palette.warning.main,
         alpha: 0.48,
-        darken: theme.palette.mode === 'light' ? 0.32 : 0,
+        darken: theme.palette.mode === "light" ? 0.32 : 0,
       };
     default:
       return { color: theme.palette.primary.main, alpha: 0.12, darken: 0 };
@@ -25,13 +25,13 @@ const getStatusColor = (status: StatusColor, theme: Theme) => {
 };
 
 export const CenterContainer = styled(Box)(({ theme }) => ({
-  display: 'grid',
-  placeItems: 'center',
-  position: 'relative',
+  display: "grid",
+  placeItems: "center",
+  position: "relative",
 }));
 
 export const IconCircle = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'status',
+  shouldForwardProp: (prop) => prop !== "status",
 })<{ status: StatusColor }>(({ theme, status }) => {
   const {
     color,
@@ -40,13 +40,13 @@ export const IconCircle = styled(Box, {
   } = getStatusColor(status, theme);
   return {
     backgroundColor: alpha(color, alphaValue),
-    borderRadius: '50%',
+    borderRadius: "50%",
     width: 64,
     height: 64,
-    display: 'grid',
-    position: 'relative',
-    placeItems: 'center',
-    '& > svg': {
+    display: "grid",
+    position: "relative",
+    placeItems: "center",
+    "& > svg": {
       color: darken(color, darkenValue),
       width: 32,
       height: 32,

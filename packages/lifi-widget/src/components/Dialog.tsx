@@ -1,19 +1,19 @@
-import type { DialogProps, Theme } from '@mui/material';
-import { Dialog as MuiDialog } from '@mui/material';
-import type { PropsWithChildren } from 'react';
-import { useGetScrollableContainer } from '../hooks';
+import type { DialogProps, Theme } from "@mui/material";
+import { Dialog as MuiDialog } from "@mui/material";
+import type { PropsWithChildren } from "react";
+import { useGetScrollableContainer } from "../hooks";
 
 export const modalProps = {
   sx: {
-    position: 'absolute',
-    overflow: 'hidden',
+    position: "absolute",
+    overflow: "hidden",
   },
 };
 
 export const paperProps = {
   sx: (theme: Theme) => ({
-    position: 'absolute',
-    backgroundImage: 'none',
+    position: "absolute",
+    backgroundImage: "none",
     borderTopLeftRadius: theme.shape.borderRadius,
     borderTopRightRadius: theme.shape.borderRadius,
   }),
@@ -21,9 +21,9 @@ export const paperProps = {
 
 export const backdropProps = {
   sx: {
-    position: 'absolute',
-    backgroundColor: 'rgb(0 0 0 / 32%)',
-    backdropFilter: 'blur(3px)',
+    position: "absolute",
+    backgroundColor: "rgb(0 0 0 / 32%)",
+    backdropFilter: "blur(3px)",
   },
 };
 

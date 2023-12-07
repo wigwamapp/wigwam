@@ -1,5 +1,5 @@
-import ContentCopyIcon from '@mui/icons-material/ContentCopyRounded';
-import DeleteIcon from '@mui/icons-material/DeleteOutline';
+import ContentCopyIcon from "@mui/icons-material/ContentCopyRounded";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import {
   Box,
   Button,
@@ -9,22 +9,22 @@ import {
   DialogTitle,
   IconButton,
   Typography,
-} from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import { shallow } from 'zustand/shallow';
-import { Card, CardTitle } from '../../components/Card';
-import { ContractComponent } from '../../components/ContractComponent';
-import { Dialog } from '../../components/Dialog';
-import { Insurance } from '../../components/Insurance';
-import { getStepList } from '../../components/Step';
-import { useNavigateBack } from '../../hooks';
-import { useWidgetConfig } from '../../providers';
-import { useHeaderStoreContext, useRouteExecutionStore } from '../../stores';
-import { formatTokenAmount } from '../../utils';
-import { ContactSupportButton } from './ContactSupportButton';
-import { Container } from './TransactionDetailsPage.style';
+} from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
+import { shallow } from "zustand/shallow";
+import { Card, CardTitle } from "../../components/Card";
+import { ContractComponent } from "../../components/ContractComponent";
+import { Dialog } from "../../components/Dialog";
+import { Insurance } from "../../components/Insurance";
+import { getStepList } from "../../components/Step";
+import { useNavigateBack } from "../../hooks";
+import { useWidgetConfig } from "../../providers";
+import { useHeaderStoreContext, useRouteExecutionStore } from "../../stores";
+import { formatTokenAmount } from "../../utils";
+import { ContactSupportButton } from "./ContactSupportButton";
+import { Container } from "./TransactionDetailsPage.style";
 
 export const TransactionDetailsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -51,14 +51,14 @@ export const TransactionDetailsPage: React.FC = () => {
   };
 
   const sourceTxHash = routeExecution?.route.steps[0].execution?.process
-    .filter((process) => process.type !== 'TOKEN_ALLOWANCE')
+    .filter((process) => process.type !== "TOKEN_ALLOWANCE")
     .find((process) => process.txHash)?.txHash;
 
   const insuranceCoverageId = sourceTxHash ?? routeExecution?.route.fromAddress;
 
-  let supportId = sourceTxHash ?? routeExecution?.route.id ?? '';
+  let supportId = sourceTxHash ?? routeExecution?.route.id ?? "";
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     supportId += `_${routeExecution?.route.id}`;
   }
 
@@ -82,30 +82,30 @@ export const TransactionDetailsPage: React.FC = () => {
     <Container>
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           flex: 1,
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
         }}
         pb={1}
       >
         <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(
+          {new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }).format(
             startedAt,
           )}
         </Typography>
         <Typography fontSize={12}>
           {new Intl.DateTimeFormat(i18n.language, {
-            timeStyle: 'short',
+            timeStyle: "short",
           }).format(startedAt)}
         </Typography>
       </Box>
       {getStepList(routeExecution?.route, subvariant)}
-      {subvariant === 'nft' ? (
+      {subvariant === "nft" ? (
         <ContractComponent mt={2}>
           {contractSecondaryComponent || contractComponent}
         </ContractComponent>
       ) : null}
-      {routeExecution?.route?.insurance?.state === 'INSURED' ? (
+      {routeExecution?.route?.insurance?.state === "INSURED" ? (
         <Insurance
           mt={2}
           status={routeExecution.status}
@@ -122,11 +122,11 @@ export const TransactionDetailsPage: React.FC = () => {
       <Card mt={2}>
         <Box
           sx={{
-            display: 'flex',
+            display: "flex",
             flex: 1,
           }}
         >
-          <CardTitle flex={1}>{t('main.supportId')}</CardTitle>
+          <CardTitle flex={1}>{t("main.supportId")}</CardTitle>
           <Box mr={1} mt={1}>
             <IconButton size="medium" onClick={copySupportId}>
               <ContentCopyIcon fontSize="small" />
@@ -138,7 +138,7 @@ export const TransactionDetailsPage: React.FC = () => {
           pt={1}
           pb={2}
           px={2}
-          sx={{ wordBreak: 'break-all' }}
+          sx={{ wordBreak: "break-all" }}
         >
           {supportId}
         </Typography>
@@ -147,16 +147,16 @@ export const TransactionDetailsPage: React.FC = () => {
         <ContactSupportButton supportId={supportId} />
       </Box>
       <Dialog open={open} onClose={toggleDialog}>
-        <DialogTitle>{t('warning.title.deleteTransaction')}</DialogTitle>
+        <DialogTitle>{t("warning.title.deleteTransaction")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('warning.message.deleteTransactionHistory')}
+            {t("warning.message.deleteTransactionHistory")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleDialog}>{t('button.cancel')}</Button>
+          <Button onClick={toggleDialog}>{t("button.cancel")}</Button>
           <Button variant="contained" onClick={handleDeleteRoute} autoFocus>
-            {t('button.delete')}
+            {t("button.delete")}
           </Button>
         </DialogActions>
       </Dialog>

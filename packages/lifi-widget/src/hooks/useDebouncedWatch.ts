@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useWatch } from 'react-hook-form';
+import { useEffect, useRef, useState } from "react";
+import { useWatch } from "react-hook-form";
 
 export const useDebouncedWatch = (name: any, delay: number) => {
   const watchedValue = useWatch({

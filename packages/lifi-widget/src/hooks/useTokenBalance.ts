@@ -1,8 +1,8 @@
-import type { Token, TokenAmount } from '@lifi/sdk';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
-import { useWallet } from '../providers';
-import { useGetTokenBalancesWithRetry } from './useGetTokenBalancesWithRetry';
+import type { Token, TokenAmount } from "@lifi/sdk";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { useWallet } from "../providers";
+import { useGetTokenBalancesWithRetry } from "./useGetTokenBalancesWithRetry";
 
 const defaultRefetchInterval = 30_000;
 
@@ -16,7 +16,7 @@ export const useTokenBalance = (token?: Token, accountAddress?: string) => {
   );
 
   const tokenBalanceQueryKey = useMemo(
-    () => ['token-balance', walletAddress, token?.chainId, token?.address],
+    () => ["token-balance", walletAddress, token?.chainId, token?.address],
     [token?.address, token?.chainId, walletAddress],
   );
 
@@ -25,7 +25,7 @@ export const useTokenBalance = (token?: Token, accountAddress?: string) => {
     async ({ queryKey: [, accountAddress] }) => {
       const cachedToken = queryClient
         .getQueryData<Token[]>([
-          'token-balances',
+          "token-balances",
           accountAddress,
           token!.chainId,
         ])
@@ -41,7 +41,7 @@ export const useTokenBalance = (token?: Token, accountAddress?: string) => {
       );
 
       if (!tokenBalances?.length) {
-        throw Error('Could not get tokens balance.');
+        throw Error("Could not get tokens balance.");
       }
 
       const cachedTokenAmount =
@@ -57,7 +57,7 @@ export const useTokenBalance = (token?: Token, accountAddress?: string) => {
       }
 
       queryClient.setQueriesData<TokenAmount[]>(
-        ['token-balances', accountAddress, token!.chainId],
+        ["token-balances", accountAddress, token!.chainId],
         (data) => {
           if (data) {
             const clonedData = [...data];
@@ -87,7 +87,7 @@ export const useTokenBalance = (token?: Token, accountAddress?: string) => {
 
   const refetchAllBalances = () => {
     queryClient.refetchQueries(
-      ['token-balances', accountAddress, token?.chainId],
+      ["token-balances", accountAddress, token?.chainId],
       { exact: false },
     );
   };

@@ -1,11 +1,11 @@
-import type { TokenAmount } from '@lifi/sdk';
-import { FormHelperText, Skeleton, Typography } from '@mui/material';
-import { useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useTokenAddressBalance } from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
-import { formatTokenAmount, formatTokenPrice } from '../../utils';
+import type { TokenAmount } from "@lifi/sdk";
+import { FormHelperText, Skeleton, Typography } from "@mui/material";
+import { useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useTokenAddressBalance } from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper } from "../../providers";
+import { formatTokenAmount, formatTokenPrice } from "../../utils";
 
 export const FormPriceHelperText: React.FC<FormTypeProps> = ({ formType }) => {
   const [chainId, tokenAddress] = useWatch({
@@ -44,18 +44,18 @@ export const FormPriceHelperTextBase: React.FC<
   return (
     <FormHelperText
       component="div"
-      sx={{ display: 'flex', justifyContent: 'space-between', margin: 0 }}
+      sx={{ display: "flex", justifyContent: "space-between", margin: 0 }}
     >
       <Typography
-        color={fromAmountTokenPrice ? 'text.secondary' : 'grey.600'}
+        color={fromAmountTokenPrice ? "text.secondary" : "grey.600"}
         fontWeight={400}
         fontSize={12}
         marginLeft={8}
         lineHeight={1.3334}
         flex={1}
         sx={{
-          wordBreak: 'break-word',
-          overflowWrap: 'break-word',
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
         }}
       >
         {t(`format.currency`, {

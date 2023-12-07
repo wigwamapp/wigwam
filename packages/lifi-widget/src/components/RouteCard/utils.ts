@@ -1,5 +1,5 @@
-import type { Route, Token } from '@lifi/sdk';
-import Big from 'big.js';
+import type { Route, Token } from "@lifi/sdk";
+import Big from "big.js";
 
 export const getGasCostsBreakdown = (route: Route) => {
   return Object.values(
@@ -14,7 +14,7 @@ export const getGasCostsBreakdown = (route: Route) => {
             )
             .div(10 ** token.decimals);
           const gasCostAmountUSD = step.estimate.gasCosts.reduce(
-            (amount, gasCost) => amount + parseFloat(gasCost.amountUSD || '0'),
+            (amount, gasCost) => amount + parseFloat(gasCost.amountUSD || "0"),
             0,
           );
           const groupedGasCost = groupedGasCosts[token.chainId];
@@ -50,7 +50,7 @@ export const getFeeCostsBreakdown = (route: Route, included?: boolean) => {
     route.steps.reduce(
       (groupedFeeCosts, step) => {
         let feeCosts = step.estimate.feeCosts;
-        if (typeof included === 'boolean') {
+        if (typeof included === "boolean") {
           feeCosts = feeCosts?.filter(
             (feeCost) => feeCost.included === included,
           );
@@ -64,7 +64,7 @@ export const getFeeCostsBreakdown = (route: Route, included?: boolean) => {
             )
             .div(10 ** token.decimals);
           const feeCostAmountUSD = feeCosts.reduce(
-            (amount, feeCost) => amount + parseFloat(feeCost.amountUSD || '0'),
+            (amount, feeCost) => amount + parseFloat(feeCost.amountUSD || "0"),
             0,
           );
           const groupedFeeCost = groupedFeeCosts[token.chainId];

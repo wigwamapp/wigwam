@@ -1,4 +1,4 @@
-import OpenInNewIcon from '@mui/icons-material/OpenInNewRounded';
+import OpenInNewIcon from "@mui/icons-material/OpenInNewRounded";
 import {
   Avatar,
   Box,
@@ -8,16 +8,16 @@ import {
   Skeleton,
   Slide,
   Typography,
-} from '@mui/material';
-import { memo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+} from "@mui/material";
+import { memo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   formatTokenAmount,
   formatTokenPrice,
   shortenAddress,
-} from '../../utils';
-import { IconButton, ListItem, ListItemButton } from './TokenList.style';
-import type { TokenListItemButtonProps, TokenListItemProps } from './types';
+} from "../../utils";
+import { IconButton, ListItem, ListItemButton } from "./TokenList.style";
+import type { TokenListItemButtonProps, TokenListItemProps } from "./types";
 
 export const TokenListItem: React.FC<TokenListItemProps> = memo(
   ({
@@ -93,7 +93,7 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
       <ListItemText
         primary={token.symbol}
         secondaryTypographyProps={{
-          component: 'div',
+          component: "div",
         }}
         secondary={
           <Box position="relative" height={20} ref={container}>
@@ -102,7 +102,7 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
               in={!showAddress}
               container={container.current}
               style={{
-                position: 'absolute',
+                position: "absolute",
               }}
               appear={false}
             >
@@ -113,7 +113,7 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
               in={showAddress}
               container={container.current}
               style={{
-                position: 'absolute',
+                position: "absolute",
               }}
               appear={false}
               mountOnEnter
@@ -141,10 +141,10 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
         isBalanceLoading ? (
           <TokenAmountSkeleton />
         ) : (
-          <Box sx={{ textAlign: 'right' }}>
+          <Box sx={{ textAlign: "right" }}>
             {Number(token.amount) ? (
               <Typography variant="body1" noWrap>
-                {t('format.number', {
+                {t("format.number", {
                   value: formatTokenAmount(token.amount),
                 })}
               </Typography>
@@ -173,7 +173,7 @@ export const TokenListItemSkeleton = () => {
     <ListItem
       secondaryAction={<TokenAmountSkeleton />}
       disablePadding
-      sx={{ position: 'relative', flexDirection: 'row', alignItems: 'center' }}
+      sx={{ position: "relative", flexDirection: "row", alignItems: "center" }}
     >
       <ListItemAvatar>
         <Skeleton
@@ -195,9 +195,9 @@ export const TokenAmountSkeleton: React.FC = () => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
       }}
     >
       <Skeleton variant="text" width={56} height={24} />

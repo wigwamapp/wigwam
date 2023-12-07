@@ -1,4 +1,4 @@
-import type { Route } from '@lifi/sdk';
+import type { Route } from "@lifi/sdk";
 
 export const calcValueLoss = (route: Route) => {
   return `${(

@@ -6,14 +6,14 @@ import type {
   Status,
   StatusMessage,
   Substatus,
-} from '@lifi/sdk';
-import { LifiErrorCode } from '@lifi/sdk';
-import type { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
-import { useWidgetConfig } from '../providers';
-import type { WidgetSubvariant } from '../types';
-import { formatTokenAmount } from '../utils';
-import { useChains } from './useChains';
+} from "@lifi/sdk";
+import { LifiErrorCode } from "@lifi/sdk";
+import type { TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
+import { useWidgetConfig } from "../providers";
+import type { WidgetSubvariant } from "../types";
+import { formatTokenAmount } from "../utils";
+import { useChains } from "./useChains";
 
 export const useProcessMessage = (step?: LifiStep, process?: Process) => {
   const { subvariant } = useWidgetConfig();
@@ -46,7 +46,7 @@ const processStatusMessages: Record<
     ACTION_REQUIRED: (t) => t(`main.process.swap.actionRequired`),
     PENDING: (t) => t(`main.process.swap.pending`),
     DONE: (t, subvariant) =>
-      subvariant === 'nft'
+      subvariant === "nft"
         ? t(`main.process.nft.done`)
         : t(`main.process.swap.done`),
   },
@@ -59,7 +59,7 @@ const processStatusMessages: Record<
   RECEIVING_CHAIN: {
     PENDING: (t) => t(`main.process.receivingChain.pending`),
     DONE: (t, subvariant) =>
-      subvariant === 'nft'
+      subvariant === "nft"
         ? t(`main.process.nft.done`)
         : t(`main.process.receivingChain.done`),
   },
@@ -106,7 +106,7 @@ export function getProcessMessage(
   title?: string;
   message?: string;
 } {
-  if (process.error && process.status === 'FAILED') {
+  if (process.error && process.status === "FAILED") {
     const getTransactionNotSentMessage = () =>
       t(`error.message.transactionNotSent`, {
         amount: formatTokenAmount(
@@ -114,10 +114,10 @@ export function getProcessMessage(
           step.action.fromToken.decimals,
         ),
         tokenSymbol: step.action.fromToken.symbol,
-        chainName: getChainById(step.action.fromChainId)?.name ?? '',
+        chainName: getChainById(step.action.fromChainId)?.name ?? "",
       });
-    let title: string = '';
-    let message: string = '';
+    let title: string = "";
+    let message: string = "";
     switch (process.error.code) {
       case LifiErrorCode.AllowanceRequired:
         title = t(`error.title.allowanceRequired`);
@@ -171,7 +171,7 @@ export function getProcessMessage(
             step.action.fromToken.decimals,
           ),
           tokenSymbol: step.action.fromToken.symbol,
-          chainName: getChainById(step.action.fromChainId)?.name ?? '',
+          chainName: getChainById(step.action.fromChainId)?.name ?? "",
         });
         break;
       case LifiErrorCode.ProviderUnavailable:

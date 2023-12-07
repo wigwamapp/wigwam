@@ -1,17 +1,17 @@
-import type { ChainId, Process, Route } from '@lifi/sdk';
+import type { ChainId, Process, Route } from "@lifi/sdk";
 
 export enum WidgetEvent {
-  RouteExecutionStarted = 'routeExecutionStarted',
-  RouteExecutionUpdated = 'routeExecutionUpdated',
-  RouteExecutionCompleted = 'routeExecutionCompleted',
-  RouteExecutionFailed = 'routeExecutionFailed',
-  RouteHighValueLoss = 'routeHighValueLoss',
-  RouteContactSupport = 'routeContactSupport', // TODO: rename for v3
-  SourceChainTokenSelected = 'sourceChainTokenSelected',
-  DestinationChainTokenSelected = 'destinationChainTokenSelected',
-  SendToWalletToggled = 'sendToWalletToggled',
-  ReviewTransactionPageEntered = 'reviewTransactionPageEntered',
-  WalletConnected = 'walletConnected',
+  RouteExecutionStarted = "routeExecutionStarted",
+  RouteExecutionUpdated = "routeExecutionUpdated",
+  RouteExecutionCompleted = "routeExecutionCompleted",
+  RouteExecutionFailed = "routeExecutionFailed",
+  RouteHighValueLoss = "routeHighValueLoss",
+  RouteContactSupport = "routeContactSupport", // TODO: rename for v3
+  SourceChainTokenSelected = "sourceChainTokenSelected",
+  DestinationChainTokenSelected = "destinationChainTokenSelected",
+  SendToWalletToggled = "sendToWalletToggled",
+  ReviewTransactionPageEntered = "reviewTransactionPageEntered",
+  WalletConnected = "walletConnected",
 }
 
 export type WidgetEvents = {

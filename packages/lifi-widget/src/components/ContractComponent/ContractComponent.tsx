@@ -1,6 +1,6 @@
-import type { BoxProps } from '@mui/material';
-import type { PropsWithChildren } from 'react';
-import { Card } from '../Card';
+import type { BoxProps } from "@mui/material";
+import type { PropsWithChildren } from "react";
+import { Card } from "../Card";
 
 export const ContractComponent: React.FC<PropsWithChildren<BoxProps>> = ({
   children,

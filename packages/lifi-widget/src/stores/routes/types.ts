@@ -1,4 +1,4 @@
-import type { Route } from '@lifi/sdk';
+import type { Route } from "@lifi/sdk";
 
 export interface RouteExecution {
   route: Route;
@@ -11,7 +11,7 @@ export interface RouteExecutionState {
   updateRoute: (route: Route) => void;
   restartRoute: (routeId: string) => void;
   deleteRoute: (routeId: string) => void;
-  deleteRoutes: (type: 'completed' | 'active') => void;
+  deleteRoutes: (type: "completed" | "active") => void;
 }
 
 export enum RouteExecutionStatus {

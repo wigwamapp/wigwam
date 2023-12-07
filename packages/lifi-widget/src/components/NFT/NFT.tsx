@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { FormKey } from '../../providers';
-import { NFTBase } from './NFTBase';
-import type { NFTProps } from './types';
+import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
+import { FormKey } from "../../providers";
+import { NFTBase } from "./NFTBase";
+import type { NFTProps } from "./types";
 
 export const NFT: React.FC<NFTProps> = ({
   imageUrl,

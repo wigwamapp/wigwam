@@ -1,14 +1,14 @@
-import { Drawer } from '@mui/material';
+import { Drawer } from "@mui/material";
 import {
   forwardRef,
   useCallback,
   useImperativeHandle,
   useRef,
   useState,
-} from 'react';
-import { useGetScrollableContainer } from '../../hooks';
-import { backdropProps, modalProps, paperProps } from '../Dialog';
-import type { BottomSheetBase, BottomSheetProps } from './types';
+} from "react";
+import { useGetScrollableContainer } from "../../hooks";
+import { backdropProps, modalProps, paperProps } from "../Dialog";
+import type { BottomSheetBase, BottomSheetProps } from "./types";
 
 export const BottomSheet = forwardRef<BottomSheetBase, BottomSheetProps>(
   ({ elementRef, children, open, onClose }, ref) => {

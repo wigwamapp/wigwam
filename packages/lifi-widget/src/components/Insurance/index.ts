@@ -1,2 +1,2 @@
-export * from './Insurance';
-export * from './types';
+export * from "./Insurance";
+export * from "./types";

@@ -1,25 +1,25 @@
-import ContentCopyIcon from '@mui/icons-material/ContentCopyRounded';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import OpenInNewIcon from '@mui/icons-material/OpenInNewRounded';
-import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNewRounded';
-import WalletIcon from '@mui/icons-material/Wallet';
-import { Avatar, Button, MenuItem } from '@mui/material';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useChain } from '../../hooks';
-import { useWallet, useWidgetConfig } from '../../providers';
-import { navigationRoutes, shortenAddress } from '../../utils';
+import ContentCopyIcon from "@mui/icons-material/ContentCopyRounded";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import OpenInNewIcon from "@mui/icons-material/OpenInNewRounded";
+import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNewRounded";
+import WalletIcon from "@mui/icons-material/Wallet";
+import { Avatar, Button, MenuItem } from "@mui/material";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useChain } from "../../hooks";
+import { useWallet, useWidgetConfig } from "../../providers";
+import { navigationRoutes, shortenAddress } from "../../utils";
 import {
   DrawerWalletContainer,
   HeaderAppBar,
   WalletButton,
-} from './Header.style';
-import { WalletMenu } from './WalletMenu';
+} from "./Header.style";
+import { WalletMenu } from "./WalletMenu";
 
 export const WalletHeader: React.FC = () => {
   return (
-    <HeaderAppBar elevation={0} sx={{ justifyContent: 'flex-end' }}>
+    <HeaderAppBar elevation={0} sx={{ justifyContent: "flex-end" }}>
       <WalletMenuButton />
     </HeaderAppBar>
   );
@@ -29,7 +29,7 @@ export const WalletMenuButton: React.FC = () => {
   const { account } = useWallet();
   const { variant } = useWidgetConfig();
 
-  if (variant === 'drawer') {
+  if (variant === "drawer") {
     return (
       <DrawerWalletContainer>
         {account.isActive ? <ConnectedButton /> : <ConnectButton />}
@@ -55,12 +55,12 @@ const ConnectButton = () => {
   return (
     <WalletButton
       endIcon={
-        variant !== 'drawer' && subvariant !== 'split' ? (
+        variant !== "drawer" && subvariant !== "split" ? (
           <WalletIcon />
         ) : undefined
       }
       startIcon={
-        variant === 'drawer' || subvariant === 'split' ? (
+        variant === "drawer" || subvariant === "split" ? (
           <WalletIcon sx={{ marginLeft: -0.25 }} />
         ) : undefined
       }
@@ -68,8 +68,8 @@ const ConnectButton = () => {
         !pathname.includes(navigationRoutes.selectWallet) ? connect : undefined
       }
       sx={{
-        marginRight: subvariant === 'split' ? 0 : -1.25,
-        marginLeft: subvariant === 'split' ? -1.25 : 0,
+        marginRight: subvariant === "split" ? 0 : -1.25,
+        marginLeft: subvariant === "split" ? -1.25 : 0,
       }}
     >
       {t(`button.connectWallet`)}
@@ -99,7 +99,7 @@ const ConnectedButton = () => {
   };
 
   const handleCopyAddress = async () => {
-    await navigator.clipboard.writeText(account.address ?? '');
+    await navigator.clipboard.writeText(account.address ?? "");
     handleClose();
   };
 
@@ -117,8 +117,8 @@ const ConnectedButton = () => {
           </Avatar>
         }
         sx={{
-          marginRight: subvariant === 'split' ? 0 : -1.25,
-          marginLeft: subvariant === 'split' ? -1 : 0,
+          marginRight: subvariant === "split" ? 0 : -1.25,
+          marginLeft: subvariant === "split" ? -1 : 0,
         }}
         onClick={handleClick}
       >

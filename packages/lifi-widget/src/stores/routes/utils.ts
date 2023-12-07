@@ -1,15 +1,15 @@
-import type { Process, Route } from '@lifi/sdk';
-import microdiff from 'microdiff';
+import type { Process, Route } from "@lifi/sdk";
+import microdiff from "microdiff";
 
 export const isRouteDone = (route: Route) => {
-  return route.steps.every((step) => step.execution?.status === 'DONE');
+  return route.steps.every((step) => step.execution?.status === "DONE");
 };
 
 export const isRoutePartiallyDone = (route: Route) => {
   return route.steps.some(
     (step) =>
       step.execution?.process.some(
-        (process) => process.substatus === 'PARTIAL',
+        (process) => process.substatus === "PARTIAL",
       ),
   );
 };
@@ -18,13 +18,13 @@ export const isRouteRefunded = (route: Route) => {
   return route.steps.some(
     (step) =>
       step.execution?.process.some(
-        (process) => process.substatus === 'REFUNDED',
+        (process) => process.substatus === "REFUNDED",
       ),
   );
 };
 
 export const isRouteFailed = (route: Route) => {
-  return route.steps.some((step) => step.execution?.status === 'FAILED');
+  return route.steps.some((step) => step.execution?.status === "FAILED");
 };
 
 export const isRouteActive = (route?: Route) => {
@@ -39,7 +39,7 @@ export const isRouteActive = (route?: Route) => {
 
 export const doesRouteHaveCustomTool = (route: Route) => {
   return route.steps.some(
-    (step) => step.tool === 'custom' || step.toolDetails.key === 'custom',
+    (step) => step.tool === "custom" || step.toolDetails.key === "custom",
   );
 };
 
@@ -48,14 +48,14 @@ export const getUpdatedProcess = (
   updatedRoute: Route,
 ): Process | undefined => {
   const processDiff = microdiff(currentRoute, updatedRoute).find((diff) =>
-    diff.path.includes('process'),
+    diff.path.includes("process"),
   );
   if (!processDiff) {
     return undefined;
   }
   // e.g. ['steps', 0, 'execution', 'process', 0]
   const process = processDiff.path
-    .slice(0, processDiff.path.findIndex((path) => path === 'process') + 2)
+    .slice(0, processDiff.path.findIndex((path) => path === "process") + 2)
     .reduce((obj, path) => obj[path], updatedRoute as any) as Process;
   return process;
 };

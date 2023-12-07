@@ -1,8 +1,8 @@
-import type { StateCreator } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createWithEqualityFn } from 'zustand/traditional';
-import type { PersistStoreProps } from '../types';
-import type { ChainOrderState } from './types';
+import type { StateCreator } from "zustand";
+import { persist } from "zustand/middleware";
+import { createWithEqualityFn } from "zustand/traditional";
+import type { PersistStoreProps } from "../types";
+import type { ChainOrderState } from "./types";
 
 export const maxChainToOrder = 9;
 
@@ -58,7 +58,7 @@ export const createChainOrderStore = ({ namePrefix }: PersistStoreProps) =>
         },
       }),
       {
-        name: `${namePrefix || 'li.fi'}-widget-chains-order`,
+        name: `${namePrefix || "li.fi"}-widget-chains-order`,
         version: 0,
         partialize: (state) => ({ chainOrder: state.chainOrder }),
       },

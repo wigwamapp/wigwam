@@ -1,5 +1,5 @@
-import type { Wallet } from '@lifi/wallet-management';
-import { supportedWallets } from '@lifi/wallet-management';
+import type { Wallet } from "@lifi/wallet-management";
+import { supportedWallets } from "@lifi/wallet-management";
 import {
   Avatar,
   Button,
@@ -11,14 +11,14 @@ import {
   ListItemAvatar,
   Theme,
   useMediaQuery,
-} from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Dialog } from '../../components/Dialog';
-import { ListItemButton } from '../../components/ListItemButton';
-import { ListItemText } from '../../components/ListItemText';
-import { useNavigateBack } from '../../hooks';
-import { useWallet } from '../../providers';
+} from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Dialog } from "../../components/Dialog";
+import { ListItemButton } from "../../components/ListItemButton";
+import { ListItemText } from "../../components/ListItemText";
+import { useNavigateBack } from "../../hooks";
+import { useWallet } from "../../providers";
 
 export const SelectWalletPage = () => {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ export const SelectWalletPage = () => {
   const [wallets, setWallets] = useState<Wallet[]>();
 
   const isDesktopView = useMediaQuery((theme: Theme) =>
-    theme.breakpoints.up('sm'),
+    theme.breakpoints.up("sm"),
   );
 
   const closeDialog = () => {
@@ -67,7 +67,7 @@ export const SelectWalletPage = () => {
         // always remove Default Wallet from not installed Wallets
         const notInstalledWallets = supportedWallets.filter(
           (wallet, index) =>
-            !installed[index] && wallet.name !== 'Default Wallet',
+            !installed[index] && wallet.name !== "Default Wallet",
         );
 
         const allowedWallets = [...installedWallets];
@@ -109,14 +109,14 @@ export const SelectWalletPage = () => {
       <Dialog open={walletIdentity.show} onClose={closeDialog}>
         <DialogContent>
           <DialogContentText>
-            {t('wallet.extensionNotFound', {
+            {t("wallet.extensionNotFound", {
               name: walletIdentity.wallet?.name,
             })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={closeDialog} autoFocus>
-            {t('button.ok')}
+            {t("button.ok")}
           </Button>
         </DialogActions>
       </Dialog>

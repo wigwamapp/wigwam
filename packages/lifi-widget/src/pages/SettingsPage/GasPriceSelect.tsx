@@ -1,14 +1,14 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { FormControl, MenuItem } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { Card, CardTitle } from '../../components/Card';
-import { Select } from '../../components/Select';
-import { useSettings, useSettingsStore } from '../../stores';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { FormControl, MenuItem } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Card, CardTitle } from "../../components/Card";
+import { Select } from "../../components/Select";
+import { useSettings, useSettingsStore } from "../../stores";
 
 export const GasPriceSelect = () => {
   const { t } = useTranslation();
   const setValue = useSettingsStore((state) => state.setValue);
-  const { gasPrice } = useSettings(['gasPrice']);
+  const { gasPrice } = useSettings(["gasPrice"]);
 
   return (
     <Card flex={1}>
@@ -18,7 +18,7 @@ export const GasPriceSelect = () => {
           MenuProps={{ elevation: 2 }}
           value={gasPrice}
           onChange={(event) =>
-            setValue('gasPrice', event.target.value as string)
+            setValue("gasPrice", event.target.value as string)
           }
           IconComponent={KeyboardArrowDownIcon}
           dense

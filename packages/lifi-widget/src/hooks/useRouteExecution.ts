@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import type { ExchangeRateUpdateParams, Route } from '@lifi/sdk';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
-import { shallow } from 'zustand/shallow';
-import { useLiFi, useWallet } from '../providers';
+import type { ExchangeRateUpdateParams, Route } from "@lifi/sdk";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef } from "react";
+import { shallow } from "zustand/shallow";
+import { useLiFi, useWallet } from "../providers";
 import {
   getUpdatedProcess,
   isRouteActive,
@@ -11,9 +11,9 @@ import {
   isRouteFailed,
   useRouteExecutionStore,
   useRouteExecutionStoreContext,
-} from '../stores';
-import { WidgetEvent } from '../types/events';
-import { useWidgetEvents } from './useWidgetEvents';
+} from "../stores";
+import { WidgetEvent } from "../types/events";
+import { useWidgetEvents } from "./useWidgetEvents";
 
 interface RouteExecutionProps {
   routeId: string;
@@ -68,7 +68,7 @@ export const useRouteExecution = ({
         process,
       });
     }
-    console.log('Route updated.', clonedUpdatedRoute);
+    console.log("Route updated.", clonedUpdatedRoute);
   };
 
   const switchChainHook = async (requiredChainId: number) => {
@@ -81,7 +81,7 @@ export const useRouteExecution = ({
     if (currentChainId !== requiredChainId) {
       const signer = await switchChain(requiredChainId);
       if (!signer) {
-        throw new Error('Chain was not switched.');
+        throw new Error("Chain was not switched.");
       }
       return signer;
     }
@@ -105,12 +105,12 @@ export const useRouteExecution = ({
   const executeRouteMutation = useMutation(
     () => {
       if (!account.signer) {
-        throw Error('Account signer not found.');
+        throw Error("Account signer not found.");
       }
       if (!routeExecution?.route) {
-        throw Error('Execution route not found.');
+        throw Error("Execution route not found.");
       }
-      queryClient.removeQueries(['routes'], { exact: false });
+      queryClient.removeQueries(["routes"], { exact: false });
       return lifi.executeRoute(account.signer, routeExecution.route, {
         updateRouteHook,
         switchChainHook,
@@ -121,7 +121,7 @@ export const useRouteExecution = ({
     },
     {
       onMutate: () => {
-        console.log('Execution started.', routeId);
+        console.log("Execution started.", routeId);
         if (routeExecution) {
           emitter.emit(WidgetEvent.RouteExecutionStarted, routeExecution.route);
         }
@@ -132,10 +132,10 @@ export const useRouteExecution = ({
   const resumeRouteMutation = useMutation(
     (resumedRoute?: Route) => {
       if (!account.signer) {
-        throw Error('Account signer not found.');
+        throw Error("Account signer not found.");
       }
       if (!routeExecution?.route) {
-        throw Error('Execution route not found.');
+        throw Error("Execution route not found.");
       }
       return lifi.resumeRoute(
         account.signer,
@@ -151,7 +151,7 @@ export const useRouteExecution = ({
     },
     {
       onMutate: () => {
-        console.log('Resumed to execution.', routeId);
+        console.log("Resumed to execution.", routeId);
       },
     },
   );
@@ -159,10 +159,10 @@ export const useRouteExecution = ({
   const executeRoute = useCallback(() => {
     executeRouteMutation.mutateAsync(undefined, {
       onError: (error) => {
-        console.warn('Execution failed!', routeId, error);
+        console.warn("Execution failed!", routeId, error);
       },
       onSuccess: (route: Route) => {
-        console.log('Executed successfully!', route);
+        console.log("Executed successfully!", route);
       },
     });
   }, [executeRouteMutation, routeId]);
@@ -171,10 +171,10 @@ export const useRouteExecution = ({
     (route?: Route) => {
       resumeRouteMutation.mutateAsync(route, {
         onError: (error) => {
-          console.warn('Resumed execution failed.', routeId, error);
+          console.warn("Resumed execution failed.", routeId, error);
         },
         onSuccess: (route) => {
-          console.log('Resumed execution successful.', route);
+          console.log("Resumed execution successful.", route);
         },
       });
     },
@@ -214,7 +214,7 @@ export const useRouteExecution = ({
         return;
       }
       lifi.updateRouteExecution(route, { executeInBackground: true });
-      console.log('Move route execution to background.', routeId);
+      console.log("Move route execution to background.", routeId);
       resumedAfterMount.current = false;
     };
   }, [lifi, routeExecutionStoreContext, routeId]);

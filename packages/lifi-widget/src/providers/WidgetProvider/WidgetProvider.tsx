@@ -1,13 +1,13 @@
-import type { ChainKey } from '@lifi/sdk';
-import { getChainByKey } from '@lifi/sdk';
-import { createContext, useContext, useId, useMemo } from 'react';
-import { setDefaultSettings } from '../../stores';
-import { formatInputAmount } from '../../utils';
-import type { WidgetContextProps, WidgetProviderProps } from './types';
+import type { ChainKey } from "@lifi/sdk";
+import { getChainByKey } from "@lifi/sdk";
+import { createContext, useContext, useId, useMemo } from "react";
+import { setDefaultSettings } from "../../stores";
+import { formatInputAmount } from "../../utils";
+import type { WidgetContextProps, WidgetProviderProps } from "./types";
 
 const initialContext: WidgetContextProps = {
-  elementId: '',
-  integrator: '',
+  elementId: "",
+  integrator: "",
 };
 
 const WidgetContext = createContext<WidgetContextProps>(initialContext);
@@ -42,7 +42,7 @@ export const WidgetProvider: React.FC<
         new URLSearchParams(window?.location.search),
       );
       // Prevent using fromToken/toToken params if chain is not selected
-      ['from', 'to'].forEach((key) => {
+      ["from", "to"].forEach((key) => {
         if (searchParams[`${key}Token`] && !searchParams[`${key}Chain`]) {
           delete searchParams[`${key}Token`];
         }
@@ -52,7 +52,7 @@ export const WidgetProvider: React.FC<
         fromChain:
           (searchParams.fromChain &&
             isNaN(parseInt(searchParams.fromChain, 10))) ||
-          typeof fromChain === 'string'
+          typeof fromChain === "string"
             ? getChainByKey(
                 (
                   searchParams.fromChain || (fromChain as string)
@@ -60,12 +60,12 @@ export const WidgetProvider: React.FC<
               )?.id
             : (searchParams.fromChain &&
                   !isNaN(parseInt(searchParams.fromChain, 10))) ||
-                typeof fromChain === 'number'
+                typeof fromChain === "number"
               ? parseInt(searchParams.fromChain, 10) || fromChain
               : undefined,
         toChain:
           (searchParams.toChain && isNaN(parseInt(searchParams.toChain, 10))) ||
-          typeof toChain === 'string'
+          typeof toChain === "string"
             ? getChainByKey(
                 (
                   searchParams.toChain || (toChain as string)
@@ -73,14 +73,14 @@ export const WidgetProvider: React.FC<
               )?.id
             : (searchParams.toChain &&
                   !isNaN(parseInt(searchParams.toChain, 10))) ||
-                typeof toChain === 'number'
+                typeof toChain === "number"
               ? parseInt(searchParams.toChain, 10) || toChain
               : undefined,
         fromToken:
           searchParams.fromToken?.toLowerCase() || fromToken?.toLowerCase(),
         toToken: searchParams.toToken?.toLowerCase() || toToken?.toLowerCase(),
         fromAmount:
-          typeof searchParams.fromAmount === 'string' &&
+          typeof searchParams.fromAmount === "string" &&
           !isNaN(parseFloat(searchParams.fromAmount))
             ? formatInputAmount(searchParams.fromAmount)
             : fromAmount,

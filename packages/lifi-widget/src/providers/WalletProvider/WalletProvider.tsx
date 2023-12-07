@@ -1,6 +1,6 @@
-import type { Signer } from '@ethersproject/abstract-signer';
-import type { Web3Provider } from '@ethersproject/providers';
-import type { StaticToken } from '@lifi/sdk';
+import type { Signer } from "@ethersproject/abstract-signer";
+import type { Web3Provider } from "@ethersproject/providers";
+import type { StaticToken } from "@lifi/sdk";
 import {
   LiFiWalletManagement,
   readActiveWallets,
@@ -8,9 +8,9 @@ import {
   addChain as walletAgnosticAddChain,
   switchChainAndAddToken as walletAgnosticAddToken,
   switchChain as walletAgnosticSwitchChain,
-} from '@lifi/wallet-management';
-import type { Wallet } from '@lifi/wallet-management/types';
-import type { FC, PropsWithChildren } from 'react';
+} from "@lifi/wallet-management";
+import type { Wallet } from "@lifi/wallet-management/types";
+import type { FC, PropsWithChildren } from "react";
 import {
   createContext,
   useCallback,
@@ -18,11 +18,11 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react';
-import { useWidgetEvents } from '../../hooks';
-import { WidgetEvent } from '../../types';
-import { useWidgetConfig } from '../WidgetProvider';
-import type { WalletAccount, WalletContextProps } from './types';
+} from "react";
+import { useWidgetEvents } from "../../hooks";
+import { WidgetEvent } from "../../types";
+import { useWidgetConfig } from "../WidgetProvider";
+import type { WalletAccount, WalletContextProps } from "./types";
 
 const liFiWalletManagement = new LiFiWalletManagement();
 
@@ -71,7 +71,7 @@ export const WalletProvider: FC<PropsWithChildren> = ({ children }) => {
         return;
       }
       await liFiWalletManagement.connect(wallet);
-      wallet.on('walletAccountChanged', handleWalletUpdate);
+      wallet.on("walletAccountChanged", handleWalletUpdate);
       const account = await handleWalletUpdate(wallet);
       emitter.emit(WidgetEvent.WalletConnected, {
         address: account.address,
@@ -177,7 +177,7 @@ export const WalletProvider: FC<PropsWithChildren> = ({ children }) => {
         return;
       }
       await liFiWalletManagement.autoConnect(activeWallets);
-      activeWallets[0].on('walletAccountChanged', handleWalletUpdate);
+      activeWallets[0].on("walletAccountChanged", handleWalletUpdate);
       await handleWalletUpdate(activeWallets[0]);
     };
     autoConnect();

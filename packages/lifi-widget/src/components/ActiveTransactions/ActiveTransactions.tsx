@@ -1,13 +1,13 @@
-import type { BoxProps } from '@mui/material';
-import { Stack } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useWallet } from '../../providers';
-import { useExecutingRoutesIds } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { Card, CardTitle } from '../Card';
-import { ActiveTransactionItem } from './ActiveTransactionItem';
-import { ShowAllButton } from './ActiveTransactions.style';
+import type { BoxProps } from "@mui/material";
+import { Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useWallet } from "../../providers";
+import { useExecutingRoutesIds } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { Card, CardTitle } from "../Card";
+import { ActiveTransactionItem } from "./ActiveTransactionItem";
+import { ShowAllButton } from "./ActiveTransactions.style";
 
 export const ActiveTransactions: React.FC<BoxProps> = (props) => {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ export const ActiveTransactions: React.FC<BoxProps> = (props) => {
 
   return (
     <Card variant="selected" selectionColor="secondary" {...props}>
-      <CardTitle>{t('header.activeTransactions')}</CardTitle>
+      <CardTitle>{t("header.activeTransactions")}</CardTitle>
       <Stack spacing={1.5} pt={1.5} pb={hasShowAll ? 0 : 2}>
         {executingRoutes.slice(0, 2).map((routeId) => (
           <ActiveTransactionItem key={routeId} routeId={routeId} dense />
@@ -35,7 +35,7 @@ export const ActiveTransactions: React.FC<BoxProps> = (props) => {
       </Stack>
       {hasShowAll ? (
         <ShowAllButton disableRipple fullWidth onClick={handleShowAll}>
-          {t('button.showAll')}
+          {t("button.showAll")}
         </ShowAllButton>
       ) : null}
     </Card>

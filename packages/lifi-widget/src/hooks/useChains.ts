@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
-import { isItemAllowed, useLiFi, useWidgetConfig } from '../providers';
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { isItemAllowed, useLiFi, useWidgetConfig } from "../providers";
 
 export const useChains = () => {
   const { chains } = useWidgetConfig();
   const lifi = useLiFi();
   const { data: availableChains, isLoading: isLoadingAvailableChains } =
-    useQuery(['chains'], async () => lifi.getChains(), {
+    useQuery(["chains"], async () => lifi.getChains(), {
       refetchInterval: 300000,
       staleTime: 300000,
     });

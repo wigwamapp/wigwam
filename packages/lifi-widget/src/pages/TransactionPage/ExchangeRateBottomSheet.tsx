@@ -1,21 +1,21 @@
-import type { ExchangeRateUpdateParams } from '@lifi/sdk';
-import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { Box, Button, Typography } from '@mui/material';
-import Big from 'big.js';
-import type { MutableRefObject } from 'react';
+import type { ExchangeRateUpdateParams } from "@lifi/sdk";
+import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import { Box, Button, Typography } from "@mui/material";
+import Big from "big.js";
+import type { MutableRefObject } from "react";
 import {
   forwardRef,
   useCallback,
   useImperativeHandle,
   useRef,
   useState,
-} from 'react';
-import { useTranslation } from 'react-i18next';
-import type { BottomSheetBase } from '../../components/BottomSheet';
-import { BottomSheet } from '../../components/BottomSheet';
-import { useSetContentHeight } from '../../hooks';
-import { formatTokenAmount } from '../../utils';
-import { CenterContainer, IconCircle } from './StatusBottomSheet.style';
+} from "react";
+import { useTranslation } from "react-i18next";
+import type { BottomSheetBase } from "../../components/BottomSheet";
+import { BottomSheet } from "../../components/BottomSheet";
+import { useSetContentHeight } from "../../hooks";
+import { formatTokenAmount } from "../../utils";
+import { CenterContainer, IconCircle } from "./StatusBottomSheet.style";
 
 export interface ExchangeRateBottomSheetBase {
   isOpen(): void;
@@ -105,38 +105,38 @@ const ExchangeRateBottomSheetContent: React.FC<
           <WarningRoundedIcon color="warning" />
         </IconCircle>
         <Typography py={1} fontSize={18} fontWeight={700}>
-          {t('warning.title.rateChanged')}
+          {t("warning.title.rateChanged")}
         </Typography>
       </CenterContainer>
-      <Typography py={1}>{t('warning.message.rateChanged')}</Typography>
+      <Typography py={1}>{t("warning.message.rateChanged")}</Typography>
       <Box display="flex" justifyContent="space-between" mt={1}>
-        <Typography>{t('main.quotedAmount')}</Typography>
+        <Typography>{t("main.quotedAmount")}</Typography>
         <Typography fontWeight={600}>
-          {t('format.number', {
+          {t("format.number", {
             value: formatTokenAmount(
               data?.oldToAmount,
               data?.toToken.decimals,
               5,
             ),
-          })}{' '}
+          })}{" "}
           {data?.toToken.symbol}
         </Typography>
       </Box>
       <Box display="flex" justifyContent="space-between" mt={0.25}>
-        <Typography>{t('main.currentAmount')}</Typography>
+        <Typography>{t("main.currentAmount")}</Typography>
         <Typography fontWeight={600}>
-          {t('format.number', {
+          {t("format.number", {
             value: formatTokenAmount(
               data?.newToAmount,
               data?.toToken.decimals,
               5,
             ),
-          })}{' '}
+          })}{" "}
           {data?.toToken.symbol}
         </Typography>
       </Box>
       <Box display="flex" justifyContent="space-between" mt={0.25}>
-        <Typography>{t('main.rateChange')}</Typography>
+        <Typography>{t("main.rateChange")}</Typography>
         <Typography fontWeight={600}>
           {Big(data?.newToAmount || 0)
             .div(oldAmount.eq(0) ? Big(1) : oldAmount)
@@ -149,11 +149,11 @@ const ExchangeRateBottomSheetContent: React.FC<
       </Box>
       <Box display="flex" mt={3}>
         <Button variant="text" onClick={onCancel} fullWidth>
-          {t('button.cancel')}
+          {t("button.cancel")}
         </Button>
         <Box display="flex" p={1} />
         <Button variant="contained" onClick={onContinue} fullWidth>
-          {t('button.continue')}
+          {t("button.continue")}
         </Button>
       </Box>
     </Box>

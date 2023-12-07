@@ -1,8 +1,8 @@
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
-import { useFormContext } from 'react-hook-form';
-import { FormKey } from '../../providers';
-import { IconButton } from './ReverseTokensButton.style';
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
+import { useFormContext } from "react-hook-form";
+import { FormKey } from "../../providers";
+import { IconButton } from "./ReverseTokensButton.style";
 
 export const ReverseTokensButton: React.FC<{ vertical?: boolean }> = ({
   vertical,
@@ -15,7 +15,7 @@ export const ReverseTokensButton: React.FC<{ vertical?: boolean }> = ({
       FormKey.ToChain,
       FormKey.ToToken,
     ]);
-    setValue(FormKey.FromAmount, '', { shouldTouch: true });
+    setValue(FormKey.FromAmount, "", { shouldTouch: true });
     setValue(FormKey.FromChain, toChain, { shouldTouch: true });
     setValue(FormKey.FromToken, toToken, { shouldTouch: true });
     setValue(FormKey.ToChain, fromChain, { shouldTouch: true });

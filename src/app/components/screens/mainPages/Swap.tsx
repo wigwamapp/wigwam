@@ -68,7 +68,7 @@ const Swap: FC = () => {
         },
       },
     };
-  }, [chainId, currentAccount.address]);
+  }, [chainId, currentAccount.address, tokenSlug]);
 
   return (
     <div className="flex mt-[1rem]">

@@ -1,14 +1,14 @@
 /* eslint-disable react/no-array-index-key */
-import type { EVMChain } from '@lifi/sdk';
-import { Avatar, Box, Skeleton, Tooltip, Typography } from '@mui/material';
-import { useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
-import { maxChainToOrder } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { ChainCard, ChainContainer } from './ChainSelect.style';
-import { useChainSelect } from './useChainSelect';
+import type { EVMChain } from "@lifi/sdk";
+import { Avatar, Box, Skeleton, Tooltip, Typography } from "@mui/material";
+import { useWatch } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper } from "../../providers";
+import { maxChainToOrder } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { ChainCard, ChainContainer } from "./ChainSelect.style";
+import { useChainSelect } from "./useChainSelect";
 
 export const ChainSelect = ({ formType }: FormTypeProps) => {
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
             >
               <ChainCard
                 onClick={() => setCurrentChain(chain.id)}
-                variant={chainId === chain.id ? 'selected' : 'default'}
+                variant={chainId === chain.id ? "selected" : "default"}
               >
                 <Avatar
                   src={chain.logoURI}
@@ -76,8 +76,8 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
             sx={{
               width: 40,
               height: 40,
-              display: 'grid',
-              placeItems: 'center',
+              display: "grid",
+              placeItems: "center",
             }}
           >
             <Typography fontWeight={500}>+{chainsToHide}</Typography>

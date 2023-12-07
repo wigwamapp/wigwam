@@ -1,10 +1,10 @@
-import SearchOffIcon from '@mui/icons-material/SearchOff';
-import { Box, Typography } from '@mui/material';
-import { useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useChains } from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
+import SearchOffIcon from "@mui/icons-material/SearchOff";
+import { Box, Typography } from "@mui/material";
+import { useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useChains } from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper } from "../../providers";
 
 export const TokenNotFound: React.FC<FormTypeProps> = ({ formType }) => {
   const { t } = useTranslation();
@@ -15,10 +15,10 @@ export const TokenNotFound: React.FC<FormTypeProps> = ({ formType }) => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
         flex: 1,
         padding: 3,
       }}
@@ -33,7 +33,7 @@ export const TokenNotFound: React.FC<FormTypeProps> = ({ formType }) => {
         mt={2}
         px={2}
       >
-        {t('info.message.emptyTokenList', {
+        {t("info.message.emptyTokenList", {
           chainName: getChainById(selectedChainId)?.name,
         })}
       </Typography>

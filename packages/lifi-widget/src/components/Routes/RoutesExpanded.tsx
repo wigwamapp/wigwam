@@ -1,26 +1,26 @@
 /* eslint-disable react/no-array-index-key */
-import type { Route } from '@lifi/sdk';
-import { Collapse, Grow, Stack, Typography } from '@mui/material';
-import { useFormState } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useMatch, useNavigate } from 'react-router-dom';
-import { useRoutes } from '../../hooks';
-import { useWidgetConfig } from '../../providers';
-import { useSetExecutableRoute } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { ProgressToNextUpdate } from '../ProgressToNextUpdate';
-import { RouteCard, RouteCardSkeleton, RouteNotFoundCard } from '../RouteCard';
+import type { Route } from "@lifi/sdk";
+import { Collapse, Grow, Stack, Typography } from "@mui/material";
+import { useFormState } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useMatch, useNavigate } from "react-router-dom";
+import { useRoutes } from "../../hooks";
+import { useWidgetConfig } from "../../providers";
+import { useSetExecutableRoute } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { ProgressToNextUpdate } from "../ProgressToNextUpdate";
+import { RouteCard, RouteCardSkeleton, RouteNotFoundCard } from "../RouteCard";
 import {
   CollapseContainer,
   Container,
   Header,
   ScrollableContainer,
-} from './RoutesExpanded.style';
+} from "./RoutesExpanded.style";
 
 const timeout = { enter: 225, exit: 225, appear: 0 };
 
 export const RoutesExpanded = () => {
-  const element = useMatch('/');
+  const element = useMatch("/");
   return (
     <CollapseContainer>
       <Collapse timeout={timeout} in={!!element} orientation="horizontal">
@@ -74,9 +74,9 @@ export const RoutesExpandedElement = () => {
           <ScrollableContainer>
             <Header>
               <Typography fontSize={18} fontWeight="700" flex={1} noWrap>
-                {subvariant === 'nft'
-                  ? t('main.fromAmount')
-                  : t('header.youGet')}
+                {subvariant === "nft"
+                  ? t("main.fromAmount")
+                  : t("header.youGet")}
               </Typography>
               <ProgressToNextUpdate
                 updatedAt={dataUpdatedAt || new Date().getTime()}

@@ -1,17 +1,17 @@
 /* eslint-disable react/no-array-index-key */
-import type { LifiStep, TokenAmount } from '@lifi/sdk';
-import { Box } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { Card, CardTitle } from '../../components/Card';
-import { StepActions } from '../../components/StepActions';
-import { Token } from '../../components/Token';
-import { useChains } from '../../hooks';
-import { useWidgetConfig } from '../../providers';
-import { shortenAddress } from '../../utils';
-import { DestinationWalletAddress } from './DestinationWalletAddress';
-import { GasStepProcess } from './GasStepProcess';
-import { StepProcess } from './StepProcess';
-import { StepTimer } from './StepTimer';
+import type { LifiStep, TokenAmount } from "@lifi/sdk";
+import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Card, CardTitle } from "../../components/Card";
+import { StepActions } from "../../components/StepActions";
+import { Token } from "../../components/Token";
+import { useChains } from "../../hooks";
+import { useWidgetConfig } from "../../providers";
+import { shortenAddress } from "../../utils";
+import { DestinationWalletAddress } from "./DestinationWalletAddress";
+import { GasStepProcess } from "./GasStepProcess";
+import { StepProcess } from "./StepProcess";
+import { StepTimer } from "./StepTimer";
 
 export const Step: React.FC<{
   step: LifiStep;
@@ -24,35 +24,35 @@ export const Step: React.FC<{
   const { subvariant } = useWidgetConfig();
 
   const stepHasError = step.execution?.process.some(
-    (process) => process.status === 'FAILED',
+    (process) => process.status === "FAILED",
   );
 
   const getCardTitle = () => {
     switch (step.type) {
-      case 'lifi':
+      case "lifi":
         const hasCrossStep = step.includedSteps.some(
-          (step) => step.type === 'cross',
+          (step) => step.type === "cross",
         );
         const hasSwapStep = step.includedSteps.some(
-          (step) => step.type === 'swap',
+          (step) => step.type === "swap",
         );
         if (hasCrossStep && hasSwapStep) {
-          return subvariant === 'nft'
-            ? t('main.stepBridgeAndBuy')
-            : t('main.stepSwapAndBridge');
+          return subvariant === "nft"
+            ? t("main.stepBridgeAndBuy")
+            : t("main.stepSwapAndBridge");
         }
         if (hasCrossStep) {
-          return subvariant === 'nft'
-            ? t('main.stepBridgeAndBuy')
-            : t('main.stepBridge');
+          return subvariant === "nft"
+            ? t("main.stepBridgeAndBuy")
+            : t("main.stepBridge");
         }
-        return subvariant === 'nft'
-          ? t('main.stepSwapAndBuy')
-          : t('main.stepSwap');
+        return subvariant === "nft"
+          ? t("main.stepSwapAndBuy")
+          : t("main.stepSwap");
       default:
-        return subvariant === 'nft'
-          ? t('main.stepSwapAndBuy')
-          : t('main.stepSwap');
+        return subvariant === "nft"
+          ? t("main.stepSwapAndBuy")
+          : t("main.stepSwap");
     }
   };
 
@@ -63,10 +63,10 @@ export const Step: React.FC<{
     : undefined;
 
   return (
-    <Card variant={stepHasError ? 'error' : 'default'}>
+    <Card variant={stepHasError ? "error" : "default"}>
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           flex: 1,
         }}
       >

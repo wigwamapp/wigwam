@@ -1,7 +1,7 @@
-import type { DrawerProps } from '@mui/material';
-import type { RefObject } from 'react';
+import type { DrawerProps } from "@mui/material";
+import type { RefObject } from "react";
 
-export type BottomSheetProps = Omit<DrawerProps, 'onClose'> & {
+export type BottomSheetProps = Omit<DrawerProps, "onClose"> & {
   elementRef?: RefObject<HTMLDivElement>;
   onClose?(): void;
 };

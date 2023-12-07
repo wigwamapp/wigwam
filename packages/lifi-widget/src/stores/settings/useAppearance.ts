@@ -1,6 +1,6 @@
-import { shallow } from 'zustand/shallow';
-import type { Appearance } from '../../types';
-import { useSettingsStore } from './useSettingsStore';
+import { shallow } from "zustand/shallow";
+import type { Appearance } from "../../types";
+import { useSettingsStore } from "./useSettingsStore";
 
 export const useAppearance = (): [
   Appearance,
@@ -11,7 +11,7 @@ export const useAppearance = (): [
     shallow,
   );
   const setAppearance = (appearance: Appearance) => {
-    setValue('appearance', appearance);
+    setValue("appearance", appearance);
   };
   return [appearance, setAppearance];
 };

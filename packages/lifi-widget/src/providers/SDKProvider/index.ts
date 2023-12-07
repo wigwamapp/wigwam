@@ -1,1 +1,1 @@
-export * from './SDKProvider';
+export * from "./SDKProvider";

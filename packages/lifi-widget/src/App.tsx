@@ -1,21 +1,21 @@
-import { forwardRef, useMemo } from 'react';
-import type { WidgetDrawer } from './AppDrawer';
-import { AppDrawer } from './AppDrawer';
-import { AppProvider } from './AppProvider';
-import { AppRoutes } from './AppRoutes';
+import { forwardRef, useMemo } from "react";
+import type { WidgetDrawer } from "./AppDrawer";
+import { AppDrawer } from "./AppDrawer";
+import { AppProvider } from "./AppProvider";
+import { AppRoutes } from "./AppRoutes";
 import {
   AppContainer,
   AppExpandedContainer,
   FlexContainer,
-} from './components/AppContainer';
-import { Header } from './components/Header';
-import { Initializer } from './components/Initializer';
-import { PoweredBy } from './components/PoweredBy';
-import { RoutesExpanded } from './components/Routes';
-import { useExpandableVariant } from './hooks';
-import { useWidgetConfig } from './providers';
-import type { WidgetConfig, WidgetProps } from './types';
-import { ElementId, createElementId } from './utils';
+} from "./components/AppContainer";
+import { Header } from "./components/Header";
+import { Initializer } from "./components/Initializer";
+import { PoweredBy } from "./components/PoweredBy";
+import { RoutesExpanded } from "./components/Routes";
+import { useExpandableVariant } from "./hooks";
+import { useWidgetConfig } from "./providers";
+import type { WidgetConfig, WidgetProps } from "./types";
+import { ElementId, createElementId } from "./utils";
 
 export const App = forwardRef<WidgetDrawer, WidgetProps>(
   ({ elementRef, open, integrator, ...other }, ref) => {
@@ -23,7 +23,7 @@ export const App = forwardRef<WidgetDrawer, WidgetProps>(
       () => ({ integrator, ...other, ...other.config }),
       [integrator, other],
     );
-    return config?.variant !== 'drawer' ? (
+    return config?.variant !== "drawer" ? (
       <AppProvider config={config}>
         <AppDefault />
       </AppProvider>

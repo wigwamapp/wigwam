@@ -13,10 +13,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2020",
+    "target": "ES2022",
+    "noEmit": false,
     "composite": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "declarationMap": true,
     "rootDir": "./src",
     "outDir": "./dist"

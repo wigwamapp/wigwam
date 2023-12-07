@@ -1,15 +1,15 @@
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import { Box, Collapse, Link, Typography } from '@mui/material';
-import type { ChangeEvent, MouseEventHandler } from 'react';
-import { useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import { InsuraceLogo } from '../../icons';
-import { RouteExecutionStatus } from '../../stores';
-import { Card, CardIconButton, CardLabel, CardLabelTypography } from '../Card';
-import { Switch } from '../Switch';
-import type { InsuranceCardProps } from './types';
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import { Box, Collapse, Link, Typography } from "@mui/material";
+import type { ChangeEvent, MouseEventHandler } from "react";
+import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import { InsuraceLogo } from "../../icons";
+import { RouteExecutionStatus } from "../../stores";
+import { Card, CardIconButton, CardLabel, CardLabelTypography } from "../Card";
+import { Switch } from "../Switch";
+import type { InsuranceCardProps } from "./types";
 
 export const InsuranceCard: React.FC<InsuranceCardProps> = ({
   status,
@@ -39,12 +39,12 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({
   return (
     <Card selectionColor="secondary" indented {...props}>
       <Box display="flex" alignItems="center" justifyContent="space-between">
-        <CardLabel type={'insurance'}>
+        <CardLabel type={"insurance"}>
           <VerifiedUserIcon fontSize="inherit" />
           <CardLabelTypography type="icon">
             {status === RouteExecutionStatus.Idle
-              ? t('main.tags.insurance')
-              : t('main.tags.insured')}
+              ? t("main.tags.insurance")
+              : t("main.tags.insured")}
           </CardLabelTypography>
         </CardLabel>
         {status === RouteExecutionStatus.Idle ? (
@@ -66,7 +66,7 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({
             mb={2}
           >
             <Typography fontSize={24} fontWeight={700} lineHeight={1}>
-              {t('format.currency', {
+              {t("format.currency", {
                 value: feeAmountUsd,
               })}
             </Typography>
@@ -77,8 +77,8 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({
               <Trans
                 i18nKey={
                   status === RouteExecutionStatus.Idle
-                    ? 'insurance.insure'
-                    : 'insurance.insured'
+                    ? "insurance.insure"
+                    : "insurance.insured"
                 }
                 values={{
                   amount: insuredAmount,
@@ -95,22 +95,22 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({
             >
               <Box
                 sx={{
-                  listStyleType: 'disc',
+                  listStyleType: "disc",
                   pl: 2,
                 }}
               >
                 <Typography fontSize={14} display="list-item">
-                  {t('insurance.bridgeExploits')}
+                  {t("insurance.bridgeExploits")}
                 </Typography>
                 <Typography fontSize={14} display="list-item">
-                  {t('insurance.slippageError')}
+                  {t("insurance.slippageError")}
                 </Typography>
               </Box>
             </Collapse>
             <Link
               href={
                 status === RouteExecutionStatus.Idle
-                  ? 'https://docs.insurace.io/landing-page/documentation/cover-products/bridge-cover/li.fi'
+                  ? "https://docs.insurace.io/landing-page/documentation/cover-products/bridge-cover/li.fi"
                   : `https://app.insurace.io/bridge-cover?search=${insuranceCoverageId}`
               }
               target="_blank"
@@ -124,8 +124,8 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({
                 fontWeight={600}
               >
                 {status === RouteExecutionStatus.Idle
-                  ? t('button.learnMore')
-                  : t('button.viewCoverage')}
+                  ? t("button.learnMore")
+                  : t("button.viewCoverage")}
               </Typography>
             </Link>
           </Box>

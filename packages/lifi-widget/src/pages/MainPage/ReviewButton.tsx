@@ -1,12 +1,12 @@
-import { useFormState } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { BaseTransactionButton } from '../../components/BaseTransactionButton';
-import { useRoutes } from '../../hooks';
-import { useWidgetConfig } from '../../providers';
-import { useSetExecutableRoute, useSplitSubvariantStore } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { ReactNode } from 'react';
+import { useFormState } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { BaseTransactionButton } from "../../components/BaseTransactionButton";
+import { useRoutes } from "../../hooks";
+import { useWidgetConfig } from "../../providers";
+import { useSetExecutableRoute, useSplitSubvariantStore } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { ReactNode } from "react";
 
 export const ReviewButton: React.FC = () => {
   const { t } = useTranslation();
@@ -32,24 +32,24 @@ export const ReviewButton: React.FC = () => {
   const getButtonText = (): string => {
     if (currentRoute) {
       switch (subvariant) {
-        case 'nft':
+        case "nft":
           return t(`button.reviewPurchase`);
-        case 'refuel':
+        case "refuel":
           return t(`button.reviewBridge`);
         default:
           const transactionType =
             currentRoute.fromChainId === currentRoute.toChainId
-              ? 'Swap'
-              : 'Bridge';
+              ? "Swap"
+              : "Bridge";
           return t(`button.review${transactionType}`);
       }
     } else {
       switch (subvariant) {
-        case 'nft':
+        case "nft":
           return t(`button.buy`);
-        case 'refuel':
+        case "refuel":
           return t(`button.getGas`);
-        case 'split':
+        case "split":
           if (splitState) {
             return t(`button.${splitState}`);
           }

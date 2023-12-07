@@ -1,11 +1,11 @@
-import { createContext, useContext, useRef } from 'react';
-import { createWithEqualityFn } from 'zustand/traditional';
+import { createContext, useContext, useRef } from "react";
+import { createWithEqualityFn } from "zustand/traditional";
 import type {
   SplitSubvariantProps,
   SplitSubvariantProviderProps,
   SplitSubvariantState,
   SplitSubvariantStore,
-} from './types';
+} from "./types";
 
 export const SplitSubvariantStoreContext =
   createContext<SplitSubvariantStore | null>(null);

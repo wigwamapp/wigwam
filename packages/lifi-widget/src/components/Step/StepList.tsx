@@ -1,8 +1,8 @@
-import type { Route, TokenAmount } from '@lifi/sdk';
-import { Fragment } from 'react';
-import { StepDivider } from '../../components/StepDivider';
-import type { WidgetSubvariant } from '../../types';
-import { Step } from './Step';
+import type { Route, TokenAmount } from "@lifi/sdk";
+import { Fragment } from "react";
+import { StepDivider } from "../../components/StepDivider";
+import type { WidgetSubvariant } from "../../types";
+import { Step } from "./Step";
 
 export const getStepList = (route?: Route, subvariant?: WidgetSubvariant) =>
   route?.steps.map((step, index, steps) => {
@@ -17,9 +17,9 @@ export const getStepList = (route?: Route, subvariant?: WidgetSubvariant) =>
             ...(step.execution?.toToken ?? step.action?.toToken),
             amount: step.execution?.toAmount
               ? step.execution.toAmount
-              : subvariant === 'nft'
-              ? route.toAmount
-              : step.estimate.toAmount,
+              : subvariant === "nft"
+                ? route.toAmount
+                : step.estimate.toAmount,
           }
         : undefined;
     const toAddress =

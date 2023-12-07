@@ -1,7 +1,7 @@
-import type { ChainId } from '@lifi/sdk';
-import { useQuery } from '@tanstack/react-query';
-import { useLiFi } from '../providers';
-import { useChains } from './useChains';
+import type { ChainId } from "@lifi/sdk";
+import { useQuery } from "@tanstack/react-query";
+import { useLiFi } from "../providers";
+import { useChains } from "./useChains";
 
 const refetchInterval = 60_000;
 
@@ -14,7 +14,7 @@ export const useGasRecommendation = (
   const { chains } = useChains();
 
   return useQuery(
-    ['gas-recommendation', chainId, fromChain, fromToken],
+    ["gas-recommendation", chainId, fromChain, fromToken],
     async ({ queryKey: [_, chainId, fromChain, fromToken] }) => {
       if (!chains?.some((chain) => chain.id === chainId)) {
         return null;

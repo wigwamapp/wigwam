@@ -1,7 +1,7 @@
-import { shallow } from 'zustand/shallow';
-import { useRouteExecutionStore } from './RouteExecutionStore';
-import type { RouteExecution } from './types';
-import { RouteExecutionStatus } from './types';
+import { shallow } from "zustand/shallow";
+import { useRouteExecutionStore } from "./RouteExecutionStore";
+import type { RouteExecution } from "./types";
+import { RouteExecutionStatus } from "./types";
 
 export const useExecutingRoutesIds = (address?: string) => {
   return useRouteExecutionStore(

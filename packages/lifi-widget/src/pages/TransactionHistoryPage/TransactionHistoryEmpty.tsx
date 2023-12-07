@@ -1,17 +1,17 @@
-import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
-import { Container, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import { Container, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const TransactionHistoryEmpty: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Container
       sx={{
-        display: 'flex',
+        display: "flex",
         flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         paddingY: 12,
       }}
     >
@@ -19,7 +19,7 @@ export const TransactionHistoryEmpty: React.FC = () => {
         <ReceiptLongRoundedIcon fontSize="inherit" />
       </Typography>
       <Typography fontSize={18} fontWeight={700}>
-        {t('info.title.emptyTransactionHistory')}
+        {t("info.title.emptyTransactionHistory")}
       </Typography>
       <Typography
         fontSize={14}
@@ -27,7 +27,7 @@ export const TransactionHistoryEmpty: React.FC = () => {
         textAlign="center"
         mt={2}
       >
-        {t('info.message.emptyTransactionHistory')}
+        {t("info.message.emptyTransactionHistory")}
       </Typography>
     </Container>
   );

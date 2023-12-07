@@ -1,25 +1,25 @@
-import EvStationIcon from '@mui/icons-material/EvStation';
-import type { BoxProps } from '@mui/material';
-import { Box, Collapse, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useGasRefuel } from '../../hooks';
-import { useSettings, useSettingsStore } from '../../stores';
+import EvStationIcon from "@mui/icons-material/EvStation";
+import type { BoxProps } from "@mui/material";
+import { Box, Collapse, Typography } from "@mui/material";
+import type { ChangeEvent } from "react";
+import { useTranslation } from "react-i18next";
+import { useGasRefuel } from "../../hooks";
+import { useSettings, useSettingsStore } from "../../stores";
 import {
   InfoMessageCard,
   InfoMessageCardTitle,
   InfoMessageSwitch,
-} from './GasMessage.style';
+} from "./GasMessage.style";
 
 export const GasRefuelMessage: React.FC<BoxProps> = (props) => {
   const { t } = useTranslation();
   const setValue = useSettingsStore((state) => state.setValue);
-  const { enabledAutoRefuel } = useSettings(['enabledAutoRefuel']);
+  const { enabledAutoRefuel } = useSettings(["enabledAutoRefuel"]);
 
   const { enabled, chain, isLoading: isRefuelLoading } = useGasRefuel();
 
   const onChange = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setValue('enabledAutoRefuel', checked);
+    setValue("enabledAutoRefuel", checked);
   };
 
   const showGasRefuelMessage = chain && enabled && !isRefuelLoading;

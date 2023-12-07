@@ -1,4 +1,4 @@
-import DeleteIcon from '@mui/icons-material/DeleteOutline';
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import {
   Button,
   Container,
@@ -8,18 +8,18 @@ import {
   DialogTitle,
   IconButton,
   List,
-} from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ActiveTransactionItem } from '../../components/ActiveTransactions';
-import { Dialog } from '../../components/Dialog';
-import { useWallet } from '../../providers';
+} from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ActiveTransactionItem } from "../../components/ActiveTransactions";
+import { Dialog } from "../../components/Dialog";
+import { useWallet } from "../../providers";
 import {
   useExecutingRoutesIds,
   useHeaderStoreContext,
   useRouteExecutionStore,
-} from '../../stores';
-import { ActiveTransactionsEmpty } from './ActiveTransactionsEmpty';
+} from "../../stores";
+import { ActiveTransactionsEmpty } from "./ActiveTransactionsEmpty";
 
 export const ActiveTransactionsPage = () => {
   const { t } = useTranslation();
@@ -60,20 +60,20 @@ export const ActiveTransactionsPage = () => {
         ))}
       </List>
       <Dialog open={open} onClose={toggleDialog}>
-        <DialogTitle>{t('warning.title.deleteActiveTransactions')}</DialogTitle>
+        <DialogTitle>{t("warning.title.deleteActiveTransactions")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('warning.message.deleteActiveTransactions')}
+            {t("warning.message.deleteActiveTransactions")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleDialog}>{t('button.cancel')}</Button>
+          <Button onClick={toggleDialog}>{t("button.cancel")}</Button>
           <Button
             variant="contained"
-            onClick={() => deleteRoutes('active')}
+            onClick={() => deleteRoutes("active")}
             autoFocus
           >
-            {t('button.delete')}
+            {t("button.delete")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,8 +1,8 @@
-import { isAddress } from '@ethersproject/address';
-import type { Provider } from '@ethersproject/providers';
-import type { Token, TokenAmount } from '@lifi/sdk';
-import { useCallback } from 'react';
-import { useLiFi } from '../providers';
+import { isAddress } from "@ethersproject/address";
+import type { Provider } from "@ethersproject/providers";
+import type { Token, TokenAmount } from "@lifi/sdk";
+import { useCallback } from "react";
+import { useLiFi } from "../providers";
 
 export const useGetTokenBalancesWithRetry = (provider?: Provider) => {
   const lifi = useLiFi();
@@ -24,7 +24,7 @@ export const useGetTokenBalancesWithRetry = (provider?: Provider) => {
         );
         if (!tokenBalances.every((token) => token.blockNumber)) {
           if (depth > 10) {
-            console.warn('Token balance backoff depth exceeded.');
+            console.warn("Token balance backoff depth exceeded.");
             return undefined;
           }
           await new Promise((resolve) => {

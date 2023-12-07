@@ -1,13 +1,13 @@
-import { Collapse } from '@mui/material';
-import { useRoutes } from '../../hooks';
+import { Collapse } from "@mui/material";
+import { useRoutes } from "../../hooks";
 import {
   RouteExecutionStatus,
   useRouteExecutionStore,
   useSetExecutableRoute,
-} from '../../stores';
-import { formatTokenAmount } from '../../utils';
-import { InsuranceCard } from './InsuranceCard';
-import type { InsuranceProps } from './types';
+} from "../../stores";
+import { formatTokenAmount } from "../../utils";
+import { InsuranceCard } from "./InsuranceCard";
+import type { InsuranceProps } from "./types";
 
 export const InsuranceCollapsed: React.FC<InsuranceProps> = ({
   status,
@@ -41,7 +41,7 @@ export const InsuranceCollapsed: React.FC<InsuranceProps> = ({
   return (
     <Collapse
       timeout={225}
-      in={insuredRoute.insurance.state === 'INSURED'}
+      in={insuredRoute.insurance.state === "INSURED"}
       unmountOnExit
       mountOnEnter
       appear={status === RouteExecutionStatus.Idle}

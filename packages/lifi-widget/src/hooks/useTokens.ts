@@ -1,13 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { isItemAllowed, useLiFi, useWidgetConfig } from '../providers';
-import type { TokenAmount } from '../types';
-import { useChains } from './useChains';
-import { useFeaturedTokens } from './useFeaturedTokens';
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { isItemAllowed, useLiFi, useWidgetConfig } from "../providers";
+import type { TokenAmount } from "../types";
+import { useChains } from "./useChains";
+import { useFeaturedTokens } from "./useFeaturedTokens";
 
 export const useTokens = (selectedChainId?: number) => {
   const lifi = useLiFi();
-  const { data, isLoading } = useQuery(['tokens'], () => lifi.getTokens(), {
+  const { data, isLoading } = useQuery(["tokens"], () => lifi.getTokens(), {
     refetchInterval: 3_600_000,
   });
   const { getChainById, isLoading: isSupportedChainsLoading } = useChains();

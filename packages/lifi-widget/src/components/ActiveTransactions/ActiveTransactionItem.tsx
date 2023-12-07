@@ -1,14 +1,14 @@
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ErrorRoundedIcon from '@mui/icons-material/ErrorRounded';
-import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
-import { ListItemAvatar, ListItemText, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useProcessMessage, useRouteExecution } from '../../hooks';
-import { RouteExecutionStatus } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { StepTimer } from '../Step/StepTimer';
-import { TokenAvatar, TokenAvatarGroup } from '../TokenAvatar';
-import { ListItem, ListItemButton } from './ActiveTransactions.style';
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ErrorRoundedIcon from "@mui/icons-material/ErrorRounded";
+import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import { ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useProcessMessage, useRouteExecution } from "../../hooks";
+import { RouteExecutionStatus } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { StepTimer } from "../Step/StepTimer";
+import { TokenAvatar, TokenAvatarGroup } from "../TokenAvatar";
+import { ListItem, ListItemButton } from "./ActiveTransactions.style";
 
 export const ActiveTransactionItem: React.FC<{
   routeId: string;
@@ -39,9 +39,9 @@ export const ActiveTransactionItem: React.FC<{
 
   const getStatusComponent = () => {
     switch (lastActiveProcess?.status) {
-      case 'ACTION_REQUIRED':
+      case "ACTION_REQUIRED":
         return <InfoRoundedIcon color="info" fontSize="small" />;
-      case 'FAILED':
+      case "FAILED":
         return <ErrorRoundedIcon color="error" fontSize="small" />;
       default:
         return (
@@ -70,8 +70,8 @@ export const ActiveTransactionItem: React.FC<{
             fontWeight={500}
             lineHeight={1}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               marginLeft: 2,
               height: 16,
             }}

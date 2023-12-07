@@ -1,16 +1,16 @@
-import BlockIcon from '@mui/icons-material/Block';
-import { Box, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import BlockIcon from "@mui/icons-material/Block";
+import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const NotFound: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
         flex: 1,
         padding: 3,
       }}
@@ -19,7 +19,7 @@ export const NotFound: React.FC = () => {
         <BlockIcon fontSize="inherit" />
       </Typography>
       <Typography fontSize={18} fontWeight={700}>
-        {t('tooltip.notFound.title')}
+        {t("tooltip.notFound.title")}
       </Typography>
       <Typography
         fontSize={14}
@@ -27,7 +27,7 @@ export const NotFound: React.FC = () => {
         textAlign="center"
         mt={2}
       >
-        {t('tooltip.notFound.text')}
+        {t("tooltip.notFound.text")}
       </Typography>
     </Box>
   );

@@ -1,14 +1,14 @@
-import { Box, Typography } from '@mui/material';
-import type { ChangeEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Switch } from '../../components/Switch';
-import { useWidgetConfig } from '../../providers';
+import { Box, Typography } from "@mui/material";
+import type { ChangeEvent } from "react";
+import { useTranslation } from "react-i18next";
+import { Switch } from "../../components/Switch";
+import { useWidgetConfig } from "../../providers";
 import {
   useSendToWalletStore,
   useSettings,
   useSettingsStore,
-} from '../../stores';
-import { HiddenUI } from '../../types';
+} from "../../stores";
+import { HiddenUI } from "../../types";
 
 export const ShowDestinationWallet = () => {
   const { t } = useTranslation();
@@ -17,14 +17,14 @@ export const ShowDestinationWallet = () => {
     (state) => state.setSendToWallet,
   );
   const setValue = useSettingsStore((state) => state.setValue);
-  const { showDestinationWallet } = useSettings(['showDestinationWallet']);
+  const { showDestinationWallet } = useSettings(["showDestinationWallet"]);
 
   if (hiddenUI?.includes(HiddenUI.ToAddress)) {
     return null;
   }
 
   const onChange = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    setValue('showDestinationWallet', checked);
+    setValue("showDestinationWallet", checked);
     setSendToWallet(false);
   };
 
@@ -32,12 +32,12 @@ export const ShowDestinationWallet = () => {
     <Box px={3} pt={2} pb={1.5}>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography
             variant="subtitle1"
             color="text.primary"

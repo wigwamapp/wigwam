@@ -1,9 +1,9 @@
-import { LoadingButton } from '@mui/lab';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useWallet, useWidgetConfig } from '../../providers';
-import { navigationRoutes } from '../../utils';
-import type { BaseTransactionButtonProps } from './types';
+import { LoadingButton } from "@mui/lab";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useWallet, useWidgetConfig } from "../../providers";
+import { navigationRoutes } from "../../utils";
+import type { BaseTransactionButtonProps } from "./types";
 
 export const BaseTransactionButton: React.FC<BaseTransactionButtonProps> = ({
   onClick,

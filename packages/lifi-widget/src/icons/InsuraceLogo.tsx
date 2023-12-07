@@ -1,10 +1,10 @@
-import { useTheme } from '@mui/material';
-import type { SVGProps } from 'react';
+import { useTheme } from "@mui/material";
+import type { SVGProps } from "react";
 
 export const InsuraceLogo = (props: SVGProps<SVGSVGElement>) => {
   const theme = useTheme();
   const insurColor =
-    theme.palette.mode === 'light' ? '#1C4332' : theme.palette.common.white;
+    theme.palette.mode === "light" ? "#1C4332" : theme.palette.common.white;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

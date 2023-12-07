@@ -1,7 +1,7 @@
-import { RouteExecutionStatus } from '../../stores';
-import { InsuranceCard } from './InsuranceCard';
-import { InsuranceCollapsed } from './InsuranceCollapsed';
-import type { InsuranceProps } from './types';
+import { RouteExecutionStatus } from "../../stores";
+import { InsuranceCard } from "./InsuranceCard";
+import { InsuranceCollapsed } from "./InsuranceCollapsed";
+import type { InsuranceProps } from "./types";
 
 export const Insurance: React.FC<InsuranceProps> = ({
   status,

@@ -1,14 +1,14 @@
-import { isAddress } from '@ethersproject/address';
-import type { Route, RoutesResponse, Token } from '@lifi/sdk';
-import { LifiErrorCode } from '@lifi/sdk';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import Big from 'big.js';
-import { useWatch } from 'react-hook-form';
-import { v4 as uuidv4 } from 'uuid';
-import { useDebouncedWatch, useGasRefuel, useToken } from '.';
-import { FormKey, useLiFi, useWallet, useWidgetConfig } from '../providers';
-import { useSettings } from '../stores';
-import { useSwapOnly } from './useSwapOnly';
+import { isAddress } from "@ethersproject/address";
+import type { Route, RoutesResponse, Token } from "@lifi/sdk";
+import { LifiErrorCode } from "@lifi/sdk";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Big from "big.js";
+import { useWatch } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { useDebouncedWatch, useGasRefuel, useToken } from ".";
+import { FormKey, useLiFi, useWallet, useWidgetConfig } from "../providers";
+import { useSettings } from "../stores";
+import { useSwapOnly } from "./useSwapOnly";
 
 const refetchTime = 60_000;
 
@@ -29,11 +29,11 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     enabledExchanges,
     routePriority,
   } = useSettings([
-    'slippage',
-    'routePriority',
-    'enabledAutoRefuel',
-    'enabledBridges',
-    'enabledExchanges',
+    "slippage",
+    "routePriority",
+    "enabledAutoRefuel",
+    "enabledBridges",
+    "enabledExchanges",
   ]);
   const [fromTokenAmount] = useDebouncedWatch([FormKey.FromAmount], 320);
   const [
@@ -69,7 +69,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     (!isNaN(toTokenAmount) && Number(toTokenAmount) > 0);
 
   const contractCallQuoteEnabled: boolean =
-    subvariant === 'nft'
+    subvariant === "nft"
       ? Boolean(toContractAddress && toContractCallData && toContractGasLimit)
       : true;
 
@@ -83,7 +83,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     contractCallQuoteEnabled;
 
   const queryKey = [
-    'routes',
+    "routes",
     account.address,
     fromChainId,
     fromToken?.address,
@@ -153,7 +153,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
         const allowedBridges: string[] = insurableRoute
           ? insurableRoute.steps.flatMap((step) =>
               step.includedSteps
-                .filter((includedStep) => includedStep.type === 'cross')
+                .filter((includedStep) => includedStep.type === "cross")
                 .map((includedStep) => includedStep.toolDetails.key),
             )
           : enabledBridges;
@@ -161,12 +161,12 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
         const allowedExchanges: string[] = insurableRoute
           ? insurableRoute.steps.flatMap((step) =>
               step.includedSteps
-                .filter((includedStep) => includedStep.type === 'swap')
+                .filter((includedStep) => includedStep.type === "swap")
                 .map((includedStep) => includedStep.toolDetails.key),
             )
           : enabledExchanges;
 
-        if (subvariant === 'nft') {
+        if (subvariant === "nft") {
           const contractCallQuote = await lifi.getContractCallQuote(
             {
               fromAddress,
@@ -188,9 +188,9 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
           contractCallQuote.action.toToken = toToken!;
 
           const customStep =
-            subvariant === 'nft'
+            subvariant === "nft"
               ? contractCallQuote.includedSteps?.find(
-                  (step) => step.type === 'custom',
+                  (step) => step.type === "custom",
                 )
               : undefined;
 
@@ -207,19 +207,19 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
           const route: Route = {
             id: uuidv4(),
             fromChainId: contractCallQuote.action.fromChainId,
-            fromAmountUSD: contractCallQuote.estimate.fromAmountUSD || '',
+            fromAmountUSD: contractCallQuote.estimate.fromAmountUSD || "",
             fromAmount: contractCallQuote.action.fromAmount,
             fromToken: contractCallQuote.action.fromToken,
             fromAddress: contractCallQuote.action.fromAddress,
             toChainId: contractCallQuote.action.toChainId,
-            toAmountUSD: contractCallQuote.estimate.toAmountUSD || '',
+            toAmountUSD: contractCallQuote.estimate.toAmountUSD || "",
             toAmount: toTokenAmount,
             toAmountMin: toTokenAmount,
             toToken: toToken!,
             toAddress: toWalletAddress,
             gasCostUSD: contractCallQuote.estimate.gasCosts?.[0].amountUSD,
             steps: [contractCallQuote],
-            insurance: { state: 'NOT_INSURABLE', feeAmountUsd: '0' },
+            insurance: { state: "NOT_INSURABLE", feeAmountUsd: "0" },
           };
 
           return { routes: [route] } as RoutesResponse;
@@ -248,7 +248,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
               },
               order: routePriority,
               allowSwitchChain:
-                subvariant === 'refuel' ? false : allowSwitchChain,
+                subvariant === "refuel" ? false : allowSwitchChain,
               insurance: insurance ? Boolean(insurableRoute) : undefined,
             },
           },
@@ -277,7 +277,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
             const { fromToken, toToken } = data.routes[0];
             [fromToken, toToken].forEach((token) => {
               queryClient.setQueriesData<Token[]>(
-                ['token-balances', account.address, token.chainId],
+                ["token-balances", account.address, token.chainId],
                 (data) => {
                   if (data) {
                     const clonedData = [...data];

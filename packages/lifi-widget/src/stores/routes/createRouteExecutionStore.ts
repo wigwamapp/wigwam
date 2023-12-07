@@ -1,17 +1,17 @@
-import type { Route } from '@lifi/sdk';
-import type { StateCreator } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createWithEqualityFn } from 'zustand/traditional';
-import { hasEnumFlag } from '../../utils';
-import type { PersistStoreProps } from '../types';
-import type { RouteExecutionState } from './types';
-import { RouteExecutionStatus } from './types';
+import type { Route } from "@lifi/sdk";
+import type { StateCreator } from "zustand";
+import { persist } from "zustand/middleware";
+import { createWithEqualityFn } from "zustand/traditional";
+import { hasEnumFlag } from "../../utils";
+import type { PersistStoreProps } from "../types";
+import type { RouteExecutionState } from "./types";
+import { RouteExecutionStatus } from "./types";
 import {
   isRouteDone,
   isRouteFailed,
   isRoutePartiallyDone,
   isRouteRefunded,
-} from './utils';
+} from "./utils";
 
 export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
   createWithEqualityFn<RouteExecutionState>(
@@ -106,7 +106,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
             const routes = { ...state.routes };
             Object.keys(routes)
               .filter((routeId) =>
-                type === 'completed'
+                type === "completed"
                   ? hasEnumFlag(
                       routes[routeId]?.status ?? 0,
                       RouteExecutionStatus.Done,
@@ -123,7 +123,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
           }),
       }),
       {
-        name: `${namePrefix || 'li.fi'}-widget-routes`,
+        name: `${namePrefix || "li.fi"}-widget-routes`,
         version: 1,
         partialize: (state) => ({ routes: state.routes }),
         merge: (persistedState: any, currentState: RouteExecutionState) => {
@@ -138,7 +138,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
             Object.values(state.routes).forEach((routeExecution) => {
               const startedAt =
                 routeExecution?.route.steps
-                  ?.find((step) => step.execution?.status === 'FAILED')
+                  ?.find((step) => step.execution?.status === "FAILED")
                   ?.execution?.process.find((process) => process.startedAt)
                   ?.startedAt ?? 0;
               const outdated =
@@ -148,7 +148,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
               }
             });
             // migrate old routes
-            const routeString = localStorage.getItem('routes');
+            const routeString = localStorage.getItem("routes");
             if (routeString) {
               const routes = JSON.parse(routeString) as Array<Route>;
               routes.forEach((route) => {
@@ -174,7 +174,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
                   state.routes[route.id]!.status = RouteExecutionStatus.Pending;
                 }
               });
-              localStorage.removeItem('routes');
+              localStorage.removeItem("routes");
             }
           } catch (error) {
             console.error(error);
@@ -186,17 +186,17 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
             Object.values(persistedState.routes).forEach((route: any) => {
               if (route) {
                 switch (route.status) {
-                  case 'idle':
+                  case "idle":
                     route.status = RouteExecutionStatus.Idle;
                     break;
-                  case 'loading':
+                  case "loading":
                     route.status = RouteExecutionStatus.Pending;
                     break;
-                  case 'success':
-                  case 'warning':
+                  case "success":
+                  case "warning":
                     route.status = RouteExecutionStatus.Done;
                     break;
-                  case 'error':
+                  case "error":
                     route.status = RouteExecutionStatus.Failed;
                     break;
                   default:

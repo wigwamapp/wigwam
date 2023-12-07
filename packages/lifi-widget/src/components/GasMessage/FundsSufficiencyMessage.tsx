@@ -1,10 +1,10 @@
-import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import { Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import {
   WarningMessageCard,
   WarningMessageCardTitle,
-} from './GasMessage.style';
+} from "./GasMessage.style";
 
 export const FundsSufficiencyMessage = () => {
   const { t } = useTranslation();

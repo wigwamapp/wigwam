@@ -1,29 +1,29 @@
-import type { TokenAmount } from '@lifi/sdk';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import type { TooltipProps } from '@mui/material';
-import { Box, Collapse, Tooltip, Typography } from '@mui/material';
-import type { MouseEventHandler } from 'react';
-import { Fragment, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import { useWidgetConfig } from '../../providers';
-import { formatTokenAmount } from '../../utils';
-import type { CardProps } from '../Card';
-import { Card, CardIconButton, CardLabel, CardLabelTypography } from '../Card';
-import type { InsuredAmount } from '../Insurance';
-import { StepActions } from '../StepActions';
-import { Token } from '../Token';
-import { RouteCardEssentials } from './RouteCardEssentials';
-import type { RouteCardProps } from './types';
+import type { TokenAmount } from "@lifi/sdk";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import type { TooltipProps } from "@mui/material";
+import { Box, Collapse, Tooltip, Typography } from "@mui/material";
+import type { MouseEventHandler } from "react";
+import { Fragment, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import { useWidgetConfig } from "../../providers";
+import { formatTokenAmount } from "../../utils";
+import type { CardProps } from "../Card";
+import { Card, CardIconButton, CardLabel, CardLabelTypography } from "../Card";
+import type { InsuredAmount } from "../Insurance";
+import { StepActions } from "../StepActions";
+import { Token } from "../Token";
+import { RouteCardEssentials } from "./RouteCardEssentials";
+import type { RouteCardProps } from "./types";
 
 export const RouteCard: React.FC<
-  RouteCardProps & Omit<CardProps, 'variant'>
-> = ({ route, active, variant = 'default', expanded, ...other }) => {
+  RouteCardProps & Omit<CardProps, "variant">
+> = ({ route, active, variant = "default", expanded, ...other }) => {
   const { t } = useTranslation();
   const { subvariant } = useWidgetConfig();
   const [cardExpanded, setCardExpanded] = useState(expanded);
-  const insurable = route.insurance?.state === 'INSURABLE';
+  const insurable = route.insurance?.state === "INSURABLE";
 
   const handleExpand: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -31,16 +31,16 @@ export const RouteCard: React.FC<
   };
 
   const token: TokenAmount =
-    subvariant === 'nft'
+    subvariant === "nft"
       ? { ...route.fromToken, amount: route.fromAmount }
       : { ...route.toToken, amount: route.toAmount };
 
   const RecommendedTagTooltip =
-    route.tags?.[0] === 'RECOMMENDED' ? RecommendedTooltip : Fragment;
+    route.tags?.[0] === "RECOMMENDED" ? RecommendedTooltip : Fragment;
 
   const cardContent = (
     <Box flex={1}>
-      {subvariant !== 'refuel' && (insurable || route.tags?.length) ? (
+      {subvariant !== "refuel" && (insurable || route.tags?.length) ? (
         <Box display="flex" alignItems="center" mb={2}>
           {insurable ? (
             <InsuranceTooltip
@@ -53,8 +53,8 @@ export const RouteCard: React.FC<
               <CardLabel
                 type={
                   route.tags?.length && !cardExpanded
-                    ? 'insurance-icon'
-                    : 'insurance'
+                    ? "insurance-icon"
+                    : "insurance"
                 }
               >
                 <VerifiedUserIcon fontSize="inherit" />
@@ -68,7 +68,7 @@ export const RouteCard: React.FC<
           ) : null}
           {route.tags?.length ? (
             <RecommendedTagTooltip>
-              <CardLabel type={active ? 'active' : undefined}>
+              <CardLabel type={active ? "active" : undefined}>
                 <CardLabelTypography>
                   {t(`main.tags.${route.tags[0].toLowerCase()}` as any)}
                 </CardLabelTypography>
@@ -97,11 +97,11 @@ export const RouteCard: React.FC<
     </Box>
   );
 
-  return subvariant === 'refuel' || variant === 'cardless' ? (
+  return subvariant === "refuel" || variant === "cardless" ? (
     cardContent
   ) : (
     <Card
-      variant={active ? 'selected' : 'default'}
+      variant={active ? "selected" : "default"}
       selectionColor="secondary"
       indented
       {...other}
@@ -112,7 +112,7 @@ export const RouteCard: React.FC<
 };
 
 const InsuranceTooltip: React.FC<
-  InsuredAmount & Pick<TooltipProps, 'children'>
+  InsuredAmount & Pick<TooltipProps, "children">
 > = ({ insuredAmount, insuredTokenSymbol, children }) => {
   const { t } = useTranslation();
   return (
@@ -131,15 +131,15 @@ const InsuranceTooltip: React.FC<
           </Typography>
           <Box
             sx={{
-              listStyleType: 'disc',
+              listStyleType: "disc",
               pl: 2,
             }}
           >
             <Typography fontSize={12} fontWeight="500" display="list-item">
-              {t('insurance.bridgeExploits')}
+              {t("insurance.bridgeExploits")}
             </Typography>
             <Typography fontSize={12} fontWeight="500" display="list-item">
-              {t('insurance.slippageError')}
+              {t("insurance.slippageError")}
             </Typography>
           </Box>
         </Box>
@@ -153,13 +153,13 @@ const InsuranceTooltip: React.FC<
   );
 };
 
-const RecommendedTooltip: React.FC<Pick<TooltipProps, 'children'>> = ({
+const RecommendedTooltip: React.FC<Pick<TooltipProps, "children">> = ({
   children,
 }) => {
   const { t } = useTranslation();
   return (
     <Tooltip
-      title={t('tooltip.recommended')}
+      title={t("tooltip.recommended")}
       placement="top"
       enterDelay={400}
       arrow

@@ -1,8 +1,8 @@
-import { WidgetEvent, useWidgetEvents } from '../../';
-import { useCallback } from 'react';
-import { useController, useFormContext } from 'react-hook-form';
-import type { FormType } from '../../providers';
-import { FormKeyHelper, useWidgetConfig } from '../../providers';
+import { WidgetEvent, useWidgetEvents } from "../../";
+import { useCallback } from "react";
+import { useController, useFormContext } from "react-hook-form";
+import type { FormType } from "../../providers";
+import { FormKeyHelper, useWidgetConfig } from "../../providers";
 
 export const useTokenSelect = (formType: FormType, onClick?: () => void) => {
   const tokenKey = FormKeyHelper.getTokenKey(formType);
@@ -24,8 +24,8 @@ export const useTokenSelect = (formType: FormType, onClick?: () => void) => {
         shouldDirty: true,
         shouldTouch: true,
       });
-      setValue(FormKeyHelper.getAmountKey(formType), '');
-      const oppositeFormType = formType === 'from' ? 'to' : 'from';
+      setValue(FormKeyHelper.getAmountKey(formType), "");
+      const oppositeFormType = formType === "from" ? "to" : "from";
       const [selectedOppositeToken, selectedOppositeChainId] = getValues([
         FormKeyHelper.getTokenKey(oppositeFormType),
         FormKeyHelper.getChainKey(oppositeFormType),
@@ -33,16 +33,16 @@ export const useTokenSelect = (formType: FormType, onClick?: () => void) => {
       if (
         selectedOppositeToken === tokenAddress &&
         selectedOppositeChainId === selectedChainId &&
-        subvariant !== 'nft'
+        subvariant !== "nft"
       ) {
-        setValue(FormKeyHelper.getTokenKey(oppositeFormType), '', {
+        setValue(FormKeyHelper.getTokenKey(oppositeFormType), "", {
           shouldDirty: true,
           shouldTouch: true,
         });
       }
 
       const eventToEmit =
-        formType === 'from'
+        formType === "from"
           ? WidgetEvent.SourceChainTokenSelected
           : WidgetEvent.DestinationChainTokenSelected;
 

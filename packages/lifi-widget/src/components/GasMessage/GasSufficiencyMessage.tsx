@@ -1,11 +1,11 @@
-import EvStationIcon from '@mui/icons-material/EvStation';
-import { Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import type { GasSufficiency } from '../../hooks';
+import EvStationIcon from "@mui/icons-material/EvStation";
+import { Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import type { GasSufficiency } from "../../hooks";
 import {
   WarningMessageCard,
   WarningMessageCardTitle,
-} from './GasMessage.style';
+} from "./GasMessage.style";
 
 interface GasSufficiencyMessageProps {
   insufficientGas?: GasSufficiency[];

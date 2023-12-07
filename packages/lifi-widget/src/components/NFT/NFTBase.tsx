@@ -1,8 +1,8 @@
-import { Box, Link, Skeleton, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { Token } from '../Token';
-import { PreviewAvatar } from './NFT.style';
-import type { NFTProps } from './types';
+import { Box, Link, Skeleton, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Token } from "../Token";
+import { PreviewAvatar } from "./NFT.style";
+import type { NFTProps } from "./types";
 
 export const NFTBase: React.FC<NFTProps> = ({
   imageUrl,
@@ -45,7 +45,7 @@ export const NFTBase: React.FC<NFTProps> = ({
             <Skeleton width={128} height={21} variant="text" />
           ) : owner ? (
             <Typography fontSize={14} color="text.secondary">
-              {t('main.ownedBy')}{' '}
+              {t("main.ownedBy")}{" "}
               <Link
                 href={owner.url}
                 target="_blank"

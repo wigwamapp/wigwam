@@ -1,2 +1,2 @@
-export * from './SelectTokenPage';
-export * from './types';
+export * from "./SelectTokenPage";
+export * from "./types";

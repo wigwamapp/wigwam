@@ -1,15 +1,15 @@
 import { ReactNode } from "react";
-import { Skeleton } from '@mui/material';
-import { useWatch } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useChain, useSwapOnly, useToken } from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper, useWidgetConfig } from '../../providers';
-import { navigationRoutes } from '../../utils';
-import { Card, CardTitle } from '../Card';
-import { TokenAvatar, TokenAvatarDefault } from '../TokenAvatar';
-import { SelectTokenCardHeader } from './SelectTokenButton.style';
+import { Skeleton } from "@mui/material";
+import { useWatch } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { useChain, useSwapOnly, useToken } from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper, useWidgetConfig } from "../../providers";
+import { navigationRoutes } from "../../utils";
+import { Card, CardTitle } from "../Card";
+import { TokenAvatar, TokenAvatarDefault } from "../TokenAvatar";
+import { SelectTokenCardHeader } from "./SelectTokenButton.style";
 
 export const SelectTokenButton: React.FC<
   FormTypeProps & {
@@ -29,24 +29,24 @@ export const SelectTokenButton: React.FC<
 
   const handleClick = () => {
     navigate(
-      formType === 'from'
+      formType === "from"
         ? navigationRoutes.fromToken
-        : subvariant === 'refuel'
-        ? navigationRoutes.toTokenNative
-        : navigationRoutes.toToken,
+        : subvariant === "refuel"
+          ? navigationRoutes.toTokenNative
+          : navigationRoutes.toToken,
     );
   };
 
   const isSelected = !!(chain && token);
   const onClick = !disabledUI?.includes(tokenKey) ? handleClick : undefined;
   const defaultPlaceholder =
-    formType === 'to' && subvariant === 'refuel'
-      ? t('main.selectChain')
-      : formType === 'to' && swapOnly
-      ? t('main.selectToken')
-      : t('main.selectChainAndToken');
+    formType === "to" && subvariant === "refuel"
+      ? t("main.selectChain")
+      : formType === "to" && swapOnly
+        ? t("main.selectToken")
+        : t("main.selectChainAndToken");
   const cardTitle: ReactNode =
-    formType === 'from' && subvariant === 'nft'
+    formType === "from" && subvariant === "nft"
       ? t(`header.payWith`)
       : t(`main.${formType}`);
   return (

@@ -1,5 +1,5 @@
-import type { StoreApi } from 'zustand';
-import type { UseBoundStoreWithEqualityFn } from 'zustand/traditional';
+import type { StoreApi } from "zustand";
+import type { UseBoundStoreWithEqualityFn } from "zustand/traditional";
 
 export type HeaderStore = UseBoundStoreWithEqualityFn<StoreApi<HeaderState>>;
 

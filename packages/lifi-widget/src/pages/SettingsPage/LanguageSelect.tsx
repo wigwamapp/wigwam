@@ -1,18 +1,18 @@
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import type { SelectChangeEvent } from '@mui/material';
-import { FormControl, MenuItem } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { Card, CardTitle } from '../../components/Card';
-import { Select } from '../../components/Select';
-import { useWidgetConfig } from '../../providers';
-import { useSettings, useSettingsStore } from '../../stores';
-import { HiddenUI } from '../../types';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import type { SelectChangeEvent } from "@mui/material";
+import { FormControl, MenuItem } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Card, CardTitle } from "../../components/Card";
+import { Select } from "../../components/Select";
+import { useWidgetConfig } from "../../providers";
+import { useSettings, useSettingsStore } from "../../stores";
+import { HiddenUI } from "../../types";
 
 export const LanguageSelect: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { languages, hiddenUI } = useWidgetConfig();
   const setValue = useSettingsStore((state) => state.setValue);
-  const { language } = useSettings(['language']);
+  const { language } = useSettings(["language"]);
 
   if (hiddenUI?.includes(HiddenUI.Language)) {
     return null;
@@ -20,7 +20,7 @@ export const LanguageSelect: React.FC = () => {
 
   const handleChangeLanguage = (event: SelectChangeEvent<unknown>) => {
     const language = event.target.value as string;
-    setValue('language', language);
+    setValue("language", language);
     i18n.changeLanguage(language);
   };
 
@@ -31,7 +31,7 @@ export const LanguageSelect: React.FC = () => {
   }
 
   const value = filteredLanguages.includes(
-    language || i18n.resolvedLanguage || '',
+    language || i18n.resolvedLanguage || "",
   )
     ? language || i18n.resolvedLanguage
     : languages?.default || languages?.allow?.[0];
@@ -50,7 +50,7 @@ export const LanguageSelect: React.FC = () => {
           {filteredLanguages.map((lng) => {
             return (
               <MenuItem key={lng} value={lng}>
-                {t('language.name', { lng })}
+                {t("language.name", { lng })}
               </MenuItem>
             );
           })}

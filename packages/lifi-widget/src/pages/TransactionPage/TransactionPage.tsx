@@ -1,37 +1,37 @@
-import type { ExchangeRateUpdateParams } from '@lifi/sdk';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, Button, Tooltip } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-import type { BottomSheetBase } from '../../components/BottomSheet';
-import { ContractComponent } from '../../components/ContractComponent';
-import { GasMessage } from '../../components/GasMessage';
-import { Insurance } from '../../components/Insurance';
-import { getStepList } from '../../components/Step';
+import type { ExchangeRateUpdateParams } from "@lifi/sdk";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Button, Tooltip } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
+import type { BottomSheetBase } from "../../components/BottomSheet";
+import { ContractComponent } from "../../components/ContractComponent";
+import { GasMessage } from "../../components/GasMessage";
+import { Insurance } from "../../components/Insurance";
+import { getStepList } from "../../components/Step";
 import {
   useNavigateBack,
   useRouteExecution,
   useWidgetEvents,
-} from '../../hooks';
-import { FormKey, useWidgetConfig } from '../../providers';
-import { RouteExecutionStatus, useHeaderStoreContext } from '../../stores';
-import { WidgetEvent } from '../../types/events';
-import { formatTokenAmount } from '../../utils';
-import type { ExchangeRateBottomSheetBase } from './ExchangeRateBottomSheet';
-import { ExchangeRateBottomSheet } from './ExchangeRateBottomSheet';
+} from "../../hooks";
+import { FormKey, useWidgetConfig } from "../../providers";
+import { RouteExecutionStatus, useHeaderStoreContext } from "../../stores";
+import { WidgetEvent } from "../../types/events";
+import { formatTokenAmount } from "../../utils";
+import type { ExchangeRateBottomSheetBase } from "./ExchangeRateBottomSheet";
+import { ExchangeRateBottomSheet } from "./ExchangeRateBottomSheet";
 import {
   StartInsurableTransactionButton,
   StartTransactionButton,
-} from './StartTransactionButton';
-import { StatusBottomSheet } from './StatusBottomSheet';
+} from "./StartTransactionButton";
+import { StatusBottomSheet } from "./StatusBottomSheet";
 import {
   TokenValueBottomSheet,
   getTokenValueLossThreshold,
-} from './TokenValueBottomSheet';
-import { Container } from './TransactionPage.style';
-import { calcValueLoss } from './utils';
+} from "./TokenValueBottomSheet";
+import { Container } from "./TransactionPage.style";
+import { calcValueLoss } from "./utils";
 
 export const TransactionPage: React.FC = () => {
   const { t } = useTranslation();
@@ -66,15 +66,15 @@ export const TransactionPage: React.FC = () => {
     });
 
   useEffect(() => {
-    if (route && subvariant !== 'nft') {
+    if (route && subvariant !== "nft") {
       const transactionType =
-        route.fromChainId === route.toChainId ? 'Swap' : 'Bridge';
+        route.fromChainId === route.toChainId ? "Swap" : "Bridge";
       return headerStoreContext
         .getState()
         .setTitle(
           status === RouteExecutionStatus.Idle
             ? t(`button.review${transactionType}`)
-            : t(`header.${transactionType.toLowerCase() as 'swap' | 'bridge'}`),
+            : t(`header.${transactionType.toLowerCase() as "swap" | "bridge"}`),
         );
     }
   }, [headerStoreContext, route, status, subvariant, t]);
@@ -104,16 +104,16 @@ export const TransactionPage: React.FC = () => {
     }
     tokenValueBottomSheetRef.current?.close();
     executeRoute();
-    setValue(FormKey.FromAmount, '');
-    if (subvariant === 'nft') {
-      setValue(FormKey.FromToken, '');
-      setValue(FormKey.ToToken, '');
+    setValue(FormKey.FromAmount, "");
+    if (subvariant === "nft") {
+      setValue(FormKey.FromToken, "");
+      setValue(FormKey.ToToken, "");
     }
   };
 
   const handleStartClick = async () => {
     if (status === RouteExecutionStatus.Idle) {
-      if (tokenValueLossThresholdExceeded && subvariant !== 'nft') {
+      if (tokenValueLossThresholdExceeded && subvariant !== "nft") {
         tokenValueBottomSheetRef.current?.open();
       } else {
         handleExecuteRoute();
@@ -133,28 +133,28 @@ export const TransactionPage: React.FC = () => {
     switch (status) {
       case RouteExecutionStatus.Idle:
         switch (subvariant) {
-          case 'nft':
-            return t('button.buyNow');
-          case 'refuel':
-            return t('button.startBridging');
+          case "nft":
+            return t("button.buyNow");
+          case "refuel":
+            return t("button.startBridging");
           default:
             const transactionType =
-              route.fromChainId === route.toChainId ? 'Swapping' : 'Bridging';
+              route.fromChainId === route.toChainId ? "Swapping" : "Bridging";
             return t(`button.start${transactionType}`);
         }
       case RouteExecutionStatus.Failed:
-        return t('button.tryAgain');
+        return t("button.tryAgain");
       default:
-        return '';
+        return "";
     }
   };
 
-  const insuredRoute = route.insurance?.state === 'INSURED';
+  const insuredRoute = route.insurance?.state === "INSURED";
   const insurableRoute =
     insurance &&
-    subvariant !== 'refuel' &&
+    subvariant !== "refuel" &&
     status === RouteExecutionStatus.Idle &&
-    route.insurance?.state === 'INSURABLE';
+    route.insurance?.state === "INSURABLE";
 
   const insuranceAvailable = insuredRoute || insurableRoute;
 
@@ -164,13 +164,13 @@ export const TransactionPage: React.FC = () => {
 
   const getInsuranceCoverageId = () =>
     route.steps[0].execution?.process
-      .filter((process) => process.type !== 'TOKEN_ALLOWANCE')
+      .filter((process) => process.type !== "TOKEN_ALLOWANCE")
       .find((process) => process.txHash)?.txHash ?? route.fromAddress;
 
   return (
     <Container>
       {getStepList(route, subvariant)}
-      {subvariant === 'nft' ? (
+      {subvariant === "nft" ? (
         <ContractComponent mt={2}>
           {contractSecondaryComponent || contractComponent}
         </ContractComponent>
@@ -203,7 +203,7 @@ export const TransactionPage: React.FC = () => {
             />
             {status === RouteExecutionStatus.Failed ? (
               <Tooltip
-                title={t('button.removeTransaction')}
+                title={t("button.removeTransaction")}
                 placement="bottom-end"
                 enterDelay={400}
                 arrow
@@ -223,7 +223,7 @@ export const TransactionPage: React.FC = () => {
         </>
       ) : null}
       {status ? <StatusBottomSheet status={status} route={route} /> : null}
-      {tokenValueLossThresholdExceeded && subvariant !== 'nft' ? (
+      {tokenValueLossThresholdExceeded && subvariant !== "nft" ? (
         <TokenValueBottomSheet
           route={route}
           ref={tokenValueBottomSheetRef}

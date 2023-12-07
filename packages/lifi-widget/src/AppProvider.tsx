@@ -1,8 +1,8 @@
-import { QueryClientProvider } from '@tanstack/react-query';
-import type { PropsWithChildren } from 'react';
-import { Fragment } from 'react';
-import { MemoryRouter, useInRouterContext } from 'react-router-dom';
-import { queryClient } from './config/queryClient';
+import { QueryClientProvider } from "@tanstack/react-query";
+import type { PropsWithChildren } from "react";
+import { Fragment } from "react";
+import { MemoryRouter, useInRouterContext } from "react-router-dom";
+import { queryClient } from "./config/queryClient";
 import {
   FormProvider,
   I18nProvider,
@@ -12,9 +12,9 @@ import {
   WalletProvider,
   WidgetProvider,
   useWidgetConfig,
-} from './providers';
-import { StoreProvider } from './stores';
-import type { WidgetConfigProps } from './types';
+} from "./providers";
+import { StoreProvider } from "./stores";
+import type { WidgetConfigProps } from "./types";
 
 export const AppProvider: React.FC<PropsWithChildren<WidgetConfigProps>> = ({
   children,

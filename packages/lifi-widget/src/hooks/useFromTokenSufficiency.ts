@@ -1,11 +1,11 @@
-import type { Route } from '@lifi/sdk';
-import { useQuery } from '@tanstack/react-query';
-import Big from 'big.js';
-import { useWatch } from 'react-hook-form';
-import { FormKey, useWallet } from '../providers';
-import { isRouteDone } from '../stores';
-import { useGetTokenBalancesWithRetry } from './useGetTokenBalancesWithRetry';
-import { useTokenAddressBalance } from './useTokenAddressBalance';
+import type { Route } from "@lifi/sdk";
+import { useQuery } from "@tanstack/react-query";
+import Big from "big.js";
+import { useWatch } from "react-hook-form";
+import { FormKey, useWallet } from "../providers";
+import { isRouteDone } from "../stores";
+import { useGetTokenBalancesWithRetry } from "./useGetTokenBalancesWithRetry";
+import { useTokenAddressBalance } from "./useTokenAddressBalance";
 
 const refetchInterval = 30_000;
 
@@ -29,7 +29,7 @@ export const useFromTokenSufficiency = (route?: Route) => {
 
   const { data: insufficientFromToken, isInitialLoading } = useQuery(
     [
-      'from-token-sufficiency-check',
+      "from-token-sufficiency-check",
       account.address,
       chainId,
       tokenAddress,
@@ -47,7 +47,7 @@ export const useFromTokenSufficiency = (route?: Route) => {
       }
 
       const currentAction = route.steps.filter(
-        (step) => !step.execution || step.execution.status !== 'DONE',
+        (step) => !step.execution || step.execution.status !== "DONE",
       )[0]?.action;
 
       if (

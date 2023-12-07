@@ -1,14 +1,14 @@
 /* eslint-disable react/no-array-index-key */
-import type { LifiStep, TokenAmount } from '@lifi/sdk';
-import type { BoxProps } from '@mui/material';
-import { Box, Skeleton } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useChain, useToken } from '../../hooks';
-import { formatTokenAmount, formatTokenPrice } from '../../utils';
-import { SmallAvatar } from '../SmallAvatar';
-import { TextFitter } from '../TextFitter';
-import { TokenAvatar } from '../TokenAvatar';
-import { TextSecondary, TextSecondaryContainer } from './Token.style';
+import type { LifiStep, TokenAmount } from "@lifi/sdk";
+import type { BoxProps } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useChain, useToken } from "../../hooks";
+import { formatTokenAmount, formatTokenPrice } from "../../utils";
+import { SmallAvatar } from "../SmallAvatar";
+import { TextFitter } from "../TextFitter";
+import { TokenAvatar } from "../TokenAvatar";
+import { TextSecondary, TextSecondaryContainer } from "./Token.style";
 
 interface TokenProps {
   token?: TokenAmount;
@@ -80,7 +80,7 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
               fontWeight: 700,
             }}
           >
-            {t('format.number', {
+            {t("format.number", {
               value: formattedTokenAmount,
             })}
           </TextFitter>

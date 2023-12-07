@@ -1,19 +1,19 @@
-import i18next from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import { useMemo } from 'react';
-import { I18nextProvider, initReactI18next } from 'react-i18next';
-import * as supportedLanguages from '../../i18n';
-import { useSettings } from '../../stores';
-import { deepMerge } from '../../utils';
-import { isItemAllowed, useWidgetConfig } from '../WidgetProvider';
-import type { LanguageKey, LanguageTranslationResources } from './types';
+import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import { useMemo } from "react";
+import { I18nextProvider, initReactI18next } from "react-i18next";
+import * as supportedLanguages from "../../i18n";
+import { useSettings } from "../../stores";
+import { deepMerge } from "../../utils";
+import { isItemAllowed, useWidgetConfig } from "../WidgetProvider";
+import type { LanguageKey, LanguageTranslationResources } from "./types";
 
 export const I18nProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const { languageResources, languages, disableLanguageDetector } =
     useWidgetConfig();
-  const { language } = useSettings(['language']);
+  const { language } = useSettings(["language"]);
 
   const i18n = useMemo(() => {
     let resources = (Object.keys(supportedLanguages) as LanguageKey[])
@@ -44,7 +44,7 @@ export const I18nProvider: React.FC<React.PropsWithChildren> = ({
     let i18n = i18next.createInstance({
       lng: languages?.default || language,
       fallbackLng: resources.en
-        ? 'en'
+        ? "en"
         : languages?.default ||
           languages?.allow?.[0] ||
           Object.keys(resources)?.[0],

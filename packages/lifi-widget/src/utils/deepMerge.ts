@@ -1,4 +1,4 @@
-const isObject = (obj: any) => obj && typeof obj === 'object';
+const isObject = (obj: any) => obj && typeof obj === "object";
 
 export const deepMerge = (...objects: any[]) => {
   return objects.reduce((prev, obj) => {

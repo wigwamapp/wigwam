@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { useChains } from './useChains';
+import { useMemo } from "react";
+import { useChains } from "./useChains";
 
 export const useChain = (chainId?: number) => {
   const { chains, isLoading } = useChains();

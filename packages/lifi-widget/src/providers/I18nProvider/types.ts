@@ -1,4 +1,4 @@
-import type * as languages from '../../i18n';
+import type * as languages from "../../i18n";
 
 export type PartialResource<T> = T extends object
   ? {
@@ -17,7 +17,7 @@ export type LanguageResources =
     };
 
 export type LanguageTranslationResource = {
-  [namespace in 'translation']: PartialResource<typeof languages.en>;
+  [namespace in "translation"]: PartialResource<typeof languages.en>;
 };
 
 export type LanguageTranslationResources = {

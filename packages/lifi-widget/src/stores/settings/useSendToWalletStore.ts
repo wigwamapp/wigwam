@@ -1,5 +1,5 @@
-import { createWithEqualityFn } from 'zustand/traditional';
-import type { SendToWalletStore } from './types';
+import { createWithEqualityFn } from "zustand/traditional";
+import type { SendToWalletStore } from "./types";
 
 export const useSendToWalletStore = createWithEqualityFn<SendToWalletStore>(
   (set) => ({

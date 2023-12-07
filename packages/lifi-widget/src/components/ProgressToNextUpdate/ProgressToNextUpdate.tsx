@@ -1,7 +1,7 @@
-import type { IconButtonProps } from '@mui/material';
-import { Box, CircularProgress, IconButton, Tooltip } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { Trans } from 'react-i18next';
+import type { IconButtonProps } from "@mui/material";
+import { Box, CircularProgress, IconButton, Tooltip } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Trans } from "react-i18next";
 
 const getProgressValue = (updatedAt: number, timeToUpdate: number) =>
   updatedAt
@@ -58,9 +58,9 @@ export const ProgressToNextUpdate: React.FC<
       >
         <Box
           sx={{
-            display: 'grid',
-            position: 'relative',
-            placeItems: 'center',
+            display: "grid",
+            position: "relative",
+            placeItems: "center",
             width: 24,
             height: 24,
           }}
@@ -70,21 +70,21 @@ export const ProgressToNextUpdate: React.FC<
             size={24}
             value={100}
             sx={(theme) => ({
-              position: 'absolute',
+              position: "absolute",
               color:
-                theme.palette.mode === 'light'
+                theme.palette.mode === "light"
                   ? theme.palette.grey[300]
                   : theme.palette.grey[800],
             })}
           />
           <CircularProgress
-            variant={isLoading ? 'indeterminate' : 'determinate'}
+            variant={isLoading ? "indeterminate" : "determinate"}
             size={24}
             value={value}
             sx={(theme) => ({
               opacity: value === 100 && !isLoading ? 0.5 : 1,
               color:
-                theme.palette.mode === 'light'
+                theme.palette.mode === "light"
                   ? theme.palette.primary.main
                   : theme.palette.primary.light,
             })}

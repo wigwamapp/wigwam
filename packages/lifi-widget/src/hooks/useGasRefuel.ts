@@ -1,10 +1,10 @@
-import Big from 'big.js';
-import { useMemo } from 'react';
-import { useWatch } from 'react-hook-form';
-import { useChains } from '.';
-import { FormKey } from '../providers';
-import { useGasRecommendation } from './useGasRecommendation';
-import { useTokenBalance } from './useTokenBalance';
+import Big from "big.js";
+import { useMemo } from "react";
+import { useWatch } from "react-hook-form";
+import { useChains } from ".";
+import { FormKey } from "../providers";
+import { useGasRecommendation } from "./useGasRecommendation";
+import { useTokenBalance } from "./useTokenBalance";
 
 export const useGasRefuel = () => {
   const { getChainById } = useChains();

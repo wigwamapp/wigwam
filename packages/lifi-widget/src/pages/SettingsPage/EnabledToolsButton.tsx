@@ -1,14 +1,14 @@
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Box } from '@mui/material';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { shallow } from 'zustand/shallow';
-import { useSettingsStore } from '../../stores';
-import { navigationRoutes } from '../../utils';
-import { ListItemButton, ListItemText } from './EnabledToolsButton.style';
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { shallow } from "zustand/shallow";
+import { useSettingsStore } from "../../stores";
+import { navigationRoutes } from "../../utils";
+import { ListItemButton, ListItemText } from "./EnabledToolsButton.style";
 
 export const EnabledToolsButton: React.FC<{
-  type: 'Bridges' | 'Exchanges';
+  type: "Bridges" | "Exchanges";
 }> = ({ type }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const EnabledToolsButton: React.FC<{
   }, shallow);
 
   const handleClick = () => {
-    navigate(navigationRoutes[type.toLowerCase() as 'bridges' | 'exchanges']);
+    navigate(navigationRoutes[type.toLowerCase() as "bridges" | "exchanges"]);
   };
 
   return (

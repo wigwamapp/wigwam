@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
-import type { FormValues } from '.';
-import { FormKey } from '.';
-import { useWallet } from '../WalletProvider';
-import { isItemAllowed, useWidgetConfig } from '../WidgetProvider';
+import { useEffect, useRef } from "react";
+import { useFormContext } from "react-hook-form";
+import type { FormValues } from ".";
+import { FormKey } from ".";
+import { useWallet } from "../WalletProvider";
+import { isItemAllowed, useWidgetConfig } from "../WidgetProvider";
 
 export const FormUpdater: React.FC<{
   defaultValues: Partial<FormValues>;
@@ -43,15 +43,15 @@ export const FormUpdater: React.FC<{
     if (!fromChain && !isFromChainTouched && !isFromTokenTouched) {
       resetField(FormKey.FromChain, { defaultValue: account.chainId });
       setValue(FormKey.FromChain, account.chainId);
-      setValue(FormKey.FromToken, '');
+      setValue(FormKey.FromToken, "");
       if (isFromAmountTouched) {
-        setValue(FormKey.FromAmount, '');
+        setValue(FormKey.FromAmount, "");
       }
     }
     if (!toChain && !isToChainTouched && !isToTokenTouched) {
       resetField(FormKey.ToChain, { defaultValue: account.chainId });
       setValue(FormKey.ToChain, account.chainId);
-      setValue(FormKey.ToToken, '');
+      setValue(FormKey.ToToken, "");
     }
   }, [
     account.chainId,
@@ -74,8 +74,8 @@ export const FormUpdater: React.FC<{
           defaultValues[key] ||
           // set the chain to the current user one if it is not present in the config
           (key === FormKey.FromChain || key === FormKey.ToChain
-            ? account.chainId || ''
-            : '');
+            ? account.chainId || ""
+            : "");
         setValue(key, value);
         resetField(key, { defaultValue: value });
       }

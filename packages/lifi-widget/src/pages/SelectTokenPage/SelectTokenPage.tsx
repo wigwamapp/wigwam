@@ -1,16 +1,16 @@
-import { Box, Container } from '@mui/material';
-import type { FC } from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
-import { ChainSelect } from '../../components/ChainSelect';
-import { TokenList } from '../../components/TokenList';
+import { Box, Container } from "@mui/material";
+import type { FC } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { ChainSelect } from "../../components/ChainSelect";
+import { TokenList } from "../../components/TokenList";
 import {
   useContentHeight,
   useNavigateBack,
   useScrollableOverflowHidden,
   useSwapOnly,
-} from '../../hooks';
-import { type FormTypeProps } from '../../providers';
-import { SearchTokenInput } from './SearchTokenInput';
+} from "../../hooks";
+import { type FormTypeProps } from "../../providers";
+import { SearchTokenInput } from "./SearchTokenInput";
 
 const minTokenListHeight = 360;
 
@@ -31,7 +31,7 @@ export const SelectTokenPage: FC<FormTypeProps> = ({ formType }) => {
     );
   }, [contentHeight]);
 
-  const hideChainSelect = swapOnly && formType === 'to';
+  const hideChainSelect = swapOnly && formType === "to";
 
   return (
     <Container disableGutters>

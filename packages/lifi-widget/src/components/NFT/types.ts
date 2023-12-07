@@ -1,5 +1,5 @@
-import type { TokenAmount } from '@lifi/sdk';
-import type { WidgetContract } from '../../types';
+import type { TokenAmount } from "@lifi/sdk";
+import type { WidgetContract } from "../../types";
 
 export interface NFTBaseProps {
   imageUrl?: string;

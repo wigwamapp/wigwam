@@ -1,7 +1,7 @@
-import { ListItemText as MuiListItemText } from '@mui/material';
-import { listItemTextClasses } from '@mui/material/ListItemText';
-import { styled } from '@mui/material/styles';
-import { ListItemButton as ListItemButtonBase } from '../../components/ListItemButton';
+import { ListItemText as MuiListItemText } from "@mui/material";
+import { listItemTextClasses } from "@mui/material/ListItemText";
+import { styled } from "@mui/material/styles";
+import { ListItemButton as ListItemButtonBase } from "../../components/ListItemButton";
 
 export const ListItemButton = styled(ListItemButtonBase)(({ theme }) => ({
   height: 48,
@@ -11,6 +11,6 @@ export const ListItemButton = styled(ListItemButtonBase)(({ theme }) => ({
 export const ListItemText = styled(MuiListItemText)({
   [`.${listItemTextClasses.primary}`]: {
     fontWeight: 400,
-    fontSize: '1rem',
+    fontSize: "1rem",
   },
 });

@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { useTokenBalances } from './useTokenBalances';
+import { useMemo } from "react";
+import { useTokenBalances } from "./useTokenBalances";
 
 export const useTokenAddressBalance = (
   chainId?: number,

@@ -1,10 +1,10 @@
-import { Box, Tooltip, Typography } from '@mui/material';
-import { useLocation } from 'react-router-dom';
-import { version } from '../../config/version';
-import { useWidgetConfig } from '../../providers';
-import { HiddenUI } from '../../types';
-import { navigationRoutes } from '../../utils';
-import { Link } from './PoweredBy.style';
+import { Box, Tooltip, Typography } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { version } from "../../config/version";
+import { useWidgetConfig } from "../../providers";
+import { HiddenUI } from "../../types";
+import { navigationRoutes } from "../../utils";
+import { Link } from "./PoweredBy.style";
 
 export const PoweredBy: React.FC = () => {
   const { hiddenUI } = useWidgetConfig();
@@ -21,9 +21,9 @@ export const PoweredBy: React.FC = () => {
       pt={1}
       pb={hiddenUI?.includes(HiddenUI.PoweredBy) ? 1 : 2}
       sx={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'flex-end',
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
       }}
     >
       {!hiddenUI?.includes(HiddenUI.PoweredBy) ? (

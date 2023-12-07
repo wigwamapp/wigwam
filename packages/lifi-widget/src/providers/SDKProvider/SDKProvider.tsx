@@ -1,8 +1,8 @@
-import type { ConfigUpdate } from '@lifi/sdk';
-import { LiFi } from '@lifi/sdk';
-import { createContext, useContext, useMemo } from 'react';
-import { version } from '../../config/version';
-import { useWidgetConfig } from '../WidgetProvider';
+import type { ConfigUpdate } from "@lifi/sdk";
+import { LiFi } from "@lifi/sdk";
+import { createContext, useContext, useMemo } from "react";
+import { version } from "../../config/version";
+import { useWidgetConfig } from "../WidgetProvider";
 
 let lifi: LiFi;
 

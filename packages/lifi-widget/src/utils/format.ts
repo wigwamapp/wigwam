@@ -1,4 +1,4 @@
-import Big from 'big.js';
+import Big from "big.js";
 
 // JavaScript numbers use exponential notation for positive exponents of 21 and above. We need more.
 Big.PE = 42;
@@ -11,7 +11,7 @@ Big.NE = -42;
  * @returns formatted amount.
  */
 export const formatTokenAmount = (
-  amount: string = '0',
+  amount: string = "0",
   decimals: number = 0,
   decimalPlaces: number = 3,
 ) => {
@@ -21,7 +21,7 @@ export const formatTokenAmount = (
   }
   const parsedAmount = parseFloat(shiftedAmount);
   if (parsedAmount === 0 || isNaN(Number(shiftedAmount))) {
-    return '0';
+    return "0";
   }
 
   const absAmount = Math.abs(parsedAmount);
@@ -33,8 +33,8 @@ export const formatTokenAmount = (
 };
 
 export const formatSlippage = (
-  slippage: string = '',
-  defaultValue: string = '',
+  slippage: string = "",
+  defaultValue: string = "",
   returnInitial: boolean = false,
 ): string => {
   if (!slippage) {
@@ -48,7 +48,7 @@ export const formatSlippage = (
     return defaultValue;
   }
   if (parsedSlippage > 100) {
-    return '100';
+    return "100";
   }
   if (parsedSlippage < 0) {
     return Math.abs(parsedSlippage).toString();
@@ -67,27 +67,27 @@ export const formatInputAmount = (
   if (!amount) {
     return amount;
   }
-  let formattedAmount = amount.replaceAll(',', '.');
-  if (formattedAmount.startsWith('.')) {
-    formattedAmount = '0' + formattedAmount;
+  let formattedAmount = amount.replaceAll(",", ".");
+  if (formattedAmount.startsWith(".")) {
+    formattedAmount = "0" + formattedAmount;
   }
   const parsedAmount = parseFloat(formattedAmount);
   if (isNaN(Number(formattedAmount)) && !isNaN(parsedAmount)) {
     return parsedAmount.toString();
   }
   if (isNaN(Math.abs(Number(formattedAmount)))) {
-    return '';
+    return "";
   }
   if (returnInitial) {
     return formattedAmount;
   }
-  let [integer, fraction = ''] = formattedAmount.split('.');
+  let [integer, fraction = ""] = formattedAmount.split(".");
   if (decimals !== null && fraction.length > decimals) {
     fraction = fraction.slice(0, decimals);
   }
-  integer = integer.replace(/^0+|-/, '');
-  fraction = fraction.replace(/(0+)$/, '');
-  return `${integer || (fraction ? '0' : '')}${fraction ? `.${fraction}` : ''}`;
+  integer = integer.replace(/^0+|-/, "");
+  fraction = fraction.replace(/(0+)$/, "");
+  return `${integer || (fraction ? "0" : "")}${fraction ? `.${fraction}` : ""}`;
 };
 
 export const formatTokenPrice = (amount?: string, price?: string) => {

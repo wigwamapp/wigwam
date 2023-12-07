@@ -1,10 +1,10 @@
-import { List, Typography } from '@mui/material';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import type { FC } from 'react';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { TokenListItem, TokenListItemSkeleton } from './TokenListItem';
-import type { VirtualizedTokenListProps } from './types';
+import { List, Typography } from "@mui/material";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import type { FC } from "react";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { TokenListItem, TokenListItemSkeleton } from "./TokenListItem";
+import type { VirtualizedTokenListProps } from "./types";
 
 export const VirtualizedTokenList: FC<VirtualizedTokenListProps> = ({
   tokens,
@@ -54,7 +54,7 @@ export const VirtualizedTokenList: FC<VirtualizedTokenListProps> = ({
 
   useEffect(() => {
     if (getVirtualItems().length) {
-      scrollToIndex(0, { align: 'start' });
+      scrollToIndex(0, { align: "start" });
     }
   }, [scrollToIndex, chainId, getVirtualItems]);
 
@@ -92,7 +92,7 @@ export const VirtualizedTokenList: FC<VirtualizedTokenListProps> = ({
                   px={2}
                   pb={1.25}
                 >
-                  {t('main.featuredTokens')}
+                  {t("main.featuredTokens")}
                 </Typography>
               ) : null
             }
@@ -108,7 +108,7 @@ export const VirtualizedTokenList: FC<VirtualizedTokenListProps> = ({
                   px={2}
                   py={1.25}
                 >
-                  {t('main.otherTokens')}
+                  {t("main.otherTokens")}
                 </Typography>
               ) : null
             }

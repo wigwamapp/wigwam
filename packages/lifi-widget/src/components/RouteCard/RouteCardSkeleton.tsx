@@ -1,8 +1,8 @@
-import type { BoxProps } from '@mui/material';
-import { Box, Skeleton } from '@mui/material';
-import { useWidgetConfig } from '../../providers';
-import { Card } from '../Card';
-import type { RouteCardSkeletonProps } from './types';
+import type { BoxProps } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
+import { useWidgetConfig } from "../../providers";
+import { Card } from "../Card";
+import type { RouteCardSkeletonProps } from "./types";
 
 export const RouteCardSkeleton: React.FC<RouteCardSkeletonProps & BoxProps> = ({
   variant,
@@ -12,7 +12,7 @@ export const RouteCardSkeleton: React.FC<RouteCardSkeletonProps & BoxProps> = ({
 
   const cardContent = (
     <Box flex={1}>
-      {subvariant !== 'refuel' && subvariant !== 'nft' ? (
+      {subvariant !== "refuel" && subvariant !== "nft" ? (
         <Box display="flex" alignItems="center" mb={2}>
           <Skeleton
             variant="rectangular"
@@ -50,7 +50,7 @@ export const RouteCardSkeleton: React.FC<RouteCardSkeletonProps & BoxProps> = ({
     </Box>
   );
 
-  return subvariant === 'refuel' || variant === 'cardless' ? (
+  return subvariant === "refuel" || variant === "cardless" ? (
     cardContent
   ) : (
     <Card indented {...other}>

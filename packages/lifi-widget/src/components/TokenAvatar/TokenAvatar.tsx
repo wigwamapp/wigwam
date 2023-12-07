@@ -1,9 +1,9 @@
-import type { Chain, StaticToken } from '@lifi/sdk';
-import type { SxProps, Theme } from '@mui/material';
-import { Avatar, Badge, Skeleton } from '@mui/material';
-import { useChain, useToken } from '../../hooks';
-import { SmallAvatar, SmallAvatarSkeleton } from '../SmallAvatar';
-import { AvatarDefault, AvatarDefaultBadge } from './TokenAvatar.style';
+import type { Chain, StaticToken } from "@lifi/sdk";
+import type { SxProps, Theme } from "@mui/material";
+import { Avatar, Badge, Skeleton } from "@mui/material";
+import { useChain, useToken } from "../../hooks";
+import { SmallAvatar, SmallAvatarSkeleton } from "../SmallAvatar";
+import { AvatarDefault, AvatarDefaultBadge } from "./TokenAvatar.style";
 
 export const TokenAvatarFallback: React.FC<{
   token?: StaticToken;
@@ -34,7 +34,7 @@ export const TokenAvatarBase: React.FC<{
   return (
     <Badge
       overlap="circular"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       badgeContent={
         chain && !isLoading ? (
           <SmallAvatar src={chain.logoURI} alt={chain.name}>
@@ -82,7 +82,7 @@ export const TokenAvatarDefault: React.FC<{
   return (
     <Badge
       overlap="circular"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       badgeContent={<AvatarDefaultBadge width={16} height={16} />}
       sx={sx}
     >

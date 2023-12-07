@@ -1,8 +1,8 @@
-import { useWatch } from 'react-hook-form';
-import { useChain, useToken } from '../../hooks';
-import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
-import { TokenAvatar, TokenAvatarDefault } from '../TokenAvatar';
+import { useWatch } from "react-hook-form";
+import { useChain, useToken } from "../../hooks";
+import type { FormTypeProps } from "../../providers";
+import { FormKeyHelper } from "../../providers";
+import { TokenAvatar, TokenAvatarDefault } from "../TokenAvatar";
 
 export const AmountInputStartAdornment: React.FC<FormTypeProps> = ({
   formType,
