@@ -13,7 +13,7 @@
     "lint": "eslint src --ext .js,.mjs,.jsx,.ts,.tsx --color",
     "ts": "tsc --pretty",
     "generate-types": "typechain --target=ethers-v6 --out-dir src/abi-types src/abi/*.json > /dev/null 2>&1",
-    "postinstall": "husky install; yarn generate-types; cd packages/lifi-widget && yarn postinstall",
+    "postinstall": "husky install; yarn generate-types",
     "format-all": "prettier --write .",
     "npm-audit": "npx synp --source-file yarn.lock && npm audit; rm package-lock.json",
     "check-updates": "npx npm-check-updates"
