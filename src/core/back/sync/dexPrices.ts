@@ -5,8 +5,12 @@ import BigNumber from "bignumber.js";
 import { getAddress, isAddress } from "ethers";
 import { withOfflineCache } from "lib/ext/offlineCache";
 
-export type CGPriceRecord = { usd: number; usd_24h_change?: number };
-export type CoinGeckoPrices = Record<string, CGPriceRecord>;
+export type DexTokenPrice = {
+  usd: number;
+  usd_24h_change?: number;
+  usd_reserve?: string;
+};
+export type DexPrices = Record<string, DexTokenPrice>;
 
 const THREE_MIN = 3 * 60_000;
 const ONE_DAY = 24 * 60 * 60_000;
@@ -21,19 +25,21 @@ export const coinGeckoTerminalApi = axios.create({
   timeout: 90_000,
 });
 
-const tokenPricesCache = new ExpiryMap<string, CGPriceRecord>(THREE_MIN);
+export const dexScreenerApi = axios.create({
+  baseURL: "https://api.dexscreener.com/latest",
+  timeout: 90_000,
+});
 
-export async function getCoinGeckoPrices(
-  chainId: number,
-  tokenAddresses: string[],
-) {
+const tokenPricesCache = new ExpiryMap<string, DexTokenPrice>(THREE_MIN);
+
+export async function getDexPrices(tokenAddresses: string[]) {
   try {
     if (tokenAddresses.length === 0) return {};
     if (tokenAddresses.length > 1000) return {}; // To much
 
     const allCoinIds = await getCoinGeckoCoinIds();
 
-    const data: CoinGeckoPrices = {};
+    const data: DexPrices = {};
     const tokensToRefresh: { tokenAddress: string; coinId: string }[] = [];
     const coinsToRefreshSet = new Set<string>();
     const missedAddresses = new Set<string>();
@@ -57,14 +63,14 @@ export async function getCoinGeckoPrices(
 
     // Coin gecko - simple
     if (coinsToRefreshSet.size > 0) {
-      const freshCoinPrices: CoinGeckoPrices = {};
+      const freshCoinPrices: DexPrices = {};
       const coinsToRefresh = Array.from(coinsToRefreshSet);
 
       while (coinsToRefresh.length > 0) {
         const nextCoins = coinsToRefresh.splice(0, 100);
 
         const res = await coinGeckoApi
-          .get<CoinGeckoPrices>("/simple/price", {
+          .get<DexPrices>("/simple/price", {
             params: {
               ids: nextCoins.join(),
               vs_currencies: "USD",
@@ -90,39 +96,51 @@ export async function getCoinGeckoPrices(
       }
     }
 
-    // Coin gecko terminal - simple
-    if (missedAddresses.size > 0 && missedAddresses.size <= 150) {
-      const cgtNetworkIds = await getCoinGeckoTerminalNetworkIds();
-      const networkName = cgtNetworkIds[chainId];
+    // Dex screener
+    if (missedAddresses.size > 0 && missedAddresses.size <= 500) {
+      const addressesToRefresh = Array.from(missedAddresses);
 
-      if (networkName) {
-        const addressesToRefresh = Array.from(missedAddresses);
+      while (addressesToRefresh.length > 0) {
+        const nextAddresses = addressesToRefresh.splice(0, 30);
 
-        while (addressesToRefresh.length > 0) {
-          const nextAddresses = addressesToRefresh.splice(0, 30);
+        const res = await dexScreenerApi
+          .get(`/dex/tokens/${nextAddresses.join()}`)
+          .catch(() => null);
 
-          const res = await coinGeckoTerminalApi
-            .get(
-              `/networks/${networkName}/tokens/multi/${nextAddresses.join()}`,
-            )
-            .catch(() => null);
+        const dsPairs = res?.data?.pairs;
+        if (!dsPairs) continue;
 
-          const cgtTokenInfos = res?.data?.data;
-          if (!cgtTokenInfos) continue;
+        for (const pair of dsPairs) {
+          const reserveBN = new BigNumber(pair.liquidity?.usd);
 
-          for (const { attributes: atrs } of cgtTokenInfos) {
-            if (new BigNumber(atrs.total_reserve_in_usd).isLessThan(1000)) {
-              continue;
-            }
-
-            const tokenAddress = getAddress(atrs.address);
-            const usdPrice = new BigNumber(atrs.price_usd).toNumber();
-            if (!usdPrice) continue;
-
-            const prices = { usd: usdPrice };
-            data[tokenAddress] = prices;
-            tokenPricesCache.set(tokenAddress, prices);
+          if (reserveBN.isNaN() || reserveBN.isLessThan(100)) {
+            continue;
           }
+
+          const tokenAddress = getAddress(pair.baseToken?.address);
+          const existing = data[tokenAddress];
+
+          if (
+            existing?.usd_reserve &&
+            new BigNumber(existing.usd_reserve).isGreaterThan(reserveBN)
+          ) {
+            continue;
+          }
+
+          const usdPrice = new BigNumber(pair.priceUsd).toNumber();
+          if (!usdPrice) continue;
+
+          const usdPriceChange =
+            new BigNumber(pair.priceChange?.h24).toNumber() || undefined;
+
+          const price: DexTokenPrice = {
+            usd: usdPrice,
+            usd_24h_change: usdPriceChange,
+            usd_reserve: reserveBN.toString(),
+          };
+
+          data[tokenAddress] = price;
+          tokenPricesCache.set(tokenAddress, price);
         }
       }
     }
@@ -154,7 +172,7 @@ export const getCoinGeckoPlatformPrices = memoize(
   async () => {
     const platformIds = await getCoinGeckoPlatformIds();
 
-    const { data } = await coinGeckoApi.get<CoinGeckoPrices>("/simple/price", {
+    const { data } = await coinGeckoApi.get<DexPrices>("/simple/price", {
       params: {
         ids: Object.values(platformIds)
           .map((p) => p.native_coin_id)

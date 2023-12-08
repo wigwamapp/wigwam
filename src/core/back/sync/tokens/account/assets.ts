@@ -11,7 +11,7 @@ import {
 import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 
-import { getCoinGeckoPrices } from "../../coinGecko";
+import { getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
 import { prepareAccountTokensSync } from "./utils";
 import { fetchCxAccountTokens } from "../../indexer";
@@ -145,7 +145,7 @@ export const syncAccountAssets = memoize(
       (t) => parseTokenSlug(t.tokenSlug).address,
     );
 
-    const cgPrices = await getCoinGeckoPrices(chainId, tokenAddresses);
+    const cgPrices = await getDexPrices(tokenAddresses);
 
     if (Object.keys(cgPrices).length > 0) {
       for (let i = 0; i < accTokens.length; i++) {
@@ -163,6 +163,13 @@ export const syncAccountAssets = memoize(
             .div(new BigNumber(10).pow(token.decimals))
             .times(priceUSD)
             .toNumber();
+
+          if (price.usd_reserve) {
+            token.balanceUSD = BigNumber.min(
+              token.balanceUSD,
+              price.usd_reserve,
+            ).toNumber();
+          }
         } else {
           token.balanceUSD = 0;
           delete token.priceUSD;

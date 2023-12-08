@@ -4,7 +4,7 @@ import { storage } from "lib/ext/storage";
 
 import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
 
-import { coinGeckoApi } from "./coinGecko";
+import { coinGeckoApi } from "./dexPrices";
 
 type CoinGeckoRate = {
   name: string;
