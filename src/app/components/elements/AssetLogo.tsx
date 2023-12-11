@@ -29,7 +29,7 @@ const AssetLogo: FC<AssetLogoProps> = ({ asset, ...rest }) => {
 
 export default AssetLogo;
 
-const srcCache = new Map<string, string>();
+const srcCache = new Map<string, string | null>();
 
 const AssetLogoAvatar: FC<
   Omit<ComponentProps<typeof Avatar>, "src"> & {
@@ -54,14 +54,18 @@ const AssetLogoAvatar: FC<
     />
   );
 
-  return srcs.length > 0 ? (
+  const cached = srcCache.get(seed);
+  const src = cached !== null ? cached ?? srcs[srcIndex] : null;
+
+  return src ? (
     <Avatar
-      src={srcCache.get(seed) ?? srcs[srcIndex]}
+      src={src}
       fallbackNode={fallback}
       withBg={false}
       onLoadingStateChange={({ state }) => {
         if (state === "error") {
-          setSrcIndex((i) => (srcs[i + 1] ? i + 1 : i));
+          setSrcIndex((i) => (srcs[i + 1] ? i + 1 : -1));
+          if (!srcs[srcIndex + 1]) srcCache.set(seed, null);
         }
 
         if (state === "loaded" && !srcCache.has(seed)) {

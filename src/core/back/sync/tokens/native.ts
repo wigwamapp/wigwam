@@ -10,7 +10,7 @@ import {
 import { getNetwork } from "core/common/network";
 import * as repo from "core/repo";
 
-import { getCoinGeckoNativeTokenPrice } from "../coinGecko";
+import { getCoinGeckoNativeTokenPrice } from "../dexPrices";
 import { getBalanceFromChain } from "../chain";
 
 export const syncNativeTokens = memoize(
