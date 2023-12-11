@@ -24,6 +24,7 @@ import { IS_FIREFOX } from "app/defaults";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { openInTab } from "app/helpers";
 import { chainIdAtom } from "app/atoms";
+import { useDialog } from "app/hooks/dialog";
 
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
@@ -32,6 +33,8 @@ import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
 import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 import IconedButton from "app/components/elements/IconedButton";
 import FiatAmount from "app/components/elements/FiatAmount";
@@ -53,6 +56,7 @@ const AssetCard = memo(
       ref,
     ) => {
       const setInternalChainId = useSetAtom(chainIdAtom);
+      const { confirm } = useDialog();
 
       const [popoverOpened, setPopoverOpened] = useState(false);
       const {
@@ -76,6 +80,32 @@ const AssetCard = memo(
         },
         [setInternalChainId, chainId],
       );
+
+      const handleHideAsset = useCallback(async () => {
+        const response = await confirm({
+          title: "Hide asset",
+          content: (
+            <>
+              <p className="mb-4 mx-auto text-center">
+                Are you sure you want to hide <b>{asset.symbol}</b>?
+              </p>
+              <p className="mx-auto text-center">
+                You can turn it back on the{" "}
+                <span className="inline-flex">
+                  &quot;
+                  <ControlIcon /> Manage Assets&quot;
+                </span>{" "}
+                at any time.
+              </p>
+            </>
+          ),
+          yesButtonText: "Hide",
+        });
+
+        if (response) {
+          toggleTokenStatus(asset);
+        }
+      }, [confirm, asset]);
 
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
@@ -270,6 +300,9 @@ const AssetCard = memo(
               >
                 Transfer
               </PopoverButton>
+              <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
+                Hide
+              </PopoverButton>
               <PopoverButton
                 Icon={SwapIcon}
                 onClick={() => openLink({ page: Page.Swap })}
@@ -322,7 +355,7 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
     )}
     {...rest}
   >
-    <Icon className="mr-2" />
+    <Icon className="mr-2 w-6 h-auto" />
     {children}
   </button>
 );
