@@ -7,7 +7,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
-
+import { toggleTokenStatus } from "core/common/tokens";
 import { coinGeckoPlatformIds, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -19,6 +19,7 @@ import {
   useLazyNetwork,
   useTokenActivitiesSync,
 } from "app/hooks";
+import { useDialog } from "app/hooks/dialog";
 import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
@@ -33,6 +34,8 @@ import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 import PriceChange from "./PriceChange";
 import TokenActivity from "./TokenActivity";
@@ -48,6 +51,7 @@ export enum TokenStandardValue {
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
+  const { confirm } = useDialog();
 
   const chainId = useChainId();
   const { currentAccount } = useAccounts();
@@ -96,6 +100,32 @@ const AssetInfo: FC = () => {
     status === TokenStatus.Native
       ? cgPlatfromIds[chainId]?.native_coin_id
       : address;
+
+  const handleHideAsset = async () => {
+    const response = await confirm({
+      title: "Hide asset",
+      content: (
+        <>
+          <p className="mb-4 mx-auto text-center">
+            Are you sure you want to hide <b>{tokenInfo?.symbol}</b>?
+          </p>
+          <p className="mx-auto text-center">
+            You can turn it back on the{" "}
+            <span className="inline-flex">
+              &quot;
+              <ControlIcon /> Manage Assets&quot;
+            </span>{" "}
+            at any time.
+          </p>
+        </>
+      ),
+      yesButtonText: "Hide",
+    });
+
+    if (response && tokenInfo) {
+      toggleTokenStatus(tokenInfo);
+    }
+  };
 
   return (
     <OverflowProvider>
@@ -154,9 +184,18 @@ const AssetInfo: FC = () => {
                         <IconedButton
                           aria-label="View asset in CoinGecko"
                           Icon={CoinGeckoIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem]"
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
                           href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                        />
+                      )}
+                      {status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label="Hide token"
+                          Icon={EyeIcon}
+                          onClick={() => handleHideAsset()}
+                          className="!w-6 !h-6 min-w-[1.5rem]"
+                          iconClassName="!w-[1.125rem]"
                         />
                       )}
                     </div>
