@@ -5,13 +5,13 @@ import { useWidgetConfig } from '../providers';
 import type { WidgetVariant } from '../types';
 import { ElementId, createElementId } from '../utils';
 
-export const maxHeight = 680;
+export const maxHeight = '80vh';
 
 export const AppExpandedContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'variant',
 })<{ variant?: WidgetVariant }>(({ variant }) => ({
   display: 'flex',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'start',
   flex: 1,
   height: variant === 'drawer' ? 'none' : maxHeight,

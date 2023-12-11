@@ -115,7 +115,7 @@ export const useRouteExecution = ({
         updateRouteHook,
         switchChainHook,
         acceptExchangeRateUpdateHook,
-        infiniteApproval: false,
+        infiniteApproval: true,
         executeInBackground,
       });
     },
@@ -144,7 +144,7 @@ export const useRouteExecution = ({
           updateRouteHook,
           switchChainHook,
           acceptExchangeRateUpdateHook,
-          infiniteApproval: false,
+          infiniteApproval: true,
           executeInBackground,
         },
       );
