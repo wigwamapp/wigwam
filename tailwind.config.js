@@ -7,7 +7,7 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          darkbg: "#13191F",
+          darkbg: "#13191F", // +
           darkover: "#191B20",
           darktext: "#11142D",
           lightgray: "#E4E4E4",
@@ -17,9 +17,9 @@ module.exports = {
           dark: "#101123",
           darkblue: "#07081B",
           darklight: "#2A2C3F",
-          light: "#F8FCFD",
+          light: "#F8FCFD", // +
           main: "#CCF9FF", // +
-          inactivelight: "#93ACAF",
+          inactivelight: "#BFC8CA", // +
           font: "#BCC2DB",
           inactivedark: "#6B8486",
           gray: "#AAABB1",
