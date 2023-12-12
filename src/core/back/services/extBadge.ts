@@ -20,5 +20,5 @@ export async function startExtBadge() {
 }
 
 const setBadgeBackgroundColor = memoizeOne(() =>
-  browser.action.setBadgeBackgroundColor({ color: "#13191F" }),
+  browser.action.setBadgeBackgroundColor({ color: "#181A1F" }),
 );

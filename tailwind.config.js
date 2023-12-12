@@ -7,11 +7,12 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          darkbg: "#13191F",
+          darkaccent: "#0D1311",
+          darkbg: "#181A1F", // #13191F
           lightgray: "#E4E4E4",
           redone: "#80EF6E",
           redtwo: "#80EF6E",
-          dark: "#13191F",
+          dark: "#181A1F",
           darkblue: "#0E1314",
           darklight: "#2A3C3F",
           light: "#F8FCFD",
@@ -122,8 +123,8 @@ module.exports = {
         },
       },
       boxShadow: {
-        buttonaccent: "0px 5px 25px rgba(255, 0, 45, 0.25)",
-        buttonsecondary: "0px 4px 15px rgba(204, 214, 255, 0.07)",
+        buttonaccent: "0px 5px 25px rgba(128, 239, 110, 0.15)",
+        buttonsecondary: "0px 4px 15px rgba(211, 255, 204, 0.07)",
         addaccountmodal:
           "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(114, 114, 114, 0.15)",
         receiveqrcode:

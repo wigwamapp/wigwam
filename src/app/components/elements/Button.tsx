@@ -123,10 +123,12 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
       "overflow-hidden",
       "py-3 px-4",
       theme !== "clean" && "min-w-[10rem]",
-      "text-brand-light text-base font-bold",
-      theme === "primary" && "bg-buttonaccent bg-opacity-90",
+      !(theme === "primary" || theme === "primary-reverse") &&
+        "text-brand-light",
+      "text-base font-bold",
+      theme === "primary" && "bg-brand-redone text-brand-darkaccent bg-opacity",
       theme === "primary-reverse" &&
-        "bg-buttonaccent bg-opacity-100 shadow-buttonaccent",
+        "bg-brand-redone text-brand-darkaccent bg-opacity shadow-buttonaccent",
       theme === "secondary" && "bg-brand-main bg-opacity-10",
       "rounded-[.375rem]",
       "inline-flex justify-center",
