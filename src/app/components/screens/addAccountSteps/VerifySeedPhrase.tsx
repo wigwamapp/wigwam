@@ -148,7 +148,10 @@ const VerifySeedPhrase = memo(() => {
               },
             ];
 
-            Object.assign(stateRef.current, { importAddresses });
+            Object.assign(stateRef.current, {
+              importAddresses,
+              derivationPath: "m/44'/60'/0'/0",
+            });
             navigateToStep(AddAccountStep.ConfirmAccounts);
           }
         } catch (err: any) {
