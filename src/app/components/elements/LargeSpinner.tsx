@@ -11,7 +11,7 @@ const LargeSpinner = memo<{ className?: string }>(({ className }) => (
       cx="60"
       cy="60"
       r="54"
-      stroke="#CCD6FF"
+      stroke="#CCF9FF"
       strokeOpacity="0.15"
       strokeWidth="12"
     />

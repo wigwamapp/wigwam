@@ -24,7 +24,7 @@
 </mask>
 <g mask="url(#mask0_4976_48933)">
 <g filter="url(#filter4_f_4976_48933)">
-<path d="M273.636 25C273.636 11.1929 284.829 0 298.636 0H469.091V50H298.636C284.829 50 273.636 38.8071 273.636 25V25Z" fill="#CCD6FF" fill-opacity="0.1"/>
+<path d="M273.636 25C273.636 11.1929 284.829 0 298.636 0H469.091V50H298.636C284.829 50 273.636 38.8071 273.636 25V25Z" fill="#CCF9FF" fill-opacity="0.1"/>
 <path d="M298.636 0.5H468.591V49.5H298.636C285.105 49.5 274.136 38.531 274.136 25C274.136 11.469 285.105 0.5 298.636 0.5Z" stroke="#323453"/>
 </g>
 </g>
@@ -39,10 +39,10 @@
 <circle cx="301" cy="25" r="9" fill="url(#paint1_linear_4976_48933)"/>
 </g>
 <g filter="url(#filter7_ii_4976_48933)">
-<circle cx="151.954" cy="24.9545" r="14.9545" fill="#CCD6FF" fill-opacity="0.2"/>
+<circle cx="151.954" cy="24.9545" r="14.9545" fill="#CCF9FF" fill-opacity="0.2"/>
 </g>
 <g filter="url(#filter8_ii_4976_48933)">
-<circle cx="300.954" cy="24.9545" r="14.9545" fill="#CCD6FF" fill-opacity="0.2"/>
+<circle cx="300.954" cy="24.9545" r="14.9545" fill="#CCF9FF" fill-opacity="0.2"/>
 </g>
 </g>
 <defs>
