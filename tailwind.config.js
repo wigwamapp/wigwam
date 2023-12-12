@@ -8,9 +8,9 @@ module.exports = {
       colors: {
         brand: {
           darkbg: "#13191F", // +
-          lightgray: "#E4E4E4",
-          redone: "#80EF6E",
-          redtwo: "#80EF6E",
+          lightgray: "#E4E4E4", // +
+          redone: "#80EF6E", // +
+          redtwo: "#80EF6E", // +
           dark: "#101123",
           darkblue: "#07191B", // +
           darklight: "#2A2C3F",
@@ -136,7 +136,7 @@ module.exports = {
       backgroundImage: {
         buttonaccent:
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",
-        radio: "linear-gradient(275.43deg, #FF002D 13.81%, #FF7F44 111.89%)",
+        radio: "linear-gradient(275.43deg, #80EF6E 13.81%, #80EF6E 111.89%)",
         activity: "linear-gradient(220deg, #80EF6E 0.11%, #80EF6E 90.88%)",
         addaccountcontinue:
           "linear-gradient(90.44deg, rgba(13, 14, 32, 0.95) 2.88%, rgba(15, 16, 34, 0.95) 21.54%, rgba(13, 14, 31, 0.95) 41.08%, rgba(17, 18, 36, 0.95) 81.76%, rgba(16, 17, 35, 0.95) 97.51%)",

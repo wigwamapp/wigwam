@@ -100,16 +100,16 @@
 <feBlend mode="normal" in2="effect1_innerShadow_5174_50135" result="effect2_innerShadow_5174_50135"/>
 </filter>
 <linearGradient id="paint0_linear_5174_50135" x1="44.9235" y1="8.09649" x2="35.6593" y2="19.1372" gradientUnits="userSpaceOnUse">
-<stop offset="0.00121575" stop-color="#FF002D"/>
-<stop offset="1" stop-color="#FF7F44"/>
+<stop offset="0.00121575" stop-color="#80EF6E"/>
+<stop offset="1" stop-color="#80EF6E"/>
 </linearGradient>
 <linearGradient id="paint1_linear_5174_50135" x1="39.0171" y1="8.51549" x2="32.1042" y2="12.5766" gradientUnits="userSpaceOnUse">
-<stop offset="0.00121575" stop-color="#FF002D"/>
-<stop offset="1" stop-color="#FF7F44"/>
+<stop offset="0.00121575" stop-color="#80EF6E"/>
+<stop offset="1" stop-color="#80EF6E"/>
 </linearGradient>
 <linearGradient id="paint2_linear_5174_50135" x1="44.9235" y1="8.09649" x2="35.6593" y2="19.1372" gradientUnits="userSpaceOnUse">
-<stop offset="0.00121575" stop-color="#FF002D"/>
-<stop offset="1" stop-color="#FF7F44"/>
+<stop offset="0.00121575" stop-color="#80EF6E"/>
+<stop offset="1" stop-color="#80EF6E"/>
 </linearGradient>
 <clipPath id="clip0_5174_50135">
 <rect width="48" height="47.9996" fill="white"/>

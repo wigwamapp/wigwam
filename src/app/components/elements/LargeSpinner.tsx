@@ -28,8 +28,8 @@ const LargeSpinner = memo<{ className?: string }>(({ className }) => (
         y2="-40.3675"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stopColor="#FF002D" />
-        <stop offset="1" stopColor="#FF7F44" />
+        <stop stopColor="#80EF6E" />
+        <stop offset="1" stopColor="#80EF6E" />
       </linearGradient>
     </defs>
   </svg>

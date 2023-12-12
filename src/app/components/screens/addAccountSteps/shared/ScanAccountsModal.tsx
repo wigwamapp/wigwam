@@ -276,8 +276,8 @@ const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
         style={{ transition: "all 0.5s" }}
       />
       <linearGradient id="loaderLinearColors" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="50%" stopColor="#FF002D" />
-        <stop offset="100%" stopColor="#FF7F44" />
+        <stop offset="50%" stopColor="#80EF6E" />
+        <stop offset="100%" stopColor="#80EF6E" />
       </linearGradient>
     </svg>
   );
