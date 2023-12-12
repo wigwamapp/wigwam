@@ -99,11 +99,16 @@ const ConfirmAccounts = memo<{
     return accounts;
   }, [stateRef, addMore, findFirstUnusedAccount]);
 
+  const oneSimpleAccount = ![
+    AccountSource.SeedPhrase,
+    AccountSource.Ledger,
+  ].includes(accountsToAdd?.[0]?.source);
+
   useEffect(() => {
-    if (!accountsToAdd.length || (addMore && !rootNeuterExtendedKey)) {
+    if (!accountsToAdd.length) {
       reset();
     }
-  }, [addMore, accountsToAdd, rootNeuterExtendedKey, reset]);
+  }, [accountsToAdd, reset]);
 
   const handleContinue = useCallback(async () => {
     try {
@@ -299,21 +304,23 @@ const ConfirmAccounts = memo<{
           })}
         </div>
 
-        <div className="mt-5 w-full flex flex-col items-center justify-center">
-          <Button
-            theme="tertiary"
-            onClick={handleEditWallets}
-            className={classNames(
-              "text-sm text-brand-light",
-              "!py-1 !px-2 !min-w-0",
-              "!font-normal",
-              "items-center",
-              "opacity-50 hover:opacity-90 focus:opacity-90",
-            )}
-          >
-            Edit wallets
-          </Button>
-        </div>
+        {!oneSimpleAccount && (
+          <div className="mt-5 w-full flex flex-col items-center justify-center">
+            <Button
+              theme="tertiary"
+              onClick={handleEditWallets}
+              className={classNames(
+                "text-sm text-brand-light",
+                "!py-1 !px-2 !min-w-0",
+                "!font-normal",
+                "items-center",
+                "opacity-50 hover:opacity-90 focus:opacity-90",
+              )}
+            >
+              Edit wallets
+            </Button>
+          </div>
+        )}
       </div>
 
       {addMore && (

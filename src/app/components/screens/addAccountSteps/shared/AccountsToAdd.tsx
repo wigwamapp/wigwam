@@ -67,6 +67,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   const { getNextAccountName } = useNextAccountName();
 
   const derivationPath = stateRef.current.derivationPath;
+  const alreadyAddedAccounts: any[] = stateRef.current.importAddresses ?? [];
 
   const preparedNetworks = useMemo(
     () => networks.filter(({ type }) => type === "mainnet"),
@@ -92,7 +93,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
     [allNetworks],
   );
 
-  const addressesToAddRef = useRef(new Set<string>());
+  const addressesToAddRef = useRef(
+    new Set<string>(alreadyAddedAccounts.map((item) => item.address)),
+  );
   const addressesNamesRef = useRef(new Map<string, string>());
   const forceUpdate = useForceUpdate();
 
