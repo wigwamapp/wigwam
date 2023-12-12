@@ -10,7 +10,7 @@ import { AccountSource, AddAccountParams, WalletStatus } from "core/types";
 import { TEvent, addAccounts, trackEvent } from "core/client";
 import { generatePreviewHDNodes } from "core/common";
 
-import { NextAddAccountStep } from "app/nav";
+import { AddAccountStep } from "app/nav";
 import { useNextAccountName } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
@@ -124,7 +124,7 @@ const ConfirmAccounts = memo<{
 
       if (initialSetup) {
         Object.assign(stateRef.current, { addAccountsParams });
-        navigateToStep(NextAddAccountStep.SetupPassword);
+        navigateToStep(AddAccountStep.SetupPassword);
       } else {
         await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
         setAccModalOpened([false]);
@@ -155,7 +155,7 @@ const ConfirmAccounts = memo<{
       stateRef.current.derivationPath = derivationPath;
     }
 
-    navigateToStep(NextAddAccountStep.EditAccounts);
+    navigateToStep(AddAccountStep.EditAccounts);
   }, [addMore, stateRef, navigateToStep, accountsToAdd, derivationPath]);
 
   return (
@@ -323,7 +323,7 @@ const ConfirmAccounts = memo<{
               Icon: ImportIcon,
               children: "Import",
               action: () => {
-                navigateToStep(NextAddAccountStep.ImportPrivateKey);
+                navigateToStep(AddAccountStep.ImportPrivateKey);
               },
             },
             "space" as const,

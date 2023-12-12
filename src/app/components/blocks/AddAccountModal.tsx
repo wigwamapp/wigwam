@@ -14,10 +14,10 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { WalletStatus } from "core/types";
 
 import { IS_FIREFOX } from "app/defaults";
-import { NextAddAccountStep } from "app/nav";
+import { AddAccountStep } from "app/nav";
 import {
   addAccountModalAtom,
-  addAccountStepAtomNext,
+  addAccountStepAtom,
   walletStatusAtom,
 } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
@@ -30,7 +30,7 @@ import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
-  const accountStep = useAtomValue(addAccountStepAtomNext);
+  const accountStep = useAtomValue(addAccountStepAtom);
   const walletStatus = useAtomValue(walletStatusAtom);
 
   const { confirm } = useDialog();
@@ -38,7 +38,7 @@ const AddAccountModal = memo(() => {
 
   const handleBackButton = useCallback<MouseEventHandler<HTMLButtonElement>>(
     async (e) => {
-      if (accountStep === NextAddAccountStep.VerifySeedPhrase) {
+      if (accountStep === AddAccountStep.VerifySeedPhrase) {
         const res = await confirm({
           title: "Secret phrase creation",
           content: (
@@ -63,9 +63,9 @@ const AddAccountModal = memo(() => {
     async (open: boolean) => {
       if (
         [
-          NextAddAccountStep.VerifySeedPhrase,
-          NextAddAccountStep.ConfirmAccounts,
-          NextAddAccountStep.SetupPassword,
+          AddAccountStep.VerifySeedPhrase,
+          AddAccountStep.ConfirmAccounts,
+          AddAccountStep.SetupPassword,
         ].includes(accountStep)
       ) {
         const res = await confirm({
@@ -171,8 +171,8 @@ const AddAccountModal = memo(() => {
                 )}
 
                 <BackButton
-                  navAtom={addAccountStepAtomNext}
-                  initialValue={NextAddAccountStep.AddAccountInitial}
+                  navAtom={addAccountStepAtom}
+                  initialValue={AddAccountStep.AddAccountInitial}
                   onClick={handleBackButton}
                   className="absolute top-4 left-4"
                 />

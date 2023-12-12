@@ -6,7 +6,7 @@ import { WalletStatus } from "core/types";
 
 import { hasSeedPhraseAtom, walletStatusAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
-import { NextAddAccountStep } from "app/nav";
+import { AddAccountStep } from "app/nav";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import { ReactComponent as CreateIcon } from "app/icons/addaccount-create.svg";
 import { ReactComponent as ImportIcon } from "app/icons/addaccount-import.svg";
@@ -57,7 +57,7 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
             Icon: CreateIcon,
             action: () => {
               stateRef.current.addSeedPhraseType = "craete";
-              navigateToStep(NextAddAccountStep.CreateSeedPhrase);
+              navigateToStep(AddAccountStep.CreateSeedPhrase);
             },
           },
           "divider",
@@ -67,7 +67,7 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
             Icon: ImportIcon,
             action: () => {
               stateRef.current.addSeedPhraseType = "import";
-              navigateToStep(NextAddAccountStep.ImportSeedPhrase);
+              navigateToStep(AddAccountStep.ImportSeedPhrase);
             },
           },
           {
