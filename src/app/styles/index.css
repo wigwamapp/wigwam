@@ -27,16 +27,19 @@ a {
     ),
     #101123; */
 
-  background-color: #151918; /*#101918;*/
+  /* @apply bg-gray-900; */
+  /* background-color: #151918; #101918; */
+  /* background-color: #212121; */
+  @apply bg-brand-darkbg;
 }
 
 .brandbg-main-fallback,
 .brandbg-popup-fallback {
-  @apply bg-gray-900;
+  @apply bg-brand-darkbg;
 }
 
 .brandbg-large-modal {
-  @apply bg-gray-900;
+  @apply bg-brand-darkbg;
 
   /* background: radial-gradient(
       31.72% 37.17% at 85.81% 79.17%,
