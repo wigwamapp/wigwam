@@ -3,7 +3,7 @@ import memoizeOne from "memoize-one";
 import memoize from "mem";
 import { assert } from "lib/system/assert";
 
-import { MessageType, RpcResponse } from "core/types";
+import { ActivitySource, MessageType, RpcResponse } from "core/types";
 
 import { porter } from "./base";
 
@@ -16,8 +16,14 @@ export class ClientProvider extends ethers.JsonRpcApiProvider {
     super(chainId);
   }
 
+  source?: ActivitySource;
+
   getNetwork = memoizeOne(super.getNetwork.bind(this));
   getCode = memoize(super.getCode.bind(this));
+
+  setActivitySource = (source?: ActivitySource) => {
+    this.source = source;
+  };
 
   getUncheckedSigner = memoize(
     (address: string) => new ethers.JsonRpcSigner(this, address),
@@ -58,7 +64,7 @@ export class ClientProvider extends ethers.JsonRpcApiProvider {
     const chainId = this.chainId;
 
     const res = await porter.request(
-      { type, chainId, method, params },
+      { type, chainId, method, params, source: this.source },
       { timeout: 0 },
     );
     assert(res?.type === type);

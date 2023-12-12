@@ -1,7 +1,7 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
-import { Approval, ApprovalResult } from "./activity";
+import { ActivitySource, Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
 import { GasPrices } from "./fees";
@@ -291,6 +291,7 @@ export interface SendRpcRequest extends MessageBase {
   chainId: number;
   method: string;
   params: any[];
+  source?: ActivitySource;
 }
 
 export interface SendRpcResponse extends MessageBase {
