@@ -294,7 +294,7 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
   transform: rotateZ(45deg);
   perspective: 1000px;
   border-radius: 50%;
-  color: #f8f9fd;
+  color: #f8fcfd;
 }
 .atom-spinner:before,
 .atom-spinner:after {

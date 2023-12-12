@@ -36,7 +36,7 @@ const ShareAddress: FC = () => {
         >
           <QRCodeCanvas
             bgColor="#1C1E2F"
-            fgColor="#F8F9FD"
+            fgColor="#F8FCFD"
             includeMargin={false}
             size={80}
             level="L"

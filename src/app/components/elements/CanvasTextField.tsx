@@ -43,7 +43,7 @@ const CanvasTextField = memo(
           if (ctx) {
             ctx.setTransform(canvasMultiplier, 0, 0, canvasMultiplier, 0, 0);
 
-            ctx.fillStyle = "#f8f9fd";
+            ctx.fillStyle = "#F8FCFD";
 
             if (prevValue !== (value ?? defaultValue)) {
               ctx.clearRect(0, 0, canvas.width, canvas.height);

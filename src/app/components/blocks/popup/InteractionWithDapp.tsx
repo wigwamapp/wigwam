@@ -164,7 +164,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                     fillRule="evenodd"
                     clipRule="evenodd"
                     d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
-                    fill="#F8F9FD"
+                    fill="#F8FCFD"
                   />
                 </svg>
               </span>

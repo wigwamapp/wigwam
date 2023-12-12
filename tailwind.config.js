@@ -17,7 +17,7 @@ module.exports = {
           dark: "#101123",
           darkblue: "#07081B",
           darklight: "#2A2C3F",
-          light: "#F3F9F4",
+          light: "#F8FCFD",
           main: "#CCF9FF", // +
           inactivelight: "#93ACAF",
           font: "#BCC2DB",
