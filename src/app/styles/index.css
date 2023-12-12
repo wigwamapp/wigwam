@@ -27,7 +27,7 @@ a {
     ),
     #101123; */
 
-  @apply bg-gray-900;
+  background-color: #151918; /*#101918;*/
 }
 
 .brandbg-main-fallback,
