@@ -32,6 +32,7 @@ const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
   const walletStatus = useAtomValue(walletStatusAtom);
+
   const { confirm } = useDialog();
   const isInitial = walletStatus === WalletStatus.Welcome;
 
@@ -61,9 +62,11 @@ const AddAccountModal = memo(() => {
   const handleOpenChange = useCallback(
     async (open: boolean) => {
       if (
-        accountStep === AddAccountStep.VerifySeedPhrase ||
-        accountStep === AddAccountStep.VerifyToAdd ||
-        accountStep === AddAccountStep.SetupPassword
+        [
+          AddAccountStep.VerifySeedPhrase,
+          AddAccountStep.ConfirmAccounts,
+          AddAccountStep.SetupPassword,
+        ].includes(accountStep)
       ) {
         const res = await confirm({
           title: "Cancel wallet creation",
@@ -153,9 +156,7 @@ const AddAccountModal = memo(() => {
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",
-                  accountStep === AddAccountStep.ChooseWay
-                    ? "pb-[3.25rem]"
-                    : "pb-28",
+                  "pb-28", // "[3.25rem]"
                 )}
                 type="scroll"
               >
@@ -171,7 +172,7 @@ const AddAccountModal = memo(() => {
 
                 <BackButton
                   navAtom={addAccountStepAtom}
-                  initialValue={AddAccountStep.ChooseWay}
+                  initialValue={AddAccountStep.AddAccountInitial}
                   onClick={handleBackButton}
                   className="absolute top-4 left-4"
                 />
@@ -181,6 +182,7 @@ const AddAccountModal = memo(() => {
                 </Dialog.Close>
 
                 {accModalOpened && <AddAccountSteps />}
+
                 {isInitial && (
                   <div
                     className={classNames(
