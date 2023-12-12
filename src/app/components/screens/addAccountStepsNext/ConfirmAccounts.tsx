@@ -32,7 +32,10 @@ import { ReactComponent as FileCheckIcon } from "app/icons/file-check.svg";
 import { ReactComponent as ImportIcon } from "app/icons/addaccount-import.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/addaccount-ledger.svg";
 
-const ConfirmAccounts = memo<{ addMore?: boolean }>(({ addMore }) => {
+const ConfirmAccounts = memo<{
+  addMore?: boolean;
+  onLedgerOpened?: () => void;
+}>(({ addMore, onLedgerOpened }) => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
 
@@ -70,7 +73,7 @@ const ConfirmAccounts = memo<{ addMore?: boolean }>(({ addMore }) => {
       }
 
       return {
-        source: AccountSource.SeedPhrase, // extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
+        source: AccountSource.SeedPhrase,
         address: acc.address,
         name: getNextAccountName(),
         index: acc.index.toString(),
@@ -328,7 +331,7 @@ const ConfirmAccounts = memo<{ addMore?: boolean }>(({ addMore }) => {
               Icon: LedgerIcon,
               children: "Ledger",
               action: () => {
-                // navigateToStep(NextAddAccountStep.ConnectLedger);
+                onLedgerOpened?.();
               },
             },
           ].map((item, i) => {

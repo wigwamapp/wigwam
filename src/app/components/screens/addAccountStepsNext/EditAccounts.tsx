@@ -35,15 +35,17 @@ const EditAccounts: FC = () => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
-  // const isUnlocked = walletStatus === WalletStatus.Unlocked;
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
-  // const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
 
   const { stateRef, navigateToStep } = useSteps();
 
-  // const { importAddresses: addresses, hardDevice } = stateRef.current;
+  const { extendedKey } = stateRef.current;
   const { alert } = useDialog();
+
+  const ledgerMode = Boolean(extendedKey);
 
   const handleContinue = useCallback(
     async (addAccountsParams: AddAccountParams[]) => {
@@ -69,32 +71,18 @@ const EditAccounts: FC = () => {
     [alert, initialSetup, navigateToStep, setAccModalOpened, stateRef],
   );
 
-  // const isAnyLedgerAccounts = useMemo(
-  //   () =>
-  //     existingAccounts?.filter(({ source }) => source === AccountSource.Ledger),
-  //   [existingAccounts],
-  // );
+  const isAnyLedgerAccounts = useMemo(
+    () =>
+      existingAccounts?.filter(({ source }) => source === AccountSource.Ledger),
+    [existingAccounts],
+  );
 
-  return hasSeedPhrase ? (
+  return (hasSeedPhrase && !ledgerMode) ||
+    (ledgerMode && isAnyLedgerAccounts?.length) ? (
     <VerifyAccountToAddExisting onContinue={handleContinue} />
   ) : (
     <VerifyAccountToAddInitial onContinue={handleContinue} />
   );
-
-  // if (addresses && addresses.length > 0) {
-  //   return <VerifyAccountToAddExisting onContinue={handleContinue} />;
-  // }
-
-  // if (
-  //   (hasSeedPhrase && hardDevice !== "ledger") ||
-  //   (hardDevice === "ledger" &&
-  //     isAnyLedgerAccounts &&
-  //     isAnyLedgerAccounts.length > 0)
-  // ) {
-  //   return <VerifyAccountToAddExisting onContinue={handleContinue} />;
-  // }
-
-  // return <VerifyAccountToAddInitial onContinue={handleContinue} />;
 };
 
 export default EditAccounts;
