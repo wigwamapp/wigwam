@@ -50,7 +50,13 @@ const LedgerScanModal: FC<ComponentProps<typeof ScanAccountsModal>> = ({
   return (
     <>
       {scanning && (
-        <ScanAccountsModal onOpenChange={() => setScanning(false)} {...rest} />
+        <ScanAccountsModal
+          onOpenChange={() => {
+            setScanning(false);
+            onOpenChange?.(false);
+          }}
+          {...rest}
+        />
       )}
     </>
   );
