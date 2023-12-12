@@ -15,7 +15,7 @@ a {
 
 .brandbg-main,
 .brandbg-popup {
-  background: radial-gradient(
+  /* background: radial-gradient(
       30.26% 62.3% at 93.12% 25.55%,
       rgba(90, 4, 20, 0.056) 0%,
       rgba(13, 14, 29, 0) 100%
@@ -25,16 +25,20 @@ a {
       rgba(4, 73, 88, 0.1) 0%,
       rgba(13, 14, 29, 0) 100%
     ),
-    #101123;
+    #101123; */
+
+  @apply bg-gray-900;
 }
 
 .brandbg-main-fallback,
 .brandbg-popup-fallback {
-  @apply bg-brand-dark;
+  @apply bg-gray-900;
 }
 
 .brandbg-large-modal {
-  background: radial-gradient(
+  @apply bg-gray-900;
+
+  /* background: radial-gradient(
       31.72% 37.17% at 85.81% 79.17%,
       rgba(43, 44, 65, 0.2) 0%,
       rgba(13, 14, 32, 0.2) 100%
@@ -54,7 +58,7 @@ a {
       rgba(118, 123, 160, 0.2) 0%,
       rgba(13, 14, 32, 0.2) 100%
     ),
-    #0c0d1e !important;
+    #0c0d1e !important; */
 }
 
 .brandbg-secondary-modal {
