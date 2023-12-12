@@ -131,33 +131,6 @@ const SetupPassword = memo(() => {
                 )}
               </Field>
 
-              <Field name="analytics" format={(v: string) => Boolean(v)}>
-                {({ input, meta }) => (
-                  <AcceptCheckbox
-                    {...input}
-                    title="Analytics"
-                    description={
-                      <>
-                        Help us make Wigwam better.
-                        <br />I agree to the{" "}
-                        <a
-                          href="https://wigwam.app/privacy"
-                          target="_blank"
-                          rel="nofollow noreferrer"
-                          className="text-brand-main underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Anonymous Tracking
-                        </a>
-                      </>
-                    }
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
-                    containerClassName="w-full mt-6"
-                  />
-                )}
-              </Field>
-
               <Field
                 name="terms"
                 format={(v: string) => Boolean(v)}
@@ -189,7 +162,34 @@ const SetupPassword = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    containerClassName={classNames("mt-4 mb-6 w-full")}
+                    containerClassName={classNames("mt-6 w-full")}
+                  />
+                )}
+              </Field>
+
+              <Field name="analytics" format={(v: string) => Boolean(v)}>
+                {({ input, meta }) => (
+                  <AcceptCheckbox
+                    {...input}
+                    title="Analytics"
+                    description={
+                      <>
+                        Help us make Wigwam better.
+                        <br />I agree to the{" "}
+                        <a
+                          href="https://wigwam.app/privacy"
+                          target="_blank"
+                          rel="nofollow noreferrer"
+                          className="text-brand-main underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Anonymous Tracking
+                        </a>
+                      </>
+                    }
+                    error={meta.touched && meta.error}
+                    errorMessage={meta.error}
+                    containerClassName="w-full mb-6 mt-4"
                   />
                 )}
               </Field>
