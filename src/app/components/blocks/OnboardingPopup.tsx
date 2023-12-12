@@ -67,7 +67,7 @@ const OnboardingPopupContent: FC = () => {
   }, [isReady, setVisible]);
 
   return (
-    <div className="fixed inset-0 z-[999999999999] bg-[#07191B]/[.98] flex flex-col">
+    <div className="fixed inset-0 z-[999999999999] bg-[#0E1314]/[.98] flex flex-col">
       <ScrollAreaContainer
         ref={scrollAreaRef}
         className={classNames("w-full flex flex-col")}

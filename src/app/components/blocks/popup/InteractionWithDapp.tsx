@@ -142,7 +142,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   "block relative",
                   "w-5 h-5 mr-1.5",
                   "rounded-full overflow-hidden",
-                  "border border-[#BCC2DB]/[0.7]",
+                  "border border-[#BCC3C4]/[0.7]",
                 )}
               >
                 <Avatar

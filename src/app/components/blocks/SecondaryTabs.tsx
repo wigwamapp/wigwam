@@ -79,7 +79,7 @@ const SecondaryItem: FC<
         <h3 className={"text-base font-bold"}>{title}</h3>
         {soon && <SoonTag />}
       </div>
-      {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
+      {desc && <p className="text-xs text-[#BCC3C4] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
           "w-6 h-auto",

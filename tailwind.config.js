@@ -7,26 +7,26 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          darkbg: "#13191F", // +
-          lightgray: "#E4E4E4", // +
-          redone: "#80EF6E", // +
-          redtwo: "#80EF6E", // +
-          dark: "#101123",
-          darkblue: "#07191B", // +
-          darklight: "#2A2C3F",
-          light: "#F8FCFD", // +
-          main: "#CCF9FF", // +
-          inactivelight: "#BFC8CA", // +
-          font: "#BCC2DB",
-          inactivedark: "#8D9C9E", // +
-          gray: "#AAABB1",
-          placeholder: "#717A7B", // +
-          disabledbackground: "#343434", // +
-          disabledcolor: "#535364",
-          inactivedark2: "#7D8398",
-          redobject: "#B82D41", // +
-          redtext: "#EA556A", // +
-          greenobject: "#4F9A5E", // +
+          darkbg: "#13191F",
+          lightgray: "#E4E4E4",
+          redone: "#80EF6E",
+          redtwo: "#80EF6E",
+          dark: "#13191F",
+          darkblue: "#0E1314",
+          darklight: "#2A3C3F",
+          light: "#F8FCFD",
+          main: "#CCF9FF",
+          inactivelight: "#BFC8CA",
+          font: "#BCC3C4",
+          inactivedark: "#8D9C9E",
+          gray: "#AAB0B1",
+          placeholder: "#717A7B",
+          disabledbackground: "#343434",
+          disabledcolor: "#606668",
+          inactivedark2: "#91999B",
+          redobject: "#B82D41",
+          redtext: "#EA556A",
+          greenobject: "#4F9A5E",
         },
       },
       fontFamily: {
