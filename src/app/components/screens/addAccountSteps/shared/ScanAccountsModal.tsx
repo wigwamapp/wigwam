@@ -183,14 +183,12 @@ const ScanAccountsModal: FC<SecondaryModalProps> = ({
     try {
       const addresses = await loadActiveWallets();
 
-      if (!isUnmountedRef.current) {
-        onOpenChange?.(false);
-        if (addresses) {
-          stateRef.current.importAddresses = addresses;
-          navigateToStep(AddAccountStep.ConfirmAccounts);
-        } else {
-          reset();
-        }
+      onOpenChange?.(false);
+      if (addresses) {
+        stateRef.current.importAddresses = addresses;
+        navigateToStep(AddAccountStep.ConfirmAccounts);
+      } else {
+        reset();
       }
     } catch (err: any) {
       alert({
@@ -200,13 +198,16 @@ const ScanAccountsModal: FC<SecondaryModalProps> = ({
     }
   }, [alert, loadActiveWallets, navigateToStep, onOpenChange, reset, stateRef]);
 
+  // little hack to avoid rerender
+  const logicProcessRef = useRef(logicProcess);
+
   useEffect(() => {
-    logicProcess();
+    logicProcessRef.current();
 
     return () => {
       isUnmountedRef.current = true;
     };
-  }, [logicProcess]);
+  }, []);
 
   return (
     <SecondaryModal
