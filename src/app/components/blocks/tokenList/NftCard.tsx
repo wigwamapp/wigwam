@@ -79,7 +79,7 @@ const NftCard = memo(
                   "absolute top-1 left-1",
                   "py-px px-2.5",
                   "rounded",
-                  "bg-[#35394D]",
+                  "bg-[#35494D]",
                   "border border-brand-main/20",
                 )}
               />
@@ -90,7 +90,7 @@ const NftCard = memo(
                 className={classNames(
                   "absolute top-1 right-1",
                   "w-5 h-5 min-w-[1.25rem]",
-                  "bg-[#35394D]",
+                  "bg-[#35494D]",
                   "rounded",
                   "flex items-center justify-center",
                   !disabled && "border border-brand-main",

@@ -94,7 +94,7 @@ const getSizeClasses = (size: sizeType) =>
       classNames(
         "rounded-[.625rem]",
         "bg-brand-main/10 backdrop-blur-[60px]",
-        IS_FIREFOX && "!bg-[#3A3C51]/[.98]",
+        IS_FIREFOX && "!bg-[#3A4551]/[.98]",
         "py-5 px-5",
       ),
     )
@@ -103,7 +103,7 @@ const getSizeClasses = (size: sizeType) =>
         "rounded-md",
         "overflow-hidden truncate",
         "bg-brand-main/20 backdrop-blur-[6px]",
-        IS_FIREFOX && "!bg-[#414356]/[.98]",
+        IS_FIREFOX && "!bg-[#414B56]/[.98]",
         "py-1 px-3",
       ),
     );

@@ -166,7 +166,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "absolute z-10",
           "inset-0 box-border",
           "rounded-[.5625rem]",
-          "bg-[#1e2031] border border-brand-main/10",
+          "bg-[#1E2731] border border-brand-main/10",
           "flex flex-col items-center justify-center",
           "transition-opacity",
           isShown ? "opacity-0 pointer-events-none" : "cursor-pointer",

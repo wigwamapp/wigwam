@@ -124,7 +124,7 @@ const AddAccountModal = memo(() => {
               "rounded-full",
               "bg-brand-dark/20",
               "backdrop-blur-[10px]",
-              IS_FIREFOX && "!bg-[#0D1020]",
+              IS_FIREFOX && "!bg-[#0E1314]",
               "border border-brand-light/5",
               "shadow-addaccountmodal",
               "absolute",
