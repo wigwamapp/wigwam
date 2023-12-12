@@ -13,8 +13,8 @@ export const pageAtom = atomWithURLHash("page", Page.Default);
 export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
 
 export const addAccountStepAtom = atomWithURLHash(
-  "addAccStep",
-  AddAccountStep.ChooseWay,
+  "addAccStepNext",
+  AddAccountStep.AddAccountInitial,
 );
 
 export const settingTabAtom = atomWithURLHash<SettingTab>(

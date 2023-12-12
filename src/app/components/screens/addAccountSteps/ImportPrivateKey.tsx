@@ -7,6 +7,7 @@ import { AccountSource } from "core/types";
 import { validatePrivateKey, add0x } from "core/common";
 
 import { AddAccountStep } from "app/nav";
+import { useNextAccountName } from "app/hooks";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import { formatPrivateKey } from "app/utils/format";
 import { useSteps } from "app/hooks/steps";
@@ -20,6 +21,7 @@ type FormValues = {
 
 const ImportPrivateKey = memo(() => {
   const { stateRef, navigateToStep } = useSteps();
+  const { getNextAccountName } = useNextAccountName();
 
   const handleContinue = useCallback(
     async ({ privateKey }: FormValues) =>
@@ -30,6 +32,7 @@ const ImportPrivateKey = memo(() => {
           const address = ethers.computeAddress(add0x(privateKey));
           stateRef.current.importAddresses = [
             {
+              name: getNextAccountName(),
               source: AccountSource.PrivateKey,
               address,
               isDisabled: true,
@@ -38,21 +41,19 @@ const ImportPrivateKey = memo(() => {
             },
           ];
 
-          navigateToStep(AddAccountStep.VerifyToAdd);
+          navigateToStep(AddAccountStep.ConfirmAccounts);
 
           return;
         } catch (err: any) {
           return { privateKey: err?.message };
         }
       }),
-    [navigateToStep, stateRef],
+    [navigateToStep, stateRef, getNextAccountName],
   );
 
   return (
     <>
-      <AddAccountHeader className="mb-8">
-        Import existing Private Key
-      </AddAccountHeader>
+      <AddAccountHeader className="mb-8">Import Private Key</AddAccountHeader>
       <Form<FormValues>
         onSubmit={handleContinue}
         decorators={[focusOnErrors]}
@@ -80,7 +81,10 @@ const ImportPrivateKey = memo(() => {
                 )}
               </Field>
             </div>
-            <AddAccountContinueButton loading={submitting} />
+
+            <AddAccountContinueButton loading={submitting}>
+              Import key
+            </AddAccountContinueButton>
           </form>
         )}
       />

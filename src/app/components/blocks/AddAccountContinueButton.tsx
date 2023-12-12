@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { IS_FIREFOX } from "app/defaults";
@@ -9,10 +9,9 @@ type AddAccountContinueButtonProps = {
   loading?: boolean;
 };
 
-const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
-  onContinue,
-  loading,
-}) => (
+const AddAccountContinueButton: FC<
+  PropsWithChildren<AddAccountContinueButtonProps>
+> = ({ onContinue, loading, children = "Continue" }) => (
   <div
     className={classNames(
       "z-20",
@@ -34,7 +33,7 @@ const AddAccountContinueButton: FC<AddAccountContinueButtonProps> = ({
       onClick={onContinue}
       loading={loading}
     >
-      Continue
+      {children}
     </Button>
   </div>
 );

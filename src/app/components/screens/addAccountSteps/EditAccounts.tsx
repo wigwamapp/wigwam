@@ -28,71 +28,28 @@ import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
 
-import AccountsToAdd, { AccountsToAddProps } from "./AccountToAdd";
+import AccountsToAdd, { AccountsToAddProps } from "./shared/AccountsToAdd";
 
-const VerifyAccountToAdd: FC = () => {
+const EditAccounts: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
-  const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
 
   const { stateRef, navigateToStep } = useSteps();
 
-  const { importAddresses: addresses, hardDevice } = stateRef.current;
-  const { alert, confirm } = useDialog();
+  const { extendedKey } = stateRef.current;
+  const { alert } = useDialog();
+
+  const ledgerMode = Boolean(extendedKey);
 
   const handleContinue = useCallback(
     async (addAccountsParams: AddAccountParams[]) => {
       try {
-        if (
-          addAccountsParams.some(
-            (acc) => acc.source === AccountSource.OpenLogin,
-          )
-        ) {
-          const confirmed = await confirm({
-            title: (
-              <>
-                Creating a wallet
-                <br />
-                <span className="text-[0.75em]">with a social account</span>
-              </>
-            ),
-            content: (
-              <div className="text-left">
-                <p>
-                  By clicking &#34;Confirm&#34; you accept all risks associated
-                  with creating a wallet using a social account.
-                </p>
-
-                <ul className="mt-2 list-disc list-outside text-sm">
-                  <li className="mb-1">
-                    If you lost access to your social account - you can&#39;t
-                    restore the linked wallet again using the same way. You can
-                    prevent this by exporting a private key (on the
-                    &#34;Wallets&#34; page) after creating a wallet.
-                  </li>
-                  <li className="mb-1">
-                    If someone else gets access to your social account, they can
-                    get full access to the linked wallet.
-                  </li>
-                  <li className="mb-1">
-                    If you connect the same social account to a malicious
-                    website, it has potentially more opportunities to access the
-                    linked wallet.
-                  </li>
-                </ul>
-              </div>
-            ),
-            yesButtonText: "Confirm",
-          });
-
-          if (!confirmed) return;
-        }
-
         if (initialSetup) {
           Object.assign(stateRef.current, { addAccountsParams });
           navigateToStep(AddAccountStep.SetupPassword);
@@ -111,34 +68,24 @@ const VerifyAccountToAdd: FC = () => {
         alert({ title: "Error!", content: err.message });
       }
     },
-    [alert, confirm, initialSetup, navigateToStep, setAccModalOpened, stateRef],
+    [alert, initialSetup, navigateToStep, setAccModalOpened, stateRef],
   );
 
   const isAnyLedgerAccounts = useMemo(
     () =>
-      importedAccounts?.filter(({ source }) => source === AccountSource.Ledger),
-    [importedAccounts],
+      existingAccounts?.filter(({ source }) => source === AccountSource.Ledger),
+    [existingAccounts],
   );
 
-  if (addresses && addresses.length > 0) {
-    return (
-      <AccountsToAdd accountsToVerify={addresses} onContinue={handleContinue} />
-    );
-  }
-
-  if (
-    (hasSeedPhrase && hardDevice !== "ledger") ||
-    (hardDevice === "ledger" &&
-      isAnyLedgerAccounts &&
-      isAnyLedgerAccounts.length > 0)
-  ) {
-    return <VerifyAccountToAddExisting onContinue={handleContinue} />;
-  }
-
-  return <VerifyAccountToAddInitial onContinue={handleContinue} />;
+  return (hasSeedPhrase && !ledgerMode) ||
+    (ledgerMode && isAnyLedgerAccounts?.length) ? (
+    <VerifyAccountToAddExisting onContinue={handleContinue} />
+  ) : (
+    <VerifyAccountToAddInitial onContinue={handleContinue} />
+  );
 };
 
-export default VerifyAccountToAdd;
+export default EditAccounts;
 
 type VerifyAccountToAddProps = Pick<AccountsToAddProps, "onContinue">;
 
@@ -174,7 +121,7 @@ const VerifyAccountToAddInitial: FC<VerifyAccountToAddProps> = ({
   const addresses = useMemo(
     () =>
       neuterExtendedKey
-        ? generatePreviewHDNodes(neuterExtendedKey).map(
+        ? generatePreviewHDNodes(neuterExtendedKey, 0, 9).map(
             ({ address, index, publicKey }) => ({
               source: extendedKey
                 ? AccountSource.Ledger
@@ -211,7 +158,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
       : null,
   );
 
-  const importedAccounts = useMaybeAtomValue(allAccountsAtom);
+  const existingAccounts = useMaybeAtomValue(allAccountsAtom);
 
   const isCreatingNew = stateRef.current.addAccounts === "existing-create";
 
@@ -236,7 +183,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
     (key: string, offset = 0, limit = 9) => {
       const newAccounts = generatePreviewHDNodes(key, offset, limit);
 
-      if (!importedAccounts || importedAccounts.length <= 0) {
+      if (!existingAccounts || existingAccounts.length <= 0) {
         return {
           source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
           address: newAccounts[0].address,
@@ -247,8 +194,8 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
 
       const filteredAccounts = newAccounts.filter(
         ({ address }) =>
-          !importedAccounts.some(
-            ({ address: imported }) => imported === address,
+          !existingAccounts.some(
+            ({ address: existingAddress }) => existingAddress === address,
           ),
       );
 
@@ -266,7 +213,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, getNextAccountName, importedAccounts],
+    [extendedKey, getNextAccountName, existingAccounts],
   );
 
   const addresses = useMemo(() => {
@@ -275,23 +222,25 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
     }
 
     if (!isCreatingNew) {
-      const newAccounts = generatePreviewHDNodes(neuterExtendedKey).map(
-        ({ address, index, publicKey }) => ({
-          source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
-          address,
-          index: index.toString(),
-          publicKey: toProtectedString(publicKey),
-        }),
-      );
+      const newAccounts = generatePreviewHDNodes(
+        neuterExtendedKey,
+        0,
+        Math.max((existingAccounts?.length ?? 0) + 2, 9),
+      ).map(({ address, index, publicKey }) => ({
+        source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
+        address,
+        index: index.toString(),
+        publicKey: toProtectedString(publicKey),
+      }));
 
-      if (!importedAccounts || importedAccounts.length <= 0) {
+      if (!existingAccounts || existingAccounts.length <= 0) {
         return newAccounts;
       }
 
       return newAccounts.map(({ address, index, publicKey }) => {
-        const isAddressImported = importedAccounts.find(
-          ({ address: imported }) => {
-            return imported === address;
+        const isAddressImported = existingAccounts.find(
+          ({ address: existingAddress }) => {
+            return existingAddress === address;
           },
         );
 
@@ -321,7 +270,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
   }, [
     extendedKey,
     findFirstUnusedAccount,
-    importedAccounts,
+    existingAccounts,
     isCreatingNew,
     neuterExtendedKey,
   ]);

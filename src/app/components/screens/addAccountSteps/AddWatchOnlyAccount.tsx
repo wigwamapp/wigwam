@@ -37,7 +37,7 @@ const AddWatchOnlyAccount = memo(() => {
             },
           ];
 
-          navigateToStep(AddAccountStep.VerifyToAdd);
+          navigateToStep(AddAccountStep.ConfirmAccounts);
 
           return;
         } catch (err: any) {

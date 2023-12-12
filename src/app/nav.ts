@@ -13,14 +13,15 @@ export enum Page {
 }
 
 export enum AddAccountStep {
-  ChooseWay = "choose-way",
+  AddAccountInitial = "add-account-initial",
+  ChooseWayImport = "choose-way-import",
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
-  ImportPrivateKey = "import-private-key",
-  AddWatchOnlyAccount = "add-watch-only",
   VerifySeedPhrase = "verify-seed-phrase",
-  SelectAccountsToAddMethod = "select-accounts-to-add-method",
-  VerifyToAdd = "verify-to-add",
+  ImportPrivateKey = "import-private-key",
+  AddWatchOnlyAccount = "add-watch-only-account",
+  ConfirmAccounts = "confirm-accounts",
+  EditAccounts = "edit-accounts",
   SetupPassword = "setup-password",
 }
 
