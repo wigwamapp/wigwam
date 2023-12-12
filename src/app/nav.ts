@@ -24,6 +24,19 @@ export enum AddAccountStep {
   SetupPassword = "setup-password",
 }
 
+export enum NextAddAccountStep {
+  AddAccountInitial = "add-account-initial",
+  ChooseWayImport = "choose-way-import",
+  CreateSeedPhrase = "create-seed-phrase",
+  ImportSeedPhrase = "import-seed-phrase",
+  VerifySeedPhrase = "verify-seed-phrase",
+  ImportPrivateKey = "import-private-key",
+  AddWatchOnlyAccount = "add-watch-only-account",
+  ConfirmAccounts = "confirm-accounts",
+  EditAccounts = "edit-accounts",
+  SetupPassword = "setup-password",
+}
+
 export enum SettingTab {
   General = "general",
   Profile = "profile",

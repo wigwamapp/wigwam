@@ -3,6 +3,7 @@ import { atomWithURLHash } from "lib/atom-utils";
 import {
   Page,
   AddAccountStep,
+  NextAddAccountStep,
   SettingTab,
   TransferTab,
   ReceiveTab,
@@ -15,6 +16,11 @@ export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
 export const addAccountStepAtom = atomWithURLHash(
   "addAccStep",
   AddAccountStep.ChooseWay,
+);
+
+export const addAccountStepAtomNext = atomWithURLHash(
+  "addAccStepNext",
+  NextAddAccountStep.AddAccountInitial,
 );
 
 export const settingTabAtom = atomWithURLHash<SettingTab>(

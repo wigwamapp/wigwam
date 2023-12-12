@@ -1,38 +1,37 @@
 import { memo, Suspense, useRef } from "react";
-import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { AddAccountStep } from "app/nav";
-import { addAccountStepAtom } from "app/atoms";
+import { NextAddAccountStep } from "app/nav";
+import { addAccountStepAtomNext } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
-import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
-import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
-import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "../screens/addAccountSteps/SetupPassword";
-import CreateSeedPhrase from "../screens/addAccountSteps/CreateSeedPhrase";
-import ImportSeedPhrase from "../screens/addAccountSteps/ImportSeedPhrase";
-import ImportPrivateKey from "../screens/addAccountSteps/ImportPrivateKey";
-import AddWatchOnlyAccount from "../screens/addAccountSteps/AddWatchOnlyAccount";
+import AddAccountInitial from "../screens/addAccountStepsNext/AddAccountInitial";
 
-const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
-  [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
-  [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
-  [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
-  [AddAccountStep.ImportPrivateKey, () => <ImportPrivateKey />],
-  [AddAccountStep.AddWatchOnlyAccount, () => <AddWatchOnlyAccount />],
-  [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
-  [
-    AddAccountStep.SelectAccountsToAddMethod,
-    () => <SelectAccountsToAddMethod />,
-  ],
-  [AddAccountStep.VerifyToAdd, () => <VerifyAccountToAdd />],
-  [AddAccountStep.SetupPassword, () => <SetupPassword />],
+import CreateSeedPhrase from "../screens/addAccountStepsNext/CreateSeedPhrase";
+import ImportSeedPhrase from "../screens/addAccountStepsNext/ImportSeedPhrase";
+import VerifySeedPhrase from "../screens/addAccountStepsNext/VerifySeedPhrase";
+import ImportPrivateKey from "../screens/addAccountStepsNext/ImportPrivateKey";
+import AddWatchOnlyAccount from "../screens/addAccountStepsNext/AddWatchOnlyAccount";
+
+import ConfirmAccounts from "../screens/addAccountStepsNext/ConfirmAccounts";
+import EditAccounts from "../screens/addAccountStepsNext/EditAccounts";
+import SetupPassword from "../screens/addAccountStepsNext/SetupPassword";
+
+const ADD_ACCOUNT_STEPS: AllSteps<NextAddAccountStep> = [
+  [NextAddAccountStep.AddAccountInitial, () => <AddAccountInitial />],
+
+  [NextAddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
+  [NextAddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
+  [NextAddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
+  [NextAddAccountStep.ImportPrivateKey, () => <ImportPrivateKey />],
+  [NextAddAccountStep.AddWatchOnlyAccount, () => <AddWatchOnlyAccount />],
+
+  [NextAddAccountStep.ConfirmAccounts, () => <ConfirmAccounts />],
+  [NextAddAccountStep.EditAccounts, () => <EditAccounts />],
+  [NextAddAccountStep.SetupPassword, () => <SetupPassword />],
 ];
 
-const AddAccountSteps = memo(() => {
-  const accountStep = useAtomValue(addAccountStepAtom);
+const AddAccountStepsNext = memo(() => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -41,14 +40,14 @@ const AddAccountSteps = memo(() => {
       className={classNames(
         "w-[59rem] mx-auto",
         "h-full",
-        "pt-24",
+        "py-24",
         "flex flex-col",
-        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24",
+        // accountStep === NextAddAccountStep.ChooseWayGeneral ? "pb-16" : "pb-24",
       )}
     >
       <StepsProvider
         rootRef={rootRef}
-        atom={addAccountStepAtom}
+        atom={addAccountStepAtomNext}
         steps={ADD_ACCOUNT_STEPS}
       >
         {({ children }) => <Suspense fallback={null}>{children}</Suspense>}
@@ -57,4 +56,4 @@ const AddAccountSteps = memo(() => {
   );
 });
 
-export default AddAccountSteps;
+export default AddAccountStepsNext;
