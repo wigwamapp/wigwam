@@ -8,29 +8,25 @@ module.exports = {
       colors: {
         brand: {
           darkbg: "#13191F", // +
-          darkover: "#191B20",
-          darktext: "#11142D",
           lightgray: "#E4E4E4",
-          primary: "#80EF6E",
           redone: "#80EF6E",
           redtwo: "#80EF6E",
           dark: "#101123",
-          darkblue: "#07081B",
+          darkblue: "#07191B", // +
           darklight: "#2A2C3F",
           light: "#F8FCFD", // +
           main: "#CCF9FF", // +
           inactivelight: "#BFC8CA", // +
           font: "#BCC2DB",
-          inactivedark: "#6B8486",
+          inactivedark: "#8D9C9E", // +
           gray: "#AAABB1",
-          placeholder: "#7A7E7B",
-          disabledbackground: "#343434",
+          placeholder: "#717A7B", // +
+          disabledbackground: "#343434", // +
           disabledcolor: "#535364",
           inactivedark2: "#7D8398",
-          redobject: "#B82D41",
-          redtext: "#EA556A",
-          greenobject: "#4F9A5E",
-          firefoxactivity: "#0D1020",
+          redobject: "#B82D41", // +
+          redtext: "#EA556A", // +
+          greenobject: "#4F9A5E", // +
         },
       },
       fontFamily: {
