@@ -229,7 +229,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "rounded-[.625rem]",
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#111226]",
+                IS_FIREFOX && "!bg-[#0E1314]",
                 "border border-brand-light/5",
                 "z-20",
                 contentClassName,

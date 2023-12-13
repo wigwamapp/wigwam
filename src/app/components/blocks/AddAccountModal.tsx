@@ -32,6 +32,7 @@ const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
   const walletStatus = useAtomValue(walletStatusAtom);
+
   const { confirm } = useDialog();
   const isInitial = walletStatus === WalletStatus.Welcome;
 
@@ -61,9 +62,11 @@ const AddAccountModal = memo(() => {
   const handleOpenChange = useCallback(
     async (open: boolean) => {
       if (
-        accountStep === AddAccountStep.VerifySeedPhrase ||
-        accountStep === AddAccountStep.VerifyToAdd ||
-        accountStep === AddAccountStep.SetupPassword
+        [
+          AddAccountStep.VerifySeedPhrase,
+          AddAccountStep.ConfirmAccounts,
+          AddAccountStep.SetupPassword,
+        ].includes(accountStep)
       ) {
         const res = await confirm({
           title: "Cancel wallet creation",
@@ -114,24 +117,15 @@ const AddAccountModal = memo(() => {
         >
           <OnMount handle={handleContentMount} />
 
-          <div
+          <WigwamIcon
             className={classNames(
-              "flex items-center justify-center",
-              "w-[6.5rem] h-[6.5rem]",
-              "rounded-full",
-              "bg-brand-dark/20",
-              "backdrop-blur-[10px]",
-              IS_FIREFOX && "!bg-[#0D1020]",
-              "border border-brand-light/5",
-              "shadow-addaccountmodal",
+              "w-16 h-auto",
               "absolute",
               "top-0 left-1/2",
-              "-translate-x-1/2 -translate-y-1/2",
+              "-translate-x-1/2 -translate-y-1/4",
               "z-30",
             )}
-          >
-            <WigwamIcon className="w-16 mt-2" />
-          </div>
+          />
 
           <OverflowProvider>
             {(ref) => (
@@ -153,9 +147,7 @@ const AddAccountModal = memo(() => {
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",
-                  accountStep === AddAccountStep.ChooseWay
-                    ? "pb-[3.25rem]"
-                    : "pb-28",
+                  "pb-28", // "[3.25rem]"
                 )}
                 type="scroll"
               >
@@ -171,16 +163,17 @@ const AddAccountModal = memo(() => {
 
                 <BackButton
                   navAtom={addAccountStepAtom}
-                  initialValue={AddAccountStep.ChooseWay}
+                  initialValue={AddAccountStep.AddAccountInitial}
                   onClick={handleBackButton}
-                  className="absolute top-4 left-4"
+                  className="absolute top-6 left-8"
                 />
 
-                <Dialog.Close className="absolute top-4 right-4" asChild>
+                <Dialog.Close className="absolute top-6 right-8" asChild>
                   <Button theme="clean">Cancel</Button>
                 </Dialog.Close>
 
                 {accModalOpened && <AddAccountSteps />}
+
                 {isInitial && (
                   <div
                     className={classNames(

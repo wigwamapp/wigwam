@@ -61,7 +61,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
         {tabHeader}
       </TabHeader>
       {withDescription && (
-        <p className="text-sm text-[#BCC2DB] mb-3">
+        <p className="text-sm text-[#BCC3C4] mb-3">
           Do you trust this site? By granding this permission, you&apos;re
           allowing{" "}
           <span className="font-semibold">

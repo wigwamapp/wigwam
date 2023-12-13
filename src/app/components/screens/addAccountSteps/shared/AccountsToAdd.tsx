@@ -41,6 +41,9 @@ import TooltipIcon from "app/components/elements/TooltipIcon";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import { ReactComponent as EditIcon } from "app/icons/edit.svg";
+import { ReactComponent as FileCheckIcon } from "app/icons/file-check.svg";
+
+const BALANCE_CHECK = false;
 
 type AccountsToVerifyProps = Omit<AddAccountParams, "name"> & {
   name?: string;
@@ -64,6 +67,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
   const { getNextAccountName } = useNextAccountName();
 
   const derivationPath = stateRef.current.derivationPath;
+  const alreadyAddedAccounts: any[] = stateRef.current.importAddresses ?? [];
 
   const preparedNetworks = useMemo(
     () => networks.filter(({ type }) => type === "mainnet"),
@@ -89,7 +93,9 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
     [allNetworks],
   );
 
-  const addressesToAddRef = useRef(new Set<string>());
+  const addressesToAddRef = useRef(
+    new Set<string>(alreadyAddedAccounts.map((item) => item.address)),
+  );
   const addressesNamesRef = useRef(new Map<string, string>());
   const forceUpdate = useForceUpdate();
 
@@ -226,34 +232,36 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
     <>
       <div className="flex flex-col w-full max-w-[45.25rem] mx-auto">
         <div className="flex mb-9">
-          <h1 className="text-[2rem] font-bold mr-auto">Wallets to add</h1>
-          <div className="flex items-center ml-auto">
-            <Tooltip
-              content={
-                <p>
-                  Use this network switch to preview balances of your wallets to
-                  select the right one.
-                  <br />
-                  It only switches network for the &#34;Balance&#34; column on
-                  this page.
-                  <br />
-                  You will be able to use these wallets with any network.
-                </p>
-              }
-              placement="left-start"
-              size="large"
-              className="mr-3"
-            >
-              <TooltipIcon />
-            </Tooltip>
-            <NetworkSelect
-              networks={allNetworks}
-              currentNetwork={network}
-              onNetworkChange={onNetworkChange}
-              withAction={false}
-              source="wallet-setup-accounts"
-            />
-          </div>
+          <h1 className="text-[2rem] font-bold mr-auto">Edit wallets</h1>
+          {BALANCE_CHECK && (
+            <div className="flex items-center ml-auto">
+              <Tooltip
+                content={
+                  <p>
+                    Use this network switch to preview balances of your wallets
+                    to select the right one.
+                    <br />
+                    It only switches network for the &#34;Balance&#34; column on
+                    this page.
+                    <br />
+                    You will be able to use these wallets with any network.
+                  </p>
+                }
+                placement="left-start"
+                size="large"
+                className="mr-3"
+              >
+                <TooltipIcon />
+              </Tooltip>
+              <NetworkSelect
+                networks={allNetworks}
+                currentNetwork={network}
+                onNetworkChange={onNetworkChange}
+                withAction={false}
+                source="wallet-setup-accounts"
+              />
+            </div>
+          )}
         </div>
         <table className="text-brand-light">
           <thead>
@@ -285,7 +293,7 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
               </Th>
               {isIndexExisting && <Th>Index</Th>}
               <Th>Address</Th>
-              <Th>Balance</Th>
+              {BALANCE_CHECK && <Th>Balance</Th>}
             </tr>
           </thead>
           <tbody>
@@ -326,7 +334,11 @@ const AccountsToAdd: FC<AccountsToAddProps> = ({
           </tbody>
         </table>
       </div>
-      <AddAccountContinueButton onContinue={handleContinue} />
+
+      <AddAccountContinueButton onContinue={handleContinue}>
+        <FileCheckIcon className="h-6 w-auto mr-2" />
+        Add wallets
+      </AddAccountContinueButton>
     </>
   );
 };
@@ -366,6 +378,8 @@ const Account = memo<AccountProps>(
     const [balance, setBalance] = useSafeState<bigint | null>(null);
 
     useEffect(() => {
+      if (!BALANCE_CHECK) return;
+
       provider
         .getBalance(address)
         .then((b) => setBalance(b))
@@ -445,17 +459,19 @@ const Account = memo<AccountProps>(
         <Td widthMaxContent>
           <HashPreview hash={address} />
         </Td>
-        <Td className="font-bold">
-          {baseAsset ? (
-            <PrettyAmount
-              amount={ethers.formatEther(baseAsset.balance)}
-              currency={baseAsset.symbol}
-              copiable={true}
-              isMinified
-              className="font-bold"
-            />
-          ) : null}
-        </Td>
+        {BALANCE_CHECK && (
+          <Td className="font-bold">
+            {baseAsset ? (
+              <PrettyAmount
+                amount={ethers.formatEther(baseAsset.balance)}
+                currency={baseAsset.symbol}
+                copiable={true}
+                isMinified
+                className="font-bold"
+              />
+            ) : null}
+          </Td>
+        )}
       </tr>
     );
   },

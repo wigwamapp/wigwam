@@ -64,7 +64,13 @@ export const syncNativeTokens = memoize(
         let allAssetsSum = new BigNumber(0);
 
         for (const asset of allAssets) {
-          if (asset.tokenSlug === NATIVE_TOKEN_SLUG) continue;
+          if (
+            asset.tokenSlug === NATIVE_TOKEN_SLUG ||
+            asset.status === TokenStatus.Disabled
+          ) {
+            continue;
+          }
+
           allAssetsSum = allAssetsSum.plus(asset.balanceUSD ?? 0);
         }
 
@@ -145,6 +151,6 @@ export const syncNativeTokens = memoize(
   },
   {
     cacheKey: ([chainId, buster]) => `${chainId}${buster}`,
-    maxAge: 20_000, // 20 sec
+    maxAge: 10_000, // 10 sec
   },
 );

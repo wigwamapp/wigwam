@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, ReactNode } from "react";
 import classNames from "clsx";
 
 type AddAccountHeaderProps = PropsWithChildren<{
-  description?: string;
+  description?: ReactNode;
   className?: string;
 }>;
 
@@ -11,9 +11,20 @@ const AddAccountHeader: FC<AddAccountHeaderProps> = ({
   className,
   children,
 }) => (
-  <div className={classNames("w-full", "text-center", className)}>
-    <h1 className={"text-[2rem] font-bold"}>{children}</h1>
-    {!!description && <p className="text-xl">{description}</p>}
+  <div className={classNames("w-full", "text-center select-none", className)}>
+    <h1 className={"text-[1.75rem] font-bold"}>{children}</h1>
+
+    {description && (
+      <p
+        className={classNames(
+          "mt-2",
+          "font-medium text-base text-brand-lightgray opacity-75",
+          "text-center",
+        )}
+      >
+        {description}
+      </p>
+    )}
   </div>
 );
 

@@ -6,13 +6,13 @@ import { pageAtom } from "app/atoms";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
-import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/WigwamTitle.svg";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
-import WelcomeBgImage from "app/images/welcome-bg.jpg";
-import WelcomeTreeLeftImage from "app/images/welcome-tree-left.png";
-import WelcomeTreeRightImage from "app/images/welcome-tree-right.png";
-import WelcomeWigwamImage from "app/images/welcome-wigwam.png";
-import WelcomeFireImage from "app/images/welcome-fire.png";
+// import WelcomeBgImage from "app/images/welcome-bg.jpg";
+// import WelcomeTreeLeftImage from "app/images/welcome-tree-left.png";
+// import WelcomeTreeRightImage from "app/images/welcome-tree-right.png";
+// import WelcomeWigwamImage from "app/images/welcome-wigwam.png";
+// import WelcomeFireImage from "app/images/welcome-fire.png";
 
 type BoardingPageLayoutProps = {
   header?: boolean;
@@ -38,7 +38,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
       "bg-center bg-cover",
     )}
     style={{
-      backgroundImage: isWelcome ? `url('${WelcomeBgImage}')` : "none",
+      backgroundImage: /*isWelcome ? `url('${WelcomeBgImage}')` : */ "none",
     }}
     onAnimationEnd={bootAnimationDisplayed ? handleBootAnimationEnd : undefined}
   >
@@ -82,11 +82,10 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
         )}
       >
         <WigwamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
-        Wigwam
       </div>
     ) : (
       <>
-        <img
+        {/* <img
           src={WelcomeTreeLeftImage}
           alt="Wigwam"
           className={classNames(
@@ -117,7 +116,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
             "absolute bottom-[4.5%] right-[36%]",
             "h-[54.5%] w-auto",
           )}
-        />
+        /> */}
       </>
     )}
   </div>

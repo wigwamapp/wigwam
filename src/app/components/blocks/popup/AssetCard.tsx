@@ -268,7 +268,7 @@ const AssetCard = memo(
               className={classNames(
                 "bg-brand-dark/10",
                 "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#111226]",
+                IS_FIREFOX && "!bg-[#0E1314]",
                 "border border-brand-light/5",
                 "rounded-[.625rem]",
                 "px-1 py-2",
@@ -300,9 +300,11 @@ const AssetCard = memo(
               >
                 Transfer
               </PopoverButton>
-              <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
-                Hide
-              </PopoverButton>
+              {asset.tokenSlug !== NATIVE_TOKEN_SLUG && (
+                <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
+                  Hide
+                </PopoverButton>
+              )}
               <PopoverButton
                 Icon={SwapIcon}
                 onClick={() => openLink({ page: Page.Swap })}

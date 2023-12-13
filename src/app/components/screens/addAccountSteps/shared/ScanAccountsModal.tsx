@@ -13,145 +13,30 @@ import {
 } from "core/common";
 import { ClientProvider } from "core/client";
 
-import {
-  allAccountsAtom,
-  hasSeedPhraseAtom,
-  walletStatusAtom,
-} from "app/atoms";
+import { allAccountsAtom, walletStatusAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import { useDialog } from "app/hooks/dialog";
-import { useLedger } from "app/hooks/ledger";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-
-import SelectAddMethod, { MethodsProps } from "./SelectAddMethod";
-
-const methodsInitial: MethodsProps = [
-  {
-    value: "auto",
-    title: "Auto (Recommended)",
-    description:
-      "Scanning first 20 wallets from Secret Phrase for a positive balance. For every known network (mainnet). If you have more wallets - you can also add them later.",
-  },
-  {
-    value: "manual",
-    title: "Manual",
-    description:
-      "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-];
-
-const methodsExisting: MethodsProps = [
-  {
-    value: "create",
-    title: "Add a wallet",
-    description:
-      "Just add a wallet with the next index of the derivation path.",
-  },
-  {
-    value: "manual",
-    title: "Select manual",
-    description:
-      "Choose which of the wallets belonging to the Secret Phrase you wish to add.",
-  },
-];
-
-const SelectAccountsToAddMethod: FC = () => {
-  const { navigateToStep, stateRef } = useSteps();
-  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
-  const withLedger = useLedger();
-
-  const [openedLoadingModal, setOpenedLoadingModal] = useState(false);
-
-  const isHardDevice: "ledger" | undefined = stateRef.current.hardDevice;
-
-  const methods = useMemo(
-    () => (!hasSeedPhrase || isHardDevice ? methodsInitial : methodsExisting),
-    [isHardDevice, hasSeedPhrase],
-  );
-
-  useEffect(() => {
-    if (isHardDevice) {
-      Promise.all([import("@ledgerhq/hw-app-eth"), import("lib/ledger")]);
-    }
-  }, [isHardDevice]);
-
-  const handleContinue = useCallback(
-    async (method: string, derivationPath: string) => {
-      stateRef.current.addAccounts = `${
-        !hasSeedPhrase || isHardDevice ? "initial" : "existing"
-      }-${method}`;
-      stateRef.current.derivationPath = derivationPath;
-      stateRef.current.importAddresses = null;
-
-      if (isHardDevice) {
-        let result: any;
-        const answer = await withLedger(
-          async ({ ledgerEth, getExtendedKey }) => {
-            const { publicKey, chainCode } = await ledgerEth.getAddress(
-              derivationPath,
-              false,
-              true,
-            );
-            result = getExtendedKey(publicKey, chainCode!);
-          },
-        );
-        stateRef.current.extendedKey = result;
-
-        if (answer) {
-          if (method === "auto") {
-            setOpenedLoadingModal(true);
-            return;
-          }
-
-          navigateToStep(AddAccountStep.VerifyToAdd);
-          return;
-        }
-
-        return;
-      }
-
-      if (!hasSeedPhrase && method === "auto") {
-        setOpenedLoadingModal(true);
-        return;
-      }
-
-      navigateToStep(AddAccountStep.VerifyToAdd);
-    },
-    [stateRef, hasSeedPhrase, isHardDevice, navigateToStep, withLedger],
-  );
-
-  return (
-    <>
-      <SelectAddMethod
-        title={`Add wallet from ${isHardDevice ? "Ledger" : "Secret Phrase"}`}
-        methods={methods}
-        onContinue={handleContinue}
-      />
-      {openedLoadingModal && (
-        <LoadingModal onOpenChange={() => setOpenedLoadingModal(false)} />
-      )}
-    </>
-  );
-};
-
-export default SelectAccountsToAddMethod;
 
 const preparedNetworks = DEFAULT_NETWORKS.filter(
   ({ type }) => type === "mainnet",
 );
 
-const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
+const ScanAccountsModal: FC<SecondaryModalProps> = ({
+  onOpenChange,
+  ...rest
+}) => {
   const { stateRef, reset, navigateToStep } = useSteps();
   const { alert } = useDialog();
   const [loadingProgress, setLoadingProgress] = useState(0);
   const isUnmountedRef = useRef(false);
   const walletStatus = useAtomValue(walletStatusAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
-  const importedAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
+  const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
   const { getNextAccountName } = useNextAccountName();
 
   const seedPhrase: SeedPharse | undefined = stateRef.current.seedPhrase;
@@ -162,6 +47,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     if (extendedKey) {
       return extendedKey;
     }
+
     if (seedPhrase && derivationPath) {
       return toNeuterExtendedKey(
         getSeedPhraseHDNode(seedPhrase),
@@ -176,10 +62,11 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     (key: string, offset = 0, limit = 9) => {
       const newAccounts = generatePreviewHDNodes(key, offset, limit);
 
-      if (!importedAccounts || importedAccounts.length <= 0) {
+      if (!existingAccounts || existingAccounts.length <= 0) {
         return {
           source: extendedKey ? AccountSource.Ledger : AccountSource.SeedPhrase,
           address: newAccounts[0].address,
+          name: getNextAccountName(),
           index: newAccounts[0].index.toString(),
           publicKey: toProtectedString(newAccounts[0].publicKey),
           isDisabled: false,
@@ -189,8 +76,8 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
       const filteredAccounts = newAccounts.filter(
         ({ address }) =>
-          !importedAccounts.some(
-            ({ address: imported }) => imported === address,
+          !existingAccounts.some(
+            ({ address: existingAddress }) => existingAddress === address,
           ),
       );
 
@@ -208,7 +95,7 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
         publicKey: toProtectedString(filteredAccounts[0].publicKey),
       };
     },
-    [extendedKey, getNextAccountName, importedAccounts],
+    [extendedKey, getNextAccountName, existingAccounts],
   );
 
   const loadActiveWallets = useCallback(async () => {
@@ -229,30 +116,37 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
       await Promise.all(
         wallets.map(async (wallet) => {
+          const existing = existingAccounts?.find(
+            ({ address: existingAddress }) =>
+              existingAddress === wallet.address,
+          );
+          if (existing) return;
+
           const balance = await provider
             .getBalance(wallet.address)
             .catch(() => null);
+          if (!balance) return;
 
-          if (balance) {
-            if (
-              !resultAddresses.some(
-                ({ address: extAdd }) => extAdd === wallet.address,
-              ) &&
-              !importedAccounts?.some(
-                ({ address: imported }) => imported === wallet.address,
-              )
-            ) {
-              resultAddresses.push({
-                source: extendedKey
-                  ? AccountSource.Ledger
-                  : AccountSource.SeedPhrase,
-                address: wallet.address,
-                index: wallet.index,
-                isDisabled: false,
-                isDefaultChecked: true,
-                publicKey: toProtectedString(wallet.publicKey),
-              });
-            }
+          const alreadyInResult = resultAddresses.find(
+            ({ address: alreadyAddedAddress }) =>
+              alreadyAddedAddress === wallet.address,
+          );
+
+          if (alreadyInResult) {
+            if (!alreadyInResult.networks) alreadyInResult.networks = [];
+            alreadyInResult.networks.push(network.chainId);
+          } else {
+            resultAddresses.push({
+              source: extendedKey
+                ? AccountSource.Ledger
+                : AccountSource.SeedPhrase,
+              address: wallet.address,
+              index: wallet.index,
+              isDisabled: false,
+              isDefaultChecked: true,
+              publicKey: toProtectedString(wallet.publicKey),
+              networks: [],
+            });
           }
         }),
       );
@@ -261,7 +155,10 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     }
 
     if (resultAddresses.length > 0) {
-      return resultAddresses;
+      return resultAddresses.map((base, i) => ({
+        ...base,
+        name: getNextAccountName(i),
+      }));
     }
 
     let offset = 0;
@@ -277,21 +174,21 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   }, [
     extendedKey,
     findFirstUnusedAccount,
-    importedAccounts,
+    existingAccounts,
     neuterExtendedKey,
+    getNextAccountName,
   ]);
 
   const logicProcess = useCallback(async () => {
     try {
       const addresses = await loadActiveWallets();
-      if (!isUnmountedRef.current) {
-        onOpenChange?.(false);
-        if (addresses) {
-          stateRef.current.importAddresses = addresses;
-          navigateToStep(AddAccountStep.VerifyToAdd);
-        } else {
-          reset();
-        }
+
+      onOpenChange?.(false);
+      if (addresses) {
+        stateRef.current.importAddresses = addresses;
+        navigateToStep(AddAccountStep.ConfirmAccounts);
+      } else {
+        reset();
       }
     } catch (err: any) {
       alert({
@@ -301,13 +198,16 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     }
   }, [alert, loadActiveWallets, navigateToStep, onOpenChange, reset, stateRef]);
 
+  // little hack to avoid rerender
+  const logicProcessRef = useRef(logicProcess);
+
   useEffect(() => {
-    logicProcess();
+    logicProcessRef.current();
 
     return () => {
       isUnmountedRef.current = true;
     };
-  }, [logicProcess]);
+  }, []);
 
   return (
     <SecondaryModal
@@ -337,6 +237,8 @@ const LoadingModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     </SecondaryModal>
   );
 };
+
+export default ScanAccountsModal;
 
 const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
   const [progress, setProgress] = useState(0);
@@ -375,8 +277,8 @@ const CircularProgress: FC<{ percentage: number }> = ({ percentage }) => {
         style={{ transition: "all 0.5s" }}
       />
       <linearGradient id="loaderLinearColors" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="50%" stopColor="#FF002D" />
-        <stop offset="100%" stopColor="#FF7F44" />
+        <stop offset="50%" stopColor="#80EF6E" />
+        <stop offset="100%" stopColor="#80EF6E" />
       </linearGradient>
     </svg>
   );

@@ -1,38 +1,37 @@
 import { memo, Suspense, useRef } from "react";
-import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AddAccountStep } from "app/nav";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
 
-import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWay";
-import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
-import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
-import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+import AddAccountInitial from "../screens/addAccountSteps/AddAccountInitial";
+
 import CreateSeedPhrase from "../screens/addAccountSteps/CreateSeedPhrase";
 import ImportSeedPhrase from "../screens/addAccountSteps/ImportSeedPhrase";
+import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
 import ImportPrivateKey from "../screens/addAccountSteps/ImportPrivateKey";
 import AddWatchOnlyAccount from "../screens/addAccountSteps/AddWatchOnlyAccount";
 
+import ConfirmAccounts from "../screens/addAccountSteps/ConfirmAccounts";
+import EditAccounts from "../screens/addAccountSteps/EditAccounts";
+import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+
 const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
-  [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
+  [AddAccountStep.AddAccountInitial, () => <AddAccountInitial />],
+
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
+  [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
   [AddAccountStep.ImportPrivateKey, () => <ImportPrivateKey />],
   [AddAccountStep.AddWatchOnlyAccount, () => <AddWatchOnlyAccount />],
-  [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
-  [
-    AddAccountStep.SelectAccountsToAddMethod,
-    () => <SelectAccountsToAddMethod />,
-  ],
-  [AddAccountStep.VerifyToAdd, () => <VerifyAccountToAdd />],
+
+  [AddAccountStep.ConfirmAccounts, () => <ConfirmAccounts />],
+  [AddAccountStep.EditAccounts, () => <EditAccounts />],
   [AddAccountStep.SetupPassword, () => <SetupPassword />],
 ];
 
-const AddAccountSteps = memo(() => {
-  const accountStep = useAtomValue(addAccountStepAtom);
+const AddAccountStepsNext = memo(() => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -41,9 +40,9 @@ const AddAccountSteps = memo(() => {
       className={classNames(
         "w-[59rem] mx-auto",
         "h-full",
-        "pt-24",
+        "py-24",
         "flex flex-col",
-        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24",
+        // accountStep === AddAccountStep.ChooseWayGeneral ? "pb-16" : "pb-24",
       )}
     >
       <StepsProvider
@@ -57,4 +56,4 @@ const AddAccountSteps = memo(() => {
   );
 });
 
-export default AddAccountSteps;
+export default AddAccountStepsNext;
