@@ -167,7 +167,7 @@ const Input = memo(
                 "border",
                 (theme === "primary" ||
                   (theme === "clean" && error && !readOnly)) &&
-                  "bg-black/20 border-brand-main/10",
+                  "bg-black/10 border-brand-main/10",
                 theme === "clean" &&
                   !(error && !readOnly) &&
                   "bg-transparent border-transparent",
