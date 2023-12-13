@@ -58,7 +58,7 @@ const ScrollTopButton: FC<ScrollTopButtonProps> = ({
         "rounded-lg",
         "bg-brand-darkblue/20",
         "backdrop-blur-[10px]",
-        IS_FIREFOX && "!bg-[#0D1020]/[.95]",
+        IS_FIREFOX && "!bg-[#0E1314]/[.95]",
         "border border-brand-main/[.05]",
         "shadow-addaccountmodal",
         "flex items-center justify-center",

@@ -562,7 +562,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               "rounded-[.625rem]",
               "bg-brand-dark/10",
               "backdrop-blur-[30px]",
-              IS_FIREFOX && "!bg-[#111226]",
+              IS_FIREFOX && "!bg-[#13191F]",
               "border border-brand-light/5",
               "z-10",
               "w-[21.875rem]",
