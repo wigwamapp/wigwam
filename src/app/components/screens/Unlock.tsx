@@ -7,7 +7,7 @@ import { Page } from "app/nav";
 import { currentProfileAtom } from "app/atoms";
 import { openInTab } from "app/helpers";
 import { ReactComponent as ChangeProfileIcon } from "app/icons/change-profile.svg";
-import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/WigwamTitle.svg";
 
 import BoardingPageLayout from "../layouts/BoardingPageLayout";
 import PopupLayout from "../layouts/PopupLayout";
@@ -63,7 +63,6 @@ const Unlock: FC<UnlockProps> = ({ isApproval }) => {
           )}
         >
           <WigwamIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
-          Wigwam
         </div>
       )}
     </>
