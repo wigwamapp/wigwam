@@ -300,9 +300,11 @@ const AssetCard = memo(
               >
                 Transfer
               </PopoverButton>
-              <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
-                Hide
-              </PopoverButton>
+              {asset.tokenSlug !== NATIVE_TOKEN_SLUG && (
+                <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
+                  Hide
+                </PopoverButton>
+              )}
               <PopoverButton
                 Icon={SwapIcon}
                 onClick={() => openLink({ page: Page.Swap })}

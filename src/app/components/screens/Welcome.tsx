@@ -1,5 +1,5 @@
-import { FC, useMemo } from "react";
-import { useAtomValue } from "jotai";
+import { FC, useEffect, useMemo } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 
 import { addAccountModalAtom, profileStateAtom } from "app/atoms";
@@ -11,8 +11,15 @@ import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 const Welcome: FC = () => {
   const { all } = useAtomValue(profileStateAtom);
   const addAccOpened = useAtomValue(addAccountModalAtom);
+  const setAddAccOpened = useSetAtom(addAccountModalAtom);
 
   const isInitial = useMemo(() => all.length === 1, [all]);
+
+  useEffect(() => {
+    if (isInitial) {
+      setAddAccOpened([true, "replace"]);
+    }
+  }, [isInitial, setAddAccOpened]);
 
   return (
     <BoardingPageLayout header={!isInitial} isWelcome>
@@ -25,7 +32,7 @@ const Welcome: FC = () => {
         )}
       >
         <WigwamIcon className={classNames("w-[5rem] h-auto mb-5")} />
-        <h1 className={classNames("mb-12 text-5xl font-bold text-brand-light")}>
+        <h1 className={classNames("mb-16 text-5xl font-bold text-brand-light")}>
           Welcome to Wigwam
         </h1>
 
@@ -33,7 +40,7 @@ const Welcome: FC = () => {
           theme="primary-reverse"
           to={{ addAccOpened: true }}
           merge
-          className="w-[14rem] shadow-pulse"
+          className="w-[14rem]"
         >
           {isInitial ? "Get started" : "Add wallet"}
         </Button>
