@@ -150,7 +150,7 @@ const CreateSeedPhrase = memo(() => {
                     "absolute z-10",
                     "inset-0 box-border",
                     "rounded-[.5625rem]",
-                    "bg-[#1e2031] bg-opacity-75",
+                    "bg-[#1E2C31] bg-opacity-75",
                     "border border-brand-main/10",
                     "flex flex-col items-center justify-center",
                     "transition-opacity",

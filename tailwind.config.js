@@ -7,30 +7,27 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          darkbg: "#050505",
-          darkover: "#191B20",
-          darktext: "#11142D",
+          darkaccent: "#0D1311",
+          darkbg: "#181A1F", // #13191F
           lightgray: "#E4E4E4",
-          primary: "#355DFF",
-          redone: "#FF002D",
-          redtwo: "#FF7F44",
-          dark: "#101123",
-          darkblue: "#07081B",
-          darklight: "#2A2C3F",
-          light: "#F8F9FD",
-          main: "#CCD6FF",
-          inactivelight: "#B7BCD0",
-          font: "#BCC2DB",
-          inactivedark: "#767C9D",
-          gray: "#AAABB1",
-          placeholder: "#66697C",
+          redone: "#80EF6E",
+          redtwo: "#80EF6E",
+          dark: "#181A1F",
+          darkblue: "#0E1314",
+          darklight: "#2A3C3F",
+          light: "#F8FCFD",
+          main: "#CCF9FF",
+          inactivelight: "#BFC8CA",
+          font: "#BCC3C4",
+          inactivedark: "#8D9C9E",
+          gray: "#AAB0B1",
+          placeholder: "#717A7B",
           disabledbackground: "#343434",
-          disabledcolor: "#535364",
-          inactivedark2: "#7D8398",
+          disabledcolor: "#606668",
+          inactivedark2: "#91999B",
           redobject: "#B82D41",
           redtext: "#EA556A",
           greenobject: "#4F9A5E",
-          firefoxactivity: "#0D1020",
         },
       },
       fontFamily: {
@@ -126,8 +123,8 @@ module.exports = {
         },
       },
       boxShadow: {
-        buttonaccent: "0px 5px 25px rgba(255, 0, 45, 0.25)",
-        buttonsecondary: "0px 4px 15px rgba(204, 214, 255, 0.07)",
+        buttonaccent: "0px 5px 25px rgba(128, 239, 110, 0.15)",
+        buttonsecondary: "0px 4px 15px rgba(211, 255, 204, 0.07)",
         addaccountmodal:
           "inset 0px 0px 7px rgba(255, 255, 255, 0.05), inset 0px 1px 1px rgba(114, 114, 114, 0.15)",
         receiveqrcode:
@@ -140,8 +137,8 @@ module.exports = {
       backgroundImage: {
         buttonaccent:
           "linear-gradient(259.09deg, rgba(204, 24, 56, var(--tw-bg-opacity)) -1.03%, rgba(215, 93, 37, var(--tw-bg-opacity)) 198.87%)",
-        radio: "linear-gradient(275.43deg, #FF002D 13.81%, #FF7F44 111.89%)",
-        activity: "linear-gradient(220deg, #FF002D 0.11%, #FF7F44 90.88%)",
+        radio: "linear-gradient(275.43deg, #80EF6E 13.81%, #80EF6E 111.89%)",
+        activity: "linear-gradient(220deg, #80EF6E 0.11%, #80EF6E 90.88%)",
         addaccountcontinue:
           "linear-gradient(90.44deg, rgba(13, 14, 32, 0.95) 2.88%, rgba(15, 16, 34, 0.95) 21.54%, rgba(13, 14, 31, 0.95) 41.08%, rgba(17, 18, 36, 0.95) 81.76%, rgba(16, 17, 35, 0.95) 97.51%)",
       },

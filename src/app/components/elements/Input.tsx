@@ -167,7 +167,7 @@ const Input = memo(
                 "border",
                 (theme === "primary" ||
                   (theme === "clean" && error && !readOnly)) &&
-                  "bg-black/20 border-brand-main/10",
+                  "bg-black/10 border-brand-main/10",
                 theme === "clean" &&
                   !(error && !readOnly) &&
                   "bg-transparent border-transparent",
@@ -224,7 +224,7 @@ const Input = memo(
                   ref={successIconRef}
                   className={classNames(
                     "absolute inset-px",
-                    "bg-[#0a0a19]",
+                    "bg-[#0E1314]",
                     "rounded-[.625rem]",
                     "flex items-center justify-center",
                     "opacity-0",
