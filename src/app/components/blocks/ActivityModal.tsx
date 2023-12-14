@@ -1054,7 +1054,12 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
           Icon={WalletExplorerIcon}
           className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
           iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-          href={explorerLink.tx(item.txHash)}
+          href={
+            item.source.type === "self" &&
+            item.source.kind === SelfActivityKind.Swap
+              ? explorerLink.lifi(item.txHash)
+              : explorerLink.tx(item.txHash)
+          }
         />
       )}
     </div>
