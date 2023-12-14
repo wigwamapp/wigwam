@@ -323,15 +323,18 @@ async function handleWalletRequest(
           ctx.reply({ type, status });
         }),
       )
-      .with({ type: MessageType.SendRpc }, ({ chainId, method, params }) => {
-        handleRpc(
-          ctx as WalletRpcMsgContext,
-          UNKNOWN_SELF_SOURCE,
-          chainId,
-          method,
-          params,
-        );
-      })
+      .with(
+        { type: MessageType.SendRpc },
+        ({ chainId, method, params, source }) => {
+          handleRpc(
+            ctx as WalletRpcMsgContext,
+            source ?? UNKNOWN_SELF_SOURCE,
+            chainId,
+            method,
+            params,
+          );
+        },
+      )
       .otherwise(() => {
         throw new Error("Not Found");
       });

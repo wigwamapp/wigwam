@@ -3,7 +3,7 @@ import memoizeOne from "memoize-one";
 import memoize from "mem";
 import { assert } from "lib/system/assert";
 
-import { MessageType, RpcResponse } from "core/types";
+import { MessageType, RpcResponse, ActivitySource } from "core/types";
 
 import { porter } from "./base";
 
@@ -15,18 +15,23 @@ export class ClientProvider extends JsonRpcProvider {
   constructor(public chainId: number) {
     super("", chainId);
   }
+  source?: ActivitySource;
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
   getSigner = memoize(super.getSigner.bind(this));
   getCode = memoize(super.getCode.bind(this));
   getUncheckedSigner = memoize(super.getUncheckedSigner.bind(this));
 
+  setActivitySource = (source?: ActivitySource) => {
+    this.source = source;
+  };
+
   async send(method: string, params: Array<any>): Promise<any> {
     const type = MessageType.SendRpc;
     const { chainId } = this.network;
 
     const res = await porter.request(
-      { type, chainId, method, params },
+      { type, chainId, method, params, source: this.source },
       { timeout: 0 },
     );
     assert(res?.type === type);

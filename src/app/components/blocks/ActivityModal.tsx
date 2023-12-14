@@ -22,12 +22,14 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { isPopup } from "lib/ext/view";
+import { Route } from "@lifi/types";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
   Activity,
   ActivitySource,
   ActivityType,
+  SelfActivityKind,
   ConnectionActivity,
   TransactionActivity,
   TxAction,
@@ -68,6 +70,7 @@ import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
+import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -375,6 +378,7 @@ const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
     const isPopupMode = isPopup();
     const [revokedPermission, setRevokedPermission] = useSafeState(false);
+    console.log(item);
 
     const status = useMemo<StatusType | undefined>(() => {
       if (item.type === ActivityType.Connection && revokedPermission) {
@@ -504,6 +508,11 @@ const ActivityCard = memo(
                 />
               </div>
             )}
+            {item.source.type === "self" &&
+              item.source.kind === SelfActivityKind.Swap &&
+              item.source.swapMeta && (
+                <ActivitySwap route={item.source.swapMeta} />
+              )}
           </div>
         ) : (
           <>
@@ -540,6 +549,12 @@ const ActivityCard = memo(
                 className="w-[10rem] mr-8"
               />
             )}
+
+            {item.source.type === "self" &&
+              item.source.kind === SelfActivityKind.Swap &&
+              item.source.swapMeta && (
+                <ActivitySwap route={item.source.swapMeta} />
+              )}
 
             {item.type === ActivityType.Connection && (
               <DisconnectDApp
@@ -679,10 +694,15 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
 
   const name =
     item.type === ActivityType.Transaction && item.source.type === "self"
-      ? "Transfer"
+      ? item.source.kind === SelfActivityKind.Swap
+        ? "Swap"
+        : "Transfer"
       : item.type;
 
-  const Icon = getActivityIcon(item.type);
+  const Icon = getActivityIcon(
+    item.type,
+    item.source.type === "self" ? item.source.kind : null,
+  );
   return (
     <div
       className={classNames(
@@ -729,15 +749,70 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
   );
 };
 
-const getActivityIcon = (type: ActivityType) => {
+const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
   switch (type) {
     case ActivityType.Connection:
       return ActivityConnectionIcon;
     case ActivityType.Signing:
       return ActivitySigningIcon;
     default:
-      return ActivityTransactionIcon;
+      if (kind && kind === SelfActivityKind.Swap) {
+        return SwapIcon;
+      } else {
+        return ActivityTransactionIcon;
+      }
   }
+};
+
+type ActivitySwapProps = {
+  route: Route;
+};
+
+const ActivitySwap: FC<ActivitySwapProps> = ({ route }) => {
+  const isPopupMode = isPopup();
+
+  return (
+    <div
+      className={classNames(
+        "flex items-center",
+        isPopupMode ? "flex-inline w-auto mt-1.5" : "flex-col w-[12rem]",
+      )}
+    >
+      <div className="inline-flex">
+        <PrettyAmount
+          amount={route.fromAmount}
+          decimals={route.fromToken.decimals}
+          currency={route.fromToken.symbol}
+          threeDots={false}
+          copiable
+          className={classNames("text-xs ml-1.5", "font-bold")}
+        />{" "}
+        <img
+          src={route.fromToken.logoURI}
+          alt={route.fromToken.name}
+          className="ml-1 w-4 h-4 rounded-full"
+        />
+      </div>
+      <div className={classNames("text-xs font-bold", isPopupMode && "ml-1.5")}>
+        {isPopupMode ? "→" : "↓"}
+      </div>
+      <div className="inline-flex">
+        <PrettyAmount
+          amount={route.toAmount}
+          decimals={route.toToken.decimals}
+          currency={route.toToken.symbol}
+          threeDots={false}
+          copiable
+          className={classNames("text-xs ml-1.5", "font-bold")}
+        />{" "}
+        <img
+          src={route.toToken.logoURI}
+          alt={route.toToken.name}
+          className="ml-1 w-4 h-4 rounded-full"
+        />
+      </div>
+    </div>
+  );
 };
 
 type ActivityWebsiteLinkProps = {

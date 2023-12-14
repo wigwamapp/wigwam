@@ -307,9 +307,9 @@ const AssetCard = memo(
               )}
               <PopoverButton
                 Icon={SwapIcon}
-                onClick={() => openLink({ page: Page.Swap })}
-                disabled
-                title="Coming soon"
+                onClick={() =>
+                  openLink({ page: Page.Swap, token: asset.tokenSlug })
+                }
               >
                 Swap
               </PopoverButton>

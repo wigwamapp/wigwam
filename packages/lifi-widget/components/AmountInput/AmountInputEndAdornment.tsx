@@ -11,7 +11,6 @@ import type { FormTypeProps } from '../../providers';
 import { FormKeyHelper } from '../../providers';
 import { formatTokenAmount } from '../../utils';
 import { Button } from './AmountInputAdornment.style';
-import { useEffect } from 'react';
 
 export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
   const { t } = useTranslation();
@@ -24,7 +23,6 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
     ],
   });
   const { data } = useGasRecommendation(chainId);
-  console.log(tokenAddress)
   const { token, isLoading } = useTokenAddressBalance(chainId, tokenAddress);
 
   const handleMax = () => {

@@ -43,6 +43,7 @@ export const TransactionPage: React.FC = () => {
     insurance,
     contractComponent,
     contractSecondaryComponent,
+    onBeforeTransaction
   } = useWidgetConfig();
   const { state }: any = useLocation();
   const headerStoreContext = useHeaderStoreContext();
@@ -116,6 +117,9 @@ export const TransactionPage: React.FC = () => {
       if (tokenValueLossThresholdExceeded && subvariant !== "nft") {
         tokenValueBottomSheetRef.current?.open();
       } else {
+        if (onBeforeTransaction) {
+          onBeforeTransaction(route)
+        }
         handleExecuteRoute();
       }
     }

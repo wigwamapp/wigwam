@@ -1,4 +1,4 @@
-import { FC, useMemo, useEffect } from "react";
+import { FC, useMemo, useEffect, useState, useCallback } from "react";
 import { LiFiWidget, WidgetConfig } from "../../../../../packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { useAccounts, useChainId } from "app/hooks";
@@ -11,11 +11,36 @@ import {
   useWidgetEvents,
   WidgetEvent,
 } from "../../../../../packages/lifi-widget";
+import { SelfActivityKind } from "core/types";
+import { Route } from "@lifi/types";
+import { ERC721__factory } from "abi-types";
+import { getClientProvider } from "core/client";
+
+const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
+const DEV_NFT_CHAIN = 137;
 
 const Swap: FC = () => {
   const { currentAccount } = useAccounts();
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
+  const [fee, setFee] = useState(0.01);
+
+  const getDevNftBalance = async () => {
+    const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
+      currentAccount.address,
+    );
+    const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
+    const nftBalance = await contract.balanceOf(currentAccount.address);
+
+    if (Boolean(nftBalance)) {
+      setFee(0);
+    }
+  };
+
+  useEffect(() => {
+    getDevNftBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentAccount.address]);
 
   const widgetEvents = useWidgetEvents();
 
@@ -51,11 +76,30 @@ const Swap: FC = () => {
     widgetEvents.on(WidgetEvent.WalletConnected, onWalletConnected);
     return () => widgetEvents.all.clear();
   }, [widgetEvents]);
+  const provider = getLiFiProvider(chainId);
+
+  const signer = provider.getSigner(currentAccount.address);
+
+  const handleBeforeTransaction = useCallback(
+    (metadata: Route) => {
+      if (metadata) {
+        provider.setActivitySource({
+          type: "self",
+          kind: SelfActivityKind.Swap,
+          swapMeta: metadata,
+        });
+      }
+    },
+    [provider],
+  );
 
   const widgetConfig = useMemo((): WidgetConfig => {
     return {
+      onBeforeTransaction: (metadata: Route) =>
+        handleBeforeTransaction(metadata),
       integrator: "Wigwam",
       variant: "expandable",
+      fee: fee,
       fromChain: chainId,
       fromToken: tokenSlug
         ? parseTokenSlug(tokenSlug).address === "0"
@@ -78,8 +122,8 @@ const Swap: FC = () => {
       theme: {
         palette: {
           background: {
-            paper: "#191b2e",
-            default: "#101123", // bg color container
+            paper: "#2b3037",
+            default: "#181a1f", // bg color container
           },
         },
         shape: {
@@ -91,7 +135,7 @@ const Swap: FC = () => {
         },
       },
       walletManagement: {
-        signer: getLiFiProvider(chainId).getSigner(currentAccount.address),
+        signer,
         connect: async () => {
           const signer = getLiFiProvider(chainId).getSigner(
             currentAccount.address,
@@ -113,7 +157,14 @@ const Swap: FC = () => {
         },
       },
     };
-  }, [chainId, currentAccount.address, tokenSlug]);
+  }, [
+    chainId,
+    currentAccount.address,
+    tokenSlug,
+    fee,
+    signer,
+    handleBeforeTransaction,
+  ]);
 
   return (
     <div className="flex mt-[1rem]">

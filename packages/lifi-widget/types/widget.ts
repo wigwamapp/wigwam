@@ -19,6 +19,7 @@ import type { TypographyOptions } from '@mui/material/styles/createTypography';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import type { LanguageKey, LanguageResources } from '../providers';
 import type { SplitSubvariantOptions } from '../stores';
+import { Route } from '@lifi/types';
 
 export type WidgetVariant = 'default' | 'expandable' | 'drawer';
 
@@ -165,6 +166,7 @@ export interface WidgetConfig {
   };
   languageResources?: LanguageResources;
   disableLanguageDetector?: boolean;
+  onBeforeTransaction?: (metadata: Route) => void;
 }
 
 export type WidgetDrawerProps = {

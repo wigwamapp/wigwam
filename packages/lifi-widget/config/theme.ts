@@ -51,7 +51,7 @@ declare module '@mui/material/Typography' {
 
 const palette = {
   primary: {
-    main: '#3F49E1',
+    main: '#81ef6e',
     light: lighten('#3F49E1', 0.5),
     dark: darken('#3F49E1', 0.2),
   },

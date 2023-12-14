@@ -2,6 +2,7 @@ import type { ethers } from "ethers";
 
 import { RpcContext } from "./rpc";
 import { Permission } from "./permissions";
+import { Route } from "@lifi/types";
 
 export enum ActivityType {
   Connection = "CONNECTION",
@@ -29,6 +30,7 @@ export type ActivitySource =
   | {
       type: "self";
       kind: SelfActivityKind;
+      swapMeta?: Route;
     }
   | {
       type: "page";

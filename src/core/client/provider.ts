@@ -15,7 +15,6 @@ export class ClientProvider extends ethers.JsonRpcApiProvider {
   constructor(public chainId: number) {
     super(chainId);
   }
-
   getNetwork = memoizeOne(super.getNetwork.bind(this));
   getCode = memoize(super.getCode.bind(this));
 
