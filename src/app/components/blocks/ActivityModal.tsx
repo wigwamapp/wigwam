@@ -178,7 +178,7 @@ const ActivityModal = memo(() => {
                   {isPopupMode ? (
                     <IconedButton Icon={CloseIcon} theme="tertiary" />
                   ) : (
-                    <Button theme="clean">Cancel</Button>
+                    <Button theme="clean">Close</Button>
                   )}
                 </Dialog.Close>
 

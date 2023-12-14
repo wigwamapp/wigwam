@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import useForceUpdate from "use-force-update";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
+import SwapIcon from "app/icons/swap.svg";
 
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
@@ -67,6 +68,16 @@ export function useTokenActivity(
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
+  const filteredActivity = activity.map((item) => {
+    if (item.project && item.project.name === "LI.FI") {
+      item.project = {
+        name: "Swap",
+        logoUrl: SwapIcon,
+      };
+    }
+    return item;
+  });
+
   const hasMore = offsetRef.current <= activity.length;
 
   const loadMore = useCallback(() => {
@@ -77,7 +88,7 @@ export function useTokenActivity(
   }, [forceUpdate, hasMore, limit]);
 
   return {
-    activity,
+    activity: filteredActivity,
     hasMore,
     loadMore,
   };
