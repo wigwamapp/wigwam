@@ -58,6 +58,7 @@ import {
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import { ReactComponent as SwapIconSmall } from "app/icons/swap.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -763,7 +764,7 @@ const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
       return ActivitySigningIcon;
     default:
       if (kind && kind === SelfActivityKind.Swap) {
-        return SwapIcon;
+        return SwapIconSmall;
       } else {
         return ActivityTransactionIcon;
       }

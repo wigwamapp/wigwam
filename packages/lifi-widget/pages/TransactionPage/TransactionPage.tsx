@@ -104,6 +104,9 @@ export const TransactionPage: React.FC = () => {
       });
     }
     tokenValueBottomSheetRef.current?.close();
+    if (onBeforeTransaction) {
+      onBeforeTransaction(route)
+    }
     executeRoute();
     setValue(FormKey.FromAmount, "");
     if (subvariant === "nft") {
@@ -117,9 +120,6 @@ export const TransactionPage: React.FC = () => {
       if (tokenValueLossThresholdExceeded && subvariant !== "nft") {
         tokenValueBottomSheetRef.current?.open();
       } else {
-        if (onBeforeTransaction) {
-          onBeforeTransaction(route)
-        }
         handleExecuteRoute();
       }
     }
