@@ -57,6 +57,7 @@ import {
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
+import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -70,7 +71,6 @@ import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
-import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
@@ -660,21 +660,27 @@ type ActivityIconProps = {
 const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
   const isPopupMode = isPopup();
 
-  return item.source.type === "page" ? (
-    <Avatar
-      src={item.source.favIconUrl}
-      alt={item.source.url}
-      className={classNames(
-        "block",
-        "bg-white",
-        "rounded-full overflow-hidden",
-        isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
-        className,
-      )}
-      fallbackClassName="!h-3/5"
-    />
-  ) : (
-    <SendIcon
+  if (item.source.type === "page") {
+    return (
+      <Avatar
+        src={item.source.favIconUrl}
+        alt={item.source.url}
+        className={classNames(
+          "block",
+          "bg-white",
+          "rounded-full overflow-hidden",
+          isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
+          className,
+        )}
+        fallbackClassName="!h-3/5"
+      />
+    );
+  }
+
+  const Icon = item.source.kind === SelfActivityKind.Swap ? SwapIcon : SendIcon;
+
+  return (
+    <Icon
       className={classNames(
         "glass-icon--active",
         isPopupMode ? "w-8 h-8" : "w-12 h-12",
