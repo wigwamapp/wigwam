@@ -313,7 +313,7 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
   animation-delay: -0.4s;
 }
 .atom-spinner:after {
-  color: #ff3d00;
+  color: rgb(128, 239, 110);
   transform: rotateY(70deg);
 }
 
