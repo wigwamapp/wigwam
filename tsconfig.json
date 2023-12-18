@@ -1,6 +1,10 @@
 {
+  "include": ["src", "packages"],
   "compilerOptions": {
     "baseUrl": "src",
+    "paths": {
+      "packages/*": ["../packages/*"]
+    },
     "module": "esnext",
     "target": "es2022",
     "moduleResolution": "node",
@@ -15,6 +19,5 @@
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "remove",
     "noImplicitAny": true
-  },
-  "include": ["src", "packages"]
+  }
 }

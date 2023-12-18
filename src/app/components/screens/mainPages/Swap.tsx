@@ -1,16 +1,17 @@
 import { FC, useMemo, useEffect, useState, useCallback } from "react";
-import { LiFiWidget, WidgetConfig } from "../../../../../packages/lifi-widget";
+import {
+  LiFiWidget,
+  WidgetConfig,
+  RouteExecutionUpdate,
+  useWidgetEvents,
+  WidgetEvent,
+} from "packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { useAccounts, useChainId } from "app/hooks";
 import { tokenSlugAtom } from "app/atoms";
 import { useAtomValue } from "jotai";
 import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
-import type { RouteExecutionUpdate } from "../../../../../packages/lifi-widget";
-import {
-  useWidgetEvents,
-  WidgetEvent,
-} from "../../../../../packages/lifi-widget";
 import { SelfActivityKind } from "core/types";
 import { Route } from "@lifi/types";
 import { ERC721__factory } from "abi-types";

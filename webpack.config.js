@@ -178,6 +178,7 @@ module.exports = {
         __dirname,
         "node_modules/@dicebear/core/lib",
       ),
+      packages: path.resolve(__dirname, "packages"),
     },
     fallback: {
       process: false,
