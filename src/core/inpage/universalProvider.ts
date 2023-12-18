@@ -62,7 +62,7 @@ export class UniversalInpageProvider extends Emitter {
   }
 
   get selectedAddress() {
-    return this.currentProvider.selectedAddress;
+    return getSelectedAddress(this.currentProvider);
   }
 
   constructor(
@@ -117,7 +117,7 @@ export class UniversalInpageProvider extends Emitter {
       this.currentProvider = provider;
       this.#proxyEvents();
 
-      this.emit("accountsChanged", [provider.selectedAddress]);
+      this.emit("accountsChanged", [getSelectedAddress(provider)]);
 
       if (prevProvider.chainId !== provider.chainId) {
         this.emit("chainChanged", provider.chainId);
@@ -132,8 +132,7 @@ export class UniversalInpageProvider extends Emitter {
 
       if (enabledProviders.length > 0) {
         changeProvider(
-          enabledProviders.find((p) => p.selectedAddress) ??
-            enabledProviders[0],
+          enabledProviders.find(getSelectedAddress) ?? enabledProviders[0],
         );
         return;
       }
@@ -142,7 +141,7 @@ export class UniversalInpageProvider extends Emitter {
     if (this.selectedAddress) return;
 
     for (const provider of this.allProviders) {
-      if (provider !== this.currentProvider && provider.selectedAddress) {
+      if (provider !== this.currentProvider && getSelectedAddress(provider)) {
         changeProvider(provider);
         break;
       }
@@ -265,7 +264,7 @@ function isPermissionMethod(method: string, currentProvider: InpageProvider) {
   return (
     method === JsonRpcMethod.wallet_requestPermissions ||
     (method === JsonRpcMethod.eth_requestAccounts &&
-      !currentProvider.selectedAddress)
+      !getSelectedAddress(currentProvider))
   );
 }
 
@@ -276,3 +275,14 @@ const EVENTS_TO_PROXY = [
   "accountsChanged",
   "message",
 ];
+
+function getSelectedAddress(provider: any): string | null {
+  // Fix issue: 'ethereum.selectedAddress' is deprecated and may be removed in the future
+  try {
+    if ("accounts" in provider._state) {
+      return provider._state.accounts?.[0] ?? null;
+    }
+  } catch {}
+
+  return provider.selectedAddress;
+}
