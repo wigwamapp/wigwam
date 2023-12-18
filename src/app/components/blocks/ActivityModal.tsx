@@ -22,7 +22,6 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { isPopup } from "lib/ext/view";
-import { Route } from "@lifi/types";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import {
@@ -379,7 +378,6 @@ const ActivityCard = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
     const isPopupMode = isPopup();
     const [revokedPermission, setRevokedPermission] = useSafeState(false);
-    console.log(item);
 
     const status = useMemo<StatusType | undefined>(() => {
       if (item.type === ActivityType.Connection && revokedPermission) {
@@ -509,11 +507,7 @@ const ActivityCard = memo(
                 />
               </div>
             )}
-            {item.source.type === "self" &&
-              item.source.kind === SelfActivityKind.Swap &&
-              item.source.swapMeta && (
-                <ActivitySwap route={item.source.swapMeta} />
-              )}
+            <ActivitySwap source={item.source} />
           </div>
         ) : (
           <>
@@ -551,11 +545,7 @@ const ActivityCard = memo(
               />
             )}
 
-            {item.source.type === "self" &&
-              item.source.kind === SelfActivityKind.Swap &&
-              item.source.swapMeta && (
-                <ActivitySwap route={item.source.swapMeta} />
-              )}
+            <ActivitySwap source={item.source} />
 
             {item.type === ActivityType.Connection && (
               <DisconnectDApp
@@ -772,54 +762,64 @@ const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
 };
 
 type ActivitySwapProps = {
-  route: Route;
+  source: ActivitySource;
 };
 
-const ActivitySwap: FC<ActivitySwapProps> = ({ route }) => {
+const ActivitySwap: FC<ActivitySwapProps> = ({ source }) => {
   const isPopupMode = isPopup();
-
-  return (
-    <div
-      className={classNames(
-        "flex items-center",
-        isPopupMode ? "flex-inline w-auto mt-1.5" : "flex-col w-[12rem]",
-      )}
-    >
-      <div className="inline-flex">
-        <PrettyAmount
-          amount={route.fromAmount}
-          decimals={route.fromToken.decimals}
-          currency={route.fromToken.symbol}
-          threeDots={false}
-          copiable
-          className={classNames("text-xs ml-1.5", "font-bold")}
-        />{" "}
-        <img
-          src={route.fromToken.logoURI}
-          alt={route.fromToken.name}
-          className="ml-1 w-4 h-4 rounded-full"
-        />
+  if (
+    source.type === "self" &&
+    source.kind === SelfActivityKind.Swap &&
+    source.swapMeta
+  ) {
+    const route = source.swapMeta;
+    return (
+      <div
+        className={classNames(
+          "flex items-center",
+          isPopupMode ? "flex-inline w-auto mt-1.5" : "flex-col w-[12rem]",
+        )}
+      >
+        <div className="inline-flex">
+          <PrettyAmount
+            amount={route.fromAmount}
+            decimals={route.fromToken.decimals}
+            currency={route.fromToken.symbol}
+            threeDots={false}
+            copiable
+            className={classNames("text-xs ml-1.5", "font-bold")}
+          />{" "}
+          <img
+            src={route.fromToken.logoURI}
+            alt={route.fromToken.name}
+            className="ml-1 w-4 h-4 rounded-full"
+          />
+        </div>
+        <div
+          className={classNames("text-xs font-bold", isPopupMode && "ml-1.5")}
+        >
+          {isPopupMode ? "→" : "↓"}
+        </div>
+        <div className="inline-flex">
+          <PrettyAmount
+            amount={route.toAmount}
+            decimals={route.toToken.decimals}
+            currency={route.toToken.symbol}
+            threeDots={false}
+            copiable
+            className={classNames("text-xs ml-1.5", "font-bold")}
+          />{" "}
+          <img
+            src={route.toToken.logoURI}
+            alt={route.toToken.name}
+            className="ml-1 w-4 h-4 rounded-full"
+          />
+        </div>
       </div>
-      <div className={classNames("text-xs font-bold", isPopupMode && "ml-1.5")}>
-        {isPopupMode ? "→" : "↓"}
-      </div>
-      <div className="inline-flex">
-        <PrettyAmount
-          amount={route.toAmount}
-          decimals={route.toToken.decimals}
-          currency={route.toToken.symbol}
-          threeDots={false}
-          copiable
-          className={classNames("text-xs ml-1.5", "font-bold")}
-        />{" "}
-        <img
-          src={route.toToken.logoURI}
-          alt={route.toToken.name}
-          className="ml-1 w-4 h-4 rounded-full"
-        />
-      </div>
-    </div>
-  );
+    );
+  } else {
+    return null;
+  }
 };
 
 type ActivityWebsiteLinkProps = {

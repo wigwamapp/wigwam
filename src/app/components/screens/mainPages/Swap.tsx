@@ -63,7 +63,7 @@ const Swap: FC = () => {
     };
 
     const onWalletConnected = () => {
-      console.log("CONNECTED");
+      console.log("onWalletConnected");
     };
 
     widgetEvents.on(WidgetEvent.RouteExecutionStarted, onRouteExecutionStarted);
@@ -77,8 +77,8 @@ const Swap: FC = () => {
     widgetEvents.on(WidgetEvent.WalletConnected, onWalletConnected);
     return () => widgetEvents.all.clear();
   }, [widgetEvents]);
-  const provider = getLiFiProvider(chainId);
 
+  const provider = getLiFiProvider(chainId);
   const signer = provider.getSigner(currentAccount.address);
 
   const handleBeforeTransaction = useCallback(
@@ -119,7 +119,7 @@ const Swap: FC = () => {
         deny: [66, 122, 1101],
       },
       appearance: "dark",
-      hiddenUI: ["appearance"],
+      hiddenUI: ["appearance", "poweredBy"],
       theme: {
         palette: {
           background: {

@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import useForceUpdate from "use-force-update";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
-import SwapIcon from "app/icons/swap.svg";
 
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { getActivityAtom, getTokenActivityAtom } from "app/atoms";
+import SwapIcon from "app/icons/swap.svg";
 
 import { useChainId } from "./chainId";
 
@@ -68,6 +68,7 @@ export function useTokenActivity(
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
+  // TODO: identify swaps created in our app by tx hashes or metadata
   const filteredActivity = activity.map((item) => {
     if (item.project && item.project.name === "LI.FI") {
       item.project = {

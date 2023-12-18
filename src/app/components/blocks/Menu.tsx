@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { useAtomValue } from "jotai";
 
 import { useIsSyncing } from "app/hooks";
 import { Page, SettingTab } from "app/nav";
@@ -6,13 +7,15 @@ import Button from "app/components/elements/Button";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import LockProfileButton from "app/components/elements/LockProfileButton";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
+import { pageAtom } from "app/atoms";
 
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();
+  const page = useAtomValue(pageAtom);
 
   return (
     <div className="flex items-center py-4 border-b border-brand-main/[.07]">
-      {!window.location.href.includes("swap") && (
+      {page !== Page.Swap && (
         <NetworkSelect
           className="w-[17.75rem]"
           contentClassName="w-[17.75rem]"
