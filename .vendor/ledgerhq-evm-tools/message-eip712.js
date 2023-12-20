@@ -48,7 +48,7 @@ var __rest =
       }
     return t;
   };
-import { ethers } from "ethers";
+import { ethers } from "../../../../../ethers";
 import SHA224 from "crypto-js/sha224";
 import { getEnv } from "@ledgerhq/live-env";
 import network from "@ledgerhq/live-network/network";

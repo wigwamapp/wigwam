@@ -28,6 +28,7 @@ import {
   Activity,
   ActivitySource,
   ActivityType,
+  SelfActivityKind,
   ConnectionActivity,
   TransactionActivity,
   TxAction,
@@ -55,6 +56,8 @@ import {
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
+import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import { ReactComponent as SwapIconSmall } from "app/icons/swap.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -175,7 +178,7 @@ const ActivityModal = memo(() => {
                   {isPopupMode ? (
                     <IconedButton Icon={CloseIcon} theme="tertiary" />
                   ) : (
-                    <Button theme="clean">Cancel</Button>
+                    <Button theme="clean">Close</Button>
                   )}
                 </Dialog.Close>
 
@@ -504,6 +507,7 @@ const ActivityCard = memo(
                 />
               </div>
             )}
+            <ActivitySwap source={item.source} />
           </div>
         ) : (
           <>
@@ -540,6 +544,8 @@ const ActivityCard = memo(
                 className="w-[10rem] mr-8"
               />
             )}
+
+            <ActivitySwap source={item.source} />
 
             {item.type === ActivityType.Connection && (
               <DisconnectDApp
@@ -645,21 +651,27 @@ type ActivityIconProps = {
 const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
   const isPopupMode = isPopup();
 
-  return item.source.type === "page" ? (
-    <Avatar
-      src={item.source.favIconUrl}
-      alt={item.source.url}
-      className={classNames(
-        "block",
-        "bg-white",
-        "rounded-full overflow-hidden",
-        isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
-        className,
-      )}
-      fallbackClassName="!h-3/5"
-    />
-  ) : (
-    <SendIcon
+  if (item.source.type === "page") {
+    return (
+      <Avatar
+        src={item.source.favIconUrl}
+        alt={item.source.url}
+        className={classNames(
+          "block",
+          "bg-white",
+          "rounded-full overflow-hidden",
+          isPopupMode ? "w-8 h-8 min-w-[2rem]" : "w-12 h-12 min-w-[3rem]",
+          className,
+        )}
+        fallbackClassName="!h-3/5"
+      />
+    );
+  }
+
+  const Icon = item.source.kind === SelfActivityKind.Swap ? SwapIcon : SendIcon;
+
+  return (
+    <Icon
       className={classNames(
         "glass-icon--active",
         isPopupMode ? "w-8 h-8" : "w-12 h-12",
@@ -679,10 +691,15 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
 
   const name =
     item.type === ActivityType.Transaction && item.source.type === "self"
-      ? "Transfer"
+      ? item.source.kind === SelfActivityKind.Swap
+        ? "Swap"
+        : "Transfer"
       : item.type;
 
-  const Icon = getActivityIcon(item.type);
+  const Icon = getActivityIcon(
+    item.type,
+    item.source.type === "self" ? item.source.kind : null,
+  );
   return (
     <div
       className={classNames(
@@ -729,14 +746,79 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
   );
 };
 
-const getActivityIcon = (type: ActivityType) => {
+const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
   switch (type) {
     case ActivityType.Connection:
       return ActivityConnectionIcon;
     case ActivityType.Signing:
       return ActivitySigningIcon;
     default:
-      return ActivityTransactionIcon;
+      if (kind && kind === SelfActivityKind.Swap) {
+        return SwapIconSmall;
+      } else {
+        return ActivityTransactionIcon;
+      }
+  }
+};
+
+type ActivitySwapProps = {
+  source: ActivitySource;
+};
+
+const ActivitySwap: FC<ActivitySwapProps> = ({ source }) => {
+  const isPopupMode = isPopup();
+  if (
+    source.type === "self" &&
+    source.kind === SelfActivityKind.Swap &&
+    source.swapMeta
+  ) {
+    const route = source.swapMeta;
+    return (
+      <div
+        className={classNames(
+          "flex items-center",
+          isPopupMode ? "flex-inline w-auto mt-1.5" : "flex-col w-[12rem]",
+        )}
+      >
+        <div className="inline-flex">
+          <PrettyAmount
+            amount={route.fromAmount}
+            decimals={route.fromToken.decimals}
+            currency={route.fromToken.symbol}
+            threeDots={false}
+            copiable
+            className={classNames("text-xs ml-1.5", "font-bold")}
+          />{" "}
+          <img
+            src={route.fromToken.logoURI}
+            alt={route.fromToken.name}
+            className="ml-1 w-4 h-4 rounded-full"
+          />
+        </div>
+        <div
+          className={classNames("text-xs font-bold", isPopupMode && "ml-1.5")}
+        >
+          {isPopupMode ? "→" : "↓"}
+        </div>
+        <div className="inline-flex">
+          <PrettyAmount
+            amount={route.toAmount}
+            decimals={route.toToken.decimals}
+            currency={route.toToken.symbol}
+            threeDots={false}
+            copiable
+            className={classNames("text-xs ml-1.5", "font-bold")}
+          />{" "}
+          <img
+            src={route.toToken.logoURI}
+            alt={route.toToken.name}
+            className="ml-1 w-4 h-4 rounded-full"
+          />
+        </div>
+      </div>
+    );
+  } else {
+    return null;
   }
 };
 
@@ -979,7 +1061,12 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
           Icon={WalletExplorerIcon}
           className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
           iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-          href={explorerLink.tx(item.txHash)}
+          href={
+            item.source.type === "self" &&
+            item.source.kind === SelfActivityKind.Swap
+              ? explorerLink.lifi(item.txHash)
+              : explorerLink.tx(item.txHash)
+          }
         />
       )}
     </div>

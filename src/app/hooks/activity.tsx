@@ -6,6 +6,7 @@ import { usePrevious } from "lib/react-hooks/usePrevious";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { getActivityAtom, getTokenActivityAtom } from "app/atoms";
+import SwapIcon from "app/icons/swap.svg";
 
 import { useChainId } from "./chainId";
 
@@ -67,6 +68,17 @@ export function useTokenActivity(
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
+  // TODO: identify swaps created in our app by tx hashes or metadata
+  const filteredActivity = activity.map((item) => {
+    if (item.project && item.project.name === "LI.FI") {
+      item.project = {
+        name: "Swap",
+        logoUrl: SwapIcon,
+      };
+    }
+    return item;
+  });
+
   const hasMore = offsetRef.current <= activity.length;
 
   const loadMore = useCallback(() => {
@@ -77,7 +89,7 @@ export function useTokenActivity(
   }, [forceUpdate, hasMore, limit]);
 
   return {
-    activity,
+    activity: filteredActivity,
     hasMore,
     loadMore,
   };

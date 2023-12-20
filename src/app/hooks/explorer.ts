@@ -10,6 +10,7 @@ export function useExplorerLink(network?: Network) {
     () =>
       explorerUrl
         ? {
+            lifi: (address: string) => `https://explorer.li.fi/tx/${address}/`,
             address: (address: string) =>
               joinPath(explorerUrl, `/address/${address}`),
             tx: (hash: string) => joinPath(explorerUrl, `/tx/${hash}`),

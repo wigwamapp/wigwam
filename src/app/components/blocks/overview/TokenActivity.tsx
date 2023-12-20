@@ -69,6 +69,8 @@ const TokenActivity = memo<{ token: AccountToken }>(({ token }) => {
   );
 
   if (activity.length === 0 && !isSyncing) return null;
+  console.log("activity");
+  console.log(activity);
 
   return (
     <div
