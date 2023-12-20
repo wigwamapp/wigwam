@@ -29,15 +29,15 @@ const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   }, 3_000);
 });
 
-inject1193("ethereum", true);
-inject1193("wigwamEthereum");
+injectEIP1193("ethereum", true);
+injectEIP1193("wigwamEthereum");
 injectEIP5749("evmproviders");
 injectEIP6963();
 
 warnIfPhishing();
 
 // https://eips.ethereum.org/EIPS/eip-1193
-function inject1193(key: string, sharedProperty = false) {
+function injectEIP1193(key: string, sharedProperty = false) {
   const existing = (window as any)[key];
 
   if (existing?.isWigwam && "addProviders" in existing) {
