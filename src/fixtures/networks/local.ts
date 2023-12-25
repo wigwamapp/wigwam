@@ -5,7 +5,7 @@ export const LOCAL: Network[] = [
   {
     chainId: 1337,
     type: "testnet",
-    rpcUrls: ["http://localhost:8545"],
+    rpcUrls: [],
     chainTag: "local",
     name: "Local testnet 8545",
     nativeCurrency: {
