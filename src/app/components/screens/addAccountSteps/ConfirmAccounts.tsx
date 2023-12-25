@@ -5,6 +5,7 @@ import { fromProtectedString, toProtectedString } from "lib/crypto-utils";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { TReplace, useI18NUpdate } from "lib/ext/react";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
+import * as SupportAlert from "app/components/elements/SupportAlert";
 
 import { AccountSource, AddAccountParams, WalletStatus } from "core/types";
 import { TEvent, addAccounts, trackEvent } from "core/client";
@@ -31,6 +32,7 @@ import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as FileCheckIcon } from "app/icons/file-check.svg";
 import { ReactComponent as ImportIcon } from "app/icons/addaccount-import.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/addaccount-ledger.svg";
+import { ReactComponent as SupportIcon } from "app/icons/chat.svg";
 
 const ConfirmAccounts = memo<{
   addMore?: boolean;
@@ -153,6 +155,10 @@ const ConfirmAccounts = memo<{
     setAccModalOpened,
     stateRef,
   ]);
+
+  const handleSupport = () => {
+    alert({ title: <SupportAlert.Title />, content: <SupportAlert.Content /> });
+  };
 
   const handleEditWallets = useCallback(() => {
     if (addMore) {
@@ -372,6 +378,14 @@ const ConfirmAccounts = memo<{
         <FileCheckIcon className="h-6 w-auto mr-2" />
         Add wallets
       </AddAccountContinueButton>
+      <Button
+        theme="clean"
+        className="absolute right-8 bottom-5 z-20 font-semibold"
+        onClick={handleSupport}
+      >
+        <SupportIcon className="mr-2" />
+        Support
+      </Button>
     </>
   );
 });
