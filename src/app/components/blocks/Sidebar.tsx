@@ -73,7 +73,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
           return (
             <Button
               theme="clean"
-              key={route}
+              key={label}
               onClick={action}
               className={classNames(
                 "group",
