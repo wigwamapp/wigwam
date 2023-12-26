@@ -37,7 +37,6 @@ const useSidebarLinks = () => {
         route: Page.Swap,
         label: "Swap",
         Icon: SwapIcon,
-        soon: true,
       },
       {
         route: Page.Apps,
