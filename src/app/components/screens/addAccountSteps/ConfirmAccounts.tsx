@@ -372,6 +372,14 @@ const ConfirmAccounts = memo<{
         <FileCheckIcon className="h-6 w-auto mr-2" />
         Add wallets
       </AddAccountContinueButton>
+      {/* <Button
+        theme="clean"
+        className="absolute right-8 bottom-5 z-20 font-semibold"
+        onClick={handleSupport}
+      >
+        <SupportIcon className="mr-2" />
+        Support
+      </Button> */}
     </>
   );
 });
