@@ -96,3 +96,9 @@ const passwordRegex = new RegExp(
 
 export const validatePassword = (value: string) =>
   !value || value.match(passwordRegex) ? undefined : "Password is invalid";
+
+export const validateNewPassword =
+  (prevPassword: string) => (newPassword: string) =>
+    prevPassword === newPassword
+      ? "Shouldn’t match the old password"
+      : undefined;

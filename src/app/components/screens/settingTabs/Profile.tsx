@@ -14,6 +14,7 @@ import {
   withHumanDelay,
   focusOnErrors,
   validatePassword,
+  validateNewPassword,
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -139,6 +140,7 @@ const Profile: FC = () => {
                 validate={composeValidators(
                   required,
                   differentPasswords(values.newPwd),
+                  validateNewPassword(values.oldPwd),
                 )}
               >
                 {({ input, meta }) => (
