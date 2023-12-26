@@ -79,6 +79,8 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         case SigningStandard.SignTypedDataV3:
         case SigningStandard.SignTypedDataV4:
           return JSON.parse(approval.message);
+        default:
+          throw new Error("Unhandled Signing standard");
       }
     } catch (err) {
       console.error(err);
@@ -154,6 +156,9 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                     hashStructMessageHex,
                   );
                   break;
+
+                default:
+                  throw new Error("Unhandled Signing standard");
               }
 
               if (sig) {
@@ -180,6 +185,8 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                       signature: signedMessage,
                     });
                     break;
+                  default:
+                    throw new Error("Unhandled Signing standard");
                 }
 
                 if (

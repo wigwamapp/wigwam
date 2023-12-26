@@ -555,6 +555,8 @@ const getSocialIcon = (social: SocialProvider) => {
       return TwitterIcon;
     case "reddit":
       return RedditIcon;
+    default:
+      throw new Error("Unhandled social icon type");
   }
 };
 

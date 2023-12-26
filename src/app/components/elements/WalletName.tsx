@@ -75,6 +75,8 @@ const getIcon = (wallet: Account) => {
         return TwitterIcon;
       case "reddit":
         return RedditIcon;
+      default:
+        throw new Error("Unhandled AccountSource");
     }
   }
 

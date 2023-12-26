@@ -32,6 +32,8 @@ export function validateAddAccountParams(params: AddAccountParams) {
     case AccountSource.Address:
       validateAddress(params.address);
       break;
+    default:
+      return;
   }
 }
 

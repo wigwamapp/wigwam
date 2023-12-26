@@ -304,6 +304,8 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           findToken(chainId, accountAddress, action.tokenSlug);
         }
         break;
+      default:
+        break;
     }
   }, [action, chainId, accountAddress]);
 
