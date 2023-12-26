@@ -14,9 +14,9 @@ const Title: FC<{ title?: string; className?: string }> = ({
   className,
 }) => {
   return (
-    <h6 className={classNames("text-[1.75rem] font-bold", className)}>
+    <p className={classNames("text-[1.75rem] font-bold", className)}>
       {title ? title : "Need assistance?"}
-    </h6>
+    </p>
   );
 };
 
