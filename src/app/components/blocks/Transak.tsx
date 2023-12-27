@@ -19,10 +19,15 @@ const Transak: FC<{ config: TransakConfig }> = ({ config }) => {
   const initWsConnection = (orderId: string) => {
     Pusher.logToConsole = true;
     const pusher = new Pusher("1d9ffac87de599c61283", { cluster: "ap2" });
-
+    const channel = pusher.subscribe(orderId);
     // https://docs.transak.com/docs/websocket-integrations
 
     console.log(orderId);
+
+    //receive updates of a specific event
+    channel.bind(`ORDER_COMPLETED`, (orderData: any) => {
+      console.log("ORDER_COMPLETED", orderData);
+    });
 
     pusher.bind_global((eventId: any, orderData: any) => {
       console.log(`pusher ${eventId} ${orderData}`);
@@ -42,10 +47,10 @@ const Transak: FC<{ config: TransakConfig }> = ({ config }) => {
 
   eventEmitter.on(Events.TRANSAK_WIDGET_INITIALISED, (payload) => {
     console.log(payload);
-    initWsConnection(payload.status.id);
   });
 
   eventEmitter.on(Events.TRANSAK_ORDER_CREATED, (payload) => {
+    initWsConnection(payload.status.id);
     console.log(payload);
   });
 

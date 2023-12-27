@@ -45,6 +45,8 @@ export function generateURL(configData: TransakConfig) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         queryParams[key] = btoa(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           String.fromCharCode.apply(null, pako.deflate(configData[key])),
         );
       } catch (e) {
