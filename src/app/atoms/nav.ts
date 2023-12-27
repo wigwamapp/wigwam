@@ -32,6 +32,11 @@ export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
   ReceiveTab.ShareAddress,
 );
 
+export const cryptoCurrencyCodeAtom = atomWithURLHash<string | null>(
+  "cryptoCurrency",
+  null,
+);
+
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
 export const activityModalAtom = atomWithURLHash("activityOpened", false);

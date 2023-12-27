@@ -271,11 +271,11 @@ const AssetInfo: FC = () => {
                 <Button
                   to={{
                     page: Page.Receive,
-                    receive: ReceiveTabEnum.BuyWithCrypto,
+                    receive: ReceiveTabEnum.BuyWithFiat,
+                    cryptoCurrency: tokenInfo?.symbol,
                   }}
                   theme="secondary"
                   className="grow !py-2"
-                  disabled
                   title="Coming soon"
                 >
                   <BuyIcon className="w-6 h-auto mr-2" />
