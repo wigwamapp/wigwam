@@ -7,10 +7,10 @@ import type {
   StatusMessage,
   Substatus,
 } from '@lifi/sdk';
-import { LifiErrorCode } from '@lifi/sdk';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { useWidgetConfig } from '../providers';
+import { LifiErrorCode } from '../types/errors';
 import type { WidgetSubvariant } from '../types';
 import { formatTokenAmount } from '../utils';
 import { useChains } from './useChains';
@@ -118,6 +118,7 @@ export function getProcessMessage(
       });
     let title: string = '';
     let message: string = '';
+    console.log(process.error.code)
     switch (process.error.code) {
       case LifiErrorCode.AllowanceRequired:
         title = t(`error.title.allowanceRequired`);
@@ -173,6 +174,10 @@ export function getProcessMessage(
           tokenSymbol: step.action.fromToken.symbol,
           chainName: getChainById(step.action.fromChainId)?.name ?? '',
         });
+        break;
+      case LifiErrorCode.TransactionDeclined:
+        title = t(`error.title.declined`);
+        message = ''
         break;
       case LifiErrorCode.ProviderUnavailable:
       default:

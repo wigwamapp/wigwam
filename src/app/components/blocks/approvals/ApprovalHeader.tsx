@@ -15,6 +15,7 @@ import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
+import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 
 type ApprovalHeaderProps = {
   account: Account;
@@ -74,11 +75,11 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
       <div className={classNames(cardClassName, className)}>
         <span className="w-6 h-6 min-w-[1.5rem] flex items-center justify-center mr-2">
           <ActivityIcon
-            Icon={SendIcon}
+            Icon={source.swapMeta ? SwapIcon : SendIcon}
             className="!w-5 !h-5 glass-icon--active"
           />
         </span>
-        Transfer
+        {source.swapMeta ? "Swap" : "Transfer"}
       </div>
     );
   }

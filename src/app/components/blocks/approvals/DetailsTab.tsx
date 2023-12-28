@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useMemo } from "react";
+import { FC, PropsWithChildren, useEffect, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
@@ -37,6 +37,56 @@ type DetailsTabProps = Omit<FeeButton, "onClick"> & {
   onFeeButtonClick: () => void;
 };
 
+const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
+  if (source.type === "self" && source.swapMeta) {
+    const route = source.swapMeta;
+    return (
+      <InfoRaw label={"Swap info"}>
+        <div
+          className={classNames(
+            "flex items-center justify-center",
+            "w-[13rem]",
+          )}
+        >
+          <div className="inline-flex">
+            <PrettyAmount
+              amount={route.fromAmount}
+              decimals={route.fromToken.decimals}
+              currency={route.fromToken.symbol}
+              threeDots={false}
+              copiable
+              className={classNames("text-xs ml-1.5", "font-bold")}
+            />{" "}
+            <img
+              src={route.fromToken.logoURI}
+              alt={route.fromToken.name}
+              className="ml-1 mr-2 w-4 h-4 rounded-full"
+            />
+          </div>
+          <div className={classNames("text-xs font-bold")}>{" →"}</div>
+          <div className="inline-flex">
+            <PrettyAmount
+              amount={route.toAmount}
+              decimals={route.toToken.decimals}
+              currency={route.toToken.symbol}
+              threeDots={false}
+              copiable
+              className={classNames("text-xs ml-1.5", "font-bold")}
+            />{" "}
+            <img
+              src={route.toToken.logoURI}
+              alt={route.toToken.name}
+              className="ml-1 w-4 h-4 rounded-full"
+            />
+          </div>
+        </div>
+      </InfoRaw>
+    );
+  } else {
+    return null;
+  }
+};
+
 const DetailsTab: FC<DetailsTabProps> = ({
   accountAddress,
   fees,
@@ -49,11 +99,15 @@ const DetailsTab: FC<DetailsTabProps> = ({
   source,
   onFeeButtonClick,
 }) => {
-  const tabHeader = useMemo(() => getTabHeader(action), [action]);
+  const tabHeader = useMemo(() => getTabHeader(action, source), [action]);
   const withDescription = useMemo(
     () => action.type === TxActionType.TokenApprove && !action.clears,
     [action],
   );
+
+  useEffect(() => {
+    console.log("source", source);
+  }, []);
 
   return (
     <>
@@ -62,14 +116,23 @@ const DetailsTab: FC<DetailsTabProps> = ({
       </TabHeader>
       {withDescription && (
         <p className="text-sm text-[#BCC3C4] mb-3">
-          Do you trust this site? By granding this permission, you&apos;re
-          allowing{" "}
-          <span className="font-semibold">
-            {source.type === "page" && source.url
-              ? new URL(source.url).host
-              : "this site"}
-          </span>{" "}
-          to withdraw tokens and automate transactions for you.
+          {source.type === "self" && source.swapMeta ? (
+            <>
+              By granting this permission, you&#39;re allowing this
+              smart-contract to automate transactions for you.
+            </>
+          ) : (
+            <>
+              Do you trust this site? By granting this permission, you&apos;re
+              allowing{" "}
+              <span className="font-semibold">
+                {source.type === "page" && source.url
+                  ? new URL(source.url).host
+                  : "this site"}
+              </span>{" "}
+              to withdraw tokens and automate transactions for you.
+            </>
+          )}
         </p>
       )}
       <FeeButton
@@ -84,13 +147,14 @@ const DetailsTab: FC<DetailsTabProps> = ({
       />
       <Recipient action={action} />
       <Tokens accountAddress={accountAddress} action={action} />
+      <ActivitySwap source={source} />
     </>
   );
 };
 
 export default DetailsTab;
 
-const getTabHeader = (action: TxAction) => {
+const getTabHeader = (action: TxAction, source: ActivitySource) => {
   switch (action.type) {
     case TxActionType.TokenTransfer:
       return "Transfer tokens";
@@ -98,9 +162,20 @@ const getTabHeader = (action: TxAction) => {
       if (action.clears) {
         return "Revoke tokens approval";
       }
+      if (source.type === "self" && source.swapMeta) {
+        return "Swap transaction";
+      }
       return "Approve tokens";
     case TxActionType.ContractInteraction:
-      return "Interact with contract";
+      if (source.type === "self" && source.swapMeta) {
+        if (source.swapMeta.fromChainId !== source.swapMeta.toChainId) {
+          return "Bridge transaction";
+        } else {
+          return "Swap transaction";
+        }
+      } else {
+        return "Interact with contract";
+      }
     default:
       return "Deploy contract";
   }
