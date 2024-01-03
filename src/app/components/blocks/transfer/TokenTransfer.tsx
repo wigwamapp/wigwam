@@ -212,7 +212,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   break;
 
                 default:
-                  throw new Error("Unhandled Token RPC standard");
+                  throw new Error("Unhandled Token ERC standard");
               }
             }
 
@@ -415,8 +415,9 @@ const TransferTokenContent = memo<TransferTokenContent>(
                       );
                     }
                     break;
+
                   default:
-                    throw new Error("Unhandled Token RPC standard");
+                    throw new Error("Unhandled Token ERC standard");
                 }
               }
 

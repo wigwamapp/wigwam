@@ -51,6 +51,7 @@ export async function requestSigning(
       accountAddress = params[0];
       message = params[1];
       break;
+
     default:
       throw new Error("Unhandled Signing standard");
   }
@@ -85,6 +86,7 @@ export async function requestSigning(
             typeof JSON.parse(message) === "object",
         );
         break;
+
       default:
         throw new Error("Unhandled Signing standard");
     }

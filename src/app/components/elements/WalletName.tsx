@@ -76,7 +76,7 @@ const getIcon = (wallet: Account) => {
       case "reddit":
         return RedditIcon;
       default:
-        throw new Error("Unhandled AccountSource");
+        throw new Error("Unhandled social provider");
     }
   }
 

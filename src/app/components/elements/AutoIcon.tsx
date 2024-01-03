@@ -124,6 +124,7 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
       return createAvatar(personasStyle, {
         seed,
       }).toString();
+
     default:
       throw new Error("Unhandled AutoIcon type");
   }

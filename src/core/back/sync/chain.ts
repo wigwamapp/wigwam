@@ -76,6 +76,7 @@ export const getTokenMetadata = async (
 
         return metadata;
       }
+
       default:
         throw new Error("Unhandled Token ERC standard");
     }
