@@ -4,21 +4,21 @@ import { useAtomValue, useAtom } from "jotai";
 import { nanoid } from "nanoid";
 import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
-import { fromProtectedString } from "lib/crypto-utils";
 
 import { getSeedPhrase } from "core/client";
+import { SeedPharse } from "core/types";
 
 import { hasSeedPhraseAtom, analyticsAtom } from "app/atoms";
 import { required, withHumanDelay, focusOnErrors } from "app/utils";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import SecretField from "app/components/blocks/SecretField";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import PasswordField from "app/components/elements/PasswordField";
 import Switcher from "app/components/elements/Switcher";
 import Separator from "app/components/elements/Seperator";
+import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
 
 const Security: FC = () => {
@@ -139,7 +139,7 @@ type FormValues = {
 };
 
 const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
-  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<SeedPharse | null>(null);
   const windowFocused = useWindowFocus();
 
   useEffect(() => {
@@ -152,8 +152,8 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     async ({ password }: FormValues) =>
       withHumanDelay(async () => {
         try {
-          const seed = await getSeedPhrase(password);
-          setSeedPhrase(seed.phrase);
+          const seedPhrase = await getSeedPhrase(password);
+          setSeedPhrase(seedPhrase);
         } catch (err: any) {
           return { password: err?.message };
         }
@@ -171,11 +171,8 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     >
       {seedPhrase ? (
         <>
-          <SecretField
-            label="Secret phrase"
-            isDownloadable
-            value={fromProtectedString(seedPhrase)}
-          />
+          <SeedPhraseWords seedPhrase={seedPhrase} />
+
           <div
             className={classNames(
               "mt-4 w-full max-w-[27.5rem]",
