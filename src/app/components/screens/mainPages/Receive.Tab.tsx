@@ -8,7 +8,6 @@ import { receiveTabAtom } from "app/atoms";
 
 import ShareAddress from "../receiveTabs/ShareAddress";
 import BuyWithCrypto from "../receiveTabs/BuyWithCrypto";
-import BuyWithFiat from "../receiveTabs/BuyWithFiat";
 import Faucet from "../receiveTabs/Faucet";
 
 function matchReceiveTab(receiveTab: ReceiveTabEnum, tabs: ReceiveTabEnum[]) {
@@ -26,7 +25,6 @@ function matchReceiveTab(receiveTab: ReceiveTabEnum, tabs: ReceiveTabEnum[]) {
     match(receiveTab)
       .with(ReceiveTabEnum.ShareAddress, () => <ShareAddress />)
       .with(ReceiveTabEnum.BuyWithCrypto, () => <BuyWithCrypto />)
-      .with(ReceiveTabEnum.BuyWithFiat, () => <BuyWithFiat />)
       .with(ReceiveTabEnum.Faucet, () => <Faucet />)
       // Redirect to default
       .otherwise(redirectToDefault)

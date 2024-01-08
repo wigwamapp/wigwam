@@ -8,7 +8,11 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { toggleTokenStatus } from "core/common/tokens";
-import { coinGeckoPlatformIds, tokenSlugAtom } from "app/atoms";
+import {
+  coinGeckoPlatformIds,
+  tokenSlugAtom,
+  onRampCurrencies,
+} from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -20,7 +24,7 @@ import {
   useTokenActivitiesSync,
 } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
-import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
+import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
 import IconedButton from "app/components/elements/IconedButton";
@@ -51,6 +55,8 @@ export enum TokenStandardValue {
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
+  const onRampCcy = useAtomValue(onRampCurrencies);
+
   const { confirm } = useDialog();
 
   const chainId = useChainId();
@@ -78,6 +84,19 @@ const AssetInfo: FC = () => {
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const onRampId = useMemo(() => {
+    if (`${chainId}_${tokenSlug}` in onRampCcy) {
+      return onRampCcy[`${chainId}_${tokenSlug}`];
+    }
+
+    return null;
+  }, [chainId, tokenSlug, onRampCcy]);
+
+  const showBuyButton = useMemo(
+    () => tokenInfo?.status !== TokenStatus.Disabled && onRampId,
+    [tokenInfo?.status, onRampId],
+  );
 
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
@@ -267,13 +286,13 @@ const AssetInfo: FC = () => {
                 <SwapIcon className="w-6 h-auto mr-2" />
                 Swap
               </Button>
-              {status === TokenStatus.Native && (
+              {showBuyButton ? (
                 <Button
                   to={{
-                    page: Page.Receive,
-                    receive: ReceiveTabEnum.BuyWithFiat,
+                    onRampOpened: true,
                     cryptoCurrency: tokenInfo?.symbol,
                   }}
+                  merge
                   theme="secondary"
                   className="grow !py-2"
                   title="Coming soon"
@@ -281,7 +300,7 @@ const AssetInfo: FC = () => {
                   <BuyIcon className="w-6 h-auto mr-2" />
                   Buy
                 </Button>
-              )}
+              ) : null}
             </div>
 
             <TokenActivity token={tokenInfo!} />
