@@ -13,8 +13,15 @@ import classNames from "clsx";
 import { CSSTransition } from "react-transition-group";
 import Link, { LinkProps } from "lib/navigation/Link";
 
+export type ButtonTheme =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "clean"
+  | "primary-reverse";
+
 type ButtonProps = {
-  theme?: "primary" | "secondary" | "tertiary" | "clean" | "primary-reverse";
+  theme?: ButtonTheme;
   disabled?: boolean;
   loading?: boolean;
   plainFocus?: boolean;

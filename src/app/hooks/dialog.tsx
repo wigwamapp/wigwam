@@ -14,6 +14,7 @@ import { assert } from "lib/system/assert";
 import { forEachSafe } from "lib/system/forEachSafe";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
+import type { ButtonTheme } from "app/components/elements/Button";
 
 type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
 
@@ -27,6 +28,10 @@ type DialogContextDataProps =
       onSecondaryButtonClick?: () => void;
       onClose?: () => void;
       state?: any;
+      buttonTheme?: Partial<{
+        primary: ButtonTheme;
+        secondary: ButtonTheme;
+      }>;
     })
   | null;
 
@@ -41,6 +46,10 @@ type ConfirmParams = {
   content: ReactNode;
   yesButtonText?: ReactNode;
   noButtonText?: ReactNode;
+  buttonTheme?: Partial<{
+    primary: ButtonTheme;
+    secondary: ButtonTheme;
+  }>;
 } & ModalProps;
 
 type WaitLoadingParams<P = any, S = any> = {
