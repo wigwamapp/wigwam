@@ -40,6 +40,7 @@ import {
   getCoinGeckoPlatformIds,
   syncTokenActivities,
 } from "../sync";
+import { getOnRampCryptoCurrencies } from "../sync/fiatOnRamp";
 
 export function startWalletServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
@@ -314,6 +315,15 @@ async function handleWalletRequest(
           );
 
           ctx.reply({ type, cgPlatformIds });
+        }),
+      )
+      .with({ type: MessageType.GetOnRampCurrencies }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, async () => {
+          const currencies = await getOnRampCryptoCurrencies().catch(
+            () => ({}),
+          );
+
+          ctx.reply({ type, currencies });
         }),
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

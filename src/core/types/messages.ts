@@ -25,7 +25,8 @@ export type Request =
   | ApproveRequest
   | GetGasPricesRequest
   | GetCgPlatformIdsRequest
-  | GetSyncStatusRequest;
+  | GetSyncStatusRequest
+  | GetOnRampCurrenciesRequest;
 
 export type Response =
   | GetWalletStateResponse
@@ -46,7 +47,8 @@ export type Response =
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
-  | ApproveResponse;
+  | ApproveResponse
+  | GetOnRampCurrenciesResponse;
 
 export type EventMessage =
   | WalletStateUpdated
@@ -86,6 +88,7 @@ export enum MessageType {
   ApprovalsUpdated = "APPROVALS_UPDATED",
   Approve = "APPROVE",
   RejectAllApprovals = "REJECT_ALL_APPROVALS",
+  GetOnRampCurrencies = "GET_ONRAMP_CURRENCIES",
 }
 
 export interface MessageBase {
@@ -324,4 +327,13 @@ export interface ApproveResponse extends MessageBase {
 
 export interface RejectAllApprovals extends MessageBase {
   type: MessageType.RejectAllApprovals;
+}
+
+export interface GetOnRampCurrenciesRequest extends MessageBase {
+  type: MessageType.GetOnRampCurrencies;
+}
+
+export interface GetOnRampCurrenciesResponse extends MessageBase {
+  type: MessageType.GetOnRampCurrencies;
+  currencies: Record<string, string>;
 }

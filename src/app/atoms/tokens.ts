@@ -5,7 +5,7 @@ import { atomWithRepoQuery, atomWithStorage } from "lib/atom-utils";
 import * as repo from "core/repo";
 import { TokenType } from "core/types";
 import { createAccountTokenKey } from "core/common/tokens";
-import { getCgPlatformIds } from "core/client";
+import { getCgPlatformIds, getOnRampCurrencies } from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
@@ -37,3 +37,4 @@ export const tokenTypeAtom = atomWithStorage<TokenType>(
 );
 
 export const coinGeckoPlatformIds = atomWithDefault(getCgPlatformIds);
+export const onRampCurrencies = atomWithDefault(getOnRampCurrencies);
