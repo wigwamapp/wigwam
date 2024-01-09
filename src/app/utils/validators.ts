@@ -24,7 +24,7 @@ export const composeValidators =
       undefined,
     );
 
-export const differentPasswords = (password1: string) => (password2: string) =>
+export const differentPasswords = (password1: string, password2: string) =>
   password2 && password1 && password2 !== password1
     ? "Provided passwords don't match"
     : undefined;

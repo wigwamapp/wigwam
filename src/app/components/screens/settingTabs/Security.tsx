@@ -2,6 +2,7 @@ import { FC, memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue, useAtom } from "jotai";
 import { nanoid } from "nanoid";
+import { FormApi } from "final-form";
 import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { fromProtectedString } from "lib/crypto-utils";
@@ -9,7 +10,12 @@ import { fromProtectedString } from "lib/crypto-utils";
 import { getSeedPhrase } from "core/client";
 
 import { hasSeedPhraseAtom, analyticsAtom } from "app/atoms";
-import { required, withHumanDelay, focusOnErrors } from "app/utils";
+import {
+  required,
+  withHumanDelay,
+  focusOnErrors,
+  resetFormPassword,
+} from "app/utils";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
@@ -149,10 +155,15 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   }, [onOpenChange, seedPhrase, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }: FormValues) =>
+    async (
+      { password }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
           const seed = await getSeedPhrase(password);
+          await resetFormPassword(form);
+
           setSeedPhrase(seed.phrase);
         } catch (err: any) {
           return { password: err?.message };
@@ -197,6 +208,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
         <Form<FormValues>
           decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
+          destroyOnUnregister
           render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"
