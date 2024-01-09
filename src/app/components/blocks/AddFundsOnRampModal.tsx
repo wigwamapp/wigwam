@@ -47,10 +47,11 @@ const AddFundsOnRampModal = memo(() => {
           ? Environments.STAGING
           : Environments.PRODUCTION,
       defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      defaultCryptoCurrency: selectedCurrency,
-      defaultNetwork: currentNetwork?.chainTag,
+      cryptoCurrency: selectedCurrency,
+      network: currentNetwork?.chainTag,
       productsAvailed: "BUY",
       walletAddress: address,
+      disableWalletAddressForm: true,
       themeColor: "#0D1311",
       exchangeScreenTitle: `Securely buy ${selectedCurrency} with Wigwam`,
       networks: [
