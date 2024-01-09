@@ -1,10 +1,10 @@
 import qs from "query-string";
 import pako from "pako";
 import {
+  type TransakConfig,
   Environments,
-  TransakConfig,
   TransakEvents,
-} from "../../core/types/transak";
+} from "core/types/transak";
 import { EventEmitter } from "events";
 
 export const WebAppUrls = {
