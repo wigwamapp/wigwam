@@ -29,7 +29,7 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
   const hiddenToToken =
     subvariant === 'nft' || hiddenUI?.includes(HiddenUI.ToToken);
 
-  const isCompact =
+  const isCompact = true ||
     fromChain &&
     toChain &&
     fromToken &&
@@ -39,7 +39,7 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
 
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: isCompact ? 'row' : 'column' }}
+      sx={{ display: 'flex', flexDirection: isCompact ? 'row' : 'column', border: 'none', borderRadius: '10px', marginBottom: '24px' }}
       {...props}
     >
       <SelectTokenButton formType="from" compact={isCompact} />
@@ -49,6 +49,7 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            border: 'none', borderRadius: '10px'
           }}
           m={!hiddenReverse ? -1.125 : 1}
         >

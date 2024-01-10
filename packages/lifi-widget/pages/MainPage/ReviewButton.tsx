@@ -52,9 +52,9 @@ export const ReviewButton: React.FC = () => {
           if (splitState) {
             return t(`button.${splitState}`);
           }
-          return t(`button.exchange`);
+          return "Start Swap";
         default:
-          return t(`button.exchange`);
+          return "Start Swap";
       }
     }
   };

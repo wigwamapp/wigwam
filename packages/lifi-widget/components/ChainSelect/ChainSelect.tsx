@@ -60,13 +60,17 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
                 onClick={() => setCurrentChain(chain.id)}
                 variant={chainId === chain.id ? 'selected' : 'default'}
               >
+                <div style={{display: 'flex', alignItems: 'center'}}>
                 <Avatar
                   src={chain.logoURI}
                   alt={chain.key}
-                  sx={{ width: 40, height: 40 }}
+                  sx={{ width: '18px', height: '18px', marginRight: '12px' }}
                 >
-                  {chain.name[0]}
                 </Avatar>
+                <Typography fontSize={14} fontWeight={500} color={'#C0C1C3'}>
+                  {chain.name}
+                </Typography>
+                </div>
               </ChainCard>
             </Tooltip>
           ))}
@@ -74,13 +78,13 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
         <ChainCard onClick={showAllChains}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
+              width: 75,
+              height: 18,
               display: 'grid',
               placeItems: 'center',
             }}
           >
-            <Typography fontWeight={500}>+{chainsToHide}</Typography>
+            <Typography fontWeight={500}>+{chainsToHide} more</Typography>
           </Box>
         </ChainCard>
       ) : null}

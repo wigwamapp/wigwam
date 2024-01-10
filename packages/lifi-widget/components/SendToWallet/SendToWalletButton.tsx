@@ -1,5 +1,4 @@
-import WalletIcon from '@mui/icons-material/Wallet';
-import { Button, Tooltip } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useWidgetEvents } from '../../hooks';
@@ -35,22 +34,28 @@ export const SendToWalletButton: React.FC = () => {
   };
 
   return (
-    <Tooltip
-      title={t('main.sendToWallet')}
-      placement="bottom-end"
-      enterDelay={400}
-      arrow
-    >
-      <Button
-        variant={showSendToWallet ? 'contained' : 'text'}
-        onClick={handleClick}
-        sx={{
-          minWidth: 48,
-          marginLeft: 1,
-        }}
-      >
-        <WalletIcon />
-      </Button>
-    </Tooltip>
+    <div style={{display: 'flex', justifyContent: 'space-between', marginRight: '24px', marginLeft: '24px', marginBottom: '24px'}}>
+      <Typography color={'#fff'} fontSize={14}>Send to different address</Typography>
+      <div className={`switcher ${showSendToWallet ? 'active' : 'unactive'}`} onClick={handleClick}>
+        <div className='point' />
+      </div>
+    </div>
+    // <Tooltip
+    //   title={t('main.sendToWallet')}
+    //   placement="bottom-end"
+    //   enterDelay={400}
+    //   arrow
+    // >
+    //   <Button
+    //     variant={showSendToWallet ? 'contained' : 'text'}
+    //     onClick={handleClick}
+    //     sx={{
+    //       minWidth: 48,
+    //       marginLeft: 1,
+    //     }}
+    //   >
+    //     <WalletIcon />
+    //   </Button>
+    // </Tooltip>
   );
 };

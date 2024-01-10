@@ -43,39 +43,41 @@ export const SelectTokenButton: React.FC<
     formType === "to" && subvariant === "refuel"
       ? t("main.selectChain")
       : formType === "to" && swapOnly
-        ? t("main.selectToken")
-        : t("main.selectChainAndToken");
+        ? "Network"
+        : "Network";
   const cardTitle: ReactNode =
     formType === "from" && subvariant === "nft"
       ? t(`header.payWith`)
       : t(`main.${formType}`);
   return (
-    <Card flex={1} onClick={onClick}>
+    <Card flex={1} onClick={onClick} sx={{border: 'none', background: 'none'}}>
       <CardTitle>{cardTitle}</CardTitle>
-      {chainId && tokenAddress && (isChainLoading || isTokenLoading) ? (
-        <SelectTokenCardHeader
-          avatar={<Skeleton variant="circular" width={32} height={32} />}
-          title={<Skeleton variant="text" width={64} height={24} />}
-          subheader={<Skeleton variant="text" width={64} height={16} />}
-          compact={compact}
-        />
-      ) : (
-        <SelectTokenCardHeader
-          avatar={
-            isSelected ? (
-              <TokenAvatar token={token} chain={chain} />
-            ) : (
-              <TokenAvatarDefault />
-            )
-          }
-          title={isSelected ? token.symbol : defaultPlaceholder}
-          subheader={
-            isSelected ? t(`main.onChain`, { chainName: chain.name }) : null
-          }
-          selected={isSelected}
-          compact={compact}
-        />
-      )}
+      <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
+        {chainId && tokenAddress && (isChainLoading || isTokenLoading) ? (
+          <SelectTokenCardHeader
+            avatar={<Skeleton variant="circular" width={32} height={32} />}
+            title={<Skeleton variant="text" width={64} height={24} />}
+            subheader={<Skeleton variant="text" width={64} height={16} />}
+            compact={compact}
+          />
+        ) : (
+          <SelectTokenCardHeader
+            avatar={
+              isSelected ? (
+                <TokenAvatar token={token} chain={chain} />
+              ) : (
+                <TokenAvatarDefault />
+              )
+            }
+            title={isSelected ? token.symbol : defaultPlaceholder}
+            subheader={
+              isSelected ? t(`main.onChain`, { chainName: chain.name }) : 'and Token'
+            }
+            selected={isSelected}
+            compact={compact}
+          />
+        )}
+      </div>
     </Card>
   );
 };

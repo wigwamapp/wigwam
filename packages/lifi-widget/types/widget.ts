@@ -107,6 +107,9 @@ export interface WidgetConfig {
   fromAmount?: number | string;
   toAmount?: number | string;
 
+  currencyRate?: number | string;
+  selectedCurrency?: string;
+
   contract?: WidgetContract;
   contractComponent?: ReactNode;
   contractSecondaryComponent?: ReactNode;

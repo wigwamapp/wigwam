@@ -1,4 +1,5 @@
 /* eslint-disable react/no-array-index-key */
+import { useState } from 'react';
 import type { Route } from '@lifi/sdk';
 import { Collapse, Grow, Stack, Typography } from '@mui/material';
 import { useFormState } from 'react-hook-form';
@@ -7,9 +8,12 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { useRoutes } from '../../hooks';
 import { useWidgetConfig } from '../../providers';
 import { useSetExecutableRoute } from '../../stores';
-import { navigationRoutes } from '../../utils';
+import { navigationRoutes, formatInputAmount } from '../../utils';
+
 import { ProgressToNextUpdate } from '../ProgressToNextUpdate';
 import { RouteCard, RouteCardSkeleton, RouteNotFoundCard } from '../RouteCard';
+import { useController, useWatch } from 'react-hook-form';
+
 import {
   CollapseContainer,
   Container,
@@ -37,6 +41,13 @@ export const RoutesExpanded = () => {
 export const RoutesExpandedElement = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const {
+    field: { onChange },
+  } = useController({
+    name: 'toAmount',
+  });
+
   const setExecutableRoute = useSetExecutableRoute();
   const { subvariant, containerStyle } = useWidgetConfig();
   const { isValid, isValidating } = useFormState();
@@ -50,14 +61,21 @@ export const RoutesExpandedElement = () => {
     refetch,
   } = useRoutes();
 
+
   const currentRoute = routes?.[0];
+
+  const [selectedRouteId, setSelectedRouteId] = useState(currentRoute?.id || 0);
 
   const handleRouteClick = (route: Route) => {
     if (isValid && !isValidating) {
       setExecutableRoute(route);
-      navigate(navigationRoutes.transactionExecution, {
-        state: { routeId: route.id },
-      });
+      setSelectedRouteId(route.id);
+      console.log('route', route)
+      const formattedAmount = String(Number(route.toAmount)/Math.pow(10, route.toToken.decimals))
+      onChange(formattedAmount)
+      // navigate(navigationRoutes.transactionExecution, {
+      //   state: { routeId: route.id },
+      // });
     }
   };
 
@@ -105,7 +123,7 @@ export const RoutesExpandedElement = () => {
                     key={route.id}
                     route={route}
                     onClick={() => handleRouteClick(route)}
-                    active={index === 0}
+                    active={route.id === selectedRouteId}
                     expanded={routes?.length <= 2}
                   />
                 ))

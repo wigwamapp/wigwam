@@ -65,7 +65,8 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     useGasRefuel();
 
   const hasAmount =
-    (!isNaN(fromTokenAmount) && Number(fromTokenAmount) > 0) ||
+    (!isNaN(fromTokenAmount) && Number(fromTokenAmount) > 0) 
+    ||
     (!isNaN(toTokenAmount) && Number(toTokenAmount) > 0);
 
   const contractCallQuoteEnabled: boolean =
@@ -91,7 +92,7 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     toAddress,
     toChainId,
     toToken?.address,
-    toTokenAmount,
+    "",
     toContractAddress,
     toContractCallData,
     toContractGasLimit,
@@ -106,6 +107,8 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     insurance,
     insurableRoute?.id,
   ];
+
+  console.log(queryKey)
 
   const { data, isLoading, isFetching, isFetched, dataUpdatedAt, refetch } =
     useQuery(

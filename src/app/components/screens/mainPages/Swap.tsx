@@ -1,4 +1,6 @@
 import { FC, useMemo, useEffect, useState, useCallback } from "react";
+import { useAtomValue } from "jotai";
+
 import {
   LiFiWidget,
   WidgetConfig,
@@ -7,24 +9,41 @@ import {
   WidgetEvent,
 } from "packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
+import { useAtomsAll } from "lib/atom-utils";
 import { useAccounts, useChainId } from "app/hooks";
-import { tokenSlugAtom } from "app/atoms";
-import { useAtomValue } from "jotai";
+import {
+  tokenSlugAtom,
+  currenciesRateAtom,
+  selectedCurrencyAtom,
+} from "app/atoms";
 import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
 import { SelfActivityKind } from "core/types";
 import { Route } from "@lifi/types";
 import { ERC721__factory } from "abi-types";
 import { getClientProvider } from "core/client";
+import { currentLocaleAtom } from "app/atoms";
+import { LanguageKey } from "packages/lifi-widget/providers";
 
 const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
 const DEV_NFT_CHAIN = 137;
 
 const Swap: FC = () => {
+  const currentLocale = useAtomValue(currentLocaleAtom);
   const { currentAccount } = useAccounts();
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const [fee, setFee] = useState(0.01);
+
+  const [currenciesRate, selectedCurrency] = useAtomsAll([
+    currenciesRateAtom,
+    selectedCurrencyAtom,
+  ]);
+
+  useEffect(() => {
+    console.log("currenciesRate", currenciesRate);
+    console.log("selectedCurrency", selectedCurrency);
+  }, [currenciesRate, selectedCurrency]);
 
   const getDevNftBalance = async () => {
     const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
@@ -100,6 +119,11 @@ const Swap: FC = () => {
         handleBeforeTransaction(metadata),
       integrator: "Wigwam",
       variant: "expandable",
+      selectedCurrency: selectedCurrency,
+      currencyRate: currenciesRate[selectedCurrency],
+      languages: {
+        default: currentLocale as LanguageKey,
+      },
       fee: fee,
       fromChain: chainId,
       fromToken: tokenSlug
@@ -164,12 +188,18 @@ const Swap: FC = () => {
     tokenSlug,
     fee,
     signer,
+    selectedCurrency,
     handleBeforeTransaction,
   ]);
 
   return (
     <div className="flex mt-[1rem]">
-      <LiFiWidget integrator={widgetConfig.integrator} config={widgetConfig} />
+      <LiFiWidget
+        currencyRate={widgetConfig.currencyRate}
+        selectedCurrency={selectedCurrency}
+        integrator={widgetConfig.integrator}
+        config={widgetConfig}
+      />
     </div>
   );
 };

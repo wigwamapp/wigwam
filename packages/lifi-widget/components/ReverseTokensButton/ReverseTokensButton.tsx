@@ -22,7 +22,7 @@ export const ReverseTokensButton: React.FC<{ vertical?: boolean }> = ({
     setValue(FormKey.ToToken, fromToken, { shouldTouch: true });
   };
   return (
-    <IconButton onClick={handleClick} size="small">
+    <IconButton onClick={handleClick} size="small" sx={{alignSelf: "flex-end", marginBottom: '24px'}}>
       {vertical ? <SwapVertIcon /> : <SwapHorizIcon />}
     </IconButton>
   );

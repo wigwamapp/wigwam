@@ -4,7 +4,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import type { PersistStoreProps } from '../types';
 import type { ChainOrderState } from './types';
 
-export const maxChainToOrder = 9;
+export const maxChainToOrder = 5;
 
 export const createChainOrderStore = ({ namePrefix }: PersistStoreProps) =>
   createWithEqualityFn<ChainOrderState>(

@@ -23,7 +23,7 @@ export const useChainSelect = (formType: FormType) => {
       .map((chainId) => chains.find((chain) => chain.id === chainId))
       .filter(Boolean) as EVMChain[];
 
-    return selectedChains;
+    return selectedChains.slice(0, 5);
   };
 
   const setCurrentChain = (chainId: number) => {

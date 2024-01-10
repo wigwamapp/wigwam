@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect, useMemo } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
@@ -104,10 +104,6 @@ const DetailsTab: FC<DetailsTabProps> = ({
     () => action.type === TxActionType.TokenApprove && !action.clears,
     [action],
   );
-
-  useEffect(() => {
-    console.log("source", source);
-  }, []);
 
   return (
     <>

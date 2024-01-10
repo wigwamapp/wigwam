@@ -143,7 +143,18 @@ export const TransactionDetailsPage: React.FC = () => {
           {supportId}
         </Typography>
       </Card>
-      <Box mt={2}>
+      <Box mt={1}>
+        <Typography
+            variant="body2"
+            pt={1}
+            pb={2}
+            px={2}
+            sx={{ wordBreak: 'break-all' }}
+          >
+          Wigwam leverages the advanced Li.Fi swap functionality for seamless asset exchanges. If you require assistance, please use this support ID  and contact them through the link below.
+        </Typography>
+      </Box>
+      <Box mt={1}>
         <ContactSupportButton supportId={supportId} />
       </Box>
       <Dialog open={open} onClose={toggleDialog}>

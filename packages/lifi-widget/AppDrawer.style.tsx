@@ -17,7 +17,7 @@ const getButtonTransformWidth = (
   if (typeof drawerMaxWidth === 'string' && !drawerMaxWidth.includes('%')) {
     return drawerMaxWidth;
   }
-  return '392px';
+  return '468px';
 };
 
 export const DrawerButton = styled(Button, {

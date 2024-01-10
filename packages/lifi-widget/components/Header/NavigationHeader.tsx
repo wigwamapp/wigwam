@@ -16,6 +16,7 @@ import {
 import { HeaderAppBar } from './Header.style';
 import { NavigationTabs } from './NavigationTabs';
 import { WalletMenuButton } from './WalletHeader';
+import SwapArrows from '../../../../src/app/icons/swap-arrows.svg';
 
 export const NavigationHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ export const NavigationHeader: React.FC = () => {
 
   return (
     <>
-      <HeaderAppBar elevation={0}>
+      <HeaderAppBar elevation={0} style={{justifyContent: 'space-between'}}>
         {backButtonRoutes.includes(path) ? (
           <IconButton size="medium" edge="start" onClick={navigateBack}>
             <ArrowBackIcon />
@@ -101,15 +102,18 @@ export const NavigationHeader: React.FC = () => {
             ) : null}
           </Box>
         ) : (
-          <Typography
-            fontSize={hasPath ? 18 : 24}
-            align={hasPath ? 'center' : 'left'}
-            fontWeight="700"
-            flex={1}
-            noWrap
-          >
-            {title || handleHeaderTitle()}
-          </Typography>
+          <div style={{display: 'flex'}}>
+            <Typography
+              fontSize={hasPath ? 18 : 20}
+              align={hasPath ? 'center' : 'left'}
+              fontWeight="600"
+              flex={1}
+              noWrap
+            >
+              {title || handleHeaderTitle()}
+            </Typography>
+            <img src={SwapArrows} style={{marginLeft: '12px'}}/>
+          </div>
         )}
         <Routes>
           <Route
@@ -127,7 +131,7 @@ export const NavigationHeader: React.FC = () => {
                     arrow
                   >
                     <IconButton
-                      size="medium"
+                      size="small"
                       edge="start"
                       onClick={() =>
                         navigate(navigationRoutes.transactionHistory)
@@ -139,7 +143,8 @@ export const NavigationHeader: React.FC = () => {
                 ) : null}
                 <Tooltip title={t(`header.settings`)} enterDelay={400} arrow>
                   <IconButton
-                    size="medium"
+                    size="small"
+                    
                     onClick={() => navigate(navigationRoutes.settings)}
                     sx={{
                       marginRight: -1.25,

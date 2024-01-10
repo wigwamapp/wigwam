@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useTokenAddressBalance } from '../../hooks';
 import type { FormTypeProps } from '../../providers';
-import { FormKeyHelper } from '../../providers';
+import { FormKeyHelper, useWidgetConfig } from '../../providers';
 import { formatTokenAmount, formatTokenPrice } from '../../utils';
 
 export const FormPriceHelperText: React.FC<FormTypeProps> = ({ formType }) => {
@@ -35,11 +35,13 @@ export const FormPriceHelperTextBase: React.FC<
   }
 > = ({ formType, isLoading, tokenAddress, token }) => {
   const { t } = useTranslation();
+  const { currencyRate, selectedCurrency } = useWidgetConfig();
+
   const amount = useWatch({
     name: FormKeyHelper.getAmountKey(formType),
   });
 
-  const fromAmountTokenPrice = formatTokenPrice(amount, token?.priceUSD);
+  const fromAmountTokenPrice = formatTokenPrice(amount, String(Number(token?.priceUSD) * (Number(currencyRate) || 1)));
 
   return (
     <FormHelperText
@@ -60,6 +62,7 @@ export const FormPriceHelperTextBase: React.FC<
       >
         {t(`format.currency`, {
           value: fromAmountTokenPrice,
+          currency: selectedCurrency
         })}
       </Typography>
       {isLoading && tokenAddress ? (

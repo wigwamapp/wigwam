@@ -23,7 +23,7 @@ const getBackgroundColor = (
     ? selectionColor === 'primary'
       ? theme.palette.mode === 'light'
         ? alpha(theme.palette.primary.main, 0.04)
-        : alpha(theme.palette.primary.main, 0.42)
+        : alpha(theme.palette.primary.main, 0.72)
       : alpha(
           theme.palette.secondary.main,
           theme.palette.mode === 'light' ? 0.08 : 0.12,

@@ -49,8 +49,8 @@
     "activeTransactions": "Active transactions",
     "bridge": "Bridge",
     "checkout": "Checkout",
-    "exchange": "Exchange",
-    "from": "Exchange from",
+    "exchange": "Swap Exchange",
+    "from": "Swap from",
     "gas": "Gas",
     "payWith": "Pay with",
     "purchase": "Purchase",
@@ -59,11 +59,11 @@
     "selectWallet": "Select your wallet",
     "settings": "Settings",
     "swap": "Swap",
-    "to": "Exchange to",
+    "to": "Swap to",
     "transactionDetails": "Transaction details",
     "transactionHistory": "Transaction history",
     "walletConnected": "Wallet connected",
-    "youGet": "You get"
+    "youGet": "Swap Route"
   },
   "info": {
     "message": {
@@ -209,7 +209,7 @@
     "receiving": "Receiving",
     "refuelStepDetails": "Get gas via {{tool}}",
     "selectChain": "Select chain",
-    "selectChainAndToken": "Select chain and token",
+    "selectChainAndToken": "Select chain",
     "selectToken": "Select token",
     "sendToAddress": "Send to {{address}}",
     "sendToWallet": "Send to a different wallet",

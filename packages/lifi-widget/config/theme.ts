@@ -231,12 +231,12 @@ export const createTheme = (mode: PaletteMode, theme: ThemeConfig = {}) => {
             backgroundColor:
               mode === 'light'
                 ? alpha(primaryMainColor, 0.08)
-                : alpha(primaryMainColor, 0.42),
+                : alpha(primaryMainColor, 0.92),
             '&:hover': {
               backgroundColor:
                 mode === 'light'
                   ? alpha(primaryMainColor, 0.12)
-                  : alpha(primaryMainColor, 0.56),
+                  : alpha(primaryMainColor, 0.96),
             },
             color:
               mode === 'light' ? primaryMainColor : contrastTextButtonColor,

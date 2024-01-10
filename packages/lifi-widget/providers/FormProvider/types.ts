@@ -41,4 +41,5 @@ export const FormKeyHelper = {
 
 export interface FormTypeProps {
   formType: FormType;
+  readOnly?: boolean;
 }

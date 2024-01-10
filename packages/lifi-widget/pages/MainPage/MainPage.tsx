@@ -29,13 +29,14 @@ export const MainPage: React.FC = () => {
       ) : null}
       <SelectChainAndToken mt={1} mx={3} mb={2} />
       {!nft ? <AmountInput formType="from" mx={3} mb={2} /> : null}
+      {!nft ? <AmountInput formType="to" readOnly={true} mx={3} mb={2} /> : null}
       {!expandable ? <Routes mx={3} mb={2} /> : null}
+      <SendToWalletButton />
       <SendToWallet mx={3} mb={2} />
       <GasRefuelMessage mx={3} mb={2} />
       <MainGasMessage mx={3} mb={2} />
       <Box display="flex" mx={3} mb={1}>
         <ReviewButton />
-        <SendToWalletButton />
       </Box>
     </FormContainer>
   );

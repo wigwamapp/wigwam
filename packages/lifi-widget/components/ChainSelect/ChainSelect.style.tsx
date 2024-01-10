@@ -5,14 +5,16 @@ import { Card } from '../../components/Card';
 export const ChainCard = styled(Card)({
   display: 'grid',
   placeItems: 'center',
-  minWidth: 52,
-  height: 56,
+  minWidth: 127,
+  height: 32,
+  borderRadius: 8,
+  background: '#22262A',
 });
 
 export const ChainContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(52px, 1fr))',
-  gridAutoRows: '56px',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(127px, 1fr))',
+  gridAutoRows: '32px',
   justifyContent: 'space-between',
   gap: theme.spacing(1.5),
 }));

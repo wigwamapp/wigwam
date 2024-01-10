@@ -16,6 +16,7 @@ import { useExpandableVariant } from './hooks';
 import { useWidgetConfig } from './providers';
 import type { WidgetConfig, WidgetProps } from './types';
 import { ElementId, createElementId } from './utils';
+import './override.css';
 
 export const App = forwardRef<WidgetDrawer, WidgetProps>(
   ({ elementRef, open, integrator, ...other }, ref) => {

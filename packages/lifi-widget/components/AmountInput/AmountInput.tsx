@@ -22,6 +22,7 @@ import { FormPriceHelperText } from './FormPriceHelperText';
 
 export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
   formType,
+  readOnly = false,
   ...props
 }) => {
   const { disabledUI } = useWidgetConfig();
@@ -42,7 +43,7 @@ export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
         !disabled ? <AmountInputEndAdornment formType={formType} /> : undefined
       }
       bottomAdornment={<FormPriceHelperText formType={formType} />}
-      disabled={disabled}
+      disabled={disabled || readOnly}
       {...props}
     />
   );
@@ -80,6 +81,7 @@ export const AmountInputBase: React.FC<
   ) => {
     const { value } = event.target;
     const formattedAmount = formatInputAmount(value, token?.decimals, true);
+    console.log('formattedAmount', formattedAmount)
     onChange(formattedAmount);
   };
 
@@ -99,8 +101,9 @@ export const AmountInputBase: React.FC<
   }, [value, ref]);
 
   return (
-    <Card {...props}>
-      <CardTitle>{t('main.fromAmount')}</CardTitle>
+    <Card {...props} sx={{border: 'none', background: 'none', marginBottom: '24px'}}>
+      <CardTitle sx={{paddingTop: '0px'}}>{formType === "to" ? "You receive" : t('main.fromAmount')}</CardTitle>
+      <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
       <FormControl fullWidth>
         <Input
           inputRef={ref}
@@ -121,6 +124,7 @@ export const AmountInputBase: React.FC<
         />
         {bottomAdornment}
       </FormControl>
+      </div>
     </Card>
   );
 };

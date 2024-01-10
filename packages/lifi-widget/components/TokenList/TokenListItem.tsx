@@ -18,6 +18,7 @@ import {
 } from '../../utils';
 import { IconButton, ListItem, ListItemButton } from './TokenList.style';
 import type { TokenListItemButtonProps, TokenListItemProps } from './types';
+import { useWidgetConfig } from 'packages/lifi-widget/providers';
 
 export const TokenListItem: React.FC<TokenListItemProps> = memo(
   ({
@@ -62,7 +63,10 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
   isBalanceLoading,
 }) => {
   const { t } = useTranslation();
-  const tokenPrice = formatTokenPrice(token.amount, token.priceUSD);
+  const { currencyRate, selectedCurrency } = useWidgetConfig();
+  const priceAmount = currencyRate ? (Number(token.priceUSD) * Number(currencyRate)) : token.priceUSD
+  const currency = selectedCurrency ? selectedCurrency : 'USD'
+  const tokenPrice = formatTokenPrice(token.amount, String(priceAmount));
   const container = useRef(null);
   const timeoutId = useRef<ReturnType<typeof setTimeout>>();
   const [showAddress, setShowAddress] = useState(false);
@@ -158,6 +162,7 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
               >
                 {t(`format.currency`, {
                   value: tokenPrice,
+                  currency: currency
                 })}
               </Typography>
             ) : null}

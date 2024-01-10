@@ -89,11 +89,12 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
       mountOnEnter
       unmountOnExit
     >
-      <Card {...props} ref={ref}>
-        <CardTitle required={requiredToAddress}>
-          {t('main.sendToWallet')}
+      <Card {...props} ref={ref} sx={{border: 'none', background: 'none', marginBottom: '24px'}}>
+        <CardTitle required={requiredToAddress} sx={{paddingTop: '0px'}}>
+          Recipient
         </CardTitle>
-        <FormControl fullWidth sx={{ paddingTop: '6px', paddingBottom: '5px' }}>
+        <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
+        <FormControl fullWidth sx={{padding: '6px 16px 6px 0px' }}>
           <Input
             size="small"
             autoComplete="off"
@@ -109,6 +110,7 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
           />
           <SendToWalletFormHelperText />
         </FormControl>
+        </div>
       </Card>
     </Collapse>
   );
