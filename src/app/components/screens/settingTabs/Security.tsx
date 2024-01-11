@@ -35,7 +35,7 @@ import { AUTO_LOCK_TIMEOUTS } from "fixtures/settings";
 
 const prepareTimeout = (timeout: number) => ({
   key: timeout,
-  value: AUTO_LOCK_TIMEOUTS.get(timeout) ?? "0",
+  value: AUTO_LOCK_TIMEOUTS.get(timeout) ?? "Default",
 });
 
 const prepareTimeouts = () => {

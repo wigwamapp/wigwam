@@ -12,7 +12,7 @@ export const AUTO_LOCK_TIMEOUTS = new Map([
   [ONE_HOUR, "1 hour"],
   [ONE_HOUR * 3, "3 hours"],
   [ONE_DAY, "1 day"],
-  [TWO_DAYS * 2, "2 days"],
+  [TWO_DAYS, "2 days"],
   [ONE_WEEK, "1 week"],
 ]);
 
