@@ -75,6 +75,8 @@ export const SelectEnabledToolsPage: React.FC<{
         sx={{
           paddingLeft: 1.5,
           paddingRight: 1.5,
+          maxHeight: '60vh',
+          overflow: 'scroll'
         }}
       >
         {tools?.[typeKey].map((tool) => (

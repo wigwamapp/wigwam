@@ -9,7 +9,8 @@ import { ListItemButton, ListItemText } from './EnabledToolsButton.style';
 
 export const EnabledToolsButton: React.FC<{
   type: 'Bridges' | 'Exchanges';
-}> = ({ type }) => {
+  handleClick: () => void
+}> = ({ type, handleClick }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [enabledTools, tools] = useSettingsStore((state) => {
@@ -17,12 +18,12 @@ export const EnabledToolsButton: React.FC<{
     return [enabledTools.filter(Boolean).length, enabledTools.length];
   }, shallow);
 
-  const handleClick = () => {
-    navigate(navigationRoutes[type.toLowerCase() as 'bridges' | 'exchanges']);
-  };
+  // const handleBtnClick = () => {
+  //   navigate(navigationRoutes[type.toLowerCase() as 'bridges' | 'exchanges']);
+  // };
 
   return (
-    <ListItemButton onClick={handleClick}>
+    <ListItemButton onClick={() => handleClick()}>
       <ListItemText primary={t(`settings.enabled${type}`)} />
       <Box display="flex" alignItems="center">
         <ListItemText primary={`${enabledTools}/${tools}`} />

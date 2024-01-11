@@ -39,3 +39,52 @@
 .switcher.active .point {
   background: #0d1311;
 }
+
+.routeEllips {
+  width: 16px;
+  height: 16px;
+  background: #737c88;
+  border-radius: 100%;
+  margin-right: 8px;
+}
+
+.routeEllips svg {
+  opacity: 0;
+}
+
+.routeEllips.selected {
+  background: #80ef6e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.routeEllips.selected svg {
+  opacity: 1;
+}
+
+.txStatus {
+  color: #000;
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: 14.068px;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.txStatus.complete {
+  background: #80ef6e;
+}
+
+.txStatus.progress {
+  background: #ffcf26;
+}
+
+.txSteps .MuiBox-root {
+  background: transparent;
+  border: none;
+}

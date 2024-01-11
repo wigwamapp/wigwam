@@ -28,8 +28,8 @@ export const SlippageInput = () => {
   const value = slippage ?? '';
 
   return (
-    <Card>
-      <CardTitle>{t(`settings.slippage`)}</CardTitle>
+    <Card sx={{background: 'transparent', border: 'none'}}>
+      <CardTitle sx={{marginBottom: '8px'}}>{t(`settings.slippage`)}</CardTitle>
       <FormControl fullWidth>
         <Input
           size="small"
@@ -42,6 +42,7 @@ export const SlippageInput = () => {
           onChange={handleChange}
           onBlur={handleBlur}
           value={value}
+          sx={{background: '#22262A', borderRadius: '10px'}}
         />
       </FormControl>
     </Card>

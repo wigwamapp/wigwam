@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Route } from '@lifi/sdk';
 import { Collapse, Grow, Stack, Typography } from '@mui/material';
 import { useFormState } from 'react-hook-form';
@@ -70,7 +70,6 @@ export const RoutesExpandedElement = () => {
     if (isValid && !isValidating) {
       setExecutableRoute(route);
       setSelectedRouteId(route.id);
-      console.log('route', route)
       const formattedAmount = String(Number(route.toAmount)/Math.pow(10, route.toToken.decimals))
       onChange(formattedAmount)
       // navigate(navigationRoutes.transactionExecution, {

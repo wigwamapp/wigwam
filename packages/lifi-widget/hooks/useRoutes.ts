@@ -108,8 +108,6 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
     insurableRoute?.id,
   ];
 
-  console.log(queryKey)
-
   const { data, isLoading, isFetching, isFetched, dataUpdatedAt, refetch } =
     useQuery(
       queryKey,

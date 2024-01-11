@@ -11,8 +11,8 @@ export const GasPriceSelect = () => {
   const { gasPrice } = useSettings(['gasPrice']);
 
   return (
-    <Card flex={1}>
-      <CardTitle>{t(`settings.gasPrice.title`)}</CardTitle>
+    <Card flex={1} sx={{background: 'transparent', border: 'none'}}>
+      <CardTitle sx={{marginBottom: '8px'}}>{t(`settings.gasPrice.title`)}</CardTitle>
       <FormControl fullWidth>
         <Select
           MenuProps={{ elevation: 2 }}
@@ -22,6 +22,7 @@ export const GasPriceSelect = () => {
           }
           IconComponent={KeyboardArrowDownIcon}
           dense
+          sx={{background: '#22262A', borderRadius: '10px'}}
         >
           <MenuItem value="slow">{t(`settings.gasPrice.slow`)}</MenuItem>
           <MenuItem value="normal">{t(`settings.gasPrice.normal`)}</MenuItem>

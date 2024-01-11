@@ -1,4 +1,5 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTimeFilled';
+import clockIcon from '../../../../src/app/icons/clock.svg'
 import EvStationIcon from '@mui/icons-material/EvStation';
 import LayersIcon from '@mui/icons-material/Layers';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
@@ -104,7 +105,8 @@ export const RouteCardEssentials: React.FC<RouteCardEssentialsProps> = ({
       >
         <Box display="flex" alignItems="center" mr={dense ? 0 : 2}>
           <IconTypography>
-            <AccessTimeIcon fontSize="small" />
+            <img src={clockIcon} />
+            {/* <AccessTimeIcon fontSize="small" /> */}
           </IconTypography>
           <Typography
             fontSize={14}

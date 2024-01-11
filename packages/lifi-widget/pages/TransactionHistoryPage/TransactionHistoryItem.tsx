@@ -6,54 +6,94 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { Token, TokenDivider } from '../../components/Token';
 import { navigationRoutes } from '../../utils';
+import { RouteExecutionStatus } from '../../stores/routes/types';
+import { useProcessMessage, useRouteExecution } from '../../hooks';
 
 export const TransactionHistoryItem: React.FC<{
-  route: Route;
-}> = ({ route }) => {
+  route: Route | null;
+  status: RouteExecutionStatus | null,
+  routeId?: string,
+}> = ({ route, status, routeId = null }) => {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate(navigationRoutes.transactionDetails, {
-      state: { routeId: route.id },
+  if (routeId && !route && !status) {
+    const { route: activeRoute, status: activeStatus } = useRouteExecution({
+      routeId,
+      executeInBackground: true,
     });
+    if (activeRoute && activeStatus) {
+      route = activeRoute
+      status = activeStatus
+    }
+  }
+
+  const handleClick = () => {
+    if (route) {
+      navigate('/?tab="transactionDetails"', {
+        state: { routeId: route.id },
+      });
+    }
   };
 
-  const startedAt = new Date(
-    route.steps[0].execution?.process[0].startedAt ?? 0,
-  );
-  const fromToken = { ...route.fromToken, amount: route.fromAmount };
-  const toToken = {
-    ...(route.steps.at(-1)?.execution?.toToken ?? route.toToken),
-    amount: route.steps.at(-1)?.execution?.toAmount ?? route.toAmount,
+  if (route && status) {
+    const startedAt = new Date(
+      route.steps[0].execution?.process[0].startedAt ?? 0,
+    );
+    const fromToken = { ...route.fromToken, amount: route.fromAmount };
+    const toToken = {
+      ...(route.steps.at(-1)?.execution?.toToken ?? route.toToken),
+      amount: route.steps.at(-1)?.execution?.toAmount ?? route.toAmount,
+    };
+  
+    const getTxStatus = (status: RouteExecutionStatus) => {
+      switch (status) {
+        case (RouteExecutionStatus.Done):
+          return (
+            <div className='txStatus complete'>Complete</div>
+          )
+        case (RouteExecutionStatus.Pending):
+          return (
+            <div className='txStatus progress'>In Progress...</div>
+          )
+      }
+    }
+    return (
+      <Card onClick={handleClick} sx={{borderRadius: '10px', background: '#22262A', border: 'none'}}>
+        <Box
+          sx={{
+            display: 'flex',
+            flex: 1,
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+          pt={1.75}
+          px={2}
+        >
+          <div style={{display: 'flex'}}>
+            <Typography fontSize={12}>
+              {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(
+                startedAt,
+              )} /&nbsp;
+            </Typography>
+            <Typography fontSize={12}>
+              {new Intl.DateTimeFormat(i18n.language, {
+                timeStyle: 'short',
+              }).format(startedAt)}
+            </Typography>
+          </div>
+          {
+            getTxStatus(status)
+          }
+        </Box>
+        <Box py={1}>
+          <Token token={fromToken} px={2} pt={1} connected/>
+          <TokenDivider />
+          <Token token={toToken} px={2} pt={0.5} pb={1} />
+        </Box>
+      </Card>
+    );
   };
-  return (
-    <Card onClick={handleClick}>
-      <Box
-        sx={{
-          display: 'flex',
-          flex: 1,
-          justifyContent: 'space-between',
-        }}
-        pt={1.75}
-        px={2}
-      >
-        <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(
-            startedAt,
-          )}
-        </Typography>
-        <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, {
-            timeStyle: 'short',
-          }).format(startedAt)}
-        </Typography>
-      </Box>
-      <Box py={1}>
-        <Token token={fromToken} px={2} pt={1} connected />
-        <TokenDivider />
-        <Token token={toToken} px={2} pt={0.5} pb={1} />
-      </Box>
-    </Card>
-  );
+
+  
 };

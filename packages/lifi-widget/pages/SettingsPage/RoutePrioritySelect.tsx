@@ -14,8 +14,8 @@ export const RoutePrioritySelect: React.FC = () => {
   const value = routePriority ?? '';
 
   return (
-    <Card>
-      <CardTitle>{t(`settings.routePriority`)}</CardTitle>
+    <Card sx={{background: 'transparent', border: 'none'}}>
+      <CardTitle sx={{marginBottom: '8px'}}>{t(`settings.routePriority`)}</CardTitle>
       <FormControl fullWidth>
         <Select
           MenuProps={{ elevation: 2 }}
@@ -25,6 +25,7 @@ export const RoutePrioritySelect: React.FC = () => {
           }
           IconComponent={KeyboardArrowDownIcon}
           dense
+          sx={{background: '#22262A', borderRadius: '10px'}}
         >
           {Orders.map((order) => {
             const tag = t(`main.tags.${order.toLowerCase()}` as any);

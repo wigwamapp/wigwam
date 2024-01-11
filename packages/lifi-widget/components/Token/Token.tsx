@@ -75,7 +75,7 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
           <Skeleton width={112} height={32} variant="text" />
         ) : (
           <TextFitter
-            height={30}
+            height={24}
             textStyle={{
               fontWeight: 700,
             }}
@@ -103,10 +103,10 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
         )}
         {!disableDescription ? (
           <TextSecondary connected={connected} px={0.5} dot>
-            &#x2022;
+            /
           </TextSecondary>
         ) : null}
-        {!step && !disableDescription ? (
+        {true ? (
           isLoading ? (
             <Skeleton
               width={96}
@@ -123,7 +123,7 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
             </TextSecondary>
           )
         ) : null}
-        {step ? (
+        {/* {step ? (
           <Box display="flex" alignItems="flex-end" height={12} mt={0.5}>
             <Box pr={0.75}>
               <SmallAvatar
@@ -139,7 +139,7 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
             </Box>
             <TextSecondary connected>{step.toolDetails.name}</TextSecondary>
           </Box>
-        ) : null}
+        ) : null} */}
       </TextSecondaryContainer>
     </Box>
   );

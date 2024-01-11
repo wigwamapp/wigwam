@@ -8,7 +8,6 @@ import { SelectEnabledToolsPage } from './pages/SelectEnabledToolsPage';
 import { SelectTokenPage } from './pages/SelectTokenPage';
 import { SelectWalletPage } from './pages/SelectWalletPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { TransactionDetailsPage } from './pages/TransactionDetailsPage';
 import { TransactionHistoryPage } from './pages/TransactionHistoryPage';
 import { TransactionPage } from './pages/TransactionPage';
 import { navigationRoutes } from './utils';
@@ -59,14 +58,14 @@ export const AppRoutes = () => {
       path: navigationRoutes.activeTransactions,
       element: <ActiveTransactionsPage />,
     },
-    {
-      path: navigationRoutes.transactionHistory,
-      element: <TransactionHistoryPage />,
-    },
-    {
-      path: `${navigationRoutes.transactionHistory}?/${navigationRoutes.routes}?/${navigationRoutes.transactionExecution}?/${navigationRoutes.transactionDetails}`,
-      element: <TransactionDetailsPage />,
-    },
+    // {
+    //   path: navigationRoutes.transactionHistory,
+    //   element: <TransactionHistoryPage />,
+    // },
+    // {
+    //   path: `${navigationRoutes.transactionHistory}?/${navigationRoutes.routes}?/${navigationRoutes.transactionExecution}?/${navigationRoutes.transactionDetails}`,
+    //   element: <TransactionDetailsPage />,
+    // },
     {
       path: `${navigationRoutes.routes}?/${navigationRoutes.transactionExecution}?/${navigationRoutes.selectWallet}`,
       element: <SelectWalletPage />,
@@ -75,10 +74,10 @@ export const AppRoutes = () => {
       path: `${navigationRoutes.routes}?/${navigationRoutes.activeTransactions}?/${navigationRoutes.transactionExecution}`,
       element: <TransactionPage />,
     },
-    {
-      path: '*',
-      element: <NotFound />,
-    },
+    // {
+    //   path: '*',
+    //   element: <NotFound />,
+    // },
   ]);
   return element;
 };

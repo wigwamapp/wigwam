@@ -16,6 +16,8 @@ import { StepActions } from '../StepActions';
 import { Token } from '../Token';
 import { RouteCardEssentials } from './RouteCardEssentials';
 import type { RouteCardProps } from './types';
+import { SmallAvatar } from '../SmallAvatar';
+import { TextSecondary, TextSecondaryContainer } from '../Token/Token.style';
 
 export const RouteCard: React.FC<
   RouteCardProps & Omit<CardProps, 'variant'>
@@ -68,15 +70,94 @@ export const RouteCard: React.FC<
           ) : null}
           {route.tags?.length ? (
             <RecommendedTagTooltip>
-              <CardLabel type={active ? 'active' : undefined}>
-                <CardLabelTypography>
-                  {t(`main.tags.${route.tags[0].toLowerCase()}` as any)}
-                </CardLabelTypography>
-              </CardLabel>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div className={`routeEllips ${active && 'selected'}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 14 13" fill="none">
+                      <path d="M11.2204 3.15625L5.41732 8.95935L2.77954 6.32158" stroke="#0D1311" strokeWidth="1.40681" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <CardLabel type={active ? 'active' : undefined} sx={{background: 'transparent'}}>
+                    <CardLabelTypography sx={{borderRadius: '6px', border: '1px solid #717A7B', background: 'transparent', padding: '5px 8px'}} fontSize={10} color={'#fff'} fontWeight={400}>
+                      {t(`main.tags.${route.tags[0].toLowerCase()}` as any)}
+                    </CardLabelTypography>
+                  </CardLabel>
+                </div>
+                <Box display="flex" alignItems="flex-end" height={12} mt={0.5}>
+                  <Box pr={0.75}>
+                    <SmallAvatar
+                      src={route.steps[0].toolDetails.logoURI}
+                      alt={route.steps[0].toolDetails.name}
+                      sx={{
+                        border: 0,
+                        marginBottom: -0.25,
+                        width: '24px',
+                        height: '24px'
+                      }}
+                    >
+                      <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                        {route.steps[0].toolDetails.name[0]}
+                      </Typography>
+                    </SmallAvatar>
+                  </Box>
+                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+                </Box>
+              </div>
             </RecommendedTagTooltip>
-          ) : null}
+          ) : <>
+          <div className={`routeEllips ${active && 'selected'}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 14 13" fill="none">
+                  <path d="M11.2204 3.15625L5.41732 8.95935L2.77954 6.32158" stroke="#0D1311" strokeWidth="1.40681" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <Box display="flex" alignItems="flex-end" height={12} mt={0.5}>
+              <Box pr={0.75}>
+                <SmallAvatar
+                  src={route.steps[0].toolDetails.logoURI}
+                  alt={route.steps[0].toolDetails.name}
+                  sx={{
+                    border: 0,
+                    marginBottom: -0.25,
+                    width: '24px',
+                    height: '24px'
+                  }}
+                >
+                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                    {route.steps[0].toolDetails.name[0]}
+                  </Typography>
+                </SmallAvatar>
+              </Box>
+              <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+            </Box></>}
         </Box>
-      ) : null}
+      ) : <Box display="flex" alignItems="center" mb={2} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <>
+              <div className={`routeEllips ${active && 'selected'}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="13" viewBox="0 0 14 13" fill="none">
+                  <path d="M11.2204 3.15625L5.41732 8.95935L2.77954 6.32158" stroke="#0D1311" strokeWidth="1.40681" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <Box display="flex" alignItems="flex-end" height={12} mt={0.5}>
+              <Box pr={0.75}>
+                <SmallAvatar
+                  src={route.steps[0].toolDetails.logoURI}
+                  alt={route.steps[0].toolDetails.name}
+                  sx={{
+                    border: 0,
+                    marginBottom: -0.25,
+                    width: '24px',
+                    height: '24px'
+                  }}
+                >
+                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                    {route.steps[0].toolDetails.name[0]}
+                  </Typography>
+                </SmallAvatar>
+              </Box>
+              <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+            </Box>
+            </>
+          </Box>}
       <Box display="flex" justifyContent="space-between" alignItems="start">
         <Token
           token={token}
@@ -104,6 +185,7 @@ export const RouteCard: React.FC<
       variant={active ? 'selected' : 'default'}
       selectionColor="secondary"
       indented
+      sx={{borderRadius: '10px', background: '#22262A', border: `1px solid ${active ? '#80EF6E' : '#32393E'}`}}
       {...other}
     >
       {cardContent}

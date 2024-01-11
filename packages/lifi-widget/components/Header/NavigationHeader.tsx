@@ -24,7 +24,7 @@ export const NavigationHeader: React.FC = () => {
   const { navigate, navigateBack } = useNavigateBack();
   const { account } = useWallet();
   const { element, title } = useHeaderStore((state) => state);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   const cleanedPathname = pathname.endsWith('/')
     ? pathname.slice(0, -1)
@@ -134,7 +134,7 @@ export const NavigationHeader: React.FC = () => {
                       size="small"
                       edge="start"
                       onClick={() =>
-                        navigate(navigationRoutes.transactionHistory)
+                        search.includes('transactionHistory') ? navigate(`${pathname}`) : navigate(`${pathname}?tab=transactionHistory`)
                       }
                     >
                       <ReceiptLongIcon />
@@ -145,7 +145,7 @@ export const NavigationHeader: React.FC = () => {
                   <IconButton
                     size="small"
                     
-                    onClick={() => navigate(navigationRoutes.settings)}
+                    onClick={() => search.includes('settings') ? navigate(`${pathname}`) : navigate(`${pathname}?tab=settings`)}
                     sx={{
                       marginRight: -1.25,
                     }}

@@ -1,7 +1,7 @@
 import type { Token } from '@lifi/sdk';
 import type { BoxProps } from '@mui/material';
 import type { ChangeEvent, ReactNode } from 'react';
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useToken } from '../../hooks';
@@ -74,14 +74,25 @@ export const AmountInputBase: React.FC<
   } = useController({
     name: amountKey,
   });
+
+  const {
+    field: { onChange: onOutChange },
+  } = useController({
+    name: "toAmount",
+  });
   const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (amountKey === "fromAmount" && !value) {
+      onOutChange('')
+    }
+  }, [value])
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { value } = event.target;
     const formattedAmount = formatInputAmount(value, token?.decimals, true);
-    console.log('formattedAmount', formattedAmount)
     onChange(formattedAmount);
   };
 

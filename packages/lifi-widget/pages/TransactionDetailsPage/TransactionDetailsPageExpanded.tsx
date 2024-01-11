@@ -25,8 +25,11 @@ import { useHeaderStoreContext, useRouteExecutionStore } from '../../stores';
 import { formatTokenAmount } from '../../utils';
 import { ContactSupportButton } from './ContactSupportButton';
 import { Container } from './TransactionDetailsPage.style';
+import backIcon from '../../../../src/app/icons/back.svg';
+import copyIcon from '../../../../src/app/icons/copy.svg';
 
-export const TransactionDetailsPage: React.FC = () => {
+
+export const TransactionDetailsPageExpanded: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { navigateBack } = useNavigateBack();
   const { subvariant, contractComponent, contractSecondaryComponent } =
@@ -79,7 +82,11 @@ export const TransactionDetailsPage: React.FC = () => {
   );
 
   return (
-    <Container>
+    <Container sx={{maxWidth: '468px !important'}}>
+      <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
+        <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
+        <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction info</Typography>
+      </div>
       <Box
         sx={{
           display: 'flex',
@@ -99,7 +106,9 @@ export const TransactionDetailsPage: React.FC = () => {
           }).format(startedAt)}
         </Typography>
       </Box>
-      {getStepList(routeExecution?.route, subvariant)}
+      <div className="txSteps">
+        {getStepList(routeExecution?.route, subvariant)}
+      </div>
       {subvariant === 'nft' ? (
         <ContractComponent mt={2}>
           {contractSecondaryComponent || contractComponent}
@@ -119,7 +128,7 @@ export const TransactionDetailsPage: React.FC = () => {
           insuranceCoverageId={insuranceCoverageId}
         />
       ) : null}
-      <Card mt={2}>
+      <Card mt={2} sx={{background: 'transparent', border: 'none'}}>
         <Box
           sx={{
             display: 'flex',
@@ -127,18 +136,14 @@ export const TransactionDetailsPage: React.FC = () => {
           }}
         >
           <CardTitle flex={1}>{t('main.supportId')}</CardTitle>
-          <Box mr={1} mt={1}>
-            <IconButton size="medium" onClick={copySupportId}>
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
+          <Box onClick={copySupportId} mr={1} mt={1} sx={{display: 'flex', cursor: 'pointer', justifyContent: 'center', alignItems: 'center', padding: '6px', background: '#2C3036', borderRadius: '4px'}}>
+            <img src={copyIcon} style={{marginRight: '10px', width: '12px', height: '12px'}}/>
+            <Typography fontSize={12} fontWeight={400} color={'#fff'}>Copy</Typography>
           </Box>
         </Box>
         <Typography
           variant="body2"
-          pt={1}
-          pb={2}
-          px={2}
-          sx={{ wordBreak: 'break-all' }}
+          sx={{ wordBreak: 'break-all', background: '#21262A', borderRadius: '10px', marginTop: '12px', border: '1px solid #272C30', padding: '12px 16px'}}
         >
           {supportId}
         </Typography>
