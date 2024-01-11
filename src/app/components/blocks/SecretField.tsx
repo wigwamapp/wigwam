@@ -67,9 +67,7 @@ type CreateSecretFieldProps = SecretFieldBaseProps &
 
 const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
   ({ label = "Secret phrase", isDownloadable, onRegenerate, ...rest }, ref) => {
-    const { copy, copied } = useCopyToClipboard(
-      rest.value ?? rest.defaultValue,
-    );
+    const { copy, copied } = useCopyToClipboard();
     const [isShown, setIsShown] = useState(false);
 
     const { confirm } = useDialog();
@@ -136,7 +134,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         onClick={(evt: any) => {
           evt.preventDefault();
           evt.stopPropagation();
-          copy();
+          copy(rest.value ?? rest.defaultValue);
         }}
         className={classNames(
           "absolute",

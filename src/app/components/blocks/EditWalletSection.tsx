@@ -16,7 +16,7 @@ import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { TReplace } from "lib/ext/i18n/react";
 
-import { Account, AccountSource, SocialProvider } from "core/types";
+import { Account, AccountSource, SeedPharse, SocialProvider } from "core/types";
 import {
   deleteAccounts,
   getPrivateKey,
@@ -44,6 +44,7 @@ import SecondaryModal, {
 import PasswordField from "app/components/elements/PasswordField";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SecretField from "app/components/blocks/SecretField";
+import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
@@ -344,7 +345,7 @@ const SensetiveActionModal = memo<
     cause: "delete" | "phrase" | "private-key";
   }
 >(({ account, cause, open, onOpenChange }) => {
-  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<SeedPharse | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const windowFocused = useWindowFocus();
   const { updateToast } = useToast();
@@ -364,10 +365,10 @@ const SensetiveActionModal = memo<
         try {
           if (cause !== "delete") {
             if (cause === "phrase") {
-              const seed = await getSeedPhrase(password); // check is password correct
+              const seedPhrase = await getSeedPhrase(password); // check is password correct
               await resetFormPassword(form);
 
-              setSeedPhrase(seed.phrase);
+              setSeedPhrase(seedPhrase);
             } else {
               const key = await getPrivateKey(password, account.uuid);
               await resetFormPassword(form);
@@ -417,11 +418,14 @@ const SensetiveActionModal = memo<
     >
       {seedPhrase || privateKey ? (
         <>
-          <SecretField
-            label={seedPhrase ? "Secret phrase" : "Private key"}
-            isDownloadable={Boolean(seedPhrase)}
-            value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
-          />
+          {seedPhrase ? (
+            <SeedPhraseWords seedPhrase={seedPhrase} />
+          ) : (
+            <SecretField
+              label="Private key"
+              value={fromProtectedString(privateKey!)}
+            />
+          )}
 
           <div
             className={classNames(
@@ -532,7 +536,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         <span className="w-full font-medium break-words">{address}</span>
         <Button
           theme="tertiary"
-          onClick={copy}
+          onClick={() => copy()}
           className={classNames(
             "absolute bottom-3 right-3",
             "text-sm text-brand-light",
