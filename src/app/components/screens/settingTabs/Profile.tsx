@@ -14,6 +14,7 @@ import {
   withHumanDelay,
   focusOnErrors,
   validatePassword,
+  validateNewPassword,
 } from "app/utils";
 import { profileStateAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
@@ -90,10 +91,9 @@ const Profile: FC = () => {
       <Form<FormValues>
         onSubmit={handleSubmit}
         validate={(values) => ({
-          confirmNewPwd: differentPasswords(
-            values.newPwd,
-            values.confirmNewPwd,
-          ),
+          confirmNewPwd:
+            differentPasswords(values.newPwd, values.confirmNewPwd) ||
+            validateNewPassword(values.oldPwd, values.newPwd),
         })}
         decorators={[focusOnErrors]}
         destroyOnUnregister

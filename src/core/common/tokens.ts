@@ -134,6 +134,9 @@ export async function isTokenStandardValid(
         } catch {}
       }
       break;
+
+    default:
+      throw new Error("Unhandled Token ERC standard");
   }
 
   return false;

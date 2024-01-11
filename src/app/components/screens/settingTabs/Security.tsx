@@ -1,4 +1,4 @@
-import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FC, memo, useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue, useAtom } from "jotai";
 import { nanoid } from "nanoid";
@@ -9,7 +9,11 @@ import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { getSeedPhrase } from "core/client";
 import { SeedPharse } from "core/types";
 
-import { hasSeedPhraseAtom, analyticsAtom } from "app/atoms";
+import {
+  hasSeedPhraseAtom,
+  analyticsAtom,
+  autoLockTimeoutAtom,
+} from "app/atoms";
 import {
   required,
   withHumanDelay,
@@ -26,10 +30,26 @@ import Switcher from "app/components/elements/Switcher";
 import Separator from "app/components/elements/Seperator";
 import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
+import Select from "app/components/elements/Select";
+import { AUTO_LOCK_TIMEOUTS } from "fixtures/settings";
+
+const prepareTimeout = (timeout: number) => ({
+  key: timeout,
+  value: AUTO_LOCK_TIMEOUTS.get(timeout) ?? "0",
+});
+
+const prepareTimeouts = () => {
+  const preparedTimeouts = [];
+  for (const timeout of AUTO_LOCK_TIMEOUTS.keys()) {
+    preparedTimeouts.push(prepareTimeout(timeout));
+  }
+  return preparedTimeouts;
+};
 
 const Security: FC = () => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
   const [analytics, setAnalytics] = useAtom(analyticsAtom);
+  const [autoLockTimeout, setAutoLockTimeout] = useAtom(autoLockTimeoutAtom);
 
   const [revealModalOpened, setRevealModalOpened] = useState(false);
 
@@ -43,8 +63,31 @@ const Security: FC = () => {
     [setAnalytics, analytics],
   );
 
+  const prepareCurrentTimeout = useMemo(
+    () =>
+      autoLockTimeout === undefined
+        ? undefined
+        : prepareTimeout(autoLockTimeout),
+    [autoLockTimeout],
+  );
+
   return (
     <div className="flex flex-col items-start">
+      <SettingsHeader className="!mb-3">Auto lock</SettingsHeader>
+      <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+        This profile will automatically locked after chosen period of
+        inactivity.
+      </p>
+      <Select
+        label="Period"
+        items={prepareTimeouts()}
+        currentItem={prepareCurrentTimeout}
+        setItem={(u) => setAutoLockTimeout(u.key)}
+        showSelected={true}
+        className={classNames("max-w-[17.75rem]")}
+        contentClassName="max-w-[17.75rem]"
+      />
+      <Separator className="mt-6 mb-8" />
       {hasSeedPhrase && (
         <>
           <SettingsHeader className="!mb-3">

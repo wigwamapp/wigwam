@@ -100,13 +100,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
     }
   }, [rest.open]);
 
-  const filteredItems = useMemo(
-    () =>
-      items.filter((item) =>
-        showSelected ? item.key : item.key !== currentItem?.key,
-      ),
-    [currentItem?.key, items, showSelected],
-  );
+  const filteredItems = useMemo(() => {
+    if (showSelected) {
+      return items;
+    }
+
+    return items.filter((item) => item.key !== currentItem?.key);
+  }, [currentItem?.key, items, showSelected]);
 
   const handleOpenChange = useCallback(
     (opn: boolean) => {
