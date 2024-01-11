@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
-import { FORM_ERROR } from "final-form";
+import { FORM_ERROR, FormApi } from "final-form";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
 import { storage } from "lib/ext/storage";
@@ -17,6 +17,7 @@ import {
   focusOnErrors,
   composeValidators,
   validatePassword,
+  resetFormPassword,
 } from "app/utils";
 import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
@@ -49,20 +50,26 @@ const SetupPassword = memo(() => {
   }, [addAccountsParams, reset]);
 
   const handleFinish = useCallback(
-    async ({ password, analytics }: FormValues) =>
+    async (
+      { password, analytics }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
           if (!addAccountsParams) return;
+
+          await setupWallet(password, addAccountsParams, seedPhrase);
+          await resetFormPassword(form);
+          await resetFormPassword(form, "confirm");
 
           if (analytics) {
             await storage.put(Setting.Analytics, {
               enabled: true,
               userId: nanoid(),
             });
-          }
 
-          await setupWallet(password, addAccountsParams, seedPhrase);
-          trackEvent(TEvent.SetupWigwam);
+            trackEvent(TEvent.SetupWigwam);
+          }
 
           setAccModalOpened([false]);
         } catch (err: any) {
@@ -85,9 +92,10 @@ const SetupPassword = memo(() => {
         initialValues={{ analytics: true, terms: false }}
         onSubmit={handleFinish}
         validate={(values) => ({
-          confirm: differentPasswords(values.confirm)(values.password),
+          confirm: differentPasswords(values.password, values.confirm),
         })}
         decorators={[focusOnErrors]}
+        destroyOnUnregister
         render={({
           handleSubmit,
           submitting,

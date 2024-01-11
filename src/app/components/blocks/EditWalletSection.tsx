@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { FormApi } from "final-form";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { replaceT } from "lib/ext/i18n";
@@ -29,6 +30,7 @@ import {
   maxLength,
   minLength,
   required,
+  resetFormPassword,
   withHumanDelay,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
@@ -333,6 +335,10 @@ const WalletBlock: FC<WalletBlockProps> = ({
   </div>
 );
 
+type FormValues = {
+  password: string;
+};
+
 const SensetiveActionModal = memo<
   SecondaryModalProps & {
     account: Account;
@@ -351,36 +357,42 @@ const SensetiveActionModal = memo<
   }, [cause, onOpenChange, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }: { password: string }) =>
+    async (
+      { password }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
           if (cause !== "delete") {
             if (cause === "phrase") {
               const seedPhrase = await getSeedPhrase(password); // check is password correct
+              await resetFormPassword(form);
+
               setSeedPhrase(seedPhrase);
             } else {
               const key = await getPrivateKey(password, account.uuid);
+              await resetFormPassword(form);
+
               setPrivateKey(key);
             }
           } else {
-            try {
-              await deleteAccounts(password, [account.uuid]);
-              updateToast(
-                <>
-                  Wallet {`"`}
-                  <TReplace msg={account.name} />
-                  {`"`} successfully deleted!
-                </>,
-              );
-              onOpenChange?.(false);
-            } catch (err: any) {
-              throw new Error(err?.message);
-            }
+            await deleteAccounts(password, [account.uuid]);
+            await resetFormPassword(form);
+
+            updateToast(
+              <>
+                Wallet {`"`}
+                <TReplace msg={account.name} />
+                {`"`} successfully deleted!
+              </>,
+            );
+            onOpenChange?.(false);
           }
+
+          return;
         } catch (err: any) {
           return { password: err?.message };
         }
-        return;
       }),
     [cause, account.uuid, account.name, updateToast, onOpenChange],
   );
@@ -441,6 +453,7 @@ const SensetiveActionModal = memo<
         <Form
           onSubmit={handleConfirmPassword}
           decorators={[focusOnErrors]}
+          destroyOnUnregister
           render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"

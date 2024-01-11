@@ -28,10 +28,7 @@
     "https://*/*"
   ],
 
-  "__chrome__content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
-  },
-  "__firefox__content_security_policy": {
+  "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
   },
 
