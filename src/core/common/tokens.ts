@@ -149,14 +149,11 @@ export async function toggleTokenStatus(token: AccountToken) {
     await repo.accountTokens.put(
       {
         ...token,
-        ...(token.status === TokenStatus.Enabled
-          ? {
-              status: TokenStatus.Disabled,
-            }
-          : {
-              status: TokenStatus.Enabled,
-              manuallyEnabled: true,
-            }),
+        status:
+          token.status === TokenStatus.Enabled
+            ? TokenStatus.Disabled
+            : TokenStatus.Enabled,
+        manuallyStatusChanged: true,
       },
       createAccountTokenKey(token),
     );

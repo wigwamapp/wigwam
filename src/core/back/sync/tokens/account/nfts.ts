@@ -167,7 +167,7 @@ export const syncAccountNFTs = memoize(
 );
 
 function getNextStatus(
-  existing: AccountToken,
+  existing: AccountToken | undefined,
   rawBalanceBN: BigNumber.Value,
 ): TokenStatus {
   if (!existing) {
@@ -175,13 +175,14 @@ function getNextStatus(
     return TokenStatus.Enabled;
   } else if (
     new BigNumber(rawBalanceBN).isZero() &&
-    !existing.manuallyEnabled
+    !existing.manuallyStatusChanged
   ) {
     // Balance changed from positive to zero
     return TokenStatus.Disabled;
   } else if (
     new BigNumber(existing.rawBalance).isZero() &&
-    new BigNumber(rawBalanceBN).isGreaterThan(0)
+    new BigNumber(rawBalanceBN).isGreaterThan(0) &&
+    !existing.manuallyStatusChanged
   ) {
     // Balance changed from zero to positive
     return TokenStatus.Enabled;

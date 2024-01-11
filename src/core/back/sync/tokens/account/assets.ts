@@ -156,10 +156,11 @@ export const syncAccountAssets = memoize(
 
         if (price && price.usd) {
           const priceUSD = new BigNumber(price.usd);
+          const rawBalanceBN = new BigNumber(token.rawBalance);
 
           token.priceUSD = priceUSD.toString();
           token.priceUSDChange = price.usd_24h_change?.toString();
-          token.balanceUSD = new BigNumber(token.rawBalance)
+          token.balanceUSD = rawBalanceBN
             .div(new BigNumber(10).pow(token.decimals))
             .times(priceUSD)
             .toNumber();
@@ -170,13 +171,19 @@ export const syncAccountAssets = memoize(
               price.usd_reserve,
             ).toNumber();
           }
+
+          if (!token.manuallyStatusChanged) {
+            token.status = rawBalanceBN.isZero()
+              ? TokenStatus.Disabled
+              : TokenStatus.Enabled;
+          }
         } else {
           token.balanceUSD = 0;
           delete token.priceUSD;
           delete token.priceUSDChange;
 
           // Remove token from the list if no price
-          if (!token.manuallyEnabled) {
+          if (!token.manuallyStatusChanged) {
             token.status = TokenStatus.Disabled;
           }
         }
