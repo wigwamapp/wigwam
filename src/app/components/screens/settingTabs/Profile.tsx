@@ -57,13 +57,14 @@ const Profile: FC = () => {
     [currentId, updateToast],
   );
 
-  const handlePasswordChange = useCallback(
+  const handleSubmit = useCallback(
     async (values: FormValues, form: FormApi<FormValues>) =>
       withHumanDelay(async () => {
         try {
           await changePassword(values.oldPwd, values.newPwd);
-          updateToast("Profile password successfully updated!");
+
           form.restart();
+          updateToast("Profile password successfully updated!");
           return;
         } catch (error: any) {
           return { oldPwd: error.message };
@@ -88,14 +89,15 @@ const Profile: FC = () => {
 
       <SettingsHeader>Change password</SettingsHeader>
       <Form<FormValues>
-        onSubmit={handlePasswordChange}
+        onSubmit={handleSubmit}
+        validate={(values) => ({
+          confirmNewPwd:
+            differentPasswords(values.newPwd, values.confirmNewPwd) ||
+            validateNewPassword(values.oldPwd, values.newPwd),
+        })}
         decorators={[focusOnErrors]}
-        render={({
-          handleSubmit,
-          submitting,
-          modifiedSinceLastSubmit,
-          values,
-        }) => (
+        destroyOnUnregister
+        render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
           <form className="max-w-[18rem]" onSubmit={handleSubmit}>
             <TippySingletonProvider>
               <Field name="oldPwd" validate={required}>
@@ -135,14 +137,7 @@ const Profile: FC = () => {
                   />
                 )}
               </Field>
-              <Field
-                name="confirmNewPwd"
-                validate={composeValidators(
-                  required,
-                  differentPasswords(values.newPwd),
-                  validateNewPassword(values.oldPwd),
-                )}
-              >
+              <Field name="confirmNewPwd" validate={required}>
                 {({ input, meta }) => (
                   <PasswordField
                     error={meta.error && meta.touched}

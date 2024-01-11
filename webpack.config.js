@@ -165,7 +165,6 @@ module.exports = {
       "@ledgerhq/devices/hid-framing": require.resolve(
         "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
-      "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
       // For `react-error-guard`
       "babel-runtime/regenerator": "regenerator-runtime",
       // Fix `path is not exported from package exports field`

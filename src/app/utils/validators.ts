@@ -24,7 +24,7 @@ export const composeValidators =
       undefined,
     );
 
-export const differentPasswords = (password1: string) => (password2: string) =>
+export const differentPasswords = (password1: string, password2: string) =>
   password2 && password1 && password2 !== password1
     ? "Provided passwords don't match"
     : undefined;
@@ -97,8 +97,8 @@ const passwordRegex = new RegExp(
 export const validatePassword = (value: string) =>
   !value || value.match(passwordRegex) ? undefined : "Password is invalid";
 
-export const validateNewPassword =
-  (prevPassword: string) => (newPassword: string) =>
-    prevPassword === newPassword
-      ? "Shouldn’t match the old password"
-      : undefined;
+export const validateNewPassword = (
+  prevPassword: string,
+  newPassword: string,
+) =>
+  prevPassword === newPassword ? "Shouldn’t match the old password" : undefined;

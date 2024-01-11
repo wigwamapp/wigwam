@@ -10,7 +10,7 @@ export async function startInpageContentScript() {
     await browser.scripting.registerContentScripts([
       {
         id: "inpage",
-        matches: ["file://*/*", "https://*/*"],
+        matches: ["file://*/*", "http://*/*", "https://*/*"],
         js: ["scripts/inpage.js"],
         runAt: "document_start",
         allFrames: true,

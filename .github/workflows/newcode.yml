@@ -43,10 +43,15 @@ jobs:
       - name: Create app build
         run: yarn build:chrome
 
-      - name: Export app build
-        uses: actions/upload-artifact@v3
+      - uses: gacts/github-slug@v1
+        id: slug
         with:
-          name: ${{ github.event.pull_request.title }}
+          to-slug: ${{ github.event.pull_request.title }} Wigwam
+
+      - name: Export app build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.slug.outputs.slug }}
           path: |
             dist/prod/chrome.zip
           if-no-files-found: error

@@ -17,11 +17,15 @@
     "activeTab",
     "scripting"
   ],
-  "host_permissions": ["file://*/*", "https://*/*"],
-  "__chrome__content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
-  },
-  "__firefox__content_security_policy": {
+
+  "host_permissions": [
+    "http://localhost:8545/",
+    "file://*/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
   },
   "author": "{{website}}",
@@ -49,7 +53,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["file://*/*", "https://*/*"],
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
       "js": ["scripts/content.js"],
       "run_at": "document_start",
       "all_frames": true
