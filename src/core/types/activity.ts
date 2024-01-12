@@ -9,6 +9,7 @@ export enum ActivityType {
   Signing = "SIGNING",
   AddNetwork = "ADD_NETWORK",
   AddToken = "ADD_TOKEN",
+  Ramp = "RAMP",
 }
 
 export enum SigningStandard {
@@ -56,7 +57,8 @@ export type Approval =
 export type Activity =
   | TransactionActivity
   | SigningActivity
-  | ConnectionActivity;
+  | ConnectionActivity
+  | RampActivity;
 
 export interface ActivityBase {
   id: string;
@@ -87,6 +89,26 @@ export interface SigningApproval extends ActivityBase {
   standard: SigningStandard;
   accountAddress: string;
   message: any;
+}
+
+export interface RampActivity extends ActivityBase {
+  partnerOrderId: string;
+  pending: 0 | 1;
+  type: ActivityType.Ramp;
+  kind: "onramp" | "offramp";
+  accountAddress: `0x${string}`;
+  amountInCrypto: number;
+  amountInFiat: number;
+  amountInFiatUSD: number;
+  totalFee: number;
+  fiatCurrency: string;
+  cryptoCurrency: string;
+  network: string;
+  status: string;
+  paymentType: string;
+  tokenSlug: string;
+  chainId: number;
+  withError?: boolean;
 }
 
 export interface SigningActivity extends SigningApproval {

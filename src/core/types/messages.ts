@@ -5,6 +5,7 @@ import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
 import { GasPrices } from "./fees";
+import { RampTokenInfo } from "core/back/sync/fiatOnRamp";
 
 export type Request =
   | GetWalletStateRequest
@@ -335,5 +336,5 @@ export interface GetOnRampCurrenciesRequest extends MessageBase {
 
 export interface GetOnRampCurrenciesResponse extends MessageBase {
   type: MessageType.GetOnRampCurrencies;
-  currencies: Record<string, string>;
+  currencies: Record<string, RampTokenInfo>;
 }

@@ -37,4 +37,4 @@ export const tokenTypeAtom = atomWithStorage<TokenType>(
 );
 
 export const coinGeckoPlatformIds = atomWithDefault(getCgPlatformIds);
-export const onRampCurrencies = atomWithDefault(getOnRampCurrencies);
+export const onRampCurrenciesAtom = atomWithDefault(getOnRampCurrencies);
