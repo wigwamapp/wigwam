@@ -5,6 +5,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import {
+  onRampCurrenciesAtom,
   onRampCurrencyCodeAtom,
   onRampModalAtom,
   selectedCurrencyAtom,
@@ -14,20 +15,26 @@ import Button from "app/components/elements/Button";
 import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 import OnRampIframe from "./OnRampIframe";
 import { Environments, TransakConfig } from "core/types/transak";
-import { useAccounts, useLazyNetwork } from "app/hooks";
+import { useAccounts } from "app/hooks";
 
 const AddFundsOnRampModal = memo(() => {
   const [onRampModalOpened, setOnRampModalOpened] = useAtom(onRampModalAtom);
+  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-  const [, setOnRampCurrency] = useAtom(onRampCurrencyCodeAtom);
   const currencyCode = useAtomValue(onRampCurrencyCodeAtom);
-  const currentNetwork = useLazyNetwork();
   const {
     currentAccount: { address },
   } = useAccounts();
   const { confirm } = useDialog();
   const isMounted = useIsMounted();
   const contentRenderedRef = useRef(false);
+
+  const rampCurrencyInfo = useMemo(() => {
+    if (currencyCode && currencyCode in onRampCurrencies) {
+      return onRampCurrencies[currencyCode];
+    }
+    return null;
+  }, [onRampCurrencies, currencyCode]);
 
   const bootAnimationDisplayed = useMemo(
     () => onRampModalOpened && isMounted() && !contentRenderedRef.current,
@@ -47,9 +54,9 @@ const AddFundsOnRampModal = memo(() => {
           ? Environments.STAGING
           : Environments.PRODUCTION,
       defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      cryptoCurrency: selectedCurrency,
-      network: currentNetwork?.chainTag,
+      defaultNetwork: rampCurrencyInfo?.network,
       productsAvailed: "BUY",
+      cryptoCurrencyCode: rampCurrencyInfo?.symbol,
       walletAddress: address,
       disableWalletAddressForm: true,
       themeColor: "#0D1311",
@@ -72,11 +79,14 @@ const AddFundsOnRampModal = memo(() => {
     }),
     [
       address,
-      currentNetwork?.chainTag,
       isCurrentUserCcyCrypto,
+      rampCurrencyInfo?.network,
+      rampCurrencyInfo?.symbol,
       selectedCurrency,
     ],
   );
+
+  console.log("🚀 ~ AddFundsOnRampModal ~ config:", config);
 
   const handleOpenChange = useCallback(
     async (open: boolean) => {
@@ -99,19 +109,14 @@ const AddFundsOnRampModal = memo(() => {
       if (!res) {
         return;
       }
-      setOnRampCurrency([null]);
       setOnRampModalOpened([open]);
     },
-    [confirm, setOnRampModalOpened, setOnRampCurrency],
+    [confirm, setOnRampModalOpened],
   );
 
   const handleContentMount = useCallback((mounted: boolean) => {
     contentRenderedRef.current = mounted;
   }, []);
-
-  if (currencyCode) {
-    config["cryptoCurrencyCode"] = currencyCode;
-  }
 
   return (
     <Dialog.Root open={onRampModalOpened} onOpenChange={handleOpenChange} modal>
