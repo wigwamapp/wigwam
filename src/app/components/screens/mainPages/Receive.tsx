@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { AccountAsset, Network } from "core/types";
 
 import { receiveTabAtom, tokenSlugAtom } from "app/atoms";
-import { useAccountToken, useLazyNetwork } from "app/hooks";
+import { useAccountToken, useChainId, useLazyNetwork } from "app/hooks";
 import { ReceiveTab as ReceiveTabEnum } from "app/nav";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
@@ -20,11 +20,13 @@ const Receive: FC = () => {
   const activeTabRoute = useAtomValue(receiveTabAtom);
   const network = useLazyNetwork();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
+  const chainId = useChainId();
+  const chainTokenSlug = useMemo(() => `${chainId}_NATIVE_0_0`, [chainId]);
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
 
   const tabsContent = useMemo(
-    () => getTabsContent(tokenInfo, network),
-    [network, tokenInfo],
+    () => getTabsContent(chainTokenSlug, tokenInfo, network),
+    [network, tokenInfo, chainTokenSlug],
   );
   const tabs = useMemo(
     () =>
@@ -68,6 +70,7 @@ const Receive: FC = () => {
 export default Receive;
 
 const getTabsContent = (
+  slug: string,
   tokenInfo: AccountAsset | undefined,
   network?: Network,
 ) => [
@@ -90,7 +93,8 @@ const getTabsContent = (
           route: {
             page: "receive",
             onRampOpened: true,
-            cryptoCurrency: tokenInfo?.symbol,
+            cryptoCurrency: slug,
+            token: tokenInfo?.tokenSlug,
           },
           title: "Buy with Fiat",
           Icon: FiatIcon,

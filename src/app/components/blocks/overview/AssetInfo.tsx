@@ -11,7 +11,7 @@ import { toggleTokenStatus } from "core/common/tokens";
 import {
   coinGeckoPlatformIds,
   tokenSlugAtom,
-  onRampCurrencies,
+  onRampCurrenciesAtom,
 } from "app/atoms";
 import {
   OverflowProvider,
@@ -55,7 +55,7 @@ export enum TokenStandardValue {
 const AssetInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
-  const onRampCcy = useAtomValue(onRampCurrencies);
+  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
 
   const { confirm } = useDialog();
 
@@ -84,14 +84,18 @@ const AssetInfo: FC = () => {
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const chainTokenSlug = useMemo(
+    () => `${chainId}_${tokenSlug}`,
+    [chainId, tokenSlug],
+  );
 
   const onRampId = useMemo(() => {
-    if (`${chainId}_${tokenSlug}` in onRampCcy) {
-      return onRampCcy[`${chainId}_${tokenSlug}`];
+    if (chainTokenSlug in onRampCurrencies) {
+      return onRampCurrencies[chainTokenSlug].id;
     }
 
     return null;
-  }, [chainId, tokenSlug, onRampCcy]);
+  }, [onRampCurrencies, chainTokenSlug]);
 
   const showBuyButton = useMemo(
     () => tokenInfo?.status !== TokenStatus.Disabled && onRampId,
@@ -290,7 +294,7 @@ const AssetInfo: FC = () => {
                 <Button
                   to={{
                     onRampOpened: true,
-                    cryptoCurrency: tokenInfo?.symbol,
+                    cryptoCurrency: chainTokenSlug,
                   }}
                   merge
                   theme="secondary"
