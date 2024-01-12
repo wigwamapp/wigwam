@@ -25,7 +25,7 @@ export const ContactSupportButton = ({
   };
 
   return (
-    <Button onClick={handleClick} fullWidth>
+    <Button onClick={handleClick} fullWidth sx={{background: '#2A2D35', borderRadius: '6px', color: '#fff'}}>
       {t('button.contactSupport')}
     </Button>
   );

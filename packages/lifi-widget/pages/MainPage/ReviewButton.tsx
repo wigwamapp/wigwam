@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BaseTransactionButton } from "../../components/BaseTransactionButton";
 import { useRoutes } from "../../hooks";
 import { useWidgetConfig } from "../../providers";
-import { useSetExecutableRoute, useSplitSubvariantStore } from "../../stores";
+import { useSetExecutableRoute, useGetExecutableRoute, useGetSelectedRoute, useSplitSubvariantStore } from "../../stores";
 import { navigationRoutes } from "../../utils";
 
 export const ReviewButton: React.FC = () => {
@@ -12,12 +12,9 @@ export const ReviewButton: React.FC = () => {
   const navigate = useNavigate();
   const { isValid, isValidating } = useFormState();
   const setExecutableRoute = useSetExecutableRoute();
+  const currentRoute = useGetSelectedRoute();
   const { subvariant } = useWidgetConfig();
   const splitState = useSplitSubvariantStore((state) => state.state);
-
-  const { routes } = useRoutes();
-
-  const currentRoute = routes?.[0];
 
   const handleClick = async () => {
     if (currentRoute) {
@@ -40,7 +37,7 @@ export const ReviewButton: React.FC = () => {
             currentRoute.fromChainId === currentRoute.toChainId
               ? "Swap"
               : "Bridge";
-          return t(`button.review${transactionType}`);
+          return 'Start Swap';
       }
     } else {
       switch (subvariant) {
@@ -63,7 +60,7 @@ export const ReviewButton: React.FC = () => {
     <BaseTransactionButton
       text={getButtonText()}
       onClick={handleClick}
-      disabled={currentRoute && (isValidating || !isValid)}
+      disabled={currentRoute && (isValidating || !isValid) || !currentRoute}
     />
   );
 };

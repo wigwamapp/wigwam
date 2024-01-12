@@ -6,15 +6,16 @@ export const ChainCard = styled(Card)({
   display: 'grid',
   placeItems: 'center',
   minWidth: 127,
-  height: 32,
+  height: 48,
   borderRadius: 8,
+  border: 'none',
   background: '#22262A',
 });
 
 export const ChainContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(127px, 1fr))',
-  gridAutoRows: '32px',
+  gridAutoRows: '48px',
   justifyContent: 'space-between',
   gap: theme.spacing(1.5),
 }));

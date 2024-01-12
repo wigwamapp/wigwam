@@ -75,12 +75,12 @@ export const FormPriceHelperTextBase: React.FC<
       ) : token?.amount ? (
         <Typography
           fontWeight={400}
-          fontSize={12}
+          fontSize={10}
           color="text.secondary"
           lineHeight={1.3334}
           pl={0.25}
         >
-          {`/ ${t(`format.number`, {
+          {`Balance: ${t(`format.number`, {
             value: formatTokenAmount(token?.amount),
           })}`}
         </Typography>

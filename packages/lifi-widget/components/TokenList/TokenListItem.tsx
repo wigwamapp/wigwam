@@ -39,6 +39,7 @@ export const TokenListItem: React.FC<TokenListItemProps> = memo(
         style={{
           height: `${size}px`,
           transform: `translateY(${start}px)`,
+          borderRadius: '10px'
         }}
       >
         {startAdornment}
@@ -87,6 +88,7 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      sx={{borderRadius: '10px'}}
       dense
     >
       <ListItemAvatar>

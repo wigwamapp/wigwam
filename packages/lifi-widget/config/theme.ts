@@ -298,13 +298,14 @@ export const createTheme = (mode: PaletteMode, theme: ThemeConfig = {}) => {
       MuiTooltip: {
         styleOverrides: {
           tooltip: ({ theme }) => ({
-            backgroundColor: 'rgb(0 0 0 / 64%)',
-            backdropFilter: 'blur(3px)',
+            backgroundColor: '#3c474d',
             fontSize: '0.75rem',
             padding: theme.spacing(1, 1.5),
+            color: '#fff',
+            borderRadius: '6px'
           }),
           arrow: {
-            color: 'rgb(0 0 0 / 64%)',
+            color: '#3c474d',
           },
         },
       },

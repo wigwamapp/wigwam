@@ -172,8 +172,10 @@ export const TransactionPage: React.FC = () => {
       .find((process) => process.txHash)?.txHash ?? route.fromAddress;
 
   return (
-    <Container>
-      {getStepList(route, subvariant)}
+    <Container sx={{background: 'transparent', border: 'none'}}>
+      <div className="txSteps">
+        {getStepList(route, subvariant)}
+      </div>
       {subvariant === "nft" ? (
         <ContractComponent mt={2}>
           {contractSecondaryComponent || contractComponent}
@@ -217,6 +219,7 @@ export const TransactionPage: React.FC = () => {
                   sx={{
                     minWidth: 48,
                     marginLeft: 1,
+                    borderRadius: '6px'
                   }}
                 >
                   <DeleteIcon />

@@ -2,6 +2,10 @@
   background: none !important;
 }
 
+.MuiBox-root.withHover:hover {
+  background: #323b41 !important;
+}
+
 .MuiTypography-body1 {
   color: #8d9c9e;
   font-family: Inter;
@@ -87,4 +91,12 @@
 .txSteps .MuiBox-root {
   background: transparent;
   border: none;
+}
+
+.MuiTooltip-root {
+  background: yellow;
+}
+
+.searchInputWrapper input {
+  padding-left: 6px !important;
 }

@@ -19,24 +19,33 @@ export const SearchTokenInput = () => {
   );
 
   return (
-    <Card>
-      <FormControl fullWidth>
-        <Input
-          size="small"
-          placeholder={t(`main.tokenSearch`) as string}
-          defaultValue=""
-          endAdornment={
-            <InputAdornment position="end">
-              <SearchIcon />
-            </InputAdornment>
-          }
-          inputProps={{
-            inputMode: 'search',
-            ...register(FormKey.TokenSearchFilter),
-          }}
-          autoComplete="off"
-        />
-      </FormControl>
+    <div className='searchInputWrapper'>
+
+    <Card sx={{
+      borderRadius: '10px',
+      border: '1px solid #272C30',
+      background: '#16171C',
+      color: '#717A7B',
+      fontSize: '14px'
+    }}>
+        <FormControl fullWidth>
+          <Input
+            size="small"
+            placeholder={t(`main.tokenSearch`) as string}
+            defaultValue=""
+            startAdornment={
+              <InputAdornment position="end">
+                <SearchIcon sx={{fill: '#717A7B'}} />
+              </InputAdornment>
+            }
+            inputProps={{
+              inputMode: 'search',
+              ...register(FormKey.TokenSearchFilter),
+            }}
+            autoComplete="off"
+          />
+        </FormControl>
     </Card>
+    </div>
   );
 };

@@ -18,6 +18,7 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
     persist(
       (set, get) => ({
         routes: {},
+        selectedRoute: null,
         setExecutableRoute: (route: Route, insurableRouteId?: string) => {
           if (!get().routes[route.id]) {
             set((state: RouteExecutionState) => {
@@ -34,6 +35,8 @@ export const createRouteExecutionStore = ({ namePrefix }: PersistStoreProps) =>
                 route,
                 status: RouteExecutionStatus.Idle,
               };
+
+              state.selectedRoute = route;
               return {
                 routes,
               };

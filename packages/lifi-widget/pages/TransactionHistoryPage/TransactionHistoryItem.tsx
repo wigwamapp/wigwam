@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { Token, TokenDivider } from '../../components/Token';
-import { navigationRoutes } from '../../utils';
 import { RouteExecutionStatus } from '../../stores/routes/types';
-import { useProcessMessage, useRouteExecution } from '../../hooks';
+import {  useRouteExecution } from '../../hooks';
 
 export const TransactionHistoryItem: React.FC<{
   route: Route | null;
@@ -59,7 +58,10 @@ export const TransactionHistoryItem: React.FC<{
       }
     }
     return (
-      <Card onClick={handleClick} sx={{borderRadius: '10px', background: '#22262A', border: 'none'}}>
+      <Card 
+        onClick={handleClick}
+        className={'withHover'}
+        sx={{borderRadius: '10px', background: '#22262A', border: 'none'}}>
         <Box
           sx={{
             display: 'flex',

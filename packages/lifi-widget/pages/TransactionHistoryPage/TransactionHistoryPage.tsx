@@ -50,7 +50,7 @@ export const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <Container sx={{width: '340px', paddingTop: '12px'}}>
+    <Container sx={{width: '340px', paddingTop: '12px', maxHeight: '70vh', overflow: 'scroll'}}>
       <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
         <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction History</Typography>

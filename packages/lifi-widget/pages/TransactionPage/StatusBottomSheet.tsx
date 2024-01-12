@@ -239,7 +239,7 @@ export const StatusBottomSheet: React.FC<RouteExecution> = ({
           <Typography py={1}>{secondaryMessage}</Typography>
         ) : null}
         <Box mt={2}>
-          <Button variant="contained" fullWidth onClick={handlePrimaryButton}>
+          <Button variant="contained" fullWidth onClick={handlePrimaryButton} sx={{borderRadius: '6px'}}>
             {status === RouteExecutionStatus.Idle ? t("button.ok") : null}
             {hasEnumFlag(status, RouteExecutionStatus.Done)
               ? t("button.done")
@@ -251,7 +251,7 @@ export const StatusBottomSheet: React.FC<RouteExecution> = ({
         </Box>
         {hasEnumFlag(status, RouteExecutionStatus.Done) ? (
           <Box mt={2}>
-            <Button variant="text" onClick={handleSeeDetails} fullWidth>
+            <Button variant="text" onClick={handleSeeDetails} fullWidth sx={{borderRadius: '6px'}}>
               {t("button.seeDetails")}
             </Button>
           </Box>

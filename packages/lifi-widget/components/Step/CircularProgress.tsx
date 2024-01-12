@@ -9,11 +9,11 @@ import {
   CircularProgressPending,
 } from './CircularProgress.style';
 
-export function CircularProgress({ process }: { process: Process }) {
+export function CircularProgress({ process, size }: { process: Process, size?: number }) {
   return (
     <CircularIcon status={process.status} substatus={process.substatus}>
       {process.status === 'STARTED' || process.status === 'PENDING' ? (
-        <CircularProgressPending size={32} thickness={3} />
+        <CircularProgressPending size={size ? size : 32} thickness={3} />
       ) : null}
       {process.status === 'ACTION_REQUIRED' ? (
         <InfoRoundedIcon

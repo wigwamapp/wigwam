@@ -68,6 +68,8 @@ export const Step: React.FC<{
         sx={{
           display: 'flex',
           flex: 1,
+          background: 'transparent',
+          border: 'none'
         }}
       >
         <CardTitle flex={1}>{getCardTitle()}</CardTitle>

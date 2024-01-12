@@ -11,18 +11,20 @@ export const StepProcess: React.FC<{
 }> = ({ step, process }) => {
   const { title, message } = useProcessMessage(step, process);
   return (
-    <Box px={2} py={1}>
+    <Box>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
+          marginBottom: '8px',
+          marginLeft: '16px'
         }}
       >
-        <CircularProgress process={process} />
+        <CircularProgress process={process} size={24} />
         <Typography
           mx={2}
           flex={1}
-          fontSize={14}
+          fontSize={10}
           fontWeight={process.error ? 600 : 400}
         >
           {title}

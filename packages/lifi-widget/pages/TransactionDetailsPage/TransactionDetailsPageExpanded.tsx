@@ -25,6 +25,7 @@ import { useHeaderStoreContext, useRouteExecutionStore } from '../../stores';
 import { formatTokenAmount } from '../../utils';
 import { ContactSupportButton } from './ContactSupportButton';
 import { Container } from './TransactionDetailsPage.style';
+import { RouteExecutionStatus } from '../../stores/routes/types';
 import backIcon from '../../../../src/app/icons/back.svg';
 import copyIcon from '../../../../src/app/icons/copy.svg';
 
@@ -81,11 +82,29 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
     routeExecution?.route.steps[0].execution?.process[0].startedAt ?? 0,
   );
 
+  const getTxStatus = (status: RouteExecutionStatus) => {
+    switch (status) {
+      case (RouteExecutionStatus.Done):
+        return (
+          <div className='txStatus complete'>Complete</div>
+        )
+      case (RouteExecutionStatus.Pending):
+        return (
+          <div className='txStatus progress'>In Progress...</div>
+        )
+    }
+  }
+
   return (
     <Container sx={{maxWidth: '468px !important'}}>
       <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
-        <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
-        <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction info</Typography>
+        <div style={{display: 'flex'}}>
+          <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
+          <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction info</Typography>
+        </div>
+        {
+          routeExecution ?  <div style={{marginLeft: 'auto'}}>{getTxStatus(routeExecution?.status)}</div> : null
+        }
       </div>
       <Box
         sx={{

@@ -112,7 +112,7 @@ export const NavigationHeader: React.FC = () => {
             >
               {title || handleHeaderTitle()}
             </Typography>
-            <img src={SwapArrows} style={{marginLeft: '12px'}}/>
+            {(title === 'Swap Exchange' || handleHeaderTitle() === 'Swap Exchange') && <img src={SwapArrows} style={{marginLeft: '12px'}}/>}
           </div>
         )}
         <Routes>

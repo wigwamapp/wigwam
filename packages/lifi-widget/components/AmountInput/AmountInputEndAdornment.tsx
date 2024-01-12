@@ -25,9 +25,9 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
   const { data } = useGasRecommendation(chainId);
   const { token, isLoading } = useTokenAddressBalance(chainId, tokenAddress);
 
-  const handleMax = () => {
+  const handleValue = (percentage: number) => {
     const chain = getChainById(chainId);
-    let maxAmount = token?.amount;
+    let maxAmount: any = percentage === 100 ? token?.amount : Number(token?.amount) * (percentage / 100);
     if (
       chain?.nativeToken.address === tokenAddress &&
       data?.available &&
@@ -59,7 +59,11 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
           sx={{ borderRadius: 0.5 }}
         />
       ) : formType === 'from' && token?.amount ? (
-        <Button onClick={handleMax}>{t('button.max')}</Button>
+        <>
+        <Button onClick={() => handleValue(25)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '10px'}}>25%</Button>
+        <Button onClick={() => handleValue(50)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '10px'}}>50%</Button>
+        <Button onClick={() => handleValue(100)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', fontSize: '10px'}}>{t('button.max')}</Button>
+        </>
       ) : null}
     </InputAdornment>
   );

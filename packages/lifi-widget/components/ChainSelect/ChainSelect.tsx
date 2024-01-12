@@ -57,6 +57,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
               arrow
             >
               <ChainCard
+                className='withHover'
                 onClick={() => setCurrentChain(chain.id)}
                 variant={chainId === chain.id ? 'selected' : 'default'}
               >
@@ -64,7 +65,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
                 <Avatar
                   src={chain.logoURI}
                   alt={chain.key}
-                  sx={{ width: '18px', height: '18px', marginRight: '12px' }}
+                  sx={{ width: '32px', height: '32px', marginRight: '12px' }}
                 >
                 </Avatar>
                 <Typography fontSize={14} fontWeight={500} color={'#C0C1C3'}>
@@ -75,7 +76,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
             </Tooltip>
           ))}
       {chainsToHide > 0 ? (
-        <ChainCard onClick={showAllChains}>
+        <ChainCard className='withHover' onClick={showAllChains}>
           <Box
             sx={{
               width: 75,
@@ -84,7 +85,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
               placeItems: 'center',
             }}
           >
-            <Typography fontWeight={500}>+{chainsToHide} more</Typography>
+            <Typography fontWeight={500} fontSize={14}>+{chainsToHide} more</Typography>
           </Box>
         </ChainCard>
       ) : null}

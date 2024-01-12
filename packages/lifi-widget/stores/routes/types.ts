@@ -7,6 +7,7 @@ export interface RouteExecution {
 
 export interface RouteExecutionState {
   routes: Partial<Record<string, RouteExecution>>;
+  selectedRoute: any;
   setExecutableRoute: (route: Route, insurableRouteId?: string) => void;
   updateRoute: (route: Route) => void;
   restartRoute: (routeId: string) => void;
