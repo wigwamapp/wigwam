@@ -21,18 +21,46 @@ type TokenAmountProps = {
     slug: string;
     amount?: string;
   };
+  rawAmount?: boolean;
   isSmall?: boolean;
   className?: string;
 };
 
 const TokenAmount = memo<TokenAmountProps>(
-  ({ accountAddress, token: { slug, amount }, isSmall = false, className }) => {
+  ({
+    accountAddress,
+    token: { slug, amount },
+    rawAmount = false,
+    isSmall = false,
+    className,
+  }) => {
     const tokenInfo = useToken(accountAddress, slug);
 
     if (!tokenInfo) return null;
 
     if (tokenInfo.tokenType === TokenType.Asset) {
       const { name, symbol, decimals, priceUSD } = tokenInfo;
+
+      if (rawAmount && amount) {
+        return (
+          <div className={classNames("flex items-center", className)}>
+            <AssetLogo
+              asset={tokenInfo}
+              alt={name}
+              className="w-4 h-4 min-w-[1rem] mr-2"
+            />
+            <PrettyAmount
+              className={classNames(
+                "text-white font-bold",
+                isSmall ? "text-xs" : "text-sm",
+              )}
+              currency={tokenInfo.symbol}
+              amount={amount}
+              threeDots={false}
+            />
+          </div>
+        );
+      }
 
       const usdAmount = amount
         ? new BigNumber(amount)

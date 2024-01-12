@@ -460,7 +460,8 @@ const ActivityCard = memo(
                   )}
 
                   {item.type !== ActivityType.Transaction &&
-                    item.source.type === "page" && (
+                    item.source &&
+                    item.source?.type === "page" && (
                       <ActivityWebsiteLink source={item.source} />
                     )}
                 </div>
@@ -504,6 +505,39 @@ const ActivityCard = memo(
                 />
               </div>
             )}
+            {item.type === ActivityType.Ramp && (
+              <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
+                <div className="flex items-center justify-between min-w-0">
+                  <ActivityWalletCard
+                    accountAddress={item.accountAddress}
+                    className="mr-4 min-w-0"
+                  />
+                  <ChainIdProvider chainId={item.chainId}>
+                    <ActivityTokens
+                      source={item.source}
+                      accountAddress={item.accountAddress}
+                    />
+                  </ChainIdProvider>
+
+                  <ChainIdProvider chainId={item.chainId}>
+                    <TokenAmount
+                      rawAmount
+                      isSmall={isPopupMode}
+                      accountAddress={item.accountAddress}
+                      token={{
+                        slug: item.tokenSlug,
+                        amount: String(item.amountInCrypto),
+                      }}
+                    />
+                  </ChainIdProvider>
+                </div>
+
+                <ActivityNetworkCard
+                  chainId={item.chainId}
+                  className="mt-1.5 min-w-0"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -519,7 +553,8 @@ const ActivityCard = memo(
             )}
 
             {(item.type === ActivityType.Transaction ||
-              item.type === ActivityType.Signing) && (
+              item.type === ActivityType.Signing ||
+              item.type === ActivityType.Ramp) && (
               <ActivityWalletCard
                 accountAddress={item.accountAddress}
                 className="w-[10rem] mr-8"
@@ -534,20 +569,28 @@ const ActivityCard = memo(
               />
             )}
 
-            {item.source.type === "page" && (
+            {item.type === ActivityType.Ramp && (
+              <ActivityNetworkCard
+                chainId={item.chainId}
+                className="w-[12rem] mr-8"
+              />
+            )}
+
+            {item.type !== ActivityType.Ramp && item.source.type === "page" && (
               <ActivityWebsiteLink
                 source={item.source}
                 className="w-[10rem] mr-8"
               />
             )}
 
-            {item.type === ActivityType.Connection && (
-              <DisconnectDApp
-                item={item}
-                className="w-[10rem] mr-8"
-                setRevokedPermission={setRevokedPermission}
-              />
-            )}
+            {item.type !== ActivityType.Ramp &&
+              item.type === ActivityType.Connection && (
+                <DisconnectDApp
+                  item={item}
+                  className="w-[10rem] mr-8"
+                  setRevokedPermission={setRevokedPermission}
+                />
+              )}
 
             {item.type === ActivityType.Transaction && (
               <ChainIdProvider chainId={item.chainId}>
@@ -556,6 +599,20 @@ const ActivityCard = memo(
                   action={item.txAction}
                   accountAddress={item.accountAddress}
                   className="w-[10rem] mr-8"
+                />
+              </ChainIdProvider>
+            )}
+
+            {item.type === ActivityType.Ramp && (
+              <ChainIdProvider chainId={item.chainId}>
+                <TokenAmount
+                  rawAmount
+                  isSmall={isPopupMode}
+                  accountAddress={item.accountAddress}
+                  token={{
+                    slug: item.tokenSlug,
+                    amount: String(item.amountInCrypto),
+                  }}
                 />
               </ChainIdProvider>
             )}
@@ -734,6 +791,9 @@ const getActivityIcon = (type: ActivityType) => {
     case ActivityType.Connection:
       return ActivityConnectionIcon;
     case ActivityType.Signing:
+      return ActivitySigningIcon;
+    // TODO paste ramp icon
+    case ActivityType.Ramp:
       return ActivitySigningIcon;
     default:
       return ActivityTransactionIcon;
