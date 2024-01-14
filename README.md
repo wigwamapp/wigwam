@@ -1,4 +1,4 @@
-# Wigwam - Web3 Wallet for EVM Blockchains
+# Wigwam - Web3 Wallet
 
 ### https://wigwam.app
 
