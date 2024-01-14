@@ -165,9 +165,7 @@
   },
   "resolutions": {
     "flux": "./.vendor/flux",
-    "axios": ">=1.6.4",
-    "@adobe/css-tools": ">=4.3.2",
-    "follow-redirects": ">=1.15.4"
+    "axios": ">=1.6.4"
   },
   "engines": {
     "node": ">=18.12.0"
