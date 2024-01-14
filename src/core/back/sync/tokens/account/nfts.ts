@@ -23,13 +23,15 @@ export const syncAccountNFTs = memoize(
     const network = await getNetwork(chainId);
     if (network.type !== "mainnet") return;
 
-    const [
-      freshAccTokensData,
-      { existingAccTokens, existingTokensMap, addToken, releaseToRepo },
-    ] = await Promise.all([
-      fetchAccountNFTs(chainId, accountAddress),
-      prepareAccountTokensSync(chainId, accountAddress, TokenType.NFT),
-    ]);
+    const [freshAccTokensData, { existingTokensMap, addToken, releaseToRepo }] =
+      await Promise.all([
+        fetchAccountNFTs(chainId, accountAddress),
+        prepareAccountTokensSync<AccountNFT>(
+          chainId,
+          accountAddress,
+          TokenType.NFT,
+        ),
+      ]);
 
     for (const coll of freshAccTokensData) {
       if (!coll.assets?.length) continue;
@@ -104,7 +106,7 @@ export const syncAccountNFTs = memoize(
           tpId: nftData.nftscan_id,
         };
 
-        const status = getNextStatus(existing, rawBalanceBN);
+        const status = getNextStatus(existing, rawBalanceBN, metadata);
         const rawBalance = rawBalanceBN.toString();
         const balanceUSD = existing?.balanceUSD ?? 0;
 
@@ -131,8 +133,7 @@ export const syncAccountNFTs = memoize(
     if (
       existingTokensMap.size > 0 &&
       // Avoid fetch balance from chain for huge amount of NFTs
-      (existingTokensMap.size !== existingAccTokens.length ||
-        existingTokensMap.size < 50)
+      existingTokensMap.size < 50
     ) {
       const restTokens = Array.from(existingTokensMap.values());
 
@@ -148,7 +149,7 @@ export const syncAccountNFTs = memoize(
 
         const token = restTokens[i];
         const rawBalance = rawBalanceBN.toString();
-        const status = getNextStatus(token, rawBalance);
+        const status = getNextStatus(token, rawBalance, token);
 
         addToken({
           ...token,
@@ -169,27 +170,45 @@ export const syncAccountNFTs = memoize(
 function getNextStatus(
   existing: AccountToken | undefined,
   rawBalanceBN: BigNumber.Value,
+  metadata: Partial<AccountNFT>,
 ): TokenStatus {
   if (!existing) {
     // The new token, just add it
     return TokenStatus.Enabled;
   } else if (
-    new BigNumber(rawBalanceBN).isZero() &&
-    !existing.manuallyStatusChanged
+    !existing.manuallyStatusChanged &&
+    new BigNumber(rawBalanceBN).isZero()
   ) {
     // Balance changed from positive to zero
     return TokenStatus.Disabled;
   } else if (
+    !existing.manuallyStatusChanged &&
     new BigNumber(existing.rawBalance).isZero() &&
-    new BigNumber(rawBalanceBN).isGreaterThan(0) &&
-    !existing.manuallyStatusChanged
+    new BigNumber(rawBalanceBN).isGreaterThan(0)
   ) {
     // Balance changed from zero to positive
     return TokenStatus.Enabled;
+  } else if (!existing.manuallyStatusChanged && !isNFTValid(metadata)) {
+    return TokenStatus.Disabled;
   } else {
     // Existing token, rest cases
     return existing.status;
   }
+}
+
+function isNFTValid({ name, description }: Partial<AccountNFT>) {
+  for (const text of [name, description]) {
+    if (!text) continue;
+
+    const textLowered = text.toLowerCase();
+    const invalid = ["airdrop", "reward", "voucher"].some((word) =>
+      textLowered.includes(word),
+    );
+
+    if (invalid) return false;
+  }
+
+  return true;
 }
 
 // export async function syncWithCIndexer() {

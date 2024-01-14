@@ -32,7 +32,11 @@ export const syncAccountAssets = memoize(
           return [];
         },
       ),
-      prepareAccountTokensSync(chainId, accountAddress, TokenType.Asset),
+      prepareAccountTokensSync<AccountAsset>(
+        chainId,
+        accountAddress,
+        TokenType.Asset,
+      ),
     ]);
 
     for (const token of freshAccTokensData) {
@@ -48,7 +52,7 @@ export const syncAccountAssets = memoize(
         id: "0",
       });
 
-      const existing = existingTokensMap.get(tokenSlug) as AccountAsset;
+      const existing = existingTokensMap.get(tokenSlug);
 
       // Skip tokens that recently synced by chain
       if (
@@ -120,7 +124,7 @@ export const syncAccountAssets = memoize(
     // Fetch data from the chain for tokens
     // that were not retrieved from the indexer
 
-    const restTokens = Array.from(existingTokensMap.values()) as AccountAsset[];
+    const restTokens = Array.from(existingTokensMap.values());
 
     if (restTokens.length > 0) {
       const balances = await Promise.all(
