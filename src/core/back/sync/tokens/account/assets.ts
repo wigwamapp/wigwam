@@ -16,6 +16,8 @@ import { getBalanceFromChain } from "../../chain";
 import { prepareAccountTokensSync } from "./utils";
 import { fetchCxAccountTokens } from "../../indexer";
 
+const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
+
 export const syncAccountAssets = memoize(
   async (chainId: number, accountAddress: string) => {
     const [
@@ -39,9 +41,10 @@ export const syncAccountAssets = memoize(
       // Skip for native token, we sync native tokens in separate module
       if (native) continue;
 
+      const tokenAddress = ethers.getAddress(token.contract_address);
       const tokenSlug = createTokenSlug({
         standard: TokenStandard.ERC20,
-        address: ethers.getAddress(token.contract_address),
+        address: tokenAddress,
         id: "0",
       });
 
@@ -59,10 +62,12 @@ export const syncAccountAssets = memoize(
 
       // Skip if alreaady exist and balance is zero
       // Skip if mainnet token without metadata
+      // Skip if dead address
       if (
         (!existing && rawBalanceBN.isZero()) ||
         (network.type === "mainnet" &&
-          (!token.contract_ticker_symbol || !token.contract_decimals))
+          (!token.contract_ticker_symbol || !token.contract_decimals)) ||
+        tokenAddress === DEAD_ADDRESS
       ) {
         continue;
       }
@@ -152,7 +157,8 @@ export const syncAccountAssets = memoize(
         const token = accTokens[i] as AccountAsset;
         const tokenAddress = tokenAddresses[i];
 
-        const price = cgPrices[tokenAddress];
+        const price =
+          tokenAddress !== DEAD_ADDRESS ? cgPrices[tokenAddress] : null;
 
         if (price && price.usd) {
           const priceUSD = new BigNumber(price.usd);
