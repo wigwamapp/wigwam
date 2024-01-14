@@ -4,7 +4,7 @@
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
-![Wigwam](https://github.com/wigwamapp/wigwam/assets/11996139/3ed8e808-5357-41f7-88f2-91bb655d9f07/)
+![Wigwam](./docs/banner.png)
 
 **Table of Contents**
 
@@ -45,10 +45,6 @@ A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain,
 
 - 📖 Committed to transparency and community-driven development. The project is open source, allowing developers to review and contribute to the codebase.
 
-### Social Authentication
-
-- 👥 Integrates with [Open Login](https://openlogin.com/) for seamless social authentication, making the onboarding process user-friendly and accessible.
-
 ### User-Friendly Interface
 
 - 🖥️ The user interface is intuitive and user-friendly, making it easy for both newcomers and experienced users to navigate and utilize the wallet's features.
@@ -75,7 +71,7 @@ You can also find documentation for specific modules within the source code.
 
 ## Build from source
 
-> Requires: [`Node.js >=18.12.0`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
+> Requires: [`Node.js >=18.12.0`](https://nodejs.org) and [`Yarn ^1`](https://yarnpkg.com)
 
 ### Get the source code
 
