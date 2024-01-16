@@ -210,7 +210,10 @@ export default Button;
 
 const Spinner = memo<{ className?: string }>(({ className }) => (
   <svg
-    className={classNames("animate-spin h-5 w-5 text-white", className)}
+    className={classNames(
+      "animate-spin h-5 w-5 text-brand-darkaccent",
+      className,
+    )}
     viewBox="0 0 20 20"
     fill="none"
   >

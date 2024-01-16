@@ -86,6 +86,11 @@ export function getCID(url: string) {
     if (isCID(dotPart)) {
       return dotPart;
     }
+
+    const uspPart = part.split("?")[0];
+    if (isCID(uspPart)) {
+      return uspPart;
+    }
   }
 
   return null;
