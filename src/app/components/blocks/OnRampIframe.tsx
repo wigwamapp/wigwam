@@ -1,6 +1,6 @@
 import { type FC, useEffect, useCallback, useMemo } from "react";
 import { Emitter } from "lib/emitter";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   type TransakConfig,
   TransakEvents,
@@ -59,7 +59,7 @@ const OnRampIframe: FC = () => {
   const { alert } = useDialog();
   const eventEmitter = useMemo(() => new Emitter(), []);
   const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
-  const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
+  const setOnRampModalOpened = useSetAtom(onRampModalAtom);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const chainId = useChainId();
@@ -108,7 +108,7 @@ const OnRampIframe: FC = () => {
       walletAddress: address,
       disableWalletAddressForm: true,
       themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${selectedCurrency} with Wigwam`,
+      exchangeScreenTitle: `Securely buy ${rampCurrencyInfo?.symbol} with Wigwam`,
     }),
     [
       address,
