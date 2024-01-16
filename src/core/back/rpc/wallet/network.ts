@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
-import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
+import { isValidHttpsUrl } from "lib/system/isValidHttpsUrl";
 
 import {
   RpcContext,
@@ -75,9 +75,10 @@ export async function requestNetwork(
 
 function formatUrls(params: AddEthereumChainParameter) {
   try {
-    params.rpcUrls = params.rpcUrls.filter(isValidHttpUrl);
-    params.blockExplorerUrls = params.blockExplorerUrls?.filter(isValidHttpUrl);
-    params.iconUrls = params.iconUrls?.filter(isValidHttpUrl);
+    params.rpcUrls = params.rpcUrls.filter(isValidHttpsUrl);
+    params.blockExplorerUrls =
+      params.blockExplorerUrls?.filter(isValidHttpsUrl);
+    params.iconUrls = params.iconUrls?.filter(isValidHttpsUrl);
   } catch (err) {
     console.error(err);
   }

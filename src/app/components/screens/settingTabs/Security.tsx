@@ -1,29 +1,55 @@
-import { FC, memo, useCallback, useEffect, useState } from "react";
+import { FC, memo, useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue, useAtom } from "jotai";
 import { nanoid } from "nanoid";
+import { FormApi } from "final-form";
 import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
-import { fromProtectedString } from "lib/crypto-utils";
 
 import { getSeedPhrase } from "core/client";
+import { SeedPharse } from "core/types";
 
-import { hasSeedPhraseAtom, analyticsAtom } from "app/atoms";
-import { required, withHumanDelay, focusOnErrors } from "app/utils";
+import {
+  hasSeedPhraseAtom,
+  analyticsAtom,
+  autoLockTimeoutAtom,
+} from "app/atoms";
+import {
+  required,
+  withHumanDelay,
+  focusOnErrors,
+  resetFormPassword,
+} from "app/utils";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
-import SecretField from "app/components/blocks/SecretField";
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import PasswordField from "app/components/elements/PasswordField";
 import Switcher from "app/components/elements/Switcher";
 import Separator from "app/components/elements/Seperator";
+import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
+import Select from "app/components/elements/Select";
+import { AUTO_LOCK_TIMEOUTS } from "fixtures/settings";
+
+const prepareTimeout = (timeout: number) => ({
+  key: timeout,
+  value: AUTO_LOCK_TIMEOUTS.get(timeout) ?? "Default",
+});
+
+const prepareTimeouts = () => {
+  const preparedTimeouts = [];
+  for (const timeout of AUTO_LOCK_TIMEOUTS.keys()) {
+    preparedTimeouts.push(prepareTimeout(timeout));
+  }
+  return preparedTimeouts;
+};
 
 const Security: FC = () => {
   const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
   const [analytics, setAnalytics] = useAtom(analyticsAtom);
+  const [autoLockTimeout, setAutoLockTimeout] = useAtom(autoLockTimeoutAtom);
 
   const [revealModalOpened, setRevealModalOpened] = useState(false);
 
@@ -37,8 +63,31 @@ const Security: FC = () => {
     [setAnalytics, analytics],
   );
 
+  const prepareCurrentTimeout = useMemo(
+    () =>
+      autoLockTimeout === undefined
+        ? undefined
+        : prepareTimeout(autoLockTimeout),
+    [autoLockTimeout],
+  );
+
   return (
     <div className="flex flex-col items-start">
+      <SettingsHeader className="!mb-3">Auto lock</SettingsHeader>
+      <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+        This profile will automatically locked after chosen period of
+        inactivity.
+      </p>
+      <Select
+        label="Period"
+        items={prepareTimeouts()}
+        currentItem={prepareCurrentTimeout}
+        setItem={(u) => setAutoLockTimeout(u.key)}
+        showSelected={true}
+        className={classNames("max-w-[17.75rem]")}
+        contentClassName="max-w-[17.75rem]"
+      />
+      <Separator className="mt-6 mb-8" />
       {hasSeedPhrase && (
         <>
           <SettingsHeader className="!mb-3">
@@ -139,7 +188,7 @@ type FormValues = {
 };
 
 const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
-  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<SeedPharse | null>(null);
   const windowFocused = useWindowFocus();
 
   useEffect(() => {
@@ -149,11 +198,16 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
   }, [onOpenChange, seedPhrase, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }: FormValues) =>
+    async (
+      { password }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
-          const seed = await getSeedPhrase(password);
-          setSeedPhrase(seed.phrase);
+          const seedPhrase = await getSeedPhrase(password);
+          await resetFormPassword(form);
+
+          setSeedPhrase(seedPhrase);
         } catch (err: any) {
           return { password: err?.message };
         }
@@ -171,11 +225,8 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
     >
       {seedPhrase ? (
         <>
-          <SecretField
-            label="Secret phrase"
-            isDownloadable
-            value={fromProtectedString(seedPhrase)}
-          />
+          <SeedPhraseWords seedPhrase={seedPhrase} />
+
           <div
             className={classNames(
               "mt-4 w-full max-w-[27.5rem]",
@@ -197,6 +248,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
         <Form<FormValues>
           decorators={[focusOnErrors]}
           onSubmit={handleConfirmPassword}
+          destroyOnUnregister
           render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"

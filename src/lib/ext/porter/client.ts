@@ -86,6 +86,9 @@ export class PorterClient<ReqData = any, ResData = unknown> {
           case msg?.type === PorterMessageType.Err:
             reject(deserializeError(msg.data));
             break;
+
+          default:
+            break;
         }
 
         cleanup();

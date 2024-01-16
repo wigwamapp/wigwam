@@ -34,8 +34,9 @@ export async function requestBalance(
 
         return await contract.balanceOf(accountAddress, id);
       }
+
+      default:
+        throw new Error("Unhandled Token ERC standard");
     }
   }
-
-  return null;
 }

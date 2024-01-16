@@ -2,17 +2,14 @@
   "manifest_version": 3,
   "name": "{{envBadge}}Wigwam — Web3 Wallet",
   "version": "{{pkg.version}}",
-
   "icons": {
     "16": "icons/16.png",
     "48": "icons/128.png",
     "128": "icons/512.png"
   },
-
   "description": "__MSG_appDesc__",
   "homepage_url": "{{website}}",
   "short_name": "Wigwam",
-
   "permissions": [
     "tabs",
     "storage",
@@ -28,26 +25,18 @@
     "https://*/*"
   ],
 
-  "__chrome__content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; frame-ancestors 'none';"
-  },
-  "__firefox__content_security_policy": {
+  "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
   },
-
   "author": "{{website}}",
-
   "__firefox__applications": {
     "gecko": {
       "id": "webextension@wigwam.app",
       "strict_min_version": "68.0"
     }
   },
-
   "__chrome__minimum_chrome_version": "88",
-
   "default_locale": "en",
-
   "action": {
     "default_popup": "popup.html",
     "default_title": "Wigwam",
@@ -59,11 +48,9 @@
     "__chrome__chrome_style": false,
     "__firefox__browser_style": false
   },
-
   "background": {
     "service_worker": "sw.js"
   },
-
   "content_scripts": [
     {
       "matches": ["file://*/*", "http://*/*", "https://*/*"],

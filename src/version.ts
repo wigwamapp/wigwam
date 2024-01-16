@@ -26,6 +26,9 @@ window.addEventListener(
         case "wigwam.openapp":
           ext.runtime.sendMessage({ type: "__OPEN_OR_FOCUS_TAB" });
           break;
+
+        default:
+          break;
       }
     }
   },

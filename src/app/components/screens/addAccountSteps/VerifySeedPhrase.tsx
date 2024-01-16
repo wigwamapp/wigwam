@@ -42,30 +42,25 @@ const VerifySeedPhrase = memo(() => {
     }
   }, [seedPhrase, reset]);
 
-  const phraseWords = useMemo(
-    () =>
-      seedPhrase
-        ? fromProtectedString(seedPhrase.phrase).split(" ").filter(Boolean)
-        : [],
-    [seedPhrase],
-  );
+  const seedPhraseWordsCount = stateRef.current.seedPhraseWordsCount || 12;
 
   const wordsToCheckIndexes = useMemo(
     () => [
       0,
       ...generateRandomIndexes(
         2,
-        phraseWords.length - 2,
-        phraseWords.length === 12 ? 2 : 4,
+        seedPhraseWordsCount - 2,
+        seedPhraseWordsCount === 12 ? 2 : 4,
       ),
-      phraseWords.length - 1,
+      seedPhraseWordsCount - 1,
     ],
-    [phraseWords],
+    [seedPhraseWordsCount],
   );
 
-  const allWordsToDisplay = useMemo(() => {
-    if (!seedPhrase || phraseWords.length === 0) return [];
+  const [allWordsToDisplay, phraseWordsPartial] = useMemo(() => {
+    if (!seedPhrase) return [[], []];
 
+    const phraseWords = fromProtectedString(seedPhrase.phrase).split(/\s+/g);
     const fakeWordsCount = phraseWords.length - wordsToCheckIndexes.length;
     const result = wordsToCheckIndexes.map((i) => phraseWords[i]);
 
@@ -82,21 +77,28 @@ const VerifySeedPhrase = memo(() => {
       result.push(word);
     }
 
-    return shuffle(result);
-  }, [phraseWords, seedPhrase, wordsToCheckIndexes]);
+    // Clean unused words
+    for (let i = 0; i < seedPhraseWordsCount; i++) {
+      if (!wordsToCheckIndexes.includes(i)) {
+        delete phraseWords[i];
+      }
+    }
+
+    return [shuffle(result), phraseWords];
+  }, [seedPhrase, wordsToCheckIndexes, seedPhraseWordsCount]);
 
   const success = useMemo(() => {
     if (selected.length !== wordsToCheckIndexes.length) return null;
 
     for (let i = 0; i < selected.length; i++) {
       const selectedWord = allWordsToDisplay[selected[i]];
-      const targetWord = phraseWords[wordsToCheckIndexes[i]];
+      const targetWord = phraseWordsPartial[wordsToCheckIndexes[i]];
 
       if (selectedWord !== targetWord) return false;
     }
 
     return true;
-  }, [selected, phraseWords, wordsToCheckIndexes, allWordsToDisplay]);
+  }, [selected, phraseWordsPartial, wordsToCheckIndexes, allWordsToDisplay]);
 
   const worlsToCheckDescription = useMemo(
     () =>
@@ -349,7 +351,7 @@ const generateRandomIndexes = (
   return sortNumbers(result);
 };
 
-function shuffle(array: any[]) {
+function shuffle<T>(array: T[]): T[] {
   let currentIndex = array.length,
     randomIndex;
 

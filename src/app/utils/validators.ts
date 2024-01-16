@@ -24,7 +24,7 @@ export const composeValidators =
       undefined,
     );
 
-export const differentPasswords = (password1: string) => (password2: string) =>
+export const differentPasswords = (password1: string, password2: string) =>
   password2 && password1 && password2 !== password1
     ? "Provided passwords don't match"
     : undefined;
@@ -56,8 +56,20 @@ export const differentSeedPhrase = (phrase1: string) => (phrase2: string) =>
     ? "Provided secret phrase doesn't match with created one"
     : undefined;
 
-export const isUrlLike = (value: string) =>
-  !value || value.includes("://") ? undefined : "URL is invalid";
+export const isUrlLike = (value: string) => {
+  const expression =
+    /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+  const regex = new RegExp(expression);
+
+  return Boolean(value?.match(regex)) ? undefined : "URL is invalid";
+};
+
+export const preventXSS = (value: string) => {
+  const expression = /<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/g;
+  const regex = new RegExp(expression);
+
+  return Boolean(value?.match(regex)) ? "Provided value is invalid" : undefined;
+};
 
 export const validateAddress = (value: string) =>
   ethers.isAddress(value) ? undefined : "The recipient address is invalid";
@@ -84,3 +96,9 @@ const passwordRegex = new RegExp(
 
 export const validatePassword = (value: string) =>
   !value || value.match(passwordRegex) ? undefined : "Password is invalid";
+
+export const validateNewPassword = (
+  prevPassword: string,
+  newPassword: string,
+) =>
+  prevPassword === newPassword ? "Shouldn’t match the old password" : undefined;

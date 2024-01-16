@@ -112,7 +112,11 @@ Wigwam is committed to transparency and is open source, allowing the community t
 
 ### 17. Security Audits
 
-TODO
+#### 01/15/2024 Pentest Security Audit by [Halborn](https://halborn.com/)
+
+**Report:** [Wigwam_Pentest_Report_Halborn_15_01_2024.pdf](../audit/Wigwam_Pentest_Report_Halborn_15_01_2024.pdf)
+
+**Summary:** No critical issues were identified, but some security risks were found. Finally, all issues were successfully resolved.
 
 ### 18. User Support
 

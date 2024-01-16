@@ -213,7 +213,7 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
               Icon={copied ? SuccessIcon : CopyIcon}
               className="!w-6 !h-6 min-w-[1.5rem]"
               iconClassName="!w-[1.125rem]"
-              onClick={copy}
+              onClick={() => copy()}
             />
             {explorerLink && (
               <IconedButton

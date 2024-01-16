@@ -1053,7 +1053,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
         Icon={copied ? SuccessIcon : CopyIcon}
         className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
         iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-        onClick={copy}
+        onClick={() => copy()}
       />
       {explorerLink && (
         <IconedButton

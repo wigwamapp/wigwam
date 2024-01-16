@@ -6,6 +6,7 @@ export async function toProtectedPassword(password: string) {
   const hash = await crypto.subtle.digest({ name: "SHA-256" }, passwordBuf);
 
   const protectedStr = toProtectedString(hash);
+  zeroBuffer(passwordBuf);
   zeroBuffer(hash);
 
   return protectedStr;

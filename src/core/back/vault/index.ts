@@ -570,6 +570,9 @@ export class Vault {
 
             return { account, keys };
           }
+
+          default:
+            throw null;
         }
       });
 

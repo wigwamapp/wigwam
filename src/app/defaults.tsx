@@ -42,7 +42,7 @@ export const ACCOUNTS_SEARCH_OPTIONS: IFuseOptions<Account> = {
   ],
 };
 
-export const FONTS: Font[] = [["Inter", 300, 400, 600, 700, 900]];
+export const FONTS: Font[] = [["InterVariable", 300, 400, 600, 700, 900]];
 
 export const LOAD_MORE_ON_TOKEN_FROM_END = 3;
 export const LOAD_MORE_ON_NFT_FROM_END = 6;
