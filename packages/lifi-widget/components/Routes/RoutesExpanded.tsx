@@ -66,6 +66,12 @@ export const RoutesExpandedElement = () => {
 
   const [selectedRouteId, setSelectedRouteId] = useState(currentRoute?.id || 0);
 
+  useEffect(() => {
+    if (currentRoute) {
+      handleRouteClick(currentRoute)
+    }
+  }, [currentRoute])
+
   const handleRouteClick = (route: Route) => {
     if (isValid && !isValidating) {
       setExecutableRoute(route);

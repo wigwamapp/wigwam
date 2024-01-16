@@ -82,6 +82,7 @@ export const TransactionPage: React.FC = () => {
 
   useEffect(() => {
     if (status === RouteExecutionStatus.Idle) {
+      handleStartClick()
       emitter.emit(WidgetEvent.ReviewTransactionPageEntered, route);
     }
     // We want to emit event only when the page is mounted
