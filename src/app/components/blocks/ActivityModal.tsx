@@ -365,7 +365,16 @@ const History = memo(() => {
   );
 });
 
-type StatusType = "succeeded" | "failed" | "skipped" | "revoked";
+type StatusType =
+  | "succeeded"
+  | "failed"
+  | "skipped"
+  | "revoked"
+  | "completed"
+  | "cancelled"
+  | "failed"
+  | "refunded"
+  | "expired";
 
 type ActivityCardProps = {
   item: Activity;
@@ -380,6 +389,11 @@ const ActivityCard = memo(
     const status = useMemo<StatusType | undefined>(() => {
       if (item.type === ActivityType.Connection && revokedPermission) {
         return "revoked";
+      }
+
+      if (item.type === ActivityType.Ramp && !item.pending) {
+        const rampStatus = item.status.toLowerCase() as StatusType;
+        return rampStatus === "completed" ? "succeeded" : rampStatus;
       }
 
       if (item.type !== ActivityType.Transaction || item.pending) {
@@ -747,6 +761,11 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
   status,
   className,
 }) => {
+  const greyColorStatuses: StatusType[] = useMemo(
+    () => ["revoked", "expired", "refunded", "cancelled"],
+    [],
+  );
+
   if (!status) {
     return null;
   }
@@ -758,7 +777,7 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
         status === "succeeded" && "text-brand-greenobject",
         status === "failed" && "text-brand-redtext",
         status === "skipped" && "text-brand-main",
-        status === "revoked" && "text-brand-inactivedark",
+        greyColorStatuses.includes(status) && "text-brand-inactivedark",
         className,
       )}
     >
