@@ -54,7 +54,6 @@ export const ETHEREUM: Network[] = [
       "https://goerlifaucet.com",
       "https://goerli-faucet.slock.it",
       "https://faucet.goerli.mudit.blog",
-      "http://fauceth.komputing.org?chain=5",
     ],
     infoUrl: "https://goerli.net/#about",
   },
@@ -79,7 +78,7 @@ export const ETHEREUM: Network[] = [
       "https://sepolia.otterscan.io",
     ],
     explorerApiUrl: "https://api-sepolia.etherscan.io/api",
-    faucetUrls: ["http://fauceth.komputing.org?chain=11155111"],
+    faucetUrls: [],
     infoUrl: "https://sepolia.otterscan.io",
   },
 ];

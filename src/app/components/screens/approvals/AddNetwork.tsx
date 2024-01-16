@@ -52,7 +52,7 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
     const { id, jsonrpc, result } = rpcResponse;
     assert(id === 1);
     assert(jsonrpc === "2.0");
-    assert(result === params.chainId);
+    assert(parseInt(result) === parseInt(params.chainId));
   }, [approval.networkParams]);
 
   const handleApprove = useCallback(
@@ -62,7 +62,12 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
       try {
         await withHumanDelay(async () => {
           if (approved) {
-            await validateRpc();
+            await validateRpc().catch(() => {
+              throw new Error(
+                "RPC validation failed. Check network params or network connection.",
+              );
+            });
+
             const params = approval.networkParams;
             const chainId = parseInt(params.chainId);
 

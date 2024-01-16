@@ -88,9 +88,11 @@ const SelectCurrency: FC<{ className?: string }> = ({ className }) => {
   const currentItem = useMemo(
     () => ({
       key: selectedCurrency,
-      value: `${selectedCurrency} - ${CONVERSION_CURRENCIES.find(
-        (currency) => currency.code === selectedCurrency,
-      )?.name}`,
+      value: `${selectedCurrency} - ${
+        CONVERSION_CURRENCIES.find(
+          (currency) => currency.code === selectedCurrency,
+        )?.name
+      }`,
     }),
     [selectedCurrency],
   );

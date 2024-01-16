@@ -74,7 +74,7 @@ async function performTokenSync(
       {
         ...tokenToAdd,
         syncedByChainAt: Date.now(),
-        manuallyEnabled: true,
+        manuallyStatusChanged: true,
       },
       dbKey,
     );

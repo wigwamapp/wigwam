@@ -5,6 +5,7 @@ import { ReactComponent as GithubIcon } from "app/icons/github.svg";
 import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
 import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as MediumIcon } from "app/icons/medium.svg";
+import { ReactComponent as DiscordIcon } from "app/icons/discord.svg";
 
 import Separator from "app/components/elements/Seperator";
 import { ReactComponent as WigwamLogo } from "app/icons/Wigwam.svg";
@@ -154,5 +155,10 @@ const mediaLinks = [
     href: "https://github.com/wigwamapp",
     label: "Github",
     Icon: GithubIcon,
+  },
+  {
+    href: "https://discord.gg/MAG2fnSqSK",
+    label: "Discord",
+    Icon: DiscordIcon,
   },
 ];

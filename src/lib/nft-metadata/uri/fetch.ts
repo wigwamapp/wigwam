@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import retry from "async-retry";
-import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
+import { isValidHttpUrl } from "lib/nft-metadata/isValidHttpUrl";
 
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 import { sanitizeUrl } from "../utils";

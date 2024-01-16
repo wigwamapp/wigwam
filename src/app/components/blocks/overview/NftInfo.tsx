@@ -134,7 +134,7 @@ const NftInfo: FC = () => {
                         Icon={copied ? SuccessIcon : CopyIcon}
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                         iconClassName="!w-[1.125rem]"
-                        onClick={copy}
+                        onClick={() => copy()}
                       />
                       <IconedButton
                         aria-label={"Refresh NFT metadata"}

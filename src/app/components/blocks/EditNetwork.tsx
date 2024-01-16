@@ -40,6 +40,7 @@ import {
   validateCurrencySymbol,
   withHumanDelay,
   focusOnErrors,
+  preventXSS,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
@@ -286,7 +287,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="rpcUrl"
-                    validate={composeValidators(required, isUrlLike)}
+                    validate={composeValidators(
+                      required,
+                      isUrlLike,
+                      preventXSS,
+                    )}
                   >
                     {({ input, meta }) => (
                       <RPCField
@@ -350,7 +355,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(isUrlLike)}
+                    validate={composeValidators(isUrlLike, preventXSS)}
                   >
                     {({ input, meta }) => (
                       <Input

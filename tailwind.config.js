@@ -31,7 +31,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Inter", ...theme.fontFamily.sans],
+        sans: ["InterVariable", ...theme.fontFamily.sans],
       },
       animation: {
         bootfadein: "fadein 0.15s ease-in",

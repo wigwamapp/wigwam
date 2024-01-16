@@ -6,7 +6,7 @@ import {
 } from "fixtures/settings";
 import { Setting, AnalyticsState } from "core/common";
 
-export const autoLockTimeout = atomWithStorage(
+export const autoLockTimeoutAtom = atomWithStorage(
   Setting.AutoLockTimeout,
   DEFAULT_AUTO_LOCK_TIMEOUT,
 );

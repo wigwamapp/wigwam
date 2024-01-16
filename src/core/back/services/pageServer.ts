@@ -98,6 +98,8 @@ export function startPageServer() {
           case "accountAddress":
             if (perm) notifyPermission(port, perm);
             break;
+          default:
+            break;
         }
       });
     } else {
