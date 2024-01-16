@@ -1,9 +1,19 @@
 import { type FC, useEffect, useCallback, useMemo } from "react";
 import events from "events";
 import { useAtom, useAtomValue } from "jotai";
-import { type TransakConfig, TransakEvents } from "core/types/transak";
+import {
+  type TransakConfig,
+  TransakEvents,
+  Environments,
+} from "core/types/transak";
 import { generateURL, makeHandleMessage } from "app/utils/transak";
-import { onRampModalAtom, tokenSlugAtom } from "app/atoms";
+import {
+  onRampCurrenciesAtom,
+  onRampCurrencyCodeAtom,
+  onRampModalAtom,
+  selectedCurrencyAtom,
+  tokenSlugAtom,
+} from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.svg";
 import { nanoid } from "nanoid";
@@ -14,7 +24,7 @@ import {
   SelfActivityKind,
 } from "core/types";
 import * as repo from "core/repo";
-import { useAccountToken } from "app/hooks";
+import { useAccountToken, useAccounts } from "app/hooks";
 
 const addRampActivity = (rampActivity: any) => {
   const activity: RampActivity = {
@@ -42,13 +52,72 @@ const addRampActivity = (rampActivity: any) => {
   repo.activities.put(activity);
 };
 
-const OnRampIframe: FC<{ config: TransakConfig }> = ({ config }) => {
+const OnRampIframe: FC = () => {
   const { alert } = useDialog();
-  const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
-  const iframeUrl = useMemo(() => generateURL(config), [config]);
   const eventEmitter = useMemo(() => new events.EventEmitter(), []);
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
+  const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
+  const [selectedCurrency] = useAtom(selectedCurrencyAtom);
+  const currencyCode = useAtomValue(onRampCurrencyCodeAtom);
+  const {
+    currentAccount: { address },
+  } = useAccounts();
+
+  const rampCurrencyInfo = useMemo(() => {
+    if (currencyCode && currencyCode in onRampCurrencies) {
+      return onRampCurrencies[currencyCode];
+    }
+    return null;
+  }, [onRampCurrencies, currencyCode]);
+
+  const isCurrentUserCcyCrypto = useMemo(
+    () => ["BTC", "USD"].includes(selectedCurrency),
+    [selectedCurrency],
+  );
+
+  const config: TransakConfig = useMemo(
+    () => ({
+      apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
+      environment:
+        process.env.NODE_ENV === "development"
+          ? Environments.STAGING
+          : Environments.PRODUCTION,
+      defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
+      defaultNetwork: rampCurrencyInfo?.network,
+      productsAvailed: "BUY",
+      cryptoCurrencyCode: rampCurrencyInfo?.symbol,
+      walletAddress: address,
+      disableWalletAddressForm: true,
+      themeColor: "#0D1311",
+      exchangeScreenTitle: `Securely buy ${selectedCurrency} with Wigwam`,
+      networks: [
+        "ethereum",
+        "polygon",
+        "avaxcchain",
+        "bnb",
+        "fantom",
+        "bsc",
+        "celo",
+        "arbitrum",
+        "fuse",
+        "moonriver",
+        "optimism",
+        "base",
+        "linea",
+      ],
+    }),
+    [
+      address,
+      isCurrentUserCcyCrypto,
+      rampCurrencyInfo?.network,
+      rampCurrencyInfo?.symbol,
+      selectedCurrency,
+    ],
+  );
+
+  const iframeUrl = useMemo(() => generateURL(config), [config]);
 
   const handleSuccessOrder = useCallback(
     (payload: any) => {

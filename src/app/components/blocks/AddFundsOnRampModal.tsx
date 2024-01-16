@@ -1,92 +1,25 @@
 import { FC, memo, useCallback, useEffect, useMemo, useRef } from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
-import {
-  onRampCurrenciesAtom,
-  onRampCurrencyCodeAtom,
-  onRampModalAtom,
-  selectedCurrencyAtom,
-} from "app/atoms";
+import { onRampModalAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import Button from "app/components/elements/Button";
 import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 import OnRampIframe from "./OnRampIframe";
-import { Environments, TransakConfig } from "core/types/transak";
-import { useAccounts } from "app/hooks";
 
 const AddFundsOnRampModal = memo(() => {
   const [onRampModalOpened, setOnRampModalOpened] = useAtom(onRampModalAtom);
-  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
-  const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-  const currencyCode = useAtomValue(onRampCurrencyCodeAtom);
-  const {
-    currentAccount: { address },
-  } = useAccounts();
   const { confirm } = useDialog();
   const isMounted = useIsMounted();
   const contentRenderedRef = useRef(false);
-
-  const rampCurrencyInfo = useMemo(() => {
-    if (currencyCode && currencyCode in onRampCurrencies) {
-      return onRampCurrencies[currencyCode];
-    }
-    return null;
-  }, [onRampCurrencies, currencyCode]);
 
   const bootAnimationDisplayed = useMemo(
     () => onRampModalOpened && isMounted() && !contentRenderedRef.current,
     [isMounted, onRampModalOpened],
   );
-
-  const isCurrentUserCcyCrypto = useMemo(
-    () => ["BTC", "USD"].includes(selectedCurrency),
-    [selectedCurrency],
-  );
-
-  const config: TransakConfig = useMemo(
-    () => ({
-      apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
-      environment:
-        process.env.NODE_ENV === "development"
-          ? Environments.STAGING
-          : Environments.PRODUCTION,
-      defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      defaultNetwork: rampCurrencyInfo?.network,
-      productsAvailed: "BUY",
-      cryptoCurrencyCode: rampCurrencyInfo?.symbol,
-      walletAddress: address,
-      disableWalletAddressForm: true,
-      themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${selectedCurrency} with Wigwam`,
-      networks: [
-        "ethereum",
-        "polygon",
-        "avaxcchain",
-        "bnb",
-        "fantom",
-        "bsc",
-        "celo",
-        "arbitrum",
-        "fuse",
-        "moonriver",
-        "optimism",
-        "base",
-        "linea",
-      ],
-    }),
-    [
-      address,
-      isCurrentUserCcyCrypto,
-      rampCurrencyInfo?.network,
-      rampCurrencyInfo?.symbol,
-      selectedCurrency,
-    ],
-  );
-
-  console.log("🚀 ~ AddFundsOnRampModal ~ config:", config);
 
   const handleOpenChange = useCallback(
     async (open: boolean) => {
@@ -154,7 +87,7 @@ const AddFundsOnRampModal = memo(() => {
 
           {onRampModalOpened && (
             <div className="h-full">
-              <OnRampIframe config={config} />
+              <OnRampIframe />
             </div>
           )}
 
