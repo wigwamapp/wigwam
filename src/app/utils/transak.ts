@@ -1,4 +1,3 @@
-import qs from "query-string";
 import pako from "pako";
 import {
   type TransakConfig,
@@ -65,7 +64,7 @@ export function generateURL(configData: TransakConfig) {
     queryParams[key] = configData[key];
   });
 
-  queryString = qs.stringify(queryParams, { arrayFormat: "comma" });
+  queryString = new URLSearchParams(queryParams).toString();
 
   return `${WebAppUrls[environment]}?${queryString}`;
 }
