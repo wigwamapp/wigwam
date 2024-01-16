@@ -29,7 +29,7 @@ import {
   ActivitySource,
   ActivityType,
   ConnectionActivity,
-  OnRampTxStatus,
+  RampActivity,
   TransactionActivity,
   TxAction,
   TxActionType,
@@ -520,21 +520,7 @@ const ActivityCard = memo(
                     />
                   </ChainIdProvider>
 
-                  {isRampTxFulfilledWithError(item.status) ? (
-                    <p className="text-brand-font">{item.statusReason}</p>
-                  ) : (
-                    <ChainIdProvider chainId={item.chainId}>
-                      <TokenAmount
-                        rawAmount
-                        isSmall={isPopupMode}
-                        accountAddress={item.accountAddress}
-                        token={{
-                          slug: item.tokenSlug,
-                          amount: String(item.amountInCrypto),
-                        }}
-                      />
-                    </ChainIdProvider>
-                  )}
+                  <RampDetailsBlock item={item} isPopupMode />
                 </div>
 
                 <ActivityNetworkCard
@@ -608,22 +594,9 @@ const ActivityCard = memo(
               </ChainIdProvider>
             )}
 
-            {item.type === ActivityType.Ramp &&
-              (isRampTxFulfilledWithError(item.status) ? (
-                <p className="text-brand-font">{item.statusReason}</p>
-              ) : (
-                <ChainIdProvider chainId={item.chainId}>
-                  <TokenAmount
-                    rawAmount
-                    isSmall={isPopupMode}
-                    accountAddress={item.accountAddress}
-                    token={{
-                      slug: item.tokenSlug,
-                      amount: String(item.amountInCrypto),
-                    }}
-                  />
-                </ChainIdProvider>
-              ))}
+            {item.type === ActivityType.Ramp && (
+              <RampDetailsBlock item={item} />
+            )}
 
             <div className="flex flex-col items-end ml-auto">
               {item.type === ActivityType.Transaction && (
@@ -1103,5 +1076,38 @@ function capitalize(word: string) {
   return `${word.charAt(0).toUpperCase()}${lower.slice(1)}`;
 }
 
-const isRampTxFulfilledWithError = (status: OnRampTxStatus) =>
-  ["FAILED", "REFUNDED", "EXPIRED"].includes(status);
+const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
+  item,
+  isPopupMode = false,
+}) => {
+  const {
+    status,
+    statusReason,
+    accountAddress,
+    chainId,
+    tokenSlug,
+    amountInCrypto,
+  } = item;
+
+  if (["REFUNDED", "EXPIRED"].includes(status)) {
+    return <p className="text-brand-font">{capitalize(status)}</p>;
+  }
+
+  if (status === "FAILED") {
+    return <p className="text-brand-font">{capitalize(statusReason)}</p>;
+  }
+
+  return (
+    <ChainIdProvider chainId={chainId}>
+      <TokenAmount
+        rawAmount
+        isSmall={isPopupMode}
+        accountAddress={accountAddress}
+        token={{
+          slug: tokenSlug,
+          amount: String(amountInCrypto),
+        }}
+      />
+    </ChainIdProvider>
+  );
+};
