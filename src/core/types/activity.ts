@@ -104,7 +104,9 @@ export interface RampActivity extends ActivityBase {
   fiatCurrency: string;
   cryptoCurrency: string;
   network: string;
-  status: string;
+  status: OnRampTxStatus;
+  statusReason: string;
+  transactionHash: string;
   paymentType: string;
   tokenSlug: string;
   chainId: number;
@@ -266,3 +268,15 @@ export type TokenActivityProject = {
   logoUrl?: string;
   siteUrl?: string;
 };
+
+export type OnRampTxStatus =
+  | "AWAITING_PAYMENT_FROM_USER"
+  | "PAYMENT_DONE_MARKED_BY_USER"
+  | "PROCESSING"
+  | "PENDING_DELIVERY_FROM_TRANSAK"
+  | "ON_HOLD_PENDING_DELIVERY_FROM_TRANSAK"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "FAILED"
+  | "REFUNDED"
+  | "EXPIRED";
