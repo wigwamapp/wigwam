@@ -27,11 +27,11 @@ export const getOnRampCryptoCurrencies = withOfflineCache(
     } = await onRampApi.get("/currencies/crypto-currencies");
 
     for (const { network, uniqueId, address, image, symbol } of tokens) {
-      // * filter tokens
+      // Filter tokens
       if (
-        // * empty token
+        // Empty token
         (!address && !network.chainId) ||
-        // * non-evm token
+        // Non-ERC20 token
         (address !== NATIVE_TOKEN_ADDRESS && !network.chainId)
       ) {
         continue;
@@ -53,7 +53,7 @@ export const getOnRampCryptoCurrencies = withOfflineCache(
     return onRampCurrencies;
   },
   {
-    key: "onRamp_crypto_currencies",
+    key: "onramp_crypto_currencies",
     hotMaxAge: 5_000,
     coldMaxAge: ONE_DAY,
   },
