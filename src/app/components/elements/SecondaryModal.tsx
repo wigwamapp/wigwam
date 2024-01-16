@@ -34,11 +34,11 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay
-          className={classNames("fixed inset-0 z-20 bg-brand-darkblue/50")}
+          className={classNames("fixed inset-0 z-30 bg-brand-darkblue/50")}
         />
         <Dialog.Content
           className={classNames(
-            "fixed z-20 w-full",
+            "fixed z-30 w-full",
             small ? "max-w-[22.25rem]" : "max-w-[43rem]",
             small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",

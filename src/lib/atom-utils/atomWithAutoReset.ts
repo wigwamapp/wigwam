@@ -43,16 +43,13 @@ export function atomWithAutoReset<Value>(
     }
 
     return () => {
-      resetTimeout = setTimeout(
-        () => {
-          resetTimeout = null;
+      resetTimeout = setTimeout(() => {
+        resetTimeout = null;
 
-          unsub?.();
+        unsub?.();
 
-          setAtom(RESET);
-        },
-        opts?.resetDelay ?? DEFAULT_RESET_DELAY,
-      );
+        setAtom(RESET);
+      }, opts?.resetDelay ?? DEFAULT_RESET_DELAY);
     };
   };
 

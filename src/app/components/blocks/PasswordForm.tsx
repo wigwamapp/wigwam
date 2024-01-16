@@ -1,5 +1,6 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "clsx";
+import { FormApi } from "final-form";
 import { Field, Form } from "react-final-form";
 import useForceUpdate from "use-force-update";
 import { intervalToDuration } from "date-fns";
@@ -10,31 +11,30 @@ import { storage } from "lib/ext/storage";
 import { unlockWallet } from "core/client";
 import { Setting } from "core/common";
 
-import { required, withHumanDelay, focusOnErrors } from "app/utils";
+import {
+  required,
+  withHumanDelay,
+  focusOnErrors,
+  resetFormPassword,
+} from "app/utils";
 import { profileBlockedUntilAtom } from "app/atoms";
 import AttentionModal from "app/components/blocks/AttentionModal";
 import Button from "app/components/elements/Button";
 import PasswordField from "app/components/elements/PasswordField";
 
-type FormValues = {
-  password: string;
-};
 type PasswordFormProps = {
   theme?: "large" | "small";
-  unlockCallback?: (password: string) => void;
   className?: string;
   autoFocus?: boolean;
   attentionModal?: boolean;
 };
 
+type FormValues = {
+  password: string;
+};
+
 const PasswordForm = memo<PasswordFormProps>(
-  ({
-    theme = "large",
-    unlockCallback,
-    className,
-    autoFocus,
-    attentionModal = true,
-  }) => {
+  ({ theme = "large", className, autoFocus, attentionModal = true }) => {
     const profileBlockedUntil = useLazyAtomValue(profileBlockedUntilAtom);
 
     const [attention, setAttention] = useState(false);
@@ -49,16 +49,16 @@ const PasswordForm = memo<PasswordFormProps>(
     const profileBlocked = Boolean(profileBlockedErrMsg);
 
     const handleSubmit = useCallback(
-      ({ password }: FormValues) => {
+      (
+        { password }: FormValues,
+        form: FormApi<FormValues, Partial<FormValues>>,
+      ) => {
         if (profileBlocked) return;
 
         return withHumanDelay(async () => {
           try {
-            if (unlockCallback) {
-              unlockCallback(password);
-            } else {
-              await unlockWallet(password);
-            }
+            await unlockWallet(password);
+            await resetFormPassword(form);
 
             return;
           } catch (err: any) {
@@ -66,21 +66,14 @@ const PasswordForm = memo<PasswordFormProps>(
           }
         });
       },
-      [profileBlocked, unlockCallback],
+      [profileBlocked],
     );
-
-    const passwordFieldRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-      if (autoFocus) {
-        setTimeout(() => passwordFieldRef.current?.focus?.(), 20);
-      }
-    }, [autoFocus]);
 
     return (
       <Form<FormValues>
         onSubmit={handleSubmit}
         decorators={[focusOnErrors]}
+        destroyOnUnregister
         render={({
           handleSubmit,
           submitting,
@@ -99,7 +92,6 @@ const PasswordForm = memo<PasswordFormProps>(
             <Field name="password" validate={required}>
               {({ input, meta }) => (
                 <PasswordField
-                  ref={passwordFieldRef}
                   className="max-w-[19rem] w-full relative min-h-[6.125rem]"
                   placeholder={"*".repeat(8)}
                   label="Password"
@@ -116,6 +108,7 @@ const PasswordForm = memo<PasswordFormProps>(
                     meta.error ||
                     (!modifiedSinceLastSubmit && meta.submitError)
                   }
+                  autoFocus={autoFocus}
                   {...input}
                 />
               )}

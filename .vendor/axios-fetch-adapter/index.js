@@ -92,11 +92,13 @@ function createRequest(config) {
 
   // HTTP basic authentication
   if (config.auth) {
-    const username = config.auth.username || "";
-    const password = config.auth.password
-      ? decodeURI(encodeURIComponent(config.auth.password))
-      : "";
-    headers.set("Authorization", `Basic ${btoa(username + ":" + password)}`);
+    throw new Error("Basic auth is not supported. Use a different behaviour");
+
+    // const username = config.auth.username || "";
+    // const password = config.auth.password
+    //   ? decodeURI(encodeURIComponent(config.auth.password))
+    //   : "";
+    // headers.set("Authorization", `Basic ${btoa(username + ":" + password)}`);
   }
 
   const method = config.method.toUpperCase();

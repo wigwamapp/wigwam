@@ -42,6 +42,9 @@ const BackButton = memo(
           case !inHome:
             setCurrentValue([initialValue, "replace"]);
             break;
+
+          default:
+            break;
         }
       },
       [onClick, historyPosition, initialValue, inHome, setCurrentValue],

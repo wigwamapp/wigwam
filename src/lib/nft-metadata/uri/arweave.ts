@@ -1,4 +1,4 @@
-import { isValidHttpUrl } from "lib/system/isValidHttpUrl";
+import { isValidHttpUrl } from "lib/nft-metadata/isValidHttpUrl";
 
 import { ARWEAVE_DEFAULT } from "../defaults";
 
