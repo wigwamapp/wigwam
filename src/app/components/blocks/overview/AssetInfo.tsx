@@ -294,7 +294,7 @@ const AssetInfo: FC = () => {
                 <Button
                   to={{
                     onRampOpened: true,
-                    cryptoCurrency: chainTokenSlug,
+                    token: tokenSlug,
                   }}
                   merge
                   theme="secondary"

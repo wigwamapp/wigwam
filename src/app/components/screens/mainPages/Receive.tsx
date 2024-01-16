@@ -1,10 +1,11 @@
 import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
-import { AccountAsset, Network } from "core/types";
+import { Network } from "core/types";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { receiveTabAtom, tokenSlugAtom } from "app/atoms";
-import { useAccountToken, useChainId, useLazyNetwork } from "app/hooks";
+import { receiveTabAtom } from "app/atoms";
+import { useLazyNetwork } from "app/hooks";
 import { ReceiveTab as ReceiveTabEnum } from "app/nav";
 import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
@@ -19,15 +20,8 @@ import ReceiveTab from "./Receive.Tab";
 const Receive: FC = () => {
   const activeTabRoute = useAtomValue(receiveTabAtom);
   const network = useLazyNetwork();
-  const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const chainId = useChainId();
-  const chainTokenSlug = useMemo(() => `${chainId}_NATIVE_0_0`, [chainId]);
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
 
-  const tabsContent = useMemo(
-    () => getTabsContent(chainTokenSlug, tokenInfo, network),
-    [network, tokenInfo, chainTokenSlug],
-  );
+  const tabsContent = useMemo(() => getTabsContent(network), [network]);
   const tabs = useMemo(
     () =>
       tabsContent
@@ -69,11 +63,7 @@ const Receive: FC = () => {
 
 export default Receive;
 
-const getTabsContent = (
-  slug: string,
-  tokenInfo: AccountAsset | undefined,
-  network?: Network,
-) => [
+const getTabsContent = (network?: Network) => [
   {
     route: { page: "receive", receive: ReceiveTabEnum.ShareAddress },
     title: "Share address",
@@ -93,8 +83,7 @@ const getTabsContent = (
           route: {
             page: "receive",
             onRampOpened: true,
-            cryptoCurrency: slug,
-            token: tokenInfo?.tokenSlug,
+            token: NATIVE_TOKEN_SLUG,
           },
           title: "Buy with Fiat",
           Icon: FiatIcon,

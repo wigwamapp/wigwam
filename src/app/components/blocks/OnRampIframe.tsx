@@ -9,7 +9,6 @@ import {
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
   onRampCurrenciesAtom,
-  onRampCurrencyCodeAtom,
   onRampModalAtom,
   selectedCurrencyAtom,
   tokenSlugAtom,
@@ -17,14 +16,9 @@ import {
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.svg";
 import { nanoid } from "nanoid";
-import {
-  AccountAsset,
-  ActivityType,
-  RampActivity,
-  SelfActivityKind,
-} from "core/types";
+import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
-import { useAccountToken, useAccounts } from "app/hooks";
+import { useAccounts, useChainId } from "app/hooks";
 
 const addRampActivity = (rampActivity: any) => {
   const activity: RampActivity = {
@@ -55,22 +49,27 @@ const addRampActivity = (rampActivity: any) => {
 const OnRampIframe: FC = () => {
   const { alert } = useDialog();
   const eventEmitter = useMemo(() => new events.EventEmitter(), []);
-  const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
   const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
   const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-  const currencyCode = useAtomValue(onRampCurrencyCodeAtom);
+  const tokenSlug = useAtomValue(tokenSlugAtom);
+  const chainId = useChainId();
+
+  const chainTokenSlug = useMemo(
+    () => `${chainId}_${tokenSlug}`,
+    [chainId, tokenSlug],
+  );
+
   const {
     currentAccount: { address },
   } = useAccounts();
 
   const rampCurrencyInfo = useMemo(() => {
-    if (currencyCode && currencyCode in onRampCurrencies) {
-      return onRampCurrencies[currencyCode];
+    if (chainTokenSlug && chainTokenSlug in onRampCurrencies) {
+      return onRampCurrencies[chainTokenSlug];
     }
     return null;
-  }, [onRampCurrencies, currencyCode]);
+  }, [onRampCurrencies, chainTokenSlug]);
 
   const isCurrentUserCcyCrypto = useMemo(
     () => ["BTC", "USD"].includes(selectedCurrency),
@@ -109,7 +108,7 @@ const OnRampIframe: FC = () => {
       addRampActivity({
         ...payload.status,
         tokenSlug,
-        chainId: tokenInfo?.chainId,
+        chainId,
       });
       setOnRampModalOpened([false]);
       alert({
@@ -126,7 +125,7 @@ const OnRampIframe: FC = () => {
         ),
       });
     },
-    [tokenInfo?.chainId, tokenSlug, setOnRampModalOpened, alert],
+    [chainId, tokenSlug, setOnRampModalOpened, alert],
   );
 
   const handleCloseIframe = useCallback(() => {
