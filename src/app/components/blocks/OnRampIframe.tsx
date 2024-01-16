@@ -8,7 +8,6 @@ import {
 } from "core/types/transak";
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
-  onRampCurrenciesAtom,
   onRampModalAtom,
   selectedCurrencyAtom,
   tokenSlugAtom,
@@ -18,7 +17,7 @@ import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.sv
 import { nanoid } from "nanoid";
 import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
-import { useAccounts, useChainId } from "app/hooks";
+import { useAccounts, useChainId, useRamp } from "app/hooks";
 
 type RampOrder = { [key: string]: any };
 
@@ -56,29 +55,17 @@ const saveRampActivity = (rampOrder: RampOrder) => {
 };
 
 const OnRampIframe: FC = () => {
-  const { alert } = useDialog();
-  const eventEmitter = useMemo(() => new Emitter(), []);
-  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
-  const setOnRampModalOpened = useSetAtom(onRampModalAtom);
-  const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-  const tokenSlug = useAtomValue(tokenSlugAtom);
   const chainId = useChainId();
-
-  const chainTokenSlug = useMemo(
-    () => `${chainId}_${tokenSlug}`,
-    [chainId, tokenSlug],
-  );
+  const { alert } = useDialog();
+  const { onRampCurrency } = useRamp();
+  const eventEmitter = useMemo(() => new Emitter(), []);
+  const [selectedCurrency] = useAtom(selectedCurrencyAtom);
+  const setOnRampModalOpened = useSetAtom(onRampModalAtom);
+  const tokenSlug = useAtomValue(tokenSlugAtom);
 
   const {
     currentAccount: { address },
   } = useAccounts();
-
-  const rampCurrencyInfo = useMemo(() => {
-    if (chainTokenSlug && chainTokenSlug in onRampCurrencies) {
-      return onRampCurrencies[chainTokenSlug];
-    }
-    return null;
-  }, [onRampCurrencies, chainTokenSlug]);
 
   const isCurrentUserCcyCrypto = useMemo(
     () => ["BTC", "USD"].includes(selectedCurrency),
@@ -102,19 +89,19 @@ const OnRampIframe: FC = () => {
           ? Environments.STAGING
           : Environments.PRODUCTION,
       defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      network: rampCurrencyInfo?.network,
+      network: onRampCurrency?.network,
       productsAvailed: "BUY",
-      cryptoCurrencyCode: rampCurrencyInfo?.symbol,
+      cryptoCurrencyCode: onRampCurrency?.symbol,
       walletAddress: address,
       disableWalletAddressForm: true,
       themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${rampCurrencyInfo?.symbol} with Wigwam`,
+      exchangeScreenTitle: `Securely buy ${onRampCurrency?.symbol} with Wigwam`,
     }),
     [
       address,
       isCurrentUserCcyCrypto,
-      rampCurrencyInfo?.network,
-      rampCurrencyInfo?.symbol,
+      onRampCurrency?.network,
+      onRampCurrency?.symbol,
       selectedCurrency,
     ],
   );

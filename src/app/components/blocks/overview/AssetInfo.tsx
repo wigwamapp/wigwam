@@ -8,11 +8,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { toggleTokenStatus } from "core/common/tokens";
-import {
-  coinGeckoPlatformIds,
-  tokenSlugAtom,
-  onRampCurrenciesAtom,
-} from "app/atoms";
+import { coinGeckoPlatformIds, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -21,6 +17,7 @@ import {
   useChainId,
   useExplorerLink,
   useLazyNetwork,
+  useRamp,
   useTokenActivitiesSync,
 } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -53,9 +50,9 @@ export enum TokenStandardValue {
 }
 
 const AssetInfo: FC = () => {
+  const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
-  const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
 
   const { confirm } = useDialog();
 
@@ -84,22 +81,10 @@ const AssetInfo: FC = () => {
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const chainTokenSlug = useMemo(
-    () => `${chainId}_${tokenSlug}`,
-    [chainId, tokenSlug],
-  );
-
-  const onRampId = useMemo(() => {
-    if (chainTokenSlug in onRampCurrencies) {
-      return onRampCurrencies[chainTokenSlug].id;
-    }
-
-    return null;
-  }, [onRampCurrencies, chainTokenSlug]);
 
   const showBuyButton = useMemo(
-    () => tokenInfo?.status !== TokenStatus.Disabled && onRampId,
-    [tokenInfo?.status, onRampId],
+    () => tokenInfo?.status !== TokenStatus.Disabled && onRampCurrency,
+    [tokenInfo?.status, onRampCurrency],
   );
 
   useEffect(() => {
