@@ -106,10 +106,12 @@ export interface RampActivity extends ActivityBase {
   network: string;
   status: OnRampTxStatus;
   statusReason: string;
-  transactionHash: string;
   paymentType: string;
   tokenSlug: string;
   chainId: number;
+  partner: "transak";
+  partnerOrder: object;
+  transactionHash?: string;
   withError?: boolean;
 }
 
