@@ -1,4 +1,5 @@
 import retry from "async-retry";
+import { AxiosResponse } from "axios";
 import { schedule } from "lib/system/schedule";
 
 import { ActivityType, OnRampTxStatus, RampActivity } from "core/types";
@@ -6,12 +7,14 @@ import * as repo from "core/repo";
 
 import { isUnlocked } from "../state";
 import { indexerApi } from "../sync";
-import { AxiosResponse } from "axios";
 
-export type TransakTxResponse = Pick<
+type TransakTxResponse = Pick<
   RampActivity,
   "id" | "status" | "statusReason" | "transactionHash"
 >;
+
+type TransakTxUpdatingFields = TransakTxResponse &
+  Pick<RampActivity, "pending" | "withError">;
 
 export async function startRampTxObserver() {
   schedule(5_000, async () => {
@@ -21,7 +24,7 @@ export async function startRampTxObserver() {
       .where("[type+pending]")
       .equals([ActivityType.Ramp, 1])
       .toArray()) as RampActivity[];
-    const txsToUpdate: TransakTxResponse[] = [];
+    const txsToUpdate: TransakTxUpdatingFields[] = [];
 
     if (pendingTxs.length === 0) return;
 
@@ -37,19 +40,22 @@ export async function startRampTxObserver() {
                 AxiosResponse<TransakTxResponse>
               >(`/transak/order/${tx.partnerOrderId}/status`, {
                 params: {
-                  staging: process.env.NODE_ENV !== "production",
+                  staging: process.env.RELEASE_ENV !== "true",
                 },
               }),
             { retries: 3, maxTimeout: 1_000 },
           );
 
           if (rampTx && status === 200) {
-            const updatedTx = {
-              ...rampTx,
+            const updatedTx: TransakTxUpdatingFields = {
               id: tx.id,
+              status: rampTx.status,
+              statusReason: rampTx.statusReason,
+              transactionHash: rampTx.transactionHash,
               pending: isPendingTx(rampTx.status) ? 1 : 0,
               withError: hasTxError(rampTx.status),
             };
+
             txsToUpdate.push(updatedTx);
           } else {
             console.error("[Transak failed response]", status, rampTx);
