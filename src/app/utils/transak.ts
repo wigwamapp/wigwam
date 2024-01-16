@@ -5,7 +5,7 @@ import {
   Environments,
   TransakEvents,
 } from "core/types/transak";
-import { EventEmitter } from "events";
+import { Emitter } from "lib/emitter";
 
 export const WebAppUrls = {
   [Environments.STAGING]: "https://global-stg.transak.com",
@@ -70,10 +70,7 @@ export function generateURL(configData: TransakConfig) {
   return `${WebAppUrls[environment]}?${queryString}`;
 }
 
-export function makeHandleMessage(
-  eventEmitter: EventEmitter,
-  close: () => void,
-) {
+export function makeHandleMessage(eventEmitter: Emitter, close: () => void) {
   return function handleMessage(
     event: MessageEvent<{ event_id: TransakEvents; data: unknown }>,
   ) {

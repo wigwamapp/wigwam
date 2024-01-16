@@ -1,5 +1,5 @@
 import { type FC, useEffect, useCallback, useMemo } from "react";
-import events from "events";
+import { Emitter } from "lib/emitter";
 import { useAtom, useAtomValue } from "jotai";
 import {
   type TransakConfig,
@@ -20,35 +20,44 @@ import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
 import { useAccounts, useChainId } from "app/hooks";
 
-const addRampActivity = (rampActivity: any) => {
-  const activity: RampActivity = {
-    ...rampActivity,
+type RampOrder = { [key: string]: any };
+
+const saveRampActivity = (rampOrder: RampOrder) => {
+  const newRampActivity: RampActivity = {
     id: nanoid(),
     type: ActivityType.Ramp,
-    partnerOrderId: rampActivity.id,
+    partnerOrderId: rampOrder.id,
+    timeAt: new Date(rampOrder.createdAt).getTime(),
+    totalFee: rampOrder.totalFeeInFiat,
+    amountInCrypto: rampOrder.cryptoAmount,
+    amountInFiat: rampOrder.fiatAmount,
+    amountInFiatUSD: rampOrder.fiatAmountInUsd,
+    tokenSlug: rampOrder.tokenSlug,
+    chainId: rampOrder.chainId,
+    accountAddress: rampOrder.walletAddress,
+    cryptoCurrency: rampOrder.cryptoCurrency,
+    fiatCurrency: rampOrder.fiatCurrency,
+    network: rampOrder.network,
+    paymentType: rampOrder.paymentOptionId,
+    status: rampOrder.status,
+    statusReason: rampOrder.statusReason,
+    partnerOrder: rampOrder,
     pending: 1,
-    timeAt: new Date(rampActivity.createdAt).getTime(),
-    totalFee: rampActivity.totalFeeInFiat,
-    amountInCrypto: rampActivity.cryptoAmount,
-    amountInFiat: rampActivity.fiatAmount,
-    amountInFiatUSD: rampActivity.fiatAmountInUsd,
-    tokenSlug: rampActivity.tokenSlug,
-    chainId: rampActivity.chainId,
-    accountAddress: rampActivity.walletAddress,
+    partner: "transak",
+    kind: "onramp",
     withError: false,
-
     source: {
       type: "self",
       kind: SelfActivityKind.Transfer,
     },
   };
 
-  repo.activities.put(activity);
+  repo.activities.put(newRampActivity);
 };
 
 const OnRampIframe: FC = () => {
   const { alert } = useDialog();
-  const eventEmitter = useMemo(() => new events.EventEmitter(), []);
+  const eventEmitter = useMemo(() => new Emitter(), []);
   const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
   const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
@@ -76,11 +85,20 @@ const OnRampIframe: FC = () => {
     [selectedCurrency],
   );
 
+  if (!process.env.WIGWAM_ON_RAMP_API_KEY) {
+    setOnRampModalOpened([false]);
+    alert({
+      title: "Error",
+      content: <p>Transak API Key is not provided!</p>,
+    });
+    console.error("[Error]: Transak API Key is not provided!");
+  }
+
   const config: TransakConfig = useMemo(
     () => ({
       apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
       environment:
-        process.env.NODE_ENV === "development"
+        process.env.RELEASE_ENV !== "true"
           ? Environments.STAGING
           : Environments.PRODUCTION,
       defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
@@ -104,8 +122,8 @@ const OnRampIframe: FC = () => {
   const iframeUrl = useMemo(() => generateURL(config), [config]);
 
   const handleSuccessOrder = useCallback(
-    (payload: any) => {
-      addRampActivity({
+    (payload: { [key: string]: any }) => {
+      saveRampActivity({
         ...payload.status,
         tokenSlug,
         chainId,
