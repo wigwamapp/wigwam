@@ -39,8 +39,8 @@ import {
   estimateGasPrices,
   getCoinGeckoPlatformIds,
   syncTokenActivities,
+  getOnRampCryptoCurrencies,
 } from "../sync";
-import { getOnRampCryptoCurrencies } from "../sync/fiatOnRamp";
 
 export function startWalletServer() {
   const walletPorter = new PorterServer<EventMessage>(PorterChannel.Wallet);
