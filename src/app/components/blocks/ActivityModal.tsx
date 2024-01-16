@@ -29,6 +29,7 @@ import {
   ActivitySource,
   ActivityType,
   ConnectionActivity,
+  OnRampTxStatus,
   TransactionActivity,
   TxAction,
   TxActionType,
@@ -519,17 +520,21 @@ const ActivityCard = memo(
                     />
                   </ChainIdProvider>
 
-                  <ChainIdProvider chainId={item.chainId}>
-                    <TokenAmount
-                      rawAmount
-                      isSmall={isPopupMode}
-                      accountAddress={item.accountAddress}
-                      token={{
-                        slug: item.tokenSlug,
-                        amount: String(item.amountInCrypto),
-                      }}
-                    />
-                  </ChainIdProvider>
+                  {isRampTxFulfilledWithError(item.status) ? (
+                    <p className="text-brand-font">{item.statusReason}</p>
+                  ) : (
+                    <ChainIdProvider chainId={item.chainId}>
+                      <TokenAmount
+                        rawAmount
+                        isSmall={isPopupMode}
+                        accountAddress={item.accountAddress}
+                        token={{
+                          slug: item.tokenSlug,
+                          amount: String(item.amountInCrypto),
+                        }}
+                      />
+                    </ChainIdProvider>
+                  )}
                 </div>
 
                 <ActivityNetworkCard
@@ -603,19 +608,22 @@ const ActivityCard = memo(
               </ChainIdProvider>
             )}
 
-            {item.type === ActivityType.Ramp && (
-              <ChainIdProvider chainId={item.chainId}>
-                <TokenAmount
-                  rawAmount
-                  isSmall={isPopupMode}
-                  accountAddress={item.accountAddress}
-                  token={{
-                    slug: item.tokenSlug,
-                    amount: String(item.amountInCrypto),
-                  }}
-                />
-              </ChainIdProvider>
-            )}
+            {item.type === ActivityType.Ramp &&
+              (isRampTxFulfilledWithError(item.status) ? (
+                <p className="text-brand-font">{item.statusReason}</p>
+              ) : (
+                <ChainIdProvider chainId={item.chainId}>
+                  <TokenAmount
+                    rawAmount
+                    isSmall={isPopupMode}
+                    accountAddress={item.accountAddress}
+                    token={{
+                      slug: item.tokenSlug,
+                      amount: String(item.amountInCrypto),
+                    }}
+                  />
+                </ChainIdProvider>
+              ))}
 
             <div className="flex flex-col items-end ml-auto">
               {item.type === ActivityType.Transaction && (
@@ -1094,3 +1102,6 @@ function capitalize(word: string) {
   const lower = word.toLowerCase();
   return `${word.charAt(0).toUpperCase()}${lower.slice(1)}`;
 }
+
+const isRampTxFulfilledWithError = (status: OnRampTxStatus) =>
+  ["FAILED", "REFUNDED", "EXPIRED"].includes(status);
