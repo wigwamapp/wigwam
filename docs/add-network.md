@@ -8,10 +8,8 @@ To add a new network, follow these steps:
 
 3. Import the new network in `src/fixtures/networks/index.ts`, placing it in the correct position according to the desired ordering.
 
-4. Update the `COINGECKO_NATIVE_TOKEN_IDS` variable with the appropriate native token ID obtained from CoinGecko.
+4. Include network icons in the `public/icons/network/{chainTag}.png` directory, and also in `public/icons/network/{chainTag}-testnet.png` if applicable.
 
-5. Include network icons in the `public/icons/network/{chainTag}.png` directory, and also in `public/icons/network/{chainTag}-testnet.png` if applicable.
+5. Add the native token icon to `public/icons/nativeToken/{chainTag}.png`.
 
-6. Add the native token icon to `public/icons/nativeToken/{chainTag}.png`.
-
-7. You're done!
+6. You're done!
