@@ -162,7 +162,7 @@ const OnRampIframe: FC = () => {
 
   return (
     <div
-      className="h-full pt-10 pb-5 flex justify-center rounded-[2rem]"
+      className="h-full pt-16 pb-12 flex justify-center rounded-[2rem]"
       id="transakPanel"
     >
       <iframe

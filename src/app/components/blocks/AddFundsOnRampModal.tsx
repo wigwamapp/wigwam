@@ -81,7 +81,7 @@ const AddFundsOnRampModal = memo(() => {
             )}
           />
 
-          <Dialog.Close className="absolute top-6 right-8" asChild>
+          <Dialog.Close className="absolute top-6 right-12" asChild>
             <Button theme="clean">Cancel</Button>
           </Dialog.Close>
 
