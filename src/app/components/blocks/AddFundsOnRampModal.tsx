@@ -27,16 +27,12 @@ const AddFundsOnRampModal = memo(() => {
         title: "Cancel funding operation",
         content: (
           <p className="mb-4 mx-auto text-center">
-            Are you sure you want to cancel? Exiting now will result in the loss
-            of all previously entered information. Confirm cancellation?
+            Are you sure you want to cancel? If you close the window now, all
+            data from previous steps will be lost.
           </p>
         ),
         noButtonText: "Stay",
         yesButtonText: "Cancel",
-        buttonTheme: {
-          primary: "secondary",
-          secondary: "primary",
-        },
       });
 
       if (!res) {
