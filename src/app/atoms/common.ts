@@ -55,12 +55,6 @@ export const getNetworkAtom = atomFamily((chainId: number) =>
   }),
 );
 
-export const getNetworkByTagAtom = atomFamily((tag: string) =>
-  atomWithRepoQuery((query) => {
-    return query(() => Repo.networks.where("chainTag").equals(tag).toArray());
-  }),
-);
-
 export const getRpcUrlAtom = atomFamily((chainId: number) =>
   atomWithStorage<string | null>(getRpcUrlKey(chainId), null),
 );
