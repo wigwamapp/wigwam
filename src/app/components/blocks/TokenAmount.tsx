@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
@@ -20,7 +20,6 @@ type TokenAmountProps = {
   token: {
     slug: string;
     amount?: string;
-    amountUsd?: string;
   };
   rawAmount?: boolean;
   isSmall?: boolean;
@@ -30,59 +29,47 @@ type TokenAmountProps = {
 const TokenAmount = memo<TokenAmountProps>(
   ({
     accountAddress,
-    token: { slug, amount, amountUsd },
+    token: { slug, amount },
     rawAmount = false,
     isSmall = false,
     className,
   }) => {
     const tokenInfo = useToken(accountAddress, slug);
 
+    const getUSDEquivalent = useCallback(
+      (
+        isRaw: boolean,
+        decimals: number,
+        amountCrypto?: string,
+        priceUSD?: string,
+      ) => {
+        if (amountCrypto) {
+          if (isRaw) {
+            if (priceUSD) {
+              return new BigNumber(amountCrypto).times(priceUSD);
+            }
+          } else {
+            return new BigNumber(amountCrypto)
+              .div(new BigNumber(10).pow(decimals))
+              .multipliedBy(priceUSD ?? 0);
+          }
+        }
+        return null;
+      },
+      [],
+    );
+
     if (!tokenInfo) return null;
 
     if (tokenInfo.tokenType === TokenType.Asset) {
       const { name, symbol, decimals, priceUSD } = tokenInfo;
 
-      if (rawAmount && amount) {
-        return (
-          <div className={classNames("flex items-center", className)}>
-            <AssetLogo
-              asset={tokenInfo}
-              alt={name}
-              className="w-4 h-4 min-w-[1rem] mr-2"
-            />
-            <PrettyAmount
-              className={classNames(
-                "text-white font-bold",
-                isSmall ? "text-xs" : "text-sm",
-              )}
-              currency={tokenInfo.symbol}
-              copiable
-              amount={amount}
-              threeDots={false}
-            />
-            {amountUsd !== undefined && (
-              <>
-                <Dot isSmall={isSmall} />
-                <FiatAmount
-                  amount={amountUsd}
-                  threeDots={false}
-                  copiable
-                  className={classNames(
-                    isSmall ? "text-xs" : "text-sm",
-                    "text-brand-inactivedark",
-                  )}
-                />
-              </>
-            )}
-          </div>
-        );
-      }
-
-      const calculatedUsdAmount = amount
-        ? new BigNumber(amount)
-            .div(new BigNumber(10).pow(decimals))
-            .multipliedBy(priceUSD ?? 0)
-        : null;
+      const equivalentInUSD = getUSDEquivalent(
+        rawAmount,
+        decimals,
+        amount,
+        priceUSD,
+      );
 
       return (
         <div className={classNames("flex items-center", className)}>
@@ -98,7 +85,7 @@ const TokenAmount = memo<TokenAmountProps>(
             <>
               <PrettyAmount
                 amount={amount}
-                decimals={decimals}
+                decimals={!rawAmount ? decimals : undefined}
                 currency={symbol}
                 threeDots={false}
                 copiable
@@ -107,11 +94,11 @@ const TokenAmount = memo<TokenAmountProps>(
                   "font-bold",
                 )}
               />
-              {calculatedUsdAmount !== undefined && (
+              {equivalentInUSD !== null && (
                 <>
                   <Dot isSmall={isSmall} />
                   <FiatAmount
-                    amount={calculatedUsdAmount}
+                    amount={equivalentInUSD}
                     threeDots={false}
                     copiable
                     className={classNames(
