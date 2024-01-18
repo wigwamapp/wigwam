@@ -27,7 +27,7 @@ export const StepConnector = styled(MuiStepConnector, {
   shouldForwardProp: (prop) =>
     !['active', 'completed', 'error'].includes(prop as string),
 })(({ theme }) => ({
-  marginLeft: theme.spacing(1.875),
+  marginLeft: '13px',
   [`.${stepConnectorClasses.line}`]: {
     minHeight: 8,
     borderLeftWidth: 2,
@@ -44,8 +44,7 @@ export const StepLabel = styled(MuiStepLabel, {
 })(({ theme }) => ({
   padding: 0,
   [`.${stepLabelClasses.iconContainer}`]: {
-    paddingLeft: theme.spacing(0.75),
-    paddingRight: theme.spacing(2.75),
+    paddingRight: '19px',
   },
   [`&.${stepLabelClasses.disabled}`]: {
     cursor: 'inherit',
@@ -61,7 +60,7 @@ export const StepContent = styled(MuiStepContent, {
       ? theme.palette.grey[300]
       : theme.palette.grey[800]
   }`,
-  marginLeft: theme.spacing(1.875),
+  marginLeft: '13px',
   paddingLeft: theme.spacing(3.875),
   [`&.${stepContentClasses.last}`]: {
     borderLeft: 'none',

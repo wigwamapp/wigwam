@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { useLocation } from 'react-router-dom'
 import { ActiveTransactions } from '../../components/ActiveTransactions';
 import { AmountInput } from '../../components/AmountInput';
 import { ContractComponent } from '../../components/ContractComponent';
@@ -19,9 +20,13 @@ export const MainPage: React.FC = () => {
   const expandable = useExpandableVariant();
   const { subvariant, contractComponent } = useWidgetConfig();
   const nft = subvariant === 'nft';
+
+  const location = useLocation();
+
   return (
     <FormContainer disableGutters>
-      <ActiveTransactions mx={3} mt={1} mb={1} />
+      
+      {(!location.search.includes("transactionHistory") && !location.search.includes("transactionDetails") && !location.search.includes("transactionProcessing")) ? <ActiveTransactions mx={3} mt={1} mb={1} /> : null }
       {nft ? (
         <ContractComponent mx={3} mt={1} mb={1}>
           {contractComponent}

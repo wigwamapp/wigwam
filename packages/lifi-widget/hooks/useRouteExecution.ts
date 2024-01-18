@@ -32,7 +32,7 @@ export const useRouteExecution = ({
   const lifi = useLiFi();
   const queryClient = useQueryClient();
   const { account, switchChain } = useWallet();
-  const resumedAfterMount = useRef(false);
+  const resumedAfterMount = useRef(true);
   const emitter = useWidgetEvents();
   const routeExecutionStoreContext = useRouteExecutionStoreContext();
   const routeExecution = useRouteExecutionStore(
@@ -110,6 +110,10 @@ export const useRouteExecution = ({
       if (!routeExecution?.route) {
         throw Error('Execution route not found.');
       }
+      console.log('lifi.executeRoute')
+      console.log(account.signer)
+      console.log(account)
+      console.log(routeExecution.route)
       queryClient.removeQueries(['routes'], { exact: false });
       return lifi.executeRoute(account.signer, routeExecution.route, {
         updateRouteHook,
@@ -157,6 +161,7 @@ export const useRouteExecution = ({
   );
 
   const executeRoute = useCallback(() => {
+    console.log('executeRouteMutation.mutateAsync')
     executeRouteMutation.mutateAsync(undefined, {
       onError: (error) => {
         console.warn('Execution failed!', routeId, error);

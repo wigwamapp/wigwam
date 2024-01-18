@@ -10,7 +10,7 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import { useNavigateBack } from 'packages/lifi-widget/hooks';
+import { useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '../../components/Dialog';
@@ -19,6 +19,7 @@ import { useHeaderStoreContext, useRouteExecutionStore, useExecutingRoutesIds } 
 import { RouteExecutionStatus, useTransactionHistory } from '../../stores/routes';
 import { TransactionHistoryEmpty } from './TransactionHistoryEmpty';
 import { TransactionHistoryItem } from './TransactionHistoryItem';
+import { TransactionActiveItem } from './TransactionActiveItem';
 import backIcon from '../../../../src/app/icons/back.svg';
 
 export const TransactionHistoryPage: React.FC = () => {
@@ -29,11 +30,15 @@ export const TransactionHistoryPage: React.FC = () => {
   const headerStoreContext = useHeaderStoreContext();
   const deleteRoutes = useRouteExecutionStore((store) => store.deleteRoutes);
   const [open, setOpen] = useState(false);
-  const { navigateBack } = useNavigateBack();
+  const navigate = useNavigate();
 
   const toggleDialog = useCallback(() => {
     setOpen((open) => !open);
   }, []);
+
+  useEffect(() => {
+    console.log(executingRoutes)
+  }, [executingRoutes])
 
   useEffect(() => {
     if (transactions.length) {
@@ -50,15 +55,15 @@ export const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <Container sx={{width: '340px', paddingTop: '12px', maxHeight: '70vh', overflow: 'scroll'}}>
+    <Container sx={{width: '480px', paddingTop: '12px', maxHeight: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
       <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
-        <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
-        <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction History</Typography>
+        <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigate('/')}/>
+        <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Transaction History</Typography>
       </div>
       <Stack spacing={2} mt={1}>
         {executingRoutes.length > 0 && (
           executingRoutes.map((routeId) => (
-            <TransactionHistoryItem key={routeId} route={null} status={RouteExecutionStatus.Pending} routeId={routeId} />
+            <TransactionActiveItem key={routeId} routeId={routeId} />
           ))
         )}
         {transactions.length ? (

@@ -6,13 +6,36 @@
   background: #323b41 !important;
 }
 
+.MuiBox-root.withHoverGray:hover {
+  background: #22262a !important;
+}
+
 .MuiTypography-body1 {
   color: #8d9c9e;
   font-family: Inter;
   font-size: 16px;
   font-style: normal;
-  font-weight: 400;
-  line-height: 24px;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+}
+
+::-webkit-scrollbar {
+  background: #181a1f;
+  width: 5px;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: rgb(204 249 255 / 0.1);
+  border-radius: 3px;
+  border: 1px solid rgb(39, 44, 48);
 }
 
 .switcher {
@@ -91,6 +114,7 @@
 .txSteps .MuiBox-root {
   background: transparent;
   border: none;
+  border-radius: 0;
 }
 
 .MuiTooltip-root {
@@ -99,4 +123,9 @@
 
 .searchInputWrapper input {
   padding-left: 6px !important;
+}
+
+.linkButton {
+  border-radius: 4px;
+  background: rgba(204, 214, 255, 0.2);
 }

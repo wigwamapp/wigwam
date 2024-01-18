@@ -9,7 +9,8 @@ export const TokenAvatarFallback: React.FC<{
   token?: StaticToken;
   isLoading?: boolean;
   sx?: SxProps<Theme>;
-}> = ({ token, isLoading, sx }) => {
+  mainAvatarStyle?: SxProps<Theme>
+}> = ({ token, isLoading, sx, mainAvatarStyle }) => {
   const { chain } = useChain(token?.chainId);
   const { token: chainToken, isLoading: isLoadingToken } = useToken(
     token?.chainId,
@@ -21,6 +22,7 @@ export const TokenAvatarFallback: React.FC<{
       isLoading={isLoading || isLoadingToken}
       chain={chain}
       sx={sx}
+      mainAvatarStyle={mainAvatarStyle}
     />
   );
 };
@@ -30,7 +32,8 @@ export const TokenAvatarBase: React.FC<{
   chain?: Chain;
   isLoading?: boolean;
   sx?: SxProps<Theme>;
-}> = ({ token, chain, isLoading, sx }) => {
+  mainAvatarStyle?: SxProps<Theme>;
+}> = ({ token, chain, isLoading, sx, mainAvatarStyle }) => {
   return (
     <Badge
       overlap="circular"
@@ -49,7 +52,7 @@ export const TokenAvatarBase: React.FC<{
       {isLoading ? (
         <Skeleton width={32} height={32} variant="circular" />
       ) : (
-        <Avatar src={token?.logoURI} alt={token?.symbol}>
+        <Avatar src={token?.logoURI} alt={token?.symbol} sx={mainAvatarStyle}>
           {token?.symbol?.[0]}
         </Avatar>
       )}
@@ -62,9 +65,10 @@ export const TokenAvatar: React.FC<{
   chain?: Chain;
   isLoading?: boolean;
   sx?: SxProps<Theme>;
-}> = ({ token, chain, isLoading, sx }) => {
+  mainAvatarStyle?: SxProps<Theme>;
+}> = ({ token, chain, isLoading, sx, mainAvatarStyle }) => {
   if (!chain || !token?.logoURI) {
-    return <TokenAvatarFallback token={token} isLoading={isLoading} sx={sx} />;
+    return <TokenAvatarFallback token={token} isLoading={isLoading} sx={sx} mainAvatarStyle={mainAvatarStyle} />;
   }
   return (
     <TokenAvatarBase
@@ -72,6 +76,7 @@ export const TokenAvatar: React.FC<{
       chain={chain}
       isLoading={isLoading}
       sx={sx}
+      mainAvatarStyle={mainAvatarStyle}
     />
   );
 };

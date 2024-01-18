@@ -75,8 +75,8 @@ export const FormPriceHelperTextBase: React.FC<
       ) : token?.amount ? (
         <Typography
           fontWeight={400}
-          fontSize={10}
-          color="text.secondary"
+          fontSize={12}
+          color={'#717A7B'}
           lineHeight={1.3334}
           pl={0.25}
         >

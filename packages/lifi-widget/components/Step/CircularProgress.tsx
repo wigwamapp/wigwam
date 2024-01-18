@@ -34,13 +34,10 @@ export function CircularProgress({ process, size }: { process: Process, size?: n
           })}
         />
       ) : process.status === 'DONE' ? (
-        <DoneIcon
-          color="success"
-          sx={{
-            position: 'absolute',
-            fontSize: '1rem',
-          }}
-        />
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+        <rect y="0.824219" width="24" height="24" rx="12" fill="#5AA94D"/>
+        <path fillRule="evenodd" clipRule="evenodd" d="M18.7722 7.99734C19.0759 8.30108 19.0759 8.79354 18.7722 9.09728L10.2166 17.6528C9.9129 17.9566 9.42044 17.9566 9.11669 17.6528L5.22781 13.7639C4.92406 13.4602 4.92406 12.9677 5.22781 12.664C5.53155 12.3603 6.02401 12.3603 6.32775 12.664L9.66667 16.0029L17.6723 7.99734C17.976 7.6936 18.4685 7.6936 18.7722 7.99734Z" fill="white"/>
+        </svg>
       ) : null}
       {process.status === 'FAILED' ? (
         <ErrorRoundedIcon

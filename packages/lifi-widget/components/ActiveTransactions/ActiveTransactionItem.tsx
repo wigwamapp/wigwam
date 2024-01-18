@@ -37,20 +37,20 @@ export const ActiveTransactionItem: React.FC<{
     navigate(navigationRoutes.transactionExecution, { state: { routeId } });
   };
 
-  const getStatusComponent = () => {
-    switch (lastActiveProcess?.status) {
-      case 'ACTION_REQUIRED':
-        return <InfoRoundedIcon color="info" fontSize="small" />;
-      case 'FAILED':
-        return <ErrorRoundedIcon color="error" fontSize="small" />;
-      default:
-        return (
-          <Typography fontSize={14} fontWeight={500}>
-            <StepTimer step={lastActiveStep} hideInProgress />
-          </Typography>
-        );
-    }
-  };
+  // const getStatusComponent = () => {
+  //   switch (lastActiveProcess?.status) {
+  //     case 'ACTION_REQUIRED':
+  //       return <InfoRoundedIcon color="info" fontSize="small" />;
+  //     case 'FAILED':
+  //       return <ErrorRoundedIcon color="error" fontSize="small" />;
+  //     default:
+  //       return (
+  //         <Typography fontSize={14} fontWeight={500}>
+  //           <StepTimer step={lastActiveStep} hideInProgress />
+  //         </Typography>
+  //       );
+  //   }
+  // };
 
   const ListItemComponent = dense ? ListItem : ListItemButton;
 
@@ -76,27 +76,13 @@ export const ActiveTransactionItem: React.FC<{
               height: 16,
             }}
           >
-            {route.fromToken.symbol}
-            <ArrowForwardIcon sx={{ paddingX: 0.5 }} />
-            {route.toToken.symbol}
+            <span style={{color: '#fff', display: 'flex'}}>{parseFloat((Number(route.fromAmount)/Math.pow(10, route.fromToken.decimals)).toFixed(4))} {route.fromToken.symbol}</span>
+            &nbsp;to&nbsp;
+            <span style={{color: '#fff', display: 'flex'}}>{parseFloat((Number(route.toAmount)/Math.pow(10, route.toToken.decimals)).toFixed(4))} {route.toToken.symbol}</span>
           </Typography>
         }
-        secondary={
-          status !== RouteExecutionStatus.Done ? (
-            <Typography
-              fontWeight={400}
-              fontSize={12}
-              color="text.secondary"
-              lineHeight={1}
-              mt={0.75}
-              ml={2}
-            >
-              {title}
-            </Typography>
-          ) : null
-        }
       />
-      {getStatusComponent()}
+      {<div className='txStatus progress'>In Progress...</div>}
     </ListItemComponent>
   );
 };

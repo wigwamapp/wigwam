@@ -112,9 +112,9 @@ export const AmountInputBase: React.FC<
   }, [value, ref]);
 
   return (
-    <Card {...props} sx={{border: 'none', background: 'none', marginBottom: '24px'}}>
-      <CardTitle sx={{paddingTop: '0px'}}>{formType === "to" ? "You receive" : t('main.fromAmount')}</CardTitle>
-      <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
+    <Card {...props} sx={{border: 'none', background: 'none', borderRadius: '10px !important', marginBottom: '24px'}}>
+      <CardTitle sx={{paddingTop: '0px', paddingLeft: '0px !important'}}>{formType === "to" ? "You receive" : t('main.fromAmount')}</CardTitle>
+      <div style={{background: '#16171C', borderRadius: '10px', marginTop: '8px', border: '1px solid #272C30'}}>
       <FormControl fullWidth>
         <Input
           inputRef={ref}

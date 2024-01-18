@@ -27,35 +27,6 @@ export const Step: React.FC<{
     (process) => process.status === 'FAILED',
   );
 
-  const getCardTitle = () => {
-    switch (step.type) {
-      case 'lifi':
-        const hasCrossStep = step.includedSteps.some(
-          (step) => step.type === 'cross',
-        );
-        const hasSwapStep = step.includedSteps.some(
-          (step) => step.type === 'swap',
-        );
-        if (hasCrossStep && hasSwapStep) {
-          return subvariant === 'nft'
-            ? t('main.stepBridgeAndBuy')
-            : t('main.stepSwapAndBridge');
-        }
-        if (hasCrossStep) {
-          return subvariant === 'nft'
-            ? t('main.stepBridgeAndBuy')
-            : t('main.stepBridge');
-        }
-        return subvariant === 'nft'
-          ? t('main.stepSwapAndBuy')
-          : t('main.stepSwap');
-      default:
-        return subvariant === 'nft'
-          ? t('main.stepSwapAndBuy')
-          : t('main.stepSwap');
-    }
-  };
-
   const formattedToAddress = shortenAddress(toAddress);
   const toAddressLink = toAddress
     ? `${getChainById(step.action.toChainId)?.metamask
@@ -72,18 +43,18 @@ export const Step: React.FC<{
           border: 'none'
         }}
       >
-        <CardTitle flex={1}>{getCardTitle()}</CardTitle>
+        {/* <CardTitle flex={1}>{getCardTitle()}</CardTitle>
         <CardTitle sx={{ fontWeight: 500 }}>
           <StepTimer step={step} />
-        </CardTitle>
+        </CardTitle> */}
       </Box>
       <Box py={1}>
-        {fromToken ? <Token token={fromToken} px={2} py={1} /> : null}
-        <StepActions step={step} px={2} py={1} dense />
+        {fromToken ? <Token token={fromToken} py={1} /> : null}
+        <StepActions step={step} py={1} dense />
         {step.execution?.process.map((process, index) => (
           <StepProcess key={index} step={step} process={process} />
         ))}
-        <GasStepProcess step={step} />
+        {/* <GasStepProcess step={step} /> */}
         {formattedToAddress && toAddressLink ? (
           <DestinationWalletAddress
             step={step}
@@ -91,7 +62,7 @@ export const Step: React.FC<{
             toAddressLink={toAddressLink}
           />
         ) : null}
-        {toToken ? <Token token={toToken} px={2} py={1} /> : null}
+        {toToken ? <Token token={toToken} py={1} /> : null}
       </Box>
     </Card>
   );

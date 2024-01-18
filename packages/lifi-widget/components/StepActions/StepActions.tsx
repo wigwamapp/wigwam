@@ -74,10 +74,8 @@ export const StepActions: React.FC<StepActionsProps> = ({
             {toolDetails.name[0]}
           </StepAvatar>
         </Badge>
-        <Typography ml={2} fontSize={18} fontWeight="500" flex={1}>
-          {t(`main.stepDetails`, {
-            tool: toolDetails.name,
-          })}
+        <Typography ml={2} fontSize={12} fontWeight="500" flex={1}>
+          <span style={{color: '#fff'}}>{toolDetails.name}</span> via <span style={{color: '#fff'}}>LI.FI</span>
         </Typography>
         {hasCollapsedSteps ? (
           <CardIconButton onClick={handleExpand} size="small">
@@ -110,6 +108,8 @@ export const IncludedSteps: React.FC<{
         alt={tool.toolDetails.name}
         sx={{
           boxSizing: 'content-box',
+          width: '24px',
+          height: '24px'
         }}
       >
         {tool.toolDetails.name[0]}
@@ -124,7 +124,7 @@ export const IncludedSteps: React.FC<{
       ? CrossStepDetailsLabel
       : SwapStepDetailsLabel;
   return step.includedSteps.length > 1 ? (
-    <Box mt={1.5}>
+    <Box sx={{marginLeft: '15px', marginTop: '12px'}}>
       <Stepper
         orientation="vertical"
         connector={<StepConnector />}
@@ -143,7 +143,7 @@ export const IncludedSteps: React.FC<{
                 <SwapStepDetailsLabel step={step} />
               )}
             </StepLabel>
-            <StepContent>
+            <StepContent sx={{position: 'relative', bottom: '7px'}}>
               <StepDetailsContent step={step} subvariant={subvariant} />
             </StepContent>
           </MuiStep>
@@ -198,9 +198,9 @@ export const StepDetailsContent: React.FC<{
 
   return (
     <Typography
-      fontSize={12}
-      fontWeight="500"
-      color="text.secondary"
+      fontSize={10}
+      fontWeight="400"
+      color={'#fff'}
       alignItems="center"
       display="flex"
     >
@@ -210,7 +210,7 @@ export const StepDetailsContent: React.FC<{
       {step.action.fromToken.symbol}
       {showToAmount ? (
         <>
-          <ArrowForwardIcon sx={{ fontSize: 18, paddingX: 0.5 }} />
+          &nbsp;to&nbsp;
           {t('format.number', {
             value: formatTokenAmount(
               step.execution?.toAmount ?? step.estimate.toAmount,
@@ -258,7 +258,7 @@ export const CrossStepDetailsLabel: React.FC<
   const { t } = useTranslation();
   const { getChainById } = useChains();
   return (
-    <Typography fontSize={12} fontWeight="500" color="text.secondary">
+    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
       {t('main.crossStepDetails', {
         from: getChainById(step.action.fromChainId)?.name,
         to: getChainById(step.action.toChainId)?.name,
@@ -274,7 +274,7 @@ export const SwapStepDetailsLabel: React.FC<
   const { t } = useTranslation();
   const { getChainById } = useChains();
   return (
-    <Typography fontSize={12} fontWeight="500" color="text.secondary">
+    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
       {t('main.swapStepDetails', {
         chain: getChainById(step.action.fromChainId)?.name,
         tool: step.toolDetails.name,
@@ -288,7 +288,7 @@ export const ProtocolStepDetailsLabel: React.FC<
 > = ({ step }) => {
   const { t } = useTranslation();
   return (
-    <Typography fontSize={12} fontWeight="500" color="text.secondary">
+    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
       {step.toolDetails.key === 'lifuelProtocol'
         ? t('main.refuelStepDetails', {
             tool: step.toolDetails.name,

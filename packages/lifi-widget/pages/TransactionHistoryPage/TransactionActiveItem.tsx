@@ -8,18 +8,16 @@ import { Token, TokenDivider } from '../../components/Token';
 import { RouteExecutionStatus } from '../../stores/routes/types';
 import {  useRouteExecution } from '../../hooks';
 
-export const TransactionHistoryItem: React.FC<{
-  route: Route;
-  status: RouteExecutionStatus | null,
-  routeId?: string,
-}> = ({ route, status, routeId = null }) => {
+export const TransactionActiveItem: React.FC<{
+  routeId: string,
+}> = ({ routeId }) => {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  // const { route: activeRoute, status: activeStatus } = useRouteExecution({
-  //   routeId,
-  //   executeInBackground: true,
-  // });
+  const { route, status } = useRouteExecution({
+    routeId,
+    executeInBackground: true,
+  });
 
   const handleClick = () => {
     if (route) {
@@ -72,7 +70,7 @@ export const TransactionHistoryItem: React.FC<{
       <Card 
         onClick={handleClick}
         className={'withHover'}
-        sx={{borderRadius: '10px', background: '#22262A', border: 'none'}}>
+        sx={{borderRadius: '10px', background: '#22262A', border: '1px solid #ffcf26'}}>
         <Box
           sx={{
             display: 'flex',

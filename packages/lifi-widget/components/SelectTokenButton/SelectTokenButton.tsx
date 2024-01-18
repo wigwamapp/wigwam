@@ -51,7 +51,7 @@ export const SelectTokenButton: React.FC<
       : t(`main.${formType}`);
   return (
     <Card flex={1} onClick={onClick} sx={{border: 'none', background: 'none'}}>
-      <CardTitle>{cardTitle}</CardTitle>
+      <CardTitle sx={{paddingLeft: '0px !important'}}>{cardTitle}</CardTitle>
       <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
         {chainId && tokenAddress && (isChainLoading || isTokenLoading) ? (
           <SelectTokenCardHeader

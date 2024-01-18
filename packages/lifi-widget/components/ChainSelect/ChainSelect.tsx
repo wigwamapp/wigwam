@@ -80,7 +80,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
           <Box
             sx={{
               width: 75,
-              height: 18,
+              height: 'fit-content',
               display: 'grid',
               placeItems: 'center',
             }}

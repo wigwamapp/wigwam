@@ -17,6 +17,7 @@ import { RoutesExpanded } from './components/Routes';
 import { TransactionHistoryPageExpanded } from './pages/TransactionHistoryPage/TransactionHistoryPageExpanded';
 import { TransactionDetailsPageExpanded } from './pages/TransactionDetailsPage/TransactionDetailsPageExpanded';
 import { SettingsPageExpanded } from './pages/SettingsPage/SettingsPageExpanded';
+import { TransactionPageExpanded } from './pages/TransactionPage/TransactionPageExpanded'
 import { useExpandableVariant } from './hooks';
 import { useWidgetConfig } from './providers';
 import type { WidgetConfig, WidgetProps } from './types';
@@ -63,10 +64,11 @@ export const AppDefault = () => {
         <PoweredBy />
         <Initializer />
       </AppContainer>
-      {expandable ? <RoutesExpanded /> : null}
+      {(expandable && !location.search.includes("transactionProcessing")) ?  <RoutesExpanded /> : null}
       {(expandable && location.search.includes("transactionHistory")) ? <TransactionHistoryPageExpanded /> : null}
       {(expandable && location.search.includes("transactionDetails")) ? <TransactionDetailsPageExpanded /> : null}
       {(expandable && location.search.includes("settings")) ? <SettingsPageExpanded /> : null}
+      {(expandable && location.search.includes("transactionProcessing")) ? <TransactionPageExpanded /> : null}
     </AppExpandedContainer>
   );
 };

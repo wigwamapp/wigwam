@@ -78,7 +78,7 @@ export const RouteCard: React.FC<
                     </svg>
                   </div>
                   <CardLabel type={active ? 'active' : undefined} sx={{background: 'transparent'}}>
-                    <CardLabelTypography sx={{borderRadius: '6px', border: '1px solid #717A7B', background: 'transparent', padding: '5px 8px'}} fontSize={10} color={'#fff'} fontWeight={400}>
+                    <CardLabelTypography sx={{borderRadius: '6px', border: '1px solid #717A7B', background: 'transparent', padding: '0px 8px'}} fontSize={10} color={'#fff'} fontWeight={400}>
                       {t(`main.tags.${route.tags[0].toLowerCase()}` as any)}
                     </CardLabelTypography>
                   </CardLabel>

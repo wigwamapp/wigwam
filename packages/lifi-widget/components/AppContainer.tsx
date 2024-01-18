@@ -57,7 +57,7 @@ export const AppContainer: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const { containerStyle, variant, elementId } = useWidgetConfig();
   return (
     <RelativeContainer
-      sx={containerStyle}
+      sx={{...containerStyle, borderRight: '1px solid #21262A'}}
       variant={variant}
       id={createElementId(ElementId.RelativeContainer, elementId)}
     >

@@ -1,6 +1,6 @@
 import { useFormState } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { BaseTransactionButton } from "../../components/BaseTransactionButton";
 import { useRoutes } from "../../hooks";
 import { useWidgetConfig } from "../../providers";
@@ -10,6 +10,7 @@ import { navigationRoutes } from "../../utils";
 export const ReviewButton: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { isValid, isValidating } = useFormState();
   const setExecutableRoute = useSetExecutableRoute();
   const currentRoute = useGetSelectedRoute();
@@ -19,9 +20,13 @@ export const ReviewButton: React.FC = () => {
   const handleClick = async () => {
     if (currentRoute) {
       setExecutableRoute(currentRoute);
-      navigate(navigationRoutes.transactionExecution, {
+      navigate(`${pathname}?tab=transactionProcessing`, {
         state: { routeId: currentRoute.id },
       });
+
+      // navigate(navigationRoutes.transactionExecution, {
+      //   state: { routeId: currentRoute.id },
+      // });
     }
   };
 

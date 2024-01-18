@@ -70,23 +70,18 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
           chain={chain}
           isLoading={isLoading}
           sx={{ marginRight: 2 }}
+          mainAvatarStyle={{height: '44px', width: '44px'}}
         />
         {isLoading ? (
           <Skeleton width={112} height={32} variant="text" />
         ) : (
-          <TextFitter
-            height={24}
-            textStyle={{
-              fontWeight: 700,
-            }}
-          >
-            {t('format.number', {
-              value: formattedTokenAmount,
-            })}
-          </TextFitter>
-        )}
-      </Box>
-      <TextSecondaryContainer connected={connected} component="span">
+          <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div style={{fontSize: '14px', fontWeight: 500}}>
+              {t('format.number', {
+                value: formattedTokenAmount,
+              })} {token?.symbol}
+            </div>
+        <TextSecondaryContainer connected={connected} component="span">
         {isLoading ? (
           <Skeleton
             width={48}
@@ -115,11 +110,8 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
               sx={{ marginTop: 0.5 }}
             />
           ) : (
-            <TextSecondary connected={connected}>
-              {t(`main.tokenOnChain`, {
-                tokenSymbol: token?.symbol,
-                chainName: chain?.name,
-              })}
+            <TextSecondary connected={connected} sx={{color: '#fff'}}>
+              {chain?.name}
             </TextSecondary>
           )
         ) : null}
@@ -141,6 +133,10 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
           </Box>
         ) : null} */}
       </TextSecondaryContainer>
+          </div>
+        )}
+      </Box>
+      
     </Box>
   );
 };

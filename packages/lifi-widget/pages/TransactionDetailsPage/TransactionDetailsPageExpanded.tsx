@@ -95,35 +95,55 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
     }
   }
 
+  const formatDate = (date: any) => {
+    return new Intl.DateTimeFormat(i18n.language, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
+  const formatTime = (date: any) => {
+    return new Intl.DateTimeFormat(i18n.language, {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(date);
+  };
+
   return (
-    <Container sx={{maxWidth: '468px !important'}}>
+    <Container sx={{maxWidth: '500px !important'}}>
       <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
         <div style={{display: 'flex'}}>
           <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
           <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction info</Typography>
         </div>
-        {
-          routeExecution ?  <div style={{marginLeft: 'auto'}}>{getTxStatus(routeExecution?.status)}</div> : null
-        }
       </div>
+      <Card sx={{
+          background: '#22262A',
+          padding: '16px',
+          border: 'none',
+      }} className='withHoverGray'>
       <Box
         sx={{
           display: 'flex',
           flex: 1,
+          alignItems: 'center',
           justifyContent: 'space-between',
         }}
         pb={1}
       >
-        <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, { dateStyle: 'long' }).format(
-            startedAt,
-          )}
+       <div style={{display: 'flex'}}>
+       <Typography fontSize={10} color="#fff">
+        {formatDate(startedAt)} /&nbsp;
         </Typography>
-        <Typography fontSize={12}>
-          {new Intl.DateTimeFormat(i18n.language, {
-            timeStyle: 'short',
-          }).format(startedAt)}
+        <Typography fontSize={10} color="#fff">
+          {formatTime(startedAt)}
         </Typography>
+       </div>
+        {
+          routeExecution ?  <div style={{marginLeft: 'auto'}}>{getTxStatus(routeExecution?.status)}</div> : null
+        }
       </Box>
       <div className="txSteps">
         {getStepList(routeExecution?.route, subvariant)}
@@ -154,15 +174,17 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
             flex: 1,
           }}
         >
-          <CardTitle flex={1}>{t('main.supportId')}</CardTitle>
-          <Box onClick={copySupportId} mr={1} mt={1} sx={{display: 'flex', cursor: 'pointer', justifyContent: 'center', alignItems: 'center', padding: '6px', background: '#2C3036', borderRadius: '4px'}}>
-            <img src={copyIcon} style={{marginRight: '10px', width: '12px', height: '12px'}}/>
-            <Typography fontSize={12} fontWeight={400} color={'#fff'}>Copy</Typography>
+          <CardTitle flex={1} fontSize={14}>{t('main.supportId')}</CardTitle>
+          <Box className='withHover' onClick={copySupportId} mt={1} sx={{display: 'flex', cursor: 'pointer', justifyContent: 'center', alignItems: 'center', padding: '4px 8px', background: '#444955', borderRadius: '4px'}}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+            <path d="M8.4 12.3242H1.2C0.537258 12.3242 0 11.787 0 11.1242V3.92422H1.2V11.1242H8.4V12.3242ZM10.8 9.92422H3.6C2.93726 9.92422 2.4 9.38696 2.4 8.72422V1.52422C2.4 0.861477 2.93726 0.324219 3.6 0.324219H10.8C11.4627 0.324219 12 0.861477 12 1.52422V8.72422C12 9.38696 11.4627 9.92422 10.8 9.92422ZM3.6 1.52422V8.72422H10.8V1.52422H3.6Z" fill="#F3F9F4"/>
+          </svg>
+            <Typography marginLeft={'10px'} fontSize={12} fontWeight={400} color={'#fff'}>Copy</Typography>
           </Box>
         </Box>
         <Typography
           variant="body2"
-          sx={{ wordBreak: 'break-all', background: '#21262A', borderRadius: '10px', marginTop: '12px', border: '1px solid #272C30', padding: '12px 16px'}}
+          sx={{ wordBreak: 'break-all', background: '#181A1F', borderRadius: '10px', marginTop: '12px', border: '1px solid #272C30', padding: '12px 16px'}}
         >
           {supportId}
         </Typography>
@@ -195,6 +217,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      </Card>
     </Container>
   );
 };
