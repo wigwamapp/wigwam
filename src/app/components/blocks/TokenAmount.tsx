@@ -20,6 +20,7 @@ type TokenAmountProps = {
   token: {
     slug: string;
     amount?: string;
+    amountUsd?: string;
   };
   rawAmount?: boolean;
   isSmall?: boolean;
@@ -29,7 +30,7 @@ type TokenAmountProps = {
 const TokenAmount = memo<TokenAmountProps>(
   ({
     accountAddress,
-    token: { slug, amount },
+    token: { slug, amount, amountUsd },
     rawAmount = false,
     isSmall = false,
     className,
@@ -55,14 +56,29 @@ const TokenAmount = memo<TokenAmountProps>(
                 isSmall ? "text-xs" : "text-sm",
               )}
               currency={tokenInfo.symbol}
+              copiable
               amount={amount}
               threeDots={false}
             />
+            {amountUsd !== undefined && (
+              <>
+                <Dot isSmall={isSmall} />
+                <FiatAmount
+                  amount={amountUsd}
+                  threeDots={false}
+                  copiable
+                  className={classNames(
+                    isSmall ? "text-xs" : "text-sm",
+                    "text-brand-inactivedark",
+                  )}
+                />
+              </>
+            )}
           </div>
         );
       }
 
-      const usdAmount = amount
+      const calculatedUsdAmount = amount
         ? new BigNumber(amount)
             .div(new BigNumber(10).pow(decimals))
             .multipliedBy(priceUSD ?? 0)
@@ -91,11 +107,11 @@ const TokenAmount = memo<TokenAmountProps>(
                   "font-bold",
                 )}
               />
-              {usdAmount !== undefined && (
+              {calculatedUsdAmount !== undefined && (
                 <>
                   <Dot isSmall={isSmall} />
                   <FiatAmount
-                    amount={usdAmount}
+                    amount={calculatedUsdAmount}
                     threeDots={false}
                     copiable
                     className={classNames(

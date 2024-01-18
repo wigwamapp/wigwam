@@ -46,7 +46,11 @@ import {
   getPermissionAtom,
   pendingActivityAtom,
 } from "app/atoms";
-import { IS_FIREFOX, LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
+import {
+  IS_FIREFOX,
+  LOAD_MORE_ON_ACTIVITY_FROM_END,
+  TRANSAK_SUPPORT_URL,
+} from "app/defaults";
 import {
   ChainIdProvider,
   OverflowProvider,
@@ -468,7 +472,8 @@ const ActivityCard = memo(
                 <div className="flex items-center justify-between">
                   <ActivityTypeLabel item={item} className="mr-4" />
 
-                  {item.type === ActivityType.Transaction && (
+                  {(item.type === ActivityType.Transaction ||
+                    item.type === ActivityType.Ramp) && (
                     <ChainIdProvider chainId={item.chainId}>
                       <ActivityTxActions item={item} />
                     </ChainIdProvider>
@@ -613,7 +618,8 @@ const ActivityCard = memo(
             )}
 
             <div className="flex flex-col items-end ml-auto">
-              {item.type === ActivityType.Transaction && (
+              {(item.type === ActivityType.Transaction ||
+                item.type === ActivityType.Ramp) && (
                 <ChainIdProvider chainId={item.chainId}>
                   <ActivityTxActions item={item} className="mb-1" />
                 </ChainIdProvider>
@@ -1013,7 +1019,7 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
 };
 
 type ActivityTxActionsProps = {
-  item: TransactionActivity;
+  item: TransactionActivity | RampActivity;
   className?: string;
 };
 
@@ -1022,7 +1028,39 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
   const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
-  const { copy, copied } = useCopyToClipboard(item.txHash);
+  const isRampActivity = useMemo(
+    () => item.type === ActivityType.Ramp,
+    [item.type],
+  );
+
+  const { copy, copied } = useCopyToClipboard(
+    isRampActivity
+      ? (item as RampActivity).partnerOrderId
+      : (item as TransactionActivity).txHash,
+  );
+
+  if (isRampActivity) {
+    return (
+      <div className={classNames("flex items-center", className)}>
+        <IconedButton
+          aria-label={copied ? "Copied" : "Copy Order ID"}
+          Icon={copied ? SuccessIcon : CopyIcon}
+          className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
+          iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
+          onClick={() => copy()}
+        />
+        {explorerLink && (
+          <IconedButton
+            aria-label="Open Transak support website"
+            Icon={WalletExplorerIcon}
+            className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
+            iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
+            href={TRANSAK_SUPPORT_URL}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={classNames("flex items-center", className)}>
@@ -1039,7 +1077,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
           Icon={WalletExplorerIcon}
           className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
           iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-          href={explorerLink.tx(item.txHash)}
+          href={explorerLink.tx((item as TransactionActivity).txHash)}
         />
       )}
     </div>
@@ -1106,6 +1144,7 @@ const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
     chainId,
     tokenSlug,
     amountInCrypto,
+    amountInFiatUSD,
   } = item;
 
   if (["REFUNDED", "EXPIRED"].includes(status)) {
@@ -1125,6 +1164,7 @@ const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
         token={{
           slug: tokenSlug,
           amount: String(amountInCrypto),
+          amountUsd: String(amountInFiatUSD),
         }}
       />
     </ChainIdProvider>
