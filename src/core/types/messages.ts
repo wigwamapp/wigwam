@@ -5,7 +5,7 @@ import { Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
 import { GasPrices } from "./fees";
-import { RampTokenInfo } from "core/back/sync/fiatOnRamp";
+import { RampTokenInfo } from "./ramp";
 
 export type Request =
   | GetWalletStateRequest

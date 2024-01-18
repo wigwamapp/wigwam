@@ -3,7 +3,7 @@ import {
   type TransakConfig,
   Environments,
   TransakEvents,
-} from "core/types/transak";
+} from "core/types/ramp";
 import { Emitter } from "lib/emitter";
 
 export const WebAppUrls = {

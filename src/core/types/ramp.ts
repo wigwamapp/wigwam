@@ -98,3 +98,11 @@ export enum TransakEvents {
   TRANSAK_WIDGET_CLOSE_REQUEST = "TRANSAK_WIDGET_CLOSE_REQUEST",
   TRANSAK_WIDGET_CLOSE = "TRANSAK_WIDGET_CLOSE",
 }
+
+export type RampTokenInfo = {
+  id: string;
+  image: string;
+  symbol: string;
+  network: string;
+  chainId: string;
+};

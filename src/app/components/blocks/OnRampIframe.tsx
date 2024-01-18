@@ -5,7 +5,7 @@ import {
   type TransakConfig,
   TransakEvents,
   Environments,
-} from "core/types/transak";
+} from "core/types/ramp";
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
   onRampModalAtom,

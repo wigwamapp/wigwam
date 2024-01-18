@@ -2,14 +2,7 @@ import axios from "axios";
 import { getAddress } from "ethers";
 import { createERC20TokenSlug, NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { withOfflineCache } from "lib/ext/offlineCache";
-
-export type RampTokenInfo = {
-  id: string;
-  image: string;
-  symbol: string;
-  network: string;
-  chainId: string;
-};
+import type { RampTokenInfo } from "core/types";
 
 const ONE_DAY = 24 * 60 * 60_000;
 const NATIVE_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
