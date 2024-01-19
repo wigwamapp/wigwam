@@ -59,7 +59,9 @@ import {
   useLazyNetwork,
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
+import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
+import { ReactComponent as ChatIcon } from "app/icons/communication.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -69,6 +71,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as ActivityConnectionIcon } from "app/icons/activity-connection.svg";
 import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signing.svg";
 import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
+import { ReactComponent as ActivityOnRampIcon } from "app/icons/activity-onramp.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
@@ -798,9 +801,8 @@ const getActivityIcon = (type: ActivityType) => {
       return ActivityConnectionIcon;
     case ActivityType.Signing:
       return ActivitySigningIcon;
-    // TODO paste ramp icon
     case ActivityType.Ramp:
-      return ActivitySigningIcon;
+      return ActivityOnRampIcon;
     default:
       return ActivityTransactionIcon;
   }
@@ -1023,8 +1025,60 @@ type ActivityTxActionsProps = {
   className?: string;
 };
 
+const SupportAlertContent: FC<{ orderId: string; isPopupMode: boolean }> = ({
+  orderId,
+  isPopupMode,
+}) => {
+  const { copy, copied } = useCopyToClipboard(orderId);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setDisabled(false);
+    }, 0);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-start">
+      <div className="flex flex-col">
+        <p className="text-left">
+          For assistance with card-based crypto balance top-ups, contact our
+          payment partner Transak. Please provide your{" "}
+          <span className="text-white">Order ID</span> at their Help Center for
+          transaction-related issues.
+        </p>
+        <div className="mb-3 flex items-center gap-2">
+          <p>
+            <b className="text-white">Order ID:</b> {orderId}
+          </p>
+          <IconedButton
+            aria-label={copied ? "Copied" : "Copy Order ID"}
+            tooltipProps={{
+              placement: "top",
+              disabled,
+            }}
+            Icon={copied ? SuccessIcon : CopyIcon}
+            className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
+            iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
+            onClick={() => copy()}
+          />
+        </div>
+      </div>
+      <Button
+        href={TRANSAK_SUPPORT_URL}
+        className="!p-0 underline"
+        theme="clean"
+      >
+        Go to the Transak Help Center
+        <WalletExplorerIcon className="ml-1" />
+      </Button>
+    </div>
+  );
+};
+
 const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
   const isPopupMode = isPopup();
+  const { alert } = useDialog();
   const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
@@ -1033,11 +1087,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
     [item.type],
   );
 
-  const { copy, copied } = useCopyToClipboard(
-    isRampActivity
-      ? (item as RampActivity).partnerOrderId
-      : (item as TransactionActivity).txHash,
-  );
+  const { copy, copied } = useCopyToClipboard();
 
   if (isRampActivity) {
     return (
@@ -1047,15 +1097,25 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
           Icon={copied ? SuccessIcon : CopyIcon}
           className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
           iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-          onClick={() => copy()}
+          onClick={() => copy((item as RampActivity).partnerOrderId)}
         />
         {explorerLink && (
           <IconedButton
-            aria-label="Open Transak support website"
-            Icon={WalletExplorerIcon}
+            aria-label="Help"
+            Icon={ChatIcon}
             className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
             iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-            href={TRANSAK_SUPPORT_URL}
+            onClick={() => {
+              alert({
+                title: "Help with a transaction",
+                content: (
+                  <SupportAlertContent
+                    isPopupMode={isPopupMode}
+                    orderId={(item as RampActivity).partnerOrderId}
+                  />
+                ),
+              });
+            }}
           />
         )}
       </div>
@@ -1069,7 +1129,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
         Icon={copied ? SuccessIcon : CopyIcon}
         className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
         iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-        onClick={() => copy()}
+        onClick={() => copy((item as TransactionActivity).txHash)}
       />
       {explorerLink && (
         <IconedButton
@@ -1144,7 +1204,6 @@ const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
     chainId,
     tokenSlug,
     amountInCrypto,
-    amountInFiatUSD,
   } = item;
 
   if (["REFUNDED", "EXPIRED"].includes(status)) {
@@ -1164,7 +1223,6 @@ const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
         token={{
           slug: tokenSlug,
           amount: String(amountInCrypto),
-          amountUsd: String(amountInFiatUSD),
         }}
       />
     </ChainIdProvider>
