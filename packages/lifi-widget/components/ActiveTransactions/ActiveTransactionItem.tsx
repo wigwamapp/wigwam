@@ -70,6 +70,7 @@ export const ActiveTransactionItem: React.FC<{
             fontWeight={500}
             lineHeight={1}
             sx={{
+              fontSize: '14px',
               display: 'flex',
               alignItems: 'center',
               marginLeft: 2,

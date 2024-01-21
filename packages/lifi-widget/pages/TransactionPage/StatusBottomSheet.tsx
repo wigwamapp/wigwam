@@ -94,10 +94,14 @@ export const StatusBottomSheet: React.FC<RouteExecution> = ({
 
   const handleSeeDetails = () => {
     handleClose();
-    navigate(navigationRoutes.transactionDetails, {
+    navigate('/?tab="transactionDetails"', {
       state: { routeId: route.id },
-      replace: true,
+      replace: true
     });
+    // navigate(navigationRoutes.transactionDetails, {
+    //   state: { routeId: route.id },
+    //   replace: true,
+    // });
   };
 
   const transactionType =
@@ -195,8 +199,8 @@ export const StatusBottomSheet: React.FC<RouteExecution> = ({
     subvariant === "nft" && hasEnumFlag(status, RouteExecutionStatus.Done);
 
   return (
-    <BottomSheet ref={ref}>
-      <Box p={3}>
+    <BottomSheet ref={ref} sx={{borderRadius: '10px'}}>
+      <Box p={3} sx={{borderRadius: '10px'}}>
         {!showContractComponent ? (
           <CenterContainer>
             <IconCircle status={status} mb={1}>

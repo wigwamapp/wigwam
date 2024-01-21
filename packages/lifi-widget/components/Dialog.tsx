@@ -22,7 +22,7 @@ export const paperProps = {
 export const backdropProps = {
   sx: {
     position: 'absolute',
-    backgroundColor: 'rgb(0 0 0 / 32%)',
+    background: 'transparent',
     backdropFilter: 'blur(3px)',
   },
 };

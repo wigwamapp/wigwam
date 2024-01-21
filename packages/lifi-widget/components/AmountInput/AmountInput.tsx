@@ -36,6 +36,7 @@ export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
   const disabled = disabledUI?.includes(DisabledUI.FromAmount);
   return (
     <AmountInputBase
+    sx={{borderRadius: '10px !important'}}
       formType={formType}
       token={token}
       startAdornment={<AmountInputStartAdornment formType={formType} />}

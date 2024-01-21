@@ -14,7 +14,7 @@ export const TransactionActiveItem: React.FC<{
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  const { route, status } = useRouteExecution({
+  const { route, status, deleteRoute } = useRouteExecution({
     routeId,
     executeInBackground: true,
   });
@@ -38,6 +38,7 @@ export const TransactionActiveItem: React.FC<{
     };
   
     const getTxStatus = (status: RouteExecutionStatus) => {
+      console.log('getTxStatus', status)
       switch (status) {
         case (RouteExecutionStatus.Done):
           return (
@@ -46,6 +47,10 @@ export const TransactionActiveItem: React.FC<{
         case (RouteExecutionStatus.Pending):
           return (
             <div className='txStatus progress'>In Progress...</div>
+          )
+        case (RouteExecutionStatus.Failed):
+          return (
+            <div className='txStatus failed'>Failed</div>
           )
       }
     }
@@ -70,7 +75,7 @@ export const TransactionActiveItem: React.FC<{
       <Card 
         onClick={handleClick}
         className={'withHover'}
-        sx={{borderRadius: '10px', background: '#22262A', border: '1px solid #ffcf26'}}>
+        sx={{borderRadius: '10px', background: '#22262A', border: `1px solid ${status === 4 ? 'rgb(234 85 106)' : '#ffcf26'}`}}>
         <Box
           sx={{
             display: 'flex',

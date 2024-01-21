@@ -52,7 +52,6 @@ export const TransactionPage: React.FC = () => {
   const headerStoreContext = useHeaderStoreContext();
   const stateRouteId = state?.routeId;
   const [routeId, setRouteId] = useState<string>(stateRouteId);
-  const [notStarted, toggleNotStarted] = useState(false);
 
   const navigate = useNavigate()
 
@@ -197,14 +196,24 @@ export const TransactionPage: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    return () => {
+      if (status === 4) {
+        deleteRoute()
+      }
+    }
+  }, [status])
+
+
+
   return (
-    <Container sx={{background: 'transparent', border: 'none', width: '480px', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
+    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigate('/')}/>
         <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Swap</Typography>
-        {getTxStatus(status || RouteExecutionStatus.Pending)}
+        {/* {getTxStatus(status || RouteExecutionStatus.Pending)} */}
       </div>
-      <div className="txSteps">
+      <div className="txSteps" style={{marginTop: '44px'}}>
         {getStepList(route, subvariant)}
       </div>
       {subvariant === "nft" ? (
@@ -267,6 +276,7 @@ export const TransactionPage: React.FC = () => {
           route={route}
           ref={tokenValueBottomSheetRef}
           onContinue={handleExecuteRoute}
+          onCancel={() => navigate('/')}
         />
       ) : null}
       <ExchangeRateBottomSheet ref={exchangeRateBottomSheetRef} />

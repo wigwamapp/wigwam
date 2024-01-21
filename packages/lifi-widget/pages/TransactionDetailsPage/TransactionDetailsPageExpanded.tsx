@@ -12,14 +12,14 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { shallow } from 'zustand/shallow';
 import { Card, CardTitle } from '../../components/Card';
 import { ContractComponent } from '../../components/ContractComponent';
 import { Dialog } from '../../components/Dialog';
 import { Insurance } from '../../components/Insurance';
 import { getStepList } from '../../components/Step';
-import { useNavigateBack } from '../../hooks';
+import { useNavigateBack, useRouteExecution } from '../../hooks';
 import { useWidgetConfig } from '../../providers';
 import { useHeaderStoreContext, useRouteExecutionStore } from '../../stores';
 import { formatTokenAmount } from '../../utils';
@@ -28,20 +28,26 @@ import { Container } from './TransactionDetailsPage.style';
 import { RouteExecutionStatus } from '../../stores/routes/types';
 import backIcon from '../../../../src/app/icons/back.svg';
 import copyIcon from '../../../../src/app/icons/copy.svg';
+import { navigate } from 'lib/navigation';
 
 
 export const TransactionDetailsPageExpanded: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { navigateBack } = useNavigateBack();
+  const navigate = useNavigate();
   const { subvariant, contractComponent, contractSecondaryComponent } =
     useWidgetConfig();
-  const { state }: any = useLocation();
+  const { state, pathname }: any = useLocation();
   const [routeExecution, deleteRoute] = useRouteExecutionStore(
     (store) => [store.routes[state?.routeId], store.deleteRoute],
     shallow,
   );
   const headerStoreContext = useHeaderStoreContext();
   const [open, setOpen] = useState(false);
+
+  const { restartRoute } = useRouteExecution({
+    routeId: state?.routeId,
+  });
 
   const toggleDialog = useCallback(() => {
     setOpen((open) => !open);
@@ -53,6 +59,18 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
       deleteRoute(routeExecution.route.id);
     }
   };
+
+  const handleRestart = () => {
+    if (routeExecution) {
+      navigate(`${pathname}?tab=transactionProcessing`, {
+        state: { routeId: routeExecution.route.id },
+      });
+
+      restartRoute()
+    }
+    
+    // restartRoute()
+  }
 
   const sourceTxHash = routeExecution?.route.steps[0].execution?.process
     .filter((process) => process.type !== 'TOKEN_ALLOWANCE')
@@ -112,9 +130,9 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
   };
 
   return (
-    <Container sx={{maxWidth: '500px !important'}}>
-      <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
-        <div style={{display: 'flex'}}>
+    <Container sx={{maxWidth: '500px !important', marginLeft: '0px', paddingTop: '0', maxHeight: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
+        <div style={{display: 'flex', }}>
           <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
           <Typography color={'#fff'} fontSize={16} fontWeight={600}>Transaction info</Typography>
         </div>
@@ -123,6 +141,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
           background: '#22262A',
           padding: '16px',
           border: 'none',
+          marginTop: '44px'
       }} className='withHoverGray'>
       <Box
         sx={{
@@ -201,6 +220,9 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
         </Typography>
       </Box>
       <Box mt={1}>
+        {/* {(routeExecution?.status === RouteExecutionStatus.Pending || routeExecution?.status === RouteExecutionStatus.Failed) && (
+          <Button sx={{borderRadius: '6px', width: '100%', marginBottom: '8px'}} onClick={() => handleRestart()}>Restart</Button>
+        )} */}
         <ContactSupportButton supportId={supportId} />
       </Box>
       <Dialog open={open} onClose={toggleDialog}>

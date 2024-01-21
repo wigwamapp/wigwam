@@ -64,7 +64,7 @@ export const AppDefault = () => {
         <PoweredBy />
         <Initializer />
       </AppContainer>
-      {(expandable && !location.search.includes("transactionProcessing")) ?  <RoutesExpanded /> : null}
+      {(expandable && !location.search.includes("transactionProcessing") && !location.search.includes("transactionHistory") && !location.search.includes("transactionDetails")) ?  <RoutesExpanded /> : null}
       {(expandable && location.search.includes("transactionHistory")) ? <TransactionHistoryPageExpanded /> : null}
       {(expandable && location.search.includes("transactionDetails")) ? <TransactionDetailsPageExpanded /> : null}
       {(expandable && location.search.includes("settings")) ? <SettingsPageExpanded /> : null}

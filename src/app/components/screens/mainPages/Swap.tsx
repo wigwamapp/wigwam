@@ -132,7 +132,7 @@ const Swap: FC = () => {
           : parseTokenSlug(tokenSlug).address
         : undefined,
       containerStyle: {
-        borderRadius: "16px",
+        borderRadius: "10px",
       },
       sdkConfig: {
         defaultRouteOptions: {
@@ -152,8 +152,8 @@ const Swap: FC = () => {
           },
         },
         shape: {
-          borderRadius: 16,
-          borderRadiusSecondary: 16,
+          borderRadius: 10,
+          borderRadiusSecondary: 10,
         },
         typography: {
           fontFamily: "Inter",

@@ -55,12 +55,12 @@ export const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <Container sx={{width: '480px', paddingTop: '12px', maxHeight: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
+    <Container sx={{width: '480px', paddingTop: '0', maxHeight: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigate('/')}/>
         <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Transaction History</Typography>
       </div>
-      <Stack spacing={2} mt={1}>
+      <Stack spacing={2} mt={1} sx={{marginTop: '44px'}}>
         {executingRoutes.length > 0 && (
           executingRoutes.map((routeId) => (
             <TransactionActiveItem key={routeId} routeId={routeId} />

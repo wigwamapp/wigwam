@@ -95,7 +95,7 @@ export const AppDrawer = forwardRef<WidgetDrawer, WidgetProps>(
           onClose={closeDrawer}
           BackdropProps={{
             sx: {
-              backgroundColor: 'rgb(0 0 0 / 48%)',
+              background: 'transparent',
               backdropFilter: 'blur(3px)',
             },
           }}

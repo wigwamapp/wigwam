@@ -111,13 +111,17 @@ div::-webkit-scrollbar-thumb {
   background: #ffcf26;
 }
 
+.txStatus.failed {
+  background: rgb(234 85 106);
+}
+
 .txSteps .MuiBox-root {
   background: transparent;
   border: none;
   border-radius: 0;
 }
 
-.MuiTooltip-root {
+.MuiBo .MuiTooltip-root {
   background: yellow;
 }
 
@@ -128,4 +132,8 @@ div::-webkit-scrollbar-thumb {
 .linkButton {
   border-radius: 4px;
   background: rgba(204, 214, 255, 0.2);
+}
+
+.MuiPaper-root {
+  border-radius: 10px;
 }

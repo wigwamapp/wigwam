@@ -45,7 +45,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
               variant="rectangular"
               width={56}
               height={56}
-              sx={{ borderRadius: 1 }}
+              sx={{ borderRadius: '10px' }}
             />
           ))
         : getChains().map((chain: EVMChain) => (

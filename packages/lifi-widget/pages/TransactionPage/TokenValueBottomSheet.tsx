@@ -45,7 +45,7 @@ const TokenValueBottomSheetContent: React.FC<TokenValueBottomSheetProps> = ({
   const ref = useRef<HTMLElement>();
   useSetContentHeight(ref);
   return (
-    <Box p={3} ref={ref}>
+    <Box p={3} ref={ref} sx={{borderRadius: '10px'}}>
       <CenterContainer>
         <IconCircle status="warning" mb={1}>
           <WarningRoundedIcon color="warning" />
@@ -78,11 +78,11 @@ const TokenValueBottomSheetContent: React.FC<TokenValueBottomSheetProps> = ({
         <Typography fontWeight={600}>{calcValueLoss(route)}</Typography>
       </Box>
       <Box display="flex" mt={3}>
-        <Button variant="text" onClick={onCancel} fullWidth>
+        <Button variant="text" onClick={onCancel} fullWidth sx={{borderRadius: '10px'}}>
           {t('button.cancel')}
         </Button>
         <Box display="flex" p={1} />
-        <Button variant="contained" onClick={onContinue} fullWidth>
+        <Button variant="contained" onClick={onContinue} sx={{borderRadius: '10px'}} fullWidth>
           {t('button.continue')}
         </Button>
       </Box>
