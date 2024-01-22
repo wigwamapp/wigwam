@@ -130,7 +130,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
   };
 
   return (
-    <Container sx={{maxWidth: '500px !important', marginLeft: '0px', paddingTop: '0', maxHeight: '85vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+    <Container sx={{maxWidth: '500px !important', marginLeft: '0px', paddingTop: '0', maxHeight: '75vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
       <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <div style={{display: 'flex', }}>
           <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
