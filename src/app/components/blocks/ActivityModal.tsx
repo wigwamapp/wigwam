@@ -738,10 +738,16 @@ type ActivityTypeLabelProps = {
 const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
   const isPopupMode = isPopup();
 
-  const name =
-    item.type === ActivityType.Transaction && item.source.type === "self"
-      ? "Transfer"
-      : item.type;
+  const name = useMemo(() => {
+    if (item.type === ActivityType.Transaction && item.source.type === "self") {
+      return "Transfer";
+    }
+    if (item.type === ActivityType.Ramp && item.kind === "onramp") {
+      return "Buy";
+    }
+
+    return item.type;
+  }, [item]);
 
   const Icon = getActivityIcon(item.type);
   return (
