@@ -162,7 +162,7 @@ const OnRampIframe: FC = () => {
 
   return (
     <div
-      className="mr-12 h-full flex justify-center rounded-md"
+      className="-ml-12 mr-12 h-full flex justify-center rounded-md"
       id="transakPanel"
     >
       <iframe
@@ -170,7 +170,7 @@ const OnRampIframe: FC = () => {
         title="transak"
         src={iframeUrl}
         allow="camera;microphone;payment"
-        className="h-full w-[26rem] border-none rounded-md"
+        className="h-full w-[420px] border-none rounded-md"
       />
     </div>
   );
