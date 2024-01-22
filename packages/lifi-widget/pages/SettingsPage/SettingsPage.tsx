@@ -46,7 +46,7 @@ export const SettingsPage = () => {
         )
       case 'bridges':
         return (
-          <div>
+          <div style={{paddingLeft: '24px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', paddingBottom: '14px'}}>
               <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
               <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Bridges</Typography>
@@ -56,7 +56,7 @@ export const SettingsPage = () => {
         )
       case 'exchanges':
         return (
-          <div>
+          <div style={{paddingLeft: '24px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', paddingBottom: '14px'}}>
               <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
               <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Exchanges</Typography>

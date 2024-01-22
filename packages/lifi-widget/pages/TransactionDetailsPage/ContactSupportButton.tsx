@@ -15,10 +15,17 @@ export const ContactSupportButton = ({
 
   const handleClick = () => {
     if (!widgetEvents.all.has(WidgetEvent.RouteContactSupport)) {
+      
       const url = 'https://discord.gg/lifi';
       const target = '_blank';
       const rel = 'nofollow noreferrer';
-      window.open(url, target, rel);
+
+      Object.assign(document.createElement('a'), {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        href: url,
+      }).click();
+      // window.open(url, target, rel);
     } else {
       widgetEvents.emit(WidgetEvent.RouteContactSupport, { supportId });
     }

@@ -183,6 +183,8 @@ const Swap: FC = () => {
       },
     };
   }, [
+    currenciesRate,
+    currentLocale,
     chainId,
     currentAccount.address,
     tokenSlug,

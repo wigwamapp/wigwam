@@ -99,7 +99,10 @@ const DetailsTab: FC<DetailsTabProps> = ({
   source,
   onFeeButtonClick,
 }) => {
-  const tabHeader = useMemo(() => getTabHeader(action, source), [action]);
+  const tabHeader = useMemo(
+    () => getTabHeader(action, source),
+    [action, source],
+  );
   const withDescription = useMemo(
     () => action.type === TxActionType.TokenApprove && !action.clears,
     [action],
