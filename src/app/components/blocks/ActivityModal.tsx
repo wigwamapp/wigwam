@@ -39,7 +39,6 @@ import * as repo from "core/repo";
 
 import {
   activityModalAtom,
-  allAccountsAtom,
   approvalStatusAtom,
   getNetworkAtom,
   getPermissionAtom,
@@ -54,7 +53,7 @@ import {
   useLazyNetwork,
 } from "app/hooks";
 import { openInTabExternal } from "app/utils";
-import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
+import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -72,9 +71,6 @@ import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 import Button from "../elements/Button";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import Avatar from "../elements/Avatar";
-import AutoIcon from "../elements/AutoIcon";
-import WalletName from "../elements/WalletName";
-import HashPreview from "../elements/HashPreview";
 import PrettyDate from "../elements/PrettyDate";
 import IconedButton from "../elements/IconedButton";
 import PrettyAmount from "../elements/PrettyAmount";
@@ -110,7 +106,7 @@ const ActivityModal = memo(() => {
           className={classNames(
             "fixed z-20",
             "w-full",
-            !isPopupMode && "max-h-[41rem] min-w-[40rem] max-w-6xl",
+            !isPopupMode && "max-h-[41rem] min-w-[40rem] max-w-4xl",
             "m-auto inset-x-0",
             isPopupMode ? "inset-y-0" : "inset-y-[3.5rem]",
             !isPopupMode && "rounded-[2.5rem]",
@@ -205,7 +201,7 @@ const ActivityContent = memo(() => {
   return (
     <div
       className={classNames(
-        isPopupMode ? "w-full" : "w-[68.25rem]",
+        isPopupMode ? "w-full" : "w-[54rem]",
         "mx-auto h-full",
         "px-4",
         isPopupMode ? "pt-6" : "pt-16",
@@ -484,10 +480,6 @@ const ActivityCard = memo(
             {item.type === ActivityType.Transaction && (
               <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
                 <div className="flex items-center justify-between min-w-0">
-                  <ActivityWalletCard
-                    accountAddress={item.accountAddress}
-                    className="mr-4 min-w-0"
-                  />
                   <ChainIdProvider chainId={item.chainId}>
                     <ActivityTokens
                       source={item.source}
@@ -510,20 +502,12 @@ const ActivityCard = memo(
             <ActivityIcon item={item} className="mr-6" />
 
             {status ? (
-              <div className={classNames("flex flex-col", "w-[10rem] mr-8")}>
+              <div className={classNames("flex flex-col", "w-[8rem] mr-8")}>
                 <ActivityTypeLabel item={item} />
                 <ActivityTypeStatus status={status} className="mt-0.5 ml-7" />
               </div>
             ) : (
-              <ActivityTypeLabel item={item} className="w-[10rem] mr-8" />
-            )}
-
-            {(item.type === ActivityType.Transaction ||
-              item.type === ActivityType.Signing) && (
-              <ActivityWalletCard
-                accountAddress={item.accountAddress}
-                className="w-[10rem] mr-8"
-              />
+              <ActivityTypeLabel item={item} className="w-[8rem] mr-8" />
             )}
 
             {item.type === ActivityType.Transaction && (
@@ -537,14 +521,14 @@ const ActivityCard = memo(
             {item.source.type === "page" && (
               <ActivityWebsiteLink
                 source={item.source}
-                className="w-[10rem] mr-8"
+                className="w-[8rem] mr-8"
               />
             )}
 
             {item.type === ActivityType.Connection && (
               <DisconnectDApp
                 item={item}
-                className="w-[10rem] mr-8"
+                className="w-[8rem] mr-8"
                 setRevokedPermission={setRevokedPermission}
               />
             )}
@@ -555,7 +539,7 @@ const ActivityCard = memo(
                   source={item.source}
                   action={item.txAction}
                   accountAddress={item.accountAddress}
-                  className="w-[10rem] mr-8"
+                  className="w-[8rem] mr-8"
                 />
               </ChainIdProvider>
             )}
@@ -661,7 +645,7 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
   ) : (
     <SendIcon
       className={classNames(
-        "glass-icon--active",
+        "styled-icon--active",
         isPopupMode ? "w-8 h-8" : "w-12 h-12",
         className,
       )}
@@ -785,76 +769,6 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
         }
       />
     </button>
-  );
-};
-
-type ActivityWalletCardProps = {
-  accountAddress: string;
-  className?: string;
-};
-
-const ActivityWalletCard: FC<ActivityWalletCardProps> = ({
-  accountAddress,
-  className,
-}) => {
-  const isPopupMode = isPopup();
-  const allAccounts = useAtomValue(allAccountsAtom);
-  const account = useMemo(
-    () => allAccounts.find((acc) => acc.address === accountAddress),
-    [allAccounts, accountAddress],
-  );
-
-  return account ? (
-    <div
-      className={classNames(
-        "relative",
-        "flex",
-        isPopupMode ? "items-center" : "items-stretch",
-        "text-left",
-        className,
-      )}
-    >
-      <AutoIcon
-        seed={account.address}
-        source="dicebear"
-        type="personas"
-        className={classNames(
-          isPopupMode
-            ? "h-4.5 w-4.5 min-w-[1.125rem]"
-            : "h-9 w-9 min-w-[2.25rem]",
-          isPopupMode ? "mr-1.5" : "mr-2",
-          "bg-black/20",
-          isPopupMode ? "rounded" : "rounded-md",
-        )}
-      />
-      <span
-        className={classNames(
-          "flex flex-col items-start justify-center",
-          "min-w-0",
-        )}
-      >
-        <WalletName
-          wallet={account}
-          theme="small"
-          className={isPopupMode ? "text-xs" : "text-sm"}
-        />
-        {!isPopupMode && (
-          <HashPreview
-            hash={account.address}
-            className="leading-none text-brand-inactivedark text-sm"
-          />
-        )}
-      </span>
-    </div>
-  ) : (
-    <span
-      className={classNames(
-        "font-medium text-brand-inactivedark text-base",
-        className,
-      )}
-    >
-      Deleted
-    </span>
   );
 };
 
