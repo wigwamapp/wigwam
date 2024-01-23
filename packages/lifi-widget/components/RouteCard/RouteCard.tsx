@@ -5,7 +5,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import type { TooltipProps } from '@mui/material';
 import { Box, Collapse, Tooltip, Typography } from '@mui/material';
 import type { MouseEventHandler } from 'react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useWidgetConfig } from '../../providers';
 import { formatTokenAmount } from '../../utils';
@@ -26,6 +26,10 @@ export const RouteCard: React.FC<
   const { subvariant } = useWidgetConfig();
   const [cardExpanded, setCardExpanded] = useState(expanded);
   const insurable = route.insurance?.state === 'INSURABLE';
+
+  useEffect(() => {
+    setCardExpanded(active)
+  }, [active])
 
   const handleExpand: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -78,7 +82,7 @@ export const RouteCard: React.FC<
                     </svg>
                   </div>
                   <CardLabel type={active ? 'active' : undefined} sx={{background: 'transparent'}}>
-                    <CardLabelTypography sx={{borderRadius: '6px', border: '1px solid #717A7B', background: 'transparent', padding: '0px 8px'}} fontSize={10} color={'#fff'} fontWeight={400}>
+                    <CardLabelTypography sx={{borderRadius: '6px', lineHeight: '24px', border: '1px solid #717A7B', background: 'transparent', padding: '0px 8px'}} fontSize={10} color={'#fff'} fontWeight={400}>
                       {t(`main.tags.${route.tags[0].toLowerCase()}` as any)}
                     </CardLabelTypography>
                   </CardLabel>
@@ -95,12 +99,12 @@ export const RouteCard: React.FC<
                         height: '24px'
                       }}
                     >
-                      <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                      <Typography color={'#fff'} fontSize={12} sx={{fontWeight: '500 !important'}}>
                         {route.steps[0].toolDetails.name[0]}
                       </Typography>
                     </SmallAvatar>
                   </Box>
-                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+                  <Typography color={'#fff'} fontSize={12} sx={{fontWeight: '500 !important'}}>{route.steps[0].toolDetails.name}</Typography>
                 </Box>
               </div>
             </RecommendedTagTooltip>
@@ -122,12 +126,12 @@ export const RouteCard: React.FC<
                     height: '24px'
                   }}
                 >
-                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                  <Typography color={'#fff'} fontSize={12} sx={{fontWeight: '500 !important'}}>
                     {route.steps[0].toolDetails.name[0]}
                   </Typography>
                 </SmallAvatar>
               </Box>
-              <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+              <Typography color={'#fff'} fontSize={12} sx={{fontWeight: '500 !important'}}>{route.steps[0].toolDetails.name}</Typography>
             </Box></>}
         </Box>
       ) : <Box display="flex" alignItems="center" mb={2} sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -149,12 +153,12 @@ export const RouteCard: React.FC<
                     height: '24px'
                   }}
                 >
-                  <Typography color={'#fff'} fontSize={12} fontWeight={500}>
+                  <Typography color={'#fff'} fontSize={12}  sx={{fontWeight: '500 !important'}}>
                     {route.steps[0].toolDetails.name[0]}
                   </Typography>
                 </SmallAvatar>
               </Box>
-              <Typography color={'#fff'} fontSize={12} fontWeight={500}>{route.steps[0].toolDetails.name}</Typography>
+              <Typography color={'#fff'} fontSize={12}  sx={{fontWeight: '500 !important'}}>{route.steps[0].toolDetails.name}</Typography>
             </Box>
             </>
           </Box>}
@@ -185,6 +189,7 @@ export const RouteCard: React.FC<
       variant={active ? 'selected' : 'default'}
       selectionColor="secondary"
       indented
+      className='withHover'
       sx={{borderRadius: '10px', background: '#22262A', border: `1px solid ${active ? '#80EF6E' : '#32393E'}`}}
       {...other}
     >

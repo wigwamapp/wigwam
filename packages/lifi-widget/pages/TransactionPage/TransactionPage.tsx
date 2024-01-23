@@ -119,10 +119,12 @@ export const TransactionPage: React.FC = () => {
     }
     executeRoute();
     setValue(FormKey.FromAmount, "");
-    if (subvariant === "nft") {
-      setValue(FormKey.FromToken, "");
-      setValue(FormKey.ToToken, "");
-    }
+    setValue(FormKey.FromToken, "");
+    setValue(FormKey.ToToken, "");
+    // if (subvariant === "nft") {
+    //   setValue(FormKey.FromToken, "");
+    //   setValue(FormKey.ToToken, "");
+    // }
   };
 
   const handleStartClick = async () => {
@@ -207,7 +209,7 @@ export const TransactionPage: React.FC = () => {
 
 
   return (
-    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: '75vh', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: 'calc(90vh - 58px)', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
       <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigate('/')}/>
         <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Swap</Typography>

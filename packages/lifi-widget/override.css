@@ -16,7 +16,11 @@
   font-size: 16px;
   font-style: normal;
   font-weight: 400 !important;
-  line-height: 24px !important;
+  /* line-height: 24px !important; */
+}
+
+.MuiStepConnector-root {
+  display: none !important;
 }
 
 ::-webkit-scrollbar {
@@ -136,4 +140,77 @@ div::-webkit-scrollbar-thumb {
 
 .MuiPaper-root {
   border-radius: 10px;
+}
+
+.preventHover:hover {
+  background: #181a1f;
+}
+
+.selectedChain {
+  border: 1px solid #80ef6e !important;
+}
+
+.selectedChain p {
+  color: #fff;
+  font-weight: 700 !important;
+  font-size: 14px;
+}
+
+.injectedContacts .flex {
+  padding-left: 0;
+  padding-right: 0;
+  color: #8d9c9e;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.injectedContacts .group {
+  border-radius: 10px;
+  border: 1px solid #272c30;
+  background: #21262a;
+}
+
+.injectedContacts textarea {
+  height: 34px !important;
+  background: transparent !important;
+  border: none !important;
+  text-wrap: nowrap;
+  overflow: hidden;
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.injectedContacts button {
+  display: none;
+}
+
+.injectedSmallContactCard {
+  background: #3e444c;
+  border-radius: 4px;
+  padding: 4px 8px 4px 4px;
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+}
+
+.injectedSmallContactCard span {
+  border: none;
+}
+
+.injectedSmallContactCardWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #272c30;
+  background: #21262a;
+  padding: 0px 10px;
+  height: 44px;
+}
+
+.preventHoverEffect {
+  pointer-events: none;
 }

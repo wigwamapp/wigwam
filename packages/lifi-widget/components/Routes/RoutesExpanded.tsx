@@ -96,10 +96,8 @@ export const RoutesExpandedElement = () => {
         <Container sx={containerStyle} enableColorScheme>
           <ScrollableContainer>
             <Header>
-              <Typography fontSize={18} fontWeight="700" flex={1} noWrap>
-                {subvariant === 'nft'
-                  ? t('main.fromAmount')
-                  : t('header.youGet')}
+              <Typography fontSize={16} color={'#fff'} fontWeight="600" flex={1} noWrap>
+                Choose a Route
               </Typography>
               <ProgressToNextUpdate
                 updatedAt={dataUpdatedAt || new Date().getTime()}

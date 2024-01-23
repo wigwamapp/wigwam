@@ -1,6 +1,7 @@
 import type { Token } from '@lifi/sdk';
 import type { BoxProps } from '@mui/material';
 import type { ChangeEvent, ReactNode } from 'react';
+import { Typography } from '@mui/material'
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ import {
 import { AmountInputEndAdornment } from './AmountInputEndAdornment';
 import { AmountInputStartAdornment } from './AmountInputStartAdornment';
 import { FormPriceHelperText } from './FormPriceHelperText';
+import { useGetSelectedRoute } from "../../stores";
 
 export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
   formType,
@@ -39,7 +41,7 @@ export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
     sx={{borderRadius: '10px !important'}}
       formType={formType}
       token={token}
-      startAdornment={<AmountInputStartAdornment formType={formType} />}
+      // startAdornment={<AmountInputStartAdornment formType={formType} />}
       endAdornment={
         !disabled ? <AmountInputEndAdornment formType={formType} /> : undefined
       }
@@ -112,9 +114,11 @@ export const AmountInputBase: React.FC<
     }
   }, [value, ref]);
 
+  const currentRoute = useGetSelectedRoute();
+
   return (
     <Card {...props} sx={{border: 'none', background: 'none', borderRadius: '10px !important', marginBottom: '24px'}}>
-      <CardTitle sx={{paddingTop: '0px', paddingLeft: '0px !important'}}>{formType === "to" ? "You receive" : t('main.fromAmount')}</CardTitle>
+      <Typography sx={{paddingTop: '0px', paddingLeft: '0px !important', display: 'flex', justifyContent: formType === 'to' ? 'space-between' : 'flex-start'}}><div>{formType === "to" ? "You receive" : t('main.fromAmount')}</div> {(formType === "to" && currentRoute) && (<div style={{display: 'flex', fontWeight: '500'}}>via <img style={{width: '24px', height: '24px', borderRadius: '100%', margin: '0 4px 0 8px'}} src={currentRoute.steps[0].toolDetails.logoURI} /> <div style={{color: '#fff', }}>{currentRoute.steps[0].toolDetails.name}</div></div>)}</Typography>
       <div style={{background: '#16171C', borderRadius: '10px', marginTop: '8px', border: '1px solid #272C30'}}>
       <FormControl fullWidth>
         <Input
@@ -132,6 +136,7 @@ export const AmountInputBase: React.FC<
           value={value}
           name={amountKey}
           disabled={disabled}
+          sx={{fontSize: '18px !important', fontWeight: '500'}}
           required
         />
         {bottomAdornment}

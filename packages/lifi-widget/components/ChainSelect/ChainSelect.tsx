@@ -57,9 +57,13 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
               arrow
             >
               <ChainCard
-                className='withHover'
                 onClick={() => setCurrentChain(chain.id)}
-                variant={chainId === chain.id ? 'selected' : 'default'}
+                className={`withHover ${chainId === chain.id ? 'selectedChain' : ''}`}
+                sx={{
+                  justifyContent: 'flex-start',
+                  paddingLeft: '12px'
+                }}
+
               >
                 <div style={{display: 'flex', alignItems: 'center'}}>
                 <Avatar
@@ -68,7 +72,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
                   sx={{ width: '32px', height: '32px', marginRight: '12px' }}
                 >
                 </Avatar>
-                <Typography fontSize={14} fontWeight={500} color={'#C0C1C3'}>
+                <Typography fontSize={14} sx={{fontWeight: '500 !important'}} color={'#C0C1C3'}>
                   {chain.name}
                 </Typography>
                 </div>
@@ -85,7 +89,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
               placeItems: 'center',
             }}
           >
-            <Typography fontWeight={500} fontSize={14}>+{chainsToHide} more</Typography>
+            <Typography sx={{fontWeight: '500 !important', color: '#fff'}} fontSize={14}>+{chainsToHide} more</Typography>
           </Box>
         </ChainCard>
       ) : null}

@@ -2,7 +2,7 @@ import { FormControl as MuiFormControl, InputBase } from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
 import { styled } from '@mui/material/styles';
 
-export const maxInputFontSize = 24;
+export const maxInputFontSize = 18;
 export const minInputFontSize = 14;
 
 export const FormControl = styled(MuiFormControl)(({ theme }) => ({
@@ -10,8 +10,8 @@ export const FormControl = styled(MuiFormControl)(({ theme }) => ({
 }));
 
 export const Input = styled(InputBase)(({ theme }) => ({
-  fontSize: 24,
-  fontWeight: 700,
+  fontSize: 18,
+  fontWeight: 500,
   boxShadow: 'none',
   // padding: theme.spacing(2, 2, 2, 0),
   [`.${inputBaseClasses.input}`]: {

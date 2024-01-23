@@ -24,20 +24,22 @@ export const ActiveTransactions: React.FC<BoxProps> = (props) => {
     navigate(`${pathname}?tab=transactionHistory`);
   };
 
-  const hasShowAll = executingRoutes?.length > 2;
+  const hasShowAll = executingRoutes?.length > 1;
 
   return (
-    <Card onClick={handleShowAll} variant="selected" selectionColor="secondary" {...props} sx={{border: '1px solid #ffcf26', background: '#2B3037', cursor: 'pointer'}}>
-      <Stack spacing={1.5} pt={1.5} pb={hasShowAll ? 0 : 2}>
-        {executingRoutes.slice(0, 2).map((routeId) => (
-          <ActiveTransactionItem key={routeId} routeId={routeId} dense />
-        ))}
-      </Stack>
+    <div style={{position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '15px'}}>
+      <Card onClick={handleShowAll} className='withHover' variant="selected" selectionColor="secondary" {...props} sx={{border: '1px solid #ffcf26', zIndex: 10, width: '100%', background: '#2B3037', cursor: 'pointer'}}>
+        <Stack sx={{paddingTop: '16px', paddingBottom: '16px'}}>
+          {executingRoutes.slice(0, 1).map((routeId) => (
+            <ActiveTransactionItem key={routeId} routeId={routeId} dense />
+          ))}
+        </Stack>
+        
+      </Card>
       {hasShowAll ? (
-        <ShowAllButton disableRipple fullWidth sx={{color: '#fff'}}>
-          {t('button.showAll')}
-        </ShowAllButton>
+        <div style={{position: 'absolute', opacity: '0.5', borderRadius: '10px', top: '-3px', width: '85%', height: '58px', zIndex: 1, background: '#2B3037', border: '1px solid #ffcf26'}}></div>
       ) : null}
-    </Card>
+    </div>
+    
   );
 };

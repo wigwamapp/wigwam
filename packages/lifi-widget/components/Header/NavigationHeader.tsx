@@ -1,6 +1,4 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -16,7 +14,6 @@ import {
 import { HeaderAppBar } from './Header.style';
 import { NavigationTabs } from './NavigationTabs';
 import { WalletMenuButton } from './WalletHeader';
-import SwapArrows from '../../../../src/app/icons/swap-arrows.svg';
 
 export const NavigationHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -89,7 +86,7 @@ export const NavigationHeader: React.FC = () => {
 
   return (
     <>
-      <HeaderAppBar elevation={0} style={{justifyContent: 'space-between'}}>
+      <HeaderAppBar elevation={0} style={{justifyContent: 'space-between'}} className='preventHover'>
         {backButtonRoutes.includes(path) ? (
           <IconButton size="medium" edge="start" onClick={navigateBack}>
             <ArrowBackIcon />
@@ -104,15 +101,16 @@ export const NavigationHeader: React.FC = () => {
         ) : (
           <div style={{display: 'flex', alignItems: 'center'}}>
             <Typography
-              fontSize={hasPath ? 18 : 20}
-              align={hasPath ? 'center' : 'left'}
-              fontWeight="600"
+              fontSize={20}
+              align={'left'}
+              color={'#fff'}
+              sx={{fontWeight: '600 !important'}}
               flex={1}
               noWrap
             >
               {title || handleHeaderTitle()}
             </Typography>
-            {(title === 'Swap Exchange' || handleHeaderTitle() === 'Swap Exchange') && <img src={SwapArrows} style={{marginLeft: '12px'}}/>}
+            {/* {(title === 'Swap Exchange' || handleHeaderTitle() === 'Swap Exchange') && <img src={SwapArrows} style={{marginLeft: '12px'}}/>} */}
           </div>
         )}
         <Routes>

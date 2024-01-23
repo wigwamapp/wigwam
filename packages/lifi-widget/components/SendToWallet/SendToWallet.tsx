@@ -9,6 +9,15 @@ import { useSendToWalletStore, useSettings } from '../../stores';
 import { DisabledUI, HiddenUI, RequiredUI } from '../../types';
 import { Card, CardTitle } from '../Card';
 import { FormControl, Input } from './SendToWallet.style';
+import ContactAutocomplete from '../../../../src/app/components/elements/ContactAutocomplete';
+import {
+  composeValidators,
+  validateAddress,
+  OnChange,
+} from "app/utils"
+import { Field, Form } from "react-final-form";
+
+type FormValues = { recipient: string };
 
 export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
   const { t } = useTranslation();
@@ -82,6 +91,14 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
     return null;
   }
 
+  const handleRecipientChange = (recipient: string) => {
+    onChange(recipient)
+  }
+
+  const handleSubmit = () => {
+    console.log('submit')
+  }
+
   return (
     <Collapse
       timeout={showInstantly ? 0 : 225}
@@ -89,28 +106,38 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
       mountOnEnter
       unmountOnExit
     >
-      <Card {...props} ref={ref} sx={{border: 'none', background: 'none', marginBottom: '24px'}}>
-        <CardTitle required={requiredToAddress} sx={{paddingTop: '0px'}}>
-          Recipient
-        </CardTitle>
-        <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
-        <FormControl fullWidth sx={{padding: '6px 16px 6px 0px' }}>
-          <Input
-            size="small"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
-            onChange={onChange}
-            onBlur={onBlur}
-            name={name}
-            value={value}
-            placeholder={t('main.walletAddressOrEns') as string}
-            disabled={Boolean(toAddress && disabledToAddress)}
-          />
-          <SendToWalletFormHelperText />
-        </FormControl>
-        </div>
+      <Card {...props} ref={ref} sx={{border: 'none', background: 'none'}}>
+      <Form<FormValues>
+        key={'recipient'}
+        onSubmit={handleSubmit}
+        render={({ form, handleSubmit, values, submitting }) => (
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col w-full"
+          >
+            <OnChange name="recipient" callback={handleRecipientChange} />
+            <Field
+              name="recipient"
+              validate={composeValidators(validateAddress)}
+            >
+              {({ input, focus, meta }) => (
+                <ContactAutocomplete
+                  injected={true}
+                  setValue={(value) => {
+                    form.change("recipient", value);
+                    focus?.();
+                  }}
+                  error={meta.error && meta.touched && meta.submitFailed}
+                  errorMessage={meta.error}
+                  meta={meta}
+                  className="mt-1 injectedContacts"
+                  {...input}
+                />
+              )}
+            </Field>
+          </form>
+        )}
+      />
       </Card>
     </Collapse>
   );

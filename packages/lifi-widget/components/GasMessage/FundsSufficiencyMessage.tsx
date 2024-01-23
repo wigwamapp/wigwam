@@ -9,7 +9,7 @@ import {
 export const FundsSufficiencyMessage = () => {
   const { t } = useTranslation();
   return (
-    <WarningMessageCard display="flex">
+    <WarningMessageCard display="flex" className="preventHoverEffect">
       <WarningMessageCardTitle>
         <WarningRoundedIcon
           sx={{

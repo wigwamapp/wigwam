@@ -43,10 +43,7 @@ const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
     return (
       <InfoRaw label={"Swap info"}>
         <div
-          className={classNames(
-            "flex items-center justify-center",
-            "w-[13rem]",
-          )}
+          className={classNames("flex items-center justify-center", "w-fit")}
         >
           <div className="inline-flex">
             <PrettyAmount

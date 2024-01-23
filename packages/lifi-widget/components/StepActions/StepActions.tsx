@@ -143,7 +143,7 @@ export const IncludedSteps: React.FC<{
                 <SwapStepDetailsLabel step={step} />
               )}
             </StepLabel>
-            <StepContent sx={{position: 'relative', bottom: '7px'}}>
+            <StepContent sx={{position: 'relative', bottom: '7px', border: 'none !important'}}>
               <StepDetailsContent step={step} subvariant={subvariant} />
             </StepContent>
           </MuiStep>
@@ -198,7 +198,7 @@ export const StepDetailsContent: React.FC<{
 
   return (
     <Typography
-      fontSize={10}
+      fontSize={12}
       fontWeight="400"
       color={'#fff'}
       alignItems="center"
@@ -258,7 +258,7 @@ export const CrossStepDetailsLabel: React.FC<
   const { t } = useTranslation();
   const { getChainById } = useChains();
   return (
-    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
+    <Typography fontSize={12} fontWeight="400" color={'#fff'}>
       {t('main.crossStepDetails', {
         from: getChainById(step.action.fromChainId)?.name,
         to: getChainById(step.action.toChainId)?.name,
@@ -274,7 +274,7 @@ export const SwapStepDetailsLabel: React.FC<
   const { t } = useTranslation();
   const { getChainById } = useChains();
   return (
-    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
+    <Typography fontSize={12} fontWeight="400" color={'#fff'}>
       {t('main.swapStepDetails', {
         chain: getChainById(step.action.fromChainId)?.name,
         tool: step.toolDetails.name,
@@ -288,7 +288,7 @@ export const ProtocolStepDetailsLabel: React.FC<
 > = ({ step }) => {
   const { t } = useTranslation();
   return (
-    <Typography fontSize={10} fontWeight="400" color={'#fff'}>
+    <Typography fontSize={12} fontWeight="400" color={'#fff'}>
       {step.toolDetails.key === 'lifuelProtocol'
         ? t('main.refuelStepDetails', {
             tool: step.toolDetails.name,

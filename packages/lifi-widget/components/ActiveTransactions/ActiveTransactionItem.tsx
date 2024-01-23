@@ -57,10 +57,10 @@ export const ActiveTransactionItem: React.FC<{
   return (
     <ListItemComponent onClick={handleClick} dense disableRipple={dense}>
       <ListItemAvatar>
-        <TokenAvatarGroup total={2}>
+        {/* <TokenAvatarGroup total={2}> */}
           <TokenAvatar token={route.fromToken} />
-          <TokenAvatar token={route.toToken} />
-        </TokenAvatarGroup>
+          <TokenAvatar token={route.toToken} sx={{marginLeft: '10px'}} />
+        {/* </TokenAvatarGroup> */}
       </ListItemAvatar>
       <ListItemText
         sx={{ margin: 0 }}

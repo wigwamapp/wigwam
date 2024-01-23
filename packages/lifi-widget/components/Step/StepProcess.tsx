@@ -24,7 +24,7 @@ export const StepProcess: React.FC<{
         <Typography
           mx={2}
           flex={1}
-          fontSize={10}
+          fontSize={12}
           fontWeight={400}
           color={'#fff'}
           sx={{marginLeft: '8px !important'}}
