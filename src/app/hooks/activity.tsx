@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useForceUpdate from "use-force-update";
+import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { getActivityAtom, getTokenActivityAtom } from "app/atoms";
+import {
+  approvalStatusAtom,
+  getActivityAtom,
+  getTokenActivityAtom,
+  pendingActivityAtom,
+} from "app/atoms";
 
 import { useChainId } from "./chainId";
 
@@ -124,4 +130,15 @@ export function useCompleteActivity(limit = 20) {
     hasMore,
     loadMore,
   };
+}
+
+export function useActivityBadge() {
+  const { total } = useAtomValue(approvalStatusAtom);
+  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
+  const pendingCount = useMemo(
+    () => pendingActivities?.length ?? 0,
+    [pendingActivities],
+  );
+
+  return useMemo(() => total > 0 || pendingCount > 0, [total, pendingCount]);
 }
