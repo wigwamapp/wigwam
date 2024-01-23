@@ -34,7 +34,7 @@ const RoundedButton: FC<RoundedButtonProps> = ({
         "absolute top-0 left-0 w-full h-full",
         "bg-opacity-10",
         "group-hover:bg-opacity-20 group-focus-visible:bg-opacity-20",
-        "glass-icon",
+        "styled-icon",
         "-z-[1]",
       )}
     />

@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import { approvalStatusAtom } from "app/atoms";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
-import { ReactComponent as SendIcon } from "app/icons/Send-activity.svg";
+import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 
 type ApprovalStatusProps = {
@@ -119,7 +119,7 @@ export const ActivityIcon: FC<ActivityIconProps> = ({
     content = (
       <Icon
         className={classNames(
-          "glass-icon--active",
+          "styled-icon--active",
           theme === "large" &&
             "w-6 h-6 mmd:w-5 mmd:h-5 mxs:w-[1.125rem] mxs:h-[1.125rem]",
           theme === "small" && "w-[1.125rem] h-[1.125rem]",
