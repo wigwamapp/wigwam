@@ -6,8 +6,8 @@ export const OPTIMISM: Network[] = [
     chainId: 10,
     type: "mainnet",
     rpcUrls: [
-      "https://optimism.llamarpc.com",
       "https://mainnet.optimism.io",
+      "https://optimism.llamarpc.com",
       "https://1rpc.io/op",
       "https://endpoints.omniatech.io/v1/op/mainnet/public",
       "https://optimism.publicnode.com",
