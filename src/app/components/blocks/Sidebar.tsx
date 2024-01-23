@@ -94,10 +94,10 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
                   "w-7 h-7",
                   "min-w-7",
                   "mr-5",
-                  "glass-icon",
-                  isPageActive && "glass-icon--active",
-                  "group-hover:glass-icon--hover",
-                  "group-focus:glass-icon--hover",
+                  "styled-icon",
+                  isPageActive
+                    ? "styled-icon--active"
+                    : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
                 )}
               />
               {label}
@@ -132,10 +132,10 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
                 "w-7 h-7",
                 "min-w-7",
                 "mr-5",
-                "glass-icon",
-                isPageActive && "glass-icon--active",
-                "group-hover:glass-icon--hover",
-                "group-focus:glass-icon--hover",
+                "styled-icon",
+                isPageActive
+                  ? "styled-icon--active"
+                  : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
               )}
             />
             {label}
