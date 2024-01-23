@@ -9,11 +9,17 @@ import { ReactComponent as ContactsIcon } from "app/icons/Contacts.svg";
 import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
+import { ReactComponent as ActivityIcon } from "app/icons/Activity.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
+import { useSetAtom } from "jotai";
+import { activityModalAtom } from "app/atoms";
+import { useActivityBadge } from "app/hooks";
 
 const useSidebarLinks = () => {
   const { alert } = useDialog();
+  const setActivityOpened = useSetAtom(activityModalAtom);
+  const showActivityBadge = useActivityBadge();
 
   const NavLinksPrimary = useMemo(() => {
     return [
@@ -23,13 +29,19 @@ const useSidebarLinks = () => {
         Icon: OverviewIcon,
       },
       {
+        label: "Activity",
+        Icon: ActivityIcon,
+        action: () => setActivityOpened([true, "replace"]),
+        badge: showActivityBadge,
+      },
+      {
         route: Page.Receive,
-        label: "Receive",
+        label: "Buy",
         Icon: ReceiveIcon,
       },
       {
         route: Page.Transfer,
-        label: "Transfer",
+        label: "Send",
         Icon: SendIcon,
       },
       {
@@ -44,16 +56,16 @@ const useSidebarLinks = () => {
         Icon: AppsIcon,
         soon: true,
       },
+    ];
+  }, [showActivityBadge, setActivityOpened]);
+
+  const NavLinksSecondary = useMemo(() => {
+    return [
       {
         route: Page.Contacts,
         label: "Contacts",
         Icon: ContactsIcon,
       },
-    ];
-  }, []);
-
-  const NavLinksSecondary = useMemo(() => {
-    return [
       {
         route: Page.Wallets,
         label: "Wallets",
