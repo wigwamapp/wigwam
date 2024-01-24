@@ -32,6 +32,8 @@ export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
   ReceiveTab.ShareAddress,
 );
 
+export const onRampModalAtom = atomWithURLHash("onRampOpened", false);
+
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
 export const activityModalAtom = atomWithURLHash("activityOpened", false);
