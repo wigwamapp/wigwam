@@ -10,6 +10,7 @@ export enum ActivityType {
   Signing = "SIGNING",
   AddNetwork = "ADD_NETWORK",
   AddToken = "ADD_TOKEN",
+  Ramp = "RAMP",
 }
 
 export enum SigningStandard {
@@ -58,7 +59,8 @@ export type Approval =
 export type Activity =
   | TransactionActivity
   | SigningActivity
-  | ConnectionActivity;
+  | ConnectionActivity
+  | RampActivity;
 
 export interface ActivityBase {
   id: string;
@@ -89,6 +91,30 @@ export interface SigningApproval extends ActivityBase {
   standard: SigningStandard;
   accountAddress: string;
   message: any;
+}
+
+export interface RampActivity extends ActivityBase {
+  partnerOrderId: string;
+  pending: 0 | 1;
+  type: ActivityType.Ramp;
+  kind: "onramp" | "offramp";
+  accountAddress: `0x${string}`;
+  amountInCrypto: number;
+  amountInFiat: number;
+  amountInFiatUSD: number;
+  totalFee: number;
+  fiatCurrency: string;
+  cryptoCurrency: string;
+  network: string;
+  status: OnRampTxStatus;
+  statusReason: string;
+  paymentType: string;
+  tokenSlug: string;
+  chainId: number;
+  partner: "transak";
+  partnerOrder: object;
+  transactionHash?: string;
+  withError?: boolean;
 }
 
 export interface SigningActivity extends SigningApproval {
@@ -246,3 +272,15 @@ export type TokenActivityProject = {
   logoUrl?: string;
   siteUrl?: string;
 };
+
+export type OnRampTxStatus =
+  | "AWAITING_PAYMENT_FROM_USER"
+  | "PAYMENT_DONE_MARKED_BY_USER"
+  | "PROCESSING"
+  | "PENDING_DELIVERY_FROM_TRANSAK"
+  | "ON_HOLD_PENDING_DELIVERY_FROM_TRANSAK"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "FAILED"
+  | "REFUNDED"
+  | "EXPIRED";

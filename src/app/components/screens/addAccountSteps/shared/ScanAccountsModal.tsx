@@ -145,7 +145,7 @@ const ScanAccountsModal: FC<SecondaryModalProps> = ({
               isDisabled: false,
               isDefaultChecked: true,
               publicKey: toProtectedString(wallet.publicKey),
-              networks: [],
+              networks: [network.chainId],
             });
           }
         }),

@@ -51,3 +51,5 @@ export const LOAD_MORE_ON_CONTACTS_FROM_END = 15;
 export const LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END = 5;
 
 export const IS_FIREFOX = process.env.TARGET_BROWSER === "firefox";
+
+export const TRANSAK_SUPPORT_URL = "https://support.transak.com/";

@@ -38,7 +38,12 @@ const AddAccountModal = memo(() => {
 
   const handleBackButton = useCallback<MouseEventHandler<HTMLButtonElement>>(
     async (e) => {
-      if (accountStep === AddAccountStep.VerifySeedPhrase) {
+      if (
+        [
+          AddAccountStep.CreateSeedPhrase,
+          AddAccountStep.VerifySeedPhrase,
+        ].includes(accountStep)
+      ) {
         const res = await confirm({
           title: "Secret phrase creation",
           content: (
@@ -63,7 +68,9 @@ const AddAccountModal = memo(() => {
     async (open: boolean) => {
       if (
         [
+          AddAccountStep.CreateSeedPhrase,
           AddAccountStep.VerifySeedPhrase,
+          AddAccountStep.ImportSeedPhrase,
           AddAccountStep.ConfirmAccounts,
           AddAccountStep.SetupPassword,
         ].includes(accountStep)

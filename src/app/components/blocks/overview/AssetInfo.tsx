@@ -17,10 +17,11 @@ import {
   useChainId,
   useExplorerLink,
   useLazyNetwork,
+  useRamp,
   useTokenActivitiesSync,
 } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
-import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
+import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
 import IconedButton from "app/components/elements/IconedButton";
@@ -49,8 +50,10 @@ export enum TokenStandardValue {
 }
 
 const AssetInfo: FC = () => {
+  const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
   const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
+
   const { confirm } = useDialog();
 
   const chainId = useChainId();
@@ -78,6 +81,11 @@ const AssetInfo: FC = () => {
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const showBuyButton = useMemo(
+    () => tokenInfo?.status !== TokenStatus.Disabled && onRampCurrency,
+    [tokenInfo?.status, onRampCurrency],
+  );
 
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
@@ -267,21 +275,21 @@ const AssetInfo: FC = () => {
                 <SwapIcon className="w-6 h-auto mr-2" />
                 Swap
               </Button>
-              {status === TokenStatus.Native && (
+              {showBuyButton ? (
                 <Button
                   to={{
-                    page: Page.Receive,
-                    receive: ReceiveTabEnum.BuyWithCrypto,
+                    onRampOpened: true,
+                    token: tokenSlug,
                   }}
+                  merge
                   theme="secondary"
                   className="grow !py-2"
-                  disabled
                   title="Coming soon"
                 >
                   <BuyIcon className="w-6 h-auto mr-2" />
                   Buy
                 </Button>
-              )}
+              ) : null}
             </div>
 
             <TokenActivity token={tokenInfo!} />

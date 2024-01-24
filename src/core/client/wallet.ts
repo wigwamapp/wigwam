@@ -281,3 +281,12 @@ export async function getCgPlatformIds() {
 
   return res.cgPlatformIds;
 }
+
+export async function getOnRampCurrencies() {
+  const type = MessageType.GetOnRampCurrencies;
+
+  const res = await porter.request({ type });
+  assert(res?.type === type);
+
+  return res.currencies;
+}

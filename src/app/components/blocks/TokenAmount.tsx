@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
@@ -21,24 +21,55 @@ type TokenAmountProps = {
     slug: string;
     amount?: string;
   };
+  rawAmount?: boolean;
   isSmall?: boolean;
   className?: string;
 };
 
 const TokenAmount = memo<TokenAmountProps>(
-  ({ accountAddress, token: { slug, amount }, isSmall = false, className }) => {
+  ({
+    accountAddress,
+    token: { slug, amount },
+    rawAmount = false,
+    isSmall = false,
+    className,
+  }) => {
     const tokenInfo = useToken(accountAddress, slug);
+
+    const getUSDEquivalent = useCallback(
+      (
+        isRaw: boolean,
+        decimals: number,
+        amountCrypto?: string,
+        priceUSD?: string,
+      ) => {
+        if (amountCrypto) {
+          if (isRaw) {
+            if (priceUSD) {
+              return new BigNumber(amountCrypto).times(priceUSD);
+            }
+          } else {
+            return new BigNumber(amountCrypto)
+              .div(new BigNumber(10).pow(decimals))
+              .multipliedBy(priceUSD ?? 0);
+          }
+        }
+        return null;
+      },
+      [],
+    );
 
     if (!tokenInfo) return null;
 
     if (tokenInfo.tokenType === TokenType.Asset) {
       const { name, symbol, decimals, priceUSD } = tokenInfo;
 
-      const usdAmount = amount
-        ? new BigNumber(amount)
-            .div(new BigNumber(10).pow(decimals))
-            .multipliedBy(priceUSD ?? 0)
-        : null;
+      const equivalentInUSD = getUSDEquivalent(
+        rawAmount,
+        decimals,
+        amount,
+        priceUSD,
+      );
 
       return (
         <div className={classNames("flex items-center", className)}>
@@ -54,7 +85,7 @@ const TokenAmount = memo<TokenAmountProps>(
             <>
               <PrettyAmount
                 amount={amount}
-                decimals={decimals}
+                decimals={!rawAmount ? decimals : undefined}
                 currency={symbol}
                 threeDots={false}
                 copiable
@@ -63,11 +94,11 @@ const TokenAmount = memo<TokenAmountProps>(
                   "font-bold",
                 )}
               />
-              {usdAmount !== undefined && (
+              {equivalentInUSD !== null && (
                 <>
                   <Dot isSmall={isSmall} />
                   <FiatAmount
-                    amount={usdAmount}
+                    amount={equivalentInUSD}
                     threeDots={false}
                     copiable
                     className={classNames(
