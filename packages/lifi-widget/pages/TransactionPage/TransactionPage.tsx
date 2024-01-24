@@ -200,18 +200,18 @@ export const TransactionPage: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    console.log('Unmount status', status)
-    console.log('Unmount flag', restartFlag)
-    console.log('Route')
-    return () => {
-      console.log('Unmount status', status)
-      console.log('Unmount flag', restartFlag)
-      if (status === RouteExecutionStatus.Failed) {
-        deleteRoute()
-      }
-    }
-  }, [status, route])
+  // useEffect(() => {
+  //   console.log('Unmount status', status)
+  //   console.log('Unmount flag', restartFlag)
+  //   console.log('Route')
+  //   return () => {
+  //     console.log('Unmount status', status)
+  //     console.log('Unmount flag', restartFlag)
+  //     if (status === RouteExecutionStatus.Failed) {
+  //       deleteRoute()
+  //     }
+  //   }
+  // }, [status, route])
 
 
 
