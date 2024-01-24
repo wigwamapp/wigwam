@@ -77,7 +77,8 @@ export const SelectEnabledToolsPage: React.FC<{
           paddingRight: 1.5,
           maxHeight: '100%',
           overflowX: 'hidden',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          marginTop: '22px'
         }}
       >
         {tools?.[typeKey].map((tool) => (

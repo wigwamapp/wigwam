@@ -17,7 +17,7 @@ export const StepProcess: React.FC<{
           display: 'flex',
           alignItems: 'center',
           marginBottom: '8px',
-          marginLeft: '12px'
+          marginLeft: '9px',
         }}
       >
         <CircularProgress process={process} size={24} />

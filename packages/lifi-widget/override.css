@@ -240,6 +240,6 @@ div::-webkit-scrollbar-thumb {
   color: #000;
 }
 
-.MuiCollapse-wrapperInner > div {
+/* .MuiCollapse-wrapperInner > div {
   height: 100%;
-}
+} */
