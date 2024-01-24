@@ -278,8 +278,8 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         ref={scrollAreaRef}
         hiddenScrollbar="horizontal"
         className="pr-5 -mr-5 mt-4"
-        viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-        scrollBarClassName="py-0 pb-20"
+        viewPortClassName="rounded-t-[.625rem] viewportBlock"
+        scrollBarClassName="py-0"
       >
         <AddTokenBanner
           isNftsSelected={isNftsSelected}
