@@ -21,8 +21,8 @@ export const SettingsPage = () => {
       case null:
         return (
           <>
-            <Box px={3} pt={1}>
-                <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px'}}>
+            <Box sx={{paddingLeft: '24px'}}>
+                <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', paddingTop: '12px'}}>
                   <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
                   <Typography color={'#fff'} fontSize={16} fontWeight={600}>Settings</Typography>
                 </div>
@@ -47,21 +47,25 @@ export const SettingsPage = () => {
       case 'bridges':
         return (
           <div style={{paddingLeft: '24px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', paddingBottom: '14px'}}>
+            <div style={{display: 'flex', justifyContent: 'flex-start', position: 'fixed', zIndex: '10', background: '#181a1f', alignItems: 'center', paddingBottom: '14px', paddingTop: '12px', width: '321px'}}>
               <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
               <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Bridges</Typography>
             </div>
-            <SelectEnabledToolsPage type="Bridges" />
+            <div style={{paddingTop: '22px'}}>
+              <SelectEnabledToolsPage type="Bridges" />
+            </div>
           </div>
         )
       case 'exchanges':
         return (
           <div style={{paddingLeft: '24px'}}>
-            <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', paddingBottom: '14px'}}>
+            <div style={{display: 'flex', justifyContent: 'flex-start', position: 'fixed', zIndex: '10', background: '#181a1f', alignItems: 'center', paddingBottom: '14px', paddingTop: '12px',  width: '321px'}}>
               <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
               <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Exchanges</Typography>
             </div>
-            <SelectEnabledToolsPage type="Exchanges" />
+            <div style={{paddingTop: '22px'}}>
+              <SelectEnabledToolsPage type="Exchanges" />
+            </div>
           </div>
         )
 
@@ -69,7 +73,7 @@ export const SettingsPage = () => {
   }
 
   return (
-    <Container disableGutters sx={{width: '340px', paddingTop: '12px'}}>
+    <Container disableGutters sx={{width: '340px'}}>
         {renderContent()}
     </Container>
   );

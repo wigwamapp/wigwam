@@ -13,7 +13,7 @@ const timeout = { enter: 225, exit: 225, appear: 0 };
 export const TransactionPageExpanded = () => {
   const element = useMatch('/');
   return (
-    <CollapseContainer style={{overflow: 'auto'}}>
+    <CollapseContainer sx={{ overflowY: 'auto', overflowX: 'hidden'}}>
       <Collapse timeout={timeout} in={!!element} orientation="horizontal">
         <Grow timeout={timeout} in={!!element} mountOnEnter unmountOnExit>
           <div>

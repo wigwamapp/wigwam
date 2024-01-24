@@ -131,6 +131,8 @@ export const NavigationHeader: React.FC = () => {
                     <IconButton
                       size="small"
                       edge="start"
+                      disableRipple
+                      className='withHover'
                       sx={{
                         background: '#2C3036',
                         borderRadius: '4px',
@@ -150,7 +152,8 @@ export const NavigationHeader: React.FC = () => {
                 <Tooltip title={t(`header.settings`)} enterDelay={400} arrow>
                   <IconButton
                     size="small"
-                    
+                    disableRipple
+                    className='withHover'
                     onClick={() => search.includes('settings') ? navigate(`${pathname}`) : navigate(`${pathname}?tab=settings`)}
                     sx={{
                       background: '#2C3036',

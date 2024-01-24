@@ -7,19 +7,18 @@ import { Card } from '../../components/Card';
 import { Token, TokenDivider } from '../../components/Token';
 import { RouteExecutionStatus } from '../../stores/routes/types';
 import {  useRouteExecution } from '../../hooks';
+import { useEffect } from 'react';
 
 export const TransactionHistoryItem: React.FC<{
   route: Route;
   status: RouteExecutionStatus | null,
-  routeId?: string,
-}> = ({ route, status, routeId = null }) => {
+}> = ({ route, status }) => {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
 
-  // const { route: activeRoute, status: activeStatus } = useRouteExecution({
-  //   routeId,
-  //   executeInBackground: true,
-  // });
+  const { deleteRoute } = useRouteExecution({
+    routeId: route.id,
+  });
 
   const handleClick = () => {
     if (route) {

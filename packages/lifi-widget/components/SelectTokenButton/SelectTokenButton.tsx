@@ -52,7 +52,7 @@ export const SelectTokenButton: React.FC<
   return (
     <Card flex={1} onClick={onClick} sx={{border: 'none', background: 'none'}}>
       <CardTitle sx={{paddingLeft: '0px !important'}}>{cardTitle}</CardTitle>
-      <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px', position: 'relative'}}>
+      <div className="selectTokenButton" style={{background: '#22262A', borderRadius: '10px', marginTop: '8px', position: 'relative'}}>
         {chainId && tokenAddress && (isChainLoading || isTokenLoading) ? (
           <SelectTokenCardHeader
             avatar={<Skeleton variant="circular" width={44} height={44} />}
@@ -69,15 +69,15 @@ export const SelectTokenButton: React.FC<
                   <TokenAvatarDefault />
               )
             }
-            title={isSelected ? token.symbol : defaultPlaceholder}
+            title={isSelected ? <span style={{fontWeight: '700', color: '#FFF'}}>{token.symbol}</span> : <span style={{fontWeight: '700', color: '#8D9C9E'}}>{defaultPlaceholder}</span>}
             subheader={
-              isSelected ? t(`main.onChain`, { chainName: chain.name }) : 'and Token'
+              isSelected ? <span style={{fontWeight: '400', fontSize: '12px', color: '#8D9C9E'}}>{t(`main.onChain`, { chainName: chain.name })}</span> : <span style={{fontWeight: '400', fontSize: '12px', color: '#8D9C9E'}}>and Token</span>
             }
             selected={isSelected}
             compact={compact}
           />
         )}
-        <div style={{position: 'absolute', right: '16px', bottom: 'calc(50% - 8px)'}}>
+        <div className="swapArrowIcon" style={{position: 'absolute', right: '16px', bottom: 'calc(50% - 8px)'}}>
           <svg xmlns="http://www.w3.org/2000/svg" width="8" height="13" viewBox="0 0 8 13" fill="none">
             <path d="M7.71191 6.15453L1.70191 0.144531L0.286912 1.55853L4.88691 6.15853L0.286912 10.7585L1.70191 12.1655L7.71191 6.15453Z" fill="#F8F9FD"/>
           </svg>

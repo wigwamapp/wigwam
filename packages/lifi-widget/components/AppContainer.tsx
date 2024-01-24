@@ -5,7 +5,7 @@ import { useWidgetConfig } from '../providers';
 import type { WidgetVariant } from '../types';
 import { ElementId, createElementId } from '../utils';
 
-export const maxHeight = '75vh';
+export const maxHeight = '100%';
 
 export const AppExpandedContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'variant',
@@ -58,7 +58,7 @@ export const AppContainer: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const { containerStyle, variant, elementId } = useWidgetConfig();
   return (
     <RelativeContainer
-      sx={{...containerStyle, borderRight: '1px solid #21262A'}}
+      sx={{...containerStyle, borderRight: '1px solid #21262A', borderRadius: '0px'}}
       variant={variant}
       id={createElementId(ElementId.RelativeContainer, elementId)}
     >

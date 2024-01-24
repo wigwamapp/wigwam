@@ -12,6 +12,7 @@ export const TransactionHistoryEmpty: React.FC = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        maxWidth: '500px !important',
         paddingY: 12,
       }}
     >

@@ -187,6 +187,7 @@ export const useRouteExecution = ({
   );
 
   const restartRouteMutation = useCallback(() => {
+    resumedAfterMount.current = false
     restartRoute(routeId);
     resumeRoute(routeExecution?.route);
     // eslint-disable-next-line react-hooks/exhaustive-deps

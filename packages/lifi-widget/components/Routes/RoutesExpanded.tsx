@@ -26,10 +26,10 @@ const timeout = { enter: 225, exit: 225, appear: 0 };
 export const RoutesExpanded = () => {
   const element = useMatch('/');
   return (
-    <CollapseContainer>
-      <Collapse timeout={timeout} in={!!element} orientation="horizontal">
-        <Grow timeout={timeout} in={!!element} mountOnEnter unmountOnExit>
-          <div>
+    <CollapseContainer sx={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', marginLeft: '0 !important'}}>
+      <Collapse timeout={timeout} in={!!element} orientation="horizontal" sx={{height: '100%', marginLeft: '0 !important'}}>
+        <Grow timeout={timeout} in={!!element} mountOnEnter unmountOnExit style={{marginLeft: '0px'}}>
+          <div style={{marginLeft: '0px'}}>
             <RoutesExpandedElement />
           </div>
         </Grow>
@@ -91,9 +91,9 @@ export const RoutesExpandedElement = () => {
   const routeNotFound = !currentRoute && !isLoading && !isFetching && expanded;
 
   return (
-    <Collapse timeout={timeout.enter} in={expanded} orientation="horizontal">
+    <Collapse timeout={timeout.enter} in={expanded} orientation="horizontal" style={{marginLeft: '0px'}}>
       <Grow timeout={timeout.enter} in={expanded} mountOnEnter unmountOnExit>
-        <Container sx={containerStyle} enableColorScheme>
+        <Container sx={{...containerStyle, width: '500px', marginLeft: '0px !important', borderRight: '1px solid #21262A'}} enableColorScheme>
           <ScrollableContainer>
             <Header>
               <Typography fontSize={16} color={'#fff'} fontWeight="600" flex={1} noWrap>

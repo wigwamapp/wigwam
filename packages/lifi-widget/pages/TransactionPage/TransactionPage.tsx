@@ -52,7 +52,7 @@ export const TransactionPage: React.FC = () => {
   const headerStoreContext = useHeaderStoreContext();
   const stateRouteId = state?.routeId;
   const [routeId, setRouteId] = useState<string>(stateRouteId);
-
+  const [restartFlag, setRestartFlag] = useState(false)
   const navigate = useNavigate()
 
   if (!stateRouteId) {
@@ -90,7 +90,8 @@ export const TransactionPage: React.FC = () => {
   }, [headerStoreContext, route, status, subvariant, t]);
 
   useEffect(() => {
-    if (status === RouteExecutionStatus.Idle) {
+    if (status === RouteExecutionStatus.Idle && !restartFlag) {
+      console.log('HANDLE START CLICK')
       emitter.emit(WidgetEvent.ReviewTransactionPageEntered, route);
       handleStartClick()
     }
@@ -136,6 +137,8 @@ export const TransactionPage: React.FC = () => {
       }
     }
     if (status === RouteExecutionStatus.Failed) {
+      console.log('RESTART ROUTE')
+      setRestartFlag(true);
       restartRoute();
     }
   };
@@ -200,16 +203,18 @@ export const TransactionPage: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      if (status === 4) {
+      console.log('Unmount status', status)
+      console.log('Unmount flag', restartFlag)
+      if (status === 4 || status === 0 ) {
         deleteRoute()
       }
     }
-  }, [status])
+  }, [])
 
 
 
   return (
-    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: 'calc(90vh - 58px)', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
+    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: '100%', overflowX: 'hidden', overflowY: 'auto', borderRight: '1px solid #21262A'}}>
       <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigate('/')}/>
         <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Swap</Typography>
@@ -272,7 +277,7 @@ export const TransactionPage: React.FC = () => {
           </Box>
         </>
       ) : null}
-      {status ? <StatusBottomSheet status={status} route={route} /> : null}
+      {/* {status ? <StatusBottomSheet status={status} route={route} /> : null} */}
       {tokenValueLossThresholdExceeded && subvariant !== "nft" ? (
         <TokenValueBottomSheet
           route={route}

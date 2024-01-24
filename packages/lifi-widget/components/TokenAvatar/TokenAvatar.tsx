@@ -87,11 +87,12 @@ export const TokenAvatarDefault: React.FC<{
   return (
     <Badge
       overlap="circular"
+      className='preventHoverEffect'
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      badgeContent={<AvatarDefaultBadge width={16} height={16} sx={{border: 'none'}} className='withHover' />}
+      badgeContent={<AvatarDefaultBadge width={16} height={16} sx={{border: '2px solid #2B3037', background: '#4C585F'}} />}
       sx={sx}
     >
-      <AvatarDefault width={44} height={44} className='withHover'/>
+      <AvatarDefault width={44} height={44} sx={{background: '#4C585F'}} className='preventHoverEffect' />
     </Badge>
   );
 };

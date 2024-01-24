@@ -130,8 +130,8 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
   };
 
   return (
-    <Container sx={{width: '500px', position: 'relative', marginLeft: '0px', paddingTop: '0', maxHeight: 'calc(90vh - 58px)', overflowX: 'scroll', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex', width: '460px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', background: '#181a1f'}}>
+    <Container sx={{width: '500px', position: 'relative', marginLeft: '0px', paddingTop: '0', maxHeight: '100%', overflowX: 'hidden', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex', width: '460px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', background: '#181a1f', marginTop: '-1px'}}>
           <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Transaction info</Typography>
           <div onClick={() => navigateBack()} style={{cursor: 'pointer'}}>
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">

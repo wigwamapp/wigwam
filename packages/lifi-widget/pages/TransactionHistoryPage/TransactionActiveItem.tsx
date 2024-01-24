@@ -1,5 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import type { Route } from '@lifi/sdk';
+import { useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -70,6 +71,28 @@ export const TransactionActiveItem: React.FC<{
         hour12: true,
       }).format(date);
     };
+
+
+    useEffect(() => {
+      console.log(status)
+      if (status !== RouteExecutionStatus.Done) {
+        console.log('NOT DONE')
+        // Get the current time
+        const currentTime: Date = new Date();
+
+        // Calculate the time difference in milliseconds
+        const timeDifference: number = currentTime.getTime() - startedAt.getTime();
+
+        // Convert milliseconds to hours
+        const hoursDifference: number = timeDifference / (1000 * 60 * 60);
+        // Check if the time difference is greater than 6 hours
+        const isMoreThan6Hours: boolean = hoursDifference > 6;
+        if (isMoreThan6Hours) {
+          console.log('deleteRoute')
+          deleteRoute()
+        }
+      }
+    }, [])
 
     return (
       <Card 
