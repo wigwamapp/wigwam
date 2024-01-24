@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -53,6 +53,7 @@ type SidebarBlockProps = {
     Icon: FC<{ className?: string }>;
     route?: Page;
     soon?: boolean;
+    badge?: boolean;
     action?: () => void;
   }[];
   className?: string;
@@ -65,7 +66,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 
   return (
     <div className={classNames("flex flex-col", className)}>
-      {links.map(({ route, label, Icon, action, soon }) => {
+      {links.map(({ route, label, Icon, action, soon, badge }) => {
         const isPageActive = route === page;
         const notificationBadge = route === Page.Settings && updateAvailable;
 
@@ -89,17 +90,18 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
                 "last:mb-0",
               )}
             >
-              <Icon
-                className={classNames(
-                  "w-7 h-7",
-                  "min-w-7",
-                  "mr-5",
-                  "styled-icon",
-                  isPageActive
-                    ? "styled-icon--active"
-                    : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
-                )}
-              />
+              <BadgeWrapper showBadge={badge}>
+                <Icon
+                  className={classNames(
+                    "w-7 h-7",
+                    "min-w-7",
+                    "styled-icon",
+                    isPageActive
+                      ? "styled-icon--active"
+                      : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
+                  )}
+                />
+              </BadgeWrapper>
               {label}
             </Button>
           );
@@ -127,17 +129,18 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               "last:mb-0",
             )}
           >
-            <Icon
-              className={classNames(
-                "w-7 h-7",
-                "min-w-7",
-                "mr-5",
-                "styled-icon",
-                isPageActive
-                  ? "styled-icon--active"
-                  : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
-              )}
-            />
+            <BadgeWrapper showBadge={badge}>
+              <Icon
+                className={classNames(
+                  "w-7 h-7",
+                  "min-w-7",
+                  "styled-icon",
+                  isPageActive
+                    ? "styled-icon--active"
+                    : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
+                )}
+              />
+            </BadgeWrapper>
             {label}
             {notificationBadge && (
               <div className="ml-1.5 h-5">
@@ -157,3 +160,20 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 const withTokenSlug = (page: Page, tokenSlug: string | null) =>
   (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
   tokenSlug;
+
+export const BadgeWrapper: FC<{
+  showBadge: boolean | undefined;
+  children: ReactNode | ReactNode[];
+}> = ({ showBadge, children }) => (
+  <div
+    className={classNames(
+      "mr-5 relative",
+      showBadge && [
+        "after:content-[' '] after:absolute after:right-[1px] after:top-0 after:h-2 after:w-2",
+        "after:bg-brand-redtwo after:rounded-full",
+      ],
+    )}
+  >
+    {children}
+  </div>
+);
