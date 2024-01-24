@@ -222,7 +222,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
         </Typography>
       </Box>
       <Box mt={1}>
-        {(routeExecution?.status === RouteExecutionStatus.Pending) && (
+        {(routeExecution?.status === RouteExecutionStatus.Pending || routeExecution?.status === RouteExecutionStatus.Failed) && (
           <Button sx={{borderRadius: '6px', width: '100%', marginBottom: '8px'}} onClick={() => handleRestart()}>Restart</Button>
         )}
         <ContactSupportButton supportId={supportId} />
