@@ -740,9 +740,8 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
 
   const name = useMemo(() => {
     if (
-      (item.type === ActivityType.Transaction && item.source.type === "self") ||
-      (item.type === ActivityType.Transaction &&
-        item.txAction?.type === TxActionType.TokenTransfer)
+      item.type === ActivityType.Transaction &&
+      item.txAction?.type === TxActionType.TokenTransfer
     ) {
       return "Transfer";
     }
