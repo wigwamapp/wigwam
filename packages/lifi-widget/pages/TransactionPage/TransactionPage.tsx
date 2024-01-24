@@ -207,7 +207,7 @@ export const TransactionPage: React.FC = () => {
     return () => {
       console.log('Unmount status', status)
       console.log('Unmount flag', restartFlag)
-      if (status === RouteExecutionStatus.Failed || status === RouteExecutionStatus.Idle) {
+      if (status === RouteExecutionStatus.Failed) {
         deleteRoute()
       }
     }
