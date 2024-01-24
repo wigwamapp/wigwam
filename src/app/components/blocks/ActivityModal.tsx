@@ -1235,7 +1235,7 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
           href={
             item.source.type === "self" &&
             item.source.kind === SelfActivityKind.Swap
-              ? explorerLink.lifi(item.txHash)
+              ? explorerLink.lifi((item as TransactionActivity).txHash)
               : explorerLink.tx((item as TransactionActivity).txHash)
           }
         />
