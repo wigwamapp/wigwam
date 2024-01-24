@@ -86,9 +86,8 @@ export const TransactionActiveItem: React.FC<{
         // Convert milliseconds to hours
         const hoursDifference: number = timeDifference / (1000 * 60 * 60);
         // Check if the time difference is greater than 6 hours
-        const isMoreThan6Hours: boolean = hoursDifference > 6;
-        if (isMoreThan6Hours) {
-          console.log('deleteRoute')
+        const isMoreThan2Hour: boolean = hoursDifference > 2;
+        if (isMoreThan2Hour) {
           deleteRoute()
         }
       }

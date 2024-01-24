@@ -91,7 +91,6 @@ export const TransactionPage: React.FC = () => {
 
   useEffect(() => {
     if (status === RouteExecutionStatus.Idle && !restartFlag) {
-      console.log('HANDLE START CLICK')
       emitter.emit(WidgetEvent.ReviewTransactionPageEntered, route);
       handleStartClick()
     }
@@ -202,14 +201,17 @@ export const TransactionPage: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log('Unmount status', status)
+    console.log('Unmount flag', restartFlag)
+    console.log('Route')
     return () => {
       console.log('Unmount status', status)
       console.log('Unmount flag', restartFlag)
-      if (status === 4 || status === 0 ) {
+      if (status === RouteExecutionStatus.Failed || status === RouteExecutionStatus.Idle) {
         deleteRoute()
       }
     }
-  }, [])
+  }, [status, route])
 
 
 
