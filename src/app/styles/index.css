@@ -84,7 +84,7 @@ a {
 
 @layer utilities {
   svg.styled-icon * {
-    @apply transition-all duration-300 ease-in;
+    @apply transition-all duration-200 ease-in;
   }
 
   .styled-icon {
