@@ -133,7 +133,6 @@ export const RouteCardEssentials: React.FC<RouteCardEssentialsProps> = ({
             </clipPath>
             </defs>
           </svg>
-            {/* <AccessTimeIcon fontSize="small" /> */}
           </IconTypography>
           <Typography
             fontSize={14}
