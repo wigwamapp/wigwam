@@ -4,7 +4,7 @@ import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
-import { ReactComponent as AppsIcon } from "app/icons/Apps.svg";
+// import { ReactComponent as AppsIcon } from "app/icons/Apps.svg";
 import { ReactComponent as ContactsIcon } from "app/icons/Contacts.svg";
 import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
@@ -50,12 +50,12 @@ const useSidebarLinks = () => {
         Icon: SwapIcon,
         soon: true,
       },
-      {
-        route: Page.Apps,
-        label: "Apps",
-        Icon: AppsIcon,
-        soon: true,
-      },
+      // {
+      //   route: Page.Apps,
+      //   label: "Apps",
+      //   Icon: AppsIcon,
+      //   soon: true,
+      // },
     ];
   }, [showActivityBadge, setActivityOpened]);
 
