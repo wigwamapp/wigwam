@@ -502,12 +502,12 @@ const ActivityCard = memo(
             <ActivityIcon item={item} className="mr-6" />
 
             {status ? (
-              <div className={classNames("flex flex-col", "w-[8rem] mr-8")}>
+              <div className={classNames("flex flex-col", "w-[9rem] mr-8")}>
                 <ActivityTypeLabel item={item} />
                 <ActivityTypeStatus status={status} className="mt-0.5 ml-7" />
               </div>
             ) : (
-              <ActivityTypeLabel item={item} className="w-[8rem] mr-8" />
+              <ActivityTypeLabel item={item} className="w-[9rem] mr-8" />
             )}
 
             {item.type === ActivityType.Transaction && (
@@ -521,14 +521,14 @@ const ActivityCard = memo(
             {item.source.type === "page" && (
               <ActivityWebsiteLink
                 source={item.source}
-                className="w-[8rem] mr-8"
+                className="w-[9rem] mr-8"
               />
             )}
 
             {item.type === ActivityType.Connection && (
               <DisconnectDApp
                 item={item}
-                className="w-[8rem] mr-8"
+                className="w-[9rem] mr-8"
                 setRevokedPermission={setRevokedPermission}
               />
             )}
@@ -539,7 +539,7 @@ const ActivityCard = memo(
                   source={item.source}
                   action={item.txAction}
                   accountAddress={item.accountAddress}
-                  className="w-[8rem] mr-8"
+                  className="w-[9rem] mr-8"
                 />
               </ChainIdProvider>
             )}
