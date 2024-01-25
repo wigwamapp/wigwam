@@ -8,7 +8,8 @@ import {
   AppExpandedContainer,
   FlexContainer,
 } from './components/AppContainer';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useWatch } from 'react-hook-form';
 
 import { Header } from './components/Header';
 import { Initializer } from './components/Initializer';
@@ -19,9 +20,10 @@ import { TransactionDetailsPageExpanded } from './pages/TransactionDetailsPage/T
 import { SettingsPageExpanded } from './pages/SettingsPage/SettingsPageExpanded';
 import { TransactionPageExpanded } from './pages/TransactionPage/TransactionPageExpanded'
 import { useExpandableVariant } from './hooks';
-import { useWidgetConfig } from './providers';
+import { useWidgetConfig, FormKey } from './providers';
 import type { WidgetConfig, WidgetProps } from './types';
 import { ElementId, createElementId } from './utils';
+
 
 import './override.css';
 
@@ -51,6 +53,17 @@ export const AppDefault = () => {
   const { elementId } = useWidgetConfig();
   const expandable = useExpandableVariant();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [fromToken, toToken, fromAmount] = useWatch({
+    name: [FormKey.FromToken, FormKey.ToToken, FormKey.FromAmount],
+  });
+
+  useEffect(() => {
+    if (fromToken && toToken && fromAmount) {
+      navigate('/')
+    }
+  }, [fromToken, toToken, fromAmount])
 
   return (
     <AppExpandedContainer
@@ -64,7 +77,7 @@ export const AppDefault = () => {
         <PoweredBy />
         <Initializer />
       </AppContainer>
-      {(expandable && !location.search.includes("transactionProcessing") && !location.search.includes("transactionHistory") && !location.search.includes("transactionDetails")) ?  <RoutesExpanded /> : null}
+      {(expandable && !location.search.includes("settings") && !location.search.includes("transactionProcessing") && !location.search.includes("transactionHistory") && !location.search.includes("transactionDetails")) ?  <RoutesExpanded /> : null}
       {(expandable && location.search.includes("transactionHistory")) ? <TransactionHistoryPageExpanded /> : null}
       {(expandable && location.search.includes("transactionDetails")) ? <TransactionDetailsPageExpanded /> : null}
       {(expandable && location.search.includes("settings")) ? <SettingsPageExpanded /> : null}

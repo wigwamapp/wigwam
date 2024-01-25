@@ -132,6 +132,9 @@ export const TokenListItemButton: React.FC<TokenListItemButtonProps> = ({
                 <IconButton
                   size="small"
                   LinkComponent={Link}
+                  disableRipple
+                  disableFocusRipple
+                  className='preventHoverEffect'
                   href={`${chain?.metamask.blockExplorerUrls[0]}address/${token.address}`}
                   target="_blank"
                   rel="nofollow noreferrer"

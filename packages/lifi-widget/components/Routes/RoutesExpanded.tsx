@@ -27,7 +27,7 @@ export const RoutesExpanded = () => {
   const element = useMatch('/');
   return (
     <CollapseContainer sx={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', marginLeft: '0 !important'}}>
-      <Collapse timeout={timeout} in={!!element} orientation="horizontal" sx={{height: '100%', marginLeft: '0 !important'}}>
+      <Collapse timeout={timeout} in={!!element} orientation="horizontal" sx={{height: '100%', marginLeft: '0 !important', borderRight: '1px solid #21262A'}}>
         <Grow timeout={timeout} in={!!element} mountOnEnter unmountOnExit style={{marginLeft: '0px'}}>
           <div style={{marginLeft: '0px'}}>
             <RoutesExpandedElement />
@@ -93,7 +93,7 @@ export const RoutesExpandedElement = () => {
   return (
     <Collapse timeout={timeout.enter} in={expanded} orientation="horizontal" style={{marginLeft: '0px'}}>
       <Grow timeout={timeout.enter} in={expanded} mountOnEnter unmountOnExit>
-        <Container sx={{...containerStyle, width: '500px', marginLeft: '0px !important', borderRight: '1px solid #21262A'}} enableColorScheme>
+        <Container sx={{...containerStyle, width: '500px', marginLeft: '0px !important'}} enableColorScheme>
           <ScrollableContainer>
             <Header>
               <Typography fontSize={16} color={'#fff'} fontWeight="600" flex={1} noWrap>
@@ -113,6 +113,7 @@ export const RoutesExpandedElement = () => {
               flex={1}
               paddingX={3}
               paddingBottom={3}
+              height={'100%'}
             >
               {routeNotFound ? (
                 <RouteNotFoundCard />

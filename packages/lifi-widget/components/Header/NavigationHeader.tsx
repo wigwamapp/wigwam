@@ -86,7 +86,7 @@ export const NavigationHeader: React.FC = () => {
 
   return (
     <>
-      <HeaderAppBar elevation={0} style={{justifyContent: 'space-between'}} className='preventHover'>
+      <HeaderAppBar elevation={0} style={{justifyContent: 'space-between', paddingLeft: '0'}} className='preventHover'>
         {backButtonRoutes.includes(path) ? (
           <IconButton size="medium" edge="start" onClick={navigateBack}>
             <ArrowBackIcon />

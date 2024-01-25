@@ -10,13 +10,14 @@ export const FormControl = styled(MuiFormControl)(({ theme }) => ({
 }));
 
 export const Input = styled(InputBase)(({ theme }) => ({
-  fontSize: 18,
+  fontSize: '20px',
   fontWeight: 500,
   boxShadow: 'none',
   // padding: theme.spacing(2, 2, 2, 0),
   [`.${inputBaseClasses.input}`]: {
     height: 32,
     padding: theme.spacing(0, 0, 0, 2),
+    fontSize: '20px !important'
   },
   '& input[type="number"]::-webkit-outer-spin-button, & input[type="number"]::-webkit-inner-spin-button':
     {

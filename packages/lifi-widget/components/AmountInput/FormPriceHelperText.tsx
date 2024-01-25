@@ -46,12 +46,12 @@ export const FormPriceHelperTextBase: React.FC<
   return (
     <FormHelperText
       component="div"
-      sx={{ display: 'flex', justifyContent: 'space-between', margin: 0 }}
+      sx={{ display: 'flex', justifyContent: 'space-between', margin: 0, paddingTop: '6px' }}
     >
       <Typography
         color={fromAmountTokenPrice ? 'text.secondary' : 'grey.600'}
         fontWeight={400}
-        fontSize={12}
+        fontSize={14}
         marginLeft={2}
         lineHeight={1.3334}
         flex={1}
@@ -75,7 +75,7 @@ export const FormPriceHelperTextBase: React.FC<
       ) : token?.amount ? (
         <Typography
           fontWeight={400}
-          fontSize={12}
+          fontSize={14}
           color={'#717A7B'}
           lineHeight={1.3334}
           pl={0.25}

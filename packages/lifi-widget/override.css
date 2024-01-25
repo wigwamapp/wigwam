@@ -76,15 +76,19 @@ div::-webkit-scrollbar-thumb {
 }
 
 .routeEllips {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   background: #737c88;
   border-radius: 100%;
-  margin-right: 8px;
+  margin-right: 12px;
+  position: relative;
+  top: 2px;
 }
 
 .routeEllips svg {
   opacity: 0;
+  width: 18px;
+  height: 18px;
 }
 
 .routeEllips.selected {
@@ -160,7 +164,7 @@ div::-webkit-scrollbar-thumb {
   font-size: 14px;
 }
 
-.injectedContacts .flex {
+/* .injectedContacts .flex {
   padding-left: 0;
   padding-right: 0;
   color: #8d9c9e;
@@ -213,7 +217,7 @@ div::-webkit-scrollbar-thumb {
   background: #21262a;
   padding: 0px 10px;
   height: 44px;
-}
+} */
 
 .preventHoverEffect {
   pointer-events: none;
@@ -238,6 +242,16 @@ div::-webkit-scrollbar-thumb {
 
 .MuiButtonBase-root:hover {
   color: #000;
+}
+
+.closeButtonWrapper {
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.closeButtonWrapper:hover {
+  background: rgba(50, 59, 65, 0.4);
 }
 
 /* .MuiCollapse-wrapperInner > div {

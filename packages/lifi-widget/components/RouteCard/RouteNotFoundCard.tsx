@@ -12,6 +12,7 @@ export const RouteNotFoundCard: React.FC = () => {
         justifyContent: 'center',
         flexDirection: 'column',
         flex: 1,
+        height: '100%'
       }}
       py={1.625}
     >

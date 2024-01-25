@@ -28,7 +28,7 @@ export const ActiveTransactions: React.FC<BoxProps> = (props) => {
 
   return (
     <div style={{position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '15px'}}>
-      <Card onClick={handleShowAll} className='withHover' variant="selected" selectionColor="secondary" {...props} sx={{border: '1px solid #ffcf26', zIndex: 10, width: '100%', background: '#2B3037', cursor: 'pointer'}}>
+      <Card onClick={handleShowAll} className='withHover' variant="selected" selectionColor="secondary" {...props} sx={{border: '1px solid #ffcf26', zIndex: 10, width: '100%', background: '#2B3037', cursor: 'pointer', marginLeft: '0px'}}>
         <Stack sx={{paddingTop: '16px', paddingBottom: '16px'}}>
           {executingRoutes.slice(0, 1).map((routeId) => (
             <ActiveTransactionItem key={routeId} routeId={routeId} dense />

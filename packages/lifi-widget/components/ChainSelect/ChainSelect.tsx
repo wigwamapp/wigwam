@@ -72,7 +72,7 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
                   sx={{ width: '32px', height: '32px', marginRight: '12px' }}
                 >
                 </Avatar>
-                <Typography fontSize={14} sx={{fontWeight: '500 !important'}} color={'#C0C1C3'}>
+                <Typography fontSize={14} sx={{fontWeight: '500 !important', maxWidth: '75px'}} className='truncate' color={'#C0C1C3'}>
                   {chain.name}
                 </Typography>
                 </div>

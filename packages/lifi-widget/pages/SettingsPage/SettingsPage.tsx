@@ -23,8 +23,8 @@ export const SettingsPage = () => {
           <>
             <Box sx={{paddingLeft: '24px'}}>
                 <div style={{display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', paddingTop: '12px'}}>
-                  <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => navigateBack()}/>
-                  <Typography color={'#fff'} fontSize={16} fontWeight={600}>Settings</Typography>
+                  <img style={{marginRight: '24px', cursor: 'pointer'}} className='closeButtonWrapper' src={backIcon} onClick={() => navigateBack()}/>
+                  <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Settings</Typography>
                 </div>
                 <ColorSchemeButtonGroup />
                 {/* <LanguageSelect /> */}
@@ -48,8 +48,8 @@ export const SettingsPage = () => {
         return (
           <div style={{paddingLeft: '24px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-start', position: 'fixed', zIndex: '10', background: '#181a1f', alignItems: 'center', paddingBottom: '14px', paddingTop: '12px', width: '321px'}}>
-              <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
-              <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Bridges</Typography>
+              <img style={{marginRight: '24px', cursor: 'pointer'}} className='closeButtonWrapper' src={backIcon} onClick={() => setCurrentTab(null)}/>
+              <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Enabled Bridges</Typography>
             </div>
             <div style={{paddingTop: '22px'}}>
               <SelectEnabledToolsPage type="Bridges" />
@@ -60,8 +60,8 @@ export const SettingsPage = () => {
         return (
           <div style={{paddingLeft: '24px'}}>
             <div style={{display: 'flex', justifyContent: 'flex-start', position: 'fixed', zIndex: '10', background: '#181a1f', alignItems: 'center', paddingBottom: '14px', paddingTop: '12px',  width: '321px'}}>
-              <img style={{marginRight: '24px', cursor: 'pointer'}} src={backIcon} onClick={() => setCurrentTab(null)}/>
-              <Typography color={'#fff'} fontSize={16} fontWeight={600}>Enabled Exchanges</Typography>
+              <img style={{marginRight: '24px', cursor: 'pointer'}} className='closeButtonWrapper' src={backIcon} onClick={() => setCurrentTab(null)}/>
+              <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Enabled Exchanges</Typography>
             </div>
             <div style={{paddingTop: '22px'}}>
               <SelectEnabledToolsPage type="Exchanges" />

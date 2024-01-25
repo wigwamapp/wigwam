@@ -41,9 +41,12 @@ const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
   if (source.type === "self" && source.swapMeta) {
     const route = source.swapMeta;
     return (
-      <InfoRaw label={"Swap info"}>
+      <InfoRaw label={"Swap info"} flexAlignPosition="items-center">
         <div
-          className={classNames("flex items-center justify-center", "w-fit")}
+          className={classNames(
+            "flex flex-col items-center justify-center",
+            "w-fit",
+          )}
         >
           <div className="inline-flex">
             <PrettyAmount
@@ -60,7 +63,12 @@ const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
               className="ml-1 mr-2 w-4 h-4 rounded-full"
             />
           </div>
-          <div className={classNames("text-xs font-bold")}>{" →"}</div>
+          <div
+            className={classNames("text-xs font-bold")}
+            style={{ transform: "rotate(90deg)" }}
+          >
+            {" →"}
+          </div>
           <div className="inline-flex">
             <PrettyAmount
               amount={route.toAmount}
@@ -455,11 +463,18 @@ const getTokens = (action: TxAction) => {
 };
 
 type InfoRawProps = PropsWithChildren<{
+  flexAlignPosition?: string;
   label: string;
 }>;
 
-const InfoRaw: FC<InfoRawProps> = ({ label, children }) => (
-  <div className="py-3 pl-4 flex items-start justify-between">
+const InfoRaw: FC<InfoRawProps> = ({
+  label,
+  flexAlignPosition = "items-start",
+  children,
+}) => (
+  <div
+    className={`py-3 pl-4 flex ${flexAlignPosition} items-start justify-between`}
+  >
     <h3 className="text-sm mr-5">{label}</h3>
     {children}
   </div>

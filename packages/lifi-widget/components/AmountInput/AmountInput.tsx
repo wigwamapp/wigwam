@@ -38,10 +38,10 @@ export const AmountInput: React.FC<FormTypeProps & BoxProps> = ({
   const disabled = disabledUI?.includes(DisabledUI.FromAmount);
   return (
     <AmountInputBase
-    sx={{borderRadius: '10px !important'}}
+      sx={{borderRadius: '10px !important'}}
       formType={formType}
       token={token}
-      // startAdornment={<AmountInputStartAdornment formType={formType} />}
+      startAdornment={<AmountInputStartAdornment formType={formType} />}
       endAdornment={
         !disabled ? <AmountInputEndAdornment formType={formType} /> : undefined
       }
@@ -120,7 +120,7 @@ export const AmountInputBase: React.FC<
     <Card {...props} sx={{border: 'none', background: 'none', borderRadius: '10px !important', marginBottom: '24px'}}>
       <Typography sx={{paddingTop: '0px', paddingLeft: '0px !important', display: 'flex', justifyContent: formType === 'to' ? 'space-between' : 'flex-start'}}><div>{formType === "to" ? "You receive" : t('main.fromAmount')}</div> {(formType === "to" && currentRoute && value) && (<div style={{display: 'flex', fontWeight: '500'}}>via <img style={{width: '24px', height: '24px', borderRadius: '100%', margin: '0 4px 0 8px'}} src={currentRoute.steps[0].toolDetails.logoURI} /> <div style={{color: '#fff', }}>{currentRoute.steps[0].toolDetails.name}</div></div>)}</Typography>
       <div style={{background: '#16171C', borderRadius: '10px', marginTop: '8px', border: '1px solid #272C30'}}>
-      <FormControl fullWidth>
+      <FormControl fullWidth sx={{cursor: 'text'}} onClick={() => ref.current?.focus()}>
         <Input
           inputRef={ref}
           size="small"
@@ -136,7 +136,7 @@ export const AmountInputBase: React.FC<
           value={value}
           name={amountKey}
           disabled={disabled}
-          sx={{fontSize: '18px !important', fontWeight: '500'}}
+          sx={{fontSize: '20px !important', fontWeight: '500'}}
           required
         />
         {bottomAdornment}

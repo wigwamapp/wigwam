@@ -34,7 +34,7 @@ export const SendToWalletButton: React.FC = () => {
   };
 
   return (
-    <div style={{display: 'flex', justifyContent: 'space-between', marginRight: '24px', marginLeft: '24px', marginBottom: showSendToWallet ? '10px' : '24px'}}>
+    <div style={{display: 'flex', justifyContent: 'space-between', marginRight: '24px', marginLeft: '0', marginBottom: showSendToWallet ? '10px' : '24px'}}>
       <Typography color={'#fff'} fontSize={14} fontWeight={500}>Send to different address</Typography>
       <div className={`switcher ${showSendToWallet ? 'active' : 'unactive'}`} onClick={handleClick}>
         <div className='point' />

@@ -76,7 +76,7 @@ export const TokenBase: React.FC<TokenProps & BoxProps> = ({
           <Skeleton width={112} height={32} variant="text" />
         ) : (
           <div style={{display: 'flex', flexDirection: 'column'}}>
-            <div style={{fontSize: '14px', fontWeight: 500}}>
+            <div style={{fontSize: '16px', fontWeight: 800}}>
               {t('format.number', {
                 value: formattedTokenAmount,
               })} {token?.symbol}
