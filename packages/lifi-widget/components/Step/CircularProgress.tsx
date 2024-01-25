@@ -13,7 +13,7 @@ export function CircularProgress({ process, size }: { process: Process, size?: n
   return (
     <CircularIcon status={process.status} substatus={process.substatus}>
       {process.status === 'STARTED' || process.status === 'PENDING' ? (
-        <CircularProgressPending size={size ? size : 32} thickness={3} />
+        <CircularProgressPending size={size ? size : 25} sx={{marginLeft: '8px'}} thickness={3} />
       ) : null}
       {process.status === 'ACTION_REQUIRED' ? (
         <InfoRoundedIcon

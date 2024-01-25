@@ -55,8 +55,8 @@ export const TransactionHistoryPage: React.FC = () => {
   }
 
   return (
-    <Container sx={{width: '500px', paddingTop: '0', height: '100%', overflowY: 'auto', overflowX: 'hidden', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex', paddingTop: '12px', width: '460px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', background: '#181a1f', marginTop: '-1px'}}>
+    <Container sx={{width: '500px', paddingTop: '0', height: '100%', overflowY: 'auto', scrollbarGutter: 'stable', overflowX: 'hidden', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex', paddingTop: '12px', width: '460px', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', position: 'sticky', top: '-1px', paddingBottom: '10px', zIndex: '10', background: '#181a1f', marginTop: '-1px'}}>
           <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Transaction history</Typography>
           <div onClick={() => navigate('/')} style={{cursor: 'pointer'}} className='closeButtonWrapper'>
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
@@ -64,7 +64,7 @@ export const TransactionHistoryPage: React.FC = () => {
           </svg>
           </div>
       </div>
-      <Stack spacing={2} mt={1} sx={{marginTop: '54px'}}>
+      <Stack spacing={2} mt={1} sx={{marginTop: '14px'}}>
         {executingRoutes.length > 0 && (
           executingRoutes.map((routeId) => (
             <TransactionActiveItem key={routeId} routeId={routeId} />

@@ -13,12 +13,11 @@ export const ContactSupportButton = ({
   const { t } = useTranslation();
   const widgetEvents = useWidgetEvents();
 
+
   const handleClick = () => {
     if (!widgetEvents.all.has(WidgetEvent.RouteContactSupport)) {
-      
+      console.log('COPIED')
       const url = 'https://discord.gg/lifi';
-      const target = '_blank';
-      const rel = 'nofollow noreferrer';
 
       Object.assign(document.createElement('a'), {
         target: '_blank',
@@ -26,6 +25,7 @@ export const ContactSupportButton = ({
         href: url,
       }).click();
       // window.open(url, target, rel);
+
     } else {
       widgetEvents.emit(WidgetEvent.RouteContactSupport, { supportId });
     }

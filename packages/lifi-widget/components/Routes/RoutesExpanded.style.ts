@@ -9,6 +9,7 @@ export const CollapseContainer = styled(Box)(({ theme }) => ({
 
 export const ScrollableContainer = styled(Box)({
   overflowY: 'auto',
+  scrollbarGutter: 'stable',
   height: '100%',
   width: '100%',
   flex: 1,

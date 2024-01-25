@@ -26,7 +26,7 @@ const timeout = { enter: 225, exit: 225, appear: 0 };
 export const RoutesExpanded = () => {
   const element = useMatch('/');
   return (
-    <CollapseContainer sx={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', marginLeft: '0 !important'}}>
+    <CollapseContainer sx={{ overflowY: 'auto', scrollbarGutter: 'stable', overflowX: 'hidden', height: '100%', marginLeft: '0 !important'}}>
       <Collapse timeout={timeout} in={!!element} orientation="horizontal" sx={{height: '100%', marginLeft: '0 !important', borderRight: '1px solid #21262A'}}>
         <Grow timeout={timeout} in={!!element} mountOnEnter unmountOnExit style={{marginLeft: '0px'}}>
           <div style={{marginLeft: '0px'}}>

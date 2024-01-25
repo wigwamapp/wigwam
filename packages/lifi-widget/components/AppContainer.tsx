@@ -44,6 +44,7 @@ const CssBaselineContainer = styled(ScopedCssBaseline, {
   width: '100%',
   maxHeight: variant === 'drawer' ? 'none' : maxHeight,
   overflowY: 'auto',
+  scrollbarGutter: 'stable',
   height: '100%',
 }));
 

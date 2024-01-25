@@ -78,6 +78,7 @@ export const SelectEnabledToolsPage: React.FC<{
           maxHeight: '100%',
           overflowX: 'hidden',
           overflowY: 'auto',
+          scrollbarGutter: 'stable',
           marginTop: '22px'
         }}
       >

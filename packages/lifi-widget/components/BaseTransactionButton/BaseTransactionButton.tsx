@@ -44,7 +44,7 @@ export const BaseTransactionButton: React.FC<BaseTransactionButtonProps> = ({
       loading={loading}
       loadingPosition="center"
       fullWidth
-      sx={{borderRadius: '6px'}}
+      sx={{borderRadius: '6px', fontWeight: '600 !important'}}
     >
       {getButtonText()}
     </LoadingButton>

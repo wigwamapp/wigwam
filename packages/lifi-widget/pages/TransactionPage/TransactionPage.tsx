@@ -216,13 +216,13 @@ export const TransactionPage: React.FC = () => {
 
 
   return (
-    <Container sx={{width: '500px !important', background: 'transparent', marginLeft: '0px', paddingTop: '0', height: '100%', overflowX: 'hidden', overflowY: 'auto', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
+    <Container sx={{width: '500px !important', background: 'transparent', scrollbarGutter: 'stable', marginLeft: '0px', paddingTop: '0', height: '100%', overflowX: 'hidden', overflowY: 'auto', borderRight: '1px solid #21262A'}}>
+      <div style={{display: 'flex',  justifyContent: 'flex-start', alignItems: 'center', marginBottom: '30px', position: 'sticky', top: '-1px', paddingBottom: '10px', zIndex: '10', width: '100%', background: '#181a1f'}}>
         <img style={{marginRight: '24px', cursor: 'pointer'}} className='closeButtonWrapper' src={backIcon} onClick={() => navigate('/')}/>
         <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Swap</Typography>
         {/* {getTxStatus(status || RouteExecutionStatus.Pending)} */}
       </div>
-      <div className="txSteps" style={{marginTop: '54px'}}>
+      <div className="txSteps" style={{marginTop: '14px'}}>
         {getStepList(route, subvariant)}
       </div>
       {subvariant === "nft" ? (

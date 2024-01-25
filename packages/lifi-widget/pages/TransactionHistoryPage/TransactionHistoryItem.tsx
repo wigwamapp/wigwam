@@ -83,10 +83,10 @@ export const TransactionHistoryItem: React.FC<{
           px={2}
         >
           <div style={{display: 'flex'}}>
-          <Typography fontSize={10} color="#fff">
+          <Typography fontSize={12} color="#fff">
             {formatDate(startedAt)} /&nbsp;
           </Typography>
-          <Typography fontSize={10} color="#fff">
+          <Typography fontSize={12} color="#fff">
             {formatTime(startedAt)}
           </Typography>
           </div>

@@ -61,7 +61,8 @@ export const ChainSelect = ({ formType }: FormTypeProps) => {
                 className={`withHover ${chainId === chain.id ? 'selectedChain' : ''}`}
                 sx={{
                   justifyContent: 'flex-start',
-                  paddingLeft: '12px'
+                  paddingLeft: '12px',
+                  border: '1px solid transparent'
                 }}
 
               >

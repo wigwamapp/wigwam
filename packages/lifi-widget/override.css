@@ -30,6 +30,8 @@
 ::-webkit-scrollbar {
   background: #181a1f;
   width: 5px;
+  position: absolute;
+  right: 0;
 }
 
 ::-webkit-scrollbar-corner {
@@ -240,8 +242,18 @@ div::-webkit-scrollbar-thumb {
   right: 13px !important;
 }
 
-.MuiButtonBase-root:hover {
+/* .MuiButtonBase-root:hover {
   color: #000;
+} */
+
+.backButtonWrapper {
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.backButtonWrapper:hover {
+  background: rgba(50, 59, 65, 0.4);
 }
 
 .closeButtonWrapper {
@@ -254,6 +266,13 @@ div::-webkit-scrollbar-thumb {
   background: rgba(50, 59, 65, 0.4);
 }
 
+.customSettings:hover {
+  background: rgb(255 255 255 / 4%) !important;
+}
 /* .MuiCollapse-wrapperInner > div {
   height: 100%;
 } */
+
+.MuiContainer-root {
+  padding-bottom: 4.5rem !important;
+}

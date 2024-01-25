@@ -37,7 +37,7 @@ export const ActiveTransactions: React.FC<BoxProps> = (props) => {
         
       </Card>
       {hasShowAll ? (
-        <div style={{position: 'absolute', opacity: '0.5', borderRadius: '10px', top: '-3px', width: '85%', height: '58px', zIndex: 1, background: '#2B3037', border: '1px solid #ffcf26'}}></div>
+        <div style={{position: 'absolute', opacity: '0.5', borderRadius: '10px', top: '-3px', width: '85%', marginRight: '24px', height: '58px', zIndex: 1, background: '#2B3037', border: '1px solid #ffcf26'}}></div>
       ) : null}
     </div>
     

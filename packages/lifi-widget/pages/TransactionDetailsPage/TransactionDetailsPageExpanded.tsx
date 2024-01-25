@@ -84,8 +84,15 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
     supportId += `_${routeExecution?.route.id}`;
   }
 
+  const [copied, setCopied] = useState(false);
+
   const copySupportId = async () => {
     await navigator.clipboard.writeText(supportId);
+    setCopied(true)
+
+    setTimeout(() => {
+      setCopied(false)
+    }, 3000)
   };
 
   useEffect(() => {
@@ -131,7 +138,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
 
   return (
     <Container sx={{width: '500px', position: 'relative', marginLeft: '0px', paddingTop: '0', maxHeight: '100%', overflowX: 'hidden', borderRight: '1px solid #21262A'}}>
-      <div style={{display: 'flex', width: '460px', justifyContent: 'space-between', paddingTop: '12px', alignItems: 'center', marginBottom: '30px', position: 'fixed', paddingBottom: '10px', zIndex: '10', background: '#181a1f', marginTop: '-1px'}}>
+      <div style={{display: 'flex', width: '460px', justifyContent: 'space-between', paddingTop: '12px', alignItems: 'center', marginBottom: '30px', position: 'sticky', top: '-1px', paddingBottom: '10px', zIndex: '10', background: '#181a1f', marginTop: '-1px'}}>
           <Typography color={'#fff'} fontSize={16} sx={{fontWeight: '600 !important'}}>Transaction info</Typography>
           <div onClick={() => navigateBack()} style={{cursor: 'pointer'}} className='closeButtonWrapper'>
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
@@ -143,7 +150,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
           background: '#22262A',
           padding: '16px',
           border: 'none',
-          marginTop: '54px'
+          marginTop: '14px'
       }} className='withHoverGray'>
       <Box
         sx={{
@@ -155,10 +162,10 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
         pb={1}
       >
        <div style={{display: 'flex'}}>
-       <Typography fontSize={10} color="#fff">
+       <Typography fontSize={12} color="#fff">
         {formatDate(startedAt)} /&nbsp;
         </Typography>
-        <Typography fontSize={10} color="#fff">
+        <Typography fontSize={12} color="#fff">
           {formatTime(startedAt)}
         </Typography>
        </div>
@@ -200,7 +207,7 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
             <path d="M8.4 12.3242H1.2C0.537258 12.3242 0 11.787 0 11.1242V3.92422H1.2V11.1242H8.4V12.3242ZM10.8 9.92422H3.6C2.93726 9.92422 2.4 9.38696 2.4 8.72422V1.52422C2.4 0.861477 2.93726 0.324219 3.6 0.324219H10.8C11.4627 0.324219 12 0.861477 12 1.52422V8.72422C12 9.38696 11.4627 9.92422 10.8 9.92422ZM3.6 1.52422V8.72422H10.8V1.52422H3.6Z" fill="#F3F9F4"/>
           </svg>
-            <Typography marginLeft={'10px'} fontSize={12} fontWeight={400} color={'#fff'}>Copy</Typography>
+            <Typography marginLeft={'10px'} fontSize={12} fontWeight={400} color={'#fff'}>{copied ? 'Copied' : 'Copy'}</Typography>
           </Box>
         </Box>
         <Typography
