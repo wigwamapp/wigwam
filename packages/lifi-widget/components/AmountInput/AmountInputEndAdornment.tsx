@@ -1,6 +1,6 @@
 import { InputAdornment, Skeleton } from '@mui/material';
 import Big from 'big.js';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext, useWatch, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import {
   useChains,
@@ -9,8 +9,9 @@ import {
 } from '../../hooks';
 import type { FormTypeProps } from '../../providers';
 import { FormKeyHelper } from '../../providers';
-import { formatTokenAmount } from '../../utils';
+import { formatTokenAmount, formatInputAmount } from '../../utils';
 import { Button } from './AmountInputAdornment.style';
+
 
 export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
   const { t } = useTranslation();
@@ -24,6 +25,12 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
   });
   const { data } = useGasRecommendation(chainId);
   const { token, isLoading } = useTokenAddressBalance(chainId, tokenAddress);
+
+  const {
+    field: { onChange },
+  } = useController({
+    name: "fromAmount",
+  });
 
   const handleValue = (percentage: number) => {
     const chain = getChainById(chainId);
@@ -44,9 +51,12 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
       }
     }
 
-    setValue(FormKeyHelper.getAmountKey(formType), maxAmount || '', {
-      shouldTouch: true,
-    });
+    const formattedAmount = formatInputAmount(String(maxAmount), token?.decimals, true);
+
+    onChange(formattedAmount)
+    // setValue('fromAmount', maxAmount || '', {
+    //   shouldTouch: true,
+    // });
   };
 
   return (

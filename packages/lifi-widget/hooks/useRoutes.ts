@@ -226,6 +226,8 @@ export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
           return { routes: [route] } as RoutesResponse;
         }
 
+        console.log('LIFI.GETROUTES')
+
         return lifi.getRoutes(
           {
             fromChainId,

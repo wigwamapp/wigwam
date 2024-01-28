@@ -74,10 +74,10 @@ export const RoutesExpandedElement = () => {
 
   const handleRouteClick = (route: Route) => {
     if (isValid && !isValidating) {
-      setExecutableRoute(route);
-      setSelectedRouteId(route.id);
       const formattedAmount = String(Number(route.toAmount)/Math.pow(10, route.toToken.decimals))
       onChange(formattedAmount)
+      setExecutableRoute(route);
+      setSelectedRouteId(route.id);
       // navigate(navigationRoutes.transactionExecution, {
       //   state: { routeId: route.id },
       // });
