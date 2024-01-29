@@ -34,26 +34,28 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
 
   const handleValue = (percentage: number) => {
     const chain = getChainById(chainId);
-    let maxAmount: any = percentage === 100 ? token?.amount : Number(token?.amount) * (percentage / 100);
-    if (
-      chain?.nativeToken.address === tokenAddress &&
-      data?.available &&
-      data?.recommended
-    ) {
-      const tokenAmount = Big(token?.amount ?? 0);
-      const recommendedAmount = Big(data.recommended.amount)
-        .div(10 ** data.recommended.token.decimals)
-        .div(2);
-      if (tokenAmount.gt(recommendedAmount)) {
-        maxAmount = formatTokenAmount(
-          tokenAmount.minus(recommendedAmount).toString(),
-        );
+    if (token?.amount) {
+      let maxAmount: any = percentage === 100 ? token?.amount : new Big((Big(token?.amount).div(100).mul(percentage)).toFixed(token.decimals/2, 3));
+
+      if (
+        chain?.nativeToken.address === tokenAddress &&
+        data?.available &&
+        data?.recommended
+      ) {
+        const tokenAmount = Big(token?.amount ?? 0);
+        const recommendedAmount = Big(data.recommended.amount)
+          .div(10 ** data.recommended.token.decimals)
+          .div(2);
+        if (tokenAmount.gt(recommendedAmount)) {
+          maxAmount = formatTokenAmount(
+            tokenAmount.minus(recommendedAmount).toString(),
+          );
+        }
       }
+      
+      const formattedAmount = formatInputAmount(String(maxAmount), token?.decimals, true);
+      onChange(formattedAmount)
     }
-
-    const formattedAmount = formatInputAmount(String(maxAmount), token?.decimals, true);
-
-    onChange(formattedAmount)
     // setValue('fromAmount', maxAmount || '', {
     //   shouldTouch: true,
     // });

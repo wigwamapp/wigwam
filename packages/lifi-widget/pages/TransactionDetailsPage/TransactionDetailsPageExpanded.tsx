@@ -29,6 +29,7 @@ import { RouteExecutionStatus } from '../../stores/routes/types';
 import backIcon from '../../../../src/app/icons/back.svg';
 import copyIcon from '../../../../src/app/icons/copy.svg';
 import { navigate } from 'lib/navigation';
+import axios from 'axios'
 
 
 export const TransactionDetailsPageExpanded: React.FC = () => {
@@ -76,6 +77,20 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
     .filter((process) => process.type !== 'TOKEN_ALLOWANCE')
     .find((process) => process.txHash)?.txHash;
 
+    console.log('sourceTxHash', sourceTxHash)
+
+  //   const handleGetSwapStatus = async () => {
+  //     const result = await axios.get('https://li.quest/v1/status', {
+  //       params: {
+  //         txHash: sourceTxHash,
+  //       }
+  //   });
+  //     console.log(result)
+  //   }
+
+  // useEffect(() => {
+  //   handleGetSwapStatus()
+  // }, [sourceTxHash])
   const insuranceCoverageId = sourceTxHash ?? routeExecution?.route.fromAddress;
 
   let supportId = sourceTxHash ?? routeExecution?.route.id ?? '';

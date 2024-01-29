@@ -110,10 +110,6 @@ export const useRouteExecution = ({
       if (!routeExecution?.route) {
         throw Error('Execution route not found.');
       }
-      console.log('lifi.executeRoute')
-      console.log(account.signer)
-      console.log(account)
-      console.log(routeExecution.route)
       queryClient.removeQueries(['routes'], { exact: false });
       return lifi.executeRoute(account.signer, routeExecution.route, {
         updateRouteHook,
@@ -127,6 +123,7 @@ export const useRouteExecution = ({
       onMutate: () => {
         console.log('Execution started.', routeId);
         if (routeExecution) {
+          console.log('!!!!!!!!!!!!!routeExecution routeExecution routeExecution', routeExecution)
           emitter.emit(WidgetEvent.RouteExecutionStarted, routeExecution.route);
         }
       },
