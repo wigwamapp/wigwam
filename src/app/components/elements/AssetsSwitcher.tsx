@@ -1,23 +1,32 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
 import classNames from "clsx";
 import * as Switch from "@radix-ui/react-switch";
 
 import { ReactComponent as AssetsIcon } from "app/icons/switcher-assets.svg";
 import { ReactComponent as NftsIcon } from "app/icons/switcher-nft.svg";
 
-type ThemeType = "large" | "small";
+type ThemeType = "large" | "medium" | "small";
 
 type AssetsSwitcherProps = Switch.SwitchProps & {
   theme?: ThemeType;
+  customLabels?: [string, string];
   className?: string;
 };
 
 const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
   theme = "large",
   checked,
+  customLabels,
   onCheckedChange,
   className,
 }) => {
+  const [labelLeft, labelRight] = useMemo(() => {
+    if (customLabels) {
+      return customLabels;
+    }
+
+    return ["Assets", "NFTs"];
+  }, [customLabels]);
   return (
     <Switch.Root
       checked={checked}
@@ -37,6 +46,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
         theme={theme}
         className={classNames(
           theme === "small" && "mr-1",
+          theme === "medium" && "mr-2",
           theme === "large" && "mr-2",
           !checked && "font-bold",
         )}
@@ -49,7 +59,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
             )}
           />
         ) : (
-          "Assets"
+          labelLeft
         )}
       </SwitchOption>
       <SwitchOption
@@ -64,18 +74,20 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
             )}
           />
         ) : (
-          "NFTs"
+          labelRight
         )}
       </SwitchOption>
       <Switch.Thumb
         className={classNames(
           "absolute",
-          theme === "small" && "w-9 h-7",
-          theme === "large" && "w-[8.5rem] h-10",
           "bg-brand-main/[.05]",
           "rounded-[.625rem]",
           "transition-transform",
+          theme === "small" && "w-9 h-7",
+          theme === "medium" && "w-[5.5rem] h-8 rounded-md",
+          theme === "large" && "w-[8.5rem] h-10",
           theme === "small" && checked && "translate-x-10",
+          theme === "medium" && checked && "translate-x-[6rem]",
           theme === "large" && checked && "translate-x-[9rem]",
         )}
       />
@@ -99,6 +111,7 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "flex items-center justify-center",
       "text-base color-brand-light",
       theme === "small" && "w-9 h-7",
+      theme === "medium" && "w-[5.5rem] py-1",
       theme === "large" && "w-[8.5rem] py-2",
       className,
     )}
