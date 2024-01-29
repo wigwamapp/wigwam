@@ -45,6 +45,7 @@ export const BottomSheet = forwardRef<BottomSheetBase, BottomSheetProps>(
         ModalProps={modalProps}
         PaperProps={paperProps}
         BackdropProps={backdropProps}
+        sx={{bottom: '4rem !important'}}
         disableAutoFocus
       >
         {children}

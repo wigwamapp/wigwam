@@ -18,7 +18,8 @@ export const Step: React.FC<{
   fromToken?: TokenAmount;
   toToken?: TokenAmount;
   toAddress?: string;
-}> = ({ step, fromToken, toToken, toAddress }) => {
+  routeId: string;
+}> = ({ step, fromToken, toToken, toAddress, routeId }) => {
   const { t } = useTranslation();
   const { getChainById } = useChains();
   const { subvariant } = useWidgetConfig();
@@ -52,7 +53,7 @@ export const Step: React.FC<{
         {fromToken ? <Token token={fromToken} py={1} /> : null}
         <StepActions step={step} py={1} dense />
         {step.execution?.process.map((process, index) => (
-          <StepProcess key={index} step={step} process={process} />
+          <StepProcess key={index} step={step} process={process} routeId={routeId} />
         ))}
         {/* <GasStepProcess step={step} /> */}
         {formattedToAddress && toAddressLink ? (

@@ -100,18 +100,17 @@ const Swap: FC = () => {
   const provider = getLiFiProvider(chainId);
   const signer = provider.getSigner(currentAccount.address);
 
-  const handleBeforeTransaction = useCallback(
-    (metadata: Route) => {
-      if (metadata) {
-        provider.setActivitySource({
-          type: "self",
-          kind: SelfActivityKind.Swap,
-          swapMeta: metadata,
-        });
-      }
-    },
-    [provider],
-  );
+  const handleBeforeTransaction = useCallback((metadata: Route) => {
+    if (metadata) {
+      const transactionProvider = getLiFiProvider(metadata.fromChainId);
+
+      transactionProvider.setActivitySource({
+        type: "self",
+        kind: SelfActivityKind.Swap,
+        swapMeta: metadata,
+      });
+    }
+  }, []);
 
   const widgetConfig = useMemo((): WidgetConfig => {
     return {

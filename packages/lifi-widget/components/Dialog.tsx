@@ -16,6 +16,7 @@ export const paperProps = {
     backgroundImage: 'none',
     borderTopLeftRadius: theme.shape.borderRadius,
     borderTopRightRadius: theme.shape.borderRadius,
+    bottom: '4rem'
   }),
 };
 

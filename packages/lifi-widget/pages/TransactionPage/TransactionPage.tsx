@@ -105,6 +105,9 @@ export const TransactionPage: React.FC = () => {
   const tokenValueLossThresholdExceeded = getTokenValueLossThreshold(route);
 
   const handleExecuteRoute = () => {
+    if (onBeforeTransaction) {
+      onBeforeTransaction(route)
+    }
     if (tokenValueBottomSheetRef.current?.isOpen()) {
       emitter.emit(WidgetEvent.RouteHighValueLoss, {
         fromAmountUsd: route.fromAmountUSD,
@@ -114,9 +117,7 @@ export const TransactionPage: React.FC = () => {
       });
     }
     tokenValueBottomSheetRef.current?.close();
-    if (onBeforeTransaction) {
-      onBeforeTransaction(route)
-    }
+    
     executeRoute();
     setValue(FormKey.FromAmount, "");
     setValue(FormKey.FromToken, "");
@@ -136,7 +137,6 @@ export const TransactionPage: React.FC = () => {
       }
     }
     if (status === RouteExecutionStatus.Failed) {
-      console.log('RESTART ROUTE')
       setRestartFlag(true);
       restartRoute();
     }
@@ -146,7 +146,7 @@ export const TransactionPage: React.FC = () => {
     if (status === RouteExecutionStatus.Idle || status === RouteExecutionStatus.Failed) {
       deleteRoute();
     }
-    navigateBack();
+    navigate('/');
   };
 
   const getButtonText = (): string => {

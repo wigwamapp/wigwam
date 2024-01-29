@@ -29,7 +29,6 @@ export class ClientProvider extends JsonRpcProvider {
   async send(method: string, params: Array<any>): Promise<any> {
     const type = MessageType.SendRpc;
     const { chainId } = this.network;
-
     const res = await porter.request(
       { type, chainId, method, params, source: this.source },
       { timeout: 0 },

@@ -1,15 +1,44 @@
 import type { LifiStep, Process } from '@lifi/sdk';
 import LinkRoundedIcon from '@mui/icons-material/LinkRounded';
-import { Box, Link, Typography } from '@mui/material';
-import { useProcessMessage } from '../../hooks';
+import { Box, Link, Typography, Button } from '@mui/material';
+import { useProcessMessage, useRouteExecution } from '../../hooks';
 import { CircularProgress } from './CircularProgress';
 import { LinkButton } from './StepProcess.style';
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const StepProcess: React.FC<{
   step: LifiStep;
   process: Process;
-}> = ({ step, process }) => {
+  routeId: string;
+}> = ({ step, process, routeId }) => {
   const { title, message } = useProcessMessage(step, process);
+  const {search, pathname} = useLocation();
+  const navigate = useNavigate();
+
+  const needToShowContinueButton = (process: Process) => {
+    if (search.includes('transactionDetails')) {
+      if (process.status === 'ACTION_REQUIRED' || process.status === 'FAILED') {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+
+  const { restartRoute } = useRouteExecution({
+    routeId: routeId,
+  });
+
+  const handleRestart = () => {
+      navigate(`${pathname}?tab=transactionProcessing`, {
+        state: { routeId },
+      });
+
+      restartRoute()
+  }
+
   return (
     <Box>
       <Box
@@ -27,9 +56,9 @@ export const StepProcess: React.FC<{
           fontSize={12}
           fontWeight={400}
           color={'#fff'}
-          sx={{marginLeft: '8px !important'}}
+          sx={{marginLeft: '8px !important', display: 'flex', flexDirection: 'column'}}
         >
-          {title}
+          {title} {needToShowContinueButton(process) ? <Button sx={{borderRadius: '6px', width: '120px', marginTop: '5px', fontSize: '12px', height: '25px'}} onClick={() => handleRestart()}>Continue</Button> : ''}
         </Typography>
         {process.txLink ? (
           <LinkButton

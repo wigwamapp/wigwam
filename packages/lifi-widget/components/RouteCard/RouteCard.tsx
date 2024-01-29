@@ -169,11 +169,9 @@ export const RouteCard: React.FC<
           token={token}
           step={!cardExpanded ? route.steps[0] : undefined}
         />
-        {!expanded ? (
-          <CardIconButton onClick={handleExpand} size="small">
-            {cardExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </CardIconButton>
-        ) : null}
+        <CardIconButton onClick={handleExpand} size="small">
+          {cardExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </CardIconButton>
       </Box>
       <Collapse timeout={225} in={cardExpanded} mountOnEnter unmountOnExit>
         {route.steps.map((step) => (

@@ -16,7 +16,6 @@ export const ContactSupportButton = ({
 
   const handleClick = () => {
     if (!widgetEvents.all.has(WidgetEvent.RouteContactSupport)) {
-      console.log('COPIED')
       const url = 'https://discord.gg/lifi';
 
       Object.assign(document.createElement('a'), {

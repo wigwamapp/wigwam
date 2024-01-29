@@ -33,6 +33,7 @@ export const getStepList = (route?: Route, subvariant?: WidgetSubvariant) =>
           fromToken={fromToken}
           toToken={toToken}
           toAddress={toAddress}
+          routeId={route.id}
         />
         {steps.length > 1 && index !== steps.length - 1 ? (
           <StepDivider />

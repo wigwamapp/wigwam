@@ -37,6 +37,7 @@ export const TransactionHistoryPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log('executingRoutes')
     console.log(executingRoutes)
   }, [executingRoutes])
 
@@ -50,7 +51,7 @@ export const TransactionHistoryPage: React.FC = () => {
     }
   }, [transactions.length, toggleDialog, headerStoreContext]);
 
-  if (!transactions.length) {
+  if (!transactions.length && !executingRoutes.length) {
     return <TransactionHistoryEmpty />;
   }
 
@@ -70,11 +71,12 @@ export const TransactionHistoryPage: React.FC = () => {
             <TransactionActiveItem key={routeId} routeId={routeId} />
           ))
         )}
-        {transactions.length ? (
+        {transactions.length > 0 && (
           transactions.map(({ route, status }) => (
             <TransactionHistoryItem key={route.id} route={route} status={status}/>
           ))
-        ) : (
+        )}
+        {(!transactions.length && !executingRoutes.length) && (
           <TransactionHistoryEmpty />
         )}
       </Stack>
