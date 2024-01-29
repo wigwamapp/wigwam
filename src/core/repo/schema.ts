@@ -14,7 +14,7 @@ export enum RepoTable {
 export const db = new AsyncDexie(underProfile("main"));
 
 /**
- * 1
+ * [1]
  */
 
 db.version(1).stores({
@@ -36,7 +36,8 @@ db.version(1).stores({
 });
 
 /**
- * 2
+ * [2]
+ * - Allow to query native tokens for one account for all chains
  */
 
 db.version(2).stores({
@@ -48,3 +49,19 @@ db.version(2).stores({
     "[chainId+tokenType+accountAddress+status+balanceUSD]",
   ].join(),
 });
+
+// /**
+//  * [3]
+//  * - Allow to query for one account
+//  * - Allow to query for one account and one chain
+//  */
+
+// db.version(3).stores({
+//   [RepoTable.Activities]: [
+//     "&id",
+//     "[pending+timeAt]",
+//     "[accountAddress+pending+timeAt]",
+//     "[chainId+accountAddress+pending+timeAt]",
+//     "[type+pending]",
+//   ].join(),
+// });

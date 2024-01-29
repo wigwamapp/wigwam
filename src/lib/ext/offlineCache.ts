@@ -2,25 +2,27 @@ import memoize from "mem";
 
 import { globalStorage } from "./globalStorage";
 
-export function withOfflineCache<T>(
-  factory: () => Promise<T>,
+export function withOfflineCache<T, U extends any[]>(
+  factory: (...args: U) => Promise<T>,
   {
     key,
     hotMaxAge,
     coldMaxAge,
   }: {
-    key: string;
+    key: string | ((args: U) => string);
     hotMaxAge: number;
     coldMaxAge: number;
   },
-): () => Promise<T> {
+): (...args: U) => Promise<T> {
   return memoize(
-    async () => {
+    async (...args: U) => {
+      const keyStr = typeof key === "function" ? key(args) : key;
+
       try {
         const cached = await globalStorage.fetchForce<{
           data: T;
           addedAt: number;
-        }>(key);
+        }>(keyStr);
 
         if (cached && cached.addedAt > Date.now() - coldMaxAge) {
           return cached.data;
@@ -29,11 +31,14 @@ export function withOfflineCache<T>(
         console.error(err);
       }
 
-      const data = await factory();
-      if (data) await globalStorage.put(key, { data, addedAt: Date.now() });
+      const data = await factory(...args);
+      if (data) await globalStorage.put(keyStr, { data, addedAt: Date.now() });
 
       return data;
     },
-    { maxAge: hotMaxAge },
+    {
+      maxAge: hotMaxAge,
+      cacheKey: typeof key === "function" ? key : undefined,
+    },
   );
 }

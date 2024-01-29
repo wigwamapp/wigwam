@@ -15,6 +15,7 @@ import { sync, syncTokenActivities } from "core/client";
 import { createAccountTokenKey } from "core/common/tokens";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
+import { useAccounts } from "./account";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -35,10 +36,10 @@ export const ChainIdProvider: FC<PropsWithChildren<{ chainId: number }>> = ({
 );
 
 export function useIsSyncing() {
-  const chainId = useChainId();
+  const { currentAccount } = useAccounts();
   const status = useSyncStatus();
 
-  return status.includes(chainId);
+  return status.includes(currentAccount.address);
 }
 
 export function useIsTokenActivitySyncing(

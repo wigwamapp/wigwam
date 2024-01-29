@@ -11,7 +11,8 @@ import {
   NATIVE_TOKEN_SLUG,
   createAccountTokenKey,
   parseTokenSlug,
-} from "core/common/tokens";
+  updateTotalBalance,
+} from "core/common";
 import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
@@ -37,7 +38,7 @@ export async function addFindTokenRequest(
   if (stack.has(dbKey)) return;
 
   stack.add(dbKey);
-  syncStarted(chainId);
+  syncStarted(accountAddress);
 
   try {
     await performTokenSync(
@@ -52,7 +53,7 @@ export async function addFindTokenRequest(
   }
 
   stack.delete(dbKey);
-  setTimeout(() => synced(chainId), 500);
+  setTimeout(() => synced(accountAddress), 500);
 }
 
 async function performTokenSync(
@@ -92,10 +93,11 @@ async function performTokenSync(
           ? tokenToAdd
           : await repo.accountTokens.get(nativeTokenDbKey);
 
+      const diff = new BigNumber(tokenToAdd.balanceUSD).minus(prevBalanceUSD);
+
       if (nativeToken?.portfolioUSD) {
         const portfolioUSD = new BigNumber(nativeToken.portfolioUSD)
-          .minus(prevBalanceUSD)
-          .plus(tokenToAdd.balanceUSD)
+          .plus(diff)
           .toString();
 
         await repo.accountTokens.put(
@@ -103,6 +105,8 @@ async function performTokenSync(
           nativeTokenDbKey,
         );
       }
+
+      await updateTotalBalance(accountAddress, (bal) => bal.plus(diff));
     }
   };
 
