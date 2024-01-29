@@ -11,6 +11,8 @@ import {
 } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import classNames from "clsx";
+import { match, P } from "ts-pattern";
+import { PopupToolbarTab } from "app/nav";
 import Masonry from "lib/react-masonry/Masonry";
 import { useAtomsAll } from "lib/atom-utils";
 
@@ -30,6 +32,7 @@ import {
 import {
   activeTabOriginAtom,
   getPermissionAtom,
+  popupToolbarTabAtom,
   tokenTypeAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
@@ -41,16 +44,15 @@ import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
 import NetworkSelect from "../elements/NetworkSelect";
-import AccountSelect from "../elements/AccountSelect";
+// import AccountSelect from "../elements/AccountSelect";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import IconedButton from "../elements/IconedButton";
-import Tooltip from "../elements/Tooltip";
 import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
-import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
+// import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
 import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
@@ -59,19 +61,33 @@ import NftCard from "../blocks/tokenList/NftCard";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
+import { Redirect } from "lib/navigation";
 
-const Popup: FC = () => (
-  <PreloadAndSync>
-    <PopupLayout>
-      <PopupNetworkSelect />
-      <AccountSelect className="mt-2" />
-      <InteractionWithDapp className="mt-2" />
-      <TokenExplorer />
-    </PopupLayout>
-  </PreloadAndSync>
-);
+const Popup: FC = () => {
+  const tab = useAtomValue(popupToolbarTabAtom);
+  return (
+    <PreloadAndSync>
+      <PopupLayout>{matchPopupTabs(tab) as unknown as ReactNode}</PopupLayout>
+    </PreloadAndSync>
+  );
+};
 
 export default Popup;
+
+const Assets: FC = () => (
+  <>
+    <PopupNetworkSelect />
+    {/* <AccountSelect className="mt-2" /> */}
+    {/* <InteractionWithDapp className="mt-2" /> */}
+    <TokenExplorer />
+  </>
+);
+
+const Activity: FC = () => (
+  <>
+    <h3>Activity</h3>
+  </>
+);
 
 const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
@@ -133,19 +149,13 @@ const TokenExplorer: FC = () => {
   const isNftsSelected = tokenType === TokenType.NFT;
 
   return (
-    <div className="flex flex-wrap mt-5 min-h-0">
-      <Tooltip
-        content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-        asChild
-      >
-        <span>
-          <AssetsSwitcher
-            theme="small"
-            checked={isNftsSelected}
-            onCheckedChange={toggleNftSwitcher}
-          />
-        </span>
-      </Tooltip>
+    <div className="flex flex-wrap mt-2 min-h-0">
+      <AssetsSwitcher
+        theme="medium"
+        customLabels={["Tokens", "NFT"]}
+        checked={isNftsSelected}
+        onCheckedChange={toggleNftSwitcher}
+      />
 
       <TokenList key={tokenType} tokenType={tokenType} />
     </div>
@@ -414,3 +424,11 @@ const ReceivePopup: FC<ReceivePopupProps> = (props) => (
     <ShareAddress />
   </SecondaryModal>
 );
+
+const matchPopupTabs = (tab: PopupToolbarTab) => {
+  return match<PopupToolbarTab, ReactNode>(tab)
+    .with(PopupToolbarTab.Assets, () => <Assets />)
+    .with(PopupToolbarTab.Activity, () => <Activity />)
+    .with(P.any, () => <Assets />)
+    .otherwise(() => <Redirect to={{ tab: PopupToolbarTab.Assets }} />);
+};
