@@ -47,3 +47,8 @@ export enum ReceiveTab {
   BuyWithFiat = "buy-with-fiat",
   Faucet = "faucet",
 }
+
+export enum PopupToolbarTab {
+  Assets = "assets",
+  Activity = "activity",
+}
