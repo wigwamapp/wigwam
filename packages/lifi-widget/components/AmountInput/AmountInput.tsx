@@ -118,7 +118,7 @@ export const AmountInputBase: React.FC<
 
   return (
     <Card {...props} sx={{border: 'none', background: 'none', borderRadius: '10px !important', marginBottom: '24px'}}>
-      <Typography sx={{paddingTop: '0px', paddingLeft: '0px !important', display: 'flex', justifyContent: formType === 'to' ? 'space-between' : 'flex-start'}}><div>{formType === "to" ? "You receive" : t('main.fromAmount')}</div> {(formType === "to" && currentRoute && value) && (<div style={{display: 'flex', fontWeight: '500'}}>via <img style={{width: '24px', height: '24px', borderRadius: '100%', margin: '0 4px 0 8px'}} src={currentRoute.steps[0].toolDetails.logoURI} /> <div style={{color: '#fff', }}>{currentRoute.steps[0].toolDetails.name}</div></div>)}</Typography>
+      <Typography sx={{paddingTop: '0px', paddingLeft: '0px !important', display: 'flex', justifyContent: formType === 'to' ? 'space-between' : 'flex-start'}}><span>{formType === "to" ? "You receive" : t('main.fromAmount')}</span> {(formType === "to" && currentRoute && value) && (<span style={{display: 'flex', fontWeight: '500'}}>via <img style={{width: '24px', height: '24px', borderRadius: '100%', margin: '0 4px 0 8px'}} src={currentRoute.steps[0].toolDetails.logoURI} /> <span style={{color: '#fff', }}>{currentRoute.steps[0].toolDetails.name}</span></span>)}</Typography>
       <div style={{background: '#16171C', borderRadius: '10px', marginTop: '8px', border: '1px solid #272C30'}}>
       <FormControl fullWidth sx={{cursor: 'text'}} onClick={() => ref.current?.focus()}>
         <Input
