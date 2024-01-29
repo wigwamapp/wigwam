@@ -9,7 +9,7 @@ import {
   createTotalBalanceKey,
   NATIVE_TOKEN_SLUG,
 } from "core/common";
-import { getCgPlatformIds } from "core/client";
+import { getCgPlatformIds, getOnRampCurrencies } from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
@@ -56,3 +56,5 @@ export const getAllNativeTokensAtom = atomFamily((accountAddress: string) =>
     ),
   ),
 );
+
+export const onRampCurrenciesAtom = atomWithDefault(getOnRampCurrencies);

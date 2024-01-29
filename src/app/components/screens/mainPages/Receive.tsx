@@ -2,6 +2,7 @@ import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { Network } from "core/types";
+import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { receiveTabAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
@@ -10,7 +11,7 @@ import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as AddressIcon } from "app/icons/receive-address.svg";
-import { ReactComponent as CryptoIcon } from "app/icons/receive-crypto.svg";
+// import { ReactComponent as CryptoIcon } from "app/icons/receive-crypto.svg";
 import { ReactComponent as FiatIcon } from "app/icons/receive-fiat.svg";
 import { ReactComponent as FaucetIcon } from "app/icons/receive-faucet.svg";
 
@@ -22,7 +23,10 @@ const Receive: FC = () => {
 
   const tabsContent = useMemo(() => getTabsContent(network), [network]);
   const tabs = useMemo(
-    () => tabsContent.map((t) => t.route.receive),
+    () =>
+      tabsContent
+        .map((t) => t.route.receive)
+        .filter((q) => Boolean(q)) as ReceiveTabEnum[],
     [tabsContent],
   );
 
@@ -68,19 +72,23 @@ const getTabsContent = (network?: Network) => [
   },
   ...(network?.type === "mainnet"
     ? [
+        // {
+        //   route: { page: "receive", receive: ReceiveTabEnum.BuyWithCrypto },
+        //   title: "Buy with Crypto",
+        //   Icon: CryptoIcon,
+        //   desc: "Top up balance with crypto from other networks using third-party services.",
+        //   soon: true,
+        // },
         {
-          route: { page: "receive", receive: ReceiveTabEnum.BuyWithCrypto },
-          title: "Buy with Crypto",
-          Icon: CryptoIcon,
-          desc: "Top up balance with crypto from other networks using third-party services.",
-          soon: true,
-        },
-        {
-          route: { page: "receive", receive: ReceiveTabEnum.BuyWithFiat },
+          route: {
+            page: "receive",
+            onRampOpened: true,
+            token: NATIVE_TOKEN_SLUG,
+          },
           title: "Buy with Fiat",
           Icon: FiatIcon,
           desc: "Top up balance with regular credit or debit cards using third-party services.",
-          soon: true,
+          // soon: true,
         },
       ]
     : []),

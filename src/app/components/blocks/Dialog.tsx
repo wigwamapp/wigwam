@@ -20,6 +20,7 @@ const Dialog: FC<{ small?: boolean }> = ({ small }) => {
     secondaryButtonText,
     onSecondaryButtonClick,
     onClose,
+    buttonTheme,
     ...rest
   } = modalData;
 
@@ -54,6 +55,7 @@ const Dialog: FC<{ small?: boolean }> = ({ small }) => {
           {primaryButtonText && (
             <Button
               plainFocus
+              theme={buttonTheme?.primary ?? "primary"}
               onClick={onPrimaryButtonClick}
               className={classNames(small ? "!py-2" : "")}
             >
@@ -63,7 +65,7 @@ const Dialog: FC<{ small?: boolean }> = ({ small }) => {
 
           {secondaryButtonText && (
             <Button
-              theme="secondary"
+              theme={buttonTheme?.secondary ?? "secondary"}
               plainFocus
               className={classNames(small && "!py-2", "mr-3")}
               onClick={onSecondaryButtonClick}

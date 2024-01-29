@@ -17,6 +17,7 @@ import {
   startTxObserver,
   startExtBadge,
   startAutoLocker,
+  startRampTxObserver,
 } from "core/back/services";
 
 setupArgon2Impl();
@@ -39,6 +40,7 @@ startPageServer();
 startApproveWindowOpener();
 startPersistingApprovals();
 startTxObserver();
+startRampTxObserver();
 startExtBadge();
 
 startInstallOrUpdateListener();

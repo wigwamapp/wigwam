@@ -39,6 +39,7 @@ import {
   estimateGasPrices,
   getCoinGeckoPlatformIds,
   syncTokenActivities,
+  getOnRampCryptoCurrencies,
 } from "../sync";
 
 export function startWalletServer() {
@@ -314,6 +315,15 @@ async function handleWalletRequest(
           );
 
           ctx.reply({ type, cgPlatformIds });
+        }),
+      )
+      .with({ type: MessageType.GetOnRampCurrencies }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, async () => {
+          const currencies = await getOnRampCryptoCurrencies().catch(
+            () => ({}),
+          );
+
+          ctx.reply({ type, currencies });
         }),
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

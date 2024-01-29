@@ -62,7 +62,7 @@ const ConfirmAccounts = memo<{
     if (!rootNeuterExtendedKey) return null;
 
     const extendedKey = fromProtectedString(rootNeuterExtendedKey);
-    const allAccounts = generatePreviewHDNodes(extendedKey, 0, 20);
+    const allAccounts = generatePreviewHDNodes(extendedKey, 0, 30);
 
     for (const acc of allAccounts) {
       if (
@@ -204,104 +204,112 @@ const ConfirmAccounts = memo<{
             "p-3",
           )}
         >
-          {accountsToAdd.map((item, i, arr) => {
-            const last = i === arr.length - 1;
+          {accountsToAdd.length > 0 ? (
+            accountsToAdd.map((item, i, arr) => {
+              const last = i === arr.length - 1;
 
-            const baseNetworkImages: string[] = [];
-            let restNetworksCount = 0;
+              const baseNetworkImages: string[] = [];
+              let restNetworksCount = 0;
 
-            for (const chainId of item.networks ?? []) {
-              if (baseNetworkImages.length < 3) {
-                const src = NETWORK_ICON_MAP.get(chainId);
+              for (const chainId of item.networks ?? []) {
+                if (baseNetworkImages.length < 3) {
+                  const src = NETWORK_ICON_MAP.get(chainId);
 
-                if (src) {
-                  baseNetworkImages.push(src);
-                  continue;
+                  if (src) {
+                    baseNetworkImages.push(src);
+                    continue;
+                  }
                 }
+
+                restNetworksCount++;
               }
 
-              restNetworksCount++;
-            }
-
-            return (
-              <Fragment key={i}>
-                <div
-                  className={classNames(
-                    "w-full p-1",
-                    "flex items-stretch",
-                    "rounded-lg",
-                  )}
-                >
-                  <AutoIcon
-                    seed={item.address}
-                    source="dicebear"
-                    type="personas"
-                    className={classNames(
-                      "h-[3rem] w-[3rem] min-w-[3rem]",
-                      "bg-black/40",
-                      "rounded-[.5rem]",
-                    )}
-                  />
-
+              return (
+                <Fragment key={i}>
                   <div
                     className={classNames(
-                      "pl-4",
-                      "flex flex-col items-start justify-around",
-                      "text-base text-brand-light",
-                      "w-full min-w-0",
+                      "w-full p-1",
+                      "flex items-stretch",
+                      "rounded-lg",
                     )}
                   >
-                    <span
+                    <AutoIcon
+                      seed={item.address}
+                      source="dicebear"
+                      type="personas"
                       className={classNames(
-                        "flex items-center",
-                        "min-w-0 w-full",
-                        "font-bold",
+                        "h-[3rem] w-[3rem] min-w-[3rem]",
+                        "bg-black/40",
+                        "rounded-[.5rem]",
+                      )}
+                    />
+
+                    <div
+                      className={classNames(
+                        "pl-4",
+                        "flex flex-col items-start justify-around",
+                        "text-base text-brand-light",
+                        "w-full min-w-0",
                       )}
                     >
-                      <span className="truncate min-w-0">
-                        <TReplace msg={item.name ?? ""} />
+                      <span
+                        className={classNames(
+                          "flex items-center",
+                          "min-w-0 w-full",
+                          "font-bold",
+                        )}
+                      >
+                        <span className="truncate min-w-0">
+                          <TReplace msg={item.name ?? ""} />
+                        </span>
                       </span>
-                    </span>
 
-                    <HashPreview
-                      hash={item.address}
-                      className="text-brand-inactivelight"
-                    />
+                      <HashPreview
+                        hash={item.address}
+                        className="text-brand-inactivelight"
+                      />
+                    </div>
+
+                    {baseNetworkImages.length > 0 && (
+                      <>
+                        <div className="flex-1" />
+
+                        <div className="flex items-center">
+                          {baseNetworkImages.map((src, j) => (
+                            <Avatar
+                              key={j}
+                              src={src}
+                              withBg={false}
+                              className="h-8 w-8 -ml-3"
+                            />
+                          ))}
+
+                          {restNetworksCount > 0 ? (
+                            <div className="ml-1 text-base font-medium text-brand-inactivelight">
+                              +{restNetworksCount}
+                            </div>
+                          ) : null}
+                        </div>
+                      </>
+                    )}
                   </div>
 
-                  {baseNetworkImages.length > 0 && (
-                    <>
-                      <div className="flex-1" />
-
-                      <div className="flex items-center">
-                        {baseNetworkImages.map((src, j) => (
-                          <Avatar
-                            key={j}
-                            src={src}
-                            withBg={false}
-                            className="h-8 w-8 -ml-3"
-                          />
-                        ))}
-
-                        {restNetworksCount > 0 ? (
-                          <div className="ml-1 text-base font-medium text-brand-inactivelight">
-                            +{restNetworksCount}
-                          </div>
-                        ) : null}
-                      </div>
-                    </>
+                  {!last && (
+                    <div
+                      key={i}
+                      className="h-px w-full bg-brand-main/[.07] my-3"
+                    />
                   )}
-                </div>
-
-                {!last && (
-                  <div
-                    key={i}
-                    className="h-px w-full bg-brand-main/[.07] my-3"
-                  />
-                )}
-              </Fragment>
-            );
-          })}
+                </Fragment>
+              );
+            })
+          ) : (
+            <p className="p-2 text-sm text-center text-brand-lightgray">
+              You have reached the maximum number of wallets - <b>30</b>.
+              <br />
+              Use another profile to increase their total number.
+            </p>
+          )}
         </div>
 
         {!oneSimpleAccount && (
