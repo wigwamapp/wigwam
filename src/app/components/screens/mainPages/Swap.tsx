@@ -134,6 +134,7 @@ const Swap: FC = () => {
         borderRadius: "10px",
       },
       sdkConfig: {
+        apiUrl: "https://li.quest/v1",
         defaultRouteOptions: {
           infiniteApproval: true,
         },
