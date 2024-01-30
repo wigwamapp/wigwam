@@ -20,11 +20,13 @@ import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import Tooltip, { TooltipProps } from "./Tooltip";
 import TooltipIcon from "./TooltipIcon";
+import FiatAmount from "./FiatAmount";
 
 type ItemProps<T, U> = {
   icon?: string;
   key: U;
   value: T;
+  balanceUSD?: string;
 };
 
 export type SelectProps<T, U> = {
@@ -198,6 +200,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
               ) : (
                 currentItem.value
               )}
+              {currentItem.balanceUSD && (
+                <FiatAmount
+                  amount={currentItem.balanceUSD}
+                  copiable={false}
+                  className="text-[0.85rem] ml-4 text-brand-inactivelight"
+                />
+              )}
               <ChevronDownIcon
                 className={classNames(
                   size === "large" && "w-6 min-w-[1.5rem]",
@@ -351,6 +360,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
                             </span>
                           ) : (
                             item.value
+                          )}
+                          {item.balanceUSD && (
+                            <FiatAmount
+                              amount={item.balanceUSD}
+                              copiable={false}
+                              className="text-[0.85rem] ml-4 text-brand-inactivelight"
+                            />
                           )}
                           {showSelected &&
                             showSelectedIcon &&
