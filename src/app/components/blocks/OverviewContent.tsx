@@ -2,6 +2,7 @@ import {
   FC,
   memo,
   ReactNode,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -93,8 +94,10 @@ const TokenExplorer: FC = () => {
         <TokenList key={tokenType} tokenType={tokenType} />
       </div>
 
-      {tokenSlug &&
-        (tokenType === TokenType.Asset ? <AssetInfo /> : <NftInfo />)}
+      <Suspense fallback={null}>
+        {tokenSlug &&
+          (tokenType === TokenType.Asset ? <AssetInfo /> : <NftInfo />)}
+      </Suspense>
     </>
   );
 };

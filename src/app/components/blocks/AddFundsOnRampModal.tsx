@@ -1,4 +1,13 @@
-import { FC, memo, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  FC,
+  Suspense,
+  lazy,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import classNames from "clsx";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAtom } from "jotai";
@@ -9,7 +18,7 @@ import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 import IconedButton from "app/components/elements/IconedButton";
 
-import OnRampIframe from "./OnRampIframe";
+const OnRampIframe = lazy(() => import("./OnRampIframe"));
 
 const AddFundsOnRampModal = memo(() => {
   const [onRampModalOpened, setOnRampModalOpened] = useAtom(onRampModalAtom);
@@ -68,14 +77,27 @@ const AddFundsOnRampModal = memo(() => {
 
           {onRampModalOpened && (
             <div className="flex justify-center h-full py-16">
-              <OnRampIframe />
-              <Dialog.Close className="-mr-12" asChild aria-description="Close">
-                <IconedButton
-                  aria-label="Close"
-                  Icon={CloseIcon}
-                  className="h-6 w-6"
-                />
-              </Dialog.Close>
+              <Suspense
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="atom-spinner w-16 h-16" />
+                  </div>
+                }
+              >
+                <OnRampIframe />
+
+                <Dialog.Close
+                  className="-mr-12"
+                  asChild
+                  aria-description="Close"
+                >
+                  <IconedButton
+                    aria-label="Close"
+                    Icon={CloseIcon}
+                    className="h-6 w-6"
+                  />
+                </Dialog.Close>
+              </Suspense>
             </div>
           )}
 
