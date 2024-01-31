@@ -8,12 +8,13 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import {
   approvalStatusAtom,
-  getActivityAtom,
+  getActivitiesAtom,
+  getPendingActivitiesAtom,
   getTokenActivityAtom,
-  pendingActivityAtom,
 } from "app/atoms";
 
 import { useChainId } from "./chainId";
+import { useAccounts } from "./account";
 
 export type UseTokenActivityOptions = {
   search?: string;
@@ -89,31 +90,32 @@ export function useTokenActivity(
   };
 }
 
-export function useCompleteActivity(limit = 20) {
+export function useCompleteActivity(accountAddress: string, limit = 20) {
   const forceUpdate = useForceUpdate();
   const offsetRef = useRef(0);
 
   const offset = offsetRef.current;
   const queryParams = useMemo(
     () => ({
+      accountAddress,
       limit: offset + limit,
     }),
-    [offset, limit],
+    [accountAddress, offset, limit],
   );
 
-  const tokenActivityAtom = getActivityAtom(queryParams);
+  const activitiesAtom = getActivitiesAtom(queryParams);
   const prevQueryParamsRef = useRef<typeof queryParams>();
 
   useEffect(() => {
     // Cleanup atoms cache
     if (prevQueryParamsRef.current) {
-      getActivityAtom.remove(prevQueryParamsRef.current);
+      getActivitiesAtom.remove(prevQueryParamsRef.current);
     }
 
     prevQueryParamsRef.current = queryParams;
   }, [queryParams]);
 
-  const activity = useLazyAtomValue(tokenActivityAtom);
+  const activity = useLazyAtomValue(activitiesAtom);
 
   const hasMore =
     activity !== undefined && offsetRef.current <= activity.length;
@@ -133,12 +135,18 @@ export function useCompleteActivity(limit = 20) {
 }
 
 export function useActivityBadge() {
-  const { total } = useAtomValue(approvalStatusAtom);
-  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
-  const pendingCount = useMemo(
+  const { currentAccount } = useAccounts();
+  const { total: totalApprovals } = useAtomValue(approvalStatusAtom);
+  const pendingActivities = useLazyAtomValue(
+    getPendingActivitiesAtom(currentAccount.address),
+  );
+  const totalPendingActivities = useMemo(
     () => pendingActivities?.length ?? 0,
     [pendingActivities],
   );
 
-  return useMemo(() => total > 0 || pendingCount > 0, [total, pendingCount]);
+  return useMemo(
+    () => totalApprovals > 0 || totalPendingActivities > 0,
+    [totalApprovals, totalPendingActivities],
+  );
 }
