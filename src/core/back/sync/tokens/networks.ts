@@ -182,6 +182,15 @@ export const syncNetworks = memoize(
   },
 );
 
+export async function isFirstSync(accountAddress: string) {
+  const anyNativeToken = await repo.accountTokens
+    .where("[accountAddress+tokenSlug]")
+    .equals([accountAddress, NATIVE_TOKEN_SLUG])
+    .first();
+
+  return Boolean(anyNativeToken);
+}
+
 export const fetchAllUsedNetworks = withOfflineCache(
   async (accountAddress: string) => {
     const res = await indexerApi.get(
