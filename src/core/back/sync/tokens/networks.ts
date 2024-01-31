@@ -18,7 +18,7 @@ import { indexerApi } from "../indexer";
 import { fetchTotalChainBalance } from "./total";
 
 export const syncNetworks = memoize(
-  async (accountAddress: string) => {
+  async (accountAddress: string, activeChainId: number) => {
     const [existingNativeTokens, allUsedNetworks] = await Promise.all([
       repo.accountTokens
         .where("[accountAddress+tokenSlug]")
@@ -40,9 +40,22 @@ export const syncNetworks = memoize(
       (chainId) => !chainIdsToRefresh.includes(chainId),
     );
 
-    const chainIds = [...chainIdsToRefresh, ...chainIdsToAdd];
+    const chainIds = new Set([
+      ...chainIdsToRefresh,
+      ...chainIdsToAdd,
+      activeChainId,
+    ]);
 
-    const dbKeys = chainIds.map((chainId) =>
+    const networks = [];
+    for (const chainId of chainIds) {
+      try {
+        networks.push(await getNetwork(chainId));
+      } catch (err) {
+        console.warn("Unlisted network founded", err);
+      }
+    }
+
+    const dbKeys = networks.map(({ chainId }) =>
       createAccountTokenKey({
         chainId,
         accountAddress,
@@ -51,20 +64,21 @@ export const syncNetworks = memoize(
     );
 
     const data = await Promise.all(
-      chainIds.map((chainId) => {
+      networks.map((network) => {
+        const { chainId } = network;
         const existing = existingTokensMap.get(chainId);
+
+        const refreshNativeBalance = !existing || chainId === activeChainId;
+
         const noTotal =
           existing?.portfolioRefreshedAt &&
           existing.portfolioRefreshedAt > Date.now() - 5 * 60_000;
 
         return props({
           chainId,
-          network: getNetwork(chainId),
-          balance: getBalanceFromChain(
-            chainId,
-            NATIVE_TOKEN_SLUG,
-            accountAddress,
-          ),
+          balance: refreshNativeBalance
+            ? getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, accountAddress)
+            : null,
           cgPrice: getCoinGeckoNativeTokenPrice(chainId),
           totalBalance: noTotal
             ? null
@@ -74,10 +88,10 @@ export const syncNetworks = memoize(
     );
 
     await repo.accountTokens.bulkPut(
-      chainIds.map((chainId, i) => {
-        const { network, balance, cgPrice, totalBalance } = data[i];
+      networks.map((network, i) => {
+        const { chainId, nativeCurrency, chainTag } = network;
+        const { balance, cgPrice, totalBalance } = data[i];
         const existing = existingTokensMap.get(chainId);
-        const { nativeCurrency, chainTag } = network;
 
         const priceUSD = cgPrice?.usd?.toString();
         const priceUSDChange = cgPrice?.usd_24h_change?.toString();
@@ -157,13 +171,14 @@ export const syncNetworks = memoize(
             : undefined),
       );
 
-      if (mostValuedItem) return mostValuedItem.chainId;
+      if (mostValuedItem) return mostValuedItem?.chainId;
     }
 
     return;
   },
   {
-    maxAge: 20_000, // 20 sec
+    maxAge: 10_000, // 10 sec
+    cacheKey: (args) => args.join(),
   },
 );
 
@@ -178,13 +193,13 @@ export const fetchAllUsedNetworks = withOfflineCache(
       },
     );
 
-    const resItems = res.data?.items ?? [];
-    const chainIds: number[] = resItems.map((item: any) => +item.chainId);
+    const resItems = res.data?.data?.items ?? [];
+    const chainIds: number[] = resItems.map((item: any) => +item.chain_id);
 
     return chainIds;
   },
   {
-    key: ([address]) => `used_networks_${address}`,
+    key: ([address]) => `networks_${address}`,
     hotMaxAge: 30_000, // 30 sec
     coldMaxAge: 20_000 * 30, // 20 min
   },

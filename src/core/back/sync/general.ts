@@ -25,7 +25,7 @@ export async function addSyncRequest(
     await syncConversionRates();
 
     await enqueueTokensSync(accountAddress, async () => {
-      const mostValuedChainId = await syncNetworks(accountAddress);
+      const mostValuedChainId = await syncNetworks(accountAddress, chainId);
 
       await syncAccountTokens(
         tokenType,
