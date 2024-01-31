@@ -12,6 +12,7 @@ export type SecondaryModalProps = DialogProps &
     header?: ReactNode;
     disabledClickOutside?: boolean;
     closeButton?: boolean;
+    closeButtonClassName?: string;
     autoFocus?: boolean;
     className?: string;
     headerClassName?: string;
@@ -22,6 +23,7 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
   header,
   disabledClickOutside,
   closeButton = true,
+  closeButtonClassName,
   autoFocus,
   open,
   onOpenChange,
@@ -75,7 +77,13 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
           {children}
 
           {closeButton && (
-            <Dialog.Close asChild className="fixed top-4 right-4">
+            <Dialog.Close
+              asChild
+              className={classNames(
+                "fixed top-4 right-4",
+                closeButtonClassName,
+              )}
+            >
               <IconedButton
                 Icon={CloseIcon}
                 aria-label="Close"
