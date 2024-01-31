@@ -166,11 +166,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
             size === "large" && "py-2.5 pl-5 pr-4 text-sm rounded-[.625rem]",
             size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
             "font-bold",
-            "bg-brand-main/5",
+            "bg-brand-darkgray",
             currentItem &&
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
-              "bg-brand-main/10": opened,
+              "bg-brand-darkgray": opened,
             },
             "transition-colors",
             currentItemClassName,
@@ -227,7 +227,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 size === "small" && "mt-1.5 w-[12.5rem]",
                 "w-full",
                 "rounded-[.625rem]",
-                "bg-brand-dark/10",
+                "bg-brand-darkgray",
                 "backdrop-blur-[30px]",
                 IS_FIREFOX && "!bg-[#0E1314]",
                 "border border-brand-light/5",

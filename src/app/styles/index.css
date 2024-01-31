@@ -83,30 +83,25 @@ a {
 @tailwind utilities;
 
 @layer utilities {
-  .glass-icon-stable {
-    --opacity: 1;
-    --color-1: theme("colors.brand.main");
-    --color-2: theme("colors.brand.main");
+  svg.styled-icon * {
+    transition-property: all;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in;
   }
 
-  .glass-icon {
-    --opacity: 0.8;
-    --color-1: theme("colors.brand.main");
-    --color-2: theme("colors.brand.main");
+  .styled-icon {
+    --color-1: #696c73;
+    --color-2: #2a2d35;
   }
 
-  svg.glass-icon * {
-    @apply transition-all duration-300 ease-in-out;
+  .styled-icon--hover {
+    --color-1: #949cae;
+    --color-2: #373b45;
   }
 
-  .glass-icon--hover {
-    --opacity: 1;
-  }
-
-  .glass-icon--active {
-    --opacity: 1;
+  .styled-icon--active {
     --color-1: theme("colors.brand.redone");
-    --color-2: theme("colors.brand.redtwo");
+    --color-2: #2a2d35;
   }
 
   /* For Webkit-based browsers (Chrome, Safari and Opera) */
