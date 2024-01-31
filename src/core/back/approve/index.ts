@@ -49,10 +49,11 @@ export async function processApprove(
 
           const origin = getPageOrigin(source);
 
+          const timeAt = Date.now();
           const newPermission: Permission = {
             origin,
             id: nanoid(),
-            timeAt: Date.now(),
+            timeAt,
             accountAddresses,
             chainId:
               overriddenChainId ?? preferredChainId ?? INITIAL_NETWORK.chainId,
@@ -64,16 +65,18 @@ export async function processApprove(
             ? accountAddresses[0]
             : wrapPermission(newPermission);
 
-          await saveActivity({
-            id: nanoid(),
-            type,
-            source,
-            returnSelectedAccount,
-            preferredChainId,
-            accountAddresses,
-            timeAt: Date.now(),
-            pending: 0,
-          });
+          await saveActivity(
+            accountAddresses.map((accountAddress) => ({
+              id: nanoid(),
+              type,
+              source,
+              returnSelectedAccount,
+              preferredChainId,
+              accountAddress,
+              timeAt,
+              pending: 0,
+            })),
+          );
 
           rpcCtx?.reply({ result: [toReturn] });
         },

@@ -137,12 +137,14 @@ export function startPageServer() {
       if (perm.accountAddresses.includes(internalAccountAddress)) {
         accountAddress = internalAccountAddress;
       } else {
-        const allAccountAddresses = $accountAddresses.getState();
+        accountAddress = null;
 
-        accountAddress =
-          perm.accountAddresses.find((address) =>
-            allAccountAddresses.includes(address),
-          ) ?? null;
+        // const allAccountAddresses = $accountAddresses.getState();
+
+        // accountAddress =
+        //   perm.accountAddresses.find((address) =>
+        //     allAccountAddresses.includes(address),
+        //   ) ?? null;
       }
 
       params = {

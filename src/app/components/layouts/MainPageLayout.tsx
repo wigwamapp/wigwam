@@ -1,10 +1,9 @@
-import { FC, PropsWithChildren, Suspense } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Sidebar from "app/components/blocks/Sidebar";
 import Menu from "app/components/blocks/Menu";
-import ActivityBar from "app/components/blocks/ActivityBar";
 
 import PreloadBaseAndSync from "./PreloadBaseAndSync";
 
@@ -35,10 +34,6 @@ const MainPageLayout: FC<PropsWithChildren> = ({ children }) => (
           {children}
         </main>
       </ContentContainer>
-
-      <Suspense fallback={null}>
-        <ActivityBar />
-      </Suspense>
     </div>
   </PreloadBaseAndSync>
 );

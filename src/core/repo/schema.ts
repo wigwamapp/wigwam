@@ -50,18 +50,19 @@ db.version(2).stores({
   ].join(),
 });
 
-// /**
-//  * [3]
-//  * - Allow to query for one account
-//  * - Allow to query for one account and one chain
-//  */
+/**
+ * [3]
+ * - Allow to query for one account
+ * - Allow to query for one account and one chain
+ */
 
-// db.version(3).stores({
-//   [RepoTable.Activities]: [
-//     "&id",
-//     "[pending+timeAt]",
-//     "[accountAddress+pending+timeAt]",
-//     "[chainId+accountAddress+pending+timeAt]",
-//     "[type+pending]",
-//   ].join(),
-// });
+db.version(3).stores({
+  [RepoTable.Activities]: [
+    "&id",
+    "[type+pending]",
+    "[type+accountAddress+pending]",
+    "[pending+timeAt]",
+    "[accountAddress+pending+timeAt]",
+    "[accountAddress+chainId+pending+timeAt]",
+  ].join(),
+});

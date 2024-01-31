@@ -9,7 +9,6 @@ import WalletsList from "app/components/blocks/WalletsList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import { ReactComponent as AssetIcon } from "app/icons/transfer-asset.svg";
 import { ReactComponent as NFTIcon } from "app/icons/transfer-nft.svg";
-import { ReactComponent as BridgeIcon } from "app/icons/transfer-bridge.svg";
 
 import TransferTab from "./Transfer.Tab";
 
@@ -61,12 +60,5 @@ const tabsContent = [
     title: "NFT",
     Icon: NFTIcon,
     desc: "Send NFTs or other non-fungible tokens such as ERC721 or ERC1155.",
-  },
-  {
-    route: { page: "transfer", transfer: TransferTabEnum.Bridge },
-    title: "Bridge",
-    Icon: BridgeIcon,
-    desc: "Send tokens to another network, but to the same wallet.",
-    soon: true,
   },
 ];
