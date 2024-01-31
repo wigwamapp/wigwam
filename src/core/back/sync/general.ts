@@ -31,11 +31,7 @@ export async function addSyncRequest(
       const firstSync = await isFirstSync(accountAddress);
       const mostValuedChainId = await syncNetworks(accountAddress, chainId);
 
-      await syncAccountTokens(
-        tokenType,
-        mostValuedChainId ?? chainId,
-        accountAddress,
-      );
+      await syncAccountTokens(tokenType, chainId, accountAddress);
 
       if (tokenType === TokenType.Asset) {
         await refreshTotalBalances(chainId, accountAddress);
