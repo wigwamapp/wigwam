@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import type { FC } from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
 import {
   useChain,
@@ -38,7 +38,12 @@ export const TokenList: FC<TokenListProps> = ({
     isLoading: isTokensLoading,
     isBalanceLoading,
     featuredTokens,
+    refetch
   } = useTokenBalances(selectedChainId);
+
+  useEffect(() => {
+    refetch()
+  }, [])
 
   let filteredTokens = (tokensWithBalance ??
     chainTokens ??
