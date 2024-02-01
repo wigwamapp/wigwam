@@ -11,7 +11,8 @@ export interface IPopupModalProps extends SecondaryModalProps {
 }
 
 const PopupModal: FC<IPopupModalProps> = (props) => {
-  const { children, className, headerClassName, contentClassName } = props;
+  const { children, className, headerClassName, contentClassName, open } =
+    props;
 
   return (
     <SecondaryModal
@@ -25,14 +26,16 @@ const PopupModal: FC<IPopupModalProps> = (props) => {
         className,
       )}
     >
-      <div
-        className={classNames(
-          "w-full pt-8 flex items-start justify-start flex-col",
-          contentClassName,
-        )}
-      >
-        {children}
-      </div>
+      {open ? (
+        <div
+          className={classNames(
+            "w-full pt-8 flex items-start justify-start flex-col",
+            contentClassName,
+          )}
+        >
+          {children}
+        </div>
+      ) : null}
     </SecondaryModal>
   );
 };
