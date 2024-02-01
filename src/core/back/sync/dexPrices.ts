@@ -152,6 +152,20 @@ export async function getDexPrices(tokenAddresses: string[]) {
   }
 }
 
+export const getExplorerDetailsUrl = async (tokenAddress: string) => {
+  try {
+    const allCoinIds = await getCoinGeckoCoinIds();
+    if (allCoinIds[tokenAddress.toLocaleLowerCase()]) {
+      return `https://www.coingecko.com/en/coins/${allCoinIds[tokenAddress.toLocaleLowerCase()]}`;
+    } else {
+      return `https://dexscreener.com/search?q=${tokenAddress}`;
+    }
+  } catch (err) {
+    console.log(err);
+    return `https://dexscreener.com/search?q=${tokenAddress}`;
+  }
+};
+
 export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
   try {
     const platformIds = await getCoinGeckoPlatformIds();
