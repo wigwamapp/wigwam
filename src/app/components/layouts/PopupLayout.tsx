@@ -97,6 +97,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 "pt-3 pb-20 px-3",
                 "overflow-hidden",
                 "flex flex-col",
+                "rounded-t-2xl",
                 className,
               )}
             >
@@ -111,7 +112,6 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
         </div>
       )}
     </OverflowProvider>
-    // </div>
   );
 };
 
