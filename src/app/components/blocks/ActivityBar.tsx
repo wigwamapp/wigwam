@@ -9,9 +9,9 @@ import { IS_FIREFOX } from "app/defaults";
 import {
   activityModalAtom,
   approvalStatusAtom,
-  pendingActivityAtom,
+  getPendingActivitiesAtom,
 } from "app/atoms";
-import { TippySingletonProvider } from "app/hooks";
+import { TippySingletonProvider, useAccounts } from "app/hooks";
 
 import ApprovalStatus from "app/components/blocks/ApprovalStatus";
 import Tooltip from "app/components/elements/Tooltip";
@@ -34,7 +34,10 @@ const ActivityBar: FC<WithThemeProps> = ({ theme = "large" }) => {
   const { total } = useAtomValue(approvalStatusAtom);
   const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
 
-  const pendingActivities = useLazyAtomValue(pendingActivityAtom);
+  const { currentAccount } = useAccounts();
+  const pendingActivities = useLazyAtomValue(
+    getPendingActivitiesAtom(currentAccount.address),
+  );
   const pendingCount = pendingActivities?.length ?? 0;
 
   const [activityHovered, setActivityHovered] = useState(false);

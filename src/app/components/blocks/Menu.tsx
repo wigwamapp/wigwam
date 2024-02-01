@@ -1,10 +1,13 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { useIsSyncing } from "app/hooks";
+import { getTotalAccountBalanceAtom } from "app/atoms";
+import { useAccounts, useIsSyncing } from "app/hooks";
 import { Page, SettingTab } from "app/nav";
 import Button from "app/components/elements/Button";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import LockProfileButton from "app/components/elements/LockProfileButton";
+import FiatAmount from "app/components/elements/FiatAmount";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 const Menu: FC = () => {
@@ -13,6 +16,10 @@ const Menu: FC = () => {
   return (
     <div className="flex items-center py-4 border-b border-brand-main/[.07]">
       <NetworkSelect className="w-[17.75rem]" contentClassName="w-[17.75rem]" />
+
+      <Suspense>
+        <TotalBalance />
+      </Suspense>
 
       {isSyncing && (
         <span className="px-4 text-sm text-white font-semibold">
@@ -37,3 +44,22 @@ const Menu: FC = () => {
 };
 
 export default Menu;
+
+const TotalBalance: FC = () => {
+  const { currentAccount } = useAccounts();
+  const totalBalance = useLazyAtomValue(
+    getTotalAccountBalanceAtom(currentAccount.address),
+  );
+
+  return (
+    <>
+      {totalBalance ? (
+        <FiatAmount
+          amount={totalBalance}
+          copiable
+          className="text-[1.25rem] font-bold leading-none ml-4"
+        />
+      ) : null}
+    </>
+  );
+};

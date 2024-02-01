@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { Page } from "app/nav";
+import { useSetAtom } from "jotai";
+
 import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -12,14 +14,13 @@ import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
-import { useSetAtom } from "jotai";
 import { activityModalAtom } from "app/atoms";
 import { useActivityBadge } from "app/hooks";
 
 const useSidebarLinks = () => {
   const { alert } = useDialog();
   const setActivityOpened = useSetAtom(activityModalAtom);
-  const showActivityBadge = useActivityBadge();
+  const activityBadgeDisplayed = useActivityBadge();
 
   const NavLinksPrimary = useMemo(() => {
     return [
@@ -32,7 +33,7 @@ const useSidebarLinks = () => {
         label: "Activity",
         Icon: ActivityIcon,
         action: () => setActivityOpened([true, "replace"]),
-        badge: showActivityBadge,
+        badge: activityBadgeDisplayed,
       },
       {
         route: Page.Receive,
@@ -57,7 +58,7 @@ const useSidebarLinks = () => {
       //   soon: true,
       // },
     ];
-  }, [showActivityBadge, setActivityOpened]);
+  }, [activityBadgeDisplayed, setActivityOpened]);
 
   const NavLinksSecondary = useMemo(() => {
     return [

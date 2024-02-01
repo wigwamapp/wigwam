@@ -1,11 +1,15 @@
-import { Account, TokenType } from "core/types";
+import { storage } from "lib/ext/storage";
 
-import { $accounts, syncStarted, synced } from "../state";
+import { CHAIN_ID, TokenType } from "core/types";
+
+import { syncStarted, synced } from "../state";
 import { syncConversionRates } from "./currencyConversion";
 import {
-  syncAccountTokens,
-  syncNativeTokens,
   enqueueTokensSync,
+  syncNetworks,
+  syncAccountTokens,
+  refreshTotalBalances,
+  isFirstSync,
 } from "./tokens";
 
 export async function addSyncRequest(
@@ -16,49 +20,33 @@ export async function addSyncRequest(
   let syncStartedAt: number | undefined;
 
   setTimeout(() => {
-    if (!syncStartedAt) syncStarted(chainId);
+    if (!syncStartedAt) syncStarted(accountAddress);
     syncStartedAt = Date.now();
   }, 300);
 
   try {
     await syncConversionRates();
 
-    await enqueueTokensSync(chainId, async () => {
+    await enqueueTokensSync(accountAddress, async () => {
+      const firstSync = await isFirstSync(accountAddress);
+      const mostValuedChainId = await syncNetworks(accountAddress, chainId);
+
       await syncAccountTokens(tokenType, chainId, accountAddress);
 
-      const allAccounts = $accounts.getState();
-
-      let currentAccount: Account | undefined;
-      const restAccounts: Account[] = [];
-
-      for (const acc of allAccounts) {
-        if (acc.address === accountAddress) {
-          currentAccount = acc;
-        } else {
-          restAccounts.push(acc);
-        }
+      if (tokenType === TokenType.Asset) {
+        await refreshTotalBalances(chainId, accountAddress);
       }
 
-      if (!currentAccount) return;
-
-      await syncNativeTokens(
-        chainId,
-        `current_${accountAddress}`,
-        currentAccount.address,
-      );
-
-      await syncNativeTokens(
-        chainId,
-        `rest_${allAccounts.length}`,
-        restAccounts.map((acc) => acc.address),
-      );
+      if (firstSync && mostValuedChainId && mostValuedChainId !== chainId) {
+        await storage.put(CHAIN_ID, mostValuedChainId);
+      }
     });
   } catch (err) {
     console.error(err);
   } finally {
     if (syncStartedAt) {
       setTimeout(
-        () => synced(chainId),
+        () => synced(accountAddress),
         Math.max(0, syncStartedAt + 1_000 - Date.now()),
       );
     } else {

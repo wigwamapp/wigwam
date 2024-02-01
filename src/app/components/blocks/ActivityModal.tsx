@@ -42,8 +42,8 @@ import {
   activityModalAtom,
   approvalStatusAtom,
   getNetworkAtom,
+  getPendingActivitiesAtom,
   getPermissionAtom,
-  pendingActivityAtom,
 } from "app/atoms";
 import {
   IS_FIREFOX,
@@ -53,6 +53,7 @@ import {
 import {
   ChainIdProvider,
   OverflowProvider,
+  useAccounts,
   useCompleteActivity,
   useExplorerLink,
   useLazyNetwork,
@@ -271,13 +272,17 @@ const Approve = memo(() => {
 });
 
 const History = memo(() => {
+  const { currentAccount } = useAccounts();
+
   const isPopupMode = isPopup();
-  const pendingActivity = useLazyAtomValue(pendingActivityAtom);
+  const pendingActivity = useLazyAtomValue(
+    getPendingActivitiesAtom(currentAccount.address),
+  );
   const {
     activity: completeActivity,
     hasMore,
     loadMore,
-  } = useCompleteActivity();
+  } = useCompleteActivity(currentAccount.address);
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
