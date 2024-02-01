@@ -76,7 +76,7 @@ const Input = memo(
         "absolute top-1/2 -translate-y-1/2",
         "pointer-events-none",
         "transition-colors",
-        focused && "fill-current text-brand-light",
+        focused && "fill-current [&>*]:fill-current text-brand-light",
         disabled &&
           theme !== "clean" &&
           "fill-current text-brand-disabledcolor",

@@ -4,13 +4,9 @@ import {
   useCallback,
   memo,
   useState,
-  useMemo,
   ButtonHTMLAttributes,
-  Dispatch,
-  SetStateAction,
   MouseEventHandler,
 } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
@@ -18,49 +14,38 @@ import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
 
 import { AccountAsset, TokenStatus } from "core/types";
-import { NATIVE_TOKEN_SLUG, toggleTokenStatus } from "core/common/tokens";
+import { toggleTokenStatus } from "core/common/tokens";
 
-import { IS_FIREFOX } from "app/defaults";
-import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
+import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { chainIdAtom } from "app/atoms";
-import { useDialog } from "app/hooks/dialog";
 
-import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
-import { ReactComponent as InfoRoundIcon } from "app/icons/info-round.svg";
-import { ReactComponent as ReceiveIcon } from "app/icons/receive-small.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
-import { ReactComponent as CheckIcon } from "app/icons/terms-check.svg";
-import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as ControlIcon } from "app/icons/control.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as CheckIcon } from "app/icons/check.svg";
 
-import IconedButton from "app/components/elements/IconedButton";
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
 import PrettyAmount from "app/components/elements/PrettyAmount";
-import PriceArrow from "app/components/elements/PriceArrow";
+import Button from "app/components/elements/Button";
+import PopupModal from "./PopupModal";
+import PriceChange from "../overview/PriceChange";
 
 type AssetCardProps = {
   asset: AccountAsset;
-  setReceivePopupOpened: Dispatch<SetStateAction<boolean>>;
   isManageMode?: boolean;
   className?: string;
 };
 
 const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
-    (
-      { asset, setReceivePopupOpened, isManageMode = false, className },
-      ref,
-    ) => {
-      const setInternalChainId = useSetAtom(chainIdAtom);
-      const { confirm } = useDialog();
-
+    ({ asset, isManageMode = false, className }, ref) => {
+      const [openModal, setModalOpen] = useState(false);
       const [popoverOpened, setPopoverOpened] = useState(false);
+
       const {
-        chainId,
         name,
         symbol,
         rawBalance,
@@ -73,43 +58,11 @@ const AssetCard = memo(
       const nativeAsset = status === TokenStatus.Native;
       const disabled = status === TokenStatus.Disabled;
 
-      const openLink = useCallback(
-        (to: Record<string, unknown>) => {
-          setInternalChainId(chainId);
-          openInTab(to);
-        },
-        [setInternalChainId, chainId],
-      );
-
-      const handleHideAsset = useCallback(async () => {
-        const response = await confirm({
-          title: "Hide asset",
-          content: (
-            <>
-              <p className="mb-4 mx-auto text-center">
-                Are you sure you want to hide <b>{asset.symbol}</b>?
-              </p>
-              <p className="mx-auto text-center">
-                You can turn it back on the{" "}
-                <span className="inline-flex">
-                  &quot;
-                  <ControlIcon /> Manage Assets&quot;
-                </span>{" "}
-                at any time.
-              </p>
-            </>
-          ),
-          yesButtonText: "Hide",
-        });
-
-        if (response) {
-          toggleTokenStatus(asset);
-        }
-      }, [confirm, asset]);
-
       const handleAssetClick = useCallback(async () => {
         if (isManageMode) {
           await toggleTokenStatus(asset);
+        } else {
+          setModalOpen(true);
         }
       }, [isManageMode, asset]);
 
@@ -126,211 +79,103 @@ const AssetCard = memo(
         },
         [isManageMode, popoverOpened],
       );
-
-      const priceClassName = useMemo(
-        () =>
-          priceUSDChange && +priceUSDChange > 0
-            ? "text-[#6BB77A]"
-            : "text-[#EA556A]",
-        [priceUSDChange],
-      );
-
-      const content = (
-        <button
-          ref={ref}
-          type="button"
-          onClick={handleAssetClick}
-          onContextMenu={handleAssetContextMenu}
-          className={classNames(
-            "relative",
-            "flex items-stretch",
-            "w-full p-2",
-            "text-left",
-            "rounded-[.625rem]",
-            "cursor-default",
-            "group",
-            "transition",
-            popoverOpened && "bg-brand-main/10",
-            isManageMode &&
-              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
-            disabled && "opacity-60",
-            "hover:opacity-100",
-            className,
-          )}
-          disabled={isManageMode && nativeAsset}
-        >
-          <AssetLogo
-            asset={asset}
-            alt={name}
-            className="w-11 h-11 min-w-[2.75rem] mr-3"
-          />
-          <span className="flex flex-col w-full min-w-0">
-            <span className="flex items-end">
-              <span className="text-sm font-bold leading-5 truncate mr-auto">
-                {name}
-              </span>
-              {!isManageMode && (
-                <FiatAmount
-                  amount={balanceUSD}
-                  copiable
-                  className={"text-sm font-bold leading-5 ml-2"}
-                  threeDots={false}
-                  asSpan
-                  isDecimalsMinified
-                />
-              )}
-            </span>
-            <span className="mt-1 flex justify-between items-end">
-              <PrettyAmount
-                amount={rawBalance ?? 0}
-                decimals={decimals}
-                currency={symbol}
-                className={classNames(
-                  // "text-sm",
-                  "text-xs leading-4",
-                  "text-brand-inactivedark",
-                )}
-                copiable={!isManageMode}
-                asSpan
-                threeDots={false}
-              />
-              {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
-                <span
-                  className={classNames(
-                    "inline-flex items-center",
-                    "opacity-75",
-                    "transition",
-                    "ml-2",
-                    priceClassName,
-                  )}
-                >
-                  <PriceArrow
-                    className={classNames(
-                      "w-2 h-2 mr-[0.125rem]",
-                      +priceUSDChange < 0 && "transform rotate-180",
-                    )}
-                  />
-
-                  <span className="text-xs leading-4">
-                    {new BigNumber(priceUSDChange).abs().toFixed(2)}%
-                  </span>
-                </span>
-              )}
-            </span>
-          </span>
-          {!isManageMode ? (
-            <DropdownMenu.Trigger asChild>
-              <IconedButton
-                Icon={PopoverIcon}
-                theme="tertiary"
-                className={classNames(
-                  "ml-2",
-                  popoverOpened && "bg-brand-main/30 shadow-buttonsecondary",
-                )}
-                tabIndex={-1}
-                asSpan
-              />
-            </DropdownMenu.Trigger>
-          ) : !nativeAsset ? (
-            <Checkbox.Root
-              className={classNames(
-                "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
-                "bg-brand-main/20",
-                "rounded",
-                "flex items-center justify-center",
-                !disabled && "border border-brand-main",
-              )}
-              checked={!disabled}
-              asChild
-            >
-              <span>
-                <Checkbox.Indicator>
-                  {!disabled && <CheckIcon />}
-                </Checkbox.Indicator>
-              </span>
-            </Checkbox.Root>
-          ) : null}
-        </button>
-      );
-
       return (
-        <DropdownMenu.Root
-          open={popoverOpened}
-          onOpenChange={setPopoverOpened}
-          modal
-        >
-          {content}
-
-          {!isManageMode && (
-            <DropdownMenu.Content
-              side="left"
-              align="start"
-              className={classNames(
-                "bg-brand-dark/10",
-                "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#0E1314]",
-                "border border-brand-light/5",
-                "rounded-[.625rem]",
-                "px-1 py-2",
-                "z-[1]",
-              )}
-            >
-              <PopoverButton
-                Icon={InfoRoundIcon}
-                onClick={() =>
-                  openLink({ page: Page.Default, token: asset.tokenSlug })
-                }
+        <>
+          <button
+            ref={ref}
+            type="button"
+            onClick={handleAssetClick}
+            onContextMenu={handleAssetContextMenu}
+            className={classNames(
+              "relative",
+              "flex items-stretch",
+              "w-full p-2",
+              "text-left",
+              "rounded-[.625rem]",
+              "cursor-default",
+              "group",
+              "transition",
+              popoverOpened && "bg-brand-main/10",
+              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
+              disabled && "opacity-60",
+              "hover:opacity-100",
+              className,
+            )}
+            disabled={isManageMode && nativeAsset}
+          >
+            {isManageMode ? (
+              <Checkbox.Root
+                className={classNames(
+                  "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
+                  "bg-[#373B45]",
+                  "rounded",
+                  "flex items-center justify-center",
+                )}
+                checked={!disabled}
+                disabled={nativeAsset}
+                asChild
               >
-                Info
-              </PopoverButton>
-              <PopoverButton
-                Icon={ReceiveIcon}
-                onClick={() => {
-                  setPopoverOpened(false);
-                  setReceivePopupOpened(true);
-                }}
-              >
-                Receive
-              </PopoverButton>
-              <PopoverButton
-                Icon={SendIcon}
-                onClick={() =>
-                  openLink({ page: Page.Transfer, token: asset.tokenSlug })
-                }
-              >
-                Transfer
-              </PopoverButton>
-              {asset.tokenSlug !== NATIVE_TOKEN_SLUG && (
-                <PopoverButton Icon={EyeIcon} onClick={() => handleHideAsset()}>
-                  Hide
-                </PopoverButton>
-              )}
-              <PopoverButton
-                Icon={SwapIcon}
-                onClick={() => openLink({ page: Page.Swap })}
-                disabled
-                title="Coming soon"
-              >
-                Swap
-              </PopoverButton>
-              {asset.tokenSlug === NATIVE_TOKEN_SLUG && (
-                <PopoverButton
-                  Icon={BuyIcon}
-                  onClick={() =>
-                    openLink({
-                      page: Page.Receive,
-                      receive: ReceiveTabEnum.BuyWithCrypto,
-                    })
-                  }
-                  disabled
-                  title="Coming soon"
-                >
-                  Buy
-                </PopoverButton>
-              )}
-            </DropdownMenu.Content>
-          )}
-        </DropdownMenu.Root>
+                <span>
+                  <Checkbox.Indicator
+                    className={classNames(
+                      "bg-brand-redone rounded",
+                      (disabled || nativeAsset) && "opacity-30",
+                    )}
+                  >
+                    {!disabled && <CheckIcon className="[&>*]:fill-black" />}
+                  </Checkbox.Indicator>
+                </span>
+              </Checkbox.Root>
+            ) : null}
+            <AssetLogo
+              asset={asset}
+              alt={name}
+              className="w-11 h-11 min-w-[2.75rem] mr-3"
+            />
+            <span className="flex flex-col w-full min-w-0">
+              <span className="flex items-end">
+                <span className="text-sm font-bold leading-5 truncate mr-auto">
+                  {name}
+                </span>
+                {!isManageMode && (
+                  <FiatAmount
+                    amount={balanceUSD}
+                    className={"text-sm font-bold leading-5 ml-2"}
+                    threeDots={false}
+                    asSpan
+                    isDecimalsMinified
+                  />
+                )}
+              </span>
+              <span className="mt-1 flex justify-between items-end">
+                <PrettyAmount
+                  amount={rawBalance ?? 0}
+                  decimals={decimals}
+                  currency={symbol}
+                  className={classNames(
+                    "text-xs leading-4",
+                    "text-brand-inactivedark",
+                  )}
+                  asSpan
+                  threeDots={false}
+                />
+                {priceUSDChange && !isManageMode ? (
+                  <PriceChange
+                    className="!p-0 !text-xs !font-normal"
+                    priceChange={priceUSDChange}
+                    isPercent
+                    hideBackground
+                  />
+                ) : null}
+              </span>
+            </span>
+          </button>
+          <AssetModal
+            open={openModal}
+            onClose={() => setModalOpen(false)}
+            asset={asset}
+          />
+        </>
       );
     },
   ),
@@ -361,3 +206,146 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
     {children}
   </button>
 );
+
+interface IAssetModalProps {
+  open: boolean;
+  onClose: () => void;
+  asset: AccountAsset;
+}
+
+const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
+  const {
+    balanceUSD,
+    name,
+    decimals,
+    symbol,
+    rawBalance,
+    priceUSD,
+    priceUSDChange,
+    chainId,
+  } = asset;
+  const setInternalChainId = useSetAtom(chainIdAtom);
+
+  const openLink = useCallback(
+    (to: Record<string, unknown>) => {
+      setInternalChainId(chainId);
+      openInTab(to);
+    },
+    [setInternalChainId, chainId],
+  );
+
+  return (
+    <PopupModal
+      open={open}
+      small
+      onOpenChange={onClose}
+      disabledClickOutside
+      headerClassName="!m-0"
+      header={
+        <p className="flex items-center text-base font-normal">
+          <span className="mr-2 font-semibold">{name}</span>
+          {priceUSD ? (
+            <span className="text-sm text-[#93ACAF]">
+              ${new BigNumber(priceUSD).toFixed(2, BigNumber.ROUND_DOWN)}
+            </span>
+          ) : null}
+          {priceUSDChange ? (
+            <PriceChange
+              className="!p-0 !text-xs [&>*]:font-normal"
+              priceChange={priceUSDChange}
+              isPercent={true}
+              hideBackground
+            />
+          ) : null}
+        </p>
+      }
+    >
+      <div className="flex flex-col w-full">
+        <div className="mb-6 flex w-full items-center">
+          <AssetLogo asset={asset} className="w-8 h-8 mr-2 shrink-0" />
+          <div className="w-full flex justify-between">
+            <div className="flex flex-col">
+              <PrettyAmount
+                amount={rawBalance ?? 0}
+                decimals={decimals}
+                currency={symbol}
+                className="mb-1 font-semibold text-base"
+                copiable
+                asSpan
+                threeDots={false}
+              />
+              <span className="text-xs text-brand-inactivedark">ERC20</span>
+            </div>
+            <div className="flex flex-col items-end">
+              <FiatAmount
+                className="mb-1 font-semibold text-base"
+                amount={balanceUSD}
+                threeDots={false}
+                isDecimalsMinified
+                copiable
+                asSpan
+              />
+              {priceUSDChange ? (
+                <PriceChange
+                  className="!p-0"
+                  textClassName="!font-normal !text-xs"
+                  hideBackground
+                  priceChange={new BigNumber(priceUSDChange)
+                    .times(balanceUSD)
+                    .div(100)}
+                />
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <div className="mb-10 flex justify-center gap-9">
+          <DeepLinkButton
+            text="Send"
+            onClick={() =>
+              openLink({ page: Page.Transfer, token: asset.tokenSlug })
+            }
+            Icon={SendIcon}
+          />
+          <DeepLinkButton
+            text="Buy"
+            onClick={() =>
+              openLink({ page: Page.Receive, token: asset.tokenSlug })
+            }
+            Icon={BuyIcon}
+          />
+          <DeepLinkButton
+            text="Swap"
+            onClick={() =>
+              openLink({ page: Page.Swap, token: asset.tokenSlug })
+            }
+            Icon={SwapIcon}
+          />
+        </div>
+        <Button
+          theme="secondary"
+          onClick={() => openInTab(undefined, ["token"])}
+        >
+          <ExpandIcon className="mr-3" />
+          Open Full
+        </Button>
+      </div>
+    </PopupModal>
+  );
+};
+
+const DeepLinkButton: FC<{
+  text: string;
+  Icon: FC<{ className?: string }>;
+  onClick: () => void;
+}> = ({ text, onClick, Icon }) => {
+  return (
+    <Button theme="clean" className="!p-0" onClick={onClick}>
+      <div className="flex flex-col items-center">
+        <div className="mb-1 p-3 bg-[#373B45] rounded-full">
+          <Icon className="w-5 h-5" />
+        </div>
+        <span className="text-xs">{text}</span>
+      </div>
+    </Button>
+  );
+};
