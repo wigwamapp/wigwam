@@ -2,7 +2,6 @@ import {
   FC,
   PropsWithChildren,
   // Suspense,
-  useEffect,
   useRef,
 } from "react";
 import classNames from "clsx";
@@ -12,6 +11,7 @@ import { useAtomValue } from "jotai";
 
 import { openInTab } from "app/helpers";
 import {
+  getTotalAccountBalanceAtom,
   popupToolbarTabAtom,
   // updateAvailableAtom,
   // walletStatusAtom,
@@ -23,18 +23,21 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 // import LockProfileButton from "app/components/elements/LockProfileButton";
 // import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
-import { ReactComponent as ChatIcon } from "app/icons/chat.svg";
+import { ReactComponent as ActivityIcon } from "app/icons/activity-toolbar.svg";
 import { ReactComponent as CoinsIcon } from "app/icons/coins.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
-import { OverflowProvider } from "app/hooks";
+import { OverflowProvider, useAccounts } from "app/hooks";
 import Button from "../elements/Button";
 import { PopupToolbarTab } from "app/nav";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import Tooltip from "../elements/Tooltip";
+import { getHashPreview } from "../elements/HashPreview";
+import FiatAmount from "../elements/FiatAmount";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -52,14 +55,6 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   // const updateAvailable = useAtomValue(updateAvailableAtom);
 
   // const isUnlocked = walletStatus === WalletStatus.Unlocked;
-
-  useEffect(() => {
-    const gradient = generateContrastGradient();
-    const r = document.getElementById("wallet");
-    if (r) {
-      r.style.backgroundImage = gradient;
-    }
-  }, []);
 
   return (
     <OverflowProvider>
@@ -83,7 +78,12 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             viewPortClassName="viewportBlock"
             scrollBarClassName="pt-[13rem] pb-[4.75rem] pl-1.5 pr-0.5 w-3"
           >
-            <div className="p-3 pb-6" id="wallet">
+            <div
+              className={classNames(
+                "p-3",
+                "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
+              )}
+            >
               <div className="mb-3 flex items-center justify-between">
                 <ConnectionStatus />
                 <p className="text-sm font-semibold">Wallet 1</p>
@@ -124,29 +124,43 @@ const NavToolbar: FC = () => {
     <nav
       className={classNames(
         "fixed bottom-0 w-full",
-        "p-3 flex items-center justify-between bg-[#2A2D35]",
+        "p-3 bg-[#2A2D35]",
+        "flex items-center justify-between gap-x-3",
       )}
     >
       <Button
-        theme={tab === PopupToolbarTab.Assets ? "primary" : "clean"}
+        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-11"
+        theme={tab === PopupToolbarTab.Assets ? "primary" : "tertiary"}
         to={{
           tab: PopupToolbarTab.Assets,
         }}
       >
-        <CoinsIcon className="mr-1" />
+        <CoinsIcon
+          className={classNames(
+            "mr-2",
+            tab !== PopupToolbarTab.Assets && "[&>*]:fill-white",
+          )}
+        />
         Assets
       </Button>
       <Button
-        theme={tab === PopupToolbarTab.Activity ? "primary" : "clean"}
+        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-11"
+        theme={tab === PopupToolbarTab.Activity ? "primary" : "tertiary"}
         to={{
           tab: PopupToolbarTab.Activity,
         }}
       >
-        <ChatIcon className="mr-1" /> Activity
+        <ActivityIcon
+          className={classNames(
+            "mr-2",
+            tab === PopupToolbarTab.Activity && "[&>*]:fill-black",
+          )}
+        />{" "}
+        Activity
       </Button>
       <Button
         theme="clean"
-        className="border border-[#515561] rounded-lg"
+        className="border border-[#515561] rounded-lg col-span-1"
         onClick={() => openInTab(undefined, ["token"])}
       >
         <ExpandIcon />
@@ -169,12 +183,21 @@ const ConnectionStatus = () => {
 };
 
 const WalletInfo: FC = () => {
+  const { currentAccount } = useAccounts();
+  const totalBalance = useLazyAtomValue(
+    getTotalAccountBalanceAtom(currentAccount.address),
+  );
+  const { address } = currentAccount;
   return (
     <section className="flex flex-col justify-center items-center">
-      <div className="flex items-center gap-2">
-        <AddressButton address="0x3a78o...b3440" />
-      </div>
-      <p className="mb-3 text-2xl font-bold">$28,983.94</p>
+      <AddressButton address={address} />
+      {totalBalance ? (
+        <FiatAmount
+          amount={totalBalance}
+          copiable
+          className="mb-3 text-2xl font-bold leading-none"
+        />
+      ) : null}
       <div className="flex gap-9">
         <DeepLinkButton text="Send" to="transfer" Icon={SendIcon} />
         <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />
@@ -188,7 +211,11 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
   const { copy, copied } = useCopyToClipboard(address);
 
   return (
-    <Button onClick={() => copy()} theme="clean" className="!p-0 flex gap-2">
+    <Button
+      onClick={() => copy()}
+      theme="clean"
+      className="!mb-2 !p-0 flex gap-2"
+    >
       <Tooltip
         content={copied ? "Copied" : "Copy Wallet Address"}
         placement="top"
@@ -200,7 +227,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
             "bg-brand-main/[.15] hover:bg-brand-main/30 hover:shadow-buttonsecondary",
           )}
         >
-          <span className="text-sm font-medium">{address}</span>
+          <span className="text-sm font-medium">{getHashPreview(address)}</span>
           {copied ? <SuccessIcon /> : <CopyIcon />}
         </div>
       </Tooltip>
@@ -228,23 +255,3 @@ const DeepLinkButton: FC<{
     </Button>
   );
 };
-
-function generateContrastGradient() {
-  // Устанавливаем фиксированную насыщенность
-  const saturation = 50;
-
-  // Случайные оттенки для двух цветов
-  const hue1 = Math.floor(Math.random() * 360);
-  const hue2 = (hue1 + Math.floor(Math.random() * 180) + 90) % 360;
-  // Гарантируем, что цвета разные
-
-  // Светлоты для контраста с белым и черным текстом
-  const lightness1 = 40; // Темнее для белого текста
-  const lightness2 = 60; // Светлее для черного текста
-
-  // CSS строки для градиента
-  const color1 = `hsl(${hue1}, ${saturation}%, ${lightness1}%)`;
-  const color2 = `hsl(${hue2}, ${saturation}%, ${lightness2}%)`;
-
-  return `linear-gradient(to bottom, ${color1}, ${color2})`;
-}
