@@ -64,6 +64,7 @@ import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 import ShareAddress from "./receiveTabs/ShareAddress";
 import { Redirect } from "lib/navigation";
 import Button from "../elements/Button";
+import ActivitiesList from "../blocks/activity/ActivitiesList";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
@@ -82,12 +83,6 @@ const Assets: FC = () => (
     {/* <AccountSelect className="mt-2" /> */}
     {/* <InteractionWithDapp className="mt-2" /> */}
     <TokenExplorer />
-  </>
-);
-
-const Activity: FC = () => (
-  <>
-    <h3>Activity</h3>
   </>
 );
 
@@ -529,7 +524,7 @@ const ReceivePopup: FC<ReceivePopupProps> = (props) => (
 const matchPopupTabs = (tab: PopupToolbarTab) => {
   return match<PopupToolbarTab, ReactNode>(tab)
     .with(PopupToolbarTab.Assets, () => <Assets />)
-    .with(PopupToolbarTab.Activity, () => <Activity />)
+    .with(PopupToolbarTab.Activity, () => <ActivitiesList />)
     .with(P.any, () => <Assets />)
     .otherwise(() => <Redirect to={{ tab: PopupToolbarTab.Assets }} />);
 };
