@@ -12,14 +12,25 @@ export const getTokenActivityAtom = atomFamily(
   dequal,
 );
 
-export const pendingActivityAtom = atomWithRepoQuery((query) =>
-  query(() => repo.queryActivities({ pending: true })),
+export const getPendingActivitiesAtom = atomFamily((accountAddress: string) =>
+  atomWithRepoQuery((query) =>
+    query(() => repo.queryActivities({ accountAddress, pending: true })),
+  ),
 );
 
-export const getActivityAtom = atomFamily(
-  (params: { offset?: number; limit?: number }) =>
+export const getActivitiesAtom = atomFamily(
+  ({
+    accountAddress,
+    ...rest
+  }: {
+    accountAddress: string;
+    offset?: number;
+    limit?: number;
+  }) =>
     atomWithRepoQuery((query) =>
-      query(() => repo.queryActivities({ pending: false, ...params })),
+      query(() =>
+        repo.queryActivities({ accountAddress, pending: false, ...rest }),
+      ),
     ),
   dequal,
 );

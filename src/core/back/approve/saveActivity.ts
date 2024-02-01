@@ -11,23 +11,27 @@ import * as repo from "core/repo";
 import { getPageOrigin } from "core/common/permissions";
 import { createTokenActivityKey } from "core/common/tokens";
 
-export async function saveActivity(activity: Activity) {
+export async function saveActivity(activity: Activity | Activity[]) {
+  const activities = Array.isArray(activity) ? activity : [activity];
+
   // TODO: Add specific logic for speed-up or cancel tx
-  await repo.activities.put(activity).catch(console.error);
+  await repo.activities.bulkPut(activities).catch(console.error);
 
-  if (activity.type === ActivityType.Connection) {
-    // Remove all early connections to the same origin
-    const actOrigin = getPageOrigin(activity.source);
+  for (const activity of activities) {
+    if (activity.type === ActivityType.Connection) {
+      // Remove all early connections to the same origin
+      const actOrigin = getPageOrigin(activity.source);
 
-    repo.activities
-      .where("[type+pending]")
-      .equals([ActivityType.Connection, 0])
-      .filter(
-        (act) =>
-          act.id !== activity.id && getPageOrigin(act.source) === actOrigin,
-      )
-      .delete()
-      .catch(console.error);
+      repo.activities
+        .where("[type+accountAddress+pending]")
+        .equals([ActivityType.Connection, activity.accountAddress, 0])
+        .filter(
+          (act) =>
+            act.id !== activity.id && getPageOrigin(act.source) === actOrigin,
+        )
+        .delete()
+        .catch(console.error);
+    }
   }
 }
 

@@ -99,8 +99,8 @@ const NftInfo: FC = () => {
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
           className="ml-6 pr-5 -mr-5 flex flex-col"
-          viewPortClassName="pb-20 pt-6 viewportBlock"
-          scrollBarClassName="py-0 pt-[18.75rem] pb-20"
+          viewPortClassName="pt-6 viewportBlock"
+          scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
           <div className="w-[31.5rem]">

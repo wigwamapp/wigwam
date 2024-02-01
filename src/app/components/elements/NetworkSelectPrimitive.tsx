@@ -1,6 +1,7 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
+import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 
 import {
@@ -23,6 +24,10 @@ export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
   icon: getNetworkIconUrl(network),
+  balanceUSD:
+    network.balanceUSD && new BigNumber(network.balanceUSD).isGreaterThan(0)
+      ? network.balanceUSD
+      : undefined,
 });
 
 type NetworkSelectProps = {
@@ -134,6 +139,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
+      showSelected={true}
       size={size}
       actions={
         withAction ? (

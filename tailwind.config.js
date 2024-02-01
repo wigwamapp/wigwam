@@ -21,6 +21,7 @@ module.exports = {
           font: "#BCC3C4",
           inactivedark: "#8D9C9E",
           gray: "#AAB0B1",
+          darkgray: "#22262A",
           placeholder: "#717A7B",
           disabledbackground: "#343434",
           disabledcolor: "#606668",

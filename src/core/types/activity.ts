@@ -129,7 +129,7 @@ export interface ConnectionApproval extends ActivityBase {
 
 export interface ConnectionActivity extends ConnectionApproval {
   pending: number;
-  accountAddresses: string[];
+  accountAddress: string;
 }
 
 export interface AddNetworkApproval extends ActivityBase {

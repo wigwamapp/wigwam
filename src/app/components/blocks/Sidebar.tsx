@@ -1,11 +1,10 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
-import Button from "app/components/elements/Button";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
 
@@ -47,14 +46,17 @@ const Sidebar: FC = () => {
 
 export default Sidebar;
 
+type SidebarLink = {
+  label: string;
+  Icon: FC<{ className?: string }>;
+  route?: Page;
+  soon?: boolean;
+  badge?: boolean;
+  action?: () => void;
+};
+
 type SidebarBlockProps = {
-  links: {
-    label: string;
-    Icon: FC<{ className?: string }>;
-    route?: Page;
-    soon?: boolean;
-    action?: () => void;
-  }[];
+  links: SidebarLink[];
   className?: string;
 };
 
@@ -65,14 +67,14 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 
   return (
     <div className={classNames("flex flex-col", className)}>
-      {links.map(({ route, label, Icon, action, soon }) => {
+      {links.map((link) => {
+        const { route, label, action } = link;
         const isPageActive = route === page;
         const notificationBadge = route === Page.Settings && updateAvailable;
 
         if (typeof action === "function") {
           return (
-            <Button
-              theme="clean"
+            <button
               key={label}
               onClick={action}
               className={classNames(
@@ -80,28 +82,18 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
                 "text-base !font-bold text-brand-light/80",
                 "w-52 !py-2 !px-3 !mb-2",
                 "rounded-[.625rem]",
-                "flex !justify-start",
-                "transition-colors",
-                "group",
-                "hover:text-brand-light",
-                "focus:text-brand-light",
-                isPageActive && "bg-brand-main/5 !text-brand-light",
+                "flex justify-start items-center",
+                isPageActive && "!bg-brand-main/5 !text-brand-light",
                 "last:mb-0",
+                "hover:text-brand-light",
               )}
             >
-              <Icon
-                className={classNames(
-                  "w-7 h-7",
-                  "min-w-7",
-                  "mr-5",
-                  "glass-icon",
-                  isPageActive && "glass-icon--active",
-                  "group-hover:glass-icon--hover",
-                  "group-focus:glass-icon--hover",
-                )}
+              <LinkContent
+                hasNotification={notificationBadge}
+                isActive={isPageActive}
+                link={link}
               />
-              {label}
-            </Button>
+            </button>
           );
         }
 
@@ -127,26 +119,11 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               "last:mb-0",
             )}
           >
-            <Icon
-              className={classNames(
-                "w-7 h-7",
-                "min-w-7",
-                "mr-5",
-                "glass-icon",
-                isPageActive && "glass-icon--active",
-                "group-hover:glass-icon--hover",
-                "group-focus:glass-icon--hover",
-              )}
+            <LinkContent
+              hasNotification={notificationBadge}
+              isActive={isPageActive}
+              link={link}
             />
-            {label}
-            {notificationBadge && (
-              <div className="ml-1.5 h-5">
-                <div
-                  className={classNames("w-2 h-2", "bg-activity rounded-full")}
-                />
-              </div>
-            )}
-            {soon && <SoonTag />}
           </Link>
         );
       })}
@@ -157,3 +134,52 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
 const withTokenSlug = (page: Page, tokenSlug: string | null) =>
   (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
   tokenSlug;
+
+export const BadgeWrapper: FC<{
+  showBadge: boolean | undefined;
+  children: ReactNode | ReactNode[];
+}> = ({ showBadge, children }) => (
+  <div
+    className={classNames(
+      "mr-5 relative",
+      showBadge && [
+        "after:content-[' '] after:absolute after:right-[1px] after:top-0 after:h-2 after:w-2",
+        "after:bg-brand-redtwo after:rounded-full",
+      ],
+    )}
+  >
+    {children}
+  </div>
+);
+
+const LinkContent: FC<{
+  link: SidebarLink;
+  isActive: boolean;
+  hasNotification: boolean;
+}> = ({ link, isActive, hasNotification }) => {
+  const { Icon, label, soon } = link;
+
+  return (
+    <>
+      <BadgeWrapper showBadge={link.badge}>
+        <Icon
+          className={classNames(
+            "w-7 h-7",
+            "min-w-7",
+            "styled-icon",
+            isActive
+              ? "styled-icon--active"
+              : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
+          )}
+        />
+      </BadgeWrapper>
+      {label}
+      {hasNotification && (
+        <div className="ml-1.5 h-5">
+          <div className={classNames("w-2 h-2", "bg-activity rounded-full")} />
+        </div>
+      )}
+      {soon && <SoonTag />}
+    </>
+  );
+};
