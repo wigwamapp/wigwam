@@ -32,7 +32,6 @@ type AccountTokenFields = {
   portfolioUSD?: string;
   manuallyStatusChanged?: boolean;
   syncedByChainAt?: number;
-  tokenInfoLink?: string;
 };
 
 export interface TokenBase {

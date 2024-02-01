@@ -216,7 +216,6 @@ async function performTokenSync(
     balanceUSD,
     priceUSD,
     priceUSDChange,
-    explorerLink: "google.com",
   };
 
   await releaseToRepo(tokenToAdd);
