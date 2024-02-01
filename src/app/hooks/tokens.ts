@@ -99,8 +99,6 @@ export function useAllAccountTokens(
   const prevTokens = usePrevious(pureTokens, "when-not-undefined");
   const tokens = pureTokens ?? prevTokens ?? [];
 
-  console.log("tokens", tokens);
-
   const hasMore = offsetRef.current <= tokens.length;
 
   const loadMore = useCallback(() => {

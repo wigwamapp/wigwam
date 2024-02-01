@@ -155,9 +155,6 @@ export async function getDexPrices(tokenAddresses: string[]) {
 export const getExplorerDetailsUrl = async (tokenAddress: string) => {
   try {
     const allCoinIds = await getCoinGeckoCoinIds();
-    // console.log(allCoinIds)
-    console.log(tokenAddress);
-    console.log(allCoinIds);
     if (allCoinIds[tokenAddress.toLocaleLowerCase()]) {
       return `https://www.coingecko.com/en/coins/${allCoinIds[tokenAddress.toLocaleLowerCase()]}`;
     } else {
@@ -212,7 +209,6 @@ export const getCoinGeckoCoinIds = withOfflineCache(
       params: { include_platform: true },
     });
 
-    console.log("data", data);
     const allCoinIds: Record<string, string> = {};
 
     for (const item of data) {
