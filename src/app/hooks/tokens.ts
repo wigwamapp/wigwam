@@ -65,6 +65,7 @@ export function useAllAccountTokens(
   );
 
   const accountTokensAtom = getAccountTokensAtom(queryParams);
+
   const prevQueryParamsRef = useRef<typeof queryParams>();
 
   useEffect(() => {
@@ -97,6 +98,8 @@ export function useAllAccountTokens(
 
   const prevTokens = usePrevious(pureTokens, "when-not-undefined");
   const tokens = pureTokens ?? prevTokens ?? [];
+
+  console.log("tokens", tokens);
 
   const hasMore = offsetRef.current <= tokens.length;
 

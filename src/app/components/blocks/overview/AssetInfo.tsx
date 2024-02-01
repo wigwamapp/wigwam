@@ -102,12 +102,13 @@ const AssetInfo: FC = () => {
     priceUSD,
     priceUSDChange,
     balanceUSD,
+    tokenInfoLink,
   } = tokenInfo;
 
-  const coinGeckoId =
+  const coinGeckoUrl =
     status === TokenStatus.Native
-      ? cgPlatfromIds[chainId]?.native_coin_id
-      : address;
+      ? `https://www.coingecko.com/en/coins/${cgPlatfromIds[chainId]?.native_coin_id}`
+      : tokenInfoLink;
 
   const handleHideAsset = async () => {
     const response = await confirm({
@@ -188,13 +189,13 @@ const AssetInfo: FC = () => {
                           href={explorerLink.token(address)}
                         />
                       )}
-                      {currentNetwork?.type === "mainnet" && coinGeckoId && (
+                      {coinGeckoUrl && (
                         <IconedButton
                           aria-label="View asset in CoinGecko"
                           Icon={CoinGeckoIcon}
                           className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
-                          href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
+                          href={coinGeckoUrl}
                         />
                       )}
                       {status !== TokenStatus.Native && (
