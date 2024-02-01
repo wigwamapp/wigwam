@@ -127,9 +127,9 @@ const PopupNetworkSelect: FC = () => {
     <NetworkSelect
       source="popup"
       className="max-w-auto"
-      currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
+      currentItemClassName="!h-11 pr-3 !pl-3 !py-7"
       currentItemIconClassName={classNames(
-        "!w-8 !h-8 !mr-3",
+        "!w-8 !h-8",
         isSyncing && "animate-pulse",
       )}
       contentClassName="w-[22.25rem]"

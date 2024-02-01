@@ -139,8 +139,8 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
-      showSelected={true}
       size={size}
+      placeholder="Search Network"
       actions={
         withAction ? (
           <IconedButton
@@ -150,7 +150,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
             onClick={handleLinkClick}
             theme="tertiary"
             Icon={GearIcon}
-            className="ml-2"
+            className="ml-2 bg-[#373B45] !w-11 !h-11 !shrink-0 !rounded-lg"
           />
         ) : undefined
       }
