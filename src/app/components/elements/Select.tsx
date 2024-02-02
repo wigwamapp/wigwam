@@ -46,6 +46,7 @@ export type SelectProps<T, U> = {
   size?: "large" | "small";
   tooltip?: ReactNode;
   tooltipProps?: TooltipProps;
+  contentAlign?: "center" | "start" | "end";
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
@@ -74,6 +75,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   size = "large",
   tooltip,
   tooltipProps,
+  contentAlign,
   className,
   contentClassName,
   scrollAreaClassName,
@@ -236,6 +238,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {(ref) => (
             <DropdownMenu.Content
               ref={ref}
+              align={contentAlign}
               style={{
                 width: "var(--radix-dropdown-menu-trigger-width)",
               }}

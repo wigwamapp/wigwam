@@ -60,11 +60,12 @@ const NetworkCard: FC<NetworkCardProps> = ({
           alt={network.name}
           className="w-11 h-11"
         />
-        <span className="flex flex-col justify-between items-start gap-1 w-full h-full">
+        <span className="flex flex-col justify-between items-start gap-1 w-full h-full min-w-0">
           <span
             className={classNames(
               "text-base font-bold text-brand-inactivelight",
               "transition-colors",
+              "truncate w-full text-left min-w-0",
               isActive
                 ? "text-brand-light"
                 : "group-hover:text-brand-light group-focus-visible:text-brand-light",

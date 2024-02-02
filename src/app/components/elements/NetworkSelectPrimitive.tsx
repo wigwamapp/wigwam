@@ -15,10 +15,13 @@ import { isTrackingEnabled, TEvent, trackEvent } from "core/client";
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { pageAtom, sentAnalyticNetworksAtom } from "app/atoms";
 import { Page, SettingTab } from "app/nav";
+import { ReactComponent as GearIcon } from "app/icons/gear.svg";
+import { ReactComponent as AddIcon } from "app/icons/PlusCircle.svg";
+
 import Select from "./Select";
 import IconedButton from "./IconedButton";
 import SmartLink from "./SmartLink";
-import { ReactComponent as GearIcon } from "app/icons/gear.svg";
+import Button from "./Button";
 
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
@@ -32,11 +35,14 @@ export const prepareNetwork = (network: Network) => ({
 
 type NetworkSelectProps = {
   networks: Network[];
+  currentItem?: any;
   currentNetwork?: Network;
   onNetworkChange: (chainId: number) => void;
   withAction?: boolean;
+  actionType?: "small" | "large";
   size?: "large" | "small";
   source?: string;
+  contentAlign?: "center" | "start" | "end";
   className?: string;
   currentItemClassName?: string;
   currentListItemClassName?: string;
@@ -46,11 +52,14 @@ type NetworkSelectProps = {
 
 const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   networks,
+  currentItem,
   currentNetwork,
   onNetworkChange,
   withAction = true,
+  actionType = "small",
   size = "large",
   source,
+  contentAlign,
   className,
   currentItemClassName,
   currentListItemClassName,
@@ -131,7 +140,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       open={opened}
       onOpenChange={setOpened}
       items={preparedNetworks}
-      currentItem={preparedCurrentNetwork}
+      currentItem={currentItem ?? preparedCurrentNetwork}
       setItem={(network) => handleNetworkChange(network.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
@@ -139,6 +148,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       showSelected={true}
       scrollAreaClassName="h-64"
       showSelectedIcon={false}
+      contentAlign={contentAlign}
       currentItemClassName={currentItemClassName}
       currentListItemClassName={currentListItemClassName}
       currentItemIconClassName={currentItemIconClassName}
@@ -148,15 +158,27 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       placeholder="Search Network"
       actions={
         withAction ? (
-          <IconedButton
-            aria-label="Manage networks"
-            to={{ page: Page.Settings, setting: SettingTab.Networks }}
-            smartLink
-            onClick={handleLinkClick}
-            theme="tertiary"
-            Icon={GearIcon}
-            className="ml-2 bg-[#373B45] !w-11 !h-11 !shrink-0 !rounded-lg"
-          />
+          actionType === "small" ? (
+            <IconedButton
+              aria-label="Manage networks"
+              to={{ page: Page.Settings, setting: SettingTab.Networks }}
+              smartLink
+              onClick={handleLinkClick}
+              theme="tertiary"
+              Icon={GearIcon}
+              className="ml-2 bg-[#373B45] !w-11 !h-11 !shrink-0 !rounded-lg"
+            />
+          ) : (
+            <Button
+              to={{ page: Page.Settings, setting: SettingTab.Networks }}
+              theme="secondary"
+              onClick={handleLinkClick}
+              className="ml-2 self-stretch !py-0"
+            >
+              <AddIcon className="w-5 h-auto min-w-[1.25rem] mr-2" /> Add
+              network
+            </Button>
+          )
         ) : undefined
       }
       emptySearchText={
