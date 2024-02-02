@@ -33,6 +33,7 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import Tooltip from "../elements/Tooltip";
 import { getHashPreview } from "../elements/HashPreview";
 import FiatAmount from "../elements/FiatAmount";
+import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import { useLazyAtomValue } from "lib/atom-utils";
 import ProfileButton from "../elements/ProfileButton";
 
@@ -73,17 +74,17 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             hiddenScrollbar="horizontal"
             className="h-full min-h-0"
             viewPortClassName="viewportBlock"
-            scrollBarClassName="pt-[13rem] pb-[4.75rem] pl-1.5 pr-0.5 w-3"
+            scrollBarClassName="pt-[16rem] pb-[4.35rem] pl-1.5 pr-0.5 w-3"
           >
             {isUnlocked ? (
               <div
                 className={classNames(
-                  "p-3",
+                  "p-3 pb-7",
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
                 <div className="mb-3 flex items-center justify-between">
-                  <ConnectionStatus />
+                  <InteractionWithDapp />
                   <ProfileButton size="small" hideAddress />
                 </div>
                 <WalletInfo />
@@ -93,11 +94,10 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               className={classNames(
                 "relative",
                 "flex-1",
-                "pt-3 pb-20 px-3",
-                "overflow-hidden",
-                "flex flex-col",
-                "rounded-t-2xl",
+                "pt-1 pb-20 px-3",
                 className,
+                "before:absolute before:w-full before:h-5 before:rounded-t-[2rem] before:left-0",
+                "before:bg-[#181A1F] before:-top-4",
               )}
             >
               {children}
@@ -107,7 +107,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 <NavToolbar />
                 <ScrollTopButton
                   scrollAreaRef={scrollAreaRef}
-                  className="fixed bottom-14 right-3"
+                  className="fixed bottom-20 right-4"
                 />
               </>
             ) : null}
@@ -169,19 +169,6 @@ const NavToolbar: FC = () => {
         <ExpandIcon />
       </Button>
     </nav>
-  );
-};
-
-const ConnectionStatus = () => {
-  return (
-    <span
-      className={classNames(
-        "text-brand-redtwo font-bold text-xs relative ml-2",
-        "before:absolute before:-left-3 before:top-1 before:h-2 before:w-2 before:rounded-full before:bg-brand-redtwo",
-      )}
-    >
-      Connected
-    </span>
   );
 };
 
