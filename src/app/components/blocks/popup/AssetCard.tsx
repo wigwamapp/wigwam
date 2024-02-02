@@ -242,7 +242,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
       disabledClickOutside
       headerClassName="!m-0"
       header={
-        <div className="flex flex-col items-center text-base font-normal">
+        <div className="flex flex-col items-start text-base font-normal">
           <p className="font-semibold">{name}</p>
           <div className="flex gap-2">
             {priceUSD ? (
