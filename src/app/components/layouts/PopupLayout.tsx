@@ -38,6 +38,7 @@ import Tooltip from "../elements/Tooltip";
 import { getHashPreview } from "../elements/HashPreview";
 import FiatAmount from "../elements/FiatAmount";
 import { useLazyAtomValue } from "lib/atom-utils";
+import ProfileButton from "../elements/ProfileButton";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -86,7 +87,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             >
               <div className="mb-3 flex items-center justify-between">
                 <ConnectionStatus />
-                <p className="text-sm font-semibold">Wallet 1</p>
+                <ProfileButton size="small" hideAddress />
               </div>
               <WalletInfo />
             </div>
