@@ -1,14 +1,18 @@
 import { FC, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import classNames from "clsx";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Network } from "core/types";
 
 import { getNetworkIconUrl } from "fixtures/networks";
+import { Page, SettingTab } from "app/nav";
+import { useAccounts } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/setting-general.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import FiatAmount from "./FiatAmount";
@@ -39,7 +43,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
         type="button"
         onClick={onClick}
         className={classNames(
-          "flex items-center w-full gap-3",
+          "flex items-center w-full max-w-1/4 gap-3",
           "group",
           "px-4 py-3",
           "rounded-[.625rem]",
@@ -109,9 +113,21 @@ const NetworkCard: FC<NetworkCardProps> = ({
           "flex flex-col",
         )}
       >
-        <PopoverButton Icon={WalletExplorerIcon}>Explorer</PopoverButton>
-        <PopoverButton Icon={SettingsIcon}>Settings</PopoverButton>
-        <PopoverButton Icon={CopyIcon}>Copy address</PopoverButton>
+        {network.explorerUrls?.length ? (
+          <PopoverButton
+            href={network.explorerUrls[0]}
+            Icon={WalletExplorerIcon}
+          >
+            Block Explorer
+          </PopoverButton>
+        ) : null}
+        <PopoverButton
+          to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          Icon={SettingsIcon}
+        >
+          Settings
+        </PopoverButton>
+        <CopyAddressButton />
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );
@@ -123,7 +139,12 @@ type PopoverButton = ButtonProps & {
   Icon: FC<{ className?: string }>;
 };
 
-const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
+const PopoverButton: FC<PopoverButton> = ({
+  Icon,
+  children,
+  className,
+  ...rest
+}) => (
   <Button
     theme="clean"
     className={classNames(
@@ -134,6 +155,7 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
       !rest.disabled &&
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 hover:!opacity-100 focus-visible:!opacity-100",
       "disabled:opacity-40 disabled:cursor-default",
+      className,
     )}
     innerClassName="w-full items-start"
     {...rest}
@@ -142,3 +164,18 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
     {children}
   </Button>
 );
+
+const CopyAddressButton: FC = () => {
+  const { currentAccount } = useAccounts();
+  const { copy, copied } = useCopyToClipboard(currentAccount.address);
+
+  return (
+    <PopoverButton
+      onClick={() => copy()}
+      Icon={copied ? SuccessIcon : CopyIcon}
+      className="!min-w-[9.75rem]"
+    >
+      {copied ? "Address copied" : "Copy address"}
+    </PopoverButton>
+  );
+};
