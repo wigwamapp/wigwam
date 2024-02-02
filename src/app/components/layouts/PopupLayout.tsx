@@ -7,21 +7,17 @@ import {
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
-// import { WalletStatus } from "core/types";
+import { WalletStatus } from "core/types";
 
 import { openInTab } from "app/helpers";
 import {
   getTotalAccountBalanceAtom,
   popupToolbarTabAtom,
   // updateAvailableAtom,
-  // walletStatusAtom,
+  walletStatusAtom,
 } from "app/atoms";
-// import ActivityBar from "app/components/blocks/ActivityBar";
 import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-// import RoundedButton from "app/components/elements/RoundedButton";
-// import LockProfileButton from "app/components/elements/LockProfileButton";
-// import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/activity-toolbar.svg";
 import { ReactComponent as CoinsIcon } from "app/icons/coins.svg";
@@ -52,10 +48,10 @@ type PopupLayoutProps = PropsWithChildren<{
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
-  // const walletStatus = useAtomValue(walletStatusAtom);
+  const walletStatus = useAtomValue(walletStatusAtom);
   // const updateAvailable = useAtomValue(updateAvailableAtom);
 
-  // const isUnlocked = walletStatus === WalletStatus.Unlocked;
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
   return (
     <OverflowProvider>
@@ -79,18 +75,20 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             viewPortClassName="viewportBlock"
             scrollBarClassName="pt-[13rem] pb-[4.75rem] pl-1.5 pr-0.5 w-3"
           >
-            <div
-              className={classNames(
-                "p-3",
-                "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
-              )}
-            >
-              <div className="mb-3 flex items-center justify-between">
-                <ConnectionStatus />
-                <ProfileButton size="small" hideAddress />
+            {isUnlocked ? (
+              <div
+                className={classNames(
+                  "p-3",
+                  "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
+                )}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <ConnectionStatus />
+                  <ProfileButton size="small" hideAddress />
+                </div>
+                <WalletInfo />
               </div>
-              <WalletInfo />
-            </div>
+            ) : null}
             <main
               className={classNames(
                 "relative",
@@ -104,11 +102,15 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             >
               {children}
             </main>
-            <NavToolbar />
-            <ScrollTopButton
-              scrollAreaRef={scrollAreaRef}
-              className="fixed bottom-14 right-3"
-            />
+            {isUnlocked ? (
+              <>
+                <NavToolbar />
+                <ScrollTopButton
+                  scrollAreaRef={scrollAreaRef}
+                  className="fixed bottom-14 right-3"
+                />
+              </>
+            ) : null}
           </ScrollAreaContainer>
         </div>
       )}
