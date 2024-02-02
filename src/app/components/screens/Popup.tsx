@@ -20,6 +20,7 @@ import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
 import { ReactComponent as BackIcon } from "app/icons/arrow-left.svg";
 import Masonry from "lib/react-masonry/Masonry";
 import { useAtomsAll } from "lib/atom-utils";
+import { Redirect } from "lib/navigation";
 
 import {
   Account,
@@ -47,14 +48,12 @@ import { useTokenList } from "app/hooks/tokenList";
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
 import NetworkSelect from "../elements/NetworkSelect";
-// import AccountSelect from "../elements/AccountSelect";
 import AssetsSwitcher from "../elements/AssetsSwitcher";
 import SearchInput from "../elements/SearchInput";
 import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
-// import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
 import NoNftState from "../blocks/tokenList/NoNftState";
@@ -62,7 +61,6 @@ import NftCard from "../blocks/tokenList/NftCard";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import { Redirect } from "lib/navigation";
 import Button from "../elements/Button";
 import ActivitiesList from "../blocks/activity/ActivitiesList";
 
@@ -80,8 +78,6 @@ export default Popup;
 const Assets: FC = () => (
   <>
     <PopupNetworkSelect />
-    {/* <AccountSelect className="mt-2" /> */}
-    {/* <InteractionWithDapp className="mt-2" /> */}
     <TokenExplorer />
   </>
 );
