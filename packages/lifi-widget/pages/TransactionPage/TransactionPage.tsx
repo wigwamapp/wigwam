@@ -285,10 +285,10 @@ export const TransactionPage: React.FC = () => {
           route={route}
           ref={tokenValueBottomSheetRef}
           onContinue={handleExecuteRoute}
-          onCancel={() => navigate('/')}
+          // onCancel={() => navigate('/')}
         />
       ) : null}
-      <ExchangeRateBottomSheet ref={exchangeRateBottomSheetRef} />
+      <ExchangeRateBottomSheet ref={exchangeRateBottomSheetRef} onContinue={handleExecuteRoute} />
     </Container>
   );
 };
