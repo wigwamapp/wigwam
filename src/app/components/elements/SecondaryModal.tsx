@@ -3,7 +3,6 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { DialogProps } from "@radix-ui/react-dialog";
 import classNames from "clsx";
 
-import { IS_FIREFOX } from "app/defaults";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
@@ -34,7 +33,11 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay
-          className={classNames("fixed inset-0 z-30 bg-brand-darkblue/50")}
+          className={classNames(
+            "fixed inset-0 z-30",
+            // "bg-brand-darkblue/50",
+            "bg-black/50 backdrop-blur-md",
+          )}
         />
         <Dialog.Content
           className={classNames(
@@ -42,11 +45,9 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
             small ? "max-w-[22.25rem]" : "max-w-[43rem]",
             small ? "p-[1.75rem]" : "p-[3.75rem]",
             "m-auto top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
-            "bg-brand-main/[.05]",
-            "border border-brand-main/[.15]",
-            "backdrop-blur-[40px]",
-            IS_FIREFOX && "brandbg-secondary-modal",
-            "rounded-[1.875rem]",
+            // "bg-brand-darkgray",
+            "bg-brand-darkbg",
+            "rounded-3xl",
             "overflow-hidden",
             "animate-dialogcontent",
             "flex flex-col justify-center items-center",

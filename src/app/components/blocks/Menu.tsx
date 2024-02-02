@@ -3,20 +3,14 @@ import { useLazyAtomValue } from "lib/atom-utils";
 
 import { getTotalAccountBalanceAtom } from "app/atoms";
 import { useAccounts, useIsSyncing } from "app/hooks";
-import { Page, SettingTab } from "app/nav";
-import Button from "app/components/elements/Button";
-import NetworkSelect from "app/components/elements/NetworkSelect";
-import LockProfileButton from "app/components/elements/LockProfileButton";
 import FiatAmount from "app/components/elements/FiatAmount";
-import { ReactComponent as ControlIcon } from "app/icons/control.svg";
+import ProfileButton from "app/components/elements/ProfileButton";
 
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();
 
   return (
-    <div className="flex items-center py-4 border-b border-brand-main/[.07]">
-      <NetworkSelect className="w-[17.75rem]" contentClassName="w-[17.75rem]" />
-
+    <div className="flex items-center py-2 border-b border-brand-main/[.07]">
       <Suspense>
         <TotalBalance />
       </Suspense>
@@ -27,18 +21,7 @@ const Menu: FC = () => {
         </span>
       )}
 
-      <div className="ml-auto flex items-center">
-        <Button
-          to={{ page: Page.Settings, setting: SettingTab.General }}
-          theme="tertiary"
-          className="!min-w-0 w-[8.5rem]"
-        >
-          <ControlIcon className="w-6 h-auto -ml-0.5 mr-2" />
-          Control
-        </Button>
-        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
-        <LockProfileButton />
-      </div>
+      <ProfileButton className="ml-auto" />
     </div>
   );
 };
