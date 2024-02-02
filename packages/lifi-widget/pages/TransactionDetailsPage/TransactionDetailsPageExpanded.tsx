@@ -77,20 +77,6 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
     .filter((process) => process.type !== 'TOKEN_ALLOWANCE')
     .find((process) => process.txHash)?.txHash;
 
-    console.log('sourceTxHash', sourceTxHash)
-
-  //   const handleGetSwapStatus = async () => {
-  //     const result = await axios.get('https://li.quest/v1/status', {
-  //       params: {
-  //         txHash: sourceTxHash,
-  //       }
-  //   });
-  //     console.log(result)
-  //   }
-
-  // useEffect(() => {
-  //   handleGetSwapStatus()
-  // }, [sourceTxHash])
   const insuranceCoverageId = sourceTxHash ?? routeExecution?.route.fromAddress;
 
   let supportId = sourceTxHash ?? routeExecution?.route.id ?? '';
