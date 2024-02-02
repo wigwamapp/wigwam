@@ -242,22 +242,24 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
       disabledClickOutside
       headerClassName="!m-0"
       header={
-        <p className="flex items-center text-base font-normal">
-          <span className="mr-2 font-semibold">{name}</span>
-          {priceUSD ? (
-            <span className="text-sm text-[#93ACAF]">
-              ${new BigNumber(priceUSD).toFixed(2, BigNumber.ROUND_DOWN)}
-            </span>
-          ) : null}
-          {priceUSDChange ? (
-            <PriceChange
-              className="!p-0 !text-xs [&>*]:font-normal"
-              priceChange={priceUSDChange}
-              isPercent={true}
-              hideBackground
-            />
-          ) : null}
-        </p>
+        <div className="flex flex-col items-center text-base font-normal">
+          <p className="font-semibold">{name}</p>
+          <div className="flex gap-2">
+            {priceUSD ? (
+              <span className="text-sm text-[#93ACAF]">
+                ${new BigNumber(priceUSD).toFixed(2, BigNumber.ROUND_DOWN)}
+              </span>
+            ) : null}
+            {priceUSDChange ? (
+              <PriceChange
+                className="!p-0 !text-xs [&>*]:font-normal"
+                priceChange={priceUSDChange}
+                isPercent={true}
+                hideBackground
+              />
+            ) : null}
+          </div>
+        </div>
       }
     >
       <div className="flex flex-col w-full">
