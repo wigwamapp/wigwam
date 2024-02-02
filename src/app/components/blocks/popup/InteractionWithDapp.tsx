@@ -116,7 +116,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[19rem] ml-6 bg-[#2A2D35] p-5 rounded-3xl flex flex-col w-full"
+          className="min-w-[19rem] ml-6 bg-[#2A2D35] p-5 rounded-3xl flex flex-col w-full z-10"
           sideOffset={8}
         >
           {urlDisplayed ? (

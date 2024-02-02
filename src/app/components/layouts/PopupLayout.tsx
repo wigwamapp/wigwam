@@ -69,16 +69,16 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             hiddenScrollbar="horizontal"
             className="h-full min-h-0"
             viewPortClassName="viewportBlock"
-            scrollBarClassName="pt-[16rem] pb-[4.35rem] pl-1.5 pr-0.5 w-3"
+            scrollBarClassName="pt-[13.85rem] pb-[3.65rem] pl-1.5 pr-0.5 w-3"
           >
             {isUnlocked ? (
               <div
                 className={classNames(
-                  "p-3 pb-7",
+                  "p-3 pb-6",
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
-                <div className="mb-3 flex items-center justify-between">
+                <div className="mb-1 flex items-center justify-between">
                   <InteractionWithDapp />
                   <ProfileButton size="small" hideAddress />
                 </div>
@@ -89,10 +89,10 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               className={classNames(
                 "relative",
                 "flex-1",
-                "pt-1 pb-20 px-3",
+                "pb-20 px-3",
                 className,
                 "before:absolute before:w-full before:h-5 before:rounded-t-[2rem] before:left-0",
-                "before:bg-[#181A1F] before:-top-4",
+                "before:bg-[#181A1F] before:-top-[1.250rem]",
               )}
             >
               {children}
@@ -122,12 +122,12 @@ const NavToolbar: FC = () => {
     <nav
       className={classNames(
         "fixed bottom-0 w-full",
-        "p-3 bg-[#2A2D35]",
+        "px-3 py-2 bg-[#2A2D35]",
         "flex items-center justify-between gap-x-3",
       )}
     >
       <Button
-        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-11"
+        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-10"
         theme={tab === PopupToolbarTab.Assets ? "primary" : "tertiary"}
         to={{
           tab: PopupToolbarTab.Assets,
@@ -142,7 +142,7 @@ const NavToolbar: FC = () => {
         Assets
       </Button>
       <Button
-        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-11"
+        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-10"
         theme={tab === PopupToolbarTab.Activity ? "primary" : "tertiary"}
         to={{
           tab: PopupToolbarTab.Activity,
@@ -158,7 +158,7 @@ const NavToolbar: FC = () => {
       </Button>
       <Button
         theme="clean"
-        className="border border-[#515561] rounded-lg col-span-1"
+        className="border border-[#515561] rounded-lg col-span-1 !p-[0.625rem]"
         onClick={() => openInTab(undefined, ["token"])}
       >
         <ExpandIcon />
@@ -199,7 +199,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
     <Button
       onClick={() => copy()}
       theme="clean"
-      className="!mb-2 !p-0 flex gap-2"
+      className="!mb-1 !p-0 flex gap-2"
     >
       <Tooltip
         content={copied ? "Copied" : "Copy Wallet Address"}
@@ -232,10 +232,10 @@ const DeepLinkButton: FC<{
       onClick={() => openInTab({ page: to }, true)}
     >
       <div className="flex flex-col items-center">
-        <div className="mb-1 p-3 bg-black rounded-full">
+        <div className="mb-1 p-[0.625rem] bg-black rounded-full">
           <Icon className="w-5 h-5" />
         </div>
-        <span>{text}</span>
+        <span className="text-xs">{text}</span>
       </div>
     </Button>
   );

@@ -137,7 +137,7 @@ const PopupNetworkSelect: FC = () => {
     <NetworkSelect
       source="popup"
       className="max-w-auto"
-      currentItemClassName="!h-11 pr-3 !pl-3 !py-7"
+      currentItemClassName="!h-10 !-mt-1 pr-3 !pl-3 !p-[1.55rem] z-10"
       currentItemIconClassName={classNames(
         "!w-8 !h-8",
         isSyncing && "animate-pulse",
@@ -287,7 +287,7 @@ const TokenManagement: FC<{
             searchValue={inputValue}
             toggleSearchValue={setInputValue}
             StartAdornment={input.Icon}
-            inputClassName="!pl-9 !max-h-none"
+            inputClassName="!pl-9 !py-[0.675rem] !max-h-none"
             placeholder={input.placeholder}
             className="!group-focus:stroke-white"
             adornmentClassName={classNames(
@@ -310,7 +310,10 @@ const ManageButton: FC<{
 }> = ({ Icon, onClick, className }) => {
   return (
     <Button
-      className={classNames("!p-3 bg-[#2A2D35] hover:bg-[#373B45]", className)}
+      className={classNames(
+        "!p-[0.625rem] bg-[#2A2D35] hover:bg-[#373B45]",
+        className,
+      )}
       theme="clean"
       onClick={onClick}
     >
@@ -390,7 +393,7 @@ const TokenList: FC<TokenListProps> = ({ tokenType, toggleNftSwitcher }) => {
 
   return (
     <>
-      <div className="pb-3 flex items-center justify-between w-full">
+      <div className="mb-2 flex items-center justify-between w-full">
         {flow === "unset" ? (
           <AssetsSwitcher
             theme="medium"

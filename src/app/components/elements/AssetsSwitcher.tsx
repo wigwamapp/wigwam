@@ -84,7 +84,7 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
           "rounded-[.625rem]",
           "transition-transform",
           theme === "small" && "w-9 h-7",
-          theme === "medium" && "w-[5.5rem] h-9 rounded-md",
+          theme === "medium" && "w-[5.8rem] h-8 rounded-md",
           theme === "large" && "w-[8.5rem] h-10",
           theme === "small" && checked && "translate-x-10",
           theme === "medium" && checked && "translate-x-[6rem]",
@@ -111,7 +111,7 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "flex items-center justify-center",
       "text-base color-brand-light",
       theme === "small" && "w-9 h-7",
-      theme === "medium" && "w-[5.5rem] py-[0.3rem]",
+      theme === "medium" && "w-[5.8rem] py-[0.2rem]",
       theme === "large" && "w-[8.5rem] py-2",
       className,
     )}
