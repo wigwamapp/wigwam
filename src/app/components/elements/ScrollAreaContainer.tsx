@@ -9,6 +9,7 @@ type ScrollAreaContainerProps = {
   horizontalScrollBarClassName?: string;
   verticalScrollBarClassName?: string;
   viewportAsChild?: boolean;
+  viewPortStyle?: React.CSSProperties;
   hiddenScrollbar?: "vertical" | "horizontal";
 } & ScrollArea.ScrollAreaProps;
 
@@ -20,6 +21,7 @@ const ScrollAreaContainer = forwardRef<
     {
       className,
       viewPortClassName,
+      viewPortStyle,
       scrollBarClassName,
       horizontalScrollBarClassName,
       verticalScrollBarClassName,
@@ -42,6 +44,7 @@ const ScrollAreaContainer = forwardRef<
           "w-full h-full overscroll-y-contain",
           viewPortClassName,
         )}
+        style={viewPortStyle}
         asChild={viewportAsChild}
       >
         {children}
