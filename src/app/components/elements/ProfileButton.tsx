@@ -1,5 +1,5 @@
 import { FC, useMemo, useRef, useState, useCallback } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
@@ -9,7 +9,7 @@ import { Account } from "core/types";
 import { lockWallet } from "core/client";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import { profileStateAtom, approvalsAtom } from "app/atoms";
+import { profileStateAtom, approvalsAtom, accountAddressAtom } from "app/atoms";
 import { Page } from "app/nav";
 import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -107,6 +107,7 @@ export default ProfileButton;
 
 const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
   const { all, currentId } = useAtomValue(profileStateAtom);
+  const setAccountAddress = useSetAtom(accountAddressAtom);
   useI18NUpdate();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -129,10 +130,29 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
   const filteredAccounts = useMemo(() => {
     if (searchValue) {
-      return fuse.search(searchValue).map(({ item: account }) => account);
+      return fuse
+        .search(searchValue)
+        .map(({ item: account }) => account)
+        .sort((a, b) =>
+          a.address === currentAccount.address
+            ? -1
+            : a.name.localeCompare(b.name, undefined, { numeric: true }),
+        );
     }
-    return allAccounts;
-  }, [allAccounts, fuse, searchValue]);
+    return allAccounts.sort((a, b) =>
+      a.address === currentAccount.address
+        ? -1
+        : a.name.localeCompare(b.name, undefined, { numeric: true }),
+    );
+  }, [allAccounts, currentAccount, fuse, searchValue]);
+
+  const changeAccount = useCallback(
+    (address: string) => {
+      setAccountAddress(address);
+      address !== currentAccount.address && onOpenChange?.(false);
+    },
+    [currentAccount, onOpenChange, setAccountAddress],
+  );
 
   return (
     <SecondaryModal
@@ -185,6 +205,7 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
               <ProfileItem
                 key={account.address}
                 account={account}
+                onClick={() => changeAccount(account.address)}
                 isActive={currentAccount.address === account.address}
                 className={index === filteredAccounts.length - 1 ? "" : "mb-2"}
               />
@@ -234,18 +255,20 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
 
 type ProfileItemProps = {
   account: Account;
+  onClick: () => void;
   isActive?: boolean;
   className?: string;
 };
 
 const ProfileItem: FC<ProfileItemProps> = ({
   account,
+  onClick,
   isActive = false,
   className,
 }) => (
   <button
     type="button"
-    key={account.address}
+    onClick={onClick}
     className={classNames(
       "w-full",
       "flex items-center",
