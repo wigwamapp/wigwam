@@ -27,18 +27,20 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
 
     return ["Assets", "NFTs"];
   }, [customLabels]);
+
   return (
     <Switch.Root
       checked={checked}
       onCheckedChange={onCheckedChange}
       className={classNames(
         "flex items-center",
-        "rounded-[.625rem]",
+        "rounded-[.875rem]",
         "bg-black/10",
-        "border border-brand-main/[.05]",
         "transition-colors",
         "hover:bg-brand-main/[.05] focus-visible:bg-brand-main/[.05]",
         "p-1",
+        "relative",
+        "after:absolute after:inset-0 after:border after:border-brand-main/[.05] after:rounded-[.875rem] after:pointer-events-none",
         className,
       )}
     >
@@ -85,10 +87,10 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
           "transition-transform",
           theme === "small" && "w-9 h-7",
           theme === "medium" && "w-[5.8rem] h-8 rounded-md",
-          theme === "large" && "w-[8.5rem] h-10",
+          theme === "large" && "w-[7.625rem] h-9",
           theme === "small" && checked && "translate-x-10",
           theme === "medium" && checked && "translate-x-[6rem]",
-          theme === "large" && checked && "translate-x-[9rem]",
+          theme === "large" && checked && "translate-x-[8.125rem]",
         )}
       />
     </Switch.Root>
@@ -112,7 +114,7 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "text-base color-brand-light",
       theme === "small" && "w-9 h-7",
       theme === "medium" && "w-[5.8rem] py-[0.2rem]",
-      theme === "large" && "w-[8.5rem] py-2",
+      theme === "large" && "w-[7.625rem] py-1.5",
       className,
     )}
   >

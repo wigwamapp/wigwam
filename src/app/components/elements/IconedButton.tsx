@@ -12,7 +12,7 @@ import Link, { LinkProps } from "lib/navigation/Link";
 import Tooltip, { TooltipProps } from "./Tooltip";
 import SmartLink from "./SmartLink";
 
-type IconedButtonProps = {
+export type IconedButtonProps = {
   disabled?: boolean;
   Icon: FC<{ className?: string }>;
   iconProps?: any;
