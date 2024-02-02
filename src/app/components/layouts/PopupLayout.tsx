@@ -1,9 +1,4 @@
-import {
-  FC,
-  PropsWithChildren,
-  // Suspense,
-  useRef,
-} from "react";
+import { FC, PropsWithChildren, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 

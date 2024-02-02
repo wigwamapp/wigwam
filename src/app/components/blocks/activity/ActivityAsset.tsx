@@ -139,7 +139,7 @@ const ActivityAsset = memo(
         ref={ref}
         className={classNames(
           "w-full",
-          "bg-brand-inactivelight/5",
+          "bg-[#22262A]",
           "border",
           item.pending && "border-[#D99E2E]/50",
           item.pending && "animate-pulse",

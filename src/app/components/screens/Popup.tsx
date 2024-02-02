@@ -4,6 +4,7 @@ import {
   Dispatch,
   SetStateAction,
   memo,
+  Suspense,
   useCallback,
   useState,
   useMemo,
@@ -28,6 +29,7 @@ import {
   AccountNFT,
   TokenStatus,
   TokenType,
+  WalletStatus,
 } from "core/types";
 import * as repo from "core/repo";
 
@@ -40,6 +42,7 @@ import {
   getPermissionAtom,
   popupToolbarTabAtom,
   tokenTypeAtom,
+  walletStatusAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
 import { useIsSyncing } from "app/hooks";
@@ -58,11 +61,11 @@ import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
+import ActivitiesList from "../blocks/activity/ActivitiesList";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
 import Button from "../elements/Button";
-import ActivitiesList from "../blocks/activity/ActivitiesList";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
@@ -75,12 +78,28 @@ const Popup: FC = () => {
 
 export default Popup;
 
-const Assets: FC = () => (
-  <>
-    <PopupNetworkSelect />
-    <TokenExplorer />
-  </>
-);
+const Assets: FC = () => {
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+
+  return isUnlocked ? (
+    <>
+      <PopupNetworkSelect />
+      <TokenExplorer />
+    </>
+  ) : null;
+};
+
+const Activities: FC = () => {
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+
+  return isUnlocked ? (
+    <Suspense fallback={null}>
+      <ActivitiesList />
+    </Suspense>
+  ) : null;
+};
 
 const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
@@ -520,7 +539,7 @@ const ReceivePopup: FC<ReceivePopupProps> = (props) => (
 const matchPopupTabs = (tab: PopupToolbarTab) => {
   return match<PopupToolbarTab, ReactNode>(tab)
     .with(PopupToolbarTab.Assets, () => <Assets />)
-    .with(PopupToolbarTab.Activity, () => <ActivitiesList />)
+    .with(PopupToolbarTab.Activity, () => <Activities />)
     .with(P.any, () => <Assets />)
     .otherwise(() => <Redirect to={{ tab: PopupToolbarTab.Assets }} />);
 };
