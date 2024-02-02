@@ -30,11 +30,19 @@ import SearchInput from "./SearchInput";
 import Button from "./Button";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 
+type Size = "small" | "large";
+
 type ProfileButtonProps = {
   className?: string;
+  size?: Size;
+  hideAddress?: boolean;
 };
 
-const ProfileButton: FC<ProfileButtonProps> = ({ className }) => {
+const ProfileButton: FC<ProfileButtonProps> = ({
+  className,
+  size = "large",
+  hideAddress,
+}) => {
   const { currentAccount } = useAccounts();
 
   const [copied, setCopied] = useState(false);
@@ -43,69 +51,84 @@ const ProfileButton: FC<ProfileButtonProps> = ({ className }) => {
   return (
     <>
       <div className={classNames("flex items-center gap-6", className)}>
-        <CopiableTooltip
-          content="Copy wallet address to clipboard"
-          textToCopy={currentAccount.address}
-          onCopiedToggle={setCopied}
-          className={classNames(
-            "px-1 pt-1 -mx-1 -mt-1",
-            "text-left",
-            "rounded",
-            "max-w-full",
-            "transition-colors",
-            "flex items-center",
-            "px-2 py-1",
-            "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-          )}
-        >
-          <>
-            <HashPreview
-              hash={currentAccount.address}
-              withTooltip={false}
-              className="text-sm font-normal leading-none mr-1"
-            />
-            {copied ? (
-              <SuccessIcon className="w-[1.3125rem] h-auto" />
-            ) : (
-              <CopyIcon className="w-[1.3125rem] h-auto" />
+        {hideAddress ? null : (
+          <CopiableTooltip
+            content="Copy wallet address to clipboard"
+            textToCopy={currentAccount.address}
+            onCopiedToggle={setCopied}
+            className={classNames(
+              "px-1 pt-1 -mx-1 -mt-1",
+              "text-left",
+              "rounded",
+              "max-w-full",
+              "transition-colors",
+              "flex items-center",
+              "px-2 py-1",
+              "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             )}
-          </>
-        </CopiableTooltip>
+          >
+            <>
+              <HashPreview
+                hash={currentAccount.address}
+                withTooltip={false}
+                className="text-sm font-normal leading-none mr-1"
+              />
+              {copied ? (
+                <SuccessIcon className="w-[1.3125rem] h-auto" />
+              ) : (
+                <CopyIcon className="w-[1.3125rem] h-auto" />
+              )}
+            </>
+          </CopiableTooltip>
+        )}
         <button
           type="button"
           onClick={() => setModalOpened(true)}
           className={classNames(
             "flex items-center gap-3",
-            "py-2 pr-2 pl-4",
-            "rounded-xl",
+            size === "large" ? "py-2 pr-2 pl-4" : "px-2 py-1",
+            size === "large" ? "rounded-xl" : "rounded-md",
             "transition-colors",
             "hover:bg-brand-main/5 focus-visible:bg-brand-main/5",
           )}
         >
           <WalletName
             wallet={currentAccount}
-            className="mb-0.5 text-base font-bold"
+            className={classNames(
+              "mb-0.5 font-bold",
+              size === "large" ? "text-base" : "text-sm",
+            )}
           />
           <AutoIcon
             seed={currentAccount.address}
             source="dicebear"
             type="personas"
             className={classNames(
-              "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]",
+              size === "large"
+                ? "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]"
+                : "h-10 w-10 min-w-10",
               "bg-black/40",
-              "rounded-[.625rem]",
+              size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
           />
         </button>
       </div>
-      <ProfilesModal open={modalOpened} onOpenChange={setModalOpened} />
+      <ProfilesModal
+        open={modalOpened}
+        onOpenChange={setModalOpened}
+        size={size}
+      />
     </>
   );
 };
 
 export default ProfileButton;
 
-const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
+const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
+  onOpenChange,
+  size = "large",
+  ...rest
+}) => {
   const { all, currentId } = useAtomValue(profileStateAtom);
   const setAccountAddress = useSetAtom(accountAddressAtom);
   useI18NUpdate();
@@ -158,7 +181,10 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     <SecondaryModal
       onOpenChange={onOpenChange}
       {...rest}
-      className="!max-w-[27.5rem] !p-0"
+      className={classNames(
+        "!p-0 !bg-[#2A2D35]",
+        size === "large" ? "!max-w-[27.5rem]" : "max-w-[21rem]",
+      )}
     >
       <div className="w-full flex flex-col px-5 pt-5">
         <div className="flex items-center text-xl font-bold gap-2 mr-auto mb-6">
@@ -177,17 +203,22 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           <SearchInput
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
-            placeholder="Type name or address..."
+            placeholder="Search Wallets"
           />
           <Button
             to={{ addAccOpened: true }}
             merge
             onClick={() => onOpenChange?.(false)}
             theme="secondary"
-            className="ml-3 !py-2 !px-4 !min-w-max"
+            className={classNames(
+              "ml-2 !py-2 !px-4 !min-w-max",
+              size === "large" ? "w-full" : "!min-w-11 !max-w-11",
+            )}
           >
-            <AddWalletIcon className="h-6 w-auto mr-2" />
-            Add wallet
+            <AddWalletIcon
+              className={classNames("h-6 w-auto", size === "large" && "mr-2")}
+            />
+            {size === "large" ? "Add wallet" : null}
           </Button>
         </div>
 
@@ -243,10 +274,15 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           to={{ page: Page.Settings }}
           onClick={() => onOpenChange?.(false)}
           theme="secondary"
-          className="w-full"
+          className={classNames(
+            "!max-h-11",
+            size === "large" ? "w-full" : "!min-w-11 !max-w-11",
+          )}
         >
-          <GearIcon className="h-6 w-auto mr-2" />
-          Settings
+          <GearIcon
+            className={classNames("h-6 w-auto", size === "large" && "mr-2")}
+          />
+          {size === "large" ? "Settings" : null}
         </Button>
       </div>
     </SecondaryModal>
@@ -351,9 +387,15 @@ const LockButton: FC = () => {
   }, [approvals.length, confirm, isPopup]);
 
   return (
-    <Button onClick={handleLock} theme="secondary" className="w-full">
-      <LockIcon className="h-6 w-auto mr-2" />
-      Lock
+    <Button
+      onClick={handleLock}
+      theme="secondary"
+      className="w-full grow-1 !max-h-11"
+    >
+      <div className="flex -mt-[0.1rem]">
+        <LockIcon className="h-6 w-auto mr-2" />
+        Lock
+      </div>
     </Button>
   );
 };
