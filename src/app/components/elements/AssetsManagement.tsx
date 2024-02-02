@@ -1,4 +1,14 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import classNames from "clsx";
@@ -6,12 +16,11 @@ import classNames from "clsx";
 import { TokenType } from "core/types";
 import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
-import { useTokenList } from "app/hooks/tokenList";
 import { ReactComponent as SearchIcon } from "app/icons/assets-search.svg";
 import { ReactComponent as ManageIcon } from "app/icons/assets-manage.svg";
 import { ReactComponent as AddIcon } from "app/icons/assets-add.svg";
 import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
-import { ReactComponent as ChevronIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as ChevronIcon } from "app/icons/chevron-left.svg";
 
 import SearchInput from "./SearchInput";
 import IconedButton, { IconedButtonProps } from "./IconedButton";
@@ -19,7 +28,29 @@ import AssetsSwitcher from "./AssetsSwitcher";
 
 type ManageMode = "manage" | "add" | "search" | null;
 
-const AssetsManagement: FC = ({}) => {
+type AssetsManagementProps = {
+  manageModeEnabled: boolean;
+  setManageModeEnabled: Dispatch<SetStateAction<boolean>>;
+  searchInputRef: RefObject<HTMLInputElement>;
+  searchValue: string | null;
+  setSearchValue: Dispatch<SetStateAction<string | null>>;
+  tokenIdSearchValue: string | null;
+  setTokenIdSearchValue: Dispatch<SetStateAction<string | null>>;
+  tokenIdSearchInputRef: RefObject<HTMLInputElement>;
+  tokenIdSearchDisplayed: boolean;
+};
+
+const AssetsManagement: FC<AssetsManagementProps> = ({
+  manageModeEnabled,
+  setManageModeEnabled,
+  searchInputRef,
+  searchValue,
+  setSearchValue,
+  tokenIdSearchValue,
+  setTokenIdSearchValue,
+  tokenIdSearchInputRef,
+  tokenIdSearchDisplayed,
+}) => {
   const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
   const [, setTokenSlug] = useAtom(tokenSlugAtom);
   const [mode, setMode] = useState<ManageMode>(null);
@@ -44,18 +75,6 @@ const AssetsManagement: FC = ({}) => {
 
     setTokenSlug([RESET, "replace"]);
   }, [tokenType, setTokenSlug]);
-
-  const {
-    manageModeEnabled,
-    setManageModeEnabled,
-    searchInputRef,
-    searchValue,
-    setSearchValue,
-    tokenIdSearchValue,
-    setTokenIdSearchValue,
-    tokenIdSearchInputRef,
-    tokenIdSearchDisplayed,
-  } = useTokenList(tokenType);
 
   const toggleManageMode = useCallback(
     (mode: ManageMode) => {

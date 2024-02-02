@@ -26,7 +26,6 @@ import { useTokenList } from "app/hooks/tokenList";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
 import AssetsManagement from "../elements/AssetsManagement";
 import NullState from "../blocks/tokenList/NullState";
-import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
 
@@ -57,8 +56,6 @@ const TokenExplorer: FC = () => {
           "flex flex-col",
         )}
       >
-        <AssetsManagement />
-
         <TokenList key={tokenType} tokenType={tokenType} />
       </div>
 
@@ -91,6 +88,14 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     searching,
     focusSearchInput,
     loadMoreTriggerRef,
+
+    setManageModeEnabled,
+    searchInputRef,
+    setSearchValue,
+    tokenIdSearchValue,
+    setTokenIdSearchValue,
+    tokenIdSearchInputRef,
+    tokenIdSearchDisplayed,
   } = useTokenList(tokenType, {
     onAccountTokensReset: handleAccountTokensReset,
   });
@@ -180,13 +185,6 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         viewPortClassName="rounded-t-[.625rem] viewportBlock"
         scrollBarClassName="py-0"
       >
-        <AddTokenBanner
-          isNftsSelected={isNftsSelected}
-          manageModeEnabled={manageModeEnabled}
-          tokens={tokens}
-          focusSearchInput={focusSearchInput}
-        />
-
         {!isNftsSelected ? (
           <>
             {tokens.map((asset, i) => (
@@ -212,5 +210,20 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     );
   }
 
-  return <>{tokensBar}</>;
+  return (
+    <>
+      <AssetsManagement
+        manageModeEnabled={manageModeEnabled}
+        setManageModeEnabled={setManageModeEnabled}
+        searchInputRef={searchInputRef}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        tokenIdSearchValue={tokenIdSearchValue}
+        setTokenIdSearchValue={setTokenIdSearchValue}
+        tokenIdSearchInputRef={tokenIdSearchInputRef}
+        tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+      />
+      {tokensBar}
+    </>
+  );
 });
