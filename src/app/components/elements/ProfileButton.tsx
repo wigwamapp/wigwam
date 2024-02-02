@@ -29,6 +29,8 @@ import Balance from "./Balance";
 import SearchInput from "./SearchInput";
 import Button from "./Button";
 import ScrollAreaContainer from "./ScrollAreaContainer";
+import TooltipIcon from "./TooltipIcon";
+import Tooltip from "./Tooltip";
 
 type Size = "small" | "large";
 
@@ -197,6 +199,22 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             className="w-8 h-8 text-5xl"
           />
           {currentName}
+          <Tooltip
+            content={
+              <p>
+                The Profiles allows split app usage experience with multiple
+                different sessions and provides more safety for our users. For
+                example, a user can have a work profile and a personal profile.
+              </p>
+            }
+            size="large"
+            interactive={false}
+          >
+            <TooltipIcon
+              theme="light"
+              className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
+            />
+          </Tooltip>
         </div>
 
         <div className="w-full flex items-center mb-3">
