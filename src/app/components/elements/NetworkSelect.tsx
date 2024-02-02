@@ -12,6 +12,7 @@ import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimiti
 type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
+  currentListItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
   withAction?: boolean;
@@ -24,6 +25,7 @@ type NetworkSelectProps = {
 const NetworkSelect: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
+  currentListItemClassName,
   currentItemIconClassName,
   contentClassName,
   withAction,
@@ -86,6 +88,10 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       currentItemClassName={classNames(
         size === "small" ? "h-[1.75rem]" : "h-12",
         currentItemClassName,
+      )}
+      currentListItemClassName={classNames(
+        "border-2 border-[#80EF6E]",
+        currentListItemClassName,
       )}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}

@@ -50,6 +50,7 @@ export type SelectProps<T, U> = {
   contentClassName?: string;
   scrollAreaClassName?: string;
   currentItemClassName?: string;
+  currentListItemClassName?: string;
   currentItemIconClassName?: string;
   itemClassName?: string;
 } & DropdownMenu.DropdownMenuProps;
@@ -77,6 +78,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   contentClassName,
   scrollAreaClassName,
   currentItemClassName,
+  currentListItemClassName,
   currentItemIconClassName,
   itemClassName,
   ...rest
@@ -329,6 +331,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "transition-colors",
                           "hover:bg-[#373B45] focus-visible:bg-[#373B45]",
                           itemClassName,
+                          currentItem?.value === item.value &&
+                            currentListItemClassName,
                         )}
                         onSelect={() => {
                           setOpened(false);

@@ -39,6 +39,7 @@ type NetworkSelectProps = {
   source?: string;
   className?: string;
   currentItemClassName?: string;
+  currentListItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
 };
@@ -52,6 +53,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   source,
   className,
   currentItemClassName,
+  currentListItemClassName,
   currentItemIconClassName,
   contentClassName,
 }) => {
@@ -134,8 +136,11 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       searchValue={searchValue}
       onSearch={setSearchValue}
       className={className}
+      showSelected={true}
       scrollAreaClassName="h-64"
+      showSelectedIcon={false}
       currentItemClassName={currentItemClassName}
+      currentListItemClassName={currentListItemClassName}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
       modal={true}
