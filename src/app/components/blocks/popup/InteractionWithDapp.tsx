@@ -11,15 +11,18 @@ import {
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
 import { useAccounts } from "app/hooks";
+import { openInTab } from "app/helpers";
 import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 import Tooltip from "app/components/elements/Tooltip";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
 import { ReactComponent as MetamaskEnabledIcon } from "app/icons/metamask-enabled.svg";
 import { ReactComponent as ConnectIcon } from "app/icons/connect.svg";
+import { ReactComponent as CircleIcon } from "app/icons/circle.svg";
 import { ReactComponent as ArrowRightIcon } from "app/icons/arrow-right.svg";
 import Button from "app/components/elements/Button";
 import Switcher from "app/components/elements/Switcher";
+import { Page, SettingTab } from "app/nav";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
@@ -87,7 +90,18 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             )}
           >
             {urlDisplayed && tabOrigin ? (
-              <span className="truncate leading-4">
+              <span className="flex items-center gap-1 truncate leading-4">
+                <div className="relative">
+                  <CircleIcon />
+                  <div
+                    className={classNames(
+                      "absolute top-0 -right-1 border",
+                      accountConnected ? "bg-[#92BC78]" : "border-[#80EF6E]",
+                      "w-2 min-w-[.375rem] h-2 rounded-full",
+                      accountConnected ? "bg-[#80EF6E]" : "bg-white",
+                    )}
+                  />
+                </div>{" "}
                 {new URL(tabOrigin).host}
               </span>
             ) : (
@@ -123,18 +137,30 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             <>
               <div className="mb-4 w-full flex justify-between items-center">
                 {tabOrigin && (
-                  <span className="truncate leading-4">
+                  <span className="flex gap-1 items-center truncate leading-4">
+                    <ConnectIcon />
                     {new URL(tabOrigin).host}
                   </span>
                 )}
-                <div
-                  className={classNames(
-                    "w-2 min-w-[.375rem] h-2 rounded-full ml-2 transition",
-                    metamaskModeEnabled
-                      ? "bg-brand-greenobject"
-                      : "bg-brand-main/60",
-                  )}
-                />
+                <div className="flex gap-1 items-center">
+                  {accountConnected ? (
+                    <div
+                      className={classNames(
+                        "w-2 min-w-[.375rem] h-2 rounded-full ml-2",
+                        "bg-[#80EF6E] border border-[#92BC78]",
+                      )}
+                    />
+                  ) : null}
+
+                  <span
+                    className={classNames(
+                      "font-bold",
+                      accountConnected ? "text-[#80EF6E]" : "text-[#7A7E7B]",
+                    )}
+                  >
+                    {accountConnected ? "Connected" : "Unconnected"}
+                  </span>
+                </div>
               </div>
               <Button
                 className={classNames(
@@ -188,6 +214,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             theme="secondary"
             className="!w-full !text-xs !font-medium"
             innerClassName="!w-full !flex !justify-between"
+            onClick={() =>
+              openInTab({ page: Page.Settings, setting: SettingTab.Web3 })
+            }
           >
             <span>Connected apps</span>
             <span className="flex items-center gap-1 text-[#93ACAF]">
