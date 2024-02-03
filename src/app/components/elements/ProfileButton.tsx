@@ -47,51 +47,25 @@ const ProfileButton: FC<ProfileButtonProps> = ({
 }) => {
   const { currentAccount } = useAccounts();
 
-  const [copied, setCopied] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
 
   return (
     <>
       <div className={classNames("flex items-center gap-6", className)}>
         {hideAddress ? null : (
-          <CopiableTooltip
-            content="Copy wallet address to clipboard"
-            textToCopy={currentAccount.address}
-            onCopiedToggle={setCopied}
-            className={classNames(
-              "px-1 pt-1 -mx-1 -mt-1",
-              "text-left",
-              "rounded",
-              "max-w-full",
-              "transition-colors",
-              "flex items-center",
-              "px-2 py-1",
-              "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-            )}
-          >
-            <>
-              <HashPreview
-                hash={currentAccount.address}
-                withTooltip={false}
-                className="text-sm font-normal leading-none mr-1"
-              />
-              {copied ? (
-                <SuccessIcon className="w-[1.3125rem] h-auto" />
-              ) : (
-                <CopyIcon className="w-[1.3125rem] h-auto" />
-              )}
-            </>
-          </CopiableTooltip>
+          <AddressButton address={currentAccount.address} />
         )}
         <button
           type="button"
           onClick={() => setModalOpened(true)}
           className={classNames(
             "flex items-center gap-3",
-            size === "large" ? "py-2 pr-2 pl-4" : "px-2 py-1",
+            size === "large" ? "py-2 pr-2 pl-4" : "py-1 pl-2 pr-1",
             size === "large" ? "rounded-xl" : "rounded-md",
             "transition-colors",
-            "hover:bg-brand-main/5 focus-visible:bg-brand-main/5",
+            size === "large"
+              ? "hover:bg-brand-main/5 focus-visible:bg-brand-main/5"
+              : "hover:bg-white/[.16] focus-visible:bg-white/[.16]",
           )}
         >
           <WalletName
@@ -109,7 +83,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
               size === "large"
                 ? "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]"
                 : "h-10 w-10 min-w-10",
-              "bg-black/40",
+              size === "large" ? "bg-black/40" : "bg-brand-darkbg",
               size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
           />
@@ -125,6 +99,41 @@ const ProfileButton: FC<ProfileButtonProps> = ({
 };
 
 export default ProfileButton;
+
+const AddressButton: FC<{ address: string }> = ({ address }) => {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <CopiableTooltip
+      content="Copy wallet address to clipboard"
+      textToCopy={address}
+      onCopiedToggle={setCopied}
+      className={classNames(
+        "px-1 pt-1 -mx-1 -mt-1",
+        "text-left",
+        "rounded",
+        "max-w-full",
+        "transition-colors",
+        "flex items-center",
+        "px-2 py-1",
+        "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+      )}
+    >
+      <>
+        <HashPreview
+          hash={address}
+          withTooltip={false}
+          className="text-sm font-normal leading-none mr-1"
+        />
+        {copied ? (
+          <SuccessIcon className="w-[1.3125rem] h-auto" />
+        ) : (
+          <CopyIcon className="w-[1.3125rem] h-auto" />
+        )}
+      </>
+    </CopiableTooltip>
+  );
+};
 
 const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
   onOpenChange,
@@ -256,6 +265,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
                 account={account}
                 onClick={() => changeAccount(account.address)}
                 isActive={currentAccount.address === account.address}
+                size={size}
                 className={index === filteredAccounts.length - 1 ? "" : "mb-2"}
               />
             ))}
@@ -314,10 +324,11 @@ type ProfileItemProps = {
   className?: string;
 };
 
-const ProfileItem: FC<ProfileItemProps> = ({
+const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
   account,
   onClick,
   isActive = false,
+  size = "large",
   className,
 }) => (
   <button
@@ -348,7 +359,11 @@ const ProfileItem: FC<ProfileItemProps> = ({
     />
 
     <span className="flex flex-col text-left min-w-0 max-w-[40%] mr-auto">
-      <WalletName wallet={account} theme="small" className="text-base" />
+      <WalletName
+        wallet={account}
+        theme="small"
+        className={classNames(size === "large" ? "text-base" : "text-sm")}
+      />
       <HashPreview
         hash={account.address}
         className={classNames(

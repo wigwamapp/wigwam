@@ -183,7 +183,12 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
               }}
             />
 
-            <div className="flex w-full h-full gap-2">
+            <div
+              className={classNames(
+                "flex w-full gap-2",
+                size === "small" ? "h-10" : "h-full",
+              )}
+            >
               <SearchInput
                 ref={searchInputRef}
                 searchValue={searchValue}
@@ -203,7 +208,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                   searchValue={tokenIdSearchValue}
                   toggleSearchValue={setTokenIdSearchValue}
                   StartAdornment={HashTagIcon}
-                  className="max-w-[8rem] h-full"
+                  className={classNames("max-w-[8rem] h-full")}
                   inputClassName={classNames(
                     "h-full !max-h-none",
                     size === "small" ? "!py-2" : "",

@@ -76,7 +76,7 @@ const Assets: FC = () => {
   return isUnlocked ? (
     <>
       <PopupNetworkSelect />
-      <TokenExplorer />
+      <TokenList />
     </>
   ) : null;
 };
@@ -128,7 +128,7 @@ const PopupNetworkSelect: FC = () => {
     <NetworkSelect
       source="popup"
       className="max-w-auto"
-      currentItemClassName="!h-10 !-mt-1 pr-3 !pl-3 !p-[1.55rem] z-10"
+      currentItemClassName="!px-3 !py-2 z-10"
       currentItemIconClassName={classNames(
         "!w-8 !h-8",
         isSyncing && "animate-pulse",
@@ -136,14 +136,6 @@ const PopupNetworkSelect: FC = () => {
       contentClassName="w-[22.25rem]"
       onChange={handleChange}
     />
-  );
-};
-
-const TokenExplorer: FC = () => {
-  return (
-    <div className="flex flex-wrap mt-2 min-h-0">
-      <TokenList />
-    </div>
   );
 };
 
@@ -226,7 +218,7 @@ const TokenList: FC = () => {
         setTokenIdSearchValue={setTokenIdSearchValue}
         tokenIdSearchInputRef={tokenIdSearchInputRef}
         tokenIdSearchDisplayed={tokenIdSearchDisplayed}
-        className="mb-2"
+        className="mb-2 mt-2"
       />
       {tokensBar}
     </>

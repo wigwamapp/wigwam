@@ -1,6 +1,7 @@
 import { FC, PropsWithChildren, useRef } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
+import Link, { LinkProps } from "lib/navigation/Link";
 
 import { WalletStatus } from "core/types";
 
@@ -74,13 +75,13 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             {isUnlocked ? (
               <div
                 className={classNames(
-                  "p-3 pb-6",
+                  "pt-2 px-4 pb-6",
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
-                <div className="mb-1 flex items-center justify-between">
+                <div className="mb-2 flex items-center justify-between">
                   <InteractionWithDapp />
-                  <ProfileButton size="small" hideAddress />
+                  <ProfileButton size="small" hideAddress className="-mr-1" />
                 </div>
                 <WalletInfo />
               </div>
@@ -89,10 +90,10 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               className={classNames(
                 "relative",
                 "flex-1",
-                "pb-20 px-3",
+                "pb-16 px-3",
+                "before:absolute before:w-full before:h-4 before:rounded-t-[2rem] before:left-0",
+                "before:bg-brand-darkbg before:-top-[1rem] before:shadow-popup-bg",
                 className,
-                "before:absolute before:w-full before:h-5 before:rounded-t-[2rem] before:left-0",
-                "before:bg-[#181A1F] before:-top-[1.250rem]",
               )}
             >
               {children}
@@ -124,41 +125,28 @@ const NavToolbar: FC = () => {
         "fixed bottom-0 w-full",
         "px-3 py-2 bg-[#2A2D35]",
         "flex items-center justify-between gap-x-3",
+        "shadow-popup-nav",
       )}
     >
-      <Button
-        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-10"
-        theme={tab === PopupToolbarTab.Assets ? "primary" : "tertiary"}
+      <NavToolbarButton
+        Icon={CoinsIcon}
+        label="Assets"
+        isActive={tab === PopupToolbarTab.Assets}
         to={{
           tab: PopupToolbarTab.Assets,
         }}
-      >
-        <CoinsIcon
-          className={classNames(
-            "mr-2",
-            tab !== PopupToolbarTab.Assets && "[&>*]:fill-white",
-          )}
-        />
-        Assets
-      </Button>
-      <Button
-        className="col-span-4 !text-sm !font-semibold !min-w-36 !max-h-10"
-        theme={tab === PopupToolbarTab.Activity ? "primary" : "tertiary"}
+      />
+      <NavToolbarButton
+        Icon={ActivityIcon}
+        label="Activity"
+        isActive={tab === PopupToolbarTab.Activity}
         to={{
           tab: PopupToolbarTab.Activity,
         }}
-      >
-        <ActivityIcon
-          className={classNames(
-            "mr-2",
-            tab === PopupToolbarTab.Activity && "[&>*]:fill-black",
-          )}
-        />{" "}
-        Activity
-      </Button>
+      />
       <Button
-        theme="clean"
-        className="border border-[#515561] rounded-lg col-span-1 !p-[0.625rem]"
+        theme="tertiary"
+        className="border border-[#515561] rounded-lg col-span-1 !p-[0.625rem] !min-w-0"
         onClick={() => openInTab(undefined, ["token"])}
       >
         <ExpandIcon />
@@ -166,6 +154,43 @@ const NavToolbar: FC = () => {
     </nav>
   );
 };
+
+type NavToolbarButtonProps = LinkProps & {
+  Icon: FC<{ className?: string }>;
+  label: string;
+  isActive?: boolean;
+};
+
+const NavToolbarButton: FC<NavToolbarButtonProps> = ({
+  Icon,
+  label,
+  isActive = false,
+  ...rest
+}) => (
+  <Link
+    className={classNames(
+      "col-span-4 !text-sm !min-w-36 !max-h-10",
+      "transition",
+      "flex items-center justify-center",
+      "text-sm font-bold",
+      "rounded-[.375rem]",
+      "h-full py-3 px-4",
+      isActive
+        ? "bg-brand-redone text-brand-darkaccent bg-opacity hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none"
+        : "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
+    )}
+    {...rest}
+  >
+    <Icon
+      className={classNames(
+        "mr-2",
+        "transition-all",
+        isActive ? "fill-black" : "fill-white",
+      )}
+    />
+    {label}
+  </Link>
+);
 
 const WalletInfo: FC = () => {
   const { currentAccount } = useAccounts();
@@ -180,10 +205,10 @@ const WalletInfo: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="mb-3 text-2xl font-bold leading-none"
+          className="mt-2 mb-4 text-2xl font-bold leading-none"
         />
       ) : null}
-      <div className="flex gap-9">
+      <div className="flex gap-8">
         <DeepLinkButton text="Send" to="transfer" Icon={SendIcon} />
         <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />
         <DeepLinkButton text="Swap" to="swap" Icon={SwapIcon} />
@@ -196,27 +221,29 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
   const { copy, copied } = useCopyToClipboard(address);
 
   return (
-    <Button
-      onClick={() => copy()}
-      theme="clean"
-      className="!mb-1 !p-0 flex gap-2"
+    <Tooltip
+      content={copied ? "Copied" : "Copy Wallet Address"}
+      placement="top"
     >
-      <Tooltip
-        content={copied ? "Copied" : "Copy Wallet Address"}
-        placement="top"
+      <button
+        type="button"
+        onClick={() => copy()}
+        className={classNames(
+          "px-2.5 py-1",
+          "rounded-2xl",
+          "transition-colors",
+          "bg-white/[.16] hover:bg-white/[.32] focus-visible:bg-white/[.32]",
+          "flex items-center gap-1",
+        )}
       >
-        <div
-          className={classNames(
-            "mb-1 px-3 py-1",
-            "flex items-center gap-1 rounded-2xl",
-            "bg-brand-main/[.15] hover:bg-brand-main/30 hover:shadow-buttonsecondary",
-          )}
-        >
-          <span className="text-sm font-medium">{getHashPreview(address)}</span>
-          {copied ? <SuccessIcon /> : <CopyIcon />}
-        </div>
-      </Tooltip>
-    </Button>
+        <span className="text-sm font-medium">{getHashPreview(address)}</span>
+        {copied ? (
+          <SuccessIcon className="w-5 h-5" />
+        ) : (
+          <CopyIcon className="w-5 h-5" />
+        )}
+      </button>
+    </Tooltip>
   );
 };
 
@@ -226,17 +253,15 @@ const DeepLinkButton: FC<{
   to: string;
 }> = ({ text, to, Icon }) => {
   return (
-    <Button
-      theme="clean"
-      className="!p-0"
+    <button
+      type="button"
+      className="flex flex-col items-center relative z-10 group"
       onClick={() => openInTab({ page: to }, true)}
     >
-      <div className="flex flex-col items-center">
-        <div className="mb-1 p-[0.625rem] bg-black rounded-full">
-          <Icon className="w-5 h-5" />
-        </div>
-        <span className="text-xs">{text}</span>
+      <div className="mb-1 p-2.5 bg-brand-darkbg rounded-full transition-colors group-hover:bg-[#373B45] group-focus-visible:bg-[#373B45]">
+        <Icon className="w-5 h-5" />
       </div>
-    </Button>
+      <span className="text-xs font-medium">{text}</span>
+    </button>
   );
 };

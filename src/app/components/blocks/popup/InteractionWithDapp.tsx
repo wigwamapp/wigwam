@@ -80,28 +80,29 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             className={classNames(
               "flex items-center",
               "min-w-0 grow",
-              "min-h-8",
               "text-xs leading-none",
               "border-2",
               "rounded-3xl",
-              "bg-[#FFFFFF29] group-hover:bg-[#FFFFFF29]/20",
-              accountConnected ? "border-[#80EF6E]" : "border-transparent",
-              urlDisplayed ? " py-1 px-3 pr-2" : "p-[0.375rem]",
+              "transition-colors",
+              "bg-white/[.16] group-hover:bg-white/[.32]",
+              accountConnected ? "border-brand-redone" : "border-transparent",
+              urlDisplayed ? " py-1 pl-1.5 pr-2" : "p-[0.375rem]",
             )}
           >
             {urlDisplayed && tabOrigin ? (
-              <span className="flex items-center gap-1 truncate leading-4">
+              <span className="flex items-center gap-1.5 text-xs text-white truncate leading-4">
                 <div className="relative">
-                  <CircleIcon />
+                  <CircleIcon className="w-5 h-5" />
                   <div
                     className={classNames(
                       "absolute top-0 -right-1 border",
-                      accountConnected ? "bg-[#92BC78]" : "border-[#80EF6E]",
+                      accountConnected
+                        ? "bg-brand-redone bg-brand-redone"
+                        : "bg-[#DFE5E0] border-brand-[#92BC78]",
                       "w-2 min-w-[.375rem] h-2 rounded-full",
-                      accountConnected ? "bg-[#80EF6E]" : "bg-white",
                     )}
                   />
-                </div>{" "}
+                </div>
                 {new URL(tabOrigin).host}
               </span>
             ) : (
@@ -111,18 +112,21 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           <span
             className={classNames(
               "flex items-center",
-              "min-h-8 p-1",
+              "p-1.5",
               "border-2",
-              "rounded-3xl",
-              "bg-[#FFFFFF29] group-hover:bg-[#FFFFFF29]/20",
+              "rounded-full",
+              "transition-colors",
+              "bg-white/[.16] group-hover:bg-white/[.32]",
               "ml-2",
-              metamaskModeEnabled ? "border-[#80EF6E]" : "border-transparent",
+              metamaskModeEnabled
+                ? "border-brand-redone"
+                : "border-transparent",
             )}
           >
             {metamaskModeEnabled ? (
-              <MetamaskEnabledIcon />
+              <MetamaskEnabledIcon className="w-4 min-w-4 h-auto" />
             ) : (
-              <MetamaskIcon className="w-5 min-w-5 h-auto" />
+              <MetamaskIcon className="w-4 min-w-4 h-auto" />
             )}
           </span>
         </div>
@@ -147,7 +151,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                     <div
                       className={classNames(
                         "w-2 min-w-[.375rem] h-2 rounded-full ml-2",
-                        "bg-[#80EF6E] border border-[#92BC78]",
+                        "bg-brand-redone border border-[#92BC78]",
                       )}
                     />
                   ) : null}
@@ -155,7 +159,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   <span
                     className={classNames(
                       "font-bold",
-                      accountConnected ? "text-[#80EF6E]" : "text-[#7A7E7B]",
+                      accountConnected ? "text-brand-redone" : "text-[#7A7E7B]",
                     )}
                   >
                     {accountConnected ? "Connected" : "Unconnected"}
