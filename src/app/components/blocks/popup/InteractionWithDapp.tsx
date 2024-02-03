@@ -134,8 +134,10 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[19rem] ml-6 bg-[#2A2D35] p-5 rounded-3xl flex flex-col w-full z-10"
+          className="min-w-[19rem] bg-brand-darkbg border border-[#2A2D35] p-5 rounded-3xl flex flex-col w-full z-10"
           sideOffset={8}
+          side="bottom"
+          align="start"
         >
           {urlDisplayed ? (
             <>
@@ -171,7 +173,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   "mb-4",
                   "!text-xs !font-medium",
                   accountConnected
-                    ? "!bg-[#FE00001F] text-[#DD0000]"
+                    ? "!bg-[#FE00001F] !text-brand-redtext hover:!shadow-buttondanger focus-visible:!shadow-buttondanger"
                     : "!bg-[#80EF6E1F] text-brand-redone",
                 )}
               >
@@ -182,7 +184,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
           <Button
             theme="secondary"
-            className="mb-2 !w-full !text-xs !font-medium"
+            className="mb-2 !w-full !text-xs !font-medium !py-2.5"
             innerClassName="!w-full !flex !justify-between !items-center"
             onClick={() =>
               setMetamaskMode(

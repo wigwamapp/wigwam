@@ -75,7 +75,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             {isUnlocked ? (
               <div
                 className={classNames(
-                  "pt-2 px-4 pb-6",
+                  "pt-2 px-3 pb-6",
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
