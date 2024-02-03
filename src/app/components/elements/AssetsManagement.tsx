@@ -29,6 +29,7 @@ import AssetsSwitcher from "./AssetsSwitcher";
 type ManageMode = "manage" | "add" | "search" | null;
 
 type AssetsManagementProps = {
+  size?: "small" | "large";
   manageModeEnabled: boolean;
   setManageModeEnabled: Dispatch<SetStateAction<boolean>>;
   searchInputRef: RefObject<HTMLInputElement>;
@@ -38,9 +39,11 @@ type AssetsManagementProps = {
   setTokenIdSearchValue: Dispatch<SetStateAction<string | null>>;
   tokenIdSearchInputRef: RefObject<HTMLInputElement>;
   tokenIdSearchDisplayed: boolean;
+  className?: string;
 };
 
 const AssetsManagement: FC<AssetsManagementProps> = ({
+  size = "large",
   manageModeEnabled,
   setManageModeEnabled,
   searchInputRef,
@@ -50,6 +53,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
   setTokenIdSearchValue,
   tokenIdSearchInputRef,
   tokenIdSearchDisplayed,
+  className,
 }) => {
   const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
   const [, setTokenSlug] = useAtom(tokenSlugAtom);
@@ -124,30 +128,39 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
   }, [mode, tokenType]);
 
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className={classNames(
+        "flex items-center justify-between gap-3 w-full",
+        className,
+      )}
+    >
       <TippySingletonProvider>
         {mode === null ? (
           <>
             <AssetsSwitcher
+              theme={size}
               checked={tokenType === TokenType.NFT}
               onCheckedChange={toggleNftSwitcher}
               className="w-full"
             />
 
-            <div className="flex w-full gap-2">
+            <div className="flex gap-2">
               <ManageButton
+                size={size}
                 Icon={SearchIcon}
                 theme="secondary"
                 aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
                 onClick={() => toggleManageMode("search")}
               />
               <ManageButton
+                size={size}
                 Icon={ManageIcon}
                 theme="secondary"
                 aria-label={`Manage ${tokenType === TokenType.Asset ? "tokens" : "nfts"} list`}
                 onClick={() => toggleManageMode("manage")}
               />
               <ManageButton
+                size={size}
                 Icon={AddIcon}
                 theme="secondary"
                 aria-label={`Add a custom ${tokenType === TokenType.Asset ? "token" : "nft"}`}
@@ -158,10 +171,13 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
         ) : (
           <>
             <ManageButton
+              size={size}
               Icon={ChevronIcon}
               theme="secondary"
               aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
               onClick={() => {
+                setSearchValue(null);
+                setTokenIdSearchValue(null);
                 setMode(null);
                 setManageModeEnabled(false);
               }}
@@ -173,7 +189,10 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                 searchValue={searchValue}
                 toggleSearchValue={setSearchValue}
                 className="h-full"
-                inputClassName="h-full !max-h-none"
+                inputClassName={classNames(
+                  "h-full !max-h-none",
+                  size === "small" ? "!py-2" : "",
+                )}
                 StartAdornment={input.Icon}
                 placeholder={input.placeholder}
               />
@@ -185,7 +204,10 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                   toggleSearchValue={setTokenIdSearchValue}
                   StartAdornment={HashTagIcon}
                   className="max-w-[8rem] h-full"
-                  inputClassName="h-full !max-h-none"
+                  inputClassName={classNames(
+                    "h-full !max-h-none",
+                    size === "small" ? "!py-2" : "",
+                  )}
                   placeholder="Token ID..."
                 />
               )}
@@ -199,13 +221,20 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
 
 export default AssetsManagement;
 
-const ManageButton: FC<IconedButtonProps> = ({
+const ManageButton: FC<IconedButtonProps & { size?: "small" | "large" }> = ({
+  size = "large",
   className,
   iconProps,
   ...rest
 }) => (
   <IconedButton
-    className={classNames("!w-11 min-w-[2.75rem] !h-11 rounded-lg", className)}
+    className={classNames(
+      "rounded-lg",
+      size === "large"
+        ? "!w-11 min-w-[2.75rem] !h-11"
+        : "!w-10 !h-10 min-w-[2.5rem]",
+      className,
+    )}
     iconProps={{
       ...iconProps,
       className: classNames("!w-5 !h-5", iconProps?.className),
