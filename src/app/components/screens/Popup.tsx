@@ -1,8 +1,6 @@
 import {
   FC,
   ReactNode,
-  Dispatch,
-  SetStateAction,
   memo,
   Suspense,
   useCallback,
@@ -11,14 +9,10 @@ import {
   useEffect,
   PropsWithChildren,
 } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { match, P } from "ts-pattern";
 import { PopupToolbarTab } from "app/nav";
-import { ReactComponent as AddIcon } from "app/icons/PlusCircle.svg";
-import { ReactComponent as AddInputIcon } from "app/icons/add.svg";
-import { ReactComponent as SearchIcon } from "app/icons/search-input.svg";
-import { ReactComponent as BackIcon } from "app/icons/arrow-left.svg";
 import Masonry from "lib/react-masonry/Masonry";
 import { useAtomsAll } from "lib/atom-utils";
 import { Redirect } from "lib/navigation";
@@ -51,9 +45,6 @@ import { useTokenList } from "app/hooks/tokenList";
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
 import NetworkSelect from "../elements/NetworkSelect";
-import AssetsSwitcher from "../elements/AssetsSwitcher";
-import SearchInput from "../elements/SearchInput";
-import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
@@ -65,7 +56,7 @@ import ActivitiesList from "../blocks/activity/ActivitiesList";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import Button from "../elements/Button";
+import AssetsManagement from "../elements/AssetsManagement";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
@@ -149,187 +140,15 @@ const PopupNetworkSelect: FC = () => {
 };
 
 const TokenExplorer: FC = () => {
-  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
-
-  const toggleNftSwitcher = useCallback(
-    (value: boolean) => {
-      setTokenType(value ? TokenType.NFT : TokenType.Asset);
-    },
-    [setTokenType],
-  );
-
   return (
     <div className="flex flex-wrap mt-2 min-h-0">
-      <TokenList
-        key={tokenType}
-        tokenType={tokenType}
-        toggleNftSwitcher={toggleNftSwitcher}
-      />
+      <TokenList />
     </div>
   );
 };
 
-const TokenManagement: FC<{
-  flow: ManagementFlow;
-  tokenType: TokenType;
-  inputValue: string | null;
-  inputRef: React.RefObject<HTMLInputElement>;
-  setFlow: Dispatch<SetStateAction<ManagementFlow>>;
-  setInputValue: Dispatch<SetStateAction<string | null>>;
-  setManageMode: Dispatch<SetStateAction<boolean>>;
-  setAddMode: Dispatch<SetStateAction<boolean>>;
-}> = ({
-  flow,
-  setFlow,
-  tokenType,
-  inputRef,
-  inputValue,
-  setInputValue,
-  setManageMode,
-  setAddMode,
-}) => {
-  const handleChangeFlow = useCallback(
-    (selectedFlow: ManagementFlow) => {
-      if (flow !== "unset") {
-        setFlow("unset");
-        setInputValue(null);
-        setManageMode(false);
-        setAddMode(false);
-      } else {
-        setFlow(selectedFlow);
-
-        switch (selectedFlow) {
-          case "search": {
-            console.log("search");
-            break;
-          }
-          case "manage": {
-            setManageMode(true);
-            break;
-          }
-          case "add": {
-            setAddMode(true);
-            setManageMode(true);
-            break;
-          }
-        }
-      }
-    },
-    [flow, setFlow, setInputValue, setManageMode, setAddMode],
-  );
-
-  const input = useMemo(() => {
-    let args: { placeholder: string; Icon?: FC } = {
-      placeholder: "",
-    };
-    const tokenTypeName =
-      tokenType === TokenType.Asset ? "Token address" : "NFT";
-
-    switch (flow) {
-      case "add": {
-        args = {
-          placeholder: `Add ${tokenTypeName}`,
-          Icon: AddInputIcon,
-        };
-        break;
-      }
-      case "search": {
-        args = {
-          placeholder: "Search",
-        };
-        break;
-      }
-      case "manage": {
-        args = {
-          placeholder: "Search to manage",
-        };
-        break;
-      }
-      default:
-        return args;
-    }
-
-    return args;
-  }, [flow, tokenType]);
-
-  useEffect(() => {
-    if (flow !== "unset" && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [flow, inputRef]);
-
-  return (
-    <div className={classNames("flex gap-2", flow !== "unset" && "w-full")}>
-      {flow === "unset" ? (
-        <>
-          <ManageButton
-            Icon={SearchIcon}
-            onClick={() => handleChangeFlow("search")}
-          />
-          <ManageButton
-            Icon={ControlIcon}
-            onClick={() => handleChangeFlow("manage")}
-          />
-          <ManageButton
-            Icon={AddIcon}
-            onClick={() => handleChangeFlow("add")}
-          />
-        </>
-      ) : (
-        <>
-          <ManageButton
-            Icon={BackIcon}
-            onClick={() => handleChangeFlow("unset")}
-            className="!shrink-0"
-          />
-          <SearchInput
-            ref={inputRef}
-            searchValue={inputValue}
-            toggleSearchValue={setInputValue}
-            StartAdornment={input.Icon}
-            inputClassName="!pl-9 !py-[0.675rem] !max-h-none"
-            placeholder={input.placeholder}
-            className="!group-focus:stroke-white"
-            adornmentClassName={classNames(
-              "!left-3",
-              flow === "add" && "!left-4 !w-3 !h-3 [&>*]:fill-[#6A7185]",
-            )}
-          />
-        </>
-      )}
-    </div>
-  );
-};
-
-const ManageButton: FC<{
-  onClick: () => void;
-  Icon: FC<{
-    className?: string;
-  }>;
-  className?: string;
-}> = ({ Icon, onClick, className }) => {
-  return (
-    <Button
-      className={classNames(
-        "!p-[0.625rem] bg-[#2A2D35] hover:bg-[#373B45]",
-        className,
-      )}
-      theme="clean"
-      onClick={onClick}
-    >
-      <Icon className="p-0 h-5 w-5 fill-white" />
-    </Button>
-  );
-};
-
-interface TokenListProps {
-  tokenType: any;
-  toggleNftSwitcher: (value: boolean) => void;
-}
-type ManagementFlow = "search" | "manage" | "add" | "unset";
-
-const TokenList: FC<TokenListProps> = ({ tokenType, toggleNftSwitcher }) => {
-  const [flow, setFlow] = useState<ManagementFlow>("unset");
+const TokenList: FC = () => {
+  const tokenType = useAtomValue(tokenTypeAtom);
 
   const {
     searchValue,
@@ -339,7 +158,10 @@ const TokenList: FC<TokenListProps> = ({ tokenType, toggleNftSwitcher }) => {
     loadMoreTriggerRef,
     manageModeEnabled,
     setManageModeEnabled,
-    setAddMode,
+    tokenIdSearchValue,
+    setTokenIdSearchValue,
+    tokenIdSearchInputRef,
+    tokenIdSearchDisplayed,
     focusSearchInput,
     currentAccount,
     isNftsSelected,
@@ -393,26 +215,19 @@ const TokenList: FC<TokenListProps> = ({ tokenType, toggleNftSwitcher }) => {
 
   return (
     <>
-      <div className="mb-2 flex items-center justify-between w-full">
-        {flow === "unset" ? (
-          <AssetsSwitcher
-            theme="medium"
-            customLabels={["Tokens", "NFT"]}
-            checked={isNftsSelected}
-            onCheckedChange={toggleNftSwitcher}
-          />
-        ) : null}
-        <TokenManagement
-          flow={flow}
-          setFlow={setFlow}
-          inputRef={searchInputRef}
-          inputValue={searchValue}
-          setInputValue={setSearchValue}
-          tokenType={tokenType}
-          setManageMode={setManageModeEnabled}
-          setAddMode={setAddMode}
-        />
-      </div>
+      <AssetsManagement
+        size="small"
+        manageModeEnabled={manageModeEnabled}
+        setManageModeEnabled={setManageModeEnabled}
+        searchInputRef={searchInputRef}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        tokenIdSearchValue={tokenIdSearchValue}
+        setTokenIdSearchValue={setTokenIdSearchValue}
+        tokenIdSearchInputRef={tokenIdSearchInputRef}
+        tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+        className="mb-2"
+      />
       {tokensBar}
     </>
   );
