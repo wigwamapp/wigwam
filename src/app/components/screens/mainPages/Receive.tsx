@@ -7,7 +7,7 @@ import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { receiveTabAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
 import { ReceiveTab as ReceiveTabEnum } from "app/nav";
-import WalletsList from "app/components/blocks/WalletsList";
+import NetworksList from "app/components/blocks/NetworksList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as AddressIcon } from "app/icons/receive-address.svg";
@@ -38,7 +38,7 @@ const Receive: FC = () => {
 
   return (
     <>
-      <WalletsList />
+      <NetworksList />
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
