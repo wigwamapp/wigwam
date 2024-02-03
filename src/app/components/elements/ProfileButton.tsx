@@ -31,6 +31,7 @@ import Button from "./Button";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
+import SmartLink from "./SmartLink";
 
 type Size = "small" | "large";
 
@@ -193,11 +194,16 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
       onOpenChange={onOpenChange}
       {...rest}
       className={classNames(
-        "!p-0 !bg-[#2A2D35]",
-        size === "large" ? "!max-w-[27.5rem]" : "max-w-[21rem]",
+        "!p-0 !bg-[#2A2D35]", //!bg-brand-darkbg
+        size === "large" ? "!max-w-[27.5rem]" : "max-w-[20.75rem]",
       )}
     >
-      <div className="w-full flex flex-col px-5 pt-5">
+      <div
+        className={classNames(
+          "w-full flex flex-col pt-5",
+          size === "large" ? "px-5" : "px-4",
+        )}
+      >
         <div className="flex items-center text-xl font-bold gap-2 mr-auto mb-6">
           <AutoIcon
             seed={currentSeed}
@@ -217,6 +223,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
               </p>
             }
             size="large"
+            placement={size === "small" ? "bottom" : undefined}
             interactive={false}
           >
             <TooltipIcon
@@ -232,21 +239,27 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             toggleSearchValue={setSearchValue}
             placeholder="Search Wallets"
           />
-          <Button
+          <SmartLink
             to={{ addAccOpened: true }}
             merge
             onClick={() => onOpenChange?.(false)}
-            theme="secondary"
             className={classNames(
-              "ml-2 !py-2 !px-4 !min-w-max",
-              size === "large" ? "w-full" : "!min-w-11 !max-w-11",
+              "bg-brand-main bg-opacity-10",
+              "ml-2 py-2 min-w-max",
+              "rounded-[.375rem]",
+              "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary",
+              "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
+              "flex items-center justify-center",
+              "text-base font-bold",
+              "transition",
+              size === "large" ? "w-full px-4" : "px-2",
             )}
           >
             <AddWalletIcon
               className={classNames("h-6 w-auto", size === "large" && "mr-2")}
             />
             {size === "large" ? "Add wallet" : null}
-          </Button>
+          </SmartLink>
         </div>
 
         {filteredAccounts.length > 0 ? (
@@ -293,25 +306,36 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
         className={classNames(
           "w-full",
           "border-t border-brand-light/[.05]",
-          "pt-3 px-5 pb-5",
+          "pt-3 pb-5",
+          size === "large" ? "px-5" : "px-4",
           "flex items-center gap-3",
         )}
       >
         <LockButton />
-        <Button
+        <SmartLink
           to={{ page: Page.Settings }}
           onClick={() => onOpenChange?.(false)}
-          theme="secondary"
           className={classNames(
+            "bg-brand-main bg-opacity-10",
+            "rounded-[.375rem]",
+            "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary",
+            "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
+            "flex items-center justify-center",
+            "py-3 px-4",
             "!max-h-11",
+            "text-base font-bold",
+            "transition",
             size === "large" ? "w-full" : "!min-w-11 !max-w-11",
           )}
         >
           <GearIcon
-            className={classNames("h-6 w-auto", size === "large" && "mr-2")}
+            className={classNames(
+              "h-6 w-6 min-w-6",
+              size === "large" && "mr-2",
+            )}
           />
           {size === "large" ? "Settings" : null}
-        </Button>
+        </SmartLink>
       </div>
     </SecondaryModal>
   );
@@ -337,7 +361,8 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
     className={classNames(
       "w-full",
       "flex items-center",
-      "min-w-0 min-h-[4.5rem] px-3 py-2",
+      "min-w-0 px-3 py-2",
+      size === "large" ? "min-h-[3.75rem]" : "min-h-[3.25rem]",
       "border",
       "rounded-lg",
       isActive
@@ -367,8 +392,9 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
       <HashPreview
         hash={account.address}
         className={classNames(
-          "text-sm font-normal mt-[2px]",
+          "font-normal",
           isActive ? "text-brand-light" : "text-brand-inactivedark",
+          size === "large" ? "text-sm" : "text-xs",
         )}
         withTooltip={false}
       />
