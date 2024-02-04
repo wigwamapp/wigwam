@@ -26,23 +26,23 @@ const NetworksList: FC = () => {
 
   const balancesMap = useMemo(
     () =>
-      accountNativeTokens &&
-      new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD])),
+      accountNativeTokens
+        ? new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD]))
+        : null,
     [accountNativeTokens],
   );
 
-  const allNetworks = useMemo(
-    () =>
-      !balancesMap?.size
-        ? allNetworksPure ?? []
-        : (allNetworksPure ?? [])
-            .map((n) => ({
-              ...n,
-              balanceUSD: balancesMap?.get(n.chainId),
-            }))
-            .sort(compareNetworks),
-    [allNetworksPure, balancesMap],
-  );
+  const allNetworks = useMemo(() => {
+    if (!allNetworksPure || !balancesMap) return [];
+    if (balancesMap.size === 0) return allNetworksPure;
+
+    return allNetworksPure
+      .map((n) => ({
+        ...n,
+        balanceUSD: balancesMap?.get(n.chainId),
+      }))
+      .sort(compareNetworks);
+  }, [allNetworksPure, balancesMap]);
 
   const currentNetwork =
     allNetworks.find((n) => n.chainId === chainId) ?? allNetworks[0];
