@@ -97,10 +97,9 @@ const Profiles: FC = () => {
 
           <ul>
             <li>
-              <strong>The Profiles</strong> allows split app usage experience
-              with multiple different sessions and provides more safety for our
-              users. For example, a user can have a work profile and a personal
-              profile.
+              <strong>Profiles</strong> enables multiple separate sessions for
+              varied needs like work and personal, boosting organization and
+              privacy.
             </li>
 
             <li>
