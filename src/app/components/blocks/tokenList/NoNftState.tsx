@@ -25,7 +25,7 @@ const NoNftState = memo<NoNftStateProps>(({ syncing }) => (
           <span>There are no NFTs yet</span>
         </div>
       ) : (
-        "Syncing..."
+        <div className="mt-8 atom-spinner w-8 h-8" />
       )}
     </Delay>
   </div>
