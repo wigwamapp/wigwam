@@ -35,8 +35,8 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
       <SwitchOption
         theme={theme}
         className={classNames(
-          theme === "small" && "mr-1",
-          theme === "large" && "mr-2",
+          theme === "small" && "mr-0.5",
+          theme === "large" && "mr-1",
           !checked && "font-bold",
         )}
       >
@@ -54,10 +54,10 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
           "bg-brand-main/[.05]",
           "rounded-[.625rem]",
           "transition-transform",
-          theme === "small" && "w-[6.125rem] h-8 rounded-md",
-          theme === "large" && "w-[7.625rem] h-9",
-          theme === "small" && checked && "translate-x-[6.375rem]",
-          theme === "large" && checked && "translate-x-[8.125rem]",
+          theme === "small" && "w-[6.875rem] h-8 rounded-md",
+          theme === "large" && "w-[8.125rem] h-9",
+          theme === "small" && checked && "translate-x-[7rem]",
+          theme === "large" && checked && "translate-x-[8.75rem]",
         )}
       />
     </Switch.Root>
@@ -79,8 +79,8 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "px-2",
       "flex items-center justify-center",
       "text-base color-brand-light",
-      theme === "small" && "w-[6.125rem] py-1",
-      theme === "large" && "w-[7.625rem] py-1.5",
+      theme === "small" && "w-[6.875rem] py-1",
+      theme === "large" && "w-[8.5rem] py-1.5",
       className,
     )}
   >

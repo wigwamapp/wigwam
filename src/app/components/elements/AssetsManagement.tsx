@@ -144,7 +144,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
               className="w-full"
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2.5">
               <ManageButton
                 size={size}
                 Icon={SearchIcon}
@@ -235,14 +235,12 @@ const ManageButton: FC<IconedButtonProps & { size?: "small" | "large" }> = ({
   <IconedButton
     className={classNames(
       "rounded-lg",
-      size === "large"
-        ? "!w-11 min-w-[2.75rem] !h-11"
-        : "!w-10 !h-10 min-w-[2.5rem]",
+      size === "large" ? "!w-9 min-w-[2.25rem] !h-9" : "!w-8 !h-8 min-w-[2rem]",
       className,
     )}
     iconProps={{
       ...iconProps,
-      className: classNames("!w-5 !h-5", iconProps?.className),
+      className: classNames("!w-4 !h-4", iconProps?.className),
     }}
     {...rest}
   />
