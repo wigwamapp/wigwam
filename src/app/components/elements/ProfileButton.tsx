@@ -31,7 +31,7 @@ import Button from "./Button";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
-import SmartLink from "./SmartLink";
+import IconedButton from "./IconedButton";
 
 type Size = "small" | "large";
 
@@ -239,27 +239,28 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             toggleSearchValue={setSearchValue}
             placeholder="Search Wallets"
           />
-          <SmartLink
-            to={{ addAccOpened: true }}
-            merge
-            onClick={() => onOpenChange?.(false)}
-            className={classNames(
-              "bg-brand-main bg-opacity-10",
-              "ml-2 py-2 min-w-max",
-              "rounded-[.375rem]",
-              "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary",
-              "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
-              "flex items-center justify-center",
-              "text-base font-bold",
-              "transition",
-              size === "large" ? "w-full px-4" : "px-2",
-            )}
-          >
-            <AddWalletIcon
-              className={classNames("h-6 w-auto", size === "large" && "mr-2")}
+          {size === "small" ? (
+            <IconedButton
+              aria-label="Add wallet"
+              to={{ addAccOpened: true }}
+              smartLink
+              onClick={() => onOpenChange?.(false)}
+              theme="secondary"
+              Icon={AddWalletIcon}
+              className="ml-2 !w-10 min-w-[2.5rem] !h-10 rounded-lg"
+              iconClassName="w-6 min-w-6 h-auto"
             />
-            {size === "large" ? "Add wallet" : null}
-          </SmartLink>
+          ) : (
+            <Button
+              to={{ addAccOpened: true }}
+              theme="secondary"
+              onClick={() => onOpenChange?.(false)}
+              className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
+            >
+              <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
+              Add wallet
+            </Button>
+          )}
         </div>
 
         {filteredAccounts.length > 0 ? (
@@ -312,30 +313,29 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
         )}
       >
         <LockButton />
-        <SmartLink
-          to={{ page: Page.Settings }}
-          onClick={() => onOpenChange?.(false)}
-          className={classNames(
-            "bg-brand-main bg-opacity-10",
-            "rounded-[.375rem]",
-            "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary",
-            "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
-            "flex items-center justify-center",
-            "py-3 px-4",
-            "!max-h-11",
-            "text-base font-bold",
-            "transition",
-            size === "large" ? "w-full" : "!min-w-11 !max-w-11",
-          )}
-        >
-          <GearIcon
-            className={classNames(
-              "h-6 w-6 min-w-6",
-              size === "large" && "mr-2",
-            )}
+
+        {size === "small" ? (
+          <IconedButton
+            aria-label="Settings"
+            to={{ page: Page.Settings }}
+            smartLink
+            onClick={() => onOpenChange?.(false)}
+            theme="secondary"
+            Icon={GearIcon}
+            className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
+            iconClassName="w-6 min-w-6 h-auto"
           />
-          {size === "large" ? "Settings" : null}
-        </SmartLink>
+        ) : (
+          <Button
+            to={{ page: Page.Settings }}
+            theme="secondary"
+            onClick={() => onOpenChange?.(false)}
+            className="!max-h-11 w-full"
+          >
+            <GearIcon className={classNames("h-6 w-auto mr-2")} />
+            Settings
+          </Button>
+        )}
       </div>
     </SecondaryModal>
   );

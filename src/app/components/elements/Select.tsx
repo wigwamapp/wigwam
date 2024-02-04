@@ -174,11 +174,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
             size === "large" && "py-4 pl-5 pr-4 text-sm rounded-[.625rem]",
             size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
             "font-bold",
-            "bg-[#2A2D35]",
+            "bg-brand-darkgray",
             currentItem &&
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
             {
-              "bg-[#373B45]": opened,
+              "bg-brand-darkgray": opened,
             },
             "transition-colors",
             currentItemClassName,
@@ -332,7 +332,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "font-bold",
                           "outline-none",
                           "transition-colors",
-                          "hover:bg-[#373B45] focus-visible:bg-[#373B45]",
+                          "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
                           itemClassName,
                           currentItem?.value === item.value &&
                             currentListItemClassName,
@@ -373,7 +373,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                             <FiatAmount
                               amount={item.balanceUSD}
                               copiable={false}
-                              className="text-[#93ACAF] font-medium ml-auto"
+                              className="text-brand-inactivelight font-medium ml-auto"
                             />
                           )}
                           {showSelected &&

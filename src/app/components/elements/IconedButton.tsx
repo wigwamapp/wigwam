@@ -42,7 +42,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       (theme === "primary" || theme === "secondary") && "w-5 h-5",
       theme === "tertiary" && "w-6 h-6",
       theme === "primary" && "bg-brand-main/20",
-      theme === "secondary" && "bg-brand-main/[.05]",
+      theme === "secondary" && "bg-brand-main/[.1]",
       "rounded",
       "flex justify-center items-center",
       "transition",
