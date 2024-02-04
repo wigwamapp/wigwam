@@ -90,7 +90,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
         currentItemClassName,
       )}
       currentListItemClassName={classNames(
-        "border-2 border-[#80EF6E]",
+        "!bg-brand-main/20 border-2 border-[#80EF6E] !py-2",
         currentListItemClassName,
       )}
       currentItemIconClassName={currentItemIconClassName}

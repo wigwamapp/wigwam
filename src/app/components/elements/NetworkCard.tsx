@@ -50,7 +50,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
           "transition-colors",
           "border",
           isActive
-            ? "border-brand-redone bg-brand-main/10"
+            ? "border-brand-redone bg-brand-main/20"
             : "border-transparent bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           className,
         )}

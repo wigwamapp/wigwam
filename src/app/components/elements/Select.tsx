@@ -11,7 +11,6 @@ import {
 import classNames from "clsx";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
-import { IS_FIREFOX } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
@@ -169,16 +168,16 @@ function Select<T extends string | ReactElement, U extends string | number>({
         <DropdownMenu.Trigger
           disabled={!currentItem}
           className={classNames(
+            "group",
             "flex items-center justify-between",
             "w-full",
             size === "large" && "py-4 pl-5 pr-4 text-sm rounded-[.625rem]",
             size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
             "font-bold",
-            "bg-brand-darkgray",
-            currentItem &&
-              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            "bg-brand-main/5",
+            currentItem && "hover:bg-brand-main/10",
             {
-              "bg-brand-darkgray": opened,
+              "!bg-brand-main/10": opened,
             },
             "transition-colors",
             currentItemClassName,
@@ -215,7 +214,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     copiable={false}
                     className={classNames(
                       "mr-2 text-sm font-medium",
-                      opened ? "text-white" : "text-[#93ACAF]",
+                      "text-white",
                     )}
                   />
                 )}
@@ -250,8 +249,6 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 "w-full",
                 "rounded-[.625rem]",
                 "bg-brand-darkgray",
-                "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#0E1314]",
                 "border border-brand-light/5",
                 "z-20",
                 contentClassName,
@@ -289,7 +286,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                   scrollAreaClassName,
                 )}
                 viewPortClassName={classNames(
-                  size === "large" && "py-3 pt-0",
+                  size === "large" && "py-3 !pt-0",
                   size === "small" && "py-2",
                   "viewportBlock",
                 )}
@@ -313,26 +310,14 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "flex items-center",
                           size === "large" && "px-3",
                           size === "small" && "px-2",
-                          size === "large" && "py-3",
-                          showSelected &&
-                            showSelectedIcon &&
-                            item.key === currentItem?.key
-                            ? size === "large"
-                              ? "py-1.5"
-                              : "py-1"
-                            : size === "large"
-                              ? "py-2"
-                              : "py-1.5",
-                          // showSelected &&
-                          //   item.key === currentItem.key &&
-                          //   "!bg-brand-main/10", // Test this variant
+                          size === "large" && "py-2.5",
                           size === "large" && "rounded-[.625rem] text-base",
                           size === "small" && "rounded-lg text-xs",
                           "cursor-pointer",
                           "font-bold",
                           "outline-none",
                           "transition-colors",
-                          "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
+                          "hover:bg-brand-main/5 focus-visible:bg-brand-main/5",
                           itemClassName,
                           currentItem?.value === item.value &&
                             currentListItemClassName,
@@ -373,7 +358,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
                             <FiatAmount
                               amount={item.balanceUSD}
                               copiable={false}
-                              className="text-brand-inactivelight font-medium ml-auto"
+                              className={classNames(
+                                "text-brand-inactivelight font-medium ml-auto",
+                                currentItem?.value === item.value &&
+                                  "!text-white",
+                              )}
                             />
                           )}
                           {showSelected &&
