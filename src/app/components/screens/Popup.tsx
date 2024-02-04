@@ -11,11 +11,10 @@ import {
 } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 import { PopupToolbarTab } from "app/nav";
 import Masonry from "lib/react-masonry/Masonry";
 import { useAtomsAll } from "lib/atom-utils";
-import { Redirect } from "lib/navigation";
 
 import {
   Account,
@@ -350,6 +349,5 @@ const matchPopupTabs = (tab: PopupToolbarTab) => {
   return match<PopupToolbarTab, ReactNode>(tab)
     .with(PopupToolbarTab.Assets, () => <Assets />)
     .with(PopupToolbarTab.Activity, () => <Activities />)
-    .with(P.any, () => <Assets />)
-    .otherwise(() => <Redirect to={{ tab: PopupToolbarTab.Assets }} />);
+    .otherwise(() => <Assets />);
 };

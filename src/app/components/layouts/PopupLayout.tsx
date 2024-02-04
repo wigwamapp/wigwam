@@ -1,7 +1,6 @@
-import { FC, PropsWithChildren, useRef } from "react";
+import { FC, HTMLAttributes, PropsWithChildren, useRef } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
-import Link, { LinkProps } from "lib/navigation/Link";
+import { useAtom, useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 
@@ -117,7 +116,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
 export default PopupLayout;
 
 const NavToolbar: FC = () => {
-  const tab = useAtomValue(popupToolbarTabAtom);
+  const [tab, setTab] = useAtom(popupToolbarTabAtom);
 
   return (
     <nav
@@ -132,17 +131,13 @@ const NavToolbar: FC = () => {
         Icon={CoinsIcon}
         label="Assets"
         isActive={tab === PopupToolbarTab.Assets}
-        to={{
-          tab: PopupToolbarTab.Assets,
-        }}
+        onClick={() => setTab(PopupToolbarTab.Assets)}
       />
       <NavToolbarButton
         Icon={ActivityIcon}
         label="Activity"
         isActive={tab === PopupToolbarTab.Activity}
-        to={{
-          tab: PopupToolbarTab.Activity,
-        }}
+        onClick={() => setTab(PopupToolbarTab.Activity)}
       />
       <Button
         theme="tertiary"
@@ -155,7 +150,7 @@ const NavToolbar: FC = () => {
   );
 };
 
-type NavToolbarButtonProps = LinkProps & {
+type NavToolbarButtonProps = HTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;
   label: string;
   isActive?: boolean;
@@ -167,8 +162,9 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
   isActive = false,
   ...rest
 }) => (
-  <Link
+  <button
     className={classNames(
+      "appearance-none",
       "col-span-4 !text-sm !min-w-36 !max-h-10",
       "transition",
       "flex items-center justify-center",
@@ -189,7 +185,7 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
       )}
     />
     {label}
-  </Link>
+  </button>
 );
 
 const WalletInfo: FC = () => {
