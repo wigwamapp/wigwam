@@ -89,7 +89,7 @@ const AssetCard = memo(
             {isManageMode ? (
               <Checkbox.Root
                 className={classNames(
-                  "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
+                  "w-5 h-5 min-w-[1.25rem] mr-5 my-auto",
                   "bg-[#373B45]",
                   "rounded",
                   "flex items-center justify-center",
