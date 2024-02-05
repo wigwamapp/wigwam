@@ -201,10 +201,10 @@ const WalletInfo: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="mt-5 mb-7 text-3xl font-bold leading-none"
+          className="mt-5 mb-5 text-3xl font-bold leading-none"
         />
       ) : null}
-      <div className="flex gap-8">
+      <div className="flex gap-8 mb-2">
         <DeepLinkButton text="Send" to="transfer" Icon={SendIcon} />
         <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />
         <DeepLinkButton text="Swap" to="swap" Icon={SwapIcon} />
@@ -232,7 +232,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
           "flex items-center gap-1",
         )}
       >
-        <span className="text-base font-medium">{getHashPreview(address)}</span>
+        <span className="text-sm font-medium">{getHashPreview(address)}</span>
         {copied ? (
           <SuccessIcon className="w-5 h-5" />
         ) : (
