@@ -69,13 +69,13 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             hiddenScrollbar="horizontal"
             className="h-full min-h-0"
             viewPortClassName="viewportBlock"
-            scrollBarClassName="pt-[13.85rem] pb-[3.65rem] pl-1.5 pr-0.5 w-3"
+            scrollBarClassName="pt-[16.65rem] pb-[3.65rem] pl-1.5 pr-0.5 w-3"
           >
             {isUnlocked ? (
               <div
                 className={classNames(
                   "pt-2 px-3 pb-6",
-                  "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
+                  "bg-gradient-to-b from-[#82B153] to-[#549BB2] to-85%",
                 )}
               >
                 <div className="mb-2 flex items-center justify-between">
@@ -201,7 +201,7 @@ const WalletInfo: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="mt-2 mb-4 text-2xl font-bold leading-none"
+          className="mt-5 mb-7 text-3xl font-bold leading-none"
         />
       ) : null}
       <div className="flex gap-8">
@@ -225,14 +225,14 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
         type="button"
         onClick={() => copy()}
         className={classNames(
-          "px-2.5 py-1",
+          "px-3 py-1 mt-2",
           "rounded-2xl",
           "transition-colors",
           "bg-white/[.16] hover:bg-white/[.32] focus-visible:bg-white/[.32]",
           "flex items-center gap-1",
         )}
       >
-        <span className="text-sm font-medium">{getHashPreview(address)}</span>
+        <span className="text-base font-medium">{getHashPreview(address)}</span>
         {copied ? (
           <SuccessIcon className="w-5 h-5" />
         ) : (
