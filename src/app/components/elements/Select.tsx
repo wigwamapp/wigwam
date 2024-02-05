@@ -43,6 +43,7 @@ export type SelectProps<T, U> = {
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
   size?: "large" | "small";
+  type?: "network";
   tooltip?: ReactNode;
   tooltipProps?: TooltipProps;
   contentAlign?: "center" | "start" | "end";
@@ -72,6 +73,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   emptySearchText,
   onOpenChange,
   size = "large",
+  type,
   tooltip,
   tooltipProps,
   contentAlign,
@@ -185,7 +187,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
         >
           {currentItem && (
             <>
-              <div className="flex items-center">
+              <div className="flex items-center w-full">
                 {currentItem.icon && (
                   <img
                     src={currentItem.icon}
@@ -213,8 +215,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     amount={currentItem.balanceUSD}
                     copiable={false}
                     className={classNames(
-                      "mr-2 text-sm font-medium",
-                      "text-white",
+                      type === "network"
+                        ? "mr-2 text-sm font-medium text-white"
+                        : "text-[0.85rem] ml-4 text-brand-inactivelight",
                     )}
                   />
                 )}
@@ -359,7 +362,9 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               amount={item.balanceUSD}
                               copiable={false}
                               className={classNames(
-                                "text-brand-inactivelight font-medium ml-auto",
+                                type === "network"
+                                  ? "text-brand-inactivelight font-medium ml-auto"
+                                  : "text-[0.85rem] ml-4 text-brand-inactivelight",
                                 currentItem?.value === item.value &&
                                   "!text-white",
                               )}
