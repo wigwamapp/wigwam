@@ -3,3 +3,4 @@ export * from "./activities";
 export * from "./find";
 export * from "./native";
 export * from "./queue";
+export * from "./detailsUrl";

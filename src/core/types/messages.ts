@@ -25,9 +25,9 @@ export type Request =
   | GetApprovalsRequest
   | ApproveRequest
   | GetGasPricesRequest
-  | GetCgPlatformIdsRequest
   | GetSyncStatusRequest
-  | GetOnRampCurrenciesRequest;
+  | GetOnRampCurrenciesRequest
+  | GetTokenDetailsUrlRequest;
 
 export type Response =
   | GetWalletStateResponse
@@ -44,12 +44,12 @@ export type Response =
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
   | GetGasPricesResponse
-  | GetCgPlatformIdsResponse
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
   | ApproveResponse
-  | GetOnRampCurrenciesResponse;
+  | GetOnRampCurrenciesResponse
+  | GetTokenDetailsUrlResponse;
 
 export type EventMessage =
   | WalletStateUpdated
@@ -81,7 +81,6 @@ export enum MessageType {
   FindToken = "FIND_TOKEN",
   SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
   GetGasPrices = "GET_GAS_PRICES",
-  GetCgPlatformIds = "GET_CG_PLATFORM_IDS",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
@@ -90,6 +89,7 @@ export enum MessageType {
   Approve = "APPROVE",
   RejectAllApprovals = "REJECT_ALL_APPROVALS",
   GetOnRampCurrencies = "GET_ONRAMP_CURRENCIES",
+  GetTokenDetailsUrl = "GET_TOKEN_DETAILS_URL",
 }
 
 export interface MessageBase {
@@ -267,15 +267,6 @@ export interface GetGasPricesResponse extends MessageBase {
   gasPrices: GasPrices;
 }
 
-export interface GetCgPlatformIdsRequest extends MessageBase {
-  type: MessageType.GetCgPlatformIds;
-}
-
-export interface GetCgPlatformIdsResponse extends MessageBase {
-  type: MessageType.GetCgPlatformIds;
-  cgPlatformIds: Record<number, { id: string; native_coin_id: string }>;
-}
-
 export interface GetSyncStatusRequest extends MessageBase {
   type: MessageType.GetSyncStatus;
 }
@@ -337,4 +328,15 @@ export interface GetOnRampCurrenciesRequest extends MessageBase {
 export interface GetOnRampCurrenciesResponse extends MessageBase {
   type: MessageType.GetOnRampCurrencies;
   currencies: Record<string, RampTokenInfo>;
+}
+
+export interface GetTokenDetailsUrlRequest extends MessageBase {
+  type: MessageType.GetTokenDetailsUrl;
+  chainId: number;
+  tokenSlug: string;
+}
+
+export interface GetTokenDetailsUrlResponse extends MessageBase {
+  type: MessageType.GetTokenDetailsUrl;
+  detailsUrl: string | null;
 }
