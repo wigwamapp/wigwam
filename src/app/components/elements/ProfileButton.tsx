@@ -83,8 +83,8 @@ const ProfileButton: FC<ProfileButtonProps> = ({
             type="personas"
             className={classNames(
               size === "large"
-                ? "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]"
-                : "h-10 w-10 min-w-10",
+                ? "h-[3rem] w-[3rem] min-w-[3rem]"
+                : "h-9 w-9 min-w-9",
               size === "large" ? "bg-black/40" : "bg-brand-darkbg",
               size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
@@ -195,8 +195,8 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
       onOpenChange={onOpenChange}
       {...rest}
       className={classNames(
-        "!p-0 !bg-brand-darkgray", //
-        size === "large" ? "!max-w-[27.5rem]" : "max-w-[20.75rem]",
+        "!p-0",
+        size === "large" ? "!max-w-[27.5rem]" : "!max-w-[20.75rem]",
       )}
     >
       <div

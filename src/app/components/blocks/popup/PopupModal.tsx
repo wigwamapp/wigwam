@@ -17,12 +17,11 @@ const PopupModal: FC<IPopupModalProps> = (props) => {
   return (
     <SecondaryModal
       {...props}
-      disabledClickOutside
       headerClassName={classNames("!m-0", headerClassName)}
       className={classNames(
-        "!min-w-80 !w-auto !p-5 !rounded-3xl",
+        "!p-5",
         "!items-start !justify-start",
-        "!bg-[#2A2D35] !border-none !blur-none",
+        "!max-w-[20.75rem]",
         className,
       )}
     >
