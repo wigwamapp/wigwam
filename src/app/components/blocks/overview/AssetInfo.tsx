@@ -4,11 +4,12 @@ import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { toggleTokenStatus } from "core/common/tokens";
-import { coinGeckoPlatformIds, tokenSlugAtom } from "app/atoms";
+import { getTokenDetailsUrlAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -52,7 +53,6 @@ export enum TokenStandardValue {
 const AssetInfo: FC = () => {
   const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
-  const cgPlatfromIds = useAtomValue(coinGeckoPlatformIds);
 
   const { confirm } = useDialog();
 
@@ -62,6 +62,11 @@ const AssetInfo: FC = () => {
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
   let tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  const tokenDetailsUrl = useLazyAtomValue(
+    getTokenDetailsUrlAtom({ chainId, tokenSlug }),
+    "off",
+  );
 
   if (tokenInfo?.tokenType !== TokenType.Asset) {
     tokenInfo = undefined;
@@ -102,13 +107,7 @@ const AssetInfo: FC = () => {
     priceUSD,
     priceUSDChange,
     balanceUSD,
-    tokenInfoLink,
   } = tokenInfo;
-
-  const coinGeckoUrl =
-    status === TokenStatus.Native
-      ? `https://www.coingecko.com/en/coins/${cgPlatfromIds[chainId]?.native_coin_id}`
-      : tokenInfoLink;
 
   const handleHideAsset = async () => {
     const response = await confirm({
@@ -167,6 +166,25 @@ const AssetInfo: FC = () => {
                   </h2>
                   <TippySingletonProvider>
                     <div className="ml-auto flex items-center">
+                      {currentNetwork?.type === "mainnet" &&
+                        tokenDetailsUrl && (
+                          <IconedButton
+                            aria-label="View chart and token info"
+                            Icon={CoinGeckoIcon}
+                            className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                            iconClassName="!w-[1.125rem]"
+                            href={tokenDetailsUrl}
+                          />
+                        )}
+                      {explorerLink && status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label="View token in Explorer"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={explorerLink.token(address)}
+                        />
+                      )}
                       {status !== TokenStatus.Native && (
                         <IconedButton
                           aria-label={
@@ -178,24 +196,6 @@ const AssetInfo: FC = () => {
                           className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
                           onClick={() => copy()}
-                        />
-                      )}
-                      {explorerLink && status !== TokenStatus.Native && (
-                        <IconedButton
-                          aria-label="View asset in Explorer"
-                          Icon={WalletExplorerIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                          iconClassName="!w-[1.125rem]"
-                          href={explorerLink.token(address)}
-                        />
-                      )}
-                      {currentNetwork?.type === "mainnet" && coinGeckoUrl && (
-                        <IconedButton
-                          aria-label="View asset in CoinGecko"
-                          Icon={CoinGeckoIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                          iconClassName="!w-[1.125rem]"
-                          href={coinGeckoUrl}
                         />
                       )}
                       {status !== TokenStatus.Native && (

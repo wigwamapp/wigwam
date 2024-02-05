@@ -273,15 +273,6 @@ export async function getGasPrices(chainId: number) {
   return res.gasPrices;
 }
 
-export async function getCgPlatformIds() {
-  const type = MessageType.GetCgPlatformIds;
-
-  const res = await porter.request({ type });
-  assert(res?.type === type);
-
-  return res.cgPlatformIds;
-}
-
 export async function getOnRampCurrencies() {
   const type = MessageType.GetOnRampCurrencies;
 
@@ -289,4 +280,13 @@ export async function getOnRampCurrencies() {
   assert(res?.type === type);
 
   return res.currencies;
+}
+
+export async function getTokenDetailsUrl(chainId: number, tokenSlug: string) {
+  const type = MessageType.GetTokenDetailsUrl;
+
+  const res = await porter.request({ type, chainId, tokenSlug });
+  assert(res?.type === type);
+
+  return res.detailsUrl;
 }

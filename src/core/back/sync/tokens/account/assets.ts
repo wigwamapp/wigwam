@@ -11,7 +11,7 @@ import {
 import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 
-import { getDexPrices, getExplorerDetailsUrl } from "../../dexPrices";
+import { getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
 import { prepareAccountTokensSync } from "./utils";
 import { fetchCxAccountTokens } from "../../indexer";
@@ -52,7 +52,6 @@ export const syncAccountAssets = memoize(
         id: "0",
       });
 
-      const tokenInfoLink = await getExplorerDetailsUrl(tokenAddress);
       const existing = existingTokensMap.get(tokenSlug);
 
       // Skip tokens that recently synced by chain
@@ -119,7 +118,6 @@ export const syncAccountAssets = memoize(
         rawBalance,
         balanceUSD,
         priceUSD,
-        tokenInfoLink,
       });
     }
 
