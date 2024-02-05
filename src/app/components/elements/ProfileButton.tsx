@@ -111,13 +111,12 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
       textToCopy={address}
       onCopiedToggle={setCopied}
       className={classNames(
-        "px-1 pt-1 -mx-1 -mt-1",
         "text-left",
-        "rounded",
+        "rounded-full",
         "max-w-full",
         "transition-colors",
         "flex items-center",
-        "px-2 py-1",
+        "px-3 py-1.5",
         "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
       )}
     >
@@ -125,12 +124,12 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
         <HashPreview
           hash={address}
           withTooltip={false}
-          className="text-sm font-normal leading-none mr-1"
+          className="text-base font-normal leading-none mr-1.5"
         />
         {copied ? (
-          <SuccessIcon className="w-[1.3125rem] h-auto" />
+          <SuccessIcon className="w-[1.5rem] h-auto" />
         ) : (
-          <CopyIcon className="w-[1.3125rem] h-auto" />
+          <CopyIcon className="w-[1.5rem] h-auto" />
         )}
       </>
     </CopiableTooltip>

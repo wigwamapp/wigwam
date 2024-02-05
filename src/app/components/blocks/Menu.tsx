@@ -40,7 +40,7 @@ const TotalBalance: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="text-[1.25rem] font-bold leading-none ml-4"
+          className="text-[1.75rem] font-bold leading-none"
         />
       ) : null}
     </>

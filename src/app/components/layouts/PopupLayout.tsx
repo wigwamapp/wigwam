@@ -74,7 +74,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             {isUnlocked ? (
               <div
                 className={classNames(
-                  "pt-2 px-3 pb-6",
+                  "pt-2 px-3 pb-8",
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
@@ -201,7 +201,7 @@ const WalletInfo: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="mt-2 mb-4 text-2xl font-bold leading-none"
+          className="mt-3 mb-5 text-[2rem] font-bold leading-none"
         />
       ) : null}
       <div className="flex gap-8">
