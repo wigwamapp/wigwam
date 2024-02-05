@@ -4,6 +4,7 @@ import classNames from "clsx";
 import Fuse from "fuse.js";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { Account } from "core/types";
 import { lockWallet } from "core/client";
@@ -217,9 +218,9 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
           <Tooltip
             content={
               <p>
-                The Profiles allows split app usage experience with multiple
-                different sessions and provides more safety for our users. For
-                example, a user can have a work profile and a personal profile.
+                <strong>Profiles</strong> enables multiple separate sessions for
+                varied needs like work and personal, boosting organization and
+                privacy.
               </p>
             }
             size="large"
@@ -407,14 +408,14 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
 );
 
 const LockButton: FC = () => {
-  const approvals = useAtomValue(approvalsAtom);
+  const approvals = useLazyAtomValue(approvalsAtom);
   const { confirm } = useDialog();
 
   const isPopup = isPopupPrimitive();
 
   const handleLock = useCallback(async () => {
     try {
-      const approvalsAmount = approvals.length;
+      const approvalsAmount = approvals?.length ?? 0;
       const response =
         approvalsAmount === 0
           ? true
@@ -443,7 +444,7 @@ const LockButton: FC = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [approvals.length, confirm, isPopup]);
+  }, [approvals?.length, confirm, isPopup]);
 
   return (
     <Button

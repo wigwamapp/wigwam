@@ -16,8 +16,8 @@ const Menu: FC = () => {
       </Suspense>
 
       {isSyncing && (
-        <span className="px-4 text-sm text-white font-semibold">
-          Syncing...
+        <span className="pl-6 pr-4 text-sm text-white font-semibold inline-flex items-center justify-center">
+          <div className="atom-spinner w-8 h-8" />
         </span>
       )}
 

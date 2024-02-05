@@ -1,4 +1,4 @@
-import { atomWithURLHash } from "lib/atom-utils";
+import { atomWithURLHash, atomWithStorage } from "lib/atom-utils";
 
 import {
   Page,
@@ -11,8 +11,8 @@ import {
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
 
-export const popupToolbarTabAtom = atomWithURLHash<PopupToolbarTab>(
-  "tab",
+export const popupToolbarTabAtom = atomWithStorage<PopupToolbarTab>(
+  "popup_toolbar_tab",
   PopupToolbarTab.Assets,
 );
 

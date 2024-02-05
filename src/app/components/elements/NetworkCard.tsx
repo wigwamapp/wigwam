@@ -55,11 +55,13 @@ const NetworkCard: FC<NetworkCardProps> = ({
           className,
         )}
       >
-        <img
-          src={getNetworkIconUrl(network)}
-          alt={network.name}
-          className="w-11 h-11"
-        />
+        <span className="w-11 h-11 min-w-11 min-h-11">
+          <img
+            src={getNetworkIconUrl(network)}
+            alt={network.name}
+            className="w-full h-full object-cover"
+          />
+        </span>
         <span className="flex flex-col justify-between items-start gap-1 w-full h-full min-w-0">
           <span
             className={classNames(
