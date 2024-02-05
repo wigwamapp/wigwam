@@ -9,7 +9,7 @@ import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { allAccountsAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
@@ -167,7 +167,7 @@ const WalletTab: FC<WalletTabProps> = ({
           className="text-sm text-brand-inactivedark font-normal -mt-px"
           withTooltip={false}
         />
-        <Balance address={address} className="mt-auto" />
+        <TotalWalletBalance address={address} className="mt-auto" />
       </span>
       <ChevronRightIcon
         className={classNames(
