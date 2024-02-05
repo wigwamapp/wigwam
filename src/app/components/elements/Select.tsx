@@ -54,6 +54,7 @@ export type SelectProps<T, U> = {
   currentListItemClassName?: string;
   currentItemIconClassName?: string;
   itemClassName?: string;
+  actionsClassName?: string;
 } & DropdownMenu.DropdownMenuProps;
 
 function Select<T extends string | ReactElement, U extends string | number>({
@@ -84,6 +85,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   currentListItemClassName,
   currentItemIconClassName,
   itemClassName,
+  actionsClassName,
   ...rest
 }: SelectProps<T, U>) {
   const [opened, setOpened] = useState(false);
@@ -256,7 +258,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
               )}
             >
               {!!onSearch && (
-                <div className="relative flex items-center p-3">
+                <div
+                  className={classNames(
+                    "relative flex items-center p-3",
+                    actionsClassName,
+                  )}
+                >
                   <SearchInput
                     placeholder={placeholder ?? "Type name to search..."}
                     searchValue={searchValue}

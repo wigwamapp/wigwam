@@ -173,7 +173,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
               to={{ page: Page.Settings, setting: SettingTab.Networks }}
               theme="secondary"
               onClick={handleLinkClick}
-              className="ml-2 self-stretch !py-0"
+              className="ml-2 self-stretch !py-0 whitespace-nowrap"
             >
               <AddIcon className="w-5 h-auto min-w-[1.25rem] mr-2" /> Add
               network
@@ -181,6 +181,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
           )
         ) : undefined
       }
+      actionsClassName="pr-4"
       emptySearchText={
         <div className="max-w-[14rem]">
           You can add a new network in the{" "}
