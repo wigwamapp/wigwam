@@ -76,7 +76,8 @@ const Input = memo(
         "absolute top-1/2 -translate-y-1/2",
         "pointer-events-none",
         "transition-colors",
-        focused && "fill-current text-brand-light",
+        "fill-[#7A7E7B]",
+        focused && "fill-current [&>*]:fill-current text-brand-light",
         disabled &&
           theme !== "clean" &&
           "fill-current text-brand-disabledcolor",
@@ -145,7 +146,7 @@ const Input = memo(
               )}
             </div>
           )}
-          <div className="group relative">
+          <div className="group relative h-full">
             {!!StartAdornment && (
               <StartAdornment
                 className={classNames(adornmentClassNames, "left-4")}

@@ -1,8 +1,7 @@
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
-
-import * as repo from "core/repo";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import {
@@ -12,26 +11,29 @@ import {
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
 import { useAccounts } from "app/hooks";
-import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
+import { openInTab } from "app/helpers";
+import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 import Tooltip from "app/components/elements/Tooltip";
-import Avatar from "app/components/elements/Avatar";
 import TooltipIcon from "app/components/elements/TooltipIcon";
-import SecondaryModal, {
-  SecondaryModalProps,
-} from "app/components/elements/SecondaryModal";
 import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
+import { ReactComponent as MetamaskEnabledIcon } from "app/icons/metamask-enabled.svg";
+import { ReactComponent as ConnectIcon } from "app/icons/connect.svg";
+import { ReactComponent as CircleIcon } from "app/icons/circle.svg";
+import { ReactComponent as ArrowRightIcon } from "app/icons/arrow-right.svg";
+import Button from "app/components/elements/Button";
+import Switcher from "app/components/elements/Switcher";
+import { Page, SettingTab } from "app/nav";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
+  const setMetamaskMode = useSetMetaMaskCompatibleMode(false);
 
   const { currentAccount } = useAccounts();
 
-  const [web3DialogOpened, setWeb3DialogOpened] = useState(false);
-
-  const metamaskModeEnabled = metamaskMode !== MetaMaskCompatibleMode.Off;
+  const metamaskModeEnabled = metamaskMode === MetaMaskCompatibleMode.Strict;
 
   const permission =
     purePermission && purePermission.accountAddresses.length > 0
@@ -46,7 +48,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
     [permission, currentAccount],
   );
 
-  const reallyConnectible = useMemo(() => {
+  const reallyConnectable = useMemo(() => {
     if (!activeTab?.url) return false;
 
     const { protocol, pathname } = new URL(activeTab.url);
@@ -60,225 +62,176 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
     return protocol.startsWith("http") || protocol.startsWith("file");
   }, [activeTab]);
 
-  const state = useMemo(() => {
-    if (!permission) return "disconnected";
-    if (accountConnected) return "connected";
-    return "connectible";
-  }, [permission, accountConnected]);
-
-  const handlePermission = useCallback(async () => {
-    if (!permission) return;
-
-    try {
-      if (accountConnected) {
-        await repo.permissions.delete(permission.origin);
-      } else {
-        await repo.permissions
-          .where({ origin: permission.origin })
-          .modify((perm) => {
-            perm.accountAddresses.push(currentAccount.address);
-          });
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [permission, accountConnected, currentAccount]);
-
-  if (!reallyConnectible) return null;
+  const urlDisplayed = useMemo(
+    () => typeof tabOrigin === "string" && reallyConnectable,
+    [tabOrigin, reallyConnectable],
+  );
 
   return (
-    <div className={classNames("flex items-center w-full", className)}>
-      <div
-        className={classNames(
-          "flex items-center",
-          "min-w-0 grow",
-          "min-h-8 py-1 px-3 pr-2",
-          "text-xs leading-none",
-          "border border-brand-main/[.07]",
-          "rounded-[.625rem]",
-        )}
-      >
-        {permission ? (
-          state === "connected" ? (
-            <span
-              className={classNames(
-                "block",
-                "w-5 h-5 min-w-[1.25rem] mr-1.5",
-                "rounded-full overflow-hidden",
-                "border border-[#4F9A5E]",
-              )}
-            >
-              <Avatar
-                src={activeTab?.favIconUrl}
-                alt={permission.origin}
-                className={classNames(
-                  "w-full h-full object-cover",
-                  "!border-none",
-                )}
-              />
-            </span>
-          ) : (
-            <Tooltip
-              content={
-                <p>
-                  Current wallet is not connected to this website. To connect it
-                  - click{" "}
-                  {metamaskMode === MetaMaskCompatibleMode.Strict
-                    ? ""
-                    : "the icon on the right to enable MetaMask compatible mode then click "}
-                  the Connect button.
-                  <br />
-                  If you want to disconnect all wallets - switch to any
-                  connected wallet, and then click the Disconnect button on the
-                  right.
-                </p>
-              }
-              placement="bottom-end"
-              size="large"
-              interactive={false}
-            >
-              <span
-                className={classNames(
-                  "block relative",
-                  "w-5 h-5 mr-1.5",
-                  "rounded-full overflow-hidden",
-                  "border border-[#BCC3C4]/[0.7]",
-                )}
-              >
-                <Avatar
-                  src={activeTab?.favIconUrl}
-                  alt={permission.origin}
-                  className={classNames(
-                    "w-full h-full object-cover",
-                    "!border-none opacity-25",
-                  )}
-                />
-
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="absolute top-0 left-0 w-4.5 h-4.5"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M8 11V8.99L11.02 8.991L11.01 13H12.02V15H9.00001V11H8ZM9.00001 7.019V5H11.02V7.019H9.00001Z"
-                    fill="#F8FCFD"
-                  />
-                </svg>
-              </span>
-            </Tooltip>
-          )
-        ) : (
-          <Tooltip
-            content={
-              <p>
-                Wigwam is not connected to this site. To connect to a web3 site,
-                find and click the Connect button.
-              </p>
-            }
-            placement="bottom-end"
-            size="large"
-            interactive={false}
-          >
-            <TooltipIcon
-              theme="dark"
-              className="w-5 h-5 mr-1.5 border border-brand-main/[.07]"
-            />
-          </Tooltip>
-        )}
-        {tabOrigin && (
-          <span
-            className={classNames(
-              "truncate leading-4",
-              state !== "connected" && "text-brand-inactivedark",
-            )}
-          >
-            {new URL(tabOrigin).host}
-          </span>
-        )}
-
-        <span className="flex-1" />
-
-        {permission && (metamaskModeEnabled || accountConnected) && (
-          <button
-            type="button"
-            className="leading-[.875rem] px-2 py-1 -my-1 ml-auto transition-opacity hover:opacity-70"
-            onClick={handlePermission}
-          >
-            {accountConnected ? "Disconnect" : "Connect"}
-          </button>
-        )}
-      </div>
-      <Tooltip
-        content={
-          !metamaskModeEnabled && accountConnected ? (
-            <>
-              <p>
-                Current wallet is connected to this website but you disabled
-                MetaMask compatible mode.
-              </p>
-              <p>
-                If you want to enable it back click the icon.
-                <br />
-                If you want to disconnect all wallets - click the Disconnect
-                button on the left.
-              </p>
-            </>
-          ) : (
-            <p>
-              MetaMask compatible mode is {metamaskMode}. To change its state,
-              click this icon.
-            </p>
-          )
-        }
-        size="large"
-        placement="bottom-end"
-        asChild
-      >
-        <button
-          type="button"
-          onClick={() => setWeb3DialogOpened(true)}
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <div
           className={classNames(
-            "flex items-center",
-            "min-h-8 py-1 px-2.5",
-            "border border-brand-main/[.07]",
-            "rounded-[.625rem]",
-            "ml-2",
+            "flex items-center cursor-pointer group",
+            className,
           )}
         >
-          <MetamaskIcon
-            className={classNames(
-              "w-[1.125rem] min-w-[1.125rem] h-auto transition-opacity",
-              metamaskModeEnabled ? "opacity-80" : "opacity-60",
-            )}
-          />
           <div
             className={classNames(
-              "w-1.5 min-w-[.375rem] h-1.5 rounded-full ml-2 transition",
-              metamaskModeEnabled ? "bg-brand-greenobject" : "bg-brand-main/60",
+              "flex items-center",
+              "min-w-0 grow",
+              "text-xs leading-none",
+              "border-2",
+              "rounded-3xl",
+              "transition-colors",
+              "bg-white/[.16] group-hover:bg-white/[.32]",
+              accountConnected ? "border-brand-redone" : "border-transparent",
+              urlDisplayed ? " py-1 pl-1.5 pr-2" : "p-[0.375rem]",
             )}
-          />
-        </button>
-      </Tooltip>
-      <Web3CompatibleModeDialog
-        open={web3DialogOpened}
-        onOpenChange={setWeb3DialogOpened}
-      />
-    </div>
-  );
-};
+          >
+            {urlDisplayed && tabOrigin ? (
+              <span className="flex items-center gap-1.5 text-xs text-white truncate leading-4">
+                <div className="relative">
+                  <CircleIcon className="w-5 h-5" />
+                  <div
+                    className={classNames(
+                      "absolute top-0 -right-1 border",
+                      accountConnected
+                        ? "bg-brand-redone bg-brand-redone"
+                        : "bg-[#DFE5E0] border-brand-[#92BC78]",
+                      "w-2 min-w-[.375rem] h-2 rounded-full",
+                    )}
+                  />
+                </div>
+                {new URL(tabOrigin).host}
+              </span>
+            ) : (
+              <ConnectIcon />
+            )}
+          </div>
+          <span
+            className={classNames(
+              "flex items-center",
+              "p-1.5",
+              "border-2",
+              "rounded-full",
+              "transition-colors",
+              "bg-white/[.16] group-hover:bg-white/[.32]",
+              "ml-2",
+              metamaskModeEnabled
+                ? "border-brand-redone"
+                : "border-transparent",
+            )}
+          >
+            {metamaskModeEnabled ? (
+              <MetamaskEnabledIcon className="w-4 min-w-4 h-auto" />
+            ) : (
+              <MetamaskIcon className="w-4 min-w-4 h-auto" />
+            )}
+          </span>
+        </div>
+      </DropdownMenu.Trigger>
 
-const Web3CompatibleModeDialog: FC<SecondaryModalProps> = ({
-  header = "MetaMask compatible mode",
-  small = true,
-  ...rest
-}) => {
-  return (
-    <SecondaryModal header={header} small={small} {...rest}>
-      <WebThreeCompatible small />
-    </SecondaryModal>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="min-w-[19rem] bg-brand-darkbg border border-[#2A2D35] p-5 rounded-3xl flex flex-col w-full z-10"
+          sideOffset={8}
+          side="bottom"
+          align="start"
+        >
+          {urlDisplayed ? (
+            <>
+              <div className="mb-4 w-full flex justify-between items-center">
+                {tabOrigin && (
+                  <span className="flex gap-1 items-center truncate leading-4">
+                    <ConnectIcon />
+                    {new URL(tabOrigin).host}
+                  </span>
+                )}
+                <div className="flex gap-1 items-center">
+                  {accountConnected ? (
+                    <div
+                      className={classNames(
+                        "w-2 min-w-[.375rem] h-2 rounded-full ml-2",
+                        "bg-brand-redone border border-[#92BC78]",
+                      )}
+                    />
+                  ) : null}
+
+                  <span
+                    className={classNames(
+                      "font-bold",
+                      accountConnected ? "text-brand-redone" : "text-[#7A7E7B]",
+                    )}
+                  >
+                    {accountConnected ? "Connected" : "Unconnected"}
+                  </span>
+                </div>
+              </div>
+              <Button
+                className={classNames(
+                  "mb-4",
+                  "!text-xs !font-medium",
+                  accountConnected
+                    ? "!bg-[#FE00001F] !text-brand-redtext hover:!shadow-buttondanger focus-visible:!shadow-buttondanger"
+                    : "!bg-[#80EF6E1F] text-brand-redone",
+                )}
+              >
+                {accountConnected ? "Disconnect" : "Connect"}
+              </Button>
+            </>
+          ) : null}
+
+          <Button
+            theme="secondary"
+            className="mb-2 !w-full !text-xs !font-medium !py-2.5"
+            innerClassName="!w-full !flex !justify-between !items-center"
+            onClick={() =>
+              setMetamaskMode(
+                metamaskModeEnabled
+                  ? MetaMaskCompatibleMode.Off
+                  : MetaMaskCompatibleMode.Strict,
+              )
+            }
+          >
+            <span className="flex items-center gap-2">
+              Connect as MetaMask{" "}
+              <Tooltip
+                content={
+                  <p>
+                    Use this mode to connect to dApps via the Metamask
+                    connection button.
+                  </p>
+                }
+                placement="bottom-end"
+                size="large"
+                interactive={false}
+              >
+                <TooltipIcon theme="dark" className="w-5 h-5" />
+              </Tooltip>
+            </span>
+            <Switcher
+              checked={metamaskModeEnabled}
+              className="!min-w-[2rem]"
+              buttonClassName="!bg-transparent !p-0 !min-h-4 !max-h-4"
+            />
+          </Button>
+          <Button
+            theme="secondary"
+            className="!w-full !text-xs !font-medium"
+            innerClassName="!w-full !flex !justify-between"
+            onClick={() =>
+              openInTab({ page: Page.Settings, setting: SettingTab.Web3 })
+            }
+          >
+            <span>Connected apps</span>
+            <span className="flex items-center gap-1 text-[#93ACAF]">
+              4 <ArrowRightIcon />
+            </span>
+          </Button>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 };
 

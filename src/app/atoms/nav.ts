@@ -1,4 +1,4 @@
-import { atomWithURLHash } from "lib/atom-utils";
+import { atomWithURLHash, atomWithStorage } from "lib/atom-utils";
 
 import {
   Page,
@@ -6,9 +6,15 @@ import {
   SettingTab,
   TransferTab,
   ReceiveTab,
+  PopupToolbarTab,
 } from "app/nav";
 
 export const pageAtom = atomWithURLHash("page", Page.Default);
+
+export const popupToolbarTabAtom = atomWithStorage<PopupToolbarTab>(
+  "popup_toolbar_tab",
+  PopupToolbarTab.Assets,
+);
 
 export const addAccountModalAtom = atomWithURLHash("addAccOpened", false);
 

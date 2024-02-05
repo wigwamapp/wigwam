@@ -39,6 +39,7 @@ export function useTokenList(
     null,
   );
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
+  const [addModeEnabled, setAddMode] = useState(false);
 
   useTokenSearchPersist(
     opts.searchPersist ?? false,
@@ -52,6 +53,11 @@ export function useTokenList(
 
     return `${searchValue}:${tokenIdSearchValue}`;
   }, [searchValue, tokenIdSearchValue]);
+
+  const searchValueIsAddress = useMemo(
+    () => searchValue && ethers.isAddress(searchValue),
+    [searchValue],
+  );
 
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
     tokenType,
@@ -95,11 +101,6 @@ export function useTokenList(
   }, []);
 
   const syncing = useIsSyncing();
-
-  const searchValueIsAddress = useMemo(
-    () => searchValue && ethers.isAddress(searchValue),
-    [searchValue],
-  );
 
   const tokenIdSearchDisplayed = Boolean(
     isNftsSelected && searchValueIsAddress,
@@ -169,6 +170,7 @@ export function useTokenList(
   ]);
 
   const searching = willSearch && syncing;
+  const tokensList = addModeEnabled && !searchValueIsAddress ? [] : tokens;
 
   return {
     currentAccount,
@@ -180,7 +182,9 @@ export function useTokenList(
     tokenIdSearchDisplayed,
     manageModeEnabled,
     setManageModeEnabled,
-    tokens,
+    addModeEnabled,
+    setAddMode,
+    tokens: tokensList,
     syncing,
     searching,
     focusSearchInput,

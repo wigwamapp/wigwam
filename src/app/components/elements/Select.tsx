@@ -11,11 +11,10 @@ import {
 import classNames from "clsx";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
-import { IS_FIREFOX } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import SearchInput from "app/components/elements/SearchInput";
-import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
+import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down-rounded.svg";
 import { ReactComponent as SelectedIcon } from "app/icons/SelectCheck.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import Tooltip, { TooltipProps } from "./Tooltip";
@@ -34,6 +33,7 @@ export type SelectProps<T, U> = {
   currentItem?: ItemProps<T, U>;
   setItem: (itemKey: ItemProps<T, U>) => void;
   label?: string;
+  placeholder?: string;
   searchValue?: string | null;
   onSearch?: (value: string | null) => void;
   actions?: ReactNode;
@@ -45,10 +45,12 @@ export type SelectProps<T, U> = {
   size?: "large" | "small";
   tooltip?: ReactNode;
   tooltipProps?: TooltipProps;
+  contentAlign?: "center" | "start" | "end";
   className?: string;
   contentClassName?: string;
   scrollAreaClassName?: string;
   currentItemClassName?: string;
+  currentListItemClassName?: string;
   currentItemIconClassName?: string;
   itemClassName?: string;
 } & DropdownMenu.DropdownMenuProps;
@@ -58,6 +60,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   currentItem,
   setItem,
   label,
+  placeholder,
   searchValue,
   onSearch,
   actions,
@@ -71,10 +74,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
   size = "large",
   tooltip,
   tooltipProps,
+  contentAlign,
   className,
   contentClassName,
   scrollAreaClassName,
   currentItemClassName,
+  currentListItemClassName,
   currentItemIconClassName,
   itemClassName,
   ...rest
@@ -163,16 +168,16 @@ function Select<T extends string | ReactElement, U extends string | number>({
         <DropdownMenu.Trigger
           disabled={!currentItem}
           className={classNames(
-            "flex items-center",
+            "group",
+            "flex items-center justify-between",
             "w-full",
-            size === "large" && "py-2.5 pl-5 pr-4 text-sm rounded-[.625rem]",
+            size === "large" && "py-4 pl-5 pr-4 text-sm rounded-[.625rem]",
             size === "small" && "py-1.5 pl-3 pr-2 text-xs rounded-lg",
             "font-bold",
-            "bg-brand-darkgray",
-            currentItem &&
-              "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+            "bg-brand-main/5",
+            currentItem && "hover:bg-brand-main/10",
             {
-              "bg-brand-darkgray": opened,
+              "!bg-brand-main/10": opened,
             },
             "transition-colors",
             currentItemClassName,
@@ -180,45 +185,51 @@ function Select<T extends string | ReactElement, U extends string | number>({
         >
           {currentItem && (
             <>
-              {currentItem.icon && (
-                <img
-                  src={currentItem.icon}
-                  alt={
-                    typeof currentItem.value === "string"
-                      ? currentItem.value
-                      : "Icon"
-                  }
+              <div className="flex items-center">
+                {currentItem.icon && (
+                  <img
+                    src={currentItem.icon}
+                    alt={
+                      typeof currentItem.value === "string"
+                        ? currentItem.value
+                        : "Icon"
+                    }
+                    className={classNames(
+                      size === "large" && "w-7 mr-3",
+                      size === "small" && "w-4 mr-1",
+                      currentItemIconClassName,
+                    )}
+                  />
+                )}
+                {typeof currentItem.value === "string" ? (
+                  <span className="min-w-0 truncate">{currentItem.value}</span>
+                ) : (
+                  currentItem.value
+                )}
+              </div>
+              <div className="flex items-center">
+                {currentItem.balanceUSD && (
+                  <FiatAmount
+                    amount={currentItem.balanceUSD}
+                    copiable={false}
+                    className={classNames(
+                      "mr-2 text-sm font-medium",
+                      "text-white",
+                    )}
+                  />
+                )}
+                <ChevronDownIcon
                   className={classNames(
-                    size === "large" && "w-7 mr-2",
-                    size === "small" && "w-4 mr-1",
-                    currentItemIconClassName,
+                    size === "large" && "w-[1.125rem] h-[1.125rem]",
+                    size === "small" && "w-5 min-w-[1.25rem]",
+                    "h-auto",
+                    "transition-transform",
+                    {
+                      "rotate-180": opened,
+                    },
                   )}
                 />
-              )}
-              {typeof currentItem.value === "string" ? (
-                <span className="min-w-0 truncate">{currentItem.value}</span>
-              ) : (
-                currentItem.value
-              )}
-              {currentItem.balanceUSD && (
-                <FiatAmount
-                  amount={currentItem.balanceUSD}
-                  copiable={false}
-                  className="text-[0.85rem] ml-4 text-brand-inactivelight"
-                />
-              )}
-              <ChevronDownIcon
-                className={classNames(
-                  size === "large" && "w-6 min-w-[1.5rem]",
-                  size === "small" && "w-5 min-w-[1.25rem]",
-                  "h-auto",
-                  "ml-auto",
-                  "transition-transform",
-                  {
-                    "rotate-180": opened,
-                  },
-                )}
-              />
+              </div>
             </>
           )}
         </DropdownMenu.Trigger>
@@ -226,37 +237,27 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {(ref) => (
             <DropdownMenu.Content
               ref={ref}
+              align={contentAlign}
               style={{
                 width: "var(--radix-dropdown-menu-trigger-width)",
               }}
               className={classNames(
                 "shadow-xs",
                 "focus-visible:outline-none",
-                size === "large" && "mt-2 min-w-[17.75rem]",
-                size === "small" && "mt-1.5 w-[12.5rem]",
+                size === "large" && "mt-1 min-w-[17.75rem]",
+                size === "small" && "mt-1 w-[12.5rem]",
                 "w-full",
                 "rounded-[.625rem]",
                 "bg-brand-darkgray",
-                "backdrop-blur-[30px]",
-                IS_FIREFOX && "!bg-[#0E1314]",
                 "border border-brand-light/5",
                 "z-20",
                 contentClassName,
               )}
             >
               {!!onSearch && (
-                <div
-                  className={classNames(
-                    "relative",
-                    "flex items-center",
-                    "p-3",
-                    "after:absolute after:bottom-0 after:left-3",
-                    "after:w-[calc(100%-1.5rem)] after:h-[1px]",
-                    "after:bg-brand-main/[.07]",
-                  )}
-                >
+                <div className="relative flex items-center p-3">
                   <SearchInput
-                    placeholder="Type name to search..."
+                    placeholder={placeholder ?? "Type name to search..."}
                     searchValue={searchValue}
                     toggleSearchValue={(value) => {
                       onSearch(value);
@@ -264,7 +265,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     onKeyDown={handleSearchKeyDown}
                     size={size}
                     inputClassName={classNames(
-                      size === "large" && "max-h-9 !pl-9",
+                      "text-[#6B8486]",
+                      size === "large" && "max-h-11 !pl-9 !placeholder:text-sm",
                       size === "small" && "max-h-7 !pl-7",
                     )}
                     adornmentClassName={classNames(
@@ -278,13 +280,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
               )}
               <ScrollAreaContainer
                 className={classNames(
-                  size === "large" && "max-h-64 pl-3 pr-4",
+                  size === "large" && "max-h-60 pl-3 pr-4",
                   size === "small" && "max-h-44 pl-1 pr-[.875rem]",
                   "flex flex-col",
                   scrollAreaClassName,
                 )}
                 viewPortClassName={classNames(
-                  size === "large" && "py-3",
+                  size === "large" && "py-3 !pt-0",
                   size === "small" && "py-2",
                   "viewportBlock",
                 )}
@@ -308,26 +310,17 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           "flex items-center",
                           size === "large" && "px-3",
                           size === "small" && "px-2",
-                          showSelected &&
-                            showSelectedIcon &&
-                            item.key === currentItem?.key
-                            ? size === "large"
-                              ? "py-1.5"
-                              : "py-1"
-                            : size === "large"
-                              ? "py-2"
-                              : "py-1.5",
-                          // showSelected &&
-                          //   item.key === currentItem.key &&
-                          //   "!bg-brand-main/10", // Test this variant
-                          size === "large" && "rounded-[.625rem] text-sm",
+                          size === "large" && "py-2.5",
+                          size === "large" && "rounded-[.625rem] text-base",
                           size === "small" && "rounded-lg text-xs",
                           "cursor-pointer",
                           "font-bold",
                           "outline-none",
                           "transition-colors",
-                          "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
+                          "hover:bg-brand-main/5 focus-visible:bg-brand-main/5",
                           itemClassName,
+                          currentItem?.value === item.value &&
+                            currentListItemClassName,
                         )}
                         onSelect={() => {
                           setOpened(false);
@@ -349,7 +342,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                                   : "Icon"
                               }
                               className={classNames(
-                                size === "large" && "w-6 h-6 mr-3",
+                                size === "large" && "w-10 h-10 mr-3",
                                 size === "small" && "w-4 h-4 mr-2",
                               )}
                             />
@@ -365,7 +358,11 @@ function Select<T extends string | ReactElement, U extends string | number>({
                             <FiatAmount
                               amount={item.balanceUSD}
                               copiable={false}
-                              className="text-[0.85rem] ml-4 text-brand-inactivelight"
+                              className={classNames(
+                                "text-brand-inactivelight font-medium ml-auto",
+                                currentItem?.value === item.value &&
+                                  "!text-white",
+                              )}
                             />
                           )}
                           {showSelected &&

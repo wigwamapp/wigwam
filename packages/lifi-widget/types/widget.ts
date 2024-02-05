@@ -107,6 +107,7 @@ export interface WidgetConfig {
   fromAmount?: number | string;
   toAmount?: number | string;
 
+  chainsOrder?: number[] | null;
   currencyRate?: number | string;
   selectedCurrency?: string;
 

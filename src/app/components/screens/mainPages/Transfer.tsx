@@ -5,7 +5,7 @@ import { transferTabAtom } from "app/atoms";
 import { TransferTab as TransferTabEnum } from "app/nav";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import WalletsList from "app/components/blocks/WalletsList";
+import NetworksList from "app/components/blocks/NetworksList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import { ReactComponent as AssetIcon } from "app/icons/transfer-asset.svg";
 import { ReactComponent as NFTIcon } from "app/icons/transfer-nft.svg";
@@ -22,7 +22,7 @@ const Transfer: FC = () => {
 
   return (
     <>
-      <WalletsList />
+      <NetworksList />
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />

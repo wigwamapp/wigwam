@@ -10,12 +10,16 @@ type PriceChangeProps = {
   priceChange: BigNumber.Value;
   isPercent?: boolean;
   className?: string;
+  textClassName?: string;
+  hideBackground?: boolean;
 };
 
 const PriceChange: FC<PriceChangeProps> = ({
   priceChange,
   isPercent = false,
+  hideBackground = false,
   className,
+  textClassName,
 }) => {
   const priceChangeNumber = +priceChange;
 
@@ -36,10 +40,10 @@ const PriceChange: FC<PriceChangeProps> = ({
         "font-bold",
         isPercent && "py-1 px-2",
         "rounded-md",
-        isPositive && isPercent && "bg-[#4F9A5E]",
-        !isPositive && isPercent && "bg-[#B82D41]",
-        isPositive && !isPercent && "text-[#6BB77A]",
-        !isPositive && !isPercent && "text-[#EA556A]",
+        !hideBackground && isPositive && isPercent && "bg-[#4F9A5E]",
+        !hideBackground && !isPositive && isPercent && "bg-[#B82D41]",
+        isPositive && (!isPercent || hideBackground) && "text-[#6BB77A]",
+        !isPositive && (!isPercent || hideBackground) && "text-[#EA556A]",
         className,
       )}
     >
@@ -55,7 +59,7 @@ const PriceChange: FC<PriceChangeProps> = ({
           }
           amount={value}
           isDecimalsMinified={true}
-          className="inline-flex items-center"
+          className={classNames("inline-flex items-center", textClassName)}
         />
       ) : (
         <FiatAmount
@@ -63,7 +67,7 @@ const PriceChange: FC<PriceChangeProps> = ({
           amount={value}
           isDecimalsMinified={true}
           copiable
-          className="text-lg font-semibold"
+          className={classNames("text-lg font-semibold", textClassName)}
         />
       )}
       {isPercent ? "%" : ""}

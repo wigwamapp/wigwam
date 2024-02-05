@@ -5,7 +5,7 @@ export const prepareNFTLabel = (id: string, name?: string) => {
       : name
     : undefined;
 
-  const isTrulyId = !preparedName?.includes(`#${id}`) && id.length <= 8;
+  const isTrulyId = !preparedName?.includes(`#${id}`) && id?.length <= 8;
 
   return {
     name: preparedName,

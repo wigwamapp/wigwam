@@ -2,7 +2,7 @@ import type { EVMChain } from '@lifi/sdk';
 import { useController, useFormContext } from 'react-hook-form';
 import { useChains, useSwapOnly } from '../../hooks';
 import type { FormType } from '../../providers';
-import { FormKey, FormKeyHelper } from '../../providers';
+import { FormKey, FormKeyHelper, useWidgetConfig } from '../../providers';
 import { useChainOrder } from '../../stores';
 
 export const useChainSelect = (formType: FormType) => {
@@ -12,6 +12,7 @@ export const useChainSelect = (formType: FormType) => {
   } = useController({ name: chainKey });
   const { setValue } = useFormContext();
   const { chains, isLoading } = useChains();
+  const { chainsOrder } = useWidgetConfig();
   const [chainOrder, setChainOrder] = useChainOrder();
   const swapOnly = useSwapOnly();
 
@@ -19,11 +20,17 @@ export const useChainSelect = (formType: FormType) => {
     if (!chains) {
       return [];
     }
-    const selectedChains = chainOrder
+    if (chainsOrder) {
+      const selectedChains = chainsOrder
       .map((chainId) => chains.find((chain) => chain.id === chainId))
       .filter(Boolean) as EVMChain[];
+    
+      console.log()
 
-    return selectedChains.slice(0, 5);
+      return selectedChains.slice(0, 5);
+    } else {
+      return []
+    }
   };
 
   const setCurrentChain = (chainId: number) => {

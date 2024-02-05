@@ -9,6 +9,7 @@ import {
   chainIdAtom,
   getNetworkAtom,
   tokenTypeAtom,
+  allNetworksAtom,
 } from "app/atoms";
 import { ChainIdProvider, useAccounts, useSync, useToken } from "app/hooks";
 
@@ -21,6 +22,7 @@ const PreloadBaseAndSync: FC<PropsWithChildren<{ chainId?: number }>> = ({
     tokenTypeAtom,
     allAccountsAtom,
     accountAddressAtom,
+    allNetworksAtom,
   ]);
   const { currentAccount } = useAccounts();
 

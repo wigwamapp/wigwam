@@ -9,13 +9,15 @@ import {
   WidgetEvent,
 } from "packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
-import { useAtomsAll } from "lib/atom-utils";
+import { useAtomsAll, useLazyAtomValue } from "lib/atom-utils";
 import { useAccounts, useChainId } from "app/hooks";
 import {
   tokenSlugAtom,
   currenciesRateAtom,
   selectedCurrencyAtom,
+  getAllNativeTokensAtom,
 } from "app/atoms";
+
 import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
 import { SelfActivityKind } from "core/types";
@@ -34,6 +36,20 @@ const Swap: FC = () => {
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const [fee, setFee] = useState(0.01);
+  const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
+
+  const accountNativeTokens = useLazyAtomValue(
+    getAllNativeTokensAtom(currentAccount.address),
+    "off",
+  );
+
+  const balancesMap = useMemo(
+    () =>
+      accountNativeTokens
+        ? new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD]))
+        : null,
+    [accountNativeTokens],
+  );
 
   const [currenciesRate, selectedCurrency] = useAtomsAll([
     currenciesRateAtom,
@@ -41,9 +57,15 @@ const Swap: FC = () => {
   ]);
 
   useEffect(() => {
-    console.log("currenciesRate", currenciesRate);
-    console.log("selectedCurrency", selectedCurrency);
-  }, [currenciesRate, selectedCurrency]);
+    if (balancesMap) {
+      const arrayFromMap = Array.from(balancesMap);
+      const sortedArray = arrayFromMap.sort(
+        (a: any, b: any) => parseFloat(b[1]) - parseFloat(a[1]),
+      );
+      const sortedChainIds = sortedArray.map(([chainId]) => chainId);
+      setChainsOrder(sortedChainIds as number[]);
+    }
+  }, [balancesMap]);
 
   const getDevNftBalance = async () => {
     const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
@@ -120,6 +142,7 @@ const Swap: FC = () => {
       variant: "expandable",
       selectedCurrency: selectedCurrency,
       currencyRate: currenciesRate[selectedCurrency],
+      chainsOrder: chainsOrder,
       languages: {
         default: currentLocale as LanguageKey,
       },
@@ -192,6 +215,7 @@ const Swap: FC = () => {
     signer,
     selectedCurrency,
     handleBeforeTransaction,
+    chainsOrder,
   ]);
 
   return (
@@ -200,6 +224,7 @@ const Swap: FC = () => {
         currencyRate={widgetConfig.currencyRate}
         selectedCurrency={selectedCurrency}
         integrator={widgetConfig.integrator}
+        chainsOrder={chainsOrder}
         config={widgetConfig}
       />
     </div>

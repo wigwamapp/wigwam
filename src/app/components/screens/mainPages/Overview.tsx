@@ -1,12 +1,12 @@
 import { FC } from "react";
 
-import WalletsList from "app/components/blocks/WalletsList";
 import OverviewContent from "app/components/blocks/OverviewContent";
+import NetworksList from "app/components/blocks/NetworksList";
 
 const Overview: FC = () => {
   return (
     <>
-      <WalletsList />
+      <NetworksList />
       <OverviewContent />
     </>
   );
