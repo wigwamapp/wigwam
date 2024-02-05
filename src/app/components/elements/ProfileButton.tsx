@@ -194,7 +194,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
       onOpenChange={onOpenChange}
       {...rest}
       className={classNames(
-        "!p-0 !bg-[#2A2D35]", //!bg-brand-darkbg
+        "!p-0 !bg-brand-darkgray", //
         size === "large" ? "!max-w-[27.5rem]" : "max-w-[20.75rem]",
       )}
     >

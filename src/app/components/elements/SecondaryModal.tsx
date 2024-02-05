@@ -37,7 +37,6 @@ const SecondaryModal: FC<SecondaryModalProps> = ({
         <Dialog.Overlay
           className={classNames(
             "fixed inset-0 z-30",
-            // "bg-brand-darkblue/50",
             "bg-black/50 backdrop-blur-md",
           )}
         />
