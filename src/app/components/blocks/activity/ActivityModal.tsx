@@ -9,10 +9,9 @@ import { isPopup } from "lib/ext/view";
 import { rejectAllApprovals } from "core/client";
 
 import { activityModalAtom, approvalStatusAtom } from "app/atoms";
-import { IS_FIREFOX } from "app/defaults";
 import { OverflowProvider } from "app/hooks";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
-import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
+import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
 import Button from "../../elements/Button";
@@ -56,24 +55,35 @@ const ActivityModal = memo(() => {
           )}
         >
           {!isPopupMode && (
-            <div
+            // <div
+            //   className={classNames(
+            //     "flex items-center justify-center",
+            //     "w-[5.5rem] h-[5.5rem]",
+            //     "rounded-full",
+            //     "bg-brand-dark/20",
+            //     "backdrop-blur-[10px]",
+            //     IS_FIREFOX && "!bg-[#0E1314]",
+            //     "border border-brand-light/5",
+            //     "shadow-addaccountmodal",
+            //     "absolute",
+            //     "top-0 left-1/2",
+            //     "-translate-x-1/2 -translate-y-1/2",
+            //     "z-30",
+            //   )}
+            // >
+            //   <ActivityIcon className="w-12 h-auto mb-0.5" />
+            // </div>
+            <ActivityIcon
               className={classNames(
-                "flex items-center justify-center",
-                "w-[5.5rem] h-[5.5rem]",
-                "rounded-full",
-                "bg-brand-dark/20",
-                "backdrop-blur-[10px]",
-                IS_FIREFOX && "!bg-[#0E1314]",
-                "border border-brand-light/5",
-                "shadow-addaccountmodal",
+                "w-[2.5rem] h-[2.5rem]",
+                "styled-icon",
+                "styled-icon--active",
                 "absolute",
                 "top-0 left-1/2",
                 "-translate-x-1/2 -translate-y-1/2",
                 "z-30",
               )}
-            >
-              <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
-            </div>
+            />
           )}
           <OverflowProvider>
             {(ref) => (
