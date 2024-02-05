@@ -114,7 +114,7 @@ const NetworksList: FC = () => {
         actionType="large"
         className="w-full !min-w-0"
         currentItemClassName="h-full !px-4 !py-3"
-        contentClassName="min-w-[26.25rem]"
+        contentClassName="min-w-[24.25rem]"
         contentAlign="end"
       />
     </div>

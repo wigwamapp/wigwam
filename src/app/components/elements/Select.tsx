@@ -215,9 +215,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     amount={currentItem.balanceUSD}
                     copiable={false}
                     className={classNames(
-                      type === "network"
-                        ? "mr-2 text-sm font-medium text-white"
-                        : "text-[0.85rem] ml-4 text-brand-inactivelight",
+                      "mr-2 text-sm font-medium text-white",
                     )}
                   />
                 )}
@@ -314,7 +312,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           size === "large" && "px-3",
                           size === "small" && "px-2",
                           size === "large" && "py-2.5",
-                          size === "large" && "rounded-[.625rem] text-base",
+                          size === "large" && "rounded-[.625rem]",
+                          type === "network" ? "text-base" : "text-sm",
                           size === "small" && "rounded-lg text-xs",
                           "cursor-pointer",
                           "font-bold",
@@ -345,7 +344,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                                   : "Icon"
                               }
                               className={classNames(
-                                size === "large" && "w-10 h-10 mr-3",
+                                size === "large" && "w-8 h-8 mr-3",
                                 size === "small" && "w-4 h-4 mr-2",
                               )}
                             />
@@ -362,9 +361,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               amount={item.balanceUSD}
                               copiable={false}
                               className={classNames(
-                                type === "network"
-                                  ? "text-brand-inactivelight font-medium ml-auto"
-                                  : "text-[0.85rem] ml-4 text-brand-inactivelight",
+                                "text-brand-inactivelight font-medium ml-auto",
                                 currentItem?.value === item.value &&
                                   "!text-white",
                               )}
