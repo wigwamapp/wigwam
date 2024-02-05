@@ -3,10 +3,6 @@ import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import {
   Box,
   Button,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Typography,
 } from '@mui/material';
@@ -26,11 +22,6 @@ import { formatTokenAmount } from '../../utils';
 import { ContactSupportButton } from './ContactSupportButton';
 import { Container } from './TransactionDetailsPage.style';
 import { RouteExecutionStatus } from '../../stores/routes/types';
-import backIcon from '../../../../src/app/icons/back.svg';
-import copyIcon from '../../../../src/app/icons/copy.svg';
-import { navigate } from 'lib/navigation';
-import axios from 'axios'
-
 
 export const TransactionDetailsPageExpanded: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -230,25 +221,9 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
         </Typography>
       </Box>
       <Box mt={1}>
-        {/* {(routeExecution?.status === RouteExecutionStatus.Pending || routeExecution?.status === RouteExecutionStatus.Failed) && (
-          <Button sx={{borderRadius: '6px', width: '100%', marginBottom: '8px'}} onClick={() => handleRestart()}>Restart</Button>
-        )} */}
         <ContactSupportButton supportId={supportId} />
+        <Button sx={{borderRadius: '6px', width: '100%', marginTop: '8px'}} onClick={() => handleDeleteRoute()}>Remove</Button>
       </Box>
-      <Dialog open={open} onClose={toggleDialog}>
-        <DialogTitle>{t('warning.title.deleteTransaction')}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t('warning.message.deleteTransactionHistory')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={toggleDialog}>{t('button.cancel')}</Button>
-          <Button variant="contained" onClick={handleDeleteRoute} autoFocus>
-            {t('button.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
       </Card>
     </Container>
   );

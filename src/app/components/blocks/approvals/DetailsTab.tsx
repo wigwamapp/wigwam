@@ -167,7 +167,7 @@ const getTabHeader = (action: TxAction, source: ActivitySource) => {
         return "Revoke tokens approval";
       }
       if (source.type === "self" && source.swapMeta) {
-        return "Swap transaction";
+        return "Approve tokens for swap";
       }
       return "Approve tokens";
     case TxActionType.ContractInteraction:
