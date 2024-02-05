@@ -2,7 +2,6 @@ import { FC, useMemo, useRef, useState, useCallback } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import BigNumber from "bignumber.js";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 import { useLazyAtomValue } from "lib/atom-utils";
@@ -11,12 +10,7 @@ import { Account } from "core/types";
 import { lockWallet } from "core/client";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import {
-  profileStateAtom,
-  approvalsAtom,
-  accountAddressAtom,
-  getTotalAccountBalanceAtom,
-} from "app/atoms";
+import { profileStateAtom, approvalsAtom, accountAddressAtom } from "app/atoms";
 import { Page } from "app/nav";
 import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -38,7 +32,7 @@ import ScrollAreaContainer from "./ScrollAreaContainer";
 import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
 import IconedButton from "./IconedButton";
-import FiatAmount from "./FiatAmount";
+import TotalWalletBalance from "./TotalWalletBalance";
 
 type Size = "small" | "large";
 
@@ -413,21 +407,6 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
     />
   </button>
 );
-
-const TotalWalletBalance: FC<{ address: string; className?: string }> = ({
-  address,
-  className,
-}) => {
-  const balance = useLazyAtomValue(getTotalAccountBalanceAtom(address), "off");
-
-  return balance ? (
-    <FiatAmount
-      amount={balance}
-      isMinified={new BigNumber(balance).isLessThan(0.01)}
-      className={className}
-    />
-  ) : null;
-};
 
 const LockButton: FC = () => {
   const approvals = useLazyAtomValue(approvalsAtom);
