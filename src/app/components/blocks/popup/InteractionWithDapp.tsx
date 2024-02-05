@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { nanoid } from "nanoid";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import * as repo from "core/repo";
 import { MetaMaskCompatibleMode } from "core/types/shared";
@@ -10,9 +11,11 @@ import { MetaMaskCompatibleMode } from "core/types/shared";
 import {
   activeTabAtom,
   activeTabOriginAtom,
+  getAllPermissionsAtom,
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
+import { Page, SettingTab } from "app/nav";
 import { useAccounts, useChainId } from "app/hooks";
 import { openInTab } from "app/helpers";
 import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
@@ -25,7 +28,6 @@ import { ReactComponent as CircleIcon } from "app/icons/circle.svg";
 import { ReactComponent as ArrowRightIcon } from "app/icons/arrow-right.svg";
 import Button from "app/components/elements/Button";
 import Switcher from "app/components/elements/Switcher";
-import { Page, SettingTab } from "app/nav";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
@@ -257,7 +259,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           >
             <span>Connected apps</span>
             <span className="flex items-center gap-1 text-[#93ACAF]">
-              4 <ArrowRightIcon />
+              <ConnectedAppsCount /> <ArrowRightIcon />
             </span>
           </Button>
         </DropdownMenu.Content>
@@ -267,3 +269,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 };
 
 export default InteractionWithDapp;
+
+const ConnectedAppsCount: FC = () => {
+  const allPermissions = useLazyAtomValue(getAllPermissionsAtom({}));
+
+  return <>{allPermissions?.length || ""}</>;
+};

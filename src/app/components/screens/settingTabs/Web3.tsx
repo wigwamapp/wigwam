@@ -63,7 +63,7 @@ const PermissionsList = memo(() => {
     <>
       <Separator className="mt-6 mb-8" />
 
-      <SettingsHeader>Permissions</SettingsHeader>
+      <SettingsHeader>Connected apps</SettingsHeader>
 
       <div className="w-full max-w-[25rem] flex-col">
         {allPermissions.map((perm) => (
