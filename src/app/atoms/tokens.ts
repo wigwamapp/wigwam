@@ -9,7 +9,7 @@ import {
   createTotalBalanceKey,
   NATIVE_TOKEN_SLUG,
 } from "core/common";
-import { getCgPlatformIds, getOnRampCurrencies } from "core/client";
+import { getOnRampCurrencies, getTokenDetailsUrl } from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
@@ -40,8 +40,6 @@ export const tokenTypeAtom = atomWithStorage<TokenType>(
   TokenType.Asset,
 );
 
-export const coinGeckoPlatformIds = atomWithDefault(getCgPlatformIds);
-
 export const getTotalAccountBalanceAtom = atomFamily((accountAddress: string) =>
   atomWithStorage<string | null>(createTotalBalanceKey(accountAddress), null),
 );
@@ -55,6 +53,12 @@ export const getAllNativeTokensAtom = atomFamily((accountAddress: string) =>
         .toArray(),
     ),
   ),
+);
+
+export const getTokenDetailsUrlAtom = atomFamily(
+  ({ chainId, tokenSlug }: { chainId: number; tokenSlug: string }) =>
+    atomWithDefault(() => getTokenDetailsUrl(chainId, tokenSlug)),
+  dequal,
 );
 
 export const onRampCurrenciesAtom = atomWithDefault(getOnRampCurrencies);
