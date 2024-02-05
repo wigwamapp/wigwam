@@ -40,6 +40,7 @@ export enum JsonRpcMethod {
   wallet_switchEthereumChain = "wallet_switchEthereumChain",
   wallet_watchAsset = "wallet_watchAsset",
   wallet_registerOnboarding = "wallet_registerOnboarding",
+  web3_clientVersion = "web3_clientVersion",
   // Snaps
   wallet_getSnaps = "wallet_getSnaps",
   wallet_requestSnaps = "wallet_requestSnaps",
