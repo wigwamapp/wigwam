@@ -1,15 +1,21 @@
-import { FC, useMemo, useRef, useState, useCallback } from "react";
+import { FC, useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { Account } from "core/types";
 import { lockWallet } from "core/client";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import { profileStateAtom, approvalsAtom, accountAddressAtom } from "app/atoms";
+import {
+  profileStateAtom,
+  approvalsAtom,
+  accountAddressAtom,
+  addAccountModalAtom,
+} from "app/atoms";
 import { Page } from "app/nav";
 import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -25,89 +31,128 @@ import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import CopiableTooltip from "./CopiableTooltip";
 import SecondaryModal, { SecondaryModalProps } from "./SecondaryModal";
-import Balance from "./Balance";
 import SearchInput from "./SearchInput";
 import Button from "./Button";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
+import IconedButton from "./IconedButton";
+import TotalWalletBalance from "./TotalWalletBalance";
+
+type Size = "small" | "large";
 
 type ProfileButtonProps = {
   className?: string;
+  size?: Size;
+  hideAddress?: boolean;
 };
 
-const ProfileButton: FC<ProfileButtonProps> = ({ className }) => {
+const ProfileButton: FC<ProfileButtonProps> = ({
+  className,
+  size = "large",
+  hideAddress,
+}) => {
   const { currentAccount } = useAccounts();
+  const addAccountModalOpened = useAtomValue(addAccountModalAtom);
 
-  const [copied, setCopied] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
+
+  useEffect(() => {
+    if (addAccountModalOpened) {
+      setModalOpened(false);
+    }
+  }, [setModalOpened, addAccountModalOpened]);
 
   return (
     <>
       <div className={classNames("flex items-center gap-6", className)}>
-        <CopiableTooltip
-          content="Copy wallet address to clipboard"
-          textToCopy={currentAccount.address}
-          onCopiedToggle={setCopied}
-          className={classNames(
-            "px-1 pt-1 -mx-1 -mt-1",
-            "text-left",
-            "rounded",
-            "max-w-full",
-            "transition-colors",
-            "flex items-center",
-            "px-2 py-1",
-            "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-          )}
-        >
-          <>
-            <HashPreview
-              hash={currentAccount.address}
-              withTooltip={false}
-              className="text-sm font-normal leading-none mr-1"
-            />
-            {copied ? (
-              <SuccessIcon className="w-[1.3125rem] h-auto" />
-            ) : (
-              <CopyIcon className="w-[1.3125rem] h-auto" />
-            )}
-          </>
-        </CopiableTooltip>
+        {hideAddress ? null : (
+          <AddressButton address={currentAccount.address} />
+        )}
         <button
           type="button"
           onClick={() => setModalOpened(true)}
           className={classNames(
             "flex items-center gap-3",
-            "py-2 pr-2 pl-4",
-            "rounded-xl",
+            size === "large" ? "py-2 pr-2 pl-4" : "py-1 pl-2 pr-1",
+            size === "large" ? "rounded-xl" : "rounded-md",
             "transition-colors",
-            "hover:bg-brand-main/5 focus-visible:bg-brand-main/5",
+            size === "large"
+              ? "hover:bg-brand-main/5 focus-visible:bg-brand-main/5"
+              : "hover:bg-white/[.16] focus-visible:bg-white/[.16]",
           )}
         >
           <WalletName
             wallet={currentAccount}
-            className="mb-0.5 text-base font-bold"
+            className={classNames(
+              "mb-0.5 font-bold",
+              size === "large" ? "text-base" : "text-sm",
+            )}
           />
           <AutoIcon
             seed={currentAccount.address}
             source="dicebear"
             type="personas"
             className={classNames(
-              "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]",
-              "bg-black/40",
-              "rounded-[.625rem]",
+              size === "large"
+                ? "h-[3rem] w-[3rem] min-w-[3rem]"
+                : "h-9 w-9 min-w-9",
+              size === "large" ? "bg-black/40" : "bg-brand-darkbg",
+              size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
           />
         </button>
       </div>
-      <ProfilesModal open={modalOpened} onOpenChange={setModalOpened} />
+      <ProfilesModal
+        open={modalOpened}
+        onOpenChange={setModalOpened}
+        size={size}
+      />
     </>
   );
 };
 
 export default ProfileButton;
 
-const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
+const AddressButton: FC<{ address: string }> = ({ address }) => {
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <CopiableTooltip
+      content="Copy wallet address to clipboard"
+      textToCopy={address}
+      onCopiedToggle={setCopied}
+      className={classNames(
+        "text-left",
+        "rounded-full",
+        "max-w-full",
+        "transition-colors",
+        "flex items-center",
+        "px-3 py-1.5",
+        "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+      )}
+    >
+      <>
+        <HashPreview
+          hash={address}
+          withTooltip={false}
+          className="text-base font-normal leading-none mr-1.5"
+        />
+        {copied ? (
+          <SuccessIcon className="w-[1.5rem] h-auto" />
+        ) : (
+          <CopyIcon className="w-[1.5rem] h-auto" />
+        )}
+      </>
+    </CopiableTooltip>
+  );
+};
+
+const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
+  onOpenChange,
+  size = "large",
+  ...rest
+}) => {
   const { all, currentId } = useAtomValue(profileStateAtom);
   const setAccountAddress = useSetAtom(accountAddressAtom);
   useI18NUpdate();
@@ -160,9 +205,17 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
     <SecondaryModal
       onOpenChange={onOpenChange}
       {...rest}
-      className="!max-w-[27.5rem] !p-0"
+      className={classNames(
+        "!p-0",
+        size === "large" ? "!max-w-[27.5rem]" : "!max-w-[20.75rem]",
+      )}
     >
-      <div className="w-full flex flex-col px-5 pt-5">
+      <div
+        className={classNames(
+          "w-full flex flex-col pt-5",
+          size === "large" ? "px-5" : "px-4",
+        )}
+      >
         <div className="flex items-center text-xl font-bold gap-2 mr-auto mb-6">
           <AutoIcon
             seed={currentSeed}
@@ -176,12 +229,13 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           <Tooltip
             content={
               <p>
-                The Profiles allows split app usage experience with multiple
-                different sessions and provides more safety for our users. For
-                example, a user can have a work profile and a personal profile.
+                <strong>Profiles</strong> enables multiple separate sessions for
+                varied needs like work and personal, boosting organization and
+                privacy.
               </p>
             }
             size="large"
+            placement={size === "small" ? "bottom" : undefined}
             interactive={false}
           >
             <TooltipIcon
@@ -195,18 +249,32 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
           <SearchInput
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
-            placeholder="Type name or address..."
+            placeholder="Search Wallets"
           />
-          <Button
-            to={{ addAccOpened: true }}
-            merge
-            onClick={() => onOpenChange?.(false)}
-            theme="secondary"
-            className="ml-3 !py-2 !px-4 !min-w-max"
-          >
-            <AddWalletIcon className="h-6 w-auto mr-2" />
-            Add wallet
-          </Button>
+          {size === "small" ? (
+            <IconedButton
+              aria-label="Manage wallets"
+              to={{ page: Page.Wallets }}
+              merge
+              smartLink
+              onClick={() => onOpenChange?.(false)}
+              theme="secondary"
+              Icon={AddWalletIcon}
+              className="ml-2 !w-10 min-w-[2.5rem] !h-10 rounded-lg"
+              iconClassName="w-6 min-w-6 h-auto"
+            />
+          ) : (
+            <Button
+              to={{ page: Page.Wallets }}
+              merge
+              theme="secondary"
+              onClick={() => onOpenChange?.(false)}
+              className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
+            >
+              <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
+              Manage wallets
+            </Button>
+          )}
         </div>
 
         {filteredAccounts.length > 0 ? (
@@ -225,6 +293,7 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
                 account={account}
                 onClick={() => changeAccount(account.address)}
                 isActive={currentAccount.address === account.address}
+                size={size}
                 className={index === filteredAccounts.length - 1 ? "" : "mb-2"}
               />
             ))}
@@ -252,20 +321,35 @@ const ProfilesModal: FC<SecondaryModalProps> = ({ onOpenChange, ...rest }) => {
         className={classNames(
           "w-full",
           "border-t border-brand-light/[.05]",
-          "pt-3 px-5 pb-5",
+          "pt-3 pb-5",
+          size === "large" ? "px-5" : "px-4",
           "flex items-center gap-3",
         )}
       >
         <LockButton />
-        <Button
-          to={{ page: Page.Settings }}
-          onClick={() => onOpenChange?.(false)}
-          theme="secondary"
-          className="w-full"
-        >
-          <GearIcon className="h-6 w-auto mr-2" />
-          Settings
-        </Button>
+
+        {size === "small" ? (
+          <IconedButton
+            aria-label="Settings"
+            to={{ page: Page.Settings }}
+            smartLink
+            onClick={() => onOpenChange?.(false)}
+            theme="secondary"
+            Icon={GearIcon}
+            className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
+            iconClassName="w-6 min-w-6 h-auto"
+          />
+        ) : (
+          <Button
+            to={{ page: Page.Settings }}
+            theme="secondary"
+            onClick={() => onOpenChange?.(false)}
+            className="!max-h-11 w-full"
+          >
+            <GearIcon className={classNames("h-6 w-auto mr-2")} />
+            Settings
+          </Button>
+        )}
       </div>
     </SecondaryModal>
   );
@@ -278,10 +362,11 @@ type ProfileItemProps = {
   className?: string;
 };
 
-const ProfileItem: FC<ProfileItemProps> = ({
+const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
   account,
   onClick,
   isActive = false,
+  size = "large",
   className,
 }) => (
   <button
@@ -290,7 +375,8 @@ const ProfileItem: FC<ProfileItemProps> = ({
     className={classNames(
       "w-full",
       "flex items-center",
-      "min-w-0 min-h-[4.5rem] px-3 py-2",
+      "min-w-0 px-3 py-2",
+      size === "large" ? "min-h-[3.75rem]" : "min-h-[3.25rem]",
       "border",
       "rounded-lg",
       isActive
@@ -312,17 +398,23 @@ const ProfileItem: FC<ProfileItemProps> = ({
     />
 
     <span className="flex flex-col text-left min-w-0 max-w-[40%] mr-auto">
-      <WalletName wallet={account} theme="small" className="text-base" />
+      <WalletName
+        wallet={account}
+        theme="small"
+        className={classNames(size === "large" ? "text-base" : "text-sm")}
+      />
       <HashPreview
         hash={account.address}
         className={classNames(
-          "text-sm font-normal mt-[2px]",
+          "font-normal",
           isActive ? "text-brand-light" : "text-brand-inactivedark",
+          size === "large" ? "text-sm" : "text-xs",
         )}
         withTooltip={false}
       />
     </span>
-    <Balance
+
+    <TotalWalletBalance
       address={account.address}
       className="text-base font-bold text-brand-light ml-auto"
     />
@@ -330,14 +422,14 @@ const ProfileItem: FC<ProfileItemProps> = ({
 );
 
 const LockButton: FC = () => {
-  const approvals = useAtomValue(approvalsAtom);
+  const approvals = useLazyAtomValue(approvalsAtom);
   const { confirm } = useDialog();
 
   const isPopup = isPopupPrimitive();
 
   const handleLock = useCallback(async () => {
     try {
-      const approvalsAmount = approvals.length;
+      const approvalsAmount = approvals?.length ?? 0;
       const response =
         approvalsAmount === 0
           ? true
@@ -366,12 +458,18 @@ const LockButton: FC = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [approvals.length, confirm, isPopup]);
+  }, [approvals?.length, confirm, isPopup]);
 
   return (
-    <Button onClick={handleLock} theme="secondary" className="w-full">
-      <LockIcon className="h-6 w-auto mr-2" />
-      Lock
+    <Button
+      onClick={handleLock}
+      theme="secondary"
+      className="w-full grow-1 !max-h-11"
+    >
+      <div className="flex -mt-[0.1rem]">
+        <LockIcon className="h-6 w-auto mr-2" />
+        Lock
+      </div>
     </Button>
   );
 };

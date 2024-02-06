@@ -53,6 +53,11 @@ export function useTokenList(
     return `${searchValue}:${tokenIdSearchValue}`;
   }, [searchValue, tokenIdSearchValue]);
 
+  const searchValueIsAddress = useMemo(
+    () => searchValue && ethers.isAddress(searchValue),
+    [searchValue],
+  );
+
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
     tokenType,
     currentAccount.address,
@@ -95,11 +100,6 @@ export function useTokenList(
   }, []);
 
   const syncing = useIsSyncing();
-
-  const searchValueIsAddress = useMemo(
-    () => searchValue && ethers.isAddress(searchValue),
-    [searchValue],
-  );
 
   const tokenIdSearchDisplayed = Boolean(
     isNftsSelected && searchValueIsAddress,
@@ -187,6 +187,7 @@ export function useTokenList(
     searchInputRef,
     tokenIdSearchInputRef,
     loadMoreTriggerRef,
+    searchValueIsAddress,
   };
 }
 

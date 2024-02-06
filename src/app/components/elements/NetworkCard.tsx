@@ -45,26 +45,29 @@ const NetworkCard: FC<NetworkCardProps> = ({
         className={classNames(
           "flex items-center w-full max-w-1/4 gap-3",
           "group",
-          "px-4 py-3",
+          "px-3 py-2",
           "rounded-[.625rem]",
           "transition-colors",
           "border",
           isActive
-            ? "border-brand-redone bg-brand-main/10"
+            ? "border-brand-redone bg-brand-main/20"
             : "border-transparent bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
           className,
         )}
       >
-        <img
-          src={getNetworkIconUrl(network)}
-          alt={network.name}
-          className="w-11 h-11"
-        />
-        <span className="flex flex-col justify-between items-start gap-1 w-full h-full">
+        <span className="w-10 h-10 min-w-10 min-h-10">
+          <img
+            src={getNetworkIconUrl(network)}
+            alt={network.name}
+            className="w-full h-full object-cover"
+          />
+        </span>
+        <span className="flex flex-col justify-between items-start gap-1 w-full h-full min-w-0">
           <span
             className={classNames(
               "text-base font-bold text-brand-inactivelight",
               "transition-colors",
+              "truncate w-full text-left min-w-0",
               isActive
                 ? "text-brand-light"
                 : "group-hover:text-brand-light group-focus-visible:text-brand-light",
@@ -74,7 +77,8 @@ const NetworkCard: FC<NetworkCardProps> = ({
           </span>
           <FiatAmount
             amount={network.balanceUSD ?? 0}
-            copiable={true}
+            copiable={isActive}
+            asSpan
             className={classNames(
               "text-left text-sm",
               "transition-colors",

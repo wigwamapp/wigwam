@@ -9,11 +9,11 @@ import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { allAccountsAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import HashPreview from "app/components/elements/HashPreview";
 import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
-import IconedButton from "app/components/elements/IconedButton";
+import Button from "app/components/elements/Button";
 import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
@@ -48,7 +48,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
   return (
     <div
       className={classNames(
-        "w-[23.25rem] min-w-[23.25rem] pr-6",
+        "w-[25.25rem] min-w-[25.25rem] pr-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col",
         className,
@@ -59,23 +59,26 @@ const WalletTabs: FC<WalletTabsProps> = ({
           <SearchInput
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
+            placeholder="Type name or address..."
           />
-          <IconedButton
+
+          <Button
             to={{ addAccOpened: true }}
             merge
-            theme="tertiary"
-            className="ml-2"
-            Icon={AddWalletIcon}
-            aria-label="Add new wallet"
-          />
+            theme="secondary"
+            className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
+          >
+            <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
+            Add wallet
+          </Button>
         </TippySingletonProvider>
       </div>
       {filteredAccounts.length > 0 ? (
         <ScrollAreaContainer
           hiddenScrollbar="horizontal"
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-5"
         >
           {filteredAccounts.map((acc, i) => (
             <WalletTab
@@ -167,7 +170,7 @@ const WalletTab: FC<WalletTabProps> = ({
           className="text-sm text-brand-inactivedark font-normal -mt-px"
           withTooltip={false}
         />
-        <Balance address={address} className="mt-auto" />
+        <TotalWalletBalance address={address} className="mt-auto" />
       </span>
       <ChevronRightIcon
         className={classNames(

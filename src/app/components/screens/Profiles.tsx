@@ -97,18 +97,17 @@ const Profiles: FC = () => {
 
           <ul>
             <li>
-              <strong>The Profiles</strong> allows split app usage experience
-              with multiple different sessions and provides more safety for our
-              users. For example, a user can have a work profile and a personal
-              profile.
+              <strong>Profiles</strong> enables multiple separate sessions for
+              varied needs like work and personal, boosting organization and
+              privacy.
             </li>
 
-            <li>
+            {/* <li>
               You will always see your <strong>profile avatar</strong>, on all
               Wigwam pages. <strong>It is unique!</strong> This feature allows
               you to <strong>determine</strong> whether the Wigwam you are
               seeing is <strong>real</strong> or fake.
-            </li>
+            </li> */}
 
             <li>
               Each profile can have <strong>only one Secret Phrase</strong>.

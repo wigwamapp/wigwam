@@ -10,7 +10,7 @@ import { getNetworkIconUrl } from "fixtures/networks";
 import { chainIdAtom, getAllNativeTokensAtom } from "app/atoms";
 import { useLazyAllNetworks, useChainId, useAccounts } from "app/hooks";
 import NetworkCard from "app/components/elements/NetworkCard";
-import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
+import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
 const SHOWN_NETWORKS_AMOUNT = 3;
 
@@ -26,23 +26,23 @@ const NetworksList: FC = () => {
 
   const balancesMap = useMemo(
     () =>
-      accountNativeTokens &&
-      new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD])),
+      accountNativeTokens
+        ? new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD]))
+        : null,
     [accountNativeTokens],
   );
 
-  const allNetworks = useMemo(
-    () =>
-      !balancesMap?.size
-        ? allNetworksPure ?? []
-        : (allNetworksPure ?? [])
-            .map((n) => ({
-              ...n,
-              balanceUSD: balancesMap?.get(n.chainId),
-            }))
-            .sort(compareNetworks),
-    [allNetworksPure, balancesMap],
-  );
+  const allNetworks = useMemo(() => {
+    if (!allNetworksPure || !balancesMap) return [];
+    if (balancesMap.size === 0) return allNetworksPure;
+
+    return allNetworksPure
+      .map((n) => ({
+        ...n,
+        balanceUSD: balancesMap?.get(n.chainId),
+      }))
+      .sort(compareNetworks);
+  }, [allNetworksPure, balancesMap]);
 
   const currentNetwork =
     allNetworks.find((n) => n.chainId === chainId) ?? allNetworks[0];
@@ -75,7 +75,7 @@ const NetworksList: FC = () => {
   );
 
   return (
-    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.666rem]">
+    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.2rem]">
       {shownNetworks.map((network) => (
         <NetworkCard
           key={network.chainId}
@@ -84,36 +84,41 @@ const NetworksList: FC = () => {
           onClick={() => handleNetworkChange(network.chainId)}
         />
       ))}
-      <div
-        className={classNames(
-          "px-4 py-3",
-          "rounded-[.625rem]",
-          "w-full",
-          "border-transparent bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-          "flex items-center gap-3",
-          "text-base font-bold",
-        )}
-      >
-        <div className="flex items-center">
-          {dropdownNetworks.slice(0, 3).map((network, index) => (
-            <img
-              key={network.chainId}
-              src={getNetworkIconUrl(network)}
-              alt={network.name}
-              className={classNames("w-8 h-8", index !== 0 ? "-ml-2.5" : "")}
-            />
-          ))}
-        </div>
-        {dropdownNetworks.length} more
-        <ChevronDownIcon
-          className={classNames(
-            "w-6 min-w-[1.5rem]",
-            "h-auto",
-            "ml-auto",
-            "transition-transform",
-          )}
-        />
-      </div>
+
+      <NetworkSelectPrimitive
+        networks={dropdownNetworks}
+        currentItem={{
+          key: currentNetwork?.chainId,
+          value: (
+            <div className="flex items-center gap-3 text-base font-bold w-full min-w-auto">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {dropdownNetworks.slice(0, 3).map((network, index) => (
+                    <img
+                      key={network.chainId}
+                      src={getNetworkIconUrl(network)}
+                      alt={network.name}
+                      className={classNames(
+                        "w-8 h-8",
+                        index !== 0 ? "-ml-3" : "",
+                      )}
+                    />
+                  ))}
+                </div>
+                <span className="truncate min-w-0">
+                  {dropdownNetworks.length} more
+                </span>
+              </div>
+            </div>
+          ),
+        }}
+        onNetworkChange={handleNetworkChange}
+        actionType="large"
+        className="w-full !min-w-0"
+        currentItemClassName="h-full !px-3 !py-2"
+        contentClassName="min-w-[24.25rem]"
+        contentAlign="end"
+      />
     </div>
   );
 };

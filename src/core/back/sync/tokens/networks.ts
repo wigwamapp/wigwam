@@ -51,7 +51,7 @@ export const syncNetworks = memoize(
       try {
         networks.push(await getNetwork(chainId));
       } catch (err) {
-        console.warn("Unlisted network founded", err);
+        console.warn("Unlisted network founded", chainId, err);
       }
     }
 

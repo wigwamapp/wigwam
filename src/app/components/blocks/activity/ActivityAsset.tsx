@@ -2,23 +2,17 @@ import {
   FC,
   forwardRef,
   memo,
-  PropsWithChildren,
-  Suspense,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
-import * as Dialog from "@radix-ui/react-dialog";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { loadable } from "jotai/utils";
 import BigNumber from "bignumber.js";
 import { ethers, Transaction } from "ethers";
-import browser from "webextension-polyfill";
 import { useLazyAtomValue } from "lib/atom-utils";
-import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { isPopup } from "lib/ext/view";
@@ -34,30 +28,12 @@ import {
   TxAction,
   TxActionType,
 } from "core/types";
-import { rejectAllApprovals } from "core/client";
 import { getPageOrigin } from "core/common/permissions";
 import * as repo from "core/repo";
 
-import {
-  activityModalAtom,
-  approvalStatusAtom,
-  getNetworkAtom,
-  getPendingActivitiesAtom,
-  getPermissionAtom,
-} from "app/atoms";
-import {
-  IS_FIREFOX,
-  LOAD_MORE_ON_ACTIVITY_FROM_END,
-  TRANSAK_SUPPORT_URL,
-} from "app/defaults";
-import {
-  ChainIdProvider,
-  OverflowProvider,
-  useAccounts,
-  useCompleteActivity,
-  useExplorerLink,
-  useLazyNetwork,
-} from "app/hooks";
+import { getNetworkAtom, getPermissionAtom } from "app/atoms";
+import { TRANSAK_SUPPORT_URL } from "app/defaults";
+import { ChainIdProvider, useExplorerLink, useLazyNetwork } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -73,305 +49,15 @@ import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signin
 import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
 import { ReactComponent as ActivityOnRampIcon } from "app/icons/activity-onramp.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
-import { ReactComponent as ActivityGlassIcon } from "app/icons/activity-glass.svg";
-import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
-import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 
-import Button from "../elements/Button";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import Avatar from "../elements/Avatar";
-import PrettyDate from "../elements/PrettyDate";
-import IconedButton from "../elements/IconedButton";
-import PrettyAmount from "../elements/PrettyAmount";
-import FiatAmount from "../elements/FiatAmount";
-import Dot from "../elements/Dot";
-import TokenAmount from "../blocks/TokenAmount";
-
-import ApprovalStatus from "./ApprovalStatus";
-
-const ActivityModal = memo(() => {
-  const [activityOpened, setActivityOpened] = useAtom(activityModalAtom);
-
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      setActivityOpened([open, "replace"]);
-    },
-    [setActivityOpened],
-  );
-
-  const isMounted = useIsMounted();
-  const bootAnimationDisplayed = activityOpened && isMounted();
-
-  const isPopupMode = isPopup();
-
-  return (
-    <Dialog.Root open={activityOpened} onOpenChange={handleOpenChange} modal>
-      <Dialog.Portal>
-        <Dialog.Overlay
-          className={classNames("fixed inset-0 z-20", "bg-brand-darkblue/50")}
-        />
-        <Dialog.Content
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          className={classNames(
-            "fixed z-20",
-            "w-full",
-            !isPopupMode && "max-h-[41rem] min-w-[40rem] max-w-4xl",
-            "m-auto inset-x-0",
-            isPopupMode ? "inset-y-0" : "inset-y-[3.5rem]",
-            !isPopupMode && "rounded-[2.5rem]",
-            bootAnimationDisplayed && "animate-modalcontent",
-          )}
-        >
-          {!isPopupMode && (
-            <div
-              className={classNames(
-                "flex items-center justify-center",
-                "w-[5.5rem] h-[5.5rem]",
-                "rounded-full",
-                "bg-brand-dark/20",
-                "backdrop-blur-[10px]",
-                IS_FIREFOX && "!bg-[#0E1314]",
-                "border border-brand-light/5",
-                "shadow-addaccountmodal",
-                "absolute",
-                "top-0 left-1/2",
-                "-translate-x-1/2 -translate-y-1/2",
-                "z-30",
-              )}
-            >
-              <ActivityGlassIcon className="w-12 h-auto mb-0.5" />
-            </div>
-          )}
-          <OverflowProvider>
-            {(ref) => (
-              <ScrollAreaContainer
-                ref={ref}
-                className={classNames(
-                  "w-full h-full",
-                  !isPopupMode && "rounded-[2.5rem]",
-                  "border border-brand-light/5",
-                  "brandbg-large-modal",
-                  !isPopupMode && [
-                    "after:absolute after:inset-0",
-                    "after:shadow-addaccountmodal",
-                    "after:rounded-[2.5rem]",
-                    "after:pointer-events-none",
-                    "after:z-20",
-                  ],
-                )}
-                viewPortClassName="viewportBlock"
-                horizontalScrollBarClassName={classNames(
-                  isPopupMode ? "" : "px-[2.25rem]",
-                )}
-                verticalScrollBarClassName={classNames(
-                  isPopupMode ? "" : "pt-[4.25rem] pb-[3.25rem]",
-                  isPopupMode ? "!right-0" : "!right-1",
-                )}
-                hiddenScrollbar={isPopupMode ? "horizontal" : undefined}
-                type="scroll"
-              >
-                <Dialog.Close
-                  className={classNames(
-                    isPopupMode ? "top-7" : "top-4",
-                    "absolute right-4",
-                  )}
-                  asChild
-                >
-                  {isPopupMode ? (
-                    <IconedButton Icon={CloseIcon} theme="tertiary" />
-                  ) : (
-                    <Button theme="clean">Cancel</Button>
-                  )}
-                </Dialog.Close>
-
-                <Suspense fallback={null}>
-                  {activityOpened && <ActivityContent />}
-                </Suspense>
-              </ScrollAreaContainer>
-            )}
-          </OverflowProvider>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-});
-
-export default ActivityModal;
-
-const ActivityContent = memo(() => {
-  const isPopupMode = isPopup();
-
-  const [delayFinished, setDelayFinished] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setDelayFinished(true), 300);
-    return () => clearTimeout(t);
-  }, []);
-
-  return (
-    <div
-      className={classNames(
-        isPopupMode ? "w-full" : "w-[54rem]",
-        "mx-auto h-full",
-        "px-4",
-        isPopupMode ? "pt-6" : "pt-16",
-        "flex flex-col",
-        !delayFinished ? "hidden" : "animate-bootfadeinfast",
-      )}
-    >
-      {!isPopupMode && <Approve />}
-      <History />
-    </div>
-  );
-});
-
-const Approve = memo(() => {
-  const approvalStatus = useAtomValue(approvalStatusAtom);
-
-  const handleApprove = useCallback(() => {
-    browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
-  }, []);
-
-  return (
-    <>
-      {approvalStatus.total > 0 && (
-        <div
-          className={classNames(
-            "w-full h-14 mb-10",
-            "border border-brand-inactivedark/25",
-            "animate-pulse hover:animate-none",
-            "rounded-2xl",
-            "flex items-center",
-            "py-2.5 px-5",
-          )}
-        >
-          <ApprovalStatus readOnly theme="large" />
-          <div className="flex-1" />
-
-          <button
-            type="button"
-            className={classNames(
-              "mr-2",
-              "px-2 py-1",
-              "!text-sm text-brand-inactivelight hover:text-brand-light",
-              "transition-colors",
-              "font-semibold",
-            )}
-            onClick={() => rejectAllApprovals()}
-          >
-            Reject all
-          </button>
-
-          <Button className="!py-2 !text-sm" onClick={handleApprove}>
-            Approve
-            <LinkIcon className="ml-1 w-4 h-4 min-w-[1rem]" />
-          </Button>
-        </div>
-      )}
-    </>
-  );
-});
-
-const History = memo(() => {
-  const { currentAccount } = useAccounts();
-
-  const isPopupMode = isPopup();
-  const pendingActivity = useLazyAtomValue(
-    getPendingActivitiesAtom(currentAccount.address),
-  );
-  const {
-    activity: completeActivity,
-    hasMore,
-    loadMore,
-  } = useCompleteActivity(currentAccount.address);
-
-  const observer = useRef<IntersectionObserver>();
-  const loadMoreTriggerRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (!completeActivity) return;
-
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          loadMore();
-        }
-      });
-
-      if (node) {
-        observer.current.observe(node);
-      }
-    },
-    [completeActivity, hasMore, loadMore],
-  );
-
-  return (
-    <>
-      {pendingActivity && pendingActivity?.length > 0 && (
-        <div className={isPopupMode ? "mb-6" : "mb-8"}>
-          <SectionHeader className={isPopupMode ? "mb-4" : "mb-6"}>
-            Pending
-          </SectionHeader>
-
-          {pendingActivity.map((item) => (
-            <ActivityCard
-              key={item.id}
-              item={item}
-              className={isPopupMode ? "mb-3" : "mb-4"}
-            />
-          ))}
-        </div>
-      )}
-
-      {completeActivity && completeActivity?.length > 0 && (
-        <div className={isPopupMode ? "mb-6" : "mb-8"}>
-          <SectionHeader className={isPopupMode ? "mb-4" : "mb-6"}>
-            {pendingActivity && pendingActivity?.length > 0
-              ? "Completed"
-              : "Activity"}
-          </SectionHeader>
-
-          {completeActivity.map((item, i) => (
-            <ActivityCard
-              key={item.id}
-              ref={
-                i ===
-                completeActivity.length - LOAD_MORE_ON_ACTIVITY_FROM_END - 1
-                  ? loadMoreTriggerRef
-                  : null
-              }
-              item={item}
-              className={
-                isPopupMode
-                  ? i !== completeActivity.length - 1
-                    ? "mb-3"
-                    : ""
-                  : "mb-4"
-              }
-            />
-          ))}
-        </div>
-      )}
-
-      {pendingActivity &&
-        completeActivity &&
-        pendingActivity.length === 0 &&
-        completeActivity.length === 0 && (
-          <div className="w-full min-h-[30rem] flex flex-col items-center justify-center">
-            <NoResultsFoundIcon
-              className={classNames(
-                !isPopupMode ? "w-[30rem]" : "w-[20rem]",
-                "h-auto mb-8",
-              )}
-            />
-            <h3 className="text-2xl text-brand-inactivedark font-bold">
-              No activity yet
-            </h3>
-          </div>
-        )}
-    </>
-  );
-});
+import Button from "../../elements/Button";
+import Avatar from "../../elements/Avatar";
+import PrettyDate from "../../elements/PrettyDate";
+import IconedButton from "../../elements/IconedButton";
+import PrettyAmount from "../../elements/PrettyAmount";
+import FiatAmount from "../../elements/FiatAmount";
+import Dot from "../../elements/Dot";
+import TokenAmount from "../../blocks/TokenAmount";
 
 type StatusType =
   | "succeeded"
@@ -389,7 +75,7 @@ type ActivityCardProps = {
   className?: string;
 };
 
-const ActivityCard = memo(
+const ActivityAsset = memo(
   forwardRef<HTMLDivElement, ActivityCardProps>(({ item, className }, ref) => {
     const isPopupMode = isPopup();
     const [revokedPermission, setRevokedPermission] = useSafeState(false);
@@ -453,7 +139,7 @@ const ActivityCard = memo(
         ref={ref}
         className={classNames(
           "w-full",
-          "bg-brand-inactivelight/5",
+          "bg-[#22262A]",
           "border",
           item.pending && "border-[#D99E2E]/50",
           item.pending && "animate-pulse",
@@ -1067,14 +753,6 @@ const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
   );
 };
 
-const SectionHeader: FC<PropsWithChildren<{ className?: string }>> = memo(
-  ({ className, children }) => (
-    <div className={classNames("w-full", className)}>
-      <h1 className={"text-2xl font-bold"}>{children}</h1>
-    </div>
-  ),
-);
-
 type ActivityTokensProps = {
   source: ActivitySource;
   action?: TxAction;
@@ -1151,3 +829,5 @@ const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
     </ChainIdProvider>
   );
 };
+
+export default ActivityAsset;

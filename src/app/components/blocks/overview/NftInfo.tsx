@@ -31,7 +31,7 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
@@ -98,12 +98,12 @@ const NftInfo: FC = () => {
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="ml-6 pr-5 -mr-5 flex flex-col"
+          className="ml-6 pr-5 -mr-5 flex flex-col w-full"
           viewPortClassName="pt-6 viewportBlock"
           scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
-          <div className="w-[31.5rem]">
+          <div>
             <div className="flex mb-6">
               <NftPreview token={tokenInfo!} rawBalance={rawBalance} />
 
@@ -174,7 +174,7 @@ const NftInfo: FC = () => {
                   className="!py-2 mt-auto mr-auto"
                 >
                   <SendIcon className="w-6 h-auto mr-2" />
-                  Transfer
+                  Send
                 </Button>
               </div>
             </div>
