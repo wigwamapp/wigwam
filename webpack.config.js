@@ -76,6 +76,7 @@ const SOURCE_MAP = RELEASE_ENV === "false" && SOURCE_MAP_ENV !== "false";
 const IMAGE_INLINE_SIZE_LIMIT = parseInt(IMAGE_INLINE_SIZE_LIMIT_ENV);
 const CWD_PATH = fs.realpathSync(process.cwd());
 const NODE_MODULES_PATH = path.join(CWD_PATH, "node_modules");
+const PACKAGES_PATH = path.join(CWD_PATH, "packages");
 const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
 const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SHORT);
@@ -156,7 +157,7 @@ module.exports = {
   },
 
   resolve: {
-    modules: [NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
+    modules: ["node_modules", NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
     extensions: MODULE_FILE_EXTENSIONS,
     alias: {
       "@toruslabs/openlogin": require.resolve(
@@ -176,6 +177,7 @@ module.exports = {
         __dirname,
         "node_modules/@dicebear/core/lib",
       ),
+      packages: path.resolve(__dirname, "packages"),
     },
     fallback: {
       process: false,
@@ -252,7 +254,7 @@ module.exports = {
           // Process application JS with SWC.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: [SOURCE_PATH],
+            include: [SOURCE_PATH, PACKAGES_PATH],
             loader: require.resolve("swc-loader"),
             options: {
               jsc: {

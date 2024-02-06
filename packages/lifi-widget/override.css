@@ -1,0 +1,286 @@
+.MuiBox-root:hover {
+  background: none !important;
+}
+
+.MuiBox-root.withHover:hover {
+  background: #323b41 !important;
+}
+
+.withHover:hover {
+  background: #323b41 !important;
+}
+
+.MuiBox-root.withHoverGray:hover {
+  background: #22262a !important;
+}
+
+.MuiTypography-body1 {
+  color: #8d9c9e;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400 !important;
+  /* line-height: 24px !important; */
+}
+
+.MuiStepConnector-root {
+  display: none !important;
+}
+
+::-webkit-scrollbar {
+  background: #181a1f;
+  width: 5px;
+  position: absolute;
+  right: 0;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-track-piece {
+  background: transparent;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: rgb(204 249 255 / 0.1);
+  border-radius: 3px;
+  border: 1px solid rgb(39, 44, 48);
+}
+
+.switcher {
+  width: 48px;
+  height: 28px;
+  border-radius: 20px;
+  background: #2b3037;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.switcher.active {
+  background: #75db65;
+  justify-content: flex-end;
+}
+
+.switcher .point {
+  width: 20px;
+  height: 20px;
+  background: #737c88;
+  border-radius: 100%;
+  margin: 0 5px;
+}
+
+.switcher.active .point {
+  background: #0d1311;
+}
+
+.routeEllips {
+  width: 24px;
+  height: 24px;
+  background: #737c88;
+  border-radius: 100%;
+  margin-right: 12px;
+  position: relative;
+  top: 2px;
+}
+
+.routeEllips svg {
+  opacity: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.routeEllips.selected {
+  background: #80ef6e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.routeEllips.selected svg {
+  opacity: 1;
+}
+
+.txStatus {
+  color: #000;
+  text-align: center;
+  leading-trim: both;
+  text-edge: cap;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 510;
+  line-height: 14.068px;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.txStatus.complete {
+  background: #80ef6e;
+}
+
+.txStatus.progress {
+  background: #ffcf26;
+}
+
+.txStatus.failed {
+  background: rgb(234 85 106);
+}
+
+.txSteps .MuiBox-root {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.MuiBo .MuiTooltip-root {
+  background: yellow;
+}
+
+.searchInputWrapper input {
+  padding-left: 6px !important;
+}
+
+.linkButton {
+  border-radius: 4px;
+  background: rgba(204, 214, 255, 0.2);
+}
+
+.MuiPaper-root {
+  border-radius: 10px;
+}
+
+.preventHover:hover {
+  background: #181a1f;
+}
+
+.selectedChain {
+  border: 1px solid #80ef6e !important;
+}
+
+.selectedChain p {
+  color: #fff;
+  font-weight: 700 !important;
+  font-size: 14px;
+}
+
+/* .injectedContacts .flex {
+  padding-left: 0;
+  padding-right: 0;
+  color: #8d9c9e;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.injectedContacts .group {
+  border-radius: 10px;
+  border: 1px solid #272c30;
+  background: #21262a;
+}
+
+.injectedContacts textarea {
+  height: 34px !important;
+  background: transparent !important;
+  border: none !important;
+  text-wrap: nowrap;
+  overflow: hidden;
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.injectedContacts button {
+  display: none;
+}
+
+.injectedSmallContactCard {
+  background: #3e444c;
+  border-radius: 4px;
+  padding: 4px 8px 4px 4px;
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+}
+
+.injectedSmallContactCard span {
+  border: none;
+}
+
+.injectedSmallContactCardWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid #272c30;
+  background: #21262a;
+  padding: 0px 10px;
+  height: 44px;
+} */
+
+.preventHoverEffect {
+  pointer-events: none;
+}
+
+.MuiScopedCssBaseline-root {
+  border-radius: 0;
+}
+
+.selectTokenButton {
+  transition: all 0.3s ease;
+}
+
+.selectTokenButton:hover {
+  background: #323b41 !important;
+}
+
+.selectTokenButton:hover .swapArrowIcon {
+  transition: all 0.3s ease;
+  right: 13px !important;
+}
+
+/* .MuiButtonBase-root:hover {
+  color: #000;
+} */
+
+.backButtonWrapper {
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.backButtonWrapper:hover {
+  background: rgba(50, 59, 65, 0.4);
+}
+
+.closeButtonWrapper {
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.closeButtonWrapper:hover {
+  background: rgba(50, 59, 65, 0.4);
+}
+
+.customSettings:hover {
+  background: rgb(255 255 255 / 4%) !important;
+}
+/* .MuiCollapse-wrapperInner > div {
+  height: 100%;
+} */
+
+.MuiContainer-root {
+  padding-bottom: 0.25rem !important;
+}
+
+.txSteps .MuiContainer-root {
+  padding-bottom: 0rem !important;
+}
+
+.hoverBlack:hover {
+  color: #000;
+}

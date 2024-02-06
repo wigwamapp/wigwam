@@ -17,6 +17,7 @@ import Fuse from "fuse.js";
 import { mergeRefs } from "react-merge-refs";
 import { TReplace } from "lib/ext/i18n/react";
 import { useOnScreen } from "lib/react-hooks/useOnScreen";
+import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 
 import { Account, Contact } from "core/types";
 
@@ -37,12 +38,13 @@ import SmallContactCard from "./SmallContactCard";
 type ContactAutocompleteProps = {
   meta: FieldMetaState<any>;
   setValue: (address: string) => void;
+  injected?: boolean;
 } & AddressFieldProps;
 
 const ContactAutocomplete = forwardRef<
   HTMLTextAreaElement,
   ContactAutocompleteProps
->(({ setValue, meta, value, ...rest }, ref) => {
+>(({ setValue, meta, value, injected = false, ...rest }, ref) => {
   const { contacts, loadMore, hasMore } = useContacts({
     search: (value as string) ?? undefined,
     limit: 20,
@@ -155,18 +157,94 @@ const ContactAutocomplete = forwardRef<
     return undefined;
   }, [mergedAccounts, meta.error, value]);
 
+  const { paste } = usePasteFromClipboard(setValue);
+
+  const pasteButton = useMemo(() => {
+    return (
+      <button
+        className="items-center rounded-md p-[6px] cursor-pointer"
+        style={{ background: "#2C3036", display: "flex" }}
+        onClick={paste}
+      >
+        <div className="mr-[10px]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="13"
+            viewBox="0 0 12 13"
+            fill="none"
+          >
+            <path
+              d="M8.4 12.1602H1.2C0.537258 12.1602 0 11.6229 0 10.9602V3.76016H1.2V10.9602H8.4V12.1602ZM10.8 9.76016H3.6C2.93726 9.76016 2.4 9.2229 2.4 8.56016V1.36016C2.4 0.697414 2.93726 0.160156 3.6 0.160156H10.8C11.4627 0.160156 12 0.697414 12 1.36016V8.56016C12 9.2229 11.4627 9.76016 10.8 9.76016Z"
+              fill="#F8F9FD"
+            />
+          </svg>
+        </div>
+        <span className="text-white">Paste</span>
+      </button>
+    );
+  }, [paste]);
+
   return (
     <Popover.Root open={opened} modal={false} onOpenChange={() => undefined}>
       <Popover.Trigger className="w-full" asChild>
-        <AddressField
-          ref={ref}
-          value={value}
-          {...rest}
-          onKeyDown={handleKeyClick}
-          setFromClipboard={setValue}
-          error={opened ? undefined : rest.error}
-          labelActions={labelAction}
-        />
+        {!injected ? (
+          <AddressField
+            ref={ref}
+            value={value}
+            {...rest}
+            onKeyDown={handleKeyClick}
+            setFromClipboard={setValue}
+            error={opened ? undefined : rest.error}
+            labelActions={!injected ? labelAction : pasteButton}
+          />
+        ) : value ? (
+          <div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingBottom: "10px",
+                paddingTop: "3px",
+              }}
+            >
+              <div style={{ color: "#8D9C9E" }}>Recipient</div>
+              {pasteButton}
+            </div>
+            <div className="injectedSmallContactCardWrapper">
+              <div className="injectedSmallContactCard">
+                <SmallContactCard address={value as string} />
+                <button className="cursor-pointer" onClick={() => setValue("")}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="19"
+                    viewBox="0 0 18 19"
+                    fill="none"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M4.71967 5.37983C5.01256 5.08693 5.48744 5.08693 5.78033 5.37983L9 8.5995L12.2197 5.37983C12.5126 5.08693 12.9874 5.08693 13.2803 5.37983C13.5732 5.67272 13.5732 6.14759 13.2803 6.44049L10.0607 9.66016L13.2803 12.8798C13.5732 13.1727 13.5732 13.6476 13.2803 13.9405C12.9874 14.2334 12.5126 14.2334 12.2197 13.9405L9 10.7208L5.78033 13.9405C5.48744 14.2334 5.01256 14.2334 4.71967 13.9405C4.42678 13.6476 4.42678 13.1727 4.71967 12.8798L7.93934 9.66016L4.71967 6.44049C4.42678 6.14759 4.42678 5.67272 4.71967 5.37983Z"
+                      fill="white"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <AddressField
+            ref={ref}
+            value={value}
+            {...rest}
+            onKeyDown={handleKeyClick}
+            setFromClipboard={setValue}
+            error={opened ? undefined : rest.error}
+            labelActions={!injected ? labelAction : pasteButton}
+          />
+        )}
       </Popover.Trigger>
       {mergedAccounts.length > 0 &&
         !(

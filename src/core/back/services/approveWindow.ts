@@ -18,6 +18,8 @@ const WINDOW_POSITION =
 
 const enqueueOpenApprove = createQueue();
 
+let lastTabBeforeApprove: number | undefined = undefined;
+
 export function startApproveWindowOpener() {
   closeAllApproveTabs();
 
@@ -42,6 +44,9 @@ export function startApproveWindowOpener() {
         browser.windows.remove(popupState.id).catch(console.error);
       } else if (popupState?.type === "tab") {
         browser.tabs.remove(popupState.id).catch(console.error);
+        if (lastTabBeforeApprove) {
+          chrome.tabs.update(Number(lastTabBeforeApprove), { active: true });
+        }
       }
     } else if (popupState) {
       focusApprovalTab(approvals[0]);
@@ -158,6 +163,11 @@ async function createApproveWindow(position: "center" | "top-right") {
   }
 
   if (lastFocused?.state === "fullscreen" && (await isMacOs())) {
+    const lastFocusedTab = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    lastTabBeforeApprove = lastFocusedTab[0].id;
     const tab = await browser.tabs.create({
       url: getPublicURL("approve.html"),
       active: true,

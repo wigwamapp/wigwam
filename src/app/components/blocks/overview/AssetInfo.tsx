@@ -285,10 +285,10 @@ const AssetInfo: FC = () => {
               </Button>
               <Button
                 to={{ page: Page.Swap }}
+                merge={["token"]}
                 theme="secondary"
-                className="grow !py-2 !min-w-0"
-                disabled
-                title="Coming soon"
+                className="grow !py-2"
+                title={`Swap ${symbol}`}
               >
                 <SwapIcon className="w-6 h-auto mr-2" />
                 Swap
