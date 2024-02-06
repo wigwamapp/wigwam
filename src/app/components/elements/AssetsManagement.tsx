@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -26,7 +25,7 @@ import SearchInput from "./SearchInput";
 import IconedButton, { IconedButtonProps } from "./IconedButton";
 import AssetsSwitcher from "./AssetsSwitcher";
 
-type ManageMode = "manage" | "add" | "search" | null;
+export type ManageMode = "manage" | "add" | "search" | null;
 
 type AssetsManagementProps = {
   size?: "small" | "large";
@@ -39,6 +38,8 @@ type AssetsManagementProps = {
   setTokenIdSearchValue: Dispatch<SetStateAction<string | null>>;
   tokenIdSearchInputRef: RefObject<HTMLInputElement>;
   tokenIdSearchDisplayed: boolean;
+  mode: ManageMode;
+  onModeChange: Dispatch<SetStateAction<ManageMode>>;
   className?: string;
 };
 
@@ -54,10 +55,11 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
   tokenIdSearchInputRef,
   tokenIdSearchDisplayed,
   className,
+  mode,
+  onModeChange,
 }) => {
   const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
   const [, setTokenSlug] = useAtom(tokenSlugAtom);
-  const [mode, setMode] = useState<ManageMode>(null);
 
   const tokenTypeChangedHereRef = useRef<boolean>(true);
 
@@ -82,7 +84,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
 
   const toggleManageMode = useCallback(
     (mode: ManageMode) => {
-      setMode(mode);
+      onModeChange(mode);
 
       if (mode === "manage" || mode === "add") {
         if (!manageModeEnabled) {
@@ -91,7 +93,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
         setManageModeEnabled(true);
       }
     },
-    [manageModeEnabled, setManageModeEnabled, setTokenSlug],
+    [manageModeEnabled, setManageModeEnabled, onModeChange, setTokenSlug],
   );
 
   const input = useMemo(() => {
@@ -134,17 +136,17 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
         className,
       )}
     >
-      <TippySingletonProvider>
-        {mode === null ? (
-          <>
-            <AssetsSwitcher
-              theme={size}
-              checked={tokenType === TokenType.NFT}
-              onCheckedChange={toggleNftSwitcher}
-              className="w-full"
-            />
+      {mode === null ? (
+        <>
+          <AssetsSwitcher
+            theme={size}
+            checked={tokenType === TokenType.NFT}
+            onCheckedChange={toggleNftSwitcher}
+            className="w-full"
+          />
 
-            <div className="flex gap-2">
+          <div className="flex gap-2">
+            <TippySingletonProvider>
               <ManageButton
                 size={size}
                 Icon={SearchIcon}
@@ -166,60 +168,61 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                 aria-label={`Add a custom ${tokenType === TokenType.Asset ? "token" : "nft"}`}
                 onClick={() => toggleManageMode("add")}
               />
-            </div>
-          </>
-        ) : (
-          <>
-            <ManageButton
-              size={size}
-              Icon={ChevronIcon}
-              theme="secondary"
-              aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
-              onClick={() => {
-                setSearchValue(null);
-                setTokenIdSearchValue(null);
-                setMode(null);
-                setManageModeEnabled(false);
-              }}
+            </TippySingletonProvider>
+          </div>
+        </>
+      ) : (
+        <>
+          <ManageButton
+            size={size}
+            Icon={ChevronIcon}
+            theme="secondary"
+            aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
+            onClick={() => {
+              setSearchValue(null);
+              setTokenIdSearchValue(null);
+              onModeChange(null);
+              setManageModeEnabled(false);
+            }}
+          />
+
+          <div
+            className={classNames(
+              "flex w-full gap-2",
+              size === "small" ? "h-10" : "h-full",
+            )}
+          >
+            <SearchInput
+              ref={searchInputRef}
+              searchValue={searchValue}
+              toggleSearchValue={setSearchValue}
+              className="h-full"
+              inputClassName={classNames(
+                "h-full !max-h-none",
+                size === "small" ? "!py-2" : "",
+              )}
+              StartAdornment={input.Icon}
+              placeholder={input.placeholder}
+              autoFocus
             />
 
-            <div
-              className={classNames(
-                "flex w-full gap-2",
-                size === "small" ? "h-10" : "h-full",
-              )}
-            >
+            {tokenIdSearchDisplayed && (
               <SearchInput
-                ref={searchInputRef}
-                searchValue={searchValue}
-                toggleSearchValue={setSearchValue}
-                className="h-full"
+                ref={tokenIdSearchInputRef}
+                searchValue={tokenIdSearchValue}
+                toggleSearchValue={setTokenIdSearchValue}
+                StartAdornment={HashTagIcon}
+                className={classNames("max-w-[8rem] h-full")}
                 inputClassName={classNames(
                   "h-full !max-h-none",
                   size === "small" ? "!py-2" : "",
                 )}
-                StartAdornment={input.Icon}
-                placeholder={input.placeholder}
+                placeholder="Token ID..."
               />
-
-              {tokenIdSearchDisplayed && (
-                <SearchInput
-                  ref={tokenIdSearchInputRef}
-                  searchValue={tokenIdSearchValue}
-                  toggleSearchValue={setTokenIdSearchValue}
-                  StartAdornment={HashTagIcon}
-                  className={classNames("max-w-[8rem] h-full")}
-                  inputClassName={classNames(
-                    "h-full !max-h-none",
-                    size === "small" ? "!py-2" : "",
-                  )}
-                  placeholder="Token ID..."
-                />
-              )}
-            </div>
-          </>
-        )}
-      </TippySingletonProvider>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -242,7 +245,7 @@ const ManageButton: FC<IconedButtonProps & { size?: "small" | "large" }> = ({
     )}
     iconProps={{
       ...iconProps,
-      className: classNames("!w-5 !h-5", iconProps?.className),
+      className: classNames("!w-[1.15rem] !h-[1.15rem]", iconProps?.className),
     }}
     {...rest}
   />

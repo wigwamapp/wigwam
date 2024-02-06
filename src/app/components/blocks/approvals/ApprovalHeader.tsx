@@ -10,7 +10,7 @@ import { ActivityIcon } from "app/components/blocks/ApprovalStatus";
 import AutoIcon from "app/components/elements/AutoIcon";
 import WalletName from "app/components/elements/WalletName";
 import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
@@ -154,7 +154,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
         className="text-xs leading-none text-brand-inactivedark"
       />
       {!signing && (
-        <Balance
+        <TotalWalletBalance
           address={account.address}
           isMinified
           copiable

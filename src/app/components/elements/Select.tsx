@@ -43,6 +43,7 @@ export type SelectProps<T, U> = {
   loadMoreOnItemFromEnd?: number;
   emptySearchText?: ReactNode;
   size?: "large" | "small";
+  type?: "network";
   tooltip?: ReactNode;
   tooltipProps?: TooltipProps;
   contentAlign?: "center" | "start" | "end";
@@ -53,6 +54,7 @@ export type SelectProps<T, U> = {
   currentListItemClassName?: string;
   currentItemIconClassName?: string;
   itemClassName?: string;
+  actionsClassName?: string;
 } & DropdownMenu.DropdownMenuProps;
 
 function Select<T extends string | ReactElement, U extends string | number>({
@@ -72,6 +74,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   emptySearchText,
   onOpenChange,
   size = "large",
+  type,
   tooltip,
   tooltipProps,
   contentAlign,
@@ -82,6 +85,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   currentListItemClassName,
   currentItemIconClassName,
   itemClassName,
+  actionsClassName,
   ...rest
 }: SelectProps<T, U>) {
   const [opened, setOpened] = useState(false);
@@ -185,7 +189,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
         >
           {currentItem && (
             <>
-              <div className="flex items-center">
+              <div className="flex items-center w-full">
                 {currentItem.icon && (
                   <img
                     src={currentItem.icon}
@@ -213,8 +217,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     amount={currentItem.balanceUSD}
                     copiable={false}
                     className={classNames(
-                      "mr-2 text-sm font-medium",
-                      "text-white",
+                      "mr-2 text-sm font-medium text-white",
                     )}
                   />
                 )}
@@ -255,7 +258,12 @@ function Select<T extends string | ReactElement, U extends string | number>({
               )}
             >
               {!!onSearch && (
-                <div className="relative flex items-center p-3">
+                <div
+                  className={classNames(
+                    "relative flex items-center p-3",
+                    actionsClassName,
+                  )}
+                >
                   <SearchInput
                     placeholder={placeholder ?? "Type name to search..."}
                     searchValue={searchValue}
@@ -311,7 +319,8 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           size === "large" && "px-3",
                           size === "small" && "px-2",
                           size === "large" && "py-2.5",
-                          size === "large" && "rounded-[.625rem] text-base",
+                          size === "large" && "rounded-[.625rem]",
+                          type === "network" ? "text-base" : "text-sm",
                           size === "small" && "rounded-lg text-xs",
                           "cursor-pointer",
                           "font-bold",
@@ -342,7 +351,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                                   : "Icon"
                               }
                               className={classNames(
-                                size === "large" && "w-10 h-10 mr-3",
+                                size === "large" && "w-8 h-8 mr-3",
                                 size === "small" && "w-4 h-4 mr-2",
                               )}
                             />

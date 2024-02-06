@@ -1,42 +1,66 @@
 import { FC, memo, MouseEvent, useCallback } from "react";
 import classNames from "clsx";
+import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 
 import * as repo from "core/repo";
+import { MetaMaskCompatibleMode } from "core/types";
 
-import { getAllPermissionsAtom } from "app/atoms";
+import { getAllPermissionsAtom, web3MetaMaskCompatibleAtom } from "app/atoms";
+import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
+import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
+import { ReactComponent as MetamaskEnabledIcon } from "app/icons/metamask-enabled.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
 import IconedButton from "app/components/elements/IconedButton";
-import WebThreeCompatible from "app/components/blocks/WebThreeCompatible";
+import Switcher from "app/components/elements/Switcher";
 
-const Web3: FC = () => (
-  <div className="flex flex-col items-start">
-    <SettingsHeader className="!mb-3">Web3</SettingsHeader>
+const Web3: FC = () => {
+  const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
+  const setMetamaskMode = useSetMetaMaskCompatibleMode(false);
 
-    <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-      Wigwam is always available to interact with applications using its
-      communication protocol `window.wigwamEthereum`. Wigwam also supports a
-      common communication protocol, like MetaMask. Learn more about{" "}
-      <a
-        href="https://wigwamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-        target="_blank"
-        rel="nofollow noreferrer"
-        className="underline"
-      >
-        how it works here
-      </a>
-      .
-    </p>
+  const metamaskModeEnabled = metamaskMode === MetaMaskCompatibleMode.Strict;
 
-    <WebThreeCompatible />
+  return (
+    <div className="flex flex-col items-start">
+      <SettingsHeader className="!mb-3">Connect as MetaMask</SettingsHeader>
 
-    <PermissionsList />
-  </div>
-);
+      <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
+        Use this mode to connect to dApps via the Metamask connection button.
+      </p>
+
+      <Switcher
+        id="testNetworks"
+        text={
+          <span className="flex items-center">
+            {metamaskModeEnabled ? (
+              <MetamaskEnabledIcon className="w-5 min-w-5 h-auto" />
+            ) : (
+              <MetamaskIcon className="w-5 min-w-5 h-auto" />
+            )}
+            <span className="ml-3">
+              {metamaskModeEnabled ? "Enabled" : "Disabled"}
+            </span>
+          </span>
+        }
+        checked={metamaskModeEnabled}
+        onCheckedChange={() =>
+          setMetamaskMode(
+            metamaskModeEnabled
+              ? MetaMaskCompatibleMode.Off
+              : MetaMaskCompatibleMode.Strict,
+          )
+        }
+        className="min-w-[17.75rem]"
+      />
+
+      <PermissionsList />
+    </div>
+  );
+};
 
 export default Web3;
 
@@ -63,7 +87,7 @@ const PermissionsList = memo(() => {
     <>
       <Separator className="mt-6 mb-8" />
 
-      <SettingsHeader>Permissions</SettingsHeader>
+      <SettingsHeader>Connected apps</SettingsHeader>
 
       <div className="w-full max-w-[25rem] flex-col">
         {allPermissions.map((perm) => (

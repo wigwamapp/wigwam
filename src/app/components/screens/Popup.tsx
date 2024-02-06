@@ -51,14 +51,15 @@ import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
-import ActivitiesList from "../blocks/activity/ActivitiesList";
+import ActivityContent from "../blocks/activity/ActivityContent";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import AssetsManagement from "../elements/AssetsManagement";
+import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
+
   return (
     <PreloadAndSync>
       <PopupLayout>{matchPopupTabs(tab) as unknown as ReactNode}</PopupLayout>
@@ -70,12 +71,13 @@ export default Popup;
 
 const Assets: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const tokenType = useAtomValue(tokenTypeAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
   return isUnlocked ? (
     <>
       <PopupNetworkSelect />
-      <TokenList />
+      <TokenList key={tokenType} />
     </>
   ) : null;
 };
@@ -86,7 +88,7 @@ const Activities: FC = () => {
 
   return isUnlocked ? (
     <Suspense fallback={null}>
-      <ActivitiesList />
+      <ActivityContent />
     </Suspense>
   ) : null;
 };
@@ -145,7 +147,7 @@ const TokenList: FC = () => {
     searchValue,
     setSearchValue,
     searchInputRef,
-    tokens,
+    tokens: tokensPure,
     loadMoreTriggerRef,
     manageModeEnabled,
     setManageModeEnabled,
@@ -158,9 +160,17 @@ const TokenList: FC = () => {
     isNftsSelected,
     syncing,
     searching,
+    searchValueIsAddress,
   } = useTokenList(tokenType, {
     searchPersist: tokenType === TokenType.NFT,
   });
+
+  const [mode, setMode] = useState<ManageMode>(null);
+
+  const tokens = useMemo(
+    () => (mode === "add" && !searchValueIsAddress ? [] : tokensPure),
+    [mode, searchValueIsAddress, tokensPure],
+  );
 
   const tokensBar = useMemo(() => {
     if (tokens.length === 0) {
@@ -172,7 +182,7 @@ const TokenList: FC = () => {
           />
         );
       } else if (isNftsSelected) {
-        return <NoNftState syncing={syncing} />;
+        return <NoNftState syncing={syncing} className="-mt-2" />;
       }
     } else {
       return !isNftsSelected ? (
@@ -217,7 +227,9 @@ const TokenList: FC = () => {
         setTokenIdSearchValue={setTokenIdSearchValue}
         tokenIdSearchInputRef={tokenIdSearchInputRef}
         tokenIdSearchDisplayed={tokenIdSearchDisplayed}
-        className="mb-2 mt-2"
+        mode={mode}
+        onModeChange={setMode}
+        className="my-3"
       />
       {tokensBar}
     </>

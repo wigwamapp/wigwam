@@ -46,8 +46,8 @@ const Receive: FC = () => {
         activeRoute?.receive === ReceiveTabEnum.Faucet ? (
           <ScrollAreaContainer
             className="box-content w-full px-6"
-            viewPortClassName="pb-20 pt-5"
-            scrollBarClassName="py-0 pt-5 pb-20"
+            viewPortClassName="pb-5 pt-5"
+            scrollBarClassName="py-0 pt-5 pb-5"
           >
             <div>
               <ReceiveTab tabs={tabs} />

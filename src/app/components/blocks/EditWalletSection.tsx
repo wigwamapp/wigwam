@@ -103,8 +103,8 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   return (
     <ScrollAreaContainer
       className="w-full min-w-[17.75rem]"
-      viewPortClassName="pb-20 pt-5 pr-5 pl-6"
-      scrollBarClassName="py-0 pt-5 pb-20"
+      viewPortClassName="pb-5 pt-5 pr-5 pl-6"
+      scrollBarClassName="py-0 pt-5 pb-5"
     >
       <ToastOverflowProvider>
         <h2 className="text-2xl text-brand-light font-bold mb-6">

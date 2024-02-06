@@ -1,16 +1,22 @@
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import { nanoid } from "nanoid";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useLazyAtomValue } from "lib/atom-utils";
+
+import * as repo from "core/repo";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 import {
   activeTabAtom,
   activeTabOriginAtom,
+  getAllPermissionsAtom,
   getPermissionAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { useAccounts } from "app/hooks";
+import { Page, SettingTab } from "app/nav";
+import { useAccounts, useChainId } from "app/hooks";
 import { openInTab } from "app/helpers";
 import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 import Tooltip from "app/components/elements/Tooltip";
@@ -22,7 +28,6 @@ import { ReactComponent as CircleIcon } from "app/icons/circle.svg";
 import { ReactComponent as ArrowRightIcon } from "app/icons/arrow-right.svg";
 import Button from "app/components/elements/Button";
 import Switcher from "app/components/elements/Switcher";
-import { Page, SettingTab } from "app/nav";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
@@ -31,6 +36,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
   const setMetamaskMode = useSetMetaMaskCompatibleMode(false);
 
+  const chainId = useChainId();
   const { currentAccount } = useAccounts();
 
   const metamaskModeEnabled = metamaskMode === MetaMaskCompatibleMode.Strict;
@@ -67,6 +73,32 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
     [tabOrigin, reallyConnectable],
   );
 
+  const handleToggleConnect = useCallback(async () => {
+    try {
+      if (accountConnected) {
+        await repo.permissions.delete(permission?.origin ?? tabOrigin!);
+      } else {
+        if (permission) {
+          await repo.permissions
+            .where({ origin: permission.origin })
+            .modify((perm) => {
+              perm.accountAddresses.push(currentAccount.address);
+            });
+        } else if (tabOrigin) {
+          await repo.permissions.put({
+            id: nanoid(),
+            origin: tabOrigin,
+            chainId,
+            accountAddresses: [currentAccount.address],
+            timeAt: Date.now(),
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [permission, accountConnected, currentAccount, tabOrigin, chainId]);
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -97,7 +129,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                     className={classNames(
                       "absolute top-0 -right-1 border",
                       accountConnected
-                        ? "bg-brand-redone bg-brand-redone"
+                        ? "bg-brand-redone"
                         : "bg-[#DFE5E0] border-brand-[#92BC78]",
                       "w-2 min-w-[.375rem] h-2 rounded-full",
                     )}
@@ -176,6 +208,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                     ? "!bg-[#FE00001F] !text-brand-redtext hover:!shadow-buttondanger focus-visible:!shadow-buttondanger"
                     : "!bg-[#80EF6E1F] text-brand-redone",
                 )}
+                onClick={handleToggleConnect}
               >
                 {accountConnected ? "Disconnect" : "Connect"}
               </Button>
@@ -226,7 +259,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
           >
             <span>Connected apps</span>
             <span className="flex items-center gap-1 text-[#93ACAF]">
-              4 <ArrowRightIcon />
+              <ConnectedAppsCount /> <ArrowRightIcon />
             </span>
           </Button>
         </DropdownMenu.Content>
@@ -236,3 +269,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 };
 
 export default InteractionWithDapp;
+
+const ConnectedAppsCount: FC = () => {
+  const allPermissions = useLazyAtomValue(getAllPermissionsAtom({}));
+
+  return <>{allPermissions?.length || ""}</>;
+};

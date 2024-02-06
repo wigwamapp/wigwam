@@ -45,7 +45,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
         className={classNames(
           "flex items-center w-full max-w-1/4 gap-3",
           "group",
-          "px-4 py-3",
+          "px-3 py-2",
           "rounded-[.625rem]",
           "transition-colors",
           "border",
@@ -55,7 +55,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
           className,
         )}
       >
-        <span className="w-11 h-11 min-w-11 min-h-11">
+        <span className="w-10 h-10 min-w-10 min-h-10">
           <img
             src={getNetworkIconUrl(network)}
             alt={network.name}
@@ -77,7 +77,8 @@ const NetworkCard: FC<NetworkCardProps> = ({
           </span>
           <FiatAmount
             amount={network.balanceUSD ?? 0}
-            copiable={true}
+            copiable={isActive}
+            asSpan
             className={classNames(
               "text-left text-sm",
               "transition-colors",

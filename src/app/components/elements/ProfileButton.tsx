@@ -1,8 +1,7 @@
-import { FC, useMemo, useRef, useState, useCallback } from "react";
+import { FC, useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
-import BigNumber from "bignumber.js";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 import { useLazyAtomValue } from "lib/atom-utils";
@@ -15,7 +14,7 @@ import {
   profileStateAtom,
   approvalsAtom,
   accountAddressAtom,
-  getTotalAccountBalanceAtom,
+  addAccountModalAtom,
 } from "app/atoms";
 import { Page } from "app/nav";
 import { useAccounts } from "app/hooks";
@@ -38,7 +37,7 @@ import ScrollAreaContainer from "./ScrollAreaContainer";
 import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
 import IconedButton from "./IconedButton";
-import FiatAmount from "./FiatAmount";
+import TotalWalletBalance from "./TotalWalletBalance";
 
 type Size = "small" | "large";
 
@@ -54,8 +53,15 @@ const ProfileButton: FC<ProfileButtonProps> = ({
   hideAddress,
 }) => {
   const { currentAccount } = useAccounts();
+  const addAccountModalOpened = useAtomValue(addAccountModalAtom);
 
   const [modalOpened, setModalOpened] = useState(false);
+
+  useEffect(() => {
+    if (addAccountModalOpened) {
+      setModalOpened(false);
+    }
+  }, [setModalOpened, addAccountModalOpened]);
 
   return (
     <>
@@ -89,8 +95,8 @@ const ProfileButton: FC<ProfileButtonProps> = ({
             type="personas"
             className={classNames(
               size === "large"
-                ? "h-[3.75rem] w-[3.75rem] min-w-[3.75rem]"
-                : "h-10 w-10 min-w-10",
+                ? "h-[3rem] w-[3rem] min-w-[3rem]"
+                : "h-9 w-9 min-w-9",
               size === "large" ? "bg-black/40" : "bg-brand-darkbg",
               size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
@@ -117,13 +123,12 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
       textToCopy={address}
       onCopiedToggle={setCopied}
       className={classNames(
-        "px-1 pt-1 -mx-1 -mt-1",
         "text-left",
-        "rounded",
+        "rounded-full",
         "max-w-full",
         "transition-colors",
         "flex items-center",
-        "px-2 py-1",
+        "px-3 py-1.5",
         "bg-brand-main/5 hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
       )}
     >
@@ -131,12 +136,12 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
         <HashPreview
           hash={address}
           withTooltip={false}
-          className="text-sm font-normal leading-none mr-1"
+          className="text-base font-normal leading-none mr-1.5"
         />
         {copied ? (
-          <SuccessIcon className="w-[1.3125rem] h-auto" />
+          <SuccessIcon className="w-[1.5rem] h-auto" />
         ) : (
-          <CopyIcon className="w-[1.3125rem] h-auto" />
+          <CopyIcon className="w-[1.5rem] h-auto" />
         )}
       </>
     </CopiableTooltip>
@@ -201,8 +206,8 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
       onOpenChange={onOpenChange}
       {...rest}
       className={classNames(
-        "!p-0 !bg-brand-darkgray", //
-        size === "large" ? "!max-w-[27.5rem]" : "max-w-[20.75rem]",
+        "!p-0",
+        size === "large" ? "!max-w-[27.5rem]" : "!max-w-[20.75rem]",
       )}
     >
       <div
@@ -248,8 +253,9 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
           />
           {size === "small" ? (
             <IconedButton
-              aria-label="Add wallet"
-              to={{ addAccOpened: true }}
+              aria-label="Manage wallets"
+              to={{ page: Page.Wallets }}
+              merge
               smartLink
               onClick={() => onOpenChange?.(false)}
               theme="secondary"
@@ -259,13 +265,14 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             />
           ) : (
             <Button
-              to={{ addAccOpened: true }}
+              to={{ page: Page.Wallets }}
+              merge
               theme="secondary"
               onClick={() => onOpenChange?.(false)}
               className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
             >
               <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
-              Add wallet
+              Manage wallets
             </Button>
           )}
         </div>
@@ -413,21 +420,6 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
     />
   </button>
 );
-
-const TotalWalletBalance: FC<{ address: string; className?: string }> = ({
-  address,
-  className,
-}) => {
-  const balance = useLazyAtomValue(getTotalAccountBalanceAtom(address), "off");
-
-  return balance ? (
-    <FiatAmount
-      amount={balance}
-      isMinified={new BigNumber(balance).isLessThan(0.01)}
-      className={className}
-    />
-  ) : null;
-};
 
 const LockButton: FC = () => {
   const approvals = useLazyAtomValue(approvalsAtom);

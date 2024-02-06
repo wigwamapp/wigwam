@@ -5,7 +5,7 @@ import {
   memo,
   useState,
   ButtonHTMLAttributes,
-  MouseEventHandler,
+  useMemo,
 } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useSetAtom } from "jotai";
@@ -19,6 +19,7 @@ import { toggleTokenStatus } from "core/common/tokens";
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { chainIdAtom } from "app/atoms";
+import { useRamp } from "app/hooks";
 
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -43,7 +44,6 @@ const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
     ({ asset, isManageMode = false, className }, ref) => {
       const [openModal, setModalOpen] = useState(false);
-      const [popoverOpened, setPopoverOpened] = useState(false);
 
       const {
         name,
@@ -66,36 +66,21 @@ const AssetCard = memo(
         }
       }, [isManageMode, asset]);
 
-      const handleAssetContextMenu = useCallback<
-        MouseEventHandler<HTMLButtonElement>
-      >(
-        async (evt) => {
-          if (!isManageMode) {
-            evt.preventDefault();
-            if (!popoverOpened) {
-              setPopoverOpened(true);
-            }
-          }
-        },
-        [isManageMode, popoverOpened],
-      );
       return (
         <>
           <button
             ref={ref}
             type="button"
             onClick={handleAssetClick}
-            onContextMenu={handleAssetContextMenu}
             className={classNames(
               "relative",
               "flex items-stretch",
-              "w-full p-2",
+              "w-full py-2 px-3",
               "text-left",
               "rounded-[.625rem]",
               "cursor-default",
               "group",
               "transition",
-              popoverOpened && "bg-brand-main/10",
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10 !cursor-pointer",
               disabled && "opacity-60",
               "hover:opacity-100",
@@ -106,7 +91,7 @@ const AssetCard = memo(
             {isManageMode ? (
               <Checkbox.Root
                 className={classNames(
-                  "w-5 h-5 min-w-[1.25rem] mx-2 my-auto",
+                  "w-5 h-5 min-w-[1.25rem] mr-5 my-auto",
                   "bg-[#373B45]",
                   "rounded",
                   "flex items-center justify-center",
@@ -223,8 +208,10 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
     priceUSD,
     priceUSDChange,
     chainId,
+    status,
   } = asset;
   const setInternalChainId = useSetAtom(chainIdAtom);
+  const { onRampCurrency } = useRamp();
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {
@@ -234,19 +221,23 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
     [setInternalChainId, chainId],
   );
 
+  const showBuyButton = useMemo(
+    () => status !== TokenStatus.Disabled && onRampCurrency,
+    [status, onRampCurrency],
+  );
+
   return (
     <PopupModal
       open={open}
       small
       onOpenChange={onClose}
-      disabledClickOutside
       headerClassName="!m-0"
       header={
         <div className="flex flex-col items-start text-base font-normal">
           <p className="font-semibold">{name}</p>
           <div className="flex gap-2">
             {priceUSD ? (
-              <span className="text-sm text-[#93ACAF]">
+              <span className="text-sm text-white">
                 ${new BigNumber(priceUSD).toFixed(2, BigNumber.ROUND_DOWN)}
               </span>
             ) : null}
@@ -264,7 +255,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
     >
       <div className="flex flex-col w-full">
         <div className="mb-6 flex w-full items-center">
-          <AssetLogo asset={asset} className="w-8 h-8 mr-2 shrink-0" />
+          <AssetLogo asset={asset} className="w-10 h-10 mr-2 shrink-0" />
           <div className="w-full flex justify-between">
             <div className="flex flex-col">
               <PrettyAmount
@@ -300,7 +291,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
             </div>
           </div>
         </div>
-        <div className="mb-10 flex justify-center gap-9">
+        <div className="mb-8 flex justify-center gap-9">
           <DeepLinkButton
             text="Send"
             onClick={() =>
@@ -314,6 +305,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
               openLink({ page: Page.Receive, token: asset.tokenSlug })
             }
             Icon={BuyIcon}
+            disabled={!showBuyButton}
           />
           <DeepLinkButton
             text="Swap"
@@ -339,9 +331,15 @@ const DeepLinkButton: FC<{
   text: string;
   Icon: FC<{ className?: string }>;
   onClick: () => void;
-}> = ({ text, onClick, Icon }) => {
+  disabled?: boolean;
+}> = ({ text, onClick, Icon, disabled = false }) => {
   return (
-    <Button theme="clean" className="!p-0" onClick={onClick}>
+    <Button
+      theme="clean"
+      className="!p-0"
+      disabled={disabled}
+      onClick={onClick}
+    >
       <div className="flex flex-col items-center">
         <div className="mb-1 p-3 bg-[#373B45] rounded-full">
           <Icon className="w-5 h-5" />

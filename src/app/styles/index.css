@@ -92,16 +92,22 @@ a {
   .styled-icon {
     --color-1: #696c73;
     --color-2: #2a2d35;
+    --color-3: #272a32;
+    --color-4: #2a2d35;
   }
 
   .styled-icon--hover {
     --color-1: #949cae;
     --color-2: #373b45;
+    --color-3: #272a32;
+    --color-4: #373b45;
   }
 
   .styled-icon--active {
     --color-1: theme("colors.brand.redone");
-    --color-2: #2a2d35;
+    --color-2: #373b45;
+    --color-3: #373b45;
+    --color-4: #696c73;
   }
 
   /* For Webkit-based browsers (Chrome, Safari and Opera) */
