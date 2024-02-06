@@ -15,12 +15,13 @@ import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
 import { activityModalAtom } from "app/atoms";
-import { useActivityBadge } from "app/hooks";
+import { useActivityBadge, useSwapBadge } from "app/hooks";
 
 const useSidebarLinks = () => {
   const { alert } = useDialog();
   const setActivityOpened = useSetAtom(activityModalAtom);
   const activityBadgeDisplayed = useActivityBadge();
+  const swapBadgeDisplayed = useSwapBadge();
 
   const NavLinksPrimary = useMemo(() => {
     return [
@@ -49,6 +50,7 @@ const useSidebarLinks = () => {
         route: Page.Swap,
         label: "Swap",
         Icon: SwapIcon,
+        badge: swapBadgeDisplayed,
       },
       // {
       //   route: Page.Apps,
@@ -57,7 +59,7 @@ const useSidebarLinks = () => {
       //   soon: true,
       // },
     ];
-  }, [activityBadgeDisplayed, setActivityOpened]);
+  }, [activityBadgeDisplayed, swapBadgeDisplayed, setActivityOpened]);
 
   const NavLinksSecondary = useMemo(() => {
     return [

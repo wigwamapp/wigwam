@@ -12,19 +12,21 @@ export const modalProps = {
 
 export const paperProps = {
   sx: (theme: Theme) => ({
+    maxWidth: '90%',
     position: 'absolute',
     backgroundImage: 'none',
     borderTopLeftRadius: theme.shape.borderRadius,
     borderTopRightRadius: theme.shape.borderRadius,
-    bottom: '4rem'
+    bottom: '14rem',
+    left: '10px',
+    right: '10px'
   }),
 };
 
 export const backdropProps = {
   sx: {
     position: 'absolute',
-    background: 'transparent',
-    backdropFilter: 'blur(3px)',
+    background: 'rgba(24, 26, 31, 0.55)',
   },
 };
 

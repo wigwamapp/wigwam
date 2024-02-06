@@ -67,6 +67,7 @@ export interface ActivityBase {
   type: ActivityType;
   source: ActivitySource;
   timeAt: number;
+  txAction?: TxAction;
   rpcCtx?: RpcContext; // only exists on approval & on back side
 }
 

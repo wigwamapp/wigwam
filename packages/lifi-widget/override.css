@@ -274,5 +274,13 @@ div::-webkit-scrollbar-thumb {
 } */
 
 .MuiContainer-root {
-  padding-bottom: 4.5rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.txSteps .MuiContainer-root {
+  padding-bottom: 0rem !important;
+}
+
+.hoverBlack:hover {
+  color: #000;
 }

@@ -72,9 +72,9 @@ export const AmountInputEndAdornment = ({ formType }: FormTypeProps) => {
         />
       ) : formType === 'from' && token?.amount ? (
         <>
-        <Button onClick={() => handleValue(25)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '12px'}}>25%</Button>
-        <Button onClick={() => handleValue(50)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '12px'}}>50%</Button>
-        <Button onClick={() => handleValue(100)} sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', fontSize: '12px'}}>{t('button.max')}</Button>
+        <Button onClick={() => handleValue(25)} className='hoverBlack' sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '12px'}}>25%</Button>
+        <Button onClick={() => handleValue(50)} className='hoverBlack' sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', marginRight: '8px', fontSize: '12px'}}>50%</Button>
+        <Button onClick={() => handleValue(100)} className='hoverBlack' sx={{background: '#2C3036', borderRadius: '4px', padding: '6px', color: '#fff', fontSize: '12px'}}>{t('button.max')}</Button>
         </>
       ) : null}
     </InputAdornment>

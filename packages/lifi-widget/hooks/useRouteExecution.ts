@@ -3,7 +3,7 @@ import type { ExchangeRateUpdateParams, Route } from '@lifi/sdk';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
-import { useLiFi, useWallet } from '../providers';
+import { useLiFi, useWallet, useWidgetConfig } from '../providers';
 import {
   getUpdatedProcess,
   isRouteActive,
@@ -38,12 +38,14 @@ export const useRouteExecution = ({
   const routeExecution = useRouteExecutionStore(
     (state) => state.routes[routeId],
   );
+  const { onBeforeTransaction } = useWidgetConfig()
   const [updateRoute, restartRoute, deleteRoute] = useRouteExecutionStore(
     (state) => [state.updateRoute, state.restartRoute, state.deleteRoute],
     shallow,
   );
 
   const updateRouteHook = (updatedRoute: Route) => {
+    console.log('updatedRoute', updatedRoute)
     const routeExecution =
       routeExecutionStoreContext.getState().routes[updatedRoute.id];
     if (!routeExecution) {
@@ -186,7 +188,11 @@ export const useRouteExecution = ({
   const restartRouteMutation = useCallback(() => {
     resumedAfterMount.current = false
     restartRoute(routeId);
+    if (onBeforeTransaction && routeExecution) {
+      onBeforeTransaction(routeExecution?.route)
+    }
     resumeRoute(routeExecution?.route);
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resumeRoute, routeExecution?.route, routeId]);
 

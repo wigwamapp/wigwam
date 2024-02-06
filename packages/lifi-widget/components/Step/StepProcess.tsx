@@ -1,10 +1,11 @@
 import type { LifiStep, Process } from '@lifi/sdk';
 import LinkRoundedIcon from '@mui/icons-material/LinkRounded';
-import { Box, Link, Typography, Button } from '@mui/material';
+import { Box, Link, Typography, Button, Tooltip } from '@mui/material';
 import { useProcessMessage, useRouteExecution } from '../../hooks';
 import { CircularProgress } from './CircularProgress';
 import { LinkButton } from './StepProcess.style';
 import { useLocation, useNavigate } from 'react-router-dom'
+import TooltipIcon from "app/components/elements/TooltipIcon";
 
 export const StepProcess: React.FC<{
   step: LifiStep;
@@ -56,9 +57,27 @@ export const StepProcess: React.FC<{
           fontSize={12}
           fontWeight={400}
           color={'#fff'}
-          sx={{marginLeft: '8px !important', display: 'flex', flexDirection: 'column'}}
+          sx={{marginLeft: '8px !important', display: 'flex', flexDirection: needToShowContinueButton(process) ? 'column' : 'row'}}
         >
           {title} {needToShowContinueButton(process) ? <Button sx={{borderRadius: '6px', width: '120px', marginTop: '5px', fontSize: '12px', height: '25px'}} onClick={() => handleRestart()}>Continue</Button> : ''}
+          {title === 'Waiting for destination chain' ? 
+            <Tooltip
+            title="Sometimes it takes up to 10-30 min to confirm, keep calm - your money is safe"
+            placement="top"
+            enterDelay={400}
+            arrow
+          >
+              <div style={{marginLeft: '0.5rem', cursor: 'pointer'}}>
+                <TooltipIcon className="!w-4 !h-4" />
+              </div>
+              {/* <div className='tooltipIcon'>
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M20 4C11.1634 4 4 11.1634 4 20C4 28.8366 11.1634 36 20 36C28.8366 36 36 28.8366 36 20C36 11.1634 28.8366 4 20 4ZM0 20C0 8.9543 8.9543 0 20 0C31.0457 0 40 8.9543 40 20C40 31.0457 31.0457 40 20 40C8.9543 40 0 31.0457 0 20Z" fill="#999999"/>
+                  <path fillRule="evenodd" clipRule="evenodd" d="M20 24C18.8954 24 18 23.1046 18 22L18 10C18 8.89543 18.8954 8 20 8C21.1046 8 22 8.89543 22 10L22 22C22 23.1046 21.1046 24 20 24Z" fill="#999999"/>
+                  <path d="M17 29C17 27.3431 18.3431 26 20 26C21.6569 26 23 27.3431 23 29C23 30.6569 21.6569 32 20 32C18.3431 32 17 30.6569 17 29Z" fill="#999999"/>
+                </svg>
+              </div> */}
+          </Tooltip> : null}
         </Typography>
         {process.txLink ? (
           <LinkButton

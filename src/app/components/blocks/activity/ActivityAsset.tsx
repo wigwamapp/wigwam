@@ -214,7 +214,7 @@ const ActivityAsset = memo(
                 />
               </div>
             )}
-            <ActivitySwap source={item.source} />
+            <ActivitySwap item={item} txAction={item.txAction} />
             {item.type === ActivityType.Ramp && (
               <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
                 <div className="flex items-center justify-between min-w-0">
@@ -270,7 +270,7 @@ const ActivityAsset = memo(
               />
             )}
 
-            <ActivitySwap source={item.source} />
+            <ActivitySwap item={item} txAction={item.txAction} />
 
             {item.type !== ActivityType.Ramp &&
               item.type === ActivityType.Connection && (
@@ -421,11 +421,21 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
   const isPopupMode = isPopup();
 
   const name = useMemo(() => {
+    console.log(item);
     if (
       item.source.type === "self" &&
-      item.source.kind === SelfActivityKind.Swap
+      item.source.kind === SelfActivityKind.Swap &&
+      item.txAction?.type !== "TOKEN_APPROVE"
     ) {
       return "Swap";
+    }
+
+    if (
+      item.source.type === "self" &&
+      item.source.kind === SelfActivityKind.Swap &&
+      item.txAction?.type === "TOKEN_APPROVE"
+    ) {
+      return "Approve";
     }
     if (
       item.type === ActivityType.Transaction &&
@@ -513,17 +523,21 @@ const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
 };
 
 type ActivitySwapProps = {
-  source: ActivitySource;
+  item: Activity;
+  txAction: TxAction | undefined;
 };
 
-const ActivitySwap: FC<ActivitySwapProps> = ({ source }) => {
+const ActivitySwap: FC<ActivitySwapProps> = ({ item, txAction }) => {
   const isPopupMode = isPopup();
+  const source = item.source;
+
   if (
     source.type === "self" &&
     source.kind === SelfActivityKind.Swap &&
-    source.swapMeta
+    source.swapMeta &&
+    txAction?.type !== "TOKEN_APPROVE"
   ) {
-    const route = source.swapMeta;
+    const route = source?.swapMeta;
     return (
       <div
         className={classNames(
@@ -563,6 +577,38 @@ const ActivitySwap: FC<ActivitySwapProps> = ({ source }) => {
           <img
             src={route.toToken.logoURI}
             alt={route.toToken.name}
+            className="ml-1 w-4 h-4 rounded-full"
+          />
+        </div>
+      </div>
+    );
+  } else if (
+    source.type === "self" &&
+    source.kind === SelfActivityKind.Swap &&
+    source.swapMeta &&
+    txAction?.type === "TOKEN_APPROVE"
+  ) {
+    const route = source?.swapMeta;
+
+    return (
+      <div
+        className={classNames(
+          "flex items-center",
+          isPopupMode ? "flex-inline w-auto mt-1.5" : "flex-col w-[12rem]",
+        )}
+      >
+        <div className="inline-flex">
+          <PrettyAmount
+            amount={route.fromAmount}
+            decimals={route.fromToken.decimals}
+            currency={route.fromToken.symbol}
+            threeDots={false}
+            copiable
+            className={classNames("text-xs ml-1.5", "font-bold")}
+          />{" "}
+          <img
+            src={route.fromToken.logoURI}
+            alt={route.fromToken.name}
             className="ml-1 w-4 h-4 rounded-full"
           />
         </div>

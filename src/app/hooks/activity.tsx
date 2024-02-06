@@ -162,3 +162,11 @@ export function useActivityBadge() {
     [totalApprovals, totalPendingActivities],
   );
 }
+
+export function useSwapBadge() {
+  return Object.values(
+    JSON.parse(localStorage["li.fi-widget-routes"]).state.routes,
+  )
+    .map((item: any) => item.status)
+    .includes(1);
+}
