@@ -25,8 +25,8 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
       "w-[calc(21.25rem+1px)] min-w-[calc(21.25rem+1px)] pr-6",
       className,
     )}
-    viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
-    scrollBarClassName="py-0 pt-5 pb-20 !right-1"
+    viewPortClassName="pb-5 rounded-t-[.625rem] pt-5"
+    scrollBarClassName="py-0 pt-5 pb-5 !right-1"
   >
     {tabs.map(({ title, Icon, route, desc, soon }, i) => (
       <SecondaryItem

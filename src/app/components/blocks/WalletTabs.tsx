@@ -77,8 +77,8 @@ const WalletTabs: FC<WalletTabsProps> = ({
         <ScrollAreaContainer
           hiddenScrollbar="horizontal"
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-5"
         >
           {filteredAccounts.map((acc, i) => (
             <WalletTab

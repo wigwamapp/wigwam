@@ -38,8 +38,8 @@ const Settings: FC = () => {
       {activeTabRoute !== SettingTabEnum.Networks ? (
         <ScrollAreaContainer
           className="box-content w-full pr-6"
-          viewPortClassName="pb-20 pt-5 pl-6"
-          scrollBarClassName="py-0 pt-5 pb-20"
+          viewPortClassName="pb-5 pt-5 pl-6"
+          scrollBarClassName="py-0 pt-5 pb-5"
         >
           <SettingsTab />
         </ScrollAreaContainer>

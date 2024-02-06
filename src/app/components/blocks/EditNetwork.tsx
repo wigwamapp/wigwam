@@ -243,8 +243,8 @@ const EditNetwork = memo<EditNetworkProps>(
 
         <ScrollAreaContainer
           className={classNames("flex flex-col")}
-          viewPortClassName="pb-20 rounded-t-[.625rem] pl-6 pt-3"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] pl-6 pt-3"
+          scrollBarClassName="py-0 pb-5"
         >
           <Form<FormValues>
             onSubmit={handleSubmit}

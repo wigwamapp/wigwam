@@ -92,8 +92,8 @@ const ContactsSection: FC = () => {
           <ScrollAreaContainer
             ref={ref}
             className="pr-5 -mr-5"
-            viewPortClassName="pb-20 rounded-t-[.625rem]"
-            scrollBarClassName="py-0 pb-20"
+            viewPortClassName="pb-5 rounded-t-[.625rem]"
+            scrollBarClassName="py-0 pb-5"
           >
             <ToastOverflowProvider className="!top-0 !right-5">
               <div className="grid grid-cols-5 gap-5">
