@@ -36,14 +36,14 @@ const useSidebarLinks = () => {
         badge: activityBadgeDisplayed,
       },
       {
-        route: Page.Receive,
-        label: "Buy",
-        Icon: ReceiveIcon,
-      },
-      {
         route: Page.Transfer,
         label: "Send",
         Icon: SendIcon,
+      },
+      {
+        route: Page.Receive,
+        label: "Buy",
+        Icon: ReceiveIcon,
       },
       {
         route: Page.Swap,

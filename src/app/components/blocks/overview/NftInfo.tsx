@@ -98,12 +98,12 @@ const NftInfo: FC = () => {
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="ml-6 pr-5 -mr-5 flex flex-col"
+          className="ml-6 pr-5 -mr-5 flex flex-col w-full"
           viewPortClassName="pt-6 viewportBlock"
           scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
-          <div className="w-[31.5rem]">
+          <div>
             <div className="flex mb-6">
               <NftPreview token={tokenInfo!} rawBalance={rawBalance} />
 

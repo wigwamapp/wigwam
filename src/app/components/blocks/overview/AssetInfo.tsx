@@ -141,12 +141,12 @@ const AssetInfo: FC = () => {
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="pr-5 -mr-5 flex flex-col"
+          className="pr-5 -mr-5 flex flex-col w-full"
           viewPortClassName="pl-6 pt-6 viewportBlock"
           scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
-          <div className="w-[31.5rem]">
+          <div>
             <div className="flex mb-5">
               <AssetLogo
                 asset={tokenInfo!}
@@ -171,7 +171,10 @@ const AssetInfo: FC = () => {
                           <IconedButton
                             aria-label="View chart and token info"
                             Icon={CoinGeckoIcon}
-                            className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                            className={classNames(
+                              "!w-6 !h-6 min-w-[1.5rem]",
+                              status !== TokenStatus.Native ? "mr-2" : "",
+                            )}
                             iconClassName="!w-[1.125rem]"
                             href={tokenDetailsUrl}
                           />
@@ -261,7 +264,7 @@ const AssetInfo: FC = () => {
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
                 theme="secondary"
-                className="grow !py-2"
+                className="grow !py-2 !min-w-0"
               >
                 <SendIcon className="w-6 h-auto mr-2" />
                 Transfer
@@ -269,7 +272,7 @@ const AssetInfo: FC = () => {
               <Button
                 to={{ page: Page.Swap }}
                 theme="secondary"
-                className="grow !py-2"
+                className="grow !py-2 !min-w-0"
                 disabled
                 title="Coming soon"
               >
@@ -284,7 +287,7 @@ const AssetInfo: FC = () => {
                   }}
                   merge
                   theme="secondary"
-                  className="grow !py-2"
+                  className="grow !py-2 !min-w-0"
                   title="Coming soon"
                 >
                   <BuyIcon className="w-6 h-auto mr-2" />
