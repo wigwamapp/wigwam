@@ -78,6 +78,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
           <FiatAmount
             amount={network.balanceUSD ?? 0}
             copiable={isActive}
+            asSpan
             className={classNames(
               "text-left text-sm",
               "transition-colors",
