@@ -75,7 +75,7 @@ const NetworksList: FC = () => {
   );
 
   return (
-    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.666rem]">
+    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.111rem]">
       {shownNetworks.map((network) => (
         <NetworkCard
           key={network.chainId}
@@ -91,29 +91,31 @@ const NetworksList: FC = () => {
           key: currentNetwork?.chainId,
           value: (
             <div className="flex items-center gap-3 text-base font-bold w-full min-w-auto">
-              <div className="flex items-center">
-                {dropdownNetworks.slice(0, 3).map((network, index) => (
-                  <img
-                    key={network.chainId}
-                    src={getNetworkIconUrl(network)}
-                    alt={network.name}
-                    className={classNames(
-                      "w-8 h-8",
-                      index !== 0 ? "-ml-2.5" : "",
-                    )}
-                  />
-                ))}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {dropdownNetworks.slice(0, 3).map((network, index) => (
+                    <img
+                      key={network.chainId}
+                      src={getNetworkIconUrl(network)}
+                      alt={network.name}
+                      className={classNames(
+                        "w-8 h-8",
+                        index !== 0 ? "-ml-3" : "",
+                      )}
+                    />
+                  ))}
+                </div>
+                <span className="truncate min-w-0">
+                  {dropdownNetworks.length} more
+                </span>
               </div>
-              <span className="truncate min-w-0">
-                {dropdownNetworks.length} more
-              </span>
             </div>
           ),
         }}
         onNetworkChange={handleNetworkChange}
         actionType="large"
         className="w-full !min-w-0"
-        currentItemClassName="h-full !px-4 !py-3"
+        currentItemClassName="h-full !px-3 !py-2"
         contentClassName="min-w-[24.25rem]"
         contentAlign="end"
       />

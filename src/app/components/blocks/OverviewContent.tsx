@@ -34,7 +34,7 @@ import AssetInfo from "./overview/AssetInfo";
 import NftInfo from "./overview/NftInfo";
 
 const OverviewContent: FC = () => (
-  <div className="flex min-h-0 grow relative overflow-hidden">
+  <div className="flex min-h-0 grow relative">
     <ToastOverflowProvider>
       <TokenExplorer />
     </ToastOverflowProvider>
@@ -51,7 +51,7 @@ const TokenExplorer: FC = () => {
     <>
       <div
         className={classNames(
-          "w-[27.75rem] min-w-[27.75rem] pr-6 mt-6",
+          "w-[26rem] min-w-[26rem] pr-6 mt-6",
           "border-r border-brand-main/[.07]",
           "flex flex-col",
         )}
