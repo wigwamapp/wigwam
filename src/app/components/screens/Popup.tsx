@@ -70,12 +70,13 @@ export default Popup;
 
 const Assets: FC = () => {
   const walletStatus = useAtomValue(walletStatusAtom);
+  const tokenType = useAtomValue(tokenTypeAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
   return isUnlocked ? (
     <>
       <PopupNetworkSelect />
-      <TokenList />
+      <TokenList key={tokenType} />
     </>
   ) : null;
 };
@@ -217,7 +218,7 @@ const TokenList: FC = () => {
         setTokenIdSearchValue={setTokenIdSearchValue}
         tokenIdSearchInputRef={tokenIdSearchInputRef}
         tokenIdSearchDisplayed={tokenIdSearchDisplayed}
-        className="mb-2 mt-2"
+        className="my-3"
       />
       {tokensBar}
     </>
