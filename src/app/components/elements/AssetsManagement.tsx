@@ -245,7 +245,7 @@ const ManageButton: FC<IconedButtonProps & { size?: "small" | "large" }> = ({
     )}
     iconProps={{
       ...iconProps,
-      className: classNames("!w-5 !h-5", iconProps?.className),
+      className: classNames("!w-[1.15rem] !h-[1.15rem]", iconProps?.className),
     }}
     {...rest}
   />
