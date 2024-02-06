@@ -253,9 +253,9 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
           />
           {size === "small" ? (
             <IconedButton
-              aria-label="Add wallet"
-              to={{ addAccOpened: true }}
-              merge={["token"]}
+              aria-label="Manage wallets"
+              to={{ page: Page.Wallets }}
+              merge
               smartLink
               onClick={() => onOpenChange?.(false)}
               theme="secondary"
@@ -265,14 +265,14 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             />
           ) : (
             <Button
-              to={{ addAccOpened: true }}
-              merge={["token"]}
+              to={{ page: Page.Wallets }}
+              merge
               theme="secondary"
               onClick={() => onOpenChange?.(false)}
               className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
             >
               <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
-              Add wallet
+              Manage wallets
             </Button>
           )}
         </div>
