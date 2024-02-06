@@ -22,7 +22,7 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
     className={classNames(
       "relative",
       "flex flex-col",
-      "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
+      "w-[calc(21.25rem+1px)] min-w-[calc(21.25rem+1px)] pr-6",
       className,
     )}
     viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
@@ -79,7 +79,7 @@ const SecondaryItem: FC<
         <h3 className={"text-base font-bold"}>{title}</h3>
         {soon && <SoonTag />}
       </div>
-      {desc && <p className="text-xs text-[#BCC3C4] mt-1">{desc}</p>}
+      {desc && <p className="text-sm text-[#BCC3C4] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
           "w-6 h-auto",
