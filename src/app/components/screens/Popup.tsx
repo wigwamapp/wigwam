@@ -172,7 +172,7 @@ const TokenList: FC = () => {
           />
         );
       } else if (isNftsSelected) {
-        return <NoNftState syncing={syncing} />;
+        return <NoNftState syncing={syncing} className="-mt-2" />;
       }
     } else {
       return !isNftsSelected ? (
