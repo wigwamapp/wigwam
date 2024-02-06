@@ -21,7 +21,7 @@ import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
-import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+import { ReactComponent as ManageWalletIcon } from "app/icons/manage-wallets.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as LockIcon } from "app/icons/lock.svg";
 import { ReactComponent as GearIcon } from "app/icons/settings-gear.svg";
@@ -259,7 +259,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
               smartLink
               onClick={() => onOpenChange?.(false)}
               theme="secondary"
-              Icon={AddWalletIcon}
+              Icon={ManageWalletIcon}
               className="ml-2 !w-10 min-w-[2.5rem] !h-10 rounded-lg"
               iconClassName="w-6 min-w-6 h-auto"
             />
@@ -271,7 +271,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
               onClick={() => onOpenChange?.(false)}
               className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
             >
-              <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
+              <ManageWalletIcon className={classNames("h-6 w-auto mr-2")} />
               Manage wallets
             </Button>
           )}
