@@ -75,7 +75,7 @@ const NetworksList: FC = () => {
   );
 
   return (
-    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.111rem]">
+    <div className="flex gap-3 py-4 border-b border-brand-main/[.07] min-h-[6.2rem]">
       {shownNetworks.map((network) => (
         <NetworkCard
           key={network.chainId}
