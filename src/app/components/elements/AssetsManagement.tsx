@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { useAtom } from "jotai";
 import { RESET } from "jotai/utils";
@@ -26,7 +25,7 @@ import SearchInput from "./SearchInput";
 import IconedButton, { IconedButtonProps } from "./IconedButton";
 import AssetsSwitcher from "./AssetsSwitcher";
 
-type ManageMode = "manage" | "add" | "search" | null;
+export type ManageMode = "manage" | "add" | "search" | null;
 
 type AssetsManagementProps = {
   size?: "small" | "large";
@@ -39,6 +38,8 @@ type AssetsManagementProps = {
   setTokenIdSearchValue: Dispatch<SetStateAction<string | null>>;
   tokenIdSearchInputRef: RefObject<HTMLInputElement>;
   tokenIdSearchDisplayed: boolean;
+  mode: ManageMode;
+  onModeChange: Dispatch<SetStateAction<ManageMode>>;
   className?: string;
 };
 
@@ -54,10 +55,11 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
   tokenIdSearchInputRef,
   tokenIdSearchDisplayed,
   className,
+  mode,
+  onModeChange,
 }) => {
   const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
   const [, setTokenSlug] = useAtom(tokenSlugAtom);
-  const [mode, setMode] = useState<ManageMode>(null);
 
   const tokenTypeChangedHereRef = useRef<boolean>(true);
 
@@ -82,7 +84,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
 
   const toggleManageMode = useCallback(
     (mode: ManageMode) => {
-      setMode(mode);
+      onModeChange(mode);
 
       if (mode === "manage" || mode === "add") {
         if (!manageModeEnabled) {
@@ -91,7 +93,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
         setManageModeEnabled(true);
       }
     },
-    [manageModeEnabled, setManageModeEnabled, setTokenSlug],
+    [manageModeEnabled, setManageModeEnabled, onModeChange, setTokenSlug],
   );
 
   const input = useMemo(() => {
@@ -178,7 +180,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
               onClick={() => {
                 setSearchValue(null);
                 setTokenIdSearchValue(null);
-                setMode(null);
+                onModeChange(null);
                 setManageModeEnabled(false);
               }}
             />
@@ -200,6 +202,7 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                 )}
                 StartAdornment={input.Icon}
                 placeholder={input.placeholder}
+                autoFocus
               />
 
               {tokenIdSearchDisplayed && (
