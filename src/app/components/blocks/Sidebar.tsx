@@ -16,7 +16,7 @@ const Sidebar: FC = () => {
   return (
     <nav
       className={classNames(
-        "pr-8",
+        "pr-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col",
       )}
@@ -81,7 +81,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               className={classNames(
                 "group",
                 "text-base !font-bold text-brand-light/80",
-                "w-52 !py-2 !px-3 !mb-2",
+                "w-48 !py-2 !px-3 !mb-2",
                 "rounded-[.625rem]",
                 "flex justify-start items-center",
                 isPageActive && "!bg-brand-main/5 !text-brand-light",
@@ -109,7 +109,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
-              "w-52 py-2 px-3 mb-2",
+              "w-48 py-2 px-3 mb-2",
               "rounded-[.625rem]",
               "flex items-center",
               "transition-colors",

@@ -9,7 +9,7 @@ const ContentContainer = ({
   <div
     className={classNames(
       "w-full",
-      narrow ? "max-w-6xl" : "max-w-[82rem]",
+      narrow ? "max-w-6xl" : "max-w-[80.5rem]",
       "mx-auto",
       narrow ? "px-4" : "px-8",
       className,
