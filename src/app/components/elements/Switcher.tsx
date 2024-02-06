@@ -5,7 +5,7 @@ import * as SwitchPrimitive from "@radix-ui/react-switch";
 interface SwitcherProps {
   id?: string;
   label?: ReactNode;
-  text?: string;
+  text?: ReactNode;
   checked: boolean;
   onCheckedChange?: (checked: boolean) => void;
   className?: string;
