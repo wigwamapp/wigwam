@@ -5,6 +5,7 @@ import {
   memo,
   useState,
   ButtonHTMLAttributes,
+  useMemo,
 } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useSetAtom } from "jotai";
@@ -18,6 +19,7 @@ import { toggleTokenStatus } from "core/common/tokens";
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
 import { chainIdAtom } from "app/atoms";
+import { useRamp } from "app/hooks";
 
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -206,8 +208,10 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
     priceUSD,
     priceUSDChange,
     chainId,
+    status,
   } = asset;
   const setInternalChainId = useSetAtom(chainIdAtom);
+  const { onRampCurrency } = useRamp();
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {
@@ -215,6 +219,11 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
       openInTab(to);
     },
     [setInternalChainId, chainId],
+  );
+
+  const showBuyButton = useMemo(
+    () => status !== TokenStatus.Disabled && onRampCurrency,
+    [status, onRampCurrency],
   );
 
   return (
@@ -296,6 +305,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
               openLink({ page: Page.Receive, token: asset.tokenSlug })
             }
             Icon={BuyIcon}
+            disabled={!showBuyButton}
           />
           <DeepLinkButton
             text="Swap"
@@ -321,9 +331,15 @@ const DeepLinkButton: FC<{
   text: string;
   Icon: FC<{ className?: string }>;
   onClick: () => void;
-}> = ({ text, onClick, Icon }) => {
+  disabled?: boolean;
+}> = ({ text, onClick, Icon, disabled = false }) => {
   return (
-    <Button theme="clean" className="!p-0" onClick={onClick}>
+    <Button
+      theme="clean"
+      className="!p-0"
+      disabled={disabled}
+      onClick={onClick}
+    >
       <div className="flex flex-col items-center">
         <div className="mb-1 p-3 bg-[#373B45] rounded-full">
           <Icon className="w-5 h-5" />

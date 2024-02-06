@@ -33,9 +33,9 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
@@ -267,7 +267,7 @@ const AssetInfo: FC = () => {
                 className="grow !py-2 !min-w-0"
               >
                 <SendIcon className="w-6 h-auto mr-2" />
-                Transfer
+                Send
               </Button>
               <Button
                 to={{ page: Page.Swap }}
@@ -279,21 +279,20 @@ const AssetInfo: FC = () => {
                 <SwapIcon className="w-6 h-auto mr-2" />
                 Swap
               </Button>
-              {showBuyButton ? (
-                <Button
-                  to={{
-                    onRampOpened: true,
-                    token: tokenSlug,
-                  }}
-                  merge
-                  theme="secondary"
-                  className="grow !py-2 !min-w-0"
-                  title="Coming soon"
-                >
-                  <BuyIcon className="w-6 h-auto mr-2" />
-                  Buy
-                </Button>
-              ) : null}
+              <Button
+                to={{
+                  onRampOpened: true,
+                  token: tokenSlug,
+                }}
+                merge
+                theme="secondary"
+                className="grow !py-2 !min-w-0"
+                disabled={!showBuyButton}
+                title={showBuyButton ? undefined : "Coming soon"}
+              >
+                <BuyIcon className="w-6 h-auto mr-2" />
+                Buy
+              </Button>
             </div>
 
             <TokenActivity token={tokenInfo!} />

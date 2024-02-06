@@ -31,7 +31,7 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
@@ -174,7 +174,7 @@ const NftInfo: FC = () => {
                   className="!py-2 mt-auto mr-auto"
                 >
                   <SendIcon className="w-6 h-auto mr-2" />
-                  Transfer
+                  Send
                 </Button>
               </div>
             </div>
