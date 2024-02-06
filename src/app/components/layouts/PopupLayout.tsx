@@ -208,7 +208,7 @@ const WalletInfo: FC = () => {
         <FiatAmount
           amount={totalBalance}
           copiable
-          className="mt-3 mb-5 text-[2rem] font-bold leading-none"
+          className="mt-3 mb-5 text-[2rem] tracking-wide font-bold leading-none"
         />
       ) : null}
       <div className="flex gap-8">
