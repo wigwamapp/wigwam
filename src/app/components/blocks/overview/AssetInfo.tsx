@@ -270,16 +270,6 @@ const AssetInfo: FC = () => {
                 Send
               </Button>
               <Button
-                to={{ page: Page.Swap }}
-                theme="secondary"
-                className="grow !py-2 !min-w-0"
-                disabled
-                title="Coming soon"
-              >
-                <SwapIcon className="w-6 h-auto mr-2" />
-                Swap
-              </Button>
-              <Button
                 to={{
                   onRampOpened: true,
                   token: tokenSlug,
@@ -292,6 +282,16 @@ const AssetInfo: FC = () => {
               >
                 <BuyIcon className="w-6 h-auto mr-2" />
                 Buy
+              </Button>
+              <Button
+                to={{ page: Page.Swap }}
+                theme="secondary"
+                className="grow !py-2 !min-w-0"
+                disabled
+                title="Coming soon"
+              >
+                <SwapIcon className="w-6 h-auto mr-2" />
+                Swap
               </Button>
             </div>
 
