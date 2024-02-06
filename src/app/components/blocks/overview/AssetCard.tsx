@@ -66,6 +66,35 @@ const AssetCard = memo(
           )}
           disabled={isManageMode && nativeAsset}
         >
+          {isManageMode ? (
+            <Checkbox.Root
+              className={classNames(
+                "w-5 h-5 min-w-[1.25rem] mr-5 my-auto",
+                "bg-[#373B45]",
+                "rounded",
+                "flex items-center justify-center",
+              )}
+              checked={!disabled}
+              disabled={nativeAsset}
+              asChild
+            >
+              <span>
+                <Checkbox.Indicator
+                  className={classNames(
+                    "bg-brand-redone rounded",
+                    "w-full h-full",
+                    "flex items-center justify-center",
+                    (disabled || nativeAsset) && "opacity-30",
+                  )}
+                >
+                  {!disabled && (
+                    <CheckIcon className="[&>*]:fill-black w-full h-full" />
+                  )}
+                </Checkbox.Indicator>
+              </span>
+            </Checkbox.Root>
+          ) : null}
+
           <AssetLogo
             asset={asset}
             alt={symbol}
@@ -130,7 +159,7 @@ const AssetCard = memo(
                   </span>
                 </span>
               )}
-              {isManageMode && !nativeAsset && (
+              {/* {isManageMode && !nativeAsset && (
                 <Checkbox.Root
                   className={classNames(
                     "absolute top-1/2 right-5 -translate-y-1/2",
@@ -149,7 +178,7 @@ const AssetCard = memo(
                     </Checkbox.Indicator>
                   </span>
                 </Checkbox.Root>
-              )}
+              )} */}
             </span>
           </span>
         </button>

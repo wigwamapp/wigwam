@@ -5,7 +5,9 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
 import { useAtom, useAtomValue } from "jotai";
@@ -24,7 +26,7 @@ import { ToastOverflowProvider } from "app/hooks/toast";
 import { useTokenList } from "app/hooks/tokenList";
 
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import AssetsManagement from "../elements/AssetsManagement";
+import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
 import NullState from "../blocks/tokenList/NullState";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
@@ -83,7 +85,7 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     isNftsSelected,
     searchValue,
     manageModeEnabled,
-    tokens,
+    tokens: tokensPure,
     syncing,
     searching,
     focusSearchInput,
@@ -96,11 +98,19 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     setTokenIdSearchValue,
     tokenIdSearchInputRef,
     tokenIdSearchDisplayed,
+    searchValueIsAddress,
   } = useTokenList(tokenType, {
     onAccountTokensReset: handleAccountTokensReset,
   });
 
   const selectedToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
+
+  const [mode, setMode] = useState<ManageMode>(null);
+
+  const tokens = useMemo(
+    () => (mode === "add" && !searchValueIsAddress ? [] : tokensPure),
+    [mode, searchValueIsAddress, tokensPure],
+  );
 
   // A little hack to avoid using `manageModeEnabled` dependency
   const manageModeEnabledRef = useRef<boolean>();
@@ -222,6 +232,8 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         setTokenIdSearchValue={setTokenIdSearchValue}
         tokenIdSearchInputRef={tokenIdSearchInputRef}
         tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+        mode={mode}
+        onModeChange={setMode}
       />
       {tokensBar}
     </>

@@ -55,10 +55,11 @@ import ActivityContent from "../blocks/activity/ActivityContent";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import AssetsManagement from "../elements/AssetsManagement";
+import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
+
   return (
     <PreloadAndSync>
       <PopupLayout>{matchPopupTabs(tab) as unknown as ReactNode}</PopupLayout>
@@ -146,7 +147,7 @@ const TokenList: FC = () => {
     searchValue,
     setSearchValue,
     searchInputRef,
-    tokens,
+    tokens: tokensPure,
     loadMoreTriggerRef,
     manageModeEnabled,
     setManageModeEnabled,
@@ -159,9 +160,17 @@ const TokenList: FC = () => {
     isNftsSelected,
     syncing,
     searching,
+    searchValueIsAddress,
   } = useTokenList(tokenType, {
     searchPersist: tokenType === TokenType.NFT,
   });
+
+  const [mode, setMode] = useState<ManageMode>(null);
+
+  const tokens = useMemo(
+    () => (mode === "add" && !searchValueIsAddress ? [] : tokensPure),
+    [mode, searchValueIsAddress, tokensPure],
+  );
 
   const tokensBar = useMemo(() => {
     if (tokens.length === 0) {
@@ -218,6 +227,8 @@ const TokenList: FC = () => {
         setTokenIdSearchValue={setTokenIdSearchValue}
         tokenIdSearchInputRef={tokenIdSearchInputRef}
         tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+        mode={mode}
+        onModeChange={setMode}
         className="my-3"
       />
       {tokensBar}
