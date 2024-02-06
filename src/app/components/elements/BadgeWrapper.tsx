@@ -10,7 +10,7 @@ export const BadgeWrapper: FC<{
     className={classNames(
       "relative",
       showBadge && [
-        "after:content-[' '] after:absolute after:right-[1px] after:top-0 after:h-3 after:w-2",
+        "after:content-[' '] after:absolute after:right-[1px] after:top-0 after:h-2 after:w-2",
         "after:bg-brand-redtwo after:rounded-full after:animate-pulse",
       ],
       className,
