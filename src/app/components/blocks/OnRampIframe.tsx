@@ -21,6 +21,8 @@ import { useAccounts, useChainId, useRamp } from "app/hooks";
 
 type RampOrder = { [key: string]: any };
 
+const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
+
 const saveRampActivity = (rampOrder: RampOrder) => {
   const newRampActivity: RampActivity = {
     id: nanoid(),
@@ -72,31 +74,38 @@ const OnRampIframe: FC = () => {
     [selectedCurrency],
   );
 
-  if (!process.env.WIGWAM_ON_RAMP_API_KEY) {
-    setOnRampModalOpened([false]);
-    alert({
-      title: "Error",
-      content: <p>Transak API Key is not provided!</p>,
-    });
-    console.error("[Error]: Transak API Key is not provided!");
-  }
+  useEffect(() => {
+    if (!API_KEY) {
+      setOnRampModalOpened([false]);
+      alert({
+        title: "Error",
+        content: <p>Transak API Key is not provided!</p>,
+      });
+      console.error("[Error]: Transak API Key is not provided!");
+    }
+  }, [alert, setOnRampModalOpened]);
 
-  const config: TransakConfig = useMemo(
-    () => ({
-      apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
-      environment:
-        process.env.RELEASE_ENV !== "true"
-          ? Environments.STAGING
-          : Environments.PRODUCTION,
-      defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      network: onRampCurrency?.network,
-      productsAvailed: "BUY",
-      cryptoCurrencyCode: onRampCurrency?.symbol,
-      walletAddress: address,
-      disableWalletAddressForm: true,
-      themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${onRampCurrency?.symbol} with Wigwam`,
-    }),
+  const config: TransakConfig | null = useMemo(
+    () =>
+      API_KEY
+        ? {
+            apiKey: API_KEY,
+            environment:
+              process.env.RELEASE_ENV !== "true"
+                ? Environments.STAGING
+                : Environments.PRODUCTION,
+            defaultFiatCurrency: !isCurrentUserCcyCrypto
+              ? selectedCurrency
+              : "USD",
+            network: onRampCurrency?.network,
+            productsAvailed: "BUY",
+            cryptoCurrencyCode: onRampCurrency?.symbol,
+            walletAddress: address,
+            disableWalletAddressForm: true,
+            themeColor: "#0D1311",
+            exchangeScreenTitle: `Securely buy ${onRampCurrency?.symbol} with Wigwam`,
+          }
+        : null,
     [
       address,
       isCurrentUserCcyCrypto,
@@ -106,7 +115,7 @@ const OnRampIframe: FC = () => {
     ],
   );
 
-  const iframeUrl = useMemo(() => generateURL(config), [config]);
+  const iframeUrl = useMemo(() => config && generateURL(config), [config]);
 
   const handleSuccessOrder = useCallback(
     (payload: { [key: string]: any }) => {
@@ -165,13 +174,15 @@ const OnRampIframe: FC = () => {
       className="-ml-12 mr-12 h-full flex justify-center rounded-md"
       id="transakPanel"
     >
-      <iframe
-        id="transakIframe"
-        title="transak"
-        src={iframeUrl}
-        allow="camera;microphone;payment"
-        className="h-full w-[420px] border-none rounded-md"
-      />
+      {iframeUrl && (
+        <iframe
+          id="transakIframe"
+          title="transak"
+          src={iframeUrl}
+          allow="camera;microphone;payment"
+          className="h-full w-[420px] border-none rounded-md"
+        />
+      )}
     </div>
   );
 };
