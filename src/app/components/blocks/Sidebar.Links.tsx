@@ -27,7 +27,7 @@ const useSidebarLinks = () => {
     return [
       {
         route: Page.Default,
-        label: "Overview",
+        label: "Assets",
         Icon: OverviewIcon,
       },
       {
