@@ -136,17 +136,17 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
         className,
       )}
     >
-      <TippySingletonProvider>
-        {mode === null ? (
-          <>
-            <AssetsSwitcher
-              theme={size}
-              checked={tokenType === TokenType.NFT}
-              onCheckedChange={toggleNftSwitcher}
-              className="w-full"
-            />
+      {mode === null ? (
+        <>
+          <AssetsSwitcher
+            theme={size}
+            checked={tokenType === TokenType.NFT}
+            onCheckedChange={toggleNftSwitcher}
+            className="w-full"
+          />
 
-            <div className="flex gap-2">
+          <div className="flex gap-2">
+            <TippySingletonProvider>
               <ManageButton
                 size={size}
                 Icon={SearchIcon}
@@ -168,61 +168,61 @@ const AssetsManagement: FC<AssetsManagementProps> = ({
                 aria-label={`Add a custom ${tokenType === TokenType.Asset ? "token" : "nft"}`}
                 onClick={() => toggleManageMode("add")}
               />
-            </div>
-          </>
-        ) : (
-          <>
-            <ManageButton
-              size={size}
-              Icon={ChevronIcon}
-              theme="secondary"
-              aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
-              onClick={() => {
-                setSearchValue(null);
-                setTokenIdSearchValue(null);
-                onModeChange(null);
-                setManageModeEnabled(false);
-              }}
+            </TippySingletonProvider>
+          </div>
+        </>
+      ) : (
+        <>
+          <ManageButton
+            size={size}
+            Icon={ChevronIcon}
+            theme="secondary"
+            aria-label={`Search ${tokenType === TokenType.Asset ? "tokens" : "nfts"} by name or address`}
+            onClick={() => {
+              setSearchValue(null);
+              setTokenIdSearchValue(null);
+              onModeChange(null);
+              setManageModeEnabled(false);
+            }}
+          />
+
+          <div
+            className={classNames(
+              "flex w-full gap-2",
+              size === "small" ? "h-10" : "h-full",
+            )}
+          >
+            <SearchInput
+              ref={searchInputRef}
+              searchValue={searchValue}
+              toggleSearchValue={setSearchValue}
+              className="h-full"
+              inputClassName={classNames(
+                "h-full !max-h-none",
+                size === "small" ? "!py-2" : "",
+              )}
+              StartAdornment={input.Icon}
+              placeholder={input.placeholder}
+              autoFocus
             />
 
-            <div
-              className={classNames(
-                "flex w-full gap-2",
-                size === "small" ? "h-10" : "h-full",
-              )}
-            >
+            {tokenIdSearchDisplayed && (
               <SearchInput
-                ref={searchInputRef}
-                searchValue={searchValue}
-                toggleSearchValue={setSearchValue}
-                className="h-full"
+                ref={tokenIdSearchInputRef}
+                searchValue={tokenIdSearchValue}
+                toggleSearchValue={setTokenIdSearchValue}
+                StartAdornment={HashTagIcon}
+                className={classNames("max-w-[8rem] h-full")}
                 inputClassName={classNames(
                   "h-full !max-h-none",
                   size === "small" ? "!py-2" : "",
                 )}
-                StartAdornment={input.Icon}
-                placeholder={input.placeholder}
-                autoFocus
+                placeholder="Token ID..."
               />
-
-              {tokenIdSearchDisplayed && (
-                <SearchInput
-                  ref={tokenIdSearchInputRef}
-                  searchValue={tokenIdSearchValue}
-                  toggleSearchValue={setTokenIdSearchValue}
-                  StartAdornment={HashTagIcon}
-                  className={classNames("max-w-[8rem] h-full")}
-                  inputClassName={classNames(
-                    "h-full !max-h-none",
-                    size === "small" ? "!py-2" : "",
-                  )}
-                  placeholder="Token ID..."
-                />
-              )}
-            </div>
-          </>
-        )}
-      </TippySingletonProvider>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
