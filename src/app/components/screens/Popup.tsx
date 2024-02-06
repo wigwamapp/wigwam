@@ -51,7 +51,7 @@ import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
-import ActivitiesList from "../blocks/activity/ActivitiesList";
+import ActivityContent from "../blocks/activity/ActivityContent";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
@@ -86,7 +86,7 @@ const Activities: FC = () => {
 
   return isUnlocked ? (
     <Suspense fallback={null}>
-      <ActivitiesList />
+      <ActivityContent />
     </Suspense>
   ) : null;
 };
