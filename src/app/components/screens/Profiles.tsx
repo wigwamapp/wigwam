@@ -102,12 +102,12 @@ const Profiles: FC = () => {
               privacy.
             </li>
 
-            <li>
+            {/* <li>
               You will always see your <strong>profile avatar</strong>, on all
               Wigwam pages. <strong>It is unique!</strong> This feature allows
               you to <strong>determine</strong> whether the Wigwam you are
               seeing is <strong>real</strong> or fake.
-            </li>
+            </li> */}
 
             <li>
               Each profile can have <strong>only one Secret Phrase</strong>.

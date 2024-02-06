@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useForceUpdate from "use-force-update";
-import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
@@ -136,7 +135,7 @@ export function useCompleteActivity(accountAddress: string, limit = 20) {
 
 export function useActivityBadge() {
   const { currentAccount } = useAccounts();
-  const { total: totalApprovals } = useAtomValue(approvalStatusAtom);
+  const totalApprovals = useLazyAtomValue(approvalStatusAtom)?.total ?? 0;
   const pendingActivities = useLazyAtomValue(
     getPendingActivitiesAtom(currentAccount.address),
   );

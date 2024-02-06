@@ -21,7 +21,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
-import { OverflowProvider, useAccounts } from "app/hooks";
+import { OverflowProvider, useAccounts, useActivityBadge } from "app/hooks";
 import Button from "../elements/Button";
 import { PopupToolbarTab } from "app/nav";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
@@ -31,6 +31,7 @@ import FiatAmount from "../elements/FiatAmount";
 import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import { useLazyAtomValue } from "lib/atom-utils";
 import ProfileButton from "../elements/ProfileButton";
+import BadgeWrapper from "../elements/BadgeWrapper";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -117,6 +118,7 @@ export default PopupLayout;
 
 const NavToolbar: FC = () => {
   const [tab, setTab] = useAtom(popupToolbarTabAtom);
+  const activityBadgeDisplayed = useActivityBadge();
 
   return (
     <nav
@@ -138,6 +140,7 @@ const NavToolbar: FC = () => {
         label="Activity"
         isActive={tab === PopupToolbarTab.Activity}
         onClick={() => setTab(PopupToolbarTab.Activity)}
+        badge={activityBadgeDisplayed}
       />
       <Button
         theme="tertiary"
@@ -154,12 +157,14 @@ type NavToolbarButtonProps = HTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;
   label: string;
   isActive?: boolean;
+  badge?: boolean;
 };
 
 const NavToolbarButton: FC<NavToolbarButtonProps> = ({
   Icon,
   label,
   isActive = false,
+  badge,
   ...rest
 }) => (
   <button
@@ -177,13 +182,15 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
     )}
     {...rest}
   >
-    <Icon
-      className={classNames(
-        "mr-2",
-        "transition-all",
-        isActive ? "fill-black" : "fill-white",
-      )}
-    />
+    <BadgeWrapper showBadge={badge}>
+      <Icon
+        className={classNames(
+          "mr-2",
+          "transition-all",
+          isActive ? "fill-black" : "fill-white",
+        )}
+      />
+    </BadgeWrapper>
     {label}
   </button>
 );

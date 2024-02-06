@@ -1,4 +1,4 @@
-import { FC, useMemo, useRef, useState, useCallback } from "react";
+import { FC, useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
@@ -10,7 +10,12 @@ import { Account } from "core/types";
 import { lockWallet } from "core/client";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import { profileStateAtom, approvalsAtom, accountAddressAtom } from "app/atoms";
+import {
+  profileStateAtom,
+  approvalsAtom,
+  accountAddressAtom,
+  addAccountModalAtom,
+} from "app/atoms";
 import { Page } from "app/nav";
 import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -48,8 +53,15 @@ const ProfileButton: FC<ProfileButtonProps> = ({
   hideAddress,
 }) => {
   const { currentAccount } = useAccounts();
+  const addAccountModalOpened = useAtomValue(addAccountModalAtom);
 
   const [modalOpened, setModalOpened] = useState(false);
+
+  useEffect(() => {
+    if (addAccountModalOpened) {
+      setModalOpened(false);
+    }
+  }, [setModalOpened, addAccountModalOpened]);
 
   return (
     <>
@@ -243,6 +255,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
             <IconedButton
               aria-label="Add wallet"
               to={{ addAccOpened: true }}
+              merge={["token"]}
               smartLink
               onClick={() => onOpenChange?.(false)}
               theme="secondary"
@@ -253,6 +266,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
           ) : (
             <Button
               to={{ addAccOpened: true }}
+              merge={["token"]}
               theme="secondary"
               onClick={() => onOpenChange?.(false)}
               className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
