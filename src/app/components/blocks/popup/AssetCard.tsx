@@ -12,27 +12,44 @@ import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import { dequal } from "dequal/lite";
 import BigNumber from "bignumber.js";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { useLazyAtomValue } from "lib/atom-utils";
+import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus } from "core/types";
-import { toggleTokenStatus } from "core/common/tokens";
+import { parseTokenSlug, toggleTokenStatus } from "core/common/tokens";
 
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
-import { chainIdAtom } from "app/atoms";
-import { useRamp } from "app/hooks";
+import { chainIdAtom, getTokenDetailsUrlAtom } from "app/atoms";
+import {
+  TippySingletonProvider,
+  useExplorerLink,
+  useLazyNetwork,
+  useRamp,
+} from "app/hooks";
+import { useDialog } from "app/hooks/dialog";
 
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
 import { ReactComponent as CheckIcon } from "app/icons/check.svg";
+import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
+import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import Button from "app/components/elements/Button";
+import PriceChange from "app/components/elements/PriceChange";
+import IconedButton from "app/components/elements/IconedButton";
+
 import PopupModal from "./PopupModal";
-import PriceChange from "../overview/PriceChange";
 
 type AssetCardProps = {
   asset: AccountAsset;
@@ -235,21 +252,22 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
       header={
         <div className="flex flex-col items-start text-base font-normal">
           <p className="font-semibold">{name}</p>
-          <div className="flex gap-2">
+          <div className="mt-2 flex gap-2">
             {priceUSD ? (
-              <span className="text-sm text-white">
+              <span className="text-base text-white font-semibold">
                 ${new BigNumber(priceUSD).toFixed(2, BigNumber.ROUND_DOWN)}
               </span>
             ) : null}
             {priceUSDChange ? (
-              <PriceChange
-                className="!p-0 !text-xs [&>*]:font-normal"
-                priceChange={priceUSDChange}
-                isPercent={true}
-                hideBackground
-              />
+              <PriceChange priceChange={priceUSDChange} isPercent={true} />
             ) : null}
           </div>
+
+          <TokenActionButtons
+            asset={asset}
+            onClose={onClose}
+            className="mt-4"
+          />
         </div>
       }
     >
@@ -347,5 +365,109 @@ const DeepLinkButton: FC<{
         <span className="text-xs">{text}</span>
       </div>
     </Button>
+  );
+};
+
+const TokenActionButtons: FC<{
+  asset: AccountAsset;
+  onClose: () => void;
+  className?: string;
+}> = ({ asset, onClose, className }) => {
+  const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
+  const { confirm } = useDialog();
+
+  const { chainId, tokenSlug, status } = asset;
+
+  const { standard, address } = useMemo(
+    () => parseTokenSlug(tokenSlug),
+    [tokenSlug],
+  );
+
+  const { copy, copied } = useCopyToClipboard(address);
+
+  const tokenDetailsUrl = useLazyAtomValue(
+    getTokenDetailsUrlAtom({ chainId, tokenSlug }),
+    "off",
+  );
+
+  const handleHideAsset = useCallback(async () => {
+    const response = await confirm({
+      title: "Hide asset",
+      content: (
+        <>
+          <p className="mb-4 mx-auto text-center">
+            Are you sure you want to hide <b>{asset?.symbol}</b>?
+          </p>
+          <p className="mx-auto text-center">
+            You can turn it back on the{" "}
+            <span className="inline-flex">
+              &quot;
+              <ControlIcon /> Manage Assets&quot;
+            </span>{" "}
+            at any time.
+          </p>
+        </>
+      ),
+      yesButtonText: "Hide",
+    });
+
+    if (response && asset) {
+      toggleTokenStatus(asset);
+    }
+
+    onClose();
+  }, [confirm, asset, onClose]);
+
+  return (
+    <div className={classNames("flex items-center", className)}>
+      <TippySingletonProvider>
+        <div className="ml-auto flex items-center">
+          {currentNetwork?.type === "mainnet" && tokenDetailsUrl && (
+            <IconedButton
+              aria-label="View chart and token info"
+              Icon={CoinGeckoIcon}
+              className={classNames(
+                "!w-6 !h-6 min-w-[1.5rem]",
+                status !== TokenStatus.Native ? "mr-2" : "",
+              )}
+              iconClassName="!w-[1.125rem]"
+              href={tokenDetailsUrl}
+            />
+          )}
+          {explorerLink && status !== TokenStatus.Native && (
+            <IconedButton
+              aria-label="View token in Explorer"
+              Icon={WalletExplorerIcon}
+              className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+              iconClassName="!w-[1.125rem]"
+              href={explorerLink.token(address)}
+            />
+          )}
+          {status !== TokenStatus.Native && (
+            <IconedButton
+              aria-label={
+                copied
+                  ? "Copied"
+                  : `Copy ${TokenStandardValue[standard]} token address`
+              }
+              Icon={copied ? SuccessIcon : CopyIcon}
+              className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+              iconClassName="!w-[1.125rem]"
+              onClick={() => copy()}
+            />
+          )}
+          {status !== TokenStatus.Native && (
+            <IconedButton
+              aria-label="Hide token"
+              Icon={EyeIcon}
+              onClick={() => handleHideAsset()}
+              className="!w-6 !h-6 min-w-[1.5rem]"
+              iconClassName="!w-[1.125rem]"
+            />
+          )}
+        </div>
+      </TippySingletonProvider>
+    </div>
   );
 };

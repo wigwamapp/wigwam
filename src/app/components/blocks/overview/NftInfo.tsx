@@ -4,6 +4,7 @@ import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountNFT, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -37,7 +38,6 @@ import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
 
 import TokenActivity from "./TokenActivity";
-import { TokenStandardValue } from "./AssetInfo";
 import NftOverview from "../nft/NftOverview";
 
 const NftInfo: FC = () => {

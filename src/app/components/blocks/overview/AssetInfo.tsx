@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { useLazyAtomValue } from "lib/atom-utils";
+import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
@@ -29,6 +30,7 @@ import IconedButton from "app/components/elements/IconedButton";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import Button from "app/components/elements/Button";
+import PriceChange from "app/components/elements/PriceChange";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
@@ -39,16 +41,7 @@ import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
-import PriceChange from "./PriceChange";
 import TokenActivity from "./TokenActivity";
-
-export enum TokenStandardValue {
-  NATIVE = "Native",
-  ERC20 = "ERC-20",
-  ERC721 = "ERC-721",
-  ERC777 = "ERC-777",
-  ERC1155 = "ERC-1155",
-}
 
 const AssetInfo: FC = () => {
   const { onRampCurrency } = useRamp();
