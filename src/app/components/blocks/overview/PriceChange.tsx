@@ -23,14 +23,12 @@ const PriceChange: FC<PriceChangeProps> = ({
 }) => {
   const priceChangeNumber = +priceChange;
 
-  if (!priceChangeNumber || priceChangeNumber === 0) {
+  if (!priceChangeNumber) {
     return <></>;
   }
 
-  const isPositive = priceChangeNumber > 0;
+  const isPositive = priceChangeNumber >= 0;
   const value = new BigNumber(priceChange).abs().toFixed(2);
-
-  if (+value === 0) return <></>;
 
   return (
     <span
