@@ -29,7 +29,10 @@ const Web3: FC = () => {
       <SettingsHeader className="!mb-3">Connect as MetaMask</SettingsHeader>
 
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-        Use this mode to connect to dApps via the Metamask connection button.
+        When enabled - use the MetaMask connection button to connect to dApps
+        only if the Wigwam wallet option is unavailable on the website.
+        <br />
+        Otherwise, choose only Wigwam wallet!
       </p>
 
       <Switcher

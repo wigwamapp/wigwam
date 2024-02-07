@@ -240,8 +240,11 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
               <Tooltip
                 content={
                   <p>
-                    Use this mode to connect to dApps via the Metamask
-                    connection button.
+                    When enabled - use the MetaMask connection button to connect
+                    to dApps only if the Wigwam wallet option is unavailable on
+                    the website.
+                    <br />
+                    Otherwise, choose only Wigwam wallet!
                   </p>
                 }
                 placement="bottom-end"
