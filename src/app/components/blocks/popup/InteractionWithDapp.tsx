@@ -24,10 +24,10 @@ import TooltipIcon from "app/components/elements/TooltipIcon";
 import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
 import { ReactComponent as MetamaskEnabledIcon } from "app/icons/metamask-enabled.svg";
 import { ReactComponent as ConnectIcon } from "app/icons/connect.svg";
-import { ReactComponent as CircleIcon } from "app/icons/circle.svg";
 import { ReactComponent as ArrowRightIcon } from "app/icons/arrow-right.svg";
 import Button from "app/components/elements/Button";
 import Switcher from "app/components/elements/Switcher";
+import Avatar from "app/components/elements/Avatar";
 
 const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
   const activeTab = useAtomValue(activeTabAtom);
@@ -124,13 +124,21 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             {urlDisplayed && tabOrigin ? (
               <span className="flex items-center gap-1.5 text-xs text-white truncate leading-4">
                 <div className="relative">
-                  <CircleIcon className="w-5 h-5" />
+                  <Avatar
+                    src={activeTab?.favIconUrl}
+                    alt={permission?.origin}
+                    className={classNames(
+                      "w-5 h-5 object-cover",
+                      "!border-none",
+                    )}
+                  />
+                  {/* <CircleIcon className="w-5 h-5" /> */}
                   <div
                     className={classNames(
                       "absolute top-0 -right-1 border",
                       accountConnected
                         ? "bg-brand-redone"
-                        : "bg-[#DFE5E0] border-brand-[#92BC78]",
+                        : "bg-[#DFE5E0] border border-[#92BC78]",
                       "w-2 min-w-[.375rem] h-2 rounded-full",
                     )}
                   />
