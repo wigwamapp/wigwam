@@ -105,4 +105,6 @@ export type RampTokenInfo = {
   symbol: string;
   network: string;
   chainId: string;
+  address: string;
+  name: string;
 };

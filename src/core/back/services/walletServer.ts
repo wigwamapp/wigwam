@@ -40,6 +40,7 @@ import {
   syncTokenActivities,
   getOnRampCryptoCurrencies,
   getTokenDetailsUrl,
+  getTransakTokenPrice,
 } from "../sync";
 
 export function startWalletServer() {
@@ -327,6 +328,18 @@ async function handleWalletRequest(
             ).catch(() => null);
 
             ctx.reply({ type, detailsUrl });
+          }),
+      )
+      .with(
+        { type: MessageType.GetTransakTokenPrice },
+        ({ type, tokenAddresses, chainId }) =>
+          withStatus(WalletStatus.Unlocked, async () => {
+            const prices = await getTransakTokenPrice(
+              tokenAddresses,
+              chainId,
+            ).catch(() => null);
+
+            ctx.reply({ type, prices });
           }),
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>

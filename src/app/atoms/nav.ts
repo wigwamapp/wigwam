@@ -40,6 +40,11 @@ export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
 
 export const onRampModalAtom = atomWithURLHash("onRampOpened", false);
 
+export const onRampSelectedCurrencyAtom = atomWithURLHash<any | null>(
+  "onRampSelectedCurrency",
+  null,
+);
+
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
 export const activityModalAtom = atomWithURLHash("activityOpened", false);

@@ -9,6 +9,7 @@ import {
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
   onRampModalAtom,
+  onRampSelectedCurrencyAtom,
   selectedCurrencyAtom,
   tokenSlugAtom,
 } from "app/atoms";
@@ -17,7 +18,7 @@ import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.sv
 import { nanoid } from "nanoid";
 import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
-import { useAccounts, useChainId, useRamp } from "app/hooks";
+import { useAccounts, useChainId } from "app/hooks";
 
 type RampOrder = { [key: string]: any };
 
@@ -57,10 +58,10 @@ const saveRampActivity = (rampOrder: RampOrder) => {
 const OnRampIframe: FC = () => {
   const chainId = useChainId();
   const { alert } = useDialog();
-  const { onRampCurrency } = useRamp();
   const eventEmitter = useMemo(() => new Emitter(), []);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
   const setOnRampModalOpened = useSetAtom(onRampModalAtom);
+  const [onRampSelectedCurrency] = useAtom(onRampSelectedCurrencyAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
 
   const {
@@ -81,30 +82,28 @@ const OnRampIframe: FC = () => {
     console.error("[Error]: Transak API Key is not provided!");
   }
 
-  const config: TransakConfig = useMemo(
-    () => ({
+  const config: TransakConfig = useMemo(() => {
+    return {
       apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
       environment:
         process.env.RELEASE_ENV !== "true"
           ? Environments.STAGING
           : Environments.PRODUCTION,
       defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      network: onRampCurrency?.network,
+      network: onRampSelectedCurrency?.network,
       productsAvailed: "BUY",
-      cryptoCurrencyCode: onRampCurrency?.symbol,
+      cryptoCurrencyCode: onRampSelectedCurrency?.symbol,
       walletAddress: address,
       disableWalletAddressForm: true,
       themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${onRampCurrency?.symbol} with Wigwam`,
-    }),
-    [
-      address,
-      isCurrentUserCcyCrypto,
-      onRampCurrency?.network,
-      onRampCurrency?.symbol,
-      selectedCurrency,
-    ],
-  );
+      exchangeScreenTitle: `Securely buy ${onRampSelectedCurrency?.symbol} with Wigwam`,
+    };
+  }, [
+    address,
+    isCurrentUserCcyCrypto,
+    onRampSelectedCurrency,
+    selectedCurrency,
+  ]);
 
   const iframeUrl = useMemo(() => generateURL(config), [config]);
 

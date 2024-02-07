@@ -2,7 +2,6 @@ import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { Network } from "core/types";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { receiveTabAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
@@ -82,8 +81,9 @@ const getTabsContent = (network?: Network) => [
         {
           route: {
             page: "receive",
-            onRampOpened: true,
-            token: NATIVE_TOKEN_SLUG,
+            // onRampOpened: true,
+            receive: ReceiveTabEnum.BuyWithFiat,
+            // token: NATIVE_TOKEN_SLUG,
           },
           title: "Buy with Fiat",
           Icon: FiatIcon,

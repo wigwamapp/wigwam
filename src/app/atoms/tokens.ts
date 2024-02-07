@@ -9,7 +9,11 @@ import {
   createTotalBalanceKey,
   NATIVE_TOKEN_SLUG,
 } from "core/common";
-import { getOnRampCurrencies, getTokenDetailsUrl } from "core/client";
+import {
+  getOnRampCurrencies,
+  getTokenDetailsUrl,
+  getTransakTokenPrice,
+} from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
@@ -58,6 +62,17 @@ export const getAllNativeTokensAtom = atomFamily((accountAddress: string) =>
 export const getTokenDetailsUrlAtom = atomFamily(
   ({ chainId, tokenSlug }: { chainId: number; tokenSlug: string }) =>
     atomWithDefault(() => getTokenDetailsUrl(chainId, tokenSlug)),
+  dequal,
+);
+
+export const getTransakTokenPriceAtom = atomFamily(
+  ({
+    tokenAddresses,
+    chainId,
+  }: {
+    tokenAddresses: string[];
+    chainId: number;
+  }) => atomWithDefault(() => getTransakTokenPrice(tokenAddresses, chainId)),
   dequal,
 );
 

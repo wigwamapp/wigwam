@@ -4,7 +4,6 @@ import { createERC20TokenSlug, NATIVE_TOKEN_SLUG } from "core/common/tokens";
 import { withOfflineCache } from "lib/ext/offlineCache";
 import type { RampTokenInfo } from "core/types";
 
-const ONE_DAY = 24 * 60 * 60_000;
 const NATIVE_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const onRampApi = axios.create({
@@ -19,7 +18,7 @@ export const getOnRampCryptoCurrencies = withOfflineCache(
       data: { response: tokens },
     } = await onRampApi.get("/currencies/crypto-currencies");
 
-    for (const { network, uniqueId, address, image, symbol } of tokens) {
+    for (const { network, uniqueId, address, image, symbol, name } of tokens) {
       // Filter tokens
       if (
         // Empty token
@@ -34,11 +33,18 @@ export const getOnRampCryptoCurrencies = withOfflineCache(
           ? NATIVE_TOKEN_SLUG
           : createERC20TokenSlug(getAddress(address));
       const coinId = `${network.chainId}_${slug}`;
+
+      const tokenAddress =
+        address == "0x0000000000000000000000000000000000000000"
+          ? null
+          : address;
       onRampCurrencies[coinId] = {
         id: uniqueId,
         chainId: network.chainId,
         network: network.name,
-        image: image.thumb,
+        image: image.large,
+        name: name,
+        address: tokenAddress,
         symbol,
       };
     }
@@ -48,6 +54,6 @@ export const getOnRampCryptoCurrencies = withOfflineCache(
   {
     key: "onramp_crypto_currencies",
     hotMaxAge: 5_000,
-    coldMaxAge: ONE_DAY,
+    coldMaxAge: 5_000,
   },
 );

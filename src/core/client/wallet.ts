@@ -290,3 +290,15 @@ export async function getTokenDetailsUrl(chainId: number, tokenSlug: string) {
 
   return res.detailsUrl;
 }
+
+export async function getTransakTokenPrice(
+  tokenAddresses: string[],
+  chainId: number,
+) {
+  const type = MessageType.GetTransakTokenPrice;
+
+  const res = await porter.request({ type, tokenAddresses, chainId });
+  assert(res?.type === type);
+
+  return res;
+}
