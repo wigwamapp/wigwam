@@ -51,7 +51,7 @@ export default Transfer;
 const tabsContent = [
   {
     route: { page: "transfer", transfer: TransferTabEnum.Asset },
-    title: "Asset",
+    title: "Token",
     Icon: AssetIcon,
     desc: "Send gas tokens or other fungible coins such as ERC20.",
   },
