@@ -5,8 +5,9 @@ import { nanoid } from "nanoid";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useLazyAtomValue } from "lib/atom-utils";
 
+import { ActivityType, Permission, MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
-import { MetaMaskCompatibleMode } from "core/types/shared";
+import { saveActivity } from "core/common/activity";
 
 import {
   activeTabAtom,
@@ -75,29 +76,66 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
 
   const handleToggleConnect = useCallback(async () => {
     try {
+      const accountAddress = currentAccount.address;
+
       if (accountConnected) {
         await repo.permissions.delete(permission?.origin ?? tabOrigin!);
       } else {
+        let perm: Permission | undefined;
+
         if (permission) {
           await repo.permissions
             .where({ origin: permission.origin })
             .modify((perm) => {
-              perm.accountAddresses.push(currentAccount.address);
+              perm.accountAddresses.push(accountAddress);
             });
+
+          perm = {
+            ...permission,
+            accountAddresses: [...permission.accountAddresses, accountAddress],
+          };
         } else if (tabOrigin) {
-          await repo.permissions.put({
+          perm = {
             id: nanoid(),
             origin: tabOrigin,
             chainId,
-            accountAddresses: [currentAccount.address],
+            accountAddresses: [accountAddress],
             timeAt: Date.now(),
+          };
+
+          await repo.permissions.put(perm);
+        }
+
+        if (activeTab && perm) {
+          await saveActivity({
+            id: nanoid(),
+            type: ActivityType.Connection,
+            source: {
+              type: "page",
+              url: activeTab.url!,
+              permission: perm,
+              tabId: activeTab.id,
+              favIconUrl: activeTab.favIconUrl,
+            },
+            returnSelectedAccount: true,
+            preferredChainId: chainId,
+            accountAddress,
+            timeAt: Date.now(),
+            pending: 0,
           });
         }
       }
     } catch (err) {
       console.error(err);
     }
-  }, [permission, accountConnected, currentAccount, tabOrigin, chainId]);
+  }, [
+    activeTab,
+    permission,
+    accountConnected,
+    currentAccount,
+    tabOrigin,
+    chainId,
+  ]);
 
   return (
     <DropdownMenu.Root>

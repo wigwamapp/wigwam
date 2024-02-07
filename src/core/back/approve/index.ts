@@ -11,12 +11,12 @@ import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { matchTxAction } from "core/common/transaction";
+import { saveActivity, saveTokenActivity } from "core/common/activity";
 
 import { Vault } from "../vault";
 import { $approvals, approvalResolved } from "../state";
 import { sendRpc, getRpcProvider } from "../rpc";
 
-import { saveActivity, saveTokenActivity } from "./saveActivity";
 import { parseTxSafe, validateTxOrigin, getAccountSafe } from "./utils";
 
 export async function processApprove(

@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
-import { useAtomValue } from "jotai";
 import browser from "webextension-polyfill";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { isPopup } from "lib/ext/view";
 import { rejectAllApprovals } from "core/client";
@@ -43,7 +43,7 @@ export default ActivityContent;
 
 const Approve = memo(() => {
   const isPopupMode = isPopup();
-  const approvalStatus = useAtomValue(approvalStatusAtom);
+  const approvalStatus = useLazyAtomValue(approvalStatusAtom);
 
   const handleApprove = useCallback(() => {
     browser.runtime.sendMessage("__OPEN_APPROVE_WINDOW");
@@ -51,7 +51,7 @@ const Approve = memo(() => {
 
   return (
     <>
-      {approvalStatus.total > 0 && (
+      {approvalStatus && approvalStatus.total > 0 && (
         <div
           className={classNames(
             "w-full h-14 mb-10",

@@ -34,7 +34,12 @@ import * as repo from "core/repo";
 
 import { getNetworkAtom, getPermissionAtom } from "app/atoms";
 import { TRANSAK_SUPPORT_URL } from "app/defaults";
-import { ChainIdProvider, useExplorerLink, useLazyNetwork } from "app/hooks";
+import {
+  ChainIdProvider,
+  useAccounts,
+  useExplorerLink,
+  useLazyNetwork,
+} from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -323,6 +328,7 @@ type DisconnectDAppProps = {
 
 const DisconnectDApp = memo<DisconnectDAppProps>(
   ({ item, className, setRevokedPermission }) => {
+    const { currentAccount } = useAccounts();
     const isPopupMode = isPopup();
     const origin = useMemo(() => getPageOrigin(item.source), [item.source]);
     const lazyPermission = useAtomValue(loadable(getPermissionAtom(origin)));
@@ -333,11 +339,13 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
       if (
         lazyPermission.state === "hasData" &&
         (!lazyPermission.data ||
-          lazyPermission.data.accountAddresses.length === 0)
+          !lazyPermission.data.accountAddresses.includes(
+            currentAccount.address,
+          ))
       ) {
         setTimeout(() => setRevokedPermission(true), 0);
       }
-    }, [lazyPermission, setRevokedPermission]);
+    }, [lazyPermission, setRevokedPermission, currentAccount.address]);
 
     const handleDisconnect = useCallback(async () => {
       if (!permission) return;
@@ -350,7 +358,8 @@ const DisconnectDApp = memo<DisconnectDAppProps>(
     }, [permission]);
 
     if (!permission) return null;
-    if (permission.accountAddresses.length === 0) return null;
+    if (!permission.accountAddresses.includes(currentAccount.address))
+      return null;
 
     return (
       <div className={classNames("flex items-center", className)}>
