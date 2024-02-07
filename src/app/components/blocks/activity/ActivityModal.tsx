@@ -51,27 +51,9 @@ const ActivityModal = memo(() => {
           )}
         >
           {!isPopupMode && (
-            // <div
-            //   className={classNames(
-            //     "flex items-center justify-center",
-            //     "w-[5.5rem] h-[5.5rem]",
-            //     "rounded-full",
-            //     "bg-brand-dark/20",
-            //     "backdrop-blur-[10px]",
-            //     IS_FIREFOX && "!bg-[#0E1314]",
-            //     "border border-brand-light/5",
-            //     "shadow-addaccountmodal",
-            //     "absolute",
-            //     "top-0 left-1/2",
-            //     "-translate-x-1/2 -translate-y-1/2",
-            //     "z-30",
-            //   )}
-            // >
-            //   <ActivityIcon className="w-12 h-auto mb-0.5" />
-            // </div>
             <ActivityIcon
               className={classNames(
-                "w-[2.5rem] h-[2.5rem]",
+                "w-[3rem] h-[3rem]",
                 "styled-icon",
                 "styled-icon--active",
                 "absolute",
@@ -119,7 +101,7 @@ const ActivityModal = memo(() => {
                   {isPopupMode ? (
                     <IconedButton Icon={CloseIcon} theme="tertiary" />
                   ) : (
-                    <Button theme="clean">Cancel</Button>
+                    <Button theme="clean">Close</Button>
                   )}
                 </Dialog.Close>
 
