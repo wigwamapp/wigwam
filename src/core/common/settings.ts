@@ -6,7 +6,7 @@ export enum Setting {
   AutoLockTimeout = "auto_lock_timeout",
   TestNetworks = "test_networks",
   Analytics = "analytics",
-  Web3MetaMaskCompatible = "web3_mm_compatible",
+  Web3MetaMaskCompatible = "connect_as_metamask",
   RequiredAuthSig = "required_authsig",
   ProfileBlockedUntil = "profile_blocked_until",
   PasswordUsageAttempts = "password_usage_attempts",

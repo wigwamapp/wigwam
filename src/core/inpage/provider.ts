@@ -36,7 +36,7 @@ export class InpageProvider extends Emitter {
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
-  mmCompatible = MetaMaskCompatibleMode.Hybrid;
+  mmCompatible = MetaMaskCompatibleMode.Strict;
 
   /**
    * The chain ID of the currently connected Ethereum chain.

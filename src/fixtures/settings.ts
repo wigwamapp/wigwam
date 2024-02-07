@@ -18,7 +18,7 @@ export const AUTO_LOCK_TIMEOUTS = new Map([
 
 export const DEFAULT_AUTO_LOCK_TIMEOUT = TWO_DAYS;
 
-export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Hybrid;
+export const DEFAULT_WEB_METAMASK_COMPATIBLE = MetaMaskCompatibleMode.Strict;
 
 export const MAX_PASSWORD_ATTEMPTS_BEFORE_BLOCK = 7;
 export const BLOCK_PROFILE_FOR = 60_000 * 1.5; // 1.5 min
