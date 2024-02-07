@@ -162,14 +162,18 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             {urlDisplayed && tabOrigin ? (
               <span className="flex items-center gap-1.5 text-xs text-white truncate leading-4">
                 <div className="relative">
-                  <Avatar
-                    src={activeTab?.favIconUrl}
-                    alt={permission?.origin}
-                    className={classNames(
-                      "w-5 h-5 object-cover",
-                      "!border-none",
-                    )}
-                  />
+                  {accountConnected ? (
+                    <Avatar
+                      src={activeTab?.favIconUrl}
+                      alt={permission?.origin}
+                      className={classNames(
+                        "w-5 h-5 object-cover",
+                        "!border-none",
+                      )}
+                    />
+                  ) : (
+                    <ConnectIcon className="w-5 h-5" />
+                  )}
                   {/* <CircleIcon className="w-5 h-5" /> */}
                   <div
                     className={classNames(
