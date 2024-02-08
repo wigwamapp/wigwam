@@ -339,7 +339,9 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
         </div>
         <Button
           theme="secondary"
-          onClick={() => openInTab(undefined, ["token"])}
+          onClick={() =>
+            openLink({ page: Page.Default, token: asset.tokenSlug })
+          }
         >
           <ExpandIcon className="mr-3" />
           Open Full
