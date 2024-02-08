@@ -44,8 +44,8 @@ export async function sendRpc(
   try {
     return { result: await getResult() };
   } catch (err: any) {
-    if (typeof err?.error === "object") {
-      const { message, code, data } = err.error;
+    if (err.info.error) {
+      const { message, code, data } = err.info.error;
 
       return {
         error: { message, code, data },
