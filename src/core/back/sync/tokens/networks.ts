@@ -46,6 +46,8 @@ export const syncNetworks = memoize(
       activeChainId,
     ]);
 
+    console.info({ chainIdsToRefresh, chainIdsToAdd, activeChainId });
+
     const networks = [];
     for (const chainId of chainIds) {
       try {

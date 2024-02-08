@@ -341,7 +341,10 @@ async function handleWalletRequest(
         ({ chainId, method, params, source }) => {
           handleRpc(
             ctx as WalletRpcMsgContext,
-            source ?? UNKNOWN_SELF_SOURCE,
+            {
+              ...(source ?? UNKNOWN_SELF_SOURCE),
+              tabId: ctx.port?.sender?.tab?.id,
+            },
             chainId,
             method,
             params,

@@ -55,7 +55,9 @@ export function startApproveWindowOpener() {
 
   const openApproveWindow = () =>
     enqueueOpenApprove(async () => {
-      if ($approvals.getState().length === 0) return;
+      const approvals = $approvals.getState();
+
+      if (approvals.length === 0) return;
 
       try {
         if (popupState?.type === "window") {
@@ -69,7 +71,10 @@ export function startApproveWindowOpener() {
         } else {
           await closeAllApproveTabs();
 
-          popupState = await createApproveWindow(WINDOW_POSITION);
+          popupState = await createApproveWindow(
+            WINDOW_POSITION,
+            approvals?.[0]?.source?.tabId,
+          );
         }
       } catch (err) {
         console.error(err);
@@ -132,7 +137,10 @@ async function closeAllApproveTabs() {
   }
 }
 
-async function createApproveWindow(position: "center" | "top-right") {
+async function createApproveWindow(
+  position: "center" | "top-right",
+  tabId?: number,
+) {
   let width = 440;
   let height = 660;
 
@@ -182,6 +190,7 @@ async function createApproveWindow(position: "center" | "top-right") {
     height,
     top: Math.max(top, 20),
     left: Math.max(left, 20),
+    tabId,
   });
 
   // Firefox currently ignores left/top for create, but it works for update

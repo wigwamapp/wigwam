@@ -31,6 +31,7 @@ export type ActivitySource =
   | {
       type: "self";
       kind: SelfActivityKind;
+      tabId?: number;
       swapMeta?: Route;
     }
   | {
