@@ -22,3 +22,13 @@ export const useExecutingRoutesIds = (address?: string) => {
     shallow,
   );
 };
+
+export const usePendingRoutesIds = (address?: string) => {
+  try {
+    return Object.values(
+      JSON.parse(localStorage["li.fi-widget-routes"]).state.routes,
+    ).filter((item: any) => item.route.fromAddress.toLowerCase() === address?.toLocaleLowerCase() && item.status === 1).map((item: any) => item.route.id)
+  } catch {
+    return []
+  }
+}

@@ -45,7 +45,7 @@ import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import { ReactComponent as BridgeIcon } from "app/icons/bridge.svg";
-import { ReactComponent as SwapIconSmall } from "app/icons/swap.svg";
+import { ReactComponent as SwapIconSmall } from "app/icons/activity-swap.svg";
 import { ReactComponent as ApproveIcon } from "app/icons/approve.svg";
 import { ReactComponent as ChatIcon } from "app/icons/communication.svg";
 import {
