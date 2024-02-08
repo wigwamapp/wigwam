@@ -8,7 +8,7 @@ import { openInTab } from "app/helpers";
 import {
   getTotalAccountBalanceAtom,
   popupToolbarTabAtom,
-  // updateAvailableAtom,
+  updateAvailableAtom,
   walletStatusAtom,
 } from "app/atoms";
 import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
@@ -21,6 +21,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { OverflowProvider, useAccounts, useActivityBadge } from "app/hooks";
 import Button from "../elements/Button";
 import { PopupToolbarTab } from "app/nav";
@@ -33,6 +34,7 @@ import { useLazyAtomValue } from "lib/atom-utils";
 import ProfileButton from "../elements/ProfileButton";
 import BadgeWrapper from "../elements/BadgeWrapper";
 import PopupBgImage from "app/images/popup-bg.svg";
+import RoundedButton from "../elements/RoundedButton";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -47,7 +49,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
   const walletStatus = useAtomValue(walletStatusAtom);
-  // const updateAvailable = useAtomValue(updateAvailableAtom);
+  const updateAvailable = useAtomValue(updateAvailableAtom);
 
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
@@ -90,7 +92,31 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 </div>
                 <WalletInfo />
               </div>
-            ) : null}
+            ) : (
+              <div className="p-4">
+                <RoundedButton
+                  theme={isUnlocked ? "small" : "large"}
+                  onClick={() => openInTab(undefined, ["token"])}
+                  className={classNames(
+                    "w-full",
+                    !isUnlocked && "p-3.5",
+                    isUnlocked && "p-3",
+                  )}
+                >
+                  <FullScreenIcon className="mr-1" />
+                  Open Full
+                  {updateAvailable ? (
+                    <div
+                      className={classNames(
+                        "w-2 h-2",
+                        "bg-activity rounded-full",
+                        "absolute top-2 right-2",
+                      )}
+                    />
+                  ) : null}
+                </RoundedButton>
+              </div>
+            )}
             <main
               className={classNames(
                 "relative",
