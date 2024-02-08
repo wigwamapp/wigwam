@@ -219,7 +219,7 @@ const Swap: FC = () => {
   ]);
 
   return (
-    <div className="flex mt-[1rem] h-full overflow-hidden">
+    <div className="flex mt-[1rem] h-full overflow-x-auto overflow-y-hidden scrollbar-hide">
       <LiFiWidget
         currencyRate={widgetConfig.currencyRate}
         selectedCurrency={selectedCurrency}
