@@ -49,6 +49,7 @@ export const useRouteExecution = ({
 
   const updateRouteHook = (updatedRoute: Route) => {
     console.log('updatedRoute', updatedRoute)
+
     const routeExecution =
       routeExecutionStoreContext.getState().routes[updatedRoute.id];
     if (!routeExecution) {
@@ -57,7 +58,11 @@ export const useRouteExecution = ({
     const clonedUpdatedRoute = structuredClone(updatedRoute);
     updateRoute(clonedUpdatedRoute);
     const process = getUpdatedProcess(routeExecution.route, clonedUpdatedRoute);
+    
     if (process) {
+      if (onBeforeTransaction && clonedUpdatedRoute && process.type === "SWAP") {
+        onBeforeTransaction({...clonedUpdatedRoute, fromChainId: clonedUpdatedRoute.toChainId, fromToken: clonedUpdatedRoute.steps[1].action.fromToken, toToken: clonedUpdatedRoute.steps[1].action.toToken})
+      }
       emitter.emit(WidgetEvent.RouteExecutionUpdated, {
         route: clonedUpdatedRoute,
         process,
@@ -141,6 +146,9 @@ export const useRouteExecution = ({
       }
       if (!routeExecution?.route) {
         throw Error('Execution route not found.');
+      }
+      if (onBeforeTransaction && routeExecution) {
+        onBeforeTransaction(routeExecution?.route)
       }
       return lifi.resumeRoute(
         account.signer,
