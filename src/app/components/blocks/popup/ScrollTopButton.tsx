@@ -2,7 +2,6 @@ import { FC, MutableRefObject, useCallback, useEffect, useState } from "react";
 import classNames from "clsx";
 import { useThrottledCallback } from "use-debounce";
 
-import { IS_FIREFOX } from "app/defaults";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down.svg";
 
 type ScrollTopButtonProps = {
@@ -56,11 +55,8 @@ const ScrollTopButton: FC<ScrollTopButtonProps> = ({
       className={classNames(
         "w-8 h-8",
         "rounded-lg",
-        "bg-brand-darkblue/20",
-        "backdrop-blur-[10px]",
-        IS_FIREFOX && "!bg-[#0E1314]/[.95]",
-        "border border-brand-main/[.05]",
-        "shadow-addaccountmodal",
+        "bg-brand-darkgray",
+        "border border-[#515561]",
         "flex items-center justify-center",
         className,
       )}
