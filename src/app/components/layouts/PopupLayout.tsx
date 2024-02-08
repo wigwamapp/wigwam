@@ -32,6 +32,7 @@ import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import { useLazyAtomValue } from "lib/atom-utils";
 import ProfileButton from "../elements/ProfileButton";
 import BadgeWrapper from "../elements/BadgeWrapper";
+import PopupBgImage from "app/images/popup-bg.svg";
 
 let bootAnimationDisplayed = true;
 const handleBootAnimationEnd = () => {
@@ -73,13 +74,13 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
             scrollBarClassName="pt-[15.25rem] pb-[3.65rem] pl-1.5 pr-0.5 w-3"
           >
             {isUnlocked ? (
-              <div
-                className={classNames(
-                  "pt-2 px-3 pb-8",
-                  "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
-                )}
-              >
-                <div className="mb-2 flex items-center justify-between gap-3">
+              <div className={classNames("pt-2 px-3 pb-8", "relative")}>
+                <img
+                  src={PopupBgImage}
+                  alt="Wigwam"
+                  className="w-full h-full absolute inset-0 max-w-none"
+                />
+                <div className="mb-2 flex items-center justify-between gap-3 relative z-10">
                   <InteractionWithDapp />
                   <ProfileButton
                     size="small"
@@ -206,7 +207,7 @@ const WalletInfo: FC = () => {
   );
   const { address } = currentAccount;
   return (
-    <section className="flex flex-col justify-center items-center">
+    <section className="flex flex-col justify-center items-center relative z-10">
       <AddressButton address={address} />
       {totalBalance ? (
         <FiatAmount
