@@ -17,6 +17,7 @@ import {
   addAccountModalAtom,
 } from "app/atoms";
 import { Page } from "app/nav";
+import { openInTab } from "app/helpers";
 import { useAccounts } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -25,6 +26,7 @@ import { ReactComponent as ManageWalletIcon } from "app/icons/manage-wallets.svg
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as LockIcon } from "app/icons/lock.svg";
 import { ReactComponent as GearIcon } from "app/icons/settings-gear.svg";
+import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 
 import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
@@ -329,16 +331,30 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
         <LockButton />
 
         {size === "small" ? (
-          <IconedButton
-            aria-label="Settings"
-            to={{ page: Page.Settings }}
-            smartLink
-            onClick={() => onOpenChange?.(false)}
-            theme="secondary"
-            Icon={GearIcon}
-            className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
-            iconClassName="w-6 min-w-6 h-auto"
-          />
+          <>
+            <IconedButton
+              aria-label="Settings"
+              to={{ page: Page.Settings }}
+              smartLink
+              onClick={() => onOpenChange?.(false)}
+              theme="secondary"
+              Icon={GearIcon}
+              className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
+              iconClassName="w-6 min-w-6 h-auto"
+            />
+
+            <IconedButton
+              aria-label="Open full screen"
+              onClick={() => {
+                openInTab(undefined, ["token"]);
+                onOpenChange?.(false);
+              }}
+              theme="secondary"
+              Icon={ExpandIcon}
+              className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
+              iconClassName="w-5 min-w-5 h-auto"
+            />
+          </>
         ) : (
           <Button
             to={{ page: Page.Settings }}
