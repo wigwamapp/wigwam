@@ -6,6 +6,7 @@ import {
   useState,
   ButtonHTMLAttributes,
   useMemo,
+  Suspense,
 } from "react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useSetAtom } from "jotai";
@@ -172,11 +173,14 @@ const AssetCard = memo(
               </span>
             </span>
           </button>
-          <AssetModal
-            open={openModal}
-            onClose={() => setModalOpen(false)}
-            asset={asset}
-          />
+
+          <Suspense>
+            <AssetModal
+              open={openModal}
+              onClose={() => setModalOpen(false)}
+              asset={asset}
+            />
+          </Suspense>
         </>
       );
     },
