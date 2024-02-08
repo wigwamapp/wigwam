@@ -163,11 +163,16 @@ export function useActivityBadge() {
   );
 }
 
-export function useSwapBadge() {
+export function useSwapBadge(address?: string) {
   try {
     return Object.values(
       JSON.parse(localStorage["li.fi-widget-routes"]).state.routes,
     )
+      .filter(
+        (item: any) =>
+          item.route.fromAddress.toLowerCase() === address?.toLocaleLowerCase(),
+      )
+
       .map((item: any) => item.status)
       .includes(1);
   } catch (e) {

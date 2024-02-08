@@ -15,13 +15,15 @@ import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
 import { activityModalAtom } from "app/atoms";
-import { useActivityBadge, useSwapBadge } from "app/hooks";
+import { useActivityBadge, useSwapBadge, useAccounts } from "app/hooks";
 
 const useSidebarLinks = () => {
   const { alert } = useDialog();
   const setActivityOpened = useSetAtom(activityModalAtom);
   const activityBadgeDisplayed = useActivityBadge();
-  const swapBadgeDisplayed = useSwapBadge();
+  const { currentAccount } = useAccounts();
+
+  const swapBadgeDisplayed = useSwapBadge(currentAccount.address);
 
   const NavLinksPrimary = useMemo(() => {
     return [
