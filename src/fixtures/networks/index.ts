@@ -25,6 +25,7 @@ import { ARBITRUMNOVA } from "./arbitrumnova";
 import { BASE } from "./base";
 import { SCROLL } from "./scroll";
 import { LINEA } from "./linea";
+import { CELO } from "./celo";
 import { GNOSIS } from "./gnosis";
 import { MANTLE } from "./mantle";
 
@@ -45,6 +46,7 @@ export const DEFAULT_NETWORKS: Network[] = [
   CRONOS,
   FANTOM,
   MANTLE,
+  CELO,
   LINEA,
   SCROLL,
   MOONBEAM,

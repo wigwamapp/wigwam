@@ -4,7 +4,11 @@ import { atomWithRepoQuery, atomWithStorage } from "lib/atom-utils";
 
 import * as repo from "core/repo";
 import { TokenType } from "core/types";
-import { createAccountTokenKey } from "core/common/tokens";
+import {
+  createAccountTokenKey,
+  createTotalBalanceKey,
+  NATIVE_TOKEN_SLUG,
+} from "core/common";
 import { getOnRampCurrencies, getTokenDetailsUrl } from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
@@ -34,6 +38,21 @@ export const getTokenAtom = atomFamily(
 export const tokenTypeAtom = atomWithStorage<TokenType>(
   "token_type",
   TokenType.Asset,
+);
+
+export const getTotalAccountBalanceAtom = atomFamily((accountAddress: string) =>
+  atomWithStorage<string | null>(createTotalBalanceKey(accountAddress), null),
+);
+
+export const getAllNativeTokensAtom = atomFamily((accountAddress: string) =>
+  atomWithRepoQuery((query) =>
+    query(() =>
+      repo.accountTokens
+        .where("[accountAddress+tokenSlug]")
+        .equals([accountAddress, NATIVE_TOKEN_SLUG])
+        .toArray(),
+    ),
+  ),
 );
 
 export const getTokenDetailsUrlAtom = atomFamily(

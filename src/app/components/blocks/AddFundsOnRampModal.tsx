@@ -43,6 +43,10 @@ const AddFundsOnRampModal = memo(() => {
         ),
         noButtonText: "Stay",
         yesButtonText: "Cancel",
+        buttonTheme: {
+          primary: "secondary",
+          secondary: "primary",
+        },
       });
 
       if (!res) {

@@ -1,14 +1,18 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useMemo } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
+import BigNumber from "bignumber.js";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { chainIdAtom } from "app/atoms";
-import { useLazyNetwork, useLazyAllNetworks } from "app/hooks";
+import { Network } from "core/types";
+import { chainIdAtom, getAllNativeTokensAtom } from "app/atoms";
+import { useLazyAllNetworks, useChainId, useAccounts } from "app/hooks";
 import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
 
 type NetworkSelectProps = {
   className?: string;
   currentItemClassName?: string;
+  currentListItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
   withAction?: boolean;
@@ -21,6 +25,7 @@ type NetworkSelectProps = {
 const NetworkSelect: FC<NetworkSelectProps> = ({
   className,
   currentItemClassName,
+  currentListItemClassName,
   currentItemIconClassName,
   contentClassName,
   withAction,
@@ -29,8 +34,37 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   size = "large",
   source,
 }) => {
-  const currentNetwork = useLazyNetwork();
-  const allNetworks = useLazyAllNetworks() ?? [];
+  const chainId = useChainId();
+  const allNetworksPure = useLazyAllNetworks();
+
+  const { currentAccount } = useAccounts();
+  const accountNativeTokens = useLazyAtomValue(
+    getAllNativeTokensAtom(currentAccount.address),
+    "off",
+  );
+
+  const balancesMap = useMemo(
+    () =>
+      accountNativeTokens &&
+      new Map(accountNativeTokens.map((t) => [t.chainId, t.portfolioUSD])),
+    [accountNativeTokens],
+  );
+
+  const allNetworks = useMemo(
+    () =>
+      !balancesMap?.size
+        ? allNetworksPure ?? []
+        : (allNetworksPure ?? [])
+            .map((n) => ({
+              ...n,
+              balanceUSD: balancesMap?.get(n.chainId),
+            }))
+            .sort(compareNetworks),
+    [allNetworksPure, balancesMap],
+  );
+
+  const currentNetwork =
+    allNetworks.find((n) => n.chainId === chainId) ?? allNetworks[0];
 
   const setChainId = useSetAtom(chainIdAtom);
 
@@ -55,6 +89,10 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
         size === "small" ? "h-[1.75rem]" : "h-12",
         currentItemClassName,
       )}
+      currentListItemClassName={classNames(
+        "!bg-brand-main/20 border-2 border-[#80EF6E] !py-2",
+        currentListItemClassName,
+      )}
       currentItemIconClassName={currentItemIconClassName}
       contentClassName={contentClassName}
     />
@@ -62,3 +100,15 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
 };
 
 export default NetworkSelect;
+
+function compareNetworks(a: Network, b: Network) {
+  if (a.balanceUSD && b.balanceUSD) {
+    return new BigNumber(a.balanceUSD).isGreaterThan(b.balanceUSD) ? -1 : 1;
+  } else if (a.balanceUSD && !b.balanceUSD) {
+    return -1;
+  } else if (b.balanceUSD && !a.balanceUSD) {
+    return 1;
+  } else {
+    return 0;
+  }
+}

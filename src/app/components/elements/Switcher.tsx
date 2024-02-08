@@ -5,10 +5,11 @@ import * as SwitchPrimitive from "@radix-ui/react-switch";
 interface SwitcherProps {
   id?: string;
   label?: ReactNode;
-  text: string;
+  text?: ReactNode;
   checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
   className?: string;
+  buttonClassName?: string;
   disabled?: boolean;
 }
 
@@ -20,6 +21,7 @@ const Switcher: FC<SwitcherProps> = ({
   disabled,
   onCheckedChange,
   className,
+  buttonClassName,
 }) => (
   <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
     {label && (
@@ -44,26 +46,26 @@ const Switcher: FC<SwitcherProps> = ({
         "rounded-[.625rem]",
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+        buttonClassName,
       )}
       disabled={disabled}
     >
-      <span className="text-sm font-bold">{text}</span>
+      {text ? <span className="text-sm font-bold">{text}</span> : null}
       <span
         className={classNames(
           "flex items-center",
           "w-11 h-[1.625rem] p-[.1875rem]",
           "rounded-full",
-          "border border-brand-light",
           "transition-colors",
-          !checked ? "bg-brand-main/[.05]" : "bg-[#21AF3D]/40",
+          !checked ? "bg-[#93ACAF]" : "bg-[#80EF6E]",
         )}
       >
         <SwitchPrimitive.SwitchThumb
           className={classNames(
             "block",
-            "w-[1.125rem] h-[1.125rem]",
+            "w-[1.3rem] h-[1.3rem]",
             "rounded-full",
-            "bg-brand-light",
+            "bg-[#373B45]",
             "transition-transform",
             checked && "translate-x-[1.125rem]",
           )}

@@ -1,10 +1,11 @@
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
+import BadgeWrapper from "app/components/elements/BadgeWrapper";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
 
@@ -15,7 +16,7 @@ const Sidebar: FC = () => {
   return (
     <nav
       className={classNames(
-        "pr-8",
+        "pr-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col",
       )}
@@ -80,7 +81,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               className={classNames(
                 "group",
                 "text-base !font-bold text-brand-light/80",
-                "w-52 !py-2 !px-3 !mb-2",
+                "w-48 !py-2 !px-3 !mb-2",
                 "rounded-[.625rem]",
                 "flex justify-start items-center",
                 isPageActive && "!bg-brand-main/5 !text-brand-light",
@@ -108,7 +109,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
             className={classNames(
               "group",
               "text-base font-bold text-brand-light/80",
-              "w-52 py-2 px-3 mb-2",
+              "w-48 py-2 px-3 mb-2",
               "rounded-[.625rem]",
               "flex items-center",
               "transition-colors",
@@ -135,23 +136,6 @@ const withTokenSlug = (page: Page, tokenSlug: string | null) =>
   (page === Page.Default || page === Page.Transfer || page === Page.Swap) &&
   tokenSlug;
 
-export const BadgeWrapper: FC<{
-  showBadge: boolean | undefined;
-  children: ReactNode | ReactNode[];
-}> = ({ showBadge, children }) => (
-  <div
-    className={classNames(
-      "mr-5 relative",
-      showBadge && [
-        "after:content-[' '] after:absolute after:right-[1px] after:top-0 after:h-2 after:w-2",
-        "after:bg-brand-redtwo after:rounded-full",
-      ],
-    )}
-  >
-    {children}
-  </div>
-);
-
 const LinkContent: FC<{
   link: SidebarLink;
   isActive: boolean;
@@ -161,7 +145,7 @@ const LinkContent: FC<{
 
   return (
     <>
-      <BadgeWrapper showBadge={link.badge}>
+      <BadgeWrapper showBadge={link.badge} className="mr-5">
         <Icon
           className={classNames(
             "w-7 h-7",

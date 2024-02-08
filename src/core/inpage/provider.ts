@@ -36,7 +36,7 @@ export class InpageProvider extends Emitter {
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
-  mmCompatible = MetaMaskCompatibleMode.Hybrid;
+  mmCompatible = MetaMaskCompatibleMode.Strict;
 
   /**
    * The chain ID of the currently connected Ethereum chain.
@@ -97,8 +97,7 @@ export class InpageProvider extends Emitter {
 
         this.mmCompatible = mmCompatible;
 
-        this.#handleNetworkChange(chainId);
-        this.#handleAccountChange(accountAddress || null);
+        this.#handleStateChange(chainId, accountAddress || null);
         this.emit(stateUpdatedType, undefined);
       }
     });
@@ -108,30 +107,35 @@ export class InpageProvider extends Emitter {
     });
   }
 
-  #handleNetworkChange(chainId: number) {
+  #handleStateChange(chainId: number, address: string | null) {
     const chainIdHex = toHex(chainId);
 
-    if (this.chainId === chainIdHex) return;
+    let connectEmitted = false;
 
-    if (this.chainId === null) {
-      this.#inited = true;
-      this.emit("connect", { chainId: chainIdHex });
+    if (this.chainId !== chainIdHex) {
+      if (this.chainId === null) {
+        this.#inited = true;
+        this.emit("connect", { chainId: chainIdHex });
+        connectEmitted = true;
+      }
+
+      // Chain id: "0x1"
+      this.chainId = chainIdHex;
+      this.emit("chainChanged", chainIdHex);
+      // Network version: "1"
+      const chainIdStr = chainId.toString();
+      this.networkVersion = chainIdStr;
+      this.emit("networkChanged", chainIdStr);
     }
 
-    // Chain id: "0x1"
-    this.chainId = chainIdHex;
-    this.emit("chainChanged", chainIdHex);
-    // Network version: "1"
-    const chainIdStr = chainId.toString();
-    this.networkVersion = chainIdStr;
-    this.emit("networkChanged", chainIdStr);
-  }
+    if (this.selectedAddress !== address) {
+      if (!connectEmitted && !this.selectedAddress && address && this.chainId) {
+        this.emit("connect", { chainId: this.chainId });
+      }
 
-  #handleAccountChange(address: string | null) {
-    if (this.selectedAddress === address) return;
-
-    this.selectedAddress = address;
-    this.emit("accountsChanged", address ? [address] : []);
+      this.selectedAddress = address;
+      this.emit("accountsChanged", address ? [address] : []);
+    }
   }
 
   async #performRequest(args: RequestArguments): Promise<unknown> {
@@ -156,6 +160,9 @@ export class InpageProvider extends Emitter {
     params = [],
   }: RequestArguments): Promise<unknown> {
     switch (method) {
+      case JsonRpcMethod.web3_clientVersion:
+        return `Wigwam/v${process.env.VERSION}`;
+
       case JsonRpcMethod.eth_chainId:
         return this.chainId!;
 

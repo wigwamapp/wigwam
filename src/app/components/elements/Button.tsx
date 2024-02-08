@@ -20,12 +20,13 @@ export type ButtonTheme =
   | "clean"
   | "primary-reverse";
 
-type ButtonProps = {
+export type ButtonProps = {
   theme?: ButtonTheme;
   disabled?: boolean;
   loading?: boolean;
   plainFocus?: boolean;
   children: ReactNode;
+  innerClassName?: string;
 } & (ButtonHTMLAttributes<HTMLButtonElement> | LinkProps);
 
 const loadingTransitionTimeout = 300;
@@ -37,6 +38,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
       className,
       loading: parentLoading = false,
       plainFocus,
+      innerClassName,
       ...rest
     },
     ref,
@@ -79,6 +81,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
                 "inline-flex items-center",
                 "transition transform duration-300",
                 loading && "opacity-0 -translate-y-[calc(100%+0.75rem)]",
+                innerClassName,
               )}
             >
               {children}
@@ -113,7 +116,7 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
             </CSSTransition>
           </>
         ),
-        [loading, children],
+        [loading, children, innerClassName],
       ),
     };
 
@@ -163,8 +166,10 @@ const Button = forwardRef<HTMLElement, ButtonProps>(
           "focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary",
           "active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
         ],
-      theme === "clean" &&
-        "font-medium hover:opacity-70 focus-visible:opacity-70",
+      theme === "clean" && [
+        "font-medium",
+        !disabled && "hover:opacity-70 focus-visible:opacity-70",
+      ],
       disabled && "opacity-40 cursor-default",
       loading && "pointer-events-none",
       "select-none",

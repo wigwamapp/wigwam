@@ -14,6 +14,12 @@ const useRamp = () => {
     [chainId, tokenSlug],
   );
 
+  const onRampTokensInChain = useMemo(() => {
+    return Object.values(onRampCurrencies).filter(
+      (item: any) => Number(item.chainId) === chainId,
+    );
+  }, [chainId, onRampCurrencies]);
+
   const onRampCurrency = useMemo(() => {
     if (chainTokenSlug && chainTokenSlug in onRampCurrencies) {
       return onRampCurrencies[chainTokenSlug];
@@ -26,9 +32,10 @@ const useRamp = () => {
     () => ({
       onRampCurrency,
       onRampCurrencies,
+      onRampTokensInChain,
       onRampSlug: chainTokenSlug,
     }),
-    [onRampCurrencies, onRampCurrency, chainTokenSlug],
+    [onRampCurrencies, onRampCurrency, chainTokenSlug, onRampTokensInChain],
   );
 };
 

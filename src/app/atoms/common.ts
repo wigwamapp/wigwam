@@ -7,7 +7,7 @@ import {
 } from "lib/atom-utils";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
-import * as Repo from "core/repo";
+import * as repo from "core/repo";
 import { getAccounts, onAccountsUpdated } from "core/client";
 import {
   CHAIN_ID,
@@ -51,7 +51,7 @@ export const selectedCurrencyAtom = atomWithStorage(
 
 export const getNetworkAtom = atomFamily((chainId: number) =>
   atomWithRepoQuery((query) => {
-    return query(() => Repo.networks.get(chainId));
+    return query(() => repo.networks.get(chainId));
   }),
 );
 
@@ -63,7 +63,7 @@ export const allNetworksAtom = atomWithRepoQuery((query, get) =>
   query(async () => {
     const testnetsEnabled = await get(testNetworksAtom);
 
-    return Repo.networks
+    return repo.networks
       .where("type")
       .anyOf(["mainnet", "unknown", ...(testnetsEnabled ? ["testnet"] : [])])
       .toArray();
@@ -71,8 +71,8 @@ export const allNetworksAtom = atomWithRepoQuery((query, get) =>
 );
 
 export const getContactsAtom = atomFamily(
-  (params: Repo.QueryContactsParams) =>
-    atomWithRepoQuery((query) => query(() => Repo.queryContacts(params))),
+  (params: repo.QueryContactsParams) =>
+    atomWithRepoQuery((query) => query(() => repo.queryContacts(params))),
   dequal,
 );
 

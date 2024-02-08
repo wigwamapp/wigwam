@@ -11,7 +11,7 @@ import BaseProvider from "./BaseProvider";
 import Unlock from "./screens/Unlock";
 import Popup from "./screens/Popup";
 import Dialog from "./blocks/Dialog";
-import ActivityModal from "./blocks/ActivityModal";
+import ActivityModal from "./blocks/activity/ActivityModal";
 
 const PopupApp: FC = () => (
   <BaseProvider>

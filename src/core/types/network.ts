@@ -21,6 +21,7 @@ export interface Network {
   };
   infoUrl?: string;
   position?: number;
+  balanceUSD?: string;
 }
 
 export type NetworkType = "mainnet" | "testnet" | "unknown";

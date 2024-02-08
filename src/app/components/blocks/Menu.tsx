@@ -1,39 +1,48 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { useIsSyncing } from "app/hooks";
-import { Page, SettingTab } from "app/nav";
-import Button from "app/components/elements/Button";
-import NetworkSelect from "app/components/elements/NetworkSelect";
-import LockProfileButton from "app/components/elements/LockProfileButton";
-import { ReactComponent as ControlIcon } from "app/icons/control.svg";
+import { getTotalAccountBalanceAtom } from "app/atoms";
+import { useAccounts, useIsSyncing } from "app/hooks";
+import FiatAmount from "app/components/elements/FiatAmount";
+import ProfileButton from "app/components/elements/ProfileButton";
 
 const Menu: FC = () => {
   const isSyncing = useIsSyncing();
 
   return (
-    <div className="flex items-center py-4 border-b border-brand-main/[.07]">
-      <NetworkSelect className="w-[17.75rem]" contentClassName="w-[17.75rem]" />
+    <div className="flex items-center py-2 border-b border-brand-main/[.07]">
+      <Suspense>
+        <TotalBalance />
+      </Suspense>
 
       {isSyncing && (
-        <span className="px-4 text-sm text-white font-semibold">
-          Syncing...
+        <span className="pl-6 pr-4 text-sm text-white font-semibold inline-flex items-center justify-center">
+          <div className="atom-spinner w-8 h-8" />
         </span>
       )}
 
-      <div className="ml-auto flex items-center">
-        <Button
-          to={{ page: Page.Settings, setting: SettingTab.General }}
-          theme="tertiary"
-          className="!min-w-0 w-[8.5rem]"
-        >
-          <ControlIcon className="w-6 h-auto -ml-0.5 mr-2" />
-          Control
-        </Button>
-        <span className="mx-6 h-7 w-0.5 bg-brand-main/[.05]" />
-        <LockProfileButton />
-      </div>
+      <ProfileButton className="ml-auto" />
     </div>
   );
 };
 
 export default Menu;
+
+const TotalBalance: FC = () => {
+  const { currentAccount } = useAccounts();
+  const totalBalance = useLazyAtomValue(
+    getTotalAccountBalanceAtom(currentAccount.address),
+  );
+
+  return (
+    <>
+      {totalBalance ? (
+        <FiatAmount
+          amount={totalBalance}
+          copiable
+          className="text-[1.75rem] tracking-wider font-bold leading-none"
+        />
+      ) : null}
+    </>
+  );
+};

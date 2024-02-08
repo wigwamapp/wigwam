@@ -30,8 +30,9 @@ type AccountTokenFields = {
   rawBalance: string;
   balanceUSD: number;
   portfolioUSD?: string;
-  manuallyStatusChanged?: boolean;
+  portfolioRefreshedAt?: number;
   syncedByChainAt?: number;
+  manuallyStatusChanged?: boolean;
 };
 
 export interface TokenBase {

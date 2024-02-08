@@ -172,7 +172,9 @@ function getNextStatus(
   rawBalanceBN: BigNumber.Value,
   metadata: Partial<AccountNFT>,
 ): TokenStatus {
-  if (!existing) {
+  if (!existing?.manuallyStatusChanged && !isNFTValid(metadata)) {
+    return TokenStatus.Disabled;
+  } else if (!existing) {
     // The new token, just add it
     return TokenStatus.Enabled;
   } else if (
@@ -188,8 +190,6 @@ function getNextStatus(
   ) {
     // Balance changed from zero to positive
     return TokenStatus.Enabled;
-  } else if (!existing.manuallyStatusChanged && !isNFTValid(metadata)) {
-    return TokenStatus.Disabled;
   } else {
     // Existing token, rest cases
     return existing.status;

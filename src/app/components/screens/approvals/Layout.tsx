@@ -1,7 +1,6 @@
 import { FC, PropsWithChildren, ReactNode } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-
 import { approvalStatusAtom } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import Button from "app/components/elements/Button";
@@ -52,7 +51,14 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
             <Button
               theme="secondary"
               className="w-full"
-              onClick={() => onApprove?.(false)}
+              onClick={() => {
+                // const urlSearchParams = new URLSearchParams(window.location.hash.slice(1));
+                // const lastActiveTab = urlSearchParams.get('lastActiveTab');
+                // if (lastActiveTab) {
+                //   chrome.tabs.update(Number(lastActiveTab), { active: true })
+                // }
+                onApprove?.(false);
+              }}
             >
               {declineText}
             </Button>
@@ -61,7 +67,14 @@ const ApprovalLayout: FC<ApprovalLayoutProps> = ({
               className="w-full"
               disabled={disabled}
               loading={approving}
-              onClick={() => onApprove?.(true)}
+              onClick={() => {
+                // const urlSearchParams = new URLSearchParams(window.location.hash.slice(1));
+                // const lastActiveTab = urlSearchParams.get('lastActiveTab');
+                // if (lastActiveTab) {
+                //   chrome.tabs.update(Number(lastActiveTab), { active: true })
+                // }
+                onApprove?.(true);
+              }}
             >
               {approveText}
             </Button>

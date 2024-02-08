@@ -73,8 +73,8 @@ const Networks: FC = () => {
         <ScrollAreaContainer
           ref={scrollAreaRef}
           className={classNames("pr-5 -mr-5 mt-5")}
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-5"
         >
           <NetworkBtn
             name="Add new network"

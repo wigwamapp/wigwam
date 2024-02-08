@@ -12,6 +12,7 @@ import {
   getPendingActivitiesAtom,
   getTokenActivityAtom,
 } from "app/atoms";
+import SwapIcon from "app/icons/swap.svg";
 
 import { useChainId } from "./chainId";
 import { useAccounts } from "./account";
@@ -74,6 +75,17 @@ export function useTokenActivity(
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
 
+  // TODO: identify swaps created in our app by tx hashes or metadata
+  const filteredActivity = activity.map((item) => {
+    if (item.project && item.project.name === "LI.FI") {
+      item.project = {
+        name: "Swap",
+        logoUrl: SwapIcon,
+      };
+    }
+    return item;
+  });
+
   const hasMore = offsetRef.current <= activity.length;
 
   const loadMore = useCallback(() => {
@@ -84,7 +96,7 @@ export function useTokenActivity(
   }, [forceUpdate, hasMore, limit]);
 
   return {
-    activity,
+    activity: filteredActivity,
     hasMore,
     loadMore,
   };
@@ -149,4 +161,21 @@ export function useActivityBadge() {
     () => totalApprovals > 0 || totalPendingActivities > 0,
     [totalApprovals, totalPendingActivities],
   );
+}
+
+export function useSwapBadge(address?: string) {
+  try {
+    return Object.values(
+      JSON.parse(localStorage["li.fi-widget-routes"]).state.routes,
+    )
+      .filter(
+        (item: any) =>
+          item.route.fromAddress.toLowerCase() === address?.toLocaleLowerCase(),
+      )
+
+      .map((item: any) => item.status)
+      .includes(1);
+  } catch (e) {
+    return false;
+  }
 }

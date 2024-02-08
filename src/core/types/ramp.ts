@@ -101,8 +101,12 @@ export enum TransakEvents {
 
 export type RampTokenInfo = {
   id: string;
+  name: string;
+  slug: string;
   image: string;
   symbol: string;
   network: string;
   chainId: string;
+  priceUsd?: number;
+  priceUsdChange?: number;
 };

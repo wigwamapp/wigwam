@@ -7,10 +7,10 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import classNames from "clsx";
-import { useAtom } from "jotai";
-import { RESET } from "jotai/utils";
+import { useAtom, useAtomValue } from "jotai";
 import Masonry from "lib/react-masonry/Masonry";
 
 import { AccountAsset, TokenType, AccountToken, AccountNFT } from "core/types";
@@ -21,19 +21,13 @@ import {
   LOAD_MORE_ON_TOKEN_FROM_END,
 } from "app/defaults";
 import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
-import { TippySingletonProvider, useAccountToken } from "app/hooks";
+import { useAccountToken } from "app/hooks";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import { useTokenList } from "app/hooks/tokenList";
 
-import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
-
-import AssetsSwitcher from "../elements/AssetsSwitcher";
-import IconedButton from "../elements/IconedButton";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import SearchInput from "../elements/SearchInput";
-import ControlIcon from "../elements/ControlIcon";
+import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
 import NullState from "../blocks/tokenList/NullState";
-import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
 
@@ -42,7 +36,7 @@ import AssetInfo from "./overview/AssetInfo";
 import NftInfo from "./overview/NftInfo";
 
 const OverviewContent: FC = () => (
-  <div className="flex min-h-0 grow relative overflow-hidden">
+  <div className="flex min-h-0 grow relative">
     <ToastOverflowProvider>
       <TokenExplorer />
     </ToastOverflowProvider>
@@ -52,45 +46,18 @@ const OverviewContent: FC = () => (
 export default OverviewContent;
 
 const TokenExplorer: FC = () => {
-  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
-  const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
-
-  const tokenTypeChangedHereRef = useRef<boolean>(true);
-
-  const toggleNftSwitcher = useCallback(
-    (value: boolean) => {
-      tokenTypeChangedHereRef.current = true;
-
-      setTokenSlug([RESET, "replace"]);
-      setTokenType(value ? TokenType.NFT : TokenType.Asset);
-    },
-    [setTokenType, setTokenSlug],
-  );
-
-  useEffect(() => {
-    if (tokenTypeChangedHereRef.current) {
-      tokenTypeChangedHereRef.current = false;
-      return;
-    }
-
-    setTokenSlug([RESET, "replace"]);
-  }, [tokenType, setTokenSlug]);
+  const tokenType = useAtomValue(tokenTypeAtom);
+  const tokenSlug = useAtomValue(tokenSlugAtom);
 
   return (
     <>
       <div
         className={classNames(
-          "w-[23.25rem] min-w-[23.25rem] pr-6 mt-6",
+          "w-[26rem] min-w-[26rem] pr-6 mt-6",
           "border-r border-brand-main/[.07]",
           "flex flex-col",
         )}
       >
-        <AssetsSwitcher
-          checked={tokenType === TokenType.NFT}
-          onCheckedChange={toggleNftSwitcher}
-          className="mx-auto mb-3"
-        />
-
         <TokenList key={tokenType} tokenType={tokenType} />
       </div>
 
@@ -117,24 +84,33 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
   const {
     isNftsSelected,
     searchValue,
-    setSearchValue,
-    tokenIdSearchValue,
-    setTokenIdSearchValue,
-    tokenIdSearchDisplayed,
     manageModeEnabled,
-    setManageModeEnabled,
-    tokens,
+    tokens: tokensPure,
     syncing,
     searching,
     focusSearchInput,
-    searchInputRef,
-    tokenIdSearchInputRef,
     loadMoreTriggerRef,
+
+    setManageModeEnabled,
+    searchInputRef,
+    setSearchValue,
+    tokenIdSearchValue,
+    setTokenIdSearchValue,
+    tokenIdSearchInputRef,
+    tokenIdSearchDisplayed,
+    searchValueIsAddress,
   } = useTokenList(tokenType, {
     onAccountTokensReset: handleAccountTokensReset,
   });
 
   const selectedToken = useAccountToken(tokenSlug ?? NATIVE_TOKEN_SLUG);
+
+  const [mode, setMode] = useState<ManageMode>(null);
+
+  const tokens = useMemo(
+    () => (mode === "add" && !searchValueIsAddress ? [] : tokensPure),
+    [mode, searchValueIsAddress, tokensPure],
+  );
 
   // A little hack to avoid using `manageModeEnabled` dependency
   const manageModeEnabledRef = useRef<boolean>();
@@ -176,14 +152,6 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     [manageModeEnabled, setTokenSlug],
   );
 
-  const toggleManageMode = useCallback(() => {
-    if (!manageModeEnabled) {
-      setTokenSlug([RESET, "replace"]);
-    }
-
-    setManageModeEnabled((mode) => !mode);
-  }, [manageModeEnabled, setManageModeEnabled, setTokenSlug]);
-
   const renderNFTCard = useCallback(
     (nft: AccountNFT, i: number) => (
       <NftCard
@@ -208,63 +176,6 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
     ],
   );
 
-  /**
-   * Contol bar
-   */
-  const controlBar = useMemo(
-    () => (
-      <div className="flex items-center">
-        <TippySingletonProvider>
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
-          />
-
-          {tokenIdSearchDisplayed && (
-            <SearchInput
-              ref={tokenIdSearchInputRef}
-              searchValue={tokenIdSearchValue}
-              toggleSearchValue={setTokenIdSearchValue}
-              StartAdornment={HashTagIcon}
-              className="ml-2 max-w-[8rem]"
-              placeholder="Token ID..."
-            />
-          )}
-
-          <IconedButton
-            Icon={ControlIcon}
-            iconProps={{
-              isActive: manageModeEnabled,
-            }}
-            theme="tertiary"
-            className={classNames(
-              "ml-2",
-              manageModeEnabled && "bg-brand-main/30",
-            )}
-            aria-label={
-              manageModeEnabled
-                ? "Finish managing assets list"
-                : "Manage assets list"
-            }
-            onClick={toggleManageMode}
-          />
-        </TippySingletonProvider>
-      </div>
-    ),
-    [
-      searchValue,
-      setSearchValue,
-      tokenIdSearchValue,
-      setTokenIdSearchValue,
-      tokenIdSearchDisplayed,
-      manageModeEnabled,
-      toggleManageMode,
-      searchInputRef,
-      tokenIdSearchInputRef,
-    ],
-  );
-
   let tokensBar: ReactNode = null;
 
   if (tokens.length === 0) {
@@ -284,13 +195,6 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
         viewPortClassName="rounded-t-[.625rem] viewportBlock"
         scrollBarClassName="py-0"
       >
-        <AddTokenBanner
-          isNftsSelected={isNftsSelected}
-          manageModeEnabled={manageModeEnabled}
-          tokens={tokens}
-          focusSearchInput={focusSearchInput}
-        />
-
         {!isNftsSelected ? (
           <>
             {tokens.map((asset, i) => (
@@ -318,7 +222,19 @@ const TokenList = memo<{ tokenType: TokenType }>(({ tokenType }) => {
 
   return (
     <>
-      {controlBar}
+      <AssetsManagement
+        manageModeEnabled={manageModeEnabled}
+        setManageModeEnabled={setManageModeEnabled}
+        searchInputRef={searchInputRef}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        tokenIdSearchValue={tokenIdSearchValue}
+        setTokenIdSearchValue={setTokenIdSearchValue}
+        tokenIdSearchInputRef={tokenIdSearchInputRef}
+        tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+        mode={mode}
+        onModeChange={setMode}
+      />
       {tokensBar}
     </>
   );

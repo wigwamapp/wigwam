@@ -165,6 +165,9 @@
     "webpackbar": "6.0.0",
     "zip-webpack-plugin": "4.0.1"
   },
+  "workspaces": [
+    "packages/lifi-widget"
+  ],
   "resolutions": {
     "flux": "./.vendor/flux",
     "axios": ">=1.6.4"

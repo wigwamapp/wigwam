@@ -2,12 +2,11 @@ import { FC, useMemo } from "react";
 import { useAtomValue } from "jotai";
 
 import { Network } from "core/types";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { receiveTabAtom } from "app/atoms";
 import { useLazyNetwork } from "app/hooks";
 import { ReceiveTab as ReceiveTabEnum } from "app/nav";
-import WalletsList from "app/components/blocks/WalletsList";
+import NetworksList from "app/components/blocks/NetworksList";
 import SecondaryTabs from "app/components/blocks/SecondaryTabs";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as AddressIcon } from "app/icons/receive-address.svg";
@@ -38,7 +37,7 @@ const Receive: FC = () => {
 
   return (
     <>
-      <WalletsList />
+      <NetworksList />
 
       <div className="flex min-h-0 grow">
         <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
@@ -46,8 +45,8 @@ const Receive: FC = () => {
         activeRoute?.receive === ReceiveTabEnum.Faucet ? (
           <ScrollAreaContainer
             className="box-content w-full px-6"
-            viewPortClassName="pb-20 pt-5"
-            scrollBarClassName="py-0 pt-5 pb-20"
+            viewPortClassName="pb-5 pt-5"
+            scrollBarClassName="py-0 pt-5 pb-5"
           >
             <div>
               <ReceiveTab tabs={tabs} />
@@ -82,8 +81,9 @@ const getTabsContent = (network?: Network) => [
         {
           route: {
             page: "receive",
-            onRampOpened: true,
-            token: NATIVE_TOKEN_SLUG,
+            // onRampOpened: true,
+            receive: ReceiveTabEnum.BuyWithFiat,
+            // token: NATIVE_TOKEN_SLUG,
           },
           title: "Buy with Fiat",
           Icon: FiatIcon,
