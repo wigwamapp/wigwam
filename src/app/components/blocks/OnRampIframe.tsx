@@ -22,6 +22,7 @@ import { useAccounts, useChainId, useRamp } from "app/hooks";
 type RampOrder = { [key: string]: any };
 
 const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
+const SUSPENDED = true;
 
 const saveRampActivity = (rampOrder: RampOrder) => {
   const newRampActivity: RampActivity = {
@@ -75,19 +76,27 @@ const OnRampIframe: FC = () => {
   );
 
   useEffect(() => {
-    if (!API_KEY) {
+    if (!API_KEY || SUSPENDED) {
       setOnRampModalOpened([false]);
       alert({
-        title: "Error",
-        content: <p>Transak API Key is not provided!</p>,
+        title: SUSPENDED ? "Buy Crypto Easily" : "Error",
+        content: SUSPENDED ? (
+          <p>
+            Soon, you&apos;ll be able to buy cryptocurrencies directly in your
+            wallet using cards, Apple Pay, Google Pay, or bank transfers.
+            Designed for ease and secured for peace of mind. Stay tuned for this
+            convenient update!
+          </p>
+        ) : (
+          <p>Transak API Key is not provided!</p>
+        ),
       });
-      console.error("[Error]: Transak API Key is not provided!");
     }
   }, [alert, setOnRampModalOpened]);
 
   const config: TransakConfig | null = useMemo(
     () =>
-      API_KEY
+      API_KEY && !SUSPENDED
         ? {
             apiKey: API_KEY,
             environment:
