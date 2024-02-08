@@ -76,6 +76,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
           onClick={() => setModalOpened(true)}
           className={classNames(
             "flex items-center gap-3",
+            "max-w-full",
             size === "large" ? "py-2 pr-2 pl-4" : "py-1 pl-2 pr-1",
             size === "large" ? "rounded-xl" : "rounded-md",
             "transition-colors",
@@ -87,7 +88,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
           <WalletName
             wallet={currentAccount}
             className={classNames(
-              "mb-0.5 font-bold",
+              "mb-0.5 font-bold truncate min-w-0",
               size === "large" ? "text-base" : "text-sm",
             )}
           />

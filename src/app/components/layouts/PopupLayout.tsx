@@ -79,9 +79,13 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                   "bg-gradient-to-b from-[#82B153] to-[#549BB2]",
                 )}
               >
-                <div className="mb-2 flex items-center justify-between">
+                <div className="mb-2 flex items-center justify-between gap-3">
                   <InteractionWithDapp />
-                  <ProfileButton size="small" hideAddress className="-mr-1" />
+                  <ProfileButton
+                    size="small"
+                    hideAddress
+                    className="-mr-1 max-w-[50%]"
+                  />
                 </div>
                 <WalletInfo />
               </div>
@@ -227,6 +231,7 @@ const AddressButton: FC<{ address: string }> = ({ address }) => {
     <Tooltip
       content={copied ? "Copied" : "Copy Wallet Address"}
       placement="top"
+      asChild
     >
       <button
         type="button"

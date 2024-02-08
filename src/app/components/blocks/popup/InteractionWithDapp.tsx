@@ -143,6 +143,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         <div
           className={classNames(
             "flex items-center cursor-pointer group",
+            "max-w-[50%]",
             className,
           )}
         >
@@ -160,7 +161,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             )}
           >
             {urlDisplayed && tabOrigin ? (
-              <span className="flex items-center gap-1.5 text-xs text-white truncate leading-4">
+              <span className="flex items-center gap-1.5 text-xs text-white leading-4  max-w-full">
                 <div className="relative">
                   {accountConnected ? (
                     <Avatar
@@ -174,7 +175,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                   ) : (
                     <ConnectIcon className="w-5 h-5" />
                   )}
-                  {/* <CircleIcon className="w-5 h-5" /> */}
+
                   <div
                     className={classNames(
                       "absolute top-0 -right-1 border",
@@ -185,7 +186,9 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                     )}
                   />
                 </div>
-                {new URL(tabOrigin).host}
+                <span className="truncate min-w-0">
+                  {new URL(tabOrigin).host}
+                </span>
               </span>
             ) : (
               <ConnectIcon />
