@@ -73,18 +73,18 @@ export const TransactionActiveItem: React.FC<{
     };
 
 
-    useEffect(() => {
-      console.log(status)
-      if (status !== RouteExecutionStatus.Done) {
-        const currentTime: Date = new Date();
-        const timeDifference: number = currentTime.getTime() - startedAt.getTime();
-        const hoursDifference: number = timeDifference / (1000 * 60 * 60);
-        const isMoreThan2Hour: boolean = hoursDifference > 2;
-        if (isMoreThan2Hour) {
-          deleteRoute()
-        }
-      }
-    }, [])
+    // useEffect(() => {
+    //   console.log(status)
+    //   if (status !== RouteExecutionStatus.Done) {
+    //     const currentTime: Date = new Date();
+    //     const timeDifference: number = currentTime.getTime() - startedAt.getTime();
+    //     const hoursDifference: number = timeDifference / (1000 * 60 * 60);
+    //     const isMoreThan2Hour: boolean = hoursDifference > 2;
+    //     if (isMoreThan2Hour) {
+    //       deleteRoute()
+    //     }
+    //   }
+    // }, [])
 
     return (
       <Card 

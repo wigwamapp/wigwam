@@ -44,7 +44,9 @@ import { openInTabExternal } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import { ReactComponent as BridgeIcon } from "app/icons/bridge.svg";
 import { ReactComponent as SwapIconSmall } from "app/icons/swap.svg";
+import { ReactComponent as ApproveIcon } from "app/icons/approve.svg";
 import { ReactComponent as ChatIcon } from "app/icons/communication.svg";
 import {
   ReactComponent as LinkIcon,
@@ -54,7 +56,7 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as ActivityConnectionIcon } from "app/icons/activity-connection.svg";
 import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signing.svg";
-import { ReactComponent as ActivityTransactionIcon } from "app/icons/activity-transaction.svg";
+import { ReactComponent as ActivityTransactionIcon } from "app/icons/transaction.svg";
 import { ReactComponent as ActivityOnRampIcon } from "app/icons/activity-onramp.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
@@ -436,7 +438,11 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
       item.source.kind === SelfActivityKind.Swap &&
       item.txAction?.type !== "TOKEN_APPROVE"
     ) {
-      return "Swap";
+      if (item.chainId === item.source?.swapMeta?.toChainId) {
+        return "Swap";
+      } else {
+        return "Bridge";
+      }
     }
 
     if (
@@ -462,6 +468,7 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
   const Icon = getActivityIcon(
     item.type,
     item.source.type === "self" ? item.source.kind : null,
+    item,
   );
   return (
     <div
@@ -514,7 +521,11 @@ const ActivityTypeStatus: FC<ActivityTypeStatusProps> = ({
   );
 };
 
-const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
+const getActivityIcon = (
+  type: ActivityType,
+  kind: SelfActivityKind | null,
+  item: any,
+) => {
   switch (type) {
     case ActivityType.Connection:
       return ActivityConnectionIcon;
@@ -524,7 +535,14 @@ const getActivityIcon = (type: ActivityType, kind: SelfActivityKind | null) => {
       return ActivityOnRampIcon;
     default:
       if (kind && kind === SelfActivityKind.Swap) {
-        return SwapIconSmall;
+        if (item.txAction.type === "TOKEN_APPROVE") {
+          return ApproveIcon;
+        }
+        if (item.chainId === item.source?.swapMeta?.toChainId) {
+          return SwapIconSmall;
+        } else {
+          return BridgeIcon;
+        }
       } else {
         return ActivityTransactionIcon;
       }

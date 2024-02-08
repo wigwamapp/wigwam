@@ -20,7 +20,6 @@ import { RouteExecutionStatus, useTransactionHistory } from '../../stores/routes
 import { TransactionHistoryEmpty } from './TransactionHistoryEmpty';
 import { TransactionHistoryItem } from './TransactionHistoryItem';
 import { TransactionActiveItem } from './TransactionActiveItem';
-import backIcon from '../../../../src/app/icons/back.svg';
 
 export const TransactionHistoryPage: React.FC = () => {
   const { t } = useTranslation();
@@ -35,11 +34,6 @@ export const TransactionHistoryPage: React.FC = () => {
   const toggleDialog = useCallback(() => {
     setOpen((open) => !open);
   }, []);
-
-  useEffect(() => {
-    console.log('executingRoutes')
-    console.log(executingRoutes)
-  }, [executingRoutes])
 
   useEffect(() => {
     if (transactions.length) {
