@@ -9,7 +9,6 @@ import {
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
   onRampModalAtom,
-  onRampSelectedCurrencyAtom,
   selectedCurrencyAtom,
   tokenSlugAtom,
 } from "app/atoms";
@@ -18,9 +17,11 @@ import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.sv
 import { nanoid } from "nanoid";
 import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
-import { useAccounts, useChainId } from "app/hooks";
+import { useAccounts, useChainId, useRamp } from "app/hooks";
 
 type RampOrder = { [key: string]: any };
+
+const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
 
 const saveRampActivity = (rampOrder: RampOrder) => {
   const newRampActivity: RampActivity = {
@@ -58,10 +59,10 @@ const saveRampActivity = (rampOrder: RampOrder) => {
 const OnRampIframe: FC = () => {
   const chainId = useChainId();
   const { alert } = useDialog();
+  const { onRampCurrency } = useRamp();
   const eventEmitter = useMemo(() => new Emitter(), []);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
   const setOnRampModalOpened = useSetAtom(onRampModalAtom);
-  const [onRampSelectedCurrency] = useAtom(onRampSelectedCurrencyAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);
 
   const {
@@ -73,39 +74,48 @@ const OnRampIframe: FC = () => {
     [selectedCurrency],
   );
 
-  if (!process.env.WIGWAM_ON_RAMP_API_KEY) {
-    setOnRampModalOpened([false]);
-    alert({
-      title: "Error",
-      content: <p>Transak API Key is not provided!</p>,
-    });
-    console.error("[Error]: Transak API Key is not provided!");
-  }
+  useEffect(() => {
+    if (!API_KEY) {
+      setOnRampModalOpened([false]);
+      alert({
+        title: "Error",
+        content: <p>Transak API Key is not provided!</p>,
+      });
+      console.error("[Error]: Transak API Key is not provided!");
+    }
+  }, [alert, setOnRampModalOpened]);
 
-  const config: TransakConfig = useMemo(() => {
-    return {
-      apiKey: process.env.WIGWAM_ON_RAMP_API_KEY!,
-      environment:
-        process.env.RELEASE_ENV !== "true"
-          ? Environments.STAGING
-          : Environments.PRODUCTION,
-      defaultFiatCurrency: !isCurrentUserCcyCrypto ? selectedCurrency : "USD",
-      network: onRampSelectedCurrency?.network,
-      productsAvailed: "BUY",
-      cryptoCurrencyCode: onRampSelectedCurrency?.symbol,
-      walletAddress: address,
-      disableWalletAddressForm: true,
-      themeColor: "#0D1311",
-      exchangeScreenTitle: `Securely buy ${onRampSelectedCurrency?.symbol} with Wigwam`,
-    };
-  }, [
-    address,
-    isCurrentUserCcyCrypto,
-    onRampSelectedCurrency,
-    selectedCurrency,
-  ]);
+  const config: TransakConfig | null = useMemo(
+    () =>
+      API_KEY
+        ? {
+            apiKey: API_KEY,
+            environment:
+              process.env.RELEASE_ENV !== "true"
+                ? Environments.STAGING
+                : Environments.PRODUCTION,
+            defaultFiatCurrency: !isCurrentUserCcyCrypto
+              ? selectedCurrency
+              : "USD",
+            network: onRampCurrency?.network,
+            productsAvailed: "BUY",
+            cryptoCurrencyCode: onRampCurrency?.symbol,
+            walletAddress: address,
+            disableWalletAddressForm: true,
+            themeColor: "#0D1311",
+            exchangeScreenTitle: `Securely buy ${onRampCurrency?.symbol} with Wigwam`,
+          }
+        : null,
+    [
+      address,
+      isCurrentUserCcyCrypto,
+      onRampCurrency?.network,
+      onRampCurrency?.symbol,
+      selectedCurrency,
+    ],
+  );
 
-  const iframeUrl = useMemo(() => generateURL(config), [config]);
+  const iframeUrl = useMemo(() => config && generateURL(config), [config]);
 
   const handleSuccessOrder = useCallback(
     (payload: { [key: string]: any }) => {
@@ -164,13 +174,15 @@ const OnRampIframe: FC = () => {
       className="-ml-12 mr-12 h-full flex justify-center rounded-md"
       id="transakPanel"
     >
-      <iframe
-        id="transakIframe"
-        title="transak"
-        src={iframeUrl}
-        allow="camera;microphone;payment"
-        className="h-full w-[420px] border-none rounded-md"
-      />
+      {iframeUrl && (
+        <iframe
+          id="transakIframe"
+          title="transak"
+          src={iframeUrl}
+          allow="camera;microphone;payment"
+          className="h-full w-[420px] border-none rounded-md"
+        />
+      )}
     </div>
   );
 };

@@ -4,16 +4,6 @@ import { useMemo } from "react";
 
 import { useChainId } from "./chainId";
 
-export type RampCurrency = {
-  chainId: string;
-  id: string;
-  image: string;
-  network: string;
-  symbol: string;
-  name: string;
-  address: string;
-};
-
 const useRamp = () => {
   const onRampCurrencies = useAtomValue(onRampCurrenciesAtom);
   const tokenSlug = useAtomValue(tokenSlugAtom);

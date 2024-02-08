@@ -5,4 +5,3 @@ export * from "./account";
 export * from "./total";
 export * from "./find";
 export * from "./detailsUrl";
-export * from "./transakTokenPrice";

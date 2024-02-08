@@ -27,8 +27,7 @@ export type Request =
   | GetGasPricesRequest
   | GetSyncStatusRequest
   | GetOnRampCurrenciesRequest
-  | GetTokenDetailsUrlRequest
-  | GetTransakTokenPriceRequest;
+  | GetTokenDetailsUrlRequest;
 
 export type Response =
   | GetWalletStateResponse
@@ -50,8 +49,7 @@ export type Response =
   | GetApprovalsResponse
   | ApproveResponse
   | GetOnRampCurrenciesResponse
-  | GetTokenDetailsUrlResponse
-  | GetTransakTokenPriceResponse;
+  | GetTokenDetailsUrlResponse;
 
 export type EventMessage =
   | WalletStateUpdated
@@ -92,7 +90,6 @@ export enum MessageType {
   RejectAllApprovals = "REJECT_ALL_APPROVALS",
   GetOnRampCurrencies = "GET_ONRAMP_CURRENCIES",
   GetTokenDetailsUrl = "GET_TOKEN_DETAILS_URL",
-  GetTransakTokenPrice = "GET_TRANSAK_TOKEN_PRICE",
 }
 
 export interface MessageBase {
@@ -343,15 +340,4 @@ export interface GetTokenDetailsUrlRequest extends MessageBase {
 export interface GetTokenDetailsUrlResponse extends MessageBase {
   type: MessageType.GetTokenDetailsUrl;
   detailsUrl: string | null;
-}
-
-export interface GetTransakTokenPriceRequest extends MessageBase {
-  type: MessageType.GetTransakTokenPrice;
-  tokenAddresses: string[];
-  chainId: number;
-}
-
-export interface GetTransakTokenPriceResponse extends MessageBase {
-  type: MessageType.GetTransakTokenPrice;
-  prices: any;
 }

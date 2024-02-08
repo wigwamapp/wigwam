@@ -1,36 +1,26 @@
 import { FC } from "react";
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import BigNumber from "bignumber.js";
 import classNames from "clsx";
 
-import { useLazyAtomValue } from "lib/atom-utils";
-import { useRamp, RampCurrency } from "app/hooks";
-import { onRampModalAtom, onRampSelectedCurrencyAtom } from "app/atoms";
+import type { RampTokenInfo } from "core/types";
+import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common";
+
+import { useRamp } from "app/hooks";
+import { onRampModalAtom, tokenSlugAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import { getTransakTokenPriceAtom } from "app/atoms";
 import PriceArrow from "app/components/elements/PriceArrow";
-import { useChainId } from "app/hooks";
 
 const BuyWithFiat: FC = () => {
   const { onRampTokensInChain } = useRamp();
-  const [, setOnRampModalOpened] = useAtom(onRampModalAtom);
-  const [, setOnRampSelectedCurrency] = useAtom(onRampSelectedCurrencyAtom);
-  const chainId = useChainId();
+  const setOnRampModalOpened = useSetAtom(onRampModalAtom);
+  const setTokenSlug = useSetAtom(tokenSlugAtom);
 
-  const handleOpenRampModal = (currency: RampCurrency) => {
-    setOnRampSelectedCurrency([currency]);
+  const handleOpenRampModal = (currency: RampTokenInfo) => {
+    setTokenSlug([currency.slug]);
     setOnRampModalOpened([true]);
   };
-
-  const response = useLazyAtomValue(
-    getTransakTokenPriceAtom({
-      tokenAddresses: onRampTokensInChain
-        .map((item) => item.address)
-        .filter((item) => item),
-      chainId: Number(chainId),
-    }),
-  );
 
   function formatNumber(value: any) {
     if (value) {
@@ -44,21 +34,16 @@ const BuyWithFiat: FC = () => {
     }
   }
 
-  const getTokenPrice = (address: string) => {
+  const getTokenPrice = (token: RampTokenInfo) => {
     return {
-      price: formatNumber(response?.prices[address]?.usd),
-      priceUSDChange: response?.prices[address]?.usd_24h_change,
+      price: formatNumber(token?.priceUsd),
+      priceUSDChange: token?.priceUsdChange ?? 0,
     };
   };
 
-  const getNativeTokenPrice = () => {
-    return {
-      price: formatNumber(response?.prices.nativeToken?.usd),
-      priceUSDChange: response?.prices.nativeToken?.usd_24h_change,
-    };
-  };
-
-  const nativeToken = onRampTokensInChain.find((item) => !item.address);
+  const nativeToken = onRampTokensInChain.find(
+    (item) => item.slug === NATIVE_TOKEN_SLUG,
+  );
 
   return (
     <ScrollAreaContainer
@@ -88,18 +73,18 @@ const BuyWithFiat: FC = () => {
               </div>
               <div className="flex items-center justify-center">
                 <div className="mr-1 text-left text-sm transition-colors text-brand-inactivedark whitespace-nowrap">
-                  {getNativeTokenPrice()?.price} $
+                  {getTokenPrice(nativeToken)?.price} $
                 </div>
-                {getNativeTokenPrice()?.priceUSDChange &&
-                  +getNativeTokenPrice()?.priceUSDChange !== 0 && (
+                {getTokenPrice(nativeToken)?.priceUSDChange &&
+                  +getTokenPrice(nativeToken)?.priceUSDChange !== 0 && (
                     <span
                       className={classNames(
                         "inline-flex items-center",
                         "group-hover:opacity-100",
                         "transition",
                         "ml-2",
-                        getNativeTokenPrice()?.priceUSDChange &&
-                          +getNativeTokenPrice()?.priceUSDChange > 0
+                        getTokenPrice(nativeToken)?.priceUSDChange &&
+                          +getTokenPrice(nativeToken)?.priceUSDChange > 0
                           ? "text-[#6BB77A]"
                           : "text-[#EA556A]",
                       )}
@@ -107,13 +92,15 @@ const BuyWithFiat: FC = () => {
                       <PriceArrow
                         className={classNames(
                           "w-2 h-2 mr-[0.125rem]",
-                          +getNativeTokenPrice()?.priceUSDChange < 0 &&
+                          +getTokenPrice(nativeToken)?.priceUSDChange < 0 &&
                             "transform rotate-180",
                         )}
                       />
 
                       <span className="text-xs leading-4">
-                        {new BigNumber(getNativeTokenPrice()?.priceUSDChange)
+                        {new BigNumber(
+                          getTokenPrice(nativeToken)?.priceUSDChange,
+                        )
                           .abs()
                           .toFixed(2)}
                         %
@@ -139,8 +126,10 @@ const BuyWithFiat: FC = () => {
       )}
 
       {onRampTokensInChain.length > 0 &&
-        onRampTokensInChain.map((item: RampCurrency) => {
-          if (item.address) {
+        onRampTokensInChain.map((item: RampTokenInfo) => {
+          const itemAddress = parseTokenSlug(item.slug).address;
+
+          if (itemAddress && item.slug !== NATIVE_TOKEN_SLUG) {
             return (
               <div
                 key={item.id}
@@ -159,18 +148,18 @@ const BuyWithFiat: FC = () => {
                 </div>
                 <div className="flex items-center justify-center">
                   <div className="mr-1 text-left text-sm transition-colors text-brand-inactivedark whitespace-nowrap">
-                    {getTokenPrice(item.address)?.price} $
+                    {getTokenPrice(item)?.price} $
                   </div>
-                  {getTokenPrice(item.address)?.priceUSDChange &&
-                    +getTokenPrice(item.address)?.priceUSDChange !== 0 && (
+                  {getTokenPrice(item)?.priceUSDChange &&
+                    +getTokenPrice(item)?.priceUSDChange !== 0 && (
                       <span
                         className={classNames(
                           "inline-flex items-center",
                           "group-hover:opacity-100",
                           "transition",
                           "ml-2",
-                          getTokenPrice(item.address)?.priceUSDChange &&
-                            +getTokenPrice(item.address)?.priceUSDChange > 0
+                          getTokenPrice(item)?.priceUSDChange &&
+                            +getTokenPrice(item)?.priceUSDChange > 0
                             ? "text-[#6BB77A]"
                             : "text-[#EA556A]",
                         )}
@@ -178,15 +167,13 @@ const BuyWithFiat: FC = () => {
                         <PriceArrow
                           className={classNames(
                             "w-2 h-2 mr-[0.125rem]",
-                            +getTokenPrice(item.address)?.priceUSDChange < 0 &&
+                            +getTokenPrice(item)?.priceUSDChange < 0 &&
                               "transform rotate-180",
                           )}
                         />
 
                         <span className="text-xs leading-4">
-                          {new BigNumber(
-                            getTokenPrice(item.address)?.priceUSDChange,
-                          )
+                          {new BigNumber(getTokenPrice(item)?.priceUSDChange)
                             .abs()
                             .toFixed(2)}
                           %
