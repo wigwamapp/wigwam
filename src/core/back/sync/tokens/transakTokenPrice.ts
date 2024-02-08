@@ -5,7 +5,6 @@ export const getTransakTokenPrice = async (
   chainId: number,
 ) => {
   try {
-    console.log(tokenAddresses);
     const coinGeckoPrices = await getDexPrices(tokenAddresses);
     const nativeTokenPrice = await getCoinGeckoNativeTokenPrice(chainId);
     return { ...coinGeckoPrices, nativeToken: nativeTokenPrice };

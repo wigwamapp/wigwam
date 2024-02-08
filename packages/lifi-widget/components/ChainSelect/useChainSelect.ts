@@ -25,8 +25,6 @@ export const useChainSelect = (formType: FormType) => {
       .map((chainId) => chains.find((chain) => chain.id === chainId))
       .filter(Boolean) as EVMChain[];
     
-      console.log()
-
       return selectedChains.slice(0, 5);
     } else {
       return []

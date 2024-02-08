@@ -23,8 +23,6 @@ const BuyWithFiat: FC = () => {
     setOnRampModalOpened([true]);
   };
 
-  console.log(onRampTokensInChain);
-
   const response = useLazyAtomValue(
     getTransakTokenPriceAtom({
       tokenAddresses: onRampTokensInChain
@@ -33,8 +31,6 @@ const BuyWithFiat: FC = () => {
       chainId: Number(chainId),
     }),
   );
-
-  console.log(response);
 
   function formatNumber(value: any) {
     if (value) {

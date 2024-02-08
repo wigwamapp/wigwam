@@ -39,7 +39,6 @@ export const TransactionActiveItem: React.FC<{
     };
   
     const getTxStatus = (status: RouteExecutionStatus) => {
-      console.log('getTxStatus', status)
       switch (status) {
         case (RouteExecutionStatus.Done):
           return (

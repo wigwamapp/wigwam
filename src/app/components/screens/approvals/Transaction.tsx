@@ -442,9 +442,6 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     trackEvent(TEvent.DappTransaction, { source: source.type });
   }, [source.type]);
 
-  console.log("source", source);
-  console.log("action", action);
-
   return (
     <ApprovalLayout
       approveText={lastError?.from === "submit" ? "Retry" : "Approve"}

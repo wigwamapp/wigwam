@@ -432,7 +432,6 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
   const isPopupMode = isPopup();
 
   const name = useMemo(() => {
-    console.log(item);
     if (
       item.source.type === "self" &&
       item.source.kind === SelfActivityKind.Swap &&

@@ -14,6 +14,7 @@ import {
 } from '../stores';
 import { WidgetEvent } from '../types/events';
 import { useWidgetEvents } from './useWidgetEvents';
+import { useNavigate } from 'react-router-dom';
 
 interface RouteExecutionProps {
   routeId: string;
@@ -43,6 +44,8 @@ export const useRouteExecution = ({
     (state) => [state.updateRoute, state.restartRoute, state.deleteRoute],
     shallow,
   );
+
+  const navigate = useNavigate();
 
   const updateRouteHook = (updatedRoute: Route) => {
     console.log('updatedRoute', updatedRoute)
@@ -125,7 +128,6 @@ export const useRouteExecution = ({
       onMutate: () => {
         console.log('Execution started.', routeId);
         if (routeExecution) {
-          console.log('!!!!!!!!!!!!!routeExecution routeExecution routeExecution', routeExecution)
           emitter.emit(WidgetEvent.RouteExecutionStarted, routeExecution.route);
         }
       },
@@ -166,6 +168,9 @@ export const useRouteExecution = ({
         console.warn('Execution failed!', routeId, error);
       },
       onSuccess: (route: Route) => {
+        navigate('/?tab="transactionDetails"', {
+          state: { routeId: route.id },
+        });
         console.log('Executed successfully!', route);
       },
     });
