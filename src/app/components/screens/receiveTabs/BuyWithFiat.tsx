@@ -136,7 +136,7 @@ const BuyWithFiat: FC = () => {
           </>
         )}
       </div>
-      {onRampTokensInChain.length > 0 && (
+      {onRampTokensInChain.length > 1 && (
         <h2 className="font-bold text-[#F8F9FD] mb-3 mt-8 text-lg">
           Other Tokens
         </h2>
