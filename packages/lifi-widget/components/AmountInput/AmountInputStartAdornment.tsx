@@ -21,6 +21,6 @@ export const AmountInputStartAdornment: React.FC<FormTypeProps> = ({
   return isSelected ? (
     <TokenAvatar token={token} chain={chain} sx={{ marginLeft: 2 }} mainAvatarStyle={{width: '36px', height: '36px'}} />
   ) : (
-    <TokenAvatarDefault sx={{ marginLeft: 2 }} />
+    <TokenAvatarDefault sx={{ marginLeft: 2 }} avatarSx={{width: '36px !important', height: '36px !important'}} />
   );
 };
