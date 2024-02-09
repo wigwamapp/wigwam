@@ -5,7 +5,6 @@ import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
-import BadgeWrapper from "app/components/elements/BadgeWrapper";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
 
@@ -108,14 +107,13 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
             merge={withTokenSlug(page, tokenSlug) ? ["token"] : undefined}
             className={classNames(
               "group",
-              "text-base font-bold text-brand-light/80",
+              "text-base font-bold",
               "w-48 py-2 px-3 mb-2",
               "rounded-[.625rem]",
               "flex items-center",
               "transition-colors",
+              "text-brand-light/80 hover:text-brand-light focus:text-brand-light",
               "group",
-              "hover:text-brand-light",
-              "focus:text-brand-light",
               isPageActive && "bg-brand-main/5 !text-brand-light",
               "last:mb-0",
             )}
@@ -145,19 +143,21 @@ const LinkContent: FC<{
 
   return (
     <>
-      <BadgeWrapper showBadge={link.badge} className="mr-5">
-        <Icon
-          className={classNames(
-            "w-7 h-7",
-            "min-w-7",
-            "styled-icon",
-            isActive
-              ? "styled-icon--active"
-              : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
-          )}
-        />
-      </BadgeWrapper>
-      {label}
+      <Icon
+        className={classNames(
+          "w-7 h-7",
+          "min-w-7",
+          "mr-5",
+          "styled-icon",
+          link.badge ? "styled-icon--pending" : "",
+          isActive
+            ? "styled-icon--active"
+            : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
+        )}
+      />
+      <span className={classNames(link.badge ? "styled-label--pending" : "")}>
+        {label}
+      </span>
       {hasNotification && (
         <div className="ml-1.5 h-5">
           <div className={classNames("w-2 h-2", "bg-activity rounded-full")} />

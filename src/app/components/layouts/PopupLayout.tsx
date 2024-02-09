@@ -32,7 +32,6 @@ import FiatAmount from "../elements/FiatAmount";
 import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import { useLazyAtomValue } from "lib/atom-utils";
 import ProfileButton from "../elements/ProfileButton";
-import BadgeWrapper from "../elements/BadgeWrapper";
 import PopupBgImage from "app/images/popup-bg.svg";
 import RoundedButton from "../elements/RoundedButton";
 
@@ -207,21 +206,21 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
       "text-sm font-bold",
       "rounded-[.375rem]",
       "h-full py-3 px-4",
+      badge && !isActive ? "styled-label--pending" : "",
       isActive
         ? "bg-brand-redone text-brand-darkaccent bg-opacity hover:bg-opacity-100 hover:shadow-buttonaccent focus-visible:bg-opacity-100 focus-visible:shadow-buttonaccent active:bg-opacity-70 active:shadow-none"
         : "hover:bg-brand-main hover:bg-opacity-[.15] hover:shadow-buttonsecondary focus-visible:bg-brand-main focus-visible:bg-opacity-[.15] focus-visible:shadow-buttonsecondary active:bg-brand-main active:text-brand-light/60 active:bg-opacity-10 active:shadow-none",
     )}
     {...rest}
   >
-    <BadgeWrapper showBadge={badge}>
-      <Icon
-        className={classNames(
-          "mr-2",
-          "transition-all",
-          isActive ? "fill-black" : "fill-white",
-        )}
-      />
-    </BadgeWrapper>
+    <Icon
+      className={classNames(
+        "mr-2",
+        "transition-all",
+        badge && !isActive ? "styled-icon--pending" : "",
+        isActive ? "styled-icon-popup--active" : "styled-icon-popup",
+      )}
+    />
     {label}
   </button>
 );

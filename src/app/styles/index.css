@@ -110,6 +110,69 @@ a {
     --color-4: #696c73;
   }
 
+  .styled-icon--pending {
+    --color-1: #949cae;
+    --color-2: #373b45;
+    --color-3: #373b45;
+    --color-4: #696c73;
+  }
+
+  .styled-icon--pending path[class$="active-element"] {
+    animation: styled-icon--pending-pulse 2.5s infinite;
+  }
+
+  .styled-icon--pending path[class$="active-element--fill"] {
+    animation: styled-icon-fill--pending-pulse 2.5s infinite;
+  }
+
+  .styled-icon-popup {
+    --color-1: #fff;
+  }
+
+  .styled-icon-popup--active {
+    --color-1: #0d1311;
+  }
+
+  @keyframes styled-icon--pending-pulse {
+    0% {
+      stroke: var(--color-1);
+    }
+    50% {
+      stroke: #d99e2e;
+    }
+    100% {
+      stroke: var(--color-1);
+    }
+  }
+
+  @keyframes styled-icon-fill--pending-pulse {
+    0% {
+      fill: var(--color-1);
+    }
+    50% {
+      fill: #d99e2e;
+    }
+    100% {
+      fill: var(--color-1);
+    }
+  }
+
+  .styled-label--pending {
+    animation: styled-label--pending-pulse 2.5s infinite;
+  }
+
+  @keyframes styled-label--pending-pulse {
+    0% {
+      color: inherit;
+    }
+    50% {
+      color: #d99e2e;
+    }
+    100% {
+      color: inherit;
+    }
+  }
+
   /* For Webkit-based browsers (Chrome, Safari and Opera) */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
