@@ -20,10 +20,10 @@ import { useActivityBadge, useSwapBadge, useAccounts } from "app/hooks";
 const useSidebarLinks = () => {
   const { alert } = useDialog();
   const setActivityOpened = useSetAtom(activityModalAtom);
-  const activityBadgeDisplayed = useActivityBadge();
+  const activityBadgeAmount = useActivityBadge();
   const { currentAccount } = useAccounts();
 
-  const swapBadgeDisplayed = useSwapBadge(currentAccount.address);
+  const swapBadgeAmount = useSwapBadge(currentAccount.address);
 
   const NavLinksPrimary = useMemo(() => {
     return [
@@ -36,7 +36,7 @@ const useSidebarLinks = () => {
         label: "Activity",
         Icon: ActivityIcon,
         action: () => setActivityOpened([true, "replace"]),
-        badge: activityBadgeDisplayed,
+        badge: activityBadgeAmount,
       },
       {
         route: Page.Transfer,
@@ -52,7 +52,7 @@ const useSidebarLinks = () => {
         route: Page.Swap,
         label: "Swap",
         Icon: SwapIcon,
-        badge: swapBadgeDisplayed,
+        badge: +swapBadgeAmount,
       },
       // {
       //   route: Page.Apps,
@@ -61,7 +61,7 @@ const useSidebarLinks = () => {
       //   soon: true,
       // },
     ];
-  }, [activityBadgeDisplayed, swapBadgeDisplayed, setActivityOpened]);
+  }, [activityBadgeAmount, swapBadgeAmount, setActivityOpened]);
 
   const NavLinksSecondary = useMemo(() => {
     return [
