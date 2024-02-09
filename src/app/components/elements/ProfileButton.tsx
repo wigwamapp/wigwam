@@ -15,6 +15,7 @@ import {
   approvalsAtom,
   accountAddressAtom,
   addAccountModalAtom,
+  updateAvailableAtom,
 } from "app/atoms";
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
@@ -56,6 +57,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
 }) => {
   const { currentAccount } = useAccounts();
   const addAccountModalOpened = useAtomValue(addAccountModalAtom);
+  const updateAvailable = useAtomValue(updateAvailableAtom);
 
   const [modalOpened, setModalOpened] = useState(false);
 
@@ -75,6 +77,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
           type="button"
           onClick={() => setModalOpened(true)}
           className={classNames(
+            "relative",
             "flex items-center gap-3",
             "max-w-full",
             size === "large" ? "py-2 pr-2 pl-4" : "py-1 pl-2 pr-1",
@@ -104,6 +107,16 @@ const ProfileButton: FC<ProfileButtonProps> = ({
               size === "large" ? "rounded-[.625rem]" : "rounded-md",
             )}
           />
+
+          {size === "small" && updateAvailable ? (
+            <div
+              className={classNames(
+                "w-2 h-2",
+                "bg-activity rounded-full",
+                "absolute top-0.5 right-0.5",
+              )}
+            />
+          ) : null}
         </button>
       </div>
       <ProfilesModal
@@ -158,6 +171,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
 }) => {
   const { all, currentId } = useAtomValue(profileStateAtom);
   const setAccountAddress = useSetAtom(accountAddressAtom);
+  const updateAvailable = useAtomValue(updateAvailableAtom);
   useI18NUpdate();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -333,16 +347,28 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
 
         {size === "small" ? (
           <>
-            <IconedButton
-              aria-label="Settings"
-              to={{ page: Page.Settings }}
-              smartLink
-              onClick={() => onOpenChange?.(false)}
-              theme="secondary"
-              Icon={GearIcon}
-              className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
-              iconClassName="w-6 min-w-6 h-auto"
-            />
+            <div className="relative flex items-center justfy-center">
+              <IconedButton
+                aria-label="Settings"
+                to={{ page: Page.Settings }}
+                smartLink
+                onClick={() => onOpenChange?.(false)}
+                theme="secondary"
+                Icon={GearIcon}
+                className="!w-11 min-w-[2.75rem] !h-11 rounded-lg"
+                iconClassName="w-6 min-w-6 h-auto"
+              />
+
+              {updateAvailable ? (
+                <div
+                  className={classNames(
+                    "w-2 h-2",
+                    "bg-activity rounded-full",
+                    "absolute top-1 right-1",
+                  )}
+                />
+              ) : null}
+            </div>
 
             <IconedButton
               aria-label="Open full screen"
