@@ -51,7 +51,7 @@ type SidebarLink = {
   Icon: FC<{ className?: string }>;
   route?: Page;
   soon?: boolean;
-  badge?: boolean;
+  badge?: number;
   action?: () => void;
 };
 
@@ -139,7 +139,7 @@ const LinkContent: FC<{
   isActive: boolean;
   hasNotification: boolean;
 }> = ({ link, isActive, hasNotification }) => {
-  const { Icon, label, soon } = link;
+  const { Icon, label, soon, badge } = link;
 
   return (
     <>
@@ -147,16 +147,26 @@ const LinkContent: FC<{
         className={classNames(
           "w-7 h-7",
           "min-w-7",
-          "mr-5",
+          "mr-4",
           "styled-icon",
-          link.badge ? "styled-icon--pending" : "",
+          badge && !isActive ? "styled-icon--pending" : "",
           isActive
             ? "styled-icon--active"
             : "group-hover:styled-icon--hover group-focus:styled-icon--hover",
         )}
       />
-      <span className={classNames(link.badge ? "styled-label--pending" : "")}>
+      <span
+        className={classNames(
+          "flex items-center",
+          badge && !isActive ? "styled-label--pending" : "",
+        )}
+      >
         {label}
+        {badge && badge > 0 ? (
+          <span className="bg-brand-darkgray border border-white/5 text-white text-xs !text-brand-light/80 rounded-md py-0.5 px-1.5 ml-2 mt-0.5">
+            +{badge}
+          </span>
+        ) : null}
       </span>
       {hasNotification && (
         <div className="ml-1.5 h-5">

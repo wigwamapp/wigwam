@@ -158,7 +158,7 @@ export function useActivityBadge() {
   );
 
   return useMemo(
-    () => totalApprovals > 0 || totalPendingActivities > 0,
+    () => totalApprovals + totalPendingActivities,
     [totalApprovals, totalPendingActivities],
   );
 }
@@ -170,11 +170,10 @@ export function useSwapBadge(address?: string) {
     )
       .filter(
         (item: any) =>
-          item.route.fromAddress.toLowerCase() === address?.toLocaleLowerCase(),
+          item.route.fromAddress.toLowerCase() ===
+            address?.toLocaleLowerCase() && item.status === 1,
       )
-
-      .map((item: any) => item.status)
-      .includes(1);
+      .map((item: any) => item.status).length;
   } catch (e) {
     return false;
   }

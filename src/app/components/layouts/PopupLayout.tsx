@@ -187,7 +187,7 @@ type NavToolbarButtonProps = HTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;
   label: string;
   isActive?: boolean;
-  badge?: boolean;
+  badge?: number;
 };
 
 const NavToolbarButton: FC<NavToolbarButtonProps> = ({
@@ -221,7 +221,14 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
         isActive ? "styled-icon-popup--active" : "styled-icon-popup",
       )}
     />
-    {label}
+    <span className="flex items-center">
+      {label}
+      {badge && badge > 0 ? (
+        <span className="bg-brand-darkgray border border-white/5 text-white text-[.625rem] leading-none !text-brand-light/80 rounded py-0.5 px-1 ml-1 mt-[.0625rem]">
+          +{badge}
+        </span>
+      ) : null}
+    </span>
   </button>
 );
 
