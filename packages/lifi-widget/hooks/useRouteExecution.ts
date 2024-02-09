@@ -60,7 +60,7 @@ export const useRouteExecution = ({
     const process = getUpdatedProcess(routeExecution.route, clonedUpdatedRoute);
     
     if (process) {
-      if (onBeforeTransaction && clonedUpdatedRoute && process.type === "SWAP" && clonedUpdatedRoute.steps[1] && clonedUpdatedRoute.steps[1]) {
+      if (onBeforeTransaction && clonedUpdatedRoute && process.type === "SWAP" && clonedUpdatedRoute.steps[1]) {
         onBeforeTransaction({...clonedUpdatedRoute, fromChainId: clonedUpdatedRoute.toChainId, fromToken: clonedUpdatedRoute.steps[1].action.fromToken, toToken: clonedUpdatedRoute.steps[1].action.toToken})
       }
       emitter.emit(WidgetEvent.RouteExecutionUpdated, {
