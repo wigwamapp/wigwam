@@ -122,12 +122,15 @@ const prepareName = (originId: string, originName?: string) => {
     component: (
       <h3
         className={classNames(
-          "line-clamp-2 break-words mt-2",
+          "line-clamp-2 break-words mt-2 max-w-full",
           !name ? "text-brand-main" : "",
         )}
       >
         <span
           className={classNames(
+            name &&
+              name.length > 25 &&
+              "inline-block max-w-full min-w-0 truncate",
             name &&
               name.length > 13 &&
               !name.slice(0, 13).includes(" ") &&

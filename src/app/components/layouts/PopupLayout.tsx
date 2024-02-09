@@ -80,7 +80,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
                 <img
                   src={PopupBgImage}
                   alt="Wigwam"
-                  className="w-full h-full absolute inset-0 max-w-none"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="mb-2 flex items-center justify-between gap-3 relative z-10">
                   <InteractionWithDapp />
