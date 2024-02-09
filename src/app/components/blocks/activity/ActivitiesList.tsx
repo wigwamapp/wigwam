@@ -7,7 +7,7 @@ import { isPopup } from "lib/ext/view";
 import { getPendingActivitiesAtom } from "app/atoms";
 import { LOAD_MORE_ON_ACTIVITY_FROM_END } from "app/defaults";
 import { useAccounts, useCompleteActivity } from "app/hooks";
-import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-activity.svg";
+import { ReactComponent as NoActivityIcon } from "app/icons/noactivity.svg";
 
 import ActivityAsset from "./ActivityAsset";
 
@@ -107,13 +107,18 @@ const ActivitiesList = memo(() => {
               isPopupMode ? "min-h-[18rem]" : "min-h-[30rem]",
             )}
           >
-            <NoResultsFoundIcon
+            <NoActivityIcon
               className={classNames(
-                !isPopupMode ? "w-[30rem]" : "w-[20rem]",
-                "h-auto mb-8",
+                !isPopupMode ? "w-[4rem]" : "w-[3rem]",
+                "h-auto mb-2",
               )}
             />
-            <h3 className="text-2xl text-brand-inactivedark font-bold">
+            <h3
+              className={classNames(
+                "text-[#4B505C] font-medium",
+                !isPopupMode ? "text-xl" : "text-lg",
+              )}
+            >
               No activity yet
             </h3>
           </div>
