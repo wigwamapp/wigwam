@@ -11,6 +11,7 @@ import { onRampModalAtom, tokenSlugAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import PriceArrow from "app/components/elements/PriceArrow";
+import { ReactComponent as NoCoinsIcon } from "app/icons/nocoins.svg";
 
 const BuyWithFiat: FC = () => {
   const { onRampTokensInChain } = useRamp();
@@ -192,6 +193,17 @@ const BuyWithFiat: FC = () => {
             );
           }
         })}
+
+      {onRampTokensInChain.length === 0 && (
+        <div className="mt-12 w-full mx-auto max-w-[24rem] flex flex-col items-center justify-center">
+          <NoCoinsIcon className="w-[3rem] h-auto mb-3" />
+
+          <h3 className="text-[#4B505C] font-medium text-base text-center">
+            Currently, there are no tokens available for purchase on the
+            selected network.
+          </h3>
+        </div>
+      )}
     </ScrollAreaContainer>
   );
 };
