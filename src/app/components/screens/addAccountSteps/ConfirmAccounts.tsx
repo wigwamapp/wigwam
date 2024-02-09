@@ -29,6 +29,7 @@ import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as FileCheckIcon } from "app/icons/file-check.svg";
+import { ReactComponent as OpenedEyeIcon } from "app/icons/opened-eye.svg";
 import { ReactComponent as ImportIcon } from "app/icons/addaccount-import.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/addaccount-ledger.svg";
 
@@ -332,7 +333,7 @@ const ConfirmAccounts = memo<{
       </div>
 
       {addMore && (
-        <div className="mt-8 w-full mx-auto max-w-md flex items-stretch">
+        <div className="mt-8 w-full mx-auto max-w-md flex items-stretch flex-wrap">
           {[
             {
               Icon: ImportIcon,
@@ -349,6 +350,18 @@ const ConfirmAccounts = memo<{
                 onLedgerOpened?.();
               },
             },
+            ...(process.env.NODE_ENV === "development"
+              ? [
+                  "space" as const,
+                  {
+                    Icon: OpenedEyeIcon,
+                    children: "Watch only",
+                    action: () => {
+                      navigateToStep(AddAccountStep.AddWatchOnlyAccount);
+                    },
+                  },
+                ]
+              : []),
           ].map((item, i) => {
             if (item === "space") {
               return <div key={i} className="flex-1" />;
