@@ -22,7 +22,7 @@ import { useAccounts, useChainId, useRamp } from "app/hooks";
 type RampOrder = { [key: string]: any };
 
 const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
-const SUSPENDED = true;
+const SUSPENDED = false;
 
 const saveRampActivity = (rampOrder: RampOrder) => {
   const newRampActivity: RampActivity = {

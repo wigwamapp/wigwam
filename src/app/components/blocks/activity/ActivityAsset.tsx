@@ -48,6 +48,7 @@ import { ReactComponent as BridgeIcon } from "app/icons/bridge.svg";
 import { ReactComponent as SwapIconSmall } from "app/icons/activity-swap.svg";
 import { ReactComponent as ApproveIcon } from "app/icons/approve.svg";
 import { ReactComponent as ChatIcon } from "app/icons/communication.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import {
   ReactComponent as LinkIcon,
   ReactComponent as WalletExplorerIcon,
@@ -266,7 +267,7 @@ const ActivityAsset = memo(
             {item.type === ActivityType.Ramp && (
               <ActivityNetworkCard
                 chainId={item.chainId}
-                className="w-[9rem] mr-8"
+                className="w-[12rem] mr-8"
               />
             )}
 
@@ -410,7 +411,14 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
     );
   }
 
-  const Icon = item.source.kind === SelfActivityKind.Swap ? SwapIcon : SendIcon;
+  const isRampActivity = item.type === ActivityType.Ramp;
+
+  const Icon =
+    item.source.kind === SelfActivityKind.Swap
+      ? SwapIcon
+      : isRampActivity
+        ? ReceiveIcon
+        : SendIcon;
 
   return (
     <Icon
