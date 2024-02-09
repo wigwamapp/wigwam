@@ -72,7 +72,7 @@ export const syncNetworks = memoize(
 
         const noTotal =
           existing?.portfolioRefreshedAt &&
-          existing.portfolioRefreshedAt > Date.now() - 5 * 60_000;
+          existing.portfolioRefreshedAt > Date.now() - 24 * 60 * 60_000;
 
         return props({
           chainId,
