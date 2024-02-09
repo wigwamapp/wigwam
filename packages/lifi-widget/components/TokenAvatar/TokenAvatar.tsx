@@ -82,8 +82,9 @@ export const TokenAvatar: React.FC<{
 };
 
 export const TokenAvatarDefault: React.FC<{
-  sx?: SxProps<Theme>;
-}> = ({ sx }) => {
+  sx?: SxProps<Theme>,
+  avatarSx?: SxProps<Theme>
+}> = ({ sx, avatarSx }) => {
   return (
     <Badge
       overlap="circular"
@@ -92,7 +93,7 @@ export const TokenAvatarDefault: React.FC<{
       badgeContent={<AvatarDefaultBadge width={16} height={16} sx={{border: '2px solid #2B3037', background: '#4C585F'}} />}
       sx={sx}
     >
-      <AvatarDefault width={44} height={44} sx={{background: '#4C585F'}} className='preventHoverEffect' />
+      <AvatarDefault width={44} height={44} sx={{background: '#4C585F', ...avatarSx}} className='preventHoverEffect' />
     </Badge>
   );
 };
