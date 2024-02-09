@@ -230,18 +230,23 @@ const WalletInfo: FC = () => {
   const { currentAccount } = useAccounts();
   const totalBalance = useLazyAtomValue(
     getTotalAccountBalanceAtom(currentAccount.address),
+    "off",
   );
+
   const { address } = currentAccount;
   return (
     <section className="flex flex-col justify-center items-center relative z-10">
       <AddressButton address={address} />
-      {totalBalance ? (
-        <FiatAmount
-          amount={totalBalance}
-          copiable
-          className="mt-3 mb-5 text-[2rem] tracking-wide font-bold leading-none"
-        />
-      ) : null}
+
+      <FiatAmount
+        amount={totalBalance ?? "0"}
+        copiable
+        className={classNames(
+          "mt-3 mb-5 text-[2rem] tracking-wide font-bold leading-none",
+          !totalBalance && "invisible",
+        )}
+      />
+
       <div className="flex gap-8">
         <DeepLinkButton text="Send" to="transfer" Icon={SendIcon} />
         <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />

@@ -32,6 +32,7 @@ const TotalBalance: FC = () => {
   const { currentAccount } = useAccounts();
   const totalBalance = useLazyAtomValue(
     getTotalAccountBalanceAtom(currentAccount.address),
+    "off",
   );
 
   return (
