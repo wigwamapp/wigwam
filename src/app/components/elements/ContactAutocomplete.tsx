@@ -159,25 +159,11 @@ const ContactAutocomplete = forwardRef<
 
   const { paste } = usePasteFromClipboard(setValue);
 
-  const { getAddressByEns } = useEns();
+  const { getAddressByEns, watchEns } = useEns();
 
   useEffect(() => {
-    const watchEns = async () => {
-      const ethereumAddressOrENSRegex =
-        /^(0x[a-fA-F0-9]{40})|([a-zA-Z0-9-]+\.eth)$/;
-      if (value && typeof value == "string") {
-        const isValid = ethereumAddressOrENSRegex.test(value);
-        if (isValid && value.includes(".eth")) {
-          const response = await getAddressByEns(value);
-          if (response) {
-            setValue(response);
-          }
-        }
-      }
-    };
-
-    watchEns();
-  }, [value, setValue, getAddressByEns]);
+    watchEns(value, setValue);
+  }, [value, setValue, getAddressByEns, watchEns]);
 
   const pasteButton = useMemo(() => {
     return (

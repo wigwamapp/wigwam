@@ -67,6 +67,11 @@ const AutoIcon: FC<AutoIconProps> = memo(
     const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
 
     useEffect(() => {
+      const isValidEthereumAddress = (seed: string) => {
+        const ethereumAddressRegex = /^(0x)?[0-9a-fA-F]{40}$/;
+        return ethereumAddressRegex.test(seed);
+      };
+
       const fetchEnsName = async () => {
         try {
           const name = await getEnsName(seed);
@@ -75,11 +80,13 @@ const AutoIcon: FC<AutoIconProps> = memo(
             setEnsAvatar(avatar);
           }
         } catch (error) {
-          console.error("Error fetching ENS avatar:", error);
+          console.error(error);
         }
       };
 
-      fetchEnsName();
+      if (isValidEthereumAddress(seed)) {
+        fetchEnsName();
+      }
     }, [getEnsName, getEnsAvatar, seed]);
 
     return (

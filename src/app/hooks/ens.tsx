@@ -1,27 +1,26 @@
 import { useMemo, useCallback } from "react";
-import { useProvider } from "app/hooks";
+import { getClientProvider } from "core/client";
 import { AvatarResolver } from "@ensdomains/ens-avatar";
-import { http } from "viem";
-import { mainnet } from "viem/chains";
-import { createEnsPublicClient } from "@ensdomains/ensjs";
 
-const client = createEnsPublicClient({
-  chain: mainnet,
-  transport: http(),
-});
+const ONE_DAY = 24 * 60 * 60 * 1000;
 
 const useEns = () => {
-  const provider = useProvider();
+  const provider = getClientProvider(1);
 
   const getEnsName = useCallback(
     async (address: string) => {
       const ensNameLS = localStorage.getItem(`ENS_${address}`);
-      if (ensNameLS) {
-        return ensNameLS;
+      const parsedData = ensNameLS ? JSON.parse(ensNameLS) : null;
+      if (parsedData && parsedData.expirationTimestamp > Date.now()) {
+        return parsedData.ensName;
       } else {
         const ensName = await provider.lookupAddress(address);
         if (ensName) {
-          localStorage.setItem(`ENS_${address}`, ensName);
+          const data = {
+            ensName,
+            expirationTimestamp: Date.now() + ONE_DAY,
+          };
+          localStorage.setItem(`ENS_${address}`, JSON.stringify(data));
           return ensName;
         } else {
           return null;
@@ -31,26 +30,37 @@ const useEns = () => {
     [provider],
   );
 
-  const getAddressByEns = useCallback(async (ensName: string) => {
-    const ethAddress = await client.getAddressRecord({ name: ensName });
-    if (ethAddress && ethAddress.value) {
-      return ethAddress.value;
-    } else {
-      return null;
-    }
-  }, []);
+  const getAddressByEns = useCallback(
+    async (ensName: string) => {
+      const address = await provider.resolveName(ensName);
+      if (address) {
+        return address;
+      } else {
+        return null;
+      }
+    },
+    [provider],
+  );
 
   const getEnsAvatar = useCallback(
     async (ensName: string) => {
       const ensAvatarLS = localStorage.getItem(`ENS_AVATAR_${ensName}`);
-      if (ensAvatarLS) {
-        return ensAvatarLS;
+      const parsedData = ensAvatarLS ? JSON.parse(ensAvatarLS) : null;
+
+      if (parsedData && parsedData.expirationTimestamp > Date.now()) {
+        return parsedData.imageUrl;
       } else {
         //@ts-expect-error: Should expect JsonRpcProvider
         const resolver = new AvatarResolver(provider);
         const imageUrl = await resolver.getAvatar(ensName, {});
+
         if (imageUrl) {
-          localStorage.setItem(`ENS_AVATAR_${ensName}`, imageUrl);
+          const data = {
+            imageUrl,
+            expirationTimestamp: Date.now() + ONE_DAY,
+          };
+
+          localStorage.setItem(`ENS_AVATAR_${ensName}`, JSON.stringify(data));
           return imageUrl;
         } else {
           return null;
@@ -60,13 +70,31 @@ const useEns = () => {
     [provider],
   );
 
+  const watchEns = useCallback(
+    async (value: any, cb: (address: string) => void) => {
+      const ethereumAddressOrENSRegex =
+        /^(0x[a-fA-F0-9]{40})|([a-zA-Z0-9-]+\.eth)$/;
+      if (value && typeof value == "string") {
+        const isValid = ethereumAddressOrENSRegex.test(value);
+        if (isValid && value.includes(".eth")) {
+          const response = await getAddressByEns(value);
+          if (response) {
+            cb(response);
+          }
+        }
+      }
+    },
+    [getAddressByEns],
+  );
+
   return useMemo(
     () => ({
       getEnsName,
       getEnsAvatar,
       getAddressByEns,
+      watchEns,
     }),
-    [getEnsName, getEnsAvatar, getAddressByEns],
+    [getEnsName, getEnsAvatar, getAddressByEns, watchEns],
   );
 };
 

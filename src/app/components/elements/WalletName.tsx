@@ -29,7 +29,6 @@ const WalletName: FC<WalletNameProps> = ({
   const { getEnsName } = useEns();
 
   const [ensName, setEnsName] = useState<string | null>(null);
-  // const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEnsName = async () => {
@@ -37,7 +36,7 @@ const WalletName: FC<WalletNameProps> = ({
         const name = await getEnsName(wallet.address);
         setEnsName(name);
       } catch (error) {
-        console.error("Error fetching ENS name:", error);
+        console.error(error);
       }
     };
 
