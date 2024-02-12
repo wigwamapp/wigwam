@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import memoize from "mem";
+import { getAddress } from "ethers";
 import { withOfflineCache } from "lib/ext/offlineCache";
 
 import { AccountToken, TokenStatus, TokenType } from "core/types";
@@ -8,9 +9,12 @@ import {
   updateTotalBalance,
   createAccountTokenKey,
   NATIVE_TOKEN_SLUG,
+  getNetwork,
 } from "core/common";
 
-import { getDxChain, indexerApi } from "../indexer";
+import { fetchCxAccountTokens } from "../indexer";
+
+const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
 
 export const refreshTotalBalances = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -74,23 +78,30 @@ export const refreshTotalBalances = memoize(
 
 export const fetchTotalChainBalance = withOfflineCache(
   async (chainId: number, accountAddress: string) => {
-    const dxChain = await getDxChain(chainId);
-    if (!dxChain) return null;
-
-    const res = await indexerApi.get<{ usd_value: number | string }>(
-      `/d/v1/user/chain_balance`,
-      {
-        params: {
-          id: accountAddress,
-          chain_id: dxChain.id,
-          _authAddress: accountAddress,
-        },
-      },
+    const accTokens = await fetchCxAccountTokens(
+      chainId,
+      accountAddress,
+      TokenType.Asset,
     );
+    const network = await getNetwork(chainId).catch(() => null);
 
-    const value = res.data.usd_value;
+    let totalValue = new BigNumber(0);
 
-    return value ? new BigNumber(res.data.usd_value).toString() : null;
+    for (const token of accTokens) {
+      // Skip if mainnet token without metadata
+      // Skip if dead address
+      if (
+        (network?.type === "mainnet" &&
+          (!token.contract_ticker_symbol || !token.contract_decimals)) ||
+        getAddress(token.contract_address) === DEAD_ADDRESS
+      ) {
+        continue;
+      }
+
+      if (token.quote) totalValue = totalValue.plus(token.quote);
+    }
+
+    return totalValue.toString();
   },
   {
     key: ([chainId, accountAddress]) =>
