@@ -129,8 +129,6 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
   >
     <WalletAvatar
       seed={account.address}
-      source="dicebear"
-      type="personas"
       className={classNames(
         "h-12 w-12 min-w-[3rem]",
         "mr-2",

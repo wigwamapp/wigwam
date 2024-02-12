@@ -214,8 +214,6 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
         <div className="flex flex-col items-center pt-8 pb-4 px-3 w-full">
           <WalletAvatar
             seed={address}
-            source="dicebear"
-            type="personas"
             className={classNames(
               "h-[4.625rem] w-[4.625rem]",
               "mb-5",

@@ -10,7 +10,7 @@ import { useDialog } from "app/hooks/dialog";
 import { approvalsAtom, currentProfileAtom } from "app/atoms";
 import Button from "app/components/elements/Button";
 import RoundedButton from "app/components/elements/RoundedButton";
-import WalletAvatar from "./WalletAvatar";
+import AutoIcon from "./AutoIcon";
 
 type LockProfileButtonProps = {
   className?: string;
@@ -58,7 +58,7 @@ const LockProfileButton: FC<LockProfileButtonProps> = ({ className }) => {
 
   const content = (
     <>
-      <WalletAvatar
+      <AutoIcon
         seed={currentProfile.avatarSeed}
         source="boring"
         variant="marble"

@@ -517,8 +517,6 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
     >
       <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-24 w-24 min-w-[6rem] m-0.5",
           "bg-black/40",

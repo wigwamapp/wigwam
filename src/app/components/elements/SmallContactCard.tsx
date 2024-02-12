@@ -102,8 +102,6 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
     >
       <WalletAvatar
         seed={contact.address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           !isSmall && "h-6 w-6 min-w-[1.5rem] mr-2",
           isSmall && "h-4 w-4 min-w-[1rem] mr-1",

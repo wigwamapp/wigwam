@@ -112,8 +112,6 @@ const ContactsDialog: FC = () => {
               {address || values.address ? (
                 <WalletAvatar
                   seed={values.address ?? address}
-                  source="dicebear"
-                  type="personas"
                   className="w-full h-full"
                 />
               ) : (

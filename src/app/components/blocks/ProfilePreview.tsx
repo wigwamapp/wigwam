@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { Profile } from "lib/ext/profile";
 import { replaceT, TReplace } from "lib/ext/react";
 
-import WalletAvatar from "app/components/elements/WalletAvatar";
+import AutoIcon from "app/components/elements/AutoIcon";
 
 type ProfilePreviewProps = {
   theme?: "large" | "small" | "extrasmall";
@@ -22,7 +22,7 @@ const ProfilePreview = memo<ProfilePreviewProps>(
           className,
         )}
       >
-        <WalletAvatar
+        <AutoIcon
           seed={profile.avatarSeed}
           source="boring"
           variant="marble"

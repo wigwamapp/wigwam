@@ -400,8 +400,6 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
       >
         <WalletAvatar
           seed={contact.address}
-          source="dicebear"
-          type="personas"
           className={classNames(
             "relative",
             "h-8 w-8 min-w-[2rem]",

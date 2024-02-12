@@ -145,8 +145,6 @@ const WalletTab: FC<WalletTabProps> = ({
     >
       <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-14 w-14 min-w-[3.5rem]",
           "mr-3",

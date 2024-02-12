@@ -149,8 +149,6 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
     <span className="flex items-center text-left w-full pr-3 min-w-0">
       <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-10 w-10 min-w-[2.5rem]",
           "mr-1",
@@ -231,8 +229,6 @@ const AccountSelectItem: FC<
     >
       <WalletAvatar
         seed={account.address}
-        source="dicebear"
-        type="personas"
         className={classNames("w-full h-full", isSelected && "opacity-20")}
       />
       {isSelected && (

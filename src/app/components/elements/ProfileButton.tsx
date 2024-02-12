@@ -40,6 +40,7 @@ import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
 import IconedButton from "./IconedButton";
 import TotalWalletBalance from "./TotalWalletBalance";
+import AutoIcon from "./AutoIcon";
 import WalletAvatar from "./WalletAvatar";
 
 type Size = "small" | "large";
@@ -97,8 +98,6 @@ const ProfileButton: FC<ProfileButtonProps> = ({
           />
           <WalletAvatar
             seed={currentAccount.address}
-            source="dicebear"
-            type="personas"
             className={classNames(
               size === "large"
                 ? "h-[3rem] w-[3rem] min-w-[3rem]"
@@ -234,7 +233,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
         )}
       >
         <div className="flex items-center text-xl font-bold gap-2 mr-auto mb-6">
-          <WalletAvatar
+          <AutoIcon
             seed={currentSeed}
             source="boring"
             variant="marble"
@@ -430,8 +429,6 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
   >
     <WalletAvatar
       seed={account.address}
-      source="dicebear"
-      type="personas"
       className={classNames(
         "h-8 w-8 min-w-[2rem]",
         "mr-3",

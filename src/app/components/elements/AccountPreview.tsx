@@ -20,12 +20,7 @@ type AccountPreviewProps = {
 export const AccountPreview = memo<AccountPreviewProps>(
   ({ address, baseAsset, quoteAsset }) => (
     <div className={classNames("inline-flex items-stretch")}>
-      <WalletAvatar
-        seed={address}
-        source="dicebear"
-        type="avataaars"
-        className="h-16 w-16 mr-4"
-      />
+      <WalletAvatar seed={address} className="h-16 w-16 mr-4" />
 
       <div className="p-1 flex flex-col">
         <span className="text-lg font-semibold">

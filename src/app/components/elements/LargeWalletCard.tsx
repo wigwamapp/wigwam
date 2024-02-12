@@ -73,8 +73,6 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
               <div className="flex">
                 <WalletAvatar
                   seed={address}
-                  source="dicebear"
-                  type="personas"
                   className={classNames(
                     "h-[4.5rem] w-[4.5rem] min-w-[4.5rem] mr-4",
                     "bg-black/40",
