@@ -16,6 +16,7 @@ export async function prepareAccountTokensSync<T extends AccountToken>(
 
   let existingAccTokens: T[];
 
+  // Remove existing nfts with broken token ids such as "1.23e+23" (float)
   if (tokenType === TokenType.NFT) {
     existingAccTokens = [];
     const dbKeysToDelete: string[] = [];
