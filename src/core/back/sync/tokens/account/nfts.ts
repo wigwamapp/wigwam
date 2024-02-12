@@ -42,7 +42,7 @@ export const syncAccountNFTs = memoize(
         const standard = nftData.erc_type?.includes("erc1155")
           ? TokenStandard.ERC1155
           : TokenStandard.ERC721;
-        const tokenId = new BigNumber(nftData.token_id).toString();
+        const tokenId = nftData.token_id;
         const tokenSlug = createTokenSlug({
           standard,
           address: contractAddress,

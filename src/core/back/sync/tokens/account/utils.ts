@@ -1,7 +1,7 @@
 import { IndexableTypeArray } from "dexie";
 
 import * as repo from "core/repo";
-import { AccountToken, TokenType } from "core/types";
+import { AccountNFT, AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG, createAccountTokenKey } from "core/common/tokens";
 
 export async function prepareAccountTokensSync<T extends AccountToken>(
@@ -9,10 +9,31 @@ export async function prepareAccountTokensSync<T extends AccountToken>(
   accountAddress: string,
   tokenType: TokenType,
 ) {
-  const existingAccTokens = (await repo.accountTokens
+  const existingAccTokensPure = (await repo.accountTokens
     .where("[chainId+tokenType+accountAddress]")
     .equals([chainId, tokenType, accountAddress])
     .toArray()) as T[];
+
+  let existingAccTokens: T[];
+
+  if (tokenType === TokenType.NFT) {
+    existingAccTokens = [];
+    const dbKeysToDelete: string[] = [];
+
+    for (const token of existingAccTokensPure as AccountNFT[]) {
+      if (token.tokenId.includes("e+")) {
+        dbKeysToDelete.push(createAccountTokenKey(token));
+      } else {
+        existingAccTokens.push(token as T);
+      }
+    }
+
+    if (dbKeysToDelete.length > 0) {
+      await repo.accountTokens.bulkDelete(dbKeysToDelete).catch(console.error);
+    }
+  } else {
+    existingAccTokens = existingAccTokensPure;
+  }
 
   const existingTokensMap = new Map(
     existingAccTokens
