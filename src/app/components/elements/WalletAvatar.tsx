@@ -1,4 +1,12 @@
-import { FC, HTMLAttributes, memo, RefObject, useRef } from "react";
+import {
+  FC,
+  HTMLAttributes,
+  memo,
+  RefObject,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 import classNames from "clsx";
 import memoize from "mem";
 import Avatar from "boring-avatars";
@@ -10,6 +18,8 @@ import useResizeObserver from "use-resize-observer";
 
 import niceColorPalettes from "fixtures/niceColorPalettes/200.json";
 
+import { useEns } from "app/hooks";
+
 type Source = "dicebear" | "boring";
 type DicebearStyleType = "avataaars" | "personas";
 type BoringVariant =
@@ -20,7 +30,7 @@ type BoringVariant =
   | "ring"
   | "bauhaus";
 
-type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
+type WalletAvatarProps = HTMLAttributes<HTMLDivElement> & {
   seed: string;
   source?: Source;
   initialsSource?: string;
@@ -35,7 +45,7 @@ type AutoIconProps = HTMLAttributes<HTMLDivElement> & {
   square?: boolean;
 };
 
-const AutoIcon: FC<AutoIconProps> = memo(
+const WalletAvatar: FC<WalletAvatarProps> = memo(
   ({
     seed,
     initialsSource,
@@ -51,6 +61,33 @@ const AutoIcon: FC<AutoIconProps> = memo(
     ...rest
   }) => {
     const rootRef = useRef<HTMLDivElement>(null);
+
+    const { getEnsName, getEnsAvatar } = useEns();
+
+    const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+
+    useEffect(() => {
+      const isValidEthereumAddress = (seed: string) => {
+        const ethereumAddressRegex = /^(0x)?[0-9a-fA-F]{40}$/;
+        return ethereumAddressRegex.test(seed);
+      };
+
+      const fetchEnsName = async () => {
+        try {
+          const name = await getEnsName(seed);
+          if (name) {
+            const avatar = await getEnsAvatar(name);
+            setEnsAvatar(avatar);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      if (isValidEthereumAddress(seed)) {
+        fetchEnsName();
+      }
+    }, [getEnsName, getEnsAvatar, seed]);
 
     return (
       <div
@@ -86,17 +123,27 @@ const AutoIcon: FC<AutoIconProps> = memo(
                 </>
               ),
             }
-          : {
-              dangerouslySetInnerHTML: {
-                __html: loadDicebearIconSvg(type, seed),
-              },
-            })}
+          : ensAvatar
+            ? {
+                children: (
+                  <img
+                    src={ensAvatar}
+                    alt="ensAvatar"
+                    style={{ borderRadius: "8px" }}
+                  />
+                ),
+              }
+            : {
+                dangerouslySetInnerHTML: {
+                  __html: loadDicebearIconSvg(type, seed),
+                },
+              })}
       />
     );
   },
 );
 
-export default AutoIcon;
+export default WalletAvatar;
 
 const loadDicebearIconSvg = memoize(generateDicebearIconSvg, {
   cacheKey: ([t, s]) => `${t}_${s}`,

@@ -12,7 +12,6 @@ import {
 } from "app/hooks";
 import { Page } from "app/nav";
 
-import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import IconedButton from "./IconedButton";
@@ -25,6 +24,7 @@ import { ReactComponent as SettingsIcon } from "app/icons/setting-general.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
+import WalletAvatar from "./WalletAvatar";
 
 type LargeWalletCardProps = {
   account: Account;
@@ -71,7 +71,7 @@ const LargeWalletCard = memo<LargeWalletCardProps>(({ account, className }) => {
           >
             <TippySingletonProvider>
               <div className="flex">
-                <AutoIcon
+                <WalletAvatar
                   seed={address}
                   source="dicebear"
                   type="personas"

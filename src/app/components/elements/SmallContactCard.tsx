@@ -8,10 +8,10 @@ import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 
 import InputLabelAction from "./InputLabelAction";
-import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import IconedButton from "./IconedButton";
+import WalletAvatar from "./WalletAvatar";
 
 type SmallContactCardProps = {
   address?: string;
@@ -100,7 +100,7 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
         className,
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={contact.address}
         source="dicebear"
         type="personas"

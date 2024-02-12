@@ -29,10 +29,10 @@ import { useContacts } from "app/hooks/contacts";
 import { useAccounts, useEns } from "app/hooks";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
-import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import SmallContactCard from "./SmallContactCard";
+import WalletAvatar from "./WalletAvatar";
 
 type ContactAutocompleteProps = {
   meta: FieldMetaState<any>;
@@ -398,7 +398,7 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
         )}
         {...rest}
       >
-        <AutoIcon
+        <WalletAvatar
           seed={contact.address}
           source="dicebear"
           type="personas"

@@ -42,7 +42,6 @@ import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 import PasswordField from "app/components/elements/PasswordField";
-import AutoIcon from "app/components/elements/AutoIcon";
 import SecretField from "app/components/blocks/SecretField";
 import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
@@ -56,6 +55,7 @@ import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as NoteIcon } from "app/icons/note.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/ledger.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 type EditWalletSectionProps = {
   account: Account;
@@ -515,7 +515,7 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         className,
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={address}
         source="dicebear"
         type="personas"

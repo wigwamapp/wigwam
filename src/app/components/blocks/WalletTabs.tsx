@@ -11,13 +11,13 @@ import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import HashPreview from "app/components/elements/HashPreview";
-import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
 import Button from "app/components/elements/Button";
 import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 type WalletTabsProps = {
   selectedAccount: Account;
@@ -143,7 +143,7 @@ const WalletTab: FC<WalletTabProps> = ({
       onClick={onClick}
       autoFocus={active}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={address}
         source="dicebear"
         type="personas"

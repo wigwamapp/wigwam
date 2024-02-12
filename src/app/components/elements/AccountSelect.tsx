@@ -21,7 +21,6 @@ import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 
 import Select from "./Select";
-import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
@@ -29,6 +28,7 @@ import WalletName from "./WalletName";
 import SmartLink from "./SmartLink";
 import Avatar from "./Avatar";
 import IconedButton from "./IconedButton";
+import WalletAvatar from "./WalletAvatar";
 
 type AccountSelectProps = {
   className?: string;
@@ -147,7 +147,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
 
   return (
     <span className="flex items-center text-left w-full pr-3 min-w-0">
-      <AutoIcon
+      <WalletAvatar
         seed={address}
         source="dicebear"
         type="personas"
@@ -229,7 +229,7 @@ const AccountSelectItem: FC<
         "rounded-[.625rem]",
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={account.address}
         source="dicebear"
         type="personas"

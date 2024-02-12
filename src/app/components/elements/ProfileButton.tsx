@@ -29,7 +29,6 @@ import { ReactComponent as LockIcon } from "app/icons/lock.svg";
 import { ReactComponent as GearIcon } from "app/icons/settings-gear.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 
-import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import CopiableTooltip from "./CopiableTooltip";
@@ -41,6 +40,7 @@ import TooltipIcon from "./TooltipIcon";
 import Tooltip from "./Tooltip";
 import IconedButton from "./IconedButton";
 import TotalWalletBalance from "./TotalWalletBalance";
+import WalletAvatar from "./WalletAvatar";
 
 type Size = "small" | "large";
 
@@ -95,7 +95,7 @@ const ProfileButton: FC<ProfileButtonProps> = ({
               size === "large" ? "text-base" : "text-sm",
             )}
           />
-          <AutoIcon
+          <WalletAvatar
             seed={currentAccount.address}
             source="dicebear"
             type="personas"
@@ -234,7 +234,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
         )}
       >
         <div className="flex items-center text-xl font-bold gap-2 mr-auto mb-6">
-          <AutoIcon
+          <WalletAvatar
             seed={currentSeed}
             source="boring"
             variant="marble"
@@ -428,7 +428,7 @@ const ProfileItem: FC<ProfileItemProps & { size?: Size }> = ({
       className,
     )}
   >
-    <AutoIcon
+    <WalletAvatar
       seed={account.address}
       source="dicebear"
       type="personas"
