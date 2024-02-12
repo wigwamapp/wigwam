@@ -26,6 +26,8 @@
     "@dicebear/core": "7.0.1",
     "@dicebear/personas": "7.0.1",
     "@emotion/is-prop-valid": "1.2.1",
+    "@ensdomains/ens-avatar": "^1.0.0-alpha.0.ethers.6",
+    "@ensdomains/ensjs": "^3.4.3",
     "@ledgerhq/hw-app-eth": "6.35.2",
     "@ledgerhq/hw-transport": "6.30.1",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
@@ -97,6 +99,7 @@
     "use-debounce": "10.0.0",
     "use-force-update": "1.0.11",
     "use-resize-observer": "9.1.0",
+    "viem": "^1.21.4",
     "webextension-polyfill": "0.10.0"
   },
   "devDependencies": {

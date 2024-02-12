@@ -26,7 +26,7 @@ import {
   LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END,
 } from "app/defaults";
 import { useContacts } from "app/hooks/contacts";
-import { useAccounts } from "app/hooks";
+import { useAccounts, useEns } from "app/hooks";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
 import AutoIcon from "./AutoIcon";
@@ -117,6 +117,7 @@ const ContactAutocomplete = forwardRef<
           e.preventDefault();
         }
       }
+
       rest.onKeyDown?.(e);
     },
     [mergedAccounts, rest, activeSuggestion, setValue],
@@ -157,6 +158,26 @@ const ContactAutocomplete = forwardRef<
   }, [mergedAccounts, meta.error, value]);
 
   const { paste } = usePasteFromClipboard(setValue);
+
+  const { getAddressByEns } = useEns();
+
+  useEffect(() => {
+    const watchEns = async () => {
+      const ethereumAddressOrENSRegex =
+        /^(0x[a-fA-F0-9]{40})|([a-zA-Z0-9-]+\.eth)$/;
+      if (value && typeof value == "string") {
+        const isValid = ethereumAddressOrENSRegex.test(value);
+        if (isValid && value.includes(".eth")) {
+          const response = await getAddressByEns(value);
+          if (response) {
+            setValue(response);
+          }
+        }
+      }
+    };
+
+    watchEns();
+  }, [value, setValue, getAddressByEns]);
 
   const pasteButton = useMemo(() => {
     return (

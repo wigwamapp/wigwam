@@ -1,4 +1,12 @@
-import { FC, HTMLAttributes, memo, RefObject, useRef } from "react";
+import {
+  FC,
+  HTMLAttributes,
+  memo,
+  RefObject,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
 import classNames from "clsx";
 import memoize from "mem";
 import Avatar from "boring-avatars";
@@ -9,6 +17,8 @@ import * as personasStyle from "@dicebear/personas";
 import useResizeObserver from "use-resize-observer";
 
 import niceColorPalettes from "fixtures/niceColorPalettes/200.json";
+
+import { useEns } from "app/hooks";
 
 type Source = "dicebear" | "boring";
 type DicebearStyleType = "avataaars" | "personas";
@@ -52,6 +62,26 @@ const AutoIcon: FC<AutoIconProps> = memo(
   }) => {
     const rootRef = useRef<HTMLDivElement>(null);
 
+    const { getEnsName, getEnsAvatar } = useEns();
+
+    const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+
+    useEffect(() => {
+      const fetchEnsName = async () => {
+        try {
+          const name = await getEnsName(seed);
+          if (name) {
+            const avatar = await getEnsAvatar(name);
+            setEnsAvatar(avatar);
+          }
+        } catch (error) {
+          console.error("Error fetching ENS avatar:", error);
+        }
+      };
+
+      fetchEnsName();
+    }, [getEnsName, getEnsAvatar, seed]);
+
     return (
       <div
         ref={rootRef}
@@ -86,11 +116,21 @@ const AutoIcon: FC<AutoIconProps> = memo(
                 </>
               ),
             }
-          : {
-              dangerouslySetInnerHTML: {
-                __html: loadDicebearIconSvg(type, seed),
-              },
-            })}
+          : ensAvatar
+            ? {
+                children: (
+                  <img
+                    src={ensAvatar}
+                    alt="ensAvatar"
+                    style={{ borderRadius: "8px" }}
+                  />
+                ),
+              }
+            : {
+                dangerouslySetInnerHTML: {
+                  __html: loadDicebearIconSvg(type, seed),
+                },
+              })}
       />
     );
   },

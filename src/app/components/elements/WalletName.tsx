@@ -1,8 +1,9 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import classNames from "clsx";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account, AccountSource } from "core/types";
+import { useEns } from "app/hooks";
 
 import { ReactComponent as GoogleIcon } from "app/icons/google.svg";
 import { ReactComponent as FacebookIcon } from "app/icons/facebook.svg";
@@ -24,30 +25,50 @@ const WalletName: FC<WalletNameProps> = ({
   theme = "large",
   className,
   iconClassName,
-}) => (
-  <span
-    className={classNames(
-      "flex items-center",
-      "min-w-0 w-full",
-      "font-bold",
-      theme === "large" && "leading-[1.125rem]",
-      className,
-    )}
-  >
-    <Icon
-      wallet={wallet}
+}) => {
+  const { getEnsName } = useEns();
+
+  const [ensName, setEnsName] = useState<string | null>(null);
+  // const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEnsName = async () => {
+      try {
+        const name = await getEnsName(wallet.address);
+        setEnsName(name);
+      } catch (error) {
+        console.error("Error fetching ENS name:", error);
+      }
+    };
+
+    fetchEnsName();
+  }, [getEnsName, wallet.address]);
+
+  return (
+    <span
       className={classNames(
-        "h-auto",
-        theme === "large" && "w-[1.125rem] min-w-[1.125rem] mr-1",
-        theme === "small" && "w-4 min-w-[1rem] mr-0.5",
-        iconClassName,
+        "flex items-center",
+        "min-w-0 w-full",
+        "font-bold",
+        theme === "large" && "leading-[1.125rem]",
+        className,
       )}
-    />
-    <span className="truncate min-w-0">
-      <TReplace msg={wallet.name} />
+    >
+      <Icon
+        wallet={wallet}
+        className={classNames(
+          "h-auto",
+          theme === "large" && "w-[1.125rem] min-w-[1.125rem] mr-1",
+          theme === "small" && "w-4 min-w-[1rem] mr-0.5",
+          iconClassName,
+        )}
+      />
+      <span className="truncate min-w-0">
+        <TReplace msg={ensName ? ensName : wallet.name} />
+      </span>
     </span>
-  </span>
-);
+  );
+};
 
 export default WalletName;
 
