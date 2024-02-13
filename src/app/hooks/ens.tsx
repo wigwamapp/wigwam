@@ -4,6 +4,19 @@ import { AvatarResolver } from "@ensdomains/ens-avatar";
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
+const toDataURL = async (url: string) =>
+  fetch(url)
+    .then((response) => response.blob())
+    .then(
+      (blob) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        }),
+    );
+
 const useEns = () => {
   const provider = getClientProvider(1);
 
@@ -15,6 +28,7 @@ const useEns = () => {
         return parsedData.ensName;
       } else {
         const ensName = await provider.lookupAddress(address);
+
         if (ensName) {
           const data = {
             ensName,
@@ -46,7 +60,6 @@ const useEns = () => {
     async (ensName: string) => {
       const ensAvatarLS = localStorage.getItem(`ENS_AVATAR_${ensName}`);
       const parsedData = ensAvatarLS ? JSON.parse(ensAvatarLS) : null;
-
       if (parsedData && parsedData.expirationTimestamp > Date.now()) {
         return parsedData.imageUrl;
       } else {
@@ -56,7 +69,7 @@ const useEns = () => {
 
         if (imageUrl) {
           const data = {
-            imageUrl,
+            imageUrl: await toDataURL(imageUrl),
             expirationTimestamp: Date.now() + ONE_DAY,
           };
 
