@@ -3,10 +3,16 @@ import { match } from "ts-pattern";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
 import { assert } from "lib/system/assert";
+import { storage } from "lib/ext/storage";
 
 import { DEFAULT_NETWORKS, INITIAL_NETWORK } from "fixtures/networks";
 import { PUSHTX_ADDITIONAL_BROADCAST } from "fixtures/settings";
-import { ActivityType, ApprovalResult, Permission } from "core/types";
+import {
+  ACCOUNT_ADDRESS,
+  ActivityType,
+  ApprovalResult,
+  Permission,
+} from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
@@ -49,6 +55,19 @@ export async function processApprove(
 
           const origin = getPageOrigin(source);
 
+          const activeAccountAddress =
+            await storage.fetchForce<string>(ACCOUNT_ADDRESS);
+
+          if (
+            activeAccountAddress &&
+            accountAddresses.includes(activeAccountAddress)
+          ) {
+            accountAddresses = [
+              activeAccountAddress,
+              ...accountAddresses.filter((a) => a !== activeAccountAddress),
+            ];
+          }
+
           const timeAt = Date.now();
           const newPermission: Permission = {
             origin,
@@ -60,6 +79,13 @@ export async function processApprove(
           };
 
           await repo.permissions.put(newPermission);
+
+          if (
+            activeAccountAddress &&
+            !accountAddresses.includes(activeAccountAddress)
+          ) {
+            await storage.put(ACCOUNT_ADDRESS, accountAddresses[0]);
+          }
 
           const toReturn = returnSelectedAccount
             ? accountAddresses[0]

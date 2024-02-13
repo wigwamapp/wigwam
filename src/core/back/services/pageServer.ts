@@ -138,13 +138,6 @@ export function startPageServer() {
         accountAddress = internalAccountAddress;
       } else {
         accountAddress = null;
-
-        // const allAccountAddresses = $accountAddresses.getState();
-
-        // accountAddress =
-        //   perm.accountAddresses.find((address) =>
-        //     allAccountAddresses.includes(address),
-        //   ) ?? null;
       }
 
       params = {
