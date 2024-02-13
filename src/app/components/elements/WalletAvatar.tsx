@@ -19,13 +19,11 @@ const WalletAvatar: FC<WalletAvatarProps> = memo(({ seed, className }) => {
       return ethereumAddressRegex.test(seed);
     };
 
-    console.log("WALLET AVATAR CHANGE", seed);
     const fetchEnsName = async () => {
       try {
         const name = await getEnsName(seed);
         if (name) {
           const avatar = await getEnsAvatar(name);
-          console.log(seed, avatar);
           setEnsAvatar(avatar);
         } else {
           setEnsAvatar(null);

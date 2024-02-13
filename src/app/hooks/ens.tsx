@@ -68,13 +68,16 @@ const useEns = () => {
         const imageUrl = await resolver.getAvatar(ensName, {});
 
         if (imageUrl) {
+          const imageDataUrl = await toDataURL(imageUrl);
+
           const data = {
-            imageUrl: await toDataURL(imageUrl),
+            imageUrl: imageDataUrl,
             expirationTimestamp: Date.now() + ONE_DAY,
           };
 
           localStorage.setItem(`ENS_AVATAR_${ensName}`, JSON.stringify(data));
-          return imageUrl;
+
+          return imageDataUrl;
         } else {
           return null;
         }
