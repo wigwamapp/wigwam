@@ -7,7 +7,6 @@ import { getNetworkIconUrl } from "fixtures/networks";
 import { useLazyNetwork } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ActivityIcon } from "app/components/blocks/ApprovalStatus";
-import AutoIcon from "app/components/elements/AutoIcon";
 import WalletName from "app/components/elements/WalletName";
 import HashPreview from "app/components/elements/HashPreview";
 import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
@@ -16,6 +15,7 @@ import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import WalletAvatar from "app/components/elements/WalletAvatar";
 
 type ApprovalHeaderProps = {
   account: Account;
@@ -127,10 +127,8 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
       "text-left",
     )}
   >
-    <AutoIcon
+    <WalletAvatar
       seed={account.address}
-      source="dicebear"
-      type="personas"
       className={classNames(
         "h-12 w-12 min-w-[3rem]",
         "mr-2",

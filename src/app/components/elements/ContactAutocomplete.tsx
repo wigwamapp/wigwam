@@ -26,13 +26,13 @@ import {
   LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END,
 } from "app/defaults";
 import { useContacts } from "app/hooks/contacts";
-import { useAccounts } from "app/hooks";
+import { useAccounts, useEns } from "app/hooks";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
-import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import SmallContactCard from "./SmallContactCard";
+import WalletAvatar from "./WalletAvatar";
 
 type ContactAutocompleteProps = {
   meta: FieldMetaState<any>;
@@ -117,6 +117,7 @@ const ContactAutocomplete = forwardRef<
           e.preventDefault();
         }
       }
+
       rest.onKeyDown?.(e);
     },
     [mergedAccounts, rest, activeSuggestion, setValue],
@@ -157,6 +158,12 @@ const ContactAutocomplete = forwardRef<
   }, [mergedAccounts, meta.error, value]);
 
   const { paste } = usePasteFromClipboard(setValue);
+
+  const { getAddressByEns, watchEns } = useEns();
+
+  useEffect(() => {
+    watchEns(value, setValue);
+  }, [value, setValue, getAddressByEns, watchEns]);
 
   const pasteButton = useMemo(() => {
     return (
@@ -391,10 +398,8 @@ const ContactButton = forwardRef<HTMLButtonElement, ContactButtonProps>(
         )}
         {...rest}
       >
-        <AutoIcon
+        <WalletAvatar
           seed={contact.address}
-          source="dicebear"
-          type="personas"
           className={classNames(
             "relative",
             "h-8 w-8 min-w-[2rem]",

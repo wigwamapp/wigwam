@@ -2,8 +2,8 @@ import { FC, memo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 
-import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
+import WalletAvatar from "./WalletAvatar";
 
 type AssetBalance = {
   symbol: string;
@@ -20,12 +20,7 @@ type AccountPreviewProps = {
 export const AccountPreview = memo<AccountPreviewProps>(
   ({ address, baseAsset, quoteAsset }) => (
     <div className={classNames("inline-flex items-stretch")}>
-      <AutoIcon
-        seed={address}
-        source="dicebear"
-        type="avataaars"
-        className="h-16 w-16 mr-4"
-      />
+      <WalletAvatar seed={address} className="h-16 w-16 mr-4" />
 
       <div className="p-1 flex flex-col">
         <span className="text-lg font-semibold">

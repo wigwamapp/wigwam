@@ -16,13 +16,13 @@ import { useDialog } from "app/hooks/dialog";
 import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import { ToastOverflowProvider, useToast } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
-import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/delete-medium.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 const ContactsSection: FC = () => {
   const { confirm } = useDialog();
@@ -212,10 +212,8 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
         )}
       >
         <div className="flex flex-col items-center pt-8 pb-4 px-3 w-full">
-          <AutoIcon
+          <WalletAvatar
             seed={address}
-            source="dicebear"
-            type="personas"
             className={classNames(
               "h-[4.625rem] w-[4.625rem]",
               "mb-5",
