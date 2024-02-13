@@ -63,7 +63,7 @@ const WalletName: FC<WalletNameProps> = ({
         )}
       />
       <span className="truncate min-w-0">
-        <TReplace msg={ensName ? ensName : wallet.name} />
+        <TReplace msg={ensName ?? wallet.name} />
       </span>
     </span>
   );

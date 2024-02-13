@@ -1,5 +1,4 @@
-import { FC, HTMLAttributes, memo, useRef, useEffect, useState } from "react";
-import classNames from "clsx";
+import { FC, HTMLAttributes, memo, useEffect, useState } from "react";
 import AutoIcon from "./AutoIcon";
 import Avatar from "app/components/elements/Avatar";
 
@@ -10,10 +9,6 @@ type WalletAvatarProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 const WalletAvatar: FC<WalletAvatarProps> = memo(({ seed, className }) => {
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  console.log("WALLET AVATAR");
-
   const { getEnsName, getEnsAvatar } = useEns();
 
   const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
@@ -24,16 +19,16 @@ const WalletAvatar: FC<WalletAvatarProps> = memo(({ seed, className }) => {
       return ethereumAddressRegex.test(seed);
     };
 
-    console.log("fetchEnsName");
-    console.log(seed);
-
+    console.log("WALLET AVATAR CHANGE", seed);
     const fetchEnsName = async () => {
       try {
         const name = await getEnsName(seed);
         if (name) {
           const avatar = await getEnsAvatar(name);
-          console.log(avatar);
+          console.log(seed, avatar);
           setEnsAvatar(avatar);
+        } else {
+          setEnsAvatar(null);
         }
       } catch (error) {
         console.error(error);
@@ -46,29 +41,24 @@ const WalletAvatar: FC<WalletAvatarProps> = memo(({ seed, className }) => {
   }, [getEnsName, getEnsAvatar, seed]);
 
   return (
-    <div
-      ref={rootRef}
-      className={classNames(
-        "inline-flex items-center justify-center relative",
-        "overflow-hidden",
-        className,
-      )}
-    >
+    <>
       {ensAvatar ? (
-        <Avatar src={ensAvatar} alt={"ensAvatar"} withBorder={false} />
+        <Avatar
+          src={ensAvatar}
+          className={className}
+          imageClassName="rounded-md"
+          alt={"ensAvatar"}
+          withBorder={false}
+        />
       ) : (
         <AutoIcon
           seed={seed}
           source="dicebear"
           type="personas"
-          className={classNames(
-            "h-24 w-24 min-w-[6rem] m-0.5",
-            "bg-black/40",
-            "rounded-l-[.5625rem]",
-          )}
+          className={className}
         />
       )}
-    </div>
+    </>
   );
 });
 
