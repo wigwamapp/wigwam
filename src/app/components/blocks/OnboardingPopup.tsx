@@ -1,241 +1,163 @@
-import {
-  FC,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import classNames from "clsx";
-import { useAtomValue, useSetAtom } from "jotai";
-import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
-import { IS_FIREFOX } from "app/defaults";
-import { onboardingPopupAtom } from "app/atoms";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Button from "app/components/elements/Button";
-import OnboardingOneImage from "app/images/onboarding-1.png";
-import OnboardingTwoImage from "app/images/onboarding-2.png";
-import OnboardingThreeImage from "app/images/onboarding-3.png";
-import OnboardingFourImage from "app/images/onboarding-4.png";
-import OnboardingFiveImage from "app/images/onboarding-5.png";
-import OnboardingSixImage from "app/images/onboarding-6.png";
-import OnboardingSevenImage from "app/images/onboarding-7.png";
-import { ReactComponent as ArrowIcon } from "app/icons/arrow-left-long.svg";
+
+import OnboardingFirstImage from "app/images/onboarding_first.png";
+import OnboardingSecondImage from "app/images/onboarding_second.png";
+import OnboardingThirdImage from "app/images/onboarding_third.png";
+import WigwamLogoImage from "app/images/wigwam.png";
+import { useAtomValue, useSetAtom } from "jotai";
+import { onboardingPopupAtom } from "app/atoms";
+
+type TStepContent = {
+  title: string;
+  description: string;
+  image: string;
+};
+
+const stepsContent: TStepContent[] = [
+  {
+    title: "Trade and explore",
+    description:
+      "Instantly trade over 2,500 tokens, connect with hundreds of dApps, and create or sell NFTs in the Web3 world, all through Wigwam",
+    image: OnboardingFirstImage,
+  },
+  {
+    title: "Easy access",
+    description:
+      "If you can't find a Wigwam button when connecting to a dApp, you can effortlessly connect to Wigwam using MetaMask button instead, as this option is automatically available",
+    image: OnboardingSecondImage,
+  },
+  {
+    title: "Always near",
+    description:
+      "Pin the Wigwam extension on your browser toolbar for fast access to your tokens and to navigate the Web3 space more efficiently",
+    image: OnboardingThirdImage,
+  },
+];
 
 const OnboardingPopup: FC = () => {
   const visible = useAtomValue(onboardingPopupAtom);
 
-  return visible ? <OnboardingPopupContent /> : null;
+  return visible ? <OnBoardingContent /> : null;
 };
 
 export default OnboardingPopup;
 
-const OnboardingPopupContent: FC = () => {
+const OnBoardingContent: FC = () => {
   const setVisible = useSetAtom(onboardingPopupAtom);
-  const [isReady, setIsReady] = useState(false);
+  const [step, setStep] = useState(0);
 
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const bottomElementRef = useRef<HTMLSpanElement>(null);
-
-  const scrolledBottom = useOnScreen(bottomElementRef);
-
-  useEffect(() => {
-    if (scrolledBottom) {
-      setIsReady(true);
-    }
-  }, [setIsReady, scrolledBottom]);
-
-  const handleButtonClick = useCallback(() => {
-    if (isReady) {
+  const handleNext = useCallback(() => {
+    if (step === 2) {
       setVisible(false);
     } else {
-      const html = document.querySelector("html")!;
-      const fontSize = parseFloat(
-        window.getComputedStyle(html, null).getPropertyValue("font-size"),
-      );
-
-      scrollAreaRef.current?.scrollTo({
-        behavior: "smooth",
-        top:
-          (scrollAreaRef.current?.scrollTop || 0) +
-          html.offsetHeight -
-          6 * fontSize,
-        left: 0,
-      });
+      setStep((prev) => prev + 1);
     }
-  }, [isReady, setVisible]);
+  }, [setVisible, step]);
 
   return (
-    <div className="fixed inset-0 z-[999999999999] bg-[#0E1314]/[.98] flex flex-col">
-      <ScrollAreaContainer
-        ref={scrollAreaRef}
-        className={classNames("w-full flex flex-col")}
-        viewPortClassName="pb-[12.5rem] rounded-t-[.625rem]"
-        scrollBarClassName="pt-2 pb-[6.5rem]"
-      >
-        <div className="w-full max-w-[56.25rem] pt-[6.5rem] flex flex-col mx-auto">
-          <h1 className="text-center text-[2.5rem] mb-4 font-bold">
-            Welcome to Wigwam Beta testing 🏕
-          </h1>
-          <p className="text-center text-lg">
-            This release is offering you to try the core functionality of the
-            application and even more!
+    <div
+      className={classNames(
+        "fixed inset-0 z-[999999999999] bg-[#141414] flex flex-col items-center w-full",
+        "p-6 pt-10 h-full",
+      )}
+    >
+      <ScrollAreaContainer className="w-full h-full flex flex-col relative">
+        <section className="mb-6 flex flex-col items-center">
+          <img
+            className="mb-6 w-11 h-11 rounded-md"
+            src={WigwamLogoImage}
+            alt="wigwam_logo"
+          />
+          <h3 className="mb-6 text-[1.75rem] font-bold text-center">
+            Welcome to Wigwam:
             <br />
-            Right now with Wigwam you can:
-          </p>
-          <Wrapper className="mt-[6.875rem]">
-            <Item>
-              Create an unlimited amount of wallets with Secret Phrase, Ledger
-              Nano device, and social media
-            </Item>
-            <img
-              src={OnboardingOneImage}
-              className="w-[26.625rem] h-auto ml-[6.5rem]"
-              alt="Create an unlimited amount of wallets with Secret Phrase, Ledger Nano device, and social media"
-            />
-          </Wrapper>
-          <Wrapper className="mt-[5.875rem]">
-            <img
-              src={OnboardingTwoImage}
-              className="w-[21.625rem] h-auto mr-[5.625rem]"
-              alt="Send and receive tokens to any of the networks that are already pre-installed in Wigwam. As well as add any EVM-compatible network"
-            />
-            <Item>
-              Send and receive tokens to any of the networks that are already
-              pre-installed in Wigwam. As well as add any EVM-compatible network
-            </Item>
-          </Wrapper>
-          <Wrapper className="mt-[6.625rem]">
-            <Item>
-              View your gas and ERC20 tokens balances, along with detailed
-              information about them, including transaction history
-            </Item>
-            <img
-              src={OnboardingThreeImage}
-              className="w-[28.25rem] h-auto ml-[4.875rem]"
-              alt="View your gas and ERC20 tokens balances, along with detailed information about them, including transaction history"
-            />
-          </Wrapper>
-          <Wrapper className="mt-[7.25rem]">
-            <img
-              src={OnboardingFourImage}
-              className="w-[23.375rem] h-auto mr-[3.75rem]"
-              alt={`Connect and fully interact with decentralized applications using the "Connect a Wallet" or "Connect MetaMask" button`}
-            />
-            <Item>
-              Connect and fully interact with decentralized applications using
-              the &quot;Connect a Wallet&quot; or &quot;Connect MetaMask&quot;
-              button
-            </Item>
-          </Wrapper>
-          <Wrapper>
-            <Item>Create an unlimited number of profiles!</Item>
-            <img
-              src={OnboardingFiveImage}
-              className="w-[21.5rem] h-auto ml-[4.875rem]"
-              alt="Create an unlimited number of profiles!"
-            />
-          </Wrapper>
-          <Wrapper>
-            <img
-              src={OnboardingSixImage}
-              className="w-[23.25rem] h-auto mr-[4rem]"
-              alt="Manage NFTs most conveniently: synchronization of all tokens from the start, instant auto-add after getting new ones, quick search and the ability to add a token, token preview with any content type, NFT transaction history."
-            />
-            <Item>
-              Manage NFTs most conveniently: synchronization of all tokens from
-              the start, instant auto-add after getting new ones, quick search
-              and the ability to add a token, token preview with any content
-              type (image/video/audio), NFT transaction history.
-            </Item>
-          </Wrapper>
-          <Wrapper className="mt-[3.75rem]">
-            <Item>
-              Join the Wigwam Testers Club and earn an Exclusive NFT!
-              <br />
-              We need your insights!{" "}
-              <Link href="https://forms.gle/LU91YfBdqR6f29th9">
-                Share your thoughts about Wigwam in our feedback form
-              </Link>{" "}
-              and stand a chance to win our unique Beta User NFT. Your feedback
-              is valuable in shaping our product.
-            </Item>
-            <img
-              src={OnboardingSevenImage}
-              className="w-[23.5rem] h-auto ml-[3.75rem]"
-              alt="To help us test the product and get NFT Wigwam Pro, check out the Beta Testing Workflow. Then fill in the Feedback Form to leave your feedback or bug report. Also, we suggest you learn Information about NFT Wigwam Pro and participation rules."
-            />
-          </Wrapper>
-          <span ref={bottomElementRef} className="invisible" />
-        </div>
-      </ScrollAreaContainer>
-      <div
-        className={classNames(
-          "z-20",
-          "absolute bottom-0 left-1/2 -translate-x-1/2",
-          "w-full h-24",
-          "flex justify-center items-center",
-          "mx-auto",
-          "bg-brand-dark/20",
-          "backdrop-blur-[10px]",
-          IS_FIREFOX && "!bg-addaccountcontinue",
-          "before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2",
-          "before:w-full before:max-w-[56.25rem] before:h-px",
-          "before:bg-brand-main/[.07]",
-        )}
-      >
-        <Button
-          type="button"
-          className="!min-w-[14rem] group"
-          onClick={handleButtonClick}
-        >
-          {isReady ? (
-            "Let's start!"
-          ) : (
-            <span className="flex items-center">
-              Next
-              <ArrowIcon className="ml-2 rotate-180 w-6 h-auto transition-transform group-hover:translate-x-1" />
-            </span>
+            Your Gateway to the Web3 World!
+          </h3>
+          <Stepper step={step} />
+        </section>
+        <ul className="mb-10 px-16 flex overflow-hidden">
+          <StepContent step={0} current={step} />
+          <StepContent step={1} current={step} />
+          <StepContent step={2} current={step} />
+        </ul>
+        <section
+          className={classNames(
+            "sticky bottom-0",
+            "px-16 flex justify-between items-center w-full gap-6",
           )}
-        </Button>
-      </div>
+        >
+          <Button
+            className={classNames(
+              "!ml-10",
+              "!font-semibold !text-[#93ACAF]",
+              step === 0 ? "collapse" : "visible",
+            )}
+            theme="clean"
+            onClick={() => setStep((prev) => prev - 1)}
+          >
+            Back
+          </Button>
+
+          <Button onClick={handleNext}>
+            {step === 2 ? "Start my journey" : "Next"}
+          </Button>
+        </section>
+      </ScrollAreaContainer>
     </div>
   );
 };
 
-const Wrapper: FC<PropsWithChildren<{ className?: string }>> = ({
-  className,
-  children,
-}) => (
-  <div
+const StepContent: FC<{ step: number; current: number }> = ({
+  step,
+  current,
+}) => {
+  const isActive = useMemo(() => {
+    return step === current;
+  }, [step, current]);
+
+  return (
+    <li
+      className={classNames(
+        "px-16 w-full min-w-full flex items-center justify-between gap-x-12",
+        "transition-all duration-300",
+        !isActive ? (current > step ? "-ml-[100%]" : "mr-[100%]") : undefined,
+      )}
+    >
+      <div>
+        <h6 className="mb-2 text-2xl font-bold">{stepsContent[step].title}</h6>
+        <p className="max-w-md text-lg font-semibold text-[#F8F9FD]/[0.6]">
+          {stepsContent[step].description}
+        </p>
+      </div>
+      <img
+        src={stepsContent[step].image}
+        alt={`${stepsContent[step].title}_image`}
+      />
+    </li>
+  );
+};
+
+const Stepper: FC<{ step: number }> = ({ step }) => {
+  return (
+    <div className="flex gap-3">
+      <StepLine active />
+      <StepLine active={step > 0} />
+      <StepLine active={step > 1} />
+    </div>
+  );
+};
+
+const StepLine: FC<{ active: boolean }> = ({ active }) => (
+  <span
     className={classNames(
-      "flex items-center w-full text-brand-light",
-      className,
+      "w-16 h-1 bg-[#D9D9D9]/[.3] rounded-full",
+      "relative after:absolute after:h-full after:rounded-full after:bg-[#80EF6E]",
+      "after:transition-all after:duration-200",
+      active ? "after:w-full" : "after:w-0",
     )}
-  >
-    {children}
-  </div>
-);
-
-const Item: FC<PropsWithChildren> = ({ children }) => (
-  <div className="flex">
-    <span className="block w-2 min-w-[.5rem] mt-2.5 h-2 rounded-full bg-buttonaccent mr-2" />
-    <p className="text-xl	font-bold">{children}</p>
-  </div>
-);
-
-type LinkProps = PropsWithChildren<{
-  href: string;
-}>;
-
-const Link: FC<LinkProps> = ({ href, children }) => (
-  <a
-    href={href}
-    className="text-brand-font transition-colors hover:text-brand-light underline"
-    target="_blank"
-    rel="nofollow noreferrer"
-  >
-    {children}
-  </a>
+  />
 );
