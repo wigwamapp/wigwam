@@ -89,12 +89,16 @@ const OnBoardingContent: FC = () => {
             className={classNames(
               "!ml-10",
               "!font-semibold !text-[#93ACAF]",
-              step === 0 ? "collapse" : "visible",
+              "visible",
             )}
             theme="clean"
-            onClick={() => setStep((prev) => prev - 1)}
+            onClick={
+              step === 0
+                ? () => setVisible(false)
+                : () => setStep((prev) => prev - 1)
+            }
           >
-            Back
+            {step === 0 ? "Skip" : "Back"}
           </Button>
 
           <Button onClick={handleNext}>
