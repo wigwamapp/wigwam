@@ -1,15 +1,15 @@
 import { FC, useCallback, useMemo, useState } from "react";
 import classNames from "clsx";
+import { useAtomValue, useSetAtom } from "jotai";
+
+import { onboardingPopupAtom } from "app/atoms";
 
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Button from "app/components/elements/Button";
-
 import OnboardingFirstImage from "app/images/onboarding_first.png";
 import OnboardingSecondImage from "app/images/onboarding_second.png";
 import OnboardingThirdImage from "app/images/onboarding_third.png";
 import WigwamLogoImage from "app/images/wigwam.png";
-import { useAtomValue, useSetAtom } from "jotai";
-import { onboardingPopupAtom } from "app/atoms";
 
 type TStepContent = {
   title: string;
@@ -65,7 +65,7 @@ const OnBoardingContent: FC = () => {
         "p-6 pt-10 h-full",
       )}
     >
-      <ScrollAreaContainer className="w-full h-full flex flex-col relative">
+      <ScrollAreaContainer className="w-full h-full flex flex-col relative max-w-7xl">
         <section className="mb-6 flex flex-col items-center">
           <img
             className="mb-6 w-11 h-11 rounded-md"
@@ -86,8 +86,8 @@ const OnBoardingContent: FC = () => {
         </ul>
         <section
           className={classNames(
-            "sticky bottom-0",
-            "px-16 flex justify-between items-center w-full gap-6",
+            "absolute bottom-0",
+            "px-16 flex justify-center items-center w-full gap-6",
           )}
         >
           <Button
@@ -122,14 +122,15 @@ const StepContent: FC<{ step: number; current: number }> = ({
   return (
     <li
       className={classNames(
-        "px-16 w-full min-w-full flex items-center justify-between gap-x-12",
+        "px-16 w-full min-w-full items-center grid grid-cols-1 gap-y-6 gap-x-12",
+        "md:grid-cols-2 md:gap-y-0",
         "transition-all duration-300",
         !isActive ? (current > step ? "-ml-[100%]" : "mr-[100%]") : undefined,
       )}
     >
       <div>
         <h6 className="mb-2 text-2xl font-bold">{stepsContent[step].title}</h6>
-        <p className="max-w-md text-lg font-semibold text-[#F8F9FD]/[0.6]">
+        <p className="max-w-md font-semibold text-[#F8F9FD]/[0.6] text-lg">
           {stepsContent[step].description}
         </p>
       </div>
@@ -143,7 +144,7 @@ const StepContent: FC<{ step: number; current: number }> = ({
 
 const Stepper: FC<{ step: number }> = ({ step }) => {
   return (
-    <div className="flex gap-3">
+    <div className="md:mb-12 mb-6 flex gap-3">
       <StepLine active />
       <StepLine active={step > 0} />
       <StepLine active={step > 1} />
