@@ -79,17 +79,12 @@ const OnBoardingContent: FC = () => {
           </h3>
           <Stepper step={step} />
         </section>
-        <ul className="mb-10 px-16 flex overflow-hidden">
+        <ul className="mb-16 px-16 flex overflow-hidden">
           <StepContent step={0} current={step} />
           <StepContent step={1} current={step} />
           <StepContent step={2} current={step} />
         </ul>
-        <section
-          className={classNames(
-            "absolute bottom-0",
-            "px-16 flex justify-center items-center w-full gap-6",
-          )}
-        >
+        <section className="px-16 flex justify-center items-center w-full gap-6">
           <Button
             className={classNames(
               "!ml-10",
