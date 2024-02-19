@@ -7,7 +7,7 @@ import { Network } from "core/types";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import { Page, SettingTab } from "app/nav";
-import { useAccounts } from "app/hooks";
+import { useAccounts, useExplorerLink } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
 import { ReactComponent as PopoverIcon } from "app/icons/popover.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
@@ -31,7 +31,12 @@ const NetworkCard: FC<NetworkCardProps> = ({
   onClick,
   className,
 }) => {
+  const { currentAccount } = useAccounts();
+  const explorerLink = useExplorerLink(network);
+
   const [popoverOpened, setPopoverOpened] = useState(false);
+
+  const explorerUrl = explorerLink?.address(currentAccount.address);
 
   return (
     <DropdownMenu.Root
@@ -117,16 +122,17 @@ const NetworkCard: FC<NetworkCardProps> = ({
           "flex flex-col",
         )}
       >
-        {network.explorerUrls?.length ? (
-          <PopoverButton
-            href={network.explorerUrls[0]}
-            Icon={WalletExplorerIcon}
-          >
+        {explorerUrl ? (
+          <PopoverButton href={explorerUrl} Icon={WalletExplorerIcon}>
             Block Explorer
           </PopoverButton>
         ) : null}
         <PopoverButton
-          to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          to={{
+            page: Page.Settings,
+            setting: SettingTab.Networks,
+            chainid: network.chainId,
+          }}
           Icon={SettingsIcon}
         >
           Settings

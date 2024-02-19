@@ -1,11 +1,13 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { useAtomValue } from "jotai";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { useLazyAllNetworks } from "app/hooks";
+import { chainIdUrlAtom } from "app/atoms";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -17,7 +19,9 @@ const Networks: FC = () => {
   const allNetworks = useLazyAllNetworks();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const [tab, setTab] = useState<"new" | number | null>(null);
+  const chainIdUrl = useAtomValue(chainIdUrlAtom);
+
+  const [tab, setTab] = useState<"new" | number | null>(chainIdUrl);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const fuse = useMemo(

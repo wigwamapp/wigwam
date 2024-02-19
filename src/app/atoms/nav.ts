@@ -43,3 +43,5 @@ export const onRampModalAtom = atomWithURLHash("onRampOpened", false);
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 
 export const activityModalAtom = atomWithURLHash("activityOpened", false);
+
+export const chainIdUrlAtom = atomWithURLHash<number | null>("chainid", null);
