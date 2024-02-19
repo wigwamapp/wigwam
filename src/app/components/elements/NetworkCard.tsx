@@ -128,7 +128,11 @@ const NetworkCard: FC<NetworkCardProps> = ({
           </PopoverButton>
         ) : null}
         <PopoverButton
-          to={{ page: Page.Settings, setting: SettingTab.Networks }}
+          to={{
+            page: Page.Settings,
+            setting: SettingTab.Networks,
+            chainid: network.chainId,
+          }}
           Icon={SettingsIcon}
         >
           Settings
