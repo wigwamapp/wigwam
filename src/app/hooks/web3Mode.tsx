@@ -16,25 +16,14 @@ export function useSetMetaMaskCompatibleMode(withDialog = true) {
     async (modeToSet: MetaMaskCompatibleMode) => {
       if (modeToSet === MetaMaskCompatibleMode.Off) {
         const response = await confirm({
-          title: "MetaMask compatible mode",
+          title: "Connect as Metamask",
           content: (
             <p className="mb-4">
               Are you sure you want to disable MetaMask compatible mode?
               <br />
-              Please note, that you won&apos;t be able to interact with dApps!
-              And you will have to refresh active browser tabs where dApps are
-              opened for the changes to take effect.
-              <br />
-              Learn more about{" "}
-              <a
-                href="https://wigwamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-                target="_blank"
-                rel="nofollow noreferrer"
-                className="underline"
-              >
-                how it works here
-              </a>
-              .
+              Please note, that you won&apos;t be able to interact with legacy
+              dApps! And you will have to refresh active browser tabs where
+              dApps are opened for the changes to take effect.
             </p>
           ),
           yesButtonText: "Disable",
