@@ -6,12 +6,12 @@ type ValidationType = (value: string) => string | undefined;
 export const required = (value: string) => (value ? undefined : "Required");
 
 export const minLength = (min: number) => (value: string | number) =>
-  value && value.toString().length >= min
+  !value || value.toString().length >= min
     ? undefined
     : `The minimum length is ${min}`;
 
 export const maxLength = (max: number) => (value: string | number) =>
-  value && value.toString().length <= max
+  !value || value.toString().length <= max
     ? undefined
     : `The maximum length is ${max}`;
 
@@ -72,7 +72,9 @@ export const preventXSS = (value: string) => {
 };
 
 export const validateAddress = (value: string) =>
-  ethers.isAddress(value) ? undefined : "The recipient address is invalid";
+  !value || ethers.isAddress(value)
+    ? undefined
+    : "The recipient address is invalid";
 
 export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+\\/{index}$");
 
@@ -102,3 +104,12 @@ export const validateNewPassword = (
   newPassword: string,
 ) =>
   prevPassword === newPassword ? "Shouldn’t match the old password" : undefined;
+
+export const validateEmail = (value: string) => {
+  const regExp =
+    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
+  return !value || String(value).toLowerCase().match(regExp)
+    ? undefined
+    : "Incorrect email address";
+};
