@@ -94,6 +94,7 @@ const Networks: FC = () => {
               name={net.name}
               onClick={() => setTab(net.chainId)}
               isActive={tab === net.chainId}
+              autoFocus={tab === net.chainId}
               className="mt-2"
             />
           ))}
@@ -125,6 +126,7 @@ type NetworkBtnProps = {
   isActive?: boolean;
   isCreateNew?: boolean;
   className?: string;
+  autoFocus?: boolean;
 };
 
 const NetworkBtn: FC<NetworkBtnProps> = ({
@@ -134,6 +136,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
   isActive = false,
   isCreateNew = false,
   className,
+  autoFocus,
 }) => {
   return (
     <button
@@ -150,6 +153,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
         className,
       )}
       onClick={onClick}
+      autoFocus={autoFocus}
     >
       {isCreateNew ? (
         <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
