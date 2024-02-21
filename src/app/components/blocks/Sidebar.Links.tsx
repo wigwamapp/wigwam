@@ -54,6 +54,11 @@ const useSidebarLinks = () => {
         Icon: SwapIcon,
         badge: +swapBadgeAmount,
       },
+      {
+        route: Page.Rewards,
+        label: "Rewards",
+        Icon: ReceiveIcon,
+      },
       // {
       //   route: Page.Apps,
       //   label: "Apps",

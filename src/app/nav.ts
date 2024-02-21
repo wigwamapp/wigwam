@@ -10,6 +10,7 @@ export enum Page {
   Contacts = "contacts",
   Wallets = "wallets",
   Settings = "settings",
+  Rewards = "Rewards",
 }
 
 export enum AddAccountStep {
