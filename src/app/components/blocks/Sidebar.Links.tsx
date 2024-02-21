@@ -12,6 +12,7 @@ import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
+import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
 import { activityModalAtom } from "app/atoms";
@@ -57,7 +58,7 @@ const useSidebarLinks = () => {
       {
         route: Page.Rewards,
         label: "Rewards",
-        Icon: ReceiveIcon,
+        Icon: RewardsIcon,
       },
       // {
       //   route: Page.Apps,
