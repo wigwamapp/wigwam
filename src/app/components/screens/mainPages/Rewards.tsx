@@ -76,8 +76,8 @@ const Rewards: FC = () => {
             viewPortClassName="max-w-2xl"
             scrollBarClassName="py-0 pb-2"
           >
-            <h1 className="mb-4 text-2xl font-semibold">Rewards</h1>
-            <p className="mb-8 text-base text-brand-gray">
+            <h1 className="mb-3 text-2xl font-bold">Rewards</h1>
+            <p className="mb-6 text-base text-brand-gray">
               You should bind your wallet address to participate in our reward
               activities. By adding your email, you will agree that we may send
               you our reward announcements and other relevant to our app
