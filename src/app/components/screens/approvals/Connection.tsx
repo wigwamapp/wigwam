@@ -215,6 +215,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
             withAction={false}
             size="small"
             source="connection"
+            withFiat={false}
           />
         </div>
         <Separator />

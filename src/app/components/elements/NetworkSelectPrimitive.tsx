@@ -48,6 +48,7 @@ type NetworkSelectProps = {
   currentListItemClassName?: string;
   currentItemIconClassName?: string;
   contentClassName?: string;
+  withFiat?: boolean;
 };
 
 const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
@@ -65,6 +66,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   currentListItemClassName,
   currentItemIconClassName,
   contentClassName,
+  withFiat,
 }) => {
   const page = useAtomValue(pageAtom);
 
@@ -155,6 +157,7 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
       contentClassName={contentClassName}
       modal={true}
       size={size}
+      withFiat={withFiat}
       placeholder="Search Network"
       actions={
         withAction ? (

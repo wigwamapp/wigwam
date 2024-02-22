@@ -55,6 +55,7 @@ export type SelectProps<T, U> = {
   currentItemIconClassName?: string;
   itemClassName?: string;
   actionsClassName?: string;
+  withFiat?: boolean;
 } & DropdownMenu.DropdownMenuProps;
 
 function Select<T extends string | ReactElement, U extends string | number>({
@@ -86,6 +87,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
   currentItemIconClassName,
   itemClassName,
   actionsClassName,
+  withFiat = true,
   ...rest
 }: SelectProps<T, U>) {
   const [opened, setOpened] = useState(false);
@@ -212,7 +214,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                 )}
               </div>
               <div className="flex items-center">
-                {currentItem.balanceUSD && (
+                {withFiat && currentItem.balanceUSD && (
                   <FiatAmount
                     amount={currentItem.balanceUSD}
                     copiable={false}
@@ -321,7 +323,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           size === "large" && "py-2.5",
                           size === "large" && "rounded-[.625rem]",
                           type === "network" ? "text-base" : "text-sm",
-                          size === "small" && "rounded-lg text-xs",
+                          size === "small" && "py-2 rounded-lg text-xs",
                           "cursor-pointer",
                           "font-bold",
                           "outline-none",
@@ -363,7 +365,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                           ) : (
                             item.value
                           )}
-                          {item.balanceUSD && (
+                          {withFiat && item.balanceUSD && (
                             <FiatAmount
                               amount={item.balanceUSD}
                               copiable={false}
