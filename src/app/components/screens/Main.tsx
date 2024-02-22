@@ -14,6 +14,7 @@ import Apps from "./mainPages/Apps";
 import Contacts from "./mainPages/Contacts";
 import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
+import Rewards from "./mainPages/Rewards";
 import OnboardingPopup from "../blocks/OnboardingPopup";
 
 const SwapDynamic = lazy(() => import("./mainPages/Swap"));
@@ -47,5 +48,6 @@ function matchMainPage(page: Page) {
     .with(Page.Contacts, () => <Contacts />)
     .with(Page.Wallets, () => <Wallets />)
     .with(Page.Settings, () => <Settings />)
+    .with(Page.Rewards, () => <Rewards />)
     .otherwise(() => <Redirect to={{ page: Page.Default }} />);
 }

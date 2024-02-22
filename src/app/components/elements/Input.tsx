@@ -240,7 +240,7 @@ const Input = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && !readOnly && "max-h-5",
+              error && errorMessage && !readOnly && "h-full max-h-5",
             )}
           >
             <span className="block text-brand-redtext pt-1 pl-4 text-xs">
