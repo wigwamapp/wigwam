@@ -67,14 +67,14 @@ const Rewards: FC = () => {
     };
 
   return (
-    <div className={classNames("p-6 pt-7 -mx-6 min-h-0", "flex flex-col grow")}>
+    <div className={classNames("-mx-6 px-6 min-h-0", "flex flex-col grow")}>
       <OverflowProvider>
         {(ref) => (
           <ScrollAreaContainer
             ref={ref}
-            className="pr-5 -mr-5"
+            className="-mr-5"
             viewPortClassName="max-w-2xl"
-            scrollBarClassName="py-0 pb-2"
+            scrollBarClassName="pb-1"
           >
             <h1 className="mb-3 text-2xl font-bold">Rewards</h1>
             <p className="mb-6 text-base text-brand-gray">
@@ -103,7 +103,7 @@ const Rewards: FC = () => {
               </a>{" "}
               channels to know more about our latest reward events.{" "}
             </p>
-            <div className="pb-6 flex flex-col">
+            <div className="pb-6 flex flex-col max-w-md">
               <Form<FormValues>
                 initialValues={{
                   isAnalyticChecked: analytics.enabled,
@@ -117,17 +117,23 @@ const Rewards: FC = () => {
                         Your current wallet address:
                       </p>
                       <div className="flex items-start flex-col w-full">
-                        <div className="mb-3 flex items-center gap-x-4">
-                          <WalletAvatar seed={address!} className="h-8 w-8" />
+                        <div
+                          className={classNames(
+                            "mb-3 p-4 w-full",
+                            "flex items-center gap-x-4",
+                            "border border-brand-main/5 rounded-[.625rem] bg-black/10",
+                          )}
+                        >
+                          <WalletAvatar seed={address!} className="h-12 w-12" />
                           <div>
                             <WalletName
                               wallet={currentAccount}
                               theme="small"
-                              className="text-sm"
+                              className="text-xl"
                             />
                             <HashPreview
                               hash={address!}
-                              className="text-sm text-brand-light font-semibold leading-4 mr-1"
+                              className="text-base text-brand-light leading-4 mr-1"
                               withTooltip={false}
                             />
                           </div>
@@ -153,7 +159,7 @@ const Rewards: FC = () => {
                                 }
                                 error={meta.error && meta.touched}
                                 errorMessage={meta.error}
-                                className="w-full max-w-md"
+                                className="w-full "
                                 {...input}
                               />
                             )}
@@ -172,12 +178,12 @@ const Rewards: FC = () => {
                           placeholder="Promo code"
                           error={meta.error && meta.touched}
                           errorMessage={meta.error}
-                          className="max-w-md mb-6 w-full"
+                          className=" mb-6 w-full"
                           {...input}
                         />
                       )}
                     </Field>
-                    <p className="mb-6 text-base font-semibold">
+                    <p className="mb-6 text-sm font-semibold">
                       Add you email to know about our following raffles and
                       prizes
                     </p>
@@ -192,7 +198,7 @@ const Rewards: FC = () => {
                           placeholder="johndoe@email.com"
                           error={meta.error && meta.touched}
                           errorMessage={meta.error}
-                          className="max-w-md mb-6 w-full"
+                          className="mb-6 w-full"
                           {...input}
                         />
                       )}
@@ -259,7 +265,7 @@ const CheckboxWithLabel: FC<ICheckboxWithLabelProps> = ({
         id={name}
         onCheckedChange={(checked) => form.change(name, Boolean(checked))}
       >
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 max-w-md">
           <Checkbox
             checked={value}
             className={classNames(
