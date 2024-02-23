@@ -20,6 +20,7 @@ type NetworkSelectProps = {
   changeInternalChainId?: boolean;
   size?: "large" | "small";
   source?: string;
+  withFiat?: boolean;
 };
 
 const NetworkSelect: FC<NetworkSelectProps> = ({
@@ -33,6 +34,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   changeInternalChainId = true,
   size = "large",
   source,
+  withFiat,
 }) => {
   const chainId = useChainId();
   const allNetworksPure = useLazyAllNetworks();
@@ -85,12 +87,14 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
       withAction={withAction}
       size={size}
       source={source}
+      withFiat={withFiat}
       currentItemClassName={classNames(
         size === "small" ? "h-[1.75rem]" : "h-12",
         currentItemClassName,
       )}
       currentListItemClassName={classNames(
-        "!bg-brand-main/20 border-2 border-[#80EF6E] !py-2",
+        "!bg-brand-main/20 border-2 border-[#80EF6E]",
+        size === "small" ? "!py-1.5" : "!py-2",
         currentListItemClassName,
       )}
       currentItemIconClassName={currentItemIconClassName}
