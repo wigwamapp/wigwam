@@ -55,16 +55,18 @@ const FeeTab = memo<FeeTabProps>(
     const changeStepDecimals = chainId === 1 ? 9 : 8;
     const changeValue = useCallback(
       (name: string, value: bigint | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
+        onOverridesChange((o) => ({ ...o, [name]: value ?? "" }));
       },
       [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
+        if (!value) {
+          onOverridesChange((o) => ({ ...o, [name]: null }));
+        }
       },
-      [changeValue],
+      [onOverridesChange],
     );
 
     const handleFeeModeChange = useCallback(

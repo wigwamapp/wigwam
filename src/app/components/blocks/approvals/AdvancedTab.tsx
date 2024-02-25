@@ -27,16 +27,18 @@ const AdvancedTab = memo<AdvancedTabProps>(
 
     const changeValue = useCallback(
       (name: string, value: ethers.BigNumberish | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
+        onOverridesChange((o) => ({ ...o, [name]: value ?? "" }));
       },
       [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
+        if (!value) {
+          onOverridesChange((o) => ({ ...o, [name]: null }));
+        }
       },
-      [changeValue],
+      [onOverridesChange],
     );
 
     return (
