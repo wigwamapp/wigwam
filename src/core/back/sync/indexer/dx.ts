@@ -1,6 +1,6 @@
 import memoize from "mem";
 
-import { indexerApi } from "./api";
+import { indexerApi } from "core/common/indexerApi";
 
 export const getDxChain = memoize(async (chainId: number) => {
   try {

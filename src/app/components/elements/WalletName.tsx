@@ -14,7 +14,7 @@ import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
 import { ReactComponent as EyeIcon } from "app/icons/opened-eye.svg";
 
 type WalletNameProps = {
-  wallet: Account;
+  wallet: Account | { name: string; address: string };
   theme?: "large" | "small" | "extrasmall";
   className?: string;
   iconClassName?: string;
@@ -53,15 +53,17 @@ const WalletName: FC<WalletNameProps> = ({
         className,
       )}
     >
-      <Icon
-        wallet={wallet}
-        className={classNames(
-          "h-auto",
-          theme === "large" && "w-[1.125rem] min-w-[1.125rem] mr-1",
-          theme === "small" && "w-4 min-w-[1rem] mr-0.5",
-          iconClassName,
-        )}
-      />
+      {"source" in wallet ? (
+        <Icon
+          wallet={wallet}
+          className={classNames(
+            "h-auto",
+            theme === "large" && "w-[1.125rem] min-w-[1.125rem] mr-1",
+            theme === "small" && "w-4 min-w-[1rem] mr-0.5",
+            iconClassName,
+          )}
+        />
+      ) : null}
       <span className="truncate min-w-0">
         <TReplace msg={ensName ?? wallet.name} />
       </span>
