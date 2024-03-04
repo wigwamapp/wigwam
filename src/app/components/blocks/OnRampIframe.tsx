@@ -13,7 +13,7 @@ import {
   tokenSlugAtom,
 } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
-import { ReactComponent as ProcessingIcon } from "app/icons/onramp-tx-pending.svg";
+import { ReactComponent as SuccessGreen } from "app/icons/success-green.svg";
 import { nanoid } from "nanoid";
 import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
@@ -137,7 +137,7 @@ const OnRampIframe: FC = () => {
       alert({
         title: (
           <div className="flex items-center gap-2">
-            <ProcessingIcon className="w-8" /> Transaction Processing
+            <SuccessGreen className="w-8" /> Transaction Processing
           </div>
         ),
         content: (

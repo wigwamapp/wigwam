@@ -2,8 +2,7 @@ import memoize from "mem";
 import { AxiosResponse } from "axios";
 
 import { TokenType } from "core/types";
-
-import { indexerApi } from "./api";
+import { indexerApi } from "core/common/indexerApi";
 
 /**
  * C-Indexer = "Cx"

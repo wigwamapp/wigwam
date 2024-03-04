@@ -2,7 +2,7 @@
  * NS-Indexer = "NSx"
  */
 
-import { indexerApi } from "./api";
+import { indexerApi } from "core/common/indexerApi";
 
 export const fetchAccountNFTs = async (
   chainId: number,
