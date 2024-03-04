@@ -253,7 +253,7 @@ const Rewards: FC = () => {
             </div>
             <Field
               name="promo"
-              validate={composeValidators(minLength(4), maxLength(10))}
+              validate={composeValidators(minLength(4), maxLength(24))}
             >
               {({ input, meta }) => (
                 <Input
@@ -270,10 +270,7 @@ const Rewards: FC = () => {
             <p className="mb-6 text-sm font-semibold">
               Add you email to know about our following raffles and prizes
             </p>
-            <Field
-              name="email"
-              validate={composeValidators(minLength(6), validateEmail)}
-            >
+            <Field name="email" validate={composeValidators(validateEmail)}>
               {({ input, meta }) => (
                 <Input
                   label="Email"
