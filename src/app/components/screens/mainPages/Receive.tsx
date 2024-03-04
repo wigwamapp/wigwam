@@ -63,12 +63,6 @@ const Receive: FC = () => {
 export default Receive;
 
 const getTabsContent = (network?: Network) => [
-  {
-    route: { page: "receive", receive: ReceiveTabEnum.ShareAddress },
-    title: "Share address",
-    Icon: AddressIcon,
-    desc: "View current wallet address. Share it or use it on exchanges to receive funds.",
-  },
   ...(network?.type === "mainnet"
     ? [
         // {
@@ -92,6 +86,12 @@ const getTabsContent = (network?: Network) => [
         },
       ]
     : []),
+  {
+    route: { page: "receive", receive: ReceiveTabEnum.ShareAddress },
+    title: "Share address",
+    Icon: AddressIcon,
+    desc: "View current wallet address. Share it or use it on exchanges to receive funds.",
+  },
   ...(network?.type === "testnet" && network.faucetUrls?.length
     ? [
         {

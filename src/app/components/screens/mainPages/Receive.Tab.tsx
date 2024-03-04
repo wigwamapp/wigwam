@@ -7,14 +7,13 @@ import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
 import { receiveTabAtom } from "app/atoms";
 
 import ShareAddress from "../receiveTabs/ShareAddress";
-import BuyWithCrypto from "../receiveTabs/BuyWithCrypto";
-import Faucet from "../receiveTabs/Faucet";
 import BuyWithFiat from "../receiveTabs/BuyWithFiat";
+import Faucet from "../receiveTabs/Faucet";
 
 function matchReceiveTab(receiveTab: ReceiveTabEnum, tabs: ReceiveTabEnum[]) {
   const redirectToDefault = () => (
     <Redirect
-      to={{ page: Page.Receive, receive: ReceiveTabEnum.ShareAddress }}
+      to={{ page: Page.Receive, receive: ReceiveTabEnum.BuyWithFiat }}
     />
   );
 
@@ -25,7 +24,6 @@ function matchReceiveTab(receiveTab: ReceiveTabEnum, tabs: ReceiveTabEnum[]) {
   return (
     match(receiveTab)
       .with(ReceiveTabEnum.ShareAddress, () => <ShareAddress />)
-      .with(ReceiveTabEnum.BuyWithCrypto, () => <BuyWithCrypto />)
       .with(ReceiveTabEnum.BuyWithFiat, () => <BuyWithFiat />)
       .with(ReceiveTabEnum.Faucet, () => <Faucet />)
       // Redirect to default

@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import memoize from "mem";
+import { withOfflineCache } from "lib/ext/offlineCache";
 import { storage } from "lib/ext/storage";
 
 import { CONVERSION_CURRENCIES } from "fixtures/conversionCurrency";
@@ -13,7 +13,7 @@ type CoinGeckoRate = {
   value: number;
 };
 
-export const syncConversionRates = memoize(
+export const syncConversionRates = withOfflineCache(
   async () => {
     try {
       const { data } = await coinGeckoApi.get("/exchange_rates");
@@ -37,9 +37,15 @@ export const syncConversionRates = memoize(
       }
 
       await storage.put("currencies_rate", rates);
+      return true;
     } catch (err) {
       console.error(err);
+      return false;
     }
   },
-  { maxAge: 5 * 60_000 },
+  {
+    key: "cg_conversion_rates",
+    hotMaxAge: 60_000,
+    coldMaxAge: 60 * 60_000,
+  },
 );

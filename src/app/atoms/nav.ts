@@ -35,7 +35,7 @@ export const transferTabAtom = atomWithURLHash<TransferTab>(
 
 export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
   "receive",
-  ReceiveTab.ShareAddress,
+  ReceiveTab.BuyWithFiat,
 );
 
 export const onRampModalAtom = atomWithURLHash("onRampOpened", false);
