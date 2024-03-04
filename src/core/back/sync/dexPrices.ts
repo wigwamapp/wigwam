@@ -5,6 +5,8 @@ import BigNumber from "bignumber.js";
 import { getAddress, isAddress } from "ethers";
 import { withOfflineCache } from "lib/ext/offlineCache";
 
+import { indexerApi } from "./indexer";
+
 export type DexTokenPrice = {
   usd: number;
   usd_24h_change?: number;
@@ -69,8 +71,8 @@ export async function getDexPrices(tokenAddresses: string[]) {
       while (coinsToRefresh.length > 0) {
         const nextCoins = coinsToRefresh.splice(0, 100);
 
-        const res = await coinGeckoApi
-          .get<DexPrices>("/simple/price", {
+        const res = await indexerApi
+          .get<DexPrices>("/cg/simple/price", {
             params: {
               ids: nextCoins.join(),
               vs_currencies: "USD",
@@ -172,7 +174,7 @@ export const getCoinGeckoPlatformPrices = memoize(
   async () => {
     const platformIds = await getCoinGeckoPlatformIds();
 
-    const { data } = await coinGeckoApi.get<DexPrices>("/simple/price", {
+    const { data } = await indexerApi.get<DexPrices>("/cg/simple/price", {
       params: {
         ids: Object.values(platformIds)
           .map((p) => p.native_coin_id)
