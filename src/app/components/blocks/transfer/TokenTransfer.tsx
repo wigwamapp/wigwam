@@ -362,18 +362,29 @@ const TransferTokenContent = memo<TransferTokenContent>(
             try {
               setEstimating(true);
 
+              const signer = provider.getVoidSigner(currentAccount.address);
+
               const value = 1;
               let gasLimit = 0n;
 
               if (tokenSlug === NATIVE_TOKEN_SLUG) {
-                gasLimit = await provider.estimateGas({
-                  to: recipientAddr,
-                  value,
-                });
+                gasLimit = await provider
+                  .estimateGas({
+                    to: recipientAddr,
+                    value,
+                  })
+                  .catch((err) =>
+                    signer
+                      .estimateGas({
+                        to: recipientAddr,
+                        value,
+                      })
+                      .catch(() => {
+                        throw err;
+                      }),
+                  );
               } else {
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
-
-                const signer = provider.getVoidSigner(currentAccount.address);
 
                 switch (standard) {
                   case TokenStandard.ERC20:

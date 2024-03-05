@@ -6,10 +6,12 @@ import { GasPrices } from "core/types";
 
 import { RpcProvider, getRpcProvider } from "../../rpc";
 
+// Skip Arbitrum & ZkSync
+// TODO: Add other mechanic for this issue.
+const DISALLOWED_CHAIN_IDS = [42161, 324];
+
 export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
-  // Skip Arbitrum
-  // TODO: Add other mechanic for this issue.
-  if (chainId === 42161) return null;
+  if (DISALLOWED_CHAIN_IDS.includes(chainId)) return null;
 
   const provider = getRpcProvider(chainId);
 
