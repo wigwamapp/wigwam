@@ -9,7 +9,6 @@ import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
-import { toggleTokenStatus } from "core/common/tokens";
 import { getTokenDetailsUrlAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -18,11 +17,11 @@ import {
   useAccounts,
   useChainId,
   useExplorerLink,
+  useHideToken,
   useLazyNetwork,
   useRamp,
   useTokenActivitiesSync,
 } from "app/hooks";
-import { useDialog } from "app/hooks/dialog";
 import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
@@ -39,15 +38,12 @@ import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 import TokenActivity from "./TokenActivity";
 
 const AssetInfo: FC = () => {
   const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
-
-  const { confirm } = useDialog();
 
   const chainId = useChainId();
   const { currentAccount } = useAccounts();
@@ -89,6 +85,8 @@ const AssetInfo: FC = () => {
     scrollAreaRef.current?.scrollTo(0, 0);
   }, [tokenSlug]);
 
+  const handleHideAsset = useHideToken(tokenInfo);
+
   if (!tokenInfo) return null;
 
   const {
@@ -101,32 +99,6 @@ const AssetInfo: FC = () => {
     priceUSDChange,
     balanceUSD,
   } = tokenInfo;
-
-  const handleHideAsset = async () => {
-    const response = await confirm({
-      title: "Hide asset",
-      content: (
-        <>
-          <p className="mb-4 mx-auto text-center">
-            Are you sure you want to hide <b>{tokenInfo?.symbol}</b>?
-          </p>
-          <p className="mx-auto text-center">
-            You can turn it back on the{" "}
-            <span className="inline-flex">
-              &quot;
-              <ControlIcon /> Manage Assets&quot;
-            </span>{" "}
-            at any time.
-          </p>
-        </>
-      ),
-      yesButtonText: "Hide",
-    });
-
-    if (response && tokenInfo) {
-      toggleTokenStatus(tokenInfo);
-    }
-  };
 
   return (
     <OverflowProvider>

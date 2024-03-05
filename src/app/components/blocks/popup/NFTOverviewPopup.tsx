@@ -1,31 +1,65 @@
 import { FC, useCallback } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
+import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { AccountNFT } from "core/types";
+import { findToken } from "core/client";
 
 import { chainIdAtom } from "app/atoms";
-import { useChainId, useAutoRefreshNftMetadata } from "app/hooks";
+import {
+  useChainId,
+  useAutoRefreshNftMetadata,
+  useHideToken,
+  TippySingletonProvider,
+  useAccounts,
+  useExplorerLink,
+  useLazyNetwork,
+} from "app/hooks";
 import { openInTab } from "app/helpers";
 import { Page } from "app/nav";
 import { prepareNFTLabel } from "app/utils";
 
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
+import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
+import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
+import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
+import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import Button from "app/components/elements/Button";
+import IconedButton from "app/components/elements/IconedButton";
 
 import PopupModal, { IPopupModalProps } from "./PopupModal";
 import NftOverview from "../nft/NftOverview";
 
 type NFTOverviewPopupProps = Pick<IPopupModalProps, "open" | "onOpenChange"> & {
-  token: AccountNFT | null;
+  token?: AccountNFT;
 };
 
-const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
+const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({
+  token,
+  onOpenChange,
+  ...rest
+}) => {
   const chainId = useChainId();
   const setInternalChainId = useSetAtom(chainIdAtom);
+  const { currentAccount } = useAccounts();
 
-  useAutoRefreshNftMetadata(token ?? undefined);
+  const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
+
+  useAutoRefreshNftMetadata(token);
+
+  const onClose = useCallback(() => onOpenChange?.(false), [onOpenChange]);
+
+  const handleHideToken = useHideToken(token, onClose);
+
+  const handleMetadataRefresh = useCallback(() => {
+    if (token?.tokenSlug) {
+      findToken(chainId, currentAccount.address, token?.tokenSlug, true);
+    }
+  }, [chainId, currentAccount.address, token?.tokenSlug]);
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {
@@ -38,9 +72,12 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
     ? prepareNFTLabel(token?.tokenId, token?.name)
     : undefined;
 
+  const { copy, copied } = useCopyToClipboard();
+
   return (
     <PopupModal
       {...rest}
+      onOpenChange={onOpenChange}
       small
       contentClassName="!pt-0"
       closeButtonClassName="!top-[1.9rem]"
@@ -49,8 +86,8 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
           <h3
             className={classNames(
               "line-clamp-2 break-words mt-2",
-              "text-xl text-center font-bold",
-              "w-full",
+              "text-xl text-left font-bold",
+              "w-full pr-6",
               !tokenInfo.name ? "text-brand-main" : "",
             )}
           >
@@ -81,7 +118,52 @@ const NFTOverviewPopup: FC<NFTOverviewPopupProps> = ({ token, ...rest }) => {
         )
       }
     >
-      <div className={classNames("w-full h-[20rem]", "rounded-xl")}>
+      {token && (
+        <TippySingletonProvider>
+          <div className="w-full flex items-center mt-2">
+            {explorerLink && (
+              <IconedButton
+                aria-label="View NFT details"
+                Icon={WalletExplorerIcon}
+                className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                iconClassName="!w-[1.125rem]"
+                href={
+                  token.detailUrl ??
+                  explorerLink.nft(token.contractAddress, token.tokenId)
+                }
+              />
+            )}
+            <IconedButton
+              aria-label={copied ? "Copied" : `Copy NFT contract address`}
+              Icon={copied ? SuccessIcon : CopyIcon}
+              className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+              iconClassName="!w-[1.125rem]"
+              onClick={() => copy(token.contractAddress)}
+            />
+            <IconedButton
+              aria-label={"Refresh NFT metadata"}
+              Icon={RefreshIcon}
+              onClick={handleMetadataRefresh}
+              className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+              iconClassName="!w-[1.125rem]"
+            />
+            <IconedButton
+              aria-label="Hide token"
+              Icon={EyeIcon}
+              onClick={() => handleHideToken()}
+              className="!w-6 !h-6 min-w-[1.5rem]"
+              iconClassName="!w-[1.125rem]"
+            />
+          </div>
+        </TippySingletonProvider>
+      )}
+
+      <div
+        className={classNames(
+          "w-full min-h-[10rem] max-h-[24rem] overflow-hidden",
+          "rounded-xl my-4 flex items-center justify-center",
+        )}
+      >
         {token && (
           <NftOverview
             key={getNftOverviewKey(token)}

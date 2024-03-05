@@ -280,7 +280,7 @@ type NftListProps = {
 
 const NftList = memo<NftListProps>(
   ({ currentAccount, tokens, manageModeEnabled, loadMoreTriggerRef }) => {
-    const [nftToken, setNftToken] = useState<AccountNFT | null>(null);
+    const [nftToken, setNftToken] = useState<AccountNFT | undefined>();
 
     const handleNFTSelect = useCallback(
       async (token: AccountNFT) => {
@@ -342,7 +342,7 @@ const NftList = memo<NftListProps>(
         <NFTOverviewPopup
           open={Boolean(nftToken)}
           token={nftToken}
-          onOpenChange={() => setNftToken(null)}
+          onOpenChange={() => setNftToken(undefined)}
         />
       </>
     );

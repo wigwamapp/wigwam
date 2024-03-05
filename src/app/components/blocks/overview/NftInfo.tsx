@@ -21,6 +21,7 @@ import {
   useTokenActivitiesSync,
   useAutoRefreshNftMetadata,
   useAccounts,
+  useHideToken,
 } from "app/hooks";
 import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -36,6 +37,7 @@ import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
 import TokenActivity from "./TokenActivity";
 import NftOverview from "../nft/NftOverview";
@@ -83,6 +85,8 @@ const NftInfo: FC = () => {
     scrollAreaRef.current?.scrollTo(0, 0);
   }, [tokenSlug]);
 
+  const handleHideNFT = useHideToken(tokenInfo);
+
   const handleMetadataRefresh = useCallback(() => {
     findToken(chainId, currentAccount.address, tokenSlug, true);
   }, [chainId, currentAccount.address, tokenSlug]);
@@ -125,6 +129,15 @@ const NftInfo: FC = () => {
 
                   <TippySingletonProvider>
                     <div className="flex items-center ml-4">
+                      {explorerLink && (
+                        <IconedButton
+                          aria-label="View NFT details"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={detailUrl ?? explorerLink.nft(address, tokenId)}
+                        />
+                      )}
                       <IconedButton
                         aria-label={
                           copied
@@ -143,15 +156,13 @@ const NftInfo: FC = () => {
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                         iconClassName="!w-[1.125rem]"
                       />
-                      {explorerLink && (
-                        <IconedButton
-                          aria-label="View NFT details"
-                          Icon={WalletExplorerIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem]"
-                          iconClassName="!w-[1.125rem]"
-                          href={detailUrl ?? explorerLink.nft(address, tokenId)}
-                        />
-                      )}
+                      <IconedButton
+                        aria-label="Hide token"
+                        Icon={EyeIcon}
+                        onClick={() => handleHideNFT()}
+                        className="!w-6 !h-6 min-w-[1.5rem]"
+                        iconClassName="!w-[1.125rem]"
+                      />
                     </div>
                   </TippySingletonProvider>
                 </div>

@@ -27,9 +27,9 @@ import {
   TippySingletonProvider,
   useExplorerLink,
   useLazyNetwork,
+  useHideToken,
   useRamp,
 } from "app/hooks";
-import { useDialog } from "app/hooks/dialog";
 
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
@@ -41,7 +41,6 @@ import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
-import { ReactComponent as ControlIcon } from "app/icons/control.svg";
 
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
@@ -381,7 +380,6 @@ const TokenActionButtons: FC<{
 }> = ({ asset, onClose, className }) => {
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
-  const { confirm } = useDialog();
 
   const { chainId, tokenSlug, status } = asset;
 
@@ -397,33 +395,7 @@ const TokenActionButtons: FC<{
     "off",
   );
 
-  const handleHideAsset = useCallback(async () => {
-    const response = await confirm({
-      title: "Hide asset",
-      content: (
-        <>
-          <p className="mb-4 mx-auto text-center">
-            Are you sure you want to hide <b>{asset?.symbol}</b>?
-          </p>
-          <p className="mx-auto text-center">
-            You can turn it back on the{" "}
-            <span className="inline-flex">
-              &quot;
-              <ControlIcon /> Manage Assets&quot;
-            </span>{" "}
-            at any time.
-          </p>
-        </>
-      ),
-      yesButtonText: "Hide",
-    });
-
-    if (response && asset) {
-      toggleTokenStatus(asset);
-    }
-
-    onClose();
-  }, [confirm, asset, onClose]);
+  const handleHideAsset = useHideToken(asset, onClose);
 
   return (
     <div className={classNames("flex items-center", className)}>
