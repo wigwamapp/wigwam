@@ -93,6 +93,20 @@ export const $approvals = createStore<Approval[]>([])
       return [newApproval, ...approvals];
     }
 
+    if (
+      newApproval.type === ActivityType.Transaction &&
+      newApproval.source.replaceTx
+    ) {
+      const prevId = newApproval.source.replaceTx.prevActivityId;
+      const restApprovals = approvals.filter(
+        (a) => a.source.replaceTx?.prevActivityId !== prevId,
+      );
+
+      if (restApprovals.length !== approvals.length) {
+        return [newApproval, ...restApprovals];
+      }
+    }
+
     return [...approvals, newApproval];
   })
   .on(approvalResolved, (current, id) => current.filter((a) => a.id !== id))

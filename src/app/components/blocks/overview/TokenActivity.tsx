@@ -138,6 +138,8 @@ const TokenActivityCard = forwardRef<HTMLDivElement, TokenActivityCardProps>(
     const tokenDecimals =
       token.tokenType === TokenType.Asset ? token.decimals : 0;
 
+    if (amoutnBN.isZero()) return null;
+
     return (
       <div
         ref={ref}
