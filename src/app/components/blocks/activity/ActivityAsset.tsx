@@ -988,7 +988,7 @@ const TxOptionsDropdown = memo(
                 </div>
               </div>
             ),
-            noButtonText: "No, back",
+            noButtonText: "Back",
             yesButtonText: "Yes, continue",
           });
           if (!confimed) return;
