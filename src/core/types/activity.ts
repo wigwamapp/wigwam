@@ -33,6 +33,7 @@ export type ReplaceTx = {
   type: ReplaceTxType;
   prevActivityId: string;
   prevTxHash: string;
+  prevTimeAt: number;
   prevReplaceTxType?: ReplaceTxType;
 };
 

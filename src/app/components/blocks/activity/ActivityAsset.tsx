@@ -926,15 +926,23 @@ const TxOptionsDropdown = memo(
               </span>
             ),
             content: (
-              <div className="text-sm">
-                <p className="mb-4 text-base text-brand-inactivelight">
+              <div className="-mt-4 text-sm">
+                <p className="mb-4 text-lg font-medium text-brand-inactivelight">
                   Are you sure you want to <b className="lowercase">{title}</b>{" "}
                   this transaction?
                 </p>
 
                 {txsBelowCount ? (
-                  <div className="-mt-2 mb-2 py-2 flex items-start rounded-lg bg-black/10 border border-white/5">
-                    <div className="w-5 mx-1">
+                  <div
+                    className={classNames(
+                      "-mt-2 mb-2 -ml-[0.5rem]",
+                      "w-[calc(100%+[0.5rem)]",
+                      "py-2 pr-2",
+                      "bg-black/10 border border-white/5 rounded-lg",
+                      "flex items-start",
+                    )}
+                  >
+                    <div className="w-7 mx-2">
                       <AlertTriangle className="h-5 w-5 text-[#d99e2e]" />
                     </div>
                     <p className="text-sm text-left">
@@ -1048,6 +1056,7 @@ const TxOptionsDropdown = memo(
                 prevActivityId: item.id,
                 prevTxHash: item.txHash,
                 prevReplaceTxType: item.source.replaceTx?.type,
+                prevTimeAt: item.timeAt,
               },
             });
 

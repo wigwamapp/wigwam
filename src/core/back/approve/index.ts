@@ -158,7 +158,7 @@ export async function processApprove(
                 rawTx: rawTx!,
                 txAction: txAction ?? undefined,
                 txHash,
-                timeAt,
+                timeAt: source.replaceTx?.prevTimeAt ?? timeAt,
                 pending: 1,
               }),
               saveTokenActivity(
