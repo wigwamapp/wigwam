@@ -894,7 +894,7 @@ const TxOptionsDropdown = memo(
 
     const txOption = useCallback(
       async (type: keyof typeof TX_OPTIONS) => {
-        if (!item.pending || item.type !== ActivityType.Transaction) return;
+        if (!fullTx) return;
 
         try {
           const { Icon, title } = TX_OPTIONS[type];
@@ -1018,7 +1018,7 @@ const TxOptionsDropdown = memo(
                 try {
                   const { nonce } = Transaction.from(activity.rawTx);
 
-                  if (nonce >= fullTx!.nonce) {
+                  if (nonce >= fullTx.nonce) {
                     idsToDelete.push(activity.id);
                     txHashesToDelete.push(activity.txHash);
                   } else {
@@ -1070,7 +1070,7 @@ const TxOptionsDropdown = memo(
             );
 
             // Set prev nonce
-            txParams.nonce = fullTx!.nonce;
+            txParams.nonce = fullTx.nonce;
 
             // Emptify tx if cancel action
             if (type === "cancel") {
