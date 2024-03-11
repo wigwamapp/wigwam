@@ -7,6 +7,7 @@ import { isPopup } from "lib/ext/view";
 import { rejectAllApprovals } from "core/client";
 
 import { approvalStatusAtom } from "app/atoms";
+import { ToastOverflowProvider, ToastProvider } from "app/hooks/toast";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 
 import Button from "../../elements/Button";
@@ -24,18 +25,22 @@ const ActivityContent = memo(() => {
   }, [isPopupMode]);
 
   return (
-    <div
-      className={classNames(
-        isPopupMode
-          ? "w-full"
-          : classNames("w-[54rem] h-full mx-auto", "px-4 pt-16"),
-        "flex flex-col",
-        !delayFinished ? "hidden" : "animate-bootfadeinfast",
-      )}
-    >
-      <Approve />
-      <ActivitiesList />
-    </div>
+    <ToastProvider>
+      <ToastOverflowProvider>
+        <div
+          className={classNames(
+            isPopupMode
+              ? "w-full"
+              : classNames("w-[54rem] h-full mx-auto", "px-4 pt-16"),
+            "flex flex-col",
+            !delayFinished ? "hidden" : "animate-bootfadeinfast",
+          )}
+        >
+          <Approve />
+          <ActivitiesList />
+        </div>
+      </ToastOverflowProvider>
+    </ToastProvider>
   );
 });
 

@@ -21,13 +21,14 @@ export function saveNonce(
   chainId: number,
   accountAddress: string,
   nonce: ethers.BigNumberish,
+  override = false,
 ) {
   return enqueueSaveNonce(async () => {
     try {
       const key = nonceStorageKey(chainId, accountAddress);
       const current = await storage.fetchForce<string>(key);
 
-      if (!current || BigInt(current) < BigInt(nonce)) {
+      if (!current || override || BigInt(current) < BigInt(nonce)) {
         await storage.put(key, nonce.toString());
       }
     } catch (err) {

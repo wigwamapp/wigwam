@@ -123,7 +123,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     if (!prepared) return null;
 
     const tx: Transaction = prepared.tx.clone();
-    tx.nonce = getNextNonce(tx, localNonce);
+    tx.nonce = approval.source?.replaceTx
+      ? tx.nonce
+      : getNextNonce(tx, localNonce);
 
     const feeSug = prepared.fees?.modes[feeMode];
     if (feeSug) {
@@ -138,7 +140,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }
 
     return tx;
-  }, [prepared, feeMode, localNonce]);
+  }, [approval.source, prepared, feeMode, localNonce]);
 
   const finalTx = useMemo<typeof originTx>(() => {
     if (!originTx) return originTx;

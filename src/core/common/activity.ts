@@ -14,7 +14,21 @@ import { createTokenActivityKey } from "core/common/tokens";
 export async function saveActivity(activity: Activity | Activity[]) {
   const activities = Array.isArray(activity) ? activity : [activity];
 
-  // TODO: Add specific logic for speed-up or cancel tx
+  // Replace TX first
+  for (const activity of activities) {
+    if (
+      activity.type === ActivityType.Transaction &&
+      activity.source.replaceTx
+    ) {
+      const { prevActivityId, prevTxHash } = activity.source.replaceTx;
+
+      await repo.activities.delete(prevActivityId);
+      await repo.tokenActivities
+        .where({ txHash: prevTxHash, pending: 1 })
+        .delete();
+    }
+  }
+
   await repo.activities.bulkPut(activities).catch(console.error);
 
   for (const activity of activities) {

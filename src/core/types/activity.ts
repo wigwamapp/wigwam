@@ -27,11 +27,22 @@ export enum SelfActivityKind {
   Unknown,
 }
 
+export type ReplaceTxType = "speedup" | "cancel";
+
+export type ReplaceTx = {
+  type: ReplaceTxType;
+  prevActivityId: string;
+  prevTxHash: string;
+  prevTimeAt: number;
+  prevReplaceTxType?: ReplaceTxType;
+};
+
 export type ActivitySource =
   | {
       type: "self";
       kind: SelfActivityKind;
       swapMeta?: Route;
+      replaceTx?: ReplaceTx;
     }
   | {
       type: "page";
@@ -39,6 +50,7 @@ export type ActivitySource =
       permission?: Permission;
       tabId?: number;
       favIconUrl?: string;
+      replaceTx?: ReplaceTx;
     };
 
 export interface ApprovalResult {

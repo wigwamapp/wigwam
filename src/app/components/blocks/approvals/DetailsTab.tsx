@@ -29,6 +29,7 @@ import Dot from "app/components/elements/Dot";
 import TokenAmount from "app/components/blocks/TokenAmount";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
   accountAddress: string;
@@ -113,10 +114,31 @@ const DetailsTab: FC<DetailsTabProps> = ({
     [action],
   );
 
+  const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
+
+  const cancelTx =
+    source.replaceTx?.type === "cancel" ||
+    source.replaceTx?.prevReplaceTxType === "cancel";
+
   return (
     <>
-      <TabHeader className={withDescription ? "!mb-1" : ""}>
-        {tabHeader}
+      <TabHeader
+        className={classNames(
+          "flex items-center w-full",
+          withDescription ? "!mb-1" : "",
+        )}
+      >
+        {cancelTx ? "Cancel transaction" : tabHeader}
+        {source.replaceTx?.type === "speedup" && (
+          <>
+            <span className="flex-1" />
+            <span className="text-xs text-brand-inactivedark font-medium inline-flex items-center">
+              <GasIcon className="w-3 h-3 mr-1" />
+              Speed up
+            </span>
+          </>
+        )}
       </TabHeader>
       {withDescription && (
         <p className="text-sm text-[#BCC3C4] mb-3">
@@ -149,9 +171,39 @@ const DetailsTab: FC<DetailsTabProps> = ({
         feeMode={feeMode}
         onClick={onFeeButtonClick}
       />
-      <Recipient action={action} />
-      <Tokens accountAddress={accountAddress} action={action} />
-      <ActivitySwap source={source} />
+      {cancelTx ? (
+        <>
+          <InfoRaw label="Transaction">
+            <div className="flex flex-col items-end">
+              <div className="flex items-center">
+                <TippySingletonProvider>
+                  <HashPreview
+                    hash={source.replaceTx!.prevTxHash}
+                    className="text-sm"
+                    startLength={8}
+                    endLength={6}
+                  />
+                  {explorerLink && (
+                    <IconedButton
+                      href={explorerLink.tx(source.replaceTx!.prevTxHash)}
+                      aria-label="View in Explorer"
+                      Icon={WalletExplorerIcon}
+                      className="!w-6 !h-6 ml-2"
+                      iconClassName="!w-[1.125rem]"
+                    />
+                  )}
+                </TippySingletonProvider>
+              </div>
+            </div>
+          </InfoRaw>
+        </>
+      ) : (
+        <>
+          <Recipient action={action} />
+          <Tokens accountAddress={accountAddress} action={action} />
+          <ActivitySwap source={source} />
+        </>
+      )}
     </>
   );
 };
