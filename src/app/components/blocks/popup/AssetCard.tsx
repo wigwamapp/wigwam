@@ -29,6 +29,7 @@ import {
   useLazyNetwork,
   useHideToken,
   useRamp,
+  ChainIdProvider,
 } from "app/hooks";
 
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
@@ -174,11 +175,13 @@ const AssetCard = memo(
           </button>
 
           <Suspense>
-            <AssetModal
-              open={openModal}
-              onClose={() => setModalOpen(false)}
-              asset={asset}
-            />
+            <ChainIdProvider chainId={asset.chainId}>
+              <AssetModal
+                open={openModal}
+                onClose={() => setModalOpen(false)}
+                asset={asset}
+              />
+            </ChainIdProvider>
           </Suspense>
         </>
       );
@@ -231,7 +234,7 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
     status,
   } = asset;
   const setInternalChainId = useSetAtom(chainIdAtom);
-  const { onRampCurrency } = useRamp();
+  const { onRampCurrency } = useRamp(asset.tokenSlug);
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {
@@ -323,7 +326,11 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
           <DeepLinkButton
             text="Buy"
             onClick={() =>
-              openLink({ page: Page.Receive, token: asset.tokenSlug })
+              openLink({
+                page: Page.Receive,
+                token: asset.tokenSlug,
+                onRampOpened: true,
+              })
             }
             Icon={BuyIcon}
             disabled={!showBuyButton}
