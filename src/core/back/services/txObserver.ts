@@ -52,6 +52,7 @@ export async function startTxObserver() {
           };
 
           if (result && result.blockNumber) {
+            updatedTx.timeAt = Date.now();
             updatedTx.gasTokenPriceUSD = await getGasTokenPriceUSD(
               tx.chainId,
               tx.accountAddress,
