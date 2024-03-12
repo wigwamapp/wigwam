@@ -2,10 +2,14 @@ import { FC, ReactElement } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
+import { SelfActivityKind } from "core/types";
+
 import { approvalStatusAtom } from "app/atoms";
 import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
+import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 
 type ApprovalStatusProps = {
@@ -31,15 +35,49 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
     >
       {total > 0 && (
         <>
-          {previewActions.map(({ type, name, icon }, i, arr) => (
-            <ActivityIcon
-              key={`${type}_${name}`}
-              Icon={type === "self" ? SendIcon : icon ?? ""}
-              ariaLabel={type === "self" ? "Transfer transaction" : name ?? ""}
-              theme={theme}
-              className={i !== arr.length - 1 ? "mr-2" : ""}
-            />
-          ))}
+          {previewActions.map(({ type, kind, name, icon }, i, arr) => {
+            const Icon = (() => {
+              switch (true) {
+                case type === "page":
+                  return icon ?? "";
+
+                case kind === SelfActivityKind.Swap:
+                  return SwapIcon;
+
+                case kind === SelfActivityKind.Reward:
+                  return RewardsIcon;
+
+                default:
+                  return SendIcon;
+              }
+            })();
+
+            const ariaLabel = (() => {
+              switch (true) {
+                case type === "page":
+                  return name ?? "";
+
+                case kind === SelfActivityKind.Swap:
+                  return "Swap transaction";
+
+                case kind === SelfActivityKind.Reward:
+                  return "Rewards signing";
+
+                default:
+                  return "Transfer transaction";
+              }
+            })();
+
+            return (
+              <ActivityIcon
+                key={`${type}_${name}`}
+                Icon={Icon}
+                ariaLabel={ariaLabel}
+                theme={theme}
+                className={i !== arr.length - 1 ? "mr-2" : ""}
+              />
+            );
+          })}
         </>
       )}
 

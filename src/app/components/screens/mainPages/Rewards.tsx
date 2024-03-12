@@ -8,6 +8,8 @@ import { FormApi } from "final-form";
 import { useLazyAtomValue } from "lib/atom-utils";
 
 import { indexerApi } from "core/common/indexerApi";
+import { ClientProvider } from "core/client";
+import { SelfActivityKind } from "core/types";
 
 import {
   composeValidators,
@@ -19,7 +21,7 @@ import {
   validateEmail,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
-import { OverflowProvider, useAccounts, useProvider } from "app/hooks";
+import { OverflowProvider, useAccounts, useChainId } from "app/hooks";
 import {
   getAppliedForRewardsAtom,
   analyticsAtom,
@@ -48,6 +50,7 @@ type FormValues = {
 };
 
 const Rewards: FC = () => {
+  const chainId = useChainId();
   const { currentAccount } = useAccounts();
   const [analytics, setAnalytics] = useAtom(analyticsAtom);
   const [rewardsApplication, setRewardsApplication] = useAtom(
@@ -73,8 +76,6 @@ const Rewards: FC = () => {
 
   const analyticsEnabledRef = useRef(analytics.enabled);
 
-  const signer = useProvider().getUncheckedSigner(currentAccount.address);
-
   const onSubmit = useCallback(
     async (values: FormValues) => {
       if (processing) return;
@@ -97,24 +98,37 @@ const Rewards: FC = () => {
 
         const { data: authMessage } = await indexerApi.get("/auth-message");
 
-        const signature = await signer.signMessage(
-          authMessage.replace("{address}", currentAccount.address),
-        );
-
-        const res = await indexerApi.post("/activity/apply", payload, {
-          headers: {
-            "auth-signature": signature,
-          },
+        const provider = new ClientProvider(chainId);
+        provider.setActivitySource({
+          type: "self",
+          kind: SelfActivityKind.Reward,
         });
 
-        if (res.status >= 200 && res.status < 300) {
-          setRewardsApplication(
-            JSON.stringify({
-              name: currentAccount.name,
-              address: currentAccount.address,
-              altAddress: values.altAddress || "",
-            }),
-          );
+        const signer = provider.getUncheckedSigner(currentAccount.address);
+
+        const signature = await signer
+          .signMessage(authMessage.replace("{address}", currentAccount.address))
+          .catch((err) => {
+            console.warn(err);
+            return null;
+          });
+
+        if (signature) {
+          const res = await indexerApi.post("/activity/apply", payload, {
+            headers: {
+              "auth-signature": signature,
+            },
+          });
+
+          if (res.status >= 200 && res.status < 300) {
+            setRewardsApplication(
+              JSON.stringify({
+                name: currentAccount.name,
+                address: currentAccount.address,
+                altAddress: values.altAddress || "",
+              }),
+            );
+          }
         }
       } catch (err: any) {
         alert({
@@ -134,9 +148,9 @@ const Rewards: FC = () => {
       analytics,
       setAnalytics,
       alert,
-      signer,
       setProcessing,
       processing,
+      chainId,
     ],
   );
 
