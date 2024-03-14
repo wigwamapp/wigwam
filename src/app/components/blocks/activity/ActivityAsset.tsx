@@ -51,6 +51,7 @@ import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as BridgeIcon } from "app/icons/bridge.svg";
 import { ReactComponent as SwapIconSmall } from "app/icons/activity-swap.svg";
 import { ReactComponent as ApproveIcon } from "app/icons/approve.svg";
@@ -428,14 +429,21 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
     );
   }
 
-  const isRampActivity = item.type === ActivityType.Ramp;
+  const Icon = (() => {
+    switch (true) {
+      case item.type === ActivityType.Ramp:
+        return ReceiveIcon;
 
-  const Icon =
-    item.source.kind === SelfActivityKind.Swap
-      ? SwapIcon
-      : isRampActivity
-        ? ReceiveIcon
-        : SendIcon;
+      case item.source.kind === SelfActivityKind.Swap:
+        return SwapIcon;
+
+      case item.source.kind === SelfActivityKind.Reward:
+        return RewardsIcon;
+
+      default:
+        return SendIcon;
+    }
+  })();
 
   return (
     <Icon

@@ -25,6 +25,7 @@ export enum SelfActivityKind {
   Transfer,
   Swap,
   Unknown,
+  Reward,
 }
 
 export type ReplaceTxType = "speedup" | "cancel";

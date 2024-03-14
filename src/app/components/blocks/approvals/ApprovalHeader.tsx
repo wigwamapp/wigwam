@@ -1,7 +1,7 @@
 import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
 
-import { Account, ActivitySource } from "core/types";
+import { Account, ActivitySource, SelfActivityKind } from "core/types";
 import { getNetworkIconUrl } from "fixtures/networks";
 
 import { useLazyNetwork } from "app/hooks";
@@ -12,6 +12,7 @@ import HashPreview from "app/components/elements/HashPreview";
 import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
+import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
@@ -75,11 +76,21 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
       <div className={classNames(cardClassName, className)}>
         <span className="w-6 h-6 min-w-[1.5rem] flex items-center justify-center mr-2">
           <ActivityIcon
-            Icon={source.swapMeta ? SwapIcon : SendIcon}
+            Icon={
+              source.swapMeta
+                ? SwapIcon
+                : source.kind === SelfActivityKind.Reward
+                  ? RewardsIcon
+                  : SendIcon
+            }
             className="!w-5 !h-5 styled-icon--active"
           />
         </span>
-        {source.swapMeta ? "Swap" : "Transfer"}
+        {source.swapMeta
+          ? "Swap"
+          : source.kind === SelfActivityKind.Reward
+            ? "Rewards"
+            : "Transfer"}
       </div>
     );
   }

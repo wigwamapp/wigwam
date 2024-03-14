@@ -2,6 +2,7 @@ import { selectAtom } from "jotai/utils";
 import { atomWithAutoReset } from "lib/atom-utils";
 
 import { getApprovals, onApprovalsUpdated } from "core/client";
+import { SelfActivityKind } from "core/types";
 
 export const approvalsAtom = atomWithAutoReset(getApprovals, {
   onMount: onApprovalsUpdated,
@@ -10,7 +11,12 @@ export const approvalsAtom = atomWithAutoReset(getApprovals, {
 export const approvalStatusAtom = selectAtom(approvalsAtom, (approvals) => {
   const actionMap = new Map<
     string,
-    { type: "page" | "self"; name?: string; icon?: string }
+    {
+      type: "page" | "self";
+      kind?: SelfActivityKind;
+      name?: string;
+      icon?: string;
+    }
   >();
 
   for (const { source } of approvals) {
@@ -23,6 +29,7 @@ export const approvalStatusAtom = selectAtom(approvalsAtom, (approvals) => {
 
     actionMap.set(actionId, {
       type: source.type,
+      kind: source.type === "self" ? source.kind : undefined,
       name: source.type === "page" ? new URL(source.url).origin : undefined,
       icon: source.type === "page" ? source.favIconUrl : undefined,
     });
