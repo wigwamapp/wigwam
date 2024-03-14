@@ -1,13 +1,7 @@
 import { FC, useMemo, useEffect, useState, useCallback } from "react";
 import { useAtomValue } from "jotai";
 
-import {
-  LiFiWidget,
-  WidgetConfig,
-  RouteExecutionUpdate,
-  useWidgetEvents,
-  WidgetEvent,
-} from "packages/lifi-widget";
+import { LiFiWidget, WidgetConfig } from "packages/lifi-widget";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { useAtomsAll, useLazyAtomValue } from "lib/atom-utils";
 import { useAccounts, useChainId } from "app/hooks";
@@ -22,20 +16,20 @@ import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
 import { SelfActivityKind } from "core/types";
 import { Route } from "@lifi/types";
-import { ERC721__factory } from "abi-types";
-import { getClientProvider } from "core/client";
+// import { ERC721__factory } from "abi-types";
+// import { getClientProvider } from "core/client";
 import { currentLocaleAtom } from "app/atoms";
 import { LanguageKey } from "packages/lifi-widget/providers";
 
-const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
-const DEV_NFT_CHAIN = 137;
+// const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
+// const DEV_NFT_CHAIN = 137;
 
 const Swap: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const { currentAccount } = useAccounts();
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
-  const [fee, setFee] = useState(0.01);
+  // const [fee, setFee] = useState(0.01);
   const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
 
   const accountNativeTokens = useLazyAtomValue(
@@ -67,57 +61,57 @@ const Swap: FC = () => {
     }
   }, [balancesMap]);
 
-  const getDevNftBalance = async () => {
-    const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
-      currentAccount.address,
-    );
-    const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
-    const nftBalance = await contract.balanceOf(currentAccount.address);
+  // const getDevNftBalance = async () => {
+  //   const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
+  //     currentAccount.address,
+  //   );
+  //   const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
+  //   const nftBalance = await contract.balanceOf(currentAccount.address);
 
-    if (Boolean(nftBalance)) {
-      setFee(0.001);
-    }
-  };
+  //   if (Boolean(nftBalance)) {
+  //     setFee(0.001);
+  //   }
+  // };
 
-  useEffect(() => {
-    getDevNftBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentAccount.address]);
+  // useEffect(() => {
+  //   getDevNftBalance();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentAccount.address]);
 
-  const widgetEvents = useWidgetEvents();
+  // const widgetEvents = useWidgetEvents();
 
-  useEffect(() => {
-    const onRouteExecutionStarted = (route: any) => {
-      console.log("onRouteExecutionStarted fired.", route);
-    };
-    const onRouteExecutionUpdated = (update: RouteExecutionUpdate) => {
-      console.log("onRouteExecutionUpdated fired.", update);
-    };
-    const onRouteExecutionCompleted = (route: any) => {
-      console.log("onRouteExecutionCompleted fired.", route);
-    };
-    const onRouteExecutionFailed = (update: RouteExecutionUpdate) => {
-      console.log("onRouteExecutionFailed fired.", update);
-    };
-    const onRouteHighValueLoss = (update: any) => {
-      console.log("onRouteHighValueLoss continued.", update);
-    };
+  // useEffect(() => {
+  //   const onRouteExecutionStarted = (route: any) => {
+  //     console.log("onRouteExecutionStarted fired.", route);
+  //   };
+  //   const onRouteExecutionUpdated = (update: RouteExecutionUpdate) => {
+  //     console.log("onRouteExecutionUpdated fired.", update);
+  //   };
+  //   const onRouteExecutionCompleted = (route: any) => {
+  //     console.log("onRouteExecutionCompleted fired.", route);
+  //   };
+  //   const onRouteExecutionFailed = (update: RouteExecutionUpdate) => {
+  //     console.log("onRouteExecutionFailed fired.", update);
+  //   };
+  //   const onRouteHighValueLoss = (update: any) => {
+  //     console.log("onRouteHighValueLoss continued.", update);
+  //   };
 
-    const onWalletConnected = () => {
-      console.log("onWalletConnected");
-    };
+  //   const onWalletConnected = () => {
+  //     console.log("onWalletConnected");
+  //   };
 
-    widgetEvents.on(WidgetEvent.RouteExecutionStarted, onRouteExecutionStarted);
-    widgetEvents.on(WidgetEvent.RouteExecutionUpdated, onRouteExecutionUpdated);
-    widgetEvents.on(
-      WidgetEvent.RouteExecutionCompleted,
-      onRouteExecutionCompleted,
-    );
-    widgetEvents.on(WidgetEvent.RouteExecutionFailed, onRouteExecutionFailed);
-    widgetEvents.on(WidgetEvent.RouteHighValueLoss, onRouteHighValueLoss);
-    widgetEvents.on(WidgetEvent.WalletConnected, onWalletConnected);
-    return () => widgetEvents.all.clear();
-  }, [widgetEvents]);
+  //   widgetEvents.on(WidgetEvent.RouteExecutionStarted, onRouteExecutionStarted);
+  //   widgetEvents.on(WidgetEvent.RouteExecutionUpdated, onRouteExecutionUpdated);
+  //   widgetEvents.on(
+  //     WidgetEvent.RouteExecutionCompleted,
+  //     onRouteExecutionCompleted,
+  //   );
+  //   widgetEvents.on(WidgetEvent.RouteExecutionFailed, onRouteExecutionFailed);
+  //   widgetEvents.on(WidgetEvent.RouteHighValueLoss, onRouteHighValueLoss);
+  //   widgetEvents.on(WidgetEvent.WalletConnected, onWalletConnected);
+  //   return () => widgetEvents.all.clear();
+  // }, [widgetEvents]);
 
   const provider = getLiFiProvider(chainId);
   const signer = provider.getSigner(currentAccount.address);
@@ -146,7 +140,7 @@ const Swap: FC = () => {
       languages: {
         default: currentLocale as LanguageKey,
       },
-      fee: fee,
+      fee: undefined,
       fromChain: chainId,
       fromToken: tokenSlug
         ? parseTokenSlug(tokenSlug).address === "0"
@@ -211,7 +205,7 @@ const Swap: FC = () => {
     chainId,
     currentAccount.address,
     tokenSlug,
-    fee,
+    // fee,
     signer,
     selectedCurrency,
     handleBeforeTransaction,

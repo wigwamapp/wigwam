@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import type { ExchangeRateUpdateParams, Route } from '@lifi/sdk';
+import { LiFi } from '@lifi/sdk';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
+import { version } from '../config/version';
 import { useLiFi, useWallet, useWidgetConfig } from '../providers';
 import {
   getUpdatedProcess,
@@ -15,6 +17,8 @@ import {
 import { WidgetEvent } from '../types/events';
 import { useWidgetEvents } from './useWidgetEvents';
 import { useNavigate } from 'react-router-dom';
+import { LINEA } from 'fixtures/networks/linea';
+import { P } from 'ts-pattern';
 
 interface RouteExecutionProps {
   routeId: string;
@@ -30,7 +34,8 @@ export const useRouteExecution = ({
   executeInBackground,
   onAcceptExchangeRateUpdate,
 }: RouteExecutionProps) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
+  // const {lifi, setFee} = useLiFi();
   const queryClient = useQueryClient();
   const { account, switchChain } = useWallet();
   const resumedAfterMount = useRef(false);
@@ -113,7 +118,7 @@ export const useRouteExecution = ({
   };
 
   const executeRouteMutation = useMutation(
-    () => {
+    async () => {
       if (!account.signer) {
         throw Error('Account signer not found.');
       }
@@ -121,13 +126,39 @@ export const useRouteExecution = ({
         throw Error('Execution route not found.');
       }
       queryClient.removeQueries(['routes'], { exact: false });
-      return lifi.executeRoute(account.signer, routeExecution.route, {
-        updateRouteHook,
-        switchChainHook,
-        acceptExchangeRateUpdateHook,
-        infiniteApproval: true,
-        executeInBackground,
-      });
+
+
+      // if (routeExecution.route.fromChainId === LINEA[0].chainId) {
+      //   setFee(undefined)
+
+      //   await new Promise<void>((resolve) => {
+      //     setTimeout(resolve, 1000);
+      //   });
+
+      //   console.log(lifi.getConfig())
+
+      //     return lifi.executeRoute(account.signer, routeExecution.route, {
+      //       updateRouteHook,
+      //       switchChainHook,
+      //       acceptExchangeRateUpdateHook,
+      //       infiniteApproval: true,
+      //       executeInBackground,
+      //     });
+      // } else {
+      //   setFee(sdkConfig?.defaultRouteOptions?.fee)
+
+      //   await new Promise<void>((resolve) => {
+      //     setTimeout(resolve, 1000);
+      //   });
+
+        return lifi.executeRoute(account.signer, routeExecution.route, {
+          updateRouteHook,
+          switchChainHook,
+          acceptExchangeRateUpdateHook,
+          infiniteApproval: true,
+          executeInBackground,
+        });
+      // }
     },
     {
       onMutate: () => {
@@ -219,11 +250,12 @@ export const useRouteExecution = ({
   //   // Check if route is eligible for automatic resuming
   //   if (
   //     isRouteActive(routeExecution?.route) &&
+  //     routeExecution?.route.id &&
   //     account.isActive &&
   //     !resumedAfterMount.current
   //   ) {
   //     resumedAfterMount.current = true;
-  //     resumeRoute();
+  //     restartRoute(routeExecution?.route.id);
   //   }
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [account.isActive]);

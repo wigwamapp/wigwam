@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { useLiFi } from '../providers';
 
 export const useGetTokenBalancesWithRetry = (provider?: Provider) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
 
   const getTokenBalancesWithRetry = useCallback(
     async (

@@ -8,7 +8,7 @@ export const useTokenSearch = (
   tokenQuery?: string,
   enabled?: boolean,
 ) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(
     ['token-search', chainId, tokenQuery],

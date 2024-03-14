@@ -10,7 +10,7 @@ export const useGasRecommendation = (
   fromChain?: ChainId,
   fromToken?: string,
 ) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const { chains } = useChains();
 
   return useQuery(

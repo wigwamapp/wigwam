@@ -17,7 +17,7 @@ interface RoutesProps {
 }
 
 export const useRoutes = ({ insurableRoute }: RoutesProps = {}) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const { subvariant, sdkConfig, insurance, contractTool } = useWidgetConfig();
   const { account } = useWallet();
   const queryClient = useQueryClient();

@@ -1,14 +1,19 @@
 import type { ConfigUpdate } from '@lifi/sdk';
 import { LiFi } from '@lifi/sdk';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { version } from '../../config/version';
 import { useWidgetConfig } from '../WidgetProvider';
 
 let lifi: LiFi;
 
-const SDKContext = createContext<LiFi>(null!);
+interface SDKContextProps {
+  lifi: LiFi;
+  setFee: (newFee: number|undefined) => void; // Define the setter function for fee
+}
 
-export const useLiFi = (): LiFi => useContext(SDKContext);
+const SDKContext = createContext<SDKContextProps>(null!);
+
+export const useLiFi = (): SDKContextProps => useContext(SDKContext);
 
 export const SDKProvider: React.FC<React.PropsWithChildren> = ({
   children,
@@ -17,19 +22,26 @@ export const SDKProvider: React.FC<React.PropsWithChildren> = ({
     sdkConfig,
     integrator,
     apiKey,
-    fee,
     referrer,
     routePriority,
     slippage,
   } = useWidgetConfig();
+
+  const [currentFee, setCurrentFee] = useState<number|undefined>(undefined); // State for managing fee
+
+  useEffect(() => {
+    console.log('currentFee', currentFee)
+  }, [currentFee])
+
   const value = useMemo(() => {
+    console.log('GENERATE NEW CONFIG FOR LIFI')
     const config: ConfigUpdate = {
       ...sdkConfig,
       apiKey,
       integrator: integrator ?? window.location.hostname,
       defaultRouteOptions: {
         integrator: integrator ?? window.location.hostname,
-        fee,
+        fee: currentFee, // Use the currentFee from state
         referrer,
         order: routePriority,
         slippage,
@@ -44,8 +56,10 @@ export const SDKProvider: React.FC<React.PropsWithChildren> = ({
       });
     }
     lifi.setConfig(config);
-    return lifi;
-  }, [apiKey, fee, integrator, referrer, routePriority, sdkConfig, slippage]);
+    return { lifi, setFee: setCurrentFee }; // Expose the setter function
+  }, [apiKey, currentFee, integrator, referrer, routePriority, sdkConfig, slippage]);
 
-  return <SDKContext.Provider value={value}>{children}</SDKContext.Provider>;
+  return (
+    <SDKContext.Provider value={value}>{children}</SDKContext.Provider>
+  );
 };

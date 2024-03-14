@@ -6,7 +6,7 @@ import { useChains } from './useChains';
 import { useFeaturedTokens } from './useFeaturedTokens';
 
 export const useTokens = (selectedChainId?: number) => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const { data, isLoading } = useQuery(['tokens'], () => lifi.getTokens(), {
     refetchInterval: 3_600_000,
   });

@@ -4,7 +4,7 @@ import { isItemAllowed, useLiFi, useWidgetConfig } from '../providers';
 import { useSettingsStore } from '../stores';
 
 export const useTools = () => {
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const { bridges, exchanges } = useWidgetConfig();
   const { data } = useQuery(
     ['tools'],

@@ -4,7 +4,7 @@ import { isItemAllowed, useLiFi, useWidgetConfig } from '../providers';
 
 export const useChains = () => {
   const { chains } = useWidgetConfig();
-  const lifi = useLiFi();
+  const {lifi} = useLiFi();
   const { data: availableChains, isLoading: isLoadingAvailableChains } =
     useQuery(['chains'], async () => lifi.getChains(), {
       refetchInterval: 300000,
