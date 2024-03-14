@@ -12,7 +12,7 @@ import {
   getNetwork,
 } from "core/common";
 
-import { fetchCxAccountTokens } from "../indexer";
+import { fetchAccountTokens } from "./account/assets";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
 
@@ -78,11 +78,7 @@ export const refreshTotalBalances = memoize(
 
 export const fetchTotalChainBalance = withOfflineCache(
   async (chainId: number, accountAddress: string) => {
-    const accTokens = await fetchCxAccountTokens(
-      chainId,
-      accountAddress,
-      TokenType.Asset,
-    );
+    const accTokens = await fetchAccountTokens(chainId, accountAddress);
     const network = await getNetwork(chainId).catch(() => null);
 
     let totalValue = new BigNumber(0);

@@ -13,10 +13,11 @@ import { getNetwork } from "core/common/network";
 
 import { getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
+import { fetchCxAccountTokens, indexerApi } from "../../indexer";
 import { prepareAccountTokensSync } from "./utils";
-import { fetchCxAccountTokens } from "../../indexer";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
+const NATIVE_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 export const syncAccountAssets = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -26,12 +27,10 @@ export const syncAccountAssets = memoize(
       { existingTokensMap, accTokens, addToken, releaseToRepo },
     ] = await Promise.all([
       getNetwork(chainId),
-      fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset).catch(
-        (err) => {
-          console.error(err);
-          return [];
-        },
-      ),
+      fetchAccountTokens(chainId, accountAddress).catch((err) => {
+        console.error(err);
+        return [];
+      }),
       prepareAccountTokensSync<AccountAsset>(
         chainId,
         accountAddress,
@@ -40,7 +39,8 @@ export const syncAccountAssets = memoize(
     ]);
 
     for (const token of freshAccTokensData) {
-      const native = token.native_token;
+      const native =
+        token.native_token ?? token.contract_address === NATIVE_TOKEN_ADDRESS;
 
       // Skip for native token, we sync native tokens in separate module
       if (native) continue;
@@ -207,3 +207,15 @@ export const syncAccountAssets = memoize(
     maxAge: 40_000, // 40 sec
   },
 );
+
+export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
+  chainId === 56
+    ? indexerApi
+        .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
+          params: {
+            _authAddress: accountAddress,
+            verified: true,
+          },
+        })
+        .then((r) => r.data)
+    : fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset);
