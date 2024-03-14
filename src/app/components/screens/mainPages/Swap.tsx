@@ -35,7 +35,7 @@ const Swap: FC = () => {
   const { currentAccount } = useAccounts();
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
-  const [fee, setFee] = useState(0.01);
+  const [fee, setFee] = useState<number | undefined>(undefined);
   const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
 
   const accountNativeTokens = useLazyAtomValue(
@@ -75,7 +75,7 @@ const Swap: FC = () => {
     const nftBalance = await contract.balanceOf(currentAccount.address);
 
     if (Boolean(nftBalance)) {
-      setFee(0);
+      setFee(undefined);
     }
   };
 
