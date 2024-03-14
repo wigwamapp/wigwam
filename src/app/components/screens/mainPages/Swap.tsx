@@ -62,23 +62,6 @@ const Swap: FC = () => {
     }
   }, [balancesMap]);
 
-  // const getDevNftBalance = async () => {
-  //   const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
-  //     currentAccount.address,
-  //   );
-  //   const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
-  //   const nftBalance = await contract.balanceOf(currentAccount.address);
-
-  //   if (Boolean(nftBalance)) {
-  //     setFee(0.01);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getDevNftBalance();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [currentAccount.address]);
-
   const widgetEvents = useWidgetEvents();
 
   useEffect(() => {
