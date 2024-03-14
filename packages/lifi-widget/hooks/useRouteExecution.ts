@@ -214,19 +214,19 @@ export const useRouteExecution = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeId]);
 
-  // Resume route execution after page reload
-  useEffect(() => {
-    // Check if route is eligible for automatic resuming
-    if (
-      isRouteActive(routeExecution?.route) &&
-      account.isActive &&
-      !resumedAfterMount.current
-    ) {
-      resumedAfterMount.current = true;
-      resumeRoute();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account.isActive]);
+  // // Resume route execution after page reload
+  // useEffect(() => {
+  //   // Check if route is eligible for automatic resuming
+  //   if (
+  //     isRouteActive(routeExecution?.route) &&
+  //     account.isActive &&
+  //     !resumedAfterMount.current
+  //   ) {
+  //     resumedAfterMount.current = true;
+  //     resumeRoute();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [account.isActive]);
 
   useEffect(() => {
     return () => {

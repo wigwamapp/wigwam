@@ -33,6 +33,7 @@ export class ClientProvider extends JsonRpcProvider {
       { type, chainId, method, params, source: this.source },
       { timeout: 0 },
     );
+
     assert(res?.type === type);
 
     return getResult(res.response);

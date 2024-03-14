@@ -75,7 +75,7 @@ const Swap: FC = () => {
     const nftBalance = await contract.balanceOf(currentAccount.address);
 
     if (Boolean(nftBalance)) {
-      setFee(0);
+      setFee(0.001);
     }
   };
 
