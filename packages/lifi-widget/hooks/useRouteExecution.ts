@@ -114,7 +114,7 @@ export const useRouteExecution = ({
   };
 
   const executeRouteMutation = useMutation(
-    async () => {
+    () => {
       if (!account.signer) {
         throw Error('Account signer not found.');
       }
