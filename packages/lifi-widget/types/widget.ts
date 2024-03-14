@@ -171,6 +171,7 @@ export interface WidgetConfig {
   languageResources?: LanguageResources;
   disableLanguageDetector?: boolean;
   onBeforeTransaction?: (metadata: Route) => void;
+  onChangeFee?: (newFee: number|undefined) => void;
 }
 
 export type WidgetDrawerProps = {

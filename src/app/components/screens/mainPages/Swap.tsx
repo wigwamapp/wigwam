@@ -22,20 +22,15 @@ import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
 import { SelfActivityKind } from "core/types";
 import { Route } from "@lifi/types";
-import { ERC721__factory } from "abi-types";
-import { getClientProvider } from "core/client";
 import { currentLocaleAtom } from "app/atoms";
 import { LanguageKey } from "packages/lifi-widget/providers";
-
-const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
-const DEV_NFT_CHAIN = 137;
 
 const Swap: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const { currentAccount } = useAccounts();
   const chainId = useChainId();
   const tokenSlug = useAtomValue(tokenSlugAtom);
-  const [fee, setFee] = useState<number | undefined>(undefined);
+  const [fee, setFee] = useState<number | undefined>(0.01);
   const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
 
   const accountNativeTokens = useLazyAtomValue(
@@ -67,22 +62,22 @@ const Swap: FC = () => {
     }
   }, [balancesMap]);
 
-  const getDevNftBalance = async () => {
-    const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
-      currentAccount.address,
-    );
-    const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
-    const nftBalance = await contract.balanceOf(currentAccount.address);
+  // const getDevNftBalance = async () => {
+  //   const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
+  //     currentAccount.address,
+  //   );
+  //   const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
+  //   const nftBalance = await contract.balanceOf(currentAccount.address);
 
-    if (Boolean(nftBalance)) {
-      setFee(undefined);
-    }
-  };
+  //   if (Boolean(nftBalance)) {
+  //     setFee(0.01);
+  //   }
+  // };
 
-  useEffect(() => {
-    getDevNftBalance();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentAccount.address]);
+  // useEffect(() => {
+  //   getDevNftBalance();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentAccount.address]);
 
   const widgetEvents = useWidgetEvents();
 
@@ -134,10 +129,15 @@ const Swap: FC = () => {
     }
   }, []);
 
+  const handleChangeFee = useCallback((newFee: undefined | number) => {
+    setFee(newFee);
+  }, []);
+
   const widgetConfig = useMemo((): WidgetConfig => {
     return {
       onBeforeTransaction: (metadata: Route) =>
         handleBeforeTransaction(metadata),
+      onChangeFee: (newFee: number | undefined) => handleChangeFee(newFee),
       integrator: "Wigwam",
       variant: "expandable",
       selectedCurrency: selectedCurrency,
@@ -215,6 +215,7 @@ const Swap: FC = () => {
     signer,
     selectedCurrency,
     handleBeforeTransaction,
+    handleChangeFee,
     chainsOrder,
   ]);
 

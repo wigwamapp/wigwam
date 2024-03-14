@@ -15,6 +15,7 @@ import {
 import { WidgetEvent } from '../types/events';
 import { useWidgetEvents } from './useWidgetEvents';
 import { useNavigate } from 'react-router-dom';
+import { LINEA } from 'fixtures/networks/linea';
 
 interface RouteExecutionProps {
   routeId: string;
@@ -39,7 +40,7 @@ export const useRouteExecution = ({
   const routeExecution = useRouteExecutionStore(
     (state) => state.routes[routeId],
   );
-  const { onBeforeTransaction } = useWidgetConfig()
+  const { onBeforeTransaction, onChangeFee } = useWidgetConfig()
   const [updateRoute, restartRoute, deleteRoute] = useRouteExecutionStore(
     (state) => [state.updateRoute, state.restartRoute, state.deleteRoute],
     shallow,
@@ -113,7 +114,7 @@ export const useRouteExecution = ({
   };
 
   const executeRouteMutation = useMutation(
-    () => {
+    async () => {
       if (!account.signer) {
         throw Error('Account signer not found.');
       }
@@ -121,6 +122,7 @@ export const useRouteExecution = ({
         throw Error('Execution route not found.');
       }
       queryClient.removeQueries(['routes'], { exact: false });
+    
       return lifi.executeRoute(account.signer, routeExecution.route, {
         updateRouteHook,
         switchChainHook,
@@ -228,18 +230,18 @@ export const useRouteExecution = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.isActive]);
 
-  useEffect(() => {
-    return () => {
-      const route =
-        routeExecutionStoreContext.getState().routes[routeId]?.route;
-      if (!route || !isRouteActive(route)) {
-        return;
-      }
-      lifi.updateRouteExecution(route, { executeInBackground: true });
-      console.log('Move route execution to background.', routeId);
-      resumedAfterMount.current = false;
-    };
-  }, [lifi, routeExecutionStoreContext, routeId]);
+  // useEffect(() => {
+  //   return () => {
+  //     const route =
+  //       routeExecutionStoreContext.getState().routes[routeId]?.route;
+  //     if (!route || !isRouteActive(route)) {
+  //       return;
+  //     }
+  //     lifi.updateRouteExecution(route, { executeInBackground: true });
+  //     console.log('Move route execution to background.', routeId);
+  //     resumedAfterMount.current = false;
+  //   };
+  // }, [lifi, routeExecutionStoreContext, routeId]);
 
   return {
     executeRoute,
