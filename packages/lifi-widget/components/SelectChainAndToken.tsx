@@ -6,13 +6,14 @@ import { SelectTokenButton } from '../components/SelectTokenButton';
 import { FormKey, useWidgetConfig } from '../providers';
 import { DisabledUI, HiddenUI } from '../types';
 import { useEffect } from 'react';
-import { LINEA } from 'fixtures/networks/linea';
 import { getClientProvider } from "core/client";
 import { ERC721__factory } from "abi-types";
-import { useAccounts } from "app/hooks";
+import { useWallet } from '../providers';
 
 const DEV_NFT_ADDRESS = "0xe4aEA1A2127bFa86FEE9D43a8F471e1D41648A9e";
 const DEV_NFT_CHAIN = 137;
+
+const DISABLED_FEE_CHAINS = [59144]
 
 export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
   const prefersNarrowView = useMediaQuery((theme: Theme) =>
@@ -28,18 +29,19 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
     ],
   });
 
-  const { currentAccount } = useAccounts();
+  const { account } = useWallet();
 
   useEffect(() => {
     const handleFromChainChange = async () => {
-      if (fromChain === LINEA[0].chainId && onChangeFee) {
+      if (!account.address) return
+      if (DISABLED_FEE_CHAINS.includes(fromChain) && onChangeFee) {
         onChangeFee(undefined)
       } else if (onChangeFee) {
         const polygonProvider = getClientProvider(DEV_NFT_CHAIN).getUncheckedSigner(
-          currentAccount.address,
+          account.address,
         );
         const contract = ERC721__factory.connect(DEV_NFT_ADDRESS, polygonProvider);
-        const nftBalance = await contract.balanceOf(currentAccount.address);
+        const nftBalance = await contract.balanceOf(account.address);
     
         if (Boolean(nftBalance)) {
           onChangeFee(undefined)
@@ -50,7 +52,7 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
     }
 
     handleFromChainChange()
-  }, [fromChain, currentAccount.address])
+  }, [fromChain, account?.address])
 
   const hiddenReverse =
     subvariant === 'refuel' ||
