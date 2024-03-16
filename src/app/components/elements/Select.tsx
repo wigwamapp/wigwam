@@ -219,7 +219,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                     amount={currentItem.balanceUSD}
                     copiable={false}
                     className={classNames(
-                      "mr-2 text-sm font-medium text-white",
+                      "mr-2 text-base font-medium text-white",
                     )}
                   />
                 )}
@@ -316,6 +316,7 @@ function Select<T extends string | ReactElement, U extends string | number>({
                         }
                         key={item.key}
                         className={classNames(
+                          "group",
                           "w-full mb-1 last:mb-0",
                           "flex items-center",
                           size === "large" && "px-3",
@@ -359,7 +360,15 @@ function Select<T extends string | ReactElement, U extends string | number>({
                             />
                           )}
                           {typeof item.value === "string" ? (
-                            <span className="min-w-0 truncate">
+                            <span
+                              className={classNames(
+                                "min-w-0 truncate text-base",
+                                "transition-colors",
+                                currentItem?.key === item.key
+                                  ? "!text-brand-light"
+                                  : "text-brand-inactivelight group-hover:!text-brand-light group-focus-visible:!text-brand-light",
+                              )}
+                            >
                               {item.value}
                             </span>
                           ) : (
@@ -370,9 +379,13 @@ function Select<T extends string | ReactElement, U extends string | number>({
                               amount={item.balanceUSD}
                               copiable={false}
                               className={classNames(
-                                "text-brand-inactivelight font-medium ml-auto",
-                                currentItem?.value === item.value &&
-                                  "!text-white",
+                                "ml-auto",
+                                "text-base font-medium",
+                                "transition-colors",
+                                currentItem?.key === item.key
+                                  ? "!text-brand-light"
+                                  : "!text-brand-inactivelight group-hover:!text-brand-light group-focus-visible:!text-brand-light",
+                                // currentItem?.key === item.key && "!text-white",
                               )}
                             />
                           )}

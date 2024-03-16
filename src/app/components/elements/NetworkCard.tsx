@@ -67,7 +67,7 @@ const NetworkCard: FC<NetworkCardProps> = ({
             className="w-full h-full object-cover"
           />
         </span>
-        <span className="flex flex-col justify-between items-start gap-1 w-full h-full min-w-0">
+        <span className="flex flex-col justify-between items-start w-full h-full min-w-0">
           <span
             className={classNames(
               "text-base font-bold text-brand-inactivelight",
@@ -85,9 +85,11 @@ const NetworkCard: FC<NetworkCardProps> = ({
             copiable={isActive}
             asSpan
             className={classNames(
-              "text-left text-sm",
+              "text-left text-base font-medium",
               "transition-colors",
-              isActive ? "text-brand-light" : "text-brand-inactivedark",
+              isActive
+                ? "text-brand-light"
+                : "text-brand-inactivedark group-hover:text-brand-inactivelight group-focus-visible:text-brand-inactivelight",
             )}
           />
         </span>
