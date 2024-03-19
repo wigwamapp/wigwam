@@ -117,6 +117,13 @@ export async function getDexPrices(tokenAddresses: string[]) {
 
           if (reserveBN.isNaN() || reserveBN.isLessThan(100)) {
             continue;
+          } else {
+            const baseBN = new BigNumber(pair.liquidity.base);
+            const quoteBN = new BigNumber(pair.liquidity.quote);
+
+            if (baseBN.isLessThan(0.01) || quoteBN.isLessThan(0.01)) {
+              continue;
+            }
           }
 
           const tokenAddress = getAddress(pair.baseToken?.address);
