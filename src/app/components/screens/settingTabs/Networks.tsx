@@ -3,7 +3,7 @@ import classNames from "clsx";
 import Fuse from "fuse.js";
 import { useAtomValue } from "jotai";
 
-import { getNetworkIconUrl } from "fixtures/networks";
+import { Network } from "core/types";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
 import { useLazyAllNetworks } from "app/hooks";
@@ -12,6 +12,7 @@ import { ToastOverflowProvider } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
+import NetworkIcon from "app/components/elements/NetworkIcon";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
@@ -81,17 +82,14 @@ const Networks: FC = () => {
           scrollBarClassName="py-0 pb-5"
         >
           <NetworkBtn
-            name="Add new network"
             isActive={tab === "new"}
             onClick={() => setTab("new")}
-            isCreateNew
             className="bg-brand-main/[.05]"
           />
           {preparedNetworks?.map((net) => (
             <NetworkBtn
               key={net.chainId}
-              icon={getNetworkIconUrl(net)}
-              name={net.name}
+              network={net}
               onClick={() => setTab(net.chainId)}
               isActive={tab === net.chainId}
               autoFocus={tab === net.chainId}
@@ -120,21 +118,17 @@ const Networks: FC = () => {
 export default Networks;
 
 type NetworkBtnProps = {
-  icon?: string;
-  name: string;
+  network?: Network;
   onClick: () => void;
   isActive?: boolean;
-  isCreateNew?: boolean;
   className?: string;
   autoFocus?: boolean;
 };
 
 const NetworkBtn: FC<NetworkBtnProps> = ({
-  icon,
-  name,
+  network,
   onClick,
   isActive = false,
-  isCreateNew = false,
   className,
   autoFocus,
 }) => {
@@ -155,12 +149,14 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
       onClick={onClick}
       autoFocus={autoFocus}
     >
-      {isCreateNew ? (
+      {!network ? (
         <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
-        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
+        <NetworkIcon network={network} className={"w-6 h-6 mr-3"} />
       )}
-      <span className="min-w-0 truncate">{name}</span>
+      <span className="min-w-0 truncate">
+        {network?.name || "Add new network"}
+      </span>
       <ChevronRightIcon
         className={classNames(
           "w-6 h-auto",

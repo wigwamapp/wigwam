@@ -1,16 +1,17 @@
 import { FC, useCallback, useMemo } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
-import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 
-import { Network } from "core/types";
+import { compareNetworks } from "core/common/network";
 
-import { getNetworkIconUrl } from "fixtures/networks";
 import { chainIdAtom, getAllNativeTokensAtom } from "app/atoms";
 import { useLazyAllNetworks, useChainId, useAccounts } from "app/hooks";
-import NetworkCard from "app/components/elements/NetworkCard";
-import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
+
+import NetworkCard from "../elements/NetworkCard";
+import NetworkIcon from "../elements/NetworkIcon";
+
+import NetworksButton from "./NetworksButton";
 
 const SHOWN_NETWORKS_AMOUNT = 3;
 
@@ -82,57 +83,28 @@ const NetworksList: FC = () => {
           network={network}
           isActive={network.chainId === currentNetwork.chainId}
           onClick={() => handleNetworkChange(network.chainId)}
+          className="!w-1/4"
         />
       ))}
 
-      <NetworkSelectPrimitive
-        networks={dropdownNetworks}
-        currentItem={{
-          key: currentNetwork?.chainId,
-          value: (
-            <div className="flex items-center gap-3 text-base font-bold w-full min-w-auto">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  {dropdownNetworks.slice(0, 3).map((network, index) => (
-                    <img
-                      key={network.chainId}
-                      src={getNetworkIconUrl(network)}
-                      alt={network.name}
-                      className={classNames(
-                        "w-8 h-8",
-                        index !== 0 ? "-ml-3" : "",
-                      )}
-                    />
-                  ))}
-                </div>
-                <span className="truncate min-w-0">
-                  {dropdownNetworks.length} more
-                </span>
-              </div>
-            </div>
-          ),
-        }}
-        onNetworkChange={handleNetworkChange}
-        actionType="large"
-        className="w-full !min-w-0"
-        currentItemClassName="h-full !px-3 !py-2"
-        contentClassName="min-w-[24.25rem]"
-        contentAlign="end"
-      />
+      <NetworksButton className="!w-1/4">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center">
+            {dropdownNetworks.slice(0, 3).map((network, index) => (
+              <NetworkIcon
+                key={network.chainId}
+                network={network}
+                className={classNames("w-8 h-8", index !== 0 ? "-ml-3" : "")}
+              />
+            ))}
+          </div>
+          <span className="truncate min-w-0">
+            {dropdownNetworks.length} more
+          </span>
+        </div>
+      </NetworksButton>
     </div>
   );
 };
 
 export default NetworksList;
-
-function compareNetworks(a: Network, b: Network) {
-  if (a.balanceUSD && b.balanceUSD) {
-    return new BigNumber(a.balanceUSD).isGreaterThan(b.balanceUSD) ? -1 : 1;
-  } else if (a.balanceUSD && !b.balanceUSD) {
-    return -1;
-  } else if (b.balanceUSD && !a.balanceUSD) {
-    return 1;
-  } else {
-    return 0;
-  }
-}

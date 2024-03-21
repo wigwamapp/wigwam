@@ -4,11 +4,7 @@ import Fuse from "fuse.js";
 import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 
-import {
-  DEFAULT_NETWORKS,
-  DEFAULT_CHAIN_IDS,
-  getNetworkIconUrl,
-} from "fixtures/networks";
+import { DEFAULT_NETWORKS, DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import { Network } from "core/types";
 import { isTrackingEnabled, TEvent, trackEvent } from "core/client";
 
@@ -22,11 +18,14 @@ import Select from "./Select";
 import IconedButton from "./IconedButton";
 import SmartLink from "./SmartLink";
 import Button from "./Button";
+import NetworkIcon from "./NetworkIcon";
 
 export const prepareNetwork = (network: Network) => ({
   key: network.chainId,
   value: network.name,
-  icon: getNetworkIconUrl(network),
+  Icon: ({ className }: { className?: string }) => (
+    <NetworkIcon network={network} className={className} />
+  ),
   balanceUSD:
     network.balanceUSD && new BigNumber(network.balanceUSD).isGreaterThan(0)
       ? network.balanceUSD

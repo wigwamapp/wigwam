@@ -17,7 +17,7 @@ import {
 } from "core/types";
 import { getRpcUrlKey } from "core/common/network";
 
-import { testNetworksAtom } from "./settings";
+//import { testNetworksAtom } from "./settings";
 
 export const chainIdAtom = atomWithStorage<number>(
   CHAIN_ID,
@@ -59,9 +59,9 @@ export const getRpcUrlAtom = atomFamily((chainId: number) =>
   atomWithStorage<string | null>(getRpcUrlKey(chainId), null),
 );
 
-export const allNetworksAtom = atomWithRepoQuery((query, get) =>
+export const allNetworksAtom = atomWithRepoQuery((query) =>
   query(async () => {
-    const testnetsEnabled = await get(testNetworksAtom);
+    const testnetsEnabled = true; //await get(testNetworksAtom);
 
     return repo.networks
       .where("type")

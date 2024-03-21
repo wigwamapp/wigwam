@@ -2,8 +2,9 @@ import type { IFuseOptions } from "fuse.js";
 import { Font } from "lib/web-fonts";
 
 import { Account, Network } from "core/types";
+import { EvmNetwork } from "core/common/chainList";
 
-export const NETWORK_SEARCH_OPTIONS: IFuseOptions<Network> = {
+export const NETWORK_SEARCH_OPTIONS: IFuseOptions<Network | EvmNetwork> = {
   includeScore: true,
   threshold: 0.3,
   fieldNormWeight: 1,

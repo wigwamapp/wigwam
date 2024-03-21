@@ -38,12 +38,11 @@ import {
   walletStatusAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { useIsSyncing } from "app/hooks";
+import { useAccountToken, useIsSyncing, useLazyNetwork } from "app/hooks";
 import { useTokenList } from "app/hooks/tokenList";
 
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
-import NetworkSelect from "../elements/NetworkSelect";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
@@ -56,6 +55,10 @@ import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
 import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
+import NetworksButton from "../blocks/NetworksButton";
+import NetworkIcon from "../elements/NetworkIcon";
+import { NATIVE_TOKEN_SLUG } from "core/common";
+import FiatAmount from "../elements/FiatAmount";
 
 const Popup: FC = () => {
   const tab = useAtomValue(popupToolbarTabAtom);
@@ -110,6 +113,9 @@ const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
 const PopupNetworkSelect: FC = () => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const isSyncing = useIsSyncing();
+  const currentNetwork = useLazyNetwork();
+
+  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
 
   const handleChange = useCallback(
     (chainId: number) => {
@@ -126,17 +132,42 @@ const PopupNetworkSelect: FC = () => {
   );
 
   return (
-    <NetworkSelect
-      source="popup"
-      className="max-w-auto"
-      currentItemClassName="!px-3 !py-2 z-10"
-      currentItemIconClassName={classNames(
-        "!w-8 !h-8",
-        isSyncing && "animate-pulse",
+    <NetworksButton className="max-w-auto" size="small" onChange={handleChange}>
+      {currentNetwork ? (
+        <div className="w-full flex items-center">
+          <NetworkIcon
+            network={currentNetwork}
+            className={classNames("w-8 h-8 mr-3", isSyncing && "animate-pulse")}
+          />
+
+          <span className="min-w-0 truncate">{currentNetwork.name}</span>
+
+          {nativeToken?.portfolioUSD && (
+            <FiatAmount
+              amount={nativeToken?.portfolioUSD}
+              copiable={false}
+              className={classNames(
+                "ml-auto mr-2 text-sm font-medium text-white",
+              )}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="h-8" />
       )}
-      contentClassName="w-[22.25rem]"
-      onChange={handleChange}
-    />
+    </NetworksButton>
+
+    // <NetworkSelect
+    //   source="popup"
+    //   className="max-w-auto"
+    //   currentItemClassName="!px-3 !py-2 z-10"
+    //   currentItemIconClassName={classNames(
+    //     "!w-8 !h-8",
+    //     isSyncing && "animate-pulse",
+    //   )}
+    //   contentClassName="w-[22.25rem]"
+    //   onChange={handleChange}
+    // />
   );
 };
 

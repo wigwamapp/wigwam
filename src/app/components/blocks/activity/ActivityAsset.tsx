@@ -21,7 +21,6 @@ import { useSafeState } from "lib/react-hooks/useSafeState";
 import { isPopup } from "lib/ext/view";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
-import { getNetworkIconUrl } from "fixtures/networks";
 import {
   Activity,
   ActivitySource,
@@ -85,6 +84,7 @@ import Dot from "../../elements/Dot";
 import Tooltip from "../../elements/Tooltip";
 import TooltipIcon from "../../elements/TooltipIcon";
 import CircleSpinner from "../../elements/CircleSpinner";
+import NetworkIcon from "app/components/elements/NetworkIcon";
 
 type StatusType =
   | "pending"
@@ -760,10 +760,8 @@ const ActivityNetworkCard: FC<ActivityNetworkCardProps> = ({
       )}
     >
       {network && (
-        <Avatar
-          src={getNetworkIconUrl(network)}
-          alt={network?.name}
-          withBorder={false}
+        <NetworkIcon
+          network={network}
           className={
             isPopupMode
               ? "w-[1.125rem] min-w-[1.125rem] mr-1.5"

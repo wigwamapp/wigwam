@@ -5,7 +5,6 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Network } from "core/types";
 
-import { getNetworkIconUrl } from "fixtures/networks";
 import { Page, SettingTab } from "app/nav";
 import { useAccounts, useExplorerLink } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
@@ -17,6 +16,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import FiatAmount from "./FiatAmount";
 import Button, { ButtonProps } from "./Button";
+import NetworkIcon from "./NetworkIcon";
 
 type NetworkCardProps = {
   network: Network;
@@ -61,9 +61,8 @@ const NetworkCard: FC<NetworkCardProps> = ({
         )}
       >
         <span className="w-10 h-10 min-w-10 min-h-10">
-          <img
-            src={getNetworkIconUrl(network)}
-            alt={network.name}
+          <NetworkIcon
+            network={network}
             className="w-full h-full object-cover"
           />
         </span>

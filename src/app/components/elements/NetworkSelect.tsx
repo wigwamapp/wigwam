@@ -1,10 +1,10 @@
 import { FC, useCallback, useMemo } from "react";
 import { useSetAtom } from "jotai";
 import classNames from "clsx";
-import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
 
-import { Network } from "core/types";
+import { compareNetworks } from "core/common/network";
+
 import { chainIdAtom, getAllNativeTokensAtom } from "app/atoms";
 import { useLazyAllNetworks, useChainId, useAccounts } from "app/hooks";
 import NetworkSelectPrimitive from "app/components/elements/NetworkSelectPrimitive";
@@ -104,15 +104,3 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
 };
 
 export default NetworkSelect;
-
-function compareNetworks(a: Network, b: Network) {
-  if (a.balanceUSD && b.balanceUSD) {
-    return new BigNumber(a.balanceUSD).isGreaterThan(b.balanceUSD) ? -1 : 1;
-  } else if (a.balanceUSD && !b.balanceUSD) {
-    return -1;
-  } else if (b.balanceUSD && !a.balanceUSD) {
-    return 1;
-  } else {
-    return 0;
-  }
-}

@@ -2,7 +2,6 @@ import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
 
 import { Account, ActivitySource, SelfActivityKind } from "core/types";
-import { getNetworkIconUrl } from "fixtures/networks";
 
 import { useLazyNetwork } from "app/hooks";
 import { openInTabExternal } from "app/utils";
@@ -17,6 +16,7 @@ import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import WalletAvatar from "app/components/elements/WalletAvatar";
+import NetworkIcon from "app/components/elements/NetworkIcon";
 
 type ApprovalHeaderProps = {
   account: Account;
@@ -180,12 +180,7 @@ const NetworkPreview = memo<{ className?: string }>(({ className }) => {
   return (
     <div className={classNames(cardClassName, className)}>
       {network && (
-        <Avatar
-          src={getNetworkIconUrl(network)}
-          alt={network?.name}
-          withBorder={false}
-          className="w-6 mr-2 min-w-[1.5rem]"
-        />
+        <NetworkIcon network={network} className="w-6 mr-2 min-w-[1.5rem]" />
       )}
 
       <span className="truncate min-w-0">{network?.name}</span>

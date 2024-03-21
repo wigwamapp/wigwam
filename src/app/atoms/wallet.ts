@@ -17,6 +17,7 @@ import {
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
 import { indexerApi } from "core/common/indexerApi";
+import { getAllEvmNetworks } from "core/common/chainList";
 
 export const walletStateAtom = atomWithAutoReset(getWalletState, {
   onMount: onWalletStateUpdated,
@@ -68,3 +69,5 @@ export const rewardsApplicationAtom = atomWithClientStorage<string>(
   "rewards-application",
   "",
 );
+
+export const allEvmNetworksAtom = atomWithDefault(getAllEvmNetworks);
