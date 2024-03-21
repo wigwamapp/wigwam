@@ -289,7 +289,7 @@ const NetworksModal: FC<
             <SearchInput
               placeholder="Search network..."
               adornmentClassName={size === "small" ? "!left-2" : ""}
-              inputClassName={size === "small" ? "!pl-8" : ""}
+              inputClassName={size === "small" ? "!pl-8" : "!min-h-[2.75rem]"}
             />
           </Command.Input>
 
@@ -478,5 +478,8 @@ function compareByInstalledNetworks(
 ) {
   if ("type" in a && !("type" in b)) return -1;
   if ("type" in b && !("type" in a)) return 1;
+
+  if ("type" in a && "type" in b) return compareNetworks(a, b);
+
   return 0;
 }

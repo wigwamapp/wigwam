@@ -80,14 +80,16 @@ const Switcher: FC<SwitcherProps> = ({
         <SwitchPrimitive.SwitchThumb
           className={classNames(
             "block",
-            size === "large" ? "w-[1.3rem] h-[1.3rem]" : "w-[1rem] h-[1rem]",
+            size === "large"
+              ? "w-[1.3rem] h-[1.3rem]"
+              : "w-[1.1rem] h-[1.1rem]",
             "rounded-full",
             "bg-[#373B45]",
             "transition-transform",
             checked &&
               (size === "large"
                 ? "translate-x-[1.125rem]"
-                : "translate-x-[0.625rem]"),
+                : "translate-x-[0.5rem]"),
           )}
         />
       </span>
