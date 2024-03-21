@@ -29,6 +29,8 @@ import {
   getAllNativeTokensAtom,
   testNetworksAtom,
 } from "app/atoms";
+import { Page } from "app/nav";
+import { openInTab } from "app/helpers";
 import { ReactComponent as ChevronDownIcon } from "app/icons/chevron-down-rounded.svg";
 import { ReactComponent as AddIcon } from "app/icons/assets-add.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
@@ -332,7 +334,19 @@ const NetworksModal: FC<
                     No results found
                   </div>
 
-                  <Button theme="secondary">Add custom network</Button>
+                  <Button
+                    theme="secondary"
+                    onClick={() => {
+                      onOpenChange?.(false);
+                      openInTab({
+                        page: Page.Settings,
+                        setting: "networks",
+                        chainid: "new",
+                      });
+                    }}
+                  >
+                    Add custom network
+                  </Button>
                 </div>
               </Command.Empty>
 
