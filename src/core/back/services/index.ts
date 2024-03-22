@@ -9,3 +9,4 @@ export * from "./txObserver";
 export * from "./extBadge";
 export * from "./autoLock";
 export * from "./rampTxObserver";
+export * from "./changeNetwork";
