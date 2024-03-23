@@ -9,9 +9,7 @@ const getAtomsAll = atomFamily(
     atom((get) => {
       const values = atoms.map((a) => get(a));
 
-      return values.some((v) => v instanceof Promise)
-        ? Promise.all(values)
-        : values;
+      return Promise.all(values);
     }),
   isAtomsEqual,
 );
