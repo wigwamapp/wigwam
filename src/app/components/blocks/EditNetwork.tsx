@@ -324,7 +324,7 @@ const EditNetwork = memo<EditNetworkProps>(
                         thousandSeparator={false}
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        readOnly={isNative}
+                        readOnly={!isNew}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
