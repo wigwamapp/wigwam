@@ -2,12 +2,12 @@ import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import { useAtomValue } from "jotai";
+import { useLazyAtomValue } from "lib/atom-utils";
 
 import { Network } from "core/types";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { useLazyAllNetworks } from "app/hooks";
-import { chainIdUrlAtom } from "app/atoms";
+import { allInstalledNetworksAtom, chainIdUrlAtom } from "app/atoms";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -17,7 +17,7 @@ import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg"
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 const Networks: FC = () => {
-  const allNetworks = useLazyAllNetworks();
+  const allNetworks = useLazyAtomValue(allInstalledNetworksAtom);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const chainIdUrl = useAtomValue(chainIdUrlAtom);

@@ -14,8 +14,9 @@ import { Command } from "cmdk";
 import Fuse from "fuse.js";
 import { useAtom, useSetAtom } from "jotai";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useLazyAtomValue } from "lib/atom-utils";
 import BigNumber from "bignumber.js";
+import { useLazyAtomValue } from "lib/atom-utils";
+import { wrapIpfsNetIcon } from "lib/wigwam-static";
 
 import { Network } from "core/types";
 import { EvmNetwork } from "core/common/chainList";
@@ -37,7 +38,7 @@ import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found
 
 import FiatAmount from "../elements/FiatAmount";
 import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import NetworkIcon, { wrapIpfsNetIcon } from "../elements/NetworkIcon";
+import NetworkIcon from "../elements/NetworkIcon";
 import { useDialog } from "app/hooks/dialog";
 import Switcher from "../elements/Switcher";
 import Button from "../elements/Button";
@@ -148,9 +149,7 @@ const NetworksModal: FC<
 
     const installed = new Set(allNetworks.map((n) => n.chainId));
 
-    return allEvmNetworksLazy.filter(
-      (n) => !installed.has(n.chainId) && n.icon,
-    );
+    return allEvmNetworksLazy.filter((n) => !installed.has(n.chainId));
   }, [testnetsVisibility, allNetworks, allEvmNetworksLazy]);
 
   const networkList = useMemo(
@@ -211,7 +210,7 @@ const NetworksModal: FC<
               nativeCurrency: net.nativeCurrency,
               rpcUrls: net.rpcUrls,
               blockExplorerUrls: net.explorers?.map((exp) => exp.url),
-              iconUrls: net.icon && [wrapIpfsNetIcon(net)],
+              iconUrls: net.icon && [wrapIpfsNetIcon(net.icon.url)],
             },
             net,
           );
@@ -436,9 +435,12 @@ const NetworkListItem = memo(
         <NetworkIcon network={net} className="w-6 h-6 min-w-[1.5rem] mr-3" />
 
         <span
-          className={classNames("text-base font-bold text-brand-lightgray")}
+          className={classNames(
+            "min-w-0 truncate",
+            "text-base font-bold text-brand-lightgray",
+          )}
         >
-          <span className="min-w-0 truncate">{net.name}</span>
+          {net.name}
         </span>
 
         {"type" in net ? (

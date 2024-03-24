@@ -11,7 +11,6 @@ import { ReactComponent as ProfileIcon } from "app/icons/setting-profile.svg";
 import { ReactComponent as SecurityIcon } from "app/icons/setting-security.svg";
 import { ReactComponent as WebIcon } from "app/icons/setting-web3.svg";
 import { ReactComponent as NetworkIcon } from "app/icons/setting-network.svg";
-import { ReactComponent as AdvancedIcon } from "app/icons/setting-advanced.svg";
 import { ReactComponent as AboutIcon } from "app/icons/setting-about.svg";
 
 import SettingsTab from "./Settings.Tab";
@@ -82,12 +81,6 @@ const tabsContent = [
     Icon: NetworkIcon,
     title: "Networks",
     desc: "Add a new network or configure the settings of an existing one.",
-  },
-  {
-    route: { page: "settings", setting: SettingTabEnum.Advanced },
-    Icon: AdvancedIcon,
-    title: "Advanced",
-    desc: "Enable test networks and other additional features.",
   },
   {
     route: { page: "settings", setting: SettingTabEnum.About },

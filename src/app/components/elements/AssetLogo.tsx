@@ -124,5 +124,9 @@ const TokenNetIcon = ({
 }) => {
   const network = useLazyAtomValue(getNetworkAtom(chainId), "off");
 
-  return network ? <NetworkIcon network={network} {...rest} /> : fallback;
+  return network ? (
+    <NetworkIcon network={network} withBorder {...rest} />
+  ) : (
+    fallback
+  );
 };

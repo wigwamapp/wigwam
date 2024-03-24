@@ -29,26 +29,4 @@ export const AVALANCHE: Network[] = [
     faucetUrls: [],
     infoUrl: "https://www.avax.network/",
   },
-
-  // Testnets
-  {
-    chainId: 43113,
-    type: "testnet",
-    rpcUrls: [
-      "https://api.avax-test.network/ext/bc/C/rpc",
-      "https://endpoints.omniatech.io/v1/avax/fuji/public",
-      "https://avalanche-fuji-c-chain.publicnode.com",
-    ],
-    chainTag: "avalanche",
-    name: "Fuji Avalanche Testnet",
-    nativeCurrency: {
-      symbol: "AVAX",
-      name: "Avalanche",
-      decimals: 18,
-    },
-    explorerUrls: ["https://testnet.snowtrace.io"],
-    explorerApiUrl: "https://api-testnet.snowtrace.io/api",
-    faucetUrls: ["https://faucet.avax-test.network/"],
-    infoUrl: "https://cchain.explorer.avax-test.network",
-  },
 ];

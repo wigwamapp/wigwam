@@ -22,22 +22,4 @@ export const EVMOS: Network[] = [
     faucetUrls: [],
     infoUrl: "https://evmos.org",
   },
-
-  // Testnets
-  {
-    chainId: 9000,
-    type: "testnet",
-    rpcUrls: ["https://eth.bd.evmos.dev:8545"],
-    chainTag: "evmos",
-    name: "Evmos Testnet",
-    nativeCurrency: {
-      symbol: "tEVMOS",
-      name: "Test Evmos",
-      decimals: 18,
-    },
-    explorerUrls: ["https://evm.evmos.dev", "https://explorer.evmos.dev"],
-    explorerApiUrl: "https://evm.evmos.dev/api",
-    faucetUrls: ["https://faucet.evmos.dev"],
-    infoUrl: "https://evmos.org",
-  },
 ];

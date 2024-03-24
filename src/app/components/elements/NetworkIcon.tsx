@@ -1,9 +1,7 @@
 import { ComponentProps, FC, useMemo, memo } from "react";
 import { dequal } from "dequal/lite";
 import { useSafeState } from "lib/react-hooks/useSafeState";
-import { getIPFSUrl } from "lib/nft-metadata/uri";
-import { IPFS_IO_GATEWAY } from "lib/nft-metadata/defaults";
-import { wrapStaticUrl } from "lib/wigwam-static";
+import { wrapIpfsNetIcon } from "lib/wigwam-static";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import { Network } from "core/types";
@@ -12,10 +10,6 @@ import { EvmNetwork } from "core/common/chainList";
 import Avatar from "./Avatar";
 import AutoIcon from "./AutoIcon";
 
-export function wrapIpfsNetIcon(network: EvmNetwork) {
-  return wrapStaticUrl(getIPFSUrl(network.icon!.url, IPFS_IO_GATEWAY));
-}
-
 type NetworkIconProps = Omit<ComponentProps<typeof Avatar>, "src"> & {
   network: Network | EvmNetwork;
 };
@@ -23,11 +17,12 @@ type NetworkIconProps = Omit<ComponentProps<typeof Avatar>, "src"> & {
 const NetworkIcon: FC<NetworkIconProps> = ({ network, ...rest }) => {
   const srcs = useMemo(() => {
     if ("type" in network) {
-      return [getNetworkIconUrl(network)];
+      const icon = getNetworkIconUrl(network);
+      return icon ? [icon] : [];
     }
 
     if (network.icon?.url?.startsWith("ipfs")) {
-      return [wrapIpfsNetIcon(network)];
+      return [wrapIpfsNetIcon(network.icon!.url)];
     }
 
     return [];

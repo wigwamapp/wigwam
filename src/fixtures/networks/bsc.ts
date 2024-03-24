@@ -41,31 +41,4 @@ export const BSC: Network[] = [
     faucetUrls: [],
     infoUrl: "https://www.binance.org",
   },
-
-  // Testnets
-  {
-    chainId: 97,
-    type: "testnet",
-    rpcUrls: [
-      "https://endpoints.omniatech.io/v1/bsc/testnet/public",
-      "https://bsc-testnet.publicnode.com",
-      "https://data-seed-prebsc-1-s1.binance.org:8545",
-      "https://data-seed-prebsc-1-s3.binance.org:8545",
-      "https://data-seed-prebsc-1-s2.binance.org:8545",
-      "https://data-seed-prebsc-2-s2.binance.org:8545",
-      "https://data-seed-prebsc-2-s3.binance.org:8545",
-      "https://data-seed-prebsc-2-s1.binance.org:8545",
-    ],
-    chainTag: "bsc",
-    name: "BNB Smart Testnet",
-    nativeCurrency: {
-      symbol: "tBNB",
-      name: "Binance Native Token",
-      decimals: 18,
-    },
-    explorerUrls: ["https://testnet.bscscan.com"],
-    explorerApiUrl: "https://api-testnet.bscscan.com/api",
-    faucetUrls: ["https://testnet.binance.org/faucet-smart"],
-    infoUrl: "https://testnet.binance.org/",
-  },
 ];

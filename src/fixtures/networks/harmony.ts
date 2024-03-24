@@ -26,21 +26,4 @@ export const HARMONY: Network[] = [
     faucetUrls: [],
     infoUrl: "https://www.harmony.one/",
   },
-
-  // Testnets
-  {
-    chainId: 1666700000,
-    type: "testnet",
-    rpcUrls: ["https://api.s0.b.hmny.io"],
-    chainTag: "harmony",
-    name: "Harmony Testnet Shard 0",
-    nativeCurrency: {
-      symbol: "ONE",
-      name: "ONE",
-      decimals: 18,
-    },
-    explorerUrls: ["https://explorer.pops.one"],
-    faucetUrls: ["https://faucet.pops.one"],
-    infoUrl: "https://www.harmony.one/",
-  },
 ];

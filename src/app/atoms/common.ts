@@ -70,6 +70,10 @@ export const allNetworksAtom = atomWithRepoQuery((query, get) =>
   }),
 );
 
+export const allInstalledNetworksAtom = atomWithRepoQuery((query) =>
+  query(() => repo.networks.orderBy("type").toArray()),
+);
+
 export const getContactsAtom = atomFamily(
   (params: repo.QueryContactsParams) =>
     atomWithRepoQuery((query) => query(() => repo.queryContacts(params))),

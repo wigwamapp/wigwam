@@ -35,29 +35,4 @@ export const GNOSIS: Network[] = [
     ],
     infoUrl: "https://docs.gnosischain.com/",
   },
-
-  // Testnets
-  {
-    chainId: 10200,
-    type: "testnet",
-    rpcUrls: [
-      "https://rpc.chiadochain.net",
-      "https://gnosis-chiado.publicnode.com",
-      "https://rpc.chiado.gnosis.gateway.fm",
-      "https://endpoints.omniatech.io/v1/gnosis/chiado/public",
-    ],
-    chainTag: "gnosis",
-    name: "Gnosis Chiado Testnet",
-    nativeCurrency: {
-      symbol: "XDAI",
-      name: "Chiado xDAI",
-      decimals: 18,
-    },
-    explorerUrls: [
-      "https://blockscout.chiadochain.net",
-      "https://gnosis-chiado.blockscout.com",
-    ],
-    faucetUrls: ["https://gnosisfaucet.com"],
-    infoUrl: "https://docs.gnosischain.com/",
-  },
 ];

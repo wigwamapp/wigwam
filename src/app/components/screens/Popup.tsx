@@ -134,7 +134,7 @@ const PopupNetworkSelect: FC = () => {
   return (
     <NetworksButton className="max-w-auto" size="small" onChange={handleChange}>
       {currentNetwork ? (
-        <div className="w-full flex items-center">
+        <>
           <NetworkIcon
             network={currentNetwork}
             className={classNames("w-8 h-8 mr-3", isSyncing && "animate-pulse")}
@@ -147,27 +147,15 @@ const PopupNetworkSelect: FC = () => {
               amount={nativeToken?.portfolioUSD}
               copiable={false}
               className={classNames(
-                "ml-auto mr-2 text-sm font-medium text-white",
+                "ml-auto mr-2 pl-2 text-sm font-medium text-white",
               )}
             />
           )}
-        </div>
+        </>
       ) : (
         <div className="h-8" />
       )}
     </NetworksButton>
-
-    // <NetworkSelect
-    //   source="popup"
-    //   className="max-w-auto"
-    //   currentItemClassName="!px-3 !py-2 z-10"
-    //   currentItemIconClassName={classNames(
-    //     "!w-8 !h-8",
-    //     isSyncing && "animate-pulse",
-    //   )}
-    //   contentClassName="w-[22.25rem]"
-    //   onChange={handleChange}
-    // />
   );
 };
 
