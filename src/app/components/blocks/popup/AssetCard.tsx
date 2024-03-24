@@ -408,7 +408,7 @@ const TokenActionButtons: FC<{
     <div className={classNames("flex items-center", className)}>
       <TippySingletonProvider>
         <div className="ml-auto flex items-center">
-          {currentNetwork?.type === "mainnet" && tokenDetailsUrl && (
+          {tokenDetailsUrl && (
             <IconedButton
               aria-label="View chart and token info"
               Icon={CoinGeckoIcon}
