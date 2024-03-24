@@ -65,7 +65,7 @@ export const syncNetworks = memoize(
 
     const data = await Promise.all(
       networks.map((network) => {
-        const { chainId } = network;
+        const { chainId, nativeCurrency, type } = network;
         const existing = existingTokensMap.get(chainId);
 
         const refreshNativeBalance = !existing || chainId === activeChainId;
@@ -74,12 +74,15 @@ export const syncNetworks = memoize(
           existing?.portfolioRefreshedAt &&
           existing.portfolioRefreshedAt > Date.now() - 24 * 60 * 60_000;
 
+        const isETHToken =
+          type !== "testnet" && nativeCurrency.symbol === "ETH";
+
         return props({
           chainId,
           balance: refreshNativeBalance
             ? getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, accountAddress)
             : null,
-          cgPrice: getCoinGeckoNativeTokenPrice(chainId),
+          cgPrice: getCoinGeckoNativeTokenPrice(isETHToken ? 1 : chainId),
           totalBalance: noTotal
             ? null
             : fetchTotalChainBalance(chainId, accountAddress).catch(() => null),
