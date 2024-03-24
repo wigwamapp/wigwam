@@ -10,7 +10,11 @@ import { ethers } from "ethers";
 import { storage } from "lib/ext/storage";
 
 import { TokenStandard, TokenType } from "core/types";
-import { createTokenSlug, detectNFTStandard } from "core/common/tokens";
+import {
+  createTokenSlug,
+  detectNFTStandard,
+  isTokenStandardValid,
+} from "core/common/tokens";
 import { findToken } from "core/client";
 
 import {
@@ -128,11 +132,19 @@ export function useTokenList(
 
           try {
             const tokenId = BigInt(tokenIdSearchValue).toString();
+
             const tokenStandard = await detectNFTStandard(
               provider,
               tokenAddress,
               tokenId,
             );
+
+            const validStandard = await isTokenStandardValid(
+              provider,
+              tokenAddress,
+              tokenStandard,
+            );
+            if (!validStandard) return;
 
             tokenSlug = createTokenSlug({
               standard: tokenStandard,
