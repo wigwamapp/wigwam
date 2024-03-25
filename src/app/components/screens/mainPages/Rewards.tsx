@@ -170,30 +170,43 @@ const Rewards: FC = () => {
         <div
           className={classNames(
             "mb-3 p-4 w-full",
-            "flex items-center gap-x-4",
             "border border-brand-main/5 rounded-[.625rem] bg-black/10",
           )}
         >
-          <WalletAvatar
-            seed={existingApplication?.address ?? currentAccount.address}
-            className="h-12 w-12"
-          />
-          <div>
-            <WalletName
-              wallet={existingApplication ?? currentAccount}
-              theme="small"
-              className="text-xl"
+          <div className={classNames("flex items-stretch gap-x-4")}>
+            <WalletAvatar
+              seed={existingApplication?.address ?? currentAccount.address}
+              className="h-12 w-12"
             />
-            <HashPreview
-              hash={existingApplication?.address ?? currentAccount.address}
-              className="text-base text-brand-light leading-4 mr-1"
-              withTooltip={false}
-            />
+            <div className="-mt-2 flex flex-col justify-around">
+              <WalletName
+                wallet={existingApplication ?? currentAccount}
+                theme="small"
+                className="text-xl"
+              />
+              <HashPreview
+                hash={existingApplication?.address ?? currentAccount.address}
+                className="text-base text-brand-light leading-4 mr-1"
+                withTooltip={false}
+              />
+            </div>
+
+            <div className="flex-1" />
+
+            <SuccessGreen className="w-8" />
           </div>
 
-          <div className="flex-1" />
-
-          <SuccessGreen className="w-8" />
+          {existingApplication?.altAddress ? (
+            <div className="mt-2 text-base text-brand-light leading-4">
+              <span className="text-brand-inactivelight">
+                Alternative address:
+              </span>{" "}
+              <HashPreview
+                hash={existingApplication.altAddress}
+                withTooltip={false}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     );
