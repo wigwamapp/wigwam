@@ -11,7 +11,8 @@ import { networks } from "./helpers";
 
 export async function setupFixtures() {
   try {
-    const allEvmNetworks = await getAllEvmNetworks();
+    const allEvmNetworks =
+      process.env.NODE_ENV !== "test" ? await getAllEvmNetworks() : [];
 
     await db.transaction("rw", networks, async () => {
       const existingNetworks = await networks.toArray();
@@ -28,6 +29,8 @@ export async function setupFixtures() {
       }
 
       await networks.bulkPut(mainNets);
+
+      if (process.env.NODE_ENV === "test") return;
 
       // Refresh rest
       const allNetsMap = new Map(allEvmNetworks.map((n) => [n.chainId, n]));
