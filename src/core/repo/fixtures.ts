@@ -43,7 +43,7 @@ export async function setupFixtures() {
               chainId: evmData.chainId,
               type: evmData.testnet ? "testnet" : "unknown",
               chainTag: "",
-              rpcUrls: evmData.rpcUrls,
+              rpcUrls: evmData.rpcUrls.filter((url) => url.startsWith("http")),
               name: evmData.name,
               nativeCurrency: evmData.nativeCurrency,
               explorerUrls: evmData.explorers?.map((exp) => exp.url),
