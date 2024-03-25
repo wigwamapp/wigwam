@@ -116,6 +116,8 @@ const NetworksModal: FC<
 
   const { confirm, alert } = useDialog();
 
+  const [searchValue, setSearchValue] = useState("");
+
   const balancesMap = useMemo(
     () =>
       accountNativeTokens &&
@@ -161,8 +163,6 @@ const NetworksModal: FC<
     () => new Fuse(networkList, NETWORK_SEARCH_OPTIONS),
     [networkList],
   );
-
-  const [searchValue, setSearchValue] = useState("");
 
   const filteredNetworkList = useMemo(() => {
     const sorted = searchValue

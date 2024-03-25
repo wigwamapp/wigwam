@@ -7,7 +7,7 @@ export const getAllEvmNetworks = withOfflineCache(
     return res.data;
   },
   {
-    key: "all_networks3",
+    key: "all_networks",
     hotMaxAge: 5_000,
     coldMaxAge: 12 * 60 * 60_000, // 12h
   },
