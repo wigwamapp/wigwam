@@ -149,7 +149,7 @@ const PopupNetworkSelect: FC = () => {
               amount={nativeToken?.portfolioUSD}
               copiable={false}
               className={classNames(
-                "ml-auto mr-2 pl-2 text-sm font-medium text-white",
+                "ml-auto mr-2 pl-2 text-base font-bold text-brand-light",
               )}
             />
           )}
