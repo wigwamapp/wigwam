@@ -140,7 +140,9 @@ const PopupNetworkSelect: FC = () => {
             className={classNames("w-8 h-8 mr-3", isSyncing && "animate-pulse")}
           />
 
-          <span className="min-w-0 truncate">{currentNetwork.name}</span>
+          <span className="min-w-0 truncate mr-auto">
+            {currentNetwork.name}
+          </span>
 
           {nativeToken?.portfolioUSD && (
             <FiatAmount
