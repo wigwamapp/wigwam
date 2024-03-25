@@ -1,8 +1,13 @@
+import retry from "async-retry";
+import BigNumber from "bignumber.js";
 import { storage } from "lib/ext/storage";
+import { assert } from "lib/system/assert";
 
 import { INITIAL_NETWORK } from "fixtures/networks";
-import { CHAIN_ID } from "core/types";
+import { AddEthereumChainParameter, CHAIN_ID, Network } from "core/types";
 import * as repo from "core/repo";
+
+import { EvmNetwork } from "./chainList";
 
 const INFURA_TEMPLATE = "${INFURA_API_KEY}";
 const INFURA_API_KEY = process.env.WIGWAM_INFURA_API_KEY;
@@ -51,6 +56,51 @@ export function setRpcUrl(chainId: number, url: string | null) {
   return url ? storage.put(key, url) : storage.remove(key);
 }
 
+export async function setupNewNetwork(
+  params: AddEthereumChainParameter,
+  evmNet?: EvmNetwork,
+) {
+  await validateRpc(params).catch(() => {
+    throw new Error(
+      "RPC validation failed. Check network params or network connection.",
+    );
+  });
+
+  const chainId = parseInt(params.chainId);
+
+  const networkExists = await repo.networks.get(chainId);
+
+  if (!networkExists) {
+    let toAdd: Network = {
+      chainId,
+      name: params.chainName,
+      type: "unknown",
+      chainTag: "",
+      nativeCurrency: params.nativeCurrency,
+      rpcUrls: params.rpcUrls,
+      explorerUrls: params.blockExplorerUrls ?? undefined,
+      iconUrls: params.iconUrls ?? undefined,
+      position: 0,
+    };
+
+    if (evmNet) {
+      toAdd = {
+        ...toAdd,
+        type: evmNet.testnet ? "testnet" : toAdd.type,
+        explorerUrls: evmNet.explorers?.map((exp) => exp.url),
+        explorerApiUrl: evmNet.explorers?.find((exp) => exp.apiUrl)?.apiUrl,
+        faucetUrls: evmNet.faucets,
+        infoUrl: evmNet.infoUrl,
+      };
+    }
+
+    // Only http
+    toAdd.rpcUrls = toAdd.rpcUrls.filter((url) => url.startsWith("http"));
+
+    await repo.networks.add(toAdd);
+  }
+}
+
 export async function cleanupNetwork(chainId: number) {
   await storage.put(CHAIN_ID, INITIAL_NETWORK.chainId);
   await repo.networks.delete(chainId);
@@ -83,4 +133,45 @@ export class NetworkNotFoundError extends Error {
 
 export function getRpcUrlKey(chainId: number) {
   return `rpc_url_${chainId}`;
+}
+
+async function validateRpc(params: AddEthereumChainParameter) {
+  const rpcUrl = params.rpcUrls[0];
+  const rpcResponse = await retry(
+    async () => {
+      const res = await fetch(rpcUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 1,
+          jsonrpc: "2.0",
+          method: "eth_chainId",
+          params: [],
+        }),
+      });
+
+      if (res.ok) return res.json();
+      throw new Error(res.statusText);
+    },
+    { retries: 1 },
+  );
+
+  const { id, jsonrpc, result } = rpcResponse;
+  assert(id === 1);
+  assert(jsonrpc === "2.0");
+  assert(parseInt(result) === parseInt(params.chainId));
+}
+
+export function compareNetworks(a: Network, b: Network) {
+  if (a.balanceUSD && b.balanceUSD) {
+    return new BigNumber(a.balanceUSD).isGreaterThan(b.balanceUSD) ? -1 : 1;
+  } else if (a.balanceUSD && !b.balanceUSD) {
+    return -1;
+  } else if (b.balanceUSD && !a.balanceUSD) {
+    return 1;
+  } else {
+    return 0;
+  }
 }

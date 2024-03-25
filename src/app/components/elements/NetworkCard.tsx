@@ -5,7 +5,6 @@ import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 
 import { Network } from "core/types";
 
-import { getNetworkIconUrl } from "fixtures/networks";
 import { Page, SettingTab } from "app/nav";
 import { useAccounts, useExplorerLink } from "app/hooks";
 import IconedButton from "app/components/elements/IconedButton";
@@ -17,6 +16,7 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 import FiatAmount from "./FiatAmount";
 import Button, { ButtonProps } from "./Button";
+import NetworkIcon from "./NetworkIcon";
 
 type NetworkCardProps = {
   network: Network;
@@ -61,21 +61,20 @@ const NetworkCard: FC<NetworkCardProps> = ({
         )}
       >
         <span className="w-10 h-10 min-w-10 min-h-10">
-          <img
-            src={getNetworkIconUrl(network)}
-            alt={network.name}
+          <NetworkIcon
+            network={network}
             className="w-full h-full object-cover"
           />
         </span>
-        <span className="flex flex-col justify-between items-start gap-1 w-full h-full min-w-0">
+        <span className="flex flex-col justify-center items-start w-full h-full min-w-0">
           <span
             className={classNames(
-              "text-base font-bold text-brand-inactivelight",
+              "text-base font-bold",
               "transition-colors",
               "truncate w-full text-left min-w-0",
               isActive
                 ? "text-brand-light"
-                : "group-hover:text-brand-light group-focus-visible:text-brand-light",
+                : "text-brand-lightgray group-hover:text-brand-light group-focus-visible:text-brand-light",
             )}
           >
             {network.name}
@@ -85,9 +84,11 @@ const NetworkCard: FC<NetworkCardProps> = ({
             copiable={isActive}
             asSpan
             className={classNames(
-              "text-left text-sm",
+              "text-left text-sm font-bold",
               "transition-colors",
-              isActive ? "text-brand-light" : "text-brand-inactivedark",
+              isActive
+                ? "text-brand-light"
+                : "text-brand-inactivelight group-hover:text-brand-light group-focus-visible:text-brand-light",
             )}
           />
         </span>

@@ -1,4 +1,5 @@
 import {
+  FC,
   KeyboardEventHandler,
   ReactElement,
   ReactNode,
@@ -23,6 +24,7 @@ import FiatAmount from "./FiatAmount";
 
 type ItemProps<T, U> = {
   icon?: string;
+  Icon?: FC<{ className?: string }>;
   key: U;
   value: T;
   balanceUSD?: string;
@@ -192,20 +194,30 @@ function Select<T extends string | ReactElement, U extends string | number>({
           {currentItem && (
             <>
               <div className="flex items-center w-full">
-                {currentItem.icon && (
-                  <img
-                    src={currentItem.icon}
-                    alt={
-                      typeof currentItem.value === "string"
-                        ? currentItem.value
-                        : "Icon"
-                    }
+                {currentItem.Icon ? (
+                  <currentItem.Icon
                     className={classNames(
                       size === "large" && "w-7 mr-3",
                       size === "small" && "w-4 mr-1",
                       currentItemIconClassName,
                     )}
                   />
+                ) : (
+                  currentItem.icon && (
+                    <img
+                      src={currentItem.icon}
+                      alt={
+                        typeof currentItem.value === "string"
+                          ? currentItem.value
+                          : "Icon"
+                      }
+                      className={classNames(
+                        size === "large" && "w-7 mr-3",
+                        size === "small" && "w-4 mr-1",
+                        currentItemIconClassName,
+                      )}
+                    />
+                  )
                 )}
                 {typeof currentItem.value === "string" ? (
                   <span className="min-w-0 truncate">{currentItem.value}</span>
@@ -344,20 +356,30 @@ function Select<T extends string | ReactElement, U extends string | number>({
                         asChild
                       >
                         <button>
-                          {item.icon && (
-                            <img
-                              src={item.icon}
-                              alt={
-                                typeof item.value === "string"
-                                  ? item.value
-                                  : "Icon"
-                              }
+                          {item.Icon ? (
+                            <item.Icon
                               className={classNames(
                                 size === "large" && "w-8 h-8 mr-3",
                                 size === "small" && "w-4 h-4 mr-2",
                               )}
                             />
+                          ) : (
+                            item.icon && (
+                              <img
+                                src={item.icon}
+                                alt={
+                                  typeof item.value === "string"
+                                    ? item.value
+                                    : "Icon"
+                                }
+                                className={classNames(
+                                  size === "large" && "w-8 h-8 mr-3",
+                                  size === "small" && "w-4 h-4 mr-2",
+                                )}
+                              />
+                            )
                           )}
+
                           {typeof item.value === "string" ? (
                             <span className="min-w-0 truncate">
                               {item.value}

@@ -32,37 +32,4 @@ export const LINEA: Network[] = [
     infoUrl: "https://linea.build",
     faucetUrls: [],
   },
-
-  // Testnets
-  {
-    chainId: 59140,
-    type: "testnet",
-    rpcUrls: [
-      "https://rpc.goerli.linea.build",
-      "https://linea-goerli.infura.io/v3/${INFURA_API_KEY}",
-    ],
-    chainTag: "linea",
-    name: "Linea Goerli Testnet",
-    nativeCurrency: {
-      symbol: "ETH",
-      name: "Goerli Ether",
-      decimals: 18,
-    },
-    explorerUrls: [
-      "https://goerli.lineascan.build",
-      "https://explorer.goerli.linea.build",
-    ],
-    explorerApiUrl: "https://api-testnet.lineascan.build/api",
-    faucetUrls: ["https://faucetlink.to/goerli"],
-    infoUrl: "https://linea.build",
-    parent: {
-      type: "L2",
-      chain: "eip155-5",
-      bridges: [
-        {
-          url: "https://goerli.hop.exchange/#/send?token=ETH&sourceNetwork=ethereum&destNetwork=linea",
-        },
-      ],
-    },
-  },
 ];

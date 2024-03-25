@@ -22,25 +22,4 @@ export const MOONBEAM: Network[] = [
     faucetUrls: [],
     infoUrl: "https://moonbeam.network/networks/moonbeam/",
   },
-
-  // Testnets
-  {
-    chainId: 1287,
-    type: "testnet",
-    rpcUrls: [
-      "https://rpc.testnet.moonbeam.network",
-      "https://rpc.api.moonbase.moonbeam.network",
-    ],
-    chainTag: "moonbeam",
-    name: "Moonbase Alpha",
-    nativeCurrency: {
-      symbol: "DEV",
-      name: "Dev",
-      decimals: 18,
-    },
-    explorerUrls: ["https://moonbase.moonscan.io"],
-    explorerApiUrl: "https://api-moonbase.moonscan.io/api",
-    faucetUrls: ["https://apps.moonbeam.network/moonbase-alpha/faucet/"],
-    infoUrl: "https://docs.moonbeam.network/networks/testnet/",
-  },
 ];

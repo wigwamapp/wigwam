@@ -131,19 +131,18 @@ const AssetInfo: FC = () => {
                   </h2>
                   <TippySingletonProvider>
                     <div className="ml-auto flex items-center">
-                      {currentNetwork?.type === "mainnet" &&
-                        tokenDetailsUrl && (
-                          <IconedButton
-                            aria-label="View chart and token info"
-                            Icon={CoinGeckoIcon}
-                            className={classNames(
-                              "!w-6 !h-6 min-w-[1.5rem]",
-                              status !== TokenStatus.Native ? "mr-2" : "",
-                            )}
-                            iconClassName="!w-[1.125rem]"
-                            href={tokenDetailsUrl}
-                          />
-                        )}
+                      {tokenDetailsUrl && (
+                        <IconedButton
+                          aria-label="View chart and token info"
+                          Icon={CoinGeckoIcon}
+                          className={classNames(
+                            "!w-6 !h-6 min-w-[1.5rem]",
+                            status !== TokenStatus.Native ? "mr-2" : "",
+                          )}
+                          iconClassName="!w-[1.125rem]"
+                          href={tokenDetailsUrl}
+                        />
+                      )}
                       {explorerLink && status !== TokenStatus.Native && (
                         <IconedButton
                           aria-label="View token in Explorer"

@@ -1,12 +1,10 @@
 import { FC, useCallback, useState } from "react";
 import classNames from "clsx";
-import retry from "async-retry";
-import { assert } from "lib/system/assert";
 import { getPublicURL } from "lib/ext/utils";
 
 import { AddEthereumChainParameter, AddNetworkApproval } from "core/types";
 import { approveItem } from "core/client";
-import * as Repo from "core/repo";
+import { setupNewNetwork } from "core/common";
 
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
@@ -25,36 +23,6 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
 
   const [approving, setApproving] = useState(false);
 
-  const validateRpc = useCallback(async () => {
-    const params = approval.networkParams;
-    const rpcUrl = params.rpcUrls[0];
-    const rpcResponse = await retry(
-      async () => {
-        const res = await fetch(rpcUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: 1,
-            jsonrpc: "2.0",
-            method: "eth_chainId",
-            params: [],
-          }),
-        });
-
-        if (res.ok) return res.json();
-        throw new Error(res.statusText);
-      },
-      { retries: 1 },
-    );
-
-    const { id, jsonrpc, result } = rpcResponse;
-    assert(id === 1);
-    assert(jsonrpc === "2.0");
-    assert(parseInt(result) === parseInt(params.chainId));
-  }, [approval.networkParams]);
-
   const handleApprove = useCallback(
     async (approved: boolean) => {
       setApproving(true);
@@ -62,33 +30,10 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
       try {
         await withHumanDelay(async () => {
           if (approved) {
-            await validateRpc().catch(() => {
-              throw new Error(
-                "RPC validation failed. Check network params or network connection.",
-              );
-            });
-
-            const params = approval.networkParams;
-            const chainId = parseInt(params.chainId);
-
-            const networkExists = await Repo.networks.get(chainId);
-            if (!networkExists) {
-              await Repo.networks.add({
-                chainId,
-                name: params.chainName,
-                type: "unknown",
-                chainTag: "",
-                nativeCurrency: params.nativeCurrency,
-                rpcUrls: params.rpcUrls,
-                explorerUrls: params.blockExplorerUrls ?? undefined,
-                position: 0,
-              });
-            }
+            await setupNewNetwork(approval.networkParams);
           }
 
-          await approveItem(approval.id, {
-            approved,
-          });
+          await approveItem(approval.id, { approved });
         });
       } catch (err: any) {
         alert({
@@ -99,7 +44,7 @@ const ApproveAddNetwork: FC<ApproveAddNetworkProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, setApproving, validateRpc, alert],
+    [approval, setApproving, alert],
   );
 
   if (approval.source.type !== "page") return null;

@@ -11,6 +11,7 @@ interface SwitcherProps {
   className?: string;
   buttonClassName?: string;
   disabled?: boolean;
+  size?: "large" | "small";
 }
 
 const Switcher: FC<SwitcherProps> = ({
@@ -22,6 +23,7 @@ const Switcher: FC<SwitcherProps> = ({
   onCheckedChange,
   className,
   buttonClassName,
+  size = "large",
 }) => (
   <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
     {label && (
@@ -35,13 +37,16 @@ const Switcher: FC<SwitcherProps> = ({
         {label}
       </label>
     )}
+
     <SwitchPrimitive.Root
       id={id}
       checked={checked}
       onCheckedChange={onCheckedChange}
       className={classNames(
         "flex items-center justify-between",
-        "min-h-[2.75rem] py-2 px-5",
+        size === "large"
+          ? "min-h-[2.75rem] py-2 px-5"
+          : "min-h-[2.25rem] py-2 px-3",
         "bg-brand-main/[.05]",
         "rounded-[.625rem]",
         "transition-colors",
@@ -50,11 +55,23 @@ const Switcher: FC<SwitcherProps> = ({
       )}
       disabled={disabled}
     >
-      {text ? <span className="text-sm font-bold">{text}</span> : null}
+      {text ? (
+        <span
+          className={classNames(
+            "font-bold",
+            size === "large" ? "text-sm" : "text-xs",
+          )}
+        >
+          {text}
+        </span>
+      ) : null}
+
       <span
         className={classNames(
           "flex items-center",
-          "w-11 h-[1.625rem] p-[.1875rem]",
+          size === "large"
+            ? "w-11 h-[1.625rem] p-[.1875rem]"
+            : "w-8 h-[1.5rem] p-[.175rem]",
           "rounded-full",
           "transition-colors",
           !checked ? "bg-[#93ACAF]" : "bg-[#80EF6E]",
@@ -63,11 +80,16 @@ const Switcher: FC<SwitcherProps> = ({
         <SwitchPrimitive.SwitchThumb
           className={classNames(
             "block",
-            "w-[1.3rem] h-[1.3rem]",
+            size === "large"
+              ? "w-[1.3rem] h-[1.3rem]"
+              : "w-[1.1rem] h-[1.1rem]",
             "rounded-full",
             "bg-[#373B45]",
             "transition-transform",
-            checked && "translate-x-[1.125rem]",
+            checked &&
+              (size === "large"
+                ? "translate-x-[1.125rem]"
+                : "translate-x-[0.5rem]"),
           )}
         />
       </span>

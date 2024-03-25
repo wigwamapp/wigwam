@@ -30,33 +30,4 @@ export const BASE: Network[] = [
     faucetUrls: [],
     infoUrl: "https://base.org/",
   },
-
-  // Testnets
-  {
-    chainId: 84531,
-    type: "testnet",
-    rpcUrls: [
-      "https://goerli.base.org",
-      "https://base-goerli.publicnode.com",
-      "https://endpoints.omniatech.io/v1/base/goerli/public",
-      "https://base-goerli.public.blastapi.io",
-    ],
-    chainTag: "base",
-    name: "Base Goerli Testnet",
-    nativeCurrency: {
-      symbol: "ETH",
-      name: "Goerli Ether",
-      decimals: 18,
-    },
-    explorerUrls: [
-      "https://goerli.basescan.org",
-      "https://base-goerli.blockscout.com",
-      "https://base-goerli.dex.guru",
-    ],
-    explorerApiUrl: "https://api-goerli.basescan.org/api",
-    faucetUrls: [
-      "https://www.coinbase.com/faucets/base-ethereum-goerli-faucet",
-    ],
-    infoUrl: "https://base.org",
-  },
 ];

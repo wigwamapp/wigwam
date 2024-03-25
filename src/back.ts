@@ -18,6 +18,7 @@ import {
   startExtBadge,
   startAutoLocker,
   startRampTxObserver,
+  startAutoNetworkChanger,
 } from "core/back/services";
 
 setupArgon2Impl();
@@ -47,3 +48,4 @@ startInstallOrUpdateListener();
 
 startAutoLocker();
 startBruteForceProtection();
+startAutoNetworkChanger();

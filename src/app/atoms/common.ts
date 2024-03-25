@@ -65,9 +65,13 @@ export const allNetworksAtom = atomWithRepoQuery((query, get) =>
 
     return repo.networks
       .where("type")
-      .anyOf(["mainnet", "unknown", ...(testnetsEnabled ? ["testnet"] : [])])
+      .anyOf(["mainnet", ...(testnetsEnabled ? ["testnet", "unknown"] : [])])
       .toArray();
   }),
+);
+
+export const allInstalledNetworksAtom = atomWithRepoQuery((query) =>
+  query(() => repo.networks.orderBy("type").toArray()),
 );
 
 export const getContactsAtom = atomFamily(

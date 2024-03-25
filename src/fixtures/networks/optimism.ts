@@ -25,25 +25,4 @@ export const OPTIMISM: Network[] = [
     faucetUrls: [],
     infoUrl: "https://optimism.io",
   },
-
-  // Testnets
-  {
-    chainId: 420,
-    type: "testnet",
-    rpcUrls: [
-      "https://goerli.optimism.io",
-      "https://endpoints.omniatech.io/v1/op/goerli/public",
-    ],
-    chainTag: "optimism",
-    name: "Optimism Testnet Goerli",
-    nativeCurrency: {
-      symbol: "GOR",
-      name: "Goerli Ether",
-      decimals: 18,
-    },
-    explorerUrls: ["https://goerli-optimism.etherscan.io/"],
-    explorerApiUrl: "https://api-goerli-optimism.etherscan.io/api",
-    faucetUrls: [],
-    infoUrl: "https://optimism.io",
-  },
 ];

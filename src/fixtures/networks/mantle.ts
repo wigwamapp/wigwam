@@ -29,22 +29,4 @@ export const MANTLE: Network[] = [
     },
     faucetUrls: [],
   },
-
-  // Testnets
-  {
-    chainId: 5001,
-    type: "testnet",
-    rpcUrls: ["https://rpc.testnet.mantle.xyz"],
-    chainTag: "mantle",
-    name: "Mantle Testnet",
-    nativeCurrency: {
-      symbol: "MNT",
-      name: "Testnet Mantle",
-      decimals: 18,
-    },
-    explorerUrls: ["https://explorer.testnet.mantle.xyz"],
-    explorerApiUrl: "https://explorer.testnet.mantle.xyz/api",
-    faucetUrls: ["https://faucet.testnet.mantle.xyz"],
-    infoUrl: "https://mantle.xyz",
-  },
 ];

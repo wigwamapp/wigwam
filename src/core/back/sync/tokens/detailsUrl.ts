@@ -1,4 +1,7 @@
+import mem from "mem";
+
 import { TokenStandard } from "core/types";
+import { getNetwork } from "core/common";
 import { parseTokenSlug } from "core/common/tokens";
 
 import { getCoinGeckoPlatformIds, getCoinGeckoCoinIds } from "../dexPrices";
@@ -11,8 +14,14 @@ export const getTokenDetailsUrl = async (
     const { standard, address } = parseTokenSlug(tokenSlug);
 
     if (standard === TokenStandard.Native) {
-      const platformIds = await getCoinGeckoPlatformIds();
-      const info = platformIds[chainId];
+      const [platformIds, network] = await Promise.all([
+        getCoinGeckoPlatformIds(),
+        getNetworkMemo(chainId),
+      ]);
+      const { type, nativeCurrency } = network;
+      const isETHToken = type !== "testnet" && nativeCurrency.symbol === "ETH";
+
+      const info = platformIds[isETHToken ? 1 : chainId];
 
       if (info) {
         return `https://www.coingecko.com/en/coins/${info.native_coin_id}`;
@@ -33,3 +42,5 @@ export const getTokenDetailsUrl = async (
 
   return null;
 };
+
+const getNetworkMemo = mem(getNetwork);

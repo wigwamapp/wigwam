@@ -12,7 +12,6 @@ import Web3 from "../settingTabs/Web3";
 import Networks from "../settingTabs/Networks";
 import Profile from "../settingTabs/Profile";
 import About from "../settingTabs/About";
-import Advanced from "../settingTabs/Advanced";
 
 function matchSettingTab(settingTab: SettingTab) {
   return (
@@ -23,7 +22,6 @@ function matchSettingTab(settingTab: SettingTab) {
       .with(SettingTab.Web3, () => <Web3 />)
       .with(SettingTab.Networks, () => <Networks />)
       .with(SettingTab.About, () => <About />)
-      .with(SettingTab.Advanced, () => <Advanced />)
       // Redirect to default
       .otherwise(() => (
         <Redirect to={{ page: Page.Settings, setting: SettingTab.General }} />
