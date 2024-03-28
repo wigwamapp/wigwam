@@ -27,6 +27,51 @@ import { currentLocaleAtom } from "app/atoms";
 import { LanguageKey } from "packages/lifi-widget/providers";
 import axios from "axios";
 
+const resources = [
+  "https://cloudflare-ipfs.com/ipns/tokens.uniswap.org",
+  "https://cloudflare-ipfs.com/ipns/extendedtokens.uniswap.org",
+];
+
+const getVerifiedTokens = memoize(
+  async () => {
+    const tokenPromises = resources.map((url) =>
+      axios.get(url).then((response) => response.data.tokens),
+    );
+
+    const response = await Promise.all(tokenPromises);
+    const fullTokensList = response.reduce((acc, curr) => {
+      return [...acc, ...curr];
+    }, []);
+
+    const networks: number[] = [];
+
+    fullTokensList.forEach((token: any) => {
+      if (!networks.includes(token.chainId)) {
+        networks.push(token.chainId);
+      }
+    });
+
+    const nativeTokens = networks.map((token) => {
+      return {
+        address: ZeroAddress,
+        chainId: token,
+      };
+    });
+
+    return [
+      ...fullTokensList.map((item: any) => ({
+        address: item.address,
+        chainId: item.chainId,
+      })),
+      ...nativeTokens,
+    ];
+  },
+  {
+    maxAge: 400_000,
+    cacheKey: (args) => args.join("_"),
+  },
+);
+
 const Swap: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
   const { currentAccount } = useAccounts();
@@ -104,54 +149,14 @@ const Swap: FC = () => {
 
   const [verifiedTokens, setVerifiedTokens] = useState<null | any>(null);
 
-  const resources = [
-    "https://cloudflare-ipfs.com/ipns/tokens.uniswap.org",
-    "https://cloudflare-ipfs.com/ipns/extendedtokens.uniswap.org",
-  ];
-
-  const getVerifiedTokens = memoize(
-    async () => {
-      const tokenPromises = resources.map((url) =>
-        axios.get(url).then((response) => response.data.tokens),
-      );
-
-      const response = await Promise.all(tokenPromises);
-      const fullTokensList = response.reduce((acc, curr) => {
-        return [...acc, ...curr];
-      }, []);
-
-      const networks: number[] = [];
-
-      fullTokensList.forEach((token: any) => {
-        if (!networks.includes(token.chainId)) {
-          networks.push(token.chainId);
-        }
-      });
-
-      const nativeTokens = networks.map((token) => {
-        return {
-          address: ZeroAddress,
-          chainId: token,
-        };
-      });
-
-      setVerifiedTokens([
-        ...fullTokensList.map((item: any) => ({
-          address: item.address,
-          chainId: item.chainId,
-        })),
-        ...nativeTokens,
-      ]);
-    },
-    {
-      maxAge: 400_000,
-      cacheKey: (args) => args.join("_"),
-    },
-  );
+  const handleGetVerifiedTokens = async () => {
+    const tokens = await getVerifiedTokens();
+    setVerifiedTokens(tokens);
+  };
 
   useEffect(() => {
-    getVerifiedTokens();
-  }, [getVerifiedTokens]);
+    handleGetVerifiedTokens();
+  }, [handleGetVerifiedTokens]);
 
   const handleBeforeTransaction = useCallback((metadata: Route) => {
     if (metadata) {
