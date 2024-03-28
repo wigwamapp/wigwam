@@ -149,10 +149,10 @@ const Swap: FC = () => {
 
   const [verifiedTokens, setVerifiedTokens] = useState<null | any>(null);
 
-  const handleGetVerifiedTokens = async () => {
+  const handleGetVerifiedTokens = useCallback(async () => {
     const tokens = await getVerifiedTokens();
     setVerifiedTokens(tokens);
-  };
+  }, []);
 
   useEffect(() => {
     handleGetVerifiedTokens();
