@@ -34,6 +34,7 @@ export const SelectChainAndToken: React.FC<BoxProps> = (props) => {
   useEffect(() => {
     const handleFromChainChange = async () => {
       if (!account.address) return
+
       if (DISABLED_FEE_CHAINS.includes(fromChain) && onChangeFee) {
         onChangeFee(undefined)
       } else if (onChangeFee) {

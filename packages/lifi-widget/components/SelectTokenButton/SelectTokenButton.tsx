@@ -1,15 +1,16 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Skeleton } from "@mui/material";
 import { useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useChain, useSwapOnly, useToken } from "../../hooks";
 import type { FormTypeProps } from "../../providers";
-import { FormKeyHelper, useWidgetConfig } from "../../providers";
+import { FormKeyHelper, FormKey, useWidgetConfig } from "../../providers";
 import { navigationRoutes } from "../../utils";
 import { Card, CardTitle } from "../Card";
 import { TokenAvatar, TokenAvatarDefault } from "../TokenAvatar";
 import { SelectTokenCardHeader } from "./SelectTokenButton.style";
+import { useFormContext } from 'react-hook-form';
 
 export const SelectTokenButton: React.FC<
   FormTypeProps & {
@@ -18,14 +19,27 @@ export const SelectTokenButton: React.FC<
 > = ({ formType, compact }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { setValue } = useFormContext();
+
   const { disabledUI, subvariant } = useWidgetConfig();
   const swapOnly = useSwapOnly();
   const tokenKey = FormKeyHelper.getTokenKey(formType);
   const [chainId, tokenAddress] = useWatch({
     name: [FormKeyHelper.getChainKey(formType), tokenKey],
   });
+  const [toToken] = useWatch({
+    name: [
+      FormKey.ToToken,
+    ],
+  });
   const { chain, isLoading: isChainLoading } = useChain(chainId);
   const { token, isLoading: isTokenLoading } = useToken(chainId, tokenAddress);
+
+  useEffect(() => {
+    if (formType === 'from' && !toToken) {
+      setValue(FormKey.ToChain, chainId, { shouldTouch: true })
+    }
+  }, [chainId])
 
   const handleClick = () => {
     navigate(
@@ -64,14 +78,14 @@ export const SelectTokenButton: React.FC<
           <SelectTokenCardHeader
             avatar={
               isSelected ? (
-                <TokenAvatar token={token} chain={chain} mainAvatarStyle={{width: '44px', height: '44px'}} />
+                <TokenAvatar token={token} chain={chain} mainAvatarStyle={{width: '44px', height: '44px'}} smallAvatarStyle={{width: '24px !important', height: '24px !important'}}/>
               ) : (
                   <TokenAvatarDefault />
               )
             }
             title={isSelected ? <span style={{fontWeight: '700', color: '#FFF'}}>{token.symbol}</span> : <span style={{fontWeight: '700', color: '#8D9C9E'}}>{defaultPlaceholder}</span>}
             subheader={
-              isSelected ? <span style={{fontWeight: '400', fontSize: '12px', color: '#8D9C9E'}}>{t(`main.onChain`, { chainName: chain.name })}</span> : <span style={{fontWeight: '400', fontSize: '12px', color: '#8D9C9E'}}>and Token</span>
+              isSelected ? <span style={{fontWeight: '800', fontSize: '14px', color: '#8D9C9E'}}>{chain.name}</span> : <span style={{fontWeight: '400', fontSize: '12px', color: '#8D9C9E'}}>and Token</span>
             }
             selected={isSelected}
             compact={compact}
