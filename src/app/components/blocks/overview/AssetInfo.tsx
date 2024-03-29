@@ -36,7 +36,8 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
 import TokenActivity from "./TokenActivity";
@@ -223,7 +224,7 @@ const AssetInfo: FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-2">
+            <div className="mt-6 grid grid-cols-4 gap-2">
               <Button
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
@@ -232,6 +233,15 @@ const AssetInfo: FC = () => {
               >
                 <SendIcon className="w-6 h-auto mr-2" />
                 Send
+              </Button>
+              <Button
+                to={{ receiveOpened: true, receiveToken: tokenSlug }}
+                merge={["token"]}
+                theme="secondary"
+                className="grow !py-2 !min-w-0"
+              >
+                <ReceiveIcon className="w-6 h-auto mr-2" />
+                Receive
               </Button>
               <Button
                 to={{

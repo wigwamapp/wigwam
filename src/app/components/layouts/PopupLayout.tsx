@@ -1,6 +1,6 @@
 import { FC, HTMLAttributes, PropsWithChildren, useRef } from "react";
 import classNames from "clsx";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { WalletStatus } from "core/types";
 
@@ -8,6 +8,7 @@ import { openInTab } from "app/helpers";
 import {
   getTotalAccountBalanceAtom,
   popupToolbarTabAtom,
+  receiveModalAtom,
   updateAvailableAtom,
   walletStatusAtom,
 } from "app/atoms";
@@ -20,7 +21,8 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { OverflowProvider, useAccounts, useActivityBadge } from "app/hooks";
 import Button from "../elements/Button";
@@ -234,6 +236,7 @@ const NavToolbarButton: FC<NavToolbarButtonProps> = ({
 
 const WalletInfo: FC = () => {
   const { currentAccount } = useAccounts();
+  const setReceiveOpened = useSetAtom(receiveModalAtom);
   const totalBalance = useLazyAtomValue(
     getTotalAccountBalanceAtom(currentAccount.address),
     "off",
@@ -255,6 +258,17 @@ const WalletInfo: FC = () => {
 
       <div className="flex gap-8">
         <DeepLinkButton text="Send" to="transfer" Icon={SendIcon} />
+        <Button
+          theme="clean"
+          className="!p-0"
+          innerClassName="flex flex-col"
+          onClick={() => setReceiveOpened([true, "replace"])}
+        >
+          <div className="mb-1 px-[0.6875rem] py-[0.65625rem] bg-brand-darkbg rounded-full transition-colors group-hover:bg-[#373B45] group-focus-visible:bg-[#373B45]">
+            <ReceiveIcon />
+          </div>
+          <span className="text-xs font-medium">Receive</span>
+        </Button>
         <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />
         <DeepLinkButton text="Swap" to="swap" Icon={SwapIcon} />
       </div>

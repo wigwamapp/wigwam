@@ -11,6 +11,7 @@ import ContactsDialog from "./blocks/ContactsDialog";
 import AddAccountModal from "./blocks/AddAccountModal";
 import ActivityModal from "./blocks/activity/ActivityModal";
 import AddFundsOnRampModal from "./blocks/AddFundsOnRampModal";
+import ReceivePopup from "./blocks/ReceiveModal";
 // import AuthSignatureModal from "./blocks/AuthSignatureModal";
 
 const MainApp: FC = () => (
@@ -36,6 +37,7 @@ const Modals: FC = () => {
           <ContactsDialog />
           <AddAccountModal />
           <ActivityModal />
+          <ReceivePopup />
           <AddFundsOnRampModal />
           {/* <AuthSignatureModal /> */}
         </>
