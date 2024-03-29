@@ -7,6 +7,7 @@ import TooltipIcon from "./TooltipIcon";
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
   labelActions?: ReactNode;
+  labelClassName?: string;
   actions?: ReactNode;
   textareaClassName?: string;
   error?: boolean;
@@ -23,6 +24,7 @@ const LongTextField = memo(
         label,
         id,
         labelActions,
+        labelClassName,
         spellCheck = false,
         actions,
         error,
@@ -42,7 +44,12 @@ const LongTextField = memo(
       return (
         <div className={classNames("flex flex-col", className)}>
           {(label || labelActions) && (
-            <div className="flex items-center justify-between px-4 mb-2 min-h-6">
+            <div
+              className={classNames(
+                "flex items-center justify-between px-4 mb-2 min-h-6",
+                labelClassName,
+              )}
+            >
               {label && (
                 <label
                   htmlFor={id}
