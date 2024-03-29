@@ -12,6 +12,7 @@ import Unlock from "./screens/Unlock";
 import Popup from "./screens/Popup";
 import Dialog from "./blocks/Dialog";
 import ActivityModal from "./blocks/activity/ActivityModal";
+import ReceivePopup from "./blocks/ReceiveModal";
 
 const PopupApp: FC = () => (
   <BaseProvider>
@@ -37,7 +38,12 @@ const PopupModals: FC = () => {
   return (
     <>
       <Dialog small />
-      {!locked && <ActivityModal />}
+      {!locked && (
+        <>
+          <ActivityModal />
+          <ReceivePopup />
+        </>
+      )}
     </>
   );
 };
