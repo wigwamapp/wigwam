@@ -22,6 +22,7 @@ import { useOnScreen } from "lib/react-hooks/useOnScreen";
 import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import * as Repo from "core/repo";
 import {
+  Setting,
   cleanupNetwork,
   getRpcUrlKey,
   mergeNetworkUrls,
@@ -98,6 +99,10 @@ const EditNetwork = memo<EditNetworkProps>(
               initialChainId && chainId !== initialChainId;
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
+
+            if (repoMethod === "add") {
+              await storage.put(Setting.TestNetworks, true);
+            }
 
             await Repo.networks[repoMethod](
               network

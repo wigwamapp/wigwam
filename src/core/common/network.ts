@@ -8,6 +8,7 @@ import { AddEthereumChainParameter, CHAIN_ID, Network } from "core/types";
 import * as repo from "core/repo";
 
 import { EvmNetwork } from "./chainList";
+import { Setting } from "./settings";
 
 const INFURA_TEMPLATE = "${INFURA_API_KEY}";
 const INFURA_API_KEY = process.env.WIGWAM_INFURA_API_KEY;
@@ -97,6 +98,7 @@ export async function setupNewNetwork(
     // Only http
     toAdd.rpcUrls = toAdd.rpcUrls.filter((url) => url.startsWith("http"));
 
+    await storage.put(Setting.TestNetworks, true);
     await repo.networks.add(toAdd);
   }
 }
