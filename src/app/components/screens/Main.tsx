@@ -16,6 +16,7 @@ import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
 import Rewards from "./mainPages/Rewards";
 import OnboardingPopup from "../blocks/OnboardingPopup";
+import Buy from "./mainPages/Buy";
 
 const SwapDynamic = lazy(() => import("./mainPages/Swap"));
 
@@ -42,6 +43,7 @@ function matchMainPage(page: Page) {
   return match(page)
     .with(Page.Default, () => <Overview />)
     .with(Page.Receive, () => <Receive />)
+    .with(Page.Buy, () => <Buy />)
     .with(Page.Transfer, () => <Transfer />)
     .with(Page.Swap, () => <SwapDynamic />)
     .with(Page.Apps, () => <Apps />)
