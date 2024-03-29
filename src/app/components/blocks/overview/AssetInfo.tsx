@@ -231,7 +231,7 @@ const AssetInfo: FC = () => {
                 theme="secondary"
                 className="grow !py-2 !min-w-0"
               >
-                <SendIcon className="w-6 h-auto mr-2" />
+                <SendIcon className="w-5 h-auto mr-2" />
                 Send
               </Button>
               <Button
@@ -240,7 +240,7 @@ const AssetInfo: FC = () => {
                 theme="secondary"
                 className="grow !py-2 !min-w-0"
               >
-                <ReceiveIcon className="w-6 h-auto mr-2" />
+                <ReceiveIcon className="w-5 h-auto mr-2" />
                 Receive
               </Button>
               <Button
@@ -254,17 +254,17 @@ const AssetInfo: FC = () => {
                 disabled={!showBuyButton}
                 title={showBuyButton ? undefined : "Coming soon"}
               >
-                <BuyIcon className="w-6 h-auto mr-2" />
+                <BuyIcon className="w-5 h-auto mr-2" />
                 Buy
               </Button>
               <Button
                 to={{ page: Page.Swap }}
                 merge={["token"]}
                 theme="secondary"
-                className="grow !py-2"
+                className="grow !py-2 !min-w-0"
                 title={`Swap ${symbol}`}
               >
-                <SwapIcon className="w-6 h-auto mr-2" />
+                <SwapIcon className="w-5 h-auto mr-2" />
                 Swap
               </Button>
             </div>
