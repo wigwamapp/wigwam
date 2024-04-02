@@ -24,7 +24,10 @@ export const syncNetworks = memoize(
         .where("[accountAddress+tokenSlug]")
         .equals([accountAddress, NATIVE_TOKEN_SLUG])
         .toArray(),
-      fetchAllUsedNetworks(accountAddress),
+      fetchAllUsedNetworks(accountAddress).catch((err) => {
+        console.error(err);
+        return [];
+      }),
     ]);
 
     const existingTokensMap = new Map(
