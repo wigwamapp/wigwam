@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { useMaybeAtomValue } from "lib/atom-utils";
 import { toProtectedString } from "lib/crypto-utils";
+import { withTimeout } from "lib/system/withTimeout";
 
 import { DEFAULT_NETWORKS } from "fixtures/networks";
 import { AccountSource, SeedPharse, WalletStatus } from "core/types";
@@ -122,9 +123,9 @@ const ScanAccountsModal: FC<SecondaryModalProps> = ({
           );
           if (existing) return;
 
-          const balance = await provider
-            .getBalance(wallet.address)
-            .catch(() => null);
+          const balance = await withTimeout(3_000, () =>
+            provider.getBalance(wallet.address),
+          ).catch(() => null);
           if (!balance) return;
 
           const alreadyInResult = resultAddresses.find(
