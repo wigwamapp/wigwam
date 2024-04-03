@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import memoize from "mem";
+import axios from "axios";
 import { withOfflineCache } from "lib/ext/offlineCache";
 import { props } from "lib/system/promise";
 
@@ -199,19 +200,30 @@ export async function isFirstSync(accountAddress: string) {
 
 export const fetchAllUsedNetworks = withOfflineCache(
   async (accountAddress: string) => {
-    const res = await indexerApi.get(
-      `/c/v1/address/${accountAddress}/activity/`,
-      {
-        params: {
-          _authAddress: accountAddress,
+    const data = await axios
+      .get<{
+        chains: { chainId: number }[];
+      }>(`https://api.llamafolio.com/balances/${accountAddress}/tokens`)
+      .then((r) => r.data)
+      .catch(() => null);
+
+    if (!data) {
+      const res = await indexerApi.get(
+        `/c/v1/address/${accountAddress}/activity/`,
+        {
+          params: {
+            _authAddress: accountAddress,
+          },
         },
-      },
-    );
+      );
 
-    const resItems = res.data?.data?.items ?? [];
-    const chainIds: number[] = resItems.map((item: any) => +item.chain_id);
+      const resItems = res.data?.data?.items ?? [];
+      const chainIds: number[] = resItems.map((item: any) => +item.chain_id);
 
-    return chainIds;
+      return chainIds;
+    }
+
+    return data.chains.map((c) => c.chainId);
   },
   {
     key: ([address]) => `networks_${address}`,

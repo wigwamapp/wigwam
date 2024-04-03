@@ -209,7 +209,7 @@ export const syncAccountAssets = memoize(
 );
 
 export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
-  chainId === 56
+  U_INDEXER_CHAINS.has(chainId)
     ? indexerApi
         .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
           params: {
@@ -219,3 +219,8 @@ export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
         })
         .then((r) => r.data)
     : fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset);
+
+const U_INDEXER_CHAINS = new Set([
+  1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
+  1313161554, 1088, 5000, 1101, 1284, 10, 8453,
+]);
