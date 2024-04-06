@@ -120,8 +120,9 @@ const EditNetwork = memo<EditNetworkProps>(
                     },
                     rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
                     explorerUrls: blockExplorer
-                      ? mergeNetworkUrls([blockExplorer], network.explorerUrls)
-                      : network.explorerUrls,
+                      ? mergeNetworkUrls(network.explorerUrls, [blockExplorer])
+                      : [],
+                    manuallyChanged: true,
                   }
                 : {
                     chainId,
@@ -134,7 +135,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       symbol: currencySymbol,
                       decimals: 18,
                     },
-                    explorerUrls: [blockExplorer],
+                    explorerUrls: blockExplorer ? [blockExplorer] : [],
                     position: 0,
                   },
             );
@@ -360,7 +361,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(isUrlLike, preventXSS)}
+                    validate={(value) =>
+                      value
+                        ? composeValidators(isUrlLike, preventXSS)(value)
+                        : undefined
+                    }
                   >
                     {({ input, meta }) => (
                       <Input
