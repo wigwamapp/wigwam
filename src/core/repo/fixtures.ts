@@ -41,6 +41,10 @@ export async function setupFixtures() {
         // Localhost
         if (net.chainId === 1337) return net;
 
+        // Manually changed
+        // TODO: Better to merge
+        if (net.manuallyChanged) return net;
+
         return evmData
           ? mergeNetwork(net, {
               chainId: evmData.chainId,

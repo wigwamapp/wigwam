@@ -22,6 +22,7 @@ import { useOnScreen } from "lib/react-hooks/useOnScreen";
 import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import * as Repo from "core/repo";
 import {
+  Setting,
   cleanupNetwork,
   getRpcUrlKey,
   mergeNetworkUrls,
@@ -99,6 +100,10 @@ const EditNetwork = memo<EditNetworkProps>(
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
 
+            if (repoMethod === "add") {
+              await storage.put(Setting.TestNetworks, true);
+            }
+
             await Repo.networks[repoMethod](
               network
                 ? {
@@ -115,8 +120,9 @@ const EditNetwork = memo<EditNetworkProps>(
                     },
                     rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
                     explorerUrls: blockExplorer
-                      ? mergeNetworkUrls([blockExplorer], network.explorerUrls)
-                      : network.explorerUrls,
+                      ? mergeNetworkUrls(network.explorerUrls, [blockExplorer])
+                      : [],
+                    manuallyChanged: true,
                   }
                 : {
                     chainId,
@@ -129,7 +135,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       symbol: currencySymbol,
                       decimals: 18,
                     },
-                    explorerUrls: [blockExplorer],
+                    explorerUrls: blockExplorer ? [blockExplorer] : [],
                     position: 0,
                   },
             );
@@ -355,7 +361,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(isUrlLike, preventXSS)}
+                    validate={(value) =>
+                      value
+                        ? composeValidators(isUrlLike, preventXSS)(value)
+                        : undefined
+                    }
                   >
                     {({ input, meta }) => (
                       <Input

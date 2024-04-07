@@ -59,7 +59,22 @@ export async function prepareAccountTokensSync<T extends AccountToken>(
     existingTokensMap.delete(token.tokenSlug);
   };
 
-  const releaseToRepo = () => repo.accountTokens.bulkPut(accTokens, dbKeys);
+  const releaseToRepo = async () => {
+    await repo.accountTokens.bulkPut(accTokens, dbKeys);
+
+    // Clean-up trash
+    if (existingTokensMap.size > 0) {
+      await repo.accountTokens.bulkDelete(
+        Array.from(existingTokensMap.keys()).map((tokenSlug) =>
+          createAccountTokenKey({
+            chainId,
+            accountAddress,
+            tokenSlug,
+          }),
+        ),
+      );
+    }
+  };
 
   return {
     existingAccTokens,

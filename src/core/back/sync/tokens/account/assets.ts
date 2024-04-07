@@ -17,7 +17,10 @@ import { fetchCxAccountTokens, indexerApi } from "../../indexer";
 import { prepareAccountTokensSync } from "./utils";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
-const NATIVE_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+const NATIVE_TOKEN_ADDRESSES = [
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "0x0000000000000000000000000000000000001010",
+];
 
 export const syncAccountAssets = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -40,7 +43,8 @@ export const syncAccountAssets = memoize(
 
     for (const token of freshAccTokensData) {
       const native =
-        token.native_token ?? token.contract_address === NATIVE_TOKEN_ADDRESS;
+        token.native_token ??
+        NATIVE_TOKEN_ADDRESSES.includes(token.contract_address);
 
       // Skip for native token, we sync native tokens in separate module
       if (native) continue;
@@ -124,7 +128,10 @@ export const syncAccountAssets = memoize(
     // Fetch data from the chain for tokens
     // that were not retrieved from the indexer
 
-    const restTokens = Array.from(existingTokensMap.values());
+    const restTokens = Array.from(existingTokensMap.values()).filter(
+      (t) =>
+        !NATIVE_TOKEN_ADDRESSES.includes(parseTokenSlug(t.tokenSlug).address),
+    );
 
     if (restTokens.length > 0) {
       const balances = await Promise.all(
@@ -209,7 +216,7 @@ export const syncAccountAssets = memoize(
 );
 
 export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
-  chainId === 56
+  U_INDEXER_CHAINS.has(chainId)
     ? indexerApi
         .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
           params: {
@@ -219,3 +226,8 @@ export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
         })
         .then((r) => r.data)
     : fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset);
+
+const U_INDEXER_CHAINS = new Set([
+  1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
+  1313161554, 1088, 5000, 1101, 1284, 10, 8453,
+]);
