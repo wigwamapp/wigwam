@@ -1,4 +1,4 @@
-import { Box, Container } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import type { FC } from 'react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { ChainSelect } from '../../components/ChainSelect';
@@ -9,8 +9,10 @@ import {
   useScrollableOverflowHidden,
   useSwapOnly,
 } from '../../hooks';
-import { type FormTypeProps } from '../../providers';
+import { useWidgetConfig, type FormTypeProps } from '../../providers';
 import { SearchTokenInput } from './SearchTokenInput';
+import type { ChangeEvent } from 'react';
+import { Switch } from '../../components/Switch';
 
 const minTokenListHeight = 360;
 
@@ -21,6 +23,7 @@ export const SelectTokenPage: FC<FormTypeProps> = ({ formType }) => {
   const contentHeight = useContentHeight();
   const [tokenListHeight, setTokenListHeight] = useState(0);
   const swapOnly = useSwapOnly();
+  const { showOnlyVerified, onShowFullList } = useWidgetConfig();
 
   useLayoutEffect(() => {
     setTokenListHeight(
@@ -33,10 +36,27 @@ export const SelectTokenPage: FC<FormTypeProps> = ({ formType }) => {
 
   const hideChainSelect = swapOnly && formType === 'to';
 
+  if (!onShowFullList) return;
+
+  const onChange = (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    onShowFullList(checked)
+  }
+
   return (
     <Container disableGutters>
       <Box pt={1} pb={2} px={3} ref={headerRef}>
         {!hideChainSelect ? <ChainSelect formType={formType} /> : null}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
+          <Typography
+            fontSize={18}
+            variant="subtitle1"
+            color="text.primary"
+            lineHeight="normal"
+          >
+            Show verified tokens
+          </Typography>
+          <Switch checked={showOnlyVerified} onChange={onChange} />
+        </Box>
         <Box mt={!hideChainSelect ? 2 : 0}>
           <SearchTokenInput />
         </Box>

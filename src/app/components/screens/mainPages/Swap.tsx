@@ -1,5 +1,6 @@
 import { FC, useMemo, useEffect, useState, useCallback } from "react";
 import { useAtomValue } from "jotai";
+import memoize from "mem";
 
 import {
   LiFiWidget,
@@ -24,6 +25,52 @@ import { SelfActivityKind } from "core/types";
 import { Route } from "@lifi/types";
 import { currentLocaleAtom } from "app/atoms";
 import { LanguageKey } from "packages/lifi-widget/providers";
+import axios from "axios";
+
+const resources = [
+  "https://cloudflare-ipfs.com/ipns/tokens.uniswap.org",
+  "https://cloudflare-ipfs.com/ipns/extendedtokens.uniswap.org",
+];
+
+const getVerifiedTokens = memoize(
+  async () => {
+    const tokenPromises = resources.map((url) =>
+      axios.get(url).then((response) => response.data.tokens),
+    );
+
+    const response = await Promise.all(tokenPromises);
+    const fullTokensList = response.reduce((acc, curr) => {
+      return [...acc, ...curr];
+    }, []);
+
+    const networks: number[] = [];
+
+    fullTokensList.forEach((token: any) => {
+      if (!networks.includes(token.chainId)) {
+        networks.push(token.chainId);
+      }
+    });
+
+    const nativeTokens = networks.map((token) => {
+      return {
+        address: ZeroAddress,
+        chainId: token,
+      };
+    });
+
+    return [
+      ...fullTokensList.map((item: any) => ({
+        address: item.address,
+        chainId: item.chainId,
+      })),
+      ...nativeTokens,
+    ];
+  },
+  {
+    maxAge: 400_000,
+    cacheKey: (args) => args.join("_"),
+  },
+);
 
 const Swap: FC = () => {
   const currentLocale = useAtomValue(currentLocaleAtom);
@@ -100,6 +147,17 @@ const Swap: FC = () => {
   const provider = getLiFiProvider(chainId);
   const signer = provider.getSigner(currentAccount.address);
 
+  const [verifiedTokens, setVerifiedTokens] = useState<null | any>(null);
+
+  const handleGetVerifiedTokens = useCallback(async () => {
+    const tokens = await getVerifiedTokens();
+    setVerifiedTokens(tokens);
+  }, []);
+
+  useEffect(() => {
+    handleGetVerifiedTokens();
+  }, [handleGetVerifiedTokens]);
+
   const handleBeforeTransaction = useCallback((metadata: Route) => {
     if (metadata) {
       const transactionProvider = getLiFiProvider(metadata.fromChainId);
@@ -116,18 +174,33 @@ const Swap: FC = () => {
     setFee(newFee);
   }, []);
 
+  const handleShowFullList = (flag: any) => {
+    setShowOnlyVerified(flag);
+  };
+
+  const [showOnlyVerified, setShowOnlyVerified] = useState(true);
+
+  const tokensList = useMemo(() => {
+    return showOnlyVerified ? verifiedTokens : [];
+  }, [showOnlyVerified, verifiedTokens]);
+
   const widgetConfig = useMemo((): WidgetConfig => {
     return {
       onBeforeTransaction: (metadata: Route) =>
         handleBeforeTransaction(metadata),
       onChangeFee: (newFee: number | undefined) => handleChangeFee(newFee),
+      onShowFullList: (flag: boolean) => handleShowFullList(flag),
       integrator: "Wigwam",
       variant: "expandable",
       selectedCurrency: selectedCurrency,
       currencyRate: currenciesRate[selectedCurrency],
       chainsOrder: chainsOrder,
+      showOnlyVerified: showOnlyVerified,
       languages: {
         default: currentLocale as LanguageKey,
+      },
+      tokens: {
+        allow: tokensList,
       },
       fee: fee,
       fromChain: chainId,
@@ -189,10 +262,12 @@ const Swap: FC = () => {
       },
     };
   }, [
+    tokensList,
     currenciesRate,
     currentLocale,
     chainId,
     currentAccount.address,
+    showOnlyVerified,
     tokenSlug,
     fee,
     signer,

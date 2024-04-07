@@ -10,7 +10,8 @@ export const TokenAvatarFallback: React.FC<{
   isLoading?: boolean;
   sx?: SxProps<Theme>;
   mainAvatarStyle?: SxProps<Theme>
-}> = ({ token, isLoading, sx, mainAvatarStyle }) => {
+  smallAvatarStyle?: SxProps<Theme>
+}> = ({ token, isLoading, sx, mainAvatarStyle, smallAvatarStyle }) => {
   const { chain } = useChain(token?.chainId);
   const { token: chainToken, isLoading: isLoadingToken } = useToken(
     token?.chainId,
@@ -23,6 +24,7 @@ export const TokenAvatarFallback: React.FC<{
       chain={chain}
       sx={sx}
       mainAvatarStyle={mainAvatarStyle}
+      smallAvatarStyle={smallAvatarStyle}
     />
   );
 };
@@ -33,14 +35,15 @@ export const TokenAvatarBase: React.FC<{
   isLoading?: boolean;
   sx?: SxProps<Theme>;
   mainAvatarStyle?: SxProps<Theme>;
-}> = ({ token, chain, isLoading, sx, mainAvatarStyle }) => {
+  smallAvatarStyle?: SxProps<Theme>;
+}> = ({ token, chain, isLoading, sx, mainAvatarStyle, smallAvatarStyle }) => {
   return (
     <Badge
       overlap="circular"
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       badgeContent={
         chain && !isLoading ? (
-          <SmallAvatar src={chain.logoURI} alt={chain.name} sx={{border: 'none'}}>
+          <SmallAvatar src={chain.logoURI} sx={{border: 'none', ...smallAvatarStyle}} alt={chain.name}>
             {chain.name[0]}
           </SmallAvatar>
         ) : (
@@ -66,9 +69,10 @@ export const TokenAvatar: React.FC<{
   isLoading?: boolean;
   sx?: SxProps<Theme>;
   mainAvatarStyle?: SxProps<Theme>;
-}> = ({ token, chain, isLoading, sx, mainAvatarStyle }) => {
+  smallAvatarStyle?: SxProps<Theme>;
+}> = ({ token, chain, isLoading, sx, mainAvatarStyle, smallAvatarStyle }) => {
   if (!chain || !token?.logoURI) {
-    return <TokenAvatarFallback token={token} isLoading={isLoading} sx={sx} mainAvatarStyle={mainAvatarStyle} />;
+    return <TokenAvatarFallback token={token} isLoading={isLoading} sx={sx} mainAvatarStyle={mainAvatarStyle} smallAvatarStyle={smallAvatarStyle} />;
   }
   return (
     <TokenAvatarBase
@@ -77,6 +81,7 @@ export const TokenAvatar: React.FC<{
       isLoading={isLoading}
       sx={sx}
       mainAvatarStyle={mainAvatarStyle}
+      smallAvatarStyle={smallAvatarStyle}
     />
   );
 };
