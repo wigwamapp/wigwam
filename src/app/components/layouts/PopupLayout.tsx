@@ -269,7 +269,7 @@ const WalletInfo: FC = () => {
           </div>
           <span className="text-xs font-medium">Receive</span>
         </Button>
-        <DeepLinkButton text="Buy" to="receive" Icon={BuyIcon} />
+        <DeepLinkButton text="Buy" to="buy" Icon={BuyIcon} />
         <DeepLinkButton text="Swap" to="swap" Icon={SwapIcon} />
       </div>
     </section>

@@ -37,9 +37,11 @@ const ShareAddress: FC<{
           className={classNames(
             "flex items-center justify-center",
             "min-w-[6.25rem] h-[6.25rem]",
-            "bg-white/[.08]",
             "rounded-[0.625rem]",
-            "shadow-receiveqrcode",
+            "box-border",
+            "bg-black/10",
+            "border border-brand-main/10",
+            "overflow-hidden",
           )}
           id="receive-canvas"
         >
@@ -73,7 +75,7 @@ const ShareAddress: FC<{
               ) : (
                 <CopyIcon className="mr-1" />
               )}
-              {copied ? "Media copied" : "Copy Media"}
+              {copied ? "Media copied" : "Copy media"}
             </Button>
           )}
         </div>
