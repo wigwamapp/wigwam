@@ -45,3 +45,9 @@ export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 export const activityModalAtom = atomWithURLHash("activityOpened", false);
 
 export const chainIdUrlAtom = atomWithURLHash<number | null>("chainid", null);
+
+export const receiveModalAtom = atomWithURLHash("receiveOpened", false);
+export const receiveTokenAtom = atomWithURLHash<string | null>(
+  "receiveToken",
+  null,
+);

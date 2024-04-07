@@ -4,6 +4,7 @@ export enum Page {
   Profiles = "profiles",
   Unlock = "unlock",
   Receive = "receive",
+  Buy = "buy",
   Transfer = "transfer",
   Swap = "swap",
   Apps = "apps",

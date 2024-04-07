@@ -35,13 +35,14 @@ import {
 import { ReactComponent as ExpandIcon } from "app/icons/expand.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
 import { ReactComponent as CheckIcon } from "app/icons/check.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
@@ -51,6 +52,7 @@ import PriceChange from "app/components/elements/PriceChange";
 import IconedButton from "app/components/elements/IconedButton";
 
 import PopupModal from "./PopupModal";
+import { navigate } from "lib/navigation";
 
 type AssetCardProps = {
   asset: AccountAsset;
@@ -178,6 +180,13 @@ const AssetCard = memo(
             <ChainIdProvider chainId={asset.chainId}>
               <AssetModal
                 open={openModal}
+                onReceive={() => {
+                  navigate((s) => ({
+                    ...s,
+                    receiveOpened: true,
+                    receiveToken: asset.tokenSlug,
+                  }));
+                }}
                 onClose={() => setModalOpen(false)}
                 asset={asset}
               />
@@ -217,11 +226,17 @@ const PopoverButton: FC<PopoverButton> = ({ Icon, children, ...rest }) => (
 
 interface IAssetModalProps {
   open: boolean;
+  onReceive: () => void;
   onClose: () => void;
   asset: AccountAsset;
 }
 
-const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
+const AssetModal: FC<IAssetModalProps> = ({
+  open,
+  onReceive,
+  asset,
+  onClose,
+}) => {
   const {
     balanceUSD,
     name,
@@ -323,6 +338,17 @@ const AssetModal: FC<IAssetModalProps> = ({ open, asset, onClose }) => {
             }
             Icon={SendIcon}
           />
+          <Button
+            theme="clean"
+            className="!p-0"
+            innerClassName="flex flex-col"
+            onClick={onReceive}
+          >
+            <div className="mb-1 py-[0.78125rem] px-[0.8125rem] bg-[#373B45] rounded-full">
+              <ReceiveIcon />
+            </div>
+            <span className="text-xs font-medium">Receive</span>
+          </Button>
           <DeepLinkButton
             text="Buy"
             onClick={() =>

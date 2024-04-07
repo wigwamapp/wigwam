@@ -36,7 +36,8 @@ import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.sv
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
 import TokenActivity from "./TokenActivity";
@@ -223,15 +224,24 @@ const AssetInfo: FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-2">
+            <div className="mt-6 grid grid-cols-4 gap-2">
               <Button
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
                 theme="secondary"
-                className="grow !py-2 !min-w-0"
+                className="grow !py-2 !min-w-0 text-sm"
               >
-                <SendIcon className="w-6 h-auto mr-2" />
+                <SendIcon className="w-4 h-auto mr-2" />
                 Send
+              </Button>
+              <Button
+                to={{ receiveOpened: true, receiveToken: tokenSlug }}
+                merge={["token"]}
+                theme="secondary"
+                className="grow !py-2 !min-w-0 text-sm"
+              >
+                <ReceiveIcon className="w-4 h-auto mr-2" />
+                Receive
               </Button>
               <Button
                 to={{
@@ -240,21 +250,21 @@ const AssetInfo: FC = () => {
                 }}
                 merge
                 theme="secondary"
-                className="grow !py-2 !min-w-0"
+                className="grow !py-2 !min-w-0 text-sm"
                 disabled={!showBuyButton}
                 title={showBuyButton ? undefined : "Coming soon"}
               >
-                <BuyIcon className="w-6 h-auto mr-2" />
+                <BuyIcon className="w-4 h-auto mr-2" />
                 Buy
               </Button>
               <Button
                 to={{ page: Page.Swap }}
                 merge={["token"]}
                 theme="secondary"
-                className="grow !py-2"
+                className="grow !py-2 !min-w-0 text-sm"
                 title={`Swap ${symbol}`}
               >
-                <SwapIcon className="w-6 h-auto mr-2" />
+                <SwapIcon className="w-4 h-auto mr-2" />
                 Swap
               </Button>
             </div>

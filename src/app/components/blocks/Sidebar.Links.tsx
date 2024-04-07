@@ -9,18 +9,20 @@ import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 // import { ReactComponent as AppsIcon } from "app/icons/Apps.svg";
 import { ReactComponent as ContactsIcon } from "app/icons/Contacts.svg";
 import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
+import { ReactComponent as BuyIcon } from "app/icons/Buy-page.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
 import { useDialog } from "app/hooks/dialog";
-import { activityModalAtom } from "app/atoms";
+import { activityModalAtom, receiveModalAtom } from "app/atoms";
 import { useActivityBadge, useSwapBadge, useAccounts } from "app/hooks";
 
 const useSidebarLinks = () => {
   const { alert } = useDialog();
   const setActivityOpened = useSetAtom(activityModalAtom);
+  const setReceiveOpened = useSetAtom(receiveModalAtom);
   const activityBadgeAmount = useActivityBadge();
   const { currentAccount } = useAccounts();
 
@@ -45,9 +47,14 @@ const useSidebarLinks = () => {
         Icon: SendIcon,
       },
       {
-        route: Page.Receive,
-        label: "Buy",
+        label: "Receive",
         Icon: ReceiveIcon,
+        action: () => setReceiveOpened([true, "replace"]),
+      },
+      {
+        route: Page.Buy,
+        label: "Buy",
+        Icon: BuyIcon,
       },
       {
         route: Page.Swap,
@@ -67,7 +74,12 @@ const useSidebarLinks = () => {
       //   soon: true,
       // },
     ];
-  }, [activityBadgeAmount, swapBadgeAmount, setActivityOpened]);
+  }, [
+    activityBadgeAmount,
+    swapBadgeAmount,
+    setActivityOpened,
+    setReceiveOpened,
+  ]);
 
   const NavLinksSecondary = useMemo(() => {
     return [
