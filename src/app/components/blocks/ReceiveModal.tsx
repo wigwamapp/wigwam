@@ -50,6 +50,7 @@ const ReceiveModal: FC<ReceiveModalProps> = (props) => {
         className={classNames(isPopupMode ? "mt-4" : "mt-8")}
         title="Wallet address"
         labelClassName="pl-0"
+        walletNameDisplayed
       />
     </SecondaryModal>
   );

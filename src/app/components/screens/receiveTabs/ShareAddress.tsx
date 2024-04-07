@@ -10,13 +10,15 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 import Button from "app/components/elements/Button";
+import SmallContactCard from "app/components/elements/SmallContactCard";
 
 const ShareAddress: FC<{
   title?: string;
   className?: string;
   hideLabel?: boolean;
   labelClassName?: string;
-}> = ({ title, className, hideLabel, labelClassName }) => {
+  walletNameDisplayed?: boolean;
+}> = ({ title, className, hideLabel, labelClassName, walletNameDisplayed }) => {
   const { currentAccount } = useAccounts();
   const { copy, copied } = useCopyCanvasToClipboard("#receive-canvas canvas");
   const isPopup = isPopupPrimitive();
@@ -27,8 +29,16 @@ const ShareAddress: FC<{
       <AddressField
         value={currentAccount.address}
         hideLabel={hideLabel}
-        labelClassName={labelClassName}
+        labelClassName={classNames(labelClassName, "ml-4")}
         label={title ? title : "Wallet address"}
+        labelActions={
+          walletNameDisplayed && (
+            <SmallContactCard
+              address={currentAccount.address}
+              className="!border-0"
+            />
+          )
+        }
         readOnly
       />
 
