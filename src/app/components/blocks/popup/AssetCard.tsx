@@ -353,7 +353,7 @@ const AssetModal: FC<IAssetModalProps> = ({
             text="Buy"
             onClick={() =>
               openLink({
-                page: Page.Receive,
+                page: Page.Buy,
                 token: asset.tokenSlug,
                 onRampOpened: true,
               })
