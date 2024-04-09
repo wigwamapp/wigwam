@@ -1,7 +1,7 @@
 import mem from "mem";
 
 import { TokenStandard } from "core/types";
-import { getNetwork } from "core/common";
+import { getNetwork, isNetworkWithEthToken } from "core/common";
 import { parseTokenSlug } from "core/common/tokens";
 
 import { getCoinGeckoPlatformIds, getCoinGeckoCoinIds } from "../dexPrices";
@@ -18,8 +18,7 @@ export const getTokenDetailsUrl = async (
         getCoinGeckoPlatformIds(),
         getNetworkMemo(chainId),
       ]);
-      const { type, nativeCurrency } = network;
-      const isETHToken = type !== "testnet" && nativeCurrency.symbol === "ETH";
+      const isETHToken = isNetworkWithEthToken(network);
 
       const info = platformIds[isETHToken ? 1 : chainId];
 

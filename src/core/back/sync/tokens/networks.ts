@@ -9,7 +9,7 @@ import {
   getNativeTokenLogoUrl,
   NATIVE_TOKEN_SLUG,
 } from "core/common/tokens";
-import { getNetwork } from "core/common/network";
+import { getNetwork, isNetworkWithEthToken } from "core/common/network";
 import * as repo from "core/repo";
 
 import { getCoinGeckoNativeTokenPrice } from "../dexPrices";
@@ -68,7 +68,7 @@ export const syncNetworks = memoize(
 
     const data = await Promise.all(
       networks.map((network) => {
-        const { chainId, nativeCurrency, type } = network;
+        const { chainId } = network;
         const existing = existingTokensMap.get(chainId);
 
         const refreshNativeBalance = !existing || chainId === activeChainId;
@@ -77,8 +77,7 @@ export const syncNetworks = memoize(
           existing?.portfolioRefreshedAt &&
           existing.portfolioRefreshedAt > Date.now() - 24 * 60 * 60_000;
 
-        const isETHToken =
-          type !== "testnet" && nativeCurrency.symbol === "ETH";
+        const isETHToken = isNetworkWithEthToken(network);
 
         return props({
           chainId,

@@ -103,6 +103,14 @@ export async function setupNewNetwork(
   }
 }
 
+export function isNetworkWithEthToken(net: Network) {
+  return (
+    net.type !== "testnet" &&
+    net.nativeCurrency.symbol === "ETH" &&
+    ["testnet", "taiko"].every((item) => !net.name.toLowerCase().includes(item))
+  );
+}
+
 export async function cleanupNetwork(chainId: number) {
   await storage.put(CHAIN_ID, INITIAL_NETWORK.chainId);
   await repo.networks.delete(chainId);
