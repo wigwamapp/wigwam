@@ -16,6 +16,7 @@ export type DexPrices = Record<string, DexTokenPrice>;
 
 const THREE_MIN = 3 * 60_000;
 const ONE_DAY = 24 * 60 * 60_000;
+const ADDITIONAL_PLATFORM_COINS = new Map([[800001, "octaspace"]]);
 
 export const coinGeckoApi = axios.create({
   baseURL: "https://api.coingecko.com/api/v3",
@@ -165,7 +166,10 @@ export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
   try {
     const platformIds = await getCoinGeckoPlatformIds();
 
-    const nativeCoinId = platformIds[chainId]?.native_coin_id;
+    let nativeCoinId: string | undefined = platformIds[chainId]?.native_coin_id;
+
+    if (!nativeCoinId) nativeCoinId = ADDITIONAL_PLATFORM_COINS.get(chainId);
+
     if (!nativeCoinId) return null;
 
     const prices = await getCoinGeckoPlatformPrices();
@@ -185,6 +189,7 @@ export const getCoinGeckoPlatformPrices = memoize(
       params: {
         ids: Object.values(platformIds)
           .map((p) => p.native_coin_id)
+          .concat(Array.from(ADDITIONAL_PLATFORM_COINS.values()))
           .join(),
         vs_currencies: "USD",
         include_24hr_change: true,
