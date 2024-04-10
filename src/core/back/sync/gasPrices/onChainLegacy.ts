@@ -1,6 +1,7 @@
 import retry from "async-retry";
 
 import { GasPrices } from "core/types";
+import { getGasPriceStep } from "core/common/transaction";
 
 import { getRpcProvider } from "../../rpc";
 
@@ -15,14 +16,14 @@ export async function getOnChainLegacy(chainId: number): Promise<GasPrices> {
 
   if (!gasPrice) return null;
 
-  const step = 10n ** (gasPrice < 10n ** 9n ? 7n : 8n);
+  const step = getGasPriceStep(gasPrice);
 
   return {
     type: "legacy",
     modes: {
-      low: { max: (gasPrice - step).toString() },
-      average: { max: gasPrice.toString() },
-      high: { max: (gasPrice + step).toString() },
+      low: { max: gasPrice.toString() },
+      average: { max: (gasPrice + step).toString() },
+      high: { max: (gasPrice + step * 2n).toString() },
     },
   };
 }

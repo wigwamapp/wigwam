@@ -12,8 +12,9 @@ import { Transaction } from "ethers";
 import classNames from "clsx";
 
 import { FEE_MODES, FeeMode, FeeSuggestions, AccountAsset } from "core/types";
+import { getGasPriceStep } from "core/common/transaction";
 
-import { useChainId, useToken } from "app/hooks";
+import { useToken } from "app/hooks";
 import {
   FEE_MODE_NAMES,
   formatUnits,
@@ -51,8 +52,9 @@ const FeeTab = memo<FeeTabProps>(
     feeMode,
     setFeeMode,
   }) => {
-    const chainId = useChainId();
-    const changeStepDecimals = chainId === 1 ? 9 : 8;
+    const changeStepDecimals = fees
+      ? getGasPriceStep(fees?.modes.average.max).toString().length - 1
+      : 8;
     const changeValue = useCallback(
       (name: string, value: bigint | null) => {
         onOverridesChange((o) => ({ ...o, [name]: value ?? "" }));
@@ -91,7 +93,7 @@ const FeeTab = memo<FeeTabProps>(
     return (
       <>
         <TabHeader>Edit network fee</TabHeader>
-        {fees && averageGasLimit && maxFee && averageFee && (
+        {fees && averageGasLimit && maxFee !== null && averageFee !== null && (
           <FeeModeSelect
             accountAddress={accountAddress}
             gasLimit={overrides.gasLimit ?? tx.gasLimit!}

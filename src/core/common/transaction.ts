@@ -16,6 +16,10 @@ import {
   NATIVE_TOKEN_SLUG,
 } from "./tokens";
 
+export function getGasPriceStep(averageGasPrice: bigint) {
+  return BigInt(`1${"0".repeat(averageGasPrice.toString().length - 2)}`);
+}
+
 export async function matchTxAction(
   provider: ethers.Provider,
   txParams: Pick<TxParams, "to" | "data"> & { value?: ethers.BigNumberish },

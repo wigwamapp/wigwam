@@ -8,7 +8,7 @@ import { RpcProvider, getRpcProvider } from "../../rpc";
 
 // Skip Arbitrum & ZkSync
 // TODO: Add other mechanic for this issue.
-const DISALLOWED_CHAIN_IDS = [42161, 324];
+const DISALLOWED_CHAIN_IDS = [42161, 324, 10, 534352, 59144];
 
 export async function getOnChainEIP1559(chainId: number): Promise<GasPrices> {
   if (DISALLOWED_CHAIN_IDS.includes(chainId)) return null;

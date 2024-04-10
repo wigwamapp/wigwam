@@ -8,7 +8,11 @@ import {
   TokenStatus,
   TokenType,
 } from "core/types";
-import { createTokenSlug, parseTokenSlug } from "core/common/tokens";
+import {
+  ZERO_ADDRESSES,
+  createTokenSlug,
+  parseTokenSlug,
+} from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 
 import { getDexPrices } from "../../dexPrices";
@@ -17,10 +21,6 @@ import { fetchCxAccountTokens, indexerApi } from "../../indexer";
 import { prepareAccountTokensSync } from "./utils";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
-const NATIVE_TOKEN_ADDRESSES = [
-  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-  "0x0000000000000000000000000000000000001010",
-];
 
 export const syncAccountAssets = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -43,8 +43,7 @@ export const syncAccountAssets = memoize(
 
     for (const token of freshAccTokensData) {
       const native =
-        token.native_token ??
-        NATIVE_TOKEN_ADDRESSES.includes(token.contract_address);
+        token.native_token ?? ZERO_ADDRESSES.has(token.contract_address);
 
       // Skip for native token, we sync native tokens in separate module
       if (native) continue;
@@ -129,8 +128,7 @@ export const syncAccountAssets = memoize(
     // that were not retrieved from the indexer
 
     const restTokens = Array.from(existingTokensMap.values()).filter(
-      (t) =>
-        !NATIVE_TOKEN_ADDRESSES.includes(parseTokenSlug(t.tokenSlug).address),
+      (t) => !ZERO_ADDRESSES.has(parseTokenSlug(t.tokenSlug).address),
     );
 
     if (restTokens.length > 0) {

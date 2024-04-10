@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ZeroAddress, ethers } from "ethers";
 
 import { ERC20__factory, ERC1155__factory, ERC721__factory } from "abi-types";
 import {
@@ -8,6 +8,13 @@ import {
   TokenStatus,
 } from "core/types";
 import * as repo from "core/repo";
+
+export const ZERO_ADDRESSES = new Set([
+  ZeroAddress,
+  "0x000000000000000000000000000000000000800A",
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "0x0000000000000000000000000000000000001010",
+]);
 
 export const NATIVE_TOKEN_SLUG = createTokenSlug({
   standard: TokenStandard.Native,

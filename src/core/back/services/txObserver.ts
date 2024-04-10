@@ -11,7 +11,12 @@ import {
   TxReceipt,
 } from "core/types";
 import * as repo from "core/repo";
-import { createAccountTokenKey, NATIVE_TOKEN_SLUG } from "core/common/tokens";
+import {
+  createAccountTokenKey,
+  NATIVE_TOKEN_SLUG,
+  parseTokenSlug,
+  ZERO_ADDRESSES,
+} from "core/common/tokens";
 import { matchTokenTransferEvents } from "core/common/transaction";
 
 import { sendRpc, getRpcProvider } from "../rpc";
@@ -75,8 +80,14 @@ export async function startTxObserver() {
                 for (const transfer of transfers) {
                   for (const transferAddress of [transfer.to, transfer.from]) {
                     const formatedAddress = getAddress(transferAddress);
+                    const tokenAddress = parseTokenSlug(
+                      transfer.tokenSlug,
+                    ).address;
 
-                    if (accountAddresses.includes(formatedAddress)) {
+                    if (
+                      accountAddresses.includes(formatedAddress) &&
+                      !ZERO_ADDRESSES.has(tokenAddress)
+                    ) {
                       addFindTokenRequest(
                         tx.chainId,
                         formatedAddress,
