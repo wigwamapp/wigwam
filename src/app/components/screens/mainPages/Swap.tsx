@@ -1,5 +1,5 @@
 import { FC, useMemo, useEffect, useState, useCallback } from "react";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import memoize from "mem";
 
 import {
@@ -17,6 +17,7 @@ import {
   currenciesRateAtom,
   selectedCurrencyAtom,
   getAllNativeTokensAtom,
+  swapVerifiedTokensAtom,
 } from "app/atoms";
 
 import { parseTokenSlug } from "core/common/tokens";
@@ -174,11 +175,16 @@ const Swap: FC = () => {
     setFee(newFee);
   }, []);
 
-  const handleShowFullList = (flag: any) => {
-    setShowOnlyVerified(flag);
-  };
+  const [showOnlyVerified, setShowOnlyVerified] = useAtom(
+    swapVerifiedTokensAtom,
+  );
 
-  const [showOnlyVerified, setShowOnlyVerified] = useState(true);
+  const handleShowFullList = useCallback(
+    (flag: any) => {
+      setShowOnlyVerified(flag);
+    },
+    [setShowOnlyVerified],
+  );
 
   const tokensList = useMemo(() => {
     return showOnlyVerified ? verifiedTokens : [];
@@ -272,6 +278,7 @@ const Swap: FC = () => {
     fee,
     signer,
     selectedCurrency,
+    handleShowFullList,
     handleBeforeTransaction,
     handleChangeFee,
     chainsOrder,

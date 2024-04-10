@@ -10,6 +10,7 @@ export enum Setting {
   RequiredAuthSig = "required_authsig",
   ProfileBlockedUntil = "profile_blocked_until",
   PasswordUsageAttempts = "password_usage_attempts",
+  SwapVerifiedTokens = "swap_verified_tokens",
 }
 
 export async function retrieveAutoLockTimeout() {

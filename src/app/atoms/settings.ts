@@ -32,3 +32,8 @@ export const profileBlockedUntilAtom = atomWithStorage<number>(
   Setting.ProfileBlockedUntil,
   0,
 );
+
+export const swapVerifiedTokensAtom = atomWithStorage<boolean>(
+  Setting.SwapVerifiedTokens,
+  true,
+);
