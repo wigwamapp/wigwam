@@ -21,7 +21,7 @@ const Content: FC<{ children?: ReactNode }> = ({ children }) => {
   return (
     <div className="mb-6 flex flex-col w-full ml-6 text-left font-medium text-base text-brand-lightgray opacity-75">
       <p className="mb-3 text-lg">How do I participate in it?</p>
-      <ol className="list-decimal ml-[14px]">
+      <ol className="list-decimal ml-4">
         <li>Find a bug 🐞.</li>
         <li>
           Check our{" "}
