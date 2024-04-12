@@ -70,7 +70,7 @@ const useSidebarLinks = () => {
         Icon: RewardsIcon,
       },
       {
-        label: "Find 🐞 - get $",
+        label: "Bug bounty",
         Icon: BugIcon,
         action: () =>
           alert({

@@ -8,7 +8,7 @@ const DS_CHANNEL = "https://discord.gg/MAG2fnSqSK";
 const Title: FC<{ className?: string }> = ({ className }) => {
   return (
     <h1 className={classNames("text-[1.75rem] font-bold", className)}>
-      Find bugs in our wallet, report & earn part of $1000+! 🎉
+      Find bugs in our wallet, report and earn part of $1000+! 🎉
     </h1>
   );
 };
