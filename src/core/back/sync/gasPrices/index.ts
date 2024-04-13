@@ -2,17 +2,10 @@ import memoize from "mem";
 
 import { GasPrices } from "core/types";
 
-import { getOnChainEIP1559 } from "./onChainEIP1559";
 import { getOnChainLegacy } from "./onChainLegacy";
-import { getPolygonGasPrices } from "./polygonGasStation";
 import { getIndexerGasPrices } from "./indexerApi";
 
-const GAS_PRICES_WAYS = [
-  getPolygonGasPrices,
-  getOnChainEIP1559,
-  getIndexerGasPrices,
-  getOnChainLegacy,
-];
+const GAS_PRICES_WAYS = [getIndexerGasPrices, getOnChainLegacy];
 
 export const estimateGasPrices = memoize(
   async (chainId: number): Promise<GasPrices> => {
