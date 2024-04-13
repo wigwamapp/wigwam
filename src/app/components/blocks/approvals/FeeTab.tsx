@@ -30,6 +30,7 @@ type FeeTabProps = {
   accountAddress: string;
   originTx: Transaction;
   fees: FeeSuggestions | null;
+  l1Fee: bigint | null;
   averageGasLimit: bigint | null;
   maxFee: bigint | null;
   averageFee: bigint | null;
@@ -46,6 +47,7 @@ const FeeTab = memo<FeeTabProps>(
     overrides,
     onOverridesChange,
     fees,
+    l1Fee,
     averageGasLimit,
     maxFee,
     averageFee,
@@ -99,6 +101,7 @@ const FeeTab = memo<FeeTabProps>(
             gasLimit={overrides.gasLimit ?? tx.gasLimit!}
             averageGasLimit={averageGasLimit}
             fees={fees}
+            l1Fee={l1Fee}
             maxFee={maxFee}
             averageFee={averageFee}
             value={feeMode}
@@ -107,7 +110,7 @@ const FeeTab = memo<FeeTabProps>(
           />
         )}
 
-        {tx.maxPriorityFeePerGas ? (
+        {fees?.type === "modern" ? (
           <>
             <PlusMinusInput
               label="Max base fee"
@@ -274,6 +277,7 @@ type FeeModeSelectProps = {
   gasLimit: bigint;
   averageGasLimit: bigint;
   fees: FeeSuggestions;
+  l1Fee: bigint | null;
   maxFee: bigint;
   averageFee: bigint;
   value: FeeMode;
@@ -287,7 +291,7 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
     gasLimit,
     averageGasLimit,
     fees,
-    // maxFee,
+    l1Fee,
     averageFee,
     value,
     onValueChange,
@@ -304,13 +308,15 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
         type="single"
         orientation="horizontal"
         value={
-          gasLimit * fees.modes[value].max === averageFee ? value : undefined
+          gasLimit * fees.modes[value].max + (l1Fee ?? 0n) === averageFee
+            ? value
+            : undefined
         }
         onValueChange={onValueChange}
         className={classNames("grid grid-cols-3 gap-2.5", className)}
       >
         {FEE_MODES.map((mode) => {
-          const modeMaxFee = gasLimit * fees.modes[mode].max;
+          const modeMaxFee = gasLimit * fees.modes[mode].max + (l1Fee ?? 0n);
 
           return (
             <FeeModeItem

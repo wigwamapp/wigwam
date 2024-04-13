@@ -96,6 +96,7 @@ const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
 const DetailsTab: FC<DetailsTabProps> = ({
   accountAddress,
   fees,
+  l1Fee,
   gasLimit,
   averageGasLimit,
   maxFee,
@@ -164,6 +165,7 @@ const DetailsTab: FC<DetailsTabProps> = ({
       <FeeButton
         accountAddress={accountAddress}
         fees={fees}
+        l1Fee={l1Fee}
         gasLimit={gasLimit}
         averageGasLimit={averageGasLimit}
         maxFee={maxFee}
@@ -240,6 +242,7 @@ const getTabHeader = (action: TxAction, source: ActivitySource) => {
 type FeeButton = {
   accountAddress: string;
   fees: FeeSuggestions;
+  l1Fee: bigint | null;
   gasLimit: bigint;
   averageGasLimit: bigint;
   maxFee: bigint | null;
@@ -253,6 +256,7 @@ const FeeButton: FC<FeeButton> = ({
   gasLimit,
   averageGasLimit,
   fees,
+  l1Fee,
   maxFee,
   averageFee,
   feeMode,
@@ -266,7 +270,10 @@ const FeeButton: FC<FeeButton> = ({
   const nativeToken = useToken<AccountAsset>(accountAddress);
 
   const averageFeeBN = averageFee ? new BigNumber(averageFee.toString()) : null;
-  const modeFee = (gasLimit * fees.modes[feeMode].max).toString();
+  const modeFee = (
+    gasLimit * fees.modes[feeMode].max +
+    (l1Fee ?? 0n)
+  ).toString();
 
   const isCustomMode = !averageFeeBN?.eq(modeFee);
 

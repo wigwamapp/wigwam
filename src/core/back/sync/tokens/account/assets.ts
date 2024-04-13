@@ -15,7 +15,7 @@ import {
 } from "core/common/tokens";
 import { getNetwork } from "core/common/network";
 
-import { getDexPrices } from "../../dexPrices";
+import { DexPrices, getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
 import { fetchCxAccountTokens, indexerApi } from "../../indexer";
 import { prepareAccountTokensSync } from "./utils";
@@ -131,7 +131,7 @@ export const syncAccountAssets = memoize(
       (t) => !ZERO_ADDRESSES.has(parseTokenSlug(t.tokenSlug).address),
     );
 
-    if (restTokens.length > 0) {
+    if (restTokens.length > 0 && restTokens.length < 200) {
       const balances = await Promise.all(
         restTokens.map(({ tokenSlug }) =>
           getBalanceFromChain(chainId, tokenSlug, accountAddress),
@@ -159,7 +159,9 @@ export const syncAccountAssets = memoize(
       (t) => parseTokenSlug(t.tokenSlug).address,
     );
 
-    const cgPrices = await getDexPrices(tokenAddresses);
+    const cgPrices = await getDexPrices(tokenAddresses).catch(
+      () => ({}) as DexPrices,
+    );
 
     if (Object.keys(cgPrices).length > 0) {
       for (let i = 0; i < accTokens.length; i++) {

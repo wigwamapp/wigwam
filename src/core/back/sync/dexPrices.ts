@@ -72,15 +72,13 @@ export async function getDexPrices(tokenAddresses: string[]) {
       while (coinsToRefresh.length > 0) {
         const nextCoins = coinsToRefresh.splice(0, 100);
 
-        const res = await indexerApi
-          .get<DexPrices>("/cg/simple/price", {
-            params: {
-              ids: nextCoins.join(),
-              vs_currencies: "USD",
-              include_24hr_change: true,
-            },
-          })
-          .catch(() => null);
+        const res = await indexerApi.get<DexPrices>("/cg/simple/price", {
+          params: {
+            ids: nextCoins.join(),
+            vs_currencies: "USD",
+            include_24hr_change: true,
+          },
+        });
 
         if (!res) continue;
 
@@ -103,55 +101,59 @@ export async function getDexPrices(tokenAddresses: string[]) {
     if (missedAddresses.size > 0 && missedAddresses.size <= 500) {
       const addressesToRefresh = Array.from(missedAddresses);
 
-      while (addressesToRefresh.length > 0) {
-        const nextAddresses = addressesToRefresh.splice(0, 30);
+      try {
+        while (addressesToRefresh.length > 0) {
+          const nextAddresses = addressesToRefresh.splice(0, 30);
 
-        const res = await dexScreenerApi
-          .get(`/dex/tokens/${nextAddresses.join()}`)
-          .catch(() => null);
+          const res = await dexScreenerApi
+            .get(`/dex/tokens/${nextAddresses.join()}`)
+            .catch(() => null);
 
-        const dsPairs = res?.data?.pairs;
-        if (!dsPairs) continue;
+          const dsPairs = res?.data?.pairs;
+          if (!dsPairs) continue;
 
-        for (const pair of dsPairs) {
-          const reserveBN = new BigNumber(pair.liquidity?.usd);
+          for (const pair of dsPairs) {
+            const reserveBN = new BigNumber(pair.liquidity?.usd);
 
-          if (reserveBN.isNaN() || reserveBN.isLessThan(100)) {
-            continue;
-          } else {
-            const baseBN = new BigNumber(pair.liquidity.base);
-            const quoteBN = new BigNumber(pair.liquidity.quote);
+            if (reserveBN.isNaN() || reserveBN.isLessThan(100)) {
+              continue;
+            } else {
+              const baseBN = new BigNumber(pair.liquidity.base);
+              const quoteBN = new BigNumber(pair.liquidity.quote);
 
-            if (baseBN.isLessThan(0.01) || quoteBN.isLessThan(0.01)) {
+              if (baseBN.isLessThan(0.01) || quoteBN.isLessThan(0.01)) {
+                continue;
+              }
+            }
+
+            const tokenAddress = getAddress(pair.baseToken?.address);
+            const existing = data[tokenAddress];
+
+            if (
+              existing?.usd_reserve &&
+              new BigNumber(existing.usd_reserve).isGreaterThan(reserveBN)
+            ) {
               continue;
             }
+
+            const usdPrice = new BigNumber(pair.priceUsd).toNumber();
+            if (!usdPrice) continue;
+
+            const usdPriceChange =
+              new BigNumber(pair.priceChange?.h24).toNumber() || undefined;
+
+            const price: DexTokenPrice = {
+              usd: usdPrice,
+              usd_24h_change: usdPriceChange,
+              usd_reserve: reserveBN.toString(),
+            };
+
+            data[tokenAddress] = price;
+            tokenPricesCache.set(tokenAddress, price);
           }
-
-          const tokenAddress = getAddress(pair.baseToken?.address);
-          const existing = data[tokenAddress];
-
-          if (
-            existing?.usd_reserve &&
-            new BigNumber(existing.usd_reserve).isGreaterThan(reserveBN)
-          ) {
-            continue;
-          }
-
-          const usdPrice = new BigNumber(pair.priceUsd).toNumber();
-          if (!usdPrice) continue;
-
-          const usdPriceChange =
-            new BigNumber(pair.priceChange?.h24).toNumber() || undefined;
-
-          const price: DexTokenPrice = {
-            usd: usdPrice,
-            usd_24h_change: usdPriceChange,
-            usd_reserve: reserveBN.toString(),
-          };
-
-          data[tokenAddress] = price;
-          tokenPricesCache.set(tokenAddress, price);
         }
+      } catch (err) {
+        console.error(err);
       }
     }
 

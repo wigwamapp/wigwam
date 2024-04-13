@@ -34,6 +34,7 @@ export type ReplaceTx = {
   type: ReplaceTxType;
   prevActivityId: string;
   prevTxHash: string;
+  prevTxGasPrice?: string;
   prevTimeAt: number;
   prevReplaceTxType?: ReplaceTxType;
 };

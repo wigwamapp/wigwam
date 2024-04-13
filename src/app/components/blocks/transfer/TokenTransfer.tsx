@@ -31,6 +31,7 @@ import {
 } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { requestBalance } from "core/common/balance";
+import { estimateL1Fee } from "core/common/l1Fee";
 import { suggestFees, TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
@@ -217,10 +218,11 @@ const TransferTokenContent = memo<TransferTokenContent>(
             }
 
             const gasLimit = await signerProvider.estimateGas(txParams);
+
             const rpcTx = provider.getRpcTransaction({
               ...txParams,
               from: currentAccount.address,
-              gasLimit,
+              gasLimit: (gasLimit * 5n) / 4n,
             });
 
             const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
@@ -366,23 +368,23 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
               const value = 1;
               let gasLimit = 0n;
+              let txParams: ethers.TransactionRequest | undefined;
 
               if (tokenSlug === NATIVE_TOKEN_SLUG) {
-                gasLimit = await provider
-                  .estimateGas({
-                    to: recipientAddr,
-                    value,
-                  })
-                  .catch((err) =>
-                    signer
-                      .estimateGas({
-                        to: recipientAddr,
-                        value,
-                      })
-                      .catch(() => {
-                        throw err;
-                      }),
-                  );
+                txParams = {
+                  to: recipientAddr,
+                  value,
+                };
+
+                gasLimit = await provider.estimateGas(txParams).catch((err) =>
+                  // Try with signer, zkSync case
+                  signer.estimateGas(txParams!).catch(() => {
+                    throw err;
+                  }),
+                );
+
+                txParams.from = signer.address;
+                txParams.gasLimit = gasLimit;
               } else {
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
 
@@ -391,10 +393,20 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC20__factory.connect(address, signer);
 
-                      gasLimit = await contract.transfer.estimateGas(
-                        recipientAddr,
-                        value,
-                      );
+                      try {
+                        txParams = await contract.transfer.populateTransaction(
+                          recipientAddr,
+                          value,
+                        );
+                        gasLimit = BigInt(txParams.gasLimit!);
+                      } catch (err) {
+                        console.warn("Failed to estimate ERC20 Transfer", err);
+
+                        gasLimit = await contract.transfer.estimateGas(
+                          recipientAddr,
+                          value,
+                        );
+                      }
                     }
                     break;
 
@@ -402,11 +414,23 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC721__factory.connect(address, signer);
 
-                      gasLimit = await contract.transferFrom.estimateGas(
-                        currentAccount.address,
-                        recipientAddr,
-                        id,
-                      );
+                      try {
+                        txParams =
+                          await contract.transferFrom.populateTransaction(
+                            currentAccount.address,
+                            recipientAddr,
+                            id,
+                          );
+                        gasLimit = BigInt(txParams.gasLimit!);
+                      } catch (err) {
+                        console.warn("Failed to estimate ERC721 Transfer", err);
+
+                        gasLimit = await contract.transferFrom.estimateGas(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                        );
+                      }
                     }
                     break;
 
@@ -417,13 +441,30 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         signer,
                       );
 
-                      gasLimit = await contract.safeTransferFrom.estimateGas(
-                        currentAccount.address,
-                        recipientAddr,
-                        id,
-                        value,
-                        new Uint8Array(),
-                      );
+                      try {
+                        txParams =
+                          await contract.safeTransferFrom.populateTransaction(
+                            currentAccount.address,
+                            recipientAddr,
+                            id,
+                            value,
+                            new Uint8Array(),
+                          );
+                        gasLimit = BigInt(txParams.gasLimit!);
+                      } catch (err) {
+                        console.warn(
+                          "Failed to estimate ERC1155 Transfer",
+                          err,
+                        );
+
+                        gasLimit = await contract.safeTransferFrom.estimateGas(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                          value,
+                          new Uint8Array(),
+                        );
+                      }
                     }
                     break;
 
@@ -436,6 +477,15 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
               const gasPrice = fees.modes.high.max;
               const maxGasLimit = (gasLimit * 3n) / 2n;
+
+              const l1Fee = txParams
+                ? await estimateL1Fee(
+                    provider,
+                    { ...txParams, gasLimit: maxGasLimit },
+                    gasPrice,
+                  )
+                : null;
+
               const rawBalance = await requestBalance(
                 provider,
                 tokenSlug,
@@ -443,8 +493,8 @@ const TransferTokenContent = memo<TransferTokenContent>(
               );
 
               setGas({
-                average: gasLimit * gasPrice,
-                max: maxGasLimit * gasPrice,
+                average: gasLimit * gasPrice + (l1Fee ?? 0n),
+                max: maxGasLimit * gasPrice + (l1Fee ?? 0n),
                 rawBalance,
               });
 

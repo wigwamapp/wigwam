@@ -17,7 +17,7 @@ import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
 
-import { getDexPrices } from "../dexPrices";
+import { DexPrices, getDexPrices } from "../dexPrices";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
 import { indexerApi } from "../indexer";
 
@@ -155,7 +155,9 @@ async function performTokenSync(
   let priceUSD, priceUSDChange: string | undefined;
 
   if (standard === TokenStandard.ERC20) {
-    const coinGeckoPrices = await getDexPrices([tokenAddress]);
+    const coinGeckoPrices = await getDexPrices([tokenAddress]).catch(
+      () => ({}) as DexPrices,
+    );
     const cgPrice = coinGeckoPrices[tokenAddress];
 
     priceUSD = cgPrice?.usd?.toString();

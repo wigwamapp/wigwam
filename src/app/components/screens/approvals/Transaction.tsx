@@ -32,6 +32,7 @@ import {
 } from "core/client";
 import { getNextNonce } from "core/common/nonce";
 import { matchTxAction } from "core/common/transaction";
+import { estimateL1Fee } from "core/common/l1Fee";
 
 import {
   OverflowProvider,
@@ -112,12 +113,14 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     tx: Transaction;
     estimatedGasLimit: bigint;
     fees: FeeSuggestions | null;
+    l1Fee: bigint | null;
     destinationIsContract: boolean;
   }>();
   const [txOverrides, setTxOverrides] = useState<Partial<Transaction>>({});
 
   const preparedTx = prepared?.tx;
   const fees = prepared?.fees;
+  const l1Fee = prepared?.l1Fee ?? null;
 
   const originTx = useMemo<Transaction | null>(() => {
     if (!prepared) return null;
@@ -129,7 +132,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
     const feeSug = prepared.fees?.modes[feeMode];
     if (feeSug) {
-      if (prepared.tx.maxPriorityFeePerGas) {
+      if (prepared.fees?.type === "modern") {
         tx.maxFeePerGas = feeSug.max;
         if ("priority" in feeSug) {
           tx.maxPriorityFeePerGas = feeSug.priority;
@@ -161,11 +164,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
     try {
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return finalTx.gasLimit * gasPrice!;
+
+      return finalTx.gasLimit * gasPrice! + (l1Fee ?? 0n);
     } catch {
       return null;
     }
-  }, [finalTx]);
+  }, [finalTx, l1Fee]);
 
   const averageFee = useMemo(() => {
     if (!finalTx || !prepared?.estimatedGasLimit) return null;
@@ -176,11 +180,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           ? prepared.estimatedGasLimit
           : finalTx.gasLimit;
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return gasLimit * gasPrice!;
+      return gasLimit * gasPrice! + (l1Fee ?? 0n);
     } catch {
       return null;
     }
-  }, [finalTx, prepared?.estimatedGasLimit]);
+  }, [finalTx, l1Fee, prepared?.estimatedGasLimit]);
 
   const withThrottle = useMemo(createOrganicThrottle, []);
 
@@ -192,15 +196,15 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setEstimating(true);
 
         try {
-          const { gasLimit, ...rest } = txParams;
+          const { gasLimit: providedGasLimit, ...pureTxParams } = txParams;
 
           // detele tx type cause auto-detect
-          delete rest.type;
+          delete pureTxParams.type;
 
           // detele gas prices
-          delete rest.gasPrice;
-          delete rest.maxFeePerGas;
-          delete rest.maxPriorityFeePerGas;
+          delete pureTxParams.gasPrice;
+          delete pureTxParams.maxFeePerGas;
+          delete pureTxParams.maxPriorityFeePerGas;
 
           // Fetch fee data
           const feeSuggestions = await suggestFees(provider).catch(() => null);
@@ -210,10 +214,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             retry(
               () =>
                 provider.getVoidSigner(account.address).populateTransaction({
-                  ...rest,
-                  nonce: rest.nonce ? +rest.nonce : undefined,
+                  ...pureTxParams,
+                  nonce: pureTxParams.nonce ? +pureTxParams.nonce : undefined,
                   type: feeSuggestions?.type === "legacy" ? 0 : undefined,
-                  chainId: rest.chainId ? +rest.chainId : undefined,
                   ...(feeSuggestions?.type === "modern"
                     ? {
                         maxFeePerGas: feeSuggestions.modes.low.max,
@@ -240,23 +243,53 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           const estimatedGasLimit = BigInt(tx.gasLimit!);
           const minGasLimit = (estimatedGasLimit * 5n) / 4n;
           const averageGasLimit = (estimatedGasLimit * 3n) / 2n;
+          const gasLimit =
+            providedGasLimit && minGasLimit <= BigInt(providedGasLimit)
+              ? BigInt(providedGasLimit)
+              : averageGasLimit;
 
           const preparedTx = Transaction.from({
             ...tx,
-            nonce: tx.nonce ? +tx.nonce : undefined,
-            gasLimit:
-              gasLimit && minGasLimit <= BigInt(gasLimit)
-                ? BigInt(gasLimit)
-                : averageGasLimit,
+            gasLimit,
           });
+
+          const l1GasFee = await estimateL1Fee(
+            provider,
+            preparedTx,
+            feeSuggestions?.modes.average.max,
+          );
 
           setLastError((le) => (le?.from === "estimation" ? null : le));
           setPrepared({
             tx: preparedTx,
             estimatedGasLimit,
             fees: feeSuggestions,
+            l1Fee: l1GasFee,
             destinationIsContract,
           });
+
+          try {
+            if (
+              approval.source?.replaceTx?.type === "speedup" &&
+              approval.source.replaceTx.prevTxGasPrice &&
+              feeSuggestions
+            ) {
+              const prevTxGasPrice = BigInt(
+                approval.source.replaceTx.prevTxGasPrice,
+              );
+              const gasPrice = (prevTxGasPrice * 11n) / 10n + 1n; // Add 10%
+
+              if (gasPrice < feeSuggestions.modes.average.max) {
+                setFeeMode("average");
+              } else {
+                setTxOverrides(
+                  tx.maxFeePerGas ? { maxFeePerGas: gasPrice } : { gasPrice },
+                );
+              }
+            }
+          } catch (err) {
+            console.error("Failed to increase fee", err);
+          }
         } catch (err) {
           console.error(err);
           setLastError({ from: "estimation", error: err });
@@ -269,9 +302,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       setEstimating,
       setPrepared,
       setLastError,
+      setTxOverrides,
+      setFeeMode,
       provider,
       account.address,
       txParams,
+      approval,
     ],
   );
 
@@ -490,6 +526,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     <DetailsTab
                       accountAddress={accountAddress}
                       fees={fees}
+                      l1Fee={l1Fee}
                       averageGasLimit={prepared.estimatedGasLimit}
                       gasLimit={txOverrides.gasLimit || originTx.gasLimit!}
                       feeMode={feeMode}
@@ -511,6 +548,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     accountAddress={accountAddress}
                     originTx={originTx}
                     fees={fees ?? null}
+                    l1Fee={l1Fee}
                     averageGasLimit={prepared?.estimatedGasLimit ?? null}
                     feeMode={feeMode}
                     setFeeMode={setFeeMode}

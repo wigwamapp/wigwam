@@ -148,13 +148,21 @@ const ActivityAsset = memo(
 
       const parsedTx = Transaction.from(item.rawTx);
 
-      const native = new BigNumber(item.result.gasUsed)
+      let native = new BigNumber(item.result.gasUsed)
         .times(
           item.result.effectiveGasPrice ??
             parsedTx.maxFeePerGas ??
             parsedTx.gasPrice,
         )
         .toString();
+
+      if ("l1Fee" in item.result) {
+        try {
+          native = new BigNumber(native)
+            .plus(item.result.l1Fee as any)
+            .toString();
+        } catch {}
+      }
 
       return {
         native,
@@ -1055,12 +1063,18 @@ const TxOptionsDropdown = memo(
               await repo.tokenActivities.where({ txHash, pending: 1 }).delete();
             }
           } else {
+            const parsedTx = Transaction.from(item.rawTx);
+
             provider.setActivitySource({
               ...item.source,
               replaceTx: {
                 type,
                 prevActivityId: item.id,
                 prevTxHash: item.txHash,
+                prevTxGasPrice:
+                  item.result?.effectiveGasPrice ??
+                  parsedTx.maxFeePerGas?.toString() ??
+                  parsedTx.gasPrice?.toString(),
                 prevReplaceTxType: item.source.replaceTx?.type,
                 prevTimeAt: item.timeAt,
               },
