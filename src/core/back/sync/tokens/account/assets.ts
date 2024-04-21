@@ -159,7 +159,7 @@ export const syncAccountAssets = memoize(
       (t) => parseTokenSlug(t.tokenSlug).address,
     );
 
-    const cgPrices = await getDexPrices(tokenAddresses).catch(
+    const cgPrices = await getDexPrices(tokenAddresses, chainId).catch(
       () => ({}) as DexPrices,
     );
 

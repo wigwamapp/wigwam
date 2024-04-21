@@ -14,7 +14,7 @@ export const getTokenDetailsUrl = async (
     const { standard, address } = parseTokenSlug(tokenSlug);
 
     if (standard === TokenStandard.Native) {
-      const [platformIds, network] = await Promise.all([
+      const [{ platformIds }, network] = await Promise.all([
         getCoinGeckoPlatformIds(),
         getNetworkMemo(chainId),
       ]);

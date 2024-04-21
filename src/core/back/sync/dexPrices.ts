@@ -35,7 +35,7 @@ export const dexScreenerApi = axios.create({
 
 const tokenPricesCache = new ExpiryMap<string, DexTokenPrice>(THREE_MIN);
 
-export async function getDexPrices(tokenAddresses: string[]) {
+export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
   try {
     if (tokenAddresses.length === 0) return {};
     if (tokenAddresses.length > 1000) return {}; // To much
@@ -48,8 +48,16 @@ export async function getDexPrices(tokenAddresses: string[]) {
     const missedAddresses = new Set<string>();
 
     for (const tokenAddress of tokenAddresses) {
-      const coinId = allCoinIds[tokenAddress.toLowerCase()];
-      const cached = tokenPricesCache.get(coinId ?? tokenAddress);
+      const coinIdsByChain = allCoinIds[tokenAddress.toLowerCase()];
+
+      const coinId = coinIdsByChain
+        ? chainId
+          ? coinIdsByChain[chainId]
+          : Object.values(coinIdsByChain)[0]
+        : undefined;
+      const cached = tokenPricesCache.get(
+        coinId ?? `${chainId ?? ""}_${tokenAddress}`,
+      );
 
       if (cached) {
         data[tokenAddress] = cached;
@@ -149,7 +157,7 @@ export async function getDexPrices(tokenAddresses: string[]) {
             };
 
             data[tokenAddress] = price;
-            tokenPricesCache.set(tokenAddress, price);
+            tokenPricesCache.set(`${chainId ?? ""}_${tokenAddress}`, price);
           }
         }
       } catch (err) {
@@ -166,9 +174,10 @@ export async function getDexPrices(tokenAddresses: string[]) {
 
 export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
   try {
-    const platformIds = await getCoinGeckoPlatformIds();
+    const { platformIds, chainIds } = await getCoinGeckoPlatformIds();
 
-    let nativeCoinId: string | undefined = platformIds[chainId]?.native_coin_id;
+    let nativeCoinId: string | undefined =
+      platformIds[chainIds[chainId]]?.native_coin_id;
 
     if (!nativeCoinId) nativeCoinId = ADDITIONAL_PLATFORM_COINS.get(chainId);
 
@@ -185,7 +194,7 @@ export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
 
 export const getCoinGeckoPlatformPrices = memoize(
   async () => {
-    const platformIds = await getCoinGeckoPlatformIds();
+    const { platformIds } = await getCoinGeckoPlatformIds();
 
     const { data } = await indexerApi.get<DexPrices>("/cg/simple/price", {
       params: {
@@ -210,13 +219,22 @@ export const getCoinGeckoCoinIds = withOfflineCache(
     const { data } = await coinGeckoApi.get("/coins/list", {
       params: { include_platform: true },
     });
+    const { platformIds } = await getCoinGeckoPlatformIds();
 
-    const allCoinIds: Record<string, string> = {};
+    const allCoinIds: Record<string, Record<number, string>> = {};
 
     for (const item of data) {
-      for (const tokenAddress of Object.values(item.platforms) as string[]) {
+      for (const [platformId, tokenAddress] of Object.entries(item.platforms)) {
         try {
-          if (isAddress(tokenAddress)) allCoinIds[tokenAddress] = item.id;
+          const chainId = platformIds[platformId]?.chain_id;
+          if (!chainId) continue;
+
+          if (isAddress(tokenAddress)) {
+            allCoinIds[tokenAddress] = {
+              ...(allCoinIds[tokenAddress] ?? {}),
+              [chainId]: item.id,
+            };
+          }
         } catch {}
       }
     }
@@ -232,12 +250,7 @@ export const getCoinGeckoCoinIds = withOfflineCache(
 
 export const getCoinGeckoTerminalNetworkIds = withOfflineCache(
   async () => {
-    const platformIds = await getCoinGeckoPlatformIds();
-
-    const reversePlatformIds: Record<string, number> = {};
-    for (const chainId in platformIds) {
-      reversePlatformIds[platformIds[chainId].id] = +chainId;
-    }
+    const { platformIds } = await getCoinGeckoPlatformIds();
 
     const cgtNetworkIds: Record<number, string> = {};
 
@@ -251,7 +264,7 @@ export const getCoinGeckoTerminalNetworkIds = withOfflineCache(
         const cgPlatformId = item.attributes.coingecko_asset_platform_id;
         if (!cgPlatformId) continue;
 
-        const chainId = reversePlatformIds[cgPlatformId];
+        const chainId = platformIds[cgPlatformId].chain_id;
         if (!chainId) continue;
 
         cgtNetworkIds[chainId] = item.id;
@@ -274,16 +287,20 @@ export const getCoinGeckoPlatformIds = withOfflineCache(
   async () => {
     const { data } = await coinGeckoApi.get("/asset_platforms");
 
-    const platformIds: Record<number, { id: string; native_coin_id: string }> =
-      {};
+    const platformIds: Record<
+      string,
+      { id: string; native_coin_id: string; chain_id: number }
+    > = {};
+    const chainIds: Record<number, string> = {};
 
     for (const { id, chain_identifier, native_coin_id } of data) {
       if (id && chain_identifier && typeof chain_identifier === "number") {
-        platformIds[chain_identifier] = { id, native_coin_id };
+        platformIds[id] = { id, native_coin_id, chain_id: chain_identifier };
+        chainIds[chain_identifier] = id;
       }
     }
 
-    return platformIds;
+    return { platformIds, chainIds };
   },
   {
     key: "cg_asset_platforms",
