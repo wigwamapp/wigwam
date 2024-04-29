@@ -49,16 +49,6 @@ const General: FC = () => {
         items={DEFAULT_LOCALES}
         onSelect={({ code }) => setLocale(code)}
         className="mb-3"
-        tooltip={
-          <>
-            We are still working on interface text translation, but you can
-            already use languages for localized dates and amount formats.
-          </>
-        }
-        tooltipProps={{
-          size: "large",
-          placement: "right",
-        }}
       />
       <SelectCurrency className="mb-3" />
       {/* <Switcher

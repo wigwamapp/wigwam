@@ -45,9 +45,16 @@ const SelectLanguage = memo<SelectLanguageProps>(
         items={preparedLanguages}
         currentItem={preparedCurrentLanguage}
         setItem={selectLanguage}
-        label="Language"
+        label="Currency format"
         showSelected
         className={className}
+        tooltip={
+          <>You can use different formats for localised dates and amounts.</>
+        }
+        tooltipProps={{
+          size: "large",
+          placement: "right",
+        }}
         {...rest}
       />
     );
