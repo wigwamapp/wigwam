@@ -14,13 +14,14 @@ export const getTokenDetailsUrl = async (
     const { standard, address } = parseTokenSlug(tokenSlug);
 
     if (standard === TokenStandard.Native) {
-      const [{ platformIds }, network] = await Promise.all([
+      const [{ platformIds, chainIds }, network] = await Promise.all([
         getCoinGeckoPlatformIds(),
         getNetworkMemo(chainId),
       ]);
+
       const isETHToken = isNetworkWithEthToken(network);
 
-      const info = platformIds[isETHToken ? 1 : chainId];
+      const info = platformIds[chainIds[isETHToken ? 1 : chainId]];
 
       if (info) {
         return `https://www.coingecko.com/en/coins/${info.native_coin_id}`;
@@ -29,8 +30,10 @@ export const getTokenDetailsUrl = async (
       const allCoinIds = await getCoinGeckoCoinIds();
       const tokenAddress = address.toLowerCase();
 
-      if (allCoinIds[tokenAddress]) {
-        return `https://www.coingecko.com/en/coins/${allCoinIds[tokenAddress]}`;
+      const coinId = allCoinIds[tokenAddress]?.[chainId];
+
+      if (coinId) {
+        return `https://www.coingecko.com/en/coins/${coinId}`;
       } else {
         return `https://dexscreener.com/search?q=${tokenAddress}`;
       }

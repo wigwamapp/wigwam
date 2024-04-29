@@ -17,7 +17,7 @@ export function withOfflineCache<T, U extends any[]>(
   return memoize(
     async (...args: U) => {
       let keyStr = typeof key === "function" ? key(args) : key;
-      keyStr = `${keyStr}_${process.env.VERSION}`;
+      keyStr = `${keyStr}_${process.env.BUILD_ID}`;
 
       try {
         const cached = await globalStorage.fetchForce<{
