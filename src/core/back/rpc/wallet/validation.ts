@@ -8,6 +8,7 @@ import {
   string,
   nullable,
   nonempty,
+  type,
   assert as assertSchema,
 } from "superstruct";
 import { ethers } from "ethers";
@@ -113,17 +114,15 @@ export const TxParamsSchema: Describe<TxParams> = object({
   maxFeePerGas: optional(stringHex()),
 });
 
-export const AddChainParamsSchema: Describe<AddEthereumChainParameter> = object(
-  {
-    chainId: stringHex(),
-    chainName: string(),
-    nativeCurrency: object({
-      name: string(),
-      symbol: string(),
-      decimals: number(),
-    }),
-    rpcUrls: nonempty(array(string())),
-    blockExplorerUrls: optional(nullable(array(string()))),
-    iconUrls: optional(nullable(array(string()))),
-  },
-);
+export const AddChainParamsSchema: Describe<AddEthereumChainParameter> = type({
+  chainId: stringHex(),
+  chainName: string(),
+  nativeCurrency: type({
+    name: string(),
+    symbol: string(),
+    decimals: number(),
+  }),
+  rpcUrls: nonempty(array(string())),
+  blockExplorerUrls: optional(nullable(array(string()))),
+  iconUrls: optional(nullable(array(string()))),
+});
