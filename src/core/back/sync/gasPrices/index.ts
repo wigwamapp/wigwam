@@ -12,7 +12,11 @@ export const estimateGasPrices = memoize(
     for (const fetchGasPrice of GAS_PRICES_WAYS) {
       try {
         const gasPrices = await fetchGasPrice(chainId);
-        if (gasPrices) return gasPrices;
+
+        if (gasPrices) {
+          avoidDuplicates(gasPrices);
+          return gasPrices;
+        }
       } catch (err) {
         console.error(err);
       }
@@ -21,6 +25,20 @@ export const estimateGasPrices = memoize(
     return null;
   },
   {
-    maxAge: 5_000,
+    maxAge: 3_000,
   },
 );
+
+function avoidDuplicates(gasPrices: GasPrices) {
+  if (!gasPrices) return;
+
+  const { modes } = gasPrices;
+
+  if (modes.low.max === modes.average.max) {
+    modes.average.max = (BigInt(modes.average.max) + 1n).toString();
+  }
+
+  if (modes.average.max === modes.high.max) {
+    modes.high.max = (BigInt(modes.high.max) + 1n).toString();
+  }
+}

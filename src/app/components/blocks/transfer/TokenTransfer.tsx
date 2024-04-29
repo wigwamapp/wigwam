@@ -69,7 +69,11 @@ import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
 const TransferToken: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
+  const chainId = useChainId();
+  const { currentAccount } = useAccounts();
+
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
+  const setTokenSlug = useSetAtom(tokenSlugAtom);
   let token = useAccountToken(tokenSlug);
 
   if (tokenType === TokenType.NFT && token?.tokenSlug === NATIVE_TOKEN_SLUG) {
@@ -78,8 +82,25 @@ const TransferToken: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
 
   const validTokenType = !token || token.tokenType === tokenType;
 
+  const contentKey = useMemo(
+    () => `${currentAccount.address}-${chainId}`,
+    [currentAccount.address, chainId],
+  );
+
+  const initialRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
+
+    setTokenSlug([RESET, "replace"]);
+  }, [setTokenSlug, contentKey]);
+
   return validTokenType ? (
     <TransferTokenContent
+      key={contentKey}
       tokenType={tokenType}
       tokenSlug={tokenSlug}
       token={token}
@@ -112,7 +133,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);
     const setTokenType = useSetAtom(tokenTypeAtom);
-    const setTokenSlug = useSetAtom(tokenSlugAtom);
     const { alert, closeCurrentDialog } = useDialog();
     const { updateToast } = useToast();
     const isMounted = useIsMounted();
@@ -388,25 +408,35 @@ const TransferTokenContent = memo<TransferTokenContent>(
               } else {
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
 
+                const performContractEstimation = (
+                  gasLimitPromise: Promise<bigint>,
+                  txParamsPromise: Promise<ethers.ContractTransaction>,
+                ) =>
+                  Promise.all([
+                    gasLimitPromise.then((value) => {
+                      gasLimit = value;
+                    }),
+                    txParamsPromise
+                      .then((value) => {
+                        txParams = value;
+                      })
+                      .catch((err) => {
+                        console.warn("Failed to populate transaction", err);
+                      }),
+                  ]);
+
                 switch (standard) {
                   case TokenStandard.ERC20:
                     {
                       const contract = ERC20__factory.connect(address, signer);
 
-                      try {
-                        txParams = await contract.transfer.populateTransaction(
+                      await performContractEstimation(
+                        contract.transfer.estimateGas(recipientAddr, value),
+                        contract.transfer.populateTransaction(
                           recipientAddr,
                           value,
-                        );
-                        gasLimit = BigInt(txParams.gasLimit!);
-                      } catch (err) {
-                        console.warn("Failed to estimate ERC20 Transfer", err);
-
-                        gasLimit = await contract.transfer.estimateGas(
-                          recipientAddr,
-                          value,
-                        );
-                      }
+                        ),
+                      );
                     }
                     break;
 
@@ -414,23 +444,18 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC721__factory.connect(address, signer);
 
-                      try {
-                        txParams =
-                          await contract.transferFrom.populateTransaction(
-                            currentAccount.address,
-                            recipientAddr,
-                            id,
-                          );
-                        gasLimit = BigInt(txParams.gasLimit!);
-                      } catch (err) {
-                        console.warn("Failed to estimate ERC721 Transfer", err);
-
-                        gasLimit = await contract.transferFrom.estimateGas(
+                      await performContractEstimation(
+                        contract.transferFrom.estimateGas(
                           currentAccount.address,
                           recipientAddr,
                           id,
-                        );
-                      }
+                        ),
+                        contract.transferFrom.populateTransaction(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                        ),
+                      );
                     }
                     break;
 
@@ -441,30 +466,22 @@ const TransferTokenContent = memo<TransferTokenContent>(
                         signer,
                       );
 
-                      try {
-                        txParams =
-                          await contract.safeTransferFrom.populateTransaction(
-                            currentAccount.address,
-                            recipientAddr,
-                            id,
-                            value,
-                            new Uint8Array(),
-                          );
-                        gasLimit = BigInt(txParams.gasLimit!);
-                      } catch (err) {
-                        console.warn(
-                          "Failed to estimate ERC1155 Transfer",
-                          err,
-                        );
-
-                        gasLimit = await contract.safeTransferFrom.estimateGas(
+                      await performContractEstimation(
+                        contract.safeTransferFrom.estimateGas(
                           currentAccount.address,
                           recipientAddr,
                           id,
                           value,
                           new Uint8Array(),
-                        );
-                      }
+                        ),
+                        contract.safeTransferFrom.populateTransaction(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                          value,
+                          new Uint8Array(),
+                        ),
+                      );
                     }
                     break;
 
@@ -545,26 +562,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
       return () => clearTimeout(t);
     }, [estimateGas]);
 
-    const formKey = useMemo(
-      () => `${currentAccount.address}-${chainId}`,
-      [currentAccount.address, chainId],
-    );
-
     const amountFieldKey = useMemo(
       () => `amount-${token?.tokenSlug}-${maxAmount}`,
       [token, maxAmount],
     );
-
-    const initialRenderRef = useRef(true);
-
-    useEffect(() => {
-      if (initialRenderRef.current) {
-        initialRenderRef.current = false;
-        return;
-      }
-
-      setTokenSlug([RESET, "replace"]);
-    }, [setTokenSlug, formKey]);
 
     const tokenSymbol =
       token?.tokenType === TokenType.Asset ? token.symbol : undefined;
@@ -573,7 +574,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
     return (
       <Form<FormValues>
-        key={formKey}
         onSubmit={handleSubmit}
         render={({ form, handleSubmit, values, submitting }) => (
           <form
@@ -638,7 +638,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                       currency={tokenSymbol}
                       error={(meta.modified || meta.submitFailed) && meta.error}
                       errorMessage={meta.error}
-                      readOnly={estimating}
+                      // readOnly={estimating}
                       {...input}
                     />
                   )}
