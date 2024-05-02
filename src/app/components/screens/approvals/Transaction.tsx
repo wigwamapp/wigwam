@@ -52,7 +52,6 @@ import TabsHeader from "app/components/blocks/approvals/TabsHeader";
 import FeeTab from "app/components/blocks/approvals/FeeTab";
 import AdvancedTab from "app/components/blocks/approvals/AdvancedTab";
 import DetailsTab from "app/components/blocks/approvals/DetailsTab";
-import LongTextField from "app/components/elements/LongTextField";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 import ApprovalLayout from "./Layout";
@@ -370,6 +369,10 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }, [preparedTx, fees, finalTx]);
   }
 
+  useEffect(() => {
+    lastError && console.info(Object.values(lastError));
+  }, [lastError]);
+
   const handleApprove = useCallback(
     async (approved: boolean) => {
       setLastError(null);
@@ -470,6 +473,35 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       nativeCurrency,
     ],
   );
+
+  const lastErrorMessage = useMemo(() => {
+    if (!lastError?.error) return null;
+
+    const originMsg =
+      lastError?.error.reason || lastError?.error.message || "Unknown error.";
+
+    switch (originMsg.toLowerCase()) {
+      case "insufficient funds for transfer":
+        return (
+          <>
+            Insufficient {nativeCurrency?.symbol} for transaction (gas) fee.
+            Check your account balance. Use Buy or Swap feature to add more if
+            necessary.
+          </>
+        );
+
+      case "execution reverted":
+        return (
+          <>
+            Failed to execute the transaction. The smart contract couldn&apos;t
+            process your request. Please review the parameters.
+          </>
+        );
+
+      default:
+        return originMsg;
+    }
+  }, [lastError, nativeCurrency]);
 
   const bootAnimationRef = useRef(true);
   const handleBootAnimationDone = useCallback(() => {
@@ -576,16 +608,19 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               </Tabs.Content>
 
               <Tabs.Content value="error">
-                {lastError && (
-                  <LongTextField
-                    readOnly
-                    textareaClassName="!h-48"
-                    value={
-                      lastError?.error.reason ||
-                      lastError?.error.message ||
-                      "Unknown error."
-                    }
-                  />
+                {lastErrorMessage && (
+                  <div
+                    className={classNames(
+                      "w-full h-48",
+                      "py-3 px-4",
+                      "box-border border border-brand-main/10",
+                      "bg-black/10 rounded-[.625rem]",
+                      "text-base leading-5 text-brand-light font-medium",
+                      "transition-colors",
+                    )}
+                  >
+                    {lastErrorMessage}
+                  </div>
                 )}
               </Tabs.Content>
             </ScrollAreaContainer>

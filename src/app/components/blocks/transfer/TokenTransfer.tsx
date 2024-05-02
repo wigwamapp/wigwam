@@ -521,7 +521,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
               setGas(undefined);
               setEstimationError(
-                "Estimation failed. Transaction may fail or there network issues",
+                "Failed to estimate transfer. The transaction might not be successful, or there may be network issues.",
               );
             } finally {
               setEstimating(false);
@@ -724,8 +724,14 @@ const TxCheck = memo<TxCheckProps>(({ tokenType, token, values, error }) => {
           "text-sm",
         )}
       >
-        <WarningIcon className="mr-2 w-6 h-auto" />
-        {error || "Insufficient funds for Network Fee"}
+        <WarningIcon className="mr-2 w-6 min-w-6 h-auto" />
+        {error || (
+          <>
+            Insufficient {nativeToken?.symbol} for transaction (gas) fee. Check
+            your account balance. Use Buy or Swap feature to add more if
+            necessary.
+          </>
+        )}
       </div>
     );
   }
