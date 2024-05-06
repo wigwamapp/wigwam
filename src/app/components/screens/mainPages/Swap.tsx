@@ -19,6 +19,8 @@ import {
   getAllNativeTokensAtom,
   swapVerifiedTokensAtom,
 } from "app/atoms";
+import { useAllAccountTokens } from "app/hooks/tokens";
+import { TokenType } from "core/types";
 
 import { parseTokenSlug } from "core/common/tokens";
 import { ZeroAddress } from "ethers";
@@ -81,6 +83,14 @@ const Swap: FC = () => {
   const [fee, setFee] = useState<number | undefined>(0.01);
   const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
 
+  const { tokens } = useAllAccountTokens(
+    TokenType.Asset,
+    currentAccount.address,
+    {
+      search: undefined,
+    },
+  );
+
   const accountNativeTokens = useLazyAtomValue(
     getAllNativeTokensAtom(currentAccount.address),
     "off",
@@ -105,10 +115,19 @@ const Swap: FC = () => {
       const sortedArray = arrayFromMap.sort(
         (a: any, b: any) => parseFloat(b[1]) - parseFloat(a[1]),
       );
+      const currentChainId = chainId;
+      const currentChainIdIndex = sortedArray.findIndex(
+        ([chainId]) => chainId === currentChainId,
+      );
+
+      if (currentChainIdIndex !== -1) {
+        const [constantItem] = sortedArray.splice(currentChainIdIndex, 1);
+        sortedArray.unshift(constantItem);
+      }
       const sortedChainIds = sortedArray.map(([chainId]) => chainId);
       setChainsOrder(sortedChainIds as number[]);
     }
-  }, [balancesMap]);
+  }, [balancesMap, chainId]);
 
   const widgetEvents = useWidgetEvents();
 
@@ -187,8 +206,14 @@ const Swap: FC = () => {
   );
 
   const tokensList = useMemo(() => {
-    return showOnlyVerified ? verifiedTokens : [];
-  }, [showOnlyVerified, verifiedTokens]);
+    if (!verifiedTokens) return;
+    const balanceTokens = tokens.map((item) => ({
+      address: parseTokenSlug(item.tokenSlug).address,
+      chainId: item.chainId,
+    }));
+    const tokensToShow = [...verifiedTokens, ...balanceTokens];
+    return showOnlyVerified ? tokensToShow : [];
+  }, [showOnlyVerified, verifiedTokens, tokens]);
 
   const widgetConfig = useMemo((): WidgetConfig => {
     return {
