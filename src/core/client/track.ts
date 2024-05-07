@@ -5,7 +5,6 @@ import { storage } from "lib/ext/storage";
 import { Setting, AnalyticsState } from "core/common/settings";
 
 export enum TEvent {
-  Promocode = "PROMOCODE_USED",
   SetupWallet = "WALLET_SETUPED",
   SetupWigwam = "WIGWAM_SETUPED",
   ProfileCreation = "PROFILE_CREATED",
@@ -14,10 +13,19 @@ export enum TEvent {
   NetworkCreation = "NETWORK_CREATED",
   NetworkEdit = "NETWORK_EDITED",
   Contact = "CONTACT_CREATED",
-  Transfer = "TRANSFER_CREATED",
   DappConnect = "DAPP_CONNECT_OPENED",
   DappSigning = "DAPP_SIGNING_OPENED",
   DappTransaction = "DAPP_TRANSACTION_OPENED",
+  SwapNavigated = "SWAP_NAVIGATED",
+  SwapStarted = "SWAP_STARTED",
+  SwapFinished = "SWAP_FINISHED",
+  BuyNavigated = "BUY_NAVIGATED",
+  BuyStarted = "BUY_STARTED",
+  BuyFinished = "BUY_FINISHED",
+  TokenTransferCreated = "TOKEN_TRANSFER_CREATED",
+  NftTransferCreated = "NFT_TRANSFER_CREATED",
+  ReceiveModalOpened = "RECEIVE_MODAL_OPENED",
+  SidebarNavigated = "SIDEBAR_NAVIGATED",
 }
 
 export const trackEvent = async (
@@ -25,7 +33,10 @@ export const trackEvent = async (
 ): Promise<any> => {
   const amplitued = await getAmplitude();
 
-  return amplitued?.track(...args).promise;
+  return amplitued?.track(...args).promise.then((result) => {
+    console.info("Tracked:", ...args);
+    return result;
+  });
 };
 
 export const isTrackingEnabled = () => getAmplitude().then(Boolean);

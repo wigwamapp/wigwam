@@ -9,6 +9,7 @@ import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
+import { TEvent, trackEvent } from "core/client";
 import { getTokenDetailsUrlAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -253,6 +254,14 @@ const AssetInfo: FC = () => {
                 className="grow !py-2 !min-w-0 text-sm"
                 disabled={!showBuyButton}
                 title={showBuyButton ? undefined : "Coming soon"}
+                onClick={() => {
+                  trackEvent(TEvent.BuyNavigated, {
+                    page: "dashboard",
+                    tokenName: name,
+                    tokenSymbol: symbol,
+                    chainId,
+                  });
+                }}
               >
                 <BuyIcon className="w-4 h-auto mr-2" />
                 Buy
@@ -263,6 +272,14 @@ const AssetInfo: FC = () => {
                 theme="secondary"
                 className="grow !py-2 !min-w-0 text-sm"
                 title={`Swap ${symbol}`}
+                onClick={() => {
+                  trackEvent(TEvent.SwapNavigated, {
+                    page: "dashboard",
+                    tokenName: name,
+                    tokenSymbol: symbol,
+                    chainId,
+                  });
+                }}
               >
                 <SwapIcon className="w-4 h-auto mr-2" />
                 Swap

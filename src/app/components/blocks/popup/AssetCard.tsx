@@ -19,6 +19,7 @@ import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus } from "core/types";
 import { parseTokenSlug, toggleTokenStatus } from "core/common/tokens";
+import { TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
@@ -351,21 +352,35 @@ const AssetModal: FC<IAssetModalProps> = ({
           </Button>
           <DeepLinkButton
             text="Buy"
-            onClick={() =>
+            onClick={() => {
+              trackEvent(TEvent.BuyNavigated, {
+                page: "popup",
+                tokenName: name,
+                tokenSymbol: symbol,
+                chainId,
+              });
+
               openLink({
                 page: Page.Buy,
                 token: asset.tokenSlug,
                 onRampOpened: true,
-              })
-            }
+              });
+            }}
             Icon={BuyIcon}
             disabled={!showBuyButton}
           />
           <DeepLinkButton
             text="Swap"
-            onClick={() =>
-              openLink({ page: Page.Swap, token: asset.tokenSlug })
-            }
+            onClick={() => {
+              trackEvent(TEvent.SwapNavigated, {
+                page: "popup",
+                tokenName: name,
+                tokenSymbol: symbol,
+                chainId,
+              });
+
+              openLink({ page: Page.Swap, token: asset.tokenSlug });
+            }}
             Icon={SwapIcon}
           />
         </div>

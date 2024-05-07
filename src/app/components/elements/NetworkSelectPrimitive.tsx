@@ -1,15 +1,10 @@
 import { FC, useCallback, useMemo, useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
 import Fuse from "fuse.js";
 import BigNumber from "bignumber.js";
-import { useLazyAtomValue } from "lib/atom-utils";
 
-import { DEFAULT_NETWORKS, DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import { Network } from "core/types";
-import { isTrackingEnabled, TEvent, trackEvent } from "core/client";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { pageAtom, sentAnalyticNetworksAtom } from "app/atoms";
 import { Page, SettingTab } from "app/nav";
 import { ReactComponent as GearIcon } from "app/icons/gear.svg";
 import { ReactComponent as AddIcon } from "app/icons/PlusCircle.svg";
@@ -58,7 +53,6 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   withAction = true,
   actionType = "small",
   size = "large",
-  source,
   contentAlign,
   className,
   currentItemClassName,
@@ -67,11 +61,6 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
   contentClassName,
   withFiat,
 }) => {
-  const page = useAtomValue(pageAtom);
-
-  const sentAnalyticNetworks = useLazyAtomValue(sentAnalyticNetworksAtom);
-  const setSentAnalyticNetworks = useSetAtom(sentAnalyticNetworksAtom);
-
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
@@ -98,51 +87,13 @@ const NetworkSelectPrimitive: FC<NetworkSelectProps> = ({
     setOpened(false);
   }, []);
 
-  const trackNetworkChanged = useCallback(
-    async (chainId: number) => {
-      try {
-        const enabled = await isTrackingEnabled();
-        if (!enabled) return;
-
-        const isAlreadySentNetwork = sentAnalyticNetworks
-          ? sentAnalyticNetworks.findIndex((id) => id === chainId) !== -1
-          : false;
-
-        if (isAlreadySentNetwork) return;
-
-        const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
-
-        trackEvent(TEvent.NetworkChange, {
-          name: isDefault
-            ? DEFAULT_NETWORKS.find((el) => el.chainId === chainId)!.name
-            : "unknown",
-          chainId: isDefault ? chainId : "unknown",
-          source: source ?? `page_${page}`,
-        });
-
-        setSentAnalyticNetworks((current) => [...current, chainId]);
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [source, page, sentAnalyticNetworks, setSentAnalyticNetworks],
-  );
-
-  const handleNetworkChange = useCallback(
-    (chainId: number) => {
-      onNetworkChange(chainId);
-      trackNetworkChanged(chainId);
-    },
-    [onNetworkChange, trackNetworkChanged],
-  );
-
   return (
     <Select
       open={opened}
       onOpenChange={setOpened}
       items={preparedNetworks}
       currentItem={currentItem ?? preparedCurrentNetwork}
-      setItem={(network) => handleNetworkChange(network.key)}
+      setItem={(network) => onNetworkChange(network.key)}
       searchValue={searchValue}
       onSearch={setSearchValue}
       className={className}

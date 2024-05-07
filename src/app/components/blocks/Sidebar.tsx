@@ -1,8 +1,10 @@
 import { FC } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-
 import { Link } from "lib/navigation";
+
+import { TEvent, trackEvent } from "core/client";
+
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
@@ -12,6 +14,7 @@ import useSidebarLinks from "./Sidebar.Links";
 
 const Sidebar: FC = () => {
   const { NavLinksPrimary, NavLinksSecondary } = useSidebarLinks();
+
   return (
     <nav
       className={classNames(
@@ -72,11 +75,22 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
         const isPageActive = route === page;
         const notificationBadge = route === Page.Settings && updateAvailable;
 
-        if (typeof action === "function") {
+        const handleClick = () => {
+          if (isPageActive) return;
+
+          action?.();
+
+          trackEvent(TEvent.SidebarNavigated, {
+            label,
+            latestPage: page,
+          });
+        };
+
+        if (!route && typeof action === "function") {
           return (
             <button
               key={label}
-              onClick={action}
+              onClick={handleClick}
               className={classNames(
                 "group",
                 "text-base !font-bold text-brand-light/80",
@@ -117,6 +131,7 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
               isPageActive && "bg-brand-main/5 !text-brand-light",
               "last:mb-0",
             )}
+            onClick={handleClick}
           >
             <LinkContent
               hasNotification={notificationBadge}

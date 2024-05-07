@@ -21,7 +21,6 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { Link, navigate, Redirect } from "lib/navigation";
 
-import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import {
   AccountAsset,
   AccountSource,
@@ -57,8 +56,6 @@ import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import TokenSelect from "app/components/elements/TokenSelect";
 import Button from "app/components/elements/Button";
-// import TooltipIcon from "app/components/elements/TooltipIcon";
-// import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -174,6 +171,12 @@ const TransferTokenContent = memo<TransferTokenContent>(
             });
           }
 
+          const {
+            standard,
+            address: tokenAddress,
+            id: tokenId,
+          } = parseTokenSlug(token.tokenSlug);
+
           try {
             let txParams: ethers.TransactionRequest;
 
@@ -188,12 +191,13 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   ? ethers.parseUnits(amount, token.decimals)
                   : amount;
 
-              const { standard, address, id } = parseTokenSlug(token.tokenSlug);
-
               switch (standard) {
                 case TokenStandard.ERC20:
                   {
-                    const contract = ERC20__factory.connect(address, provider);
+                    const contract = ERC20__factory.connect(
+                      tokenAddress,
+                      provider,
+                    );
 
                     txParams = await contract.transfer.populateTransaction(
                       recipient,
@@ -204,12 +208,15 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                 case TokenStandard.ERC721:
                   {
-                    const contract = ERC721__factory.connect(address, provider);
+                    const contract = ERC721__factory.connect(
+                      tokenAddress,
+                      provider,
+                    );
 
                     txParams = await contract.transferFrom.populateTransaction(
                       currentAccount.address,
                       recipient,
-                      id,
+                      tokenId,
                     );
                   }
                   break;
@@ -217,7 +224,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 case TokenStandard.ERC1155:
                   {
                     const contract = ERC1155__factory.connect(
-                      address,
+                      tokenAddress,
                       provider,
                     );
 
@@ -225,7 +232,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                       await contract.safeTransferFrom.populateTransaction(
                         currentAccount.address,
                         recipient,
-                        id,
+                        tokenId,
                         rawAmount,
                         new Uint8Array(),
                       );
@@ -247,12 +254,19 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
             const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
 
-            const isDefault =
-              currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
-            trackEvent(TEvent.Transfer, {
-              networkName: isDefault ? currentNetwork.name : "unknown",
-              networkChainId: isDefault ? currentNetwork.chainId : "unknown",
-            });
+            if (currentNetwork) {
+              trackEvent(
+                token.tokenType === TokenType.Asset
+                  ? TEvent.TokenTransferCreated
+                  : TEvent.NftTransferCreated,
+                {
+                  networkName: currentNetwork.name,
+                  networkChainId: currentNetwork.chainId,
+                  tokenName: token.name,
+                  tokenAddress,
+                },
+              );
+            }
 
             const tokenPreview =
               token.tokenType === TokenType.Asset ? (
