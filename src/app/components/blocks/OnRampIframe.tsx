@@ -6,6 +6,7 @@ import {
   TransakEvents,
   Environments,
 } from "core/types/ramp";
+import { TEvent, trackEvent } from "core/client";
 import { generateURL, makeHandleMessage } from "app/utils/transak";
 import {
   onRampModalAtom,
@@ -147,8 +148,21 @@ const OnRampIframe: FC = () => {
           </p>
         ),
       });
+
+      trackEvent(TEvent.BuyFinished, {
+        currency: onRampCurrency?.symbol,
+        network: onRampCurrency?.network,
+        chainId,
+      });
     },
-    [chainId, tokenSlug, setOnRampModalOpened, alert],
+    [
+      chainId,
+      tokenSlug,
+      setOnRampModalOpened,
+      alert,
+      onRampCurrency?.network,
+      onRampCurrency?.symbol,
+    ],
   );
 
   const handleCloseIframe = useCallback(() => {
@@ -170,7 +184,20 @@ const OnRampIframe: FC = () => {
     );
 
     eventEmitter.on(TransakEvents.TRANSAK_ORDER_SUCCESSFUL, handleSuccessOrder);
-  }, [eventEmitter, handleCloseIframe, handleSuccessOrder]);
+
+    trackEvent(TEvent.BuyStarted, {
+      currency: onRampCurrency?.symbol,
+      network: onRampCurrency?.network,
+      chainId,
+    });
+  }, [
+    eventEmitter,
+    handleCloseIframe,
+    handleSuccessOrder,
+    onRampCurrency?.network,
+    onRampCurrency?.symbol,
+    chainId,
+  ]);
 
   useEffect(() => {
     handleOpenIframe();

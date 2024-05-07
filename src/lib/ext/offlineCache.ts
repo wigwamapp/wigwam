@@ -16,16 +16,21 @@ export function withOfflineCache<T, U extends any[]>(
 ): (...args: U) => Promise<T> {
   return memoize(
     async (...args: U) => {
-      let keyStr = typeof key === "function" ? key(args) : key;
-      keyStr = `${keyStr}_${process.env.BUILD_ID}`;
+      const keyStr = `cache_${typeof key === "function" ? key(args) : key}`;
+      const bid = process.env.BUILD_ID;
 
       try {
         const cached = await globalStorage.fetchForce<{
           data: T;
           addedAt: number;
+          bid: string;
         }>(keyStr);
 
-        if (cached && cached.addedAt > Date.now() - coldMaxAge) {
+        if (
+          cached &&
+          cached.bid === bid &&
+          cached.addedAt > Date.now() - coldMaxAge
+        ) {
           return cached.data;
         }
       } catch (err) {
@@ -33,7 +38,8 @@ export function withOfflineCache<T, U extends any[]>(
       }
 
       const data = await factory(...args);
-      if (data) await globalStorage.put(keyStr, { data, addedAt: Date.now() });
+      if (data)
+        await globalStorage.put(keyStr, { data, addedAt: Date.now(), bid });
 
       return data;
     },

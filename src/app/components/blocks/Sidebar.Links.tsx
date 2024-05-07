@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { Page } from "app/nav";
 import { useSetAtom } from "jotai";
 
+import { TEvent, trackEvent } from "core/client";
+
 import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
@@ -57,12 +59,20 @@ const useSidebarLinks = () => {
         route: Page.Buy,
         label: "Buy",
         Icon: BuyIcon,
+        action: () =>
+          trackEvent(TEvent.BuyNavigated, {
+            page: "dashboard",
+          }),
       },
       {
         route: Page.Swap,
         label: "Swap",
         Icon: SwapIcon,
         badge: +swapBadgeAmount,
+        action: () =>
+          trackEvent(TEvent.SwapNavigated, {
+            page: "dashboard",
+          }),
       },
       {
         route: Page.Rewards,

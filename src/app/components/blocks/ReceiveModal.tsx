@@ -1,9 +1,10 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect } from "react";
 import classNames from "clsx";
 import { useAtom, useSetAtom } from "jotai";
 import { isPopup } from "lib/ext/view";
 
 import { AccountAsset } from "core/types";
+import { TEvent, trackEvent } from "core/client";
 
 import { receiveModalAtom, receiveTokenAtom } from "app/atoms";
 import { useAccountToken } from "app/hooks";
@@ -27,6 +28,14 @@ const ReceiveModal: FC<ReceiveModalProps> = (props) => {
     },
     [setReceiveOpened, setReceiveToken],
   );
+
+  useEffect(() => {
+    if (receiveOpened) {
+      trackEvent(TEvent.ReceiveModalOpened, {
+        page: isPopupMode ? "popup" : "dashboard",
+      });
+    }
+  }, [receiveOpened, isPopupMode]);
 
   return (
     <SecondaryModal

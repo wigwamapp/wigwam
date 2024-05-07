@@ -3,6 +3,7 @@ import classNames from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { WalletStatus } from "core/types";
+import { TEvent, trackEvent } from "core/client";
 
 import { openInTab } from "app/helpers";
 import {
@@ -269,8 +270,26 @@ const WalletInfo: FC = () => {
           </div>
           <span className="text-xs font-medium">Receive</span>
         </Button>
-        <DeepLinkButton text="Buy" to="buy" Icon={BuyIcon} />
-        <DeepLinkButton text="Swap" to="swap" Icon={SwapIcon} />
+        <DeepLinkButton
+          text="Buy"
+          to="buy"
+          Icon={BuyIcon}
+          onClick={() => {
+            trackEvent(TEvent.BuyNavigated, {
+              page: "popup",
+            });
+          }}
+        />
+        <DeepLinkButton
+          text="Swap"
+          to="swap"
+          Icon={SwapIcon}
+          onClick={() => {
+            trackEvent(TEvent.SwapNavigated, {
+              page: "popup",
+            });
+          }}
+        />
       </div>
     </section>
   );
@@ -311,12 +330,16 @@ const DeepLinkButton: FC<{
   text: string;
   Icon: FC<{ className?: string }>;
   to: string;
-}> = ({ text, to, Icon }) => {
+  onClick?: () => void;
+}> = ({ text, to, Icon, onClick }) => {
   return (
     <button
       type="button"
       className="flex flex-col items-center relative z-10 group"
-      onClick={() => openInTab({ page: to }, true)}
+      onClick={() => {
+        onClick?.();
+        openInTab({ page: to }, true);
+      }}
     >
       <div className="mb-1 p-2.5 bg-brand-darkbg rounded-full transition-colors group-hover:bg-[#373B45] group-focus-visible:bg-[#373B45]">
         <Icon className="w-5 h-5" />
