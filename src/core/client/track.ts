@@ -26,6 +26,8 @@ export enum TEvent {
   NftTransferCreated = "NFT_TRANSFER_CREATED",
   ReceiveModalOpened = "RECEIVE_MODAL_OPENED",
   SidebarNavigated = "SIDEBAR_NAVIGATED",
+  Web3SharedModeToggled = "WEB3_SHARED_MODE_TOGGLED",
+  Web3ManualConnected = "WEB3_MANUAL_CONNECTED",
 }
 
 export const trackEvent = async (

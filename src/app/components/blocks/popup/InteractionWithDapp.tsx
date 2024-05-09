@@ -8,6 +8,7 @@ import { useLazyAtomValue } from "lib/atom-utils";
 import { ActivityType, Permission, MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
 import { saveActivity } from "core/common/activity";
+import { trackEvent, TEvent } from "core/client";
 
 import {
   activeTabAtom,
@@ -124,6 +125,8 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             pending: 0,
           });
         }
+
+        trackEvent(TEvent.Web3ManualConnected);
       }
     } catch (err) {
       console.error(err);
@@ -136,6 +139,18 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
     tabOrigin,
     chainId,
   ]);
+
+  const handleMetamaskMode = useCallback(() => {
+    setMetamaskMode(
+      metamaskModeEnabled
+        ? MetaMaskCompatibleMode.Off
+        : MetaMaskCompatibleMode.Strict,
+    );
+
+    trackEvent(TEvent.Web3SharedModeToggled, {
+      mode: metamaskModeEnabled ? "disabled" : "enabled",
+    });
+  }, [metamaskModeEnabled, setMetamaskMode]);
 
   return (
     <DropdownMenu.Root>
@@ -272,13 +287,7 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             theme="secondary"
             className="mb-2 !w-full !text-xs !font-medium !py-2.5"
             innerClassName="!w-full !flex !justify-between !items-center"
-            onClick={() =>
-              setMetamaskMode(
-                metamaskModeEnabled
-                  ? MetaMaskCompatibleMode.Off
-                  : MetaMaskCompatibleMode.Strict,
-              )
-            }
+            onClick={handleMetamaskMode}
           >
             <span className="flex items-center gap-2">
               Connect as MetaMask{" "}
