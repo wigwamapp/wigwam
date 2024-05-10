@@ -171,6 +171,7 @@ export interface WidgetConfig {
   languageResources?: LanguageResources;
   disableLanguageDetector?: boolean;
   showOnlyVerified?: boolean;
+  hideVerifiedToggle?: boolean;
   onBeforeTransaction?: (metadata: Route) => void;
   onChangeFee?: (newFee: number|undefined) => void;
   onShowFullList?: (flag: boolean) => void;
