@@ -61,8 +61,6 @@ const getVerifiedTokens = memoize(
       };
     });
 
-    console.log(fullTokensList);
-
     return [
       ...fullTokensList.map((item: any) => ({
         address: item.address,
