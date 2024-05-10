@@ -70,7 +70,7 @@ const getVerifiedTokens = memoize(
     ];
   },
   {
-    maxAge: 1_000,
+    maxAge: 300_000,
     cacheKey: (args) => args.join("_"),
   },
 );
