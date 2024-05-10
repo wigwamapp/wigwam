@@ -23,7 +23,7 @@ export const SelectTokenPage: FC<FormTypeProps> = ({ formType }) => {
   const contentHeight = useContentHeight();
   const [tokenListHeight, setTokenListHeight] = useState(0);
   const swapOnly = useSwapOnly();
-  const { showOnlyVerified, onShowFullList } = useWidgetConfig();
+  const { showOnlyVerified, hideVerifiedToggle, onShowFullList } = useWidgetConfig();
 
   useLayoutEffect(() => {
     setTokenListHeight(
@@ -46,17 +46,19 @@ export const SelectTokenPage: FC<FormTypeProps> = ({ formType }) => {
     <Container disableGutters>
       <Box pt={1} pb={2} px={3} ref={headerRef}>
         {!hideChainSelect ? <ChainSelect formType={formType} /> : null}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
-          <Typography
-            fontSize={18}
-            variant="subtitle1"
-            color="text.primary"
-            lineHeight="normal"
-          >
-            Show verified tokens
-          </Typography>
-          <Switch checked={showOnlyVerified} onChange={onChange} />
-        </Box>
+        {!hideVerifiedToggle && (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
+            <Typography
+              fontSize={18}
+              variant="subtitle1"
+              color="text.primary"
+              lineHeight="normal"
+            >
+              Show verified tokens
+            </Typography>
+            <Switch checked={showOnlyVerified} onChange={onChange} />
+          </Box>
+        )}
         <Box mt={!hideChainSelect ? 2 : 0}>
           <SearchTokenInput />
         </Box>

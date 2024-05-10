@@ -61,6 +61,8 @@ const getVerifiedTokens = memoize(
       };
     });
 
+    console.log(fullTokensList);
+
     return [
       ...fullTokensList.map((item: any) => ({
         address: item.address,
@@ -70,7 +72,7 @@ const getVerifiedTokens = memoize(
     ];
   },
   {
-    maxAge: 400_000,
+    maxAge: 1_000,
     cacheKey: (args) => args.join("_"),
   },
 );
@@ -82,6 +84,7 @@ const Swap: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom);
   const [fee, setFee] = useState<number | undefined>(0.01);
   const [chainsOrder, setChainsOrder] = useState<number[] | null>(null);
+  const [hideVerifiedToggle, setHideVerifiedToggle] = useState<boolean>(false);
 
   const { tokens } = useAllAccountTokens(
     TokenType.Asset,
@@ -171,8 +174,17 @@ const Swap: FC = () => {
 
   const handleGetVerifiedTokens = useCallback(async () => {
     const tokens = await getVerifiedTokens();
-    setVerifiedTokens(tokens);
-  }, []);
+    const tokensInCurrentChain = tokens.filter(
+      (item) => item.chainId === chainId,
+    );
+    if (tokensInCurrentChain.length === 0) {
+      setShowOnlyVerified(false);
+      setHideVerifiedToggle(true);
+    } else {
+      setVerifiedTokens(tokens);
+      setHideVerifiedToggle(false);
+    }
+  }, [chainId]);
 
   useEffect(() => {
     handleGetVerifiedTokens();
@@ -227,6 +239,7 @@ const Swap: FC = () => {
       currencyRate: currenciesRate[selectedCurrency],
       chainsOrder: chainsOrder,
       showOnlyVerified: showOnlyVerified,
+      hideVerifiedToggle: hideVerifiedToggle,
       languages: {
         default: currentLocale as LanguageKey,
       },
@@ -299,6 +312,7 @@ const Swap: FC = () => {
     chainId,
     currentAccount.address,
     showOnlyVerified,
+    hideVerifiedToggle,
     tokenSlug,
     fee,
     signer,
