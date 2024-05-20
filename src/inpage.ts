@@ -70,7 +70,7 @@ function injectEIP1193(key: string, sharedProperty = false) {
     });
 
   if (redefineProperty) {
-    if (existing && sharedProperty) {
+    if (sharedProperty) {
       isMetaMaskModeEnabled.then((enabled) => {
         if (enabled) defineProperty();
       });
