@@ -1,27 +1,26 @@
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { recoverPersonalSignature } from "lib/eth-sig-util";
+import { recoverPersonalSignature } from "@metamask/eth-sig-util";
+import { nanoid } from "nanoid";
 import { assert } from "lib/system/assert";
 
 import {
   SigningStandard,
-  RpcReply,
+  RpcContext,
   ActivitySource,
   ActivityType,
 } from "core/types";
+import { approvalAdded } from "core/back/state";
 
 import { validatePermission, validateAccount } from "./validation";
-import { approvalAdded } from "core/back/state";
-import { nanoid } from "nanoid";
 
-const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } =
-  ethers.utils;
+const { isAddress, getAddress, isHexString, toUtf8Bytes, hexlify } = ethers;
 
 export async function requestSigning(
+  rpcCtx: RpcContext,
   source: ActivitySource,
   standard: SigningStandard,
   params: any[],
-  rpcReply: RpcReply
 ) {
   validatePermission(source);
 
@@ -52,6 +51,9 @@ export async function requestSigning(
       accountAddress = params[0];
       message = params[1];
       break;
+
+    default:
+      throw new Error("Unhandled Signing standard");
   }
 
   try {
@@ -71,8 +73,8 @@ export async function requestSigning(
               (item: any) =>
                 typeof item.type === "string" &&
                 typeof item.name === "string" &&
-                typeof item.value === "string"
-            )
+                typeof item.value === "string",
+            ),
         );
         break;
 
@@ -81,9 +83,12 @@ export async function requestSigning(
         assert(
           message &&
             typeof message === "string" &&
-            typeof JSON.parse(message) === "object"
+            typeof JSON.parse(message) === "object",
         );
         break;
+
+      default:
+        throw new Error("Unhandled Signing standard");
     }
   } catch {
     throw ethErrors.rpc.invalidParams();
@@ -99,26 +104,26 @@ export async function requestSigning(
     accountAddress,
     standard,
     message,
-    rpcReply,
+    rpcCtx,
   });
 }
 
 export async function recoverPersonalSign(
+  rpcCtx: RpcContext,
   source: ActivitySource,
   params: any[],
-  rpcReply: RpcReply
 ) {
   validatePermission(source);
 
-  let data, signature;
+  let data, signature, ecRecoverAddr;
   try {
     [data, signature] = params;
     assert(isHexString(data) && isHexString(signature));
+
+    ecRecoverAddr = recoverPersonalSignature({ data, signature });
   } catch {
     throw ethErrors.rpc.invalidParams();
   }
 
-  const ecRecoverAddr = recoverPersonalSignature({ data, signature });
-
-  rpcReply({ result: ecRecoverAddr });
+  rpcCtx.reply({ result: getAddress(ecRecoverAddr) });
 }

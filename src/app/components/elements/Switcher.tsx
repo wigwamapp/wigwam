@@ -5,11 +5,13 @@ import * as SwitchPrimitive from "@radix-ui/react-switch";
 interface SwitcherProps {
   id?: string;
   label?: ReactNode;
-  text: string;
+  text?: ReactNode;
   checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
   className?: string;
+  buttonClassName?: string;
   disabled?: boolean;
+  size?: "large" | "small";
 }
 
 const Switcher: FC<SwitcherProps> = ({
@@ -20,6 +22,8 @@ const Switcher: FC<SwitcherProps> = ({
   disabled,
   onCheckedChange,
   className,
+  buttonClassName,
+  size = "large",
 }) => (
   <div className={classNames("flex flex-col min-w-[17.75rem]", className)}>
     {label && (
@@ -27,45 +31,65 @@ const Switcher: FC<SwitcherProps> = ({
         className={classNames(
           "mx-4 mb-2",
           "text-base font-normal",
-          "text-brand-gray"
+          "text-brand-gray",
         )}
       >
         {label}
       </label>
     )}
+
     <SwitchPrimitive.Root
       id={id}
       checked={checked}
       onCheckedChange={onCheckedChange}
       className={classNames(
         "flex items-center justify-between",
-        "min-h-[2.75rem] py-2 px-5",
+        size === "large"
+          ? "min-h-[2.75rem] py-2 px-5"
+          : "min-h-[2.25rem] py-2 px-3",
         "bg-brand-main/[.05]",
         "rounded-[.625rem]",
         "transition-colors",
-        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10"
+        "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
+        buttonClassName,
       )}
       disabled={disabled}
     >
-      <span className="text-sm font-bold">{text}</span>
+      {text ? (
+        <span
+          className={classNames(
+            "font-bold",
+            size === "large" ? "text-sm" : "text-xs",
+          )}
+        >
+          {text}
+        </span>
+      ) : null}
+
       <span
         className={classNames(
           "flex items-center",
-          "w-11 h-[1.625rem] p-[.1875rem]",
+          size === "large"
+            ? "w-11 h-[1.625rem] p-[.1875rem]"
+            : "w-8 h-[1.5rem] p-[.175rem]",
           "rounded-full",
-          "border border-brand-light",
           "transition-colors",
-          !checked ? "bg-brand-main/[.05]" : "bg-[#21AF3D]/40"
+          !checked ? "bg-[#93ACAF]" : "bg-[#80EF6E]",
         )}
       >
         <SwitchPrimitive.SwitchThumb
           className={classNames(
             "block",
-            "w-[1.125rem] h-[1.125rem]",
+            size === "large"
+              ? "w-[1.3rem] h-[1.3rem]"
+              : "w-[1.1rem] h-[1.1rem]",
             "rounded-full",
-            "bg-brand-light",
+            "bg-[#373B45]",
             "transition-transform",
-            checked && "translate-x-[1.125rem]"
+            checked &&
+              (size === "large"
+                ? "translate-x-[1.125rem]"
+                : "translate-x-[0.5rem]"),
           )}
         />
       </span>

@@ -2,16 +2,16 @@ import { FC, HTMLAttributes, memo, RefObject, useRef } from "react";
 import classNames from "clsx";
 import memoize from "mem";
 import Avatar from "boring-avatars";
-import { createAvatar, utils } from "@dicebear/avatars";
-import * as jdenticonStyle from "@dicebear/avatars-jdenticon-sprites";
-import * as avataaarsStyle from "@dicebear/avatars-avataaars-sprites";
+import { createAvatar } from "@dicebear/core";
+import { create as createPrng } from "@dicebear/core/lib/utils/prng";
+import * as avataaarsStyle from "@dicebear/avataaars";
 import * as personasStyle from "@dicebear/personas";
 import useResizeObserver from "use-resize-observer";
 
 import niceColorPalettes from "fixtures/niceColorPalettes/200.json";
 
 type Source = "dicebear" | "boring";
-type DicebearStyleType = "jdenticon" | "avataaars" | "personas";
+type DicebearStyleType = "avataaars" | "personas";
 type BoringVariant =
   | "marble"
   | "beam"
@@ -43,7 +43,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
     initialsPlaceholder,
     className,
     source = "dicebear",
-    type = "jdenticon",
+    type = "avataaars",
     variant,
     colors,
     autoColors,
@@ -58,7 +58,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
         className={classNames(
           "inline-flex items-center justify-center relative",
           "overflow-hidden",
-          className
+          className,
         )}
         {...rest}
         {...(source === "boring"
@@ -93,7 +93,7 @@ const AutoIcon: FC<AutoIconProps> = memo(
             })}
       />
     );
-  }
+  },
 );
 
 export default AutoIcon;
@@ -104,9 +104,6 @@ const loadDicebearIconSvg = memoize(generateDicebearIconSvg, {
 
 function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
   switch (type) {
-    case "jdenticon":
-      return createAvatar(jdenticonStyle, { seed });
-
     case "avataaars":
       return createAvatar(avataaarsStyle, {
         seed,
@@ -115,19 +112,21 @@ function generateDicebearIconSvg(type: DicebearStyleType, seed: string) {
           "disbelief",
           "eating",
           "grimace",
-          "scream",
           "screamOpen",
           "serious",
           "smile",
           "tongue",
           "twinkle",
         ],
-      });
+      }).toString();
 
     case "personas":
       return createAvatar(personasStyle, {
         seed,
-      });
+      }).toString();
+
+    default:
+      throw new Error("Unhandled AutoIcon type");
   }
 }
 
@@ -179,7 +178,7 @@ const Initials: FC<InitialsProps> = ({
         className={classNames(
           "absolute top-1/2 left-1/2",
           "-translate-x-1/2 -translate-y-1/2",
-          "uppercase leading-[0px] font-bold drop-shadow-profileinitial"
+          "uppercase leading-[0px] font-bold drop-shadow-profileinitial",
         )}
         style={{
           fontSize: Math.floor(size * scale),
@@ -192,7 +191,7 @@ const Initials: FC<InitialsProps> = ({
 };
 
 const seedToColors = memoize((seed: string) => {
-  const prng = utils.prng.create(seed);
+  const prng = createPrng(seed);
 
   return prng.pick(niceColorPalettes);
 });

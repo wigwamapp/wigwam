@@ -2,6 +2,7 @@ import { Runtime } from "webextension-polyfill";
 import { ethErrors } from "eth-rpc-errors";
 import { liveQuery, Subscription } from "dexie";
 import { livePromise } from "lib/system/livePromise";
+import { isPhishingWebsite } from "lib/phishing-detect";
 import { storage } from "lib/ext/storage";
 import { PorterServer, MessageContext } from "lib/ext/porter/server";
 
@@ -16,10 +17,16 @@ import {
   CHAIN_ID,
   ACCOUNT_ADDRESS,
   ActivityType,
+  MetaMaskCompatibleMode,
 } from "core/types";
 import * as repo from "core/repo";
 import { Setting } from "core/common";
-import { JSONRPC, VIGVAM_FAVICON, VIGVAM_STATE } from "core/common/rpc";
+import {
+  JSONRPC,
+  WIGWAM_FAVICON,
+  WIGWAM_PHISHING_WARNING,
+  WIGWAM_STATE,
+} from "core/common/rpc";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
 import {
@@ -48,23 +55,35 @@ export function startPageServer() {
   pagePorter.onConnection(async (action, port) => {
     if (!port.sender?.url) return;
 
-    const { origin } = new URL(port.sender.url);
+    const { origin, hostname } = new URL(port.sender.url);
     if (!origin) return;
+
+    checkForPhishing(hostname, () => {
+      pagePorter.notify(port, {
+        jsonrpc: JSONRPC,
+        method: WIGWAM_PHISHING_WARNING,
+      });
+    });
 
     await ensureInited();
 
     if (action === "connect") {
-      const permission = await repo.permissions.get(origin);
-      notifyPermission(port, permission);
+      // Obtain current permission
+      let currentPermission = await repo.permissions.get(origin);
+      notifyPermission(port, currentPermission);
 
+      // Subscribe to permission updates
       const sub = liveQuery(() => repo.permissions.get(origin)).subscribe(
-        (perm) => notifyPermission(port, perm)
+        (perm) => {
+          currentPermission = perm;
+          notifyPermission(port, perm);
+        },
       );
-
       permissionSubs.set(port, sub);
 
-      internalStateSubs.set(port, async (type) => {
-        const perm = await repo.permissions.get(origin).catch(() => undefined);
+      // Subscribe to internal wallet state updates
+      internalStateSubs.set(port, (type) => {
+        const perm = currentPermission;
 
         switch (type) {
           case "walletStatus":
@@ -79,9 +98,12 @@ export function startPageServer() {
           case "accountAddress":
             if (perm) notifyPermission(port, perm);
             break;
+          default:
+            break;
         }
       });
     } else {
+      // Disconnect -> Clean up
       const permSub = permissionSubs.get(port);
       if (permSub) {
         permSub.unsubscribe();
@@ -105,7 +127,7 @@ export function startPageServer() {
   const notifyPermission = async (port: Runtime.Port, perm?: Permission) => {
     let params;
 
-    const sharedPropertyEnabled = await loadSharedPropertyEnabled();
+    const metamaskMode = await loadMetaMaskCompatibleMode();
 
     if (isUnlocked() && perm) {
       const internalAccountAddress = await loadAccountAddress();
@@ -115,47 +137,42 @@ export function startPageServer() {
       if (perm.accountAddresses.includes(internalAccountAddress)) {
         accountAddress = internalAccountAddress;
       } else {
-        const allAccountAddresses = $accountAddresses.getState();
-
-        accountAddress =
-          perm.accountAddresses.find((address) =>
-            allAccountAddresses.includes(address)
-          ) ?? null;
+        accountAddress = null;
       }
 
       params = {
         chainId: perm.chainId,
         accountAddress: accountAddress?.toLowerCase(),
-        sharedPropertyEnabled,
+        mmCompatible: metamaskMode,
       };
     } else {
       params = {
         chainId: perm?.chainId ?? (await loadInternalChainId()),
         accountAddress: null,
-        sharedPropertyEnabled,
+        mmCompatible: metamaskMode,
       };
     }
 
     pagePorter.notify(port, {
       jsonrpc: JSONRPC,
-      method: VIGVAM_STATE,
+      method: WIGWAM_STATE,
       params,
     });
   };
 }
 
-const faviconCache = new WeakMap<Runtime.Port, string>();
+const faviconCache = new Map<string, string>();
 
 async function handlePageRequest(
-  ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>
+  ctx: MessageContext<JsonRpcRequest, JsonRpcResponse>,
 ) {
   console.debug("New page request", ctx);
 
   const { id, jsonrpc, method, params } = ctx.data;
 
-  if (method === VIGVAM_FAVICON) {
+  if (method === WIGWAM_FAVICON) {
     if (Array.isArray(params) && typeof params[0] === "string") {
-      faviconCache.set(ctx.port, params[0]);
+      faviconCache.set(ctx.portId, params[0]);
     }
 
     return;
@@ -164,7 +181,7 @@ async function handlePageRequest(
   try {
     await ensureInited();
 
-    const senderUrl = ctx.port.sender?.url;
+    const senderUrl = ctx.port?.sender?.url;
     if (!senderUrl) {
       throw ethErrors.rpc.resourceNotFound();
     }
@@ -174,27 +191,12 @@ async function handlePageRequest(
       url: senderUrl,
       tabId: ctx.port.sender?.tab?.id,
       favIconUrl:
-        faviconCache.get(ctx.port) || ctx.port.sender?.tab?.favIconUrl,
+        faviconCache.get(ctx.portId) || ctx.port.sender?.tab?.favIconUrl,
     };
 
     const chainId = await loadInternalChainId();
 
-    handleRpc(source, chainId, method, (params as any[]) ?? [], (response) => {
-      if ("error" in response) {
-        // Send plain object, not an Error instance
-        // Also remove error stack
-        const { message, code, data } = response.error;
-        response = {
-          error: { message, code, data },
-        };
-      }
-
-      ctx.reply({
-        id,
-        jsonrpc,
-        ...response,
-      });
-    });
+    handleRpc(ctx, source, chainId, method, (params as any[]) ?? []);
   } catch (err) {
     console.error(err);
 
@@ -207,7 +209,7 @@ async function handlePageRequest(
 }
 
 async function resolveConnectionApproval(perm?: Permission) {
-  if (!(isUnlocked() && perm)) return;
+  if (!(isUnlocked() && perm && perm.accountAddresses.length > 0)) return;
 
   try {
     for (const approval of $approvals.getState()) {
@@ -219,7 +221,7 @@ async function resolveConnectionApproval(perm?: Permission) {
           ? perm.accountAddresses
           : [wrapPermission(perm)];
 
-        approval.rpcReply?.({ result });
+        approval.rpcCtx?.reply({ result });
         approvalResolved(approval.id);
       }
     }
@@ -228,39 +230,50 @@ async function resolveConnectionApproval(perm?: Permission) {
   }
 }
 
-const loadSharedPropertyEnabled = livePromise(
+const loadMetaMaskCompatibleMode = livePromise(
   () =>
     storage
-      .fetch<boolean>(Setting.Web3MetaMaskCompatible)
+      .fetch<MetaMaskCompatibleMode>(Setting.Web3MetaMaskCompatible)
       .catch(() => DEFAULT_WEB_METAMASK_COMPATIBLE),
   (callback) =>
-    storage.subscribe<boolean>(Setting.Web3MetaMaskCompatible, ({ newValue }) =>
-      callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE)
-    )
+    storage.subscribe<MetaMaskCompatibleMode>(
+      Setting.Web3MetaMaskCompatible,
+      ({ newValue }) => callback(newValue ?? DEFAULT_WEB_METAMASK_COMPATIBLE),
+    ),
 );
 
 const loadInternalChainId = livePromise(
   () => storage.fetch<number>(CHAIN_ID).catch(() => INITIAL_NETWORK.chainId),
-  subscribeInternalChainId
+  subscribeInternalChainId,
 );
 
 function subscribeInternalChainId(callback: (chainId: number) => void) {
   return storage.subscribe<number>(CHAIN_ID, ({ newValue }) =>
-    callback(newValue ?? INITIAL_NETWORK.chainId)
+    callback(newValue ?? INITIAL_NETWORK.chainId),
   );
 }
 
 const loadAccountAddress = livePromise(
   () => storage.fetch<string>(ACCOUNT_ADDRESS).catch(getDefaultAccountAddress),
-  subscribeAccountAddress
+  subscribeAccountAddress,
 );
 
 function subscribeAccountAddress(callback: (address: string) => void) {
   return storage.subscribe<string>(ACCOUNT_ADDRESS, ({ newValue }) =>
-    callback(newValue ?? getDefaultAccountAddress())
+    callback(newValue ?? getDefaultAccountAddress()),
   );
 }
 
 function getDefaultAccountAddress() {
   return $accountAddresses.getState()[0];
+}
+
+async function checkForPhishing(hostname: string, callback: () => void) {
+  const phishing = isPhishingWebsite(hostname);
+
+  // TODO: Add checker - is user already allowed this website
+
+  if (phishing) {
+    callback();
+  }
 }

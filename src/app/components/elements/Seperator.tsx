@@ -21,14 +21,14 @@ const Separator: FC<SeparatorProps> = ({
         ? classNames(
             "w-full h-px",
             "left-0 right-0",
-            position === "start" ? "top-0" : "bottom-0"
+            position === "start" ? "top-0" : "bottom-0",
           )
         : classNames(
             "w-px h-full",
             "top-0 bottom-0",
-            position === "start" ? "left-0" : "right-0"
+            position === "start" ? "left-0" : "right-0",
           ),
-      className
+      className,
     )}
   />
 );

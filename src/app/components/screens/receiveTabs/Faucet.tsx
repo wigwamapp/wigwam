@@ -1,19 +1,21 @@
 import { FC } from "react";
-import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
-import { currentAccountAtom } from "app/atoms";
-import { useLazyNetwork } from "app/hooks";
+import { useAccounts, useLazyNetwork } from "app/hooks";
 import AddressField from "app/components/elements/AddressField";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
 const Faucet: FC = () => {
-  const { address } = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
   const network = useLazyNetwork();
 
   return (
     <div className="flex flex-col max-w-[23.25rem]">
-      <AddressField value={address} label="Wallet address" readOnly />
+      <AddressField
+        value={currentAccount.address}
+        label="Wallet address"
+        readOnly
+      />
 
       <p className="mt-1 px-4 text-brand-font text-xs">
         Use this wallet address to receive funds on faucets.
@@ -40,7 +42,7 @@ const Faucet: FC = () => {
                   "rounded-lg",
                   "flex items-center py-2 px-4",
                   "text-base text-brand-light font-medium",
-                  "hover:underline"
+                  "hover:underline",
                 )}
               >
                 {new URL(faucetUrl).host}

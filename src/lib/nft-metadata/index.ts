@@ -1,6 +1,4 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { getAddress } from "@ethersproject/address";
-import { Contract } from "ethers";
+import { ethers } from "ethers";
 
 import { ERC721__factory } from "abi-types";
 
@@ -9,7 +7,7 @@ import {
   IPFS_IO_GATEWAY,
   SVG_IMAGE_MIME_TYPE,
 } from "./defaults";
-import { convertToDesiredGateway, serealizeTokenId1155 } from "./utils";
+import { sanitizeUrl, serealizeTokenId1155 } from "./utils";
 import {
   fetchMimeType,
   fetchURI,
@@ -18,8 +16,6 @@ import {
   getStaticURI,
   getURIData,
   createDataURI,
-  sanitizeCustomUrl,
-  isIPFS,
 } from "./uri";
 import { fetchOnChainData, normaliseURIData } from "./metadata";
 
@@ -55,8 +51,8 @@ export class NFTMetadataAgent {
 
   constructor(
     private chainId: number,
-    private provider: JsonRpcProvider,
-    opts: AgentOptions = {}
+    private provider: ethers.JsonRpcApiProvider,
+    opts: AgentOptions = {},
   ) {
     this.ipfsGatewayUrl = opts.ipfsGatewayUrl || IPFS_IO_GATEWAY;
     this.ipfsFallbackGatewayUrl =
@@ -75,7 +71,7 @@ export class NFTMetadataAgent {
       this.chainId,
       tokenAddress,
       tokenId,
-      this.provider
+      this.provider,
     );
 
     if (alternateMethod) {
@@ -85,7 +81,7 @@ export class NFTMetadataAgent {
     try {
       const erc721Contract = ERC721__factory.connect(
         tokenAddress,
-        this.provider
+        this.provider,
       );
       const uri = await erc721Contract.tokenURI(tokenId);
 
@@ -98,10 +94,10 @@ export class NFTMetadataAgent {
     }
 
     try {
-      const erc1155Contract = new Contract(
+      const erc1155Contract = new ethers.Contract(
         tokenAddress,
         ["function uri(uint256 index) public view returns (string memory)"],
-        this.provider
+        this.provider,
       );
 
       let uri = await erc1155Contract.uri(tokenId);
@@ -122,7 +118,7 @@ export class NFTMetadataAgent {
     tokenAddress: string,
     tokenId: string,
     tokenURI: string,
-    ipfsGateway: string
+    ipfsGateway: string,
   ) {
     const alternateMethod = getURIData(this.chainId, tokenAddress, tokenId);
 
@@ -134,7 +130,7 @@ export class NFTMetadataAgent {
       tokenURI,
       { timeout: this.timeout },
       ipfsGateway,
-      this.ipfsFallbackGatewayUrl
+      this.ipfsFallbackGatewayUrl,
     );
 
     if (!resp) {
@@ -149,13 +145,13 @@ export class NFTMetadataAgent {
     tokenId: string,
     tokenURI: string,
     uriData: any = {},
-    ipfsGateway: string
+    ipfsGateway: string,
   ) {
     const onChainData = await fetchOnChainData(
       this.chainId,
       tokenAddress,
       tokenId,
-      this.provider
+      this.provider,
     );
 
     const meta = normaliseURIData(this.chainId, tokenAddress, {
@@ -166,13 +162,8 @@ export class NFTMetadataAgent {
       }),
     });
 
-    const sanitizeUrl = (url: string) =>
-      isIPFS(url)
-        ? convertToDesiredGateway(url, ipfsGateway)
-        : sanitizeCustomUrl(url);
-
     if (meta.image) {
-      meta.imageURL = sanitizeUrl(meta.image);
+      meta.imageURL = sanitizeUrl(meta.image, ipfsGateway);
     }
 
     if (meta.image_data) {
@@ -181,7 +172,7 @@ export class NFTMetadataAgent {
     }
 
     if (meta.animation_url) {
-      meta.contentURL = sanitizeUrl(meta.animation_url);
+      meta.contentURL = sanitizeUrl(meta.animation_url, ipfsGateway);
     }
 
     if (!meta.contentURL && meta.imageURL) {
@@ -227,9 +218,9 @@ export class NFTMetadataAgent {
 
   public async fetchMetadata(
     rawAddress: string,
-    tokenId: string
+    tokenId: string,
   ): Promise<NftMetadata> {
-    const tokenAddress = getAddress(rawAddress);
+    const tokenAddress = ethers.getAddress(rawAddress);
     try {
       const uriFetchResult = await this.fetchTokenURI(tokenAddress, tokenId);
 
@@ -242,7 +233,7 @@ export class NFTMetadataAgent {
         tokenAddress,
         tokenId,
         tokenURI,
-        ipfsGateway
+        ipfsGateway,
       );
 
       const metadata = await this.parseURIData(
@@ -250,7 +241,7 @@ export class NFTMetadataAgent {
         tokenId,
         tokenURI,
         URIData,
-        ipfsGateway
+        ipfsGateway,
       );
 
       return {
@@ -265,7 +256,7 @@ export class NFTMetadataAgent {
       if (err instanceof ChainFetchError) {
         console.error(err);
         throw new Error(
-          `Failed to get tokenURI token: ${tokenAddress} is unsupported`
+          `Failed to get tokenURI token: ${tokenAddress} is unsupported`,
         );
       }
 

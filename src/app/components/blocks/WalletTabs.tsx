@@ -9,15 +9,15 @@ import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
 import { allAccountsAtom } from "app/atoms";
 import { TippySingletonProvider } from "app/hooks";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import HashPreview from "app/components/elements/HashPreview";
-import AutoIcon from "app/components/elements/AutoIcon";
 import SearchInput from "app/components/elements/SearchInput";
-import IconedButton from "app/components/elements/IconedButton";
+import Button from "app/components/elements/Button";
 import WalletName from "app/components/elements/WalletName";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 type WalletTabsProps = {
   selectedAccount: Account;
@@ -35,7 +35,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
 
   const fuse = useMemo(
     () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
+    [accounts],
   );
 
   const filteredAccounts = useMemo(() => {
@@ -48,10 +48,10 @@ const WalletTabs: FC<WalletTabsProps> = ({
   return (
     <div
       className={classNames(
-        "w-[23.25rem] min-w-[23.25rem] pr-6",
+        "w-[25.25rem] min-w-[25.25rem] pr-6",
         "border-r border-brand-main/[.07]",
         "flex flex-col",
-        className
+        className,
       )}
     >
       <div className="flex items-center">
@@ -59,30 +59,33 @@ const WalletTabs: FC<WalletTabsProps> = ({
           <SearchInput
             searchValue={searchValue}
             toggleSearchValue={setSearchValue}
+            placeholder="Type name or address..."
           />
-          <IconedButton
+
+          <Button
             to={{ addAccOpened: true }}
             merge
-            theme="tertiary"
-            className="ml-2"
-            Icon={AddWalletIcon}
-            aria-label="Add new wallet"
-          />
+            theme="secondary"
+            className="ml-2 !py-2 !px-4 !min-w-max !max-h-11 w-auto"
+          >
+            <AddWalletIcon className={classNames("h-6 w-auto mr-2")} />
+            Add wallet
+          </Button>
         </TippySingletonProvider>
       </div>
       {filteredAccounts.length > 0 ? (
         <ScrollAreaContainer
           hiddenScrollbar="horizontal"
           className="pr-5 -mr-5 mt-4"
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-5"
         >
           {filteredAccounts.map((acc, i) => (
             <WalletTab
               key={acc.address}
               active={acc.address === selectedAccount.address}
               className={classNames(
-                i !== filteredAccounts.length - 1 && "mb-2"
+                i !== filteredAccounts.length - 1 && "mb-2",
               )}
               account={acc}
               onClick={() => onAccountChange(acc)}
@@ -94,7 +97,7 @@ const WalletTabs: FC<WalletTabsProps> = ({
           className={classNames(
             "flex flex-col items-center",
             "h-full w-full py-9",
-            "text-sm text-brand-placeholder text-center"
+            "text-sm text-brand-placeholder text-center",
           )}
         >
           <NoResultsFoundIcon className="mb-4" />
@@ -135,20 +138,18 @@ const WalletTab: FC<WalletTabProps> = ({
         "transition-colors",
         active && "bg-brand-main/10",
         !active && "hover:bg-brand-main/5",
-        className
+        className,
       )}
       onClick={onClick}
       autoFocus={active}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-14 w-14 min-w-[3.5rem]",
           "mr-3",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
       <span
@@ -158,7 +159,7 @@ const WalletTab: FC<WalletTabProps> = ({
           "min-w-0",
           "transition-colors",
           "group-hover:text-brand-light",
-          "group-focus-visible:text-brand-light"
+          "group-focus-visible:text-brand-light",
         )}
       >
         <WalletName wallet={account} />
@@ -167,7 +168,7 @@ const WalletTab: FC<WalletTabProps> = ({
           className="text-sm text-brand-inactivedark font-normal -mt-px"
           withTooltip={false}
         />
-        <Balance address={address} className="mt-auto" />
+        <TotalWalletBalance address={address} className="mt-auto" />
       </span>
       <ChevronRightIcon
         className={classNames(
@@ -175,7 +176,7 @@ const WalletTab: FC<WalletTabProps> = ({
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           active && "translate-x-0 opacity-100",
-          !active && "-translate-x-1.5 opacity-0"
+          !active && "-translate-x-1.5 opacity-0",
         )}
       />
     </button>

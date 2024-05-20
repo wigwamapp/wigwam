@@ -10,6 +10,7 @@ import {
   MessageType,
   PorterChannel,
   WalletStatus,
+  WalletRpcMsgContext,
   SelfActivityKind,
   ACCOUNT_ADDRESS,
 } from "core/types";
@@ -35,8 +36,10 @@ import { processApprove } from "../approve";
 import {
   addFindTokenRequest,
   addSyncRequest,
-  getTPGasPrices,
+  estimateGasPrices,
   syncTokenActivities,
+  getOnRampCryptoCurrencies,
+  getTokenDetailsUrl,
 } from "../sync";
 
 export function startWalletServer() {
@@ -70,7 +73,7 @@ export function startWalletServer() {
           ? // New account added
             current[prev.length].address
           : // Account deleted
-            current[0].address
+            current[0].address,
       )
       .catch(console.error);
   });
@@ -93,7 +96,7 @@ export function startWalletServer() {
 const withQueue = createQueue();
 
 async function handleWalletRequest(
-  ctx: MessageContext<Request | EventMessage, Response>
+  ctx: MessageContext<Request | EventMessage, Response>,
 ) {
   console.debug("New wallet request", ctx);
 
@@ -116,7 +119,7 @@ async function handleWalletRequest(
                 const vault = await Vault.setup(
                   password,
                   accountsParams,
-                  seedPhrase
+                  seedPhrase,
                 );
 
                 const accounts = vault.getAccounts();
@@ -125,9 +128,9 @@ async function handleWalletRequest(
                 unlocked({ vault, accounts, hasSeedPhrase });
 
                 ctx.reply({ type });
-              }
-            )
-          )
+              },
+            ),
+          ),
       )
       .with({ type: MessageType.UnlockWallet }, ({ type, password }) =>
         withQueue(() =>
@@ -140,8 +143,8 @@ async function handleWalletRequest(
             unlocked({ vault, accounts, hasSeedPhrase });
 
             ctx.reply({ type });
-          })
-        )
+          }),
+        ),
       )
       .with({ type: MessageType.LockWallet }, ({ type }) => {
         locked();
@@ -156,15 +159,15 @@ async function handleWalletRequest(
               await vault.changePassword(currentPassword, nextPassword);
 
               ctx.reply({ type });
-            })
-          )
+            }),
+          ),
       )
       .with({ type: MessageType.GetAccounts }, ({ type }) =>
         withVault(async (vault) => {
           const accounts = vault.getAccounts();
 
           ctx.reply({ type, accounts });
-        })
+        }),
       )
       .with(
         { type: MessageType.AddAccounts },
@@ -181,8 +184,8 @@ async function handleWalletRequest(
               }
 
               ctx.reply({ type });
-            })
-          )
+            }),
+          ),
       )
       .with(
         { type: MessageType.DeleteAccounts },
@@ -195,8 +198,8 @@ async function handleWalletRequest(
               accountsUpdated(accounts);
 
               ctx.reply({ type });
-            })
-          )
+            }),
+          ),
       )
       .with(
         { type: MessageType.UpdateAccountName },
@@ -209,8 +212,8 @@ async function handleWalletRequest(
               accountsUpdated(accounts);
 
               ctx.reply({ type });
-            })
-          )
+            }),
+          ),
       )
       .with({ type: MessageType.GetSeedPhrase }, ({ type, password }) =>
         withQueue(() =>
@@ -218,8 +221,8 @@ async function handleWalletRequest(
             const seedPhrase = await vault.getSeedPhrase(password);
 
             ctx.reply({ type, seedPhrase });
-          })
-        )
+          }),
+        ),
       )
       .with(
         { type: MessageType.GetPrivateKey },
@@ -228,19 +231,19 @@ async function handleWalletRequest(
             withVault(async (vault) => {
               const privateKey = await vault.getPrivateKey(
                 password,
-                accountUuid
+                accountUuid,
               );
 
               ctx.reply({ type, privateKey });
-            })
-          )
+            }),
+          ),
       )
       .with({ type: MessageType.GetPublicKey }, ({ type, accountUuid }) =>
         withVault(async (vault) => {
           const publicKey = vault.getPublicKey(accountUuid);
 
           ctx.reply({ type, publicKey });
-        })
+        }),
       )
       .with(
         { type: MessageType.GetNeuterExtendedKey },
@@ -249,14 +252,14 @@ async function handleWalletRequest(
             const extendedKey = vault.getNeuterExtendedKey(derivationPath);
 
             ctx.reply({ type, extendedKey });
-          })
+          }),
       )
       .with({ type: MessageType.GetApprovals }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, () => {
           const approvals = $approvals.getState();
 
           ctx.reply({ type, approvals });
-        })
+        }),
       )
       .with({ type: MessageType.Approve }, ({ type, approvalId, result }) =>
         withQueue(() =>
@@ -264,20 +267,20 @@ async function handleWalletRequest(
             await processApprove(approvalId, result, vault);
 
             ctx.reply({ type });
-          })
-        )
+          }),
+        ),
       )
       .with({ type: MessageType.RejectAllApprovals }, () =>
         withStatus(WalletStatus.Unlocked, () => {
           approvalsRejected(null);
-        })
+        }),
       )
       .with(
         { type: MessageType.Sync },
         ({ chainId, accountAddress, tokenType }) =>
           withStatus(WalletStatus.Unlocked, () => {
             addSyncRequest(chainId, accountAddress, tokenType);
-          })
+          }),
       )
       .with(
         { type: MessageType.FindToken },
@@ -287,38 +290,63 @@ async function handleWalletRequest(
               chainId,
               accountAddress,
               tokenSlug,
-              refreshMetadata
+              refreshMetadata,
             );
-          })
+          }),
       )
       .with(
         { type: MessageType.SyncTokenActivities },
         ({ chainId, accountAddress, tokenSlug }) =>
           withStatus(WalletStatus.Unlocked, () => {
             syncTokenActivities(chainId, accountAddress, tokenSlug);
-          })
+          }),
       )
-      .with({ type: MessageType.GetTPGasPrices }, ({ type, chainId }) =>
+      .with({ type: MessageType.GetGasPrices }, ({ type, chainId }) =>
         withStatus(WalletStatus.Unlocked, async () => {
-          const gasPrices = await getTPGasPrices(chainId);
+          const gasPrices = await estimateGasPrices(chainId);
 
           ctx.reply({ type, gasPrices });
-        })
+        }),
+      )
+      .with({ type: MessageType.GetOnRampCurrencies }, ({ type }) =>
+        withStatus(WalletStatus.Unlocked, async () => {
+          const currencies = await getOnRampCryptoCurrencies().catch(
+            () => ({}),
+          );
+
+          ctx.reply({ type, currencies });
+        }),
+      )
+      .with(
+        { type: MessageType.GetTokenDetailsUrl },
+        ({ type, chainId, tokenSlug }) =>
+          withStatus(WalletStatus.Unlocked, async () => {
+            const detailsUrl = await getTokenDetailsUrl(
+              chainId,
+              tokenSlug,
+            ).catch(() => null);
+
+            ctx.reply({ type, detailsUrl });
+          }),
       )
       .with({ type: MessageType.GetSyncStatus }, ({ type }) =>
         withStatus(WalletStatus.Unlocked, () => {
           const status = $syncStatus.getState();
 
           ctx.reply({ type, status });
-        })
+        }),
       )
       .with(
         { type: MessageType.SendRpc },
-        ({ type, chainId, method, params }) => {
-          handleRpc(UNKNOWN_SELF_SOURCE, chainId, method, params, (response) =>
-            ctx.reply({ type, response })
+        ({ chainId, method, params, source }) => {
+          handleRpc(
+            ctx as WalletRpcMsgContext,
+            source ?? UNKNOWN_SELF_SOURCE,
+            chainId,
+            method,
+            params,
           );
-        }
+        },
       )
       .otherwise(() => {
         throw new Error("Not Found");

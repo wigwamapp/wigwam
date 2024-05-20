@@ -53,7 +53,7 @@ const NftCard = memo(
               "hover:bg-brand-main/10 hover:!opacity-100",
             isActive && "bg-brand-main/20",
             (disabled || rawBalance === "0") && "opacity-60",
-            invisible && "invisible"
+            invisible && "invisible",
           )}
         >
           <div className="relative w-full">
@@ -61,10 +61,10 @@ const NftCard = memo(
               src={thumbnailUrl}
               alt={title.label}
               delay={1_000}
-              setLoadingStatus={setLoadingStatus}
+              onLoadingStateChange={setLoadingStatus}
               className={classNames(
                 "w-full h-auto !rounded-md",
-                !loaded && "h-[6rem]"
+                !loaded && "aspect-square h-[6rem]",
               )}
               errorClassName="h-[6rem]"
             />
@@ -79,8 +79,8 @@ const NftCard = memo(
                   "absolute top-1 left-1",
                   "py-px px-2.5",
                   "rounded",
-                  "bg-[#35394D]",
-                  "border border-brand-main/20"
+                  "bg-[#35494D]",
+                  "border border-brand-main/20",
                 )}
               />
             )}
@@ -90,10 +90,10 @@ const NftCard = memo(
                 className={classNames(
                   "absolute top-1 right-1",
                   "w-5 h-5 min-w-[1.25rem]",
-                  "bg-[#35394D]",
+                  "bg-[#35494D]",
                   "rounded",
                   "flex items-center justify-center",
-                  !disabled && "border border-brand-main"
+                  !disabled && "border border-brand-main",
                 )}
                 checked={!disabled}
                 asChild
@@ -109,8 +109,8 @@ const NftCard = memo(
           {title.component}
         </button>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default NftCard;
@@ -122,16 +122,19 @@ const prepareName = (originId: string, originName?: string) => {
     component: (
       <h3
         className={classNames(
-          "line-clamp-2 break-words mt-2",
-          !name ? "text-brand-main" : ""
+          "line-clamp-2 break-words mt-2 max-w-full",
+          !name ? "text-brand-main" : "",
         )}
       >
         <span
           className={classNames(
             name &&
+              name.length > 25 &&
+              "inline-block max-w-full min-w-0 truncate",
+            name &&
               name.length > 13 &&
               !name.slice(0, 13).includes(" ") &&
-              "break-all"
+              "break-all",
           )}
         >
           {name}
@@ -141,7 +144,7 @@ const prepareName = (originId: string, originName?: string) => {
           <span
             className={classNames(
               "text-brand-main",
-              id.length > 11 ? "break-all" : "break-words"
+              id.length > 11 ? "break-all" : "break-words",
             )}
           >
             {id}

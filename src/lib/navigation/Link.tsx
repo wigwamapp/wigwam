@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   forwardRef,
+  MouseEventHandler,
 } from "react";
 import useForceUpdate from "use-force-update";
 import { dequal } from "dequal/lite";
@@ -24,7 +25,7 @@ export type LinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 const Link = forwardRef<HTMLAnchorElement, LinkProps>(
   (
     { to, replace, merge, children, target, disabled, onClick, ...rest },
-    ref
+    ref,
   ) => {
     const forceUpdate = useForceUpdate();
 
@@ -35,7 +36,7 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 
     const generateUrl = useCallback(
       () => toURL(toHash(to, merge)),
-      [to, merge]
+      [to, merge],
     );
 
     const prevGenerateUrl = usePrevious(generateUrl);
@@ -52,16 +53,16 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
               forceUpdate();
             })
           : undefined,
-      [merge, forceUpdate]
+      [merge, forceUpdate],
     );
 
     const url = urlRef.current;
     const navigate = useCallback(
       () => changeState(url, replace),
-      [url, replace]
+      [url, replace],
     );
 
-    const handleClick = useCallback(
+    const handleClick = useCallback<MouseEventHandler<HTMLAnchorElement>>(
       (evt) => {
         if (disabled) {
           evt.preventDefault();
@@ -87,7 +88,7 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
           navigate();
         }
       },
-      [onClick, target, disabled, navigate]
+      [onClick, target, disabled, navigate],
     );
 
     return (
@@ -102,7 +103,7 @@ const Link = forwardRef<HTMLAnchorElement, LinkProps>(
         {children}
       </a>
     );
-  }
+  },
 );
 
 export default Link;

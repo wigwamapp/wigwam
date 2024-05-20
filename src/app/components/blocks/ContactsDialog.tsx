@@ -19,11 +19,11 @@ import { useContactsDialog } from "app/hooks/contacts";
 import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import SecondaryModal from "app/components/elements/SecondaryModal";
-import AutoIcon from "app/components/elements/AutoIcon";
 import Input from "app/components/elements/Input";
 import AddressField from "app/components/elements/AddressField";
 import Button from "app/components/elements/Button";
 import { ReactComponent as AvatarPlaceholderIcon } from "app/icons/avatar-placeholder.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 type FormValues = {
   name: string;
@@ -36,10 +36,10 @@ const ContactsDialog: FC = () => {
   const { modalData, upsertContact } = useContactsDialog();
 
   const handleSubmit = useCallback(
-    async ({ name: newName, address: newAddress }) =>
+    async ({ name: newName, address: newAddress }: FormValues) =>
       withHumanDelay(async () => {
         if (modalData) {
-          newAddress = ethers.utils.getAddress(newAddress);
+          newAddress = ethers.getAddress(newAddress);
           const { name, address, addedAt, fromPage } = modalData;
           const isNew = !name || !address;
           try {
@@ -72,7 +72,7 @@ const ContactsDialog: FC = () => {
           }
         }
       }),
-    [modalData, upsertContact, updateToast, alert]
+    [modalData, upsertContact, updateToast, alert],
   );
 
   if (modalData === null) {
@@ -106,14 +106,12 @@ const ContactsDialog: FC = () => {
                 "mr-16",
                 "bg-black/20",
                 "rounded-[.625rem]",
-                "overflow-hidden"
+                "overflow-hidden",
               )}
             >
               {address || values.address ? (
-                <AutoIcon
+                <WalletAvatar
                   seed={values.address ?? address}
-                  source="dicebear"
-                  type="personas"
                   className="w-full h-full"
                 />
               ) : (
@@ -129,7 +127,7 @@ const ContactsDialog: FC = () => {
                 validate={composeValidators(
                   required,
                   minLength(3),
-                  maxLength(40)
+                  maxLength(40),
                 )}
               >
                 {({ input, meta }) => (

@@ -1,114 +1,71 @@
-import {
-  ChangeEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useAtomValue } from "jotai";
+import { memo, useCallback, useEffect, useState } from "react";
+import classNames from "clsx";
 import { ethers } from "ethers";
-import { wordlists } from "@ethersproject/wordlists";
+import * as bip39 from "@scure/bip39";
+import { wordlist as englishWordlist } from "@scure/bip39/wordlists/english";
 import { getRandomBytes, toProtectedString } from "lib/crypto-utils";
 
 import { SeedPharse } from "core/types";
-import { toWordlistLang, validateSeedPhrase } from "core/common";
-import { DEFAULT_LOCALES, FALLBACK_LOCALE } from "fixtures/locales";
+import { validateSeedPhrase } from "core/common";
 
 import { AddAccountStep } from "app/nav";
-import { currentLocaleAtom } from "app/atoms";
 import { useDialog } from "app/hooks/dialog";
 import { useSteps } from "app/hooks/steps";
-import Select from "app/components/elements/Select";
-import SelectLanguage from "app/components/blocks/SelectLanguage";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
-import SecretField from "app/components/blocks/SecretField";
+import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
+import { ReactComponent as BookmarkCheckIcon } from "app/icons/bookmark-check.svg";
+import { ReactComponent as PencilLineIcon } from "app/icons/pencil-line.svg";
+import { ReactComponent as AlertTriangleIcon } from "app/icons/alert-triangle.svg";
+import { ReactComponent as ShieldOffIcon } from "app/icons/shield-off.svg";
+import { ReactComponent as EyeOffIcon } from "app/icons/eye-off.svg";
 
-const { arrayify, hexDataSlice, keccak256, concat } = ethers.utils;
+const { toBeArray, dataSlice, keccak256, concat } = ethers;
 
-const SUPPORTED_LOCALES = DEFAULT_LOCALES.filter(
-  ({ code }) => toWordlistLang(code) in wordlists
-);
-
-const WORDS_COUNT = [12, 24];
+const WORDS_LIST = [12, 24];
 
 const CreateSeedPhrase = memo(() => {
-  const currentLocale = useAtomValue(currentLocaleAtom);
-  const { alert } = useDialog();
-  const [seedPhraseFiled, setSeedPhraseField] = useState("");
-
   const { stateRef, navigateToStep } = useSteps();
 
-  const defaultLocale = useMemo(
-    () =>
-      SUPPORTED_LOCALES.find(({ code }) => currentLocale === code) ??
-      FALLBACK_LOCALE,
-    [currentLocale]
-  );
+  const [wordsCount] = useState(WORDS_LIST[0]);
+  const [seedPhrase, setSeedPhrase] = useState<null | SeedPharse>();
 
-  const [locale, setLocale] = useState(defaultLocale);
-
-  const wordlistLocale = useMemo(
-    () => toWordlistLang(locale.code),
-    [locale.code]
-  );
-
-  const wordsCountList = useMemo(
-    () =>
-      WORDS_COUNT.map((count) => ({
-        key: count,
-        value: count.toString(),
-      })),
-    []
-  );
-
-  const [wordsCount, setWordsCount] = useState(wordsCountList[0]);
+  const { alert } = useDialog();
 
   const handleContinue = useCallback(async () => {
     try {
-      const inputSeedPhrase = seedPhraseFiled;
-
-      if (!inputSeedPhrase) {
+      if (!seedPhrase) {
         throw new Error("Not a valid secret phrase");
       }
-
-      const seedPhrase: SeedPharse = {
-        phrase: toProtectedString(inputSeedPhrase),
-        lang: wordlistLocale,
-      };
 
       validateSeedPhrase(seedPhrase);
 
       stateRef.current.seedPhrase = seedPhrase;
-      stateRef.current.seedPhraseLocale = wordlistLocale;
+      stateRef.current.seedPhraseWordsCount = wordsCount;
 
       navigateToStep(AddAccountStep.VerifySeedPhrase);
     } catch (err: any) {
-      alert(err?.message);
+      alert({ title: "Error", content: err?.message });
     }
-  }, [seedPhraseFiled, wordlistLocale, stateRef, navigateToStep, alert]);
+  }, [seedPhrase, wordsCount, stateRef, navigateToStep, alert]);
 
   const generateNew = useCallback(() => {
-    const entropySize = wordsCount.value === "12" ? 16 : 32;
+    const entropySize = wordsCount === 12 ? 16 : 32;
     const baseEntropy = getRandomBytes(entropySize);
     const extraEntropy = getRandomBytes(entropySize);
 
-    const entropy = arrayify(
-      hexDataSlice(
-        keccak256(concat([baseEntropy, extraEntropy])),
-        0,
-        entropySize
-      )
+    const entropy = toBeArray(
+      dataSlice(keccak256(concat([baseEntropy, extraEntropy])), 0, entropySize),
     );
 
-    const phrase = ethers.utils.entropyToMnemonic(
-      entropy,
-      wordlists[wordlistLocale]
-    );
+    const phraseText = bip39.entropyToMnemonic(entropy, englishWordlist);
+    const seedPhrase: SeedPharse = {
+      phrase: toProtectedString(phraseText),
+      lang: "en",
+    };
 
-    setSeedPhraseField(phrase);
-  }, [wordlistLocale, wordsCount]);
+    setSeedPhrase(seedPhrase);
+  }, [wordsCount]);
 
   useEffect(() => {
     setTimeout(generateNew, 0);
@@ -116,45 +73,49 @@ const CreateSeedPhrase = memo(() => {
 
   return (
     <>
-      <AddAccountHeader className="mb-8">
-        Create a new Secret Phrase
-      </AddAccountHeader>
-      <div className="flex flex-col max-w-[27.5rem] mx-auto">
-        <div className="flex">
-          <SelectLanguage
-            selected={locale}
-            items={SUPPORTED_LOCALES}
-            onSelect={setLocale}
-            className="mr-6"
-          />
-          <Select
-            currentItem={wordsCount}
-            setItem={setWordsCount}
-            items={wordsCountList}
-            label="Words"
-            showSelected
-            className="!min-w-[8.375rem]"
-            contentClassName="!min-w-[8.375rem]"
-          />
-        </div>
+      <AddAccountHeader className="mb-12">Secret Phrase</AddAccountHeader>
 
-        <SecretField
-          onRegenerate={generateNew}
-          isDownloadable
-          placeholder="Type there a secret phrase or generate new"
-          className="mt-8"
-          value={seedPhraseFiled}
-          onChange={(
-            evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-          ) => {
-            const { value } = evt.target;
-            setSeedPhraseField(value);
-          }}
-        />
+      <div
+        className={classNames("w-full mx-auto max-w-4xl", "flex items-stretch")}
+      >
+        <div className="w-5/12 px-8 select-none">
+          {CONTENT_ITEMS.map(({ Icon, text }, i) => (
+            <div key={i} className={classNames("mb-10 flex items-center")}>
+              <Icon className="w-8 h-auto mr-3 min-w-[2rem]" />
+              <p className="text-sm font-medium text-brand-light">{text}</p>
+            </div>
+          ))}
+        </div>
+        <div className="w-7/12 px-8">
+          {seedPhrase && <SeedPhraseWords seedPhrase={seedPhrase} />}
+        </div>
       </div>
-      <AddAccountContinueButton onContinue={handleContinue} />
+
+      <AddAccountContinueButton onContinue={handleContinue}>
+        <BookmarkCheckIcon className="h-6 w-auto mr-2" />
+        I’ve saved the phrase
+      </AddAccountContinueButton>
     </>
   );
 });
 
 export default CreateSeedPhrase;
+
+const CONTENT_ITEMS = [
+  {
+    Icon: PencilLineIcon,
+    text: "Write down and store your Secret phrase in the a safe place",
+  },
+  {
+    Icon: AlertTriangleIcon,
+    text: "Your Secret phrase is the only way to recover your wallet",
+  },
+  {
+    Icon: ShieldOffIcon,
+    text: "Anyone with your Secret phrase can get full access to your wallet and funds",
+  },
+  {
+    Icon: EyeOffIcon,
+    text: "Never share your Secret phrase with anyone. Your wallet's security depends on keeping this detail private",
+  },
+] as const;

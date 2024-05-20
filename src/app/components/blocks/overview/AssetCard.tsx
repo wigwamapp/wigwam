@@ -22,7 +22,7 @@ const AssetCard = memo(
   forwardRef<HTMLButtonElement, AssetCardProps>(
     (
       { asset, isActive = false, onAssetSelect, isManageMode, className },
-      ref
+      ref,
     ) => {
       const {
         name,
@@ -42,7 +42,7 @@ const AssetCard = memo(
           priceUSDChange && +priceUSDChange > 0
             ? "text-[#6BB77A]"
             : "text-[#EA556A]",
-        [priceUSDChange]
+        [priceUSDChange],
       );
 
       return (
@@ -62,10 +62,39 @@ const AssetCard = memo(
             isActive && "bg-brand-main/20",
             disabled && "opacity-60",
             "hover:opacity-100",
-            className
+            className,
           )}
           disabled={isManageMode && nativeAsset}
         >
+          {isManageMode ? (
+            <Checkbox.Root
+              className={classNames(
+                "w-5 h-5 min-w-[1.25rem] mr-5 my-auto",
+                "bg-[#373B45]",
+                "rounded",
+                "flex items-center justify-center",
+              )}
+              checked={!disabled}
+              disabled={nativeAsset}
+              asChild
+            >
+              <span>
+                <Checkbox.Indicator
+                  className={classNames(
+                    "bg-brand-redone rounded",
+                    "w-full h-full",
+                    "flex items-center justify-center",
+                    (disabled || nativeAsset) && "opacity-30",
+                  )}
+                >
+                  {!disabled && (
+                    <CheckIcon className="[&>*]:fill-black w-full h-full" />
+                  )}
+                </Checkbox.Indicator>
+              </span>
+            </Checkbox.Root>
+          ) : null}
+
           <AssetLogo
             asset={asset}
             alt={symbol}
@@ -76,7 +105,7 @@ const AssetCard = memo(
               <span
                 className={classNames(
                   "text-base font-bold leading-4 truncate mr-auto pb-1 -mb-1",
-                  isManageMode && "mr-14"
+                  isManageMode && "mr-14",
                 )}
               >
                 {name}
@@ -104,7 +133,7 @@ const AssetCard = memo(
                   hoverable && "group-hover:text-brand-light",
                   "transition-colors",
                   "truncate min-w-0",
-                  isManageMode && "mr-14"
+                  isManageMode && "mr-14",
                 )}
               />
               {!isManageMode && priceUSDChange && +priceUSDChange !== 0 && (
@@ -115,13 +144,13 @@ const AssetCard = memo(
                     "group-hover:opacity-100",
                     "transition",
                     "ml-2",
-                    priceClassName
+                    priceClassName,
                   )}
                 >
                   <PriceArrow
                     className={classNames(
                       "w-2 h-2 mr-[0.125rem]",
-                      +priceUSDChange < 0 && "transform rotate-180"
+                      +priceUSDChange < 0 && "transform rotate-180",
                     )}
                   />
 
@@ -130,7 +159,7 @@ const AssetCard = memo(
                   </span>
                 </span>
               )}
-              {isManageMode && !nativeAsset && (
+              {/* {isManageMode && !nativeAsset && (
                 <Checkbox.Root
                   className={classNames(
                     "absolute top-1/2 right-5 -translate-y-1/2",
@@ -138,7 +167,7 @@ const AssetCard = memo(
                     "bg-brand-main/20",
                     "rounded",
                     "flex items-center justify-center",
-                    !disabled && "border border-brand-main"
+                    !disabled && "border border-brand-main",
                   )}
                   checked={!disabled}
                   asChild
@@ -149,13 +178,13 @@ const AssetCard = memo(
                     </Checkbox.Indicator>
                   </span>
                 </Checkbox.Root>
-              )}
+              )} */}
             </span>
           </span>
         </button>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default AssetCard;

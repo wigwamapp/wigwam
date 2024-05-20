@@ -1,4 +1,5 @@
 import { FC, useMemo } from "react";
+import classNames from "clsx";
 import { useAtomValue } from "jotai";
 
 import { settingTabAtom } from "app/atoms";
@@ -10,7 +11,6 @@ import { ReactComponent as ProfileIcon } from "app/icons/setting-profile.svg";
 import { ReactComponent as SecurityIcon } from "app/icons/setting-security.svg";
 import { ReactComponent as WebIcon } from "app/icons/setting-web3.svg";
 import { ReactComponent as NetworkIcon } from "app/icons/setting-network.svg";
-import { ReactComponent as AdvancedIcon } from "app/icons/setting-advanced.svg";
 import { ReactComponent as AboutIcon } from "app/icons/setting-about.svg";
 
 import SettingsTab from "./Settings.Tab";
@@ -21,18 +21,24 @@ const Settings: FC = () => {
   const activeRoute = useMemo(
     () =>
       tabsContent.find(({ route }) => route.setting === activeTabRoute)?.route,
-    [activeTabRoute]
+    [activeTabRoute],
   );
 
   return (
-    <div className="flex min-h-0 grow">
+    <div
+      className={classNames(
+        "px-6 -mx-6 min-h-0",
+        "flex grow",
+        "overflow-x-auto scrollbar-hide",
+      )}
+    >
       <SecondaryTabs tabs={tabsContent} activeRoute={activeRoute} />
 
       {activeTabRoute !== SettingTabEnum.Networks ? (
         <ScrollAreaContainer
           className="box-content w-full pr-6"
-          viewPortClassName="pb-20 pt-5 pl-6"
-          scrollBarClassName="py-0 pt-5 pb-20"
+          viewPortClassName="pb-5 pt-5 pl-6"
+          scrollBarClassName="py-0 pt-5 pb-5"
         >
           <SettingsTab />
         </ScrollAreaContainer>
@@ -77,15 +83,9 @@ const tabsContent = [
     desc: "Add a new network or configure the settings of an existing one.",
   },
   {
-    route: { page: "settings", setting: SettingTabEnum.Advanced },
-    Icon: AdvancedIcon,
-    title: "Advanced",
-    desc: "Enable test networks and other additional features.",
-  },
-  {
     route: { page: "settings", setting: SettingTabEnum.About },
     Icon: AboutIcon,
     title: "About",
-    desc: "Check current Vigvam version. Find us elsewhere.",
+    desc: "Check current Wigwam version. Find us elsewhere.",
   },
 ];

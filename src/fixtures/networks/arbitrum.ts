@@ -6,9 +6,12 @@ export const ARBITRUM: Network[] = [
     chainId: 42161,
     type: "mainnet",
     rpcUrls: [
-      "https://arb1.arbitrum.io/rpc",
-      "https://rpc.ankr.com/arbitrum",
       "https://arbitrum-mainnet.infura.io/v3/${INFURA_API_KEY}",
+      "https://arbitrum.llamarpc.com",
+      "https://arb1.arbitrum.io/rpc",
+      "https://1rpc.io/arb",
+      "https://arbitrum.meowrpc.com",
+      "https://endpoints.omniatech.io/v1/arbitrum/one/public",
     ],
     chainTag: "arbitrum",
     name: "Arbitrum One",
@@ -20,29 +23,11 @@ export const ARBITRUM: Network[] = [
     explorerUrls: ["https://arbiscan.io", "https://explorer.arbitrum.io"],
     explorerApiUrl: "https://api.arbiscan.io/api",
     faucetUrls: [],
-    bridgesUrls: ["https://bridge.arbitrum.io"],
-    infoUrl: "https://arbitrum.io",
-  },
-
-  // Testnets
-  {
-    chainId: 421611,
-    type: "testnet",
-    rpcUrls: ["https://rinkeby.arbitrum.io/rpc"],
-    chainTag: "arbitrum",
-    name: "Rinkeby Arbitrum Testnet",
-    nativeCurrency: {
-      symbol: "ARETH",
-      name: "Arbitrum Rinkeby Ether",
-      decimals: 18,
+    parent: {
+      type: "L2",
+      chain: "eip155-1",
+      bridges: [{ url: "https://bridge.arbitrum.io" }],
     },
-    explorerUrls: [
-      "https://testnet.arbiscan.io",
-      "https://rinkeby-explorer.arbitrum.io",
-    ],
-    explorerApiUrl: "https://api-testnet.arbiscan.io/api",
-    faucetUrls: ["https://fauceth.komputing.org/?chain=421611"],
-    bridgesUrls: ["https://bridge.arbitrum.io"],
     infoUrl: "https://arbitrum.io",
   },
 ];

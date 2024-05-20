@@ -1,44 +1,54 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
-import { createWorker } from "lib/web-worker";
 
 import { RpcResponse } from "core/types";
 import { getRpcUrl } from "core/common/network";
 
-import type * as Provider from "./provider";
-
-const { perform } = createWorker<typeof Provider>(
-  () => new Worker(new URL("./worker", import.meta.url))
-);
+import * as Provider from "./provider";
 
 export async function sendRpc(
   chainId: number,
   method: string,
-  params: any[]
+  params: any[],
 ): Promise<RpcResponse> {
   const rpcUrl = await getRpcUrl(chainId);
 
-  return perform((worker) => worker.sendRpc(chainId, rpcUrl, method, params));
+  return Provider.sendRpc(chainId, rpcUrl, method, params);
 }
 
 export const getRpcProvider = memoize(
-  (chainId: number) => new RpcProvider(chainId)
+  (chainId: number) => new RpcProvider(chainId),
 );
 
-export class RpcProvider extends JsonRpcProvider {
-  constructor(chainId: number) {
-    super("", chainId);
+export class RpcProvider extends ethers.JsonRpcApiProvider {
+  constructor(public chainId: number) {
+    super(chainId, { staticNetwork: ethers.Network.from(chainId) });
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));
 
-  getSigner = memoize(super.getSigner.bind(this));
-
   async send(method: string, params: Array<any>): Promise<any> {
-    const res = await sendRpc(this.network.chainId, method, params);
+    const res = await sendRpc(this.chainId, method, params);
 
     return getResult(res);
+  }
+
+  async _send(
+    payload: ethers.JsonRpcPayload | Array<ethers.JsonRpcPayload>,
+  ): Promise<Array<ethers.JsonRpcResult>> {
+    const payloadArr = Array.isArray(payload) ? payload : [payload];
+
+    const responses = await Promise.all(
+      payloadArr.map(async ({ jsonrpc, id, method, params }) => {
+        // TODO: Check JSONRPC params types
+        const res = await sendRpc(this.chainId, method, params as any);
+
+        return { jsonrpc, id, ...res };
+      }),
+    );
+
+    return responses as any;
   }
 }
 

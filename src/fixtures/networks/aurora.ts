@@ -19,22 +19,4 @@ export const AURORA: Network[] = [
     faucetUrls: [],
     infoUrl: "https://aurora.dev",
   },
-
-  // Testnets
-  {
-    chainId: 1313161555,
-    type: "testnet",
-    rpcUrls: ["https://testnet.aurora.dev"],
-    chainTag: "aurora",
-    name: "Aurora Testnet",
-    nativeCurrency: {
-      name: "Ether Test",
-      symbol: "TETH",
-      decimals: 18,
-    },
-    explorerUrls: ["https://testnet.aurorascan.dev"],
-    explorerApiUrl: "https://api-testnet.aurorascan.dev/api",
-    faucetUrls: ["https://aurora.dev/faucet"],
-    infoUrl: "https://aurora.dev",
-  },
 ];

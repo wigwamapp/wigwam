@@ -8,6 +8,7 @@ import {
   useEffect,
   useRef,
   useState,
+  FocusEventHandler,
 } from "react";
 import classNames from "clsx";
 import { CSSTransition } from "react-transition-group";
@@ -24,7 +25,7 @@ export type InputProps = {
   theme?: "primary" | "clean";
   optional?: boolean;
   error?: boolean;
-  errorMessage?: string;
+  errorMessage?: ReactNode;
   success?: boolean;
   successWithIcon?: boolean;
   labelActions?: ReactNode;
@@ -66,7 +67,7 @@ const Input = memo(
         autoComplete = "off",
         ...rest
       },
-      ref
+      ref,
     ) => {
       const [focused, setFocused] = useState<boolean>(false);
 
@@ -75,27 +76,28 @@ const Input = memo(
         "absolute top-1/2 -translate-y-1/2",
         "pointer-events-none",
         "transition-colors",
-        focused && "fill-current text-brand-light",
+        "fill-[#7A7E7B]",
+        focused && "fill-current [&>*]:fill-current text-brand-light",
         disabled &&
           theme !== "clean" &&
           "fill-current text-brand-disabledcolor",
-        adornmentClassName
+        adornmentClassName,
       );
 
-      const handleFocus = useCallback(
+      const handleFocus = useCallback<FocusEventHandler<HTMLInputElement>>(
         (evt) => {
           setFocused(true);
           onFocus?.(evt);
         },
-        [onFocus]
+        [onFocus],
       );
 
-      const handleBlur = useCallback(
+      const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
         (evt) => {
           setFocused(false);
           onBlur?.(evt);
         },
-        [onBlur]
+        [onBlur],
       );
 
       const successIconRef = useRef(null);
@@ -106,7 +108,7 @@ const Input = memo(
         if (successWithIcon) {
           const timeout = setTimeout(
             () => setIsHiddenWithSuccess(Boolean(success)),
-            500
+            500,
           );
           return () => clearTimeout(timeout);
         }
@@ -144,7 +146,7 @@ const Input = memo(
               )}
             </div>
           )}
-          <div className="group relative">
+          <div className="group relative h-full">
             {!!StartAdornment && (
               <StartAdornment
                 className={classNames(adornmentClassNames, "left-4")}
@@ -166,7 +168,7 @@ const Input = memo(
                 "border",
                 (theme === "primary" ||
                   (theme === "clean" && error && !readOnly)) &&
-                  "bg-black/20 border-brand-main/10",
+                  "bg-black/10 border-brand-main/10",
                 theme === "clean" &&
                   !(error && !readOnly) &&
                   "bg-transparent border-transparent",
@@ -188,7 +190,7 @@ const Input = memo(
                   ],
                 error && !readOnly && "!border-brand-redobject",
                 success && "!border-brand-greenobject",
-                inputClassName
+                inputClassName,
               )}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -206,7 +208,7 @@ const Input = memo(
               <span
                 className={classNames(
                   "absolute top-1/2 -translate-y-1/2 right-3",
-                  actionsClassName
+                  actionsClassName,
                 )}
               >
                 {actions}
@@ -223,10 +225,10 @@ const Input = memo(
                   ref={successIconRef}
                   className={classNames(
                     "absolute inset-px",
-                    "bg-[#0a0a19]",
+                    "bg-[#0E1314]",
                     "rounded-[.625rem]",
                     "flex items-center justify-center",
-                    "opacity-0"
+                    "opacity-0",
                   )}
                 >
                   <SuccessIcon />
@@ -238,7 +240,7 @@ const Input = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && !readOnly && "max-h-5"
+              error && errorMessage && !readOnly && "h-full max-h-5",
             )}
           >
             <span className="block text-brand-redtext pt-1 pl-4 text-xs">
@@ -247,8 +249,8 @@ const Input = memo(
           </div>
         </div>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default Input;

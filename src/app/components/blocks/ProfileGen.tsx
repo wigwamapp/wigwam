@@ -39,11 +39,11 @@ const ProfileGen: FC<ProfileGenProps> = ({
   }, []);
 
   const handleAdd = useCallback(
-    async ({ profileName }) =>
+    async ({ profileName }: FormValues) =>
       withHumanDelay(async () => {
         await onSubmit(profileName, profileSeed);
       }),
-    [onSubmit, profileSeed]
+    [onSubmit, profileSeed],
   );
 
   return (
@@ -95,7 +95,7 @@ const ProfileGen: FC<ProfileGenProps> = ({
                   type="submit"
                   className={classNames(
                     "mt-5",
-                    editMode ? "!py-2" : "w-full flex items-center"
+                    editMode ? "!py-2" : "w-full flex items-center",
                   )}
                   loading={submitting}
                 >

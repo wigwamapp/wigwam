@@ -1,24 +1,25 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { ReactComponent as GithubIcon } from "app/icons/github.svg";
 import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
 import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as MediumIcon } from "app/icons/medium.svg";
+import { ReactComponent as DiscordIcon } from "app/icons/discord.svg";
 
 import Separator from "app/components/elements/Seperator";
-import { ReactComponent as VigvamLogo } from "app/icons/Vigvam.svg";
+import { ReactComponent as WigwamLogo } from "app/icons/Wigwam.svg";
 
 const About: FC = () => {
   return (
     <div className="flex flex-col items-start pt-3">
       <div className="flex items-center">
-        <VigvamLogo className="w-[3.25rem] h-auto" />
-        <span className="text-2xl font-black ml-4">Vigvam</span>
+        <WigwamLogo className="w-[3.25rem] h-auto" />
+        <span className="text-2xl font-black ml-4">Wigwam</span>
       </div>
 
       <p className="text-brand-font text-sm mt-6 mb-8 max-w-[20rem]">
-        Vigvam lets you explore DeFi and NFTs in a safer, faster and more modern
+        Wigwam lets you explore DeFi and NFTs in a safer, faster and more modern
         way.
       </p>
 
@@ -42,7 +43,7 @@ const About: FC = () => {
               className={classNames(
                 "p-1",
                 "flex justify-center items-center",
-                "group"
+                "group",
               )}
               aria-label={label}
             >
@@ -51,7 +52,7 @@ const About: FC = () => {
                   "w-8 h-8",
                   "fill-brand-inactivelight group-hover:fill-brand-light",
                   "group-focus-visible:fill-brand-light",
-                  "transition-colors ease-in-out"
+                  "transition-colors ease-in-out",
                 )}
               />
             </a>
@@ -64,7 +65,7 @@ const About: FC = () => {
 
 export default About;
 
-const AboutHeader: FC = ({ children }) => (
+const AboutHeader: FC<PropsWithChildren> = ({ children }) => (
   <h3 className="font-bold leading-none text-base mb-3">{children}</h3>
 );
 
@@ -104,7 +105,7 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
       "text-sm",
       "transition-colors ease-in-out",
       "text-brand-inactivelight hover:text-brand-light focus-visible:text-brand-light",
-      className
+      className,
     )}
   >
     {label}
@@ -114,45 +115,50 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
 const usefulLinks = [
   {
     label: "Website",
-    href: "https://vigvam.app/",
+    href: "https://wigwam.app/",
   },
   {
     label: "Contact us",
-    href: "https://vigvam.app/contact",
+    href: "https://wigwam.app/contact",
   },
   {
     label: "Help",
-    href: "https://vigvam.app/help",
+    href: "https://wigwam.app/help",
   },
   {
     label: "Terms of Use",
-    href: "https://vigvam.app/terms",
+    href: "https://wigwam.app/terms",
   },
   {
     label: "Privacy policy",
-    href: "https://vigvam.app/privacy",
+    href: "https://wigwam.app/privacy",
   },
 ];
 
 const mediaLinks = [
   {
-    href: "https://t.me/vigvamapp",
+    href: "https://t.me/wigwamapp",
     label: "Telegram",
     Icon: TelegramIcon,
   },
   {
-    href: "https://twitter.com/vigvamapp",
+    href: "https://twitter.com/wigwam_app",
     label: "Twitter",
     Icon: TwitterIcon,
   },
   {
-    href: "https://vigvamapp.medium.com",
+    href: "https://wigwamapp.medium.com",
     label: "Medium",
     Icon: MediumIcon,
   },
   {
-    href: "https://github.com/vigvamapp",
+    href: "https://github.com/wigwamapp",
     label: "Github",
     Icon: GithubIcon,
+  },
+  {
+    href: "https://discord.gg/MAG2fnSqSK",
+    label: "Discord",
+    Icon: DiscordIcon,
   },
 ];

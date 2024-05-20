@@ -22,11 +22,11 @@ const SecondaryTabs: FC<SecondaryTabsProps> = ({
     className={classNames(
       "relative",
       "flex flex-col",
-      "w-[calc(19.25rem+1px)] min-w-[calc(19.25rem+1px)] pr-6",
-      className
+      "w-[calc(21.25rem+1px)] min-w-[calc(21.25rem+1px)] pr-6",
+      className,
     )}
-    viewPortClassName="pb-20 rounded-t-[.625rem] pt-5"
-    scrollBarClassName="py-0 pt-5 pb-20 !right-1"
+    viewPortClassName="pb-5 rounded-t-[.625rem] pt-5"
+    scrollBarClassName="py-0 pt-5 pb-5 !right-1"
   >
     {tabs.map(({ title, Icon, route, desc, soon }, i) => (
       <SecondaryItem
@@ -61,6 +61,7 @@ const SecondaryItem: FC<
     <Link
       key={title}
       to={route}
+      onClick={(e) => isActive && e.preventDefault()}
       className={classNames(
         "relative group",
         "flex flex-col",
@@ -70,7 +71,7 @@ const SecondaryItem: FC<
         "group",
         isActive && "bg-brand-main/10",
         !isActive && "hover:bg-brand-main/5",
-        className
+        className,
       )}
     >
       <div className="flex items-center">
@@ -78,7 +79,7 @@ const SecondaryItem: FC<
         <h3 className={"text-base font-bold"}>{title}</h3>
         {soon && <SoonTag />}
       </div>
-      {desc && <p className="text-xs text-[#BCC2DB] mt-1">{desc}</p>}
+      {desc && <p className="text-sm text-[#BCC3C4] mt-1">{desc}</p>}
       <ChevronRightIcon
         className={classNames(
           "w-6 h-auto",
@@ -86,7 +87,7 @@ const SecondaryItem: FC<
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           !isActive && "-translate-x-1.5 opacity-0",
-          isActive && "translate-x-0 opacity-100"
+          isActive && "translate-x-0 opacity-100",
         )}
       />
     </Link>

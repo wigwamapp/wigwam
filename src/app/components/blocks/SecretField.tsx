@@ -1,6 +1,6 @@
 import { forwardRef, RefObject, useEffect, useState } from "react";
 import classNames from "clsx";
-import { ethers } from "ethers";
+import { encodeBase58 } from "ethers";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
@@ -67,9 +67,7 @@ type CreateSecretFieldProps = SecretFieldBaseProps &
 
 const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
   ({ label = "Secret phrase", isDownloadable, onRegenerate, ...rest }, ref) => {
-    const { copy, copied } = useCopyToClipboard(
-      rest.value ?? rest.defaultValue
-    );
+    const { copy, copied } = useCopyToClipboard();
     const [isShown, setIsShown] = useState(false);
 
     const { confirm } = useDialog();
@@ -92,7 +90,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         Download this Secret Phrase and keep it stored safely on an external encrypted hard drive or storage medium.`,
         }).then((answer) => {
           if (answer) {
-            const name = ethers.utils.base58.encode(getRandomBytes(10));
+            const name = encodeBase58(getRandomBytes(10));
             downloadFile(value, name, "text/richtext");
           }
         });
@@ -136,7 +134,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         onClick={(evt: any) => {
           evt.preventDefault();
           evt.stopPropagation();
-          copy();
+          copy(rest.value ?? rest.defaultValue);
         }}
         className={classNames(
           "absolute",
@@ -146,7 +144,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "items-center",
           isShown
             ? "bottom-3 right-3"
-            : "bottom-[calc(.75rem-1px)] right-[calc(.75rem-1px)]"
+            : "bottom-[calc(.75rem-1px)] right-[calc(.75rem-1px)]",
         )}
       >
         {copied ? (
@@ -166,10 +164,11 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
           "absolute z-10",
           "inset-0 box-border",
           "rounded-[.5625rem]",
-          "bg-[#1e2031] border border-brand-main/10",
+          "bg-[#1E2C31] bg-opacity-75",
+          "border border-brand-main/10",
           "flex flex-col items-center justify-center",
           "transition-opacity",
-          isShown ? "opacity-0 pointer-events-none" : "cursor-pointer"
+          isShown ? "opacity-0 pointer-events-none" : "cursor-pointer",
         )}
         onClick={isShown ? undefined : () => setIsShown(true)}
         onKeyDown={isShown ? undefined : () => setIsShown(true)}
@@ -194,7 +193,7 @@ const CreateSecretField = forwardRef<HTMLCanvasElement, CreateSecretFieldProps>(
         value={isShown ? (rest.value as string) : ""}
       />
     );
-  }
+  },
 );
 
 type ImportSecretFieldProps = SecretFieldBaseProps &
@@ -237,7 +236,7 @@ const ImportSecretField = forwardRef<
         "text-sm text-brand-light",
         "!p-0 !pr-1 !min-w-0",
         "!font-normal",
-        "items-center"
+        "items-center",
       )}
     >
       {pasted ? (

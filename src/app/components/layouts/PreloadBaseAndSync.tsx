@@ -1,22 +1,34 @@
-import { FC } from "react";
+import { FC, PropsWithChildren, useEffect } from "react";
 import { useAtomValue } from "jotai";
-import { waitForAll, loadable } from "jotai/utils";
+import { loadable } from "jotai/utils";
+import { useAtomsAll } from "lib/atom-utils";
+import { isPopup } from "lib/ext/view";
+
+import { TEvent, trackEvent } from "core/client";
+import { getNetwork } from "core/common";
 
 import {
+  accountAddressAtom,
+  allAccountsAtom,
   chainIdAtom,
-  currentAccountAtom,
   getNetworkAtom,
   tokenTypeAtom,
+  allNetworksAtom,
 } from "app/atoms";
-import { ChainIdProvider, useSync, useToken } from "app/hooks";
+import { ChainIdProvider, useAccounts, useSync, useToken } from "app/hooks";
 
-const PreloadBaseAndSync: FC<{ chainId?: number }> = ({
+const PreloadBaseAndSync: FC<PropsWithChildren<{ chainId?: number }>> = ({
   chainId: overriddenChainId,
   children,
 }) => {
-  const [internalChainId, currentAccount, tokenType] = useAtomValue(
-    waitForAll([chainIdAtom, currentAccountAtom, tokenTypeAtom])
-  );
+  const [internalChainId, tokenType] = useAtomsAll([
+    chainIdAtom,
+    tokenTypeAtom,
+    allAccountsAtom,
+    accountAddressAtom,
+    allNetworksAtom,
+  ]);
+  const { currentAccount } = useAccounts();
 
   const chainId = overriddenChainId ?? internalChainId;
 
@@ -24,6 +36,23 @@ const PreloadBaseAndSync: FC<{ chainId?: number }> = ({
   useToken(currentAccount.address);
 
   useSync(chainId, currentAccount.address, tokenType);
+
+  useEffect(() => {
+    const latestChainId = localStorage.getItem("latestChainId");
+    if (!latestChainId || latestChainId !== chainId.toString()) {
+      localStorage.setItem("latestChainId", chainId.toString());
+
+      getNetwork(chainId)
+        .then((net) => {
+          trackEvent(TEvent.NetworkChange, {
+            name: net.name,
+            chainId,
+            page: isPopup() ? "popup" : "dashboard",
+          });
+        })
+        .catch(console.error);
+    }
+  }, [chainId]);
 
   return overriddenChainId ? (
     <ChainIdProvider chainId={overriddenChainId}>{children}</ChainIdProvider>

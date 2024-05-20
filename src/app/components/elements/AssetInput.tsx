@@ -16,20 +16,20 @@ const AssetInput = forwardRef<HTMLInputElement, AssetInputProps>(
               paddingRight: `${(currency.length * 10 + 12 + 16) / 16}rem`,
             }
           : undefined,
-      [currency]
+      [currency],
     );
 
     return (
       <NumberInput
         ref={ref}
-        decimalScale={assetDecimals}
+        decimalScale={Number(assetDecimals)}
         style={{ ...assetInputStyle, ...style }}
         actions={currency}
         actionsClassName="text-sm font-bold pointer-events-none !right-4"
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default AssetInput;

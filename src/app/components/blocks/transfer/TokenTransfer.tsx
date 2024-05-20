@@ -12,6 +12,7 @@ import BigNumber from "bignumber.js";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { Field, Form } from "react-final-form";
+import type { FormApi } from "final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC1155__factory, ERC20__factory, ERC721__factory } from "abi-types";
@@ -20,7 +21,6 @@ import { useIsMounted } from "lib/react-hooks/useIsMounted";
 import { useSafeState } from "lib/react-hooks/useSafeState";
 import { Link, navigate, Redirect } from "lib/navigation";
 
-import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import {
   AccountAsset,
   AccountSource,
@@ -29,6 +29,8 @@ import {
   TokenType,
 } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
+import { requestBalance } from "core/common/balance";
+import { estimateL1Fee } from "core/common/l1Fee";
 import { suggestFees, TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
@@ -40,8 +42,9 @@ import {
   withHumanDelay,
   OnChange,
 } from "app/utils";
-import { currentAccountAtom, tokenSlugAtom, tokenTypeAtom } from "app/atoms";
+import { tokenSlugAtom, tokenTypeAtom } from "app/atoms";
 import {
+  useAccounts,
   useChainId,
   useExplorerLink,
   useLazyNetwork,
@@ -53,8 +56,6 @@ import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import TokenSelect from "app/components/elements/TokenSelect";
 import Button from "app/components/elements/Button";
-// import TooltipIcon from "app/components/elements/TooltipIcon";
-// import Tooltip from "app/components/elements/Tooltip";
 import AssetInput from "app/components/elements/AssetInput";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
@@ -65,7 +66,11 @@ import { ReactComponent as WarningIcon } from "app/icons/circle-warning.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
 const TransferToken: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
+  const chainId = useChainId();
+  const { currentAccount } = useAccounts();
+
   const tokenSlug = useAtomValue(tokenSlugAtom) ?? NATIVE_TOKEN_SLUG;
+  const setTokenSlug = useSetAtom(tokenSlugAtom);
   let token = useAccountToken(tokenSlug);
 
   if (tokenType === TokenType.NFT && token?.tokenSlug === NATIVE_TOKEN_SLUG) {
@@ -74,8 +79,25 @@ const TransferToken: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
 
   const validTokenType = !token || token.tokenType === tokenType;
 
+  const contentKey = useMemo(
+    () => `${currentAccount.address}-${chainId}`,
+    [currentAccount.address, chainId],
+  );
+
+  const initialRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
+
+    setTokenSlug([RESET, "replace"]);
+  }, [setTokenSlug, contentKey]);
+
   return validTokenType ? (
     <TransferTokenContent
+      key={contentKey}
       tokenType={tokenType}
       tokenSlug={tokenSlug}
       token={token}
@@ -103,23 +125,25 @@ type TransferTokenContent = {
 
 const TransferTokenContent = memo<TransferTokenContent>(
   ({ tokenType, tokenSlug, token }) => {
-    const currentAccount = useAtomValue(currentAccountAtom);
+    const { currentAccount } = useAccounts();
     const chainId = useChainId();
     const currentNetwork = useLazyNetwork();
     const explorerLink = useExplorerLink(currentNetwork);
     const setTokenType = useSetAtom(tokenTypeAtom);
-    const setTokenSlug = useSetAtom(tokenSlugAtom);
     const { alert, closeCurrentDialog } = useDialog();
     const { updateToast } = useToast();
     const isMounted = useIsMounted();
 
     const provider = useProvider();
-    const signerProvider = provider.getUncheckedSigner(currentAccount.address);
+    const signerProvider = provider.getVoidSigner(currentAccount.address);
 
     useSync(chainId, currentAccount.address, tokenType);
 
     const handleSubmit = useCallback(
-      async ({ recipient, amount }, form) =>
+      async (
+        { recipient, amount }: FormValues,
+        form: FormApi<FormValues, Partial<FormValues>>,
+      ) =>
         withHumanDelay(async () => {
           if (!token) {
             return;
@@ -147,41 +171,52 @@ const TransferTokenContent = memo<TransferTokenContent>(
             });
           }
 
+          const {
+            standard,
+            address: tokenAddress,
+            id: tokenId,
+          } = parseTokenSlug(token.tokenSlug);
+
           try {
-            let txParams;
+            let txParams: ethers.TransactionRequest;
 
             if (token.tokenSlug === NATIVE_TOKEN_SLUG) {
               txParams = await provider.populateTransaction({
                 to: recipient,
-                value: ethers.utils.parseEther(amount),
+                value: ethers.parseEther(amount),
               });
             } else {
-              if ("decimals" in token && token.decimals > 0) {
-                amount = ethers.utils.parseUnits(amount, token.decimals);
-              }
-
-              const { standard, address, id } = parseTokenSlug(token.tokenSlug);
+              const rawAmount =
+                "decimals" in token && token.decimals > 0
+                  ? ethers.parseUnits(amount, token.decimals)
+                  : amount;
 
               switch (standard) {
                 case TokenStandard.ERC20:
                   {
-                    const contract = ERC20__factory.connect(address, provider);
+                    const contract = ERC20__factory.connect(
+                      tokenAddress,
+                      provider,
+                    );
 
-                    txParams = await contract.populateTransaction.transfer(
+                    txParams = await contract.transfer.populateTransaction(
                       recipient,
-                      amount
+                      rawAmount,
                     );
                   }
                   break;
 
                 case TokenStandard.ERC721:
                   {
-                    const contract = ERC721__factory.connect(address, provider);
+                    const contract = ERC721__factory.connect(
+                      tokenAddress,
+                      provider,
+                    );
 
-                    txParams = await contract.populateTransaction.transferFrom(
+                    txParams = await contract.transferFrom.populateTransaction(
                       currentAccount.address,
                       recipient,
-                      id
+                      tokenId,
                     );
                   }
                   break;
@@ -189,43 +224,56 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 case TokenStandard.ERC1155:
                   {
                     const contract = ERC1155__factory.connect(
-                      address,
-                      provider
+                      tokenAddress,
+                      provider,
                     );
 
                     txParams =
-                      await contract.populateTransaction.safeTransferFrom(
+                      await contract.safeTransferFrom.populateTransaction(
                         currentAccount.address,
                         recipient,
-                        id,
-                        amount,
-                        new Uint8Array()
+                        tokenId,
+                        rawAmount,
+                        new Uint8Array(),
                       );
                   }
                   break;
 
                 default:
-                  return;
+                  throw new Error("Unhandled Token ERC standard");
               }
             }
 
             const gasLimit = await signerProvider.estimateGas(txParams);
 
-            const txResPromise = signerProvider.sendUncheckedTransaction({
+            const rpcTx = provider.getRpcTransaction({
               ...txParams,
-              gasLimit,
+              from: currentAccount.address,
+              gasLimit: (gasLimit * 5n) / 4n,
             });
 
-            const isDefault =
-              currentNetwork && DEFAULT_CHAIN_IDS.has(currentNetwork.chainId);
-            trackEvent(TEvent.Transfer, {
-              networkName: isDefault ? currentNetwork.name : "unknown",
-              networkChainId: isDefault ? currentNetwork.chainId : "unknown",
-            });
+            const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
+
+            if (currentNetwork) {
+              trackEvent(
+                token.tokenType === TokenType.Asset
+                  ? TEvent.TokenTransferCreated
+                  : TEvent.NftTransferCreated,
+                {
+                  networkName: currentNetwork.name,
+                  networkChainId: currentNetwork.chainId,
+                  tokenName: token.name,
+                  tokenAddress,
+                },
+              );
+            }
 
             const tokenPreview =
               token.tokenType === TokenType.Asset ? (
-                <PrettyAmount amount={amount} currency={token.symbol} />
+                <PrettyAmount
+                  amount={amount?.toString()}
+                  currency={token.symbol}
+                />
               ) : (
                 token.name
               );
@@ -234,7 +282,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
               <>
                 Request for transfer <strong>{tokenPreview}</strong>{" "}
                 successfully created! Please approve it in the opened window.
-              </>
+              </>,
             );
             form.restart();
 
@@ -245,7 +293,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
                   setTimeout(
                     () => navigate((s) => ({ ...s, page: Page.Default })),
-                    50
+                    50,
                   );
 
                   setTimeout(() => {
@@ -270,7 +318,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                             </span>
                           </a>
                         )}
-                      </div>
+                      </div>,
                     );
                   }, 100);
                 }
@@ -300,24 +348,28 @@ const TransferTokenContent = memo<TransferTokenContent>(
         isMounted,
         setTokenType,
         explorerLink,
-      ]
+      ],
     );
 
     const [recipientAddr, setRecipientAddr] = useSafeState<string>();
 
     const [estimating, setEstimating] = useSafeState(false);
     const [gas, setGas] = useSafeState<{
-      max: ethers.BigNumber;
-      average: ethers.BigNumber;
+      max: bigint;
+      average: bigint;
+      rawBalance: bigint | null;
     }>();
     const [estimationError, setEstimationError] = useSafeState<string | null>(
-      null
+      null,
     );
 
     const maxAmount = useMemo(() => {
-      if (!token?.rawBalance) return "0";
+      if (!token) return "0";
 
-      let value = new BigNumber(token.rawBalance);
+      const rawBalance = gas?.rawBalance?.toString() ?? token.rawBalance;
+      if (!rawBalance) return "0";
+
+      let value = new BigNumber(rawBalance);
 
       if (token.tokenSlug === NATIVE_TOKEN_SLUG) {
         value = value.minus(new BigNumber(gas ? gas.max.toString() : 0));
@@ -325,8 +377,8 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
       if (token?.tokenType === TokenType.Asset) {
         value = value
-          .div(new BigNumber(10).pow(token.decimals))
-          .decimalPlaces(token.decimals, BigNumber.ROUND_DOWN);
+          .div(new BigNumber(10).pow(token.decimals.toString()))
+          .decimalPlaces(Number(token.decimals), BigNumber.ROUND_DOWN);
       }
 
       if (value.lt(0)) {
@@ -346,29 +398,58 @@ const TransferTokenContent = memo<TransferTokenContent>(
             try {
               setEstimating(true);
 
+              const signer = provider.getVoidSigner(currentAccount.address);
+
               const value = 1;
-              let gasLimit = ethers.BigNumber.from(0);
+              let gasLimit = 0n;
+              let txParams: ethers.TransactionRequest | undefined;
 
               if (tokenSlug === NATIVE_TOKEN_SLUG) {
-                gasLimit = await provider.estimateGas({
+                txParams = {
                   to: recipientAddr,
                   value,
-                });
+                };
+
+                gasLimit = await provider.estimateGas(txParams).catch((err) =>
+                  // Try with signer, zkSync case
+                  signer.estimateGas(txParams!).catch(() => {
+                    throw err;
+                  }),
+                );
+
+                txParams.from = signer.address;
+                txParams.gasLimit = gasLimit;
               } else {
                 const { standard, address, id } = parseTokenSlug(tokenSlug);
 
-                const signer = provider.getUncheckedSigner(
-                  currentAccount.address
-                );
+                const performContractEstimation = (
+                  gasLimitPromise: Promise<bigint>,
+                  txParamsPromise: Promise<ethers.ContractTransaction>,
+                ) =>
+                  Promise.all([
+                    gasLimitPromise.then((value) => {
+                      gasLimit = value;
+                    }),
+                    txParamsPromise
+                      .then((value) => {
+                        txParams = value;
+                      })
+                      .catch((err) => {
+                        console.warn("Failed to populate transaction", err);
+                      }),
+                  ]);
 
                 switch (standard) {
                   case TokenStandard.ERC20:
                     {
                       const contract = ERC20__factory.connect(address, signer);
 
-                      gasLimit = await contract.estimateGas.transfer(
-                        recipientAddr,
-                        value
+                      await performContractEstimation(
+                        contract.transfer.estimateGas(recipientAddr, value),
+                        contract.transfer.populateTransaction(
+                          recipientAddr,
+                          value,
+                        ),
                       );
                     }
                     break;
@@ -377,10 +458,17 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC721__factory.connect(address, signer);
 
-                      gasLimit = await contract.estimateGas.transferFrom(
-                        currentAccount.address,
-                        recipientAddr,
-                        id
+                      await performContractEstimation(
+                        contract.transferFrom.estimateGas(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                        ),
+                        contract.transferFrom.populateTransaction(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                        ),
                       );
                     }
                     break;
@@ -389,38 +477,65 @@ const TransferTokenContent = memo<TransferTokenContent>(
                     {
                       const contract = ERC1155__factory.connect(
                         address,
-                        signer
+                        signer,
                       );
 
-                      gasLimit = await contract.estimateGas.safeTransferFrom(
-                        currentAccount.address,
-                        recipientAddr,
-                        id,
-                        value,
-                        new Uint8Array()
+                      await performContractEstimation(
+                        contract.safeTransferFrom.estimateGas(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                          value,
+                          new Uint8Array(),
+                        ),
+                        contract.safeTransferFrom.populateTransaction(
+                          currentAccount.address,
+                          recipientAddr,
+                          id,
+                          value,
+                          new Uint8Array(),
+                        ),
                       );
                     }
                     break;
+
+                  default:
+                    throw new Error("Unhandled Token ERC standard");
                 }
               }
 
               const fees = await suggestFees(provider);
-              if (fees) {
-                const gasPrice = fees.modes.high.max;
-                const maxGasLimit = gasLimit.mul(3).div(2);
 
-                setGas({
-                  average: gasLimit.mul(gasPrice),
-                  max: maxGasLimit.mul(gasPrice),
-                });
-              }
+              const gasPrice = fees.modes.high.max;
+              const maxGasLimit = (gasLimit * 3n) / 2n;
+
+              const l1Fee = txParams
+                ? await estimateL1Fee(
+                    provider,
+                    { ...txParams, gasLimit: maxGasLimit },
+                    gasPrice,
+                  )
+                : null;
+
+              const rawBalance = await requestBalance(
+                provider,
+                tokenSlug,
+                currentAccount.address,
+              );
+
+              setGas({
+                average: gasLimit * gasPrice + (l1Fee ?? 0n),
+                max: maxGasLimit * gasPrice + (l1Fee ?? 0n),
+                rawBalance,
+              });
 
               setEstimationError(null);
             } catch (err) {
               console.warn(err);
 
+              setGas(undefined);
               setEstimationError(
-                "Estimation failed. Transaction may fail or there network issues"
+                "Failed to estimate transfer. The transaction might not be successful, or there may be network issues.",
               );
             } finally {
               setEstimating(false);
@@ -439,11 +554,11 @@ const TransferTokenContent = memo<TransferTokenContent>(
         provider,
         recipientAddr,
         tokenSlug,
-      ]
+      ],
     );
 
     const handleRecipientChange = useDebouncedCallback((recipient: string) => {
-      if (recipient && ethers.utils.isAddress(recipient)) {
+      if (recipient && ethers.isAddress(recipient)) {
         setRecipientAddr(recipient);
       }
     }, 150);
@@ -461,26 +576,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
       return () => clearTimeout(t);
     }, [estimateGas]);
 
-    const formKey = useMemo(
-      () => `${currentAccount.address}-${chainId}`,
-      [currentAccount.address, chainId]
-    );
-
     const amountFieldKey = useMemo(
       () => `amount-${token?.tokenSlug}-${maxAmount}`,
-      [token, maxAmount]
+      [token, maxAmount],
     );
-
-    const initialRenderRef = useRef(true);
-
-    useEffect(() => {
-      if (initialRenderRef.current) {
-        initialRenderRef.current = false;
-        return;
-      }
-
-      setTokenSlug([RESET, "replace"]);
-    }, [setTokenSlug, formKey]);
 
     const tokenSymbol =
       token?.tokenType === TokenType.Asset ? token.symbol : undefined;
@@ -489,7 +588,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
 
     return (
       <Form<FormValues>
-        key={formKey}
         onSubmit={handleSubmit}
         render={({ form, handleSubmit, values, submitting }) => (
           <form
@@ -529,7 +627,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   name="amount"
                   validate={composeValidators(
                     required,
-                    maxValue(maxAmount, tokenSymbol)
+                    maxValue(maxAmount, tokenSymbol),
                   )}
                 >
                   {({ input, meta }) => (
@@ -554,7 +652,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                       currency={tokenSymbol}
                       error={(meta.modified || meta.submitFailed) && meta.error}
                       errorMessage={meta.error}
-                      readOnly={estimating}
+                      // readOnly={estimating}
                       {...input}
                     />
                   )}
@@ -581,13 +679,13 @@ const TransferTokenContent = memo<TransferTokenContent>(
         )}
       />
     );
-  }
+  },
 );
 
 type TxCheckProps = {
   tokenType: TokenType;
   token?: AccountToken;
-  values: FormValues & { gas?: ethers.BigNumber };
+  values: FormValues & { gas?: bigint };
   error: string | null;
 };
 
@@ -599,7 +697,7 @@ const TxCheck = memo<TxCheckProps>(({ tokenType, token, values, error }) => {
       values.amount && token?.tokenType === TokenType.Asset
         ? new BigNumber(values.amount).multipliedBy(token.priceUSD ?? 0)
         : new BigNumber(0),
-    [token, values.amount]
+    [token, values.amount],
   );
 
   const gas = useMemo(() => {
@@ -637,11 +735,17 @@ const TxCheck = memo<TxCheckProps>(({ tokenType, token, values, error }) => {
           "bg-brand-redobject/[.05]",
           "border border-brand-redobject/[.8]",
           "rounded-[.625rem]",
-          "text-sm"
+          "text-sm",
         )}
       >
-        <WarningIcon className="mr-2 w-6 h-auto" />
-        {error || "Insufficient funds for Network Fee"}
+        <WarningIcon className="mr-2 w-6 min-w-6 h-auto" />
+        {error || (
+          <>
+            Insufficient {nativeToken?.symbol} for transaction (gas) fee. Check
+            your account balance. Use Buy or Swap feature to add more if
+            necessary.
+          </>
+        )}
       </div>
     );
   }
@@ -732,13 +836,13 @@ const SummaryRow: FC<SummaryRowProps> = ({
     className={classNames(
       "flex items-center justify-between",
       "text-sm",
-      className
+      className,
     )}
   >
     <h4
       className={classNames(
         "flex-nowrap font-semibold",
-        lightHeader ? "text-brand-light" : "text-brand-inactivedark"
+        lightHeader ? "text-brand-light" : "text-brand-inactivedark",
       )}
     >
       {header}

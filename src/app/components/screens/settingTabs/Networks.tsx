@@ -1,28 +1,33 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
 import classNames from "clsx";
 import Fuse from "fuse.js";
+import { useAtomValue } from "jotai";
+import { useLazyAtomValue } from "lib/atom-utils";
 
-import { getNetworkIconUrl } from "fixtures/networks";
+import { Network } from "core/types";
 
 import { NETWORK_SEARCH_OPTIONS } from "app/defaults";
-import { useLazyAllNetworks } from "app/hooks";
+import { allInstalledNetworksAtom, chainIdUrlAtom } from "app/atoms";
 import { ToastOverflowProvider } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import EditNetwork from "app/components/blocks/EditNetwork";
+import NetworkIcon from "app/components/elements/NetworkIcon";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
 import { ReactComponent as PlusCircleIcon } from "app/icons/PlusCircle.svg";
 
 const Networks: FC = () => {
-  const allNetworks = useLazyAllNetworks();
+  const allNetworks = useLazyAtomValue(allInstalledNetworksAtom);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const [tab, setTab] = useState<"new" | number | null>(null);
+  const chainIdUrl = useAtomValue(chainIdUrlAtom);
+
+  const [tab, setTab] = useState<"new" | number | null>(chainIdUrl);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const fuse = useMemo(
     () => new Fuse(allNetworks ?? [], NETWORK_SEARCH_OPTIONS),
-    [allNetworks]
+    [allNetworks],
   );
 
   const preparedNetworks = useMemo(() => {
@@ -38,7 +43,7 @@ const Networks: FC = () => {
 
   const selectedNetwork = useMemo(
     () => allNetworks?.find((n) => n.chainId === tab),
-    [tab, allNetworks]
+    [tab, allNetworks],
   );
 
   const cancelEditing = useCallback(() => setTab(null), []);
@@ -53,7 +58,7 @@ const Networks: FC = () => {
         });
       }, 300);
     },
-    [scrollAreaRef]
+    [scrollAreaRef],
   );
 
   return (
@@ -62,7 +67,7 @@ const Networks: FC = () => {
         className={classNames(
           "flex flex-col",
           "w-[calc(19.875rem+1px)] px-6",
-          "border-r border-brand-main/[.07]"
+          "border-r border-brand-main/[.07]",
         )}
       >
         <SearchInput
@@ -73,23 +78,21 @@ const Networks: FC = () => {
         <ScrollAreaContainer
           ref={scrollAreaRef}
           className={classNames("pr-5 -mr-5 mt-5")}
-          viewPortClassName="pb-20 rounded-t-[.625rem] viewportBlock"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] viewportBlock"
+          scrollBarClassName="py-0 pb-5"
         >
           <NetworkBtn
-            name="Add new network"
             isActive={tab === "new"}
             onClick={() => setTab("new")}
-            isCreateNew
             className="bg-brand-main/[.05]"
           />
-          {preparedNetworks?.map(({ chainId, name }) => (
+          {preparedNetworks?.map((net) => (
             <NetworkBtn
-              key={chainId}
-              icon={getNetworkIconUrl(chainId)}
-              name={name}
-              onClick={() => setTab(chainId)}
-              isActive={tab === chainId}
+              key={net.chainId}
+              network={net}
+              onClick={() => setTab(net.chainId)}
+              isActive={tab === net.chainId}
+              autoFocus={tab === net.chainId}
               className="mt-2"
             />
           ))}
@@ -115,21 +118,19 @@ const Networks: FC = () => {
 export default Networks;
 
 type NetworkBtnProps = {
-  icon?: string;
-  name: string;
+  network?: Network;
   onClick: () => void;
   isActive?: boolean;
-  isCreateNew?: boolean;
   className?: string;
+  autoFocus?: boolean;
 };
 
 const NetworkBtn: FC<NetworkBtnProps> = ({
-  icon,
-  name,
+  network,
   onClick,
   isActive = false,
-  isCreateNew = false,
   className,
+  autoFocus,
 }) => {
   return (
     <button
@@ -143,16 +144,19 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
         "transition-colors",
         !isActive && "hover:bg-brand-main/[.05]",
         isActive && "bg-brand-main/10",
-        className
+        className,
       )}
       onClick={onClick}
+      autoFocus={autoFocus}
     >
-      {isCreateNew ? (
+      {!network ? (
         <PlusCircleIcon className="w-[1.625rem] h-auto mr-3" />
       ) : (
-        <img src={icon} alt={name} className={"w-6 h-6 mr-3"} />
+        <NetworkIcon network={network} className={"w-6 h-6 mr-3"} />
       )}
-      <span className="min-w-0 truncate">{name}</span>
+      <span className="min-w-0 truncate">
+        {network?.name || "Add new network"}
+      </span>
       <ChevronRightIcon
         className={classNames(
           "w-6 h-auto",
@@ -160,7 +164,7 @@ const NetworkBtn: FC<NetworkBtnProps> = ({
           "transition",
           "group-hover:translate-x-0 group-hover:opacity-100",
           isActive && "translate-x-0 opacity-100",
-          !isActive && "-translate-x-1.5 opacity-0"
+          !isActive && "-translate-x-1.5 opacity-0",
         )}
       />
     </button>

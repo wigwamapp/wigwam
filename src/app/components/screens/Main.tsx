@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, Suspense, useMemo, lazy } from "react";
 import { useAtomValue } from "jotai";
 import { match } from "ts-pattern";
 import { Redirect } from "lib/navigation";
@@ -10,18 +10,23 @@ import MainPageLayout from "app/components/layouts/MainPageLayout";
 import Overview from "./mainPages/Overview";
 import Receive from "./mainPages/Receive";
 import Transfer from "./mainPages/Transfer";
-import Swap from "./mainPages/Swap";
 import Apps from "./mainPages/Apps";
 import Contacts from "./mainPages/Contacts";
 import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
+import Rewards from "./mainPages/Rewards";
 import OnboardingPopup from "../blocks/OnboardingPopup";
+import Buy from "./mainPages/Buy";
+
+const SwapDynamic = lazy(() => import("./mainPages/Swap"));
 
 const Main: FC = () => {
   return (
     <MainPageLayout>
-      <MainPageRouter />
-      <OnboardingPopup />
+      <Suspense>
+        <MainPageRouter />
+        <OnboardingPopup />
+      </Suspense>
     </MainPageLayout>
   );
 };
@@ -38,11 +43,13 @@ function matchMainPage(page: Page) {
   return match(page)
     .with(Page.Default, () => <Overview />)
     .with(Page.Receive, () => <Receive />)
+    .with(Page.Buy, () => <Buy />)
     .with(Page.Transfer, () => <Transfer />)
-    .with(Page.Swap, () => <Swap />)
+    .with(Page.Swap, () => <SwapDynamic />)
     .with(Page.Apps, () => <Apps />)
     .with(Page.Contacts, () => <Contacts />)
     .with(Page.Wallets, () => <Wallets />)
     .with(Page.Settings, () => <Settings />)
+    .with(Page.Rewards, () => <Rewards />)
     .otherwise(() => <Redirect to={{ page: Page.Default }} />);
 }

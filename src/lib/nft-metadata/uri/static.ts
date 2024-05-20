@@ -11,7 +11,7 @@ import { isAddressMatch } from "../utils";
 export function getStaticURI(
   chainId: number,
   tokenAddress: string,
-  tokenId: string
+  tokenId: string,
 ) {
   if (isAddressMatch(chainId, tokenAddress, DECENTRALAND_TOKEN_ADDRESS)) {
     return {
@@ -60,7 +60,7 @@ export function getStaticURI(
 export function getURIData(
   chainId: number,
   tokenAddress: string,
-  tokenId: string
+  tokenId: string,
 ) {
   if (
     isAddressMatch(chainId, tokenAddress, WRAPPED_CRYPTOPUNKS_TOKEN_ADDRESS)

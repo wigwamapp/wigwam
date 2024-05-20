@@ -6,7 +6,10 @@ type ScrollAreaContainerProps = {
   className?: string;
   viewPortClassName?: string;
   scrollBarClassName?: string;
+  horizontalScrollBarClassName?: string;
+  verticalScrollBarClassName?: string;
   viewportAsChild?: boolean;
+  viewPortStyle?: React.CSSProperties;
   hiddenScrollbar?: "vertical" | "horizontal";
 } & ScrollArea.ScrollAreaProps;
 
@@ -18,14 +21,17 @@ const ScrollAreaContainer = forwardRef<
     {
       className,
       viewPortClassName,
+      viewPortStyle,
       scrollBarClassName,
+      horizontalScrollBarClassName,
+      verticalScrollBarClassName,
       viewportAsChild = false,
       hiddenScrollbar,
       type = "hover",
       children,
       ...rest
     },
-    ref
+    ref,
   ) => (
     <ScrollArea.Root
       className={classNames("overflow-hidden", className)}
@@ -35,22 +41,32 @@ const ScrollAreaContainer = forwardRef<
       <ScrollArea.Viewport
         ref={ref}
         className={classNames(
-          "w-full h-full overscroll-contain",
-          viewPortClassName
+          "w-full h-full overscroll-y-contain",
+          viewPortClassName,
         )}
+        style={viewPortStyle}
         asChild={viewportAsChild}
       >
         {children}
       </ScrollArea.Viewport>
       {hiddenScrollbar !== "vertical" && (
-        <Scrollbar orientation="vertical" className={scrollBarClassName} />
+        <Scrollbar
+          orientation="vertical"
+          className={classNames(verticalScrollBarClassName, scrollBarClassName)}
+        />
       )}
       {hiddenScrollbar !== "horizontal" && (
-        <Scrollbar orientation="horizontal" className={scrollBarClassName} />
+        <Scrollbar
+          orientation="horizontal"
+          className={classNames(
+            horizontalScrollBarClassName,
+            scrollBarClassName,
+          )}
+        />
       )}
       <ScrollArea.Corner />
     </ScrollArea.Root>
-  )
+  ),
 );
 
 export default ScrollAreaContainer;
@@ -69,7 +85,7 @@ const Scrollbar: FC<ScrollArea.ScrollAreaScrollbarProps> = ({
       },
       "p-1",
       "transition",
-      className
+      className,
     )}
     {...rest}
   >
@@ -83,7 +99,7 @@ const Scrollbar: FC<ScrollArea.ScrollAreaScrollbarProps> = ({
         {
           "w-2": orientation === "vertical",
           "h-2 min-h-[.5rem]": orientation === "horizontal", // TODO: replace min height if we can
-        }
+        },
       )}
     />
   </ScrollArea.Scrollbar>

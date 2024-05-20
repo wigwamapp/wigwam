@@ -11,6 +11,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const EslintWebpackPlugin = require("eslint-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -28,8 +29,8 @@ const ENV_SHORT =
   NODE_ENV === "development"
     ? "dev"
     : NODE_ENV === "production"
-    ? "prod"
-    : NODE_ENV;
+      ? "prod"
+      : NODE_ENV;
 
 // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
 const dotenvFiles = [
@@ -53,13 +54,13 @@ for (const path of dotenvFiles) {
   }
 }
 
-// Grab default and VIGVAM_* environment variables and prepare them to be
+// Grab default and WIGWAM_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
-const VIGVAM_ENV_PATTERN = /^VIGVAM_/i;
+const WIGWAM_ENV_PATTERN = /^WIGWAM_/i;
 const {
   RELEASE_ENV = "false",
   TARGET_BROWSER = "chrome",
-  VIGVAM_WEBSITE_ORIGIN = "",
+  WIGWAM_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
@@ -75,6 +76,7 @@ const SOURCE_MAP = RELEASE_ENV === "false" && SOURCE_MAP_ENV !== "false";
 const IMAGE_INLINE_SIZE_LIMIT = parseInt(IMAGE_INLINE_SIZE_LIMIT_ENV);
 const CWD_PATH = fs.realpathSync(process.cwd());
 const NODE_MODULES_PATH = path.join(CWD_PATH, "node_modules");
+const PACKAGES_PATH = path.join(CWD_PATH, "packages");
 const SOURCE_PATH = path.join(CWD_PATH, "src");
 const PUBLIC_PATH = path.join(CWD_PATH, "public");
 const DEST_PATH = path.join(CWD_PATH, "dist", ENV_SHORT);
@@ -82,7 +84,7 @@ const OUTPUT_PATH = path.join(DEST_PATH, `${TARGET_BROWSER}_unpacked`);
 const PACKED_EXTENSION = TARGET_BROWSER === "firefox" ? "xpi" : "zip";
 const OUTPUT_PACKED_PATH = path.join(
   DEST_PATH,
-  `${TARGET_BROWSER}.${PACKED_EXTENSION}`
+  `${TARGET_BROWSER}.${PACKED_EXTENSION}`,
 );
 
 const MODULE_FILE_EXTENSIONS = [".js", ".mjs", ".jsx", ".ts", ".tsx", ".json"];
@@ -93,9 +95,14 @@ const ADDITIONAL_MODULE_PATHS = [
 const CSS_REGEX = /\.css$/;
 const CSS_MODULE_REGEX = /\.module\.css$/;
 
-const HTML_TEMPLATES = [
+const HTML_PLUGIN_TEMPLATES = [
+  NODE_ENV === "development" && {
+    path: path.join(PUBLIC_PATH, "hotreload.html"),
+    chunks: ["hotreload"],
+  },
   {
-    path: path.join(PUBLIC_PATH, "back.html"),
+    jsWorker: true,
+    path: path.join(PUBLIC_PATH, "sw.js"),
     chunks: ["back"],
   },
   {
@@ -110,7 +117,7 @@ const HTML_TEMPLATES = [
     path: path.join(PUBLIC_PATH, "approve.html"),
     chunks: ["approve"],
   },
-];
+].filter(Boolean);
 const SOLO_ENTRIES = ["content", "inpage", "version"];
 
 const entry = (...files) =>
@@ -124,13 +131,21 @@ module.exports = {
   target: ["web", ES_TARGET],
 
   entry: {
-    back: entry("back.ts", NODE_ENV === "development" && "_dev/hotReload.ts"),
+    back: entry(
+      "back.ts",
+      NODE_ENV === "development" && "_dev/hotReloadObserver.ts",
+    ),
     main: entry("main.tsx", RELEASE_ENV === "false" && "_dev/devTools.ts"),
     popup: entry("popup.tsx"),
     approve: entry("approve.tsx"),
     content: entry("content.ts"),
     inpage: entry("inpage.ts"),
     version: entry("version.ts"),
+    ...(NODE_ENV === "development"
+      ? {
+          hotreload: entry("_dev/hotReload.ts"),
+        }
+      : {}),
   },
 
   output: {
@@ -138,28 +153,42 @@ module.exports = {
     pathinfo: NODE_ENV === "development",
     filename: "scripts/[name].js",
     chunkFilename: "scripts/[name].chunk.js",
+    assetModuleFilename: "media/[hash:8].[ext]",
   },
 
   resolve: {
-    modules: [NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
+    modules: ["node_modules", NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
     extensions: MODULE_FILE_EXTENSIONS,
     alias: {
       "@toruslabs/openlogin": require.resolve(
-        "@toruslabs/openlogin/dist/openlogin.umd.min.js"
+        "@toruslabs/openlogin/dist/openlogin.umd.min.js",
       ),
       "@ledgerhq/devices/hid-framing": require.resolve(
-        "@ledgerhq/devices/lib-es/hid-framing.js"
+        "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
-      "@ethersproject/random": "lib/ethers-random",
-      "fuse.js": "fuse.js/dist/fuse.basic.esm.js",
-      "argon2-browser": "argon2-browser/dist/argon2-bundled.min.js",
-      "babel-runtime/regenerator": "regenerator-runtime", // For `react-error-guard`
+      // For `react-error-guard`
+      "babel-runtime/regenerator": "regenerator-runtime",
+      // Fix `path is not exported from package exports field`
+      // Used by `.vendor/axios-fetch-adapter`
+      "axios/lib": path.resolve(__dirname, "node_modules/axios/lib"),
+      // Fix `path is not exported from package exports field`
+      // Used by `src/app/components/elements/AutoIcon.tsx`
+      "@dicebear/core/lib": path.resolve(
+        __dirname,
+        "node_modules/@dicebear/core/lib",
+      ),
+      packages: path.resolve(__dirname, "packages"),
     },
     fallback: {
       process: false,
       path: false,
       fs: false,
       crypto: false,
+      util: false,
+      url: false,
+      zlib: false,
+      http: false,
+      https: false,
     },
   },
 
@@ -177,10 +206,11 @@ module.exports = {
           // A missing `test` is equivalent to a match.
           {
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve("url-loader"),
-            options: {
-              limit: IMAGE_INLINE_SIZE_LIMIT,
-              name: "media/[hash:8].[ext]",
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                maxSize: IMAGE_INLINE_SIZE_LIMIT,
+              },
             },
           },
 
@@ -198,10 +228,13 @@ module.exports = {
                         params: {
                           overrides: {
                             removeViewBox: false,
-                            cleanupIDs: {
-                              prefix: `svg-${hash(resource)}`,
-                            },
                           },
+                        },
+                      },
+                      {
+                        name: "prefixIds",
+                        params: {
+                          prefix: `svg-${hash(resource)}`,
                         },
                       },
                     ],
@@ -221,7 +254,7 @@ module.exports = {
           // Process application JS with SWC.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: [SOURCE_PATH],
+            include: [SOURCE_PATH, PACKAGES_PATH],
             loader: require.resolve("swc-loader"),
             options: {
               jsc: {
@@ -252,7 +285,9 @@ module.exports = {
             use: getStyleLoaders({
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
-              modules: false,
+              modules: {
+                mode: "icss",
+              },
             }),
             // Don't consider CSS imports dead code even if the
             // containing package claims to have no side effects.
@@ -269,6 +304,7 @@ module.exports = {
               importLoaders: 1,
               sourceMap: SOURCE_MAP,
               modules: {
+                mode: "local",
                 getLocalIdent: getCSSModuleLocalIdent,
               },
             }),
@@ -280,15 +316,12 @@ module.exports = {
           // This loader doesn't use a "test" so it will catch all modules
           // that fall through the other loaders.
           {
-            loader: require.resolve("file-loader"),
             // Exclude `js` files to keep "css" loader working as it injects
             // its runtime that would otherwise be processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
             exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-            options: {
-              name: "media/[hash:8].[ext]",
-            },
+            type: "asset/resource",
           },
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
@@ -300,11 +333,20 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [OUTPUT_PATH, OUTPUT_PACKED_PATH],
-      cleanStaleWebpackAssets: false,
       verbose: false,
     }),
 
     new CaseSensitivePathsPlugin(),
+
+    new webpack.NormalModuleReplacementPlugin(
+      /@ledgerhq\/live-network\/lib-es\/network\.js/,
+      path.resolve(__dirname, ".vendor/ledgerhq-live-network/network.js"),
+    ),
+
+    new webpack.NormalModuleReplacementPlugin(
+      /@ledgerhq\/evm-tools\/lib-es\/message\/EIP712\/index\.js/,
+      path.resolve(__dirname, ".vendor/ledgerhq-evm-tools/message-eip712.js"),
+    ),
 
     new webpack.DefinePlugin({
       // for web extensions
@@ -318,7 +360,7 @@ module.exports = {
       ...(() => {
         const appEnvs = {};
         for (const k of Object.keys(process.env)) {
-          if (VIGVAM_ENV_PATTERN.test(k)) {
+          if (WIGWAM_ENV_PATTERN.test(k)) {
             appEnvs[`process.env.${k}`] = JSON.stringify(process.env[k]);
           }
         }
@@ -335,15 +377,43 @@ module.exports = {
       chunkFilename: "styles/[name].chunk.css",
     }),
 
-    ...HTML_TEMPLATES.map(
-      (htmlTemplate) =>
+    ...HTML_PLUGIN_TEMPLATES.map(
+      ({ path: templatePath, chunks, jsWorker }) =>
         new HtmlWebpackPlugin({
-          template: htmlTemplate.path,
-          filename: path.basename(htmlTemplate.path),
-          chunks: htmlTemplate.chunks,
-          inject: "body",
+          ...(jsWorker
+            ? {
+                templateContent: ({ htmlWebpackPlugin }) => {
+                  const scriptList = htmlWebpackPlugin.files.js
+                    .map((p) => `"${p}"`)
+                    .join(",");
+
+                  let content = fs.readFileSync(templatePath, "utf8");
+
+                  content += `importScripts(${scriptList});`;
+
+                  // Hot reload helper
+                  // Notify hot reload tab what the chunks used in bg script
+                  if (NODE_ENV === "development") {
+                    content += `
+                    setTimeout(() => {
+                      chrome.runtime.sendMessage({
+                        type: "__hr_bg_scripts",
+                        scripts: [${scriptList}],
+                      }).catch(console.warn);
+                    }, 1000);`;
+                  }
+
+                  return content;
+                },
+              }
+            : {
+                template: templatePath,
+              }),
+          filename: path.basename(templatePath),
+          chunks,
+          inject: jsWorker ? false : "body",
           minify: false,
-        })
+        }),
     ),
 
     new CopyWebpackPlugin({
@@ -353,7 +423,7 @@ module.exports = {
           to: OUTPUT_PATH,
           globOptions: {
             dot: false,
-            ignore: ["**/*.html", "**/manifest.json", "**/locales"],
+            ignore: ["**/*.html", "**/{manifest.json,sw.js}", "**/locales"],
           },
         },
         {
@@ -368,8 +438,8 @@ module.exports = {
                   pkg,
                   env: ENV_SHORT,
                   envBadge: ENV_BADGE ? `[${ENV_BADGE.toUpperCase()}] ` : "",
-                  website: VIGVAM_WEBSITE_ORIGIN,
-                })
+                  website: WIGWAM_WEBSITE_ORIGIN,
+                }),
               );
               const manifest = transformManifestKeys(json, TARGET_BROWSER);
               return JSON.stringify(manifest, null, 2);
@@ -400,12 +470,12 @@ module.exports = {
                       Array.from(keySet).map((key, i) => [
                         key,
                         { content: `$${i + 1}` },
-                      ])
+                      ]),
                     );
                   }
 
                   return [name, extVal];
-                })
+                }),
               );
               return JSON.stringify(extJson, null, 2);
             },
@@ -414,20 +484,18 @@ module.exports = {
       ],
     }),
 
-    new ForkTsCheckerWebpackPlugin({
-      eslint: {
-        files: "src/**/*.{js,mjs,jsx,ts,tsx}",
-        options: {
-          cache: true,
-          cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
-          cwd: CWD_PATH,
-          resolvePluginsRelativeTo: __dirname,
-        },
-      },
+    new ForkTsCheckerWebpackPlugin(),
+
+    new EslintWebpackPlugin({
+      files: "src/**/*.{js,mjs,jsx,ts,tsx}",
+      cache: true,
+      cacheLocation: path.resolve(NODE_MODULES_PATH, ".cache/.eslintcache"),
+      context: CWD_PATH,
+      failOnError: false,
     }),
 
     new WebpackBar({
-      name: "Vigvam",
+      name: "Wigwam",
       color: "#ffffff",
     }),
 
@@ -535,7 +603,7 @@ function getStyleLoaders(cssOptions = {}) {
 function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
   // Use the filename or folder name, based on some uses the index.js / index.module.(css|scss|sass) project style
   const fileNameOrFolder = context.resourcePath.match(
-    /index\.module\.(css|scss|sass)$/
+    /index\.module\.(css|scss|sass)$/,
   )
     ? "[folder]"
     : "[name]";
@@ -544,13 +612,13 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
     path.posix.relative(context.rootContext, context.resourcePath) + localName,
     "md5",
     "base64",
-    5
+    5,
   );
   // Use loaderUtils to find the file or folder name
   const className = loaderUtils.interpolateName(
     context,
     fileNameOrFolder + "_" + localName + "__" + hash,
-    options
+    options,
   );
   // Remove the .module that appears in every classname when based on the file and replace all "." with "_".
   return className.replace(".module_", "_").replace(/\./g, "_");
@@ -561,7 +629,7 @@ function getCSSModuleLocalIdent(context, _localIdentName, localName, options) {
  */
 const browserVendors = ["chrome", "firefox", "opera", "edge", "safari"];
 const vendorRegExp = new RegExp(
-  `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`
+  `^__((?:(?:${browserVendors.join("|")})\\|?)+)__(.*)`,
 );
 
 const transformManifestKeys = (manifest, vendor) => {

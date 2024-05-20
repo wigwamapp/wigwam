@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
-import { FORM_ERROR } from "final-form";
+import { FORM_ERROR, FormApi } from "final-form";
 import { nanoid } from "nanoid";
 import classNames from "clsx";
 import { storage } from "lib/ext/storage";
@@ -17,8 +17,9 @@ import {
   focusOnErrors,
   composeValidators,
   validatePassword,
+  resetFormPassword,
 } from "app/utils";
-import { addAccountModalAtom, profileStateAtom } from "app/atoms";
+import { addAccountModalAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -35,7 +36,6 @@ type FormValues = {
 
 const SetupPassword = memo(() => {
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
-  const profileState = useAtomValue(profileStateAtom);
 
   const { stateRef, reset } = useSteps();
 
@@ -49,23 +49,27 @@ const SetupPassword = memo(() => {
     }
   }, [addAccountsParams, reset]);
 
-  const analyticsFieldDisplayed = profileState.all.length > 1;
-
   const handleFinish = useCallback(
-    async ({ password, analytics }) =>
+    async (
+      { password, analytics }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
           if (!addAccountsParams) return;
 
-          if (analyticsFieldDisplayed && analytics) {
+          await setupWallet(password, addAccountsParams, seedPhrase);
+          await resetFormPassword(form);
+          await resetFormPassword(form, "confirm");
+
+          if (analytics) {
             await storage.put(Setting.Analytics, {
               enabled: true,
               userId: nanoid(),
             });
-          }
 
-          await setupWallet(password, addAccountsParams, seedPhrase);
-          trackEvent(TEvent.SetupVigvam);
+            trackEvent(TEvent.SetupWigwam);
+          }
 
           setAccModalOpened([false]);
         } catch (err: any) {
@@ -73,7 +77,7 @@ const SetupPassword = memo(() => {
         }
         return;
       }),
-    [addAccountsParams, seedPhrase, setAccModalOpened, analyticsFieldDisplayed]
+    [addAccountsParams, seedPhrase, setAccModalOpened],
   );
 
   if (!addAccountsParams) {
@@ -88,9 +92,10 @@ const SetupPassword = memo(() => {
         initialValues={{ analytics: true, terms: false }}
         onSubmit={handleFinish}
         validate={(values) => ({
-          confirm: differentPasswords(values.confirm)(values.password),
+          confirm: differentPasswords(values.password, values.confirm),
         })}
         decorators={[focusOnErrors]}
+        destroyOnUnregister
         render={({
           handleSubmit,
           submitting,
@@ -134,35 +139,6 @@ const SetupPassword = memo(() => {
                 )}
               </Field>
 
-              {analyticsFieldDisplayed && (
-                <Field name="analytics" format={(v: string) => Boolean(v)}>
-                  {({ input, meta }) => (
-                    <AcceptCheckbox
-                      {...input}
-                      title="Analytics"
-                      description={
-                        <>
-                          Help us make Vigvam better.
-                          <br />I agree to the{" "}
-                          <a
-                            href="https://vigvam.app/privacy"
-                            target="_blank"
-                            rel="nofollow noreferrer"
-                            className="text-brand-main underline"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Anonymous Tracking
-                          </a>
-                        </>
-                      }
-                      error={meta.touched && meta.error}
-                      errorMessage={meta.error}
-                      containerClassName="w-full mt-6"
-                    />
-                  )}
-                </Field>
-              )}
-
               <Field
                 name="terms"
                 format={(v: string) => Boolean(v)}
@@ -177,7 +153,7 @@ const SetupPassword = memo(() => {
                         I have read and agree to the
                         <br />
                         <a
-                          href="https://vigvam.app/terms"
+                          href="https://wigwam.app/terms"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"
@@ -194,10 +170,34 @@ const SetupPassword = memo(() => {
                     errorMessage={
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
-                    containerClassName={classNames(
-                      "mb-6 w-full",
-                      analyticsFieldDisplayed ? "mt-4" : "mt-6"
-                    )}
+                    containerClassName={classNames("mt-6 w-full")}
+                  />
+                )}
+              </Field>
+
+              <Field name="analytics" format={(v: string) => Boolean(v)}>
+                {({ input, meta }) => (
+                  <AcceptCheckbox
+                    {...input}
+                    title="Analytics"
+                    description={
+                      <>
+                        Help us make Wigwam better.
+                        <br />I agree to the{" "}
+                        <a
+                          href="https://wigwam.app/privacy"
+                          target="_blank"
+                          rel="nofollow noreferrer"
+                          className="text-brand-main underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Anonymous Tracking
+                        </a>
+                      </>
+                    }
+                    error={meta.touched && meta.error}
+                    errorMessage={meta.error}
+                    containerClassName="w-full mb-6 mt-4"
                   />
                 )}
               </Field>

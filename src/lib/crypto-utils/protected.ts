@@ -7,8 +7,14 @@ import {
   bytesToBase64,
 } from "./bytes";
 
-export function toProtectedString(str: string) {
-  const bytes = utf8ToBytes(str);
+export function toProtectedString(entry: string | ArrayBuffer | Uint8Array) {
+  let bytes;
+  if (typeof entry === "string") {
+    bytes = utf8ToBytes(entry);
+  } else {
+    bytes = new Uint8Array(entry);
+  }
+
   const salt = getRandomBytes(bytes.length);
 
   for (let i = 0, len = bytes.length; i < len; i++) {
@@ -19,10 +25,10 @@ export function toProtectedString(str: string) {
   zeroBuffer(bytes);
   zeroBuffer(salt);
 
-  str = bytesToBase64(combined);
+  const b64 = bytesToBase64(combined);
   zeroBuffer(combined);
 
-  return str;
+  return b64;
 }
 
 export function fromProtectedString(str: string) {

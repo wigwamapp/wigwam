@@ -1,5 +1,4 @@
-import { Signer, ethers } from "ethers";
-import { Provider } from "@ethersproject/abstract-provider";
+import { ethers } from "ethers";
 import { ERC20__factory, ERC721__factory, ERC1155__factory } from "abi-types";
 
 import { TokenStandard } from "core/types";
@@ -7,9 +6,9 @@ import { TokenStandard } from "core/types";
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "./tokens";
 
 export async function requestBalance(
-  provider: Provider | Signer,
+  provider: ethers.Provider,
   tokenSlug: string,
-  accountAddress: string
+  accountAddress: string,
 ) {
   if (tokenSlug === NATIVE_TOKEN_SLUG) {
     return await provider.getBalance(accountAddress);
@@ -27,9 +26,7 @@ export async function requestBalance(
         const contract = ERC721__factory.connect(address, provider);
         const owner = await contract.ownerOf(id);
 
-        return ethers.BigNumber.from(
-          ethers.utils.getAddress(owner) === accountAddress ? 1 : 0
-        );
+        return ethers.getAddress(owner) === accountAddress ? 1n : 0n;
       }
 
       case TokenStandard.ERC1155: {
@@ -37,8 +34,9 @@ export async function requestBalance(
 
         return await contract.balanceOf(accountAddress, id);
       }
+
+      default:
+        throw new Error("Unhandled Token ERC standard");
     }
   }
-
-  return null;
 }

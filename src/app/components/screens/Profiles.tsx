@@ -1,7 +1,7 @@
 import { FC, memo, useCallback, useState, useRef, useMemo } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { changeProfile, addProfile } from "lib/ext/profile";
+import { changeProfile, addProfile, Profile } from "lib/ext/profile";
 import { replaceT } from "lib/ext/i18n";
 
 import { TEvent, trackEvent } from "core/client";
@@ -43,7 +43,7 @@ const Profiles: FC = () => {
     processingRef.current = false;
   }, []);
 
-  const handleSelect = useCallback((profile) => {
+  const handleSelect = useCallback((profile: Profile) => {
     changeProfile(profile.id);
   }, []);
 
@@ -65,7 +65,7 @@ const Profiles: FC = () => {
                   "flex items-center justify-center",
                   "transition-colors",
                   active ? "bg-brand-main/20" : "hover:bg-brand-main/10",
-                  !isLastInRow && "mr-2"
+                  !isLastInRow && "mr-2",
                 )}
                 onClick={active ? undefined : () => handleSelect(p)}
               >
@@ -83,7 +83,7 @@ const Profiles: FC = () => {
               "rounded-[.625rem]",
               "transition-colors",
               "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-              "active:bg-brand-main/[.05]"
+              "active:bg-brand-main/[.05]",
             )}
           >
             <span className="rounded-full flex items-center justify-center bg-brand-main/10 w-24 h-24 mb-4">
@@ -97,18 +97,17 @@ const Profiles: FC = () => {
 
           <ul>
             <li>
-              <strong>The Profiles</strong> allows split app usage experience
-              with multiple different sessions and provides more safety for our
-              users. For example, a user can have a work profile and a personal
-              profile.
+              <strong>Profiles</strong> enables multiple separate sessions for
+              varied needs like work and personal, boosting organization and
+              privacy.
             </li>
 
-            <li>
+            {/* <li>
               You will always see your <strong>profile avatar</strong>, on all
-              Vigvam pages. <strong>It is unique!</strong> This feature allows
-              you to <strong>determine</strong> whether the Vigvam you are
+              Wigwam pages. <strong>It is unique!</strong> This feature allows
+              you to <strong>determine</strong> whether the Wigwam you are
               seeing is <strong>real</strong> or fake.
-            </li>
+            </li> */}
 
             <li>
               Each profile can have <strong>only one Secret Phrase</strong>.
@@ -139,7 +138,7 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
   ({ open, onOpenChange, profilesLength, handleAddProfile }) => {
     const defaultNameValue = useMemo(
       () => `{{profile}} ${profilesLength + 1}`,
-      [profilesLength]
+      [profilesLength],
     );
 
     return (
@@ -157,5 +156,5 @@ const AddProfileDialog = memo<AddProfileDialogProps>(
         />
       </SecondaryModal>
     );
-  }
+  },
 );

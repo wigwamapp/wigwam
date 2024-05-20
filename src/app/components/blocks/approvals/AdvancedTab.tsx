@@ -1,5 +1,5 @@
 import { Dispatch, memo, SetStateAction, useCallback, useMemo } from "react";
-import { ethers } from "ethers";
+import { ethers, Transaction } from "ethers";
 
 import {
   formatUnits,
@@ -11,34 +11,34 @@ import LongTextField from "app/components/elements/LongTextField";
 import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 
-type Tx = ethers.utils.UnsignedTransaction;
-
 type AdvancedTabProps = {
-  originTx: Tx;
-  finalTx: Tx;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
+  originTx: Transaction;
+  finalTx: Transaction;
+  overrides: Partial<Transaction>;
+  onOverridesChange: Dispatch<SetStateAction<Partial<Transaction>>>;
 };
 
 const AdvancedTab = memo<AdvancedTabProps>(
   ({ originTx: tx, finalTx, overrides, onOverridesChange }) => {
     const rawTx = useMemo(
-      () => ethers.utils.serializeTransaction(finalTx),
-      [finalTx]
+      () => Transaction.from(finalTx).unsignedSerialized,
+      [finalTx],
     );
 
     const changeValue = useCallback(
       (name: string, value: ethers.BigNumberish | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
+        onOverridesChange((o) => ({ ...o, [name]: value ?? "" }));
       },
-      [onOverridesChange]
+      [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
+        if (!value) {
+          onOverridesChange((o) => ({ ...o, [name]: null }));
+        }
       },
-      [changeValue]
+      [onOverridesChange],
     );
 
     return (
@@ -72,7 +72,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
                 value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
                 decimals: 3,
                 operator: "minus",
-              })
+              }),
             )
           }
           onPlusClick={() =>
@@ -81,7 +81,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
               prepareAmountOnChange({
                 value: (overrides.gasLimit ?? tx.gasLimit ?? 0).toString(),
                 decimals: 3,
-              })
+              }),
             )
           }
         />
@@ -113,7 +113,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
                 value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
                 decimals: 0,
                 operator: "minus",
-              })
+              }),
             )
           }
           onPlusClick={() =>
@@ -122,7 +122,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
               prepareAmountOnChange({
                 value: (overrides.nonce ?? tx.nonce ?? 0).toString(),
                 decimals: 0,
-              })
+              }),
             )
           }
         />
@@ -140,7 +140,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
             size: "large",
             placement: "top",
           }}
-          value={ethers.utils.hexlify(tx.data ?? "0x00")}
+          value={ethers.hexlify(tx.data ?? "0x00")}
           textareaClassName="!h-36 mb-3"
         />
 
@@ -157,7 +157,7 @@ const AdvancedTab = memo<AdvancedTabProps>(
         />
       </>
     );
-  }
+  },
 );
 
 export default AdvancedTab;

@@ -1,9 +1,6 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 import * as Switch from "@radix-ui/react-switch";
-
-import { ReactComponent as AssetsIcon } from "app/icons/switcher-assets.svg";
-import { ReactComponent as NftsIcon } from "app/icons/switcher-nft.svg";
 
 type ThemeType = "large" | "small";
 
@@ -24,13 +21,15 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
       onCheckedChange={onCheckedChange}
       className={classNames(
         "flex items-center",
-        "rounded-[.625rem]",
+        theme === "large" && "rounded-[.875rem] after:rounded-[.875rem]",
+        theme === "small" && "rounded-[.625rem] after:rounded-[.625rem]",
         "bg-black/10",
-        "border border-brand-main/[.05]",
-        "p-1",
         "transition-colors",
         "hover:bg-brand-main/[.05] focus-visible:bg-brand-main/[.05]",
-        className
+        "p-1",
+        "relative",
+        "after:absolute after:inset-0 after:border after:border-brand-main/[.05] after:pointer-events-none",
+        className,
       )}
     >
       <SwitchOption
@@ -38,55 +37,37 @@ const AssetsSwitcher: FC<AssetsSwitcherProps> = ({
         className={classNames(
           theme === "small" && "mr-1",
           theme === "large" && "mr-2",
-          !checked && "font-bold"
+          !checked && "font-bold",
         )}
       >
-        {theme === "small" ? (
-          <AssetsIcon
-            className={classNames(
-              "transition-all",
-              !checked && "fill-brand-light"
-            )}
-          />
-        ) : (
-          "Assets"
-        )}
+        Tokens
       </SwitchOption>
       <SwitchOption
         theme={theme}
         className={classNames(checked && "font-bold")}
       >
-        {theme === "small" ? (
-          <NftsIcon
-            className={classNames(
-              "transition-all",
-              checked && "fill-brand-light"
-            )}
-          />
-        ) : (
-          "NFTs"
-        )}
+        NFTs
       </SwitchOption>
       <Switch.Thumb
         className={classNames(
           "absolute",
-          theme === "small" && "w-9 h-7",
-          theme === "large" && "w-[8.5rem] h-10",
           "bg-brand-main/[.05]",
           "rounded-[.625rem]",
           "transition-transform",
-          theme === "small" && checked && "translate-x-10",
-          theme === "large" && checked && "translate-x-[9rem]"
+          theme === "small" && "w-[6.125rem] h-8 rounded-md",
+          theme === "large" && "w-[6.722rem] h-9",
+          theme === "small" && checked && "translate-x-[6.375rem]",
+          theme === "large" && checked && "translate-x-[7.222rem]",
         )}
       />
     </Switch.Root>
   );
 };
 
-type SwitchOptionProps = {
+type SwitchOptionProps = PropsWithChildren<{
   theme?: ThemeType;
   className?: string;
-};
+}>;
 
 const SwitchOption: FC<SwitchOptionProps> = ({
   theme,
@@ -98,9 +79,9 @@ const SwitchOption: FC<SwitchOptionProps> = ({
       "px-2",
       "flex items-center justify-center",
       "text-base color-brand-light",
-      theme === "small" && "w-9 h-7",
-      theme === "large" && "w-[8.5rem] py-2",
-      className
+      theme === "small" && "w-[6.125rem] py-1",
+      theme === "large" && "w-[6.722rem] py-1.5",
+      className,
     )}
   >
     {children}

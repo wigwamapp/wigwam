@@ -8,12 +8,13 @@ import {
 } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
+import { Transaction } from "ethers";
 import classNames from "clsx";
 
 import { FEE_MODES, FeeMode, FeeSuggestions, AccountAsset } from "core/types";
+import { getGasPriceStep } from "core/common/transaction";
 
-import { useChainId, useToken } from "app/hooks";
+import { useToken } from "app/hooks";
 import {
   FEE_MODE_NAMES,
   formatUnits,
@@ -25,19 +26,18 @@ import FiatAmount from "app/components/elements/FiatAmount";
 import TabHeader from "app/components/elements/approvals/TabHeader";
 import PlusMinusInput from "app/components/elements/approvals/PlusMinusInput";
 
-type Tx = ethers.utils.UnsignedTransaction;
-
 type FeeTabProps = {
   accountAddress: string;
-  originTx: Tx;
+  originTx: Transaction;
   fees: FeeSuggestions | null;
-  averageGasLimit: ethers.BigNumber | null;
-  maxFee: ethers.BigNumber | null;
-  averageFee: ethers.BigNumber | null;
+  l1Fee: bigint | null;
+  averageGasLimit: bigint | null;
+  maxFee: bigint | null;
+  averageFee: bigint | null;
   feeMode: FeeMode;
   setFeeMode: Dispatch<FeeMode>;
-  overrides: Partial<Tx>;
-  onOverridesChange: Dispatch<SetStateAction<Partial<Tx>>>;
+  overrides: Partial<Transaction>;
+  onOverridesChange: Dispatch<SetStateAction<Partial<Transaction>>>;
 };
 
 const FeeTab = memo<FeeTabProps>(
@@ -47,26 +47,30 @@ const FeeTab = memo<FeeTabProps>(
     overrides,
     onOverridesChange,
     fees,
+    l1Fee,
     averageGasLimit,
     maxFee,
     averageFee,
     feeMode,
     setFeeMode,
   }) => {
-    const chainId = useChainId();
-    const changeStepDecimals = chainId === 1 ? 9 : 8;
+    const changeStepDecimals = fees
+      ? getGasPriceStep(fees?.modes.average.max).toString().length - 1
+      : 8;
     const changeValue = useCallback(
-      (name: string, value: ethers.BigNumberish | null) => {
-        onOverridesChange((o) => ({ ...o, [name]: value }));
+      (name: string, value: bigint | null) => {
+        onOverridesChange((o) => ({ ...o, [name]: value ?? "" }));
       },
-      [onOverridesChange]
+      [onOverridesChange],
     );
 
     const fixValue = useCallback(
       (name: string, value?: string) => {
-        if (!value) changeValue(name, null);
+        if (!value) {
+          onOverridesChange((o) => ({ ...o, [name]: null }));
+        }
       },
-      [changeValue]
+      [onOverridesChange],
     );
 
     const handleFeeModeChange = useCallback(
@@ -82,21 +86,22 @@ const FeeTab = memo<FeeTabProps>(
               gasPrice: null,
               maxFeePerGas: null,
               maxPriorityFeePerGas: null,
-            } as any)
+            }) as any,
         );
       },
-      [setFeeMode, onOverridesChange]
+      [setFeeMode, onOverridesChange],
     );
 
     return (
       <>
         <TabHeader>Edit network fee</TabHeader>
-        {fees && averageGasLimit && maxFee && averageFee && (
+        {fees && averageGasLimit && maxFee !== null && averageFee !== null && (
           <FeeModeSelect
             accountAddress={accountAddress}
-            gasLimit={ethers.BigNumber.from(overrides.gasLimit ?? tx.gasLimit!)}
+            gasLimit={overrides.gasLimit ?? tx.gasLimit!}
             averageGasLimit={averageGasLimit}
             fees={fees}
+            l1Fee={l1Fee}
             maxFee={maxFee}
             averageFee={averageFee}
             value={feeMode}
@@ -105,7 +110,7 @@ const FeeTab = memo<FeeTabProps>(
           />
         )}
 
-        {tx.maxPriorityFeePerGas ? (
+        {fees?.type === "modern" ? (
           <>
             <PlusMinusInput
               label="Max base fee"
@@ -121,9 +126,13 @@ const FeeTab = memo<FeeTabProps>(
                   (in GWEI) * gas limit.
                 </>
               }
+              tooltipProps={{
+                size: "large",
+                placement: "top",
+              }}
               value={formatUnits(
                 overrides.maxFeePerGas ?? tx.maxFeePerGas,
-                "gwei"
+                "gwei",
               )}
               onChange={(e) =>
                 changeValue("maxFeePerGas", parseUnits(e.target.value, "gwei"))
@@ -141,7 +150,7 @@ const FeeTab = memo<FeeTabProps>(
                     ).toString(),
                     decimals: changeStepDecimals,
                     operator: "minus",
-                  })
+                  }),
                 )
               }
               onPlusClick={() =>
@@ -154,7 +163,7 @@ const FeeTab = memo<FeeTabProps>(
                       0
                     ).toString(),
                     decimals: changeStepDecimals,
-                  })
+                  }),
                 )
               }
             />
@@ -171,14 +180,18 @@ const FeeTab = memo<FeeTabProps>(
                   incentivizes them to prioritize your transaction.
                 </>
               }
+              tooltipProps={{
+                size: "large",
+                placement: "top",
+              }}
               value={formatUnits(
                 overrides.maxPriorityFeePerGas ?? tx.maxPriorityFeePerGas,
-                "gwei"
+                "gwei",
               )}
               onChange={(e) =>
                 changeValue(
                   "maxPriorityFeePerGas",
-                  parseUnits(e.target.value, "gwei")
+                  parseUnits(e.target.value, "gwei"),
                 )
               }
               onBlur={(e) => fixValue("maxPriorityFeePerGas", e.target.value)}
@@ -193,7 +206,7 @@ const FeeTab = memo<FeeTabProps>(
                     ).toString(),
                     decimals: changeStepDecimals,
                     operator: "minus",
-                  })
+                  }),
                 )
               }
               onPlusClick={() =>
@@ -206,7 +219,7 @@ const FeeTab = memo<FeeTabProps>(
                       0
                     ).toString(),
                     decimals: changeStepDecimals,
-                  })
+                  }),
                 )
               }
             />
@@ -238,7 +251,7 @@ const FeeTab = memo<FeeTabProps>(
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
                   decimals: changeStepDecimals,
                   operator: "minus",
-                })
+                }),
               )
             }
             onPlusClick={() =>
@@ -247,25 +260,26 @@ const FeeTab = memo<FeeTabProps>(
                 prepareAmountOnChange({
                   value: (overrides.gasPrice ?? tx.gasPrice ?? 0).toString(),
                   decimals: changeStepDecimals,
-                })
+                }),
               )
             }
           />
         )}
       </>
     );
-  }
+  },
 );
 
 export default FeeTab;
 
 type FeeModeSelectProps = {
   accountAddress: string;
-  gasLimit: ethers.BigNumber;
-  averageGasLimit: ethers.BigNumber;
+  gasLimit: bigint;
+  averageGasLimit: bigint;
   fees: FeeSuggestions;
-  maxFee: ethers.BigNumber;
-  averageFee: ethers.BigNumber;
+  l1Fee: bigint | null;
+  maxFee: bigint;
+  averageFee: bigint;
   value: FeeMode;
   onValueChange: (value: FeeMode) => void;
   className?: string;
@@ -277,15 +291,16 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
     gasLimit,
     averageGasLimit,
     fees,
-    // maxFee,
+    l1Fee,
     averageFee,
     value,
     onValueChange,
     className,
   }) => {
     gasLimit = useMemo(
-      () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
-      [averageGasLimit, gasLimit]
+      () =>
+        BigInt(gasLimit) > BigInt(averageGasLimit) ? averageGasLimit : gasLimit,
+      [averageGasLimit, gasLimit],
     );
 
     return (
@@ -293,13 +308,15 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
         type="single"
         orientation="horizontal"
         value={
-          gasLimit.mul(fees.modes[value].max).eq(averageFee) ? value : undefined
+          gasLimit * fees.modes[value].max + (l1Fee ?? 0n) === averageFee
+            ? value
+            : undefined
         }
         onValueChange={onValueChange}
         className={classNames("grid grid-cols-3 gap-2.5", className)}
       >
         {FEE_MODES.map((mode) => {
-          const modeMaxFee = gasLimit.mul(fees.modes[mode].max);
+          const modeMaxFee = gasLimit * fees.modes[mode].max + (l1Fee ?? 0n);
 
           return (
             <FeeModeItem
@@ -307,19 +324,19 @@ const FeeModeSelect = memo<FeeModeSelectProps>(
               accountAddress={accountAddress}
               value={mode}
               fee={modeMaxFee}
-              selected={modeMaxFee.eq(averageFee)}
+              selected={modeMaxFee === averageFee}
             />
           );
         })}
       </ToggleGroup.Root>
     );
-  }
+  },
 );
 
 type FeeModeItemProps = {
   accountAddress: string;
   value: FeeMode;
-  fee: ethers.BigNumber;
+  fee: bigint;
   selected: boolean;
 };
 
@@ -350,7 +367,7 @@ const FeeModeItem: FC<FeeModeItemProps> = ({
         "transition-colors",
         "group",
         !selected && "hover:bg-brand-main/10",
-        selected && "bg-brand-main/[.2]"
+        selected && "bg-brand-main/[.2]",
       )}
     >
       <span className="mb-1.5 text-sm items-center">
@@ -373,7 +390,7 @@ const FeeModeItem: FC<FeeModeItemProps> = ({
           className={classNames(
             "text-xs text-brand-inactivedark truncate",
             "transition-colors",
-            selected && "!text-brand-light"
+            selected && "!text-brand-light",
           )}
         />
       )}

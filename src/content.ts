@@ -1,18 +1,16 @@
-import browser from "webextension-polyfill";
 import { PorterClient } from "lib/ext/porter/client";
 import { PorterDisconnectedError } from "lib/ext/porter/helpers";
 
 import { PorterChannel } from "core/types/shared";
-import { JSONRPC, DISCONNECT_ERROR, VIGVAM_FAVICON } from "core/common/rpc";
+import { JSONRPC, DISCONNECT_ERROR, WIGWAM_FAVICON } from "core/common/rpc";
 import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
 if (shouldInject()) {
-  const injected = injectScript(browser.runtime.getURL("scripts/inpage.js"));
-  injected && initMsgGateway(injected);
+  initMsgGateway();
 }
 
-function initMsgGateway(injected: Promise<void>) {
+function initMsgGateway() {
   const inpage = new InpageProtocol("content", "injected");
 
   let fullyDisconnected = false;
@@ -24,21 +22,23 @@ function initMsgGateway(injected: Promise<void>) {
 
     if (
       process.env.NODE_ENV === "development" &&
-      process.env.VIGVAM_DEV_ACTIVE_TAB_RELOAD === "true"
+      process.env.WIGWAM_DEV_ACTIVE_TAB_RELOAD === "true"
     ) {
-      location.reload();
+      // Wait for the fresh content script to be loaded
+      // via browser.scripting.registerContentScripts()
+      setTimeout(() => location.reload(), 300);
       return;
     }
 
     console.error(
-      "Vigvam: Provider disconnected." +
-        " A page reload is required to reestablish the connection."
+      "Wigwam: Provider disconnected." +
+        " A page reload is required to reestablish the connection.",
     );
   };
 
   // Redirect messages: Background --> Injected
   porter.onOneWayMessage((msg) => {
-    injected.then(() => inpage.send(msg));
+    inpage.send(msg);
   });
 
   // Redirect messages: Injected --> Background
@@ -69,7 +69,7 @@ function initMsgGateway(injected: Promise<void>) {
       if (favIconUrl) {
         porter.sendOneWayMessage({
           jsonrpc: JSONRPC,
-          method: VIGVAM_FAVICON,
+          method: WIGWAM_FAVICON,
           params: [favIconUrl],
         });
       }
@@ -77,24 +77,6 @@ function initMsgGateway(injected: Promise<void>) {
       console.error(err);
     }
   });
-}
-
-function injectScript(src: string) {
-  try {
-    const container = document.head || document.documentElement;
-    const script = document.createElement("script");
-    script.setAttribute("async", "false");
-    script.src = src;
-    container.insertBefore(script, container.children[0]);
-    container.removeChild(script);
-
-    return new Promise<void>((res) =>
-      script.addEventListener("load", () => res(), true)
-    );
-  } catch (err) {
-    console.error("Vigvam: Provider injection failed.", err);
-    return null;
-  }
 }
 
 function getFavicon(): string | null {

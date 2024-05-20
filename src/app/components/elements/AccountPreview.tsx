@@ -2,13 +2,13 @@ import { FC, memo } from "react";
 import classNames from "clsx";
 import { ethers } from "ethers";
 
-import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
+import WalletAvatar from "./WalletAvatar";
 
 type AssetBalance = {
   symbol: string;
   name: string;
-  balance: ethers.BigNumber;
+  balance: bigint;
 };
 
 type AccountPreviewProps = {
@@ -20,12 +20,7 @@ type AccountPreviewProps = {
 export const AccountPreview = memo<AccountPreviewProps>(
   ({ address, baseAsset, quoteAsset }) => (
     <div className={classNames("inline-flex items-stretch")}>
-      <AutoIcon
-        seed={address}
-        source="dicebear"
-        type="avataaars"
-        className="h-16 w-16 mr-4"
-      />
+      <WalletAvatar seed={address} className="h-16 w-16 mr-4" />
 
       <div className="p-1 flex flex-col">
         <span className="text-lg font-semibold">
@@ -38,7 +33,7 @@ export const AccountPreview = memo<AccountPreviewProps>(
         </div>
       </div>
     </div>
-  )
+  ),
 );
 
 export default AccountPreview;
@@ -53,9 +48,7 @@ const AssetBalancePreivew: FC<AssetBalancePreivewProps> = ({
   className,
 }) => (
   <div className={classNames("inline-flex text-base", className)}>
-    <span className="font-medium mr-1">
-      {ethers.utils.formatEther(balance)}
-    </span>
+    <span className="font-medium mr-1">{ethers.formatEther(balance)}</span>
     <span>{symbol}</span>
   </div>
 );

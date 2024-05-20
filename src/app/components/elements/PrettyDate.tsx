@@ -1,8 +1,8 @@
 import { memo, useEffect } from "react";
 import { useAtomValue } from "jotai";
-import format from "date-fns/format";
-import formatDistanceToNowStrict from "date-fns/formatDistanceToNowStrict";
-import isToday from "date-fns/isToday";
+import { format } from "date-fns/format";
+import { formatDistanceToNowStrict } from "date-fns/formatDistanceToNowStrict";
+import { isToday } from "date-fns/isToday";
 import useForceUpdate from "use-force-update";
 
 import {
@@ -40,7 +40,7 @@ export default PrettyDate;
 
 export const getPrettyDate = (
   date: string | number,
-  currentLocaleCode: string
+  currentLocaleCode: string,
 ) => {
   const preparedDate = new Date(date);
 

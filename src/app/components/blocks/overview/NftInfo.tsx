@@ -4,12 +4,13 @@ import { followCursor } from "tippy.js";
 import { useAtomValue } from "jotai";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
+import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountNFT, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
 import { findToken } from "core/client";
 
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
@@ -19,6 +20,8 @@ import {
   useLazyNetwork,
   useTokenActivitiesSync,
   useAutoRefreshNftMetadata,
+  useAccounts,
+  useHideToken,
 } from "app/hooks";
 import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -30,20 +33,20 @@ import PrettyAmount from "app/components/elements/PrettyAmount";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 import { ReactComponent as PlayIcon } from "app/icons/media-play.svg";
 import { ReactComponent as ExpandIcon } from "app/icons/media-expand.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
 import TokenActivity from "./TokenActivity";
-import { TokenStandardValue } from "./AssetInfo";
 import NftOverview from "../nft/NftOverview";
 
 const NftInfo: FC = () => {
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
@@ -54,17 +57,24 @@ const NftInfo: FC = () => {
     tokenInfo = undefined;
   }
 
+  if (process.env.RELEASE_ENV === "false") {
+    // eslint-disable-next-line
+    useEffect(() => {
+      console.info(tokenInfo);
+    }, [tokenInfo]);
+  }
+
   useTokenActivitiesSync(
     chainId,
     currentAccount.address,
-    tokenInfo && tokenSlug
+    tokenInfo && tokenSlug,
   );
 
   useAutoRefreshNftMetadata(tokenInfo);
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
-    [tokenSlug]
+    [tokenSlug],
   );
 
   const { copy, copied } = useCopyToClipboard(address);
@@ -74,6 +84,8 @@ const NftInfo: FC = () => {
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
   }, [tokenSlug]);
+
+  const handleHideNFT = useHideToken(tokenInfo);
 
   const handleMetadataRefresh = useCallback(() => {
     findToken(chainId, currentAccount.address, tokenSlug, true);
@@ -90,12 +102,12 @@ const NftInfo: FC = () => {
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="ml-6 pr-5 -mr-5 flex flex-col"
-          viewPortClassName="pb-20 pt-6 viewportBlock"
-          scrollBarClassName="py-0 pt-[18.75rem] pb-20"
+          className="ml-6 pr-5 -mr-5 flex flex-col w-full"
+          viewPortClassName="pt-6 viewportBlock"
+          scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
-          <div className="w-[31.5rem]">
+          <div>
             <div className="flex mb-6">
               <NftPreview token={tokenInfo!} rawBalance={rawBalance} />
 
@@ -109,7 +121,7 @@ const NftInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold text-left",
                       "text-brand-main",
-                      "min-w-0 truncate"
+                      "min-w-0 truncate",
                     )}
                   >
                     <>{preparedId}</>
@@ -117,6 +129,15 @@ const NftInfo: FC = () => {
 
                   <TippySingletonProvider>
                     <div className="flex items-center ml-4">
+                      {explorerLink && (
+                        <IconedButton
+                          aria-label="View NFT details"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={detailUrl ?? explorerLink.nft(address, tokenId)}
+                        />
+                      )}
                       <IconedButton
                         aria-label={
                           copied
@@ -126,7 +147,7 @@ const NftInfo: FC = () => {
                         Icon={copied ? SuccessIcon : CopyIcon}
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                         iconClassName="!w-[1.125rem]"
-                        onClick={copy}
+                        onClick={() => copy()}
                       />
                       <IconedButton
                         aria-label={"Refresh NFT metadata"}
@@ -135,15 +156,13 @@ const NftInfo: FC = () => {
                         className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                         iconClassName="!w-[1.125rem]"
                       />
-                      {explorerLink && (
-                        <IconedButton
-                          aria-label="View NFT details"
-                          Icon={WalletExplorerIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem]"
-                          iconClassName="!w-[1.125rem]"
-                          href={detailUrl ?? explorerLink.nft(address, tokenId)}
-                        />
-                      )}
+                      <IconedButton
+                        aria-label="Hide token"
+                        Icon={EyeIcon}
+                        onClick={() => handleHideNFT()}
+                        className="!w-6 !h-6 min-w-[1.5rem]"
+                        iconClassName="!w-[1.125rem]"
+                      />
                     </div>
                   </TippySingletonProvider>
                 </div>
@@ -153,7 +172,7 @@ const NftInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold",
                       "line-clamp-3",
-                      preparedId && "mt-1 mb-6"
+                      preparedId && "mt-1 mb-6",
                     )}
                   >
                     {name}
@@ -166,7 +185,7 @@ const NftInfo: FC = () => {
                   className="!py-2 mt-auto mr-auto"
                 >
                   <SendIcon className="w-6 h-auto mr-2" />
-                  Transfer
+                  Send
                 </Button>
               </div>
             </div>
@@ -190,12 +209,12 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
 
   const overviewable = Boolean(token.contentUrl || token.thumbnailUrl);
   const playable = Boolean(
-    token.contentType === "video_url" || token.contentType === "audio_url"
+    token.contentType === "video_url" || token.contentType === "audio_url",
   );
 
   const handleModalOpen = useCallback(
     () => overviewable && setModalOpened(true),
-    [overviewable]
+    [overviewable],
   );
 
   const handleModalClose = useCallback(() => {
@@ -210,7 +229,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
         className={classNames(
           "relative",
           "group",
-          overviewable ? "cursor-zoom-in" : "cursor-default"
+          overviewable ? "cursor-zoom-in" : "cursor-default",
         )}
       >
         <NftAvatar
@@ -218,7 +237,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
           alt={token.name}
           className={classNames(
             "w-[13rem] min-w-[13rem] h-[13rem]",
-            "!rounded-[.625rem]"
+            "!rounded-[.625rem]",
           )}
         />
 
@@ -237,7 +256,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
               "bg-brand-darkblue/[.8]",
               "backdrop-blur-[8px]",
               "border border-brand-main/20",
-              "color-brand-light"
+              "color-brand-light",
             )}
           />
         )}
@@ -251,7 +270,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
                   "!p-2.5",
                   "!bg-brand-darkblue/[.6]",
                   "group-hover:!bg-brand-darkblue/[.8]",
-                  "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                 )}
               >
                 <PlayIcon className="w-6 h-auto" />
@@ -265,7 +284,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
                 "!bg-brand-darkblue/[.8]",
                 "opacity-0",
                 "group-hover:opacity-100",
-                "absolute top-2 right-2"
+                "absolute top-2 right-2",
               )}
             >
               <ExpandIcon className="w-4 min-w-[1rem] h-auto" />
@@ -284,7 +303,7 @@ const NftPreview: FC<NftPreviewProps> = ({ token, rawBalance }) => {
         >
           <NftOverview
             token={token}
-            className="p-8 bg-[#07081B]/[.98] cursor-zoom-out"
+            className="p-8 bg-[#0E1314]/[.98] cursor-zoom-out"
           />
         </div>
       )}
@@ -300,5 +319,5 @@ const controlClassName = classNames(
   "transition",
   "p-2",
   "flex items-center justify-center",
-  "hover:bg-brand-darkblue/[.6]"
+  "hover:bg-brand-darkblue/[.6]",
 );

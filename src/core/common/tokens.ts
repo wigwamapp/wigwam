@@ -1,7 +1,20 @@
-import { Provider } from "@ethersproject/abstract-provider";
+import { ZeroAddress, ethers } from "ethers";
 
 import { ERC20__factory, ERC1155__factory, ERC721__factory } from "abi-types";
-import { TokenActivity, TokenStandard } from "core/types";
+import {
+  AccountToken,
+  TokenActivity,
+  TokenStandard,
+  TokenStatus,
+} from "core/types";
+import * as repo from "core/repo";
+
+export const ZERO_ADDRESSES = new Set([
+  ZeroAddress,
+  "0x000000000000000000000000000000000000800A",
+  "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "0x0000000000000000000000000000000000001010",
+]);
 
 export const NATIVE_TOKEN_SLUG = createTokenSlug({
   standard: TokenStandard.Native,
@@ -59,9 +72,9 @@ export function getNativeTokenLogoUrl(chainTag: string) {
 }
 
 export async function detectNFTStandard(
-  provider: Provider,
+  provider: ethers.Provider,
   tokenAddress: string,
-  tokenId: string
+  tokenId: string,
 ) {
   try {
     const erc1155Contract = ERC1155__factory.connect(tokenAddress, provider);
@@ -73,14 +86,14 @@ export async function detectNFTStandard(
   return TokenStandard.ERC721;
 }
 
-const STUB_ADDRESS = "0x0000000000000000000000000000000000000001";
+// const STUB_ADDRESS = "0x0000000000000000000000000000000000000001";
 const ERC721_IFACE_ID = "0x80ac58cd";
 const ERC1155_IFACE_ID = "0xd9b67a26";
 
 export async function isTokenStandardValid(
-  provider: Provider,
+  provider: ethers.Provider,
   address: string,
-  standard: TokenStandard
+  standard: TokenStandard,
 ) {
   switch (standard) {
     case TokenStandard.ERC20:
@@ -98,7 +111,7 @@ export async function isTokenStandardValid(
 
           const supply = await contract.totalSupply();
 
-          return !supply.isZero();
+          return supply !== 0n;
         } catch {}
       }
       break;
@@ -112,10 +125,10 @@ export async function isTokenStandardValid(
           if (is721) return is721;
         } catch {}
 
-        try {
-          await contract.balanceOf(STUB_ADDRESS);
-          return true;
-        } catch {}
+        // try {
+        //   await contract.balanceOf(STUB_ADDRESS);
+        //   return true;
+        // } catch {}
       }
       break;
 
@@ -124,11 +137,35 @@ export async function isTokenStandardValid(
         const contract = ERC1155__factory.connect(address, provider);
 
         try {
-          return await contract.supportsInterface(ERC1155_IFACE_ID);
+          const is1155 = await contract.supportsInterface(ERC1155_IFACE_ID);
+          if (is1155) return is1155;
         } catch {}
       }
       break;
+
+    default:
+      throw new Error("Unhandled Token ERC standard");
   }
 
   return false;
+}
+
+export async function toggleTokenStatus(token: AccountToken) {
+  try {
+    if (token.status === TokenStatus.Native) return;
+
+    await repo.accountTokens.put(
+      {
+        ...token,
+        status:
+          token.status === TokenStatus.Enabled
+            ? TokenStatus.Disabled
+            : TokenStatus.Enabled,
+        manuallyStatusChanged: true,
+      },
+      createAccountTokenKey(token),
+    );
+  } catch (e) {
+    console.error(e);
+  }
 }

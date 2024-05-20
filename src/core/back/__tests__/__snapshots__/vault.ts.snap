@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Vault signDigest 1`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0xff7ba4aad6ef31c93e13eae86c353a27a50ec898737eb06112cdef3f4fcf1ff7",
+  "s": "0x47e9d61e1761592d79e936fd77c609ddacc3b3cb971e809c1b07ee8c413e5d50",
+  "v": 27,
+}
+`;
+
+exports[`Vault signDigest 2`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x70dff536ec5f278f846050519745149ac99bbc375bc048285c60b5a2befd08b2",
+  "s": "0x17f90d7d1f5fdd866db4de2d2f72285195fd7dd41ed3d115a93e9edf2a8ab723",
+  "v": 28,
+}
+`;
+
+exports[`Vault signDigest 3`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0xe86e1433449e1a2e326a7e4eeec3f638af8045d12d570d54c390dc83ca3998bb",
+  "s": "0x14cb3e75bb1c5bca45ff374257bfe273d7eca601def2828419a7fa422a5ab731",
+  "v": 28,
+}
+`;
+
+exports[`Vault signDigest 4`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x9c09e7e02e6445e805b1ae515da4903aed89a87c6e4ba261cdfd06b15bee6229",
+  "s": "0x41d495aef6840c0ce0092c1094eccf8b3128c6912e24da4c50241986ddca43a0",
+  "v": 28,
+}
+`;
+
+exports[`Vault signDigest 5`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x73f1ee82e3e09d2c1d6c8d571555fd16d76362b17980154ccd5954cbfc70b031",
+  "s": "0x2bff2621e998fbd1bb70c3912d0747d629c59cb8dbb64ef93a02e7d7b3905300",
+  "v": 27,
+}
+`;
+
+exports[`Vault signDigest 6`] = `
+{
+  "_type": "signature",
+  "networkV": null,
+  "r": "0x956328b488517c80389e1ec4e352299bb700db40410d468a641b5f5b43154af3",
+  "s": "0x15c67cd4f80913890fc139eb36ef92ab23ebc829497c7df3ea4e523c7888976d",
+  "v": 28,
+}
+`;
+
+exports[`Vault signMessage basic 1`] = `"0x134e4740d0814f3cb6f3c24d2ee8b007c189311b07c9f822124173d82865093d6c38b7543db3505440a7e108ea830256de7cdce785b15e3ba464cd7337f408831b"`;
+
+exports[`Vault signTypedMessage 1`] = `"0xb6c957d6af9300979098cf5ddf83a2ddcadf2ab518ee28c73a5bca2f90c824980436224417df4932e3b7aa915420721a96bba72a644a139d988003eb3763bb751b"`;
+
+exports[`Vault signTypedMessage 2`] = `"0x06a36b81a3c474b8a7624b6514d84e8b4fac5cf321493473afb90d9a63c697e17d30c423a843f0944ee98fb7f963d5c25af4342cd7882582711abb94d408c73e1c"`;
+
+exports[`Vault signTypedMessage 3`] = `"0xae59d546381583849b7e62ec5b2c1e252f281a6ef465c2d7e5658b5cd9ebc6c85784de3264c4db05acc82ebbc37f4c839a7ed6b212a81c7ce231f446509c8bb41c"`;

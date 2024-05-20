@@ -1,4 +1,11 @@
-import { FC, createContext, useContext, useEffect, useMemo } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { useDocumentVisibility } from "lib/react-hooks/useDocumentVisibility";
@@ -8,6 +15,7 @@ import { sync, syncTokenActivities } from "core/client";
 import { createAccountTokenKey } from "core/common/tokens";
 
 import { chainIdAtom, syncStatusAtom } from "app/atoms";
+import { useAccounts } from "./account";
 
 const ScopedChainIdContext = createContext<number | null>(null);
 
@@ -18,7 +26,7 @@ export function useChainId() {
   return scopedChainId === null ? globalChainId : scopedChainId;
 }
 
-export const ChainIdProvider: FC<{ chainId: number }> = ({
+export const ChainIdProvider: FC<PropsWithChildren<{ chainId: number }>> = ({
   chainId,
   children,
 }) => (
@@ -28,23 +36,23 @@ export const ChainIdProvider: FC<{ chainId: number }> = ({
 );
 
 export function useIsSyncing() {
-  const chainId = useChainId();
+  const { currentAccount } = useAccounts();
   const status = useSyncStatus();
 
-  return status.includes(chainId);
+  return status.includes(currentAccount.address);
 }
 
 export function useIsTokenActivitySyncing(
   chainId: number,
   accountAddress: string,
-  tokenSlug?: string
+  tokenSlug?: string,
 ) {
   const status = useSyncStatus();
   const syncKey = useMemo(
     () =>
       tokenSlug &&
       createAccountTokenKey({ chainId, accountAddress, tokenSlug }),
-    [chainId, accountAddress, tokenSlug]
+    [chainId, accountAddress, tokenSlug],
   );
 
   return syncKey ? status.includes(syncKey) : false;
@@ -53,7 +61,7 @@ export function useIsTokenActivitySyncing(
 export function useSync(
   chainId: number,
   accountAddress: string,
-  tokenType = TokenType.Asset
+  tokenType = TokenType.Asset,
 ) {
   const isHidden = useDocumentVisibility();
 
@@ -77,7 +85,7 @@ export function useSync(
 export function useTokenActivitiesSync(
   chainId: number,
   accountAddress: string,
-  tokenSlug?: string
+  tokenSlug?: string,
 ) {
   const isHidden = useDocumentVisibility();
 

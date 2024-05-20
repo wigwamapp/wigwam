@@ -2,7 +2,7 @@ import { ethErrors } from "eth-rpc-errors";
 
 import {
   ActivitySource,
-  RpcReply,
+  RpcMessageContext,
   JsonRpcMethod,
   SigningStandard,
   JsonRpcError,
@@ -13,22 +13,48 @@ import { getPageOrigin } from "core/common/permissions";
 import { isUnlocked } from "../state";
 
 import { sendRpc } from "./network";
+import { RpcCtx } from "./context";
 import {
   fetchPermission,
   requestConnection,
   requestTransaction,
   requestSigning,
   recoverPersonalSign,
-  requestSwitchChain,
+  requestNetwork,
 } from "./wallet";
 
+/**
+ * The `handleRpc` function handles various RPC methods and performs different
+ * actions based on the method type.
+ * @param {RpcMessageContext} msgCtx - The `msgCtx` parameter is of type
+ * `RpcMessageContext` and represents the context of the RPC message being handled.
+ * @param {ActivitySource} source - The `source` parameter represents the source of
+ * the activity that triggered the RPC call. It contains information about the type
+ * of source (e.g., "page") and any associated permissions or chain ID.
+ * @param {number} chainId - The `chainId` parameter represents the ID of the
+ * blockchain network that the RPC request is targeting. It is a number that
+ * uniquely identifies a specific blockchain network.
+ * @param {string} method - The `method` parameter in the `handleRpc` function is a
+ * string that represents the JSON-RPC method being called. It is used to determine
+ * the specific logic to execute based on the method being called.
+ * @param {any[]} params - The `params` parameter is an array that contains the
+ * arguments passed to the RPC method. The specific arguments depend on the method
+ * being called.
+ */
 export async function handleRpc(
+  msgCtx: RpcMessageContext,
   source: ActivitySource,
   chainId: number,
   method: string,
   params: any[],
-  reply: RpcReply
 ) {
+  const rpcCtx = new RpcCtx(msgCtx);
+
+  /**
+   * The function `expandPermission` checks if the source type is "page", and if
+   * so, retrieves the permission for the page's origin and updates the source
+   * object with the permission and chainId
+   */
   const expandPermission = async () => {
     if (source.type === "page") {
       if (!isUnlocked()) return;
@@ -52,7 +78,7 @@ export async function handleRpc(
       case JsonRpcMethod.wallet_getPermissions: {
         dropForSelf(source);
 
-        return await fetchPermission(source, reply);
+        return await fetchPermission(rpcCtx, source);
       }
 
       case JsonRpcMethod.wallet_requestPermissions:
@@ -63,17 +89,17 @@ export async function handleRpc(
           method === JsonRpcMethod.eth_requestAccounts;
 
         return await requestConnection(
+          rpcCtx,
           source,
           params,
           returnSelectedAccount,
-          reply
         );
       }
 
       case JsonRpcMethod.eth_sendTransaction: {
         await expandPermission();
 
-        return await requestTransaction(source, chainId, params, reply);
+        return await requestTransaction(rpcCtx, source, chainId, params);
       }
 
       case JsonRpcMethod.personal_sign:
@@ -85,13 +111,13 @@ export async function handleRpc(
         await expandPermission();
 
         const standard = getSigningStandard(method);
-        return await requestSigning(source, standard, params, reply);
+        return await requestSigning(rpcCtx, source, standard, params);
       }
 
       case JsonRpcMethod.personal_ecRecover: {
         await expandPermission();
 
-        return await recoverPersonalSign(source, params, reply);
+        return await recoverPersonalSign(rpcCtx, source, params);
       }
 
       case JsonRpcMethod.wallet_switchEthereumChain:
@@ -101,7 +127,18 @@ export async function handleRpc(
 
         const type =
           method === JsonRpcMethod.wallet_addEthereumChain ? "add" : "switch";
-        return await requestSwitchChain(type, source, params, reply);
+        return await requestNetwork(rpcCtx, type, source, params);
+      }
+
+      case JsonRpcMethod.wallet_getSnaps:
+      case JsonRpcMethod.wallet_requestSnaps: {
+        dropForSelf(source);
+        await expandPermission();
+
+        rpcCtx.reply({
+          // Just a stub
+          result: {},
+        });
       }
 
       case JsonRpcMethod.eth_sign:
@@ -114,9 +151,13 @@ export async function handleRpc(
       }
 
       default: {
+        if (method.startsWith("wallet")) {
+          throw ethErrors.provider.unsupportedMethod();
+        }
+
         await expandPermission();
 
-        reply(await sendRpc(chainId, method, params));
+        rpcCtx.reply(await sendRpc(chainId, method, params));
       }
     }
   } catch (err: any) {
@@ -130,7 +171,7 @@ export async function handleRpc(
       error = ethErrors.rpc.internal();
     }
 
-    reply({ error });
+    rpcCtx.reply({ error });
   }
 }
 
@@ -157,6 +198,7 @@ function getSigningStandard(method: string) {
   }
 }
 
+// Drop if request source is wallet internal page
 function dropForSelf(source: ActivitySource) {
   if (source.type === "self") {
     throw ethErrors.provider.unsupportedMethod();

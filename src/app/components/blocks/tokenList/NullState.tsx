@@ -14,7 +14,7 @@ const NullState = memo<NullStateProps>(({ searching, focusSearchInput }) => (
     className={classNames(
       "flex flex-col items-center",
       "h-full w-full py-9",
-      "text-sm text-brand-placeholder text-center"
+      "text-sm text-brand-placeholder text-center",
     )}
     onClick={focusSearchInput}
   >

@@ -4,57 +4,60 @@ import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import classNames from "clsx";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
-
-import { COINGECKO_NATIVE_TOKEN_IDS } from "fixtures/networks";
+import { useLazyAtomValue } from "lib/atom-utils";
+import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
-
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { TEvent, trackEvent } from "core/client";
+import { getTokenDetailsUrlAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
   TippySingletonProvider,
   useAccountToken,
+  useAccounts,
   useChainId,
   useExplorerLink,
+  useHideToken,
   useLazyNetwork,
+  useRamp,
   useTokenActivitiesSync,
 } from "app/hooks";
-import { Page, ReceiveTab as ReceiveTabEnum } from "app/nav";
+import { Page } from "app/nav";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
 import IconedButton from "app/components/elements/IconedButton";
 import FiatAmount from "app/components/elements/FiatAmount";
 import PrettyAmount from "app/components/elements/PrettyAmount";
 import Button from "app/components/elements/Button";
+import PriceChange from "app/components/elements/PriceChange";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
-import { ReactComponent as SendIcon } from "app/icons/send-small.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
-import { ReactComponent as BuyIcon } from "app/icons/buy.svg";
+import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
+import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
+import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
+import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
-import PriceChange from "./PriceChange";
 import TokenActivity from "./TokenActivity";
 
-export enum TokenStandardValue {
-  NATIVE = "Native",
-  ERC20 = "ERC-20",
-  ERC721 = "ERC-721",
-  ERC777 = "ERC-777",
-  ERC1155 = "ERC-1155",
-}
-
 const AssetInfo: FC = () => {
+  const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
   const currentNetwork = useLazyNetwork();
   const explorerLink = useExplorerLink(currentNetwork);
   let tokenInfo = useAccountToken(tokenSlug) as AccountAsset | undefined;
+
+  const tokenDetailsUrl = useLazyAtomValue(
+    getTokenDetailsUrlAtom({ chainId, tokenSlug }),
+    "off",
+  );
 
   if (tokenInfo?.tokenType !== TokenType.Asset) {
     tokenInfo = undefined;
@@ -63,21 +66,28 @@ const AssetInfo: FC = () => {
   useTokenActivitiesSync(
     chainId,
     currentAccount.address,
-    tokenInfo && tokenSlug
+    tokenInfo && tokenSlug,
   );
 
   const { standard, address } = useMemo(
     () => parseTokenSlug(tokenSlug),
-    [tokenSlug]
+    [tokenSlug],
   );
 
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  const showBuyButton = useMemo(
+    () => tokenInfo?.status !== TokenStatus.Disabled && onRampCurrency,
+    [tokenInfo?.status, onRampCurrency],
+  );
+
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
   }, [tokenSlug]);
+
+  const handleHideAsset = useHideToken(tokenInfo);
 
   if (!tokenInfo) return null;
 
@@ -92,23 +102,18 @@ const AssetInfo: FC = () => {
     balanceUSD,
   } = tokenInfo;
 
-  const coinGeckoId =
-    status === TokenStatus.Native
-      ? COINGECKO_NATIVE_TOKEN_IDS.get(chainId)
-      : address;
-
   return (
     <OverflowProvider>
       {(ref) => (
         <ScrollAreaContainer
           ref={mergeRefs([ref, scrollAreaRef])}
           hiddenScrollbar="horizontal"
-          className="ml-6 pr-5 -mr-5 flex flex-col"
-          viewPortClassName="pb-20 pt-6 viewportBlock"
-          scrollBarClassName="py-0 pt-[18.75rem] pb-20"
+          className="pr-5 -mr-5 flex flex-col w-full"
+          viewPortClassName="pl-6 pt-6 viewportBlock"
+          scrollBarClassName="py-0 pt-[18.75rem]"
           type="scroll"
         >
-          <div className="w-[31.5rem]">
+          <div>
             <div className="flex mb-5">
               <AssetLogo
                 asset={tokenInfo!}
@@ -121,13 +126,34 @@ const AssetInfo: FC = () => {
                     className={classNames(
                       "text-2xl font-bold",
                       "mr-4",
-                      "truncate"
+                      "truncate",
                     )}
                   >
                     {name}
                   </h2>
                   <TippySingletonProvider>
                     <div className="ml-auto flex items-center">
+                      {tokenDetailsUrl && (
+                        <IconedButton
+                          aria-label="View chart and token info"
+                          Icon={CoinGeckoIcon}
+                          className={classNames(
+                            "!w-6 !h-6 min-w-[1.5rem]",
+                            status !== TokenStatus.Native ? "mr-2" : "",
+                          )}
+                          iconClassName="!w-[1.125rem]"
+                          href={tokenDetailsUrl}
+                        />
+                      )}
+                      {explorerLink && status !== TokenStatus.Native && (
+                        <IconedButton
+                          aria-label="View token in Explorer"
+                          Icon={WalletExplorerIcon}
+                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
+                          iconClassName="!w-[1.125rem]"
+                          href={explorerLink.token(address)}
+                        />
+                      )}
                       {status !== TokenStatus.Native && (
                         <IconedButton
                           aria-label={
@@ -138,25 +164,16 @@ const AssetInfo: FC = () => {
                           Icon={copied ? SuccessIcon : CopyIcon}
                           className="!w-6 !h-6 min-w-[1.5rem] mr-2"
                           iconClassName="!w-[1.125rem]"
-                          onClick={copy}
+                          onClick={() => copy()}
                         />
                       )}
-                      {explorerLink && status !== TokenStatus.Native && (
+                      {status !== TokenStatus.Native && (
                         <IconedButton
-                          aria-label="View asset in Explorer"
-                          Icon={WalletExplorerIcon}
-                          className="!w-6 !h-6 min-w-[1.5rem] mr-2"
-                          iconClassName="!w-[1.125rem]"
-                          href={explorerLink.token(address)}
-                        />
-                      )}
-                      {currentNetwork?.type === "mainnet" && coinGeckoId && (
-                        <IconedButton
-                          aria-label="View asset in CoinGecko"
-                          Icon={CoinGeckoIcon}
+                          aria-label="Hide token"
+                          Icon={EyeIcon}
+                          onClick={() => handleHideAsset()}
                           className="!w-6 !h-6 min-w-[1.5rem]"
                           iconClassName="!w-[1.125rem]"
-                          href={`https://www.coingecko.com/en/coins/${coinGeckoId}`}
                         />
                       )}
                     </div>
@@ -208,41 +225,65 @@ const AssetInfo: FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-2">
+            <div className="mt-6 grid grid-cols-4 gap-2">
               <Button
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
                 theme="secondary"
-                className="grow !py-2"
+                className="grow !py-2 !min-w-0 text-sm"
               >
-                <SendIcon className="w-6 h-auto mr-2" />
-                Transfer
+                <SendIcon className="w-4 h-auto mr-2" />
+                Send
+              </Button>
+              <Button
+                to={{ receiveOpened: true, receiveToken: tokenSlug }}
+                merge={["token"]}
+                theme="secondary"
+                className="grow !py-2 !min-w-0 text-sm"
+              >
+                <ReceiveIcon className="w-4 h-auto mr-2" />
+                Receive
+              </Button>
+              <Button
+                to={{
+                  onRampOpened: true,
+                  token: tokenSlug,
+                }}
+                merge
+                theme="secondary"
+                className="grow !py-2 !min-w-0 text-sm"
+                disabled={!showBuyButton}
+                title={showBuyButton ? undefined : "Coming soon"}
+                onClick={() => {
+                  trackEvent(TEvent.BuyNavigated, {
+                    page: "dashboard",
+                    tokenName: name,
+                    tokenSymbol: symbol,
+                    chainId,
+                  });
+                }}
+              >
+                <BuyIcon className="w-4 h-auto mr-2" />
+                Buy
               </Button>
               <Button
                 to={{ page: Page.Swap }}
+                merge={["token"]}
                 theme="secondary"
-                className="grow !py-2"
-                disabled
-                title="Coming soon"
+                className="grow !py-2 !min-w-0 text-sm"
+                title={`Swap ${symbol}`}
+                onClick={() => {
+                  trackEvent(TEvent.SwapNavigated, {
+                    page: "dashboard",
+                    tokenName: name,
+                    tokenSymbol: symbol,
+                    chainId,
+                  });
+                }}
               >
-                <SwapIcon className="w-6 h-auto mr-2" />
+                <SwapIcon className="w-4 h-auto mr-2" />
                 Swap
               </Button>
-              {status === TokenStatus.Native && (
-                <Button
-                  to={{
-                    page: Page.Receive,
-                    receive: ReceiveTabEnum.BuyWithCrypto,
-                  }}
-                  theme="secondary"
-                  className="grow !py-2"
-                  disabled
-                  title="Coming soon"
-                >
-                  <BuyIcon className="w-6 h-auto mr-2" />
-                  Buy
-                </Button>
-              )}
             </div>
 
             <TokenActivity token={tokenInfo!} />

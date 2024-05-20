@@ -1,7 +1,8 @@
-import { atomFamily, selectAtom } from "jotai/utils";
+import { atomFamily, atomWithDefault, selectAtom } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithAutoReset,
+  atomWithClientStorage,
   atomWithRepoQuery,
   atomWithStorage,
 } from "lib/atom-utils";
@@ -15,6 +16,8 @@ import {
   onSyncStatusUpdated,
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
+import { indexerApi } from "core/common/indexerApi";
+import { getAllEvmNetworks } from "core/common/chainList";
 
 export const walletStateAtom = atomWithAutoReset(getWalletState, {
   onMount: onWalletStateUpdated,
@@ -22,16 +25,16 @@ export const walletStateAtom = atomWithAutoReset(getWalletState, {
 
 export const walletStatusAtom = selectAtom(
   walletStateAtom,
-  ({ status }) => status
+  ({ status }) => status,
 );
 
 export const hasSeedPhraseAtom = selectAtom(
   walletStateAtom,
-  ({ hasSeedPhrase }) => hasSeedPhrase
+  ({ hasSeedPhrase }) => hasSeedPhrase,
 );
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
-  atomWithAutoReset(() => getNeuterExtendedKey(derivationPath))
+  atomWithAutoReset(() => getNeuterExtendedKey(derivationPath)),
 );
 
 export const syncStatusAtom = atomWithAutoReset(getSyncStatus, {
@@ -42,13 +45,29 @@ export const getLocalNonceAtom = atomFamily(
   ({ chainId, accountAddress }: { chainId: number; accountAddress: string }) =>
     atomWithStorage<string | null>(
       nonceStorageKey(chainId, accountAddress),
-      null
+      null,
     ),
-  dequal
+  dequal,
 );
 
 export const getPermissionAtom = atomFamily((origin?: string) =>
   atomWithRepoQuery((query) =>
-    query(() => repo.permissions.get(origin || "<stub>"))
-  )
+    query(() => repo.permissions.get(origin || "<stub>")),
+  ),
 );
+
+export const getAppliedForRewardsAtom = atomFamily((address: string) =>
+  atomWithDefault(() =>
+    indexerApi
+      .get<{ applied: boolean }>(`/activity/check/${address}`)
+      .then((res) => res.data?.applied)
+      .catch(() => "error" as const),
+  ),
+);
+
+export const rewardsApplicationAtom = atomWithClientStorage<string>(
+  "rewards-application",
+  "",
+);
+
+export const allEvmNetworksAtom = atomWithDefault(getAllEvmNetworks);

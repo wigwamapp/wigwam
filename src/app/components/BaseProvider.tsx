@@ -1,6 +1,5 @@
-import { FC, Suspense } from "react";
-import { Provider as JotaiProvider, useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
+import { FC, PropsWithChildren, Suspense } from "react";
+import { useAtomsAll } from "lib/atom-utils";
 
 import { FONTS } from "app/defaults";
 import {
@@ -14,34 +13,30 @@ import { DialogProvider } from "app/hooks/dialog";
 import { ContactsDialogProvider } from "app/hooks/contacts";
 import ErrBond from "app/components/layouts/ErrBond";
 
-const BaseProvider: FC = ({ children }) => (
+const BaseProvider: FC<PropsWithChildren> = ({ children }) => (
   <>
     <ErrBond>
-      <JotaiProvider>
-        <Suspense fallback={null}>
-          <Boot />
+      <Suspense>
+        <Boot />
 
-          <DialogProvider>
-            <ContactsDialogProvider>{children}</ContactsDialogProvider>
-          </DialogProvider>
-        </Suspense>
-      </JotaiProvider>
+        <DialogProvider>
+          <ContactsDialogProvider>{children}</ContactsDialogProvider>
+        </DialogProvider>
+      </Suspense>
     </ErrBond>
   </>
 );
 
 export default BaseProvider;
 
-const bootAtom = waitForAll([
-  fontsAtom(FONTS),
-  i18nAtom,
-  currentLocaleAtom,
-  currenciesRateAtom,
-  selectedCurrencyAtom,
-]);
-
 const Boot: FC = () => {
-  useAtomValue(bootAtom);
+  useAtomsAll([
+    fontsAtom(FONTS),
+    i18nAtom,
+    currentLocaleAtom,
+    currenciesRateAtom,
+    selectedCurrencyAtom,
+  ]);
 
   return null;
 };

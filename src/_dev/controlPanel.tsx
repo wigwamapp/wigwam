@@ -1,6 +1,6 @@
-import { FC, StrictMode, useCallback, useRef } from "react";
+import { FC, PropsWithChildren, StrictMode, useCallback, useRef } from "react";
 import classNames from "clsx";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { ethers } from "ethers";
 import { ERC20__factory } from "abi-types";
 import { getRandomName } from "lib/random-name";
@@ -17,11 +17,11 @@ async function sendPolygonTokens() {
 
   const linkTokenAddress = "0x326c977e6efc84e512bb9c30f76e30c160ed06fb";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(linkTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
+  const convertedAmount = ethers.parseUnits("0.0001", 18);
 
   const txResult = await contract.transfer(recipient, convertedAmount);
   console.info({ txResult });
@@ -35,11 +35,11 @@ async function sendBscTokens() {
 
   const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(daiTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0.0001", 18);
+  const convertedAmount = ethers.parseUnits("0.0001", 18);
 
   const txResult = await contract.transfer(recipient, convertedAmount);
   console.info({ txResult });
@@ -53,11 +53,11 @@ async function approveBscTokens() {
 
   const daiTokenAddress = "0xec5dcb5dbf4b114c9d0f65bccab49ec54f6a0867";
 
-  const provider = getClientProvider(chainId).getSigner(fromAccount);
+  const provider = getClientProvider(chainId).getUncheckedSigner(fromAccount);
 
   const contract = ERC20__factory.connect(daiTokenAddress, provider);
 
-  const convertedAmount = ethers.utils.parseUnits("0", 18);
+  const convertedAmount = ethers.parseUnits("0", 18);
 
   const txResult = await contract.approve(recipient, convertedAmount);
   console.info({ txResult });
@@ -66,8 +66,8 @@ async function approveBscTokens() {
 async function generateRandomContacts() {
   const contractsToAdd: any[] = [];
 
-  const seedPhrase = ethers.Wallet.createRandom().mnemonic.phrase;
-  const hdNode = ethers.utils.HDNode.fromMnemonic(seedPhrase);
+  const seedPhrase = ethers.Wallet.createRandom().mnemonic;
+  const hdNode = ethers.HDNodeWallet.fromMnemonic(seedPhrase!);
 
   for (let i = 0; i < 99; i++) {
     const { address } = hdNode.derivePath(`m/44'/60'/0'/0/${i}`);
@@ -97,7 +97,7 @@ const ControlPanel: FC = () => {
         "flex flex-col",
         "bg-white/20 backdrop-blur-[10px]",
         "border border-brand-main/[.05]",
-        "shadow-addaccountmodal rounded-[.625rem]"
+        "shadow-addaccountmodal rounded-[.625rem]",
       )}
     >
       {Object.keys(actions).map((key) => (
@@ -109,9 +109,11 @@ const ControlPanel: FC = () => {
   );
 };
 
-const ControlButton: FC<{
-  action: () => Promise<void>;
-}> = ({ action, children }) => {
+const ControlButton: FC<
+  PropsWithChildren<{
+    action: () => Promise<void>;
+  }>
+> = ({ action, children }) => {
   const forceUpdate = useForceUpdate();
   const processesRef = useRef(0);
 
@@ -139,7 +141,7 @@ const ControlButton: FC<{
         "bg-black/40 hover:bg-black/20",
         "text-xs text-left",
         "transition ease-in-out duration-300",
-        processing && "animate-bounce"
+        processing && "animate-bounce",
       )}
       onClick={handleClick}
     >
@@ -151,9 +153,8 @@ const ControlButton: FC<{
 const el = document.createElement("div");
 document.body.appendChild(el);
 
-render(
+createRoot(el).render(
   <StrictMode>
     <ControlPanel />
   </StrictMode>,
-  el
 );

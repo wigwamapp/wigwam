@@ -1,4 +1,4 @@
-import { atomWithGlobal, atomWithStorage } from "lib/atom-utils";
+import { atomWithStorage } from "lib/atom-utils";
 
 import {
   DEFAULT_AUTO_LOCK_TIMEOUT,
@@ -6,23 +6,34 @@ import {
 } from "fixtures/settings";
 import { Setting, AnalyticsState } from "core/common";
 
-export const autoLockTimeout = atomWithStorage(
+export const autoLockTimeoutAtom = atomWithStorage(
   Setting.AutoLockTimeout,
-  DEFAULT_AUTO_LOCK_TIMEOUT
+  DEFAULT_AUTO_LOCK_TIMEOUT,
 );
 
 export const web3MetaMaskCompatibleAtom = atomWithStorage(
   Setting.Web3MetaMaskCompatible,
-  DEFAULT_WEB_METAMASK_COMPATIBLE
+  DEFAULT_WEB_METAMASK_COMPATIBLE,
 );
 
-export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, true);
+export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, false);
 
 export const analyticsAtom = atomWithStorage<AnalyticsState>(
   Setting.Analytics,
-  { enabled: false }
+  { enabled: false },
 );
 
-export const betaTestCodeAtom = atomWithGlobal("betatest_promocode", "");
+export const requiredAuthSigAtom = atomWithStorage<string[]>(
+  Setting.RequiredAuthSig,
+  [],
+);
 
-export const betaTestEnabledAtom = atomWithGlobal("betatest_enabled", "false");
+export const profileBlockedUntilAtom = atomWithStorage<number>(
+  Setting.ProfileBlockedUntil,
+  0,
+);
+
+export const swapVerifiedTokensAtom = atomWithStorage<boolean>(
+  Setting.SwapVerifiedTokens,
+  true,
+);

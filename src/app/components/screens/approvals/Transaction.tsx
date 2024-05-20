@@ -9,8 +9,7 @@ import {
 } from "react";
 import classNames from "clsx";
 import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
-import { ethers } from "ethers";
+import { Transaction, ethers } from "ethers";
 import retry from "async-retry";
 import * as Tabs from "@radix-ui/react-tabs";
 import { createOrganicThrottle } from "lib/system/organicThrottle";
@@ -22,6 +21,7 @@ import {
   FeeSuggestions,
   AccountSource,
   TxAction,
+  TxSignature,
 } from "core/types";
 import {
   approveItem,
@@ -32,9 +32,11 @@ import {
 } from "core/client";
 import { getNextNonce } from "core/common/nonce";
 import { matchTxAction } from "core/common/transaction";
+import { estimateL1Fee } from "core/common/l1Fee";
 
 import {
   OverflowProvider,
+  useAccounts,
   useChainId,
   useNativeCurrency,
   useOnBlock,
@@ -42,7 +44,7 @@ import {
   useSync,
 } from "app/hooks";
 import { useLedger } from "app/hooks/ledger";
-import { allAccountsAtom, getLocalNonceAtom } from "app/atoms";
+import { getLocalNonceAtom } from "app/atoms";
 import { withHumanDelay } from "app/utils";
 import { formatUnits } from "app/utils/txApprove";
 import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
@@ -50,13 +52,11 @@ import TabsHeader from "app/components/blocks/approvals/TabsHeader";
 import FeeTab from "app/components/blocks/approvals/FeeTab";
 import AdvancedTab from "app/components/blocks/approvals/AdvancedTab";
 import DetailsTab from "app/components/blocks/approvals/DetailsTab";
-import LongTextField from "app/components/elements/LongTextField";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 
 import ApprovalLayout from "./Layout";
 
-const { serializeTransaction, keccak256, recoverAddress, getAddress } =
-  ethers.utils;
+const { keccak256, recoverAddress, getAddress } = ethers;
 
 const TAB_VALUES = ["details", "fee", "advanced", "error"] as const;
 
@@ -67,8 +67,7 @@ const TAB_NAMES: Record<TabValue, ReactNode> = {
   error: "Error",
 };
 
-type TabValue = typeof TAB_VALUES[number];
-type Tx = ethers.utils.UnsignedTransaction;
+type TabValue = (typeof TAB_VALUES)[number];
 
 type ApproveTransactionProps = {
   approval: TransactionApproval;
@@ -77,20 +76,18 @@ type ApproveTransactionProps = {
 const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const { accountAddress, txParams, source } = approval;
   const chainId = useChainId();
+  const { allAccounts } = useAccounts();
   const nativeCurrency = useNativeCurrency();
 
-  const [allAccounts, localNonce] = useAtomValue(
-    waitForAll([
-      allAccountsAtom,
-      getLocalNonceAtom({ chainId, accountAddress }),
-    ])
+  const localNonce = useAtomValue(
+    getLocalNonceAtom({ chainId, accountAddress }),
   );
 
   useSync(chainId, accountAddress);
 
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === approval.accountAddress)!,
-    [approval, allAccounts]
+    [approval, allAccounts],
   );
 
   const provider = useProvider();
@@ -112,25 +109,29 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
   const [action, setAction] = useState<TxAction | null>(null);
   const [prepared, setPrepared] = useState<{
-    tx: Tx;
-    estimatedGasLimit: ethers.BigNumber;
+    tx: Transaction;
+    estimatedGasLimit: bigint;
     fees: FeeSuggestions | null;
+    l1Fee: bigint | null;
     destinationIsContract: boolean;
   }>();
-  const [txOverrides, setTxOverrides] = useState<Partial<Tx>>({});
+  const [txOverrides, setTxOverrides] = useState<Partial<Transaction>>({});
 
   const preparedTx = prepared?.tx;
   const fees = prepared?.fees;
+  const l1Fee = prepared?.l1Fee ?? null;
 
-  const originTx = useMemo<Tx | null>(() => {
+  const originTx = useMemo<Transaction | null>(() => {
     if (!prepared) return null;
 
-    const tx = { ...prepared.tx };
-    tx.nonce = getNextNonce(tx, localNonce);
+    const tx: Transaction = prepared.tx.clone();
+    tx.nonce = approval.source?.replaceTx
+      ? tx.nonce
+      : getNextNonce(tx, localNonce);
 
     const feeSug = prepared.fees?.modes[feeMode];
     if (feeSug) {
-      if (prepared.tx.maxPriorityFeePerGas) {
+      if (prepared.fees?.type === "modern") {
         tx.maxFeePerGas = feeSug.max;
         if ("priority" in feeSug) {
           tx.maxPriorityFeePerGas = feeSug.priority;
@@ -141,12 +142,12 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     }
 
     return tx;
-  }, [prepared, feeMode, localNonce]);
+  }, [approval.source, prepared, feeMode, localNonce]);
 
   const finalTx = useMemo<typeof originTx>(() => {
     if (!originTx) return originTx;
 
-    const tx = { ...originTx };
+    const tx = originTx.clone();
 
     for (const [key, value] of Object.entries(txOverrides)) {
       if (value || value === 0) {
@@ -162,25 +163,27 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
     try {
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return ethers.BigNumber.from(finalTx.gasLimit).mul(gasPrice!);
+
+      return finalTx.gasLimit * gasPrice! + (l1Fee ?? 0n);
     } catch {
       return null;
     }
-  }, [finalTx]);
+  }, [finalTx, l1Fee]);
 
   const averageFee = useMemo(() => {
     if (!finalTx || !prepared?.estimatedGasLimit) return null;
 
     try {
-      const gasLimit = prepared.estimatedGasLimit.lt(finalTx.gasLimit!)
-        ? prepared.estimatedGasLimit
-        : finalTx.gasLimit;
+      const gasLimit =
+        prepared.estimatedGasLimit < finalTx.gasLimit!
+          ? prepared.estimatedGasLimit
+          : finalTx.gasLimit;
       const gasPrice = finalTx.maxFeePerGas || finalTx.gasPrice;
-      return ethers.BigNumber.from(gasLimit).mul(gasPrice!);
+      return gasLimit * gasPrice! + (l1Fee ?? 0n);
     } catch {
       return null;
     }
-  }, [finalTx, prepared?.estimatedGasLimit]);
+  }, [finalTx, l1Fee, prepared?.estimatedGasLimit]);
 
   const withThrottle = useMemo(createOrganicThrottle, []);
 
@@ -192,15 +195,15 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
         setEstimating(true);
 
         try {
-          const { gasLimit, ...rest } = txParams;
+          const { gasLimit: providedGasLimit, ...pureTxParams } = txParams;
 
           // detele tx type cause auto-detect
-          delete rest.type;
+          delete pureTxParams.type;
 
           // detele gas prices
-          delete rest.gasPrice;
-          delete rest.maxFeePerGas;
-          delete rest.maxPriorityFeePerGas;
+          delete pureTxParams.gasPrice;
+          delete pureTxParams.maxFeePerGas;
+          delete pureTxParams.maxPriorityFeePerGas;
 
           // Fetch fee data
           const feeSuggestions = await suggestFees(provider).catch(() => null);
@@ -209,25 +212,22 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
             // Prepare transaction with other fields
             retry(
               () =>
-                provider
-                  .getUncheckedSigner(account.address)
-                  .populateTransaction({
-                    ...rest,
-                    type: feeSuggestions?.type === "legacy" ? 0 : undefined,
-                    chainId: bnify(rest?.chainId)?.toNumber(),
-                    ...(feeSuggestions?.type === "modern"
+                provider.getVoidSigner(account.address).populateTransaction({
+                  ...pureTxParams,
+                  nonce: pureTxParams.nonce ? +pureTxParams.nonce : undefined,
+                  type: feeSuggestions?.type === "legacy" ? 0 : undefined,
+                  ...(feeSuggestions?.type === "modern"
+                    ? {
+                        maxFeePerGas: feeSuggestions.modes.low.max,
+                        maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
+                      }
+                    : feeSuggestions?.type === "legacy"
                       ? {
-                          maxFeePerGas: feeSuggestions.modes.low.max,
-                          maxPriorityFeePerGas:
-                            feeSuggestions.modes.low.priority,
-                        }
-                      : feeSuggestions?.type === "legacy"
-                      ? {
-                          gasPrice: feeSuggestions.modes.low.max,
+                          gasPrice: feeSuggestions.modes.average.max,
                         }
                       : {}),
-                  }),
-              { retries: 2, minTimeout: 0, maxTimeout: 0 }
+                }),
+              { retries: 2, minTimeout: 0, maxTimeout: 0 },
             ),
             false,
             // TODO: Add logic for this
@@ -239,23 +239,56 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           delete tx.from;
 
-          const estimatedGasLimit = ethers.BigNumber.from(tx.gasLimit);
-          const minGasLimit = estimatedGasLimit.mul(5).div(4);
-          const averageGasLimit = estimatedGasLimit.mul(3).div(2);
+          const estimatedGasLimit = BigInt(tx.gasLimit!);
+          const minGasLimit = (estimatedGasLimit * 5n) / 4n;
+          const averageGasLimit = (estimatedGasLimit * 3n) / 2n;
+          const gasLimit =
+            providedGasLimit && minGasLimit <= BigInt(providedGasLimit)
+              ? BigInt(providedGasLimit)
+              : averageGasLimit;
 
+          const preparedTx = Transaction.from({
+            ...tx,
+            gasLimit,
+          });
+
+          const l1GasFee = await estimateL1Fee(
+            provider,
+            preparedTx,
+            feeSuggestions?.modes.average.max,
+          );
+
+          setLastError((le) => (le?.from === "estimation" ? null : le));
           setPrepared({
-            tx: {
-              ...tx,
-              nonce: bnify(tx.nonce)?.toNumber(),
-              gasLimit:
-                gasLimit && minGasLimit.lte(gasLimit)
-                  ? ethers.BigNumber.from(gasLimit)
-                  : averageGasLimit,
-            },
+            tx: preparedTx,
             estimatedGasLimit,
             fees: feeSuggestions,
+            l1Fee: l1GasFee,
             destinationIsContract,
           });
+
+          try {
+            if (
+              approval.source?.replaceTx?.type === "speedup" &&
+              approval.source.replaceTx.prevTxGasPrice &&
+              feeSuggestions
+            ) {
+              const prevTxGasPrice = BigInt(
+                approval.source.replaceTx.prevTxGasPrice,
+              );
+              const gasPrice = (prevTxGasPrice * 11n) / 10n + 1n; // Add 10%
+
+              if (gasPrice < feeSuggestions.modes.average.max) {
+                setFeeMode("average");
+              } else {
+                setTxOverrides(
+                  tx.maxFeePerGas ? { maxFeePerGas: gasPrice } : { gasPrice },
+                );
+              }
+            }
+          } catch (err) {
+            console.error("Failed to increase fee", err);
+          }
         } catch (err) {
           console.error(err);
           setLastError({ from: "estimation", error: err });
@@ -268,10 +301,13 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       setEstimating,
       setPrepared,
       setLastError,
+      setTxOverrides,
+      setFeeMode,
       provider,
       account.address,
       txParams,
-    ]
+      approval,
+    ],
   );
 
   useEffect(() => {
@@ -305,6 +341,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           findToken(chainId, accountAddress, action.tokenSlug);
         }
         break;
+
+      default:
+        return;
     }
   }, [action, chainId, accountAddress]);
 
@@ -323,12 +362,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           const { low, average, high } = fees.modes;
           console.info(
             "f",
-            [low, average, high].map((m) => formatUnits(m.max, "gwei"))
+            [low, average, high].map((m) => formatUnits(m.max, "gwei")),
           );
         }
       }
     }, [preparedTx, fees, finalTx]);
   }
+
+  useEffect(() => {
+    lastError && console.info(Object.values(lastError));
+  }, [lastError]);
 
   const handleApprove = useCallback(
     async (approved: boolean) => {
@@ -348,37 +391,39 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           }
 
           const gasBalance = await provider.getBalance(account.address);
-          const totalGas = ethers.BigNumber.from(finalTx.gasLimit)
-            .mul(finalTx.maxFeePerGas ?? finalTx.gasPrice!)
-            .add(finalTx.value ?? 0);
+          const totalGas =
+            finalTx.gasLimit * (finalTx.maxFeePerGas ?? finalTx.gasPrice!) +
+              finalTx.value ?? 0n;
 
-          if (gasBalance.lt(totalGas)) {
+          if (gasBalance < totalGas) {
             throw new Error(
               `Not enough ${
                 nativeCurrency?.symbol
                   ? `${nativeCurrency.symbol} token balance`
                   : "funds"
-              } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`
+              } to cover the network (gas) fee. Or the transaction may require a manual fee and a "gas limit" setting.`,
             );
           }
 
-          const rawTx = serializeTransaction(finalTx);
+          console.info({ finalTx });
+
+          const rawTx = Transaction.from(finalTx).unsignedSerialized;
 
           if (account.source !== AccountSource.Ledger) {
             await approveItem(approval.id, { approved, rawTx });
           } else {
-            let signedRawTx: string | undefined;
+            let signature: TxSignature | undefined;
             let ledgerError: any;
 
             await withLedger(async ({ ledgerEth }) => {
               try {
                 const sig = await ledgerEth.signTransaction(
                   account.derivationPath,
-                  rawTx.substring(2)
+                  rawTx.substring(2),
                 );
 
                 const formattedSig = {
-                  v: ethers.BigNumber.from("0x" + sig.v).toNumber(),
+                  v: Number("0x" + sig.v),
                   r: "0x" + sig.r,
                   s: "0x" + sig.s,
                 };
@@ -389,18 +434,18 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   getAddress(addressSignedWith) !== getAddress(account.address)
                 ) {
                   throw new Error(
-                    "Ledger: The signature doesnt match the right address"
+                    "Ledger: The signature doesnt match the right address",
                   );
                 }
 
-                signedRawTx = serializeTransaction(finalTx, formattedSig);
+                signature = formattedSig;
               } catch (err) {
                 ledgerError = err;
               }
             });
 
-            if (signedRawTx) {
-              await approveItem(approval.id, { approved, signedRawTx });
+            if (signature) {
+              await approveItem(approval.id, { approved, rawTx, signature });
             } else {
               throw (
                 ledgerError ??
@@ -426,8 +471,37 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       provider,
       withLedger,
       nativeCurrency,
-    ]
+    ],
   );
+
+  const lastErrorMessage = useMemo(() => {
+    if (!lastError?.error) return null;
+
+    const originMsg =
+      lastError?.error.reason || lastError?.error.message || "Unknown error.";
+
+    switch (originMsg.toLowerCase()) {
+      case "insufficient funds for transfer":
+        return (
+          <>
+            Insufficient {nativeCurrency?.symbol} for transaction (gas) fee.
+            Check your account balance. Use Buy or Swap feature to add more if
+            necessary.
+          </>
+        );
+
+      case "execution reverted":
+        return (
+          <>
+            Failed to execute the transaction. The smart contract couldn&apos;t
+            process your request. Please review the parameters.
+          </>
+        );
+
+      default:
+        return originMsg;
+    }
+  }, [lastError, nativeCurrency]);
 
   const bootAnimationRef = useRef(true);
   const handleBootAnimationDone = useCallback(() => {
@@ -477,17 +551,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   <div
                     className={classNames(
                       "w-full",
-                      bootAnimationRef.current && "animate-bootfadeinfast"
+                      bootAnimationRef.current && "animate-bootfadeinfast",
                     )}
                     onAnimationEnd={handleBootAnimationDone}
                   >
                     <DetailsTab
                       accountAddress={accountAddress}
                       fees={fees}
+                      l1Fee={l1Fee}
                       averageGasLimit={prepared.estimatedGasLimit}
-                      gasLimit={ethers.BigNumber.from(
-                        txOverrides.gasLimit || originTx.gasLimit!
-                      )}
+                      gasLimit={txOverrides.gasLimit || originTx.gasLimit!}
                       feeMode={feeMode}
                       maxFee={maxFee}
                       averageFee={averageFee}
@@ -507,6 +580,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                     accountAddress={accountAddress}
                     originTx={originTx}
                     fees={fees ?? null}
+                    l1Fee={l1Fee}
                     averageGasLimit={prepared?.estimatedGasLimit ?? null}
                     feeMode={feeMode}
                     setFeeMode={setFeeMode}
@@ -534,16 +608,19 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               </Tabs.Content>
 
               <Tabs.Content value="error">
-                {lastError && (
-                  <LongTextField
-                    readOnly
-                    textareaClassName="!h-48"
-                    value={
-                      lastError?.error.reason ||
-                      lastError?.error.message ||
-                      "Unknown error."
-                    }
-                  />
+                {lastErrorMessage && (
+                  <div
+                    className={classNames(
+                      "w-full h-48",
+                      "py-3 px-4",
+                      "box-border border border-brand-main/10",
+                      "bg-black/10 rounded-[.625rem]",
+                      "text-base leading-5 text-brand-light font-medium",
+                      "transition-colors",
+                    )}
+                  >
+                    {lastErrorMessage}
+                  </div>
                 )}
               </Tabs.Content>
             </ScrollAreaContainer>
@@ -569,14 +646,10 @@ const Loading: FC = () => {
       className={classNames(
         !delayed ? "hidden" : "animate-bootfadeinfast",
         "min-h-[200px] flex items-center justify-center",
-        "text-white text-lg text-semibold"
+        "text-white text-lg text-semibold",
       )}
     >
       <div className="atom-spinner w-12 h-12" />
     </div>
   );
 };
-
-function bnify(v?: ethers.BigNumberish) {
-  return v !== undefined ? ethers.BigNumber.from(v) : undefined;
-}

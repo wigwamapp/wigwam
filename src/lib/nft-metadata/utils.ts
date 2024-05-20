@@ -1,28 +1,48 @@
 import { ethers } from "ethers";
 import { CID } from "multiformats/cid";
 
+import { sanitizeCustomUrl } from "./uri/custom";
+import { IPFS_IO_GATEWAY } from "./defaults";
+
 export function serealizeTokenId1155(tokenId: string) {
-  return ethers.utils
-    .hexZeroPad(ethers.BigNumber.from(tokenId).toHexString(), 32)
-    .slice(2);
+  return ethers.zeroPadValue(ethers.toBeHex(tokenId), 32).slice(2);
 }
 
 export function isAddressMatch(
   chainId: number,
   address: string,
-  addressByNetwork: { [chainId: number]: string }
+  addressByNetwork: { [chainId: number]: string },
 ) {
   if (!addressByNetwork[chainId]) return false;
 
   return (
-    ethers.utils.getAddress(address) ===
-    ethers.utils.getAddress(addressByNetwork[chainId])
+    ethers.getAddress(address) === ethers.getAddress(addressByNetwork[chainId])
   );
+}
+
+export function sanitizeUrl(url: string, desiredIpfsGateway?: string): string;
+export function sanitizeUrl(
+  url: undefined,
+  desiredIpfsGateway?: string,
+): undefined;
+export function sanitizeUrl(
+  url?: string,
+  desiredIpfsGateway?: string,
+): string | undefined;
+export function sanitizeUrl(
+  url: string | undefined,
+  desiredIpfsGateway = IPFS_IO_GATEWAY,
+) {
+  if (!url) return url;
+
+  return Boolean(getCID(url))
+    ? convertToDesiredGateway(url, desiredIpfsGateway)
+    : sanitizeCustomUrl(url);
 }
 
 export function convertToDesiredGateway(
   sourceUrl: string,
-  desiredGatewayPrefix: string
+  desiredGatewayPrefix: string,
 ) {
   const cid = getCID(sourceUrl);
   if (!cid) {
@@ -32,7 +52,7 @@ export function convertToDesiredGateway(
   const splitUrl = sourceUrl.split(cid);
 
   if (isCID(cid)) {
-    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1]}`;
+    return `${desiredGatewayPrefix}/ipfs/${cid}${splitUrl[1] ?? ""}`;
   }
 
   // Case 1 - the ipfs://cid path
@@ -65,6 +85,11 @@ export function getCID(url: string) {
     const dotPart = part.split(".")[0];
     if (isCID(dotPart)) {
       return dotPart;
+    }
+
+    const uspPart = part.split("?")[0];
+    if (isCID(uspPart)) {
+      return uspPart;
     }
   }
 

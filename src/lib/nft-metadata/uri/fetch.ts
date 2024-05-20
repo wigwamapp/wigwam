@@ -1,21 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
 import retry from "async-retry";
+import { isValidHttpUrl } from "lib/nft-metadata/isValidHttpUrl";
 
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
+import { sanitizeUrl } from "../utils";
 
 import { getIPFSUrl, isIPFS } from "./ipfs";
 import { getARWeaveURI, isArweave } from "./arweave";
-import { sanitizeCustomUrl } from "./custom";
-
-export function isValidHttpUrl(uri: string) {
-  try {
-    const url = new URL(uri);
-
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch (_) {
-    return false;
-  }
-}
 
 export function forceHttps(source: string) {
   return source.replace("http://", "https://");
@@ -53,7 +44,7 @@ export type FetchOptions = AxiosRequestConfig;
 
 export async function fetchWithTimeout(
   resource: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ) {
   const httpsUrl = forceHttps(resource);
   return axios.get(httpsUrl, {
@@ -64,18 +55,18 @@ export async function fetchWithTimeout(
 export async function fetchWithRetriesAndTimeout(
   resource: string,
   options: FetchOptions = {},
-  maxRetries = 1
+  maxRetries = 1,
 ) {
   const method = options.method || "get";
 
   try {
     const response = await retry(
       () =>
-        axios(sanitizeCustomUrl(resource), {
+        axios(sanitizeUrl(resource), {
           timeout: options.timeout,
           method: method,
         }),
-      { retries: maxRetries }
+      { retries: maxRetries },
     );
 
     return response;
@@ -87,7 +78,7 @@ export async function fetchWithRetriesAndTimeout(
 
 export async function fetchARWeaveWithTimeout(
   uri: string,
-  options: FetchOptions
+  options: FetchOptions,
 ) {
   const tokenURL = getARWeaveURI(uri);
   return fetchWithRetriesAndTimeout(tokenURL, options);
@@ -96,7 +87,7 @@ export async function fetchARWeaveWithTimeout(
 export async function fetchIPFSWithTimeout(
   uri: string,
   options: FetchOptions,
-  gateway: string
+  gateway: string,
 ) {
   const tokenURL = getIPFSUrl(uri, gateway);
   return fetchWithRetriesAndTimeout(tokenURL, options);
@@ -106,7 +97,7 @@ async function multiAttemptIPFSFetch(
   uri: string,
   options: FetchOptions,
   ipfsGateway?: string,
-  ipfsFallbackGatewayUrl?: string
+  ipfsFallbackGatewayUrl?: string,
 ) {
   if (isValidHttpUrl(uri)) {
     try {
@@ -121,7 +112,7 @@ async function multiAttemptIPFSFetch(
     return await fetchIPFSWithTimeout(
       uri,
       options,
-      ipfsGateway || IPFS_IO_GATEWAY
+      ipfsGateway || IPFS_IO_GATEWAY,
     );
   } catch (err) {
     console.warn("Failed on initial fetch", err);
@@ -130,7 +121,7 @@ async function multiAttemptIPFSFetch(
       return await fetchIPFSWithTimeout(
         uri,
         options,
-        ipfsFallbackGatewayUrl || IPFS_CLOUDFLARE_GATEWAY
+        ipfsFallbackGatewayUrl || IPFS_CLOUDFLARE_GATEWAY,
       );
     } else {
       throw err;
@@ -142,7 +133,7 @@ export async function fetchURI(
   uri: string,
   options: FetchOptions,
   ipfsGateway?: string,
-  ipfsFallbackGatewayUrl?: string
+  ipfsFallbackGatewayUrl?: string,
 ) {
   if (isArweave(uri)) {
     const resp = await fetchARWeaveWithTimeout(uri, options);
@@ -153,7 +144,7 @@ export async function fetchURI(
       uri,
       options,
       ipfsGateway,
-      ipfsFallbackGatewayUrl
+      ipfsFallbackGatewayUrl,
     );
     return resp?.data;
   }
@@ -174,7 +165,7 @@ export async function fetchURI(
 export async function fetchMimeType(
   uri: string,
   { timeout }: FetchOptions = {},
-  defaultType?: string
+  defaultType?: string,
 ): Promise<string | undefined> {
   if (uri.startsWith("data:")) {
     const parsedUri = parseDataUri(uri);
@@ -201,7 +192,7 @@ export async function fetchMimeType(
     console.warn(
       `Failed to fetch mimetype for uri: ${uri} because: ${
         e?.message || "Unknown Error occurred"
-      }`
+      }`,
     );
     return defaultType;
   }

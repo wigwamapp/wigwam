@@ -11,21 +11,34 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
 export type AddressFieldProps = LongTextFieldProps & {
   setFromClipboard?: (value: string) => void;
+  hideLabel?: boolean;
+  labelClassName?: string;
 };
 
 const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
-  ({ label = "Recipient", setFromClipboard, className, ...rest }, ref) => {
+  (
+    {
+      label = "Recipient",
+      setFromClipboard,
+      className,
+      hideLabel,
+      labelClassName,
+      ...rest
+    },
+    ref,
+  ) => {
     const { paste, pasted } = usePasteFromClipboard(setFromClipboard);
     const { copy, copied } = useCopyToClipboard(
-      rest.value ?? rest.defaultValue
+      rest.value ?? rest.defaultValue,
     );
 
     return (
       <LongTextField
         ref={ref}
-        label={label}
+        label={!hideLabel ? label : undefined}
         placeholder="0x0000000000000000000000000000000000000000"
         textareaClassName="!h-20"
+        labelClassName={labelClassName}
         maxLength={42}
         actions={
           <Button
@@ -42,7 +55,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              "items-center"
+              "items-center",
             )}
           >
             {setFromClipboard ? (
@@ -70,7 +83,7 @@ const AddressField = forwardRef<HTMLTextAreaElement, AddressFieldProps>(
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default AddressField;

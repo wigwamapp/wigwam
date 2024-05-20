@@ -23,21 +23,21 @@ const SelectLanguage = memo<SelectLanguageProps>(
   ({ className, selected, items, onSelect, ...rest }) => {
     const preparedLanguages = useMemo(
       () => items.map((language) => prepareLanguage(language)),
-      [items]
+      [items],
     );
 
     const preparedCurrentLanguage = useMemo(
       () => prepareLanguage(selected),
-      [selected]
+      [selected],
     );
 
     const selectLanguage = useCallback(
-      ({ key }) => {
+      ({ key }: { key: string }) => {
         const locale =
           items.find(({ code }) => key === code) ?? FALLBACK_LOCALE;
         onSelect(locale);
       },
-      [items, onSelect]
+      [items, onSelect],
     );
 
     return (
@@ -45,13 +45,20 @@ const SelectLanguage = memo<SelectLanguageProps>(
         items={preparedLanguages}
         currentItem={preparedCurrentLanguage}
         setItem={selectLanguage}
-        label="Language"
+        label="Currency format"
         showSelected
         className={className}
+        tooltip={
+          <>You can use different formats for localised dates and amounts.</>
+        }
+        tooltipProps={{
+          size: "large",
+          placement: "right",
+        }}
         {...rest}
       />
     );
-  }
+  },
 );
 
 export default SelectLanguage;

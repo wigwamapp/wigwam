@@ -2,6 +2,7 @@ import { ethErrors } from "eth-rpc-errors";
 import { nanoid } from "nanoid";
 import { Emitter } from "lib/emitter";
 
+import { MetaMaskCompatibleMode } from "core/types/shared";
 import {
   JsonRpcResponse,
   JsonRpcRequest,
@@ -15,7 +16,7 @@ import {
 } from "core/types/rpc";
 import {
   JSONRPC,
-  VIGVAM_STATE,
+  WIGWAM_STATE,
   AUTHORIZED_RPC_METHODS,
   STATE_RPC_METHODS,
 } from "core/common/rpc";
@@ -23,6 +24,7 @@ import {
 import { InpageProtocol } from "./protocol";
 import { FilterManager } from "./filterManager";
 import { SubscriptionManager } from "./subscriptionManager";
+import ICON_SVG_BASE64 from "./iconSvgBase64";
 
 const gatewayEventType = Symbol();
 const stateUpdatedType = Symbol();
@@ -30,11 +32,11 @@ const stateUpdatedType = Symbol();
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 
 export class InpageProvider extends Emitter {
-  isVigvam = true;
+  isWigwam = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
-  sharedPropertyEnabled = true;
+  mmCompatible = MetaMaskCompatibleMode.Strict;
 
   /**
    * The chain ID of the currently connected Ethereum chain.
@@ -50,17 +52,28 @@ export class InpageProvider extends Emitter {
    */
   selectedAddress: string | null = null;
 
+  // https://eips.ethereum.org/EIPS/eip-6963
+  // https://eips.ethereum.org/EIPS/eip-5749
+  info: EIP6963ProviderInfo = Object.freeze({
+    name: "Wigwam",
+    uuid: `wigwam-${process.env.BUILD_ID}`,
+    rdns: "com.wigwam.wallet",
+    icon: ICON_SVG_BASE64,
+    description: "Wigwam — Web 3.0 Wallet",
+  });
+
   #inited = false;
   #reqIdPrefix = nanoid();
   #nextReqId = 0;
 
-  #inpage = new InpageProtocol("injected", "content");
+  #inpage: InpageProtocol;
   #filter = new FilterManager(this);
   #subscription = new SubscriptionManager(this, this.#filter);
 
-  constructor() {
+  constructor(inpageProto: InpageProtocol) {
     super();
 
+    this.#inpage = inpageProto;
     this.#listenInpage();
     this.#listenNotifications();
   }
@@ -79,15 +92,12 @@ export class InpageProvider extends Emitter {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (evt?.method === VIGVAM_STATE) {
-        const { chainId, accountAddress, sharedPropertyEnabled } =
-          evt.params as any;
+      if (evt?.method === WIGWAM_STATE) {
+        const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
-        this.sharedPropertyEnabled = sharedPropertyEnabled;
-        this.isMetaMask = sharedPropertyEnabled;
+        this.mmCompatible = mmCompatible;
 
-        this.#handleNetworkChange(chainId);
-        this.#handleAccountChange(accountAddress || null);
+        this.#handleStateChange(chainId, accountAddress || null);
         this.emit(stateUpdatedType, undefined);
       }
     });
@@ -97,30 +107,35 @@ export class InpageProvider extends Emitter {
     });
   }
 
-  #handleNetworkChange(chainId: number) {
+  #handleStateChange(chainId: number, address: string | null) {
     const chainIdHex = toHex(chainId);
 
-    if (this.chainId === chainIdHex) return;
+    let connectEmitted = false;
 
-    if (this.chainId === null) {
-      this.#inited = true;
-      this.emit("connect", { chainId: chainIdHex });
+    if (this.chainId !== chainIdHex) {
+      if (this.chainId === null) {
+        this.#inited = true;
+        this.emit("connect", { chainId: chainIdHex });
+        connectEmitted = true;
+      }
+
+      // Chain id: "0x1"
+      this.chainId = chainIdHex;
+      this.emit("chainChanged", chainIdHex);
+      // Network version: "1"
+      const chainIdStr = chainId.toString();
+      this.networkVersion = chainIdStr;
+      this.emit("networkChanged", chainIdStr);
     }
 
-    // Chain id: "0x1"
-    this.chainId = chainIdHex;
-    this.emit("chainChanged", chainIdHex);
-    // Network version: "1"
-    const chainIdStr = chainId.toString();
-    this.networkVersion = chainIdStr;
-    this.emit("networkChanged", chainIdStr);
-  }
+    if (this.selectedAddress !== address) {
+      if (!connectEmitted && !this.selectedAddress && address && this.chainId) {
+        this.emit("connect", { chainId: this.chainId });
+      }
 
-  #handleAccountChange(address: string | null) {
-    if (this.selectedAddress === address) return;
-
-    this.selectedAddress = address;
-    this.emit("accountsChanged", address ? [address] : []);
+      this.selectedAddress = address;
+      this.emit("accountsChanged", address ? [address] : []);
+    }
   }
 
   async #performRequest(args: RequestArguments): Promise<unknown> {
@@ -145,6 +160,9 @@ export class InpageProvider extends Emitter {
     params = [],
   }: RequestArguments): Promise<unknown> {
     switch (method) {
+      case JsonRpcMethod.web3_clientVersion:
+        return `Wigwam/v${process.env.VERSION}`;
+
       case JsonRpcMethod.eth_chainId:
         return this.chainId!;
 
@@ -278,6 +296,10 @@ export class InpageProvider extends Emitter {
     return this.#inited;
   }
 
+  _metamask = {
+    isUnlocked: async () => true,
+  };
+
   /**
    * Submits an RPC request for the given method, with the given params.
    * Resolves with the result of the method call, or rejects on error.
@@ -352,11 +374,11 @@ export class InpageProvider extends Emitter {
 
   sendAsync<T>(
     payload: JsonRpcRequest<unknown>,
-    callback: JsonRpcCallback<T>
+    callback: JsonRpcCallback<T>,
   ): void;
   sendAsync(
     payload: JsonRpcRequest<unknown>[],
-    callback: JsonRpcCallback<unknown>[]
+    callback: JsonRpcCallback<unknown>[],
   ): void;
   sendAsync(payload: any, callback: any): void {
     this.send(payload, callback);
@@ -380,7 +402,7 @@ export class InpageProvider extends Emitter {
   send<T>(payload: JsonRpcRequest<unknown>, callback: JsonRpcCallback<T>): void;
   send(
     payload: JsonRpcRequest<unknown>[],
-    callback: JsonRpcCallbackBatch
+    callback: JsonRpcCallbackBatch,
   ): void;
   send<T>(payload: SendSyncJsonRpcRequest): JsonRpcResponse<T>;
   send(methodOrPayload: unknown, callbackOrArgs?: unknown): unknown {
@@ -402,8 +424,8 @@ export class InpageProvider extends Emitter {
           methodOrPayload.map((payload: JsonRpcRequest<any>) =>
             this.request(payload)
               .then((result) => wrapRpcResponse({ result }, payload))
-              .catch((error) => wrapRpcResponse({ error }, payload))
-          )
+              .catch((error) => wrapRpcResponse({ error }, payload)),
+          ),
         ).then((result) => callbackOrArgs(null, result));
 
         return;
@@ -413,10 +435,10 @@ export class InpageProvider extends Emitter {
 
       this.request(payload)
         .then((result) =>
-          callbackOrArgs(null, wrapRpcResponse({ result }, payload))
+          callbackOrArgs(null, wrapRpcResponse({ result }, payload)),
         )
         .catch((error) =>
-          callbackOrArgs(error, wrapRpcResponse({ error }, payload))
+          callbackOrArgs(error, wrapRpcResponse({ error }, payload)),
         );
 
       return;
@@ -460,7 +482,7 @@ export class InpageProvider extends Emitter {
 
 function wrapRpcResponse<T>(
   res: { result: T } | { error: JsonRpcError },
-  req?: JsonRpcRequest<unknown>
+  req?: JsonRpcRequest<unknown>,
 ): JsonRpcResponse<T> {
   return {
     id: req?.id ?? null,
@@ -481,3 +503,11 @@ const errorMessages = {
   unsupportedSync: (method: string) =>
     `The provider does not support synchronous methods like ${method} without a callback parameter.`,
 };
+
+interface EIP6963ProviderInfo {
+  uuid: string;
+  name: string;
+  icon: string;
+  rdns: string;
+  description?: string;
+}

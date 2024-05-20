@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import classNames from "clsx";
 import BigNumber from "bignumber.js";
 
@@ -21,23 +21,55 @@ type TokenAmountProps = {
     slug: string;
     amount?: string;
   };
+  rawAmount?: boolean;
+  isSmall?: boolean;
   className?: string;
 };
 
 const TokenAmount = memo<TokenAmountProps>(
-  ({ accountAddress, token: { slug, amount }, className }) => {
+  ({
+    accountAddress,
+    token: { slug, amount },
+    rawAmount = false,
+    isSmall = false,
+    className,
+  }) => {
     const tokenInfo = useToken(accountAddress, slug);
+
+    const getUSDEquivalent = useCallback(
+      (
+        isRaw: boolean,
+        decimals: number,
+        amountCrypto?: string,
+        priceUSD?: string,
+      ) => {
+        if (amountCrypto) {
+          if (isRaw) {
+            if (priceUSD) {
+              return new BigNumber(amountCrypto).times(priceUSD);
+            }
+          } else {
+            return new BigNumber(amountCrypto)
+              .div(new BigNumber(10).pow(decimals))
+              .multipliedBy(priceUSD ?? 0);
+          }
+        }
+        return null;
+      },
+      [],
+    );
 
     if (!tokenInfo) return null;
 
     if (tokenInfo.tokenType === TokenType.Asset) {
       const { name, symbol, decimals, priceUSD } = tokenInfo;
 
-      const usdAmount = amount
-        ? new BigNumber(amount)
-            .div(new BigNumber(10).pow(decimals))
-            .multipliedBy(priceUSD ?? 0)
-        : null;
+      const equivalentInUSD = getUSDEquivalent(
+        rawAmount,
+        decimals,
+        amount,
+        priceUSD,
+      );
 
       return (
         <div className={classNames("flex items-center", className)}>
@@ -47,35 +79,49 @@ const TokenAmount = memo<TokenAmountProps>(
             className="w-4 h-4 min-w-[1rem]"
           />
           {amount !== undefined &&
-          new BigNumber(amount).lt(new BigNumber(10).pow(decimals + 12)) ? (
+          new BigNumber(amount).lt(
+            new BigNumber(10).pow(new BigNumber(decimals).plus(12)),
+          ) ? (
             <>
               <PrettyAmount
                 amount={amount}
-                decimals={decimals}
+                decimals={!rawAmount ? decimals : undefined}
                 currency={symbol}
                 threeDots={false}
                 copiable
-                className="text-sm font-bold ml-2"
+                className={classNames(
+                  isSmall ? "text-xs ml-1.5" : "text-sm ml-2",
+                  "font-bold",
+                )}
               />
-              {usdAmount !== undefined && (
+              {equivalentInUSD !== null && (
                 <>
-                  <Dot />
+                  <Dot isSmall={isSmall} />
                   <FiatAmount
-                    amount={usdAmount}
+                    amount={equivalentInUSD}
                     threeDots={false}
                     copiable
-                    className="text-sm text-brand-inactivedark"
+                    className={classNames(
+                      isSmall ? "text-xs" : "text-sm",
+                      "text-brand-inactivedark",
+                    )}
                   />
                 </>
               )}
             </>
           ) : (
-            <span className="text-sm font-bold ml-2">
-              {amount !== undefined && new BigNumber(amount).gte(LARGE_AMOUNT) && (
-                <>
-                  <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
-                </>
+            <span
+              className={classNames(
+                isSmall ? "text-xs" : "text-sm",
+                "font-bold ml-2",
               )}
+            >
+              {amount !== undefined &&
+                new BigNumber(amount).gte(LARGE_AMOUNT) && (
+                  <>
+                    <span className="text-[#D99E2E]">[ infinity ]</span>{" "}
+                  </>
+                )}
               {symbol}
             </span>
           )}
@@ -92,9 +138,10 @@ const TokenAmount = memo<TokenAmountProps>(
           <div className="flex flex-col items-end justify-around text-brand-light min-w-0">
             <div
               className={classNames(
-                "text-sm min-w-0 w-full text-right",
+                isSmall ? "text-xs" : "text-sm",
+                "min-w-0 w-full text-right",
                 !name && isId ? "text-brand-main" : "",
-                !(name && isId) ? "line-clamp-2" : "truncate"
+                !(name && isId) ? "line-clamp-2" : "truncate",
               )}
             >
               {name ? name : ""}
@@ -107,7 +154,12 @@ const TokenAmount = memo<TokenAmountProps>(
             </div>
 
             {name && isId ? (
-              <div className="text-sm text-brand-main font-bold min-w-0 w-full truncate text-right">
+              <div
+                className={classNames(
+                  isSmall ? "text-xs" : "text-sm",
+                  "text-brand-main font-bold min-w-0 w-full truncate text-right",
+                )}
+              >
                 {id}
               </div>
             ) : (
@@ -115,16 +167,23 @@ const TokenAmount = memo<TokenAmountProps>(
             )}
           </div>
 
-          <div className="ml-2 w-11 h-11 min-w-[2.75rem] relative group">
+          <div
+            className={classNames(
+              isSmall ? "ml-1.5" : "ml-2",
+              isSmall ? "w-8 h-8 min-w-[2rem]" : "w-11 h-11 min-w-[2.75rem]",
+              "relative group",
+            )}
+          >
             <NftAvatar
               src={thumbnailUrl}
               alt={name}
               className={classNames(
-                "w-full h-full !rounded-md",
+                "w-full h-full",
+                isSmall ? "!rounded" : "!rounded-md",
                 isAmountLargerOne &&
-                  "opacity-20 transition-opacity group-hover:opacity-100"
+                  "opacity-20 transition-opacity group-hover:opacity-100",
               )}
-              errorClassName="h-[6rem]"
+              errorClassName={isSmall ? "h-[2rem]" : "h-[2.75rem]"}
             />
             {isAmountLargerOne ? (
               <div
@@ -133,12 +192,12 @@ const TokenAmount = memo<TokenAmountProps>(
                   "text-xs font-bold",
                   "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                   "transition-opacity group-hover:opacity-0",
-                  "min-w-0 w-full"
+                  "min-w-0 w-full",
                 )}
               >
                 <XSymbolIcon className="w-2 min-w-[.5rem] h-auto mr-0.5" />
                 <PrettyAmount
-                  amount={135}
+                  amount={amount}
                   isMinified
                   isThousandsMinified={false}
                   decimals={0}
@@ -151,7 +210,7 @@ const TokenAmount = memo<TokenAmountProps>(
         </div>
       );
     }
-  }
+  },
 );
 
 export default TokenAmount;

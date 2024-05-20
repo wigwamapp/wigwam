@@ -1,13 +1,13 @@
 import browser from "webextension-polyfill";
 import { getMainURL, openOrFocusMainTab } from "lib/ext/utils";
-import * as Global from "lib/ext/global";
+import { globalStorage } from "lib/ext/globalStorage";
 
-const WEBSITE_URL = process.env.VIGVAM_WEBSITE_ORIGIN;
-const BETATEST_PROMOCODES =
-  process.env.VIGVAM_BETATEST_PROMOCODES?.split(",") ?? [];
+import { LATEST_VERSION } from "core/types/storage";
+
+const WEBSITE_URL = process.env.WIGWAM_WEBSITE_ORIGIN;
 
 export function startInstallOrUpdateListener() {
-  let websiteTabId: number | undefined;
+  // let websiteTabId: number | undefined;
 
   // Open new tab with extension page after install
   browser.runtime.onInstalled.addListener(({ reason }) => {
@@ -18,7 +18,7 @@ export function startInstallOrUpdateListener() {
       });
     }
 
-    if (reason === "install" || reason === "update") {
+    if (WEBSITE_URL && ["install", "update"].includes(reason)) {
       browser.tabs
         .query({ url: `${WEBSITE_URL}/**` })
         .then((tabs) => {
@@ -27,11 +27,13 @@ export function startInstallOrUpdateListener() {
             return browser.tabs.reload(tabId);
           }
 
-          if (reason === "install") {
-            return browser.tabs.create({ url: WEBSITE_URL }).then((tab) => {
-              websiteTabId = tab.id;
-            });
-          }
+          // Can be used to pass data from a website to an extension
+          //
+          // if (reason === "install") {
+          //   return browser.tabs.create({ url: WEBSITE_URL }).then((tab) => {
+          //     websiteTabId = tab.id;
+          //   });
+          // }
 
           return;
         })
@@ -46,38 +48,30 @@ export function startInstallOrUpdateListener() {
     }
   });
 
-  // To pass promocode from landing page
-  browser.runtime.onMessage.addListener((msg) => {
-    if (
-      msg?.type === "__APPLY_WEBSITE_DATA" &&
-      msg.data &&
-      typeof msg.data === "object"
-    ) {
-      try {
-        const { betatestPromocode } = msg.data;
+  // To pass data from a website to an extension
+  //
+  // browser.runtime.onMessage.addListener((msg) => {
+  //   if (
+  //     msg?.type === "__APPLY_WEBSITE_DATA" &&
+  //     msg.data &&
+  //     typeof msg.data === "object"
+  //   ) {
+  //     try {
+  //       const {} = msg.data;
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //
+  //     if (websiteTabId) {
+  //       browser.tabs.remove(websiteTabId).catch(console.error);
+  //       websiteTabId = undefined;
+  //     }
+  //   }
+  // });
 
-        if (betatestPromocode && typeof betatestPromocode === "string") {
-          const code = betatestPromocode.toLowerCase();
-
-          if (
-            BETATEST_PROMOCODES.includes(code) &&
-            !Global.get("betatest_promocode")
-          ) {
-            Global.put("betatest_promocode", code);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-
-      if (websiteTabId) {
-        browser.tabs.remove(websiteTabId).catch(console.error);
-        websiteTabId = undefined;
-      }
-    }
-  });
+  browser.runtime.requestUpdateCheck().catch(console.error);
 
   browser.runtime.onUpdateAvailable?.addListener(({ version }) => {
-    Global.put("latest_version", version);
+    globalStorage.put(LATEST_VERSION, version).catch(console.error);
   });
 }

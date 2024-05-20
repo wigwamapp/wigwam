@@ -1,5 +1,5 @@
 import browser, { Storage } from "webextension-polyfill";
-import { utils } from "ethers";
+import { ethers } from "ethers";
 import { utf8ToBytes } from "lib/crypto-utils/bytes";
 
 export type StorageItems = { [key: string]: unknown } | [string, unknown][];
@@ -9,8 +9,15 @@ export type StorageAreaOptions = Partial<{
   obfuscate: boolean;
 }>;
 
+/**
+ * The `StorageArea` class is a wrapper over browser storage areas.
+ * It allows to customize the storage keys with async formatter + obfuscate them
+ */
 export class StorageArea {
-  constructor(private name: string, private opts: StorageAreaOptions = {}) {}
+  constructor(
+    private name: string,
+    private opts: StorageAreaOptions = {},
+  ) {}
 
   private get area(): Storage.StorageArea {
     return (browser.storage as any)[this.name];
@@ -57,8 +64,8 @@ export class StorageArea {
 
     items = Object.fromEntries(
       await Promise.all(
-        items.map(async ([k, v]) => [await this.wrapKeys(k), v])
-      )
+        items.map(async ([k, v]) => [await this.wrapKeys(k), v]),
+      ),
     );
 
     return this.area.set(items);
@@ -76,11 +83,11 @@ export class StorageArea {
 
   subscribe<T = any>(
     key: string,
-    callback: (change: { newValue?: T; oldValue?: T }) => void
+    callback: (change: { newValue?: T; oldValue?: T }) => void,
   ) {
     let listener: (
       changes: { [s: string]: Storage.StorageChange },
-      areaName: string
+      areaName: string,
     ) => void;
 
     this.wrapKeys(key)
@@ -112,7 +119,7 @@ export class StorageArea {
     // Obfuscate with hashing
     key =
       this.opts.obfuscate !== false
-        ? utils.ripemd160(utf8ToBytes(key)).slice(2)
+        ? ethers.ripemd160(utf8ToBytes(key)).slice(2)
         : key;
 
     return key;

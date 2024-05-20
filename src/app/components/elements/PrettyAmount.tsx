@@ -9,8 +9,6 @@ import { currentLocaleAtom } from "app/atoms";
 
 import CopiableTooltip from "./CopiableTooltip";
 
-BigNumber.set({ EXPONENTIAL_AT: 38 });
-
 export type PrettyAmountProps = {
   amount: BigNumber.Value | null;
   decimals?: number;
@@ -46,7 +44,9 @@ const PrettyAmount = memo<PrettyAmountProps>(
     const amountExist = amount !== null;
     const bigNumberAmount = new BigNumber(amount ?? 0);
 
-    const convertedAmount = bigNumberAmount.div(10 ** (decimals ?? 0));
+    const convertedAmount = bigNumberAmount.div(
+      new BigNumber(10).pow(decimals ?? 0),
+    );
     const integerPart = convertedAmount.decimalPlaces(0);
     const decimalPlaces = convertedAmount.toString().split(".")[1];
 
@@ -81,7 +81,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
             2,
             convertedAmount.gte(0.01)
               ? BigNumber.ROUND_DOWN
-              : BigNumber.ROUND_UP
+              : BigNumber.ROUND_UP,
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
@@ -96,7 +96,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
             2,
             convertedAmount.gte(0.01)
               ? BigNumber.ROUND_DOWN
-              : BigNumber.ROUND_UP
+              : BigNumber.ROUND_UP,
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
@@ -111,7 +111,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
             2,
             convertedAmount.gte(0.01)
               ? BigNumber.ROUND_DOWN
-              : BigNumber.ROUND_UP
+              : BigNumber.ROUND_UP,
           )
         : convertedAmount,
       dec: isMinified && isThousandsMinified ? 3 : undefined,
@@ -160,7 +160,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
       content = getPrettyAmount({
         value: convertedAmount.decimalPlaces(
           isFiatDecimalsMinified ? 2 : decSplit,
-          isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN
+          isFiatDecimalsMinified ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN,
         ),
         dec: isMinified && isThousandsMinified ? 3 : undefined,
         zeroDecimals,
@@ -226,7 +226,7 @@ const PrettyAmount = memo<PrettyAmountProps>(
     }
 
     return <span className={className}>{children}</span>;
-  }
+  },
 );
 
 export default PrettyAmount;
@@ -293,7 +293,7 @@ export const getPrettyAmount = ({
       "compact",
       useGrouping,
       isFiat ? "currency" : undefined,
-      isFiat ? currency : undefined
+      isFiat ? currency : undefined,
     )
       .format(+minifiedFractions)
       .replace("US$", "$");
@@ -306,7 +306,7 @@ export const getPrettyAmount = ({
     "standard",
     useGrouping,
     isFiat ? "currency" : undefined,
-    isFiat ? currency : undefined
+    isFiat ? currency : undefined,
   )
     .format(+value)
     .replace("US$", "$")}${threeDots && !isDecimalsMinified ? "..." : ""}`;
@@ -320,7 +320,7 @@ const getIntlNumberFormat = memoize(
     notation?: "standard" | "scientific" | "engineering" | "compact",
     useGrouping?: boolean,
     style?: "currency",
-    currency?: string
+    currency?: string,
   ) =>
     new Intl.NumberFormat(locale, {
       minimumFractionDigits,
@@ -332,13 +332,13 @@ const getIntlNumberFormat = memoize(
     }),
   {
     cacheKey: (args) => args.join(),
-  }
+  },
 );
 
 const minifyFractions = (
   value: BigNumber.Value,
   maxRound: number,
-  fractions: number
+  fractions: number,
 ) => {
   const multiplier = new BigNumber(10).pow(fractions);
 

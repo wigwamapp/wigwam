@@ -8,9 +8,12 @@ import {
   validateDerivationPath,
   validatePrivateKey,
   validatePublicKey,
+  validateAddress,
 } from "./wallet";
 
 export function validateAddAccountParams(params: AddAccountParams) {
+  validateName(params.name);
+
   switch (params.source) {
     case AccountSource.SeedPhrase:
       validateDerivationPath(params.derivationPath);
@@ -25,17 +28,28 @@ export function validateAddAccountParams(params: AddAccountParams) {
     case AccountSource.OpenLogin:
       validatePrivateKey(fromProtectedString(params.privateKey));
       break;
+
+    case AccountSource.Address:
+      validateAddress(params.address);
+      break;
+
+    default:
+      return;
   }
 }
 
 export function validateNoAccountDuplicates(accounts: Account[]) {
   const uniques = new Set<string>();
 
-  for (const { address } of accounts) {
-    if (!uniques.has(address)) {
-      uniques.add(address);
+  for (const { uuid, address } of accounts) {
+    if (!uniques.has(uuid) && !uniques.has(address)) {
+      uniques.add(uuid).add(address);
     } else {
       throw new PublicError(t("walletAlreadyExists"));
     }
   }
+}
+
+export function validateName(value: string) {
+  if (!value) throw new PublicError(t("invalidName"));
 }

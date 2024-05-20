@@ -1,9 +1,11 @@
 import { WalletStatus, SeedPharse } from "./base";
 import { AddAccountParams, Account } from "./account";
 import { RpcResponse } from "./rpc";
-import { Approval, ApprovalResult } from "./activity";
+import { ActivitySource, Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
+import { GasPrices } from "./fees";
+import { RampTokenInfo } from "./ramp";
 
 export type Request =
   | GetWalletStateRequest
@@ -22,8 +24,10 @@ export type Request =
   | SendRpcRequest
   | GetApprovalsRequest
   | ApproveRequest
-  | GetTPGasPricesRequest
-  | GetSyncStatusRequest;
+  | GetGasPricesRequest
+  | GetSyncStatusRequest
+  | GetOnRampCurrenciesRequest
+  | GetTokenDetailsUrlRequest;
 
 export type Response =
   | GetWalletStateResponse
@@ -39,11 +43,13 @@ export type Response =
   | GetPrivateKeyResponse
   | GetPublicKeyResponse
   | GetNeuterExtendedKeyResponse
-  | GetTPGasPricesResponse
+  | GetGasPricesResponse
   | GetSyncStatusResponse
   | SendRpcResponse
   | GetApprovalsResponse
-  | ApproveResponse;
+  | ApproveResponse
+  | GetOnRampCurrenciesResponse
+  | GetTokenDetailsUrlResponse;
 
 export type EventMessage =
   | WalletStateUpdated
@@ -74,7 +80,7 @@ export enum MessageType {
   Sync = "SYNC",
   FindToken = "FIND_TOKEN",
   SyncTokenActivities = "SYNC_TOKEN_ACTIVITIES",
-  GetTPGasPrices = "GET_TP_GAS_PRICES",
+  GetGasPrices = "GET_GAS_PRICES",
   GetSyncStatus = "GET_SYNC_STATUS",
   SyncStatusUpdated = "SYNC_STATUS_UPDATED",
   SendRpc = "SEND_RPC",
@@ -82,6 +88,8 @@ export enum MessageType {
   ApprovalsUpdated = "APPROVALS_UPDATED",
   Approve = "APPROVE",
   RejectAllApprovals = "REJECT_ALL_APPROVALS",
+  GetOnRampCurrencies = "GET_ONRAMP_CURRENCIES",
+  GetTokenDetailsUrl = "GET_TOKEN_DETAILS_URL",
 }
 
 export interface MessageBase {
@@ -249,14 +257,14 @@ export interface SyncTokenActivities extends MessageBase {
   tokenSlug: string;
 }
 
-export interface GetTPGasPricesRequest extends MessageBase {
-  type: MessageType.GetTPGasPrices;
+export interface GetGasPricesRequest extends MessageBase {
+  type: MessageType.GetGasPrices;
   chainId: number;
 }
 
-export interface GetTPGasPricesResponse extends MessageBase {
-  type: MessageType.GetTPGasPrices;
-  gasPrices: readonly [string, string, string] | null;
+export interface GetGasPricesResponse extends MessageBase {
+  type: MessageType.GetGasPrices;
+  gasPrices: GasPrices;
 }
 
 export interface GetSyncStatusRequest extends MessageBase {
@@ -278,6 +286,7 @@ export interface SendRpcRequest extends MessageBase {
   chainId: number;
   method: string;
   params: any[];
+  source?: ActivitySource;
 }
 
 export interface SendRpcResponse extends MessageBase {
@@ -311,4 +320,24 @@ export interface ApproveResponse extends MessageBase {
 
 export interface RejectAllApprovals extends MessageBase {
   type: MessageType.RejectAllApprovals;
+}
+
+export interface GetOnRampCurrenciesRequest extends MessageBase {
+  type: MessageType.GetOnRampCurrencies;
+}
+
+export interface GetOnRampCurrenciesResponse extends MessageBase {
+  type: MessageType.GetOnRampCurrencies;
+  currencies: Record<string, RampTokenInfo>;
+}
+
+export interface GetTokenDetailsUrlRequest extends MessageBase {
+  type: MessageType.GetTokenDetailsUrl;
+  chainId: number;
+  tokenSlug: string;
+}
+
+export interface GetTokenDetailsUrlResponse extends MessageBase {
+  type: MessageType.GetTokenDetailsUrl;
+  detailsUrl: string | null;
 }

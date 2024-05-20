@@ -7,11 +7,13 @@ export const OPTIMISM: Network[] = [
     type: "mainnet",
     rpcUrls: [
       "https://mainnet.optimism.io",
-      "https://optimism-mainnet.public.blastapi.io",
-      "https://rpc.ankr.com/optimism",
+      "https://optimism.llamarpc.com",
+      "https://1rpc.io/op",
+      "https://endpoints.omniatech.io/v1/op/mainnet/public",
+      "https://optimism.publicnode.com",
     ],
     chainTag: "optimism",
-    name: "Optimism",
+    name: "OP Mainnet",
     nativeCurrency: {
       symbol: "OETH",
       name: "Ether",
@@ -23,39 +25,4 @@ export const OPTIMISM: Network[] = [
     faucetUrls: [],
     infoUrl: "https://optimism.io",
   },
-
-  // Testnets
-  {
-    chainId: 69,
-    type: "testnet",
-    rpcUrls: ["https://kovan.optimism.io"],
-    chainTag: "optimism",
-    name: "Kovan Optimism Testnet",
-    nativeCurrency: {
-      symbol: "KOR",
-      name: "Kovan Ether",
-      decimals: 18,
-    },
-    explorerUrls: ["https://kovan-optimistic.etherscan.io"],
-    explorerApiUrl: "https://api-kovan-optimistic.etherscan.io/api",
-    faucetUrls: [
-      "https://kovan.optifaucet.com",
-      "http://fauceth.komputing.org?chain=69",
-    ],
-    infoUrl: "https://optimism.io",
-  },
-  // {
-  //   chainId: 420,
-  //   type: "testnet",
-  //   rpcUrls: ["https://goerli.optimism.io"],
-  //   chainTag: "optimism",
-  //   name: "Optimism Testnet Goerli",
-  //   nativeCurrency: {
-  //     symbol: "GOR",
-  //     name: "Goerli Ether",
-  //     decimals: 18,
-  //   },
-  //   faucetUrls: [],
-  //   infoUrl: "https://optimism.io",
-  // },
 ];

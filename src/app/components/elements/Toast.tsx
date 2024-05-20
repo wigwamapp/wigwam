@@ -17,12 +17,12 @@ const Toast: FC<ToastProps> = ({ description, ...rest }) => {
         "w-80",
         "p-4",
         "rounded-[.625rem]",
-        "bg-[#1F1F31]",
+        "bg-[#13191F]",
         "border border-brand-main/[.15]",
         "text-brand-light text-sm",
         "flex items-start",
         "relative",
-        "z-10"
+        "z-10",
       )}
       {...rest}
     >

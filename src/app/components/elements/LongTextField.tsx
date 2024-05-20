@@ -7,6 +7,7 @@ import TooltipIcon from "./TooltipIcon";
 export type LongTextFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
   labelActions?: ReactNode;
+  labelClassName?: string;
   actions?: ReactNode;
   textareaClassName?: string;
   error?: boolean;
@@ -23,6 +24,7 @@ const LongTextField = memo(
         label,
         id,
         labelActions,
+        labelClassName,
         spellCheck = false,
         actions,
         error,
@@ -37,12 +39,17 @@ const LongTextField = memo(
         hoverStyles = true,
         ...rest
       },
-      ref
+      ref,
     ) => {
       return (
         <div className={classNames("flex flex-col", className)}>
           {(label || labelActions) && (
-            <div className="flex items-center justify-between px-4 mb-2 min-h-6">
+            <div
+              className={classNames(
+                "flex items-center justify-between px-4 mb-2 min-h-6",
+                labelClassName,
+              )}
+            >
               {label && (
                 <label
                   htmlFor={id}
@@ -76,7 +83,7 @@ const LongTextField = memo(
                 "py-3 px-4",
                 "box-border",
                 "text-base leading-5 text-brand-light font-medium",
-                "bg-black/20",
+                "bg-black/10",
                 "border border-brand-main/10",
                 "rounded-[.625rem]",
                 "outline-none",
@@ -95,7 +102,7 @@ const LongTextField = memo(
                   "border-brand-main/5",
                   "text-brand-disabledcolor placeholder-brand-disabledcolor",
                 ],
-                textareaClassName
+                textareaClassName,
               )}
               autoComplete={autoComplete}
               {...rest}
@@ -106,7 +113,7 @@ const LongTextField = memo(
             className={classNames(
               "max-h-0 overflow-hidden",
               "transition-[max-height] duration-200",
-              error && errorMessage && !readOnly && "max-h-5"
+              error && errorMessage && !readOnly && "max-h-5",
             )}
           >
             <span className="block text-brand-redtext text-left pt-1 pl-4 text-xs">
@@ -115,8 +122,8 @@ const LongTextField = memo(
           </div>
         </div>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default LongTextField;

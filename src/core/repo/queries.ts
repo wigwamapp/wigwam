@@ -43,7 +43,7 @@ export function queryAccountTokens({
       .where("[chainId+tokenType+accountAddress+status+balanceUSD]")
       .between(
         [...baseArgs, TokenStatus.Enabled, 0],
-        [...baseArgs, TokenStatus.Native, Infinity]
+        [...baseArgs, TokenStatus.Native, Infinity],
       );
   }
 
@@ -95,7 +95,7 @@ export function queryContacts({ search, offset, limit }: QueryContactsParams) {
     const match = createSearchMatcher(search);
 
     coll = coll.filter(
-      (contact) => match(contact.name) || match(contact.address)
+      (contact) => match(contact.name) || match(contact.address),
     );
   }
 
@@ -112,16 +112,21 @@ export function queryContacts({ search, offset, limit }: QueryContactsParams) {
 
 export type QueryActivitiesParams = {
   pending: boolean;
+  accountAddress: string;
   offset?: number;
   limit?: number;
 };
 
 export function queryActivities({
   pending,
+  accountAddress,
   offset,
   limit,
 }: QueryActivitiesParams) {
-  let coll = activities.where("pending").equals(Number(pending)).reverse();
+  let coll = activities
+    .where("[accountAddress+pending]")
+    .equals([accountAddress, Number(pending)])
+    .reverse();
 
   if (offset) {
     coll = coll.offset(offset);

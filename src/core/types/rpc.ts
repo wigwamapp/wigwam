@@ -1,3 +1,8 @@
+import { MessageContext } from "lib/ext/porter/server";
+import { PorterClientMessage } from "lib/ext/porter/types";
+
+import { SendRpcRequest, SendRpcResponse } from "./messages";
+
 export enum JsonRpcMethod {
   // Simple
   eth_chainId = "eth_chainId",
@@ -19,12 +24,6 @@ export enum JsonRpcMethod {
   eth_signTypedData_v2 = "eth_signTypedData_v2",
   eth_signTypedData_v3 = "eth_signTypedData_v3",
   eth_signTypedData_v4 = "eth_signTypedData_v4",
-  wallet_getPermissions = "wallet_getPermissions",
-  wallet_requestPermissions = "wallet_requestPermissions",
-  wallet_addEthereumChain = "wallet_addEthereumChain",
-  wallet_switchEthereumChain = "wallet_switchEthereumChain",
-  wallet_watchAsset = "wallet_watchAsset",
-  wallet_registerOnboarding = "wallet_registerOnboarding",
   // Subscribtion
   eth_subscribe = "eth_subscribe",
   eth_unsubscribe = "eth_unsubscribe",
@@ -34,6 +33,17 @@ export enum JsonRpcMethod {
   eth_newPendingTransactionFilter = "eth_newPendingTransactionFilter",
   eth_getFilterChanges = "eth_getFilterChanges",
   eth_getFilterLogs = "eth_getFilterLogs",
+  // Wallet
+  wallet_getPermissions = "wallet_getPermissions",
+  wallet_requestPermissions = "wallet_requestPermissions",
+  wallet_addEthereumChain = "wallet_addEthereumChain",
+  wallet_switchEthereumChain = "wallet_switchEthereumChain",
+  wallet_watchAsset = "wallet_watchAsset",
+  wallet_registerOnboarding = "wallet_registerOnboarding",
+  web3_clientVersion = "web3_clientVersion",
+  // Snaps
+  wallet_getSnaps = "wallet_getSnaps",
+  wallet_requestSnaps = "wallet_requestSnaps",
 }
 
 /**
@@ -72,12 +82,12 @@ export interface JsonRpcNotification<T> {
 
 export type JsonRpcCallback<T> = (
   error: Error | null,
-  result?: JsonRpcResponse<T>
+  result?: JsonRpcResponse<T>,
 ) => void;
 
 export type JsonRpcCallbackBatch = (
   error: Error | null,
-  result?: JsonRpcResponse<unknown>[]
+  result?: JsonRpcResponse<unknown>[],
 ) => void;
 
 interface JsonRpcResponseBase {
@@ -127,4 +137,20 @@ export interface SendSyncJsonRpcRequest extends JsonRpcRequest<unknown> {
 
 export type RpcResponse = { result: any } | { error: JsonRpcError };
 
-export type RpcReply = (res: RpcResponse) => void;
+export type SerializedRpcContext = {
+  portId: string;
+  msg: PorterClientMessage;
+};
+
+export interface RpcContext {
+  serialize(): SerializedRpcContext;
+  reply(response: RpcResponse): void;
+}
+
+export type RpcMessageContext = WalletRpcMsgContext | PageRpcMsgContext;
+
+export type WalletRpcMsgContext = MessageContext<
+  SendRpcRequest,
+  SendRpcResponse
+>;
+export type PageRpcMsgContext = MessageContext<JsonRpcRequest, JsonRpcResponse>;

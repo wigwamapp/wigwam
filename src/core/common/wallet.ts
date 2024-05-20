@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { wordlists } from "@ethersproject/wordlists";
 import { t } from "lib/ext/i18n";
 import { assert } from "lib/system/assert";
 import { fromProtectedString } from "lib/crypto-utils";
@@ -13,21 +12,21 @@ export const derivationPathRegex = new RegExp("^m(\\/[0-9]+'?)+$");
 export function generatePreviewHDNodes(
   extendedKey: string,
   offset = 0,
-  limit = 9
+  limit = 9,
 ) {
-  const root = ethers.utils.HDNode.fromExtendedKey(extendedKey);
+  const root = ethers.HDNodeWallet.fromExtendedKey(extendedKey);
 
-  const nodes: ethers.utils.HDNode[] = [];
+  const nodes: (ethers.HDNodeWallet | ethers.HDNodeVoidWallet)[] = [];
   for (let i = offset; i < offset + limit; i++) {
-    nodes.push(root.derivePath(i.toString()));
+    nodes.push(root.deriveChild(i));
   }
 
   return nodes;
 }
 
 export function toNeuterExtendedKey(
-  hdNode: ethers.utils.HDNode,
-  derivationPath?: string
+  hdNode: ethers.HDNodeWallet,
+  derivationPath?: string,
 ) {
   if (derivationPath) {
     hdNode = hdNode.derivePath(derivationPath);
@@ -37,32 +36,43 @@ export function toNeuterExtendedKey(
 }
 
 export function getSeedPhraseHDNode({ phrase, lang }: SeedPharse) {
-  return ethers.utils.HDNode.fromMnemonic(
+  return ethers.HDNodeWallet.fromPhrase(
     fromProtectedString(phrase),
     undefined,
-    wordlists[lang]
+    "m",
+    ethers.wordlists[lang],
   );
 }
 
 export function validateSeedPhrase({ phrase, lang }: SeedPharse) {
-  assert(lang in wordlists, t("seedPhraseLanguageNotSupported"), PublicError);
   assert(
-    ethers.utils.isValidMnemonic(fromProtectedString(phrase), wordlists[lang]),
-    t("seedPhraseIsNotValid"),
-    PublicError
+    lang in ethers.wordlists,
+    t("seedPhraseLanguageNotSupported"),
+    PublicError,
   );
+
+  try {
+    assert(
+      ethers.Mnemonic.isValidMnemonic(
+        fromProtectedString(phrase),
+        ethers.wordlists[lang],
+      ),
+    );
+  } catch {
+    throw new PublicError(t("seedPhraseIsNotValid"));
+  }
 }
 
 export function validateDerivationPath(path: string) {
   if (!derivationPathRegex.test(path)) {
-    throw new PublicError(t("derivationPathIsInvalid"));
+    throw new PublicError(t("invalidDerivationPath"));
   }
 }
 
 export function validatePrivateKey(privKey: string) {
   try {
     privKey = add0x(privKey);
-    assert(ethers.utils.isHexString(privKey, 32));
+    assert(ethers.isHexString(privKey, 32));
   } catch {
     throw new PublicError(t("invalidPrivateKey"));
   }
@@ -71,12 +81,17 @@ export function validatePrivateKey(privKey: string) {
 export function validatePublicKey(pubKey: string) {
   try {
     pubKey = add0x(pubKey);
-    assert(
-      ethers.utils.isHexString(pubKey, 33) ||
-        ethers.utils.isHexString(pubKey, 65)
-    );
+    assert(ethers.isHexString(pubKey, 33) || ethers.isHexString(pubKey, 65));
   } catch {
     throw new PublicError(t("invalidPublicKey"));
+  }
+}
+
+export function validateAddress(value: string) {
+  try {
+    assert(ethers.isAddress(value));
+  } catch {
+    throw new PublicError(t("invalidAddress"));
   }
 }
 

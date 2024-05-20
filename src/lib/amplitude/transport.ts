@@ -16,7 +16,7 @@ export class SendBeaconTransport extends BaseTransport implements Transport {
         const data = JSON.stringify(payload);
         const success = window.navigator.sendBeacon(
           serverUrl,
-          JSON.stringify(payload)
+          JSON.stringify(payload),
         );
 
         return resolve(
@@ -28,8 +28,8 @@ export class SendBeaconTransport extends BaseTransport implements Transport {
                   payload_size_bytes: data.length,
                   server_upload_time: Date.now(),
                 }
-              : { code: 500 }
-          )
+              : { code: 500 },
+          ),
         );
       } catch (err) {
         reject(err);

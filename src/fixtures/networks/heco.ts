@@ -19,22 +19,4 @@ export const HECO: Network[] = [
     faucetUrls: [],
     infoUrl: "https://www.hecochain.com",
   },
-
-  // Testnets
-  {
-    chainId: 256,
-    type: "testnet",
-    rpcUrls: ["https://http-testnet.hecochain.com"],
-    chainTag: "heco",
-    name: "Huobi Testnet",
-    nativeCurrency: {
-      symbol: "htt",
-      name: "Huobi Test Token",
-      decimals: 18,
-    },
-    explorerUrls: ["https://testnet.hecoinfo.com"],
-    explorerApiUrl: "https://api-testnet.hecoinfo.com/api",
-    faucetUrls: ["https://scan-testnet.hecochain.com/faucet"],
-    infoUrl: "https://testnet.hecoinfo.com",
-  },
 ];

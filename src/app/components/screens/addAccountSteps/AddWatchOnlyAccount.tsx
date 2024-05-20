@@ -13,6 +13,7 @@ import {
   validateAddress,
 } from "app/utils";
 import { useSteps } from "app/hooks/steps";
+import { useNextAccountName } from "app/hooks";
 import AddressField from "app/components/elements/AddressField";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -23,6 +24,7 @@ type FormValues = {
 
 const AddWatchOnlyAccount = memo(() => {
   const { stateRef, navigateToStep } = useSteps();
+  const { getNextAccountName } = useNextAccountName();
 
   const handleContinue = useCallback(
     async ({ address }: FormValues) =>
@@ -30,21 +32,22 @@ const AddWatchOnlyAccount = memo(() => {
         try {
           stateRef.current.importAddresses = [
             {
+              name: getNextAccountName(),
               source: AccountSource.Address,
-              address: ethers.utils.getAddress(address),
+              address: ethers.getAddress(address),
               isDisabled: true,
               isDefaultChecked: true,
             },
           ];
 
-          navigateToStep(AddAccountStep.VerifyToAdd);
+          navigateToStep(AddAccountStep.ConfirmAccounts);
 
           return;
         } catch (err: any) {
           return { address: err?.message };
         }
       }),
-    [navigateToStep, stateRef]
+    [navigateToStep, stateRef, getNextAccountName],
   );
 
   return (

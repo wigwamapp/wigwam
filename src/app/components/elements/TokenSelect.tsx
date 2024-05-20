@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import classNames from "clsx";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 import { Link } from "lib/navigation";
@@ -8,7 +8,8 @@ import { AccountAsset, AccountNFT, AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { LOAD_MORE_ON_TOKEN_FROM_END } from "app/defaults";
-import { currentAccountAtom, tokenSlugAtom } from "app/atoms";
+import { tokenSlugAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import { useAccountToken, useAllAccountTokens } from "app/hooks/tokens";
 import { prepareNFTLabel } from "app/utils";
 import { Page } from "app/nav";
@@ -33,7 +34,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
   tokenType,
   handleTokenChanged,
 }) => {
-  const currentAccount = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
   const [opened, setOpened] = useState(false);
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
@@ -42,7 +43,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
     currentAccount.address,
     {
       search: searchValue ?? undefined,
-    }
+    },
   );
 
   const [tokenSlug, setTokenSlug] = useAtom(tokenSlugAtom);
@@ -61,7 +62,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLElement) => {
       if (!tokens) return;
 
       if (observer.current) {
@@ -77,7 +78,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, tokens]
+    [hasMore, loadMore, tokens],
   );
 
   useEffect(() => {
@@ -91,7 +92,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
     (tSlug: string) => {
       setTokenSlug([tSlug, "replace"]);
     },
-    [setTokenSlug]
+    [setTokenSlug],
   );
 
   const preparedTokens = useMemo(
@@ -100,10 +101,10 @@ const TokenSelect: FC<TokenSelectProps> = ({
         prepareToken(
           token as AccountAsset,
           "small",
-          token.tokenSlug === tokenSlug
-        )
+          token.tokenSlug === tokenSlug,
+        ),
       ),
-    [tokenSlug, tokens]
+    [tokenSlug, tokens],
   );
 
   const preparedCurrentToken = useMemo(
@@ -111,7 +112,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
       currentToken
         ? prepareToken(currentToken as AccountAsset, "large")
         : undefined,
-    [currentToken]
+    [currentToken],
   );
 
   const prevTokenSlug = usePrevious(currentToken?.tokenSlug);
@@ -130,7 +131,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
             "ml-4 mb-2",
             "text-base font-normal text-left",
             "text-brand-gray",
-            "flex items-center"
+            "flex items-center",
           )}
         >
           Token
@@ -141,7 +142,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
             "p-3",
             "bg-brand-main/5 rounded-[.625rem]",
             "flex items-center",
-            "text-sm text-brand-inactivelight"
+            "text-sm text-brand-inactivelight",
           )}
         >
           <Delay ms={300}>
@@ -152,7 +153,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
                   "bg-brand-main/5 rounded-[.625rem]",
                   "flex items-center justify-center",
                   "mr-3",
-                  "animate-bootfadein"
+                  "animate-bootfadein",
                 )}
               >
                 <MediaFallbackIcon className="w-full h-auto" />
@@ -196,7 +197,7 @@ const TokenSelect: FC<TokenSelectProps> = ({
       }
       currentItemClassName={classNames(
         tokenType === TokenType.Asset ? "h-16" : "h-[6.125rem]",
-        "!p-3"
+        "!p-3",
       )}
       contentClassName="w-[23.25rem] flex flex-col"
       itemClassName="group"
@@ -219,7 +220,7 @@ const AssetItem: FC<{
         "flex grow",
         "min-w-0",
         size === "large" && "mr-3",
-        size === "small" && "items-center"
+        size === "small" && "items-center",
       )}
     >
       <span className="flex relative mr-3">
@@ -228,7 +229,7 @@ const AssetItem: FC<{
           className={classNames(
             size === "large" && "w-10 h-10 min-w-[2.5rem]",
             size === "small" && "w-8 h-8 min-w-[2rem]",
-            isSelected && "opacity-20"
+            isSelected && "opacity-20",
           )}
         />
         {isSelected && (
@@ -237,7 +238,7 @@ const AssetItem: FC<{
               "absolute inset-0",
               "rounded-full",
               "border border-brand-light",
-              "flex items-center justify-center"
+              "flex items-center justify-center",
             )}
           >
             <SelectedIcon className="w-6 h-auto fill-brand-light" />
@@ -261,7 +262,7 @@ const AssetItem: FC<{
               "text-xs text-brand-inactivedark font-normal",
               "truncate",
               "transition-colors",
-              size === "small" && "group-hover:text-brand-light"
+              size === "small" && "group-hover:text-brand-light",
             )}
           >
             {name}
@@ -304,7 +305,7 @@ const NFTItem: FC<{
           className={classNames(
             "w-[4.625rem] h-[4.625rem] min-w-[4.625rem]",
             "!rounded-[.625rem]",
-            isSelected && "opacity-20"
+            isSelected && "opacity-20",
           )}
         />
 
@@ -314,7 +315,7 @@ const NFTItem: FC<{
               "absolute inset-0",
               "rounded-[.625rem]",
               "border border-brand-light",
-              "flex items-center justify-center"
+              "flex items-center justify-center",
             )}
           >
             <SelectedIcon className="w-10 h-auto fill-brand-light" />
@@ -327,7 +328,7 @@ const NFTItem: FC<{
             "text-xl leading-[1.375rem]",
             isAmountLargerOne ? "line-clamp-2" : "flex flex-col",
             "break-words",
-            !name ? "text-brand-main" : ""
+            !name ? "text-brand-main" : "",
           )}
         >
           {name && (
@@ -336,7 +337,7 @@ const NFTItem: FC<{
                 name.length > 23 &&
                   !name.slice(0, 23).includes(" ") &&
                   "break-all",
-                !isAmountLargerOne && "line-clamp-2"
+                !isAmountLargerOne && "line-clamp-2",
               )}
             >
               {name}
@@ -348,7 +349,7 @@ const NFTItem: FC<{
               className={classNames(
                 "text-brand-main",
                 id.length > 23 ? "break-all" : "break-words",
-                !isAmountLargerOne && "truncate"
+                !isAmountLargerOne && "truncate",
               )}
             >
               {id}
@@ -377,7 +378,7 @@ const NFTItem: FC<{
 const prepareToken = (
   token: AccountToken,
   size: "large" | "small" = "small",
-  isSelected = false
+  isSelected = false,
 ) => ({
   key: token.tokenSlug,
   value:

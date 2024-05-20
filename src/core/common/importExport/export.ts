@@ -17,7 +17,7 @@ export async function exportCurrentProfile() {
   ];
   const storageValues = await storage.fetchMany(storageKeys);
   const storageDump = Object.fromEntries(
-    storageKeys.map((k, i) => [k, storageValues[i]])
+    storageKeys.map((k, i) => [k, storageValues[i]]),
   );
 
   const repoBlob = await exportDB(repo.db);

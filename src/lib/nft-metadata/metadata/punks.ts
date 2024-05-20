@@ -1,5 +1,4 @@
-import { Contract } from "@ethersproject/contracts";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 // This properly encodes the svg data uri for punks
 // from: spectrexyz/use-nft
@@ -14,15 +13,15 @@ function encodeUriData(dataUri: string): string {
 export async function fetchPunkAttributes(
   punksDataContract: string,
   tokenId: string,
-  provider: JsonRpcProvider
+  provider: ethers.JsonRpcApiProvider,
 ) {
-  const PunksDataContract = new Contract(
+  const PunksDataContract = new ethers.Contract(
     punksDataContract,
     [
       "function punkAttributes(uint16 index) public view returns (string memory)",
       "function punkImageSvg(uint16 index) public view returns (string memory)",
     ],
-    provider
+    provider,
   );
   const [type, ...accessories] = (
     await PunksDataContract.punkAttributes(tokenId)

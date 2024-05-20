@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useRef, useState } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
-import { waitForAll } from "jotai/utils";
+import { useSetAtom } from "jotai";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 import Link from "lib/navigation/Link";
@@ -8,11 +7,8 @@ import Link from "lib/navigation/Link";
 import { Account } from "core/types";
 
 import { ACCOUNTS_SEARCH_OPTIONS } from "app/defaults";
-import {
-  accountAddressAtom,
-  allAccountsAtom,
-  currentAccountAtom,
-} from "app/atoms";
+import { accountAddressAtom } from "app/atoms";
+import { useAccounts } from "app/hooks";
 import LargeWalletCard from "app/components/elements/LargeWalletCard";
 import Button from "app/components/elements/Button";
 import WalletCard from "app/components/elements/WalletCard";
@@ -22,21 +18,12 @@ import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 
 const WalletsList: FC = () => {
-  const { currentAccount, allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
+  const { currentAccount, allAccounts } = useAccounts();
 
   const accountsWithoutCurrent = useMemo(
     () =>
       allAccounts.filter(({ address }) => address !== currentAccount.address),
-    [allAccounts, currentAccount.address]
+    [allAccounts, currentAccount.address],
   );
 
   return (
@@ -58,7 +45,7 @@ const emptyClassBg = classNames(
   "h-3",
   "rounded bg-brand-main/10",
   "transition-colors",
-  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
 );
 
 const EmptyWalletCard: FC = () => (
@@ -76,14 +63,14 @@ const EmptyWalletCard: FC = () => (
           "rounded-t-[.625rem]",
           "p-3",
           "transition-colors",
-          "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
+          "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10",
         )}
       >
         <div
           className={classNames(
             "!h-12 w-12 min-w-[3rem] mr-3",
             "!rounded-[.625rem]",
-            emptyClassBg
+            emptyClassBg,
           )}
         />
         <span className="flex flex-col">
@@ -98,7 +85,7 @@ const EmptyWalletCard: FC = () => (
           "bg-brand-main/10",
           "rounded-b-[.625rem]",
           "transition-colors",
-          "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+          "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
         )}
       >
         <AddWalletIcon />
@@ -123,7 +110,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
 
   const fuse = useMemo(
     () => new Fuse(accounts, ACCOUNTS_SEARCH_OPTIONS),
-    [accounts]
+    [accounts],
   );
 
   const filteredAccounts = useMemo(() => {
@@ -146,7 +133,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
         left: 0,
       });
     },
-    [setAccountAddress, setSearchValue]
+    [setAccountAddress, setSearchValue],
   );
 
   return (
@@ -190,7 +177,7 @@ const SearchableAccountsScrollArea: FC<SearchableAccountsScrollAreaProps> = ({
             "h-full mr-[11.25rem]",
             "border border-brand-light/[.05]",
             "rounded-[.625rem]",
-            "text-sm text-brand-placeholder"
+            "text-sm text-brand-placeholder",
           )}
         >
           <NoResultsFoundIcon className="mr-5" />

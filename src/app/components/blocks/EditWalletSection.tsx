@@ -1,4 +1,13 @@
-import { FC, memo, ReactNode, useCallback, useEffect, useState } from "react";
+import {
+  FC,
+  memo,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { FormApi } from "final-form";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import { replaceT } from "lib/ext/i18n";
@@ -7,7 +16,7 @@ import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { useCopyToClipboard } from "lib/react-hooks/useCopyToClipboard";
 import { TReplace } from "lib/ext/i18n/react";
 
-import { Account, AccountSource, SocialProvider } from "core/types";
+import { Account, AccountSource, SeedPharse, SocialProvider } from "core/types";
 import {
   deleteAccounts,
   getPrivateKey,
@@ -21,6 +30,7 @@ import {
   maxLength,
   minLength,
   required,
+  resetFormPassword,
   withHumanDelay,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
@@ -32,8 +42,8 @@ import SecondaryModal, {
   SecondaryModalProps,
 } from "app/components/elements/SecondaryModal";
 import PasswordField from "app/components/elements/PasswordField";
-import AutoIcon from "app/components/elements/AutoIcon";
 import SecretField from "app/components/blocks/SecretField";
+import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as KeyIcon } from "app/icons/lock-key.svg";
@@ -45,6 +55,7 @@ import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
 import { ReactComponent as NoteIcon } from "app/icons/note.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/Delete.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/ledger.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 type EditWalletSectionProps = {
   account: Account;
@@ -59,23 +70,23 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   >(null);
 
   const handleNameUpdate = useCallback(
-    async ({ name }) =>
+    async ({ name }: { name: string }) =>
       withHumanDelay(async () => {
         try {
           await updateAccountName(account.uuid, name);
           updateToast(
             <>
               Wallet {`"`}
-              <TReplace msg={account.name} />
+              <TReplace msg={name} />
               {`"`} successfully updated!
-            </>
+            </>,
           );
         } catch (err: any) {
           return { name: err?.message };
         }
         return;
       }),
-    [account.name, account.uuid, updateToast]
+    [account.uuid, updateToast],
   );
 
   const handleDeleteAccount = useCallback(() => {
@@ -92,8 +103,8 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
   return (
     <ScrollAreaContainer
       className="w-full min-w-[17.75rem]"
-      viewPortClassName="pb-20 pt-5 pr-5 pl-6"
-      scrollBarClassName="py-0 pt-5 pb-20"
+      viewPortClassName="pb-5 pt-5 pr-5 pl-6"
+      scrollBarClassName="py-0 pt-5 pb-5"
     >
       <ToastOverflowProvider>
         <h2 className="text-2xl text-brand-light font-bold mb-6">
@@ -114,7 +125,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                 validate={composeValidators(
                   required,
                   minLength(3),
-                  maxLength(32)
+                  maxLength(32),
                 )}
               >
                 {({ input, meta }) => (
@@ -160,7 +171,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                   "max-h-[2.625rem]",
                   "flex !justify-start items-center",
                   "text-left",
-                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                  "mt-2 !px-3 min-w-[12rem] mr-auto",
                 )}
                 onClick={() => setModalState("private-key")}
               >
@@ -230,7 +241,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
                   "max-h-[2.625rem]",
                   "flex !justify-start items-center",
                   "text-left",
-                  "mt-2 !px-3 min-w-[12rem] mr-auto"
+                  "mt-2 !px-3 min-w-[12rem] mr-auto",
                 )}
                 onClick={() => setModalState("phrase")}
               >
@@ -270,7 +281,7 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
             "mt-6 mb-8 w-48",
             "!py-2",
             "flex items-center",
-            "text-brand-light"
+            "text-brand-light",
           )}
         >
           <DeleteIcon className="w-4 h-4 ml-1 mr-3" />
@@ -292,12 +303,12 @@ const EditWalletSection: FC<EditWalletSectionProps> = ({ account }) => {
 
 export default EditWalletSection;
 
-type WalletBlockProps = {
+type WalletBlockProps = PropsWithChildren<{
   Icon: FC<{ className?: string }>;
   title: string;
   description: ReactNode;
   className?: string;
-};
+}>;
 
 const WalletBlock: FC<WalletBlockProps> = ({
   Icon,
@@ -310,7 +321,7 @@ const WalletBlock: FC<WalletBlockProps> = ({
     className={classNames(
       "pb-7",
       "border-b border-brand-main/[.07]",
-      className
+      className,
     )}
   >
     <h2 className="flex text-lg font-bold text-brand-light items-center">
@@ -324,13 +335,17 @@ const WalletBlock: FC<WalletBlockProps> = ({
   </div>
 );
 
+type FormValues = {
+  password: string;
+};
+
 const SensetiveActionModal = memo<
   SecondaryModalProps & {
     account: Account;
     cause: "delete" | "phrase" | "private-key";
   }
 >(({ account, cause, open, onOpenChange }) => {
-  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<SeedPharse | null>(null);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
   const windowFocused = useWindowFocus();
   const { updateToast } = useToast();
@@ -342,38 +357,44 @@ const SensetiveActionModal = memo<
   }, [cause, onOpenChange, windowFocused]);
 
   const handleConfirmPassword = useCallback(
-    async ({ password }) =>
+    async (
+      { password }: FormValues,
+      form: FormApi<FormValues, Partial<FormValues>>,
+    ) =>
       withHumanDelay(async () => {
         try {
           if (cause !== "delete") {
             if (cause === "phrase") {
-              const seed = await getSeedPhrase(password); // check is password correct
-              setSeedPhrase(seed.phrase);
+              const seedPhrase = await getSeedPhrase(password); // check is password correct
+              await resetFormPassword(form);
+
+              setSeedPhrase(seedPhrase);
             } else {
               const key = await getPrivateKey(password, account.uuid);
+              await resetFormPassword(form);
+
               setPrivateKey(key);
             }
           } else {
-            try {
-              await deleteAccounts(password, [account.uuid]);
-              updateToast(
-                <>
-                  Wallet {`"`}
-                  <TReplace msg={account.name} />
-                  {`"`} successfully deleted!
-                </>
-              );
-              onOpenChange?.(false);
-            } catch (err: any) {
-              throw new Error(err?.message);
-            }
+            await deleteAccounts(password, [account.uuid]);
+            await resetFormPassword(form);
+
+            updateToast(
+              <>
+                Wallet {`"`}
+                <TReplace msg={account.name} />
+                {`"`} successfully deleted!
+              </>,
+            );
+            onOpenChange?.(false);
           }
+
+          return;
         } catch (err: any) {
           return { password: err?.message };
         }
-        return;
       }),
-    [cause, account.uuid, account.name, updateToast, onOpenChange]
+    [cause, account.uuid, account.name, updateToast, onOpenChange],
   );
 
   return (
@@ -397,11 +418,14 @@ const SensetiveActionModal = memo<
     >
       {seedPhrase || privateKey ? (
         <>
-          <SecretField
-            label={seedPhrase ? "Secret phrase" : "Private key"}
-            isDownloadable={Boolean(seedPhrase)}
-            value={fromProtectedString(seedPhrase ?? privateKey ?? "")}
-          />
+          {seedPhrase ? (
+            <SeedPhraseWords seedPhrase={seedPhrase} />
+          ) : (
+            <SecretField
+              label="Private key"
+              value={fromProtectedString(privateKey!)}
+            />
+          )}
 
           <div
             className={classNames(
@@ -411,7 +435,7 @@ const SensetiveActionModal = memo<
               "bg-brand-redobject/[.05]",
               "border border-brand-redobject/[.8]",
               "rounded-[.625rem]",
-              "text-sm"
+              "text-sm",
             )}
           >
             <span>
@@ -429,6 +453,7 @@ const SensetiveActionModal = memo<
         <Form
           onSubmit={handleConfirmPassword}
           decorators={[focusOnErrors]}
+          destroyOnUnregister
           render={({ handleSubmit, submitting, modifiedSinceLastSubmit }) => (
             <form
               className="flex flex-col items-center"
@@ -487,17 +512,15 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
         "bg-brand-main/[.05]",
         "max-w-[23.188rem]",
         "rounded-[0.625rem]",
-        className
+        className,
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-24 w-24 min-w-[6rem] m-0.5",
           "bg-black/40",
-          "rounded-l-[.5625rem]"
+          "rounded-l-[.5625rem]",
         )}
       />
       <div
@@ -505,19 +528,19 @@ const AddressField: FC<AddressFieldProps> = ({ address, className }) => {
           "flex relative",
           "text-brand-light text-sm",
           "min-w-0",
-          "p-4"
+          "p-4",
         )}
       >
         <span className="w-full font-medium break-words">{address}</span>
         <Button
           theme="tertiary"
-          onClick={copy}
+          onClick={() => copy()}
           className={classNames(
             "absolute bottom-3 right-3",
             "text-sm text-brand-light",
             "!p-0 !pr-1 !min-w-0",
             "!font-normal",
-            "items-center"
+            "items-center",
           )}
         >
           {copied ? (
@@ -547,6 +570,8 @@ const getSocialIcon = (social: SocialProvider) => {
       return TwitterIcon;
     case "reddit":
       return RedditIcon;
+    default:
+      throw new Error("Unhandled social icon type");
   }
 };
 

@@ -1,5 +1,4 @@
-import { JsonRpcProvider, Networkish } from "@ethersproject/providers";
-import { providers as multicallProviders } from "@0xsequence/multicall";
+import { ethers } from "ethers";
 import memoizeOne from "memoize-one";
 import memoize from "mem";
 
@@ -9,11 +8,11 @@ export async function sendRpc(
   chainId: number,
   url: string,
   method: string,
-  params: any[]
+  params: any[],
 ): Promise<RpcResponse> {
-  console.info("Perform RPC request", { chainId, url, method, params });
+  // console.info("Perform RPC request", { chainId, url, method, params });
 
-  const { plainProvider, multicallProvider } = getProvider(url, chainId);
+  const rpcProvider = getRpcProvider(url, chainId);
 
   const getResult = async () => {
     switch (method) {
@@ -21,45 +20,34 @@ export async function sendRpc(
        * Cached
        */
       case "eth_chainId":
-        return plainProvider.getChainId().then(numToHex);
+        return rpcProvider.getChainId().then(numToHex);
 
       case "net_version":
-        return plainProvider.getChainId();
+        return rpcProvider.getChainId();
 
       case "eth_blockNumber":
-        return plainProvider._getFastBlockNumber().then(numToHex);
+        return rpcProvider.getBlockNumber().then(numToHex);
 
-      case "eth_getBlockByHash":
-      case "eth_getBlockByNumber":
-        return plainProvider._getBlock(params[0], params[1]);
-
-      /**
-       * Multicall
-       */
-      case "eth_getBalance":
-        return multicallProvider
-          .getBalance(params[0], params[1])
-          .then((b) => b.toHexString());
-
-      case "eth_getCode":
-        return multicallProvider.getCode(params[0], params[1]);
-
-      case "eth_call":
-        return multicallProvider.call(params[0], params[1]);
+      // case "eth_getBlockByHash":
+      // case "eth_getBlockByNumber":
+      //   TODO: Implement or suggest non-formatted version of this method
+      //   return rpcProvider.getBlock(params[0], params[1]);
 
       /**
        * Rest
        */
       default:
-        return plainProvider.send(method, params);
+        return rpcProvider.send(method, params);
     }
   };
 
   try {
     return { result: await getResult() };
   } catch (err: any) {
-    if (typeof err?.error === "object") {
-      const { message, code, data } = err.error;
+    const error = err.info?.error ?? err.error;
+
+    if (error) {
+      const { message, code, data } = error;
 
       return {
         error: { message, code, data },
@@ -72,30 +60,42 @@ export async function sendRpc(
   }
 }
 
-const getProvider = memoize((url: string, chainId: number) => {
-  const plainProvider = new RpcProvider(url, chainId);
-  const multicallProvider = new multicallProviders.MulticallProvider(
-    plainProvider
-  );
+const getRpcProvider = memoize(
+  (url: string, chainId: number) => new RpcProvider(url, chainId),
+);
 
-  return { plainProvider, multicallProvider };
-});
-
-class RpcProvider extends JsonRpcProvider {
+class RpcProvider extends ethers.JsonRpcProvider {
   getNetwork = memoizeOne(super.getNetwork.bind(this));
 
   getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
 
-  constructor(url: string, network?: Networkish) {
-    super(url, network);
+  constructor(url: string, chainId: number) {
+    super(url, chainId, { staticNetwork: ethers.Network.from(chainId) });
 
     // To use cache first provider._getBlock(), but without formatting
-    this.formatter.block = (b) => b;
-    this.formatter.blockWithTransactions = (b) => b;
+    // this.formatter = getRpcFormatter();
   }
 }
 
-function numToHex(value: number): string {
+// const getRpcFormatter = memoizeOne(() => {
+//   const formatter = new ethers.Formatter();
+//   formatter.block = formatBlockData;
+//   formatter.blockWithTransactions = formatBlockData;
+
+//   return formatter;
+// });
+
+// function formatBlockData(data: any) {
+//   // Fix using getBlock() function with Celo,
+//   // invalid RPC response from Celo by design
+//   // @see https://github.com/ethers-io/ethers.js/issues/1735
+//   return {
+//     ...data,
+//     gasLimit: data.gasLimit ?? "0x0",
+//   };
+// }
+
+function numToHex(value: number | bigint): string {
   return `0x${value.toString(16)}`;
 }
 

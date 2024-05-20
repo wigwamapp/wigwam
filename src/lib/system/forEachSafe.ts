@@ -1,6 +1,6 @@
 export function forEachSafe<T>(
   iterable: Iterable<T>,
-  handle: (value: T) => void
+  handle: (value: T) => void,
 ) {
   for (const value of iterable) {
     try {

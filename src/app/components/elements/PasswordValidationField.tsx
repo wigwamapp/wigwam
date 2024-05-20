@@ -1,4 +1,10 @@
-import { FC, forwardRef, useCallback, useState } from "react";
+import {
+  FC,
+  forwardRef,
+  useCallback,
+  useState,
+  ChangeEventHandler,
+} from "react";
 import classNames from "clsx";
 
 import { InputProps } from "./Input";
@@ -27,21 +33,21 @@ const PasswordValidationField = forwardRef<
     characters: false,
   });
 
-  const handleInputChange = useCallback(
-    (e) => {
-      const { value } = e.target;
+  const handleInputChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (evt) => {
+      const { value } = evt.target;
 
       setPasswordRequirements({
-        bigLetter: value.match(/(?=.*[A-Z])/),
-        smallLetter: value.match(/(?=.*[a-z])/),
-        numbers: value.match(/(?=.*[0-9])/),
+        bigLetter: /(?=.*[A-Z])/.test(value),
+        smallLetter: /(?=.*[a-z])/.test(value),
+        numbers: /(?=.*[0-9])/.test(value),
         length: value.length >= 8,
-        characters: value.match(/[`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]/),
+        characters: /[`!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~]/.test(value),
       });
 
-      onChange?.(e);
+      onChange?.(evt);
     },
-    [onChange]
+    [onChange],
   );
 
   return (
@@ -53,7 +59,7 @@ const PasswordValidationField = forwardRef<
           "mt-2 pl-2 -mb-2",
           "max-h-0 overflow-hidden",
           "transition-[max-height] duration-200",
-          (modified || rest.error) && "max-h-[4rem]"
+          (modified || rest.error) && "max-h-[4rem]",
         )}
       >
         {Object.keys(passwordRequirements).map((key) => (
@@ -63,7 +69,7 @@ const PasswordValidationField = forwardRef<
             isActive={passwordRequirements[key as RequirementsType]}
             isOptional={key === "characters"}
             isError={Boolean(
-              !passwordRequirements[key as RequirementsType] && rest.error
+              !passwordRequirements[key as RequirementsType] && rest.error,
             )}
           />
         ))}
@@ -109,7 +115,7 @@ const Tag: FC<TagProps> = ({
         (isOptional
           ? ""
           : "border-brand-redtext/20 bg-brand-redtext/20 text-brand-redtext"),
-      className
+      className,
     )}
   >
     {getLabel(type)}

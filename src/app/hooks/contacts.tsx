@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -33,7 +34,7 @@ export function useContacts({
     () => ({
       search,
     }),
-    [search]
+    [search],
   );
   const prevBaseParams = usePrevious(baseParams);
 
@@ -55,7 +56,7 @@ export function useContacts({
       ...baseParams,
       limit: offset + limit,
     }),
-    [baseParams, offset, limit]
+    [baseParams, offset, limit],
   );
 
   const contactsAtom = getContactsAtom(queryParams);
@@ -129,7 +130,7 @@ export const useContactsDialog = () => {
   return value;
 };
 
-export const ContactsDialogProvider: FC = ({ children }) => {
+export const ContactsDialogProvider: FC<PropsWithChildren> = ({ children }) => {
   const [modalData, setModalData] = useState<ContactDialogParams>(null);
 
   return (

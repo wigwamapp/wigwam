@@ -7,16 +7,22 @@ export interface Network {
   nativeCurrency: {
     name: string;
     symbol: string; // 2-6 characters long
-    decimals: 18;
+    decimals: number;
   };
   ensRegistry?: string;
   explorerUrls?: string[];
   explorerApiUrl?: string;
   iconUrls?: string[];
   faucetUrls?: string[];
-  bridgesUrls?: string[];
+  parent?: {
+    type: "L2" | "shard";
+    chain: string;
+    bridges?: { url: string }[];
+  };
   infoUrl?: string;
   position?: number;
+  balanceUSD?: string;
+  manuallyChanged?: boolean;
 }
 
 export type NetworkType = "mainnet" | "testnet" | "unknown";

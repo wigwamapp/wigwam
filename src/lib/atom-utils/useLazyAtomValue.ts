@@ -4,7 +4,7 @@ import { usePrevious, KeepPrevious } from "lib/react-hooks/usePrevious";
 
 export function useLazyAtomValue<T>(
   atom: Atom<T>,
-  previousMode: KeepPrevious = "when-not-undefined"
+  previousMode: KeepPrevious = "when-not-undefined",
 ) {
   const value = useAtomValue(loadable(atom));
 

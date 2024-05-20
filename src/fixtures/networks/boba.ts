@@ -21,22 +21,4 @@ export const BOBA: Network[] = [
     faucetUrls: [],
     infoUrl: "https://boba.network",
   },
-
-  // Testnets
-  {
-    chainId: 28,
-    type: "testnet",
-    rpcUrls: ["https://rinkeby.boba.network/"],
-    chainTag: "boba",
-    name: "Boba Rinkeby Testnet",
-    nativeCurrency: {
-      symbol: "tBOBA",
-      name: "Test Boba",
-      decimals: 18,
-    },
-    explorerUrls: ["https://blockexplorer.rinkeby.boba.network"],
-    explorerApiUrl: "https://blockexplorer.rinkeby.boba.network/api",
-    faucetUrls: ["https://faucet.rinkeby.io"],
-    infoUrl: "https://boba.network",
-  },
 ];

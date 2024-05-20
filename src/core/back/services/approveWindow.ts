@@ -18,7 +18,11 @@ const WINDOW_POSITION =
 
 const enqueueOpenApprove = createQueue();
 
+let lastTabBeforeApprove: number | undefined = undefined;
+
 export function startApproveWindowOpener() {
+  closeAllApproveTabs();
+
   let popupState: ApprovePopupState = null;
 
   browser.runtime.onMessage.addListener((msg) => {
@@ -40,6 +44,9 @@ export function startApproveWindowOpener() {
         browser.windows.remove(popupState.id).catch(console.error);
       } else if (popupState?.type === "tab") {
         browser.tabs.remove(popupState.id).catch(console.error);
+        if (lastTabBeforeApprove) {
+          chrome.tabs.update(Number(lastTabBeforeApprove), { active: true });
+        }
       }
     } else if (popupState) {
       focusApprovalTab(approvals[0]);
@@ -60,14 +67,7 @@ export function startApproveWindowOpener() {
             .update(popupState.id, { active: true })
             .catch(console.error);
         } else {
-          await browser.tabs
-            .query({ url: APPROVE_WINDOW_URL })
-            .then((restApproveTabs) =>
-              restApproveTabs.length > 0
-                ? browser.tabs.remove(restApproveTabs.map(({ id }) => id!))
-                : null
-            )
-            .catch(console.error);
+          await closeAllApproveTabs();
 
           popupState = await createApproveWindow(WINDOW_POSITION);
         }
@@ -120,6 +120,18 @@ export function startApproveWindowOpener() {
   });
 }
 
+async function closeAllApproveTabs() {
+  try {
+    const approveTabs = await browser.tabs.query({ url: APPROVE_WINDOW_URL });
+
+    if (approveTabs.length > 0) {
+      await browser.tabs.remove(approveTabs.map(({ id }) => id!));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function createApproveWindow(position: "center" | "top-right") {
   let width = 440;
   let height = 660;
@@ -151,6 +163,11 @@ async function createApproveWindow(position: "center" | "top-right") {
   }
 
   if (lastFocused?.state === "fullscreen" && (await isMacOs())) {
+    const lastFocusedTab = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    lastTabBeforeApprove = lastFocusedTab[0].id;
     const tab = await browser.tabs.create({
       url: getPublicURL("approve.html"),
       active: true,

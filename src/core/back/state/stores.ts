@@ -20,11 +20,11 @@ import {
 
 export const $walletStatus = createStore(WalletStatus.Idle)
   .on(inited, (_s, vaultExists) =>
-    vaultExists ? WalletStatus.Locked : WalletStatus.Welcome
+    vaultExists ? WalletStatus.Locked : WalletStatus.Welcome,
   )
   .on(unlocked, () => WalletStatus.Unlocked)
   .on(locked, (state) =>
-    state === WalletStatus.Unlocked ? WalletStatus.Locked : state
+    state === WalletStatus.Unlocked ? WalletStatus.Locked : state,
   );
 
 export const $hasSeedPhrase = createStore(false)
@@ -73,19 +73,38 @@ export const $syncPool = createStore<(number | string)[]>([])
 export const $syncStatus = $syncPool.map((pool) => Array.from(new Set(pool)));
 
 export const $approvals = createStore<Approval[]>([])
+  .on(unlocked, (_, { approvals }) => approvals ?? [])
   .on(approvalAdded, (approvals, newApproval) => {
     if (newApproval.type === ActivityType.Connection) {
       const newApprovalOrigin = getPageOrigin(newApproval.source);
+
+      let index = 0;
       for (const approval of approvals) {
         if (
           approval.type === ActivityType.Connection &&
           getPageOrigin(approval.source) === newApprovalOrigin
         ) {
-          return approvals;
+          return approvals.filter((a, i) => (i === index ? newApproval : a));
         }
+
+        index++;
       }
 
       return [newApproval, ...approvals];
+    }
+
+    if (
+      newApproval.type === ActivityType.Transaction &&
+      newApproval.source.replaceTx
+    ) {
+      const prevId = newApproval.source.replaceTx.prevActivityId;
+      const restApprovals = approvals.filter(
+        (a) => a.source.replaceTx?.prevActivityId !== prevId,
+      );
+
+      if (restApprovals.length !== approvals.length) {
+        return [newApproval, ...restApprovals];
+      }
     }
 
     return [...approvals, newApproval];
@@ -119,15 +138,15 @@ export const $approvals = createStore<Approval[]>([])
   });
 
 export const $accountAddresses = $accounts.map((accounts) =>
-  accounts.map((acc) => acc.address)
+  accounts.map((acc) => acc.address),
 );
 
 function rejectApprovalsRpc(approvals: Approval[]) {
-  try {
-    for (const { rpcReply } of approvals) {
-      rpcReply?.({
+  for (const { rpcCtx } of approvals) {
+    try {
+      rpcCtx?.reply({
         error: ethErrors.provider.userRejectedRequest(),
       });
-    }
-  } catch {}
+    } catch {}
+  }
 }

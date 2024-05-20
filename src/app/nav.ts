@@ -4,23 +4,26 @@ export enum Page {
   Profiles = "profiles",
   Unlock = "unlock",
   Receive = "receive",
+  Buy = "buy",
   Transfer = "transfer",
   Swap = "swap",
   Apps = "apps",
   Contacts = "contacts",
   Wallets = "wallets",
   Settings = "settings",
+  Rewards = "Rewards",
 }
 
 export enum AddAccountStep {
-  ChooseWay = "choose-way",
+  AddAccountInitial = "add-account-initial",
+  ChooseWayImport = "choose-way-import",
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",
-  ImportPrivateKey = "import-private-key",
-  AddWatchOnlyAccount = "add-watch-only",
   VerifySeedPhrase = "verify-seed-phrase",
-  SelectAccountsToAddMethod = "select-accounts-to-add-method",
-  VerifyToAdd = "verify-to-add",
+  ImportPrivateKey = "import-private-key",
+  AddWatchOnlyAccount = "add-watch-only-account",
+  ConfirmAccounts = "confirm-accounts",
+  EditAccounts = "edit-accounts",
   SetupPassword = "setup-password",
 }
 
@@ -45,4 +48,9 @@ export enum ReceiveTab {
   BuyWithCrypto = "buy-with-crypto",
   BuyWithFiat = "buy-with-fiat",
   Faucet = "faucet",
+}
+
+export enum PopupToolbarTab {
+  Assets = "assets",
+  Activity = "activity",
 }

@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  FormEventHandler,
 } from "react";
 import classNames from "clsx";
 import { mergeRefs } from "react-merge-refs";
@@ -40,7 +41,7 @@ const ContentEditableField = forwardRef<
       errorMessage,
       placeholder,
     },
-    ref
+    ref,
   ) => {
     const innerRef = useRef<HTMLDivElement>(null);
     const initialValueRef = useRef(value);
@@ -54,7 +55,7 @@ const ContentEditableField = forwardRef<
       };
     }, []);
 
-    const handleInput = useCallback(
+    const handleInput = useCallback<FormEventHandler<HTMLDivElement>>(
       (evt) => {
         const value = evt.currentTarget.textContent || null;
 
@@ -66,7 +67,7 @@ const ContentEditableField = forwardRef<
 
         onChange?.({ target: { value } } as any);
       },
-      [onChange]
+      [onChange],
     );
 
     return (
@@ -94,7 +95,7 @@ const ContentEditableField = forwardRef<
                 "text-base leading-5",
                 !disabled && "text-brand-placeholder",
                 disabled && "text-brand-disabledcolor",
-                "pointer-events-none"
+                "pointer-events-none",
               )}
             >
               {placeholder}
@@ -128,7 +129,7 @@ const ContentEditableField = forwardRef<
                 "border-brand-main/5",
                 "text-brand-disabledcolor",
               ],
-              textareaClassName
+              textareaClassName,
             )}
             style={{
               wordBreak: "break-word",
@@ -143,7 +144,7 @@ const ContentEditableField = forwardRef<
           className={classNames(
             "max-h-0 overflow-hidden",
             "transition-[max-height] duration-200",
-            error && errorMessage && "max-h-5"
+            error && errorMessage && "max-h-5",
           )}
         >
           <span className="block text-brand-redtext text-left pt-1 pl-4 text-xs">
@@ -152,7 +153,7 @@ const ContentEditableField = forwardRef<
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default ContentEditableField;

@@ -18,22 +18,4 @@ export const SYSCOIN: Network[] = [
     faucetUrls: [],
     infoUrl: "https://www.syscoin.org",
   },
-
-  // Testnets
-  {
-    chainId: 5700,
-    type: "testnet",
-    rpcUrls: ["https://rpc.tanenbaum.io"],
-    chainTag: "syscoin",
-    name: "Syscoin Tanenbaum Testnet",
-    nativeCurrency: {
-      symbol: "tSYS",
-      name: "Test Syscoin",
-      decimals: 18,
-    },
-    explorerUrls: ["https://tanenbaum.io"],
-    explorerApiUrl: "https://tanenbaum.io/api",
-    faucetUrls: ["https://faucet.tanenbaum.io"],
-    infoUrl: "https://syscoin.org",
-  },
 ];

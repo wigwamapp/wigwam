@@ -4,13 +4,16 @@ export function toWordlistLang(localeCode: string) {
 
 export function withError<T>(
   errMessage: string,
-  factory: (getError: () => void) => T
+  factory: (getError: () => void) => T,
 ): T {
   const getError = (err?: unknown) => {
     if (err instanceof PublicError) {
       return err;
     } else {
-      err && console.warn(errMessage, err);
+      if (process.env.NODE_ENV !== "test" && err) {
+        console.warn(errMessage, err);
+      }
+
       return new PublicError(errMessage);
     }
   };

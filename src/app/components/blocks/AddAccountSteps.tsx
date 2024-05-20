@@ -1,39 +1,48 @@
-import { memo, Suspense, useRef } from "react";
-import { useAtomValue } from "jotai/utils";
+import { memo, Suspense, useCallback, useRef } from "react";
 import classNames from "clsx";
 
 import { AddAccountStep } from "app/nav";
 import { addAccountStepAtom } from "app/atoms";
 import { AllSteps, StepsProvider } from "app/hooks/steps";
+import { useDialog } from "app/hooks/dialog";
 
-import ChooseAddAccountWay from "../screens/addAccountSteps/ChooseAddAccountWayBeta";
-import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
-import SelectAccountsToAddMethod from "../screens/addAccountSteps/SelectAccountsToAddMethod";
-import VerifyAccountToAdd from "../screens/addAccountSteps/VerifyAccountToAdd";
-import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+import { ReactComponent as SupportIcon } from "app/icons/chat.svg";
+
+import * as SupportAlert from "app/components/elements/SupportAlert";
+
+import AddAccountInitial from "../screens/addAccountSteps/AddAccountInitial";
 import CreateSeedPhrase from "../screens/addAccountSteps/CreateSeedPhrase";
 import ImportSeedPhrase from "../screens/addAccountSteps/ImportSeedPhrase";
+import VerifySeedPhrase from "../screens/addAccountSteps/VerifySeedPhrase";
 import ImportPrivateKey from "../screens/addAccountSteps/ImportPrivateKey";
 import AddWatchOnlyAccount from "../screens/addAccountSteps/AddWatchOnlyAccount";
 
+import ConfirmAccounts from "../screens/addAccountSteps/ConfirmAccounts";
+import EditAccounts from "../screens/addAccountSteps/EditAccounts";
+import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+import Button from "../elements/Button";
+
 const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
-  [AddAccountStep.ChooseWay, () => <ChooseAddAccountWay />],
+  [AddAccountStep.AddAccountInitial, () => <AddAccountInitial />],
+
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
+  [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
   [AddAccountStep.ImportPrivateKey, () => <ImportPrivateKey />],
   [AddAccountStep.AddWatchOnlyAccount, () => <AddWatchOnlyAccount />],
-  [AddAccountStep.VerifySeedPhrase, () => <VerifySeedPhrase />],
-  [
-    AddAccountStep.SelectAccountsToAddMethod,
-    () => <SelectAccountsToAddMethod />,
-  ],
-  [AddAccountStep.VerifyToAdd, () => <VerifyAccountToAdd />],
+
+  [AddAccountStep.ConfirmAccounts, () => <ConfirmAccounts />],
+  [AddAccountStep.EditAccounts, () => <EditAccounts />],
   [AddAccountStep.SetupPassword, () => <SetupPassword />],
 ];
 
-const AddAccountSteps = memo(() => {
-  const accountStep = useAtomValue(addAccountStepAtom);
+const AddAccountStepsNext = memo(() => {
+  const { alert } = useDialog();
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const handleSupport = useCallback(() => {
+    alert({ title: <SupportAlert.Title />, content: <SupportAlert.Content /> });
+  }, [alert]);
 
   return (
     <div
@@ -41,9 +50,9 @@ const AddAccountSteps = memo(() => {
       className={classNames(
         "w-[59rem] mx-auto",
         "h-full",
-        "pt-24",
+        "py-24",
         "flex flex-col",
-        accountStep === AddAccountStep.ChooseWay ? "pb-16" : "pb-24"
+        // accountStep === AddAccountStep.ChooseWayGeneral ? "pb-16" : "pb-24",
       )}
     >
       <StepsProvider
@@ -53,8 +62,16 @@ const AddAccountSteps = memo(() => {
       >
         {({ children }) => <Suspense fallback={null}>{children}</Suspense>}
       </StepsProvider>
+      <Button
+        theme="clean"
+        className="absolute right-8 bottom-5 z-20 font-semibold"
+        onClick={handleSupport}
+      >
+        <SupportIcon className="mr-2" />
+        Support
+      </Button>
     </div>
   );
 });
 
-export default AddAccountSteps;
+export default AddAccountStepsNext;

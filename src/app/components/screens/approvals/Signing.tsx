@@ -1,6 +1,7 @@
 import {
   FC,
   lazy,
+  PropsWithChildren,
   ReactNode,
   useCallback,
   useEffect,
@@ -16,7 +17,7 @@ import {
   SignTypedDataVersion,
   recoverPersonalSignature,
   recoverTypedSignature,
-} from "lib/eth-sig-util";
+} from "@metamask/eth-sig-util";
 
 import { AccountSource, SigningApproval, SigningStandard } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";
@@ -29,6 +30,7 @@ import { withHumanDelay } from "app/utils";
 import ApprovalHeader from "app/components/blocks/approvals/ApprovalHeader";
 import LongTextField from "app/components/elements/LongTextField";
 import Button from "app/components/elements/Button";
+import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 
@@ -36,7 +38,7 @@ import ApprovalLayout from "./Layout";
 
 const JsonView = lazy(() => import("@microlink/react-json-view"));
 
-const { toUtf8String, hexlify, joinSignature, getAddress } = ethers.utils;
+const { toUtf8String, hexlify, getAddress } = ethers;
 
 type ApproveSigningProps = {
   approval: SigningApproval;
@@ -47,7 +49,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
 
   const account = useMemo(
     () => allAccounts.find((acc) => acc.address === approval.accountAddress)!,
-    [approval, allAccounts]
+    [approval, allAccounts],
   );
 
   const { alert } = useDialog();
@@ -77,6 +79,9 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         case SigningStandard.SignTypedDataV3:
         case SigningStandard.SignTypedDataV4:
           return JSON.parse(approval.message);
+
+        default:
+          throw new Error("Unhandled Signing standard");
       }
     } catch (err) {
       console.error(err);
@@ -107,14 +112,14 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                 case SigningStandard.PersonalSign:
                   sig = await ledgerEth.signPersonalMessage(
                     account.derivationPath,
-                    hexlify(approval.message).substring(2)
+                    hexlify(approval.message).substring(2),
                   );
                   break;
 
                 case SigningStandard.SignTypedDataV1:
                 case SigningStandard.SignTypedDataV3:
                   throw new Error(
-                    "Ledger: Only version 4 of typed data signing is supported"
+                    "Ledger: Only version 4 of typed data signing is supported",
                   );
 
                 case SigningStandard.SignTypedDataV4:
@@ -127,20 +132,20 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                       primaryType,
                       message: sanitizedMessage,
                     } = TypedDataUtils.sanitizeData(
-                      JSON.parse(approval.message)
+                      JSON.parse(approval.message),
                     );
 
                     domainSeparatorHex = TypedDataUtils.hashStruct(
                       "EIP712Domain",
                       domain,
                       types,
-                      SignTypedDataVersion.V4
+                      SignTypedDataVersion.V4,
                     ).toString("hex");
                     hashStructMessageHex = TypedDataUtils.hashStruct(
                       primaryType as any,
                       sanitizedMessage,
                       types,
-                      SignTypedDataVersion.V4
+                      SignTypedDataVersion.V4,
                     ).toString("hex");
                   } catch {
                     throw new Error("Invalid message");
@@ -149,17 +154,20 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                   sig = await ledgerEth.signEIP712HashedMessage(
                     account.derivationPath,
                     domainSeparatorHex,
-                    hashStructMessageHex
+                    hashStructMessageHex,
                   );
                   break;
+
+                default:
+                  throw new Error("Unhandled Signing standard");
               }
 
               if (sig) {
-                signedMessage = joinSignature({
+                signedMessage = ethers.Signature.from({
                   v: sig.v,
                   r: "0x" + sig.r,
                   s: "0x" + sig.s,
-                });
+                }).serialized;
 
                 let addressSignedWith: string | undefined;
 
@@ -178,13 +186,16 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
                       signature: signedMessage,
                     });
                     break;
+
+                  default:
+                    throw new Error("Unhandled Signing standard");
                 }
 
                 if (
                   getAddress(addressSignedWith!) !== getAddress(account.address)
                 ) {
                   throw new Error(
-                    "Ledger: The signature doesnt match the right address"
+                    "Ledger: The signature doesnt match the right address",
                   );
                 }
               }
@@ -210,7 +221,7 @@ const ApproveSigning: FC<ApproveSigningProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, account, setApproving, alert, withLedger, message]
+    [approval, account, setApproving, alert, withLedger, message],
   );
 
   useEffect(() => {
@@ -250,7 +261,7 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
   message,
 }) => {
   const { copy, copied } = useCopyToClipboard(
-    typeof message === "string" ? message : JSON.stringify(message, null, 2)
+    typeof message === "string" ? message : JSON.stringify(message, null, 2),
   );
 
   const standardLabel = (
@@ -268,7 +279,7 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
         "text-sm text-brand-light",
         "!p-0 !pr-1 !min-w-0",
         "!font-normal",
-        "items-center"
+        "items-center",
       )}
     >
       {copied ? (
@@ -282,57 +293,68 @@ const MessageField: FC<{ standard: SigningStandard; message: any }> = ({
 
   const heightClassName = "!h-[20rem]";
 
-  return typeof message === "string" ? (
-    <LongTextField
-      label="Message"
-      readOnly
-      textareaClassName={heightClassName}
-      value={message}
-      actions={copyButton}
-      labelActions={standardLabel}
-      hoverStyles={false}
-    />
-  ) : (
-    <>
-      <FieldLabel action={standardLabel}>Message</FieldLabel>
+  return (
+    <ScrollAreaContainer
+      className="w-full box-content -mr-5 pr-5"
+      viewPortClassName="viewportBlock pt-5"
+      scrollBarClassName="pt-5 pb-0"
+    >
+      {typeof message === "string" ? (
+        <LongTextField
+          label="Message"
+          readOnly
+          textareaClassName={heightClassName}
+          value={message}
+          actions={copyButton}
+          labelActions={standardLabel}
+          hoverStyles={false}
+        />
+      ) : (
+        <>
+          <FieldLabel action={standardLabel}>Message</FieldLabel>
 
-      <div className="relative w-full">
-        <div
-          className={classNames(
-            "w-full",
-            heightClassName,
-            "py-3 px-4",
-            "box-border",
-            "text-sm text-brand-light",
-            "bg-black/20",
-            "border border-brand-main/10",
-            "rounded-[.625rem]",
-            "overflow-auto"
-          )}
-        >
-          <JsonView
-            src={message}
-            theme="harmonic"
-            iconStyle="triangle"
-            name={null}
-            indentWidth={3}
-            collapsed={false}
-            collapseStringsAfterLength={42}
-            enableClipboard={false}
-            displayObjectSize={false}
-            displayDataTypes={false}
-            style={{ backgroundColor: "none" }}
-            sortKeys
-          />
-        </div>
+          <div className="relative w-full">
+            <div
+              className={classNames(
+                "w-full",
+                heightClassName,
+                "py-3 px-4",
+                "box-border",
+                "text-sm text-brand-light",
+                "bg-black/20",
+                "border border-brand-main/10",
+                "rounded-[.625rem]",
+                "overflow-auto",
+              )}
+            >
+              <JsonView
+                src={message}
+                theme="harmonic"
+                iconStyle="triangle"
+                name={null}
+                indentWidth={3}
+                collapsed={false}
+                collapseStringsAfterLength={42}
+                enableClipboard={false}
+                displayObjectSize={false}
+                displayDataTypes={false}
+                style={{ backgroundColor: "none" }}
+                sortKeys
+              />
+            </div>
 
-        {copyButton}
-      </div>
-    </>
+            {copyButton}
+          </div>
+        </>
+      )}
+    </ScrollAreaContainer>
   );
 };
 
-const FieldLabel: FC<{ action?: ReactNode }> = ({ children, action }) => (
+const FieldLabel: FC<PropsWithChildren<{ action?: ReactNode }>> = ({
+  children,
+  action,
+}) => (
   <div className="flex items-center justify-between px-4 mb-2 min-h-6">
     <div className="text-base text-brand-gray cursor-pointer flex align-center">
       {children}

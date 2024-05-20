@@ -2,14 +2,19 @@ import {
   FC,
   ReactNode,
   memo,
+  Suspense,
   useCallback,
-  useRef,
   useState,
   useMemo,
+  useEffect,
+  PropsWithChildren,
 } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
+import { match } from "ts-pattern";
+import { PopupToolbarTab } from "app/nav";
 import Masonry from "lib/react-masonry/Masonry";
+import { useAtomsAll } from "lib/atom-utils";
 
 import {
   Account,
@@ -17,6 +22,7 @@ import {
   AccountNFT,
   TokenStatus,
   TokenType,
+  WalletStatus,
 } from "core/types";
 import * as repo from "core/repo";
 
@@ -27,56 +33,75 @@ import {
 import {
   activeTabOriginAtom,
   getPermissionAtom,
+  popupToolbarTabAtom,
   tokenTypeAtom,
+  walletStatusAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
-import { TippySingletonProvider, useIsSyncing } from "app/hooks";
+import { useAccountToken, useIsSyncing, useLazyNetwork } from "app/hooks";
 import { useTokenList } from "app/hooks/tokenList";
-
-import { ReactComponent as HashTagIcon } from "app/icons/hashtag.svg";
 
 import PopupLayout from "../layouts/PopupLayout";
 import PreloadBaseAndSync from "../layouts/PreloadBaseAndSync";
-import NetworkSelect from "../elements/NetworkSelect";
-import AccountSelect from "../elements/AccountSelect";
-import AssetsSwitcher from "../elements/AssetsSwitcher";
-import SearchInput from "../elements/SearchInput";
-import IconedButton from "../elements/IconedButton";
-import ScrollAreaContainer from "../elements/ScrollAreaContainer";
-import Tooltip from "../elements/Tooltip";
-import ControlIcon from "../elements/ControlIcon";
 import SecondaryModal, {
   SecondaryModalProps,
 } from "../elements/SecondaryModal";
-import InteractionWithDapp from "../blocks/popup/InteractionWithDapp";
 import AssetCard from "../blocks/popup/AssetCard";
 import NullState from "../blocks/tokenList/NullState";
-import AddTokenBanner from "../blocks/tokenList/AddTokenBanner";
 import NoNftState from "../blocks/tokenList/NoNftState";
 import NftCard from "../blocks/tokenList/NftCard";
+import ActivityContent from "../blocks/activity/ActivityContent";
 import NFTOverviewPopup from "../blocks/popup/NFTOverviewPopup";
 
 import ShareAddress from "./receiveTabs/ShareAddress";
-import { waitForAll } from "jotai/utils";
+import AssetsManagement, { ManageMode } from "../elements/AssetsManagement";
+import NetworksButton from "../blocks/NetworksButton";
+import NetworkIcon from "../elements/NetworkIcon";
+import { NATIVE_TOKEN_SLUG } from "core/common";
+import FiatAmount from "../elements/FiatAmount";
 
-const Popup: FC = () => (
-  <PreloadAndSync>
-    <PopupLayout>
-      <PopupNetworkSelect />
-      <AccountSelect className="mt-2" />
-      <InteractionWithDapp className="mt-2" />
-      <TokenExplorer />
-    </PopupLayout>
-  </PreloadAndSync>
-);
+const Popup: FC = () => {
+  const tab = useAtomValue(popupToolbarTabAtom);
+
+  return (
+    <PreloadAndSync>
+      <PopupLayout>{matchPopupTabs(tab) as unknown as ReactNode}</PopupLayout>
+    </PreloadAndSync>
+  );
+};
 
 export default Popup;
 
-const PreloadAndSync: FC = ({ children }) => {
+const Assets: FC = () => {
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const tokenType = useAtomValue(tokenTypeAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+
+  return isUnlocked ? (
+    <>
+      <PopupNetworkSelect />
+      <TokenList key={tokenType} />
+    </>
+  ) : null;
+};
+
+const Activities: FC = () => {
+  const walletStatus = useAtomValue(walletStatusAtom);
+  const isUnlocked = walletStatus === WalletStatus.Unlocked;
+
+  return isUnlocked ? (
+    <Suspense fallback={null}>
+      <ActivityContent />
+    </Suspense>
+  ) : null;
+};
+
+const PreloadAndSync: FC<PropsWithChildren> = ({ children }) => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
-  const [permission] = useAtomValue(
-    waitForAll([getPermissionAtom(tabOrigin), web3MetaMaskCompatibleAtom])
-  );
+  const [permission] = useAtomsAll([
+    getPermissionAtom(tabOrigin),
+    web3MetaMaskCompatibleAtom,
+  ]);
 
   return (
     <PreloadBaseAndSync chainId={permission?.chainId}>
@@ -88,6 +113,9 @@ const PreloadAndSync: FC = ({ children }) => {
 const PopupNetworkSelect: FC = () => {
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const isSyncing = useIsSyncing();
+  const currentNetwork = useLazyNetwork();
+
+  const nativeToken = useAccountToken(NATIVE_TOKEN_SLUG);
 
   const handleChange = useCallback(
     (chainId: number) => {
@@ -100,198 +128,130 @@ const PopupNetworkSelect: FC = () => {
         })
         .catch(console.error);
     },
-    [tabOrigin]
+    [tabOrigin],
   );
 
   return (
-    <NetworkSelect
-      source="popup"
-      className="max-w-auto"
-      currentItemClassName="!h-11 pr-3 !pl-3 !py-1.5"
-      currentItemIconClassName={classNames(
-        "!w-8 !h-8 !mr-3",
-        isSyncing && "animate-pulse"
-      )}
-      contentClassName="w-[22.25rem]"
-      onChange={handleChange}
-    />
-  );
-};
-
-const TokenExplorer: FC = () => {
-  const [tokenType, setTokenType] = useAtom(tokenTypeAtom);
-
-  const toggleNftSwitcher = useCallback(
-    (value: boolean) => {
-      setTokenType(value ? TokenType.NFT : TokenType.Asset);
-    },
-    [setTokenType]
-  );
-
-  const isNftsSelected = tokenType === TokenType.NFT;
-
-  return (
-    <div className="flex flex-wrap mt-5 min-h-0">
-      <Tooltip
-        content={`Switch to ${isNftsSelected ? "assets" : "NFTs"}`}
-        asChild
-      >
-        <span>
-          <AssetsSwitcher
-            theme="small"
-            checked={isNftsSelected}
-            onCheckedChange={toggleNftSwitcher}
+    <NetworksButton className="max-w-auto" size="small" onChange={handleChange}>
+      {currentNetwork ? (
+        <>
+          <NetworkIcon
+            network={currentNetwork}
+            className={classNames("w-8 h-8 mr-3", isSyncing && "animate-pulse")}
           />
-        </span>
-      </Tooltip>
 
-      <TokenList key={tokenType} tokenType={tokenType} />
-    </div>
+          <span className="min-w-0 truncate mr-auto">
+            {currentNetwork.name}
+          </span>
+
+          {nativeToken?.portfolioUSD && (
+            <FiatAmount
+              amount={nativeToken?.portfolioUSD}
+              copiable={false}
+              className={classNames(
+                "ml-auto mr-2 pl-2 text-base font-bold text-brand-light",
+              )}
+            />
+          )}
+        </>
+      ) : (
+        <div className="h-8" />
+      )}
+    </NetworksButton>
   );
 };
 
-const TokenList: FC<{ tokenType: TokenType }> = ({ tokenType }) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  const handleAccountTokensReset = useCallback(() => {
-    scrollAreaRef.current?.scrollTo(0, 0);
-  }, []);
+const TokenList: FC = () => {
+  const tokenType = useAtomValue(tokenTypeAtom);
 
   const {
-    currentAccount,
-    isNftsSelected,
     searchValue,
     setSearchValue,
-    tokenIdSearchValue,
-    setTokenIdSearchValue,
-    tokenIdSearchDisplayed,
+    searchInputRef,
+    tokens: tokensPure,
+    loadMoreTriggerRef,
     manageModeEnabled,
     setManageModeEnabled,
-    tokens,
+    tokenIdSearchValue,
+    setTokenIdSearchValue,
+    tokenIdSearchInputRef,
+    tokenIdSearchDisplayed,
+    focusSearchInput,
+    currentAccount,
+    isNftsSelected,
     syncing,
     searching,
-    focusSearchInput,
-    searchInputRef,
-    tokenIdSearchInputRef,
-    loadMoreTriggerRef,
+    searchValueIsAddress,
   } = useTokenList(tokenType, {
-    onAccountTokensReset: handleAccountTokensReset,
     searchPersist: tokenType === TokenType.NFT,
   });
 
-  const controlBar = useMemo(
-    () => (
-      <>
-        <TippySingletonProvider>
-          <SearchInput
-            ref={searchInputRef}
-            searchValue={searchValue}
-            toggleSearchValue={setSearchValue}
-            className="ml-2 !w-auto grow max-w-[13.875rem]"
-            inputClassName="max-h-[2.375rem] !pl-9"
-            placeholder="Type to search..."
-            adornmentClassName="!left-3"
-          />
+  const [mode, setMode] = useState<ManageMode>(null);
 
-          <IconedButton
-            Icon={ControlIcon}
-            iconProps={{
-              isActive: manageModeEnabled,
-            }}
-            theme="tertiary"
-            className={classNames(
-              "ml-2 mr-2 mt-[.4375rem]",
-              manageModeEnabled && "bg-brand-main/30"
-            )}
-            aria-label={
-              manageModeEnabled
-                ? "Finish managing assets list"
-                : "Manage assets list"
-            }
-            onClick={() => setManageModeEnabled(!manageModeEnabled)}
-          />
-        </TippySingletonProvider>
-
-        <div
-          className={classNames(
-            "w-full pt-2",
-            "max-h-0",
-            "overflow-hidden",
-            "transition-[max-height] duration-200",
-            tokenIdSearchDisplayed && "max-h-[3rem]"
-          )}
-        >
-          <SearchInput
-            ref={tokenIdSearchInputRef}
-            searchValue={tokenIdSearchValue}
-            toggleSearchValue={setTokenIdSearchValue}
-            StartAdornment={HashTagIcon}
-            className="w-full"
-            placeholder="Type token ID to search..."
-          />
-        </div>
-      </>
-    ),
-    [
-      manageModeEnabled,
-      setManageModeEnabled,
-      searchInputRef,
-      searchValue,
-      setSearchValue,
-      tokenIdSearchDisplayed,
-      tokenIdSearchInputRef,
-      tokenIdSearchValue,
-      setTokenIdSearchValue,
-    ]
+  const tokens = useMemo(
+    () => (mode === "add" && !searchValueIsAddress ? [] : tokensPure),
+    [mode, searchValueIsAddress, tokensPure],
   );
 
-  let tokensBar: ReactNode = null;
-
-  if (tokens.length === 0) {
-    if (searchValue) {
-      tokensBar = (
-        <NullState searching={searching} focusSearchInput={focusSearchInput} />
-      );
-    } else if (isNftsSelected) {
-      tokensBar = <NoNftState syncing={syncing} />;
-    }
-  } else {
-    tokensBar = (
-      <ScrollAreaContainer
-        ref={scrollAreaRef}
-        hiddenScrollbar="horizontal"
-        className="pr-3.5 pb-16 -mr-3.5 mt-2 w-[calc(100%+3.5rem)] h-full min-h-0"
-        viewPortClassName="pb-16 rounded-t-[.625rem] viewportBlock"
-        scrollBarClassName="py-0 pb-16"
-      >
-        <AddTokenBanner
-          isNftsSelected={isNftsSelected}
+  const tokensBar = useMemo(() => {
+    if (tokens.length === 0) {
+      if (searchValue) {
+        return (
+          <NullState
+            searching={searching}
+            focusSearchInput={focusSearchInput}
+          />
+        );
+      } else if (isNftsSelected) {
+        return <NoNftState syncing={syncing} className="-mt-2" />;
+      }
+    } else {
+      return !isNftsSelected ? (
+        <AssetList
+          tokens={tokens as AccountAsset[]}
           manageModeEnabled={manageModeEnabled}
-          tokens={tokens}
-          focusSearchInput={focusSearchInput}
+          loadMoreTriggerRef={loadMoreTriggerRef}
         />
+      ) : (
+        <NftList
+          tokens={tokens as AccountNFT[]}
+          currentAccount={currentAccount}
+          manageModeEnabled={manageModeEnabled}
+          loadMoreTriggerRef={loadMoreTriggerRef}
+        />
+      );
+    }
 
-        {!isNftsSelected ? (
-          <AssetList
-            tokens={tokens as AccountAsset[]}
-            manageModeEnabled={manageModeEnabled}
-            loadMoreTriggerRef={loadMoreTriggerRef}
-          />
-        ) : (
-          <NftList
-            tokens={tokens as AccountNFT[]}
-            currentAccount={currentAccount}
-            manageModeEnabled={manageModeEnabled}
-            loadMoreTriggerRef={loadMoreTriggerRef}
-          />
-        )}
-      </ScrollAreaContainer>
-    );
-  }
+    return null;
+  }, [
+    currentAccount,
+    focusSearchInput,
+    isNftsSelected,
+    loadMoreTriggerRef,
+    manageModeEnabled,
+    searchValue,
+    searching,
+    syncing,
+    tokens,
+  ]);
 
   return (
     <>
-      {controlBar}
+      <AssetsManagement
+        size="small"
+        manageModeEnabled={manageModeEnabled}
+        setManageModeEnabled={setManageModeEnabled}
+        searchInputRef={searchInputRef}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        tokenIdSearchValue={tokenIdSearchValue}
+        setTokenIdSearchValue={setTokenIdSearchValue}
+        tokenIdSearchInputRef={tokenIdSearchInputRef}
+        tokenIdSearchDisplayed={tokenIdSearchDisplayed}
+        mode={mode}
+        onModeChange={setMode}
+        className="my-3"
+      />
       {tokensBar}
     </>
   );
@@ -319,7 +279,6 @@ const AssetList = memo<AssetListProps>(
             }
             asset={asset as AccountAsset}
             isManageMode={manageModeEnabled}
-            setReceivePopupOpened={setReceivePopupOpened}
             className={classNames(i !== tokens.length - 1 && "mb-1")}
           />
         ))}
@@ -330,7 +289,7 @@ const AssetList = memo<AssetListProps>(
         />
       </>
     );
-  }
+  },
 );
 
 type NftListProps = {
@@ -342,9 +301,7 @@ type NftListProps = {
 
 const NftList = memo<NftListProps>(
   ({ currentAccount, tokens, manageModeEnabled, loadMoreTriggerRef }) => {
-    const [nftTokenOpened, setNftTokenOpened] = useState<AccountNFT | null>(
-      null
-    );
+    const [nftToken, setNftToken] = useState<AccountNFT | undefined>();
 
     const handleNFTSelect = useCallback(
       async (token: AccountNFT) => {
@@ -358,17 +315,29 @@ const NftList = memo<NftListProps>(
                     ? TokenStatus.Disabled
                     : TokenStatus.Enabled,
               },
-              [token.chainId, currentAccount.address, token.tokenSlug].join("_")
+              [token.chainId, currentAccount.address, token.tokenSlug].join(
+                "_",
+              ),
             );
           } catch (e) {
             console.error(e);
           }
         } else {
-          setNftTokenOpened(token);
+          setNftToken(token);
         }
       },
-      [manageModeEnabled, currentAccount.address, setNftTokenOpened]
+      [manageModeEnabled, currentAccount.address, setNftToken],
     );
+
+    useEffect(() => {
+      setNftToken((current) => {
+        if (!current) return current;
+
+        const updated = tokens.find((t) => t.tokenSlug === current.tokenSlug);
+
+        return updated ?? current;
+      });
+    }, [tokens, setNftToken]);
 
     const renderNFTCard = useCallback(
       (nft: AccountNFT, i: number) => (
@@ -384,7 +353,7 @@ const NftList = memo<NftListProps>(
           isManageMode={manageModeEnabled}
         />
       ),
-      [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerRef]
+      [tokens.length, manageModeEnabled, handleNFTSelect, loadMoreTriggerRef],
     );
 
     return (
@@ -392,13 +361,13 @@ const NftList = memo<NftListProps>(
         <Masonry items={tokens} renderItem={renderNFTCard} gap="0.25rem" />
 
         <NFTOverviewPopup
-          open={Boolean(nftTokenOpened)}
-          token={nftTokenOpened}
-          onOpenChange={() => setNftTokenOpened(null)}
+          open={Boolean(nftToken)}
+          token={nftToken}
+          onOpenChange={() => setNftToken(undefined)}
         />
       </>
     );
-  }
+  },
 );
 
 type ReceivePopupProps = Pick<SecondaryModalProps, "open" | "onOpenChange">;
@@ -408,3 +377,10 @@ const ReceivePopup: FC<ReceivePopupProps> = (props) => (
     <ShareAddress />
   </SecondaryModal>
 );
+
+const matchPopupTabs = (tab: PopupToolbarTab) => {
+  return match<PopupToolbarTab, ReactNode>(tab)
+    .with(PopupToolbarTab.Assets, () => <Assets />)
+    .with(PopupToolbarTab.Activity, () => <Activities />)
+    .otherwise(() => <Assets />);
+};

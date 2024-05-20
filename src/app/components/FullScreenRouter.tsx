@@ -1,9 +1,8 @@
 import { FC, useMemo, useLayoutEffect } from "react";
-import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import { match, P } from "ts-pattern";
 import { getLastAction, HistoryAction, resetPosition } from "lib/history";
 import { Redirect } from "lib/navigation";
+import { useAtomsAll } from "lib/atom-utils";
 
 import { WalletStatus } from "core/types";
 
@@ -16,16 +15,7 @@ import Welcome from "./screens/Welcome";
 import Main from "./screens/Main";
 
 const FullScreenRouter: FC = () => {
-  const { page, walletStatus } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          page: pageAtom,
-          walletStatus: walletStatusAtom,
-        }),
-      []
-    )
-  );
+  const [page, walletStatus] = useAtomsAll([pageAtom, walletStatusAtom]);
 
   // Scroll to top after new page pushed.
   const lastHistoryAction = getLastAction();
@@ -41,7 +31,7 @@ const FullScreenRouter: FC = () => {
 
   return useMemo(
     () => matchFullScreen({ page, walletStatus }),
-    [page, walletStatus]
+    [page, walletStatus],
   );
 };
 
@@ -55,10 +45,10 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
         {
           page: Page.Profiles,
           walletStatus: P.when((s) =>
-            [WalletStatus.Welcome, WalletStatus.Locked].includes(s)
+            [WalletStatus.Welcome, WalletStatus.Locked].includes(s),
           ),
         },
-        () => <Profiles />
+        () => <Profiles />,
       )
       // Unlock when wallet locked
       .with({ walletStatus: WalletStatus.Locked }, () => <Unlock />)
@@ -67,7 +57,7 @@ function matchFullScreen(params: { page: Page; walletStatus: WalletStatus }) {
           page: Page.Default,
           walletStatus: WalletStatus.Welcome,
         },
-        () => <Welcome />
+        () => <Welcome />,
       )
       // Only ready below
       .with({ walletStatus: P.not(WalletStatus.Unlocked) }, () => (

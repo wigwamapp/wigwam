@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`wrapPermission should wrap permission with correct parent capability 1`] = `
+{
+  "caveats": [
+    {
+      "type": "restrictReturnedAccounts",
+      "value": [
+        "0x123",
+        "0x456",
+      ],
+    },
+  ],
+  "date": 1697821898588,
+  "id": "123",
+  "invoker": "test",
+  "parentCapability": "eth_accounts",
+}
+`;

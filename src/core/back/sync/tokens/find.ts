@@ -5,14 +5,21 @@ import {
   TokenStandard,
   TokenStatus,
   TokenType,
+  NFT,
 } from "core/types";
-import { createAccountTokenKey, parseTokenSlug } from "core/common/tokens";
+import {
+  NATIVE_TOKEN_SLUG,
+  createAccountTokenKey,
+  parseTokenSlug,
+  updateTotalBalance,
+} from "core/common";
 import * as repo from "core/repo";
 
 import { syncStarted, synced } from "../../state";
-import { getDebankChain, debankApi } from "../debank";
-import { getCoinGeckoPrices } from "../coinGecko";
+
+import { DexPrices, getDexPrices } from "../dexPrices";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
+import { indexerApi } from "../indexer";
 
 const stack = new Set<string>();
 
@@ -20,7 +27,7 @@ export async function addFindTokenRequest(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata = false
+  refreshMetadata = false,
 ) {
   const dbKey = createAccountTokenKey({
     chainId,
@@ -31,7 +38,7 @@ export async function addFindTokenRequest(
   if (stack.has(dbKey)) return;
 
   stack.add(dbKey);
-  syncStarted(chainId);
+  syncStarted(accountAddress);
 
   try {
     await performTokenSync(
@@ -39,14 +46,14 @@ export async function addFindTokenRequest(
       chainId,
       accountAddress,
       tokenSlug,
-      refreshMetadata
+      refreshMetadata,
     );
   } catch (err) {
     console.error(err);
   }
 
   stack.delete(dbKey);
-  setTimeout(() => synced(chainId), 500);
+  setTimeout(() => synced(accountAddress), 500);
 }
 
 async function performTokenSync(
@@ -54,13 +61,55 @@ async function performTokenSync(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata = false
+  refreshMetadata = false,
 ) {
-  let tokenToAdd: AccountToken | undefined;
-
   const { standard, address: tokenAddress } = parseTokenSlug(tokenSlug);
 
   const existing = await repo.accountTokens.get(dbKey);
+
+  const releaseToRepo = async (
+    tokenToAdd: AccountToken,
+    prevBalanceUSD = 0,
+  ) => {
+    await repo.accountTokens.put(
+      {
+        ...tokenToAdd,
+        syncedByChainAt: Date.now(),
+        manuallyStatusChanged: true,
+      },
+      dbKey,
+    );
+
+    // Update portfolioUSD
+    if (tokenToAdd.tokenType === TokenType.Asset) {
+      const nativeTokenDbKey = createAccountTokenKey({
+        chainId,
+        accountAddress,
+        tokenSlug: NATIVE_TOKEN_SLUG,
+      });
+
+      const nativeToken =
+        tokenToAdd.tokenSlug === NATIVE_TOKEN_SLUG
+          ? tokenToAdd
+          : await repo.accountTokens.get(nativeTokenDbKey);
+
+      const diff = new BigNumber(tokenToAdd.balanceUSD).minus(prevBalanceUSD);
+
+      if (nativeToken?.portfolioUSD) {
+        const portfolioUSD = new BigNumber(nativeToken.portfolioUSD)
+          .plus(diff)
+          .toString();
+
+        await repo.accountTokens.put(
+          { ...nativeToken, portfolioUSD },
+          nativeTokenDbKey,
+        );
+      }
+
+      await updateTotalBalance(accountAddress, (bal) => bal.plus(diff));
+    }
+  };
+
   if (existing) {
     const [balance, metadata] = await Promise.all([
       getBalanceFromChain(chainId, tokenSlug, accountAddress),
@@ -73,32 +122,29 @@ async function performTokenSync(
       "priceUSD" in existing &&
       existing.priceUSD
         ? new BigNumber(rawBalance)
-            .div(10 ** existing.decimals)
+            .div(new BigNumber(10).pow(existing.decimals))
             .times(existing.priceUSD)
             .toNumber()
-        : existing.balanceUSD ?? 0;
+        : existing.balanceUSD;
 
     const balanceChangedToZero =
       existing.status === TokenStatus.Enabled &&
       new BigNumber(existing.rawBalance).gt(0) &&
       new BigNumber(rawBalance).isZero();
 
-    await repo.accountTokens.put(
+    await releaseToRepo(
       {
-        ...existing,
-        ...((metadata as any) ?? {}),
+        ...mergeMetadataSafe(existing, metadata),
         status:
-          existing.status === TokenStatus.Disabled &&
-          balance &&
-          !balance.isZero()
+          existing.status === TokenStatus.Disabled && balance
             ? TokenStatus.Enabled
-            : balanceChangedToZero && existing.tokenType == TokenType.NFT
-            ? TokenStatus.Disabled
-            : existing.status,
+            : balanceChangedToZero && existing.tokenType === TokenType.NFT
+              ? TokenStatus.Disabled
+              : existing.status,
         rawBalance,
         balanceUSD,
       },
-      dbKey
+      existing.balanceUSD,
     );
 
     return;
@@ -109,109 +155,97 @@ async function performTokenSync(
   let priceUSD, priceUSDChange: string | undefined;
 
   if (standard === TokenStandard.ERC20) {
-    const [debankChain, coinGeckoPrices] = await Promise.all([
-      getDebankChain(chainId),
-      getCoinGeckoPrices(chainId, [tokenAddress]),
-    ]);
-
-    const cgTokenAddress = tokenAddress.toLowerCase();
-    const cgPrice = coinGeckoPrices[cgTokenAddress];
+    const coinGeckoPrices = await getDexPrices([tokenAddress], chainId).catch(
+      () => ({}) as DexPrices,
+    );
+    const cgPrice = coinGeckoPrices[tokenAddress];
 
     priceUSD = cgPrice?.usd?.toString();
     priceUSDChange = cgPrice?.usd_24h_change?.toString();
+  }
 
-    if (debankChain) {
-      const [{ data: dbToken }, balance] = await Promise.all([
-        debankApi
-          .get("/token", {
-            params: {
-              chain_id: debankChain.id,
-              id: tokenAddress,
-            },
-          })
-          .catch(() => ({ data: null })),
-        getBalanceFromChain(chainId, tokenSlug, accountAddress),
-      ]);
+  const [metadata, balance] = await Promise.all([
+    getTokenMetadata(chainId, tokenSlug, true),
+    getBalanceFromChain(chainId, tokenSlug, accountAddress),
+  ]);
 
-      if (dbToken) {
-        if (!priceUSD && dbToken.price) {
-          priceUSD = new BigNumber(dbToken.price).toString();
-        }
+  if (!metadata) return;
 
-        const rawBalance = balance?.toString() ?? "0";
-        const balanceUSD = priceUSD
-          ? new BigNumber(rawBalance)
-              .div(10 ** dbToken.decimals)
-              .times(priceUSD)
-              .toNumber()
-          : 0;
+  // Logo URL
+  if (standard === TokenStandard.ERC20) {
+    const res = await indexerApi
+      .get("/cmc/v2/cryptocurrency/info", {
+        params: { address: tokenAddress },
+      })
+      .catch(() => null);
 
-        tokenToAdd = {
-          tokenType: TokenType.Asset,
-          status: TokenStatus.Enabled,
-          chainId,
-          accountAddress,
-          tokenSlug,
-          // Metadata
-          decimals: dbToken.decimals,
-          name: dbToken.name,
-          symbol: dbToken.symbol,
-          logoUrl: dbToken.logo_url,
-          // Volumes
-          rawBalance,
-          balanceUSD,
-          priceUSD,
-          priceUSDChange,
-        };
+    const items = res?.data?.data;
+    if (items) {
+      const token = items[Object.keys(items)[0]];
+
+      if (token?.logo) {
+        Object.assign(metadata, { logoUrl: token.logo });
       }
     }
   }
 
-  if (!tokenToAdd) {
-    const [metadata, balance] = await Promise.all([
-      getTokenMetadata(chainId, tokenSlug),
-      getBalanceFromChain(chainId, tokenSlug, accountAddress),
-    ]);
+  const rawBalance = balance?.toString() ?? "0";
+  const balanceUSD =
+    priceUSD && "decimals" in metadata
+      ? new BigNumber(rawBalance)
+          .div(new BigNumber(10).pow(Number(metadata.decimals)))
+          .times(priceUSD)
+          .toNumber()
+      : 0;
 
-    if (!metadata) return;
+  const tokenType =
+    standard === TokenStandard.ERC20 ||
+    ("decimals" in metadata && metadata.decimals > 0)
+      ? TokenType.Asset
+      : TokenType.NFT;
 
-    const rawBalance = balance?.toString() ?? "0";
-    const balanceUSD =
-      priceUSD && "decimals" in metadata
-        ? new BigNumber(rawBalance)
-            .div(10 ** metadata.decimals)
-            .times(priceUSD)
-            .toNumber()
-        : 0;
+  const status =
+    tokenType === TokenType.Asset || balance
+      ? TokenStatus.Enabled
+      : TokenStatus.Disabled;
 
-    const tokenType =
-      standard === TokenStandard.ERC20 ||
-      ("decimals" in metadata && metadata.decimals > 0)
-        ? TokenType.Asset
-        : TokenType.NFT;
+  const tokenToAdd: AccountToken = {
+    tokenType,
+    status,
+    chainId,
+    accountAddress,
+    tokenSlug,
+    // Metadata
+    ...(metadata as any),
+    // Volumes
+    rawBalance,
+    balanceUSD,
+    priceUSD,
+    priceUSDChange,
+  };
 
-    const status =
-      tokenType === TokenType.Asset || (balance && !balance.isZero())
-        ? TokenStatus.Enabled
-        : TokenStatus.Disabled;
+  await releaseToRepo(tokenToAdd);
+}
 
-    tokenToAdd = {
-      tokenType,
-      status,
-      chainId,
-      accountAddress,
-      tokenSlug,
-      // Metadata
-      ...(metadata as any),
-      // Volumes
-      rawBalance,
-      balanceUSD,
-      priceUSD,
-      priceUSDChange,
-    };
+function mergeMetadataSafe(
+  existing: AccountToken,
+  metadata:
+    | {
+        decimals: bigint;
+        symbol: string;
+        name: string;
+      }
+    | Partial<NFT>
+    | null,
+) {
+  if (!metadata) return existing;
+
+  const next: AccountToken = { ...existing };
+
+  for (const key of Object.keys(metadata)) {
+    const value = (metadata as any)[key];
+    if (value || value === 0n) (next as any)[key] = value;
   }
 
-  if (tokenToAdd) {
-    await repo.accountTokens.put(tokenToAdd, dbKey);
-  }
+  return next;
 }

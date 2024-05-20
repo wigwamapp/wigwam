@@ -14,7 +14,6 @@ import {
   KdbxEntryField,
   ByteUtils,
 } from "kdbxweb";
-import * as Argon2 from "lib/argon2";
 
 const { base64ToBytes, bytesToBase64, zeroBuffer } = ByteUtils;
 
@@ -30,21 +29,6 @@ export type KdfParams =
       parallelism: number;
     };
 
-export function setupArgon2Impl() {
-  CryptoEngine.setArgon2Impl(
-    (pass, salt, mem, time, hashLen, parallelism, type) =>
-      Argon2.hash({
-        pass: new Uint8Array(pass),
-        salt: new Uint8Array(salt),
-        mem,
-        time,
-        hashLen,
-        parallelism,
-        type,
-      }).then(({ hash }) => hash)
-  );
-}
-
 // The copy of https://github.com/keeweb/kdbxweb/blob/master/lib/format/kdbx.ts#L49
 // But:
 // - without special KeePass features, like RecycleBin, lastSelectedGroup, lastTopVisibleGroup
@@ -52,7 +36,7 @@ export function setupArgon2Impl() {
 export function createKdbx(
   credentials: Credentials,
   name: string,
-  kdfParams: KdfParams
+  kdfParams: KdfParams,
 ) {
   const kdbx = new Kdbx();
 
@@ -100,7 +84,7 @@ export function applyKdfParams(kdbx: Kdbx, params: KdfParams) {
 
 export function createGroup(
   parentGroup: KdbxGroup,
-  uuid: string | KdbxUuid = KdbxUuid.random()
+  uuid: string | KdbxUuid = KdbxUuid.random(),
 ) {
   const group = new KdbxGroup();
   group.uuid = toUuid(uuid);
@@ -113,7 +97,7 @@ export function createGroup(
 
 export function setFields(
   entry: KdbxEntry,
-  toSet: Record<string, KdbxEntryField>
+  toSet: Record<string, KdbxEntryField>,
 ) {
   for (const [key, value] of Object.entries(toSet)) {
     entry.fields.set(key, value);
@@ -122,7 +106,7 @@ export function setFields(
 
 export function exportFields<T extends { [k: string]: KdbxEntryField }>(
   entry: KdbxEntry,
-  opts: { uuid?: boolean } = {}
+  opts: { uuid?: boolean } = {},
 ) {
   const base: Record<string, string> = {};
 

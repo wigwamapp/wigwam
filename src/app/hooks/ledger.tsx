@@ -17,7 +17,7 @@ export type LedgerHandler = (
     ledgerEth: LedgerEthType;
     getExtendedKey: typeof getExtendedKeyType;
   },
-  onClose: (callback: () => void) => void
+  onClose: (callback: () => void) => void,
 ) => Promise<any>;
 
 export function useLedger() {
@@ -51,33 +51,35 @@ export function useLedger() {
                 setTimeout(() => {
                   transportRef.current?.close();
                   transportRef.current = undefined;
-                })
+                }),
               );
 
-              const { name: currentApp } = await getAppInfo(
-                transportRef.current
-              );
-              if (closed) return false;
+              if (process.env.TARGET_BROWSER === "chrome") {
+                const { name: currentApp } = await getAppInfo(
+                  transportRef.current,
+                );
+                if (closed) return false;
 
-              if (currentApp !== "Ethereum") {
-                if (currentApp !== "BOLOS") {
-                  await disconnectFromConnectedApp(transportRef.current);
+                if (currentApp !== "Ethereum") {
+                  if (currentApp !== "BOLOS") {
+                    await disconnectFromConnectedApp(transportRef.current);
+                    transportRef.current = await LedgerTransport.create();
+                    await timeout(500);
+                    if (closed) return false;
+                  }
+
+                  setState("connectApp");
+                  await connectToEthereumApp(transportRef.current);
                   transportRef.current = await LedgerTransport.create();
                   await timeout(500);
                   if (closed) return false;
+                  setState("loading");
                 }
-
-                setState("connectApp");
-                await connectToEthereumApp(transportRef.current);
-                transportRef.current = await LedgerTransport.create();
-                await timeout(500);
-                if (closed) return false;
-                setState("loading");
               }
 
               return true;
             },
-            { retries: 5, maxTimeout: 2_000 }
+            { retries: 5, maxTimeout: 2_000 },
           );
 
           if (!connected || !transportRef.current) return false;
@@ -94,12 +96,12 @@ export function useLedger() {
           throw new Error(msg);
         }
       }),
-    []
+    [],
   );
 
   return useCallback(
-    async (handler: LedgerHandler) => {
-      return await waitLoading({
+    (handler: LedgerHandler) =>
+      waitLoading({
         title: "Loading...",
         headerClassName: "mb-3",
         content: (state: "loading" | "connectApp") => (
@@ -112,21 +114,22 @@ export function useLedger() {
             <span className="mt-8">
               {state === "connectApp"
                 ? "Open the Ethereum app on yur device."
-                : "Connect and unlock your device."}
+                : process.env.TARGET_BROWSER === "chrome"
+                  ? "Connect and unlock your device."
+                  : "Connect, unlock your device, and open the Ethereum app."}
             </span>
           </>
         ),
         loadingHandler,
         handlerParams: handler,
         state: "loading",
-      });
-    },
-    [loadingHandler, waitLoading]
+      }),
+    [loadingHandler, waitLoading],
   );
 }
 
 const getAppInfo = async (
-  transport: Transport
+  transport: Transport,
 ): Promise<{
   name: string;
   version: string;
@@ -159,12 +162,12 @@ const connectToEthereumApp = async (transport: Transport): Promise<void> => {
     0xd8,
     0x00,
     0x00,
-    Buffer.from("Ethereum", "ascii")
+    Buffer.from("Ethereum", "ascii"),
   );
 };
 
 const disconnectFromConnectedApp = async (
-  transport: Transport
+  transport: Transport,
 ): Promise<void> => {
   await transport.send(0xb0, 0xa7, 0x00, 0x00);
 };

@@ -16,18 +16,18 @@ export const FEE_MODE_NAMES: Record<
 export const CUSTOM_FEE_MODE = { icon: "⚙️", name: "Custom" };
 
 export function formatUnits(
-  v?: ethers.BigNumberish,
-  unit: ethers.BigNumberish = 0
+  v?: ethers.BigNumberish | null,
+  unit: ethers.BigNumberish = 0,
 ) {
   if (!v && v !== 0) return "";
-  return ethers.utils.formatUnits(v, unit);
+  return ethers.formatUnits(v, unit);
 }
 
-export function parseUnits(v: string, unit: ethers.BigNumberish = 0) {
+export function parseUnits(v: string, unit: string | ethers.BigNumberish = 0) {
   try {
-    return ethers.utils.parseUnits(v, unit);
+    return ethers.parseUnits(v, unit);
   } catch {
-    return "";
+    return null;
   }
 }
 
@@ -42,9 +42,9 @@ export const prepareAmountOnChange = ({
 }) => {
   const preparedValue = new BigNumber(value);
   const valueToChange = new BigNumber(1).multipliedBy(
-    new BigNumber(10).pow(decimals)
+    new BigNumber(10).pow(decimals),
   );
   const finalValue = preparedValue[operator](valueToChange);
 
-  return finalValue.gt(0) ? ethers.BigNumber.from(finalValue.toString()) : 0;
+  return finalValue.gt(0) ? BigInt(finalValue.toString()) : 0n;
 };

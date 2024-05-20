@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useRef,
+  PropsWithChildren,
 } from "react";
 import useForceUpdate from "use-force-update";
 import memoizeOne from "memoize-one";
@@ -13,11 +14,13 @@ import { assert } from "lib/system/assert";
 import { forEachSafe } from "lib/system/forEachSafe";
 
 import { SecondaryModalProps } from "app/components/elements/SecondaryModal";
+import type { ButtonTheme } from "app/components/elements/Button";
 
 type ModalProps = Omit<SecondaryModalProps, "header" | "open" | "onOpenChange">;
 
 type DialogContextDataProps =
   | (ModalProps & {
+      children: ReactNode | ((state: any) => ReactNode);
       header: ReactNode;
       primaryButtonText?: ReactNode;
       onPrimaryButtonClick?: () => void;
@@ -25,6 +28,10 @@ type DialogContextDataProps =
       onSecondaryButtonClick?: () => void;
       onClose?: () => void;
       state?: any;
+      buttonTheme?: Partial<{
+        primary: ButtonTheme;
+        secondary: ButtonTheme;
+      }>;
     })
   | null;
 
@@ -39,6 +46,10 @@ type ConfirmParams = {
   content: ReactNode;
   yesButtonText?: ReactNode;
   noButtonText?: ReactNode;
+  buttonTheme?: Partial<{
+    primary: ButtonTheme;
+    secondary: ButtonTheme;
+  }>;
 } & ModalProps;
 
 type WaitLoadingParams<P = any, S = any> = {
@@ -75,7 +86,7 @@ export const useDialog = () => {
   return value;
 };
 
-export const DialogProvider: FC = ({ children }) => {
+export const DialogProvider: FC<PropsWithChildren> = ({ children }) => {
   const forceUpdate = useForceUpdate();
 
   const queueRef = useRef<DialogContextDataProps[]>([]);
@@ -91,7 +102,7 @@ export const DialogProvider: FC = ({ children }) => {
 
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate],
   );
 
   const closeCurrentDialog = useCallback(() => {
@@ -136,7 +147,7 @@ export const DialogProvider: FC = ({ children }) => {
           ...rest,
         });
       }),
-    [addDialog, closeCurrentDialog]
+    [addDialog, closeCurrentDialog],
   );
 
   const confirm = useCallback(
@@ -164,7 +175,7 @@ export const DialogProvider: FC = ({ children }) => {
           ...rest,
         });
       }),
-    [addDialog, closeCurrentDialog]
+    [addDialog, closeCurrentDialog],
   );
 
   const waitLoading = useCallback(
@@ -184,9 +195,9 @@ export const DialogProvider: FC = ({ children }) => {
           res(confirmed);
         });
 
-        const dialogParams = {
+        const dialogParams: DialogContextDataProps = {
           header: title,
-          children: content,
+          children: content as any,
           onClose: () => handleConfirm(false),
           disabledClickOutside: true,
           ...rest,
@@ -217,7 +228,7 @@ export const DialogProvider: FC = ({ children }) => {
           });
         }
       }),
-    [forceUpdate, addDialog, alert, closeCurrentDialog]
+    [forceUpdate, addDialog, alert, closeCurrentDialog],
   );
 
   return (

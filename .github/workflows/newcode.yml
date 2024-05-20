@@ -7,10 +7,14 @@ on:
       - dev
 
 env:
-  VIGVAM_INFURA_API_KEY: ${{ secrets.VIGVAM_INFURA_API_KEY }}
-  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.TEST_VIGVAM_ANALYTICS_API_KEY }}
-  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_VIGVAM_OPEN_LOGIN_CLIENT_ID }}
-  VIGVAM_BETATEST_PROMOCODES: ${{ secrets.VIGVAM_BETATEST_PROMOCODES }}
+  WIGWAM_STATIC_CDN: ${{ secrets.WIGWAM_STATIC_CDN }}
+  WIGWAM_INDEXER_API: ${{ secrets.WIGWAM_INDEXER_API }}
+  WIGWAM_INDEXER_API_KEY: ${{ secrets.WIGWAM_INDEXER_API_KEY }}
+  WIGWAM_INFURA_API_KEY: ${{ secrets.WIGWAM_INFURA_API_KEY }}
+  WIGWAM_ANALYTICS_API_KEY: ${{ secrets.TEST_WIGWAM_ANALYTICS_API_KEY }}
+  WIGWAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_WIGWAM_OPEN_LOGIN_CLIENT_ID }}
+  WIGWAM_ON_RAMP_API_KEY: ${{ secrets.WIGWAM_ON_RAMP_API_KEY }}
+  WIGWAM_ON_RAMP_API_URL: ${{ secrets.WIGWAM_ON_RAMP_API_URL }}
 
 jobs:
   newcode:
@@ -23,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: "yarn"
 
       - name: Install deps
@@ -38,15 +42,19 @@ jobs:
       - name: Run tests
         run: yarn test
 
-      # - name: Create app build
-      #   run: yarn build:chrome & yarn build:firefox
+      - name: Create app build
+        run: yarn build:chrome
 
-      # - name: Export app build
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: ${{ github.event.pull_request.title }}
-      #     path: |
-      #       dist/prod/chrome.zip
-      #       dist/prod/firefox.xpi
-      #     if-no-files-found: error
-      #     retention-days: 21
+      - uses: gacts/github-slug@v1
+        id: slug
+        with:
+          to-slug: ${{ github.event.pull_request.title }} Wigwam
+
+      - name: Export app build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.slug.outputs.slug }}
+          path: |
+            dist/prod/chrome.zip
+          if-no-files-found: error
+          retention-days: 21

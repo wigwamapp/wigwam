@@ -1,22 +1,28 @@
 import {
+  ButtonHTMLAttributes,
+  KeyboardEventHandler,
   forwardRef,
   memo,
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import classNames from "clsx";
+import { mergeRefs } from "react-merge-refs";
 import { Field, FieldMetaState, Form } from "react-final-form";
 import { FormApi } from "final-form";
 import { useThrottledCallback } from "use-debounce";
 import * as Popover from "@radix-ui/react-popover";
 import { usePasteFromClipboard } from "lib/react-hooks/usePasteFromClipboard";
 import { storage } from "lib/ext/storage";
+import { useOnScreen } from "lib/react-hooks/useOnScreen";
 
 import { DEFAULT_CHAIN_IDS } from "fixtures/networks";
 import * as Repo from "core/repo";
 import {
+  Setting,
   cleanupNetwork,
   getRpcUrlKey,
   mergeNetworkUrls,
@@ -28,13 +34,14 @@ import { TEvent, trackEvent } from "core/client";
 import { IS_FIREFOX } from "app/defaults";
 import {
   composeValidators,
-  isLink,
+  isUrlLike,
   maxLength,
   minLength,
   required,
   validateCurrencySymbol,
   withHumanDelay,
   focusOnErrors,
+  preventXSS,
 } from "app/utils";
 import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
@@ -77,7 +84,13 @@ const EditNetwork = memo<EditNetworkProps>(
     const initialChainId = useMemo(() => network?.chainId, [network?.chainId]);
 
     const handleSubmit = useCallback(
-      async ({ nName, rpcUrl, chainId, currencySymbol, blockExplorer }) =>
+      async ({
+        nName,
+        rpcUrl,
+        chainId,
+        currencySymbol,
+        blockExplorer,
+      }: FormValues) =>
         withHumanDelay(async () => {
           chainId = Number(chainId);
 
@@ -86,6 +99,10 @@ const EditNetwork = memo<EditNetworkProps>(
               initialChainId && chainId !== initialChainId;
 
             const repoMethod = isNew || isChangedChainId ? "add" : "put";
+
+            if (repoMethod === "add") {
+              await storage.put(Setting.TestNetworks, true);
+            }
 
             await Repo.networks[repoMethod](
               network
@@ -103,8 +120,9 @@ const EditNetwork = memo<EditNetworkProps>(
                     },
                     rpcUrls: mergeNetworkUrls([rpcUrl], network.rpcUrls),
                     explorerUrls: blockExplorer
-                      ? mergeNetworkUrls([blockExplorer], network.explorerUrls)
-                      : network.explorerUrls,
+                      ? mergeNetworkUrls(network.explorerUrls, [blockExplorer])
+                      : [],
+                    manuallyChanged: true,
                   }
                 : {
                     chainId,
@@ -117,15 +135,15 @@ const EditNetwork = memo<EditNetworkProps>(
                       symbol: currencySymbol,
                       decimals: 18,
                     },
-                    explorerUrls: [blockExplorer],
+                    explorerUrls: blockExplorer ? [blockExplorer] : [],
                     position: 0,
-                  }
+                  },
             );
 
             if (network) {
               await setRpcUrl(
                 chainId,
-                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null
+                rpcUrl !== network.rpcUrls[0] ? rpcUrl : null,
               );
             }
 
@@ -154,7 +172,7 @@ const EditNetwork = memo<EditNetworkProps>(
                   } successfully created!`
                 : `Network ${
                     network?.name ? `"${network?.name}"` : ""
-                  } successfully updated!`
+                  } successfully updated!`,
             );
             onCancelHandler();
           } catch (err: any) {
@@ -169,7 +187,7 @@ const EditNetwork = memo<EditNetworkProps>(
         updateToast,
         onCancelHandler,
         alert,
-      ]
+      ],
     );
 
     const deleteNetwork = useCallback(async () => {
@@ -190,12 +208,12 @@ const EditNetwork = memo<EditNetworkProps>(
         updateToast(
           `Network ${
             network?.name ? `"${network?.name}"` : ""
-          } successfully deleted!`
+          } successfully deleted!`,
         );
       }
     }, [confirm, initialChainId, network?.name, onActionFinished, updateToast]);
 
-    const isNative = network && network.type !== "unknown";
+    const isNative = network && DEFAULT_CHAIN_IDS.has(network.chainId);
 
     return (
       <section className={classNames("flex flex-col grow")}>
@@ -231,8 +249,8 @@ const EditNetwork = memo<EditNetworkProps>(
 
         <ScrollAreaContainer
           className={classNames("flex flex-col")}
-          viewPortClassName="pb-20 rounded-t-[.625rem] pl-6 pt-3"
-          scrollBarClassName="py-0 pb-20"
+          viewPortClassName="pb-5 rounded-t-[.625rem] pl-6 pt-3"
+          scrollBarClassName="py-0 pb-5"
         >
           <Form<FormValues>
             onSubmit={handleSubmit}
@@ -254,7 +272,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(
                       required,
                       minLength(3),
-                      maxLength(256)
+                      maxLength(256),
                     )}
                   >
                     {({ input, meta }) => (
@@ -265,13 +283,21 @@ const EditNetwork = memo<EditNetworkProps>(
                         errorMessage={meta.error}
                         readOnly={isNative}
                         inputClassName="h-11"
+                        // Focus on init
+                        // EditNetwork has 3th depth level of settings
+                        // Required for case when viewport width too small
+                        autoFocus
                         {...input}
                       />
                     )}
                   </Field>
                   <Field
                     name="rpcUrl"
-                    validate={composeValidators(required, isLink)}
+                    validate={composeValidators(
+                      required,
+                      isUrlLike,
+                      preventXSS,
+                    )}
                   >
                     {({ input, meta }) => (
                       <RPCField
@@ -293,7 +319,7 @@ const EditNetwork = memo<EditNetworkProps>(
                     validate={composeValidators(
                       required,
                       minLength(1),
-                      maxLength(16)
+                      maxLength(16),
                     )}
                   >
                     {({ input, meta }) => (
@@ -304,7 +330,7 @@ const EditNetwork = memo<EditNetworkProps>(
                         thousandSeparator={false}
                         error={meta.error && meta.touched}
                         errorMessage={meta.error}
-                        readOnly={isNative}
+                        readOnly={!isNew}
                         className="mt-4"
                         inputClassName="h-11"
                         {...input}
@@ -317,7 +343,7 @@ const EditNetwork = memo<EditNetworkProps>(
                       required,
                       minLength(2),
                       maxLength(8),
-                      validateCurrencySymbol
+                      validateCurrencySymbol,
                     )}
                   >
                     {({ input, meta }) => (
@@ -335,10 +361,11 @@ const EditNetwork = memo<EditNetworkProps>(
                   </Field>
                   <Field
                     name="blockExplorer"
-                    validate={composeValidators(
-                      isLink,
-                      isNative ? required : undefined
-                    )}
+                    validate={(value) =>
+                      value
+                        ? composeValidators(isUrlLike, preventXSS)(value)
+                        : undefined
+                    }
                   >
                     {({ input, meta }) => (
                       <Input
@@ -377,7 +404,7 @@ const EditNetwork = memo<EditNetworkProps>(
         </ScrollAreaContainer>
       </section>
     );
-  }
+  },
 );
 
 export default EditNetwork;
@@ -392,13 +419,14 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
   ({ formApi, meta, network, ...rest }, ref) => {
     const setValue = useThrottledCallback(
       (value) => formApi.change("rpcUrl", value),
-      300
+      300,
     );
 
     const { paste, pasted } = usePasteFromClipboard(setValue);
     const [opened, setOpened] = useState(false);
     const [activeSuggestion, setActiveSuggestion] = useState<number | null>(0);
     const [savedRpcUrl, setSavedRpcUrl] = useState<string>();
+    const [isAfterArrowClick, setIsAfterArrowClick] = useState(false);
 
     const rpcList = useMemo(() => {
       if (!network) return undefined;
@@ -421,7 +449,14 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
 
     useEffect(() => {
       if (meta.active) {
-        setOpened(true);
+        setTimeout(() => {
+          setOpened((prevState) => {
+            if (!prevState) {
+              setActiveSuggestion(0);
+            }
+            return true;
+          });
+        }, 50);
       } else {
         setOpened(false);
       }
@@ -445,7 +480,9 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
       }
     }, [rest.value, rpcList]);
 
-    const handleKeyClick = useCallback(
+    const handleKeyClick = useCallback<
+      KeyboardEventHandler<HTMLTextAreaElement>
+    >(
       (e) => {
         if (rpcList) {
           if (e.keyCode === 40) {
@@ -453,9 +490,10 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               prevState === null
                 ? 0
                 : prevState + 1 > rpcList.length - 1
-                ? 0
-                : prevState + 1
+                  ? 0
+                  : prevState + 1,
             );
+            setIsAfterArrowClick(true);
             e.preventDefault();
           }
           if (e.keyCode === 38) {
@@ -463,22 +501,23 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               prevState === null
                 ? 0
                 : prevState - 1 < 0
-                ? rpcList.length - 1
-                : prevState - 1
+                  ? rpcList.length - 1
+                  : prevState - 1,
             );
+            setIsAfterArrowClick(true);
             e.preventDefault();
           }
           if (e.keyCode === 32 || e.keyCode === 13) {
             if (activeSuggestion !== null) {
               setValue(rpcList[activeSuggestion]);
             }
-            (document.activeElement as any)?.blur();
+            // (document.activeElement as any)?.blur();
             e.preventDefault();
           }
         }
         rest.onKeyDown?.(e);
       },
-      [activeSuggestion, rest, rpcList, setValue]
+      [activeSuggestion, rest, rpcList, setValue],
     );
 
     const content = (
@@ -494,7 +533,7 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               "text-sm text-brand-light",
               "!p-0 !pr-1 !min-w-0",
               "!font-normal",
-              "items-center"
+              "items-center",
             )}
           >
             {pasted ? (
@@ -524,18 +563,23 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
             onOpenAutoFocus={(e) => {
               e.preventDefault();
             }}
+            side="bottom"
+            align="start"
+            avoidCollisions={false}
+            style={{
+              width: "var(--radix-popover-trigger-width)",
+            }}
             className={classNames(
               "shadow-xs",
               "focus-visible:outline-none",
               "mt-2",
               "w-full min-w-[17.75rem]",
               "rounded-[.625rem]",
-              "bg-brand-dark/10",
-              "backdrop-blur-[30px]",
-              IS_FIREFOX && "!bg-[#111226]",
+              "bg-brand-darkgray",
+              IS_FIREFOX && "!bg-[#13191F]",
               "border border-brand-light/5",
               "z-10",
-              "w-[21.875rem]"
+              "w-[21.875rem]",
             )}
           >
             <ScrollAreaContainer
@@ -544,32 +588,23 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
               scrollBarClassName="py-3"
             >
               {rpcList.map((item, index) => (
-                <button
-                  type="button"
+                <NetworkButton
                   key={item}
-                  className={classNames(
-                    "w-full mb-1 last:mb-0",
-                    "flex items-center",
-                    "px-3",
-                    item === rpcList[0] ? "py-1.5" : "py-2",
-                    "rounded-[.625rem]",
-                    "cursor-pointer",
-                    "text-sm",
-                    "outline-none",
-                    "transition-colors",
-                    activeSuggestion === index && "bg-brand-main/20"
-                  )}
-                  onPointerDown={() => setValue(item)}
-                  onMouseOver={() =>
-                    setActiveSuggestion(rpcList?.indexOf(item))
-                  }
+                  network={item}
+                  isSelected={item === rest.value}
+                  isActive={activeSuggestion === index}
+                  isAfterArrowClick={isAfterArrowClick}
+                  onPointerDown={(evt) => {
+                    evt.preventDefault();
+                    setValue(item);
+                    // (document.activeElement as any)?.blur();
+                  }}
+                  onMouseOver={() => {
+                    setActiveSuggestion(rpcList?.indexOf(item));
+                    setIsAfterArrowClick(false);
+                  }}
                   onFocus={() => setActiveSuggestion(rpcList?.indexOf(item))}
-                >
-                  <span className="min-w-0 truncate">{item}</span>
-                  {item === rpcList[0] && (
-                    <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
-                  )}
-                </button>
+                />
               ))}
             </ScrollAreaContainer>
           </Popover.Content>
@@ -578,5 +613,51 @@ const RPCField = forwardRef<HTMLTextAreaElement, RPCFieldProps>(
     }
 
     return content;
-  }
+  },
+);
+
+type NetworkButtonProps = {
+  network: string;
+  isActive?: boolean;
+  isSelected?: boolean;
+  isAfterArrowClick?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
+const NetworkButton = forwardRef<HTMLButtonElement, NetworkButtonProps>(
+  ({ isActive, isSelected, isAfterArrowClick, network, ...rest }, ref) => {
+    const elementRef = useRef<HTMLButtonElement>(null);
+    const onScreen = useOnScreen(elementRef);
+
+    useEffect(() => {
+      if (isActive && isAfterArrowClick && !onScreen) {
+        elementRef.current?.scrollIntoView();
+      }
+    }, [isActive, isAfterArrowClick, onScreen]);
+
+    return (
+      <button
+        ref={mergeRefs([ref, elementRef])}
+        type="button"
+        key={network}
+        className={classNames(
+          "w-full",
+          "flex items-center",
+          "px-3",
+          isSelected ? "py-2" : "py-2.5",
+          "rounded-[.625rem]",
+          "cursor-pointer",
+          "text-sm",
+          "outline-none",
+          "transition-colors",
+          isActive && "bg-brand-main/20",
+        )}
+        {...rest}
+      >
+        <span className="min-w-0 truncate">{network}</span>
+        {isSelected && (
+          <SelectedIcon className="w-6 min-w-[1.5rem] h-auto ml-auto" />
+        )}
+      </button>
+    );
+  },
 );

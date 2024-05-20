@@ -9,14 +9,11 @@ import { usePrevious } from "lib/react-hooks/usePrevious";
 import { AccountToken, TokenType } from "core/types";
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import {
-  currentAccountAtom,
-  getTokenAtom,
-  getAccountTokensAtom,
-} from "app/atoms";
+import { getTokenAtom, getAccountTokensAtom } from "app/atoms";
 
 import { useChainId } from "./chainId";
 import { matchNativeToken } from "core/repo";
+import { useAccounts } from "./account";
 
 export type UseAccountTokensOptions = {
   withDisabled?: boolean;
@@ -28,7 +25,7 @@ export type UseAccountTokensOptions = {
 export function useAllAccountTokens(
   tokenType: TokenType,
   accountAddress: string,
-  { withDisabled, search, limit = 20, onReset }: UseAccountTokensOptions = {}
+  { withDisabled, search, limit = 20, onReset }: UseAccountTokensOptions = {},
 ) {
   const forceUpdate = useForceUpdate();
   const chainId = useChainId();
@@ -41,7 +38,7 @@ export function useAllAccountTokens(
       withDisabled,
       search,
     }),
-    [chainId, tokenType, accountAddress, withDisabled, search]
+    [chainId, tokenType, accountAddress, withDisabled, search],
   );
   const prevBaseParams = usePrevious(baseParams);
 
@@ -64,7 +61,7 @@ export function useAllAccountTokens(
       withNative: false,
       limit: offset + limit,
     }),
-    [baseParams, offset, limit]
+    [baseParams, offset, limit],
   );
 
   const accountTokensAtom = getAccountTokensAtom(queryParams);
@@ -118,20 +115,20 @@ export function useAllAccountTokens(
 }
 
 export function useAccountToken<T extends AccountToken>(tokenSlug: string) {
-  const acc = useAtomValue(currentAccountAtom);
+  const { currentAccount } = useAccounts();
 
-  return useToken<T>(acc.address, tokenSlug);
+  return useToken<T>(currentAccount.address, tokenSlug);
 }
 
 export function useToken<T extends AccountToken>(
   accountAddress: string,
-  tokenSlug: string = NATIVE_TOKEN_SLUG
+  tokenSlug: string = NATIVE_TOKEN_SLUG,
 ) {
   const chainId = useChainId();
 
   const params = useMemo(
     () => ({ chainId, accountAddress, tokenSlug }),
-    [chainId, accountAddress, tokenSlug]
+    [chainId, accountAddress, tokenSlug],
   );
 
   const atom = loadable(getTokenAtom(params));
@@ -149,7 +146,7 @@ export function useToken<T extends AccountToken>(
   if (token?.portfolioUSD) {
     token.portfolioUSD = BigNumber.max(
       token.portfolioUSD,
-      token.balanceUSD
+      token.balanceUSD,
     ).toString();
   }
 

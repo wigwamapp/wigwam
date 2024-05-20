@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useForceUpdate from "use-force-update";
+import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 import { usePrevious } from "lib/react-hooks/usePrevious";
 
 import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
-import { getActivityAtom, getTokenActivityAtom } from "app/atoms";
+import {
+  approvalStatusAtom,
+  getActivitiesAtom,
+  getPendingActivitiesAtom,
+  getTokenActivityAtom,
+} from "app/atoms";
+import SwapIcon from "app/icons/swap.svg";
 
 import { useChainId } from "./chainId";
+import { useAccounts } from "./account";
 
 export type UseTokenActivityOptions = {
   search?: string;
@@ -17,7 +25,7 @@ export type UseTokenActivityOptions = {
 export function useTokenActivity(
   accountAddress: string,
   tokenSlug: string = NATIVE_TOKEN_SLUG,
-  { limit = 20 }: UseTokenActivityOptions = {}
+  { limit = 20 }: UseTokenActivityOptions = {},
 ) {
   const chainId = useChainId();
   const forceUpdate = useForceUpdate();
@@ -28,7 +36,7 @@ export function useTokenActivity(
       accountAddress,
       tokenSlug,
     }),
-    [chainId, accountAddress, tokenSlug]
+    [chainId, accountAddress, tokenSlug],
   );
   const prevBaseParams = usePrevious(baseParams);
 
@@ -44,7 +52,7 @@ export function useTokenActivity(
       ...baseParams,
       limit: offset + limit,
     }),
-    [baseParams, offset, limit]
+    [baseParams, offset, limit],
   );
 
   const tokenActivityAtom = getTokenActivityAtom(queryParams);
@@ -63,9 +71,20 @@ export function useTokenActivity(
 
   const prevTokenActivity = usePrevious(
     pureTokenActivity,
-    "when-not-undefined"
+    "when-not-undefined",
   );
   const activity = pureTokenActivity ?? prevTokenActivity ?? [];
+
+  // TODO: identify swaps created in our app by tx hashes or metadata
+  const filteredActivity = activity.map((item) => {
+    if (item.project && item.project.name === "LI.FI") {
+      item.project = {
+        name: "Swap",
+        logoUrl: SwapIcon,
+      };
+    }
+    return item;
+  });
 
   const hasMore = offsetRef.current <= activity.length;
 
@@ -77,37 +96,38 @@ export function useTokenActivity(
   }, [forceUpdate, hasMore, limit]);
 
   return {
-    activity,
+    activity: filteredActivity,
     hasMore,
     loadMore,
   };
 }
 
-export function useCompleteActivity(limit = 20) {
+export function useCompleteActivity(accountAddress: string, limit = 20) {
   const forceUpdate = useForceUpdate();
   const offsetRef = useRef(0);
 
   const offset = offsetRef.current;
   const queryParams = useMemo(
     () => ({
+      accountAddress,
       limit: offset + limit,
     }),
-    [offset, limit]
+    [accountAddress, offset, limit],
   );
 
-  const tokenActivityAtom = getActivityAtom(queryParams);
+  const activitiesAtom = getActivitiesAtom(queryParams);
   const prevQueryParamsRef = useRef<typeof queryParams>();
 
   useEffect(() => {
     // Cleanup atoms cache
     if (prevQueryParamsRef.current) {
-      getActivityAtom.remove(prevQueryParamsRef.current);
+      getActivitiesAtom.remove(prevQueryParamsRef.current);
     }
 
     prevQueryParamsRef.current = queryParams;
   }, [queryParams]);
 
-  const activity = useLazyAtomValue(tokenActivityAtom);
+  const activity = useLazyAtomValue(activitiesAtom);
 
   const hasMore =
     activity !== undefined && offsetRef.current <= activity.length;
@@ -124,4 +144,37 @@ export function useCompleteActivity(limit = 20) {
     hasMore,
     loadMore,
   };
+}
+
+export function useActivityBadge() {
+  const { currentAccount } = useAccounts();
+  const { total: totalApprovals } = useAtomValue(approvalStatusAtom);
+  const pendingActivities = useLazyAtomValue(
+    getPendingActivitiesAtom(currentAccount.address),
+  );
+  const totalPendingActivities = useMemo(
+    () => pendingActivities?.length ?? 0,
+    [pendingActivities],
+  );
+
+  return useMemo(
+    () => totalApprovals + totalPendingActivities,
+    [totalApprovals, totalPendingActivities],
+  );
+}
+
+export function useSwapBadge(address?: string) {
+  try {
+    return Object.values(
+      JSON.parse(localStorage["li.fi-widget-routes"]).state.routes,
+    )
+      .filter(
+        (item: any) =>
+          item.route.fromAddress.toLowerCase() ===
+            address?.toLocaleLowerCase() && item.status === 1,
+      )
+      .map((item: any) => item.status).length;
+  } catch (e) {
+    return false;
+  }
 }

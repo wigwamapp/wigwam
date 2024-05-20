@@ -1,47 +1,41 @@
-import BigNumber from "bignumber.js";
 import { nanoid } from "nanoid";
 import { match } from "ts-pattern";
 import { ethers } from "ethers";
 import { ethErrors } from "eth-rpc-errors";
-import { dequal } from "dequal/lite";
 import { assert } from "lib/system/assert";
+import { storage } from "lib/ext/storage";
 
-import { INITIAL_NETWORK } from "fixtures/networks";
+import { DEFAULT_NETWORKS, INITIAL_NETWORK } from "fixtures/networks";
+import { PUSHTX_ADDITIONAL_BROADCAST } from "fixtures/settings";
 import {
-  Activity,
+  ACCOUNT_ADDRESS,
   ActivityType,
   ApprovalResult,
   Permission,
-  TxParams,
-  TxActionType,
-  TokenActivity,
-  TxAction,
-  AccountSource,
 } from "core/types";
 import * as repo from "core/repo";
 import { saveNonce } from "core/common/nonce";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 import { matchTxAction } from "core/common/transaction";
-import { createTokenActivityKey } from "core/common/tokens";
+import { saveActivity, saveTokenActivity } from "core/common/activity";
 
 import { Vault } from "../vault";
-import { $accounts, $approvals, approvalResolved } from "../state";
+import { $approvals, approvalResolved } from "../state";
 import { sendRpc, getRpcProvider } from "../rpc";
 
-const { serializeTransaction, parseTransaction, keccak256, hexValue } =
-  ethers.utils;
+import { parseTxSafe, validateTxOrigin, getAccountSafe } from "./utils";
 
 export async function processApprove(
   approvalId: string,
   {
     approved,
     rawTx,
-    signedRawTx,
+    signature,
     signedMessage,
     accountAddresses,
     overriddenChainId,
   }: ApprovalResult,
-  vault: Vault
+  vault: Vault,
 ) {
   const approval = $approvals.getState().find((a) => a.id === approvalId);
   assert(approval, "Not Found");
@@ -51,20 +45,34 @@ export async function processApprove(
       .with(
         { type: ActivityType.Connection },
         async ({
+          rpcCtx,
           type,
           source,
           returnSelectedAccount,
           preferredChainId,
-          rpcReply,
         }) => {
           assert(accountAddresses?.length, "Accounts not provided");
 
           const origin = getPageOrigin(source);
 
+          const activeAccountAddress =
+            await storage.fetchForce<string>(ACCOUNT_ADDRESS);
+
+          if (
+            activeAccountAddress &&
+            accountAddresses.includes(activeAccountAddress)
+          ) {
+            accountAddresses = [
+              activeAccountAddress,
+              ...accountAddresses.filter((a) => a !== activeAccountAddress),
+            ];
+          }
+
+          const timeAt = Date.now();
           const newPermission: Permission = {
             origin,
             id: nanoid(),
-            timeAt: Date.now(),
+            timeAt,
             accountAddresses,
             chainId:
               overriddenChainId ?? preferredChainId ?? INITIAL_NETWORK.chainId,
@@ -72,59 +80,62 @@ export async function processApprove(
 
           await repo.permissions.put(newPermission);
 
+          if (
+            activeAccountAddress &&
+            !accountAddresses.includes(activeAccountAddress)
+          ) {
+            await storage.put(ACCOUNT_ADDRESS, accountAddresses[0]);
+          }
+
           const toReturn = returnSelectedAccount
             ? accountAddresses[0]
             : wrapPermission(newPermission);
 
-          await saveActivity({
-            id: nanoid(),
-            type,
-            source,
-            returnSelectedAccount,
-            preferredChainId,
-            accountAddresses,
-            timeAt: Date.now(),
-            pending: 0,
-          });
+          await saveActivity(
+            accountAddresses.map((accountAddress) => ({
+              id: nanoid(),
+              type,
+              source,
+              returnSelectedAccount,
+              preferredChainId,
+              accountAddress,
+              timeAt,
+              pending: 0,
+            })),
+          );
 
-          rpcReply?.({ result: [toReturn] });
-        }
+          rpcCtx?.reply({ result: [toReturn] });
+        },
       )
       .with(
         { type: ActivityType.Transaction },
-        async ({
-          type,
-          source,
-          chainId,
-          accountAddress,
-          txParams,
-          rpcReply,
-        }) => {
-          assert(rawTx || signedRawTx, "Transaction not provided");
+        async ({ rpcCtx, type, source, chainId, accountAddress, txParams }) => {
+          assert(rawTx, "Transaction not provided");
 
-          const tx = parseTxSafe(rawTx ?? signedRawTx!);
+          const tx = parseTxSafe(rawTx);
           validateTxOrigin(tx, txParams);
 
-          if (!signedRawTx) {
-            accountAddress = ethers.utils.getAddress(accountAddress);
+          if (!signature) {
+            accountAddress = ethers.getAddress(accountAddress);
             const account = getAccountSafe(accountAddress);
 
-            const signature = await vault.sign(account.uuid, keccak256(rawTx!));
-            signedRawTx = serializeTransaction(tx, signature);
-          } else {
-            rawTx = serializeTransaction(tx);
+            signature = await vault.sign(
+              account.uuid,
+              ethers.keccak256(rawTx!),
+            );
           }
+
+          const signedTx = tx.clone();
+          signedTx.signature = signature;
 
           if (
-            process.env.NODE_ENV === "development" &&
-            process.env.VIGVAM_DEV_BLOCK_TX_SEND === "true"
+            process.env.NODE_ENV !== "production" &&
+            process.env.WIGWAM_DEV_BLOCK_TX_SEND === "true"
           ) {
-            throw new Error("Blocked by VIGVAM_DEV_BLOCK_TX_SEND env variable");
+            throw new Error("Blocked by WIGWAM_DEV_BLOCK_TX_SEND env variable");
           }
 
-          const rpcRes = await sendRpc(chainId, "eth_sendRawTransaction", [
-            signedRawTx,
-          ]);
+          const rpcRes = await pushTransaction(chainId, signedTx);
 
           if ("result" in rpcRes) {
             const txHash = rpcRes.result;
@@ -132,7 +143,7 @@ export async function processApprove(
 
             const txAction = await matchTxAction(
               getRpcProvider(chainId),
-              txParams
+              txParams,
             ).catch(() => null);
 
             await Promise.all([
@@ -147,7 +158,7 @@ export async function processApprove(
                 rawTx: rawTx!,
                 txAction: txAction ?? undefined,
                 txHash,
-                timeAt,
+                timeAt: source.replaceTx?.prevTimeAt ?? timeAt,
                 pending: 1,
               }),
               saveTokenActivity(
@@ -155,11 +166,11 @@ export async function processApprove(
                 chainId,
                 accountAddress,
                 txHash,
-                timeAt
+                timeAt,
               ),
             ]);
 
-            rpcReply?.({ result: txHash });
+            rpcCtx?.reply({ result: txHash });
           } else {
             console.warn(rpcRes.error);
 
@@ -169,24 +180,17 @@ export async function processApprove(
 
             throw err;
           }
-        }
+        },
       )
       .with(
         { type: ActivityType.Signing },
-        async ({
-          type,
-          source,
-          standard,
-          accountAddress,
-          message,
-          rpcReply,
-        }) => {
+        async ({ rpcCtx, type, source, standard, accountAddress, message }) => {
           if (signedMessage) {
-            rpcReply?.({ result: signedMessage });
+            rpcCtx?.reply({ result: signedMessage });
             return;
           }
 
-          accountAddress = ethers.utils.getAddress(accountAddress);
+          accountAddress = ethers.getAddress(accountAddress);
           const account = getAccountSafe(accountAddress);
 
           const signature = vault.signMessage(account.uuid, standard, message);
@@ -202,154 +206,69 @@ export async function processApprove(
             pending: 0,
           });
 
-          rpcReply?.({ result: signature });
-        }
+          rpcCtx?.reply({ result: signature });
+        },
+      )
+      .with(
+        { type: ActivityType.AddNetwork },
+        async ({ rpcCtx, source, chainId }) => {
+          const origin = getPageOrigin(source);
+          await repo.createOrUpdateNetworkPermission(origin, chainId);
+
+          rpcCtx?.reply({ result: null });
+        },
       )
       .otherwise(() => {
         throw new Error("Not Found");
       });
   } else {
-    approval.rpcReply?.({ error: DECLINE_ERROR });
+    approval.rpcCtx?.reply({
+      error: ethErrors.provider.userRejectedRequest(),
+    });
   }
 
   approvalResolved(approvalId);
 }
 
-function getAccountSafe(accountAddress: string) {
-  const account = $accounts
-    .getState()
-    .find((a) => a.address === accountAddress);
+async function pushTransaction(chainId: number, signedTx: ethers.Transaction) {
+  const res = await sendRpc(chainId, "eth_sendRawTransaction", [
+    signedTx.serialized,
+  ]);
 
-  assert(account, "Account not found");
-  assert(
-    account.source !== AccountSource.Address,
-    "This wallet was added as a watch-only account by importing an address." +
-      " It is not possible to perform signing using this type of accounts."
-  );
+  if ("result" in res) {
+    try {
+      // Pick additional rpcs to broadcast tx
+      // Avoid the first one because it's the default, and it's already been sent before
+      const defNet = DEFAULT_NETWORKS.find((n) => n.chainId === chainId);
+      const restToPush = defNet?.rpcUrls.slice(
+        1,
+        1 + PUSHTX_ADDITIONAL_BROADCAST,
+      );
 
-  return account;
-}
-
-async function saveActivity(activity: Activity) {
-  // TODO: Add specific logic for speed-up or cancel tx
-  await repo.activities.put(activity).catch(console.error);
-
-  if (activity.type === ActivityType.Connection) {
-    // Remove all early connections to the same origin
-    const actOrigin = getPageOrigin(activity.source);
-
-    repo.activities
-      .where("[type+pending]")
-      .equals([ActivityType.Connection, 0])
-      .filter(
-        (act) =>
-          act.id !== activity.id && getPageOrigin(act.source) === actOrigin
-      )
-      .delete()
-      .catch(console.error);
-  }
-}
-
-async function saveTokenActivity(
-  action: TxAction | null,
-  chainId: number,
-  accountAddress: string,
-  txHash: string,
-  timeAt: number
-) {
-  try {
-    if (action) {
-      const tokenActivities = new Map<string, TokenActivity>();
-      const addToActivities = (activity: TokenActivity) => {
-        const dbKey = createTokenActivityKey(activity);
-        tokenActivities.set(dbKey, activity);
-      };
-
-      const base = {
-        chainId,
-        accountAddress,
-        txHash,
-        pending: 1,
-        timeAt,
-      };
-
-      if (action.type === TxActionType.TokenTransfer) {
-        for (const { slug: tokenSlug, amount } of action.tokens) {
-          addToActivities({
-            ...base,
-            type: "transfer",
-            anotherAddress: action.toAddress,
-            amount: new BigNumber(amount).times(-1).toString(),
-            tokenSlug,
+      if (restToPush) {
+        for (const rpcUrl of restToPush) {
+          fetch(rpcUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              method: "eth_sendRawTransaction",
+              params: [signedTx.serialized],
+            }),
+          }).then((res) => {
+            if (!res.ok) {
+              console.error("Failed to push tx to another rpc", res);
+            }
           });
         }
-      } else if (
-        action.type === TxActionType.TokenApprove &&
-        action.tokenSlug
-      ) {
-        addToActivities({
-          ...base,
-          type: "approve",
-          anotherAddress: action.toAddress,
-          tokenSlug: action.tokenSlug,
-          amount: action.amount,
-          clears: action.clears,
-        });
       }
-
-      if (tokenActivities.size > 0) {
-        await repo.tokenActivities.bulkPut(
-          Array.from(tokenActivities.values()),
-          Array.from(tokenActivities.keys())
-        );
-      }
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-const DECLINE_ERROR = ethErrors.provider.userRejectedRequest();
-
-const STRICT_TX_PROPS = [
-  "to",
-  "data",
-  "accessList",
-  "chainId",
-  "value",
-] as const;
-
-function validateTxOrigin(tx: ethers.Transaction, originTxParams: TxParams) {
-  for (const key of STRICT_TX_PROPS) {
-    const txValue = hexValueMaybe(tx[key]);
-    const originValue = hexValueMaybe(originTxParams[key]);
-
-    if (originValue) {
-      assert(dequal(txValue, originValue), "Invalid transaction");
+    } catch (err) {
+      console.error(err);
     }
   }
-}
 
-function hexValueMaybe<T>(smth: T) {
-  if (smth === undefined) return;
-
-  if (
-    ethers.BigNumber.isBigNumber(smth) ||
-    ["string", "number"].includes(typeof smth)
-  ) {
-    return hexValue(smth as any);
-  }
-
-  return smth;
-}
-
-function parseTxSafe(rawTx: ethers.BytesLike): ethers.Transaction {
-  const tx = parseTransaction(rawTx);
-
-  // Remove signature props
-  delete tx.r;
-  delete tx.v;
-  delete tx.s;
-
-  return tx;
+  return res;
 }

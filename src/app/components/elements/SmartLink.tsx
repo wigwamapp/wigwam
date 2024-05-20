@@ -1,4 +1,4 @@
-import { forwardRef, useCallback } from "react";
+import { forwardRef, useCallback, MouseEventHandler } from "react";
 import { isPopup as isPopupPrimitive } from "lib/ext/view";
 import { Link } from "lib/navigation";
 import { LinkProps } from "lib/navigation/Link";
@@ -12,7 +12,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
     const { to, merge, onClick, children, ...rest } = props;
     const isPopup = isPopupPrimitive();
 
-    const handleClick = useCallback(
+    const handleClick = useCallback<MouseEventHandler<HTMLAnchorElement>>(
       (evt) => {
         onClick?.(evt);
 
@@ -21,7 +21,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
           openInTab(to, merge);
         }
       },
-      [onClick, to, merge]
+      [onClick, to, merge],
     );
 
     if (isPopup) {
@@ -32,7 +32,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
           tabIndex={0}
           onClick={handleClick}
           onKeyDown={(evt) =>
-            ["Enter", "Space"].includes(evt.code) && handleClick(evt)
+            ["Enter", "Space"].includes(evt.code) && handleClick(evt as any)
           }
           {...rest}
         >
@@ -42,7 +42,7 @@ const SmartLink = forwardRef<HTMLAnchorElement, SmartLinkProps>(
     }
 
     return <Link ref={ref} {...props} />;
-  }
+  },
 );
 
 export default SmartLink;

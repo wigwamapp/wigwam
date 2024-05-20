@@ -1,8 +1,8 @@
 import browser from "webextension-polyfill";
 
-import * as Global from "./global";
+import { globalStorage } from "./globalStorage";
 
-const WAS_RESTARTED = "_was_restarted";
+const WAS_RESTARTED = "was_restarted";
 
 export const getPublicURL = browser.runtime.getURL;
 
@@ -27,7 +27,7 @@ export async function openOrFocusMainTab() {
 }
 
 export async function restartApp() {
-  // Open empty tab if there are only one tab and this tab is Vigvam
+  // Open empty tab if there are only one tab and this tab is Wigwam
   // because after reload this tab will be removed
   try {
     const tabs = await browser.tabs.query({ url: getMainURL() });
@@ -37,20 +37,22 @@ export async function restartApp() {
     }
   } catch {}
 
-  Global.put(WAS_RESTARTED, "true");
+  await globalStorage.put(WAS_RESTARTED, true);
   browser.runtime.reload();
 }
 
-export function openIfWasRestarted() {
-  if (Global.get(WAS_RESTARTED) === "true") {
-    Global.remove(WAS_RESTARTED);
+export async function openIfWasRestarted() {
+  const wasRestarted = await globalStorage.fetchForce<boolean>(WAS_RESTARTED);
+
+  if (wasRestarted) {
+    await globalStorage.remove(WAS_RESTARTED);
     openMainTab();
   }
 }
 
 export function isUpdateAvailable(
   currentVersion: string,
-  latestVersion: string
+  latestVersion: string,
 ) {
   if (currentVersion === latestVersion) return false;
 

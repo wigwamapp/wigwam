@@ -8,10 +8,10 @@ import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import { ReactComponent as PlusIcon } from "app/icons/PlusCircle.svg";
 
 import InputLabelAction from "./InputLabelAction";
-import AutoIcon from "./AutoIcon";
 import WalletName from "./WalletName";
 import HashPreview from "./HashPreview";
 import IconedButton from "./IconedButton";
+import WalletAvatar from "./WalletAvatar";
 
 type SmallContactCardProps = {
   address?: string;
@@ -41,14 +41,14 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
   const accounts = useMemo(
     () =>
       (allAccounts ?? []).filter(
-        ({ address: accAddress }) => accAddress === address
+        ({ address: accAddress }) => accAddress === address,
       ),
-    [allAccounts, address]
+    [allAccounts, address],
   );
 
   const mergedAccounts = useMemo(
     () => [...contacts, ...accounts],
-    [contacts, accounts]
+    [contacts, accounts],
   );
 
   if (!address) {
@@ -97,18 +97,16 @@ const SmallContactCard: FC<SmallContactCardProps> = ({
         !isSmall && "py-0.5 pl-0.5 text-sm",
         isSmall && "py-[0.1875rem] pl-[0.1875rem] text-xs",
         "flex items-center",
-        className
+        className,
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={contact.address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           !isSmall && "h-6 w-6 min-w-[1.5rem] mr-2",
           isSmall && "h-4 w-4 min-w-[1rem] mr-1",
           "bg-black/40",
-          "rounded"
+          "rounded",
         )}
       />
       {"source" in contact ? (

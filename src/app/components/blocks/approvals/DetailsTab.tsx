@@ -1,6 +1,5 @@
-import { FC, useMemo } from "react";
+import { FC, PropsWithChildren, useMemo } from "react";
 import classNames from "clsx";
-import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
 import {
@@ -30,6 +29,7 @@ import Dot from "app/components/elements/Dot";
 import TokenAmount from "app/components/blocks/TokenAmount";
 import { ReactComponent as WalletExplorerIcon } from "app/icons/external-link.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 
 type DetailsTabProps = Omit<FeeButton, "onClick"> & {
   accountAddress: string;
@@ -38,9 +38,65 @@ type DetailsTabProps = Omit<FeeButton, "onClick"> & {
   onFeeButtonClick: () => void;
 };
 
+const ActivitySwap: FC<{ source: ActivitySource }> = ({ source }) => {
+  if (source.type === "self" && source.swapMeta) {
+    const route = source.swapMeta;
+    return (
+      <InfoRaw label={"Swap info"} flexAlignPosition="items-center">
+        <div
+          className={classNames(
+            "flex flex-col items-center justify-center",
+            "w-fit",
+          )}
+        >
+          <div className="inline-flex">
+            <PrettyAmount
+              amount={route.fromAmount}
+              decimals={route.fromToken.decimals}
+              currency={route.fromToken.symbol}
+              threeDots={false}
+              copiable
+              className={classNames("text-xs ml-1.5", "font-bold")}
+            />{" "}
+            <img
+              src={route.fromToken.logoURI}
+              alt={route.fromToken.name}
+              className="ml-1 mr-2 w-4 h-4 rounded-full"
+            />
+          </div>
+          <div
+            className={classNames("text-xs font-bold")}
+            style={{ transform: "rotate(90deg)" }}
+          >
+            {" →"}
+          </div>
+          <div className="inline-flex">
+            <PrettyAmount
+              amount={route.toAmount}
+              decimals={route.toToken.decimals}
+              currency={route.toToken.symbol}
+              threeDots={false}
+              copiable
+              className={classNames("text-xs ml-1.5", "font-bold")}
+            />{" "}
+            <img
+              src={route.toToken.logoURI}
+              alt={route.toToken.name}
+              className="ml-1 w-4 h-4 rounded-full"
+            />
+          </div>
+        </div>
+      </InfoRaw>
+    );
+  } else {
+    return null;
+  }
+};
+
 const DetailsTab: FC<DetailsTabProps> = ({
   accountAddress,
   fees,
+  l1Fee,
   gasLimit,
   averageGasLimit,
   maxFee,
@@ -50,32 +106,66 @@ const DetailsTab: FC<DetailsTabProps> = ({
   source,
   onFeeButtonClick,
 }) => {
-  const tabHeader = useMemo(() => getTabHeader(action), [action]);
+  const tabHeader = useMemo(
+    () => getTabHeader(action, source),
+    [action, source],
+  );
   const withDescription = useMemo(
     () => action.type === TxActionType.TokenApprove && !action.clears,
-    [action]
+    [action],
   );
+
+  const currentNetwork = useLazyNetwork();
+  const explorerLink = useExplorerLink(currentNetwork);
+
+  const cancelTx =
+    source.replaceTx?.type === "cancel" ||
+    source.replaceTx?.prevReplaceTxType === "cancel";
 
   return (
     <>
-      <TabHeader className={withDescription ? "!mb-1" : ""}>
-        {tabHeader}
+      <TabHeader
+        className={classNames(
+          "flex items-center w-full",
+          withDescription ? "!mb-1" : "",
+        )}
+      >
+        {cancelTx ? "Cancel transaction" : tabHeader}
+        {source.replaceTx?.type === "speedup" && (
+          <>
+            <span className="flex-1" />
+            <span className="text-xs text-brand-inactivedark font-medium inline-flex items-center">
+              <GasIcon className="w-3 h-3 mr-1" />
+              Speed up
+            </span>
+          </>
+        )}
       </TabHeader>
       {withDescription && (
-        <p className="text-sm text-[#BCC2DB] mb-3">
-          Do you trust this site? By granding this permission, you&apos;re
-          allowing{" "}
-          <span className="font-semibold">
-            {source.type === "page" && source.url
-              ? new URL(source.url).host
-              : "this site"}
-          </span>{" "}
-          to withdraw tokens and automate transactions for you.
+        <p className="text-sm text-[#BCC3C4] mb-3">
+          {source.type === "self" && source.swapMeta ? (
+            <>
+              By granting this permission, you&#39;re allowing this
+              smart-contract to automate transactions for you.
+            </>
+          ) : (
+            <>
+              Do you trust this site? By granting this permission, you&apos;re
+              allowing{" "}
+              <span className="font-semibold">
+                {source.type === "page" && source.url
+                  ? new URL(source.url).host
+                  : "this site"}
+              </span>{" "}
+              to withdraw tokens and automate transactions for you.
+            </>
+          )}
         </p>
       )}
       <FeeButton
         accountAddress={accountAddress}
         fees={fees}
+        l1Fee={l1Fee}
         gasLimit={gasLimit}
         averageGasLimit={averageGasLimit}
         maxFee={maxFee}
@@ -83,15 +173,46 @@ const DetailsTab: FC<DetailsTabProps> = ({
         feeMode={feeMode}
         onClick={onFeeButtonClick}
       />
-      <Recipient action={action} />
-      <Tokens accountAddress={accountAddress} action={action} />
+      {cancelTx ? (
+        <>
+          <InfoRaw label="Transaction">
+            <div className="flex flex-col items-end">
+              <div className="flex items-center">
+                <TippySingletonProvider>
+                  <HashPreview
+                    hash={source.replaceTx!.prevTxHash}
+                    className="text-sm"
+                    startLength={8}
+                    endLength={6}
+                  />
+                  {explorerLink && (
+                    <IconedButton
+                      href={explorerLink.tx(source.replaceTx!.prevTxHash)}
+                      aria-label="View in Explorer"
+                      Icon={WalletExplorerIcon}
+                      className="!w-6 !h-6 ml-2"
+                      iconClassName="!w-[1.125rem]"
+                    />
+                  )}
+                </TippySingletonProvider>
+              </div>
+            </div>
+          </InfoRaw>
+        </>
+      ) : (
+        <>
+          <Recipient action={action} />
+          <Tokens accountAddress={accountAddress} action={action} />
+          <ActivitySwap source={source} />
+        </>
+      )}
     </>
   );
 };
 
 export default DetailsTab;
 
-const getTabHeader = (action: TxAction) => {
+const getTabHeader = (action: TxAction, source: ActivitySource) => {
   switch (action.type) {
     case TxActionType.TokenTransfer:
       return "Transfer tokens";
@@ -99,9 +220,20 @@ const getTabHeader = (action: TxAction) => {
       if (action.clears) {
         return "Revoke tokens approval";
       }
+      if (source.type === "self" && source.swapMeta) {
+        return "Approve tokens for swap";
+      }
       return "Approve tokens";
     case TxActionType.ContractInteraction:
-      return "Interact with contract";
+      if (source.type === "self" && source.swapMeta) {
+        if (source.swapMeta.fromChainId !== source.swapMeta.toChainId) {
+          return "Bridge transaction";
+        } else {
+          return "Swap transaction";
+        }
+      } else {
+        return "Interact with contract";
+      }
     default:
       return "Deploy contract";
   }
@@ -110,10 +242,11 @@ const getTabHeader = (action: TxAction) => {
 type FeeButton = {
   accountAddress: string;
   fees: FeeSuggestions;
-  gasLimit: ethers.BigNumber;
-  averageGasLimit: ethers.BigNumber;
-  maxFee: ethers.BigNumber | null;
-  averageFee: ethers.BigNumber | null;
+  l1Fee: bigint | null;
+  gasLimit: bigint;
+  averageGasLimit: bigint;
+  maxFee: bigint | null;
+  averageFee: bigint | null;
   feeMode: FeeMode;
   onClick: () => void;
 };
@@ -123,20 +256,24 @@ const FeeButton: FC<FeeButton> = ({
   gasLimit,
   averageGasLimit,
   fees,
+  l1Fee,
   maxFee,
   averageFee,
   feeMode,
   onClick,
 }) => {
   gasLimit = useMemo(
-    () => (gasLimit.gt(averageGasLimit) ? averageGasLimit : gasLimit),
-    [averageGasLimit, gasLimit]
+    () => (gasLimit > averageGasLimit ? averageGasLimit : gasLimit),
+    [averageGasLimit, gasLimit],
   );
 
   const nativeToken = useToken<AccountAsset>(accountAddress);
 
-  const averageFeeBN = averageFee && new BigNumber(averageFee.toString());
-  const modeFee = gasLimit.mul(fees.modes[feeMode].max).toString();
+  const averageFeeBN = averageFee ? new BigNumber(averageFee.toString()) : null;
+  const modeFee = (
+    gasLimit * fees.modes[feeMode].max +
+    (l1Fee ?? 0n)
+  ).toString();
 
   const isCustomMode = !averageFeeBN?.eq(modeFee);
 
@@ -157,7 +294,7 @@ const FeeButton: FC<FeeButton> = ({
         "py-3 pr-2 pl-4 mb-3",
         "bg-brand-main/5",
         "transition-colors",
-        "hover:bg-brand-main/10"
+        "hover:bg-brand-main/10",
       )}
       onClick={onClick}
     >
@@ -166,11 +303,11 @@ const FeeButton: FC<FeeButton> = ({
           className={classNames(
             "flex items-center justify-between",
             "mb-0.5",
-            "text-sm"
+            "text-sm",
           )}
         >
           Network fee
-          {averageFeeBN && (
+          {averageFeeBN ? (
             <span className="ml-auto flex items-center">
               <PrettyAmount
                 amount={averageFeeBN}
@@ -186,14 +323,14 @@ const FeeButton: FC<FeeButton> = ({
                 className="font-bold"
               />
             </span>
-          )}
+          ) : null}
         </span>
         <span
           className={classNames("flex items-center justify-between", "text-xs")}
         >
           <FeeModeLabel feeMode={isCustomMode ? "custom" : feeMode} />
 
-          {maxFee && nativeToken && (
+          {maxFee && nativeToken ? (
             <span className="">
               <span className="font-semibold">Max fee:</span>
               <PrettyAmount
@@ -204,7 +341,7 @@ const FeeButton: FC<FeeButton> = ({
                 className="ml-2 mb-0"
               />
             </span>
-          )}
+          ) : null}
         </span>
       </span>
       <ChevronRightIcon className="w-6 h-auto ml-2" />
@@ -226,7 +363,7 @@ const FeeModeLabel: FC<FeeModeLabelProps> = ({ feeMode }) => {
         "py-0.5 pl-1.5 pr-2.5",
         "rounded-md",
         "border border-brand-main/[.07] text-sm",
-        "flex items-center"
+        "flex items-center",
       )}
     >
       <span className="mr-1.5 text-xs">{icon}</span>
@@ -371,7 +508,8 @@ const getTokens = (action: TxAction) => {
   }
   if (
     action.type === TxActionType.ContractInteraction &&
-    action.nativeTokenAmount
+    action.nativeTokenAmount &&
+    BigInt(action.nativeTokenAmount) > 0n
   ) {
     return [
       {
@@ -383,12 +521,19 @@ const getTokens = (action: TxAction) => {
   return null;
 };
 
-type InfoRawProps = {
+type InfoRawProps = PropsWithChildren<{
+  flexAlignPosition?: string;
   label: string;
-};
+}>;
 
-const InfoRaw: FC<InfoRawProps> = ({ label, children }) => (
-  <div className="py-3 pl-4 flex items-start justify-between">
+const InfoRaw: FC<InfoRawProps> = ({
+  label,
+  flexAlignPosition = "items-start",
+  children,
+}) => (
+  <div
+    className={`py-3 pl-4 flex ${flexAlignPosition} items-start justify-between`}
+  >
     <h3 className="text-sm mr-5">{label}</h3>
     {children}
   </div>

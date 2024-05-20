@@ -4,46 +4,59 @@ import { useAtomValue } from "jotai";
 import { useLazyAtomValue } from "lib/atom-utils";
 
 import * as repo from "core/repo";
+import { MetaMaskCompatibleMode } from "core/types";
 
 import { getAllPermissionsAtom, web3MetaMaskCompatibleAtom } from "app/atoms";
-import { useToggleMetaMaskCompatibleMode } from "app/hooks/web3Mode";
+import { useSetMetaMaskCompatibleMode } from "app/hooks/web3Mode";
 
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
+import { ReactComponent as MetamaskIcon } from "app/icons/metamask.svg";
+import { ReactComponent as MetamaskEnabledIcon } from "app/icons/metamask-enabled.svg";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
-import Switcher from "app/components/elements/Switcher";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import Separator from "app/components/elements/Seperator";
 import IconedButton from "app/components/elements/IconedButton";
+import Switcher from "app/components/elements/Switcher";
 
 const Web3: FC = () => {
   const metamaskMode = useAtomValue(web3MetaMaskCompatibleAtom);
-  const toggleMetamaskMode = useToggleMetaMaskCompatibleMode();
+  const setMetamaskMode = useSetMetaMaskCompatibleMode(false);
+
+  const metamaskModeEnabled = metamaskMode === MetaMaskCompatibleMode.Strict;
 
   return (
     <div className="flex flex-col items-start">
-      <SettingsHeader className="!mb-3">Web3</SettingsHeader>
+      <SettingsHeader className="!mb-3">Connect as MetaMask</SettingsHeader>
 
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
-        Vigvam is always available to interact with applications using its
-        communication protocol `window.vigvamEthereum`. Vigvam also supports a
-        common communication protocol, like MetaMask. Learn more about{" "}
-        <a
-          href="https://vigvamapp.medium.com/how-vigvam-wallet-may-be-connected-to-any-dapp-with-the-aid-of-metamask-b688f9757184"
-          target="_blank"
-          rel="nofollow noreferrer"
-          className="underline"
-        >
-          how it works here
-        </a>
-        .
+        When enabled - use the MetaMask connection button to connect to dApps
+        only if the Wigwam wallet option is unavailable on the website.
+        <br />
+        Otherwise, choose only Wigwam wallet!
       </p>
 
       <Switcher
-        id="web3_metamask_compatible"
-        label="MetaMask Compatible Mode"
-        text={metamaskMode ? "Enabled" : "Disabled"}
-        checked={metamaskMode}
-        onCheckedChange={toggleMetamaskMode}
+        id="testNetworks"
+        text={
+          <span className="flex items-center">
+            {metamaskModeEnabled ? (
+              <MetamaskEnabledIcon className="w-5 min-w-5 h-auto" />
+            ) : (
+              <MetamaskIcon className="w-5 min-w-5 h-auto" />
+            )}
+            <span className="ml-3">
+              {metamaskModeEnabled ? "Enabled" : "Disabled"}
+            </span>
+          </span>
+        }
+        checked={metamaskModeEnabled}
+        onCheckedChange={() =>
+          setMetamaskMode(
+            metamaskModeEnabled
+              ? MetaMaskCompatibleMode.Off
+              : MetaMaskCompatibleMode.Strict,
+          )
+        }
         className="min-w-[17.75rem]"
       />
 
@@ -68,7 +81,7 @@ const PermissionsList = memo(() => {
         console.error(err);
       }
     },
-    []
+    [],
   );
 
   if (!allPermissions || allPermissions.length === 0) return null;
@@ -77,7 +90,7 @@ const PermissionsList = memo(() => {
     <>
       <Separator className="mt-6 mb-8" />
 
-      <SettingsHeader>Permissions</SettingsHeader>
+      <SettingsHeader>Connected apps</SettingsHeader>
 
       <div className="w-full max-w-[25rem] flex-col">
         {allPermissions.map((perm) => (
@@ -95,7 +108,7 @@ const PermissionsList = memo(() => {
               "rounded-lg",
               "flex items-center py-2 pl-4 pr-2",
               "text-base text-brand-light font-medium",
-              "hover:underline"
+              "hover:underline",
             )}
           >
             <span className="min-w-0 truncate">

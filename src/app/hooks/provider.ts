@@ -17,7 +17,7 @@ export type UseOnBlockOptions = {
 
 export function useOnBlock(
   callback: (blockNumber: number) => void,
-  opts: UseOnBlockOptions = {}
+  opts: UseOnBlockOptions = {},
 ) {
   const provider = useProvider();
 
@@ -33,12 +33,12 @@ export function useOnBlock(
 
       latestBlockRef.current = blockNumber;
     },
-    [callback, opts.callFirstTime]
+    [callback, opts.callFirstTime],
   );
 
   const debouncedCallback = useDebouncedCallback(
     handleNewBlock,
-    opts.debounceWait ?? 500
+    opts.debounceWait ?? 500,
   );
 
   useEffect(() => {

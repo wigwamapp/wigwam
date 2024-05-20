@@ -1,5 +1,5 @@
 import { assert } from "lib/system/assert";
-import { toProtectedString } from "lib/crypto-utils";
+import { toProtectedPassword } from "lib/crypto-utils";
 import {
   EventMessage,
   MessageType,
@@ -18,7 +18,16 @@ import { porter } from "./base";
 
 export async function getWalletState() {
   const type = MessageType.GetWalletState;
-  const res = await porter.request({ type });
+  const res = await porter.request(
+    { type },
+    {
+      // This request is base, it's called first
+      // If no answer during this time - there is a possibility
+      // that the Service Worker has stalled or smth happen
+      // So, let's not delay the user
+      timeout: 5_000,
+    },
+  );
   assert(res?.type === type);
 
   const { status, hasSeedPhrase } = res;
@@ -26,7 +35,7 @@ export async function getWalletState() {
 }
 
 export function onWalletStateUpdated(
-  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void
+  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void,
 ) {
   return porter.onOneWayMessage<EventMessage>((msg) => {
     if (msg?.type === MessageType.WalletStateUpdated) {
@@ -47,9 +56,9 @@ export function onAccountsUpdated(callback: (newAccounts: Account[]) => void) {
 export async function setupWallet(
   password: string,
   accountsParams: AddAccountParams[],
-  seedPhrase?: SeedPharse
+  seedPhrase?: SeedPharse,
 ) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.SetupWallet;
 
@@ -63,7 +72,7 @@ export async function setupWallet(
 }
 
 export async function unlockWallet(password: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.UnlockWallet;
 
@@ -83,10 +92,10 @@ export async function lockWallet() {
 
 export async function changePassword(
   currentPassword: string,
-  nextPassword: string
+  nextPassword: string,
 ) {
-  currentPassword = toProtectedString(currentPassword);
-  nextPassword = toProtectedString(nextPassword);
+  currentPassword = await toProtectedPassword(currentPassword);
+  nextPassword = await toProtectedPassword(nextPassword);
 
   const type = MessageType.ChangePassword;
 
@@ -105,7 +114,7 @@ export async function getAccounts() {
 
 export async function addAccounts(
   accountsParams: AddAccountParams[],
-  seedPhrase?: SeedPharse
+  seedPhrase?: SeedPharse,
 ) {
   const type = MessageType.AddAccounts;
 
@@ -118,7 +127,7 @@ export async function addAccounts(
 }
 
 export async function deleteAccounts(password: string, accountUuids: string[]) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.DeleteAccounts;
 
@@ -142,7 +151,7 @@ export async function updateAccountName(accountUuid: string, name: string) {
 }
 
 export async function getSeedPhrase(password: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.GetSeedPhrase;
 
@@ -156,7 +165,7 @@ export async function getSeedPhrase(password: string) {
 }
 
 export async function getPrivateKey(password: string, accountUuid: string) {
-  password = toProtectedString(password);
+  password = await toProtectedPassword(password);
 
   const type = MessageType.GetPrivateKey;
 
@@ -211,7 +220,7 @@ export function onSyncStatusUpdated(callback: (status: SyncStatus) => void) {
 export function sync(
   chainId: number,
   accountAddress: string,
-  tokenType: TokenType
+  tokenType: TokenType,
 ) {
   const msg: Sync = {
     type: MessageType.Sync,
@@ -227,7 +236,7 @@ export function findToken(
   chainId: number,
   accountAddress: string,
   tokenSlug: string,
-  refreshMetadata?: boolean
+  refreshMetadata?: boolean,
 ) {
   const msg: FindToken = {
     type: MessageType.FindToken,
@@ -243,7 +252,7 @@ export function findToken(
 export function syncTokenActivities(
   chainId: number,
   accountAddress: string,
-  tokenSlug: string
+  tokenSlug: string,
 ) {
   const msg: SyncTokenActivities = {
     type: MessageType.SyncTokenActivities,
@@ -255,11 +264,29 @@ export function syncTokenActivities(
   porter.sendOneWayMessage(msg);
 }
 
-export async function getThirdPartyGasPrices(chainId: number) {
-  const type = MessageType.GetTPGasPrices;
+export async function getGasPrices(chainId: number) {
+  const type = MessageType.GetGasPrices;
 
   const res = await porter.request({ type, chainId });
   assert(res?.type === type);
 
   return res.gasPrices;
+}
+
+export async function getOnRampCurrencies() {
+  const type = MessageType.GetOnRampCurrencies;
+
+  const res = await porter.request({ type });
+  assert(res?.type === type);
+
+  return res.currencies;
+}
+
+export async function getTokenDetailsUrl(chainId: number, tokenSlug: string) {
+  const type = MessageType.GetTokenDetailsUrl;
+
+  const res = await porter.request({ type, chainId, tokenSlug });
+  assert(res?.type === type);
+
+  return res.detailsUrl;
 }

@@ -1,4 +1,4 @@
-import { atom, SetStateAction, WritableAtom } from "jotai";
+import { atom, WritableAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { listen, changeState } from "lib/history";
 import {
@@ -10,17 +10,20 @@ import {
 
 import { atomWithAutoReset } from "./atomWithAutoReset";
 
-type Update<T> = typeof RESET | SetStateAction<T>;
+type Update<Value> =
+  | Value
+  | typeof RESET
+  | ((prev: Value) => Value | typeof RESET);
 
 export type URLHashAtom<T> = WritableAtom<
   T,
-  [Update<T>] | [Update<T>, "replace"],
+  [[Update<T>] | [Update<T>, "replace"]],
   void
 >;
 
 export function atomWithURLHash<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
 ): URLHashAtom<T> {
   const getValue = (params: URLSearchParams) => {
     const value = params.get(key);
@@ -29,7 +32,7 @@ export function atomWithURLHash<T>(
 
   const readAtom = atomWithAutoReset(() => getValue(getHashSearchParams()), {
     onMount: (setAtom) =>
-      listen(() => setAtom(getValue(getHashSearchParams()))),
+      listen(() => setAtom(getValue(getHashSearchParams()) as Awaited<T>)),
   });
 
   const urlHashAtom = atom(
@@ -48,7 +51,7 @@ export function atomWithURLHash<T>(
       }
 
       changeState(toURL(searchParams.toString()), action === "replace");
-    }
+    },
   );
 
   return urlHashAtom;

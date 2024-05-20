@@ -1,4 +1,4 @@
-@import "./fonts/inter.css";
+@import "inter-ui/inter-variable.css";
 
 * {
   font-variant-ligatures: none;
@@ -15,7 +15,7 @@ a {
 
 .brandbg-main,
 .brandbg-popup {
-  background: radial-gradient(
+  /* background: radial-gradient(
       30.26% 62.3% at 93.12% 25.55%,
       rgba(90, 4, 20, 0.056) 0%,
       rgba(13, 14, 29, 0) 100%
@@ -25,16 +25,23 @@ a {
       rgba(4, 73, 88, 0.1) 0%,
       rgba(13, 14, 29, 0) 100%
     ),
-    #101123;
+    #181A1F; */
+
+  /* @apply bg-gray-900; */
+  /* background-color: #151918; #101918; */
+  /* background-color: #212121; */
+  @apply bg-brand-darkbg;
 }
 
 .brandbg-main-fallback,
 .brandbg-popup-fallback {
-  @apply bg-brand-dark;
+  @apply bg-brand-darkbg;
 }
 
 .brandbg-large-modal {
-  background: radial-gradient(
+  @apply bg-brand-darkbg;
+
+  /* background: radial-gradient(
       31.72% 37.17% at 85.81% 79.17%,
       rgba(43, 44, 65, 0.2) 0%,
       rgba(13, 14, 32, 0.2) 100%
@@ -54,7 +61,7 @@ a {
       rgba(118, 123, 160, 0.2) 0%,
       rgba(13, 14, 32, 0.2) 100%
     ),
-    #0c0d1e !important;
+    #0c0d1e !important; */
 }
 
 .brandbg-secondary-modal {
@@ -76,30 +83,104 @@ a {
 @tailwind utilities;
 
 @layer utilities {
-  .glass-icon-stable {
-    --opacity: 1;
-    --color-1: theme("colors.brand.main");
-    --color-2: theme("colors.brand.main");
+  svg.styled-icon * {
+    transition-property: all;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in;
   }
 
-  .glass-icon {
-    --opacity: 0.8;
-    --color-1: theme("colors.brand.main");
-    --color-2: theme("colors.brand.main");
+  .styled-icon {
+    --color-1: #696c73;
+    --color-2: #2a2d35;
+    --color-3: #272a32;
+    --color-4: #2a2d35;
   }
 
-  svg.glass-icon * {
-    @apply transition-all duration-300 ease-in-out;
+  .styled-icon--hover {
+    --color-1: #949cae;
+    --color-2: #373b45;
+    --color-3: #272a32;
+    --color-4: #373b45;
   }
 
-  .glass-icon--hover {
-    --opacity: 1;
-  }
-
-  .glass-icon--active {
-    --opacity: 1;
+  .styled-icon--active {
     --color-1: theme("colors.brand.redone");
-    --color-2: theme("colors.brand.redtwo");
+    --color-2: #373b45;
+    --color-3: #373b45;
+    --color-4: #696c73;
+  }
+
+  .styled-icon--pending {
+    --color-1: #949cae;
+    --color-2: #373b45;
+    --color-3: #373b45;
+    --color-4: #696c73;
+  }
+
+  .styled-icon--pending path[class$="active-element"] {
+    animation: styled-icon--pending-pulse 2.5s infinite;
+  }
+
+  .styled-icon--pending path[class$="active-element--fill"] {
+    animation: styled-icon-fill--pending-pulse 2.5s infinite;
+  }
+
+  .styled-icon-popup {
+    --color-1: #fff;
+  }
+
+  .styled-icon-popup--active {
+    --color-1: #0d1311;
+  }
+
+  @keyframes styled-icon--pending-pulse {
+    0% {
+      stroke: var(--color-1);
+    }
+    50% {
+      stroke: #d99e2e;
+    }
+    100% {
+      stroke: var(--color-1);
+    }
+  }
+
+  @keyframes styled-icon-fill--pending-pulse {
+    0% {
+      fill: var(--color-1);
+    }
+    50% {
+      fill: #d99e2e;
+    }
+    100% {
+      fill: var(--color-1);
+    }
+  }
+
+  .styled-label--pending {
+    animation: styled-label--pending-pulse 2.5s infinite;
+  }
+
+  @keyframes styled-label--pending-pulse {
+    0% {
+      color: inherit;
+    }
+    50% {
+      color: #d99e2e;
+    }
+    100% {
+      color: inherit;
+    }
+  }
+
+  /* For Webkit-based browsers (Chrome, Safari and Opera) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  /* For IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
 
@@ -277,7 +358,7 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
   transform: rotateZ(45deg);
   perspective: 1000px;
   border-radius: 50%;
-  color: #f8f9fd;
+  color: #f8fcfd;
 }
 .atom-spinner:before,
 .atom-spinner:after {
@@ -296,7 +377,7 @@ div[data-radix-scroll-area-viewport].viewportBlock > div {
   animation-delay: -0.4s;
 }
 .atom-spinner:after {
-  color: #ff3d00;
+  color: rgb(128, 239, 110);
   transform: rotateY(70deg);
 }
 

@@ -12,7 +12,7 @@ import Link, { LinkProps } from "lib/navigation/Link";
 import Tooltip, { TooltipProps } from "./Tooltip";
 import SmartLink from "./SmartLink";
 
-type IconedButtonProps = {
+export type IconedButtonProps = {
   disabled?: boolean;
   Icon: FC<{ className?: string }>;
   iconProps?: any;
@@ -35,14 +35,14 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
       asSpan = false,
       ...rest
     },
-    ref
+    ref,
   ) => {
     const classNamesList = classNames(
       "group",
       (theme === "primary" || theme === "secondary") && "w-5 h-5",
       theme === "tertiary" && "w-6 h-6",
       theme === "primary" && "bg-brand-main/20",
-      theme === "secondary" && "bg-brand-main/[.05]",
+      theme === "secondary" && "bg-brand-main/[.1]",
       "rounded",
       "flex justify-center items-center",
       "transition",
@@ -52,7 +52,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
         "focus-visible:bg-brand-main/30 focus-visible:shadow-buttonsecondary",
         "active:bg-brand-main/20 active:shadow-none",
       ],
-      className
+      className,
     );
 
     const content = (
@@ -63,7 +63,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
           "h-auto",
           "transition-opacity",
           "group-active:opacity-60",
-          iconClassName
+          iconClassName,
         )}
         {...iconProps}
       />
@@ -125,7 +125,7 @@ const IconedButton = forwardRef<HTMLElement, IconedButtonProps>(
         {content}
       </button>
     );
-  }
+  },
 );
 
 type ForwardRefProps = IconedButtonProps & {
@@ -135,7 +135,7 @@ type ForwardRefProps = IconedButtonProps & {
 const withTooltip = (
   WrappedComponent: ForwardRefExoticComponent<
     ForwardRefProps & RefAttributes<HTMLElement>
-  >
+  >,
 ) => {
   return forwardRef<HTMLElement, ForwardRefProps>(
     ({ tooltipProps, ...rest }, ref) => {
@@ -149,7 +149,7 @@ const withTooltip = (
       } else {
         return <WrappedComponent {...rest} ref={ref} />;
       }
-    }
+    },
   );
 };
 

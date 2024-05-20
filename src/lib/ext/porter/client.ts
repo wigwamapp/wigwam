@@ -1,4 +1,5 @@
 import browser, { Runtime } from "webextension-polyfill";
+import { nanoid } from "nanoid";
 import { forEachSafe } from "lib/system/forEachSafe";
 
 import { PorterMessageType } from "./types";
@@ -11,6 +12,7 @@ import {
 
 export class PorterClient<ReqData = any, ResData = unknown> {
   private port?: Runtime.Port;
+  private portId = nanoid();
   private reqId = 0;
   private messageHandlers = new Set<(msg: any) => void>();
 
@@ -21,19 +23,21 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
     const handleReconnect = (err?: any) => {
       if (attempts > 20 || err?.message === "Extension context invalidated.") {
+        console.error(err);
         this.onFullyDisconnect?.();
         return;
       }
 
       setTimeout(
         () => this.connect(name, attempts + 1),
-        attempts < 10 ? 100 : 1_000
+        attempts < 10 ? 100 : 1_000,
       );
     };
 
     let port: Runtime.Port;
     try {
-      port = browser.runtime.connect({ name });
+      const nameWithId = `${name}_${this.portId}`;
+      port = browser.runtime.connect({ name: nameWithId });
     } catch (err) {
       handleReconnect(err);
       console.error(err);
@@ -47,10 +51,8 @@ export class PorterClient<ReqData = any, ResData = unknown> {
     port.onDisconnect.addListener((p) => {
       delete this.port;
 
-      handleReconnect();
-
       const err = p.error ?? browser.runtime.lastError;
-      if (err) console.error(new Error(err.message));
+      handleReconnect(err);
     });
 
     this.port = port;
@@ -62,13 +64,13 @@ export class PorterClient<ReqData = any, ResData = unknown> {
    */
   async request(
     data: ReqData,
-    opts: { timeout?: number; signal?: AbortSignal } = {}
+    opts: { timeout?: number; signal?: AbortSignal } = {},
   ): Promise<ResData> {
     const port = this.getCurrentPort();
     const reqId = this.reqId++;
 
     port.postMessage(
-      sanitizeMessage({ type: PorterMessageType.Req, reqId, data })
+      sanitizeMessage({ type: PorterMessageType.Req, reqId, data }),
     );
 
     return new Promise((resolve, reject) => {
@@ -83,6 +85,9 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
           case msg?.type === PorterMessageType.Err:
             reject(deserializeError(msg.data));
+            break;
+
+          default:
             break;
         }
 

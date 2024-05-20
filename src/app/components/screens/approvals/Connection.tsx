@@ -1,25 +1,23 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
-import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import useForceUpdate from "use-force-update";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { assert } from "lib/system/assert";
+import { useAtomsAll } from "lib/atom-utils";
 
 import { Account as AccountType, ConnectionApproval } from "core/types";
 import { approveItem, TEvent, trackEvent } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
 import {
+  accountAddressAtom,
   allAccountsAtom,
   chainIdAtom,
-  currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { ChainIdProvider, useSync, useToken } from "app/hooks";
+import { ChainIdProvider, useAccounts, useSync } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
-import Avatar from "app/components/elements/Avatar";
 import Checkbox from "app/components/elements/Checkbox";
 import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
@@ -27,17 +25,16 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import Separator from "app/components/elements/Seperator";
 import TooltipIcon from "app/components/elements/TooltipIcon";
 import Tooltip from "app/components/elements/Tooltip";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import WalletName from "app/components/elements/WalletName";
 import NetworkSelect from "app/components/elements/NetworkSelect";
 import Button from "app/components/elements/Button";
+import DappLogos from "app/components/elements/approvals/DappLogos";
 import { ReactComponent as BalanceIcon } from "app/icons/dapp-balance.svg";
 import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.svg";
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
-import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
-import vigvamLogoUrl from "app/images/vigvam.png";
 
 import ApprovalLayout from "./Layout";
 
@@ -51,26 +48,21 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     return new URL(approval.source.url).origin;
   }, [approval]);
 
-  const [internalChainId, currentAccount, allAccounts, currentPermission] =
-    useAtomValue(
-      useMemo(
-        () =>
-          waitForAll([
-            chainIdAtom,
-            currentAccountAtom,
-            allAccountsAtom,
-            getPermissionAtom(sourceOrigin),
-          ]),
-        [sourceOrigin]
-      )
-    );
+  const [internalChainId, currentPermission] = useAtomsAll([
+    chainIdAtom,
+    getPermissionAtom(sourceOrigin),
+    allAccountsAtom,
+    accountAddressAtom,
+  ]);
+
+  const { currentAccount, allAccounts } = useAccounts();
 
   const defaultAddresses = useMemo(
     () => [
       ...(currentPermission?.accountAddresses ?? []),
       currentAccount.address,
     ],
-    [currentPermission, currentAccount]
+    [currentPermission, currentAccount],
   );
 
   const { alert } = useDialog();
@@ -86,7 +78,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       localChainIdRef.current = chainId;
       forceUpdate();
     },
-    [forceUpdate]
+    [forceUpdate],
   );
 
   useSync(localChainId, currentAccount.address);
@@ -115,7 +107,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 
       forceUpdate();
     },
-    [allAccounts.length, forceUpdate]
+    [allAccounts.length, forceUpdate],
   );
 
   const [allAccountsChecked, setAllAccountsChecked] = useState(false);
@@ -137,7 +129,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
       setAllAccountsChecked((prevState) => !prevState);
       forceUpdate();
     },
-    [allAccounts, forceUpdate]
+    [allAccounts, forceUpdate],
   );
 
   const [approving, setApproving] = useState(false);
@@ -168,7 +160,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
         setApproving(false);
       }
     },
-    [approval, setApproving, alert]
+    [approval, setApproving, alert],
   );
 
   useEffect(() => {
@@ -223,6 +215,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
             withAction={false}
             size="small"
             source="connection"
+            withFiat={false}
           />
         </div>
         <Separator />
@@ -251,25 +244,6 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
 };
 
 export default ApproveConnection;
-
-const iconsClassNames = classNames(
-  "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
-  "border border-brand-main/60"
-);
-
-const DappLogos: FC<{ dappLogoUrl?: string }> = ({ dappLogoUrl }) => (
-  <div className="flex items-center">
-    <Avatar
-      className={classNames(iconsClassNames, "z-10")}
-      src={vigvamLogoUrl}
-    />
-    <Avatar
-      className={classNames(iconsClassNames, "-ml-7")}
-      src={dappLogoUrl}
-      imageClassName="min-h-[calc(100%+1px)] min-w-[calc(100%+1px)]"
-    />
-  </div>
-);
 
 const warnings = [
   {
@@ -302,7 +276,7 @@ const EmptyAccountsToConnect: FC = () => (
     className={classNames(
       "flex flex-col items-center justify-center mx-auto",
       "w-full h-full py-4",
-      "text-sm text-brand-inactivedark2 text-center"
+      "text-sm text-brand-inactivedark2 text-center",
     )}
   >
     <NoResultsFoundIcon className="mb-4" />
@@ -332,7 +306,6 @@ const Account: FC<AccountProps> = ({
   className,
 }) => {
   const { address } = account;
-  const portfolioBalance = useToken(address)?.portfolioUSD;
 
   return (
     <CheckboxPrimitive.Root
@@ -347,7 +320,7 @@ const Account: FC<AccountProps> = ({
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
         "outline-none",
-        className
+        className,
       )}
     >
       <Checkbox checked={checked} className="mr-4 min-w-[1.25rem]" />
@@ -360,7 +333,7 @@ const Account: FC<AccountProps> = ({
           "h-8 w-8 min-w-[2rem]",
           "mr-3",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
 
@@ -373,19 +346,10 @@ const Account: FC<AccountProps> = ({
         />
       </span>
       <span className="flex flex-col text-right min-w-0">
-        <Balance
+        <TotalWalletBalance
           address={address}
           className="text-sm font-bold text-brand-light ml-2"
         />
-        {portfolioBalance && (
-          <Balance
-            address={address}
-            isNative
-            isMinified
-            prefix={<GasIcon className="w-2.5 h-2.5 mr-1" />}
-            className="text-xs leading-4 text-brand-inactivedark font-normal flex items-center max-h-[1rem]"
-          />
-        )}
       </span>
     </CheckboxPrimitive.Root>
   );

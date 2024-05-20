@@ -16,30 +16,33 @@ window.addEventListener(
       evt.data?.salt === salt
     ) {
       switch (evt.data.type) {
-        case "vigvam.reply":
+        case "wigwam.reply":
           ext.runtime.sendMessage({
             type: "__APPLY_WEBSITE_DATA",
             data: evt.data.data,
           });
           break;
 
-        case "vigvam.openapp":
+        case "wigwam.openapp":
           ext.runtime.sendMessage({ type: "__OPEN_OR_FOCUS_TAB" });
+          break;
+
+        default:
           break;
       }
     }
   },
-  false
+  false,
 );
 
 window.addEventListener("load", () => {
   window.postMessage(
     {
-      type: "vigvam.version",
+      type: "wigwam.version",
       extId,
       version,
       salt,
     },
-    location.origin
+    location.origin,
   );
 });

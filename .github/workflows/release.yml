@@ -7,10 +7,14 @@ on:
 
 env:
   RELEASE_ENV: true
-  VIGVAM_INFURA_API_KEY: ${{ secrets.VIGVAM_INFURA_API_KEY }}
-  VIGVAM_ANALYTICS_API_KEY: ${{ secrets.VIGVAM_ANALYTICS_API_KEY }}
-  VIGVAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.VIGVAM_OPEN_LOGIN_CLIENT_ID }}
-  VIGVAM_BETATEST_PROMOCODES: ${{ secrets.VIGVAM_BETATEST_PROMOCODES }}
+  WIGWAM_STATIC_CDN: ${{ secrets.WIGWAM_STATIC_CDN }}
+  WIGWAM_INDEXER_API: ${{ secrets.WIGWAM_INDEXER_API }}
+  WIGWAM_INDEXER_API_KEY: ${{ secrets.WIGWAM_INDEXER_API_KEY }}
+  WIGWAM_INFURA_API_KEY: ${{ secrets.WIGWAM_INFURA_API_KEY }}
+  WIGWAM_ANALYTICS_API_KEY: ${{ secrets.WIGWAM_ANALYTICS_API_KEY }}
+  WIGWAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.WIGWAM_OPEN_LOGIN_CLIENT_ID }}
+  WIGWAM_ON_RAMP_API_KEY: ${{ secrets.WIGWAM_ON_RAMP_API_KEY }}
+  WIGWAM_ON_RAMP_API_URL: ${{ secrets.WIGWAM_ON_RAMP_API_URL }}
 
 jobs:
   release:
@@ -24,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: "yarn"
 
       - name: Install deps

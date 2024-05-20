@@ -9,7 +9,10 @@ import FullScreenRouter from "./FullScreenRouter";
 import Dialog from "./blocks/Dialog";
 import ContactsDialog from "./blocks/ContactsDialog";
 import AddAccountModal from "./blocks/AddAccountModal";
-import ActivityModal from "./blocks/ActivityModal";
+import ActivityModal from "./blocks/activity/ActivityModal";
+import AddFundsOnRampModal from "./blocks/AddFundsOnRampModal";
+import ReceivePopup from "./blocks/ReceiveModal";
+// import AuthSignatureModal from "./blocks/AuthSignatureModal";
 
 const MainApp: FC = () => (
   <BaseProvider>
@@ -34,6 +37,9 @@ const Modals: FC = () => {
           <ContactsDialog />
           <AddAccountModal />
           <ActivityModal />
+          <ReceivePopup />
+          <AddFundsOnRampModal />
+          {/* <AuthSignatureModal /> */}
         </>
       )}
     </>

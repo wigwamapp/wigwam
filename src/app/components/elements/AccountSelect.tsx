@@ -1,6 +1,5 @@
 import { FC, useMemo, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { waitForAll } from "jotai/utils";
 import classNames from "clsx";
 import Fuse from "fuse.js";
 
@@ -11,11 +10,9 @@ import {
   accountAddressAtom,
   activeTabAtom,
   activeTabOriginAtom,
-  allAccountsAtom,
-  currentAccountAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { useToken } from "app/hooks";
+import { useAccounts, useToken } from "app/hooks";
 import { Page } from "app/nav";
 import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
@@ -24,7 +21,6 @@ import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 
 import Select from "./Select";
-import AutoIcon from "./AutoIcon";
 import HashPreview from "./HashPreview";
 import Balance from "./Balance";
 import CopiableTooltip from "./CopiableTooltip";
@@ -32,39 +28,33 @@ import WalletName from "./WalletName";
 import SmartLink from "./SmartLink";
 import Avatar from "./Avatar";
 import IconedButton from "./IconedButton";
+import WalletAvatar from "./WalletAvatar";
 
 type AccountSelectProps = {
   className?: string;
 };
 
 const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
-  const [opened, setOpened] = useState(false);
-  const { currentAccount, allAccounts } = useAtomValue(
-    useMemo(
-      () =>
-        waitForAll({
-          currentAccount: currentAccountAtom,
-          allAccounts: allAccountsAtom,
-        }),
-      []
-    )
-  );
+  const { currentAccount, allAccounts } = useAccounts();
   const setAccountAddress = useSetAtom(accountAddressAtom);
   const activeTab = useAtomValue(activeTabAtom);
   const tabOrigin = useAtomValue(activeTabOriginAtom);
   const purePermission = useAtomValue(getPermissionAtom(tabOrigin));
+
+  const [opened, setOpened] = useState(false);
+  const [searchValue, setSearchValue] = useState<string | null>(null);
+
   const connectedAccountAddresses = useMemo(
     () =>
       purePermission && purePermission.accountAddresses.length > 0
         ? purePermission.accountAddresses
         : [],
-    [purePermission]
+    [purePermission],
   );
 
-  const [searchValue, setSearchValue] = useState<string | null>(null);
   const fuse = useMemo(
     () => new Fuse(allAccounts, ACCOUNTS_SEARCH_OPTIONS),
-    [allAccounts]
+    [allAccounts],
   );
 
   const preparedAccounts = useMemo(() => {
@@ -99,7 +89,7 @@ const AccountSelect: FC<AccountSelectProps> = ({ className }) => {
 
   const preparedCurrentAccount = useMemo(
     () => prepareCurrentAccount(currentAccount),
-    [currentAccount]
+    [currentAccount],
   );
 
   return (
@@ -157,15 +147,13 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
 
   return (
     <span className="flex items-center text-left w-full pr-3 min-w-0">
-      <AutoIcon
+      <WalletAvatar
         seed={address}
-        source="dicebear"
-        type="personas"
         className={classNames(
           "h-10 w-10 min-w-[2.5rem]",
           "mr-1",
           "bg-black/20",
-          "rounded-[.625rem]"
+          "rounded-[.625rem]",
         )}
       />
       <CopiableTooltip
@@ -181,7 +169,7 @@ const CurrentAccount: FC<AccountSelectItemProps> = ({ account }) => {
           "max-w-full",
           "inline-flex flex-col",
           "transition-colors",
-          "hover:bg-brand-main/40 focus-visible:bg-brand-main/40"
+          "hover:bg-brand-main/40 focus-visible:bg-brand-main/40",
         )}
       >
         <>
@@ -236,13 +224,11 @@ const AccountSelectItem: FC<
         "h-8 w-8 min-w-[2rem]",
         "mr-3",
         "bg-black/20",
-        "rounded-[.625rem]"
+        "rounded-[.625rem]",
       )}
     >
-      <AutoIcon
+      <WalletAvatar
         seed={account.address}
-        source="dicebear"
-        type="personas"
         className={classNames("w-full h-full", isSelected && "opacity-20")}
       />
       {isSelected && (
@@ -252,7 +238,7 @@ const AccountSelectItem: FC<
             dapp?.isConnected ? "inset-px" : "inset-0",
             "rounded-[.625rem]",
             "border border-brand-light",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
         >
           <SelectedIcon className="fill-brand-light" />
@@ -264,7 +250,7 @@ const AccountSelectItem: FC<
             "absolute",
             "inset-0",
             "rounded-[calc(.625rem+1px)]",
-            "border border-brand-greenobject"
+            "border border-brand-greenobject",
           )}
         >
           <span
@@ -274,7 +260,7 @@ const AccountSelectItem: FC<
               "block",
               "w-4 h-4",
               "rounded-full overflow-hidden",
-              "border border-brand-greenobject"
+              "border border-brand-greenobject",
             )}
           >
             <Avatar
@@ -282,7 +268,7 @@ const AccountSelectItem: FC<
               alt={dapp.origin}
               className={classNames(
                 "w-full h-full object-cover",
-                "!border-none"
+                "!border-none",
               )}
             />
           </span>
@@ -297,7 +283,7 @@ const AccountSelectItem: FC<
           "text-xs text-brand-inactivedark font-normal",
           "mt-px",
           "transition-colors",
-          "group-hover:text-brand-light"
+          "group-hover:text-brand-light",
         )}
         withTooltip={false}
       />
@@ -317,7 +303,7 @@ const prepareCurrentAccount = (account: Account) => ({
 const prepareAccount = (
   account: Account,
   isSelected = false,
-  dapp: DappObj
+  dapp: DappObj,
 ) => ({
   key: account.address,
   value: (

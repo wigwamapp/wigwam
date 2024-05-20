@@ -6,20 +6,23 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAtomValue } from "jotai";
 import { ethers } from "ethers";
 import { storage } from "lib/ext/storage";
 
 import { TokenStandard, TokenType } from "core/types";
-import { createTokenSlug, detectNFTStandard } from "core/common/tokens";
+import {
+  createTokenSlug,
+  detectNFTStandard,
+  isTokenStandardValid,
+} from "core/common/tokens";
 import { findToken } from "core/client";
 
-import { currentAccountAtom } from "app/atoms";
 import {
   useChainId,
   useIsSyncing,
   useAllAccountTokens,
   useProvider,
+  useAccounts,
 } from "app/hooks";
 
 export function useTokenList(
@@ -27,24 +30,24 @@ export function useTokenList(
   opts: {
     onAccountTokensReset?: () => void;
     searchPersist?: boolean;
-  } = {}
+  } = {},
 ) {
-  const currentAccount = useAtomValue(currentAccountAtom);
   const chainId = useChainId();
   const provider = useProvider();
+  const { currentAccount } = useAccounts();
 
   const isNftsSelected = tokenType === TokenType.NFT;
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
   const [tokenIdSearchValue, setTokenIdSearchValue] = useState<string | null>(
-    null
+    null,
   );
   const [manageModeEnabled, setManageModeEnabled] = useState(false);
 
   useTokenSearchPersist(
     opts.searchPersist ?? false,
     searchValue,
-    setSearchValue
+    setSearchValue,
   );
 
   const combinedSearchValue = useMemo(() => {
@@ -54,6 +57,11 @@ export function useTokenList(
     return `${searchValue}:${tokenIdSearchValue}`;
   }, [searchValue, tokenIdSearchValue]);
 
+  const searchValueIsAddress = useMemo(
+    () => searchValue && ethers.isAddress(searchValue),
+    [searchValue],
+  );
+
   const { tokens, loadMore, hasMore } = useAllAccountTokens(
     tokenType,
     currentAccount.address,
@@ -62,12 +70,12 @@ export function useTokenList(
         manageModeEnabled || Boolean(isNftsSelected && combinedSearchValue),
       search: combinedSearchValue,
       onReset: opts.onAccountTokensReset,
-    }
+    },
   );
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerRef = useCallback(
-    (node) => {
+    (node: HTMLButtonElement) => {
       if (!tokens) return;
 
       if (observer.current) {
@@ -83,7 +91,7 @@ export function useTokenList(
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, tokens]
+    [hasMore, loadMore, tokens],
   );
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -97,18 +105,13 @@ export function useTokenList(
 
   const syncing = useIsSyncing();
 
-  const searchValueIsAddress = useMemo(
-    () => searchValue && ethers.utils.isAddress(searchValue),
-    [searchValue]
-  );
-
   const tokenIdSearchDisplayed = Boolean(
-    isNftsSelected && searchValueIsAddress
+    isNftsSelected && searchValueIsAddress,
   );
   const willSearch = Boolean(
     searchValueIsAddress &&
       tokens.length === 0 &&
-      (tokenIdSearchDisplayed ? tokenIdSearchValue : true)
+      (tokenIdSearchDisplayed ? tokenIdSearchValue : true),
   );
 
   useEffect(() => {
@@ -120,7 +123,7 @@ export function useTokenList(
   useEffect(() => {
     if (willSearch) {
       const t = setTimeout(async () => {
-        const tokenAddress = ethers.utils.getAddress(searchValue!);
+        const tokenAddress = ethers.getAddress(searchValue!);
 
         let tokenSlug: string;
 
@@ -128,13 +131,20 @@ export function useTokenList(
           if (!tokenIdSearchValue) return;
 
           try {
-            const tokenId =
-              ethers.BigNumber.from(tokenIdSearchValue).toString();
+            const tokenId = BigInt(tokenIdSearchValue).toString();
+
             const tokenStandard = await detectNFTStandard(
               provider,
               tokenAddress,
-              tokenId
+              tokenId,
             );
+
+            const validStandard = await isTokenStandardValid(
+              provider,
+              tokenAddress,
+              tokenStandard,
+            );
+            if (!validStandard) return;
 
             tokenSlug = createTokenSlug({
               standard: tokenStandard,
@@ -148,7 +158,7 @@ export function useTokenList(
         } else {
           tokenSlug = createTokenSlug({
             standard: TokenStandard.ERC20,
-            address: ethers.utils.getAddress(searchValue!),
+            address: ethers.getAddress(searchValue!),
             id: "0",
           });
         }
@@ -189,6 +199,7 @@ export function useTokenList(
     searchInputRef,
     tokenIdSearchInputRef,
     loadMoreTriggerRef,
+    searchValueIsAddress,
   };
 }
 
@@ -201,7 +212,7 @@ type TokenSearchPersist = {
 function useTokenSearchPersist(
   enabled: boolean,
   searchValue: string | null,
-  setSearchValue: Dispatch<React.SetStateAction<string | null>>
+  setSearchValue: Dispatch<React.SetStateAction<string | null>>,
 ) {
   useEffect(() => {
     if (!enabled) {
@@ -214,13 +225,12 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        const persist = await storage.fetchForce<TokenSearchPersist>(
-          TOKEN_SEARCH_PERSIST
-        );
+        const persist =
+          await storage.fetchForce<TokenSearchPersist>(TOKEN_SEARCH_PERSIST);
         if (!persist) return;
 
         const { value, addedAt } = persist;
-        if (ethers.utils.isAddress(value) && addedAt > Date.now() - 30_000) {
+        if (ethers.isAddress(value) && addedAt > Date.now() - 30_000) {
           setSearchValue(value);
         } else {
           await storage.remove(TOKEN_SEARCH_PERSIST);
@@ -236,7 +246,7 @@ function useTokenSearchPersist(
 
     (async () => {
       try {
-        if (searchValue && ethers.utils.isAddress(searchValue)) {
+        if (searchValue && ethers.isAddress(searchValue)) {
           await storage.put<TokenSearchPersist>(TOKEN_SEARCH_PERSIST, {
             value: searchValue,
             addedAt: Date.now(),

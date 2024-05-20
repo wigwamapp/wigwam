@@ -1,7 +1,8 @@
 import type { ethers } from "ethers";
 
-import { RpcReply } from "./rpc";
+import { RpcContext } from "./rpc";
 import { Permission } from "./permissions";
+import type { Route } from "@lifi/types";
 
 export enum ActivityType {
   Connection = "CONNECTION",
@@ -9,6 +10,7 @@ export enum ActivityType {
   Signing = "SIGNING",
   AddNetwork = "ADD_NETWORK",
   AddToken = "ADD_TOKEN",
+  Ramp = "RAMP",
 }
 
 export enum SigningStandard {
@@ -23,12 +25,26 @@ export enum SelfActivityKind {
   Transfer,
   Swap,
   Unknown,
+  Reward,
 }
+
+export type ReplaceTxType = "speedup" | "cancel";
+
+export type ReplaceTx = {
+  type: ReplaceTxType;
+  prevActivityId: string;
+  prevTxHash: string;
+  prevTxGasPrice?: string;
+  prevTimeAt: number;
+  prevReplaceTxType?: ReplaceTxType;
+};
 
 export type ActivitySource =
   | {
       type: "self";
       kind: SelfActivityKind;
+      swapMeta?: Route;
+      replaceTx?: ReplaceTx;
     }
   | {
       type: "page";
@@ -36,12 +52,13 @@ export type ActivitySource =
       permission?: Permission;
       tabId?: number;
       favIconUrl?: string;
+      replaceTx?: ReplaceTx;
     };
 
 export interface ApprovalResult {
   approved: boolean;
   rawTx?: string;
-  signedRawTx?: string;
+  signature?: TxSignature;
   signedMessage?: string;
   accountAddresses?: string[];
   overriddenChainId?: number;
@@ -50,19 +67,23 @@ export interface ApprovalResult {
 export type Approval =
   | TransactionApproval
   | SigningApproval
-  | ConnectionApproval;
+  | ConnectionApproval
+  | AddNetworkApproval;
 
 export type Activity =
   | TransactionActivity
   | SigningActivity
-  | ConnectionActivity;
+  | ConnectionActivity
+  | RampActivity;
 
 export interface ActivityBase {
   id: string;
   type: ActivityType;
   source: ActivitySource;
   timeAt: number;
-  rpcReply?: RpcReply; // only exists on approval & on back side
+  txAction?: TxAction;
+  chainId?: number;
+  rpcCtx?: RpcContext; // only exists on approval & on back side
 }
 
 export interface TransactionApproval extends ActivityBase {
@@ -88,6 +109,30 @@ export interface SigningApproval extends ActivityBase {
   message: any;
 }
 
+export interface RampActivity extends ActivityBase {
+  partnerOrderId: string;
+  pending: 0 | 1;
+  type: ActivityType.Ramp;
+  kind: "onramp" | "offramp";
+  accountAddress: `0x${string}`;
+  amountInCrypto: number;
+  amountInFiat: number;
+  amountInFiatUSD: number;
+  totalFee: number;
+  fiatCurrency: string;
+  cryptoCurrency: string;
+  network: string;
+  status: OnRampTxStatus;
+  statusReason: string;
+  paymentType: string;
+  tokenSlug: string;
+  chainId: number;
+  partner: "transak";
+  partnerOrder: object;
+  transactionHash?: string;
+  withError?: boolean;
+}
+
 export interface SigningActivity extends SigningApproval {
   pending: number;
 }
@@ -100,7 +145,26 @@ export interface ConnectionApproval extends ActivityBase {
 
 export interface ConnectionActivity extends ConnectionApproval {
   pending: number;
-  accountAddresses: string[];
+  accountAddress: string;
+}
+
+export interface AddNetworkApproval extends ActivityBase {
+  type: ActivityType.AddNetwork;
+  chainId: number;
+  networkParams: AddEthereumChainParameter;
+}
+
+export interface AddEthereumChainParameter {
+  chainId: string; // A 0x-prefixed hexadecimal string
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: number;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[] | null;
+  iconUrls?: string[] | null; // Currently ignored.
 }
 
 export type TxParams = {
@@ -116,10 +180,16 @@ export type TxParams = {
   chainId?: string | number;
   // eip2930
   type?: string | number;
-  accessList?: ethers.utils.AccessList;
+  accessList?: ethers.AccessList;
   // eip1559
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
+};
+
+export type TxSignature = {
+  v: number;
+  r: string;
+  s: string;
 };
 
 export type TxReceipt = {
@@ -195,6 +265,7 @@ export interface TokenActivityBase {
   timeAt: number;
   type: TokenActivityType;
   project?: TokenActivityProject;
+  blockNumber?: number;
 }
 
 export type TokenActivity = TransferTokenActivity | ApproveTokenActivity;
@@ -217,3 +288,15 @@ export type TokenActivityProject = {
   logoUrl?: string;
   siteUrl?: string;
 };
+
+export type OnRampTxStatus =
+  | "AWAITING_PAYMENT_FROM_USER"
+  | "PAYMENT_DONE_MARKED_BY_USER"
+  | "PROCESSING"
+  | "PENDING_DELIVERY_FROM_TRANSAK"
+  | "ON_HOLD_PENDING_DELIVERY_FROM_TRANSAK"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "FAILED"
+  | "REFUNDED"
+  | "EXPIRED";

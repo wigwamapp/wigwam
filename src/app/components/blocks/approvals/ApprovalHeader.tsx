@@ -1,20 +1,22 @@
 import { FC, memo, useCallback } from "react";
 import classNames from "clsx";
 
-import { Account, ActivitySource } from "core/types";
-import { getNetworkIconUrl } from "fixtures/networks";
+import { Account, ActivitySource, SelfActivityKind } from "core/types";
 
 import { useLazyNetwork } from "app/hooks";
 import { openInTabExternal } from "app/utils";
 import { ActivityIcon } from "app/components/blocks/ApprovalStatus";
-import AutoIcon from "app/components/elements/AutoIcon";
 import WalletName from "app/components/elements/WalletName";
 import HashPreview from "app/components/elements/HashPreview";
-import Balance from "app/components/elements/Balance";
+import TotalWalletBalance from "app/components/elements/TotalWalletBalance";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
+import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as LinkIcon } from "app/icons/external-link.svg";
 import { ReactComponent as SigningIcon } from "app/icons/edit-medium.svg";
+import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
+import WalletAvatar from "app/components/elements/WalletAvatar";
+import NetworkIcon from "app/components/elements/NetworkIcon";
 
 type ApprovalHeaderProps = {
   account: Account;
@@ -54,7 +56,7 @@ const cardClassName = classNames(
   "py-1 px-3",
   "text-xs font-bold",
   "bg-brand-main/5",
-  "rounded-[.625rem]"
+  "rounded-[.625rem]",
 );
 
 type ActSourceProps = {
@@ -74,11 +76,21 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
       <div className={classNames(cardClassName, className)}>
         <span className="w-6 h-6 min-w-[1.5rem] flex items-center justify-center mr-2">
           <ActivityIcon
-            Icon={SendIcon}
-            className="!w-5 !h-5 glass-icon--active"
+            Icon={
+              source.swapMeta
+                ? SwapIcon
+                : source.kind === SelfActivityKind.Reward
+                  ? RewardsIcon
+                  : SendIcon
+            }
+            className="!w-5 !h-5 styled-icon--active"
           />
         </span>
-        Transfer
+        {source.swapMeta
+          ? "Swap"
+          : source.kind === SelfActivityKind.Reward
+            ? "Rewards"
+            : "Transfer"}
       </div>
     );
   }
@@ -91,7 +103,7 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
         "cursor-pointer",
         "transition-colors",
         "hover:bg-brand-main/10 focus-visible:bg-brand-main/10",
-        className
+        className,
       )}
     >
       <Avatar
@@ -99,7 +111,7 @@ const ActSource: FC<ActSourceProps> = ({ source, className }) => {
         alt={source.url}
         className={classNames(
           "w-6 min-w-[1.5rem] h-6 mr-2 object-cover",
-          "!border-none"
+          "!border-none",
         )}
         fallbackClassName="!h-3/5"
       />
@@ -123,24 +135,22 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
       "bg-brand-main/5",
       "rounded-[.625rem]",
       "flex items-stretch",
-      "text-left"
+      "text-left",
     )}
   >
-    <AutoIcon
+    <WalletAvatar
       seed={account.address}
-      source="dicebear"
-      type="personas"
       className={classNames(
         "h-12 w-12 min-w-[3rem]",
         "mr-2",
         "bg-black/20",
-        "rounded-[.625rem]"
+        "rounded-[.625rem]",
       )}
     />
     <span
       className={classNames(
         "flex flex-col items-start min-w-0 text-sm leading-none",
-        signing && "justify-center"
+        signing && "justify-center",
       )}
     >
       <WalletName
@@ -153,7 +163,7 @@ const WalletCard: FC<WalletCardProps> = ({ account, signing }) => (
         className="text-xs leading-none text-brand-inactivedark"
       />
       {!signing && (
-        <Balance
+        <TotalWalletBalance
           address={account.address}
           isMinified
           copiable
@@ -170,12 +180,7 @@ const NetworkPreview = memo<{ className?: string }>(({ className }) => {
   return (
     <div className={classNames(cardClassName, className)}>
       {network && (
-        <Avatar
-          src={network && getNetworkIconUrl(network.chainId)}
-          alt={network?.name}
-          withBorder={false}
-          className="w-6 mr-2 min-w-[1.5rem]"
-        />
+        <NetworkIcon network={network} className="w-6 mr-2 min-w-[1.5rem]" />
       )}
 
       <span className="truncate min-w-0">{network?.name}</span>

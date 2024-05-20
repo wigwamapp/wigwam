@@ -1,10 +1,9 @@
-import { FC, Suspense } from "react";
+import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Sidebar from "app/components/blocks/Sidebar";
 import Menu from "app/components/blocks/Menu";
-import ActivityBar from "app/components/blocks/ActivityBar";
 
 import PreloadBaseAndSync from "./PreloadBaseAndSync";
 
@@ -13,12 +12,12 @@ const handleBootAnimationEnd = () => {
   bootAnimationDisplayed = false;
 };
 
-const MainPageLayout: FC = ({ children }) => (
+const MainPageLayout: FC<PropsWithChildren> = ({ children }) => (
   <PreloadBaseAndSync>
     <div
       className={classNames(
         "h-screen flex flex-col",
-        bootAnimationDisplayed && "animate-bootfadein"
+        bootAnimationDisplayed && "animate-bootfadein",
       )}
       onAnimationEnd={
         bootAnimationDisplayed ? handleBootAnimationEnd : undefined
@@ -35,10 +34,6 @@ const MainPageLayout: FC = ({ children }) => (
           {children}
         </main>
       </ContentContainer>
-
-      <Suspense fallback={null}>
-        <ActivityBar />
-      </Suspense>
     </div>
   </PreloadBaseAndSync>
 );

@@ -16,13 +16,13 @@ import { useDialog } from "app/hooks/dialog";
 import { useContacts, useContactsDialog } from "app/hooks/contacts";
 import { ToastOverflowProvider, useToast } from "app/hooks/toast";
 import SearchInput from "app/components/elements/SearchInput";
-import AutoIcon from "app/components/elements/AutoIcon";
 import HashPreview from "app/components/elements/HashPreview";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
 import { ReactComponent as DeleteIcon } from "app/icons/delete-medium.svg";
 import { ReactComponent as EditIcon } from "app/icons/edit-medium.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
+import WalletAvatar from "../elements/WalletAvatar";
 
 const ContactsSection: FC = () => {
   const { confirm } = useDialog();
@@ -36,7 +36,7 @@ const ContactsSection: FC = () => {
 
   const observer = useRef<IntersectionObserver>();
   const loadMoreTriggerCardRef = useCallback(
-    (node) => {
+    (node: HTMLDivElement) => {
       if (!contacts) return;
 
       if (observer.current) {
@@ -52,7 +52,7 @@ const ContactsSection: FC = () => {
         observer.current.observe(node);
       }
     },
-    [hasMore, loadMore, contacts]
+    [hasMore, loadMore, contacts],
   );
 
   const handleDelete = useCallback(
@@ -73,7 +73,7 @@ const ContactsSection: FC = () => {
         updateToast(`Contact "${name}" successfully deleted!`);
       }
     },
-    [confirm, updateToast]
+    [confirm, updateToast],
   );
 
   return (
@@ -92,8 +92,8 @@ const ContactsSection: FC = () => {
           <ScrollAreaContainer
             ref={ref}
             className="pr-5 -mr-5"
-            viewPortClassName="pb-20 rounded-t-[.625rem]"
-            scrollBarClassName="py-0 pb-20"
+            viewPortClassName="pb-5 rounded-t-[.625rem]"
+            scrollBarClassName="py-0 pb-5"
           >
             <ToastOverflowProvider className="!top-0 !right-5">
               <div className="grid grid-cols-5 gap-5">
@@ -108,7 +108,7 @@ const ContactsSection: FC = () => {
                       "border border-brand-light/[.05]",
                       "rounded-[.625rem]",
                       "text-sm text-brand-placeholder",
-                      "col-span-4"
+                      "col-span-4",
                     )}
                   >
                     <NoResultsFoundIcon className="mb-4" />
@@ -145,7 +145,7 @@ export default ContactsSection;
 const emptyClassBg = classNames(
   "rounded bg-brand-main/10",
   "transition-colors",
-  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+  "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
 );
 
 const NewContactCard = forwardRef<
@@ -164,7 +164,7 @@ const NewContactCard = forwardRef<
       "overflow-hidden",
       "group",
       "transition-colors",
-      "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10"
+      "group-hover:bg-brand-main/10 group-focus-visible:bg-brand-main/10",
     )}
   >
     <span
@@ -172,7 +172,7 @@ const NewContactCard = forwardRef<
         emptyClassBg,
         "h-[4.625rem] w-[4.625rem]",
         "mb-[1.375rem]",
-        "!rounded-[.625rem]"
+        "!rounded-[.625rem]",
       )}
     />
     <span className={classNames(emptyClassBg, "block w-28 h-5 mb-2")} />
@@ -183,7 +183,7 @@ const NewContactCard = forwardRef<
         "flex items-center justify-center",
         "bg-brand-main/[.05]",
         "transition-colors",
-        "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20"
+        "group-hover:bg-brand-main/20 group-focus-visible:bg-brand-main/20",
       )}
     >
       <AddWalletIcon className="w-6 h-auto" />
@@ -208,19 +208,17 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
           "flex flex-col items-center",
           "bg-brand-main/[.05] rounded-[.625rem]",
           "overflow-hidden",
-          "min-h-[14.375rem]"
+          "min-h-[14.375rem]",
         )}
       >
         <div className="flex flex-col items-center pt-8 pb-4 px-3 w-full">
-          <AutoIcon
+          <WalletAvatar
             seed={address}
-            source="dicebear"
-            type="personas"
             className={classNames(
               "h-[4.625rem] w-[4.625rem]",
               "mb-5",
               "bg-black/20",
-              "rounded-[.625rem]"
+              "rounded-[.625rem]",
             )}
           />
           <h2 className="text-base font-bold mb-1 truncate w-full text-center">
@@ -238,7 +236,7 @@ const ContactCard = forwardRef<HTMLDivElement, ContactCardProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 type ActionButtonProps = {
@@ -254,7 +252,7 @@ const ActionButton: FC<ActionButtonProps> = ({ Icon, className, ...rest }) => (
       "bg-brand-main/[.05]",
       "transition-colors",
       "hover:bg-brand-main/20 focus-visible:bg-brand-main/20",
-      className
+      className,
     )}
     {...rest}
   >

@@ -18,7 +18,7 @@ export async function getApprovals() {
 }
 
 export function onApprovalsUpdated(
-  callback: (newApprovals: Approval[]) => void
+  callback: (newApprovals: Approval[]) => void,
 ) {
   return porter.onOneWayMessage<EventMessage>((msg) => {
     if (msg?.type === MessageType.ApprovalsUpdated) {
@@ -32,7 +32,7 @@ export async function approveItem(approvalId: string, result: ApprovalResult) {
 
   const res = await porter.request(
     { type, approvalId, result },
-    { timeout: 3 * 60_000 }
+    { timeout: 3 * 60_000 },
   );
   assert(res?.type === type);
 }
