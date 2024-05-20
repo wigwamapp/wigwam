@@ -184,6 +184,10 @@ const Swap: FC = () => {
 
   const [verifiedTokens, setVerifiedTokens] = useState<null | any>(null);
 
+  const [showOnlyVerified, setShowOnlyVerified] = useAtom(
+    swapVerifiedTokensAtom,
+  );
+
   const handleGetVerifiedTokens = useCallback(async () => {
     const tokens = await getVerifiedTokens();
     const tokensInCurrentChain = tokens.filter(
@@ -196,7 +200,7 @@ const Swap: FC = () => {
       setVerifiedTokens(tokens);
       setHideVerifiedToggle(false);
     }
-  }, [chainId]);
+  }, [chainId, setShowOnlyVerified]);
 
   useEffect(() => {
     handleGetVerifiedTokens();
@@ -217,10 +221,6 @@ const Swap: FC = () => {
   const handleChangeFee = useCallback((newFee: undefined | number) => {
     setFee(newFee);
   }, []);
-
-  const [showOnlyVerified, setShowOnlyVerified] = useAtom(
-    swapVerifiedTokensAtom,
-  );
 
   const handleShowFullList = useCallback(
     (flag: any) => {
