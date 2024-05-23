@@ -64,6 +64,14 @@ export const DEFAULT_NETWORKS: Network[] = [
   })),
 );
 
+const ADDITIONAL_NETWORK_ICONS = [
+  {
+    chainId: 88,
+    chainTag: "viction",
+    type: "mainnet",
+  },
+];
+
 export const DEFAULT_CHAIN_IDS = new Set(
   DEFAULT_NETWORKS.map((n) => n.chainId),
 );
@@ -83,7 +91,7 @@ if (process.env.RELEASE_ENV === "false") {
 export const INITIAL_NETWORK = ETHEREUM[0]; // Ethereum Mainnet
 
 export const NETWORK_ICON_MAP = new Map<number, string>(
-  DEFAULT_NETWORKS.map((n) => [
+  [...DEFAULT_NETWORKS, ...ADDITIONAL_NETWORK_ICONS].map((n) => [
     n.chainId,
     getPublicURL(
       `icons/network/${n.chainTag}${
