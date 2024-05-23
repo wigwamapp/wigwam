@@ -15,7 +15,7 @@ import Contacts from "./mainPages/Contacts";
 import Wallets from "./mainPages/Wallets";
 import Settings from "./mainPages/Settings";
 import Rewards from "./mainPages/Rewards";
-import OnboardingPopup from "../blocks/OnboardingPopup";
+// import OnboardingPopup from "../blocks/OnboardingPopup";
 import Buy from "./mainPages/Buy";
 
 const SwapDynamic = lazy(() => import("./mainPages/Swap"));
@@ -25,7 +25,7 @@ const Main: FC = () => {
     <MainPageLayout>
       <Suspense>
         <MainPageRouter />
-        <OnboardingPopup />
+        {/* <OnboardingPopup /> */}
       </Suspense>
     </MainPageLayout>
   );

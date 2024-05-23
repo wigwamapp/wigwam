@@ -105,6 +105,22 @@ const AddAccountModal = memo(() => {
   const bootAnimationDisplayed =
     !isInitial && accModalOpened && isMounted() && !contentRenderedRef.current;
 
+  useEffect(() => {
+    if (!accModalOpened) return;
+
+    const t = setTimeout(() => {
+      const scrollarea = document.querySelector(
+        ".add-account-scrollviewport",
+      ) as HTMLElement;
+
+      if (scrollarea) {
+        scrollarea.scrollLeft = scrollarea.offsetWidth / 2;
+      }
+    }, 0);
+
+    return () => clearTimeout(t);
+  }, [accModalOpened]);
+
   return (
     <Dialog.Root open={accModalOpened} onOpenChange={handleOpenChange} modal>
       <Dialog.Portal>
@@ -115,7 +131,7 @@ const AddAccountModal = memo(() => {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className={classNames(
             "fixed z-20",
-            "w-full max-w-6xl min-w-[40rem]",
+            "w-full max-w-6xl md:min-w-[40rem]",
             "max-h-[41rem]",
             "m-auto inset-x-0 inset-y-[3.5rem]",
             "rounded-[2.5rem]",
@@ -151,6 +167,7 @@ const AddAccountModal = memo(() => {
                     "after:z-20",
                   ],
                 )}
+                viewPortClassName="add-account-scrollviewport"
                 scrollBarClassName={classNames(
                   "pt-[4.25rem]",
                   "!right-1",

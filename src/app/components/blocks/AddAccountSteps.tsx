@@ -64,7 +64,7 @@ const AddAccountStepsNext = memo(() => {
       </StepsProvider>
       <Button
         theme="clean"
-        className="absolute right-8 bottom-5 z-20 font-semibold"
+        className="absolute right-8 bottom-5 z-20 font-semibold hidden sm:block"
         onClick={handleSupport}
       >
         <SupportIcon className="mr-2" />

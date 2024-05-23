@@ -1,6 +1,7 @@
 import { FC, HTMLAttributes, PropsWithChildren, useRef } from "react";
 import classNames from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { isPopupWindow } from "lib/ext/view";
 
 import { WalletStatus } from "core/types";
 import { TEvent, trackEvent } from "core/client";
@@ -61,7 +62,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
         <div
           ref={ref}
           className={classNames(
-            "w-full",
+            isPopupWindow() ? "w-full" : "w-screen",
             "h-screen",
             "flex flex-col items-stretch",
             bootAnimationDisplayed && "animate-bootfadeinfast",

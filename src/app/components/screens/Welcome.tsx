@@ -21,6 +21,19 @@ const Welcome: FC = () => {
     }
   }, [isInitial, setAddAccOpened]);
 
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const scrollarea = document.documentElement;
+
+      if (scrollarea) {
+        scrollarea.scrollLeft =
+          (scrollarea.offsetWidth - scrollarea.clientWidth) / 2;
+      }
+    }, 0);
+
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <BoardingPageLayout header={!isInitial} isWelcome>
       <div
