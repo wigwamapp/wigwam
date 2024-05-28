@@ -38,7 +38,9 @@ warnIfPhishing();
 
 // https://eips.ethereum.org/EIPS/eip-1193
 function injectEIP1193(key: string, sharedProperty = false) {
-  const existing = (window as any)[key];
+  const getExisting = () => (window as any)[key];
+
+  let existing = getExisting();
 
   if (existing?.isWigwam && "addProviders" in existing) {
     existing.addProviders(wigwam);
@@ -50,15 +52,21 @@ function injectEIP1193(key: string, sharedProperty = false) {
     !propertyDescriptor || propertyDescriptor.configurable;
   const propIsMetaMaskPreferred = sharedProperty && redefineProperty;
 
-  const universal = new UniversalInpageProvider(
-    existing && redefineProperty
-      ? [wigwam, ...getProvidersInline(existing)]
-      : [wigwam],
-    sharedProperty,
-    propIsMetaMaskPreferred,
-  );
+  const getUniversal = () => {
+    existing = getExisting();
 
-  const defineProperty = () =>
+    return new UniversalInpageProvider(
+      existing && redefineProperty
+        ? [wigwam, ...getProvidersInline(existing)]
+        : [wigwam],
+      sharedProperty,
+      propIsMetaMaskPreferred,
+    );
+  };
+
+  const defineProperty = () => {
+    const universal = getUniversal();
+
     Object.defineProperty(window, key, {
       configurable: false,
       get() {
@@ -68,6 +76,11 @@ function injectEIP1193(key: string, sharedProperty = false) {
         if (value) universal.addProviders(value);
       },
     });
+
+    if (!existing) {
+      window.dispatchEvent(new Event(`${key}#initialized`));
+    }
+  };
 
   if (redefineProperty) {
     if (sharedProperty) {
@@ -79,14 +92,10 @@ function injectEIP1193(key: string, sharedProperty = false) {
     }
   } else {
     try {
-      (window as any)[key] = universal;
+      (window as any)[key] = getUniversal();
     } catch (err) {
       console.warn(err);
     }
-  }
-
-  if (!existing) {
-    window.dispatchEvent(new Event(`${key}#initialized`));
   }
 }
 
