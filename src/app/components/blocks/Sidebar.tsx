@@ -39,7 +39,7 @@ const Sidebar: FC = () => {
       <SidebarBlock
         links={NavLinksSecondary}
         className={classNames(
-          "mt-[6.25rem] pt-8",
+          "mt-[6.25rem] pt-4",
           "border-t border-brand-main/[.07]",
         )}
       />

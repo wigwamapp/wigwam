@@ -70,4 +70,9 @@ export const rewardsApplicationAtom = atomWithClientStorage<string>(
   "",
 );
 
+export const tgApplicationAtom = atomWithClientStorage<string>(
+  "tg-application",
+  "",
+);
+
 export const allEvmNetworksAtom = atomWithDefault(getAllEvmNetworks);

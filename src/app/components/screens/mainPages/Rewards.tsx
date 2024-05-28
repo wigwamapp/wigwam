@@ -1,7 +1,16 @@
-import { FC, ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  ReactNode,
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Field, Form } from "react-final-form";
 import classNames from "clsx";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import * as Tabs from "@radix-ui/react-tabs";
 import { useAtom } from "jotai";
 import { nanoid } from "nanoid";
 import { FormApi } from "final-form";
@@ -26,6 +35,7 @@ import {
   getAppliedForRewardsAtom,
   analyticsAtom,
   rewardsApplicationAtom,
+  tgApplicationAtom,
 } from "app/atoms";
 
 import Input from "app/components/elements/Input";
@@ -37,11 +47,76 @@ import WalletAvatar from "app/components/elements/WalletAvatar";
 import WalletName from "app/components/elements/WalletName";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as SuccessGreen } from "app/icons/success-green.svg";
+import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
 
 const TELEGRAM = "https://t.me/wigwamapp";
+const TWITTER = "https://twitter.com/wigwam_app";
 const DISCORD = "https://discord.gg/MAG2fnSqSK";
 
-type FormValues = {
+enum Tab {
+  TelegramPromos = "telegram_promos",
+  Rewards = "rewards",
+}
+
+const Rewards: FC = () => {
+  return (
+    <div className={classNames("-mx-6 px-6 min-h-0", "flex flex-col grow")}>
+      <OverflowProvider>
+        {(ref) => (
+          <ScrollAreaContainer
+            ref={ref}
+            className="-mr-5"
+            viewPortClassName="max-w-2xl"
+            scrollBarClassName="pb-1"
+          >
+            <Tabs.Root defaultValue={Tab.TelegramPromos}>
+              <Tabs.List className="flex items-stretch gap-4 border-b border-brand-main/[.07] mb-4">
+                {[
+                  {
+                    value: Tab.TelegramPromos,
+                    children: (
+                      <>
+                        Telegram registration{" "}
+                        <TelegramIcon className="ml-1 fill-[#0088cc] h-8 w-auto" />
+                      </>
+                    ),
+                  },
+                  { value: Tab.Rewards, children: "Rewards 🎁" },
+                ].map((tab) => (
+                  <Tabs.Trigger
+                    key={tab.value}
+                    value={tab.value}
+                    className={classNames(
+                      "my-3 px-4 py-2 text-xl font-bold flex items-center",
+                      "text-brand-light/80",
+                      "transition-colors duration-300 rounded-lg",
+                      "aria-selected:bg-brand-main/10 aria-selected:text-brand-light",
+                      "hover:bg-brand-main/5 hover:text-brand-light",
+                    )}
+                  >
+                    {tab.children}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+
+              <Tabs.Content value={Tab.TelegramPromos}>
+                <TelegramPromosContent />
+              </Tabs.Content>
+
+              <Tabs.Content value={Tab.Rewards}>
+                <RewardsContent />
+              </Tabs.Content>
+            </Tabs.Root>
+          </ScrollAreaContainer>
+        )}
+      </OverflowProvider>
+    </div>
+  );
+};
+
+export default Rewards;
+
+type RewardsFormValues = {
   promo: string;
   email: string;
   isAnalyticChecked: boolean;
@@ -49,7 +124,7 @@ type FormValues = {
   altAddress: string;
 };
 
-const Rewards: FC = () => {
+const RewardsContent = memo(() => {
   const chainId = useChainId();
   const { currentAccount } = useAccounts();
   const [analytics, setAnalytics] = useAtom(analyticsAtom);
@@ -77,7 +152,7 @@ const Rewards: FC = () => {
   const analyticsEnabledRef = useRef(analytics.enabled);
 
   const onSubmit = useCallback(
-    async (values: FormValues) => {
+    async (values: RewardsFormValues) => {
       if (processing) return;
       setProcessing(true);
 
@@ -212,7 +287,7 @@ const Rewards: FC = () => {
     );
   } else if (applied === false) {
     content = (
-      <Form<FormValues>
+      <Form<RewardsFormValues>
         initialValues={{
           isAnalyticChecked: analyticsEnabledRef.current,
         }}
@@ -358,38 +433,235 @@ const Rewards: FC = () => {
   }
 
   return (
-    <div className={classNames("-mx-6 px-6 min-h-0", "flex flex-col grow")}>
-      <OverflowProvider>
-        {(ref) => (
-          <ScrollAreaContainer
-            ref={ref}
-            className="-mr-5"
-            viewPortClassName="max-w-2xl"
-            scrollBarClassName="pb-1"
-          >
-            <h1 className="mt-5 mb-3 text-2xl font-bold">Rewards 🎁</h1>
+    <>
+      {applied === true || existingApplication
+        ? ALREADY_PARTICIPATING_CONTENT
+        : applied === undefined
+          ? null
+          : PARTICIPATE_CONTENT}
 
-            {applied === true || existingApplication
-              ? ALREADY_PARTICIPATING_CONTENT
-              : applied === undefined
-                ? null
-                : PARTICIPATE_CONTENT}
-
-            <div className="pb-6 flex flex-col max-w-md">{content}</div>
-          </ScrollAreaContainer>
-        )}
-      </OverflowProvider>
-    </div>
+      <div className="pb-6 flex flex-col max-w-md">{content}</div>
+    </>
   );
+});
+
+type TgFormValues = {
+  username: string;
 };
 
-export default Rewards;
+const TelegramPromosContent = memo(() => {
+  const chainId = useChainId();
+  const { currentAccount } = useAccounts();
+  const [tgApplication, setTgApplication] = useAtom(tgApplicationAtom);
+  const { alert } = useDialog();
+
+  const [processing, setProcessing] = useState(false);
+
+  const existingApplication = useMemo(() => {
+    try {
+      if (tgApplication) return JSON.parse(tgApplication);
+    } catch {}
+
+    return null;
+  }, [tgApplication]);
+
+  const onSubmit = useCallback(
+    async (values: TgFormValues) => {
+      if (processing) return;
+      setProcessing(true);
+
+      try {
+        let username = values.username;
+        if (username.startsWith("@")) {
+          username = username.slice(1);
+        }
+
+        const payload = {
+          address: currentAccount.address,
+          username,
+        };
+
+        const { data: authMessage } = await indexerApi.get("/auth-message");
+
+        const provider = new ClientProvider(chainId);
+        provider.setActivitySource({
+          type: "self",
+          kind: SelfActivityKind.Reward,
+        });
+
+        const signer = provider.getUncheckedSigner(currentAccount.address);
+
+        const signature = await signer
+          .signMessage(authMessage.replace("{address}", currentAccount.address))
+          .catch((err) => {
+            console.warn(err);
+            return null;
+          });
+
+        if (signature) {
+          const res = await indexerApi.post("/activity/tgapply", payload, {
+            headers: {
+              "auth-signature": signature,
+            },
+          });
+
+          if (res.status >= 200 && res.status < 300) {
+            setTgApplication(
+              JSON.stringify({
+                username,
+                name: currentAccount.name,
+                address: currentAccount.address,
+              }),
+            );
+          }
+        }
+      } catch (err: any) {
+        alert({
+          title: "Error!",
+          content:
+            err?.response?.data ||
+            err?.message ||
+            "Failed to apply. Please try again later.",
+        });
+      }
+
+      setProcessing(false);
+    },
+    [
+      setTgApplication,
+      currentAccount,
+      alert,
+      setProcessing,
+      processing,
+      chainId,
+    ],
+  );
+
+  let content: ReactNode;
+
+  if (existingApplication) {
+    content = (
+      <div>
+        <h2 className="font-semibold text-lg mt-4 mb-6 text-brand-lightgray">
+          You are already registred in telegram program.
+        </h2>
+
+        <div
+          className={classNames(
+            "mb-3 p-4 w-full max-w-[20rem]",
+            "border border-brand-main/5 rounded-[.625rem] bg-black/10",
+          )}
+        >
+          <div className={classNames("flex items-stretch gap-x-4")}>
+            <WalletAvatar
+              seed={existingApplication?.address ?? currentAccount.address}
+              className="h-12 w-12"
+            />
+            <div className="-mt-2 flex flex-col justify-around">
+              <div className="mt-2 text-base text-brand-light leading-4 flex flex-col gap-2">
+                <span className="text-brand-inactivelight">
+                  Telegram username:
+                </span>{" "}
+                <span className="font-bold">
+                  @{existingApplication.username}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex-1" />
+
+            <SuccessGreen className="w-8" />
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    content = (
+      <Form<TgFormValues>
+        decorators={[focusOnErrors]}
+        onSubmit={onSubmit}
+        render={({ handleSubmit, submitting }) => (
+          <>
+            <p className="mb-6 text-base text-brand-gray">
+              To participate in our telegram promotional activities you should
+              register your telegram handle here.
+            </p>
+
+            <Field
+              name="username"
+              validate={composeValidators(
+                required,
+                minLength(2),
+                maxLength(128),
+              )}
+            >
+              {({ input, meta }) => (
+                <Input
+                  label="Telegram handle (username)"
+                  placeholder="username"
+                  StartAdornment={() => (
+                    <div className="absolute left-3 top-0 bottom-0 flex items-center">
+                      @
+                    </div>
+                  )}
+                  error={meta.error && meta.touched}
+                  errorMessage={meta.error}
+                  className="mb-6 max-w-[20rem]"
+                  inputClassName="!pl-7"
+                  {...input}
+                />
+              )}
+            </Field>
+
+            <Button
+              className="mx-auto"
+              disabled={submitting}
+              onClick={handleSubmit}
+              loading={processing}
+            >
+              Register
+            </Button>
+          </>
+        )}
+      />
+    );
+  }
+
+  return (
+    <>
+      {content}
+      <p className="mt-6 mb-4 text-sm text-brand-gray">
+        Don&apos;t forget to follow our recent updates on{" "}
+        <a
+          href={TWITTER}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold underline hover:text-brand-gray"
+          aria-label="telegram"
+        >
+          Twitter
+        </a>{" "}
+        or{" "}
+        <a
+          href={TELEGRAM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold underline hover:text-brand-gray"
+          aria-label="telegram"
+        >
+          Telegram
+        </a>
+        .
+      </p>
+    </>
+  );
+});
 
 interface ICheckboxWithLabelProps {
   value: boolean;
   text: string;
-  name: keyof FormValues;
-  form: FormApi<FormValues, Partial<FormValues>>;
+  name: keyof RewardsFormValues;
+  form: FormApi<RewardsFormValues, Partial<RewardsFormValues>>;
   className?: string;
 }
 
