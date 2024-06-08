@@ -4,7 +4,11 @@ import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 
-import { hasSeedPhraseAtom, walletStatusAtom } from "app/atoms";
+import {
+  hasSeedPhraseAtom,
+  tgApplicationAtom,
+  walletStatusAtom,
+} from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -12,6 +16,8 @@ import { ReactComponent as CreateIcon } from "app/icons/addaccount-create.svg";
 import { ReactComponent as ImportIcon } from "app/icons/addaccount-import.svg";
 import { ReactComponent as LedgerIcon } from "app/icons/addaccount-ledger.svg";
 import { ReactComponent as ChevronRightIcon } from "app/icons/chevron-right.svg";
+import { ReactComponent as SuccessGreen } from "app/icons/success-green.svg";
+import drumGameLogoUrl from "app/images/drum-game.png";
 
 import ConfirmAccounts from "./ConfirmAccounts";
 import LedgerScanModal from "./shared/LedgerScanModal";
@@ -41,6 +47,15 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
   ({ onLedgerOpened }) => {
     const walletStatus = useAtomValue(walletStatusAtom);
     const { navigateToStep, stateRef } = useSteps();
+    const tgApplication = useAtomValue(tgApplicationAtom);
+
+    const existingApplication = useMemo(() => {
+      try {
+        if (tgApplication) return JSON.parse(tgApplication);
+      } catch {}
+
+      return null;
+    }, [tgApplication]);
 
     useEffect(() => {
       stateRef.current = {};
@@ -62,6 +77,20 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
           },
           "divider",
           {
+            title: existingApplication
+              ? "Drum Game target completed"
+              : "Complete Drum Game target",
+            description: existingApplication
+              ? `You added Telegram username: @${existingApplication.username} and finished game task`
+              : "Add your Telegram @username to finish game task",
+            promotional: existingApplication ? "completed" : true,
+            image: drumGameLogoUrl,
+            action: () => {
+              navigateToStep(AddAccountStep.DrumGameTarget);
+            },
+          },
+          "divider",
+          {
             title: "Import or recover wallet",
             description: "Using your own secret phrase or private key",
             Icon: ImportIcon,
@@ -79,7 +108,7 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
             },
           },
         ] as const,
-      [stateRef, navigateToStep, onLedgerOpened],
+      [existingApplication, stateRef, navigateToStep, onLedgerOpened],
     );
 
     return (
@@ -108,7 +137,13 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
               );
             }
 
-            const { Icon, title, description, action } = item;
+            const { title, description, action } = item;
+            const Icon = "Icon" in item && item.Icon ? item.Icon : null;
+            const image = "image" in item && item.image ? item.image : null;
+            const promotional =
+              "promotional" in item && item.promotional
+                ? item.promotional
+                : false;
             const first = i === 0;
             const last = i === arr.length - 1;
 
@@ -124,15 +159,35 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
                   "rounded-lg",
                   "transition-colors",
                   "hover:bg-brand-main/5",
+                  "text-left",
+                  promotional && "bg-[#80EF6E]/20 hover:bg-[#80EF6E]/40",
                 )}
                 onClick={action}
               >
-                <Icon
-                  className={classNames(
-                    first ? "w-[3.5rem]" : "w-[2.75rem]",
-                    "h-auto mx-1",
-                  )}
-                />
+                {Icon ? (
+                  <Icon
+                    className={classNames(
+                      first ? "w-[3.5rem]" : "w-[2.75rem]",
+                      "h-auto mx-1",
+                    )}
+                  />
+                ) : null}
+                {image ? (
+                  <span className="relative w-[2.75rem] h-[2.75rem] my-auto mx-1 flex justify-center items-center">
+                    {promotional === "completed" ? (
+                      <SuccessGreen className="w-[1.75rem] h-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fill-[#ffffff] z-[1]" />
+                    ) : null}
+                    <img
+                      src={image}
+                      alt="Drum Game"
+                      className={classNames(
+                        "w-[2.75rem] min-w-[2.75rem] h-[2.75rem]",
+                        "my-auto mx-1",
+                        promotional === "completed" ? "opacity-50" : "",
+                      )}
+                    />
+                  </span>
+                ) : null}
 
                 <div
                   className={classNames(
@@ -140,7 +195,15 @@ const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
                   )}
                 >
                   <span className="font-bold text-lg text-white">{title}</span>
-                  <span className="font-normal text-sm text-brand-inactivedark">
+                  <span
+                    className={classNames(
+                      "font-normal text-sm",
+                      "text-brand-inactivedark",
+                      promotional
+                        ? "transition-colors group-hover:text-brand-lightgray"
+                        : "",
+                    )}
+                  >
                     {description}
                   </span>
                 </div>
