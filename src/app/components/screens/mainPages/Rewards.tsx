@@ -555,14 +555,14 @@ const TelegramPromosContent = memo(() => {
           <div className={classNames("flex items-stretch gap-x-4")}>
             <WalletAvatar
               seed={existingApplication?.address ?? currentAccount.address}
-              className="h-12 w-12"
+              className="h-12 w-12 min-w-12"
             />
-            <div className="-mt-2 flex flex-col justify-around">
+            <div className="-mt-2 flex flex-col justify-around min-w-0">
               <div className="mt-2 text-base text-brand-light leading-4 flex flex-col gap-2">
                 <span className="text-brand-inactivelight">
                   Telegram username:
                 </span>{" "}
-                <span className="font-bold">
+                <span className="font-bold truncate">
                   @{existingApplication.username}
                 </span>
               </div>

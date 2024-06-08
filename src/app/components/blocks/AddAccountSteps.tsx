@@ -1,4 +1,5 @@
 import { memo, Suspense, useCallback, useRef } from "react";
+import { useAtomValue } from "jotai";
 import classNames from "clsx";
 
 import { AddAccountStep } from "app/nav";
@@ -20,10 +21,13 @@ import AddWatchOnlyAccount from "../screens/addAccountSteps/AddWatchOnlyAccount"
 import ConfirmAccounts from "../screens/addAccountSteps/ConfirmAccounts";
 import EditAccounts from "../screens/addAccountSteps/EditAccounts";
 import SetupPassword from "../screens/addAccountSteps/SetupPassword";
+import DrumGameTarget from "../screens/addAccountSteps/DrumGameTarget";
 import Button from "../elements/Button";
 
 const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
   [AddAccountStep.AddAccountInitial, () => <AddAccountInitial />],
+
+  [AddAccountStep.DrumGameTarget, () => <DrumGameTarget />],
 
   [AddAccountStep.CreateSeedPhrase, () => <CreateSeedPhrase />],
   [AddAccountStep.ImportSeedPhrase, () => <ImportSeedPhrase />],
@@ -39,6 +43,7 @@ const ADD_ACCOUNT_STEPS: AllSteps<AddAccountStep> = [
 const AddAccountStepsNext = memo(() => {
   const { alert } = useDialog();
   const rootRef = useRef<HTMLDivElement>(null);
+  const accountStep = useAtomValue(addAccountStepAtom);
 
   const handleSupport = useCallback(() => {
     alert({ title: <SupportAlert.Title />, content: <SupportAlert.Content /> });
@@ -50,9 +55,12 @@ const AddAccountStepsNext = memo(() => {
       className={classNames(
         "w-[59rem] mx-auto",
         "h-full",
-        "py-24",
+        "py-24 mmd:pt-20 mmd:pb-[3rem]",
         "flex flex-col",
-        // accountStep === AddAccountStep.ChooseWayGeneral ? "pb-16" : "pb-24",
+        accountStep === AddAccountStep.AddAccountInitial ||
+          accountStep === AddAccountStep.DrumGameTarget
+          ? "w-full px-3"
+          : "",
       )}
     >
       <StepsProvider

@@ -189,10 +189,13 @@ const AddAccountModal = memo(() => {
                   navAtom={addAccountStepAtom}
                   initialValue={AddAccountStep.AddAccountInitial}
                   onClick={handleBackButton}
-                  className="absolute top-6 left-8"
+                  className="absolute top-6 left-8 mmd:top-4 mmd:left-4"
                 />
 
-                <Dialog.Close className="absolute top-6 right-8" asChild>
+                <Dialog.Close
+                  className="absolute top-6 right-8 mmd:top-4 mmd:right-4"
+                  asChild
+                >
                   <Button theme="clean">Cancel</Button>
                 </Dialog.Close>
 

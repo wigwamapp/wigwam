@@ -16,6 +16,7 @@ export enum Page {
 
 export enum AddAccountStep {
   AddAccountInitial = "add-account-initial",
+  DrumGameTarget = "drum-game-target",
   ChooseWayImport = "choose-way-import",
   CreateSeedPhrase = "create-seed-phrase",
   ImportSeedPhrase = "import-seed-phrase",

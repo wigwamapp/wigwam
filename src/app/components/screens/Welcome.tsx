@@ -45,7 +45,11 @@ const Welcome: FC = () => {
         )}
       >
         <WigwamIcon className={classNames("w-[5rem] h-auto mb-5")} />
-        <h1 className={classNames("mb-16 text-5xl font-bold text-brand-light")}>
+        <h1
+          className={classNames(
+            "mb-16 text-5xl mmd:text-4xl font-bold text-brand-light",
+          )}
+        >
           Welcome to Wigwam
         </h1>
 
