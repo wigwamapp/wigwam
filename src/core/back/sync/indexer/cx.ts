@@ -14,7 +14,7 @@ export const fetchCxAccountTokens = async (
   tokenType: TokenType,
 ) => {
   const cxChain = await getCxChain(chainId);
-  if (!cxChain) return [];
+  if (!cxChain) throw new Error("Chain not supported");
 
   const urlTail =
     tokenType === TokenType.Asset ? "balances_v2" : "balances_nft";
