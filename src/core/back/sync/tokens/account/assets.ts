@@ -216,24 +216,25 @@ export const syncAccountAssets = memoize(
 );
 
 export const fetchAccountTokens = (chainId: number, accountAddress: string) =>
-  fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset).catch(
-    (err) => {
-      console.warn("Using another indexer", err);
+  fetchUxAccountTokens(chainId, accountAddress).catch((err) => {
+    console.warn("Using another indexer", err);
+    return fetchCxAccountTokens(chainId, accountAddress, TokenType.Asset);
+  });
 
-      if (!U_INDEXER_CHAINS.has(chainId)) {
-        throw new Error("Chain not supported");
-      }
+async function fetchUxAccountTokens(chainId: number, accountAddress: string) {
+  if (!U_INDEXER_CHAINS.has(chainId)) {
+    throw new Error("Chain not supported");
+  }
 
-      return indexerApi
-        .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
-          params: {
-            _authAddress: accountAddress,
-            verified: true,
-          },
-        })
-        .then((r) => r.data);
-    },
-  );
+  return indexerApi
+    .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
+      params: {
+        _authAddress: accountAddress,
+        verified: true,
+      },
+    })
+    .then((r) => r.data);
+}
 
 const U_INDEXER_CHAINS = new Set([
   1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
