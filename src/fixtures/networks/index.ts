@@ -28,6 +28,7 @@ import { LINEA } from "./linea";
 import { CELO } from "./celo";
 import { GNOSIS } from "./gnosis";
 import { MANTLE } from "./mantle";
+import { ROOTSTOCK } from "./rootstock";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -57,6 +58,7 @@ export const DEFAULT_NETWORKS: Network[] = [
   HECO,
   HARMONY,
   LOCAL,
+  ROOTSTOCK,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
     ...n,
