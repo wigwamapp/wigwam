@@ -52,9 +52,9 @@ export async function openIfWasRestarted() {
 
 export function isUpdateAvailable(
   currentVersion: string,
-  latestVersion: string,
+  latestVersion?: string,
 ) {
-  if (currentVersion === latestVersion) return false;
+  if (!latestVersion || currentVersion === latestVersion) return false;
 
   try {
     const compared = latestVersion.localeCompare(currentVersion, undefined, {

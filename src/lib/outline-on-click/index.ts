@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+import * as styles from "./index.module.css";
 
 const TAB_KEY_CODE = 9;
 const CLASS_NAME = styles["focus-disabled"];

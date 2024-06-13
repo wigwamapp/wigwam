@@ -1,4 +1,5 @@
-import { atomFamily, atomWithDefault, selectAtom } from "jotai/utils";
+import { atom } from "jotai";
+import { atomFamily, atomWithDefault } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithAutoReset,
@@ -23,14 +24,12 @@ export const walletStateAtom = atomWithAutoReset(getWalletState, {
   onMount: onWalletStateUpdated,
 });
 
-export const walletStatusAtom = selectAtom(
-  walletStateAtom,
-  ({ status }) => status,
+export const walletStatusAtom = atom((get) =>
+  get(walletStateAtom).then((v) => v.status),
 );
 
-export const hasSeedPhraseAtom = selectAtom(
-  walletStateAtom,
-  ({ hasSeedPhrase }) => hasSeedPhrase,
+export const hasSeedPhraseAtom = atom((get) =>
+  get(walletStateAtom).then((v) => v.hasSeedPhrase),
 );
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { selectAtom } from "jotai/utils";
+import { selectAtom, unwrap } from "jotai/utils";
 import { atomWithAutoReset, atomWithGlobalStorage } from "lib/atom-utils";
 import { loadState, subscribeState } from "lib/ext/profile";
 import { getActiveTab } from "lib/ext/tab";
@@ -13,7 +13,7 @@ export const currentLocaleAtom = atom(getLocale);
 export const activeTabAtom = atom(getActiveTab);
 
 export const activeTabOriginAtom = selectAtom(
-  activeTabAtom,
+  unwrap(activeTabAtom),
   (tab) => tab?.url && new URL(tab.url).origin,
 );
 
@@ -33,6 +33,6 @@ export const latestVersionAtom = atomWithGlobalStorage(
 );
 
 export const updateAvailableAtom = selectAtom(
-  latestVersionAtom,
+  unwrap(latestVersionAtom),
   (latestVersion) => isUpdateAvailable(process.env.VERSION, latestVersion),
 );

@@ -4,12 +4,11 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
   },
-  plugins: ["prettier", "@typescript-eslint", "react-hooks", "jsx-a11y"],
+  plugins: ["prettier", "@typescript-eslint", "react-hooks"],
   extends: [
     "plugin:prettier/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:jsx-a11y/recommended",
   ],
   rules: {
     "@typescript-eslint/no-use-before-define": [
@@ -30,8 +29,6 @@ module.exports = {
     "react/prop-types": "off",
     "react/display-name": "off",
     "react/react-in-jsx-scope": "off",
-    "jsx-a11y/no-autofocus": "off",
-    "jsx-a11y/anchor-has-content": "off",
   },
   settings: {
     react: {
