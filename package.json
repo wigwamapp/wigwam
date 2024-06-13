@@ -170,7 +170,9 @@
   ],
   "resolutions": {
     "flux": "./.vendor/flux",
-    "axios": ">=1.6.4"
+    "axios": ">=1.6.4",
+    "braces": ">=3.0.3",
+    "@solana/web3.js": ">=1.87.7"
   },
   "engines": {
     "node": ">=18.12.0"
