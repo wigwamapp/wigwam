@@ -29,6 +29,8 @@ import { CELO } from "./celo";
 import { GNOSIS } from "./gnosis";
 import { MANTLE } from "./mantle";
 import { ROOTSTOCK } from "./rootstock";
+import { MODE } from "./mode";
+import { BLAST } from "./blast";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -50,6 +52,9 @@ export const DEFAULT_NETWORKS: Network[] = [
   CELO,
   LINEA,
   SCROLL,
+  BLAST,
+  ROOTSTOCK,
+  MODE,
   MOONBEAM,
   AURORA,
   MOONRIVER,
@@ -58,7 +63,6 @@ export const DEFAULT_NETWORKS: Network[] = [
   HECO,
   HARMONY,
   LOCAL,
-  ROOTSTOCK,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
     ...n,
