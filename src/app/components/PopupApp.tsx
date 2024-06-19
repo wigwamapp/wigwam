@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
-import { walletStatusAtom } from "app/atoms";
+import { walletStateAtom } from "app/atoms";
 import { useLocked } from "app/hooks";
 import { openInTab } from "app/helpers";
 
@@ -24,7 +24,7 @@ const PopupApp: FC = () => (
 export default PopupApp;
 
 const PopupRouter: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
 
   return match(walletStatus)
     .with(WalletStatus.Unlocked, () => <Popup />)

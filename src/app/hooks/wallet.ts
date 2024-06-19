@@ -2,10 +2,10 @@ import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 
-import { walletStatusAtom } from "app/atoms";
+import { walletStateAtom } from "app/atoms";
 
 export function useLocked() {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
 
   return walletStatus === WalletStatus.Locked;
 }

@@ -12,7 +12,7 @@ import {
   popupToolbarTabAtom,
   receiveModalAtom,
   updateAvailableAtom,
-  walletStatusAtom,
+  walletStateAtom,
 } from "app/atoms";
 import ScrollTopButton from "app/components/blocks/popup/ScrollTopButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
@@ -51,7 +51,7 @@ type PopupLayoutProps = PropsWithChildren<{
 const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const updateAvailable = useAtomValue(updateAvailableAtom);
 
   const isUnlocked = walletStatus === WalletStatus.Unlocked;

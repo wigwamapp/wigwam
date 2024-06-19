@@ -6,7 +6,7 @@ import { useAtomValue } from "jotai";
 import { ActivityType, Approval, WalletStatus } from "core/types";
 import { rejectAllApprovals } from "core/client";
 
-import { walletStatusAtom, approvalsAtom } from "app/atoms";
+import { walletStateAtom, approvalsAtom } from "app/atoms";
 import { ChainIdProvider, TippySingletonProvider } from "app/hooks";
 
 import BaseProvider from "./BaseProvider";
@@ -29,7 +29,7 @@ const ApproveApp: FC = () => (
 export default ApproveApp;
 
 const ApproveRouter: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
 
   return match(walletStatus)
     .with(WalletStatus.Unlocked, () => <Approvals />)

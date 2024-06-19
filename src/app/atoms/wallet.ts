@@ -1,4 +1,3 @@
-import { atom } from "jotai";
 import { atomFamily, atomWithDefault } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
@@ -23,14 +22,6 @@ import { getAllEvmNetworks } from "core/common/chainList";
 export const walletStateAtom = atomWithAutoReset(getWalletState, {
   onMount: onWalletStateUpdated,
 });
-
-export const walletStatusAtom = atom((get) =>
-  get(walletStateAtom).then((v) => v.status),
-);
-
-export const hasSeedPhraseAtom = atom((get) =>
-  get(walletStateAtom).then((v) => v.hasSeedPhrase),
-);
 
 export const getNeuterExtendedKeyAtom = atomFamily((derivationPath: string) =>
   atomWithAutoReset(() => getNeuterExtendedKey(derivationPath)),

@@ -21,8 +21,7 @@ import {
   addAccountModalAtom,
   allAccountsAtom,
   getNeuterExtendedKeyAtom,
-  hasSeedPhraseAtom,
-  walletStatusAtom,
+  walletStateAtom,
 } from "app/atoms";
 import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
@@ -31,8 +30,7 @@ import { useDialog } from "app/hooks/dialog";
 import AccountsToAdd, { AccountsToAddProps } from "./shared/AccountsToAdd";
 
 const EditAccounts: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
-  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  const { walletStatus, hasSeedPhrase } = useAtomValue(walletStateAtom);
 
   const initialSetup = walletStatus === WalletStatus.Welcome;
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
@@ -145,7 +143,7 @@ const VerifyAccountToAddInitial: FC<VerifyAccountToAddProps> = ({
 const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
   onContinue,
 }) => {
-  const hasSeedPhrase = useMaybeAtomValue(hasSeedPhraseAtom);
+  const walletState = useMaybeAtomValue(walletStateAtom);
   const { reset, stateRef } = useSteps();
   const { getNextAccountName } = useNextAccountName();
 
@@ -153,7 +151,7 @@ const VerifyAccountToAddExisting: FC<VerifyAccountToAddProps> = ({
   const derivationPath = stateRef.current.derivationPath;
 
   const rootNeuterExtendedKey = useMaybeAtomValue(
-    hasSeedPhrase && derivationPath
+    walletState?.hasSeedPhrase && derivationPath
       ? getNeuterExtendedKeyAtom(derivationPath)
       : null,
   );

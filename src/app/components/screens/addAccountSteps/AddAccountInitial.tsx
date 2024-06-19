@@ -4,11 +4,7 @@ import { useAtomValue } from "jotai";
 
 import { WalletStatus } from "core/types";
 
-import {
-  hasSeedPhraseAtom,
-  tgApplicationAtom,
-  walletStatusAtom,
-} from "app/atoms";
+import { tgApplicationAtom, walletStateAtom } from "app/atoms";
 import { useSteps } from "app/hooks/steps";
 import { AddAccountStep } from "app/nav";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -23,7 +19,7 @@ import ConfirmAccounts from "./ConfirmAccounts";
 import LedgerScanModal from "./shared/LedgerScanModal";
 
 const AddAccountInitial = memo(() => {
-  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  const { hasSeedPhrase } = useAtomValue(walletStateAtom);
   const [ledgerOpened, setLedgerOpened] = useState(false);
 
   return (
@@ -45,7 +41,7 @@ export default AddAccountInitial;
 
 const ChooseAddAccountWay = memo<{ onLedgerOpened?: () => void }>(
   ({ onLedgerOpened }) => {
-    const walletStatus = useAtomValue(walletStatusAtom);
+    const { walletStatus } = useAtomValue(walletStateAtom);
     const { navigateToStep, stateRef } = useSteps();
     const tgApplication = useAtomValue(tgApplicationAtom);
 
