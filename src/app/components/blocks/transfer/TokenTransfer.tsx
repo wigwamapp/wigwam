@@ -12,7 +12,6 @@ import BigNumber from "bignumber.js";
 import { useAtomValue, useSetAtom } from "jotai";
 import { RESET } from "jotai/utils";
 import { Field, Form } from "react-final-form";
-import type { FormApi } from "final-form";
 import { ethers } from "ethers";
 import { useDebouncedCallback } from "use-debounce";
 import { ERC1155__factory, ERC20__factory, ERC721__factory } from "abi-types";
@@ -140,10 +139,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
     useSync(chainId, currentAccount.address, tokenType);
 
     const handleSubmit = useCallback(
-      async (
-        { recipient, amount }: FormValues,
-        form: FormApi<FormValues, Partial<FormValues>>,
-      ) =>
+      async ({ recipient, amount }: FormValues) =>
         withHumanDelay(async () => {
           if (!token) {
             return;
@@ -284,7 +280,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 successfully created! Please approve it in the opened window.
               </>,
             );
-            form.restart();
 
             txResPromise
               .then((txHash) => {
