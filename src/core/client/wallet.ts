@@ -30,17 +30,17 @@ export async function getWalletState() {
   );
   assert(res?.type === type);
 
-  const { status, hasSeedPhrase } = res;
-  return { status, hasSeedPhrase };
+  const { walletStatus, hasSeedPhrase } = res;
+  return { walletStatus, hasSeedPhrase };
 }
 
 export function onWalletStateUpdated(
-  callback: (s: { status: WalletStatus; hasSeedPhrase: boolean }) => void,
+  callback: (s: { walletStatus: WalletStatus; hasSeedPhrase: boolean }) => void,
 ) {
   return porter.onOneWayMessage<EventMessage>((msg) => {
     if (msg?.type === MessageType.WalletStateUpdated) {
-      const { status, hasSeedPhrase } = msg;
-      callback({ status, hasSeedPhrase });
+      const { walletStatus, hasSeedPhrase } = msg;
+      callback({ walletStatus, hasSeedPhrase });
     }
   });
 }

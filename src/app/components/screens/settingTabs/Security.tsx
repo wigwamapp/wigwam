@@ -9,11 +9,7 @@ import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { getSeedPhrase } from "core/client";
 import { SeedPharse } from "core/types";
 
-import {
-  hasSeedPhraseAtom,
-  analyticsAtom,
-  autoLockTimeoutAtom,
-} from "app/atoms";
+import { walletStateAtom, analyticsAtom, autoLockTimeoutAtom } from "app/atoms";
 import {
   required,
   withHumanDelay,
@@ -47,7 +43,7 @@ const prepareTimeouts = () => {
 };
 
 const Security: FC = () => {
-  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  const { hasSeedPhrase } = useAtomValue(walletStateAtom);
   const [analytics, setAnalytics] = useAtom(analyticsAtom);
   const [autoLockTimeout, setAutoLockTimeout] = useAtom(autoLockTimeoutAtom);
 

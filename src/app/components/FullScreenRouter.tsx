@@ -6,7 +6,7 @@ import { useAtomsAll } from "lib/atom-utils";
 
 import { WalletStatus } from "core/types";
 
-import { walletStatusAtom, pageAtom } from "app/atoms";
+import { walletStateAtom, pageAtom } from "app/atoms";
 import { Page } from "app/nav";
 
 import Profiles from "./screens/Profiles";
@@ -15,7 +15,7 @@ import Welcome from "./screens/Welcome";
 import Main from "./screens/Main";
 
 const FullScreenRouter: FC = () => {
-  const [page, walletStatus] = useAtomsAll([pageAtom, walletStatusAtom]);
+  const [page, { walletStatus }] = useAtomsAll([pageAtom, walletStateAtom]);
 
   // Scroll to top after new page pushed.
   const lastHistoryAction = getLastAction();

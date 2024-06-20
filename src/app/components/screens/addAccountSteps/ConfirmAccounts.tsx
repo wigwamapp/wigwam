@@ -19,8 +19,7 @@ import {
   addAccountModalAtom,
   allAccountsAtom,
   getNeuterExtendedKeyAtom,
-  hasSeedPhraseAtom,
-  walletStatusAtom,
+  walletStateAtom,
 } from "app/atoms";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
 import AddAccountContinueButton from "app/components/blocks/AddAccountContinueButton";
@@ -37,8 +36,7 @@ const ConfirmAccounts = memo<{
   addMore?: boolean;
   onLedgerOpened?: () => void;
 }>(({ addMore, onLedgerOpened }) => {
-  const walletStatus = useAtomValue(walletStatusAtom);
-  const hasSeedPhrase = useAtomValue(hasSeedPhraseAtom);
+  const { walletStatus, hasSeedPhrase } = useAtomValue(walletStateAtom);
 
   const setAccModalOpened = useSetAtom(addAccountModalAtom);
 

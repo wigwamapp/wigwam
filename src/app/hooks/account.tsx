@@ -7,7 +7,7 @@ import { Account, WalletStatus } from "core/types";
 import {
   accountAddressAtom,
   allAccountsAtom,
-  walletStatusAtom,
+  walletStateAtom,
 } from "app/atoms";
 
 export function useAccounts() {
@@ -30,7 +30,7 @@ export function useAccounts() {
 }
 
 export function useNextAccountName() {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
   const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
 

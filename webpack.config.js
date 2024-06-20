@@ -160,9 +160,6 @@ module.exports = {
     modules: ["node_modules", NODE_MODULES_PATH, ...ADDITIONAL_MODULE_PATHS],
     extensions: MODULE_FILE_EXTENSIONS,
     alias: {
-      "@toruslabs/openlogin": require.resolve(
-        "@toruslabs/openlogin/dist/openlogin.umd.min.js",
-      ),
       "@ledgerhq/devices/hid-framing": require.resolve(
         "@ledgerhq/devices/lib-es/hid-framing.js",
       ),
@@ -338,15 +335,15 @@ module.exports = {
 
     new CaseSensitivePathsPlugin(),
 
-    new webpack.NormalModuleReplacementPlugin(
-      /@ledgerhq\/live-network\/lib-es\/network\.js/,
-      path.resolve(__dirname, ".vendor/ledgerhq-live-network/network.js"),
-    ),
+    // new webpack.NormalModuleReplacementPlugin(
+    //   /@ledgerhq\/live-network\/lib-es\/network\.js/,
+    //   path.resolve(__dirname, ".vendor/ledgerhq-live-network/network.js"),
+    // ),
 
-    new webpack.NormalModuleReplacementPlugin(
-      /@ledgerhq\/evm-tools\/lib-es\/message\/EIP712\/index\.js/,
-      path.resolve(__dirname, ".vendor/ledgerhq-evm-tools/message-eip712.js"),
-    ),
+    // new webpack.NormalModuleReplacementPlugin(
+    //   /@ledgerhq\/evm-tools\/lib-es\/message\/EIP712\/index\.js/,
+    //   path.resolve(__dirname, ".vendor/ledgerhq-evm-tools/message-eip712.js"),
+    // ),
 
     new webpack.DefinePlugin({
       // for web extensions

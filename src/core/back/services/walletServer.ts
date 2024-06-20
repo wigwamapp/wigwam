@@ -51,10 +51,10 @@ export function startWalletServer() {
 
   walletPorter.onMessage<Request, Response>(handleWalletRequest);
 
-  $walletState.watch(([status, hasSeedPhrase]) => {
+  $walletState.watch(([walletStatus, hasSeedPhrase]) => {
     walletPorter.broadcast({
       type: MessageType.WalletStateUpdated,
-      status,
+      walletStatus,
       hasSeedPhrase,
     });
   });
@@ -105,9 +105,9 @@ async function handleWalletRequest(
 
     await match(ctx.data)
       .with({ type: MessageType.GetWalletState }, async ({ type }) => {
-        const [status, hasSeedPhrase] = $walletState.getState();
+        const [walletStatus, hasSeedPhrase] = $walletState.getState();
 
-        ctx.reply({ type, status, hasSeedPhrase });
+        ctx.reply({ type, walletStatus, hasSeedPhrase });
       })
       .with(
         { type: MessageType.SetupWallet },

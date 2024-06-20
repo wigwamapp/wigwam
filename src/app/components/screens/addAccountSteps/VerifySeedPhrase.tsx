@@ -16,7 +16,7 @@ import { withHumanDelay } from "app/utils";
 
 import { useDialog } from "app/hooks/dialog";
 import { AddAccountStep } from "app/nav";
-import { walletStatusAtom } from "app/atoms";
+import { walletStateAtom } from "app/atoms";
 import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
 import AddAccountHeader from "app/components/blocks/AddAccountHeader";
@@ -27,7 +27,7 @@ import { ReactComponent as RefreshIcon } from "app/icons/refresh.svg";
 const VerifySeedPhrase = memo(() => {
   const { stateRef, reset, navigateToStep } = useSteps();
 
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const { getNextAccountName } = useNextAccountName();
   const { alert, confirm } = useDialog();
 

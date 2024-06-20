@@ -14,7 +14,7 @@ import {
 } from "core/common";
 import { ClientProvider } from "core/client";
 
-import { allAccountsAtom, walletStatusAtom } from "app/atoms";
+import { allAccountsAtom, walletStateAtom } from "app/atoms";
 import { AddAccountStep } from "app/nav";
 import { useNextAccountName } from "app/hooks";
 import { useSteps } from "app/hooks/steps";
@@ -35,7 +35,7 @@ const ScanAccountsModal: FC<SecondaryModalProps> = ({
   const { alert } = useDialog();
   const [loadingProgress, setLoadingProgress] = useState(0);
   const isUnmountedRef = useRef(false);
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
   const existingAccounts = useMaybeAtomValue(isUnlocked && allAccountsAtom);
   const { getNextAccountName } = useNextAccountName();

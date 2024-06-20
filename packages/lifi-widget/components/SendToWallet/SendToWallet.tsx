@@ -1,23 +1,23 @@
-import { isAddress } from '@ethersproject/address';
-import type { BoxProps } from '@mui/material';
-import { Collapse, FormHelperText } from '@mui/material';
-import { forwardRef, useEffect, useRef } from 'react';
-import { useController, useFormContext, useFormState } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { FormKey, useWallet, useWidgetConfig } from '../../providers';
-import { useSendToWalletStore, useSettings } from '../../stores';
-import { DisabledUI, HiddenUI, RequiredUI } from '../../types';
-import { Card, CardTitle } from '../Card';
-import { FormControl, Input } from './SendToWallet.style';
+import { isAddress } from "@ethersproject/address";
+import type { BoxProps } from "@mui/material";
+import { Collapse, FormHelperText } from "@mui/material";
+import { forwardRef, useEffect, useRef } from "react";
+import { useController, useFormContext, useFormState } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { FormKey, useWallet, useWidgetConfig } from "../../providers";
+import { useSendToWalletStore, useSettings } from "../../stores";
+import { DisabledUI, HiddenUI, RequiredUI } from "../../types";
+import { Card, CardTitle } from "../Card";
+import { FormControl, Input } from "./SendToWallet.style";
 
-export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
+export const SendToWallet = forwardRef((props: BoxProps, ref) => {
   const { t } = useTranslation();
   const { trigger, getValues, setValue, clearErrors } = useFormContext();
   const { account } = useWallet();
   const { disabledUI, hiddenUI, requiredUI, toAddress } = useWidgetConfig();
   const { showSendToWallet, showSendToWalletDirty, setSendToWallet } =
     useSendToWalletStore();
-  const { showDestinationWallet } = useSettings(['showDestinationWallet']);
+  const { showDestinationWallet } = useSettings(["showDestinationWallet"]);
 
   const hiddenToAddress = hiddenUI?.includes(HiddenUI.ToAddress);
   const disabledToAddress = disabledUI?.includes(DisabledUI.ToAddress);
@@ -30,7 +30,7 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
     name: FormKey.ToAddress,
     rules: {
       required:
-        requiredToAddress && (t('error.title.walletAddressRequired') as string),
+        requiredToAddress && (t("error.title.walletAddressRequired") as string),
       onChange: (e) => {
         setValue(FormKey.ToAddress, e.target.value.trim());
       },
@@ -42,10 +42,10 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
           const address = await account.signer?.provider?.resolveName(value);
           return (
             isAddress(address || value) ||
-            (t('error.title.walletAddressInvalid') as string)
+            (t("error.title.walletAddressInvalid") as string)
           );
         } catch {
-          return t('error.title.walletEnsAddressInvalid') as string;
+          return t("error.title.walletEnsAddressInvalid") as string;
         }
       },
       onBlur: () => trigger(FormKey.ToAddress),
@@ -89,27 +89,40 @@ export const SendToWallet: React.FC<BoxProps> = forwardRef((props, ref) => {
       mountOnEnter
       unmountOnExit
     >
-      <Card {...props} ref={ref} sx={{border: 'none', background: 'none', marginBottom: '24px'}}>
-        <CardTitle required={requiredToAddress} sx={{paddingTop: '0px', paddingLeft: '0px', fontSize: '16px'}}>
+      <Card
+        {...props}
+        ref={ref}
+        sx={{ border: "none", background: "none", marginBottom: "24px" }}
+      >
+        <CardTitle
+          required={requiredToAddress}
+          sx={{ paddingTop: "0px", paddingLeft: "0px", fontSize: "16px" }}
+        >
           Recipient
         </CardTitle>
-        <div style={{background: '#22262A', borderRadius: '10px', marginTop: '8px'}}>
-        <FormControl fullWidth sx={{padding: '6px 16px 6px 0px' }}>
-          <Input
-            size="small"
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
-            onChange={onChange}
-            onBlur={onBlur}
-            name={name}
-            value={value}
-            placeholder={t('main.walletAddressOrEns') as string}
-            disabled={Boolean(toAddress && disabledToAddress)}
-          />
-          <SendToWalletFormHelperText />
-        </FormControl>
+        <div
+          style={{
+            background: "#22262A",
+            borderRadius: "10px",
+            marginTop: "8px",
+          }}
+        >
+          <FormControl fullWidth sx={{ padding: "6px 16px 6px 0px" }}>
+            <Input
+              size="small"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              onChange={onChange}
+              onBlur={onBlur}
+              name={name}
+              value={value}
+              placeholder={t("main.walletAddressOrEns") as string}
+              disabled={Boolean(toAddress && disabledToAddress)}
+            />
+            <SendToWalletFormHelperText />
+          </FormControl>
         </div>
       </Card>
     </Collapse>

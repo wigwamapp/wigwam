@@ -18,7 +18,7 @@ import { AddAccountStep } from "app/nav";
 import {
   addAccountModalAtom,
   addAccountStepAtom,
-  walletStatusAtom,
+  walletStateAtom,
 } from "app/atoms";
 import { OverflowProvider } from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
@@ -31,7 +31,7 @@ import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
   const accountStep = useAtomValue(addAccountStepAtom);
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
 
   const { confirm } = useDialog();
   const isInitial = walletStatus === WalletStatus.Welcome;

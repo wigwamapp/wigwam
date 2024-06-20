@@ -102,13 +102,13 @@ export interface GetWalletStateRequest extends MessageBase {
 
 export interface GetWalletStateResponse extends MessageBase {
   type: MessageType.GetWalletState;
-  status: WalletStatus;
+  walletStatus: WalletStatus;
   hasSeedPhrase: boolean;
 }
 
 export interface WalletStateUpdated extends MessageBase {
   type: MessageType.WalletStateUpdated;
-  status: WalletStatus;
+  walletStatus: WalletStatus;
   hasSeedPhrase: boolean;
 }
 

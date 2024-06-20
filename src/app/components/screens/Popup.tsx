@@ -35,7 +35,7 @@ import {
   getPermissionAtom,
   popupToolbarTabAtom,
   tokenTypeAtom,
-  walletStatusAtom,
+  walletStateAtom,
   web3MetaMaskCompatibleAtom,
 } from "app/atoms";
 import { useAccountToken, useIsSyncing, useLazyNetwork } from "app/hooks";
@@ -73,7 +73,7 @@ const Popup: FC = () => {
 export default Popup;
 
 const Assets: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const tokenType = useAtomValue(tokenTypeAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
@@ -86,7 +86,7 @@ const Assets: FC = () => {
 };
 
 const Activities: FC = () => {
-  const walletStatus = useAtomValue(walletStatusAtom);
+  const { walletStatus } = useAtomValue(walletStateAtom);
   const isUnlocked = walletStatus === WalletStatus.Unlocked;
 
   return isUnlocked ? (
