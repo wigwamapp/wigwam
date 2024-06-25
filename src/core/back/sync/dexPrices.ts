@@ -295,7 +295,14 @@ export const getCoinGeckoPlatformIds = withOfflineCache(
 
     for (const { id, chain_identifier, native_coin_id } of data) {
       if (id && chain_identifier && typeof chain_identifier === "number") {
-        platformIds[id] = { id, native_coin_id, chain_id: chain_identifier };
+        // Fix wrong native_coin_id for taiko
+        const nativeCoinId = id === "taiko" ? "ethereum" : native_coin_id;
+
+        platformIds[id] = {
+          id,
+          native_coin_id: nativeCoinId,
+          chain_id: chain_identifier,
+        };
         chainIds[chain_identifier] = id;
       }
     }
