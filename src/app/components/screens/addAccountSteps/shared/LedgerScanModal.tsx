@@ -25,17 +25,23 @@ const LedgerScanModal: FC<ComponentProps<typeof ScanAccountsModal>> = ({
 
   const connectToLedger = useCallback(async () => {
     try {
-      const derivationPath = "m/44'/60'/0'/0";
+      const ethDerivationPath = "m/44'/60'/0'/0";
+      const rskDerivationPath = "m/44'/137'/0'/0";
       let extendedKey: string | undefined;
+      let derivationPath: string | undefined;
 
-      const answer = await withLedger(async ({ ledgerEth, getExtendedKey }) => {
-        const { publicKey, chainCode } = await ledgerEth.getAddress(
-          derivationPath,
-          false,
-          true,
-        );
-        extendedKey = getExtendedKey(publicKey, chainCode!);
-      });
+      const answer = await withLedger(
+        async ({ ledgerEth, getExtendedKey, connectedApp }) => {
+          derivationPath =
+            connectedApp === "RSK" ? rskDerivationPath : ethDerivationPath;
+          const { publicKey, chainCode } = await ledgerEth.getAddress(
+            derivationPath,
+            false,
+            true,
+          );
+          extendedKey = getExtendedKey(publicKey, chainCode!);
+        },
+      );
 
       stateRef.current.derivationPath = derivationPath;
       stateRef.current.extendedKey = extendedKey;
