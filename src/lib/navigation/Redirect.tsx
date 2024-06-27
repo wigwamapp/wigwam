@@ -4,14 +4,14 @@ import { Destination } from "./types";
 import { navigate } from "./navigate";
 
 type RedirectProps = {
-  to: Destination;
+  to?: Destination;
   merge?: boolean | string[];
   push?: boolean;
   fallback?: ReactElement;
 };
 
 const Redirect: FC<RedirectProps> = ({
-  to,
+  to = {},
   merge,
   push = false,
   fallback = null,
