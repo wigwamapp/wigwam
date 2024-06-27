@@ -1,8 +1,7 @@
 import { FC, ReactElement, useLayoutEffect } from "react";
-import { changeState } from "lib/history";
 
 import { Destination } from "./types";
-import { toHash, toURL } from "./utils";
+import { navigate } from "./navigate";
 
 type RedirectProps = {
   to: Destination;
@@ -18,7 +17,7 @@ const Redirect: FC<RedirectProps> = ({
   fallback = null,
 }) => {
   useLayoutEffect(
-    () => changeState(toURL(toHash(to, merge)), !push),
+    () => navigate(to, { merge, replace: !push }),
     [to, merge, push],
   );
 
