@@ -26,7 +26,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
     >
       <img
         src={ComingSoonImage}
-        alt={`The ${label} section is under development`}
+        alt={`The ${label} section is under maintenance`}
         className={classNames(
           size === "large" && "w-[33.5rem] h-[14.25rem]",
           size === "medium" && "w-[29rem] h-[12.3358rem]",
@@ -44,7 +44,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
           size === "large" && "text-3xl mt-10",
         )}
       >
-        We are on the way...
+        Suspended
       </h2>
       <p
         className={classNames(
@@ -55,7 +55,7 @@ const ComingSoon: FC<ComingSoonProps> = ({
           size === "large" && "text-lg mt-1.5",
         )}
       >
-        The {label} section is under development
+        The {label} section is under maintenance
       </p>
     </div>
   );

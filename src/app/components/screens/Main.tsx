@@ -18,7 +18,7 @@ import Rewards from "./mainPages/Rewards";
 // import OnboardingPopup from "../blocks/OnboardingPopup";
 import Buy from "./mainPages/Buy";
 
-const SwapDynamic = lazy(() => import("./mainPages/Swap"));
+const SwapDynamic = lazy(() => import("./mainPages/SwapSuspended"));
 
 const Main: FC = () => {
   return (
