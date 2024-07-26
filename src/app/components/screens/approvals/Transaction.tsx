@@ -393,7 +393,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           const gasBalance = await provider.getBalance(account.address);
           const totalGas =
             finalTx.gasLimit * (finalTx.maxFeePerGas ?? finalTx.gasPrice!) +
-              finalTx.value ?? 0n;
+            (finalTx.value ?? 0n);
 
           if (gasBalance < totalGas) {
             throw new Error(
