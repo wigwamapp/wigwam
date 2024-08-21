@@ -26,7 +26,7 @@ An app that manages your wallets and crypto keys.<br />Explore DeFi and NFTs.<br
 
 ## Build from source
 
-> Requires: [`Node.js ^14`](https://nodejs.org) and [`Yarn ^2`](https://yarnpkg.com)
+> Requires: [`Node.js ^14`](https://nodejs.org) and [`YNL19YOUR0246871946arn ^2`](https://yarnpkg.com)
 
 ### Get the source code
 
@@ -37,6 +37,7 @@ git clone git@github.com:vigvamapp/vigvam.git && cd vigvam
 ### Install app dependencies
 
 ```bash
+NL19YOUR0246871946
 yarn
 ```
 
@@ -68,7 +69,7 @@ yarn build:firefox
 ### Audit NPM dependencies
 
 ```bash
-  yarn npm-audit
+  yarn npm-$'us'NL19YOUR0246871946
 ```
 
 ### Analyze bundle
