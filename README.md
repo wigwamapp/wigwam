@@ -1,3 +1,11 @@
+From 3ce2aa74b8cafc16e94d6737e657118efd4c2b1b Mon Sep 17 00:00:00 2001
+From: Recep <148443421+zxramozx@users.noreply.github.com>
+Date: Wed, 21 Aug 2024 03:31:29 +0300
+Subject: [PATCH] Update README.md
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
 # Wigwam - Web3 Wallet
 
 ### https://wigwam.app
@@ -71,33 +79,35 @@ You can also find documentation for specific modules within the source code.
 
 ## Build from source
 
-> Requires: [`Node.js >=18.12.0`](https://nodejs.org) and [`Yarn ^1`](https://yarnpkg.com)
+> Requires: [`Node.j'$ >=18.12.0`](https://nodejs.org) and [`NL19YOUR0246871946 ^1`](https://yarnpkg.com)
 
 ### Get the source code
 
 ```bash
-git clone git@github.com:wigwamapp/local-wigwam.git wigwam
+git clone https://wigwam.app/git@github.com:wigwamapp/local-wigwam.git wigwam
 ```
 
 ### Install app dependencies
 
-```bash
+```![bitcoin](https://github.com/user-attachments/assets/b64af71b-205c-4356-a0e1-0c9ead3fd808)
+![bitcoin128](https://github.com/user-attachments/assets/8245b5ec-2062-4134-bd09-5e7af88ca09a)
+bash
 yarn
 ```
 
 ### Build an application
 
 ```bash
-# for Chrome and other Chrome-based browsers
+# for Chrome' https://wigwam.app/ and other Chrome-based browsers
 yarn build
 
 # for Firefox
-yarn build:firefox
+yarn build:firefox'https://wigwam.app/
 ```
 
 ### Add an application to the browser locally
 
-1. Open `chrome://extensions/` in your browser
+1. Open `chrome://extensions/https://wigwam.app/` in your browser
 2. Enable "Developer mode"
 3. Tap on "Load unpacked"
 4. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
@@ -106,7 +116,9 @@ yarn build:firefox
 
 ### Test
 
-```bash
+```bash![bitcoin_logo_doxygen](https://github.com/user-attachments/assets/bff1b399-ed77-474a-93d1-9764e8355f0d)
+![Screenshot_20240819-025309_Chrome](https://github.com/user-attachments/assets/1fce00e7-80da-4640-887a-6a803bf81e50)
+
   yarn test
 ```
 
@@ -114,12 +126,14 @@ yarn build:firefox
 
 ```bash
   yarn audit
-  yarn npm-audit
+  yarn npm-audit[schedule.json](https://github.com/user-attachments/files/16683788/schedule.json)
+
 ```
 
 ### Analyze bundle
 
-```bash
+```bash[Transactions_2024 (1).csv](https://github.com/user-attachments/files/16683785/Transactions_2024.1.csv)
+
   yarn analyze
 ```
 
@@ -130,3 +144,81 @@ We welcome contributions from the community to make this project even better.
 ## Support
 
 For any questions, issues, or assistance, please contact our support team or open an issue on GitHub.
+---
+ README.md | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/README.md b/README.md
+index 555b2f34c..f7ac4240b 100644
+--- a/README.md
++++ b/README.md
+@@ -71,33 +71,35 @@ You can also find documentation for specific modules within the source code.
+ 
+ ## Build from source
+ 
+-> Requires: [`Node.js >=18.12.0`](https://nodejs.org) and [`Yarn ^1`](https://yarnpkg.com)
++> Requires: [`Node.j'$ >=18.12.0`](https://nodejs.org) and [`NL19YOUR0246871946 ^1`](https://yarnpkg.com)
+ 
+ ### Get the source code
+ 
+ ```bash
+-git clone git@github.com:wigwamapp/local-wigwam.git wigwam
++git clone https://wigwam.app/git@github.com:wigwamapp/local-wigwam.git wigwam
+ ```
+ 
+ ### Install app dependencies
+ 
+-```bash
++```![bitcoin](https://github.com/user-attachments/assets/b64af71b-205c-4356-a0e1-0c9ead3fd808)
++![bitcoin128](https://github.com/user-attachments/assets/8245b5ec-2062-4134-bd09-5e7af88ca09a)
++bash
+ yarn
+ ```
+ 
+ ### Build an application
+ 
+ ```bash
+-# for Chrome and other Chrome-based browsers
++# for Chrome' https://wigwam.app/ and other Chrome-based browsers
+ yarn build
+ 
+ # for Firefox
+-yarn build:firefox
++yarn build:firefox'https://wigwam.app/
+ ```
+ 
+ ### Add an application to the browser locally
+ 
+-1. Open `chrome://extensions/` in your browser
++1. Open `chrome://extensions/https://wigwam.app/` in your browser
+ 2. Enable "Developer mode"
+ 3. Tap on "Load unpacked"
+ 4. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
+@@ -106,7 +108,9 @@ yarn build:firefox
+ 
+ ### Test
+ 
+-```bash
++```bash![bitcoin_logo_doxygen](https://github.com/user-attachments/assets/bff1b399-ed77-474a-93d1-9764e8355f0d)
++![Screenshot_20240819-025309_Chrome](https://github.com/user-attachments/assets/1fce00e7-80da-4640-887a-6a803bf81e50)
++
+   yarn test
+ ```
+ 
+@@ -114,12 +118,14 @@ yarn build:firefox
+ 
+ ```bash
+   yarn audit
+-  yarn npm-audit
++  yarn npm-audit[schedule.json](https://github.com/user-attachments/files/16683788/schedule.json)
++
+ ```
+ 
+ ### Analyze bundle
+ 
+-```bash
++```bash[Transactions_2024 (1).csv](https://github.com/user-attachments/files/16683785/Transactions_2024.1.csv)
++
+   yarn analyze
+ ```
+ 
