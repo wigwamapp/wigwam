@@ -105,7 +105,7 @@ export const syncAccountAssets = memoize(
               .div(new BigNumber(10).pow(metadata.decimals))
               .times(priceUSD)
               .toNumber()
-          : existing?.balanceUSD ?? 0);
+          : (existing?.balanceUSD ?? 0));
 
       addToken({
         ...(existing ?? {

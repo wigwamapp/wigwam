@@ -28,7 +28,7 @@ export function toHash(
 
       for (const key of merge) {
         const value = current.get(key);
-        value && usp.set(key, value);
+        if (value) usp.set(key, value);
       }
     } else {
       usp = current;

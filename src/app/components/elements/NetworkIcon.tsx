@@ -69,7 +69,7 @@ const NetworkIconAvatar: FC<
   );
 
   const cached = srcCache.get(seed);
-  const src = cached !== null ? cached ?? srcs[srcIndex] : null;
+  const src = cached !== null ? (cached ?? srcs[srcIndex]) : null;
 
   return src ? (
     <Avatar

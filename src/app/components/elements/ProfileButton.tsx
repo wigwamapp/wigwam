@@ -212,7 +212,7 @@ const ProfilesModal: FC<SecondaryModalProps & { size?: Size }> = ({
   const changeAccount = useCallback(
     (address: string) => {
       setAccountAddress(address);
-      address !== currentAccount.address && onOpenChange?.(false);
+      if (address !== currentAccount.address) onOpenChange?.(false);
     },
     [currentAccount, onOpenChange, setAccountAddress],
   );

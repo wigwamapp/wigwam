@@ -107,7 +107,7 @@ export class NFTMetadataAgent {
       }
 
       return { uri, type: "ERC1155" };
-    } catch (e) {
+    } catch {
       // if this fails, fail function
     }
 

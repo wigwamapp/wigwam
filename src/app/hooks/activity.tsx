@@ -174,7 +174,7 @@ export function useSwapBadge(address?: string) {
             address?.toLocaleLowerCase() && item.status === 1,
       )
       .map((item: any) => item.status).length;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

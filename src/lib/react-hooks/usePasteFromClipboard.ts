@@ -30,7 +30,7 @@ export function usePasteFromClipboard(
         setValue(text);
       }
       setPasted(true);
-    } catch (e) {
+    } catch {
       alert({
         title: "Error while pasting value",
         content: "Paste functionality doesn't work in this environment.",

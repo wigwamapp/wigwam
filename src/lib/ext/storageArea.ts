@@ -41,7 +41,7 @@ export class StorageArea {
     key = await this.wrapKeys(key);
 
     const items = await this.area.get([key]);
-    return items[key];
+    return items[key] as T;
   }
 
   async fetchMany<T = any>(keys: string[]) {
@@ -68,7 +68,7 @@ export class StorageArea {
       ),
     );
 
-    return this.area.set(items);
+    return this.area.set(items as any);
   }
 
   async remove(keys: string | string[]) {
@@ -94,7 +94,7 @@ export class StorageArea {
       .then((finalKey) => {
         listener = (changes, areaName) => {
           if (areaName === this.name && finalKey in changes) {
-            callback(changes[finalKey]);
+            callback(changes[finalKey] as { newValue?: T; oldValue?: T });
           }
         };
 

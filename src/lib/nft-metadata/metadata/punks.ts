@@ -6,7 +6,7 @@ function encodeUriData(dataUri: string): string {
   const dataStart = dataUri.indexOf(",") + 1;
   return (
     dataUri.slice(0, dataStart) +
-      encodeURIComponent(dataUri.slice(dataStart)) ?? ""
+      encodeURIComponent(dataUri.slice(dataStart)) || ""
   );
 }
 

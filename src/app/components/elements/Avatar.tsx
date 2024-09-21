@@ -13,8 +13,10 @@ import classNames from "clsx";
 
 import { ReactComponent as FallbackIconPrimitive } from "app/icons/Fallback.svg";
 
+export type ImageLoadingStatus = "idle" | "loading" | "loaded" | "error";
+
 export type LoadingStatus = {
-  state: AvatarPrimitive.ImageLoadingStatus;
+  state: ImageLoadingStatus;
   delayFinished: boolean;
 };
 
@@ -50,7 +52,7 @@ const Avatar = memo(
       ref,
     ) => {
       const [loadingState, setLoadingState] =
-        useState<AvatarPrimitive.ImageLoadingStatus>("idle");
+        useState<ImageLoadingStatus>("idle");
       const [delayFinished, setDelayFinished] = useState(false);
 
       const notLoaded = loadingState === "idle" || loadingState === "loading";

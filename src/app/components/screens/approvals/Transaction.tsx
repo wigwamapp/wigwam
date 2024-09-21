@@ -370,7 +370,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   }
 
   useEffect(() => {
-    lastError && console.info(Object.values(lastError));
+    if (lastError) console.info(Object.values(lastError));
   }, [lastError]);
 
   const handleApprove = useCallback(
