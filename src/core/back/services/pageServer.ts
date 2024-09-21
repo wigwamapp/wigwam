@@ -269,7 +269,7 @@ function getDefaultAccountAddress() {
 }
 
 async function checkForPhishing(hostname: string, callback: () => void) {
-  const phishing = isPhishingWebsite(hostname);
+  const phishing = await isPhishingWebsite(hostname);
 
   // TODO: Add checker - is user already allowed this website
 

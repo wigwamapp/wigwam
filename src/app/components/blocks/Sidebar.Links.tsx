@@ -98,7 +98,6 @@ const useSidebarLinks = () => {
     swapBadgeAmount,
     setActivityOpened,
     setReceiveOpened,
-    alert,
   ]);
 
   const NavLinksSecondary = useMemo(() => {
