@@ -1,6 +1,6 @@
 {
   "name": "@wigwam/app",
-  "version": "2.5.4",
+  "version": "2.6.0",
   "private": true,
   "license": "MIT",
   "scripts": {
