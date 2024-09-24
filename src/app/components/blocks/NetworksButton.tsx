@@ -117,6 +117,7 @@ const NetworksModal: FC<
   const { confirm, alert } = useDialog();
 
   const [searchValue, setSearchValue] = useState("");
+  const [contentMounted, setContentMounted] = useState(false);
 
   const balancesMap = useMemo(
     () =>
@@ -238,6 +239,7 @@ const NetworksModal: FC<
   }, [searchValue, testnetsVisibility]);
 
   const rowVirtualizer = useVirtualizer({
+    enabled: contentMounted,
     count: filteredNetworkList.length,
     getScrollElement: () => scrollAreaRef.current,
     estimateSize: () => {
@@ -307,6 +309,8 @@ const NetworksModal: FC<
 
         <Command.List>
           <Command.Group className="relative">
+            <Mount onMountChange={(m) => setContentMounted(m)} />
+
             <ScrollAreaContainer
               ref={scrollAreaRef}
               className="w-full h-full box-content -mr-5 pr-5 grow"
@@ -485,3 +489,15 @@ function compareByInstalledNetworks(
 
   return 0;
 }
+
+const Mount: FC<{ onMountChange: (mounted: boolean) => void }> = ({
+  onMountChange,
+}) => {
+  useEffect(() => {
+    onMountChange(true);
+    return () => onMountChange(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
+};

@@ -42,7 +42,7 @@ export function startInstallOrUpdateListener() {
   });
 
   // To open app from landing page
-  browser.runtime.onMessage.addListener((msg) => {
+  browser.runtime.onMessage.addListener((msg: any): undefined => {
     if (msg?.type === "__OPEN_OR_FOCUS_TAB") {
       openOrFocusMainTab().catch(console.error);
     }

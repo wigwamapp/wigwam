@@ -25,7 +25,7 @@ export function startApproveWindowOpener() {
 
   let popupState: ApprovePopupState = null;
 
-  browser.runtime.onMessage.addListener((msg) => {
+  browser.runtime.onMessage.addListener((msg): undefined => {
     if (msg === "__OPEN_APPROVE_WINDOW") {
       openApproveWindow();
 

@@ -3,7 +3,7 @@ export function isValidHttpsUrl(uri: string) {
     const url = new URL(uri);
 
     return url.protocol === "https:";
-  } catch (_) {
+  } catch {
     return false;
   }
 }

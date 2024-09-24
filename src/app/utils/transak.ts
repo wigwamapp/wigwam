@@ -24,9 +24,7 @@ export function generateURL(configData: TransakConfig) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         queryParams[key] = JSON.stringify(configData[key]);
-      } catch (e) {
-        /* empty */
-      }
+      } catch {}
 
       return;
     }
@@ -36,9 +34,7 @@ export function generateURL(configData: TransakConfig) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         queryParams[key] = btoa(JSON.stringify(configData[key]));
-      } catch (e) {
-        /* empty */
-      }
+      } catch {}
 
       return;
     }
@@ -52,9 +48,7 @@ export function generateURL(configData: TransakConfig) {
           // @ts-ignore
           String.fromCharCode.apply(null, pako.deflate(configData[key])),
         );
-      } catch (e) {
-        /* empty */
-      }
+      } catch {}
 
       return;
     }

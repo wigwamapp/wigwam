@@ -16,9 +16,7 @@ import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
 import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
-import { ReactComponent as BugIcon } from "app/icons/Bug.svg";
 import * as SupportAlert from "app/components/elements/SupportAlert";
-import * as FindBug from "app/components/elements/FindBug";
 import { useDialog } from "app/hooks/dialog";
 import { activityModalAtom, receiveModalAtom } from "app/atoms";
 import { useActivityBadge, useSwapBadge, useAccounts } from "app/hooks";
@@ -79,15 +77,15 @@ const useSidebarLinks = () => {
         label: "Rewards",
         Icon: RewardsIcon,
       },
-      {
-        label: "Bug bounty",
-        Icon: BugIcon,
-        action: () =>
-          alert({
-            title: <FindBug.Title />,
-            content: <FindBug.Content />,
-          }),
-      },
+      // {
+      //   label: "Bug bounty",
+      //   Icon: BugIcon,
+      //   action: () =>
+      //     alert({
+      //       title: <FindBug.Title />,
+      //       content: <FindBug.Content />,
+      //     }),
+      // },
       // {
       //   route: Page.Apps,
       //   label: "Apps",
@@ -100,7 +98,6 @@ const useSidebarLinks = () => {
     swapBadgeAmount,
     setActivityOpened,
     setReceiveOpened,
-    alert,
   ]);
 
   const NavLinksSecondary = useMemo(() => {

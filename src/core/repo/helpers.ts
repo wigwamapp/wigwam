@@ -22,7 +22,7 @@ export async function clear() {
   try {
     const databases = await indexedDB.databases();
     for (const { name } of databases) {
-      name && indexedDB.deleteDatabase(name);
+      if (name) indexedDB.deleteDatabase(name);
     }
   } catch {}
 }

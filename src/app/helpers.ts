@@ -6,7 +6,7 @@ import { Destination, toHash, navigate } from "lib/navigation";
 
 export async function openInTab(to?: Destination, merge?: boolean | string[]) {
   if (!isPopup()) {
-    to && navigate(to);
+    if (to) navigate(to);
     return;
   }
 

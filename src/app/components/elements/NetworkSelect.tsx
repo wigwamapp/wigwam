@@ -55,7 +55,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
   const allNetworks = useMemo(
     () =>
       !balancesMap?.size
-        ? allNetworksPure ?? []
+        ? (allNetworksPure ?? [])
         : (allNetworksPure ?? [])
             .map((n) => ({
               ...n,
@@ -72,7 +72,7 @@ const NetworkSelect: FC<NetworkSelectProps> = ({
 
   const handleNetworkChange = useCallback(
     (chainId: number) => {
-      changeInternalChainId && setChainId(chainId);
+      if (changeInternalChainId) setChainId(chainId);
       onChange?.(chainId);
     },
     [changeInternalChainId, setChainId, onChange],

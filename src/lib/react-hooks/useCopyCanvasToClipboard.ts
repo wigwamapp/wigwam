@@ -43,7 +43,7 @@ export function useCopyCanvasToClipboard(
           }
         }
       }
-    } catch (e) {
+    } catch {
       alert({
         title: "Error while copying media",
         content: "Copy media doesn't work in this environment.",
