@@ -76,6 +76,11 @@ export class InpageProvider extends Emitter {
     this.#inpage = inpageProto;
     this.#listenInpage();
     this.#listenNotifications();
+
+    this.request = this.request.bind(this);
+    this.send = this.send.bind(this);
+    this.sendAsync = this.sendAsync.bind(this);
+    this.sendSync = this.sendSync.bind(this);
   }
 
   #getReqId() {
