@@ -239,7 +239,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
 
           delete tx.from;
 
-          const estimatedGasLimit = BigInt(tx.gasLimit!);
+          const estimatedGasLimit = BigInt(
+            feeSuggestions?.gasLimit ?? tx.gasLimit!,
+          );
           const minGasLimit = (estimatedGasLimit * 5n) / 4n;
           const averageGasLimit = (estimatedGasLimit * 3n) / 2n;
           const gasLimit =

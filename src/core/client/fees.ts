@@ -14,6 +14,7 @@ export async function suggestFees(
 
   return {
     type: gasPrices.type,
+    gasLimit: gasPrices.gasLimit ? BigInt(gasPrices.gasLimit) : undefined,
     modes: Object.fromEntries(
       Object.entries(gasPrices.modes).map(([mode, fees]) => [
         mode,
@@ -21,6 +22,6 @@ export async function suggestFees(
           Object.entries(fees).map(([prop, price]) => [prop, BigInt(price)]),
         ),
       ]),
-    ),
-  } as any;
+    ) as any,
+  };
 }

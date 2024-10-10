@@ -500,6 +500,9 @@ const TransferTokenContent = memo<TransferTokenContent>(
               }
 
               const fees = await suggestFees(provider);
+              if (fees.gasLimit) {
+                gasLimit = BigInt(fees.gasLimit);
+              }
 
               const gasPrice = fees.modes.high.max;
               const maxGasLimit = (gasLimit * 3n) / 2n;

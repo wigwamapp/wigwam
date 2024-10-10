@@ -2,10 +2,15 @@ import memoize from "mem";
 
 import { GasPrices } from "core/types";
 
-import { getOnChainLegacy } from "./onChainLegacy";
+import { getLineaGasPrices } from "./linea";
 import { getIndexerGasPrices } from "./indexerApi";
+import { getOnChainLegacy } from "./onChainLegacy";
 
-const GAS_PRICES_WAYS = [getIndexerGasPrices, getOnChainLegacy];
+const GAS_PRICES_WAYS = [
+  getLineaGasPrices,
+  getIndexerGasPrices,
+  getOnChainLegacy,
+];
 
 export const estimateGasPrices = memoize(
   async (chainId: number): Promise<GasPrices> => {
