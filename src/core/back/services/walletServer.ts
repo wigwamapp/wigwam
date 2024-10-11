@@ -98,7 +98,7 @@ const withQueue = createQueue();
 async function handleWalletRequest(
   ctx: MessageContext<Request | EventMessage, Response>,
 ) {
-  console.debug("New wallet request", ctx);
+  // console.debug("New wallet request", ctx);
 
   try {
     await ensureInited();

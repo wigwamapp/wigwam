@@ -111,7 +111,7 @@ export const syncNetworks = memoize(
         };
 
         if (existing) {
-          if (!balance) {
+          if (balance === null) {
             return {
               ...existing,
               priceUSD,
