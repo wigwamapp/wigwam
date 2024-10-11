@@ -17,7 +17,11 @@ import {
 } from "./tokens";
 
 export function getGasPriceStep(averageGasPrice: bigint) {
-  return BigInt(`1${"0".repeat(averageGasPrice.toString().length - 2)}`);
+  try {
+    return BigInt(`1${"0".repeat(averageGasPrice.toString().length - 2)}`);
+  } catch {
+    return 1n;
+  }
 }
 
 export async function matchTxAction(
@@ -443,7 +447,7 @@ function ethStringify(v: ethers.BigNumberish) {
     : v.toString();
 }
 
-function isZeroHex(val?: any) {
+export function isZeroHex(val?: any) {
   val = val?.toHexString?.() ?? val?.toString?.();
   return !val || val === "0x" || val === "0x00" || val === ethers.ZeroAddress;
 }

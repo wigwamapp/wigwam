@@ -31,7 +31,7 @@ import {
   trackEvent,
 } from "core/client";
 import { getNextNonce } from "core/common/nonce";
-import { matchTxAction } from "core/common/transaction";
+import { isZeroHex, matchTxAction } from "core/common/transaction";
 import { estimateL1Fee } from "core/common/l1Fee";
 
 import {
@@ -216,16 +216,16 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                   ...pureTxParams,
                   nonce: pureTxParams.nonce ? +pureTxParams.nonce : undefined,
                   type: feeSuggestions?.type === "legacy" ? 0 : undefined,
-                  ...(feeSuggestions?.type === "modern"
-                    ? {
-                        maxFeePerGas: feeSuggestions.modes.low.max,
-                        maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
-                      }
-                    : feeSuggestions?.type === "legacy"
-                      ? {
-                          gasPrice: feeSuggestions.modes.average.max,
-                        }
-                      : {}),
+                  // ...(feeSuggestions?.type === "modern"
+                  //   ? {
+                  //       maxFeePerGas: feeSuggestions.modes.low.max,
+                  //       maxPriorityFeePerGas: feeSuggestions.modes.low.priority,
+                  //     }
+                  //   : feeSuggestions?.type === "legacy"
+                  //     ? {
+                  //         gasPrice: feeSuggestions.modes.average.max,
+                  //       }
+                  //     : {}),
                 }),
               { retries: 2, minTimeout: 0, maxTimeout: 0 },
             ),
@@ -244,10 +244,14 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
           );
           const minGasLimit = (estimatedGasLimit * 5n) / 4n;
           const averageGasLimit = (estimatedGasLimit * 3n) / 2n;
-          const gasLimit =
+          let gasLimit =
             providedGasLimit && minGasLimit <= BigInt(providedGasLimit)
               ? BigInt(providedGasLimit)
               : averageGasLimit;
+
+          if (isZeroHex(tx.data)) {
+            gasLimit = 21_000n;
+          }
 
           const preparedTx = Transaction.from({
             ...tx,

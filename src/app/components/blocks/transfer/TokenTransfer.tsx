@@ -405,12 +405,14 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   value,
                 };
 
-                gasLimit = await provider.estimateGas(txParams).catch((err) =>
-                  // Try with signer, zkSync case
-                  signer.estimateGas(txParams!).catch(() => {
-                    throw err;
-                  }),
-                );
+                gasLimit = 21_000n;
+
+                // gasLimit = await provider.estimateGas(txParams).catch((err) =>
+                //   // Try with signer, zkSync case
+                //   signer.estimateGas(txParams!).catch(() => {
+                //     throw err;
+                //   }),
+                // );
 
                 txParams.from = signer.address;
                 txParams.gasLimit = gasLimit;
@@ -505,7 +507,10 @@ const TransferTokenContent = memo<TransferTokenContent>(
               }
 
               const gasPrice = fees.modes.high.max;
-              const maxGasLimit = (gasLimit * 3n) / 2n;
+              const maxGasLimit =
+                tokenSlug !== NATIVE_TOKEN_SLUG
+                  ? (gasLimit * 3n) / 2n
+                  : gasLimit;
 
               const l1Fee = txParams
                 ? await estimateL1Fee(
