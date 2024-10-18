@@ -250,7 +250,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
               : averageGasLimit;
 
           if (isZeroHex(tx.data)) {
-            gasLimit = 21_000n;
+            gasLimit = estimatedGasLimit;
           }
 
           const preparedTx = Transaction.from({

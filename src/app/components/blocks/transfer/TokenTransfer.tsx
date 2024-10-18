@@ -405,14 +405,16 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   value,
                 };
 
-                gasLimit = 21_000n;
+                // if (!UNKNOWN_NATIVE_TRANSFER_GAS_LIMIT.has(chainId)) {
+                //   gasLimit = 21_000n;
+                // }
 
-                // gasLimit = await provider.estimateGas(txParams).catch((err) =>
-                //   // Try with signer, zkSync case
-                //   signer.estimateGas(txParams!).catch(() => {
-                //     throw err;
-                //   }),
-                // );
+                gasLimit = await provider.estimateGas(txParams).catch((err) =>
+                  // Try with signer, zkSync case
+                  signer.estimateGas(txParams!).catch(() => {
+                    throw err;
+                  }),
+                );
 
                 txParams.from = signer.address;
                 txParams.gasLimit = gasLimit;
