@@ -405,10 +405,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
                   value,
                 };
 
-                // if (!UNKNOWN_NATIVE_TRANSFER_GAS_LIMIT.has(chainId)) {
-                //   gasLimit = 21_000n;
-                // }
-
                 gasLimit = await provider.estimateGas(txParams).catch((err) =>
                   // Try with signer, zkSync case
                   signer.estimateGas(txParams!).catch(() => {
