@@ -31,6 +31,7 @@ import { MANTLE } from "./mantle";
 import { ROOTSTOCK } from "./rootstock";
 import { MODE } from "./mode";
 import { BLAST } from "./blast";
+import { DAVINCI } from "./davinci";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -63,6 +64,7 @@ export const DEFAULT_NETWORKS: Network[] = [
   HECO,
   HARMONY,
   LOCAL,
+  DAVINCI,
 ].flatMap((chainNets, i) =>
   chainNets.map((n) => ({
     ...n,
