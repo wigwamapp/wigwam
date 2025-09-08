@@ -86,7 +86,7 @@ export const estimateL1Fee = async (
         provider,
       );
 
-      const serializedTx = Transaction.from(tx).unsignedSerialized;
+      const serializedTx = Transaction.from(tx as any).unsignedSerialized;
 
       return await retry(() => contract.getL1Fee(serializedTx), {
         retries: 2,
@@ -105,7 +105,7 @@ export const estimateL1Fee = async (
       const fixedOverhead = 2100n;
       const dynamicOverhead = 1n;
 
-      const serializedTx = Transaction.from(tx).unsignedSerialized;
+      const serializedTx = Transaction.from(tx as any).unsignedSerialized;
       const txBytes = getBytes(serializedTx);
 
       const zeroBytes = countZeroBytes(txBytes);
