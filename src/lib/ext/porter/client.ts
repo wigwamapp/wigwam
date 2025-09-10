@@ -19,7 +19,7 @@ export class PorterClient<ReqData = any, ResData = unknown> {
   public onFullyDisconnect?: () => void;
 
   connect(name: string, attempts = 0) {
-    this.port?.disconnect();
+    this.disconnect();
 
     const handleReconnect = (err?: any) => {
       if (attempts > 20 || err?.message === "Extension context invalidated.") {
@@ -57,6 +57,12 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
     this.port = port;
     attempts = 0;
+  }
+
+  disconnect() {
+    try {
+      this.port?.disconnect();
+    } catch {}
   }
 
   /**
