@@ -237,6 +237,12 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
             <span>
               <strong>DO NOT share</strong> this set of words with anyone! It
               can be used to steal all wallets belonging to this phrase.
+              <br />
+              We <strong>WILL NEVER</strong> ask for this information.
+              <br />
+              No Support Agent, Tech Team Member, Wigwam Team Member, or
+              Security Specialist can request it. Sharing this information is
+              strictly prohibited!
             </span>
           </div>
         </>

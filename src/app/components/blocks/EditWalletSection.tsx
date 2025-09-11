@@ -446,6 +446,12 @@ const SensetiveActionModal = memo<
                 ? "all wallets belonging to this phrase"
                 : "this wallet"}
               .
+              <br />
+              We <strong>WILL NEVER</strong> ask for this information.
+              <br />
+              No Support Agent, Tech Team Member, Wigwam Team Member, or
+              Security Specialist can request it. Sharing this information is
+              strictly prohibited!
             </span>
           </div>
         </>
