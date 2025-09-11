@@ -200,8 +200,19 @@ export const fetchAllUsedNetworks = withOfflineCache(
   async (accountAddress: string) => {
     const items = await Promise.all(
       [
-        1, 56, 137, 25, 42161, 43114, 250, 122, 1313161554, 5000, 1101, 10,
-        8453,
+        42161, // arbitrum
+        43114, // avalanche
+        8453, // base
+        56, // bsc
+        1, // eth
+        250, // fantom
+        14, // flare
+        100, // gnosis
+        59144, // linea
+        10, // optimism
+        137, // polygon
+        1101, // polygon_zkevm
+        534352, // scroll
       ].map(async (chainId) => ({
         chainId,
         tokens: await fetchAccountTokens(chainId, accountAddress).catch(

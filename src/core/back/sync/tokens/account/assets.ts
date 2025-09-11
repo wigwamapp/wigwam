@@ -19,6 +19,7 @@ import { DexPrices, getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
 import { CxToken, indexerApi } from "../../indexer";
 import { prepareAccountTokensSync } from "./utils";
+import { K_INDEXER_CHAINS } from "./constants";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
 
@@ -217,13 +218,14 @@ export const syncAccountAssets = memoize(
 
 export const fetchAccountTokens = memoize(
   (chainId: number, accountAddress: string) =>
-    fetchKxAccountTokens(chainId, accountAddress).catch((err) => {
-      if (!err?.message?.includes("Chain not supported")) {
-        console.warn("Using another indexer", err);
-      }
+    fetchKxAccountTokens(chainId, accountAddress),
+  // .catch((err) => {
+  //     if (!err?.message?.includes("Chain not supported")) {
+  //       console.warn("Using another indexer", err);
+  //     }
 
-      return fetchUxAccountTokens(chainId, accountAddress);
-    }),
+  //     return fetchUxAccountTokens(chainId, accountAddress);
+  //   }),
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 10_000, // 10 sec
@@ -274,24 +276,22 @@ async function fetchKxAccountTokens(chainId: number, accountAddress: string) {
     });
 }
 
-async function fetchUxAccountTokens(chainId: number, accountAddress: string) {
-  if (!U_INDEXER_CHAINS.has(chainId)) {
-    throw new Error("Chain not supported");
-  }
+// async function fetchUxAccountTokens(chainId: number, accountAddress: string) {
+//   if (!U_INDEXER_CHAINS.has(chainId)) {
+//     throw new Error("Chain not supported");
+//   }
 
-  return indexerApi
-    .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
-      params: {
-        _authAddress: accountAddress,
-        verified: true,
-      },
-    })
-    .then((r) => r.data as CxToken[]);
-}
+//   return indexerApi
+//     .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
+//       params: {
+//         _authAddress: accountAddress,
+//         verified: true,
+//       },
+//     })
+//     .then((r) => r.data as CxToken[]);
+// }
 
-const U_INDEXER_CHAINS = new Set([
-  1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
-  1313161554, 1088, 5000, 1101, 1284, 10, 8453, 34443, 169,
-]);
-
-const K_INDEXER_CHAINS = new Set([1, 56, 137, 8453]);
+// const U_INDEXER_CHAINS = new Set([
+//   1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
+//   1313161554, 1088, 5000, 1101, 1284, 10, 8453, 34443, 169,
+// ]);
