@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 
 import { AccountToken, TokenActivityBase, TokenType } from "core/types";
-import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
+// import { NATIVE_TOKEN_SLUG } from "core/common/tokens";
 
 import { indexerApi, getDxChain } from "../../indexer";
 import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
@@ -14,7 +14,7 @@ import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
 export async function syncDxTokenActivities(token: AccountToken) {
   const { chainId, tokenSlug, accountAddress, tokenType } = token;
 
-  if (tokenSlug !== NATIVE_TOKEN_SLUG) return;
+  // if (tokenSlug !== NATIVE_TOKEN_SLUG) return;
 
   const dxChain = await getDxChain(chainId);
   if (!dxChain) return;

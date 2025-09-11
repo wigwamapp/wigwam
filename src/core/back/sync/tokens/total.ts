@@ -88,8 +88,10 @@ export const fetchTotalChainBalance = withOfflineCache(
       // Skip if dead address
       if (
         (network?.type === "mainnet" &&
-          (!token.contract_ticker_symbol || !token.contract_decimals)) ||
-        getAddress(token.contract_address) === DEAD_ADDRESS
+          (!token.contract_ticker_symbol ||
+            token.contract_decimals === null ||
+            token.contract_decimals === undefined)) ||
+        isDeadAddress(token.contract_address)
       ) {
         continue;
       }
@@ -106,3 +108,11 @@ export const fetchTotalChainBalance = withOfflineCache(
     coldMaxAge: 10 * 60_000, // 10 min
   },
 );
+
+function isDeadAddress(address: string) {
+  try {
+    return getAddress(address) === DEAD_ADDRESS;
+  } catch {
+    return false;
+  }
+}
