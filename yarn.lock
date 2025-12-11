@@ -2440,6 +2440,18 @@
     eth-rpc-errors "^4.0.3"
     ethers "^5.7.2"
 
+"@lifi/sdk@^2.5.2":
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@lifi/sdk/-/sdk-2.5.2.tgz#ce02d77f46c848172d79c67873a2477fa397f5e7"
+  integrity sha512-LljyEU3OARdHp+PJstWhI/ZdRDeBrd0MOYDeecTUp3Ox+B2WaZlz/qCd3HsaW9Rqr1RWP6Sge8t5BjjZaXXfsQ==
+  dependencies:
+    "@ethersproject/abi" "^5.7.0"
+    "@ethersproject/contracts" "^5.7.0"
+    "@lifi/types" "^9.3.0"
+    bignumber.js "^9.1.2"
+    eth-rpc-errors "^4.0.3"
+    ethers "^5.7.2"
+
 "@lifi/types@^9.3.0":
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/@lifi/types/-/types-9.3.1.tgz#99bf27c7f0315ebf2cec6de2b1fde6da4dc10792"
