@@ -6,6 +6,7 @@ export const POLYGON: Network[] = [
     chainId: 137,
     type: "mainnet",
     rpcUrls: [
+      "https://polygon-public.nodies.app",
       "https://polygon-rpc.com",
       "https://polygon.llamarpc.com",
       "https://rpc.ankr.com/polygon",
