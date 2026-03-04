@@ -15,13 +15,18 @@ export class PorterClient<ReqData = any, ResData = unknown> {
   private portId = nanoid();
   private reqId = 0;
   private messageHandlers = new Set<(msg: any) => void>();
+  private suspended = false;
 
   public onFullyDisconnect?: () => void;
 
   connect(name: string, attempts = 0) {
     this.port?.disconnect();
 
+    if (this.suspended) return;
+
     const handleReconnect = (err?: any) => {
+      if (this.suspended) return;
+
       if (attempts > 20 || err?.message === "Extension context invalidated.") {
         console.error(err);
         this.onFullyDisconnect?.();
@@ -144,6 +149,17 @@ export class PorterClient<ReqData = any, ResData = unknown> {
 
     this.messageHandlers.add(listener);
     return () => this.messageHandlers.delete(listener);
+  }
+
+  suspend() {
+    this.suspended = true;
+    this.port?.disconnect();
+    delete this.port;
+  }
+
+  resume(name: string) {
+    this.suspended = false;
+    this.connect(name);
   }
 
   private getCurrentPort() {

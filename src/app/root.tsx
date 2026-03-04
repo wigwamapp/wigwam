@@ -14,9 +14,11 @@ if (
   require("spacingjs/dist/bundle");
 }
 
-export function mount(app: ReactNode) {
-  disableOutlinesForClick();
+disableOutlinesForClick();
 
+export function mount(app: ReactNode) {
   const root = createRoot(document.getElementById("root")!);
   root.render(<>{app}</>);
+
+  return () => root.unmount();
 }
