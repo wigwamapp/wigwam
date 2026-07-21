@@ -182,7 +182,7 @@ const SetupPassword = memo(() => {
                     title="Analytics"
                     description={
                       <>
-                        Help us make OG better.
+                        Help us make OG Wallet better.
                         <br />I agree to the{" "}
                         <a
                           href="https://ogwallet.tech/privacy"

@@ -704,8 +704,8 @@ const CheckboxWithLabel: FC<ICheckboxWithLabelProps> = ({
 const ALREADY_PARTICIPATING_CONTENT = (
   <>
     <p className="mb-6 text-base text-brand-gray">
-      You are already participating in the OG rewards program. A huge thank you
-      for your support! Stay ahead of the curve - follow us on{" "}
+      You are already participating in the OG Wallet rewards program. A huge
+      thank you for your support! Stay ahead of the curve - follow us on{" "}
       <a
         className="font-semibold underline hover:text-brand-gray"
         href={DISCORD}

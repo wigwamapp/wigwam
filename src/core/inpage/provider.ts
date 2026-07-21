@@ -55,11 +55,11 @@ export class InpageProvider extends Emitter {
   // https://eips.ethereum.org/EIPS/eip-6963
   // https://eips.ethereum.org/EIPS/eip-5749
   info: EIP6963ProviderInfo = Object.freeze({
-    name: "OG",
+    name: "OG Wallet",
     uuid: `og-${process.env.BUILD_ID}`,
     rdns: "com.og.wallet",
     icon: ICON_SVG_BASE64,
-    description: "OG — Web 3.0 Wallet",
+    description: "OG Wallet — Web 3.0 Wallet",
   });
 
   #inited = false;

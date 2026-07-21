@@ -21,19 +21,19 @@ const stepsContent: TStepContent[] = [
   {
     title: "Trade and explore",
     description:
-      "Instantly trade over 2,500 tokens, connect with hundreds of dApps, and create or sell NFTs in the Web3 world, all through OG",
+      "Instantly trade over 2,500 tokens, connect with hundreds of dApps, and create or sell NFTs in the Web3 world, all through OG Wallet",
     image: OnboardingFirstImage,
   },
   {
     title: "Easy access",
     description:
-      "If you can't find a OG button when connecting to a dApp, you can effortlessly connect to OG using MetaMask button instead, as this option is automatically available",
+      "If you can't find a OG Wallet button when connecting to a dApp, you can effortlessly connect to OG Wallet using MetaMask button instead, as this option is automatically available",
     image: OnboardingSecondImage,
   },
   {
     title: "Always near",
     description:
-      "Pin the OG extension on your browser toolbar for fast access to your tokens and to navigate the Web3 space more efficiently",
+      "Pin the OG Wallet extension on your browser toolbar for fast access to your tokens and to navigate the Web3 space more efficiently",
     image: OnboardingThirdImage,
   },
 ];
@@ -73,7 +73,7 @@ const OnBoardingContent: FC = () => {
             alt="og_logo"
           />
           <h3 className="mb-6 text-[1.75rem] font-bold text-center">
-            Welcome to OG:
+            Welcome to OG Wallet:
             <br />
             Your Gateway to the Web3 World!
           </h3>

@@ -26,7 +26,7 @@ function initMsgGateway() {
     }
 
     console.error(
-      "OG: Provider disconnected." +
+      "OG Wallet: Provider disconnected." +
         " A page reload is required to reestablish the connection.",
     );
   };

@@ -50,7 +50,7 @@ const Welcome: FC = () => {
             "mb-16 text-5xl mmd:text-4xl font-bold text-brand-light",
           )}
         >
-          Welcome to OG
+          Welcome to OG Wallet
         </h1>
 
         <Button
