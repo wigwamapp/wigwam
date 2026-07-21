@@ -68,7 +68,7 @@ const SetupPassword = memo(() => {
               userId: nanoid(),
             });
 
-            trackEvent(TEvent.SetupWigwam);
+            trackEvent(TEvent.SetupOG);
           }
 
           setAccModalOpened([false]);

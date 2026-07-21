@@ -5,7 +5,7 @@ import { JSONRPC, OG_PHISHING_WARNING, OG_STATE } from "core/common/rpc";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 const inpageProto = new InpageProtocol("injected", "content");
-const wigwam = new InpageProvider(inpageProto);
+const og = new InpageProvider(inpageProto);
 
 const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   const unsub = inpageProto.subscribe((payload) => {
@@ -26,7 +26,7 @@ const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
 });
 
 injectEIP1193("ethereum", true);
-injectEIP1193("wigwamEthereum");
+injectEIP1193("ogEthereum");
 injectEIP5749("evmproviders");
 injectEIP6963();
 
@@ -38,8 +38,8 @@ function injectEIP1193(key: string, sharedProperty = false) {
 
   let existing = getExisting();
 
-  if (existing?.isWigwam && "addProviders" in existing) {
-    existing.addProviders(wigwam);
+  if (existing?.isOG && "addProviders" in existing) {
+    existing.addProviders(og);
     return;
   }
 
@@ -53,8 +53,8 @@ function injectEIP1193(key: string, sharedProperty = false) {
 
     return new UniversalInpageProvider(
       existing && redefineProperty
-        ? [wigwam, ...getProvidersInline(existing)]
-        : [wigwam],
+        ? [og, ...getProvidersInline(existing)]
+        : [og],
       sharedProperty,
       propIsMetaMaskPreferred,
     );
@@ -100,7 +100,7 @@ function injectEIP5749(key: string) {
   const evmProviders: Record<string, InpageProvider> =
     (window as any)[key] || ((window as any)[key] = {});
 
-  evmProviders[wigwam.info.uuid] = wigwam;
+  evmProviders[og.info.uuid] = og;
 }
 
 // https://eips.ethereum.org/EIPS/eip-6963
@@ -108,7 +108,7 @@ function injectEIP6963() {
   const announceProvider = () => {
     window.dispatchEvent(
       new CustomEvent("eip6963:announceProvider", {
-        detail: Object.freeze({ info: wigwam.info, provider: wigwam }),
+        detail: Object.freeze({ info: og.info, provider: og }),
       }),
     );
   };

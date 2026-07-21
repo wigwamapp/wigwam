@@ -32,7 +32,7 @@ const stateUpdatedType = Symbol();
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 
 export class InpageProvider extends Emitter {
-  isWigwam = true;
+  isOG = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
