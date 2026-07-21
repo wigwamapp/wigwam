@@ -1,4 +1,4 @@
-# Wigwam Web Extension Wallet - General Tech Documentation
+# OG Web Extension Wallet - General Tech Documentation
 
 ## Architecture
 
