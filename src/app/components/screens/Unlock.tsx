@@ -62,7 +62,6 @@ const Unlock: FC<UnlockProps> = ({ isApproval }) => {
             "flex items-center",
           )}
         >
-          {/* TODO REBRANDING: replace logo artwork */}
           <OGIcon className={classNames("h-[1.375rem]", "w-auto mr-3")} />
         </div>
       )}

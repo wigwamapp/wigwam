@@ -67,7 +67,6 @@ const OnBoardingContent: FC = () => {
     >
       <ScrollAreaContainer className="w-full h-full flex flex-col relative max-w-7xl">
         <section className="mb-6 flex flex-col items-center">
-          {/* TODO REBRANDING: replace logo artwork */}
           <img
             className="mb-6 w-11 h-11 rounded-md"
             src={OGLogoImage}

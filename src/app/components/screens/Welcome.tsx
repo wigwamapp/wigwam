@@ -44,7 +44,6 @@ const Welcome: FC = () => {
             : "opacity-100 transition-opacity duration-500",
         )}
       >
-        {/* TODO REBRANDING: replace logo artwork */}
         <OGIcon className={classNames("w-[5rem] h-auto mb-5")} />
         <h1
           className={classNames(

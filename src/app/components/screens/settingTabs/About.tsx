@@ -11,7 +11,6 @@ const About: FC = () => {
   return (
     <div className="flex flex-col items-start pt-3">
       <div className="flex items-center">
-        {/* TODO REBRANDING: replace logo artwork */}
         <OGLogo className="w-[3.25rem] h-auto" />
         <span className="text-2xl font-black ml-4">OG</span>
       </div>

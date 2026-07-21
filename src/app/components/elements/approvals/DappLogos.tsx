@@ -14,7 +14,6 @@ const DappLogos: FC<{ firstLogoUrl?: string; dappLogoUrl?: string }> = ({
   dappLogoUrl,
 }) => (
   <div className="flex items-center">
-    {/* TODO REBRANDING: replace logo artwork */}
     <Avatar
       className={classNames(iconsClassNames, "z-10")}
       src={firstLogoUrl}

@@ -140,7 +140,6 @@ const AddAccountModal = memo(() => {
         >
           <OnMount handle={handleContentMount} />
 
-          {/* TODO REBRANDING: replace logo artwork */}
           <OGIcon
             className={classNames(
               "w-16 h-auto",

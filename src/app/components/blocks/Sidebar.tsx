@@ -34,7 +34,6 @@ const Sidebar: FC = () => {
           "text-2xl font-black",
         )}
       >
-        {/* TODO REBRANDING: replace logo artwork */}
         <OGTitleIcon className={classNames("ml-3 my-1 h-8 w-auto")} />
       </Link>
       <SidebarBlock links={NavLinksPrimary} />
