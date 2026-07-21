@@ -116,8 +116,8 @@ const usefulLinks = [
     href: "https://ogwallet.tech/",
   },
   {
-    label: "Contact us",
-    href: "https://ogwallet.tech/contact",
+    label: "Email",
+    href: "mailto:info@ogwallet.tech",
   },
   {
     label: "Help",
