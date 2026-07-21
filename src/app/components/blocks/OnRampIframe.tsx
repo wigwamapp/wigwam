@@ -19,11 +19,12 @@ import { nanoid } from "nanoid";
 import { ActivityType, RampActivity, SelfActivityKind } from "core/types";
 import * as repo from "core/repo";
 import { useAccounts, useChainId, useRamp } from "app/hooks";
+import { BUY_ENABLED } from "app/defaults";
 
 type RampOrder = { [key: string]: any };
 
 const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
-const SUSPENDED = false;
+const SUSPENDED = !BUY_ENABLED;
 
 const saveRampActivity = (rampOrder: RampOrder) => {
   const newRampActivity: RampActivity = {

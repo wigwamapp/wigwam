@@ -5,6 +5,7 @@ import { Redirect } from "lib/navigation";
 
 import { Page } from "app/nav";
 import { pageAtom } from "app/atoms";
+import { BUY_ENABLED } from "app/defaults";
 import MainPageLayout from "app/components/layouts/MainPageLayout";
 
 import Overview from "./mainPages/Overview";
@@ -41,7 +42,9 @@ function matchMainPage(page: Page) {
   return match(page)
     .with(Page.Default, () => <Overview />)
     .with(Page.Receive, () => <Receive />)
-    .with(Page.Buy, () => <Buy />)
+    .with(Page.Buy, () =>
+      BUY_ENABLED ? <Buy /> : <Redirect to={{ page: Page.Default }} />,
+    )
     .with(Page.Transfer, () => <Transfer />)
     .with(Page.Swap, () => <SwapDynamic />)
     .with(Page.Apps, () => <Apps />)

@@ -17,6 +17,7 @@ declare namespace NodeJS {
     readonly WIGWAM_INFURA_API_KEY?: string;
     readonly WIGWAM_ANALYTICS_API_KEY?: string;
     readonly WIGWAM_OPEN_LOGIN_CLIENT_ID?: string;
+    readonly WIGWAM_BUY_ENABLED?: string;
     // Dev
     readonly WIGWAM_DEV_UNLOCK_PASSWORD?: string;
     readonly WIGWAM_DEV_ACTIVE_TAB_RELOAD?: string;

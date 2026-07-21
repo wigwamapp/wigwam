@@ -7,6 +7,7 @@ import { WalletStatus } from "core/types";
 import { TEvent, trackEvent } from "core/client";
 
 import { openInTab, toggleSidePanel } from "app/helpers";
+import { BUY_ENABLED } from "app/defaults";
 import {
   getTotalAccountBalanceAtom,
   isSidePanelEnabledAtom,
@@ -288,16 +289,18 @@ const WalletInfo: FC = () => {
           </div>
           <span className="text-xs font-medium">Receive</span>
         </Button>
-        <DeepLinkButton
-          text="Buy"
-          to="buy"
-          Icon={BuyIcon}
-          onClick={() => {
-            trackEvent(TEvent.BuyNavigated, {
-              page: "popup",
-            });
-          }}
-        />
+        {BUY_ENABLED && (
+          <DeepLinkButton
+            text="Buy"
+            to="buy"
+            Icon={BuyIcon}
+            onClick={() => {
+              trackEvent(TEvent.BuyNavigated, {
+                page: "popup",
+              });
+            }}
+          />
+        )}
         <DeepLinkButton
           text="Swap"
           to="swap"

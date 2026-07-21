@@ -23,6 +23,7 @@ import { TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
+import { BUY_ENABLED } from "app/defaults";
 import { chainIdAtom, getTokenDetailsUrlAtom } from "app/atoms";
 import {
   TippySingletonProvider,
@@ -261,7 +262,7 @@ const AssetModal: FC<IAssetModalProps> = ({
   );
 
   const showBuyButton = useMemo(
-    () => status !== TokenStatus.Disabled && onRampCurrency,
+    () => BUY_ENABLED && status !== TokenStatus.Disabled && onRampCurrency,
     [status, onRampCurrency],
   );
 
@@ -350,25 +351,26 @@ const AssetModal: FC<IAssetModalProps> = ({
             </div>
             <span className="text-xs font-medium">Receive</span>
           </Button>
-          <DeepLinkButton
-            text="Buy"
-            onClick={() => {
-              trackEvent(TEvent.BuyNavigated, {
-                page: "popup",
-                tokenName: name,
-                tokenSymbol: symbol,
-                chainId,
-              });
+          {showBuyButton && (
+            <DeepLinkButton
+              text="Buy"
+              onClick={() => {
+                trackEvent(TEvent.BuyNavigated, {
+                  page: "popup",
+                  tokenName: name,
+                  tokenSymbol: symbol,
+                  chainId,
+                });
 
-              openLink({
-                page: Page.Buy,
-                token: asset.tokenSlug,
-                onRampOpened: true,
-              });
-            }}
-            Icon={BuyIcon}
-            disabled={!showBuyButton}
-          />
+                openLink({
+                  page: Page.Buy,
+                  token: asset.tokenSlug,
+                  onRampOpened: true,
+                });
+              }}
+              Icon={BuyIcon}
+            />
+          )}
           <DeepLinkButton
             text="Swap"
             onClick={() => {

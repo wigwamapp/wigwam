@@ -3,6 +3,7 @@ import { Page } from "app/nav";
 import { useSetAtom } from "jotai";
 
 import { TEvent, trackEvent } from "core/client";
+import { BUY_ENABLED } from "app/defaults";
 
 import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
@@ -51,15 +52,19 @@ const useSidebarLinks = () => {
         Icon: ReceiveIcon,
         action: () => setReceiveOpened([true, "replace"]),
       },
-      {
-        route: Page.Buy,
-        label: "Buy",
-        Icon: BuyIcon,
-        action: () =>
-          trackEvent(TEvent.BuyNavigated, {
-            page: "dashboard",
-          }),
-      },
+      ...(BUY_ENABLED
+        ? [
+            {
+              route: Page.Buy,
+              label: "Buy",
+              Icon: BuyIcon,
+              action: () =>
+                trackEvent(TEvent.BuyNavigated, {
+                  page: "dashboard",
+                }),
+            },
+          ]
+        : []),
       {
         route: Page.Swap,
         label: "Swap",

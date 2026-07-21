@@ -24,6 +24,7 @@ import {
   useTokenActivitiesSync,
 } from "app/hooks";
 import { Page } from "app/nav";
+import { BUY_ENABLED } from "app/defaults";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
 import IconedButton from "app/components/elements/IconedButton";
@@ -79,7 +80,10 @@ const AssetInfo: FC = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const showBuyButton = useMemo(
-    () => tokenInfo?.status !== TokenStatus.Disabled && onRampCurrency,
+    () =>
+      BUY_ENABLED &&
+      tokenInfo?.status !== TokenStatus.Disabled &&
+      onRampCurrency,
     [tokenInfo?.status, onRampCurrency],
   );
 
@@ -225,7 +229,12 @@ const AssetInfo: FC = () => {
                 />
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-4 gap-2">
+            <div
+              className={classNames(
+                "mt-6 grid gap-2",
+                showBuyButton ? "grid-cols-4" : "grid-cols-3",
+              )}
+            >
               <Button
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
@@ -244,28 +253,28 @@ const AssetInfo: FC = () => {
                 <ReceiveIcon className="w-4 h-auto mr-2" />
                 Receive
               </Button>
-              <Button
-                to={{
-                  onRampOpened: true,
-                  token: tokenSlug,
-                }}
-                merge
-                theme="secondary"
-                className="grow !py-2 !min-w-0 text-sm"
-                disabled={!showBuyButton}
-                title={showBuyButton ? undefined : "Coming soon"}
-                onClick={() => {
-                  trackEvent(TEvent.BuyNavigated, {
-                    page: "dashboard",
-                    tokenName: name,
-                    tokenSymbol: symbol,
-                    chainId,
-                  });
-                }}
-              >
-                <BuyIcon className="w-4 h-auto mr-2" />
-                Buy
-              </Button>
+              {showBuyButton && (
+                <Button
+                  to={{
+                    onRampOpened: true,
+                    token: tokenSlug,
+                  }}
+                  merge
+                  theme="secondary"
+                  className="grow !py-2 !min-w-0 text-sm"
+                  onClick={() => {
+                    trackEvent(TEvent.BuyNavigated, {
+                      page: "dashboard",
+                      tokenName: name,
+                      tokenSymbol: symbol,
+                      chainId,
+                    });
+                  }}
+                >
+                  <BuyIcon className="w-4 h-auto mr-2" />
+                  Buy
+                </Button>
+              )}
               <Button
                 to={{ page: Page.Swap }}
                 merge={["token"]}

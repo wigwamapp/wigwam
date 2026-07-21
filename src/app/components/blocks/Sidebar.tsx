@@ -11,6 +11,7 @@ import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
 
 import useSidebarLinks from "./Sidebar.Links";
+import { BUY_ENABLED } from "app/defaults";
 
 const Sidebar: FC = () => {
   const { NavLinksPrimary, NavLinksSecondary } = useSidebarLinks();
@@ -39,8 +40,9 @@ const Sidebar: FC = () => {
       <SidebarBlock
         links={NavLinksSecondary}
         className={classNames(
-          "mt-[6.25rem] pt-4",
+          "pt-4",
           "border-t border-brand-main/[.07]",
+          BUY_ENABLED ? "mt-[6.25rem]" : "mt-[4rem]",
         )}
       />
     </nav>

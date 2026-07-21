@@ -14,6 +14,7 @@ import { useAtom } from "jotai";
 import { useIsMounted } from "lib/react-hooks/useIsMounted";
 
 import { onRampModalAtom } from "app/atoms";
+import { BUY_ENABLED } from "app/defaults";
 import { useDialog } from "app/hooks/dialog";
 import { ReactComponent as CloseIcon } from "app/icons/close.svg";
 import IconedButton from "app/components/elements/IconedButton";
@@ -60,6 +61,10 @@ const AddFundsOnRampModal = memo(() => {
   const handleContentMount = useCallback((mounted: boolean) => {
     contentRenderedRef.current = mounted;
   }, []);
+
+  if (!BUY_ENABLED) {
+    return null;
+  }
 
   return (
     <Dialog.Root open={onRampModalOpened} onOpenChange={handleOpenChange} modal>
