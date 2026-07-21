@@ -6,12 +6,12 @@ import { pageAtom } from "app/atoms";
 import ContentContainer from "app/components/layouts/ContentContainer";
 import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
-import { ReactComponent as WigwamIcon } from "app/icons/WigwamTitle.svg";
+import { ReactComponent as OGIcon } from "app/icons/OGTitle.svg";
 import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.svg";
 // import WelcomeBgImage from "app/images/welcome-bg.jpg";
 // import WelcomeTreeLeftImage from "app/images/welcome-tree-left.png";
 // import WelcomeTreeRightImage from "app/images/welcome-tree-right.png";
-// import WelcomeWigwamImage from "app/images/welcome-wigwam.png";
+// import WelcomeOGImage from "app/images/welcome-og.png";
 // import WelcomeFireImage from "app/images/welcome-fire.png";
 
 type BoardingPageLayoutProps = {
@@ -81,7 +81,8 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           "w-full flex justify-center items-center",
         )}
       >
-        <WigwamIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
+        {/* TODO REBRANDING: replace logo artwork */}
+        <OGIcon className={classNames("h-[2rem]", "w-auto mr-3")} />
       </div>
     ) : (
       <>
@@ -102,7 +103,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           )}
         />
         <img
-          src={WelcomeWigwamImage}
+          src={WelcomeOGImage}
           alt="OG"
           className={classNames(
             "absolute bottom-[7.5%] right-[22.7%]",

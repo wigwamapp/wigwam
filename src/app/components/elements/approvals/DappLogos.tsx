@@ -2,7 +2,7 @@ import { FC } from "react";
 import classNames from "clsx";
 
 import Avatar from "app/components/elements/Avatar";
-import wigwamLogoUrl from "app/images/wigwam.png";
+import ogLogoUrl from "app/images/og.png";
 
 const iconsClassNames = classNames(
   "w-[4.65rem] h-[4.75rem] min-w-[4.75rem]",
@@ -10,10 +10,11 @@ const iconsClassNames = classNames(
 );
 
 const DappLogos: FC<{ firstLogoUrl?: string; dappLogoUrl?: string }> = ({
-  firstLogoUrl = wigwamLogoUrl,
+  firstLogoUrl = ogLogoUrl,
   dappLogoUrl,
 }) => (
   <div className="flex items-center">
+    {/* TODO REBRANDING: replace logo artwork */}
     <Avatar
       className={classNames(iconsClassNames, "z-10")}
       src={firstLogoUrl}

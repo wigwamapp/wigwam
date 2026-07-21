@@ -8,7 +8,7 @@ import { TEvent, trackEvent } from "core/client";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
-import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
+import { ReactComponent as OGTitleIcon } from "app/icons/OGTitle.svg";
 
 import useSidebarLinks from "./Sidebar.Links";
 import { BUY_ENABLED } from "app/defaults";
@@ -34,7 +34,8 @@ const Sidebar: FC = () => {
           "text-2xl font-black",
         )}
       >
-        <WigwamTitleIcon className={classNames("ml-3 my-1 h-8 w-auto")} />
+        {/* TODO REBRANDING: replace logo artwork */}
+        <OGTitleIcon className={classNames("ml-3 my-1 h-8 w-auto")} />
       </Link>
       <SidebarBlock links={NavLinksPrimary} />
       <SidebarBlock

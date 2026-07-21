@@ -6,7 +6,7 @@ import { addAccountModalAtom, profileStateAtom } from "app/atoms";
 
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import Button from "app/components/elements/Button";
-import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
+import { ReactComponent as OGIcon } from "app/icons/OG.svg";
 
 const Welcome: FC = () => {
   const { all } = useAtomValue(profileStateAtom);
@@ -44,7 +44,8 @@ const Welcome: FC = () => {
             : "opacity-100 transition-opacity duration-500",
         )}
       >
-        <WigwamIcon className={classNames("w-[5rem] h-auto mb-5")} />
+        {/* TODO REBRANDING: replace logo artwork */}
+        <OGIcon className={classNames("w-[5rem] h-auto mb-5")} />
         <h1
           className={classNames(
             "mb-16 text-5xl mmd:text-4xl font-bold text-brand-light",

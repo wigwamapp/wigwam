@@ -9,7 +9,7 @@ import Button from "app/components/elements/Button";
 import OnboardingFirstImage from "app/images/onboarding_first.png";
 import OnboardingSecondImage from "app/images/onboarding_second.png";
 import OnboardingThirdImage from "app/images/onboarding_third.png";
-import WigwamLogoImage from "app/images/wigwam.png";
+import OGLogoImage from "app/images/og.png";
 
 type TStepContent = {
   title: string;
@@ -67,9 +67,10 @@ const OnBoardingContent: FC = () => {
     >
       <ScrollAreaContainer className="w-full h-full flex flex-col relative max-w-7xl">
         <section className="mb-6 flex flex-col items-center">
+          {/* TODO REBRANDING: replace logo artwork */}
           <img
             className="mb-6 w-11 h-11 rounded-md"
-            src={WigwamLogoImage}
+            src={OGLogoImage}
             alt="og_logo"
           />
           <h3 className="mb-6 text-[1.75rem] font-bold text-center">
