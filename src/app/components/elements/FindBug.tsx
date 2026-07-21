@@ -1,8 +1,9 @@
 import classNames from "clsx";
 import type { FC, ReactNode } from "react";
 
+// TODO REBRANDING: update link
 const ARTICLE_LINK =
-  "https://wigwam.app/blog/find-a-bug-earn-a-reward-with-wigwam-wallet";
+  "https://ogwallet.tech/blog/find-a-bug-earn-a-reward-with-og-wallet";
 const DS_CHANNEL = "https://discord.gg/MAG2fnSqSK";
 
 const Title: FC<{ className?: string }> = ({ className }) => {

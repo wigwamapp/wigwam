@@ -2,9 +2,6 @@ import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { ReactComponent as GithubIcon } from "app/icons/github.svg";
-import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
-import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
-import { ReactComponent as MediumIcon } from "app/icons/medium.svg";
 import { ReactComponent as DiscordIcon } from "app/icons/discord.svg";
 
 import Separator from "app/components/elements/Seperator";
@@ -115,42 +112,27 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
 const usefulLinks = [
   {
     label: "Website",
-    href: "https://wigwam.app/",
+    href: "https://ogwallet.tech/",
   },
   {
     label: "Contact us",
-    href: "https://wigwam.app/contact",
+    href: "https://ogwallet.tech/contact",
   },
   {
     label: "Help",
-    href: "https://wigwam.app/help",
+    href: "https://ogwallet.tech/help",
   },
   {
     label: "Terms of Use",
-    href: "https://wigwam.app/terms",
+    href: "https://ogwallet.tech/terms",
   },
   {
     label: "Privacy policy",
-    href: "https://wigwam.app/privacy",
+    href: "https://ogwallet.tech/privacy",
   },
 ];
 
 const mediaLinks = [
-  {
-    href: "https://t.me/wigwamapp",
-    label: "Telegram",
-    Icon: TelegramIcon,
-  },
-  {
-    href: "https://twitter.com/wigwam_app",
-    label: "Twitter",
-    Icon: TwitterIcon,
-  },
-  {
-    href: "https://wigwamapp.medium.com",
-    label: "Medium",
-    Icon: MediumIcon,
-  },
   {
     href: "https://github.com/wigwamapp",
     label: "Github",

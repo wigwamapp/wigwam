@@ -153,7 +153,7 @@ const SetupPassword = memo(() => {
                         I have read and agree to the
                         <br />
                         <a
-                          href="https://wigwam.app/terms"
+                          href="https://ogwallet.tech/terms"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"
@@ -185,7 +185,7 @@ const SetupPassword = memo(() => {
                         Help us make OG better.
                         <br />I agree to the{" "}
                         <a
-                          href="https://wigwam.app/privacy"
+                          href="https://ogwallet.tech/privacy"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"

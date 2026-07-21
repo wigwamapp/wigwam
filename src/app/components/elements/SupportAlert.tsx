@@ -2,7 +2,7 @@ import classNames from "clsx";
 import type { FC, ReactNode } from "react";
 import Input from "./Input";
 
-const TIPS = "https://wigwam.app/safety-tips";
+const TIPS = "https://ogwallet.tech/safety-tips";
 
 const Title: FC<{ title?: string; className?: string }> = ({
   title,
@@ -28,7 +28,7 @@ const Content: FC<{ children?: ReactNode }> = ({ children }) => {
       </p>
       <p className="mt-2">
         <Input
-          value="info@wigwam.app"
+          value="info@ogwallet.tech"
           id="support-email"
           readOnly
           tabIndex={-1}

@@ -49,8 +49,6 @@ import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import { ReactComponent as SuccessGreen } from "app/icons/success-green.svg";
 import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
 
-const TELEGRAM = "https://t.me/wigwamapp";
-const TWITTER = "https://twitter.com/wigwam_app";
 const DISCORD = "https://discord.gg/MAG2fnSqSK";
 
 enum Tab {
@@ -633,23 +631,13 @@ const TelegramPromosContent = memo(() => {
       <p className="mt-6 mb-4 text-sm text-brand-gray">
         Don&apos;t forget to follow our recent updates on{" "}
         <a
-          href={TWITTER}
+          href={DISCORD}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noreferrer"
           className="font-semibold underline hover:text-brand-gray"
-          aria-label="telegram"
+          aria-label="discord"
         >
-          Twitter
-        </a>{" "}
-        or{" "}
-        <a
-          href={TELEGRAM}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold underline hover:text-brand-gray"
-          aria-label="telegram"
-        >
-          Telegram
+          Discord
         </a>
         .
       </p>
@@ -719,16 +707,6 @@ const ALREADY_PARTICIPATING_CONTENT = (
       You are already participating in the OG rewards program. A huge thank you
       for your support! Stay ahead of the curve - follow us on{" "}
       <a
-        href={TELEGRAM}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-semibold underline hover:text-brand-gray"
-        aria-label="telegram"
-      >
-        Telegram
-      </a>{" "}
-      and{" "}
-      <a
         className="font-semibold underline hover:text-brand-gray"
         href={DISCORD}
         target="_blank"
@@ -754,16 +732,6 @@ const PARTICIPATE_CONTENT = (
       rewarded activities. You can bind your OG address and any alternative EVM
       address you currently use. Join our{" "}
       <a
-        href={TELEGRAM}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-semibold underline hover:text-brand-gray"
-        aria-label="telegram"
-      >
-        Telegram
-      </a>{" "}
-      and{" "}
-      <a
         className="font-semibold underline hover:text-brand-gray"
         href={DISCORD}
         target="_blank"
@@ -772,8 +740,7 @@ const PARTICIPATE_CONTENT = (
       >
         Discord
       </a>{" "}
-      communities today and be the first to hear about our upcoming reward
-      events.
+      community today and be the first to hear about our upcoming reward events.
     </p>
 
     <p className="mb-6 text-base text-brand-gray">

@@ -122,7 +122,7 @@ const Security: FC = () => {
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
         Read more about our{" "}
         <a
-          href="https://wigwam.app/privacy"
+          href="https://ogwallet.tech/privacy"
           target="_blank"
           rel="nofollow noreferrer"
           className="underline"
