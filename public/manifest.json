@@ -30,12 +30,6 @@
     "extension_pages": "script-src 'self'; object-src 'self'; frame-ancestors 'none';"
   },
   "author": "{{website}}",
-  "__firefox__applications": {
-    "gecko": {
-      "id": "webextension@wigwam.app",
-      "strict_min_version": "68.0"
-    }
-  },
   "__chrome__minimum_chrome_version": "88",
   "default_locale": "en",
   "action": {

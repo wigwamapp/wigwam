@@ -50,7 +50,7 @@ const Welcome: FC = () => {
             "mb-16 text-5xl mmd:text-4xl font-bold text-brand-light",
           )}
         >
-          Welcome to Wigwam
+          Welcome to OG
         </h1>
 
         <Button

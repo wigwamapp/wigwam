@@ -26,7 +26,7 @@ function initMsgGateway() {
     }
 
     console.error(
-      "Wigwam: Provider disconnected." +
+      "OG: Provider disconnected." +
         " A page reload is required to reestablish the connection.",
     );
   };

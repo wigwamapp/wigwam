@@ -97,7 +97,7 @@ const Security: FC = () => {
             You should always have a backup copy of it.
             <br />
             <strong>Never, ever share</strong> your Secret Phrase, not even with
-            Wigwam!
+            OG!
           </p>
 
           <Button
@@ -138,7 +138,7 @@ const Security: FC = () => {
           <>
             Analytics
             <p className="text-xs text-brand-placeholder max-w-[18.75rem]">
-              Anonymous. Help us make Wigwam better.
+              Anonymous. Help us make OG better.
             </p>
           </>
         }
@@ -240,9 +240,9 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               <br />
               We <strong>WILL NEVER</strong> ask for this information.
               <br />
-              No Support Agent, Tech Team Member, Wigwam Team Member, or
-              Security Specialist can request it. Sharing this information is
-              strictly prohibited!
+              No Support Agent, Tech Team Member, OG Team Member, or Security
+              Specialist can request it. Sharing this information is strictly
+              prohibited!
             </span>
           </div>
         </>

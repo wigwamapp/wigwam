@@ -87,7 +87,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
       <>
         {/* <img
           src={WelcomeTreeLeftImage}
-          alt="Wigwam"
+          alt="OG"
           className={classNames(
             "absolute bottom-0 left-[5%]",
             "h-[82%] w-auto",
@@ -95,7 +95,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
         />
         <img
           src={WelcomeTreeRightImage}
-          alt="Wigwam"
+          alt="OG"
           className={classNames(
             "absolute bottom-0 right-[2%] z-[2]",
             "h-[82.6%] w-auto",
@@ -103,7 +103,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
         />
         <img
           src={WelcomeWigwamImage}
-          alt="Wigwam"
+          alt="OG"
           className={classNames(
             "absolute bottom-[7.5%] right-[22.7%]",
             "h-[42.22%] w-auto",
@@ -111,7 +111,7 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
         />
         <img
           src={WelcomeFireImage}
-          alt="Wigwam"
+          alt="OG"
           className={classNames(
             "absolute bottom-[4.5%] right-[36%]",
             "h-[54.5%] w-auto",

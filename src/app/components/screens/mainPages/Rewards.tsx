@@ -716,8 +716,8 @@ const CheckboxWithLabel: FC<ICheckboxWithLabelProps> = ({
 const ALREADY_PARTICIPATING_CONTENT = (
   <>
     <p className="mb-6 text-base text-brand-gray">
-      You are already participating in the Wigwam rewards program. A huge thank
-      you for your support! Stay ahead of the curve - follow us on{" "}
+      You are already participating in the OG rewards program. A huge thank you
+      for your support! Stay ahead of the curve - follow us on{" "}
       <a
         href={TELEGRAM}
         target="_blank"
@@ -751,8 +751,8 @@ const PARTICIPATE_CONTENT = (
 
     <p className="mb-2 text-base text-brand-gray">
       You should bind your wallet address below to participate in our regular
-      rewarded activities. You can bind your Wigwam address and any alternative
-      EVM address you currently use. Join our{" "}
+      rewarded activities. You can bind your OG address and any alternative EVM
+      address you currently use. Join our{" "}
       <a
         href={TELEGRAM}
         target="_blank"

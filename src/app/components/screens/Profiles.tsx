@@ -104,8 +104,8 @@ const Profiles: FC = () => {
 
             {/* <li>
               You will always see your <strong>profile avatar</strong>, on all
-              Wigwam pages. <strong>It is unique!</strong> This feature allows
-              you to <strong>determine</strong> whether the Wigwam you are
+              OG pages. <strong>It is unique!</strong> This feature allows
+              you to <strong>determine</strong> whether the OG you are
               seeing is <strong>real</strong> or fake.
             </li> */}
 

@@ -182,7 +182,7 @@ const SetupPassword = memo(() => {
                     title="Analytics"
                     description={
                       <>
-                        Help us make Wigwam better.
+                        Help us make OG better.
                         <br />I agree to the{" "}
                         <a
                           href="https://wigwam.app/privacy"

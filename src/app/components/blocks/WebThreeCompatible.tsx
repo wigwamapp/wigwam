@@ -17,7 +17,7 @@ const compatibleModesLabels = [
     content: {
       Icon: OffIcon,
       label: "Disabled",
-      description: "Wigwam will be disabled",
+      description: "OG will be disabled",
     },
   },
   {
@@ -33,7 +33,7 @@ const compatibleModesLabels = [
     content: {
       Icon: StrictIcon,
       label: "By Default",
-      description: "Only Wigwam will be connected",
+      description: "Only OG will be connected",
     },
   },
 ];

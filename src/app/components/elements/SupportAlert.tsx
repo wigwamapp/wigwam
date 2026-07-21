@@ -23,7 +23,7 @@ const Content: FC<{ children?: ReactNode }> = ({ children }) => {
   return (
     <div className="text-left font-medium text-base text-brand-lightgray opacity-75">
       <p>
-        If you have trouble working with the Wigwam extension, <br />
+        If you have trouble working with the OG extension, <br />
         please contact us via email:
       </p>
       <p className="mt-2">

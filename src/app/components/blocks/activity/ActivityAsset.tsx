@@ -997,8 +997,8 @@ const TxOptionsDropdown = memo(
                       <>
                         <li>
                           This will hide this transaction{" "}
-                          <b>only inside the Wigwam applicaiton</b>. This means
-                          you should only proceed if you are certain that the
+                          <b>only inside the OG applicaiton</b>. This means you
+                          should only proceed if you are certain that the
                           transaction was lost.
                         </li>
                         <li>

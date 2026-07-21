@@ -449,9 +449,9 @@ const SensetiveActionModal = memo<
               <br />
               We <strong>WILL NEVER</strong> ask for this information.
               <br />
-              No Support Agent, Tech Team Member, Wigwam Team Member, or
-              Security Specialist can request it. Sharing this information is
-              strictly prohibited!
+              No Support Agent, Tech Team Member, OG Team Member, or Security
+              Specialist can request it. Sharing this information is strictly
+              prohibited!
             </span>
           </div>
         </>
