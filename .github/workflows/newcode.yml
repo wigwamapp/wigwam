@@ -7,14 +7,14 @@ on:
       - dev
 
 env:
-  WIGWAM_STATIC_CDN: ${{ secrets.WIGWAM_STATIC_CDN }}
-  WIGWAM_INDEXER_API: ${{ secrets.WIGWAM_INDEXER_API }}
-  WIGWAM_INDEXER_API_KEY: ${{ secrets.WIGWAM_INDEXER_API_KEY }}
-  WIGWAM_INFURA_API_KEY: ${{ secrets.WIGWAM_INFURA_API_KEY }}
-  WIGWAM_ANALYTICS_API_KEY: ${{ secrets.TEST_WIGWAM_ANALYTICS_API_KEY }}
-  WIGWAM_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_WIGWAM_OPEN_LOGIN_CLIENT_ID }}
-  WIGWAM_ON_RAMP_API_KEY: ${{ secrets.WIGWAM_ON_RAMP_API_KEY }}
-  WIGWAM_ON_RAMP_API_URL: ${{ secrets.WIGWAM_ON_RAMP_API_URL }}
+  OG_STATIC_CDN: ${{ secrets.OG_STATIC_CDN }}
+  OG_INDEXER_API: ${{ secrets.OG_INDEXER_API }}
+  OG_INDEXER_API_KEY: ${{ secrets.OG_INDEXER_API_KEY }}
+  OG_INFURA_API_KEY: ${{ secrets.OG_INFURA_API_KEY }}
+  OG_ANALYTICS_API_KEY: ${{ secrets.TEST_OG_ANALYTICS_API_KEY }}
+  OG_OPEN_LOGIN_CLIENT_ID: ${{ secrets.TEST_OG_OPEN_LOGIN_CLIENT_ID }}
+  OG_ON_RAMP_API_KEY: ${{ secrets.OG_ON_RAMP_API_KEY }}
+  OG_ON_RAMP_API_URL: ${{ secrets.OG_ON_RAMP_API_URL }}
 
 jobs:
   newcode:
@@ -48,7 +48,7 @@ jobs:
       - uses: gacts/github-slug@v1
         id: slug
         with:
-          to-slug: ${{ github.event.pull_request.title }} Wigwam
+          to-slug: ${{ github.event.pull_request.title }} OG
 
       - name: Export app build
         uses: actions/upload-artifact@v4

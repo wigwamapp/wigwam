@@ -1,7 +1,7 @@
 import { ComponentProps, FC, useMemo, memo } from "react";
 import { dequal } from "dequal/lite";
 import { useSafeState } from "lib/react-hooks/useSafeState";
-import { wrapIpfsNetIcon } from "lib/wigwam-static";
+import { wrapIpfsNetIcon } from "lib/static-cdn";
 
 import { getNetworkIconUrl } from "fixtures/networks";
 import { Network } from "core/types";

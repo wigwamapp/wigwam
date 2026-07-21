@@ -45,7 +45,7 @@ const AuthSignatureModal: FC = () => {
         }
 
         const authMessage = await fetch(
-          `${process.env.WIGWAM_INDEXER_API}/auth-message`,
+          `${process.env.OG_INDEXER_API}/auth-message`,
         ).then((r) => r.text());
 
         const results = await Promise.all(

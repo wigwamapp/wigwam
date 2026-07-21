@@ -55,4 +55,4 @@ export const IS_FIREFOX = process.env.TARGET_BROWSER === "firefox";
 
 export const TRANSAK_SUPPORT_URL = "https://support.transak.com/";
 
-export const BUY_ENABLED = process.env.WIGWAM_BUY_ENABLED === "true";
+export const BUY_ENABLED = process.env.OG_BUY_ENABLED === "true";

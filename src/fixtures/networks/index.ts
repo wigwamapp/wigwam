@@ -1,6 +1,6 @@
 import { assert } from "lib/system/assert";
 import { getPublicURL } from "lib/ext/utils";
-import { getERC20IconUrl } from "lib/wigwam-static";
+import { getERC20IconUrl } from "lib/static-cdn";
 
 import { Network, Asset } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";

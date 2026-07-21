@@ -16,7 +16,7 @@ const ONE_DAY = 24 * 60 * 60_000;
 const NATIVE_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const onRampApi = axios.create({
-  baseURL: process.env.WIGWAM_ON_RAMP_API_URL!,
+  baseURL: process.env.OG_ON_RAMP_API_URL!,
   timeout: 90_000,
 });
 

@@ -17,7 +17,7 @@ function initMsgGateway() {
   porter.onFullyDisconnect = () => {
     if (
       process.env.NODE_ENV === "development" &&
-      process.env.WIGWAM_DEV_ACTIVE_TAB_RELOAD === "true"
+      process.env.OG_DEV_ACTIVE_TAB_RELOAD === "true"
     ) {
       // Wait for the fresh content script to be loaded
       // via browser.scripting.registerContentScripts()

@@ -1,4 +1,4 @@
-import { wrapIpfsNetIcon } from "lib/wigwam-static";
+import { wrapIpfsNetIcon } from "lib/static-cdn";
 
 import { mergeNetworkUrls } from "core/common";
 import { Network } from "core/types";

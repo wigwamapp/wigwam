@@ -23,7 +23,7 @@ import { BUY_ENABLED } from "app/defaults";
 
 type RampOrder = { [key: string]: any };
 
-const API_KEY = process.env.WIGWAM_ON_RAMP_API_KEY;
+const API_KEY = process.env.OG_ON_RAMP_API_KEY;
 const SUSPENDED = !BUY_ENABLED;
 
 const saveRampActivity = (rampOrder: RampOrder) => {

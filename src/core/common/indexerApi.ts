@@ -1,10 +1,10 @@
 import axios from "axios";
 
 export const indexerApi = axios.create({
-  baseURL: process.env.WIGWAM_INDEXER_API!,
+  baseURL: process.env.OG_INDEXER_API!,
   timeout: 120_000,
   headers: {
-    "X-API-KEY": process.env.WIGWAM_INDEXER_API_KEY,
+    "X-API-KEY": process.env.OG_INDEXER_API_KEY,
   },
 });
 
