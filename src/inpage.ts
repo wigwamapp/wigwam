@@ -1,11 +1,7 @@
 import { InpageProtocol } from "core/inpage/protocol";
 import { InpageProvider } from "core/inpage/provider";
 import { UniversalInpageProvider } from "core/inpage/universalProvider";
-import {
-  JSONRPC,
-  WIGWAM_PHISHING_WARNING,
-  WIGWAM_STATE,
-} from "core/common/rpc";
+import { JSONRPC, OG_PHISHING_WARNING, OG_STATE } from "core/common/rpc";
 import { MetaMaskCompatibleMode } from "core/types/shared";
 
 const inpageProto = new InpageProtocol("injected", "content");
@@ -13,7 +9,7 @@ const wigwam = new InpageProvider(inpageProto);
 
 const isMetaMaskModeEnabled = new Promise<boolean>((res) => {
   const unsub = inpageProto.subscribe((payload) => {
-    if (payload?.jsonrpc === JSONRPC && payload?.method === WIGWAM_STATE) {
+    if (payload?.jsonrpc === JSONRPC && payload?.method === OG_STATE) {
       const metamaskModeEnabled =
         payload.params.mmCompatible !== MetaMaskCompatibleMode.Off;
 
@@ -138,7 +134,7 @@ function warnIfPhishing() {
   const unsub = inpageProto.subscribe((payload) => {
     if (
       payload?.jsonrpc === JSONRPC &&
-      payload?.method === WIGWAM_PHISHING_WARNING
+      payload?.method === OG_PHISHING_WARNING
     ) {
       unsub();
 

@@ -1,7 +1,7 @@
 import { PorterClient } from "lib/ext/porter/client";
 
 import { PorterChannel } from "core/types/shared";
-import { JSONRPC, DISCONNECT_ERROR, WIGWAM_FAVICON } from "core/common/rpc";
+import { JSONRPC, DISCONNECT_ERROR, OG_FAVICON } from "core/common/rpc";
 import { shouldInject } from "core/inpage/shouldInject";
 import { InpageProtocol } from "core/inpage/protocol";
 
@@ -60,7 +60,7 @@ function initMsgGateway() {
       if (favIconUrl) {
         porter.sendOneWayMessage({
           jsonrpc: JSONRPC,
-          method: WIGWAM_FAVICON,
+          method: OG_FAVICON,
           params: [favIconUrl],
         });
       }

@@ -16,7 +16,7 @@ import {
 } from "core/types/rpc";
 import {
   JSONRPC,
-  WIGWAM_STATE,
+  OG_STATE,
   AUTHORIZED_RPC_METHODS,
   STATE_RPC_METHODS,
 } from "core/common/rpc";
@@ -97,7 +97,7 @@ export class InpageProvider extends Emitter {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (evt?.method === WIGWAM_STATE) {
+      if (evt?.method === OG_STATE) {
         const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
         this.mmCompatible = mmCompatible;
