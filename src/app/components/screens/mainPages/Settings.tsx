@@ -86,6 +86,6 @@ const tabsContent = [
     route: { page: "settings", setting: SettingTabEnum.About },
     Icon: AboutIcon,
     title: "About",
-    desc: "Check current OG version. Find us elsewhere.",
+    desc: "Check current OG Wallet version. Find us elsewhere.",
   },
 ];

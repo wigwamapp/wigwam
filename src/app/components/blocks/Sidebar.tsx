@@ -34,7 +34,7 @@ const Sidebar: FC = () => {
           "text-2xl font-black",
         )}
       >
-        <OGTitleIcon className={classNames("ml-3 my-1 h-8 w-auto")} />
+        <OGTitleIcon className={classNames("ml-3 my-1 h-7 w-auto")} />
       </Link>
       <SidebarBlock links={NavLinksPrimary} />
       <SidebarBlock

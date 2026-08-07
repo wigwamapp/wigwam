@@ -729,8 +729,8 @@ const PARTICIPATE_CONTENT = (
 
     <p className="mb-2 text-base text-brand-gray">
       You should bind your wallet address below to participate in our regular
-      rewarded activities. You can bind your OG address and any alternative EVM
-      address you currently use. Join our{" "}
+      rewarded activities. You can bind your OG Wallet address and any
+      alternative EVM address you currently use. Join our{" "}
       <a
         className="font-semibold underline hover:text-brand-gray"
         href={DISCORD}

@@ -1,4 +1,4 @@
-# OG Web Extension Wallet - General Tech Documentation
+# OG Wallet - Browser Extension - General Tech Documentation
 
 ## Architecture
 

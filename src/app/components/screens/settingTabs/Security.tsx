@@ -97,7 +97,7 @@ const Security: FC = () => {
             You should always have a backup copy of it.
             <br />
             <strong>Never, ever share</strong> your Secret Phrase, not even with
-            OG!
+            OG Wallet!
           </p>
 
           <Button
@@ -240,9 +240,9 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               <br />
               We <strong>WILL NEVER</strong> ask for this information.
               <br />
-              No Support Agent, Tech Team Member, OG Team Member, or Security
-              Specialist can request it. Sharing this information is strictly
-              prohibited!
+              No Support Agent, Tech Team Member, OG Wallet Team Member, or
+              Security Specialist can request it. Sharing this information is
+              strictly prohibited!
             </span>
           </div>
         </>

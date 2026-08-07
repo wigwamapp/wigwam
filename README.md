@@ -1,4 +1,4 @@
-# OG - Web3 Wallet
+# OG Wallet - Web3 Wallet
 
 ### https://ogwallet.tech
 
@@ -6,7 +6,7 @@ A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain,
 
 <!-- TODO REBRANDING: replace banner artwork -->
 
-![OG](./docs/banner.png)
+![OG Wallet](./docs/banner.png)
 
 **Table of Contents**
 

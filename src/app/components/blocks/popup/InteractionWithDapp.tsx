@@ -295,10 +295,10 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 content={
                   <p>
                     When enabled - use the MetaMask connection button to connect
-                    to dApps only if the OG wallet option is unavailable on the
+                    to dApps only if the OG Wallet option is unavailable on the
                     website.
                     <br />
-                    Otherwise, choose only OG wallet!
+                    Otherwise, choose only OG Wallet!
                   </p>
                 }
                 placement="bottom-end"

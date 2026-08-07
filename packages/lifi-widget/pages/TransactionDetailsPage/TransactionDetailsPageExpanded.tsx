@@ -217,9 +217,9 @@ export const TransactionDetailsPageExpanded: React.FC = () => {
             px={2}
             sx={{ wordBreak: 'break-all' }}
           >
-            OG leverages the advanced Li.Fi swap functionality for seamless
-            asset exchanges. If you require assistance, please use this support
-            ID and contact them through the link below.
+            OG Wallet leverages the advanced Li.Fi swap functionality for
+            seamless asset exchanges. If you require assistance, please use this
+            support ID and contact them through the link below.
         </Typography>
       </Box>
       <Box mt={1}>

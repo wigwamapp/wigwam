@@ -12,7 +12,9 @@ import { networks } from "./helpers";
 export async function setupFixtures() {
   try {
     const allEvmNetworks =
-      process.env.NODE_ENV !== "test" ? await getAllEvmNetworks() : [];
+      process.env.NODE_ENV !== "test"
+        ? await getAllEvmNetworks().catch(() => [])
+        : [];
 
     await db.transaction("rw", networks, async () => {
       const existingNetworks = await networks.toArray();
