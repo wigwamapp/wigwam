@@ -27,7 +27,7 @@ import {
   LOAD_MORE_ON_CONTACTS_DROPDOWN_FROM_END,
 } from "app/defaults";
 import { useContacts } from "app/hooks/contacts";
-import { useAccounts, useEns, useRns } from "app/hooks";
+import { useAccounts, useEns } from "app/hooks";
 import ScrollAreaContainer from "./ScrollAreaContainer";
 import AddressField, { AddressFieldProps } from "./AddressField";
 import WalletName from "./WalletName";
@@ -161,11 +161,9 @@ const ContactAutocomplete = forwardRef<
   const { paste } = usePasteFromClipboard(setValue);
 
   const { watchEns } = useEns();
-  const { watchRns } = useRns();
 
   const watchDomain = useThrottledCallback(() => {
     watchEns(value, setValue);
-    watchRns(value, setValue);
   }, 500);
 
   useEffect(() => {

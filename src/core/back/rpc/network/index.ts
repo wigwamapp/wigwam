@@ -23,7 +23,11 @@ export const getRpcProvider = memoize(
 
 export class RpcProvider extends ethers.JsonRpcApiProvider {
   constructor(public chainId: number) {
-    super(chainId, { staticNetwork: ethers.Network.from(chainId) });
+    super(chainId, {
+      staticNetwork: ethers.Network.from(chainId),
+      // Requests are dispatched one by one, never grouped into a batch
+      batchMaxCount: 1,
+    });
   }
 
   getNetwork = memoizeOne(super.getNetwork.bind(this));

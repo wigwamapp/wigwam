@@ -15,6 +15,7 @@ declare namespace NodeJS {
     readonly OG_INDEXER_API?: string;
     readonly OG_INDEXER_API_KEY?: string;
     readonly OG_INFURA_API_KEY?: string;
+    readonly OG_ETHERSCAN_API_KEY?: string;
     readonly OG_ANALYTICS_API_KEY?: string;
     readonly OG_OPEN_LOGIN_CLIENT_ID?: string;
     readonly OG_BUY_ENABLED?: string;

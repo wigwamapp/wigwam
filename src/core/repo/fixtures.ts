@@ -48,21 +48,27 @@ export async function setupFixtures() {
         if (net.manuallyChanged) return net;
 
         return evmData
-          ? mergeNetwork(net, {
-              chainId: evmData.chainId,
-              type: evmData.testnet ? "testnet" : "unknown",
-              chainTag: "",
-              rpcUrls: evmData.rpcUrls.filter((url) => url.startsWith("http")),
-              name: evmData.name,
-              nativeCurrency: evmData.nativeCurrency,
-              explorerUrls: evmData.explorers?.map((exp) => exp.url),
-              explorerApiUrl: evmData.explorers?.find((exp) => exp.apiUrl)
-                ?.apiUrl,
-              faucetUrls: evmData.faucets,
-              iconUrls: evmData.icon && [wrapIpfsNetIcon(evmData.icon.url)],
-              infoUrl: evmData.infoUrl,
-              position: 0,
-            })
+          ? mergeNetwork(
+              net,
+              // Fields the source does not provide must keep the saved value
+              stripUndefined({
+                chainId: evmData.chainId,
+                type: evmData.testnet ? "testnet" : "unknown",
+                chainTag: "",
+                rpcUrls: evmData.rpcUrls.filter((url) =>
+                  url.startsWith("http"),
+                ),
+                name: evmData.name,
+                nativeCurrency: evmData.nativeCurrency,
+                explorerUrls: evmData.explorers?.map((exp) => exp.url),
+                explorerApiUrl: evmData.explorers?.find((exp) => exp.apiUrl)
+                  ?.apiUrl,
+                faucetUrls: evmData.faucets,
+                iconUrls: evmData.icon && [wrapIpfsNetIcon(evmData.icon.url)],
+                infoUrl: evmData.infoUrl,
+                position: 0,
+              }),
+            )
           : net;
       });
 
@@ -73,7 +79,7 @@ export async function setupFixtures() {
   }
 }
 
-function mergeNetwork(saved: Network, toMerge: Network): Network {
+function mergeNetwork(saved: Network, toMerge: Partial<Network>): Network {
   return {
     ...saved,
     // Override
@@ -82,4 +88,10 @@ function mergeNetwork(saved: Network, toMerge: Network): Network {
     rpcUrls: mergeNetworkUrls(saved.rpcUrls, toMerge.rpcUrls)!,
     explorerUrls: mergeNetworkUrls(saved.explorerUrls, toMerge.explorerUrls),
   };
+}
+
+function stripUndefined<T extends object>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined),
+  ) as Partial<T>;
 }

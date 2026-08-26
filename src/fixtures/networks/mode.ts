@@ -9,6 +9,8 @@ export const MODE: Network[] = [
       "https://mainnet.mode.network",
       "https://mode.drpc.org",
       "https://1rpc.io/mode",
+      "https://public.1rpc.io/mode",
+      "https://mode-mainnet.rpc.sentio.xyz",
     ],
     chainTag: "mode",
     name: "Mode",

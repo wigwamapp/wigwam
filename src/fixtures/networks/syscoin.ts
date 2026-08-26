@@ -5,7 +5,11 @@ export const SYSCOIN: Network[] = [
   {
     chainId: 57,
     type: "mainnet",
-    rpcUrls: ["https://rpc.syscoin.org", "https://rpc.ankr.com/syscoin"],
+    rpcUrls: [
+      "https://rpc.syscoin.org",
+      "https://syscoin-evm.publicnode.com",
+      "https://57.rpc.thirdweb.com",
+    ],
     chainTag: "syscoin",
     name: "Syscoin",
     nativeCurrency: {

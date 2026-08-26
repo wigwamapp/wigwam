@@ -5,7 +5,11 @@ export const ROOTSTOCK: Network[] = [
   {
     chainId: 30,
     type: "mainnet",
-    rpcUrls: ["https://public-node.rsk.co", "https://mycrypto.rsk.co"],
+    rpcUrls: [
+      "https://public-node.rsk.co",
+      "https://mycrypto.rsk.co",
+      "https://rootstock.drpc.org",
+    ],
     chainTag: "rootstock",
     name: "Rootstock",
     nativeCurrency: {
@@ -17,7 +21,7 @@ export const ROOTSTOCK: Network[] = [
       "https://explorer.rootstock.io",
       "https://rootstock.blockscout.com",
     ],
-    explorerApiUrl: "https://rootstock.blockscout.com/api/v2",
+    explorerApiUrl: "https://rootstock.blockscout.com/api",
     faucetUrls: [],
     infoUrl: "https://rootstock.io",
   },

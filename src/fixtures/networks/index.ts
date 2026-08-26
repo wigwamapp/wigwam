@@ -14,11 +14,9 @@ import { AVALANCHE } from "./avalanche";
 import { HARMONY } from "./harmony";
 import { FANTOM } from "./fantom";
 import { AURORA } from "./aurora";
-import { HECO } from "./heco";
 import { CRONOS } from "./cronos";
 import { MOONBEAM } from "./moonbeam";
 import { MOONRIVER } from "./moonriver";
-import { EVMOS } from "./evmos";
 import { LOCAL } from "./local";
 import { ZKSYNCERA } from "./zksyncera";
 import { ARBITRUMNOVA } from "./arbitrumnova";
@@ -31,6 +29,16 @@ import { MANTLE } from "./mantle";
 import { ROOTSTOCK } from "./rootstock";
 import { MODE } from "./mode";
 import { BLAST } from "./blast";
+import { UNICHAIN } from "./unichain";
+import { MONAD } from "./monad";
+import { SONIC } from "./sonic";
+import { WORLDCHAIN } from "./worldchain";
+import { HYPEREVM } from "./hyperevm";
+import { SEI } from "./sei";
+import { PLASMA } from "./plasma";
+import { INK } from "./ink";
+import { BERACHAIN } from "./berachain";
+import { KATANA } from "./katana";
 
 // Currently taken from
 // https://github.com/TP-Lab/networklist-org/blob/main/chains.json
@@ -46,6 +54,16 @@ export const DEFAULT_NETWORKS: Network[] = [
   ZKSYNCERA,
   GNOSIS,
   BASE,
+  BERACHAIN,
+  MONAD,
+  UNICHAIN,
+  SONIC,
+  HYPEREVM,
+  INK,
+  PLASMA,
+  SEI,
+  WORLDCHAIN,
+  KATANA,
   CRONOS,
   FANTOM,
   MANTLE,
@@ -59,8 +77,6 @@ export const DEFAULT_NETWORKS: Network[] = [
   AURORA,
   MOONRIVER,
   ARBITRUMNOVA,
-  EVMOS,
-  HECO,
   HARMONY,
   LOCAL,
 ].flatMap((chainNets, i) =>

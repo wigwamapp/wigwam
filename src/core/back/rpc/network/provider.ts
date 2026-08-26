@@ -61,8 +61,7 @@ export async function sendRpc(
 }
 
 const getRpcProvider = memoize(
-  (url: string, chainId: number) =>
-    new RpcProvider(url, chainId, !url.toLowerCase().includes("infura")),
+  (url: string, chainId: number) => new RpcProvider(url, chainId),
 );
 
 class RpcProvider extends ethers.JsonRpcProvider {
@@ -70,10 +69,14 @@ class RpcProvider extends ethers.JsonRpcProvider {
 
   getChainId = () => this.getNetwork().then(({ chainId }) => chainId);
 
-  constructor(url: string, chainId: number, batchEnabled = true) {
+  constructor(url: string, chainId: number) {
     super(url, chainId, {
       staticNetwork: ethers.Network.from(chainId),
-      batchMaxCount: batchEnabled ? 100 : 1,
+      // No JSON-RPC batching. Public nodes often cap or reject batches
+      // ("Batch of more than 3 requests are not allowed on free plan"),
+      // and a single rejected batch fails every request inside it.
+      // With 1 ethers sends a plain object instead of an array.
+      batchMaxCount: 1,
     });
 
     // To use cache first provider._getBlock(), but without formatting
