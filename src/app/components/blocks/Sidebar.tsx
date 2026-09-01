@@ -3,15 +3,12 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 
-import { TEvent, trackEvent } from "core/client";
-
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
 import { ReactComponent as OGTitleIcon } from "app/icons/OGTitle.svg";
 
 import useSidebarLinks from "./Sidebar.Links";
-import { BUY_ENABLED } from "app/defaults";
 
 const Sidebar: FC = () => {
   const { NavLinksPrimary, NavLinksSecondary } = useSidebarLinks();
@@ -42,7 +39,7 @@ const Sidebar: FC = () => {
         className={classNames(
           "pt-4",
           "border-t border-brand-main/[.07]",
-          BUY_ENABLED ? "mt-[6.25rem]" : "mt-[4rem]",
+          "mt-[4rem]",
         )}
       />
     </nav>
@@ -81,11 +78,6 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
           if (isPageActive) return;
 
           action?.();
-
-          trackEvent(TEvent.SidebarNavigated, {
-            label,
-            latestPage: page,
-          });
         };
 
         if (!route && typeof action === "function") {

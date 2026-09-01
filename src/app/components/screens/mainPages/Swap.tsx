@@ -17,7 +17,6 @@ import { useAtomsAll, useLazyAtomValue } from "lib/atom-utils";
 import { getLiFiProvider } from "core/client/lifi-provider";
 import { TokenType, SelfActivityKind } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
-import { TEvent, trackEvent } from "core/client";
 
 import { useAccounts, useChainId } from "app/hooks";
 import { useAllAccountTokens } from "app/hooks/tokens";
@@ -134,26 +133,12 @@ const Swap: FC = () => {
 
   useEffect(() => {
     const onRouteExecutionStarted = (route: any) => {
-      trackEvent(TEvent.SwapStarted, {
-        fromToken: route?.fromToken?.symbol,
-        toToken: route?.toToken?.symbol,
-        fromChainId: route?.fromChainId,
-        toChainId: route?.toChainId,
-      });
-
       console.log("onRouteExecutionStarted fired.", route);
     };
     const onRouteExecutionUpdated = (update: RouteExecutionUpdate) => {
       console.log("onRouteExecutionUpdated fired.", update);
     };
     const onRouteExecutionCompleted = (route: any) => {
-      trackEvent(TEvent.SwapFinished, {
-        fromToken: route?.fromToken?.symbol,
-        toToken: route?.toToken?.symbol,
-        fromChainId: route?.fromChainId,
-        toChainId: route?.toChainId,
-      });
-
       console.log("onRouteExecutionCompleted fired.", route);
     };
     const onRouteExecutionFailed = (update: RouteExecutionUpdate) => {

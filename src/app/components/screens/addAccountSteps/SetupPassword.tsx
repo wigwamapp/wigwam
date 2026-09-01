@@ -2,13 +2,10 @@ import { memo, useCallback, useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { Field, Form } from "react-final-form";
 import { FORM_ERROR, FormApi } from "final-form";
-import { nanoid } from "nanoid";
 import classNames from "clsx";
-import { storage } from "lib/ext/storage";
 
 import { AddAccountParams, SeedPharse } from "core/types";
-import { Setting } from "core/common";
-import { setupWallet, TEvent, trackEvent } from "core/client";
+import { setupWallet } from "core/client";
 
 import {
   differentPasswords,
@@ -30,7 +27,6 @@ import PasswordValidationField from "app/components/elements/PasswordValidationF
 type FormValues = {
   password: string;
   confirm: string;
-  analytics: boolean;
   terms: boolean;
 };
 
@@ -51,7 +47,7 @@ const SetupPassword = memo(() => {
 
   const handleFinish = useCallback(
     async (
-      { password, analytics }: FormValues,
+      { password }: FormValues,
       form: FormApi<FormValues, Partial<FormValues>>,
     ) =>
       withHumanDelay(async () => {
@@ -61,15 +57,6 @@ const SetupPassword = memo(() => {
           await setupWallet(password, addAccountsParams, seedPhrase);
           await resetFormPassword(form);
           await resetFormPassword(form, "confirm");
-
-          if (analytics) {
-            await storage.put(Setting.Analytics, {
-              enabled: true,
-              userId: nanoid(),
-            });
-
-            trackEvent(TEvent.SetupOG);
-          }
 
           setAccModalOpened([false]);
         } catch (err: any) {
@@ -89,7 +76,7 @@ const SetupPassword = memo(() => {
       <AddAccountHeader className="mb-7">Setup Password</AddAccountHeader>
 
       <Form<FormValues>
-        initialValues={{ analytics: true, terms: false }}
+        initialValues={{ terms: false }}
         onSubmit={handleFinish}
         validate={(values) => ({
           confirm: differentPasswords(values.password, values.confirm),
@@ -171,33 +158,6 @@ const SetupPassword = memo(() => {
                       meta.error || (!modifiedSinceLastSubmit && submitError)
                     }
                     containerClassName={classNames("mt-6 w-full")}
-                  />
-                )}
-              </Field>
-
-              <Field name="analytics" format={(v: string) => Boolean(v)}>
-                {({ input, meta }) => (
-                  <AcceptCheckbox
-                    {...input}
-                    title="Analytics"
-                    description={
-                      <>
-                        Help us make OG Wallet better.
-                        <br />I agree to the{" "}
-                        <a
-                          href="https://ogwallet.tech/privacy"
-                          target="_blank"
-                          rel="nofollow noreferrer"
-                          className="text-brand-main underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Anonymous Tracking
-                        </a>
-                      </>
-                    }
-                    error={meta.touched && meta.error}
-                    errorMessage={meta.error}
-                    containerClassName="w-full mb-6 mt-4"
                   />
                 )}
               </Field>

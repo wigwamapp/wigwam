@@ -8,7 +8,6 @@ import { useLazyAtomValue } from "lib/atom-utils";
 import { ActivityType, Permission, MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
 import { saveActivity } from "core/common/activity";
-import { trackEvent, TEvent } from "core/client";
 
 import {
   activeTabAtom,
@@ -125,8 +124,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             pending: 0,
           });
         }
-
-        trackEvent(TEvent.Web3ManualConnected);
       }
     } catch (err) {
       console.error(err);
@@ -146,10 +143,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         ? MetaMaskCompatibleMode.Off
         : MetaMaskCompatibleMode.Strict,
     );
-
-    trackEvent(TEvent.Web3SharedModeToggled, {
-      mode: metamaskModeEnabled ? "disabled" : "enabled",
-    });
   }, [metamaskModeEnabled, setMetamaskMode]);
 
   return (

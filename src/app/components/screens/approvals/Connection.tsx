@@ -6,7 +6,7 @@ import { assert } from "lib/system/assert";
 import { useAtomsAll } from "lib/atom-utils";
 
 import { Account as AccountType, ConnectionApproval } from "core/types";
-import { approveItem, TEvent, trackEvent } from "core/client";
+import { approveItem } from "core/client";
 
 import { openInTabStrict } from "app/helpers";
 import {
@@ -15,7 +15,12 @@ import {
   chainIdAtom,
   getPermissionAtom,
 } from "app/atoms";
-import { ChainIdProvider, useAccounts, useSync } from "app/hooks";
+import {
+  ChainIdProvider,
+  useAccounts,
+  useIsKnownDapp,
+  useSync,
+} from "app/hooks";
 import { useDialog } from "app/hooks/dialog";
 import { withHumanDelay } from "app/utils";
 import Checkbox from "app/components/elements/Checkbox";
@@ -35,6 +40,7 @@ import { ReactComponent as TransactionsIcon } from "app/icons/dapp-transactions.
 import { ReactComponent as FundsIcon } from "app/icons/dapp-move-funds.svg";
 import { ReactComponent as NoResultsFoundIcon } from "app/icons/no-results-found.svg";
 import { ReactComponent as AddWalletIcon } from "app/icons/add-wallet.svg";
+import { ReactComponent as AlertTriangleIcon } from "app/icons/alert-triangle.svg";
 
 import ApprovalLayout from "./Layout";
 
@@ -56,6 +62,11 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
   ]);
 
   const { currentAccount, allAccounts } = useAccounts();
+
+  const knownDapp = useIsKnownDapp(sourceOrigin);
+  // Only for a site that is both unlisted and never connected before: warning
+  // again about a site the user already trusted teaches them to click through
+  const unverified = knownDapp === false && !currentPermission;
 
   const defaultAddresses = useMemo(
     () => [
@@ -163,9 +174,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     [approval, setApproving, alert],
   );
 
-  useEffect(() => {
-    trackEvent(TEvent.DappConnect);
-  }, []);
+  useEffect(() => {}, []);
 
   if (approval.source.type !== "page") return null;
 
@@ -183,6 +192,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
         <span className="text-base text-center mb-6">
           {new URL(approval.source.url).host}
         </span>
+        {unverified && <UnverifiedDappAlert />}
         <div className="w-full flex items-center px-3 pb-1.5">
           <CheckboxPrimitive.Root
             checked={allAccountsChecked}
@@ -259,6 +269,31 @@ const warnings = [
     label: "CANNOT move funds without permission",
   },
 ];
+
+const UnverifiedDappAlert: FC = () => (
+  <div
+    role="alert"
+    className={classNames(
+      "w-full mb-5 p-4",
+      "flex items-start",
+      "rounded-[.625rem]",
+      "border border-brand-redobject/40 bg-brand-redobject/10",
+    )}
+  >
+    <AlertTriangleIcon className="w-7 h-7 min-w-[1.75rem] mt-px text-brand-redtext" />
+    <div className="ml-3">
+      <h3 className="text-base font-bold text-brand-redtext">
+        We can&apos;t recognize this website
+      </h3>
+      <p className="text-xs text-brand-inactivelight mt-1.5 leading-relaxed">
+        It is not among the known protocols, which is normal for a new or a
+        niche one — and also how a fake copy of a popular site looks. Check the
+        address above character by character, and never approve a transaction
+        here unless you are sure.
+      </p>
+    </div>
+  </div>
+);
 
 const ConnectionWarnings: FC = () => (
   <div className="grid grid-cols-3 gap-3 py-3 border-y border-brand-main/[.07] mt-auto">

@@ -9,7 +9,7 @@ import {
   createTotalBalanceKey,
   NATIVE_TOKEN_SLUG,
 } from "core/common";
-import { getOnRampCurrencies, getTokenDetailsUrl } from "core/client";
+import { getTokenDetailsUrl } from "core/client";
 
 export const getAccountTokensAtom = atomFamily(
   (params: repo.QueryAccountTokensParams) =>
@@ -60,5 +60,3 @@ export const getTokenDetailsUrlAtom = atomFamily(
     atomWithDefault(() => getTokenDetailsUrl(chainId, tokenSlug)),
   dequal,
 );
-
-export const onRampCurrenciesAtom = atomWithDefault(getOnRampCurrencies);

@@ -4,7 +4,7 @@ import * as repo from "core/repo";
 import { createAccountTokenKey } from "core/common/tokens";
 import { synced, syncStarted } from "core/back/state";
 
-import { syncDxTokenActivities } from "./dx";
+import { syncWcTokenActivities } from "./wc";
 import { syncExplorerTokenActivities } from "./explorer";
 import { syncChainTokenActivities } from "./chain";
 
@@ -23,8 +23,7 @@ export const syncTokenActivities = memoize(
       if (!token) return;
 
       for (const sync of [
-        syncDxTokenActivities,
-        // syncUxTokenActivities,
+        syncWcTokenActivities,
         syncExplorerTokenActivities,
         syncChainTokenActivities,
       ]) {

@@ -23,13 +23,7 @@ import {
   TxAction,
   TxSignature,
 } from "core/types";
-import {
-  approveItem,
-  findToken,
-  suggestFees,
-  TEvent,
-  trackEvent,
-} from "core/client";
+import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
 import { isZeroHex, matchTxAction } from "core/common/transaction";
 import { estimateL1Fee } from "core/common/l1Fee";
@@ -517,9 +511,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
     bootAnimationRef.current = false;
   }, []);
 
-  useEffect(() => {
-    trackEvent(TEvent.DappTransaction, { source: source.type });
-  }, [source.type]);
+  useEffect(() => {}, [source.type]);
 
   return (
     <ApprovalLayout

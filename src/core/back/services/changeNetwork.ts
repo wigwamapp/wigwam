@@ -1,54 +1,25 @@
-import BigNumber from "bignumber.js";
 import { storage } from "lib/ext/storage";
 
-import { NATIVE_TOKEN_SLUG, Setting, getNetwork } from "core/common";
-import { ACCOUNT_ADDRESS, AccountToken, CHAIN_ID } from "core/types";
-import * as repo from "core/repo";
+import { Setting, getNetwork } from "core/common";
+import { CHAIN_ID } from "core/types";
 import { INITIAL_NETWORK } from "fixtures/networks";
 
-import { $accountAddresses } from "../state";
-
+/**
+ * The one case where the active network changes on its own: the user hides
+ * test networks while sitting on one. Falls back to Ethereum, never to a
+ * network guessed from balances — picking the active network is the user's job.
+ */
 export function startAutoNetworkChanger() {
   storage.subscribe<boolean>(Setting.TestNetworks, async ({ newValue }) => {
-    if (newValue === false) {
-      const [currentChainId, accountAddress] = await Promise.all([
-        storage.fetchForce<number>(CHAIN_ID),
-        storage
-          .fetch<string>(ACCOUNT_ADDRESS)
-          .catch(() => $accountAddresses.getState()[0]),
-      ]);
+    if (newValue !== false) return;
 
-      if (currentChainId) {
-        const net = await getNetwork(currentChainId);
+    const currentChainId = await storage.fetchForce<number>(CHAIN_ID);
+    if (!currentChainId) return;
 
-        if (net.type !== "mainnet") {
-          let highNetNativeToken: AccountToken | undefined;
+    const net = await getNetwork(currentChainId).catch(() => null);
 
-          const accNativeTokens = await repo.accountTokens
-            .where("[accountAddress+tokenSlug]")
-            .equals([accountAddress, NATIVE_TOKEN_SLUG])
-            .toArray();
-
-          for (const nativeToken of accNativeTokens) {
-            if (!nativeToken.portfolioUSD) continue;
-
-            const bal = new BigNumber(nativeToken.portfolioUSD);
-            if (bal.isZero()) continue;
-
-            if (
-              !highNetNativeToken ||
-              bal.isGreaterThan(nativeToken.portfolioUSD!)
-            ) {
-              highNetNativeToken = nativeToken;
-            }
-          }
-
-          storage.put(
-            CHAIN_ID,
-            (highNetNativeToken ?? INITIAL_NETWORK).chainId,
-          );
-        }
-      }
+    if (net && net.type !== "mainnet") {
+      await storage.put(CHAIN_ID, INITIAL_NETWORK.chainId);
     }
   });
 }

@@ -1,7 +1,6 @@
 import { FC, memo, useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "clsx";
 import { useAtomValue, useAtom } from "jotai";
-import { nanoid } from "nanoid";
 import { FormApi } from "final-form";
 import { Form, Field } from "react-final-form";
 import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
@@ -9,7 +8,7 @@ import { useWindowFocus } from "lib/react-hooks/useWindowFocus";
 import { getSeedPhrase } from "core/client";
 import { SeedPharse } from "core/types";
 
-import { walletStateAtom, analyticsAtom, autoLockTimeoutAtom } from "app/atoms";
+import { walletStateAtom, autoLockTimeoutAtom } from "app/atoms";
 import {
   required,
   withHumanDelay,
@@ -22,7 +21,6 @@ import SecondaryModal, {
 import Button from "app/components/elements/Button";
 import SettingsHeader from "app/components/elements/SettingsHeader";
 import PasswordField from "app/components/elements/PasswordField";
-import Switcher from "app/components/elements/Switcher";
 import Separator from "app/components/elements/Seperator";
 import SeedPhraseWords from "app/components/blocks/SeedPhraseWords";
 import { ReactComponent as RevealIcon } from "app/icons/reveal.svg";
@@ -44,20 +42,9 @@ const prepareTimeouts = () => {
 
 const Security: FC = () => {
   const { hasSeedPhrase } = useAtomValue(walletStateAtom);
-  const [analytics, setAnalytics] = useAtom(analyticsAtom);
   const [autoLockTimeout, setAutoLockTimeout] = useAtom(autoLockTimeoutAtom);
 
   const [revealModalOpened, setRevealModalOpened] = useState(false);
-
-  const hanldeAnalyticsChange = useCallback(
-    (enabled: boolean) => {
-      setAnalytics({
-        enabled,
-        userId: analytics.userId ?? nanoid(),
-      });
-    },
-    [setAnalytics, analytics],
-  );
 
   const prepareCurrentTimeout = useMemo(
     () =>
@@ -131,22 +118,6 @@ const Security: FC = () => {
         </a>
         .
       </p>
-
-      <Switcher
-        id="analytics"
-        label={
-          <>
-            Analytics
-            <p className="text-xs text-brand-placeholder max-w-[18.75rem]">
-              Anonymous. Help us make OG Wallet better.
-            </p>
-          </>
-        }
-        text={analytics.enabled ? "Enabled" : "Disabled"}
-        checked={analytics.enabled}
-        onCheckedChange={hanldeAnalyticsChange}
-        className="min-w-[17.75rem]"
-      />
 
       {/* <Separator className="my-8" />
       <SettingsHeader>Security</SettingsHeader>

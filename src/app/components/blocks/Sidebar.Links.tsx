@@ -2,16 +2,12 @@ import { useMemo } from "react";
 import { Page } from "app/nav";
 import { useSetAtom } from "jotai";
 
-import { TEvent, trackEvent } from "core/client";
-import { BUY_ENABLED } from "app/defaults";
-
 import { ReactComponent as OverviewIcon } from "app/icons/Overview.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
 import { ReactComponent as ContactsIcon } from "app/icons/Contacts.svg";
 import { ReactComponent as WalletsIcon } from "app/icons/Wallets.svg";
-import { ReactComponent as BuyIcon } from "app/icons/Buy-page.svg";
 import { ReactComponent as SettingsIcon } from "app/icons/Settings.svg";
 import { ReactComponent as SupportIcon } from "app/icons/Support.svg";
 import { ReactComponent as ActivityIcon } from "app/icons/ActivityIcon.svg";
@@ -52,34 +48,12 @@ const useSidebarLinks = () => {
         Icon: ReceiveIcon,
         action: () => setReceiveOpened([true, "replace"]),
       },
-      ...(BUY_ENABLED
-        ? [
-            {
-              route: Page.Buy,
-              label: "Buy",
-              Icon: BuyIcon,
-              action: () =>
-                trackEvent(TEvent.BuyNavigated, {
-                  page: "dashboard",
-                }),
-            },
-          ]
-        : []),
       {
         route: Page.Swap,
         label: "Swap",
         Icon: SwapIcon,
         badge: +swapBadgeAmount,
-        action: () =>
-          trackEvent(TEvent.SwapNavigated, {
-            page: "dashboard",
-          }),
       },
-      // {
-      //   route: Page.Rewards,
-      //   label: "Rewards",
-      //   Icon: RewardsIcon,
-      // },
       // {
       //   label: "Bug bounty",
       //   Icon: BugIcon,

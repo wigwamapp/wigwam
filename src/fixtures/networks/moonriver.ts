@@ -6,11 +6,12 @@ export const MOONRIVER: Network[] = [
     chainId: 1285,
     type: "mainnet",
     rpcUrls: [
-      "https://rpc.api.moonriver.moonbeam.network",
-      "https://moonriver.api.onfinality.io/public",
-      "https://moonriver-rpc.publicnode.com",
+      // Dropped: the official "https://rpc.api.moonriver.moonbeam.network"
+      // resolves to a private 10.1.0.10, "https://moonriver-rpc.publicnode.com"
+      // answers 404 and "https://moonriver.api.pocket.network" fails every
+      // call but eth_chainId
       "https://moonriver.drpc.org",
-      "https://moonriver.api.pocket.network",
+      "https://moonriver.api.onfinality.io/public",
     ],
     chainTag: "moonriver",
     name: "Moonriver",

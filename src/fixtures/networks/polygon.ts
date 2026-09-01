@@ -6,8 +6,8 @@ export const POLYGON: Network[] = [
     chainId: 137,
     type: "mainnet",
     rpcUrls: [
-      "https://1rpc.io/matic",
       "https://polygon.drpc.org",
+      "https://1rpc.io/matic",
       "https://public.1rpc.io/matic",
       "https://polygon-bor-rpc.publicnode.com",
       "https://poly.api.pocket.network",

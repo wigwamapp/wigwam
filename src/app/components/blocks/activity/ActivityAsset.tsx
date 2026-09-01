@@ -27,7 +27,6 @@ import {
   ActivityType,
   SelfActivityKind,
   ConnectionActivity,
-  RampActivity,
   TransactionActivity,
   TxAction,
   TxActionType,
@@ -38,7 +37,6 @@ import { ClientProvider } from "core/client";
 import { saveNonce } from "core/common/nonce";
 
 import { getNetworkAtom, getPermissionAtom } from "app/atoms";
-import { TRANSAK_SUPPORT_URL } from "app/defaults";
 import {
   ChainIdProvider,
   useAccounts,
@@ -50,12 +48,9 @@ import { useDialog } from "app/hooks/dialog";
 import { useToast } from "app/hooks/toast";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
-import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as BridgeIcon } from "app/icons/bridge.svg";
 import { ReactComponent as SwapIconSmall } from "app/icons/activity-swap.svg";
 import { ReactComponent as ApproveIcon } from "app/icons/approve.svg";
-import { ReactComponent as ChatIcon } from "app/icons/communication.svg";
-import { ReactComponent as ReceiveIcon } from "app/icons/Receive.svg";
 import { ReactComponent as BanIcon } from "app/icons/ban.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as OptionsHorizontal } from "app/icons/options-horizontal.svg";
@@ -69,12 +64,10 @@ import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as ActivityConnectionIcon } from "app/icons/activity-connection.svg";
 import { ReactComponent as ActivitySigningIcon } from "app/icons/activity-signing.svg";
 import { ReactComponent as ActivityTransactionIcon } from "app/icons/transaction.svg";
-import { ReactComponent as ActivityOnRampIcon } from "app/icons/activity-onramp.svg";
 import { ReactComponent as GasIcon } from "app/icons/gas.svg";
 import { ReactComponent as ExternalLinkIcon } from "app/icons/external-link.svg";
 
 import TokenAmount from "../../blocks/TokenAmount";
-import Button from "../../elements/Button";
 import Avatar from "../../elements/Avatar";
 import PrettyDate from "../../elements/PrettyDate";
 import IconedButton from "../../elements/IconedButton";
@@ -115,11 +108,6 @@ const ActivityAsset = memo(
 
       if (item.type === ActivityType.Connection && revokedPermission) {
         return "revoked";
-      }
-
-      if (item.type === ActivityType.Ramp && !item.pending) {
-        const rampStatus = item.status.toLowerCase() as StatusType;
-        return rampStatus === "completed" ? "succeeded" : rampStatus;
       }
 
       if (item.type !== ActivityType.Transaction || item.pending) {
@@ -201,8 +189,7 @@ const ActivityAsset = memo(
                 <div className="flex items-center justify-between">
                   <ActivityTypeLabel item={item} className="mr-4" />
 
-                  {(item.type === ActivityType.Transaction ||
-                    item.type === ActivityType.Ramp) && (
+                  {item.type === ActivityType.Transaction && (
                     <ChainIdProvider chainId={item.chainId}>
                       <ActivityTxActions item={item} />
                     </ChainIdProvider>
@@ -251,22 +238,6 @@ const ActivityAsset = memo(
               </div>
             )}
             <ActivitySwap item={item} txAction={item.txAction} />
-            {item.type === ActivityType.Ramp && (
-              <div className="flex flex-col mt-2 pt-2 border-t border-brand-main/[.07] ">
-                <ChainIdProvider chainId={item.chainId}>
-                  <div className="flex items-center justify-between min-w-0">
-                    <ActivityTokens
-                      source={item.source}
-                      accountAddress={item.accountAddress}
-                    />
-
-                    <RampDetailsBlock item={item} isPopupMode />
-                  </div>
-                </ChainIdProvider>
-
-                <ActivityNetworkCard item={item} className="mt-1.5 min-w-0" />
-              </div>
-            )}
           </div>
         ) : (
           <>
@@ -289,11 +260,7 @@ const ActivityAsset = memo(
               />
             )}
 
-            {item.type === ActivityType.Ramp && (
-              <ActivityNetworkCard item={item} className="w-[12rem] mr-8" />
-            )}
-
-            {item.type !== ActivityType.Ramp && item.source.type === "page" && (
+            {item.source.type === "page" && (
               <ActivityWebsiteLink
                 source={item.source}
                 className="w-[9rem] mr-8"
@@ -302,14 +269,13 @@ const ActivityAsset = memo(
 
             <ActivitySwap item={item} txAction={item.txAction} />
 
-            {item.type !== ActivityType.Ramp &&
-              item.type === ActivityType.Connection && (
-                <DisconnectDApp
-                  item={item}
-                  className="w-[10rem] mr-8"
-                  setRevokedPermission={setRevokedPermission}
-                />
-              )}
+            {item.type === ActivityType.Connection && (
+              <DisconnectDApp
+                item={item}
+                className="w-[10rem] mr-8"
+                setRevokedPermission={setRevokedPermission}
+              />
+            )}
 
             {item.type === ActivityType.Transaction && (
               <ChainIdProvider chainId={item.chainId}>
@@ -322,15 +288,8 @@ const ActivityAsset = memo(
               </ChainIdProvider>
             )}
 
-            {item.type === ActivityType.Ramp && (
-              <ChainIdProvider chainId={item.chainId}>
-                <RampDetailsBlock item={item} />
-              </ChainIdProvider>
-            )}
-
             <div className="flex flex-col items-end ml-auto">
-              {(item.type === ActivityType.Transaction ||
-                item.type === ActivityType.Ramp) && (
+              {item.type === ActivityType.Transaction && (
                 <ChainIdProvider chainId={item.chainId}>
                   <ActivityTxActions item={item} className="mb-1" />
                 </ChainIdProvider>
@@ -439,14 +398,8 @@ const ActivityIcon = memo<ActivityIconProps>(({ item, className }) => {
 
   const Icon = (() => {
     switch (true) {
-      case item.type === ActivityType.Ramp:
-        return ReceiveIcon;
-
       case item.source.kind === SelfActivityKind.Swap:
         return SwapIcon;
-
-      case item.source.kind === SelfActivityKind.Reward:
-        return RewardsIcon;
 
       default:
         return SendIcon;
@@ -497,9 +450,6 @@ const ActivityTypeLabel: FC<ActivityTypeLabelProps> = ({ item, className }) => {
       item.txAction?.type === TxActionType.TokenTransfer
     ) {
       return "Transfer";
-    }
-    if (item.type === ActivityType.Ramp && item.kind === "onramp") {
-      return "Buy";
     }
 
     return item.type;
@@ -576,8 +526,6 @@ const getActivityIcon = (
       return ActivityConnectionIcon;
     case ActivityType.Signing:
       return ActivitySigningIcon;
-    case ActivityType.Ramp:
-      return ActivityOnRampIcon;
     default:
       if (kind && kind === SelfActivityKind.Swap) {
         if (item.txAction.type === "TOKEN_APPROVE") {
@@ -740,7 +688,7 @@ const ActivityWebsiteLink: FC<ActivityWebsiteLinkProps> = ({
 };
 
 type ActivityNetworkCardProps = {
-  item: TransactionActivity | RampActivity;
+  item: TransactionActivity;
   fee?: {
     native: BigNumber.Value;
     fiat?: BigNumber.Value;
@@ -1191,107 +1139,17 @@ const TxOptionsDropdown = memo(
   },
 );
 
-const SupportAlertContent: FC<{ orderId: string; isPopupMode: boolean }> = ({
-  orderId,
-  isPopupMode,
-}) => {
-  const { copy, copied } = useCopyToClipboard(orderId);
-  const [disabled, setDisabled] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setDisabled(false);
-    }, 0);
-  }, []);
-
-  return (
-    <div className="flex flex-col items-start">
-      <div className="flex flex-col">
-        <p className="text-left">
-          For assistance with card-based crypto balance top-ups, contact our
-          payment partner Transak. Please provide your{" "}
-          <span className="text-white">Order ID</span> at their Help Center for
-          transaction-related issues.
-        </p>
-        <div className="mb-3 flex items-center gap-2">
-          <p>
-            <b className="text-white">Order ID:</b> {orderId}
-          </p>
-          <IconedButton
-            aria-label={copied ? "Copied" : "Copy Order ID"}
-            tooltipProps={{
-              placement: "top",
-              disabled,
-            }}
-            Icon={copied ? SuccessIcon : CopyIcon}
-            className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
-            iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-            onClick={() => copy()}
-          />
-        </div>
-      </div>
-      <Button
-        href={TRANSAK_SUPPORT_URL}
-        className="!p-0 underline"
-        theme="clean"
-      >
-        Go to the Transak Help Center
-        <WalletExplorerIcon className="ml-1" />
-      </Button>
-    </div>
-  );
-};
-
 type ActivityTxActionsProps = {
-  item: TransactionActivity | RampActivity;
+  item: TransactionActivity;
   className?: string;
 };
 
 const ActivityTxActions: FC<ActivityTxActionsProps> = ({ item, className }) => {
   const isPopupMode = isPopup();
-  const { alert } = useDialog();
   const network = useLazyNetwork();
   const explorerLink = useExplorerLink(network);
 
-  const isRampActivity = useMemo(
-    () => item.type === ActivityType.Ramp,
-    [item.type],
-  );
-
   const { copy, copied } = useCopyToClipboard();
-
-  if (isRampActivity) {
-    return (
-      <div className={classNames("flex items-center", className)}>
-        <IconedButton
-          aria-label={copied ? "Copied" : "Copy Order ID"}
-          Icon={copied ? SuccessIcon : CopyIcon}
-          className={isPopupMode ? undefined : "!w-6 !h-6 min-w-[1.5rem]"}
-          iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-          onClick={() => copy((item as RampActivity).partnerOrderId)}
-        />
-        {explorerLink && (
-          <IconedButton
-            aria-label="Help"
-            Icon={ChatIcon}
-            className={isPopupMode ? "ml-1" : "!w-6 !h-6 min-w-[1.5rem] ml-2"}
-            iconClassName={isPopupMode ? undefined : "!w-[1.125rem]"}
-            onClick={() => {
-              alert({
-                title: "Help with a transaction",
-                content: (
-                  <SupportAlertContent
-                    isPopupMode={isPopupMode}
-                    orderId={(item as RampActivity).partnerOrderId}
-                  />
-                ),
-              });
-            }}
-          />
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className={classNames("flex items-center", className)}>
@@ -1386,34 +1244,6 @@ function capitalize(word: string) {
   const lower = word.toLowerCase();
   return `${word.charAt(0).toUpperCase()}${lower.slice(1)}`;
 }
-
-const RampDetailsBlock: FC<{ item: RampActivity; isPopupMode?: boolean }> = ({
-  item,
-  isPopupMode = false,
-}) => {
-  const { status, statusReason, accountAddress, tokenSlug, amountInCrypto } =
-    item;
-
-  if (["REFUNDED", "EXPIRED"].includes(status)) {
-    return <p className="text-brand-font">{capitalize(status)}</p>;
-  }
-
-  if (status === "FAILED") {
-    return <p className="text-brand-font">{capitalize(statusReason)}</p>;
-  }
-
-  return (
-    <TokenAmount
-      rawAmount
-      isSmall={isPopupMode}
-      accountAddress={accountAddress}
-      token={{
-        slug: tokenSlug,
-        amount: String(amountInCrypto),
-      }}
-    />
-  );
-};
 
 type PopoverButton = ButtonHTMLAttributes<HTMLButtonElement> & {
   Icon: FC<{ className?: string }>;

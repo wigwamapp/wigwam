@@ -22,7 +22,9 @@ export const WORLDCHAIN: Network[] = [
       "https://worldscan.org",
       "https://worldchain-mainnet.explorer.alchemy.com",
     ],
-    explorerApiUrl: "https://worldchain-mainnet.explorer.alchemy.com/api",
+    // The alchemy-hosted blockscout answers 500 on every api call, v1 and v2
+    // alike, so the etherscan multichain api serves the data instead
+    explorerApiUrl: "https://api.etherscan.io/v2/api?chainid=480",
     faucetUrls: [],
     infoUrl: "https://world.org/world-chain",
   },

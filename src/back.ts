@@ -17,7 +17,6 @@ import {
   startTxObserver,
   startExtBadge,
   startAutoLocker,
-  startRampTxObserver,
   startAutoNetworkChanger,
 } from "core/back/services";
 
@@ -41,7 +40,6 @@ startPageServer();
 startApproveWindowOpener();
 startPersistingApprovals();
 startTxObserver();
-startRampTxObserver();
 startExtBadge();
 
 startInstallOrUpdateListener();

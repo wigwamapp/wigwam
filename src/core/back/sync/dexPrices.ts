@@ -53,9 +53,8 @@ export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
           ? coinIdsByChain[chainId]
           : Object.values(coinIdsByChain)[0]
         : undefined;
-      const cached = tokenPricesCache.get(
-        coinId ?? `${chainId ?? ""}_${tokenAddress}`,
-      );
+      const cacheKey = coinId ?? `${chainId ?? ""}_${tokenAddress}`;
+      const cached = tokenPricesCache.get(cacheKey);
 
       if (cached) {
         data[tokenAddress] = cached;
@@ -169,6 +168,17 @@ export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
     return {};
   }
 }
+
+/**
+ * Native coin price.
+ *
+ * Coingecko fetches the native coin of every platform in a single call that is
+ * memoized for a few minutes, so one request covers all chains at once. The
+ * WalletConnect price endpoint cannot batch, which made it strictly more
+ * expensive here despite the smaller free-tier footprint.
+ */
+export const getNativeTokenPrice = (chainId: number) =>
+  getCoinGeckoNativeTokenPrice(chainId);
 
 export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
   try {

@@ -5,7 +5,6 @@ import {
   AddAccountStep,
   SettingTab,
   TransferTab,
-  ReceiveTab,
   PopupToolbarTab,
 } from "app/nav";
 
@@ -32,13 +31,6 @@ export const transferTabAtom = atomWithURLHash<TransferTab>(
   "transfer",
   TransferTab.Asset,
 );
-
-export const receiveTabAtom = atomWithURLHash<ReceiveTab>(
-  "receive",
-  ReceiveTab.BuyWithFiat,
-);
-
-export const onRampModalAtom = atomWithURLHash("onRampOpened", false);
 
 export const tokenSlugAtom = atomWithURLHash<string | null>("token", null);
 

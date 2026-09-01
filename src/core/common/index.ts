@@ -5,3 +5,4 @@ export * from "./settings";
 export * from "./network";
 export * from "./tokens";
 export * from "./totalBalance";
+export * from "./knownDapps";

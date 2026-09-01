@@ -38,6 +38,7 @@ import {
   isUnlocked,
 } from "../state";
 import { handleRpc } from "../rpc";
+import { syncKnownDapps } from "../sync";
 
 type InternalStateType = "walletStatus" | "chainId" | "accountAddress";
 
@@ -64,6 +65,9 @@ export function startPageServer() {
         method: OG_PHISHING_WARNING,
       });
     });
+
+    // Refreshed here, a page load ahead of any approval screen that needs it
+    syncKnownDapps();
 
     await ensureInited();
 

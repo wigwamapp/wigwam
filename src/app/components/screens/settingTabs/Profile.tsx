@@ -5,7 +5,7 @@ import type { FormApi } from "final-form";
 import { updateProfile } from "lib/ext/profile";
 import { replaceT, useI18NUpdate } from "lib/ext/react";
 
-import { changePassword, TEvent, trackEvent } from "core/client";
+import { changePassword } from "core/client";
 
 import {
   composeValidators,
@@ -48,7 +48,6 @@ const Profile: FC = () => {
     async (name: string, profileSeed: string) => {
       try {
         await updateProfile(currentId, { name, avatarSeed: profileSeed });
-        trackEvent(TEvent.ProfileUpdate);
         updateToast("Profile info successfully updated!");
       } catch (err) {
         console.error(err);

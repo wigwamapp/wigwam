@@ -9,7 +9,6 @@ import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus, TokenType } from "core/types";
 import { parseTokenSlug } from "core/common/tokens";
-import { TEvent, trackEvent } from "core/client";
 import { getTokenDetailsUrlAtom, tokenSlugAtom } from "app/atoms";
 import {
   OverflowProvider,
@@ -20,11 +19,9 @@ import {
   useExplorerLink,
   useHideToken,
   useLazyNetwork,
-  useRamp,
   useTokenActivitiesSync,
 } from "app/hooks";
 import { Page } from "app/nav";
-import { BUY_ENABLED } from "app/defaults";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AssetLogo from "app/components/elements/AssetLogo";
 import IconedButton from "app/components/elements/IconedButton";
@@ -39,13 +36,11 @@ import { ReactComponent as CoinGeckoIcon } from "app/icons/coingecko.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 
 import TokenActivity from "./TokenActivity";
 
 const AssetInfo: FC = () => {
-  const { onRampCurrency } = useRamp();
   const tokenSlug = useAtomValue(tokenSlugAtom)!;
 
   const chainId = useChainId();
@@ -78,14 +73,6 @@ const AssetInfo: FC = () => {
   const { copy, copied } = useCopyToClipboard(address);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  const showBuyButton = useMemo(
-    () =>
-      BUY_ENABLED &&
-      tokenInfo?.status !== TokenStatus.Disabled &&
-      onRampCurrency,
-    [tokenInfo?.status, onRampCurrency],
-  );
 
   useEffect(() => {
     scrollAreaRef.current?.scrollTo(0, 0);
@@ -229,12 +216,7 @@ const AssetInfo: FC = () => {
                 />
               </div>
             </div>
-            <div
-              className={classNames(
-                "mt-6 grid gap-2",
-                showBuyButton ? "grid-cols-4" : "grid-cols-3",
-              )}
-            >
+            <div className={classNames("mt-6 grid gap-2", "grid-cols-3")}>
               <Button
                 to={{ page: Page.Transfer }}
                 merge={["token"]}
@@ -253,42 +235,13 @@ const AssetInfo: FC = () => {
                 <ReceiveIcon className="w-4 h-auto mr-2" />
                 Receive
               </Button>
-              {showBuyButton && (
-                <Button
-                  to={{
-                    onRampOpened: true,
-                    token: tokenSlug,
-                  }}
-                  merge
-                  theme="secondary"
-                  className="grow !py-2 !min-w-0 text-sm"
-                  onClick={() => {
-                    trackEvent(TEvent.BuyNavigated, {
-                      page: "dashboard",
-                      tokenName: name,
-                      tokenSymbol: symbol,
-                      chainId,
-                    });
-                  }}
-                >
-                  <BuyIcon className="w-4 h-auto mr-2" />
-                  Buy
-                </Button>
-              )}
               <Button
                 to={{ page: Page.Swap }}
                 merge={["token"]}
                 theme="secondary"
                 className="grow !py-2 !min-w-0 text-sm"
                 title={`Swap ${symbol}`}
-                onClick={() => {
-                  trackEvent(TEvent.SwapNavigated, {
-                    page: "dashboard",
-                    tokenName: name,
-                    tokenSymbol: symbol,
-                    chainId,
-                  });
-                }}
+                onClick={() => {}}
               >
                 <SwapIcon className="w-4 h-auto mr-2" />
                 Swap

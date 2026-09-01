@@ -12,13 +12,10 @@ declare namespace NodeJS {
     // OG specific
     readonly OG_WEBSITE_ORIGIN?: string;
     readonly OG_STATIC_CDN?: string;
-    readonly OG_INDEXER_API?: string;
-    readonly OG_INDEXER_API_KEY?: string;
     readonly OG_INFURA_API_KEY?: string;
     readonly OG_ETHERSCAN_API_KEY?: string;
-    readonly OG_ANALYTICS_API_KEY?: string;
+    readonly OG_WC_PROJECT_ID?: string;
     readonly OG_OPEN_LOGIN_CLIENT_ID?: string;
-    readonly OG_BUY_ENABLED?: string;
     // Dev
     readonly OG_DEV_UNLOCK_PASSWORD?: string;
     readonly OG_DEV_ACTIVE_TAB_RELOAD?: string;

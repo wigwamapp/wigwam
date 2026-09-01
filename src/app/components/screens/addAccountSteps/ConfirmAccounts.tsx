@@ -7,7 +7,7 @@ import { TReplace, useI18NUpdate } from "lib/ext/react";
 import { NETWORK_ICON_MAP } from "fixtures/networks";
 
 import { AccountSource, AddAccountParams, WalletStatus } from "core/types";
-import { TEvent, addAccounts, trackEvent } from "core/client";
+import { addAccounts } from "core/client";
 import { generatePreviewHDNodes } from "core/common";
 
 import { AddAccountStep } from "app/nav";
@@ -133,13 +133,6 @@ const ConfirmAccounts = memo<{
         await addAccounts(addAccountsParams, stateRef.current.seedPhrase);
         setAccModalOpened([false]);
       }
-
-      const trackParams = {
-        source: addAccountsParams[0].source,
-        walletsAddedAmount: addAccountsParams.length,
-      };
-
-      trackEvent(TEvent.SetupWallet, trackParams);
     } catch (err: any) {
       alert({ title: "Error!", content: err.message });
     }

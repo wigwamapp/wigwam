@@ -4,7 +4,6 @@ import { useAtom, useSetAtom } from "jotai";
 import { isPopup } from "lib/ext/view";
 
 import { AccountAsset } from "core/types";
-import { TEvent, trackEvent } from "core/client";
 
 import { receiveModalAtom, receiveTokenAtom } from "app/atoms";
 import { useAccountToken } from "app/hooks";
@@ -31,9 +30,6 @@ const ReceiveModal: FC<ReceiveModalProps> = (props) => {
 
   useEffect(() => {
     if (receiveOpened) {
-      trackEvent(TEvent.ReceiveModalOpened, {
-        page: isPopupMode ? "popup" : "dashboard",
-      });
     }
   }, [receiveOpened, isPopupMode]);
 

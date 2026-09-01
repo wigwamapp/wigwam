@@ -4,10 +4,8 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { isPopupWindow } from "lib/ext/view";
 
 import { WalletStatus } from "core/types";
-import { TEvent, trackEvent } from "core/client";
 
 import { openInTab, toggleSidePanel } from "app/helpers";
-import { BUY_ENABLED } from "app/defaults";
 import {
   getTotalAccountBalanceAtom,
   isSidePanelEnabledAtom,
@@ -28,7 +26,6 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as SwapIcon } from "app/icons/swap.svg";
 import { ReactComponent as SendIcon } from "app/icons/send-action.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 import { ReactComponent as FullScreenIcon } from "app/icons/full-screen.svg";
 import { OverflowProvider, useAccounts, useActivityBadge } from "app/hooks";
 import Button from "../elements/Button";
@@ -289,27 +286,11 @@ const WalletInfo: FC = () => {
           </div>
           <span className="text-xs font-medium">Receive</span>
         </Button>
-        {BUY_ENABLED && (
-          <DeepLinkButton
-            text="Buy"
-            to="buy"
-            Icon={BuyIcon}
-            onClick={() => {
-              trackEvent(TEvent.BuyNavigated, {
-                page: "popup",
-              });
-            }}
-          />
-        )}
         <DeepLinkButton
           text="Swap"
           to="swap"
           Icon={SwapIcon}
-          onClick={() => {
-            trackEvent(TEvent.SwapNavigated, {
-              page: "popup",
-            });
-          }}
+          onClick={() => {}}
         />
       </div>
     </section>
