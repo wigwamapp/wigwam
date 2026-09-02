@@ -6,9 +6,12 @@ export const MOONBEAM: Network[] = [
     chainId: 1284,
     type: "mainnet",
     rpcUrls: [
-      "https://rpc.api.moonbeam.network",
-      "https://moonbeam.public.blastapi.io",
-      "https://rpc.ankr.com/moonbeam",
+      // Dropped: the official "https://rpc.api.moonbeam.network" resolves to a
+      // private 10.1.0.10 and "https://moonbeam-rpc.publicnode.com" answers 404
+      "https://moonbeam.drpc.org",
+      "https://moonbeam.api.pocket.network",
+      "https://moonbeam.api.onfinality.io/public",
+      "https://public.1rpc.io/glmr",
     ],
     chainTag: "moonbeam",
     name: "Moonbeam",
@@ -18,7 +21,7 @@ export const MOONBEAM: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://moonbeam.moonscan.io"],
-    explorerApiUrl: "https://api-moonbeam.moonscan.io/api",
+    explorerApiUrl: "https://api.etherscan.io/v2/api?chainid=1284",
     faucetUrls: [],
     infoUrl: "https://moonbeam.network/networks/moonbeam/",
   },

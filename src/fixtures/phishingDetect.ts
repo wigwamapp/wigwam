@@ -1,13 +1,10 @@
 import defaultConfig from "eth-phishing-detect/src/config.json";
 
-const WEBSITE_ORIGIN = process.env.WIGWAM_WEBSITE_ORIGIN;
-const WEBSITE_HOST = WEBSITE_ORIGIN && new URL(WEBSITE_ORIGIN).host;
-
 export const getPhishingDetectConfig = () =>
   getBase().then((base) => ({
     ...base,
-    fuzzylist: [...base.fuzzylist, WEBSITE_HOST],
-    whitelist: [...base.whitelist, WEBSITE_HOST],
+    fuzzylist: base.fuzzylist,
+    whitelist: base.whitelist,
   }));
 
 export const getBase = (): Promise<typeof defaultConfig> =>

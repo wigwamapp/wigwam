@@ -12,10 +12,9 @@ declare namespace NodeJS {
     // Wigwam specific
     readonly WIGWAM_WEBSITE_ORIGIN?: string;
     readonly WIGWAM_STATIC_CDN?: string;
-    readonly WIGWAM_INDEXER_API?: string;
-    readonly WIGWAM_INDEXER_API_KEY?: string;
     readonly WIGWAM_INFURA_API_KEY?: string;
-    readonly WIGWAM_ANALYTICS_API_KEY?: string;
+    readonly WIGWAM_ETHERSCAN_API_KEY?: string;
+    readonly WIGWAM_WC_PROJECT_ID?: string;
     readonly WIGWAM_OPEN_LOGIN_CLIENT_ID?: string;
     // Dev
     readonly WIGWAM_DEV_UNLOCK_PASSWORD?: string;

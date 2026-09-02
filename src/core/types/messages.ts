@@ -5,7 +5,6 @@ import { ActivitySource, Approval, ApprovalResult } from "./activity";
 import { SyncStatus } from "./sync";
 import { TokenType } from "./tokens";
 import { GasPrices } from "./fees";
-import { RampTokenInfo } from "./ramp";
 
 export type Request =
   | GetWalletStateRequest
@@ -26,7 +25,6 @@ export type Request =
   | ApproveRequest
   | GetGasPricesRequest
   | GetSyncStatusRequest
-  | GetOnRampCurrenciesRequest
   | GetTokenDetailsUrlRequest;
 
 export type Response =
@@ -48,7 +46,6 @@ export type Response =
   | SendRpcResponse
   | GetApprovalsResponse
   | ApproveResponse
-  | GetOnRampCurrenciesResponse
   | GetTokenDetailsUrlResponse;
 
 export type EventMessage =
@@ -88,7 +85,6 @@ export enum MessageType {
   ApprovalsUpdated = "APPROVALS_UPDATED",
   Approve = "APPROVE",
   RejectAllApprovals = "REJECT_ALL_APPROVALS",
-  GetOnRampCurrencies = "GET_ONRAMP_CURRENCIES",
   GetTokenDetailsUrl = "GET_TOKEN_DETAILS_URL",
 }
 
@@ -320,15 +316,6 @@ export interface ApproveResponse extends MessageBase {
 
 export interface RejectAllApprovals extends MessageBase {
   type: MessageType.RejectAllApprovals;
-}
-
-export interface GetOnRampCurrenciesRequest extends MessageBase {
-  type: MessageType.GetOnRampCurrencies;
-}
-
-export interface GetOnRampCurrenciesResponse extends MessageBase {
-  type: MessageType.GetOnRampCurrencies;
-  currencies: Record<string, RampTokenInfo>;
 }
 
 export interface GetTokenDetailsUrlRequest extends MessageBase {

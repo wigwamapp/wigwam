@@ -1,4 +1,4 @@
-# Wigwam Web Extension Wallet - Security Guidelines
+# Wigwam - Security Guidelines
 
 At Wigwam, we prioritize the security and privacy of our users' digital assets and personal information. This document outlines the security measures and features we have implemented to ensure a secure web3 wallet experience.
 

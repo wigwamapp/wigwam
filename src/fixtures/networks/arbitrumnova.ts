@@ -9,6 +9,8 @@ export const ARBITRUMNOVA: Network[] = [
       "https://nova.arbitrum.io/rpc",
       "https://arbitrum-nova.publicnode.com",
       "https://arbitrum-nova.drpc.org",
+      "https://arbitrum-nova-rpc.publicnode.com",
+      "https://arb-nova-mainnet.gateway.tatum.io",
     ],
     chainTag: "arbitrumnova",
     name: "Arbitrum Nova",
@@ -21,7 +23,7 @@ export const ARBITRUMNOVA: Network[] = [
       "https://nova.arbiscan.io/",
       "https://nova-explorer.arbitrum.io",
     ],
-    explorerApiUrl: "https://api-nova.arbiscan.io/api",
+    explorerApiUrl: "https://arbitrum-nova.blockscout.com/api",
     iconUrls: [],
     faucetUrls: [],
     parent: {

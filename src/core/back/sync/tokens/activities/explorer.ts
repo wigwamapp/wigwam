@@ -10,6 +10,17 @@ import { getNetwork } from "core/common/network";
 import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
 
 /**
+ * Etherscan V2 multichain api, a single host serves every supported chain
+ * via the `chainid` query param.
+ *
+ * The key is optional and never required to run: public builds go key-less,
+ * self-hosted setups may provide one to unlock etherscan-only chains.
+ * @see https://docs.etherscan.io/etherscan-v2
+ */
+const ETHERSCAN_V2_HOST = "api.etherscan.io/v2/";
+const ETHERSCAN_API_KEY = process.env.WIGWAM_ETHERSCAN_API_KEY;
+
+/**
  * Explorer (etherscan) Token Activities sync
  * For ERC20 tokens, For NFTS, and for native token as default 'txlist'
  */
@@ -18,6 +29,11 @@ export async function syncExplorerTokenActivities(token: AccountToken) {
 
   const { explorerApiUrl } = await getNetwork(chainId);
   if (!explorerApiUrl) return;
+
+  // Only etherscan takes a key, and only when one is configured.
+  // Blockscout and routescan stay key-less.
+  const withApiKey =
+    Boolean(ETHERSCAN_API_KEY) && explorerApiUrl.includes(ETHERSCAN_V2_HOST);
 
   const nativeToken = tokenSlug === NATIVE_TOKEN_SLUG;
   const {
@@ -47,6 +63,7 @@ export async function syncExplorerTokenActivities(token: AccountToken) {
         sort: "desc",
         page: 1,
         offset: 500,
+        ...(withApiKey ? { apikey: ETHERSCAN_API_KEY } : null),
       },
     }).then((res) => {
       if (res.data?.message === "NOTOK") {
@@ -59,7 +76,13 @@ export async function syncExplorerTokenActivities(token: AccountToken) {
 
   let txs = data.result;
 
-  if (!txs || txs.length === 0) return true;
+  // Explorers disagree on how they report errors. Older blockscout instances
+  // answer `{ message: "Unknown action", result: null }` for actions they do
+  // not implement (e.g. token1155tx), which is not the `NOTOK` handled above.
+  // Returning falsy lets the caller fall back to the on-chain sync, while an
+  // empty list stays a legitimate "nothing to sync".
+  if (!Array.isArray(txs)) return;
+  if (txs.length === 0) return true;
 
   if (tokenType === TokenType.NFT) {
     txs = txs.filter((t: any) => t.tokenID === tokenId);

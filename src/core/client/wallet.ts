@@ -273,15 +273,6 @@ export async function getGasPrices(chainId: number) {
   return res.gasPrices;
 }
 
-export async function getOnRampCurrencies() {
-  const type = MessageType.GetOnRampCurrencies;
-
-  const res = await porter.request({ type });
-  assert(res?.type === type);
-
-  return res.currencies;
-}
-
 export async function getTokenDetailsUrl(chainId: number, tokenSlug: string) {
   const type = MessageType.GetTokenDetailsUrl;
 

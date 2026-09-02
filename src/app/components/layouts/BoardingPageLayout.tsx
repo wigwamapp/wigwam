@@ -11,7 +11,6 @@ import { ReactComponent as ArrowLeftLongIcon } from "app/icons/arrow-left-long.s
 // import WelcomeBgImage from "app/images/welcome-bg.jpg";
 // import WelcomeTreeLeftImage from "app/images/welcome-tree-left.png";
 // import WelcomeTreeRightImage from "app/images/welcome-tree-right.png";
-// import WelcomeWigwamImage from "app/images/welcome-wigwam.png";
 // import WelcomeFireImage from "app/images/welcome-fire.png";
 
 type BoardingPageLayoutProps = {
@@ -99,14 +98,6 @@ const BoardingPageLayout: FC<PropsWithChildren<BoardingPageLayoutProps>> = ({
           className={classNames(
             "absolute bottom-0 right-[2%] z-[2]",
             "h-[82.6%] w-auto",
-          )}
-        />
-        <img
-          src={WelcomeWigwamImage}
-          alt="Wigwam"
-          className={classNames(
-            "absolute bottom-[7.5%] right-[22.7%]",
-            "h-[42.22%] w-auto",
           )}
         />
         <img

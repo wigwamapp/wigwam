@@ -2,7 +2,6 @@ import { atomFamily, atomWithDefault } from "jotai/utils";
 import { dequal } from "dequal/lite";
 import {
   atomWithAutoReset,
-  atomWithClientStorage,
   atomWithRepoQuery,
   atomWithStorage,
 } from "lib/atom-utils";
@@ -16,7 +15,6 @@ import {
   onSyncStatusUpdated,
 } from "core/client";
 import { nonceStorageKey } from "core/common/nonce";
-import { indexerApi } from "core/common/indexerApi";
 import { getAllEvmNetworks } from "core/common/chainList";
 
 export const walletStateAtom = atomWithAutoReset(getWalletState, {
@@ -44,25 +42,6 @@ export const getPermissionAtom = atomFamily((origin?: string) =>
   atomWithRepoQuery((query) =>
     query(() => repo.permissions.get(origin || "<stub>")),
   ),
-);
-
-export const getAppliedForRewardsAtom = atomFamily((address: string) =>
-  atomWithDefault(() =>
-    indexerApi
-      .get<{ applied: boolean }>(`/activity/check/${address}`)
-      .then((res) => res.data?.applied)
-      .catch(() => "error" as const),
-  ),
-);
-
-export const rewardsApplicationAtom = atomWithClientStorage<string>(
-  "rewards-application",
-  "",
-);
-
-export const tgApplicationAtom = atomWithClientStorage<string>(
-  "tg-application",
-  "",
 );
 
 export const allEvmNetworksAtom = atomWithDefault(getAllEvmNetworks);

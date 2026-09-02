@@ -17,9 +17,8 @@ import { getNetwork } from "core/common/network";
 
 import { DexPrices, getDexPrices } from "../../dexPrices";
 import { getBalanceFromChain } from "../../chain";
-import { CxToken, indexerApi } from "../../indexer";
+import { fetchAccountAssets } from "./assetSources";
 import { prepareAccountTokensSync } from "./utils";
-import { K_INDEXER_CHAINS } from "./constants";
 
 const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
 
@@ -93,7 +92,10 @@ export const syncAccountAssets = memoize(
             : existing?.logoUrl,
       };
 
-      const rawBalance = rawBalanceBN.toString();
+      // toFixed, not toString: BigNumber switches to exponential notation past
+      // EXPONENTIAL_AT, and uint256-max balances (spam tokens, infinite
+      // approvals) sit far above it. `rawBalance` must stay plain digits.
+      const rawBalance = rawBalanceBN.toFixed(0);
 
       const priceUSD = token.quote_rate
         ? new BigNumber(token.quote_rate).toString()
@@ -126,7 +128,7 @@ export const syncAccountAssets = memoize(
     }
 
     // Fetch data from the chain for tokens
-    // that were not retrieved from the indexer
+    // that were not retrieved from the explorer
 
     const restTokens = Array.from(existingTokensMap.values()).filter(
       (t) => !ZERO_ADDRESSES.has(parseTokenSlug(t.tokenSlug).address),
@@ -218,80 +220,9 @@ export const syncAccountAssets = memoize(
 
 export const fetchAccountTokens = memoize(
   (chainId: number, accountAddress: string) =>
-    fetchKxAccountTokens(chainId, accountAddress),
-  // .catch((err) => {
-  //     if (!err?.message?.includes("Chain not supported")) {
-  //       console.warn("Using another indexer", err);
-  //     }
-
-  //     return fetchUxAccountTokens(chainId, accountAddress);
-  //   }),
+    fetchAccountAssets(chainId, accountAddress),
   {
     cacheKey: (args) => args.join("_"),
     maxAge: 10_000, // 10 sec
   },
 );
-
-async function fetchKxAccountTokens(chainId: number, accountAddress: string) {
-  if (!K_INDEXER_CHAINS.has(chainId)) {
-    throw new Error("Chain not supported");
-  }
-
-  return indexerApi
-    .get(`/k/assets`, {
-      params: {
-        _authAddress: accountAddress,
-        chainId,
-        accountAddress,
-      },
-    })
-    .then((r) => {
-      const data = r.data;
-      if ("error" in data) {
-        throw new Error(data.error.message);
-      }
-
-      const assets: CxToken[] = [];
-
-      for (const item of data.result.assets) {
-        const asset: CxToken = {
-          native_token: item.tokenType === "NATIVE",
-          type: item.tokenType,
-          contract_address: item.contractAddress,
-          contract_name: item.tokenName || "",
-          contract_ticker_symbol: item.tokenSymbol || "",
-          contract_decimals: item.tokenDecimals || 18,
-          logo_url: item.thumbnail || "",
-          balance: item.balanceRawInteger,
-          quote_rate: item.tokenPrice || "0",
-          quote: item.balanceUsd || "0",
-          is_spam: false,
-          balance_24h: item.balanceUsd24h || "0",
-        };
-
-        assets.push(asset);
-      }
-
-      return assets;
-    });
-}
-
-// async function fetchUxAccountTokens(chainId: number, accountAddress: string) {
-//   if (!U_INDEXER_CHAINS.has(chainId)) {
-//     throw new Error("Chain not supported");
-//   }
-
-//   return indexerApi
-//     .get(`/u/v1/${chainId}/address/${accountAddress}/assets`, {
-//       params: {
-//         _authAddress: accountAddress,
-//         verified: true,
-//       },
-//     })
-//     .then((r) => r.data as CxToken[]);
-// }
-
-// const U_INDEXER_CHAINS = new Set([
-//   1, 56, 137, 42220, 8217, 25, 106, 42161, 43114, 50, 32769, 250, 122,
-//   1313161554, 1088, 5000, 1101, 1284, 10, 8453, 34443, 169,
-// ]);

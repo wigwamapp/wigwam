@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { getERC20IconUrl } from "lib/static-cdn";
 
 import {
   AccountToken,
@@ -19,7 +20,6 @@ import { syncStarted, synced } from "../../state";
 
 import { DexPrices, getDexPrices } from "../dexPrices";
 import { getBalanceFromChain, getTokenMetadata } from "../chain";
-import { indexerApi } from "../indexer";
 
 const stack = new Set<string>();
 
@@ -173,20 +173,9 @@ async function performTokenSync(
 
   // Logo URL
   if (standard === TokenStandard.ERC20) {
-    const res = await indexerApi
-      .get("/cmc/v2/cryptocurrency/info", {
-        params: { address: tokenAddress },
-      })
-      .catch(() => null);
+    const logoUrl = getERC20IconUrl(chainId, tokenAddress.toLowerCase());
 
-    const items = res?.data?.data;
-    if (items) {
-      const token = items[Object.keys(items)[0]];
-
-      if (token?.logo) {
-        Object.assign(metadata, { logoUrl: token.logo });
-      }
-    }
+    if (logoUrl) Object.assign(metadata, { logoUrl });
   }
 
   const rawBalance = balance?.toString() ?? "0";

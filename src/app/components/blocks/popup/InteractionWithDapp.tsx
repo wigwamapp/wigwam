@@ -8,7 +8,6 @@ import { useLazyAtomValue } from "lib/atom-utils";
 import { ActivityType, Permission, MetaMaskCompatibleMode } from "core/types";
 import * as repo from "core/repo";
 import { saveActivity } from "core/common/activity";
-import { trackEvent, TEvent } from "core/client";
 
 import {
   activeTabAtom,
@@ -125,8 +124,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
             pending: 0,
           });
         }
-
-        trackEvent(TEvent.Web3ManualConnected);
       }
     } catch (err) {
       console.error(err);
@@ -146,10 +143,6 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
         ? MetaMaskCompatibleMode.Off
         : MetaMaskCompatibleMode.Strict,
     );
-
-    trackEvent(TEvent.Web3SharedModeToggled, {
-      mode: metamaskModeEnabled ? "disabled" : "enabled",
-    });
   }, [metamaskModeEnabled, setMetamaskMode]);
 
   return (
@@ -295,10 +288,10 @@ const InteractionWithDapp: FC<{ className?: string }> = ({ className }) => {
                 content={
                   <p>
                     When enabled - use the MetaMask connection button to connect
-                    to dApps only if the Wigwam wallet option is unavailable on
-                    the website.
+                    to dApps only if the Wigwam option is unavailable on the
+                    website.
                     <br />
-                    Otherwise, choose only Wigwam wallet!
+                    Otherwise, choose only Wigwam!
                   </p>
                 }
                 placement="bottom-end"

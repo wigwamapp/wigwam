@@ -22,7 +22,7 @@ export class UniversalInpageProvider extends Emitter {
       (p) => p.isWigwam && p.mmCompatible === MetaMaskCompatibleMode.Strict,
     );
 
-    // If we have wigwam providers with strict metamask compatible mode (use as default)
+    // If we have Wigwam providers with strict metamask compatible mode (use as default)
     if (allWigwamStrict.length > 0) return allWigwamStrict;
 
     return this.allProviders.filter(

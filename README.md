@@ -2,7 +2,7 @@
 
 ### https://wigwam.app
 
-A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Smart Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
+A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
 ![Wigwam](./docs/banner.png)
 
@@ -76,7 +76,7 @@ You can also find documentation for specific modules within the source code.
 ### Get the source code
 
 ```bash
-git clone git@github.com:wigwamapp/local-wigwam.git wigwam
+git clone git@github.com:wigwamapp/wigwam.git
 ```
 
 ### Install app dependencies
@@ -88,11 +88,7 @@ yarn
 ### Build an application
 
 ```bash
-# for Chrome and other Chrome-based browsers
 yarn build
-
-# for Firefox
-yarn build:firefox
 ```
 
 ### Add an application to the browser locally

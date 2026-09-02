@@ -1,6 +1,4 @@
-import { storage } from "lib/ext/storage";
-
-import { CHAIN_ID, TokenType } from "core/types";
+import { TokenType } from "core/types";
 
 import { syncStarted, synced } from "../state";
 import { syncConversionRates } from "./currencyConversion";
@@ -9,7 +7,6 @@ import {
   syncNetworks,
   syncAccountTokens,
   refreshTotalBalances,
-  isFirstSync,
 } from "./tokens";
 
 export async function addSyncRequest(
@@ -28,17 +25,13 @@ export async function addSyncRequest(
     await syncConversionRates();
 
     await enqueueTokensSync(accountAddress, async () => {
-      const firstSync = await isFirstSync(accountAddress);
-      const mostValuedChainId = await syncNetworks(accountAddress, chainId);
+      // Syncing never changes the active network: it is the user's choice alone
+      await syncNetworks(accountAddress, chainId);
 
       await syncAccountTokens(tokenType, chainId, accountAddress);
 
       if (tokenType === TokenType.Asset) {
         await refreshTotalBalances(chainId, accountAddress);
-      }
-
-      if (firstSync && mostValuedChainId && mostValuedChainId !== chainId) {
-        await storage.put(CHAIN_ID, mostValuedChainId);
       }
     });
   } catch (err) {

@@ -7,3 +7,4 @@ export * from "./settings";
 export * from "./tokens";
 export * from "./approve";
 export * from "./activity";
+export * from "./dapps";

@@ -1,4 +1,4 @@
-# Wigwam Web Extension Wallet - General Tech Documentation
+# Wigwam - Browser Extension - General Tech Documentation
 
 ## Architecture
 

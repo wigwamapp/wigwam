@@ -4,7 +4,7 @@ import {
   DEFAULT_AUTO_LOCK_TIMEOUT,
   DEFAULT_WEB_METAMASK_COMPATIBLE,
 } from "fixtures/settings";
-import { Setting, AnalyticsState } from "core/common";
+import { Setting } from "core/common";
 
 export const autoLockTimeoutAtom = atomWithStorage(
   Setting.AutoLockTimeout,
@@ -17,16 +17,6 @@ export const web3MetaMaskCompatibleAtom = atomWithStorage(
 );
 
 export const testNetworksAtom = atomWithStorage(Setting.TestNetworks, false);
-
-export const analyticsAtom = atomWithStorage<AnalyticsState>(
-  Setting.Analytics,
-  { enabled: false },
-);
-
-export const requiredAuthSigAtom = atomWithStorage<string[]>(
-  Setting.RequiredAuthSig,
-  [],
-);
 
 export const profileBlockedUntilAtom = atomWithStorage<number>(
   Setting.ProfileBlockedUntil,

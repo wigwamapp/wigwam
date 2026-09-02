@@ -38,7 +38,6 @@ import {
   addSyncRequest,
   estimateGasPrices,
   syncTokenActivities,
-  getOnRampCryptoCurrencies,
   getTokenDetailsUrl,
 } from "../sync";
 
@@ -306,15 +305,6 @@ async function handleWalletRequest(
           const gasPrices = await estimateGasPrices(chainId);
 
           ctx.reply({ type, gasPrices });
-        }),
-      )
-      .with({ type: MessageType.GetOnRampCurrencies }, ({ type }) =>
-        withStatus(WalletStatus.Unlocked, async () => {
-          const currencies = await getOnRampCryptoCurrencies().catch(
-            () => ({}),
-          );
-
-          ctx.reply({ type, currencies });
         }),
       )
       .with(

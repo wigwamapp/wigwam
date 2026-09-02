@@ -2,9 +2,6 @@ import { FC, PropsWithChildren } from "react";
 import classNames from "clsx";
 
 import { ReactComponent as GithubIcon } from "app/icons/github.svg";
-import { ReactComponent as TelegramIcon } from "app/icons/telegram.svg";
-import { ReactComponent as TwitterIcon } from "app/icons/twitter.svg";
-import { ReactComponent as MediumIcon } from "app/icons/medium.svg";
 import { ReactComponent as DiscordIcon } from "app/icons/discord.svg";
 
 import Separator from "app/components/elements/Seperator";
@@ -118,8 +115,8 @@ const usefulLinks = [
     href: "https://wigwam.app/",
   },
   {
-    label: "Contact us",
-    href: "https://wigwam.app/contact",
+    label: "Email",
+    href: "mailto:info@wigwam.app",
   },
   {
     label: "Help",
@@ -136,21 +133,6 @@ const usefulLinks = [
 ];
 
 const mediaLinks = [
-  {
-    href: "https://t.me/wigwamapp",
-    label: "Telegram",
-    Icon: TelegramIcon,
-  },
-  {
-    href: "https://twitter.com/wigwam_app",
-    label: "Twitter",
-    Icon: TwitterIcon,
-  },
-  {
-    href: "https://wigwamapp.medium.com",
-    label: "Medium",
-    Icon: MediumIcon,
-  },
   {
     href: "https://github.com/wigwamapp",
     label: "Github",

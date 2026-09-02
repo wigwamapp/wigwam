@@ -1,4 +1,4 @@
-import { wrapStaticUrl } from "lib/wigwam-static";
+import { wrapStaticUrl } from "lib/static-cdn";
 
 import { IPFS_CLOUDFLARE_GATEWAY, IPFS_IO_GATEWAY } from "../defaults";
 

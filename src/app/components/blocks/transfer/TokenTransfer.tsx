@@ -30,7 +30,7 @@ import {
 import { NATIVE_TOKEN_SLUG, parseTokenSlug } from "core/common/tokens";
 import { requestBalance } from "core/common/balance";
 import { estimateL1Fee } from "core/common/l1Fee";
-import { suggestFees, TEvent, trackEvent } from "core/client";
+import { suggestFees } from "core/client";
 
 import { Page } from "app/nav";
 import {
@@ -251,17 +251,6 @@ const TransferTokenContent = memo<TransferTokenContent>(
             const txResPromise = provider.send("eth_sendTransaction", [rpcTx]);
 
             if (currentNetwork) {
-              trackEvent(
-                token.tokenType === TokenType.Asset
-                  ? TEvent.TokenTransferCreated
-                  : TEvent.NftTransferCreated,
-                {
-                  networkName: currentNetwork.name,
-                  networkChainId: currentNetwork.chainId,
-                  tokenName: token.name,
-                  tokenAddress,
-                },
-              );
             }
 
             const tokenPreview =
@@ -504,7 +493,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 gasLimit = BigInt(fees.gasLimit);
               }
 
-              const gasPrice = fees.modes.high.max;
+              const gasPrice = fees.modes.average.max;
               const maxGasLimit =
                 tokenSlug !== NATIVE_TOKEN_SLUG
                   ? (gasLimit * 3n) / 2n

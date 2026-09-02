@@ -16,7 +16,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import BigNumber from "bignumber.js";
 import { useLazyAtomValue } from "lib/atom-utils";
-import { wrapIpfsNetIcon } from "lib/wigwam-static";
+import { wrapIpfsNetIcon } from "lib/static-cdn";
 
 import { Network } from "core/types";
 import { EvmNetwork } from "core/common/chainList";

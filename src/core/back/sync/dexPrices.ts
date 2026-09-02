@@ -5,8 +5,6 @@ import BigNumber from "bignumber.js";
 import { getAddress, isAddress } from "ethers";
 import { withOfflineCache } from "lib/ext/offlineCache";
 
-import { indexerApi } from "./indexer";
-
 export type DexTokenPrice = {
   usd: number;
   usd_24h_change?: number;
@@ -55,9 +53,8 @@ export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
           ? coinIdsByChain[chainId]
           : Object.values(coinIdsByChain)[0]
         : undefined;
-      const cached = tokenPricesCache.get(
-        coinId ?? `${chainId ?? ""}_${tokenAddress}`,
-      );
+      const cacheKey = coinId ?? `${chainId ?? ""}_${tokenAddress}`;
+      const cached = tokenPricesCache.get(cacheKey);
 
       if (cached) {
         data[tokenAddress] = cached;
@@ -80,7 +77,7 @@ export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
       while (coinsToRefresh.length > 0) {
         const nextCoins = coinsToRefresh.splice(0, 100);
 
-        const res = await indexerApi.get<DexPrices>("/cg/simple/price", {
+        const res = await coinGeckoApi.get<DexPrices>("/simple/price", {
           params: {
             ids: nextCoins.join(),
             vs_currencies: "USD",
@@ -172,6 +169,17 @@ export async function getDexPrices(tokenAddresses: string[], chainId?: number) {
   }
 }
 
+/**
+ * Native coin price.
+ *
+ * Coingecko fetches the native coin of every platform in a single call that is
+ * memoized for a few minutes, so one request covers all chains at once. The
+ * WalletConnect price endpoint cannot batch, which made it strictly more
+ * expensive here despite the smaller free-tier footprint.
+ */
+export const getNativeTokenPrice = (chainId: number) =>
+  getCoinGeckoNativeTokenPrice(chainId);
+
 export const getCoinGeckoNativeTokenPrice = async (chainId: number) => {
   try {
     const { platformIds, chainIds } = await getCoinGeckoPlatformIds();
@@ -196,7 +204,7 @@ export const getCoinGeckoPlatformPrices = memoize(
   async () => {
     const { platformIds } = await getCoinGeckoPlatformIds();
 
-    const { data } = await indexerApi.get<DexPrices>("/cg/simple/price", {
+    const { data } = await coinGeckoApi.get<DexPrices>("/simple/price", {
       params: {
         ids: Object.values(platformIds)
           .map((p) => p.native_coin_id)

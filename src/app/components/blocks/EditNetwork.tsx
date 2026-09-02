@@ -29,7 +29,6 @@ import {
   setRpcUrl,
 } from "core/common";
 import { Network } from "core/types";
-import { TEvent, trackEvent } from "core/client";
 
 import { IS_FIREFOX } from "app/defaults";
 import {
@@ -149,16 +148,6 @@ const EditNetwork = memo<EditNetworkProps>(
 
             if (isChangedChainId) {
               await cleanupNetwork(initialChainId);
-            }
-
-            if (isNew) {
-              trackEvent(TEvent.NetworkCreation);
-            } else {
-              const isDefault = DEFAULT_CHAIN_IDS.has(chainId);
-              trackEvent(TEvent.NetworkEdit, {
-                name: isDefault ? nName : "unknown",
-                chainId: isDefault ? chainId : "unknown",
-              });
             }
 
             if (isNew && onActionFinished) {

@@ -4,8 +4,6 @@ import { useAtomValue } from "jotai";
 import { changeProfile, addProfile, Profile } from "lib/ext/profile";
 import { replaceT } from "lib/ext/i18n";
 
-import { TEvent, trackEvent } from "core/client";
-
 import { profileStateAtom } from "app/atoms";
 import BoardingPageLayout from "app/components/layouts/BoardingPageLayout";
 import SecondaryModal, {
@@ -32,8 +30,6 @@ const Profiles: FC = () => {
 
     try {
       await addProfile(name, profileSeed);
-
-      trackEvent(TEvent.ProfileCreation);
 
       setAdding(false);
     } catch (err) {
@@ -104,9 +100,9 @@ const Profiles: FC = () => {
 
             {/* <li>
               You will always see your <strong>profile avatar</strong>, on all
-              Wigwam pages. <strong>It is unique!</strong> This feature allows
-              you to <strong>determine</strong> whether the Wigwam you are
-              seeing is <strong>real</strong> or fake.
+              Wigwam pages. <strong>It is unique!</strong> This feature
+              allows you to <strong>determine</strong> whether the Wigwam you
+              are seeing is <strong>real</strong> or fake.
             </li> */}
 
             <li>

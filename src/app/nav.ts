@@ -4,14 +4,12 @@ export enum Page {
   Profiles = "profiles",
   Unlock = "unlock",
   Receive = "receive",
-  Buy = "buy",
   Transfer = "transfer",
   Swap = "swap",
   Apps = "apps",
   Contacts = "contacts",
   Wallets = "wallets",
   Settings = "settings",
-  Rewards = "Rewards",
 }
 
 export enum AddAccountStep {
@@ -41,13 +39,6 @@ export enum TransferTab {
   Asset = "asset",
   Nft = "nft",
   Bridge = "bridge",
-}
-
-export enum ReceiveTab {
-  ShareAddress = "share-address",
-  BuyWithCrypto = "buy-with-crypto",
-  BuyWithFiat = "buy-with-fiat",
-  Faucet = "faucet",
 }
 
 export enum PopupToolbarTab {

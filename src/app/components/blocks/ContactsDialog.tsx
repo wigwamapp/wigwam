@@ -4,7 +4,6 @@ import { Field, Form } from "react-final-form";
 import { ethers } from "ethers";
 
 import * as Repo from "core/repo";
-import { TEvent, trackEvent } from "core/client";
 
 import {
   composeValidators,
@@ -40,7 +39,7 @@ const ContactsDialog: FC = () => {
       withHumanDelay(async () => {
         if (modalData) {
           newAddress = ethers.getAddress(newAddress);
-          const { name, address, addedAt, fromPage } = modalData;
+          const { name, address, addedAt } = modalData;
           const isNew = !name || !address;
           try {
             const isChangedAddress = newAddress !== address;
@@ -51,7 +50,6 @@ const ContactsDialog: FC = () => {
                 addedAt: isNew || !addedAt ? new Date().getTime() : addedAt,
               });
               if (isNew) {
-                trackEvent(TEvent.Contact, { fromPage: fromPage || false });
               }
               if (isChangedAddress && address) {
                 await Repo.contacts.delete(address);

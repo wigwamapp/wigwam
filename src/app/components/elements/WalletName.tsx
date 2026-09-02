@@ -3,7 +3,7 @@ import classNames from "clsx";
 import { TReplace } from "lib/ext/i18n/react";
 
 import { Account, AccountSource } from "core/types";
-import { useEns, useRns } from "app/hooks";
+import { useEns } from "app/hooks";
 
 import { ReactComponent as GoogleIcon } from "app/icons/google.svg";
 import { ReactComponent as FacebookIcon } from "app/icons/facebook.svg";
@@ -27,16 +27,13 @@ const WalletName: FC<WalletNameProps> = ({
   iconClassName,
 }) => {
   const { getEnsName } = useEns();
-  const { getRnsName } = useRns();
 
   const [ensName, setEnsName] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEnsName = async () => {
       try {
-        const name =
-          (await getEnsName(wallet.address)) ||
-          (await getRnsName(wallet.address));
+        const name = await getEnsName(wallet.address);
         setEnsName(name);
       } catch (error) {
         console.error(error);
@@ -44,7 +41,7 @@ const WalletName: FC<WalletNameProps> = ({
     };
 
     fetchEnsName();
-  }, [getEnsName, getRnsName, wallet.address]);
+  }, [getEnsName, wallet.address]);
 
   return (
     <span

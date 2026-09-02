@@ -8,9 +8,12 @@ export const MANTLE: Network[] = [
     rpcUrls: [
       "https://rpc.mantle.xyz",
       "https://mantle.drpc.org",
-      "https://rpc.ankr.com/mantle",
       "https://mantle.publicnode.com",
-      "https://mantle-mainnet.public.blastapi.io",
+      "https://mantle-rpc.publicnode.com",
+      "https://public.1rpc.io/mantle",
+      "https://mantle.api.pocket.network",
+      "https://mantle-public.nodies.app",
+      "https://mantle.api.onfinality.io/public",
     ],
     chainTag: "mantle",
     name: "Mantle",
@@ -20,7 +23,7 @@ export const MANTLE: Network[] = [
       decimals: 18,
     },
     explorerUrls: ["https://explorer.mantle.xyz"],
-    explorerApiUrl: "https://explorer.mantle.xyz/api",
+    explorerApiUrl: "https://api.etherscan.io/v2/api?chainid=5000",
     infoUrl: "https://mantle.xyz",
     parent: {
       type: "L2",

@@ -1,7 +1,5 @@
 import BigNumber from "bignumber.js";
 import memoize from "mem";
-import { getAddress } from "ethers";
-import { withOfflineCache } from "lib/ext/offlineCache";
 
 import { AccountToken, TokenStatus, TokenType } from "core/types";
 import * as repo from "core/repo";
@@ -9,12 +7,7 @@ import {
   updateTotalBalance,
   createAccountTokenKey,
   NATIVE_TOKEN_SLUG,
-  getNetwork,
 } from "core/common";
-
-import { fetchAccountTokens } from "./account/assets";
-
-const DEAD_ADDRESS = "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000";
 
 export const refreshTotalBalances = memoize(
   async (chainId: number, accountAddress: string) => {
@@ -75,44 +68,3 @@ export const refreshTotalBalances = memoize(
     maxAge: 5_000,
   },
 );
-
-export const fetchTotalChainBalance = withOfflineCache(
-  async (chainId: number, accountAddress: string) => {
-    const accTokens = await fetchAccountTokens(chainId, accountAddress);
-    const network = await getNetwork(chainId).catch(() => null);
-
-    let totalValue = new BigNumber(0);
-
-    for (const token of accTokens) {
-      // Skip if mainnet token without metadata
-      // Skip if dead address
-      if (
-        (network?.type === "mainnet" &&
-          (!token.contract_ticker_symbol ||
-            token.contract_decimals === null ||
-            token.contract_decimals === undefined)) ||
-        isDeadAddress(token.contract_address)
-      ) {
-        continue;
-      }
-
-      if (token.quote) totalValue = totalValue.plus(token.quote);
-    }
-
-    return totalValue.toString();
-  },
-  {
-    key: ([chainId, accountAddress]) =>
-      `total_balance_${chainId}_${accountAddress}`,
-    hotMaxAge: 30_000, // 30 sec
-    coldMaxAge: 10 * 60_000, // 10 min
-  },
-);
-
-function isDeadAddress(address: string) {
-  try {
-    return getAddress(address) === DEAD_ADDRESS;
-  } catch {
-    return false;
-  }
-}

@@ -1,9 +1,8 @@
 import BigNumber from "bignumber.js";
 import memoize from "mem";
-import { withOfflineCache } from "lib/ext/offlineCache";
 import { props } from "lib/system/promise";
 
-import { TokenStatus, TokenType } from "core/types";
+import { AccountAsset, Network, TokenStatus, TokenType } from "core/types";
 import {
   createAccountTokenKey,
   getNativeTokenLogoUrl,
@@ -12,44 +11,76 @@ import {
 import { getNetwork, isNetworkWithEthToken } from "core/common/network";
 import * as repo from "core/repo";
 
-import { getCoinGeckoNativeTokenPrice } from "../dexPrices";
+import { getNativeTokenPrice } from "../dexPrices";
 import { getBalanceFromChain } from "../chain";
-import { fetchTotalChainBalance } from "./total";
-import { fetchAccountTokens } from "./account/assets";
 
+/**
+ * Chains probed on the very first sync of an account. Long-lived networks
+ * where an untouched wallet is most likely to hold something, so a fresh
+ * install shows a balance without the user opening each one by hand.
+ *
+ * Only probed once: from then on the tracked set is whatever came back
+ * non-empty (see {@link syncNetworks}).
+ */
+export const INITIAL_SYNC_CHAIN_IDS = [
+  1, // ethereum
+  137, // polygon
+  56, // bsc
+  8453, // base
+  42161, // arbitrum
+  10, // optimism
+  43114, // avalanche
+  59144, // linea
+];
+
+/**
+ * Native token sync.
+ *
+ * The first run for an account probes {@link INITIAL_SYNC_CHAIN_IDS} and keeps
+ * only the chains that came back with a balance. Every run after that refreshes
+ * that remembered set plus the active chain — the whitelist is never walked
+ * again. A chain drops out of the set as soon as its balance is confirmed zero,
+ * and a chain the user opens by hand joins it as soon as it syncs non-zero.
+ *
+ * The active chain is always synced and always kept, even at zero balance, so
+ * the UI has a native token to render for the network being viewed. Syncing
+ * never switches the active network — that is the user's choice alone.
+ *
+ * Strictly the native token: a full token list costs an explorer request per
+ * chain, so those are synced for the active chain alone.
+ */
 export const syncNetworks = memoize(
   async (accountAddress: string, activeChainId: number) => {
-    const [existingNativeTokens, allUsedNetworks] = await Promise.all([
+    const [existingNativeTokens, allNetworks] = await Promise.all([
       repo.accountTokens
         .where("[accountAddress+tokenSlug]")
         .equals([accountAddress, NATIVE_TOKEN_SLUG])
         .toArray(),
-      fetchAllUsedNetworks(accountAddress).catch((err) => {
+      repo.networks.toArray().catch((err) => {
         console.error(err);
         return [];
       }),
     ]);
 
+    // Native tokens are always assets, never NFTs
     const existingTokensMap = new Map(
-      existingNativeTokens.map((t) => [t.chainId, t]),
+      existingNativeTokens.map((t) => [t.chainId, t as AccountAsset]),
     );
-    const chainIdsToRefresh = existingNativeTokens
-      .filter(
-        (t) => t.portfolioUSD && new BigNumber(t.portfolioUSD).isGreaterThan(0),
-      )
-      .map((t) => t.chainId);
 
-    const chainIdsToAdd = allUsedNetworks.filter(
-      (chainId) => !chainIdsToRefresh.includes(chainId),
-    );
+    const knownChainIds = new Set(allNetworks.map((n) => n.chainId));
+
+    const firstSync = existingNativeTokens.length === 0;
 
     const chainIds = new Set([
-      ...chainIdsToRefresh,
-      ...chainIdsToAdd,
+      ...(firstSync
+        ? INITIAL_SYNC_CHAIN_IDS.filter((id) => knownChainIds.has(id))
+        : // Empty chains are pruned below, so a stored chain is one the account
+          // is known to hold something on
+          existingNativeTokens.filter(worthKeeping).map((t) => t.chainId)),
       activeChainId,
     ]);
 
-    const networks = [];
+    const networks: Network[] = [];
     for (const chainId of chainIds) {
       try {
         networks.push(await getNetwork(chainId));
@@ -58,128 +89,135 @@ export const syncNetworks = memoize(
       }
     }
 
-    const dbKeys = networks.map(({ chainId }) =>
+    const keyFor = (chainId: number) =>
       createAccountTokenKey({
         chainId,
         accountAddress,
         tokenSlug: NATIVE_TOKEN_SLUG,
-      }),
-    );
+      });
 
     const data = await Promise.all(
       networks.map((network) => {
         const { chainId } = network;
-        const existing = existingTokensMap.get(chainId);
-
-        const refreshNativeBalance = !existing || chainId === activeChainId;
-
-        const noTotal =
-          existing?.portfolioRefreshedAt &&
-          existing.portfolioRefreshedAt > Date.now() - 24 * 60 * 60_000;
-
         const isETHToken = isNetworkWithEthToken(network);
 
         return props({
           chainId,
-          balance: refreshNativeBalance
-            ? getBalanceFromChain(chainId, NATIVE_TOKEN_SLUG, accountAddress)
-            : null,
-          cgPrice: getCoinGeckoNativeTokenPrice(isETHToken ? 1 : chainId),
-          totalBalance: noTotal
-            ? null
-            : fetchTotalChainBalance(chainId, accountAddress).catch(() => null),
+          balance: getBalanceFromChain(
+            chainId,
+            NATIVE_TOKEN_SLUG,
+            accountAddress,
+          ).catch(() => null),
+          cgPrice: getNativeTokenPrice(isETHToken ? 1 : chainId),
         });
       }),
     );
 
-    await repo.accountTokens.bulkPut(
-      networks.map((network, i) => {
-        const { chainId, nativeCurrency, chainTag } = network;
-        const { balance, cgPrice, totalBalance } = data[i];
-        const existing = existingTokensMap.get(chainId);
+    // The whitelist is walked once, so a run that reached nothing (browser
+    // started before the network was up) must not count as that one walk:
+    // leaving the repo untouched keeps the account on the first-sync path
+    if (firstSync && data.every(({ balance }) => balance === null)) return;
 
-        const priceUSD = cgPrice?.usd?.toString();
-        const priceUSDChange = cgPrice?.usd_24h_change?.toString();
+    const records: AccountAsset[] = [];
+    const dbKeys: string[] = [];
 
-        const portfolioUSD = totalBalance || existing?.portfolioUSD || "0";
+    // Leftovers from a previous run: stored, yet neither held nor active.
+    // Anything worth keeping is part of `chainIds` by construction
+    const dbKeysToDelete = existingNativeTokens
+      .filter((t) => !chainIds.has(t.chainId))
+      .map((t) => keyFor(t.chainId));
 
-        const metadata = {
-          decimals: nativeCurrency.decimals,
-          name: nativeCurrency.name,
-          symbol: nativeCurrency.symbol,
-          logoUrl: getNativeTokenLogoUrl(chainTag),
-        };
+    const buildRecord = (network: Network, i: number): AccountAsset => {
+      const { chainId, nativeCurrency, chainTag } = network;
+      const { balance, cgPrice } = data[i];
+      const existing = existingTokensMap.get(chainId);
 
-        if (existing) {
-          if (balance === null) {
-            return {
-              ...existing,
-              priceUSD,
-              priceUSDChange,
-              portfolioUSD,
-            };
-          }
+      const priceUSD = cgPrice?.usd?.toString();
+      const priceUSDChange = cgPrice?.usd_24h_change?.toString();
 
-          const rawBalance = balance.toString();
-          const balanceUSD = priceUSD
-            ? new BigNumber(rawBalance)
-                .div(new BigNumber(10).pow(nativeCurrency.decimals))
-                .times(priceUSD)
-                .toNumber()
-            : existing.balanceUSD;
+      // Portfolio value is recalculated from the repo by refreshTotalBalances
+      // for the active chain, the rest keep whatever was stored
+      const portfolioUSD = existing?.portfolioUSD || "0";
 
+      const metadata = {
+        decimals: nativeCurrency.decimals,
+        name: nativeCurrency.name,
+        symbol: nativeCurrency.symbol,
+        logoUrl: getNativeTokenLogoUrl(chainTag),
+      };
+
+      if (existing) {
+        if (balance === null) {
           return {
             ...existing,
-            ...metadata,
-            rawBalance,
-            balanceUSD,
-            priceUSD,
-            priceUSDChange,
-            portfolioUSD,
-          };
-        } else {
-          const rawBalance = balance?.toString() ?? "0";
-          const balanceUSD =
-            balance && priceUSD
-              ? new BigNumber(rawBalance)
-                  .div(new BigNumber(10).pow(nativeCurrency.decimals))
-                  .times(priceUSD)
-                  .toNumber()
-              : 0;
-
-          return {
-            chainId,
-            accountAddress,
-            tokenType: TokenType.Asset,
-            status: TokenStatus.Native,
-            tokenSlug: NATIVE_TOKEN_SLUG,
-            ...metadata,
-            rawBalance,
-            balanceUSD,
             priceUSD,
             priceUSDChange,
             portfolioUSD,
           };
         }
-      }),
-      dbKeys,
-    );
 
-    // First time sync
-    if (existingNativeTokens.length === 0) {
-      const mostValuedItem = findWithMaxValue(
-        data,
-        (prev, next) =>
-          !prev?.totalBalance ||
-          (next.totalBalance
-            ? new BigNumber(next.totalBalance).isGreaterThan(prev.totalBalance)
-            : undefined),
-      );
+        const rawBalance = balance.toString();
+        const balanceUSD = priceUSD
+          ? new BigNumber(rawBalance)
+              .div(new BigNumber(10).pow(nativeCurrency.decimals))
+              .times(priceUSD)
+              .toNumber()
+          : existing.balanceUSD;
 
-      if (mostValuedItem) return mostValuedItem?.chainId;
+        return {
+          ...existing,
+          ...metadata,
+          rawBalance,
+          balanceUSD,
+          priceUSD,
+          priceUSDChange,
+          portfolioUSD,
+        };
+      } else {
+        const rawBalance = balance?.toString() ?? "0";
+        const balanceUSD =
+          balance && priceUSD
+            ? new BigNumber(rawBalance)
+                .div(new BigNumber(10).pow(nativeCurrency.decimals))
+                .times(priceUSD)
+                .toNumber()
+            : 0;
+
+        return {
+          chainId,
+          accountAddress,
+          tokenType: TokenType.Asset,
+          status: TokenStatus.Native,
+          tokenSlug: NATIVE_TOKEN_SLUG,
+          ...metadata,
+          rawBalance,
+          balanceUSD,
+          priceUSD,
+          priceUSDChange,
+          portfolioUSD,
+        };
+      }
+    };
+
+    networks.forEach((network, i) => {
+      const { chainId } = network;
+      const record = buildRecord(network, i);
+
+      // A failed balance request leaves `rawBalance` as stored, so an RPC
+      // hiccup never prunes a chain — only a confirmed zero does
+      if (chainId === activeChainId || worthKeeping(record)) {
+        records.push(record);
+        dbKeys.push(keyFor(chainId));
+      } else if (existingTokensMap.has(chainId)) {
+        dbKeysToDelete.push(keyFor(chainId));
+      }
+    });
+
+    await repo.accountTokens.bulkPut(records, dbKeys);
+
+    if (dbKeysToDelete.length > 0) {
+      await repo.accountTokens.bulkDelete(dbKeysToDelete).catch(console.error);
     }
-
-    return;
   },
   {
     maxAge: 10_000, // 10 sec
@@ -187,76 +225,18 @@ export const syncNetworks = memoize(
   },
 );
 
-export async function isFirstSync(accountAddress: string) {
-  const anyNativeToken = await repo.accountTokens
-    .where("[accountAddress+tokenSlug]")
-    .equals([accountAddress, NATIVE_TOKEN_SLUG])
-    .first();
-
-  return Boolean(anyNativeToken);
+/**
+ * Whether a chain earns its place in the synced set. Native coin on it is the
+ * main signal; a non-zero portfolio keeps chains where the value sits in tokens
+ * rather than in the native coin (gas spent to the last drop, funds in USDC).
+ */
+function worthKeeping({
+  rawBalance,
+  portfolioUSD,
+}: Pick<AccountAsset, "rawBalance" | "portfolioUSD">) {
+  return isPositive(rawBalance) || isPositive(portfolioUSD);
 }
 
-export const fetchAllUsedNetworks = withOfflineCache(
-  async (accountAddress: string) => {
-    const items = await Promise.all(
-      [
-        42161, // arbitrum
-        43114, // avalanche
-        8453, // base
-        56, // bsc
-        1, // eth
-        250, // fantom
-        14, // flare
-        100, // gnosis
-        59144, // linea
-        10, // optimism
-        137, // polygon
-        1101, // polygon_zkevm
-        534352, // scroll
-      ].map(async (chainId) => ({
-        chainId,
-        tokens: await fetchAccountTokens(chainId, accountAddress).catch(
-          () => [],
-        ),
-      })),
-    );
-
-    return items
-      .filter(({ tokens }) => tokens.length > 0)
-      .map(({ chainId }) => chainId);
-
-    // const res = await indexerApi.get(
-    //   `/c/v1/address/${accountAddress}/activity/`,
-    //   {
-    //     params: {
-    //       _authAddress: accountAddress,
-    //     },
-    //   },
-    // );
-
-    // const resItems = res.data?.data?.items ?? [];
-    // const chainIds: number[] = resItems.map((item: any) => +item.chain_id);
-
-    // return chainIds;
-  },
-  {
-    key: ([address]) => `networks_${address}`,
-    hotMaxAge: 30_000, // 30 sec
-    coldMaxAge: 20_000 * 30, // 20 min
-  },
-);
-
-function findWithMaxValue<T>(
-  items: T[],
-  compare: (prev: T | undefined, next: T) => boolean | undefined,
-) {
-  let mostVeluedItem: T | undefined;
-
-  for (const item of items) {
-    if (!mostVeluedItem || compare(mostVeluedItem, item)) {
-      mostVeluedItem = item;
-    }
-  }
-
-  return mostVeluedItem;
+function isPositive(value?: string | null) {
+  return Boolean(value) && new BigNumber(value!).isGreaterThan(0);
 }

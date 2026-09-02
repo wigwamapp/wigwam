@@ -9,7 +9,6 @@ import Tooltip from "app/components/elements/Tooltip";
 import Avatar from "app/components/elements/Avatar";
 import { ReactComponent as SendIcon } from "app/icons/Send.svg";
 import { ReactComponent as SwapIcon } from "app/icons/SwapIcon.svg";
-import { ReactComponent as RewardsIcon } from "app/icons/Rewards.svg";
 import { ReactComponent as ArrowIcon } from "app/icons/arrow-up.svg";
 
 type ApprovalStatusProps = {
@@ -44,9 +43,6 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
                 case kind === SelfActivityKind.Swap:
                   return SwapIcon;
 
-                case kind === SelfActivityKind.Reward:
-                  return RewardsIcon;
-
                 default:
                   return SendIcon;
               }
@@ -59,9 +55,6 @@ const ApprovalStatus: FC<ApprovalStatusProps> = ({
 
                 case kind === SelfActivityKind.Swap:
                   return "Swap transaction";
-
-                case kind === SelfActivityKind.Reward:
-                  return "Rewards signing";
 
                 default:
                   return "Transfer transaction";

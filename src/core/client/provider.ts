@@ -13,7 +13,8 @@ export const getClientProvider = memoize(
 
 export class ClientProvider extends ethers.JsonRpcApiProvider {
   constructor(public chainId: number) {
-    super(chainId);
+    // Requests are dispatched one by one, never grouped into a batch
+    super(chainId, { batchMaxCount: 1 });
   }
   source?: ActivitySource;
 

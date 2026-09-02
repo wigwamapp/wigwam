@@ -3,8 +3,6 @@ import classNames from "clsx";
 import { useAtomValue } from "jotai";
 import { Link } from "lib/navigation";
 
-import { TEvent, trackEvent } from "core/client";
-
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
@@ -33,14 +31,15 @@ const Sidebar: FC = () => {
           "text-2xl font-black",
         )}
       >
-        <WigwamTitleIcon className={classNames("ml-3 my-1 h-8 w-auto")} />
+        <WigwamTitleIcon className={classNames("ml-3 my-1 h-7 w-auto")} />
       </Link>
       <SidebarBlock links={NavLinksPrimary} />
       <SidebarBlock
         links={NavLinksSecondary}
         className={classNames(
-          "mt-[6.25rem] pt-4",
+          "pt-4",
           "border-t border-brand-main/[.07]",
+          "mt-[4rem]",
         )}
       />
     </nav>
@@ -79,11 +78,6 @@ const SidebarBlock: FC<SidebarBlockProps> = ({ links, className }) => {
           if (isPageActive) return;
 
           action?.();
-
-          trackEvent(TEvent.SidebarNavigated, {
-            label,
-            latestPage: page,
-          });
         };
 
         if (!route && typeof action === "function") {

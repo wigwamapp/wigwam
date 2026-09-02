@@ -19,7 +19,6 @@ import { TokenStandardValue } from "fixtures/tokens";
 
 import { AccountAsset, TokenStatus } from "core/types";
 import { parseTokenSlug, toggleTokenStatus } from "core/common/tokens";
-import { TEvent, trackEvent } from "core/client";
 
 import { Page } from "app/nav";
 import { openInTab } from "app/helpers";
@@ -29,7 +28,6 @@ import {
   useExplorerLink,
   useLazyNetwork,
   useHideToken,
-  useRamp,
   ChainIdProvider,
 } from "app/hooks";
 
@@ -43,7 +41,6 @@ import { ReactComponent as SuccessIcon } from "app/icons/success.svg";
 import { ReactComponent as CopyIcon } from "app/icons/copy.svg";
 import { ReactComponent as EyeIcon } from "app/icons/eye.svg";
 import { ReactComponent as ReceiveIcon } from "app/icons/buy-action.svg";
-import { ReactComponent as BuyIcon } from "app/icons/plus-rounded.svg";
 
 import FiatAmount from "app/components/elements/FiatAmount";
 import AssetLogo from "app/components/elements/AssetLogo";
@@ -247,10 +244,8 @@ const AssetModal: FC<IAssetModalProps> = ({
     priceUSD,
     priceUSDChange,
     chainId,
-    status,
   } = asset;
   const setInternalChainId = useSetAtom(chainIdAtom);
-  const { onRampCurrency } = useRamp(asset.tokenSlug);
 
   const openLink = useCallback(
     (to: Record<string, unknown>) => {
@@ -258,11 +253,6 @@ const AssetModal: FC<IAssetModalProps> = ({
       openInTab(to);
     },
     [setInternalChainId, chainId],
-  );
-
-  const showBuyButton = useMemo(
-    () => status !== TokenStatus.Disabled && onRampCurrency,
-    [status, onRampCurrency],
   );
 
   return (
@@ -351,34 +341,8 @@ const AssetModal: FC<IAssetModalProps> = ({
             <span className="text-xs font-medium">Receive</span>
           </Button>
           <DeepLinkButton
-            text="Buy"
-            onClick={() => {
-              trackEvent(TEvent.BuyNavigated, {
-                page: "popup",
-                tokenName: name,
-                tokenSymbol: symbol,
-                chainId,
-              });
-
-              openLink({
-                page: Page.Buy,
-                token: asset.tokenSlug,
-                onRampOpened: true,
-              });
-            }}
-            Icon={BuyIcon}
-            disabled={!showBuyButton}
-          />
-          <DeepLinkButton
             text="Swap"
             onClick={() => {
-              trackEvent(TEvent.SwapNavigated, {
-                page: "popup",
-                tokenName: name,
-                tokenSymbol: symbol,
-                chainId,
-              });
-
               openLink({ page: Page.Swap, token: asset.tokenSlug });
             }}
             Icon={SwapIcon}
