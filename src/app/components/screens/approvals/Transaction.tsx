@@ -91,7 +91,7 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
   const withLedger = useLedger();
 
   const [tabValue, setTabValue] = useState<TabValue>("details");
-  const [feeMode, setFeeMode] = useState<FeeMode>("average");
+  const [feeMode, setFeeMode] = useState<FeeMode>("low");
   const [estimating, setEstimating] = useState(false);
   const [lastError, setLastError] = useState<{
     from: "estimation" | "submit";

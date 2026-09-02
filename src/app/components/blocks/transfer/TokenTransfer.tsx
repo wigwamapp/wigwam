@@ -493,7 +493,7 @@ const TransferTokenContent = memo<TransferTokenContent>(
                 gasLimit = BigInt(fees.gasLimit);
               }
 
-              const gasPrice = fees.modes.high.max;
+              const gasPrice = fees.modes.average.max;
               const maxGasLimit =
                 tokenSlug !== NATIVE_TOKEN_SLUG
                   ? (gasLimit * 3n) / 2n
