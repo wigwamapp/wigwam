@@ -7,7 +7,7 @@ import browser from "webextension-polyfill";
  * @see https://docs.reown.com/cloud/blockchain-api
  */
 const WC_API_URL = "https://rpc.walletconnect.org/v1";
-const WC_PROJECT_ID = process.env.WIGWAM_WC_PROJECT_ID;
+const WC_PROJECT_ID = process.env.OG_WC_PROJECT_ID;
 const SDK_VERSION = "4.1.9";
 /**
  * Only the presence of `Origin` is checked, never its value, so the extension

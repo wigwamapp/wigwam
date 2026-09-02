@@ -6,7 +6,7 @@ import { Link } from "lib/navigation";
 import { Page } from "app/nav";
 import { SoonTag } from "app/components/elements/SoonTag";
 import { updateAvailableAtom, pageAtom, tokenSlugAtom } from "app/atoms";
-import { ReactComponent as WigwamTitleIcon } from "app/icons/WigwamTitle.svg";
+import { ReactComponent as OGTitleIcon } from "app/icons/OGTitle.svg";
 
 import useSidebarLinks from "./Sidebar.Links";
 
@@ -31,7 +31,7 @@ const Sidebar: FC = () => {
           "text-2xl font-black",
         )}
       >
-        <WigwamTitleIcon className={classNames("ml-3 my-1 h-7 w-auto")} />
+        <OGTitleIcon className={classNames("ml-3 my-1 h-7 w-auto")} />
       </Link>
       <SidebarBlock links={NavLinksPrimary} />
       <SidebarBlock

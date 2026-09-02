@@ -18,7 +18,7 @@ import { getLatestTokenActivity, prepareTokenActivitiesRepo } from "./utils";
  * @see https://docs.etherscan.io/etherscan-v2
  */
 const ETHERSCAN_V2_HOST = "api.etherscan.io/v2/";
-const ETHERSCAN_API_KEY = process.env.WIGWAM_ETHERSCAN_API_KEY;
+const ETHERSCAN_API_KEY = process.env.OG_ETHERSCAN_API_KEY;
 
 /**
  * Explorer (etherscan) Token Activities sync

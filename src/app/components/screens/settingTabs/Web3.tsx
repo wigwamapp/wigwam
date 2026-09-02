@@ -30,9 +30,9 @@ const Web3: FC = () => {
 
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
         When enabled - use the MetaMask connection button to connect to dApps
-        only if the Wigwam option is unavailable on the website.
+        only if the OG Wallet option is unavailable on the website.
         <br />
-        Otherwise, choose only Wigwam!
+        Otherwise, choose only OG Wallet!
       </p>
 
       <Switcher

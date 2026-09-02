@@ -83,7 +83,7 @@ const PopupLayout: FC<PopupLayoutProps> = ({ className, children }) => {
               <div className={classNames("pt-2 px-3 pb-8", "relative")}>
                 <img
                   src={PopupBgImage}
-                  alt="Wigwam"
+                  alt="OG Wallet"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="mb-2 flex items-center justify-between gap-3 relative z-10">

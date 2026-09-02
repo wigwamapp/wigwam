@@ -9,18 +9,18 @@ declare namespace NodeJS {
     readonly TARGET_BROWSER: "chrome" | "firefox" | "opera" | "edge" | "safari";
     readonly VERSION: string;
     readonly BUILD_ID: string;
-    // Wigwam specific
-    readonly WIGWAM_WEBSITE_ORIGIN?: string;
-    readonly WIGWAM_STATIC_CDN?: string;
-    readonly WIGWAM_INFURA_API_KEY?: string;
-    readonly WIGWAM_ETHERSCAN_API_KEY?: string;
-    readonly WIGWAM_WC_PROJECT_ID?: string;
-    readonly WIGWAM_OPEN_LOGIN_CLIENT_ID?: string;
+    // OG specific
+    readonly OG_WEBSITE_ORIGIN?: string;
+    readonly OG_STATIC_CDN?: string;
+    readonly OG_INFURA_API_KEY?: string;
+    readonly OG_ETHERSCAN_API_KEY?: string;
+    readonly OG_WC_PROJECT_ID?: string;
+    readonly OG_OPEN_LOGIN_CLIENT_ID?: string;
     // Dev
-    readonly WIGWAM_DEV_UNLOCK_PASSWORD?: string;
-    readonly WIGWAM_DEV_ACTIVE_TAB_RELOAD?: string;
-    readonly WIGWAM_DEV_ELEMENTS_SPACING?: string;
-    readonly WIGWAM_DEV_BLOCK_TX_SEND?: string;
+    readonly OG_DEV_UNLOCK_PASSWORD?: string;
+    readonly OG_DEV_ACTIVE_TAB_RELOAD?: string;
+    readonly OG_DEV_ELEMENTS_SPACING?: string;
+    readonly OG_DEV_BLOCK_TX_SEND?: string;
   }
 }
 

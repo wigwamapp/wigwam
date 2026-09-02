@@ -1,10 +1,12 @@
-# Wigwam - Web3 Wallet
+# OG Wallet - Web3 Wallet
 
-### https://wigwam.app
+### https://ogwallet.tech
 
 A browser extension Web3 wallet designed for Ethereum, Polygon, BNB Chain, Arbitrum, and all EVM networks. Reliable and secure solution for managing accounts and crypto keys, exploring DeFi, NFTs, and GameFi.
 
-![Wigwam](./docs/banner.png)
+<!-- TODO REBRANDING: replace banner artwork -->
+
+![OG Wallet](./docs/banner.png)
 
 **Table of Contents**
 
@@ -96,7 +98,7 @@ yarn build
 1. Open `chrome://extensions/` in your browser
 2. Enable "Developer mode"
 3. Tap on "Load unpacked"
-4. Select `<your_local_wigwam_repository_dir>/dist/prod/chrome_unpacked`
+4. Select `<your_local_ogwallet_repository_dir>/dist/prod/chrome_unpacked`
 
 ## Useful scripts
 

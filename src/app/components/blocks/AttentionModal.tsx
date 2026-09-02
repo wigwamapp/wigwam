@@ -81,9 +81,9 @@ const AttentionContent = [
     content: (
       <>
         <p className="mb-2">
-          It is not possible to recover the current profile password. Wigwam is{" "}
-          <strong>non-custodial</strong> software. The user is the only one who
-          knows the password.
+          It is not possible to recover the current profile password. OG Wallet
+          is <strong>non-custodial</strong> software. The user is the only one
+          who knows the password.
         </p>
 
         <p className="mt-2">
@@ -112,7 +112,7 @@ const AttentionContent = [
     header: "Reset the app",
     content: (
       <p>
-        Wigwam does not have a built-in function to reset the application. We
+        OG Wallet does not have a built-in function to reset the application. We
         recommend using{" "}
         <SmartLink to={{ page: Page.Profiles }}>profiles</SmartLink>, but if you
         still want to reset - just reinstall the application (all profiles will

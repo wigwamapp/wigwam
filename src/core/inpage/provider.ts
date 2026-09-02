@@ -16,7 +16,7 @@ import {
 } from "core/types/rpc";
 import {
   JSONRPC,
-  WIGWAM_STATE,
+  OG_STATE,
   AUTHORIZED_RPC_METHODS,
   STATE_RPC_METHODS,
 } from "core/common/rpc";
@@ -32,7 +32,7 @@ const stateUpdatedType = Symbol();
 type GatewayPayload<T = any> = JsonRpcResponse<T> | JsonRpcNotification<T>;
 
 export class InpageProvider extends Emitter {
-  isWigwam = true;
+  isOG = true;
   isMetaMask = true;
   autoRefreshOnNetworkChange = false;
 
@@ -55,11 +55,11 @@ export class InpageProvider extends Emitter {
   // https://eips.ethereum.org/EIPS/eip-6963
   // https://eips.ethereum.org/EIPS/eip-5749
   info: EIP6963ProviderInfo = Object.freeze({
-    name: "Wigwam",
-    uuid: `wigwam-${process.env.BUILD_ID}`,
-    rdns: "com.wigwam.wallet",
+    name: "OG Wallet",
+    uuid: `og-${process.env.BUILD_ID}`,
+    rdns: "com.og.wallet",
     icon: ICON_SVG_BASE64,
-    description: "Wigwam — Web 3.0 Wallet",
+    description: "OG Wallet — Web 3.0 Wallet",
   });
 
   #inited = false;
@@ -97,7 +97,7 @@ export class InpageProvider extends Emitter {
 
   #listenNotifications() {
     this.on(gatewayEventType, (evt?: JsonRpcNotification<unknown>) => {
-      if (evt?.method === WIGWAM_STATE) {
+      if (evt?.method === OG_STATE) {
         const { chainId, accountAddress, mmCompatible } = evt.params as any;
 
         this.mmCompatible = mmCompatible;
@@ -166,7 +166,7 @@ export class InpageProvider extends Emitter {
   }: RequestArguments): Promise<unknown> {
     switch (method) {
       case JsonRpcMethod.web3_clientVersion:
-        return `Wigwam/v${process.env.VERSION}`;
+        return `OG/v${process.env.VERSION}`;
 
       case JsonRpcMethod.eth_chainId:
         return this.chainId!;

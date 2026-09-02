@@ -54,13 +54,13 @@ for (const path of dotenvFiles) {
   }
 }
 
-// Grab default and WIGWAM_* environment variables and prepare them to be
+// Grab default and OG_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
-const WIGWAM_ENV_PATTERN = /^WIGWAM_/i;
+const OG_ENV_PATTERN = /^OG_/i;
 const {
   RELEASE_ENV = "false",
   TARGET_BROWSER = "chrome",
-  WIGWAM_WEBSITE_ORIGIN = "",
+  OG_WEBSITE_ORIGIN = "",
   SOURCE_MAP: SOURCE_MAP_ENV,
   IMAGE_INLINE_SIZE_LIMIT: IMAGE_INLINE_SIZE_LIMIT_ENV = "10000",
   WEBPACK_ANALYZE = "false",
@@ -361,7 +361,7 @@ module.exports = {
       ...(() => {
         const appEnvs = {};
         for (const k of Object.keys(process.env)) {
-          if (WIGWAM_ENV_PATTERN.test(k)) {
+          if (OG_ENV_PATTERN.test(k)) {
             appEnvs[`process.env.${k}`] = JSON.stringify(process.env[k]);
           }
         }
@@ -439,7 +439,7 @@ module.exports = {
                   pkg,
                   env: ENV_SHORT,
                   envBadge: ENV_BADGE ? `[${ENV_BADGE.toUpperCase()}] ` : "",
-                  website: WIGWAM_WEBSITE_ORIGIN,
+                  website: OG_WEBSITE_ORIGIN,
                 }),
               );
               const manifest = transformManifestKeys(json, TARGET_BROWSER);
@@ -496,7 +496,7 @@ module.exports = {
     }),
 
     new WebpackBar({
-      name: "Wigwam",
+      name: "OG",
       color: "#ffffff",
     }),
 

@@ -164,7 +164,7 @@ const ConfirmAccounts = memo<{
             <>
               {accountsToAdd[0]?.networks?.length > 0 ? (
                 <>
-                  Wigwam detected {accountsToAdd.length}{" "}
+                  OG Wallet detected {accountsToAdd.length}{" "}
                   {accountsToAdd.length === 1 ? "wallet" : "wallets"} with
                   positive balances.
                 </>
