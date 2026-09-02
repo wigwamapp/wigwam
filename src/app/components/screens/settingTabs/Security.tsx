@@ -84,7 +84,7 @@ const Security: FC = () => {
             You should always have a backup copy of it.
             <br />
             <strong>Never, ever share</strong> your Secret Phrase, not even with
-            OG Wallet!
+            Wigwam!
           </p>
 
           <Button
@@ -109,7 +109,7 @@ const Security: FC = () => {
       <p className="mb-6 text-sm text-brand-font max-w-[30rem]">
         Read more about our{" "}
         <a
-          href="https://ogwallet.tech/privacy"
+          href="https://wigwam.app/privacy"
           target="_blank"
           rel="nofollow noreferrer"
           className="underline"
@@ -211,7 +211,7 @@ const SeedPhraseModal = memo<SecondaryModalProps>(({ open, onOpenChange }) => {
               <br />
               We <strong>WILL NEVER</strong> ask for this information.
               <br />
-              No Support Agent, Tech Team Member, OG Wallet Team Member, or
+              No Support Agent, Tech Team Member, Wigwam Team Member, or
               Security Specialist can request it. Sharing this information is
               strictly prohibited!
             </span>

@@ -9,7 +9,7 @@ import Button from "app/components/elements/Button";
 import OnboardingFirstImage from "app/images/onboarding_first.png";
 import OnboardingSecondImage from "app/images/onboarding_second.png";
 import OnboardingThirdImage from "app/images/onboarding_third.png";
-import OGLogoImage from "app/images/og.png";
+import WigwamLogoImage from "app/images/wigwam.png";
 
 type TStepContent = {
   title: string;
@@ -21,19 +21,19 @@ const stepsContent: TStepContent[] = [
   {
     title: "Trade and explore",
     description:
-      "Instantly trade over 2,500 tokens, connect with hundreds of dApps, and create or sell NFTs in the Web3 world, all through OG Wallet",
+      "Instantly trade over 2,500 tokens, connect with hundreds of dApps, and create or sell NFTs in the Web3 world, all through Wigwam",
     image: OnboardingFirstImage,
   },
   {
     title: "Easy access",
     description:
-      "If you can't find a OG Wallet button when connecting to a dApp, you can effortlessly connect to OG Wallet using MetaMask button instead, as this option is automatically available",
+      "If you can't find a Wigwam button when connecting to a dApp, you can effortlessly connect to Wigwam using MetaMask button instead, as this option is automatically available",
     image: OnboardingSecondImage,
   },
   {
     title: "Always near",
     description:
-      "Pin the OG Wallet extension on your browser toolbar for fast access to your tokens and to navigate the Web3 space more efficiently",
+      "Pin the Wigwam extension on your browser toolbar for fast access to your tokens and to navigate the Web3 space more efficiently",
     image: OnboardingThirdImage,
   },
 ];
@@ -69,11 +69,11 @@ const OnBoardingContent: FC = () => {
         <section className="mb-6 flex flex-col items-center">
           <img
             className="mb-6 w-11 h-11 rounded-md"
-            src={OGLogoImage}
-            alt="og_logo"
+            src={WigwamLogoImage}
+            alt="wigwam_logo"
           />
           <h3 className="mb-6 text-[1.75rem] font-bold text-center">
-            Welcome to OG Wallet:
+            Welcome to Wigwam:
             <br />
             Your Gateway to the Web3 World!
           </h3>

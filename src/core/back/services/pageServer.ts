@@ -23,9 +23,9 @@ import * as repo from "core/repo";
 import { Setting } from "core/common";
 import {
   JSONRPC,
-  OG_FAVICON,
-  OG_PHISHING_WARNING,
-  OG_STATE,
+  WIGWAM_FAVICON,
+  WIGWAM_PHISHING_WARNING,
+  WIGWAM_STATE,
 } from "core/common/rpc";
 import { getPageOrigin, wrapPermission } from "core/common/permissions";
 
@@ -62,7 +62,7 @@ export function startPageServer() {
     checkForPhishing(hostname, () => {
       pagePorter.notify(port, {
         jsonrpc: JSONRPC,
-        method: OG_PHISHING_WARNING,
+        method: WIGWAM_PHISHING_WARNING,
       });
     });
 
@@ -159,7 +159,7 @@ export function startPageServer() {
 
     pagePorter.notify(port, {
       jsonrpc: JSONRPC,
-      method: OG_STATE,
+      method: WIGWAM_STATE,
       params,
     });
   };
@@ -174,7 +174,7 @@ async function handlePageRequest(
 
   const { id, jsonrpc, method, params } = ctx.data;
 
-  if (method === OG_FAVICON) {
+  if (method === WIGWAM_FAVICON) {
     if (Array.isArray(params) && typeof params[0] === "string") {
       faviconCache.set(ctx.portId, params[0]);
     }

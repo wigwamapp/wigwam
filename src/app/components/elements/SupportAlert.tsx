@@ -2,7 +2,7 @@ import classNames from "clsx";
 import type { FC, ReactNode } from "react";
 import Input from "./Input";
 
-const TIPS = "https://ogwallet.tech/safety-tips";
+const TIPS = "https://wigwam.app/safety-tips";
 
 const Title: FC<{ title?: string; className?: string }> = ({
   title,
@@ -23,12 +23,12 @@ const Content: FC<{ children?: ReactNode }> = ({ children }) => {
   return (
     <div className="text-left font-medium text-base text-brand-lightgray opacity-75">
       <p>
-        If you have trouble working with the OG Wallet extension, <br />
+        If you have trouble working with the Wigwam extension, <br />
         please contact us via email:
       </p>
       <p className="mt-2">
         <Input
-          value="info@ogwallet.tech"
+          value="info@wigwam.app"
           id="support-email"
           readOnly
           tabIndex={-1}

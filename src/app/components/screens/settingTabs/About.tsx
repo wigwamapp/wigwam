@@ -5,19 +5,19 @@ import { ReactComponent as GithubIcon } from "app/icons/github.svg";
 import { ReactComponent as DiscordIcon } from "app/icons/discord.svg";
 
 import Separator from "app/components/elements/Seperator";
-import { ReactComponent as OGLogo } from "app/icons/OG.svg";
+import { ReactComponent as WigwamLogo } from "app/icons/Wigwam.svg";
 
 const About: FC = () => {
   return (
     <div className="flex flex-col items-start pt-3">
       <div className="flex items-center">
-        <OGLogo className="w-[3.25rem] h-auto" />
-        <span className="text-2xl font-black ml-4">OG Wallet</span>
+        <WigwamLogo className="w-[3.25rem] h-auto" />
+        <span className="text-2xl font-black ml-4">Wigwam</span>
       </div>
 
       <p className="text-brand-font text-sm mt-6 mb-8 max-w-[20rem]">
-        OG Wallet lets you explore DeFi and NFTs in a safer, faster and more
-        modern way.
+        Wigwam lets you explore DeFi and NFTs in a safer, faster and more modern
+        way.
       </p>
 
       <AboutHeader>Version</AboutHeader>
@@ -112,23 +112,23 @@ const Link: FC<LinkProps> = ({ label, href, className }) => (
 const usefulLinks = [
   {
     label: "Website",
-    href: "https://ogwallet.tech/",
+    href: "https://wigwam.app/",
   },
   {
     label: "Email",
-    href: "mailto:info@ogwallet.tech",
+    href: "mailto:info@wigwam.app",
   },
   {
     label: "Help",
-    href: "https://ogwallet.tech/help",
+    href: "https://wigwam.app/help",
   },
   {
     label: "Terms of Use",
-    href: "https://ogwallet.tech/terms",
+    href: "https://wigwam.app/terms",
   },
   {
     label: "Privacy policy",
-    href: "https://ogwallet.tech/privacy",
+    href: "https://wigwam.app/privacy",
   },
 ];
 

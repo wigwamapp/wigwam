@@ -130,9 +130,9 @@ export async function processApprove(
 
           if (
             process.env.NODE_ENV !== "production" &&
-            process.env.OG_DEV_BLOCK_TX_SEND === "true"
+            process.env.WIGWAM_DEV_BLOCK_TX_SEND === "true"
           ) {
-            throw new Error("Blocked by OG_DEV_BLOCK_TX_SEND env variable");
+            throw new Error("Blocked by WIGWAM_DEV_BLOCK_TX_SEND env variable");
           }
 
           const rpcRes = await pushTransaction(chainId, signedTx);

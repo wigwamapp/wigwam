@@ -945,9 +945,9 @@ const TxOptionsDropdown = memo(
                       <>
                         <li>
                           This will hide this transaction{" "}
-                          <b>only inside the OG Wallet applicaiton</b>. This
-                          means you should only proceed if you are certain that
-                          the transaction was lost.
+                          <b>only inside the Wigwam applicaiton</b>. This means
+                          you should only proceed if you are certain that the
+                          transaction was lost.
                         </li>
                         <li>
                           All pending transactions above will also be hidden.

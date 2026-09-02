@@ -140,7 +140,7 @@ const SetupPassword = memo(() => {
                         I have read and agree to the
                         <br />
                         <a
-                          href="https://ogwallet.tech/terms"
+                          href="https://wigwam.app/terms"
                           target="_blank"
                           rel="nofollow noreferrer"
                           className="text-brand-main underline"

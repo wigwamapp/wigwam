@@ -26,7 +26,7 @@ import Button from "app/components/elements/Button";
 import BackButton from "app/components/elements/BackButton";
 import ScrollAreaContainer from "app/components/elements/ScrollAreaContainer";
 import AddAccountSteps from "app/components/blocks/AddAccountSteps";
-import { ReactComponent as OGIcon } from "app/icons/OG.svg";
+import { ReactComponent as WigwamIcon } from "app/icons/Wigwam.svg";
 
 const AddAccountModal = memo(() => {
   const [accModalOpened, setAccModalOpened] = useAtom(addAccountModalAtom);
@@ -140,7 +140,7 @@ const AddAccountModal = memo(() => {
         >
           <OnMount handle={handleContentMount} />
 
-          <OGIcon
+          <WigwamIcon
             className={classNames(
               "w-16 h-auto",
               "absolute",
