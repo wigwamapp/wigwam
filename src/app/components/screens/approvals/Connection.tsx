@@ -7,6 +7,7 @@ import { useAtomsAll } from "lib/atom-utils";
 
 import { Account as AccountType, ConnectionApproval } from "core/types";
 import { approveItem } from "core/client";
+import * as repo from "core/repo";
 
 import { openInTabStrict } from "app/helpers";
 import {
@@ -14,6 +15,7 @@ import {
   allAccountsAtom,
   chainIdAtom,
   getPermissionAtom,
+  getTrustedDappAtom,
 } from "app/atoms";
 import {
   ChainIdProvider,
@@ -54,9 +56,10 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
     return new URL(approval.source.url).origin;
   }, [approval]);
 
-  const [internalChainId, currentPermission] = useAtomsAll([
+  const [internalChainId, currentPermission, trustedDapp] = useAtomsAll([
     chainIdAtom,
     getPermissionAtom(sourceOrigin),
+    getTrustedDappAtom(sourceOrigin),
     allAccountsAtom,
     accountAddressAtom,
   ]);
@@ -64,9 +67,10 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
   const { currentAccount, allAccounts } = useAccounts();
 
   const knownDapp = useIsKnownDapp(sourceOrigin);
-  // Only for a site that is both unlisted and never connected before: warning
-  // again about a site the user already trusted teaches them to click through
-  const unverified = knownDapp === false && !currentPermission;
+  // Only for a site that is unlisted, never connected before and never waved
+  // through: asking again about a site the user already judged teaches them
+  // to click the notice away
+  const unverified = knownDapp === false && !currentPermission && !trustedDapp;
 
   const defaultAddresses = useMemo(
     () => [
@@ -146,6 +150,14 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
   const [approving, setApproving] = useState(false);
   const [riskAccepted, setRiskAccepted] = useState(false);
 
+  const handleTakeRisk = useCallback(() => {
+    // Hide the notice right away, the stored decision is what keeps it hidden
+    // the next time this site asks
+    setRiskAccepted(true);
+
+    repo.trustDapp(sourceOrigin).catch(console.error);
+  }, [sourceOrigin]);
+
   const handleApprove = useCallback(
     async (approved: boolean) => {
       setApproving(true);
@@ -198,7 +210,7 @@ const ApproveConnection: FC<ApproveConnectionProps> = ({ approval }) => {
             host={dappHost}
             denying={approving}
             onDeny={() => handleApprove(false)}
-            onContinue={() => setRiskAccepted(true)}
+            onContinue={handleTakeRisk}
           />
         )}
         <div className="w-full flex items-center px-3 pb-1.5">
@@ -311,13 +323,13 @@ const UnverifiedDappAlert: FC<UnverifiedDappAlertProps> = ({
       <div
         role="alertdialog"
         aria-modal="true"
-        aria-label="We can't recognize this website"
+        aria-label="Unusual website to connect to"
         className={classNames(
           "w-full max-w-[24rem]",
           "flex flex-col items-center text-center",
           "p-6",
           "rounded-2xl",
-          "border border-brand-redobject/40 bg-brand-darkgray",
+          "border border-brand-main/[.09] bg-brand-darkgray",
           "animate-modalcontent",
         )}
       >
@@ -326,25 +338,24 @@ const UnverifiedDappAlert: FC<UnverifiedDappAlertProps> = ({
             "flex items-center justify-center",
             "w-14 h-14 mb-4",
             "rounded-full",
-            "bg-brand-redobject/20",
+            "bg-brand-redobject/15",
           )}
         >
           <AlertTriangleIcon className="w-8 h-8 text-brand-redtext" />
         </span>
 
-        <h3 className="text-xl font-bold text-brand-redtext">
-          We can&apos;t recognize this website
+        <h3 className="text-xl font-bold text-brand-light">
+          Unusual website to connect to
         </h3>
 
-        <span className="text-sm font-bold text-brand-light mt-2 break-all">
+        <span className="text-base font-bold text-brand-light mt-2.5 break-all">
           {host}
         </span>
 
         <p className="text-xs text-brand-inactivelight mt-3 leading-relaxed">
-          It is not among the known protocols, which is normal for a new or a
-          niche one - and also how a fake copy of a popular site looks. Check
-          the address above character by character, and never approve a
-          transaction here unless you are sure.
+          It may be a new, a smaller or a more advanced project, and that is
+          perfectly fine. Just make sure you know what you are connecting to,
+          and double-check the address above.
         </p>
 
         <Button
@@ -364,6 +375,10 @@ const UnverifiedDappAlert: FC<UnverifiedDappAlertProps> = ({
         >
           Continue, take risk
         </Button>
+
+        <span className="text-[.6875rem] text-brand-inactivedark mt-3">
+          We will not ask about this site again
+        </span>
       </div>
     </div>
   );

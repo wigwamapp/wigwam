@@ -44,4 +44,10 @@ export const getPermissionAtom = atomFamily((origin?: string) =>
   ),
 );
 
+export const getTrustedDappAtom = atomFamily((origin?: string) =>
+  atomWithRepoQuery((query) =>
+    query(() => repo.trustedDapps.get(origin || "<stub>")),
+  ),
+);
+
 export const allEvmNetworksAtom = atomWithDefault(getAllEvmNetworks);

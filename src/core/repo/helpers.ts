@@ -5,6 +5,7 @@ import {
   TokenActivity,
   Activity,
   Permission,
+  TrustedDapp,
 } from "core/types";
 
 import { db, RepoTable } from "./schema";
@@ -17,6 +18,7 @@ export const tokenActivities = db.table<TokenActivity>(
 );
 export const activities = db.table<Activity>(RepoTable.Activities);
 export const permissions = db.table<Permission>(RepoTable.Permissions);
+export const trustedDapps = db.table<TrustedDapp>(RepoTable.TrustedDapps);
 
 export async function clear() {
   try {

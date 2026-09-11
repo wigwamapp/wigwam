@@ -9,6 +9,7 @@ export enum RepoTable {
   TokenActivities = "token_activities",
   Activities = "activities",
   Permissions = "permissions",
+  TrustedDapps = "trusted_dapps",
 }
 
 export const db = new AsyncDexie(underProfile("main"));
@@ -65,4 +66,14 @@ db.version(3).stores({
     "[accountAddress+pending+timeAt]",
     "[accountAddress+chainId+pending+timeAt]",
   ].join(),
+});
+
+/**
+ * [4]
+ * - Remember the sites the user decided to proceed with
+ *   after they could not be recognized
+ */
+
+db.version(4).stores({
+  [RepoTable.TrustedDapps]: "&origin,timeAt",
 });
