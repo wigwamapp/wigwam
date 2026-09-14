@@ -43,3 +43,91 @@ export function isKnownDappHost(host: string, hosts: Set<string>): boolean {
 
   return false;
 }
+
+/**
+ * Our own additions to the directory, baked in at build time from
+ * `WIGWAM_KNOWN_DAPPS_WHITELIST`.
+ *
+ * A comma separated list of urls or bare hosts, where `*` stands for a whole
+ * label or part of one:
+ *
+ *     https://*.kek.io, kek.io, app-*.example.org
+ *
+ * Unlike a directory entry, a literal host matches only itself — `kek.io` does
+ * not vouch for `app.kek.io`, list `*.kek.io` next to it for that. A leading
+ * `*.` covers subdomains at any depth. The last label has to be literal, so no
+ * entry can hand a whole tld the known-dapp badge.
+ */
+const WHITELISTED_DAPP_PATTERNS = parseDappHostPatterns(
+  process.env.WIGWAM_KNOWN_DAPPS_WHITELIST,
+);
+
+/** Whether the host is one we vouch for ourselves. See the whitelist above. */
+export function isWhitelistedDappHost(host: string): boolean {
+  return WHITELISTED_DAPP_PATTERNS.some((pattern) => pattern.test(host));
+}
+
+/**
+ * The whitelist env, as matchers for hosts in `toDappHost` shape. Entries that
+ * are not a host pattern are dropped rather than thrown on: a typo in the
+ * build env must not take the extension down, and dropping only ever narrows
+ * what counts as known.
+ */
+export function parseDappHostPatterns(raw?: string): RegExp[] {
+  if (!raw) return [];
+
+  const patterns: RegExp[] = [];
+
+  for (const entry of raw.split(",")) {
+    const pattern = toDappHostPattern(entry);
+    if (pattern) patterns.push(pattern);
+  }
+
+  return patterns;
+}
+
+/**
+ * A single whitelist entry, `https://*.kek.io` or `*.kek.io` alike.
+ *
+ * The host is cut out by hand, not by `new URL`: `*` is no legal host
+ * character, and every engine mauls it its own way — Chrome percent-encodes it
+ * into `%2A`, node and the spec leave it be. Running a glob through a url
+ * parser left the whitelist empty in the browser while jest, on node, stayed
+ * green. An entry is a pattern, so it is read as plain text.
+ */
+function toDappHostPattern(entry: string): RegExp | null {
+  const host = entry
+    .trim()
+    .toLowerCase()
+    .replace(/^[a-z][a-z\d+.-]*:\/\//, "") // scheme
+    .replace(/[/?#].*$/, "") // path, query, fragment
+    .replace(/^[^@]*@/, "") // credentials
+    .replace(/:\d*$/, "") // port
+    .replace(/^www\./, "")
+    .replace(/\.$/, "");
+
+  if (!host) return null;
+
+  const labels = host.split(".");
+
+  // A single label is either junk or `localhost`, and a wildcard tld would
+  // whitelist half the internet
+  if (labels.length < 2) return null;
+  if (!labels.every((label) => /^[a-z\d*_-]+$/.test(label))) return null;
+  if (!/^[a-z\d-]+$/.test(labels[labels.length - 1])) return null;
+
+  // A leading `*.` is the one wildcard that spans labels: `*.kek.io` is meant
+  // to cover `a.b.kek.io` too, but still requires a subdomain to be there
+  const deep = labels[0] === "*";
+  const rest = deep ? labels.slice(1) : labels;
+  if (rest.length < 2) return null;
+
+  const source = rest.map(labelSource).join("\\.");
+
+  return new RegExp(`^${deep ? "(?:[^.]+\\.)+" : ""}${source}$`);
+}
+
+/** One label, with `*` as "one or more characters that are not a dot" */
+function labelSource(label: string): string {
+  return label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, "[^.]+");
+}

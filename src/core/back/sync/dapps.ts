@@ -12,6 +12,10 @@ import { KnownDapps, toDappHost } from "core/common/knownDapps";
  * The response is megabytes of TVL data for a few thousand hosts, so it is
  * fetched at most once a day and only the hosts are kept — the whole set fits
  * in ~60 KB.
+ *
+ * Our own additions to it are not synced at all: `WIGWAM_KNOWN_DAPPS_WHITELIST`
+ * is baked into the bundle and matched in `core/common/knownDapps`, so it holds
+ * even when this request fails.
  */
 
 const PROTOCOLS_URL = "https://api.llama.fi/protocols";

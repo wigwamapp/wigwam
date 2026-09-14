@@ -1,4 +1,8 @@
-import { isKnownDappHost, toDappHost } from "../knownDapps";
+import {
+  isKnownDappHost,
+  parseDappHostPatterns,
+  toDappHost,
+} from "../knownDapps";
 
 describe("toDappHost", () => {
   it("keeps the bare hostname", () => {
@@ -53,5 +57,78 @@ describe("isKnownDappHost", () => {
     // Climbing labels reaches `co.uk`, which is not and cannot be listed
     expect(isKnownDappHost("phishing.co.uk", hosts)).toBe(false);
     expect(isKnownDappHost("someprotocol.co.uk", hosts)).toBe(true);
+  });
+});
+
+describe("parseDappHostPatterns", () => {
+  const matches = (whitelist: string, host: string) =>
+    parseDappHostPatterns(whitelist).some((pattern) => pattern.test(host));
+
+  it("takes a comma separated list of urls and bare hosts", () => {
+    const whitelist = " https://kek.io/some/path , kek.app ";
+
+    expect(matches(whitelist, "kek.io")).toBe(true);
+    expect(matches(whitelist, "kek.app")).toBe(true);
+    expect(matches(whitelist, "other.io")).toBe(false);
+  });
+
+  it("matches a literal entry exactly, subdomains included only via `*`", () => {
+    expect(matches("https://kek.io", "app.kek.io")).toBe(false);
+    expect(matches("https://*.kek.io", "app.kek.io")).toBe(true);
+  });
+
+  it("covers subdomains at any depth behind a leading `*.`", () => {
+    const whitelist = "https://*.kek.io";
+
+    expect(matches(whitelist, "a.b.kek.io")).toBe(true);
+    // The wildcard asks for a subdomain, the bare domain is a separate entry
+    expect(matches(whitelist, "kek.io")).toBe(false);
+  });
+
+  it("matches part of a label too", () => {
+    const whitelist = "app-*.kek.io";
+
+    expect(matches(whitelist, "app-1.kek.io")).toBe(true);
+    expect(matches(whitelist, "app-1.beta.kek.io")).toBe(false);
+    expect(matches(whitelist, "evil.io")).toBe(false);
+  });
+
+  it("normalizes like the directory does, so a match cannot be dodged", () => {
+    expect(matches("https://WWW.Kek.IO", "kek.io")).toBe(true);
+  });
+
+  it("reads the entry as text, not through the url parser", () => {
+    // Chrome parses the host of `https://*.cedex.io` into `%2A.cedex.io`,
+    // node and the spec keep `*.cedex.io`. Going through `new URL` here left
+    // the whitelist empty in the browser while this suite, on node, passed
+    expect(matches("https://*.cedex.io", "app.cedex.io")).toBe(true);
+    expect(parseDappHostPatterns("https://%2A.cedex.io")).toHaveLength(0);
+  });
+
+  it("ignores whatever a url carries besides the host", () => {
+    expect(matches("https://kek.io:8080/path?q=1#top", "kek.io")).toBe(true);
+    expect(matches("https://user:pass@kek.io", "kek.io")).toBe(true);
+  });
+
+  it("never lets a wildcard swallow a tld or the whole internet", () => {
+    expect(parseDappHostPatterns("*")).toHaveLength(0);
+    expect(parseDappHostPatterns("*.*")).toHaveLength(0);
+    expect(parseDappHostPatterns("kek.*")).toHaveLength(0);
+    expect(parseDappHostPatterns("https://*.io")).toHaveLength(0);
+  });
+
+  it("drops junk instead of throwing, a typo must not break the build", () => {
+    expect(parseDappHostPatterns(undefined)).toEqual([]);
+    expect(parseDappHostPatterns("")).toEqual([]);
+    expect(parseDappHostPatterns(", ,")).toEqual([]);
+    expect(parseDappHostPatterns("localhost")).toEqual([]);
+    expect(parseDappHostPatterns("not a host")).toEqual([]);
+
+    // The good entries next to a bad one survive
+    expect(parseDappHostPatterns("not a host, kek.io")).toHaveLength(1);
+  });
+
+  it("does not let a dot in an entry match any character", () => {
+    expect(matches("kek.io", "kekxio")).toBe(false);
   });
 });

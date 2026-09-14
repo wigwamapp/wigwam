@@ -16,6 +16,8 @@ declare namespace NodeJS {
     readonly WIGWAM_ETHERSCAN_API_KEY?: string;
     readonly WIGWAM_WC_PROJECT_ID?: string;
     readonly WIGWAM_OPEN_LOGIN_CLIENT_ID?: string;
+    /** Comma separated dapp urls/hosts, `*` allowed: `https://*.kek.io, kek.io` */
+    readonly WIGWAM_KNOWN_DAPPS_WHITELIST?: string;
     // Dev
     readonly WIGWAM_DEV_UNLOCK_PASSWORD?: string;
     readonly WIGWAM_DEV_ACTIVE_TAB_RELOAD?: string;
