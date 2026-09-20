@@ -61,6 +61,38 @@ export function multiply(value: bigint, [num, den]: [bigint, bigint]) {
 }
 
 /**
+ * Turns the prices observed on a chain without a base fee into the `gasPrice`
+ * to send.
+ *
+ * There is no cap to overshoot here: a legacy `gasPrice` is paid in full, so
+ * the modes carry no head-room of their own and differ only by how far above
+ * the node's own suggestion they sit.
+ *
+ * @param prices - Price per mode, as observed on chain
+ * @param floor - `eth_gasPrice`, when known, as the lowest price the node
+ * itself would suggest
+ */
+export function buildLegacyModes(
+  prices: Record<FeeMode, bigint>,
+  floor: bigint | null,
+) {
+  const modes = {} as Record<FeeMode, { max: string }>;
+
+  for (const mode of MODES) {
+    let max = prices[mode];
+
+    if (floor !== null) {
+      const minMax = multiply(floor, FLOOR_MULTIPLIER[mode]);
+      if (max < minMax) max = minMax;
+    }
+
+    modes[mode] = { max: max.toString() };
+  }
+
+  return modes;
+}
+
+/**
  * Turns a base fee and a tip per mode into the `maxFeePerGas` caps to send.
  *
  * @param baseFee - Base fee of the block being built next

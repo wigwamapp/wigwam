@@ -25,7 +25,11 @@ import {
 } from "core/types";
 import { approveItem, findToken, suggestFees } from "core/client";
 import { getNextNonce } from "core/common/nonce";
-import { isZeroHex, matchTxAction } from "core/common/transaction";
+import {
+  applyFeeSuggestion,
+  isZeroHex,
+  matchTxAction,
+} from "core/common/transaction";
 import { estimateL1Fee } from "core/common/l1Fee";
 
 import {
@@ -126,16 +130,11 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
       ? tx.nonce
       : getNextNonce(tx, localNonce);
 
-    const feeSug = prepared.fees?.modes[feeMode];
-    if (feeSug) {
-      if (prepared.fees?.type === "modern") {
-        tx.maxFeePerGas = feeSug.max;
-        if ("priority" in feeSug) {
-          tx.maxPriorityFeePerGas = feeSug.priority;
-        }
-      } else {
-        tx.gasPrice = feeSug.max;
-      }
+    // The estimation decides how the chain prices transactions, so it also
+    // decides the shape of the transaction, whatever `populateTransaction`
+    // guessed from what the node happens to answer
+    if (prepared.fees) {
+      applyFeeSuggestion(tx, prepared.fees, feeMode);
     }
 
     return tx;
@@ -285,7 +284,9 @@ const ApproveTransaction: FC<ApproveTransactionProps> = ({ approval }) => {
                 setFeeMode("average");
               } else {
                 setTxOverrides(
-                  tx.maxFeePerGas ? { maxFeePerGas: gasPrice } : { gasPrice },
+                  feeSuggestions.type === "modern"
+                    ? { maxFeePerGas: gasPrice }
+                    : { gasPrice },
                 );
               }
             }

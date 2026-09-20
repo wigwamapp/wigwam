@@ -10,6 +10,7 @@ import {
   buildModernModes,
   multiply,
 } from "./modes";
+import { resolveFeeType } from "./feeType";
 
 /**
  * Last resort for chains without `eth_feeHistory`, and for the rare moment a
@@ -28,8 +29,11 @@ export async function getOnChainLegacy(chainId: number): Promise<GasPrices> {
   );
 
   const baseFee = block?.baseFeePerGas ?? null;
+  // A node happily suggests a priority fee on a chain that has no use for one,
+  // so what the chain does with a base fee decides the shape, not the answer
+  const modern = resolveFeeType(chainId, baseFee) === "modern";
 
-  if (baseFee !== null && maxPriorityFeePerGas) {
+  if (modern && baseFee !== null && maxPriorityFeePerGas) {
     // `getFeeData()` caps at twice the base fee, which is double the head-room
     // the modes are meant to have, so they are shaped from the base fee itself
     const tips = {} as Record<FeeMode, bigint>;

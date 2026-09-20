@@ -4,6 +4,8 @@ import { ERC20__factory, ERC721__factory, ERC1155__factory } from "abi-types";
 
 import {
   ContractInteractionAction,
+  FeeMode,
+  FeeSuggestions,
   TokenStandard,
   TxAction,
   TxActionType,
@@ -22,6 +24,46 @@ export function getGasPriceStep(averageGasPrice: bigint) {
   } catch {
     return 1n;
   }
+}
+
+/**
+ * Puts a fee suggestion on a transaction, in the shape the chain prices by.
+ *
+ * A transaction carries either EIP-1559 caps or a `gasPrice`, never both. The
+ * fields of the other shape are cleared rather than left behind: ethers reads
+ * the type back off whichever fields are set, so a leftover `maxPriorityFee`
+ * is all it takes to send a tip to a chain that has no base fee to bid over,
+ * and a leftover cap makes a legacy transaction refuse to serialize.
+ *
+ * Mutates and returns the given transaction.
+ */
+export function applyFeeSuggestion(
+  tx: ethers.Transaction,
+  fees: FeeSuggestions,
+  mode: FeeMode,
+) {
+  const suggestion = fees.modes[mode];
+
+  if (fees.type === "modern" && "priority" in suggestion) {
+    tx.gasPrice = null;
+    tx.type = 2;
+    tx.maxFeePerGas = suggestion.max;
+    tx.maxPriorityFeePerGas = suggestion.priority;
+
+    return tx;
+  }
+
+  // A typed transaction reports an access list of `[]` even when it holds
+  // none, and a legacy one refuses to serialize while it holds any
+  const accessList = tx.accessList?.length ? tx.accessList : null;
+
+  tx.maxFeePerGas = null;
+  tx.maxPriorityFeePerGas = null;
+  tx.accessList = accessList;
+  tx.type = accessList ? 1 : 0;
+  tx.gasPrice = suggestion.max;
+
+  return tx;
 }
 
 export async function matchTxAction(

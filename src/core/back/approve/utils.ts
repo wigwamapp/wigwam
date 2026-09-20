@@ -47,6 +47,10 @@ export function validateTxOrigin(
     const txValue = hexValueMaybe(tx[key]);
     const originValue = hexValueMaybe(originTxParams[key]);
 
+    // An empty access list grants nothing, so a transaction dropping it (a
+    // legacy one cannot carry any) still matches what the origin asked for
+    if (Array.isArray(originValue) && originValue.length === 0) continue;
+
     if (originValue) {
       assert(dequal(txValue, originValue), "Invalid transaction");
     }

@@ -3,15 +3,25 @@ import retry from "async-retry";
 import { FeeMode, GasPrices } from "core/types";
 
 import { getRpcProvider } from "../../rpc";
-import { MODES, TIP_PERCENTILES, buildModernModes } from "./modes";
+import {
+  MODES,
+  TIP_PERCENTILES,
+  buildLegacyModes,
+  buildModernModes,
+} from "./modes";
+import { resolveFeeType } from "./feeType";
 
 /**
- * Standard EIP-1559 gas estimation via `eth_feeHistory`.
+ * Gas estimation from `eth_feeHistory`.
  *
  * Works on any chain that implements the method, which is nearly every evm
  * network. Chains that do not (rootstock, harmony) fall through to the legacy
  * `eth_gasPrice` path, and chains with a bespoke method (linea) are handled
  * before this one.
+ *
+ * The method being available does not mean the chain runs an EIP-1559 market —
+ * see `feeType` — so the same sampled prices are shaped either into 1559 caps
+ * or into a plain `gasPrice`.
  */
 
 /** More blocks smooth out single-block spikes, fewer keep it responsive */
@@ -46,6 +56,18 @@ export async function getFeeHistoryGasPrices(
   if (!tips) return null;
 
   const floor = await getGasPriceFloor(chainId);
+
+  if (resolveFeeType(chainId, nextBaseFee) === "legacy") {
+    // Without a base fee the tip is the entire price of the transaction, so it
+    // is sent as one: a tip over a base fee of zero is only a confusing way of
+    // writing the same number twice
+    const modes = buildLegacyModes(tips, floor);
+
+    if (modes.high.max === "0") return null;
+
+    return { type: "legacy", modes };
+  }
+
   const modes = buildModernModes(nextBaseFee, tips, floor);
 
   // A chain reporting no base fee and no tips gives nothing to work with

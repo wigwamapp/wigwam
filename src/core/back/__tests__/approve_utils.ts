@@ -123,4 +123,30 @@ describe("validateTxOrigin", () => {
       ),
     ).not.toThrow();
   });
+
+  it("not throw when a legacy tx drops an empty access list", () => {
+    expect(() =>
+      validateTxOrigin(
+        // Same tx, as legacy: a type-0 tx cannot carry an access list at all
+        ethers.Transaction.from({
+          to: "0x6eb893e3466931517a04a17d153a6330c3f2f1dd",
+          nonce: 648,
+          gasLimit: "0x9d",
+          gasPrice: "0x346d9246",
+          data: "0x889e365e59664fb881554ba1175519b5195b1d20390beb806d8f2cda7893e6f79848195dba4c905db6d7257ffb5eefea35f18ae33c",
+          value: "0xc854",
+          chainId: "0x8404bf1f",
+          type: 0,
+        }),
+        {
+          to: "0x6eb893e3466931517a04a17d153a6330c3f2f1dd",
+          from: "0x801040E2965D0cf9d73FEe4ccc8eEA9eeBbC491e",
+          data: "0x889e365e59664fb881554ba1175519b5195b1d20390beb806d8f2cda7893e6f79848195dba4c905db6d7257ffb5eefea35f18ae33c",
+          value: "0xc854",
+          accessList: [],
+          chainId: "0x8404bf1f",
+        },
+      ),
+    ).not.toThrow();
+  });
 });
