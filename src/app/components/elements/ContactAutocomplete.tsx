@@ -35,6 +35,8 @@ import HashPreview from "./HashPreview";
 import SmallContactCard from "./SmallContactCard";
 import WalletAvatar from "./WalletAvatar";
 
+const ADDRESS_LENGTH = 42;
+
 type ContactAutocompleteProps = {
   meta: FieldMetaState<any>;
   setValue: (address: string) => void;
@@ -158,6 +160,11 @@ const ContactAutocomplete = forwardRef<
     return undefined;
   }, [mergedAccounts, meta.error, value]);
 
+  // The input is not truncated, so a value longer than an address
+  // is shown as invalid right away, even while the field is focused
+  const tooLong = typeof value === "string" && value.length > ADDRESS_LENGTH;
+  const fieldError = tooLong || (opened ? undefined : rest.error);
+
   const { paste } = usePasteFromClipboard(setValue);
 
   const { watchEns } = useEns();
@@ -204,9 +211,10 @@ const ContactAutocomplete = forwardRef<
             ref={ref}
             value={value}
             {...rest}
+            maxLength={undefined}
             onKeyDown={handleKeyClick}
             setFromClipboard={setValue}
-            error={opened ? undefined : rest.error}
+            error={fieldError}
             labelActions={!injected ? labelAction : pasteButton}
           />
         ) : value ? (
@@ -250,9 +258,10 @@ const ContactAutocomplete = forwardRef<
             ref={ref}
             value={value}
             {...rest}
+            maxLength={undefined}
             onKeyDown={handleKeyClick}
             setFromClipboard={setValue}
-            error={opened ? undefined : rest.error}
+            error={fieldError}
             labelActions={!injected ? labelAction : pasteButton}
           />
         )}
